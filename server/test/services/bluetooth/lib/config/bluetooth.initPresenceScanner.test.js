@@ -25,6 +25,8 @@ describe('bluetooth.initPresenceScanner', () => {
   });
 
   it('stop scanner', async () => {
+    sinon.spy(clock, 'clearInterval');
+
     const timer = setInterval(() => {}, 5000);
 
     const bluetoothManager = new BluetoothManager(gladys, serviceId);
@@ -37,9 +39,36 @@ describe('bluetooth.initPresenceScanner', () => {
 
     expect(bluetoothManager.presenceScanner.timer).eq(undefined);
     assert.notCalled(scanPresenceMock);
+    assert.calledOnce(clock.clearInterval);
   });
 
-  it('restart scanner', async () => {
+  it('restart scanner, bluetooth is ready', async () => {
+    sinon.spy(clock, 'clearInterval');
+
+    const timer = setInterval(() => {}, 5000);
+
+    const bluetoothManager = new BluetoothManager(gladys, serviceId);
+    bluetoothManager.ready = true;
+    bluetoothManager.presenceScanner = {
+      status: 'enabled',
+      frequency: 5000,
+      timer,
+    };
+
+    bluetoothManager.initPresenceScanner();
+
+    expect(bluetoothManager.presenceScanner.timer).not.eq(undefined);
+    assert.calledOnce(scanPresenceMock);
+    assert.calledOnce(clock.clearInterval);
+
+    clock.tick(6000);
+
+    assert.callCount(scanPresenceMock, 2);
+  });
+
+  it('restart scanner, bluetooth not ready', async () => {
+    sinon.spy(clock, 'clearInterval');
+
     const timer = setInterval(() => {}, 5000);
 
     const bluetoothManager = new BluetoothManager(gladys, serviceId);
@@ -51,16 +80,14 @@ describe('bluetooth.initPresenceScanner', () => {
 
     bluetoothManager.initPresenceScanner();
 
-    expect(bluetoothManager.presenceScanner.timer).not.eq(undefined);
-    assert.calledOnce(scanPresenceMock);
-
-    clock.tick(6000);
-
-    assert.callCount(scanPresenceMock, 2);
+    expect(bluetoothManager.presenceScanner.timer).eq(undefined);
+    assert.calledOnce(clock.clearInterval);
+    assert.notCalled(scanPresenceMock);
   });
 
-  it('start scanner', async () => {
+  it('start scanner, bluetooth is ready', async () => {
     const bluetoothManager = new BluetoothManager(gladys, serviceId);
+    bluetoothManager.ready = true;
     bluetoothManager.presenceScanner = {
       status: 'enabled',
       frequency: 5000,
@@ -74,5 +101,18 @@ describe('bluetooth.initPresenceScanner', () => {
     clock.tick(6000);
 
     assert.callCount(scanPresenceMock, 2);
+  });
+
+  it('start scanner, but bluetooth not ready', async () => {
+    const bluetoothManager = new BluetoothManager(gladys, serviceId);
+    bluetoothManager.presenceScanner = {
+      status: 'enabled',
+      frequency: 5000,
+    };
+
+    bluetoothManager.initPresenceScanner();
+
+    expect(bluetoothManager.presenceScanner.timer).eq(undefined);
+    assert.notCalled(scanPresenceMock);
   });
 });
