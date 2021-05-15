@@ -12,6 +12,7 @@ export class Dispatcher {
 
     // Check if the event is not a string
     if (typeof event !== 'string') {
+      console.log(event);
       console.error(`The event name must be a string, the given type is ${typeof event}`);
       return false;
     }

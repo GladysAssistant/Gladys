@@ -1,0 +1,19 @@
+{
+  "name": "gladys-example",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "lgtv2": "^1.6.3"
+  },
+  "devDependencies": {}
+}

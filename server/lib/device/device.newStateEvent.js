@@ -13,7 +13,7 @@ async function newStateEvent(event) {
   try {
     const deviceFeature = this.stateManager.get('deviceFeatureByExternalId', event.device_feature_external_id);
     if (deviceFeature === null) {
-      throw new NotFoundError('DeviceFeature not found');
+      throw new NotFoundError(`DeviceFeature "${event.device_feature_external_id}" not found`);
     }
     await this.saveState(deviceFeature, event.state);
   } catch (e) {

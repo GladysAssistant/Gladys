@@ -1,0 +1,8 @@
+.stamp {
+  width: 2.5rem;
+  display: flex;
+  overflow: hidden;
+  padding: 0;
+  justify-content: center;
+  align-items: center;
+}

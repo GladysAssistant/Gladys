@@ -1,0 +1,19 @@
+const logger = require('../../../utils/logger');
+const { STATE, EVENTS } = require('../../../utils/constants');
+
+/**
+ * @description TurnOn a given deviceFeature.
+ * @param {Object} device - The device to turnOn.
+ * @param {Object} deviceFeature - The deviceFeature to turnOn.
+ * @example
+ * mediaPlayer.turnOn(device, deviceFeature);
+ */
+async function turnOn(device, deviceFeature) {
+  logger.debug(`Turning on the media player of deviceFeature "${deviceFeature.selector}"`);
+  await this.deviceManager.setValue(device, deviceFeature, STATE.ON);
+  this.eventManager.emit(EVENTS.MEDIA_PLAYER.TURNED_ON, { device, deviceFeature });
+}
+
+module.exports = {
+  turnOn,
+};

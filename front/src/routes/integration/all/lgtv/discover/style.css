@@ -1,0 +1,18 @@
+.emptyStateDivBox {
+  margin-top: 35px;
+  margin-bottom: 35px;
+}
+
+.scanResults {
+  margin-bottom: 40px;
+  padding-top: 20px;
+}
+
+.additionalScannedDevice {
+  border-bottom: 1px solid #0028641f;
+  margin-bottom: 40px;
+}
+
+.heading {
+  margin-bottom: 40px;
+}

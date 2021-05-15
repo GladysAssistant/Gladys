@@ -181,7 +181,8 @@
       "humidity-in-room": "Humidity in room",
       "user-presence": "User presence",
       "camera": "Camera",
-      "devices-in-room": "Devices in room"
+      "devices-in-room": "Devices in room",
+      "media-player": "Media player"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -230,6 +231,10 @@
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box"
+      },
+      "mediaPlayer": {
+        "currentlyWatching": "Currently watching {{media}}",
+        "editPlayerLabel": "Select the device you want to display here"
       }
     }
   },
@@ -310,6 +315,40 @@
       "deleteButton": "Delete",
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
+    },
+    "lgtv": {
+      "title": "LG TV",
+      "or": "or",
+      "new": "Add manually",
+      "description": "LG WebOS TVs in Gladys.",
+      "deviceTab": "TVs",
+      "discoverTab": "Discover",
+      "discoverButton": "Discover",
+      "setUpManually": "set up manually",
+      "scanning": "Scanning",
+      "addDetectedDevice": "Add {{modelName}}",
+      "addDetectedDeviceNoModel": "Add TV",
+      "requestPrompt": "Authenticate with TV",
+      "promptError": "An error occured showing the prompt, please try again.",
+      "prompt": "Please accept the prompt on your TV",
+      "deviceFound": "Discovered LG {{modelName}} on the network",
+      "deviceFoundNoModel": "Discovered an LG TV on the network",
+      "discover": {
+        "title": "Discover"
+      },
+      "device": {
+        "title": "Your TVs",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "nameLabel": "Device Name",
+        "roomLabel": "Room",
+        "ipLabel": "Hostname/IP"
+      },
+      "add": {
+        "title": "Add an LG TV",
+        "name": "Name",
+        "namePlaceholder": "Living room LG OLED65GX"
+      }
     },
     "tasmota": {
       "title": "Tasmota",

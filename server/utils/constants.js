@@ -143,6 +143,7 @@ const EVENTS = {
   WEBSOCKET: {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
+    RECEIVE: 'websocket.receive',
   },
   HOUSE: {
     CREATED: 'house.created',
@@ -150,6 +151,14 @@ const EVENTS = {
     DELETED: 'house.deleted',
     EMPTY: 'house.empty',
     NO_LONGER_EMPTY: 'house.no-longer-empty',
+  },
+  MEDIA_PLAYER: {
+    TURNED_ON: 'media-player.turned-on',
+    TURNED_OFF: 'media-player.turned-off',
+    VOLUME: 'media-player.volume',
+    MUTE: 'media-player.mute',
+    SOURCE: 'media-player.source-changed',
+    CURRENT_MEDIA: 'media-player.current-media-changed',
   },
 };
 
@@ -245,6 +254,15 @@ const ACTIONS = {
   HTTP: {
     REQUEST: 'http.request',
   },
+  MEDIA_PLAYER: {
+    PLAY_MEDIA: 'intent.media-player.play-media',
+    PLAY: 'intent.media-player.play',
+    STOP: 'intent.media-player.stop',
+    PAUSE: 'intent.media-player.pause',
+    SELECT_SOURCE: 'intent.media-player.select-source',
+    TURN_ON: 'intent.media-player.turn-on',
+    TURN_OFF: 'intent.media-player.turn-off',
+  },
 };
 
 const INTENTS = {
@@ -266,6 +284,15 @@ const INTENTS = {
   },
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
+  },
+  MEDIA_PLAYER: {
+    PLAY_MEDIA: 'intent.media-player.play-media',
+    PLAY: 'intent.media-player.play',
+    STOP: 'intent.media-player.stop',
+    PAUSE: 'intent.media-player.pause',
+    SELECT_SOURCE: 'intent.media-player.select-source',
+    TURN_ON: 'intent.media-player.turn-on',
+    TURN_OFF: 'intent.media-player.turn-off',
   },
 };
 
@@ -292,6 +319,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
+  MEDIA_PLAYER: 'media-player',
   UNKNOWN: 'unknown',
 };
 
@@ -351,6 +379,13 @@ const DEVICE_FEATURE_TYPES = {
   BUTTON: {
     CLICK: 'click',
   },
+  MEDIA_PLAYER: {
+    POWER: 'power',
+    SOURCE: 'source',
+    CHANNEL: 'channel',
+    VOLUME: 'volume',
+    MUTED: 'muted',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -371,6 +406,7 @@ const DEVICE_FEATURE_UNITS = {
   PPM: 'ppm',
   MM: 'mm',
   CM: 'cm',
+  INTEGER: 'integer',
 };
 
 const WEATHER_UNITS = {
@@ -469,6 +505,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
   },
+  LGTV: {
+    PROMPT: 'lgtv.prompt',
+    PROMPT_ERROR: 'lgtv.prompt.error',
+    PROMPT_TIMEOUT: 'lgtv.prompt.timeout',
+    STATUS: 'lgtv.status',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -482,6 +524,7 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  MEDIA_PLAYER: 'media-player',
 };
 
 const ERROR_MESSAGES = {
