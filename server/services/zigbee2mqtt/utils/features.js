@@ -222,7 +222,7 @@ const features = {
     has_feedback: false,
     min: 0,
     max: 16777215,
-    zigbeeField: 'color_xy',
+    zigbeeField: 'color',
   },
   gas: {
     category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,

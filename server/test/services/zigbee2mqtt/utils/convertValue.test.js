@@ -11,9 +11,9 @@ describe('zigbee2mqtt convertValue', () => {
     const result = convertValue('binary', 'OFF');
     return assert.deepEqual(result, 0);
   });
-  it('should return color 255', () => {
-    const result = convertValue('color', '{"x": 0.15001662234042554, "y": 0.060006648936170214}');
-    return assert.deepEqual(result, 255);
+  it('should return color 16711680', () => {
+    const result = convertValue('color', { x: 0.701, y: 0.299 });
+    return assert.deepEqual(result, 16711680);
   });
   it('should return simple click state', () => {
     const result = convertValue('click', 'single');
