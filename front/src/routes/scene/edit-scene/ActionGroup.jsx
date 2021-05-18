@@ -52,6 +52,7 @@ const ActionGroup = ({ children, ...props }) => (
                   actionsGroupsBefore={props.actionsGroupsBefore}
                   variables={props.variables}
                   setVariables={props.setVariables}
+                  scene={props.scene}
                 />
               ))}
             </div>

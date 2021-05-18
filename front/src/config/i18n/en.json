@@ -163,7 +163,7 @@
       "title": "Allow me to thank you 🙏",
       "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\">Pierre-Gilles Leymarie</a>, and I founded Gladys Assistant in 2013.",
       "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys 🙌 I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\">Gladys Plus</a>.",
       "goToDashboardButton": "Go to Dashboard"
     }
   },
@@ -744,8 +744,11 @@
     },
     "caldav": {
       "title": "CalDAV",
+      "accountTab": "Account",
+      "syncTab": "Synchronization",
       "description": "Sync your CalDAV calendars.",
-      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "syncIntroduction": "Choose the calendars to synchronize.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
@@ -800,6 +803,9 @@
       "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
       "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
       "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
+      "synchronizationNeeded": "A first synchronization is necessary to list your calendars.",
+      "calendarChoiceSuccess": "Your choices have been saved.",
+      "calendarChoiceError": "An error occurred while saving.",
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
@@ -981,6 +987,12 @@
         "orText": "OR",
         "orButton": "+ OR"
       },
+      "checkTime": {
+        "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
+        "beforeLabel": "Before",
+        "afterLabel": "After",
+        "daysOfTheWeekLabel": "Weekdays"
+      },
       "userPresence": {
         "userLabel": "User",
         "houseLabel": "House",
@@ -1014,6 +1026,10 @@
         "responseData": "Response",
         "tryButton": "Try request",
         "requestError": "An error happened while making the request. Are you sure parameters are right?"
+      },
+      "scene": {
+        "label": "Select a scene",
+        "notice": "The trigger conditions of the called scene will be ignored. If a scene calls another scene, and vice versa, Gladys will not fall into an infinite loop: each scene will be executed once."
       }
     },
     "actions": {
@@ -1040,7 +1056,8 @@
         "stop": "Stop service"
       },
       "condition": {
-        "only-continue-if": "Only continue if"
+        "only-continue-if": "Only continue if",
+        "check-time": "Time condition"
       },
       "user": {
         "set-seen-at-home": "User seen at home",
@@ -1066,6 +1083,10 @@
         "changed": "Scheduled trigger",
         "sunrise": "Every sunrise",
         "sunset": "Every sunset"
+      },
+      "user": {
+        "back-home": "User left home",
+        "left-home": "User back at home"
       },
       "house": {
         "empty": "House is empty",
@@ -1119,6 +1140,12 @@
       },
       "warning": {
         "houseWithoutCoordinate": "Your house has no coordinates. This trigger cannot work without this data. Please go to Settings / Houses and click on the map to set the house coordinates."
+      },
+      "userPresence": {
+        "backAtHomeDescription": "This will trigger when the selected user is back at the selected home.",
+        "leftHomeDescription": "This will trigger when the selected user is leaving the selected home.",
+        "userLabel": "User",
+        "houseLabel": "House"
       },
       "houseEmptyOrNot": {
         "houseEmptyDescription": "This will trigger when a user leaves the house and is the last to leave.",
@@ -1707,8 +1734,8 @@
   },
   "gatewayOpenApi": {
     "title": "Open API",
-    "description": "The Open API allows you to send information to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
-    "moreInformations": "<a href=\"https://gladysassistant.com/en/docs/integrations/owntracks\">More information.</a>",
+    "description": "The Open API allows you to send information to Gladys outside of your network.",
+    "moreInformations": "<a href=\"https://gladysassistant.com/docs/plus/open-api\">More information.</a>",
     "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
     "keyName": "Name",
     "keyLastUsed": "Last used",

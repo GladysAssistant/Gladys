@@ -47,7 +47,11 @@ async function userLeft(houseSelector, userSelector) {
     this.stateManager.setState('user', userPlainFinal.selector, userPlainFinal);
     this.stateManager.setState('userById', userPlainFinal.id, userPlainFinal);
     // so we emit left home event
-    this.event.emit(EVENTS.USER_PRESENCE.LEFT_HOME, userPlainFinal);
+    this.event.emit(EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.USER_PRESENCE.LEFT_HOME,
+      user: userSelector,
+      house: houseSelector,
+    });
     // and we emit websocket event so that the change is sent to UI
     this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME,
