@@ -26,8 +26,9 @@ function connect(Path) {
       parity: 'none',
       autoOpen: false,
     });
+    this.sendUsb = port;
 
-    port.open(function(err) {
+    this.sendUsb.open(function(err) {
       if (err) {
         this.connected = false;
         this.ready = false;
@@ -43,9 +44,9 @@ function connect(Path) {
     const readline = new Readline({
       baudRate: 57600,
     });
-    port.pipe(readline);
+    this.sendUsb.pipe(readline);
     this.usb = readline;
-    this.sendUsb = port;
+
     logger.debug(`Rflink : Connecting to USB = ${Path}`);
     this.connected = true;
     this.ready = true;
