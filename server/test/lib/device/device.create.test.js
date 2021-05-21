@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
+const uuid = require('uuid');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
@@ -246,5 +247,60 @@ describe('Device', () => {
     expect(newDevice).to.have.property('selector', 'philips-hue-1');
     expect(newDevice).to.have.property('features');
     expect(newDevice).to.have.property('params');
+  });
+
+  it('should update device which already exist, update a feature and a featureState', async () => {
+    const stateManager = new StateManager(event);
+    const device = new Device(event, {}, stateManager);
+    const uniqueId = uuid.v4();
+    const newDevice = await device.create({
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      features: [
+        {
+          name: 'New device feature',
+          selector: 'new-device-feature',
+          external_id: 'philips-hue:1:binary',
+          category: 'temperature',
+          type: 'decimal',
+          read_only: false,
+          has_feedback: false,
+          last_value: 0,
+          last_value_changed: null,
+          last_value_string: null,
+          min: 0,
+          max: 100,
+          feature_state: [
+            {
+              id: uniqueId,
+              value: 20.0,
+              created_at: '2019-02-12 07:49:07.556 +00:00',
+              updated_at: '2019-02-12 07:49:07.556 +00:00',
+            },
+          ],
+        },
+      ],
+      params: [
+        {
+          name: 'TEST_PARAM',
+          value: 'UPDATED_VALUE',
+          device_id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+        },
+      ],
+    });
+    expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
+    expect(newDevice).to.have.property('selector', 'test-device');
+    expect(newDevice).to.have.property('params');
+    expect(newDevice).to.have.property('features');
+    expect(newDevice.params).to.have.lengthOf(1);
+    newDevice.params.forEach((param) => {
+      expect(param).to.have.property('value', 'UPDATED_VALUE');
+    });
   });
 });
