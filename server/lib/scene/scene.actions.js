@@ -135,7 +135,9 @@ const actionsFunc = {
         oneConditionVerified = true;
       } else {
         logger.debug(
-          `Condition not verified. Condition = ${scope[condition.variable]} ${condition.operator} ${condition.value}`,
+          `Condition not verified. Condition: "${get(scope, condition.variable)} ${condition.operator} ${
+            condition.value
+          }"`,
         );
       }
     });
