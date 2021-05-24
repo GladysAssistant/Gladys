@@ -1,11 +1,20 @@
 import { Component } from 'preact';
 import leaflet from 'leaflet';
+
 import 'leaflet/dist/leaflet.css';
 import style from './style.css';
+import { route } from 'preact-router';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
 class MapComponent extends Component {
+  onMapClick = e => {
+    let popup = leaflet.popup();
+    popup
+      .setLatLng(e.latlng)
+      .setContent(`You clicked the map at ${e.latlng.toString()}`)
+      .openOn(this.leafletMap);
+  };
   initMap = () => {
     if (this.leafletMap) {
       this.leafletMap.remove();
@@ -19,7 +28,7 @@ class MapComponent extends Component {
         maxZoom: 19
       })
       .addTo(this.leafletMap);
-
+    //this.leafletMap.on('click', this.onMapClick);
     this.displayHouses();
     this.displayUsers();
   };
@@ -69,6 +78,10 @@ class MapComponent extends Component {
     }
   };
 
+  openNewAreaView = () => {
+    route('/dashboard/maps/area/new');
+  };
+
   setMapRef = map => {
     this.map = map;
   };
@@ -101,7 +114,20 @@ class MapComponent extends Component {
   }
 
   render(props) {
-    return <div ref={this.setMapRef} style="height: 500px;" />;
+    return (
+      <div ref={this.setMapRef} style="height: 500px;">
+        <div class="leaflet-top leaflet-right">
+          <button
+            href="/dashboard/maps/area/new"
+            class="btn btn-primary"
+            onClick={this.openNewAreaView}
+            style={{ marginTop: '10px', marginRight: '10px', pointerEvents: 'auto' }}
+          >
+            Create new zone
+          </button>
+        </div>
+      </div>
+    );
   }
 }
 
