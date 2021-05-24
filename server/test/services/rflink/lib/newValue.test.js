@@ -101,4 +101,14 @@ describe('RFLinkHandler.newValue', () => {
     await rflinkHandler.newValue(device, deviceFeature, state);
     assert.notCalled(gladys.event.emit);
   });
+
+  it('should not update a device on a undefined device id', async () => {
+    const device = DEVICES[0];
+    device.id = undefined;
+    const deviceFeature = 'pressure';
+    const state = 'ON';
+
+    await rflinkHandler.newValue(device, deviceFeature, state);
+    assert.notCalled(gladys.event.emit);
+  });
 });

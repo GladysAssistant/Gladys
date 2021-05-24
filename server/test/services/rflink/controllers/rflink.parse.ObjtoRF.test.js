@@ -26,7 +26,7 @@ describe('rflink.parse.ObjToRF', () => {
       model: 'Tristate',
     };
     const deviceFeature = 'SWITCH';
-    const state = '';
+    const state = undefined;
     const rfcode = ObjToRF(device, deviceFeature, state);
     const expected = '10;Tristate;86aa7;;\n';
     expect(rfcode).to.be.an('string');

@@ -55,6 +55,20 @@ describe('RFLinkHandler.setValue', () => {
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
   });
 
+  it('should send a message to change value of a SWITCH where feature is binary and state is undefined', async () => {
+    const device = DEVICES[0];
+    const deviceFeature = {
+      'type': DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      'category': DEVICE_FEATURE_CATEGORIES.SWITCH,
+    };
+    const state = 'undefined';
+    const expectedMsg = '10;Tristate;86aa7;11;undefined;\n';
+    await rflinkHandler.setValue(device, deviceFeature, state);
+
+    assert.calledOnce(rflinkHandler.sendUsb.write);
+    expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
+  });
+
   it('should send a message to change value of a BUTTON where feature is binary and state is 0', async () => {
       const device = DEVICES[0];
       const deviceFeature = {
@@ -101,6 +115,19 @@ describe('RFLinkHandler.setValue', () => {
         };
         const state = 0;
         const expectedMsg = '10;MiLightv1;86aa70;000;34BC;OFF;\n'; // cmd;model;deviceId;external_id last item;cmd
+        await rflinkHandler.setValue(device, deviceFeature, state);
+        assert.calledOnce(rflinkHandler.sendUsb.write);
+        expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
+  });
+
+  it('should send a message with non standard state to a Milight device', async () => {
+        // 10;MiLightv1;9926;00;fed0;ON;
+        const device = DEVICES[2];
+        const deviceFeature = {
+          'external_id': '1:1:1:1:power',
+        };
+        const state = 'undefined';
+        const expectedMsg = '10;MiLightv1;86aa70;000;34BC;ON;\n'; // cmd;model;deviceId;external_id last item;cmd
         await rflinkHandler.setValue(device, deviceFeature, state);
         assert.calledOnce(rflinkHandler.sendUsb.write);
         expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
