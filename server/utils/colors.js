@@ -65,6 +65,18 @@ function hexToInt(hexColor) {
 }
 
 /**
+ * @description Reverse Gamma correction applied in rgbToXy.
+ * @param {number} value - Color value.
+ * @returns {number} ReversedGammaCorrectedValue - Color with Gamma added.
+ * @example
+ * const value = getReversedGammaCorrectedValue(0,5);
+ * console.log(value === 0.73535698305);
+ */
+function getReversedGammaCorrectedValue(value) {
+  return value <= 0.0031308 ? 12.92 * value : (1.0 + 0.055) * value ** (1.0 / 2.4) - 0.055;
+}
+
+/**
  * @description Converts XY color (CIE 1931 color space) to int.
  * @param {number} x - X color.
  * @param {number} y - Y color.
@@ -74,18 +86,6 @@ function hexToInt(hexColor) {
  * console.log(int === 16711680);
  */
 function xyToInt(x, y) {
-  /**
-   * @description Reverse Gamma correction applied in rgbToXy.
-   * @param {number} value - Color value.
-   * @returns {number} ReversedGammaCorrectedValue - Color with Gamma added.
-   * @example
-   * const value = getReversedGammaCorrectedValue(0,5);
-   * console.log(value === 0.73535698305);
-   */
-  function getReversedGammaCorrectedValue(value) {
-    return value <= 0.0031308 ? 12.92 * value : (1.0 + 0.055) * value ** (1.0 / 2.4) - 0.055;
-  }
-
   const xy = {
     x,
     y,
