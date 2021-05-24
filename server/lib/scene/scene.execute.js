@@ -9,11 +9,15 @@ const { AbortScene } = require('../../utils/coreErrors');
  * @example
  * sceneManager.execute('test');
  */
-function execute(sceneSelector, scope) {
+function execute(sceneSelector, scope = {}) {
   try {
     if (!this.scenes[sceneSelector]) {
       throw new Error(`Scene with selector ${sceneSelector} not found.`);
     }
+
+    scope.alreadyExecutedScenes = scope.alreadyExecutedScenes || new Set();
+    scope.alreadyExecutedScenes.add(sceneSelector);
+
     this.queue.push(async () => {
       try {
         await executeActions(this, this.scenes[sceneSelector].actions, scope);

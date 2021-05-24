@@ -109,7 +109,16 @@ const actionsFunc = {
       }
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
-  [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
+  [ACTIONS.SCENE.START]: async (self, action, scope) => {
+    if (scope.alreadyExecutedScenes && scope.alreadyExecutedScenes.has(action.scene)) {
+      logger.info(
+        `It looks the scene "${action.scene}" has already been triggered in this chain. Preventing running again to avoid loops.`,
+      );
+      return;
+    }
+
+    self.execute(action.scene, scope);
+  },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     await self.message.sendToUser(action.user, textWithVariables);
@@ -126,7 +135,9 @@ const actionsFunc = {
         oneConditionVerified = true;
       } else {
         logger.debug(
-          `Condition not verified. Condition = ${scope[condition.variable]} ${condition.operator} ${condition.value}`,
+          `Condition not verified. Condition: "${get(scope, condition.variable)} ${condition.operator} ${
+            condition.value
+          }"`,
         );
       }
     });
