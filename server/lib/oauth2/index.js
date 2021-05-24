@@ -1,13 +1,11 @@
-const { executeQuery } = require('./oauth2.executeQuery');
-const { saveVar } = require('./oauth2.saveVar');
-const { deleteVar } = require('./oauth2.deleteVar');
+const { executeOauth2HTTPQuery } = require('./oauth2.executeOauth2HTTPQuery');
+const { deleteClient } = require('./oauth2.deleteClient');
 
 const OAuth2Manager = function OAuth2Manager(gladys) {
   this.gladys = gladys;
 };
 
-OAuth2Manager.prototype.executeQuery = executeQuery;
-OAuth2Manager.prototype.saveVar = saveVar;
-OAuth2Manager.prototype.deleteVar = deleteVar;
+OAuth2Manager.prototype.executeOauth2HTTPQuery = executeOauth2HTTPQuery;
+OAuth2Manager.prototype.deleteClient = deleteClient;
 
 module.exports = OAuth2Manager;

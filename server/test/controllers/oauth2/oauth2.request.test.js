@@ -11,28 +11,24 @@ const header = `Bearer ${token}`;
 const referer = 'http://localhost:9090';
 
 const buildOauth2Request = {
-  // @ts-ignore
   get: (url) =>
     request(TEST_BACKEND_APP)
       .get(url)
       .set('Accept', 'application/json')
       .set('Authorization', header)
       .set('referer', referer),
-  // @ts-ignore
   post: (url) =>
     request(TEST_BACKEND_APP)
       .post(url)
       .set('Accept', 'application/json')
       .set('Authorization', header)
       .set('referer', referer),
-  // @ts-ignore
   patch: (url) =>
     request(TEST_BACKEND_APP)
       .patch(url)
       .set('Accept', 'application/json')
       .set('Authorization', header)
       .set('referer', referer),
-  // @ts-ignore
   delete: (url) =>
     request(TEST_BACKEND_APP)
       .delete(url)
@@ -42,22 +38,18 @@ const buildOauth2Request = {
 };
 
 const unBuildOauth2RequestRequest = {
-  // @ts-ignore
   get: (url) =>
     request(TEST_BACKEND_APP)
       .get(url)
       .set('Accept', 'application/json'),
-  // @ts-ignore
   post: (url) =>
     request(TEST_BACKEND_APP)
       .post(url)
       .set('Accept', 'application/json'),
-  // @ts-ignore
   patch: (url) =>
     request(TEST_BACKEND_APP)
       .patch(url)
       .set('Accept', 'application/json'),
-  // @ts-ignore
   delete: (url) =>
     request(TEST_BACKEND_APP)
       .delete(url)

@@ -84,7 +84,7 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                             <b>
                               <Text id={`integration.${integrationName}.settings.clientId`} />
                             </b>
-                            {`${props.clientIdInDb}`}
+                            {props.clientIdInDb}
                           </p>
                           <p>
                             <Text id={`integration.${integrationName}.settings.afterIntegration`} />
@@ -99,7 +99,7 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                         <div class="form-group">
                           <span class="input-group-append">
                             <button class="btn btn-primary" onClick={props.unConnect}>
-                              <Text id={`integration.oauth2.buttonUnConnect`} />
+                              <Text id={`integration.oauth2.unconnectButton`} />
                             </button>
                           </span>
                         </div>

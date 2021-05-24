@@ -1,4 +1,5 @@
 import { RequestStatus } from '../../utils/consts';
+import { OAUTH2 } from '../../../server/utils/constants';
 
 const actions = store => ({
   updateIntegrationName(state, e) {
@@ -21,10 +22,9 @@ const actions = store => ({
       oauth2GetStatus: RequestStatus.Getting
     });
 
-    const returnServiceId = await state.httpClient.get(`/api/v1/service/${state.integrationName}/getServiceId`);
+    const returnServiceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
 
-    const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client/current-config', {
-      integrationName: state.integrationName,
+    const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
       serviceId: returnServiceId.result.serviceId
     });
 
@@ -55,21 +55,17 @@ const actions = store => ({
         return;
       }
 
-      const returnSaveVar = await state.httpClient.post(`/api/v1/service/${state.integrationName}/savevar`, {
-        clientId: state.clientId,
-        secretId: state.secretId,
-        integrationName: state.integrationName
+      const serviceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
+
+      // Save Oauth2 variables
+      await state.httpClient.post(`/api/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_ID}`, {
+        value: state.clientId,
+        secretId: state.secretId
       });
 
-      let serviceId;
-      if (returnSaveVar.success === true) {
-        serviceId = returnSaveVar.result.serviceId;
-      } else {
-        store.setState({
-          oauth2GetStatus: RequestStatus.Error,
-          oauth2ErrorMsg: 'errorServiceId'
-        });
-      }
+      await state.httpClient.post(`/api/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_SECRET}`, {
+        value: state.secretId
+      });
 
       const returnValue = await state.httpClient.post('/api/v1/service/oauth2/client/authorization-uri', {
         clientId: state.clientId,
