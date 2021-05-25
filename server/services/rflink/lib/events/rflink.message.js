@@ -21,14 +21,12 @@ function message(msgRF) {
   logger.log(`sending new message ${msgRF}`);
   const msg = RFtoObj(msgRF);
   logger.debug(`message RFtoObj => ${msg}`);
-  console.log(msg);
   let newDevice;
   let doesntExistYet = true;
 
   if (typeof msg.id === 'string') {
     if (msg.id.includes('=') === false) {
       this.newDevices.forEach((d) => {
-        console.log(d.external_id);
         if (`rflink:${msg.id}:${msg.switch}` === d.external_id) {
           doesntExistYet = false;
         }
@@ -314,7 +312,6 @@ function message(msgRF) {
             max: 8,
           });
         }
-        console.log(newDevice);
         this.addNewDevice(newDevice);
       } else if (doesntExistYet === false) {
         if (msg.temp !== undefined) {
