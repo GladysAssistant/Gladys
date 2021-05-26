@@ -38,7 +38,7 @@ const TriggerGroup = ({ children, ...props }) => (
             <div class="row">
               {props.triggers &&
                 props.triggers.map((trigger, index) => (
-                  <div class="col-lg-6">
+                  <div class="col-lg-6" key={trigger.temporary_id}>
                     <TriggerCard
                       trigger={trigger}
                       deleteTrigger={props.deleteTrigger}

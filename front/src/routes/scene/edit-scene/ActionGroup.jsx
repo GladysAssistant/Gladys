@@ -42,6 +42,7 @@ const ActionGroup = ({ children, ...props }) => (
             <div class="row">
               {props.actions.map((action, index) => (
                 <ActionCard
+                  key={action.temporary_id}
                   sceneParamsData={props.sceneParamsData}
                   action={action}
                   columnIndex={props.index}

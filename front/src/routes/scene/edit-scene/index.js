@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
+import uuid from 'uuid';
 
 import { RequestStatus } from '../../../utils/consts';
 import EditScenePage from './EditScenePage';
@@ -24,6 +25,10 @@ class EditScene extends Component {
       scene.actions.forEach(actionGroup => {
         variables.push(actionGroup.map(action => []));
       });
+      scene.triggers = scene.triggers.map(trigger => ({ ...trigger, temporary_id: uuid.v4() }));
+      scene.actions = scene.actions.map(actionsInGroup =>
+        actionsInGroup.map(action => ({ ...action, temporary_id: uuid.v4() }))
+      );
       this.setState({
         scene,
         variables,
@@ -50,7 +55,21 @@ class EditScene extends Component {
     }
     this.setState({ saving: true, error: false });
     try {
-      await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
+      // we first need to remove all temporary_id
+      const sceneToSave = this.state.scene;
+      sceneToSave.triggers = sceneToSave.triggers.map(trigger => {
+        const newTrigger = { ...trigger };
+        delete newTrigger.temporary_id;
+        return newTrigger;
+      });
+      sceneToSave.actions = sceneToSave.actions.map(actionsInGroup => {
+        return actionsInGroup.map(action => {
+          const newAction = { ...action };
+          delete newAction.temporary_id;
+          return newAction;
+        });
+      });
+      await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, sceneToSave);
       this.setState({ isNameEditable: false });
     } catch (e) {
       console.error(e);
@@ -66,7 +85,8 @@ class EditScene extends Component {
             [columnIndex]: {
               $push: [
                 {
-                  type: null
+                  type: null,
+                  temporary_id: uuid.v4()
                 }
               ]
             }
@@ -182,7 +202,8 @@ class EditScene extends Component {
           triggers: {
             $push: [
               {
-                type: null
+                type: null,
+                temporary_id: uuid.v4()
               }
             ]
           }
@@ -279,6 +300,7 @@ class EditScene extends Component {
   }
 
   render(props, { saving, error, variables, scene, isNameEditable }) {
+    console.log(scene ? scene.triggers : null);
     return (
       scene && (
         <EditScenePage
