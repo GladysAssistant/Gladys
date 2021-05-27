@@ -33,7 +33,7 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
     "per-env": "^1.0.2",
-    "preact-cli": "^2.1.0",
+    "preact-cli": "^2.2.1",
     "preact-render-spy": "^1.2.1",
     "prettier": "^1.17.1"
   },
@@ -44,6 +44,7 @@
     "axios": "^0.21.1",
     "classnames": "^2.2.6",
     "cropperjs": "^1.5.1",
+    "date-fns": "^2.10.0",
     "dayjs": "^1.8.14",
     "debounce": "^1.2.0",
     "dotenv": "^6.2.0",
