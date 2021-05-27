@@ -1,6 +1,5 @@
 const sinon = require('sinon');
 
-
 const proxyquire = require('proxyquire').noCallThru();
 const SerialPortMock = require('../SerialPortMock.test');
 const DEVICES = require('./devicesToTest.test');
@@ -33,8 +32,10 @@ describe('RFLinkHandler.newValue', () => {
 
     await rflinkHandler.newValue(device, deviceFeature, state);
 
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE,
-      { device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`, state: 0.1, });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
+      state: 0.1,
+    });
   });
 
   it('should update a device with a new value with a default state', async () => {
@@ -44,10 +45,11 @@ describe('RFLinkHandler.newValue', () => {
 
     await rflinkHandler.newValue(device, deviceFeature, state);
 
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE,
-      { device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`, state: 'default', });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
+      state: 'default',
+    });
   });
-
 
   it('should update a device with a new value state OFF', async () => {
     const device = DEVICES[0];
@@ -56,8 +58,10 @@ describe('RFLinkHandler.newValue', () => {
 
     await rflinkHandler.newValue(device, deviceFeature, state);
 
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE,
-      { device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`, state: 0.0, });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
+      state: 0.0,
+    });
   });
 
   it('should update a device with a new value of battery', async () => {
@@ -67,8 +71,10 @@ describe('RFLinkHandler.newValue', () => {
 
     await rflinkHandler.newValue(device, deviceFeature, state);
 
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE,
-      { device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`, state: 'non géré', });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
+      state: 'non géré',
+    });
   });
 
   it('should update a device with a new light-intensity', async () => {
@@ -78,8 +84,10 @@ describe('RFLinkHandler.newValue', () => {
 
     await rflinkHandler.newValue(device, deviceFeature, state);
 
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE,
-      { device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`, state: 1, });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
+      state: 1,
+    });
   });
 
   it('should update a device with a new pressure', async () => {
@@ -89,8 +97,10 @@ describe('RFLinkHandler.newValue', () => {
 
     await rflinkHandler.newValue(device, deviceFeature, state);
 
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE,
-      { device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`, state: 1, });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
+      state: 1,
+    });
   });
 
   it('should not update a device on a undefined feature', async () => {

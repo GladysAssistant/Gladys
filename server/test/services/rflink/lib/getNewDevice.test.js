@@ -24,6 +24,8 @@ describe('RFLinkHandler.getNewDevice', () => {
     const rflinkHandler = new RFLinkHandler(gladys, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
     rflinkHandler.newDevices = ['1'];
     const devices = rflinkHandler.getNewDevices();
-    expect(devices).to.be.an('array').that.deep.equal(['1']);
+    expect(devices)
+      .to.be.an('array')
+      .that.deep.equal(['1']);
   });
 });

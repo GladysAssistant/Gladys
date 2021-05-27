@@ -11,8 +11,6 @@ const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
   serialport: SerialPortMock,
 });
 
-
-
 describe('RFLinkHandler.addDevice', () => {
   let rflinkHandler;
   let gladys;
@@ -30,7 +28,9 @@ describe('RFLinkHandler.addDevice', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_DEVICE,
     });
-    expect(rflinkHandler.newDevices).to.be.an('array').that.includes(device);
+    expect(rflinkHandler.newDevices)
+      .to.be.an('array')
+      .that.includes(device);
   });
 
   it('should not add new devices because something went wrong', async () => {

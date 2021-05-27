@@ -34,7 +34,6 @@ describe('RFLinkHandler.message', () => {
     });
   });
 
-
   it('should not get a message from the RFLink', async () => {
     const msgRF = '20;03;OK;';
     await rflinkHandler.message(msgRF);
@@ -47,7 +46,8 @@ describe('RFLinkHandler.message', () => {
 
   it('should add a new sensor', async () => {
     // this "super" device is a sample of all the paramater that could be handled
-    const msgRF = '20;e5;Oregon BTHR;ID=5a6d;TEMP=00be;HUM=40;BARO=03d7;UV=40;LUX=40;BAT=OK;RAIN=0010;WINDIR=0002;WINSP=0060;WINGS=0088;AWINSP=0060;CO2=50;RGBW=50;';
+    const msgRF =
+      '20;e5;Oregon BTHR;ID=5a6d;TEMP=00be;HUM=40;BARO=03d7;UV=40;LUX=40;BAT=OK;RAIN=0010;WINDIR=0002;WINSP=0060;WINGS=0088;AWINSP=0060;CO2=50;RGBW=50;';
     await rflinkHandler.message(msgRF);
     assert.calledOnce(rflinkHandler.addNewDevice);
   });
@@ -66,30 +66,30 @@ describe('RFLinkHandler.message', () => {
     assert.calledOnce(rflinkHandler.addNewDevice);
   });
 
-
   it('should update value of an existing sensor', async () => {
-    const msgRF = '20;e5;Oregon BTHR;ID=5a6d;TEMP=00be;HUM=40;BARO=03d7;UV=40;LUX=40;BAT=OK;RAIN=0010;WINDIR=0002;WINSP=0060;WINGS=0088;AWINSP=0060;CO2=50;RGBW=50;';
-    const device = {external_id: 'rflink:5a6d:undefined'};
-    rflinkHandler.newDevices = [ device ];
+    const msgRF =
+      '20;e5;Oregon BTHR;ID=5a6d;TEMP=00be;HUM=40;BARO=03d7;UV=40;LUX=40;BAT=OK;RAIN=0010;WINDIR=0002;WINSP=0060;WINGS=0088;AWINSP=0060;CO2=50;RGBW=50;';
+    const device = { external_id: 'rflink:5a6d:undefined' };
+    rflinkHandler.newDevices = [device];
     await rflinkHandler.message(msgRF);
     const msg = {
-                  id: '5a6d',
-                  protocol: 'Oregon BTHR',
-                  features: [],
-                  temp: '00be',
-                  baro: '03d7',
-                  hum: '40',
-                  uv: '40',
-                  lux: '40',
-                  bat: 'OK',
-                  rain: '0010',
-                  winsp: '0060',
-                  windir: '0002',
-                  wings: '0088',
-                  awinsp: '0060',
-                  co2: '50',
-                  rgbw: '50'
-                };
+      id: '5a6d',
+      protocol: 'Oregon BTHR',
+      features: [],
+      temp: '00be',
+      baro: '03d7',
+      hum: '40',
+      uv: '40',
+      lux: '40',
+      bat: 'OK',
+      rain: '0010',
+      winsp: '0060',
+      windir: '0002',
+      wings: '0088',
+      awinsp: '0060',
+      co2: '50',
+      rgbw: '50',
+    };
     assert.notCalled(rflinkHandler.addNewDevice);
     assert.callCount(rflinkHandler.newValue, 14);
     assert.calledWith(rflinkHandler.newValue, msg, 'temperature', msg.temp);
@@ -106,7 +106,6 @@ describe('RFLinkHandler.message', () => {
     assert.calledWith(rflinkHandler.newValue, msg, 'co2', msg.co2);
     assert.calledWith(rflinkHandler.newValue, msg, 'color', msg.rgbw);
     assert.calledWith(rflinkHandler.newValue, msg, 'brightness', msg.rgbw);
-
   });
 
   it('should add a new sensor (temperature, humidity, pressure)', async () => {
@@ -120,7 +119,6 @@ describe('RFLinkHandler.message', () => {
     rflinkHandler.newDevices = [];
     await rflinkHandler.message(msgRF);
     assert.calledOnce(rflinkHandler.addNewDevice);
-
   });
 
   it('should add a new CO2 sensor', async () => {
@@ -141,57 +139,40 @@ describe('RFLinkHandler.message', () => {
     assert.calledOnce(rflinkHandler.addNewDevice);
   });
 
-
   it('should handle a message with a cmd SWITCH value of an existing device', async () => {
     const msgRF = '20;47;Cresta;ID=8001;SWITCH=11;CMD=ON;';
-    const device = {external_id: 'rflink:8001:11'};
+    const device = { external_id: 'rflink:8001:11' };
     // store device
-    rflinkHandler.newDevices = [ device ];
+    rflinkHandler.newDevices = [device];
     await rflinkHandler.message(msgRF);
 
-    const msg = { protocol: 'Cresta',
-                  features: [],
-                  id: '8001',
-                  switch: '11',
-                  cmd: 'ON'
-    };
+    const msg = { protocol: 'Cresta', features: [], id: '8001', switch: '11', cmd: 'ON' };
     assert.notCalled(rflinkHandler.addNewDevice);
     assert.calledWith(rflinkHandler.newValue, msg, 'switch', msg.cmd);
-
   });
 
   it('should handle a message with a cmd MODE value of an existing milight device', async () => {
     const msgRF = '20;47;Cresta;ID=8001;CMD=MODE;';
-    const device = {external_id: 'rflink:8001:undefined'};
+    const device = { external_id: 'rflink:8001:undefined' };
     // store device
-    rflinkHandler.newDevices = [ device ];
+    rflinkHandler.newDevices = [device];
     await rflinkHandler.message(msgRF);
 
-    const msg = { protocol: 'Cresta',
-                  features: [],
-                  id: '8001',
-                  cmd: 'MODE'
-    };
+    const msg = { protocol: 'Cresta', features: [], id: '8001', cmd: 'MODE' };
     assert.notCalled(rflinkHandler.addNewDevice);
     assert.calledWith(rflinkHandler.newValue, msg, 'milight-mode', msg.cmd);
-
   });
 
   it('should handle a message with a cmd DISCO value of an existing milight device', async () => {
     const msgRF = '20;47;Cresta;ID=8001;CMD=DISCO;';
-    const device = {external_id: 'rflink:8001:undefined'};
+    const device = { external_id: 'rflink:8001:undefined' };
     // store device
-    rflinkHandler.newDevices = [ device ];
+    rflinkHandler.newDevices = [device];
     await rflinkHandler.message(msgRF);
 
-    const msg = { protocol: 'Cresta',
-                  features: [],
-                  id: '8001',
-                  cmd: 'DISCO'
-    };
+    const msg = { protocol: 'Cresta', features: [], id: '8001', cmd: 'DISCO' };
     assert.notCalled(rflinkHandler.addNewDevice);
     assert.calledWith(rflinkHandler.newValue, msg, 'milight-mode', msg.cmd);
-
   });
 
   it('should log an undefined id', async () => {
@@ -207,5 +188,4 @@ describe('RFLinkHandler.message', () => {
     assert.notCalled(rflinkHandler.newValue);
     assert.notCalled(rflinkHandler.addNewDevice);
   });
-
 });

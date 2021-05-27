@@ -45,7 +45,6 @@ describe('RFLinkHandler.connect', () => {
     expect(rflinkHandler.Path).to.be.equal('/dev/cu.');
   });
 
-
   it('should fail connection with a non defined path', async () => {
     const path = '';
     try {
@@ -64,8 +63,5 @@ describe('RFLinkHandler.connect', () => {
       type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED,
     });
     */
-
   });
-
-
 });

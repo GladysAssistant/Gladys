@@ -49,5 +49,4 @@ describe('RFLinkHandler.pair', () => {
     await rflinkHandler.pair(currentMilightGateway, milightZone);
     expect(rflinkHandler.newDevices).to.have.lengthOf(0);
   });
-
 });

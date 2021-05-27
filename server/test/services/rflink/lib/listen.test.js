@@ -15,7 +15,7 @@ describe('RFLinkHandler.listen', () => {
   });
 
   it('should listen', async () => {
-    rflinkHandler.usb = { on: stub().resolves('data'), };
+    rflinkHandler.usb = { on: stub().resolves('data') };
     rflinkHandler.message = stub().returns(true);
     rflinkHandler.listen();
     assert.calledOnce(rflinkHandler.usb.on);

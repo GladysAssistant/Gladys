@@ -7,8 +7,8 @@ const SerialPort = function SerialPort(path) {
 };
 
 SerialPort.prototype = Object.create(new EventEmitter());
-SerialPort.prototype.write =   fake.returns(true);
-SerialPort.prototype.open =   fake.returns(true);
+SerialPort.prototype.write = fake.returns(true);
+SerialPort.prototype.open = fake.returns(true);
 
 const path = '/dev/tty.HC-05-DevB';
 

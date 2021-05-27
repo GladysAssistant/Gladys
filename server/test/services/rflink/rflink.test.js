@@ -35,8 +35,8 @@ describe('RFlinkService', () => {
       .to.have.property('start')
       .and.be.instanceOf(Function);
     expect(rflinkService)
-        .to.have.property('device')
-        .and.be.instanceOf(Object);
+      .to.have.property('device')
+      .and.be.instanceOf(Object);
     await rflinkService.start();
     assert.calledTwice(gladys.variable.getValue);
     expect(rflinkService.device.connected).to.be.equal(true);
@@ -60,7 +60,7 @@ describe('RFlinkService', () => {
       await rflinkService.start();
     } catch (e) {
       expect(e).to.be.instanceOf(Error);
-    };
+    }
   });
 
   it('should start service and set default value to miligh gateway', async () => {

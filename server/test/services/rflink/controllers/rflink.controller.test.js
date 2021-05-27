@@ -5,9 +5,9 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const serviceId = '6d1bd783-ab5c-4d90-8551-6bc5fcd02212';
 const gladys = {
   service: {
-        getLocalServiceByName: stub().resolves({
-          id: serviceId,
-        }),
+    getLocalServiceByName: stub().resolves({
+      id: serviceId,
+    }),
   },
   event: {
     emit: fake.returns(null),
@@ -16,10 +16,11 @@ const gladys = {
     get: fake.returns(null),
   },
   variable: {
-    getValue: stub().withArgs('RFLINK_PATH', serviceId).resolves('//tty'),
+    getValue: stub()
+      .withArgs('RFLINK_PATH', serviceId)
+      .resolves('//tty'),
   },
 };
-
 
 const rflinkHandler = {
   gladys: fake.returns(gladys),
@@ -34,13 +35,16 @@ const rflinkHandler = {
   pair: stub().resolves(),
   unpair: stub().resolves(),
   getNewDevices: fake.resolves(true),
-  connect: stub().withArgs('rflinkPath').resolves('connected'),
+  connect: stub()
+    .withArgs('rflinkPath')
+    .resolves('connected'),
   disconnect: stub().resolves(),
   sendUsb: {
-    write: stub().withArgs('command').resolves(),
+    write: stub()
+      .withArgs('command')
+      .resolves(),
   },
 };
-
 
 describe('POST /api/v1/service/rflink/connect', () => {
   let controller;
@@ -58,7 +62,9 @@ describe('POST /api/v1/service/rflink/connect', () => {
   });
 
   it('should raise an error on connection when no path is given', async () => {
-    gladys.variable.getValue = stub().withArgs('RFLINK_PATH').resolves(undefined);
+    gladys.variable.getValue = stub()
+      .withArgs('RFLINK_PATH')
+      .resolves(undefined);
     controller = RFLinkController(gladys, rflinkHandler);
 
     const req = {};
@@ -67,11 +73,10 @@ describe('POST /api/v1/service/rflink/connect', () => {
       await controller['post /api/v1/service/rflink/connect'].controller(req, res);
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    };
+    }
     // @Todo assert.calledOnce(rflinkHandler.connect);
     // @Todo assert.calledOnce(res.json); KO for unknown reason :(
   });
-
 });
 
 describe('POST /api/v1/service/rflink/disconnect', () => {
@@ -96,15 +101,17 @@ describe('POST /api/v1/service/rflink/pair', () => {
   let controller;
 
   beforeEach(() => {
-    gladys.variable.getValue = stub().withArgs('CURRENT_MILIGHT_GATEWAY').resolves('64b');
+    gladys.variable.getValue = stub()
+      .withArgs('CURRENT_MILIGHT_GATEWAY')
+      .resolves('64b');
     controller = RFLinkController(gladys, rflinkHandler, serviceId);
   });
 
   it('should send a milight pairing command', async () => {
     const req = {
       body: {
-        zone: 42
-      }
+        zone: 42,
+      },
     };
     const res = {
       json: fake.returns(null),
@@ -115,12 +122,14 @@ describe('POST /api/v1/service/rflink/pair', () => {
   });
 
   it('should send a milight pairing command even without a milight zone defined nor a gateway', async () => {
-    gladys.variable.getValue = stub().withArgs('CURRENT_MILIGHT_GATEWAY').resolves(null);
+    gladys.variable.getValue = stub()
+      .withArgs('CURRENT_MILIGHT_GATEWAY')
+      .resolves(null);
     controller = RFLinkController(gladys, rflinkHandler, serviceId);
     const req = {
       body: {
-        zone: undefined
-      }
+        zone: undefined,
+      },
     };
     const res = {
       json: fake.returns(null),
@@ -129,7 +138,6 @@ describe('POST /api/v1/service/rflink/pair', () => {
     // assert.calledWith(rflinkHandler.pair, rflinkHandler.currentMilightGateway, 1);
     // @Todo assert.calledOnce(res.json);
   });
-
 });
 
 describe('POST /api/v1/service/rflink/unpair', () => {
@@ -140,11 +148,13 @@ describe('POST /api/v1/service/rflink/unpair', () => {
   });
 
   it('should send a milight unpairing command even without a milight zone defined nor a gateway', async () => {
-    gladys.variable.getValue = stub().withArgs('CURRENT_MILIGHT_GATEWAY').resolves(null);
+    gladys.variable.getValue = stub()
+      .withArgs('CURRENT_MILIGHT_GATEWAY')
+      .resolves(null);
     const req = {
       body: {
-        zone: undefined
-      }
+        zone: undefined,
+      },
     };
     const res = {
       json: fake.returns(null),
@@ -155,12 +165,11 @@ describe('POST /api/v1/service/rflink/unpair', () => {
     // @ Todo assert.calledOnce(res.json);
   });
 
-
   it('should send a milight unpairing command', async () => {
     const req = {
       body: {
-        zone: 42
-      }
+        zone: 42,
+      },
     };
     const res = {
       json: fake.returns(null),
@@ -169,7 +178,6 @@ describe('POST /api/v1/service/rflink/unpair', () => {
     // @ Todo assert.calledOnce(rflinkHandler.unpair);
     // @ Todo assert.calledOnce(res.json);
   });
-
 });
 
 describe('GET /api/v1/service/rflink/newDevices', () => {
@@ -205,7 +213,6 @@ describe('GET /api/v1/service/rflink/status', () => {
     await controller['get /api/v1/service/rflink/status'].controller(req, res);
     assert.calledOnce(res.json);
   });
-
 });
 
 describe('POST /api/v1/service/rflink/debug', () => {
@@ -216,7 +223,6 @@ describe('POST /api/v1/service/rflink/debug', () => {
   });
 
   it('should send a debug test message', async () => {
-
     const req = {
       body: {
         value: '10;MiLightv1;9926;02;34BC;ON;',
@@ -242,13 +248,13 @@ describe('POST /api/v1/service/rflink/remove', () => {
   it('should remove a device from the new device list', async () => {
     const externalId = `rflink:86aa7:11`;
     const device = {
-      external_id: externalId
+      external_id: externalId,
     };
     rflinkHandler.newDevices = [device];
     const req = {
       body: {
-        external_id: externalId
-      }
+        external_id: externalId,
+      },
     };
     const res = { json: fake.returns(true) };
     await controller['post /api/v1/service/rflink/remove'].controller(req, res);

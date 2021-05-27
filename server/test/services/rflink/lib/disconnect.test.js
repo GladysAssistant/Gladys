@@ -27,5 +27,4 @@ describe('RFLinkHandler.disconnect', () => {
     expect(rflinkHandler.ready).to.equal(false);
     expect(rflinkHandler.scanInProgress).to.equal(false);
   });
-
 });

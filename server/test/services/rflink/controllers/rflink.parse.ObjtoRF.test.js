@@ -2,7 +2,6 @@ const { expect } = require('chai');
 const ObjToRF = require('../../../../services/rflink/api/rflink.parse.ObjToRF');
 
 describe('rflink.parse.ObjToRF', () => {
-
   it('should return a string rfcode', async () => {
     const device = {
       id: '86aa7',
@@ -28,7 +27,7 @@ describe('rflink.parse.ObjToRF', () => {
     const deviceFeature = 'SWITCH';
     const state = undefined;
     const rfcode = ObjToRF(device, deviceFeature, state);
-    const expected = '10;Tristate;86aa7;;\n';
+    const expected = '10;Tristate;86aa7;\n';
     expect(rfcode).to.be.an('string');
     expect(rfcode).to.deep.equal(expected);
   });
