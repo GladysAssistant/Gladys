@@ -256,6 +256,8 @@
       "description": "Connect to RFLink gateway.",
       "settingsTab": "Settings",
       "deviceTab": "Devices",
+      "roomLabel": "Room",
+      "urlPlaceholder": "url",
       "settings": {
         "title": "RFLink Usb Settings",
         "description": "To use RFLink in Gladys, you need to have a RFLink gateway connected to your Gladys instance.",
@@ -267,6 +269,11 @@
         "connectedWithSuccess": "RFLink Gateway connected with success.",
         "connecting": "Trying to connect to RFLink Gateway ...",
         "driverFailedError": "An error occured while trying to connect to RFLink Gateway.",
+        "rflinkUsbDriverPathLabel": "Select the rflink gateway usb path :",
+        "zone1": "1",
+        "zone2": "2",
+        "zone3": "3",
+        "zone4": "4",
         "debug": {
           "title": "RFLink debug console",
           "info": "Here you can see the last command that RFLink sent to Gladys it's in this form : 20;02;MODEL;ID;LABEL=data;LABEL1=data1;  ...",

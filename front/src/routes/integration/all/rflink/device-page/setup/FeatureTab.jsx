@@ -11,7 +11,7 @@ const FeatureTab = ({ children, ...props }) => (
     <div class="card-header">
       <Link href="/dashboard/integration/device/rflink">
         <button class="btn btn-secondary mr-2">
-          ◀️ <Text id="integration.rflink.device.returnButton" />
+          <Text id="integration.rflink.device.returnButton" />
         </button>
       </Link>
       <h3 class="card-title">
@@ -87,7 +87,7 @@ const FeatureTab = ({ children, ...props }) => (
               <div class="form-group">
                 <Link href="/dashboard/integration/device/rflink">
                   <button class="btn btn-secondary mr-2">
-                    ◀️ <Text id="integration.rflink.device.returnButton" />
+                    <Text id="integration.rflink.device.returnButton" />
                   </button>
                 </Link>
                 <button onClick={props.saveDevice} class="btn btn-success mr-2">

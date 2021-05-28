@@ -60,7 +60,7 @@ class RflinkDeviceBox extends Component {
             {batteryLevel && (
               <div class="page-options d-flex">
                 <div class="tag tag-green">
-                  {batteryLevel}%
+                  <Text id="global.percentValue" fields={{ value: batteryLevel }} />
                   <span class="tag-addon">
                     <i class="fe fe-battery" />
                   </span>
@@ -86,16 +86,16 @@ class RflinkDeviceBox extends Component {
                       value={props.device.name}
                       onInput={this.updateName}
                       class="form-control"
-                      placeholder={<Text id="integration.rtspCamera.urlPlaceholder" />}
+                      placeholder={<Text id="integration.rflink.urlPlaceholder" />}
                     />
                   </Localizer>
                 </div>
                 <div class="form-group">
                   <label>
-                    <Text id="integration.rtspCamera.roomLabel" />
+                    <Text id="integration.rflink.roomLabel" />
                   </label>
                   <select onChange={this.updateRoom} class="form-control">
-                    <option value="">-------</option>
+                    <option value=""><Text id="global.emptySelectOption" /></option>
                     {props.houses &&
                       props.houses.map(house => (
                         <optgroup label={house.name}>

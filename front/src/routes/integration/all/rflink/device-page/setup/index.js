@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from '../actions';
 import FeatureTab from './FeatureTab';
 import RflinkPage from '../../RflinkPage';
-import integrations from '../../../../../../config/integrations';
 import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
