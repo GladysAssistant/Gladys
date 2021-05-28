@@ -60,9 +60,9 @@ function createActions(store) {
         });
 
         if (state.rflinkDevices !== undefined && rflinkNewDevicesFiltered !== undefined) {
-          rflinkNewDevicesFiltered = rflinkNewDevicesFiltered.filter((newDevice) => {
+          rflinkNewDevicesFiltered = rflinkNewDevicesFiltered.filter(newDevice => {
             let alreadyListed;
-            state.rflinkDevices.forEach((device) => {
+            state.rflinkDevices.forEach(device => {
               if (!(device.external_id === newDevice.external_id)) {
                 alreadyListed = true;
                 return true;
@@ -78,16 +78,12 @@ function createActions(store) {
             }
             return true;
           });
-      }
-
-
-
+        }
 
         store.setState({
           rflinkNewDevices: rflinkNewDevicesFiltered,
           getRflinkNewDevicesStatus: RequestStatus.Success
         });
-
       } catch (e) {
         store.setState({
           getRflinkNewDevicesStatus: RequestStatus.Error
