@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import leaflet from 'leaflet';
 import { Text } from 'preact-i18n';
+import { connect } from 'unistore/preact';
 
 import 'leaflet/dist/leaflet.css';
 import style from './style.css';
@@ -8,14 +9,8 @@ import { route } from 'preact-router';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
+@connect('httpClient', {})
 class MapComponent extends Component {
-  onMapClick = e => {
-    let popup = leaflet.popup();
-    popup
-      .setLatLng(e.latlng)
-      .setContent(`You clicked the map at ${e.latlng.toString()}`)
-      .openOn(this.leafletMap);
-  };
   initMap = () => {
     if (this.leafletMap) {
       this.leafletMap.remove();
@@ -29,9 +24,9 @@ class MapComponent extends Component {
         maxZoom: 19
       })
       .addTo(this.leafletMap);
-    //this.leafletMap.on('click', this.onMapClick);
     this.displayHouses();
     this.displayUsers();
+    this.getAreas();
   };
 
   displayUsers = () => {
@@ -79,6 +74,28 @@ class MapComponent extends Component {
     }
   };
 
+  getAreas = async () => {
+    try {
+      const areas = await this.props.httpClient.get('/api/v1/area');
+      areas.forEach(area => {
+        if (this.areaMarkers[area.id]) {
+          this.areaMarkers[area.id].remove();
+        }
+        this.areaMarkers[area.id] = leaflet
+          .circle([area.latitude, area.longitude], {
+            radius: area.radius,
+            color: area.color,
+            fillColor: area.color,
+            fillOpacity: 0.2
+          })
+          .addTo(this.leafletMap);
+        this.markerArray.push(this.areaMarkers[area.id]);
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   openNewAreaView = () => {
     route('/dashboard/maps/area/new');
   };
@@ -91,6 +108,7 @@ class MapComponent extends Component {
     this.props = props;
     this.userMarkers = {};
     this.houseMarkers = {};
+    this.areaMarkers = {};
     this.markerArray = [];
   }
 
