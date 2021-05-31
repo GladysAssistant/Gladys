@@ -60,3 +60,21 @@ describe('area.get', () => {
     });
   });
 });
+
+describe('area.getBySelector', () => {
+  const area = new Area();
+  it('should get one area', async () => {
+    const oneArea = await area.getBySelector('test-area');
+    expect(oneArea).to.deep.equal({
+      id: '939ff9b0-d349-483e-9a16-04e3ff03f1cd',
+      name: 'Test area',
+      selector: 'test-area',
+      latitude: 10,
+      longitude: 10,
+      radius: 1000,
+      color: '#0000',
+      created_at: new Date('2019-02-12T07:49:07.556Z'),
+      updated_at: new Date('2019-02-12T07:49:07.556Z'),
+    });
+  });
+});
