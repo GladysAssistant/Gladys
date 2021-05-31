@@ -1,9 +1,12 @@
 const { expect, assert } = require('chai');
+const EventEmitter = require('events');
+
+const event = new EventEmitter();
 
 const Area = require('../../../lib/area');
 
 describe('area.create', () => {
-  const area = new Area();
+  const area = new Area(event);
   it('should create a area', async () => {
     const newArea = await area.create({
       name: 'My test area',
@@ -19,7 +22,7 @@ describe('area.create', () => {
 });
 
 describe('area.update', () => {
-  const area = new Area();
+  const area = new Area(event);
   it('should update a area', async () => {
     const newArea = await area.update('test-area', {
       name: 'New name',
@@ -36,7 +39,7 @@ describe('area.update', () => {
 });
 
 describe('area.destroy', () => {
-  const area = new Area();
+  const area = new Area(event);
   it('should destroy a area', async () => {
     await area.destroy('test-area');
   });
@@ -47,7 +50,7 @@ describe('area.destroy', () => {
 });
 
 describe('area.get', () => {
-  const area = new Area();
+  const area = new Area(event);
   it('should get list of areas', async () => {
     const areas = await area.get();
     areas.forEach((oneArea) => {
@@ -62,7 +65,7 @@ describe('area.get', () => {
 });
 
 describe('area.getBySelector', () => {
-  const area = new Area();
+  const area = new Area(event);
   it('should get one area', async () => {
     const oneArea = await area.getBySelector('test-area');
     expect(oneArea).to.deep.equal({

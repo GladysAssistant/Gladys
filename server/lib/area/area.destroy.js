@@ -19,6 +19,14 @@ async function destroy(selector) {
   }
 
   await area.destroy();
+
+  // remove the area from memory
+  const areaIndexInMemory = this.areas.findIndex((a) => a.id === area.id);
+  if (areaIndexInMemory !== -1) {
+    this.areas.splice(areaIndexInMemory, 1);
+  }
+
+  return null;
 }
 
 module.exports = {
