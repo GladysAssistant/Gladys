@@ -95,7 +95,9 @@ class RflinkDeviceBox extends Component {
                     <Text id="integration.rflink.roomLabel" />
                   </label>
                   <select onChange={this.updateRoom} class="form-control">
-                    <option value=""><Text id="global.emptySelectOption" /></option>
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
                     {props.houses &&
                       props.houses.map(house => (
                         <optgroup label={house.name}>

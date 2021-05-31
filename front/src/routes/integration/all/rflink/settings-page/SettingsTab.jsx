@@ -96,10 +96,18 @@ const SettingsTab = ({ children, ...props }) => (
               />
               <Text id="integration.rflink.settings.milight.zoneInfo" />
               <select class="form-control" onChange={props.updateZone}>
-                <option value="1"><Text id="integration.rflink.settings.zone1" /></option>
-                <option value="2"><Text id="integration.rflink.settings.zone2" /></option>
-                <option value="3"><Text id="integration.rflink.settings.zone3" /></option>
-                <option value="4"><Text id="integration.rflink.settings.zone4" /></option>
+                <option value="1">
+                  <Text id="integration.rflink.settings.zone1" />
+                </option>
+                <option value="2">
+                  <Text id="integration.rflink.settings.zone2" />
+                </option>
+                <option value="3">
+                  <Text id="integration.rflink.settings.zone3" />
+                </option>
+                <option value="4">
+                  <Text id="integration.rflink.settings.zone4" />
+                </option>
               </select>
             </div>
 
