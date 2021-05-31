@@ -77,6 +77,7 @@ const NewAreaPage = ({ children, ...props }) => (
                 setLatLong={props.setLatLong}
                 latitude={props.latitude}
                 longitude={props.longitude}
+                houses={props.houses}
               />
             </div>
 
@@ -109,6 +110,14 @@ class NewArea extends Component {
   createArea = e => {
     e.preventDefault();
   };
+  getHouses = async () => {
+    try {
+      const houses = await this.props.httpClient.get('/api/v1/house');
+      this.setState({
+        houses
+      });
+    } catch (e) {}
+  };
   constructor(props) {
     super(props);
     this.props = props;
@@ -117,10 +126,14 @@ class NewArea extends Component {
       color: '#3498db',
       name: '',
       latitude: null,
-      longitude: null
+      longitude: null,
+      houses: []
     };
   }
-  render(props, { name, color, radius, latitude, longitude }) {
+  componentDidMount() {
+    this.getHouses();
+  }
+  render(props, { name, color, radius, latitude, longitude, houses }) {
     return (
       <div class="page">
         <div class="page-main">
@@ -137,6 +150,7 @@ class NewArea extends Component {
                 setLatLong={this.setLatLong}
                 latitude={latitude}
                 longitude={longitude}
+                houses={houses}
               />
             </div>
           </div>

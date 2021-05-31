@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import leaflet from 'leaflet';
+import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
@@ -42,8 +43,42 @@ class MapComponent extends Component {
     this.map = map;
   };
 
+  displayHouses = props => {
+    if (props.houses) {
+      props.houses.forEach(house => {
+        if (this.houseMarkers[house.id]) {
+          this.houseMarkers[house.id].remove();
+        }
+        if (house.latitude && house.longitude) {
+          this.houseMarkers[house.id] = leaflet
+            .marker([house.latitude, house.longitude], {
+              icon: leaflet.icon({
+                iconUrl: '/assets/images/home-icon.png',
+                iconSize: [40, 40],
+                className: style.houseIconImage
+              })
+            })
+            .addTo(this.leafletMap);
+          this.markerArray.push(this.houseMarkers[house.id]);
+        }
+      });
+      if (this.markerArray.length > 0) {
+        const group = leaflet.featureGroup(this.markerArray);
+        this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
+      }
+    }
+  };
+
+  constructor(props) {
+    super(props);
+    this.props = props;
+    this.houseMarkers = {};
+    this.markerArray = [];
+  }
+
   componentDidMount() {
     this.initMap(this.props);
+    this.displayHouses(this.props);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -51,11 +86,14 @@ class MapComponent extends Component {
     const colorChanged = nextProps.color !== this.props.color;
     const latitudeChanged = nextProps.latitude !== this.props.latitude;
     const longitudeChanged = nextProps.longitude !== this.props.longitude;
-    const latitudeLongitudeValid = nextProps.latitude && nextProps.longitude;
+    const latitudeLongitudeValid = nextProps.latitude !== null && nextProps.longitude !== null;
     if (latitudeLongitudeValid) {
       if (radiusChanged || colorChanged || latitudeChanged || longitudeChanged) {
         this.setPinMap(nextProps);
       }
+    }
+    if (nextProps.houses) {
+      this.displayHouses(nextProps);
     }
   }
 
