@@ -227,6 +227,7 @@ const AppRouter = connect(
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
         <MapNewAreaPage path="/dashboard/maps/area/new" />
+        <MapNewAreaPage path="/dashboard/maps/area/edit/:areaSelector" />
         <CalendarPage path="/dashboard/calendar" />
         <ScenePage path="/dashboard/scene" />
         <NewScenePage path="/dashboard/scene/new" />

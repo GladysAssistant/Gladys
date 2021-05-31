@@ -21,7 +21,8 @@ const NewAreaPage = ({ children, ...props }) => (
           <div class="card-body p-6">
             <div class="card-title">
               <h3>
-                <Text id="newArea.cardTitle" />
+                {props.creationMode && <Text id="newArea.cardTitleCreate" />}
+                {!props.creationMode && <Text id="newArea.cardTitleEdit" />}
               </h3>
             </div>
 
@@ -84,7 +85,8 @@ const NewAreaPage = ({ children, ...props }) => (
 
             <div class="form-footer">
               <button onClick={props.createArea} class="btn btn-primary btn-block">
-                <Text id="newArea.createButton" />
+                {props.creationMode && <Text id="newArea.createButton" />}
+                {!props.creationMode && <Text id="newArea.updateButton" />}
               </button>
             </div>
           </div>
@@ -118,7 +120,11 @@ class NewArea extends Component {
         latitude: this.state.latitude,
         longitude: this.state.longitude
       };
-      await this.props.httpClient.post('/api/v1/area', newArea);
+      if (this.props.areaSelector) {
+        await this.props.httpClient.patch(`/api/v1/area/${this.props.areaSelector}`, newArea);
+      } else {
+        await this.props.httpClient.post('/api/v1/area', newArea);
+      }
       route('/dashboard/maps');
     } catch (e) {
       console.error(e);
@@ -129,6 +135,20 @@ class NewArea extends Component {
       const houses = await this.props.httpClient.get('/api/v1/house');
       this.setState({
         houses
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  getArea = async () => {
+    try {
+      const area = await this.props.httpClient.get(`/api/v1/area/${this.props.areaSelector}`);
+      this.setState({
+        name: area.name,
+        radius: area.radius,
+        color: area.color,
+        latitude: area.latitude,
+        longitude: area.longitude
       });
     } catch (e) {
       console.error(e);
@@ -148,6 +168,9 @@ class NewArea extends Component {
   }
   componentDidMount() {
     this.getHouses();
+    if (this.props.areaSelector) {
+      this.getArea();
+    }
   }
   render(props, { name, color, radius, latitude, longitude, houses }) {
     return (
@@ -167,6 +190,7 @@ class NewArea extends Component {
                 latitude={latitude}
                 longitude={longitude}
                 houses={houses}
+                creationMode={this.props.areaSelector === undefined}
               />
             </div>
           </div>

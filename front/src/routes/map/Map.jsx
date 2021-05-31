@@ -89,6 +89,13 @@ class MapComponent extends Component {
             fillOpacity: 0.2
           })
           .addTo(this.leafletMap);
+
+        this.areaMarkers[area.id].bindTooltip(area.name).openTooltip();
+
+        this.areaMarkers[area.id].on('click', () => {
+          route(`/dashboard/maps/area/edit/${area.selector}`);
+        });
+
         this.markerArray.push(this.areaMarkers[area.id]);
       });
     } catch (e) {
