@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { route } from 'preact-router';
 import actions from '../../actions/map';
 import cx from 'classnames';
 import get from 'get-value';
@@ -107,8 +108,21 @@ class NewArea extends Component {
   setLatLong = (latitude, longitude) => {
     this.setState({ latitude, longitude });
   };
-  createArea = e => {
+  createArea = async e => {
     e.preventDefault();
+    try {
+      const newArea = {
+        name: this.state.name,
+        color: this.state.color,
+        radius: this.state.radius,
+        latitude: this.state.latitude,
+        longitude: this.state.longitude
+      };
+      await this.props.httpClient.post('/api/v1/area', newArea);
+      route('/dashboard/maps');
+    } catch (e) {
+      console.error(e);
+    }
   };
   getHouses = async () => {
     try {
@@ -116,7 +130,9 @@ class NewArea extends Component {
       this.setState({
         houses
       });
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   };
   constructor(props) {
     super(props);
