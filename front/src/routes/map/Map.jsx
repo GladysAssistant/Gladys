@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import leaflet from 'leaflet';
+import { Text } from 'preact-i18n';
 
 import 'leaflet/dist/leaflet.css';
 import style from './style.css';
@@ -123,7 +124,7 @@ class MapComponent extends Component {
             onClick={this.openNewAreaView}
             style={{ marginTop: '10px', marginRight: '10px', pointerEvents: 'auto' }}
           >
-            Create new zone
+            <Text id="newArea.createNewZoneButton" />
           </button>
         </div>
       </div>

@@ -1287,6 +1287,17 @@
       "dead": "Dead"
     }
   },
+  "newArea": {
+    "createNewZoneButton": "Create new zone",
+    "cardTitle": "Create a new zone",
+    "cardDescription": "In Gladys, you can defines \"zones\". Those zones are useful in scene, if you want to trigger a scenario when a user enters/leaves a zone.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter the name of the zone",
+    "radiusLabel": "Radius (in meter)",
+    "radiusPlaceholder": "Enter the radius of your zone in meter",
+    "colorLabel": "Color",
+    "createButton": "Create zone"
+  },
   "newScene": {
     "cardTitle": "New scene",
     "nameLabel": "Name",

@@ -21,39 +21,42 @@ class MapComponent extends Component {
   };
 
   onClickOnMap = e => {
-    this.setPinMap(e.latlng.lat, e.latlng.lng);
+    this.props.setLatLong(e.latlng.lat, e.latlng.lng);
   };
 
-  setPinMap = (latitude, longitude) => {
+  setPinMap = props => {
     if (this.areaCircle) {
-      this.areaCircle.setLatLng(leaflet.latLng(latitude, longitude));
-    } else {
-      this.areaCircle = leaflet
-        .circle([latitude, longitude], {
-          radius: this.state.radius,
-          color: this.state.color,
-          fillColor: this.state.color,
-          fillOpacity: 0.2
-        })
-        .addTo(this.leafletMap);
+      this.areaCircle.remove();
     }
-    this.setState({ latitude, longitude });
+    this.areaCircle = leaflet
+      .circle([props.latitude, props.longitude], {
+        radius: props.radius,
+        color: props.color,
+        fillColor: props.color,
+        fillOpacity: 0.2
+      })
+      .addTo(this.leafletMap);
   };
 
   setMapRef = map => {
     this.map = map;
   };
-  constructor(props) {
-    super(props);
-    this.props = props;
-    this.state = {
-      radius: 20,
-      color: '#f03'
-    };
-  }
 
   componentDidMount() {
-    this.initMap();
+    this.initMap(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const radiusChanged = nextProps.radius !== this.props.radius;
+    const colorChanged = nextProps.color !== this.props.color;
+    const latitudeChanged = nextProps.latitude !== this.props.latitude;
+    const longitudeChanged = nextProps.longitude !== this.props.longitude;
+    const latitudeLongitudeValid = nextProps.latitude && nextProps.longitude;
+    if (latitudeLongitudeValid) {
+      if (radiusChanged || colorChanged || latitudeChanged || longitudeChanged) {
+        this.setPinMap(nextProps);
+      }
+    }
   }
 
   componentWillUnmount() {
@@ -63,7 +66,7 @@ class MapComponent extends Component {
   }
 
   render(props) {
-    return <div ref={this.setMapRef} style="width: 100%; height: 300px;" />;
+    return <div ref={this.setMapRef} style="width: 100%; height: 300px; z-index: 1" />;
   }
 }
 
