@@ -177,8 +177,12 @@ describe('SceneManager', () => {
       sceneManager.queue.start(() => {
         try {
           assert.calledTwice(executeSpy);
-          assert.calledWith(executeSpy.firstCall, 'my-scene', scope);
-          assert.calledWith(executeSpy.secondCall, 'second-scene', scope);
+          assert.calledWith(executeSpy.firstCall, 'my-scene', {
+            alreadyExecutedScenes: new Set(['my-scene']),
+          });
+          assert.calledWith(executeSpy.secondCall, 'second-scene', {
+            alreadyExecutedScenes: new Set(['my-scene', 'second-scene']),
+          });
           resolve();
         } catch (e) {
           reject(e);
@@ -187,7 +191,7 @@ describe('SceneManager', () => {
     });
   });
 
-  it('should deduplicate calls to other scenes', async () => {
+  it('should prevent infinite loop', async () => {
     const stateManager = new StateManager(event);
     const sceneManager = new SceneManager(stateManager, event);
 
@@ -198,20 +202,6 @@ describe('SceneManager', () => {
       triggers: [],
       actions: [
         [
-          {
-            type: ACTIONS.SCENE.START,
-            scene: 'second-scene',
-          },
-          {
-            type: ACTIONS.SCENE.START,
-            scene: 'second-scene',
-          },
-        ],
-        [
-          {
-            type: ACTIONS.SCENE.START,
-            scene: 'second-scene',
-          },
           {
             type: ACTIONS.SCENE.START,
             scene: 'second-scene',
@@ -228,10 +218,6 @@ describe('SceneManager', () => {
             type: ACTIONS.SCENE.START,
             scene: 'my-scene',
           },
-          {
-            type: ACTIONS.SCENE.START,
-            scene: 'my-scene',
-          },
         ],
       ],
     };
@@ -242,8 +228,12 @@ describe('SceneManager', () => {
       sceneManager.queue.start(() => {
         try {
           assert.calledTwice(executeSpy);
-          assert.calledWith(executeSpy.firstCall, 'my-scene', scope);
-          assert.calledWith(executeSpy.secondCall, 'second-scene', scope);
+          assert.calledWith(executeSpy.firstCall, 'my-scene', {
+            alreadyExecutedScenes: new Set(['my-scene']),
+          });
+          assert.calledWith(executeSpy.secondCall, 'second-scene', {
+            alreadyExecutedScenes: new Set(['my-scene', 'second-scene']),
+          });
           resolve();
         } catch (e) {
           reject(e);
