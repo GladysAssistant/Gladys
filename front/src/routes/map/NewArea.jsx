@@ -19,75 +19,78 @@ const NewAreaPage = ({ children, ...props }) => (
       <div class="col col-md-8 mx-auto">
         <form onSubmit={props.createScene} class="card">
           <div class="card-body p-6">
-            <div class="card-title">
-              <h3>
-                {props.creationMode && <Text id="newArea.cardTitleCreate" />}
-                {!props.creationMode && <Text id="newArea.cardTitleEdit" />}
-              </h3>
-            </div>
+            <div class={props.loading ? 'dimmer active' : 'dimmer'}>
+              <div class="loader" />
+              <div class="card-title">
+                <h3>
+                  {props.creationMode && <Text id="newArea.cardTitleCreate" />}
+                  {!props.creationMode && <Text id="newArea.cardTitleEdit" />}
+                </h3>
+              </div>
 
-            <p>
-              <Text id="newArea.cardDescription" />
-            </p>
+              <p>
+                <Text id="newArea.cardDescription" />
+              </p>
 
-            <div class="form-group">
-              <label class="form-label">
-                <Text id="newArea.nameLabel" />
-              </label>
-              <Localizer>
-                <input
-                  type="text"
-                  class="form-control"
-                  value={props.name}
-                  onInput={props.setName}
-                  placeholder={<Text id="newArea.namePlaceholder" />}
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="newArea.nameLabel" />
+                </label>
+                <Localizer>
+                  <input
+                    type="text"
+                    class="form-control"
+                    value={props.name}
+                    onInput={props.setName}
+                    placeholder={<Text id="newArea.namePlaceholder" />}
+                  />
+                </Localizer>
+              </div>
+
+              <div class="row gutters-xs">
+                <div class="col">
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="newArea.radiusLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        type="number"
+                        value={props.radius}
+                        onInput={props.setRadius}
+                        class="form-control"
+                        placeholder={<Text id="newArea.radiusPlaceholder" />}
+                      />
+                    </Localizer>
+                  </div>
+                </div>
+                <div class="col">
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="newArea.colorLabel" />
+                    </label>
+                    <ColorPicker value={props.color} setColor={props.setColor} />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <NewAreaMap
+                  radius={props.radius}
+                  color={props.color}
+                  setLatLong={props.setLatLong}
+                  latitude={props.latitude}
+                  longitude={props.longitude}
+                  houses={props.houses}
                 />
-              </Localizer>
-            </div>
-
-            <div class="row gutters-xs">
-              <div class="col">
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="newArea.radiusLabel" />
-                  </label>
-                  <Localizer>
-                    <input
-                      type="number"
-                      value={props.radius}
-                      onInput={props.setRadius}
-                      class="form-control"
-                      placeholder={<Text id="newArea.radiusPlaceholder" />}
-                    />
-                  </Localizer>
-                </div>
               </div>
-              <div class="col">
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="newArea.colorLabel" />
-                  </label>
-                  <ColorPicker value={props.color} setColor={props.setColor} />
-                </div>
+
+              <div class="form-footer">
+                <button onClick={props.createArea} class="btn btn-primary btn-block">
+                  {props.creationMode && <Text id="newArea.createButton" />}
+                  {!props.creationMode && <Text id="newArea.updateButton" />}
+                </button>
               </div>
-            </div>
-
-            <div class="form-group">
-              <NewAreaMap
-                radius={props.radius}
-                color={props.color}
-                setLatLong={props.setLatLong}
-                latitude={props.latitude}
-                longitude={props.longitude}
-                houses={props.houses}
-              />
-            </div>
-
-            <div class="form-footer">
-              <button onClick={props.createArea} class="btn btn-primary btn-block">
-                {props.creationMode && <Text id="newArea.createButton" />}
-                {!props.creationMode && <Text id="newArea.updateButton" />}
-              </button>
             </div>
           </div>
         </form>
@@ -142,15 +145,18 @@ class NewArea extends Component {
   };
   getArea = async () => {
     try {
+      await this.setState({ loading: true });
       const area = await this.props.httpClient.get(`/api/v1/area/${this.props.areaSelector}`);
       this.setState({
         name: area.name,
         radius: area.radius,
         color: area.color,
         latitude: area.latitude,
-        longitude: area.longitude
+        longitude: area.longitude,
+        loading: false
       });
     } catch (e) {
+      this.setState({ loading: false });
       console.error(e);
     }
   };
@@ -172,7 +178,7 @@ class NewArea extends Component {
       this.getArea();
     }
   }
-  render(props, { name, color, radius, latitude, longitude, houses }) {
+  render(props, { name, color, radius, latitude, longitude, houses, loading }) {
     return (
       <div class="page">
         <div class="page-main">
@@ -190,6 +196,7 @@ class NewArea extends Component {
                 latitude={latitude}
                 longitude={longitude}
                 houses={houses}
+                loading={loading}
                 creationMode={this.props.areaSelector === undefined}
               />
             </div>
