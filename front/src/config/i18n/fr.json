@@ -19,6 +19,14 @@
     "metersPerSec": "m/s",
     "milesPerHour": "m/h"
   },
+  "color": {
+    "blue": "Bleu",
+    "red": "Rouge",
+    "green": "Vert",
+    "black": "Noir",
+    "yellow": "Jaune",
+    "purple": "Violet"
+  },
   "calendar": {
     "allDay": "Toute la journée",
     "previous": "précédent",

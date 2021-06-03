@@ -1,6 +1,8 @@
 import { Component } from 'preact';
 import Select from 'react-select';
 
+import withIntlAsProp from '../../utils/withIntlAsProp';
+
 function hexToRgb(hex) {
   // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
   let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
@@ -22,39 +24,6 @@ function generateDimmedColor(hex) {
   const { r, g, b } = hexToRgb(hex);
   return `rgba(${r}, ${g}, ${b}, 0.1);`;
 }
-
-const colourOptions = [
-  {
-    value: '#3498db',
-    label: 'blue',
-    contrast: 'white'
-  },
-  {
-    value: '#e74c3c',
-    label: 'Red',
-    contrast: 'white'
-  },
-  {
-    value: '#2ecc71',
-    label: 'Green',
-    contrast: 'white'
-  },
-  {
-    value: '#2c3e50',
-    label: 'Black',
-    contrast: 'white'
-  },
-  {
-    value: '#f1c40f',
-    label: 'Yellow',
-    contrast: 'black'
-  },
-  {
-    value: '#8e44ad',
-    label: 'Purple',
-    contrast: 'white'
-  }
-];
 
 const dot = (color = '#ccc') => ({
   alignItems: 'center',
@@ -96,8 +65,43 @@ const colourStyles = {
 
 class ColorPicker extends Component {
   initValue = props => {
+    const colorOptions = [
+      {
+        value: '#3498db',
+        label: this.props.intl.dictionary.color.blue,
+        contrast: 'white'
+      },
+      {
+        value: '#e74c3c',
+        label: this.props.intl.dictionary.color.red,
+        contrast: 'white'
+      },
+      {
+        value: '#2ecc71',
+        label: this.props.intl.dictionary.color.green,
+        contrast: 'white'
+      },
+      {
+        value: '#2c3e50',
+        label: this.props.intl.dictionary.color.black,
+        contrast: 'white'
+      },
+      {
+        value: '#f1c40f',
+        label: this.props.intl.dictionary.color.yellow,
+        contrast: 'black'
+      },
+      {
+        value: '#8e44ad',
+        label: this.props.intl.dictionary.color.purple,
+        contrast: 'white'
+      }
+    ];
+
+    this.setState({ colorOptions });
+
     if (props.value) {
-      const color = colourOptions.find(c => c.value === props.value);
+      const color = colorOptions.find(c => c.value === props.value);
       if (color) {
         this.setState({ value: color });
       }
@@ -113,11 +117,15 @@ class ColorPicker extends Component {
   componentWillReceiveProps(nextProps) {
     this.initValue(nextProps);
   }
-  render(props, { value }) {
+  render(props, { value, colorOptions }) {
+    if (!colorOptions) {
+      return null;
+    }
     return (
       <Select
-        defaultValue={colourOptions[0]}
-        options={colourOptions}
+        id="react-select-color-picker"
+        defaultValue={colorOptions[0]}
+        options={colorOptions}
         styles={colourStyles}
         value={value}
         onChange={this.onChange}
@@ -126,4 +134,4 @@ class ColorPicker extends Component {
   }
 }
 
-export default ColorPicker;
+export default withIntlAsProp(ColorPicker);
