@@ -94,4 +94,8 @@ describe('area.getBySelector', () => {
       updated_at: new Date('2019-02-12T07:49:07.556Z'),
     });
   });
+  it('should return area not found', async () => {
+    const promise = area.getBySelector('unknown-area');
+    return assert.isRejected(promise, 'Area not found');
+  });
 });
