@@ -32,7 +32,8 @@ describe('area.checkNewLocation', () => {
       areasTheUserWasIn: new Set(),
     });
     assert.calledOnce(event.emit);
-    assert.calledWith(event.emit, EVENTS.AREA.USER_ENTERED, {
+    assert.calledWith(event.emit, EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.AREA.USER_ENTERED,
       user: 'toto',
       area: 'my-area',
     });
@@ -65,7 +66,8 @@ describe('area.checkNewLocation', () => {
       areasTheUserWasIn: new Set(['my-area']),
     });
     assert.calledOnce(event.emit);
-    assert.calledWith(event.emit, EVENTS.AREA.USER_LEFT, {
+    assert.calledWith(event.emit, EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.AREA.USER_LEFT,
       user: 'toto',
       area: 'my-area',
     });

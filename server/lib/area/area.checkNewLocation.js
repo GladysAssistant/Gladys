@@ -34,7 +34,8 @@ function checkNewLocation({ userSelector, previousLocation, newLocation }) {
   areasTheUserIsIn.forEach((areaTheUserIsIn) => {
     if (!areasTheUserWasIn.has(areaTheUserIsIn)) {
       logger.info(`User ${userSelector} just arrived in area ${areaTheUserIsIn}`);
-      this.event.emit(EVENTS.AREA.USER_ENTERED, {
+      this.event.emit(EVENTS.TRIGGERS.CHECK, {
+        type: EVENTS.AREA.USER_ENTERED,
         area: areaTheUserIsIn,
         user: userSelector,
       });
@@ -43,7 +44,8 @@ function checkNewLocation({ userSelector, previousLocation, newLocation }) {
   areasTheUserWasIn.forEach((areaTheUserWasIn) => {
     if (!areasTheUserIsIn.has(areaTheUserWasIn)) {
       logger.info(`User ${userSelector} just left the area ${areaTheUserWasIn}`);
-      this.event.emit(EVENTS.AREA.USER_LEFT, {
+      this.event.emit(EVENTS.TRIGGERS.CHECK, {
+        type: EVENTS.AREA.USER_LEFT,
         area: areaTheUserWasIn,
         user: userSelector,
       });
