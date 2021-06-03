@@ -110,6 +110,14 @@ class MapComponent extends Component {
   setMapRef = map => {
     this.map = map;
   };
+  updateDimensions = () => {
+    const largeWindowOffset = 120;
+    const smallWindowOffset = 65;
+    const height =
+      window.innerWidth >= 992 ? window.innerHeight - largeWindowOffset : window.innerHeight - smallWindowOffset;
+    this.setState({ height });
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
@@ -119,8 +127,13 @@ class MapComponent extends Component {
     this.markerArray = [];
   }
 
+  componentWillMount() {
+    this.updateDimensions();
+  }
+
   componentDidMount() {
     this.initMap();
+    window.addEventListener('resize', this.updateDimensions.bind(this));
   }
 
   componentDidUpdate() {
@@ -137,11 +150,12 @@ class MapComponent extends Component {
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
+    window.removeEventListener('resize', this.updateDimensions.bind(this));
   }
 
-  render(props) {
+  render(props, { height }) {
     return (
-      <div ref={this.setMapRef} style="height: 500px;">
+      <div ref={this.setMapRef} style={{ height: `${height}px` }}>
         <div class="leaflet-top leaflet-right">
           <button
             href="/dashboard/maps/area/new"
