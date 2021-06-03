@@ -28,7 +28,7 @@ function connect(Path) {
     });
     this.sendUsb = port;
 
-    this.sendUsb.open(function(err) {
+    this.sendUsb.open(function returnOpenErr(err) {
       if (err) {
         this.connected = false;
         this.ready = false;
