@@ -1013,6 +1013,10 @@
       "house": {
         "empty": "House is empty",
         "no-longer-empty": "House is no longer empty"
+      },
+      "area": {
+        "user-entered": "User entered a zone",
+        "user-left": "User left a zone"
       }
     },
     "triggersCard": {
@@ -1073,6 +1077,12 @@
         "houseEmptyDescription": "This will trigger when a user leaves the house and is the last to leave.",
         "houseNoLongerEmptyDescription": "This will trigger when a user comes back home and home was empty before him.",
         "houseLabel": "House"
+      },
+      "area": {
+        "userEnteredDescription": "This scene will start when a user enters this zone. Zones can be created in the maps tab.",
+        "userLeftDescription": "This scene will start when a user left this zone. Zones can be created in the maps tab.",
+        "userLabel": "User",
+        "areaLabel": "Zone"
       }
     }
   },
