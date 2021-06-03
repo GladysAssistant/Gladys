@@ -1308,7 +1308,11 @@
     "radiusPlaceholder": "Enter the radius of your zone in meter",
     "colorLabel": "Color",
     "createButton": "Create zone",
-    "updateButton": "Update zone"
+    "updateButton": "Update zone",
+    "deleteButton": "Delete zone",
+    "createAreaError": "Unable to create this zone: are you sure you filled every field?",
+    "getAreaError": "Unable to get data from this zone. Please refresh this page to retry.",
+    "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry."
   },
   "newScene": {
     "cardTitle": "New scene",

@@ -5,7 +5,6 @@ import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import actions from '../../actions/map';
 import cx from 'classnames';
-import get from 'get-value';
 import style from './style.css';
 import ColorPicker from './ColorPicker';
 import NewAreaMap from './NewAreaMap';
@@ -21,75 +20,106 @@ const NewAreaPage = ({ children, ...props }) => (
           <div class="card-body p-6">
             <div class={props.loading ? 'dimmer active' : 'dimmer'}>
               <div class="loader" />
-              <div class="card-title">
-                <h3>
-                  {props.creationMode && <Text id="newArea.cardTitleCreate" />}
-                  {!props.creationMode && <Text id="newArea.cardTitleEdit" />}
-                </h3>
-              </div>
+              <div class="dimmer-content">
+                <div class="card-title">
+                  <h3>
+                    {props.creationMode && <Text id="newArea.cardTitleCreate" />}
+                    {!props.creationMode && <Text id="newArea.cardTitleEdit" />}
+                  </h3>
+                </div>
 
-              <p>
-                <Text id="newArea.cardDescription" />
-              </p>
+                {props.createAreaError && (
+                  <div class="alert alert-danger">
+                    <Text id="newArea.createAreaError" />
+                  </div>
+                )}
 
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="newArea.nameLabel" />
-                </label>
-                <Localizer>
-                  <input
-                    type="text"
-                    class="form-control"
-                    value={props.name}
-                    onInput={props.setName}
-                    placeholder={<Text id="newArea.namePlaceholder" />}
+                {props.getAreaError && (
+                  <div class="alert alert-danger">
+                    <Text id="newArea.getAreaError" />
+                  </div>
+                )}
+
+                {props.deleteAreaError && (
+                  <div class="alert alert-danger">
+                    <Text id="newArea.deleteAreaError" />
+                  </div>
+                )}
+
+                <p>
+                  <Text id="newArea.cardDescription" />
+                </p>
+
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="newArea.nameLabel" />
+                  </label>
+                  <Localizer>
+                    <input
+                      type="text"
+                      class="form-control"
+                      value={props.name}
+                      onInput={props.setName}
+                      placeholder={<Text id="newArea.namePlaceholder" />}
+                    />
+                  </Localizer>
+                </div>
+
+                <div class="row gutters-xs">
+                  <div class="col">
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="newArea.radiusLabel" />
+                      </label>
+                      <Localizer>
+                        <input
+                          type="number"
+                          value={props.radius}
+                          onInput={props.setRadius}
+                          class="form-control"
+                          placeholder={<Text id="newArea.radiusPlaceholder" />}
+                        />
+                      </Localizer>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="form-group">
+                      <label class="form-label">
+                        <Text id="newArea.colorLabel" />
+                      </label>
+                      <ColorPicker value={props.color} setColor={props.setColor} />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <NewAreaMap
+                    radius={props.radius}
+                    color={props.color}
+                    setLatLong={props.setLatLong}
+                    latitude={props.latitude}
+                    longitude={props.longitude}
+                    houses={props.houses}
                   />
-                </Localizer>
-              </div>
+                </div>
 
-              <div class="row gutters-xs">
-                <div class="col">
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="newArea.radiusLabel" />
-                    </label>
-                    <Localizer>
-                      <input
-                        type="number"
-                        value={props.radius}
-                        onInput={props.setRadius}
-                        class="form-control"
-                        placeholder={<Text id="newArea.radiusPlaceholder" />}
-                      />
-                    </Localizer>
+                <div class="form-footer">
+                  <div class="row">
+                    <div class="col">
+                      <button onClick={props.createArea} class="btn btn-primary btn-block">
+                        {props.creationMode && <Text id="newArea.createButton" />}
+                        {!props.creationMode && <Text id="newArea.updateButton" />}
+                      </button>
+                    </div>
+                    {!props.creationMode && (
+                      <div class="col">
+                        <button onClick={props.deleteArea} class="btn btn-danger btn-block">
+                          <Text id="newArea.deleteButton" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div class="col">
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="newArea.colorLabel" />
-                    </label>
-                    <ColorPicker value={props.color} setColor={props.setColor} />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <NewAreaMap
-                  radius={props.radius}
-                  color={props.color}
-                  setLatLong={props.setLatLong}
-                  latitude={props.latitude}
-                  longitude={props.longitude}
-                  houses={props.houses}
-                />
-              </div>
-
-              <div class="form-footer">
-                <button onClick={props.createArea} class="btn btn-primary btn-block">
-                  {props.creationMode && <Text id="newArea.createButton" />}
-                  {!props.creationMode && <Text id="newArea.updateButton" />}
-                </button>
               </div>
             </div>
           </div>
@@ -116,6 +146,7 @@ class NewArea extends Component {
   createArea = async e => {
     e.preventDefault();
     try {
+      await this.setState({ loading: true, createAreaError: false });
       const newArea = {
         name: this.state.name,
         color: this.state.color,
@@ -130,6 +161,18 @@ class NewArea extends Component {
       }
       route('/dashboard/maps');
     } catch (e) {
+      await this.setState({ loading: false, createAreaError: true });
+      console.error(e);
+    }
+  };
+  deleteArea = async e => {
+    e.preventDefault();
+    try {
+      await this.setState({ loading: true, deleteAreaError: false });
+      await this.props.httpClient.delete(`/api/v1/area/${this.props.areaSelector}`);
+      route('/dashboard/maps');
+    } catch (e) {
+      await this.setState({ loading: false, deleteAreaError: true });
       console.error(e);
     }
   };
@@ -145,7 +188,7 @@ class NewArea extends Component {
   };
   getArea = async () => {
     try {
-      await this.setState({ loading: true });
+      await this.setState({ loading: true, getAreaError: false });
       const area = await this.props.httpClient.get(`/api/v1/area/${this.props.areaSelector}`);
       this.setState({
         name: area.name,
@@ -156,7 +199,7 @@ class NewArea extends Component {
         loading: false
       });
     } catch (e) {
-      this.setState({ loading: false });
+      this.setState({ loading: false, getAreaError: true });
       console.error(e);
     }
   };
@@ -178,7 +221,10 @@ class NewArea extends Component {
       this.getArea();
     }
   }
-  render(props, { name, color, radius, latitude, longitude, houses, loading }) {
+  render(
+    props,
+    { name, color, radius, latitude, longitude, houses, loading, createAreaError, deleteAreaError, getAreaError }
+  ) {
     return (
       <div class="page">
         <div class="page-main">
@@ -192,11 +238,15 @@ class NewArea extends Component {
                 setColor={this.setColor}
                 setRadius={this.setRadius}
                 createArea={this.createArea}
+                deleteArea={this.deleteArea}
                 setLatLong={this.setLatLong}
                 latitude={latitude}
                 longitude={longitude}
                 houses={houses}
                 loading={loading}
+                createAreaError={createAreaError}
+                deleteAreaError={deleteAreaError}
+                getAreaError={getAreaError}
                 creationMode={this.props.areaSelector === undefined}
               />
             </div>
