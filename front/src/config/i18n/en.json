@@ -19,6 +19,14 @@
     "metersPerSec": "m/s",
     "milesPerHour": "m/h"
   },
+  "color": {
+    "blue": "Blue",
+    "red": "Red",
+    "green": "Green",
+    "black": "Black",
+    "yellow": "Yellow",
+    "purple": "Purple"
+  },
   "calendar": {
     "allDay": "All Day",
     "previous": "Previous",
@@ -1098,6 +1106,10 @@
       "house": {
         "empty": "House is empty",
         "no-longer-empty": "House is no longer empty"
+      },
+      "area": {
+        "user-entered": "User entered a zone",
+        "user-left": "User left a zone"
       }
     },
     "triggersCard": {
@@ -1158,6 +1170,12 @@
         "houseEmptyDescription": "This will trigger when a user leaves the house and is the last to leave.",
         "houseNoLongerEmptyDescription": "This will trigger when a user comes back home and home was empty before him.",
         "houseLabel": "House"
+      },
+      "area": {
+        "userEnteredDescription": "This scene will start when a user enters this zone. Zones can be created in the maps tab.",
+        "userLeftDescription": "This scene will start when a user left this zone. Zones can be created in the maps tab.",
+        "userLabel": "User",
+        "areaLabel": "Zone"
       }
     }
   },
@@ -1371,6 +1389,23 @@
       "exited": "Exited",
       "dead": "Dead"
     }
+  },
+  "newArea": {
+    "createNewZoneButton": "Create new zone",
+    "cardTitleCreate": "Create a new zone",
+    "cardTitleEdit": "Edit a zone",
+    "cardDescription": "In Gladys, you can defines \"zones\". Those zones are useful in scene, if you want to trigger a scenario when a user enters/leaves a zone.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter the name of the zone",
+    "radiusLabel": "Radius (in meter)",
+    "radiusPlaceholder": "Enter the radius of your zone in meter",
+    "colorLabel": "Color",
+    "createButton": "Create zone",
+    "updateButton": "Update zone",
+    "deleteButton": "Delete zone",
+    "createAreaError": "Unable to create this zone: are you sure you filled every field?",
+    "getAreaError": "Unable to get data from this zone. Please refresh this page to retry.",
+    "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry."
   },
   "newScene": {
     "cardTitle": "New scene",

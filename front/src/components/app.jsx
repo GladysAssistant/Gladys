@@ -37,6 +37,7 @@ import Device from '../routes/device';
 import IntegrationPage from '../routes/integration';
 import ChatPage from '../routes/chat';
 import MapPage from '../routes/map';
+import MapNewAreaPage from '../routes/map/NewArea';
 import CalendarPage from '../routes/calendar';
 import ScenePage from '../routes/scene';
 import NewScenePage from '../routes/scene/new-scene';
@@ -231,6 +232,8 @@ const AppRouter = connect(
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
+        <MapNewAreaPage path="/dashboard/maps/area/new" />
+        <MapNewAreaPage path="/dashboard/maps/area/edit/:areaSelector" />
         <CalendarPage path="/dashboard/calendar" />
         <ScenePage path="/dashboard/scene" />
         <NewScenePage path="/dashboard/scene/new" />

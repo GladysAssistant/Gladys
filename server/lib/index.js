@@ -36,6 +36,7 @@ const Weather = require('./weather');
  * @param {boolean} [params.disableDeviceLoading] - If true, disable the loading of devices in RAM.
  * @param {boolean} [params.disableUserLoading] - If true, disable the loading of users in RAM.
  * @param {boolean} [params.disableSchedulerLoading] - If true, disable the loading of the scheduler.
+ * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
  * @example
  * const gladys = Gladys();
  */
@@ -47,7 +48,7 @@ function Gladys(params = {}) {
   const variable = new Variable(event);
   const brain = new Brain();
   const cache = new Cache();
-  const area = new Area();
+  const area = new Area(event);
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
   const system = new System(db.sequelize, event, config);
@@ -117,6 +118,9 @@ function Gladys(params = {}) {
       }
       if (!params.disableRoomLoading) {
         await room.init();
+      }
+      if (!params.disableAreaLoading) {
+        await area.init();
       }
       if (!params.disableSchedulerLoading) {
         scheduler.init();

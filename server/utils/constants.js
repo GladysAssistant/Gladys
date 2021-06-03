@@ -151,6 +151,13 @@ const EVENTS = {
     EMPTY: 'house.empty',
     NO_LONGER_EMPTY: 'house.no-longer-empty',
   },
+  USER: {
+    NEW_LOCATION: 'user.new-location',
+  },
+  AREA: {
+    USER_ENTERED: 'area.user-entered',
+    USER_LEFT: 'area.user-left',
+  },
 };
 
 const LIFE_EVENTS = {

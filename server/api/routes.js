@@ -105,6 +105,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: areaController.get,
     },
+    'get /api/v1/area/:area_selector': {
+      authenticated: true,
+      controller: areaController.getBySelector,
+    },
     'patch /api/v1/area/:area_selector': {
       authenticated: true,
       controller: areaController.update,

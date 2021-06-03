@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const Handlebars = require('handlebars');
+const cloneDeep = require('lodash.clonedeep');
 const set = require('set-value');
 const get = require('get-value');
 const dayjs = require('dayjs');
@@ -116,8 +117,9 @@ const actionsFunc = {
       );
       return;
     }
-
-    self.execute(action.scene, scope);
+    // we clone the scope so that the new scene is not polluting
+    // other scenes writing on the same scope: it needs to be a fresh object
+    self.execute(action.scene, cloneDeep(scope));
   },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
@@ -135,7 +137,9 @@ const actionsFunc = {
         oneConditionVerified = true;
       } else {
         logger.debug(
-          `Condition not verified. Condition = ${scope[condition.variable]} ${condition.operator} ${condition.value}`,
+          `Condition not verified. Condition: "${get(scope, condition.variable)} ${condition.operator} ${
+            condition.value
+          }"`,
         );
       }
     });
