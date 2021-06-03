@@ -100,6 +100,7 @@ const NewAreaPage = ({ children, ...props }) => (
                     latitude={props.latitude}
                     longitude={props.longitude}
                     houses={props.houses}
+                    creationMode={props.creationMode}
                   />
                 </div>
 

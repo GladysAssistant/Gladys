@@ -28,6 +28,10 @@ class MapComponent extends Component {
   setPinMap = props => {
     if (this.areaCircle) {
       this.areaCircle.remove();
+    } else if (!props.creationMode) {
+      this.leafletMap.flyTo([props.latitude, props.longitude], 17, {
+        duration: 0.25
+      });
     }
     this.areaCircle = leaflet
       .circle([props.latitude, props.longitude], {
@@ -62,7 +66,7 @@ class MapComponent extends Component {
           this.markerArray.push(this.houseMarkers[house.id]);
         }
       });
-      if (this.markerArray.length > 0) {
+      if (this.markerArray.length > 0 && props.creationMode) {
         const group = leaflet.featureGroup(this.markerArray);
         this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
       }
@@ -82,6 +86,7 @@ class MapComponent extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
+    const housesChanged = nextProps.houses !== this.props.houses;
     const radiusChanged = nextProps.radius !== this.props.radius;
     const colorChanged = nextProps.color !== this.props.color;
     const latitudeChanged = nextProps.latitude !== this.props.latitude;
@@ -92,7 +97,7 @@ class MapComponent extends Component {
         this.setPinMap(nextProps);
       }
     }
-    if (nextProps.houses) {
+    if (housesChanged) {
       this.displayHouses(nextProps);
     }
   }
