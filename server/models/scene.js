@@ -57,6 +57,7 @@ const triggersSchema = Joi.array().items(
     operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
     value: Joi.number(),
     user: Joi.string(),
+    area: Joi.string(),
     scheduler_type: Joi.string().valid('every-month', 'every-week', 'every-day', 'interval', 'custom-time'),
     date: Joi.date().format('YYYY-MM-DD'),
     time: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
