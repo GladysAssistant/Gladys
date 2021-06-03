@@ -18,6 +18,7 @@ describe('area.create', () => {
     expect(newArea).to.have.property('name', 'My test area');
     expect(newArea).to.have.property('selector', 'my-test-area');
     expect(newArea).to.have.property('latitude', 10);
+    expect(area.areas).to.deep.equal([newArea]);
   });
 });
 
@@ -29,6 +30,15 @@ describe('area.update', () => {
     });
     expect(newArea).to.have.property('name', 'New name');
     expect(newArea).to.have.property('selector', 'test-area');
+    expect(area.areas).to.deep.equal([newArea]);
+  });
+  it('should update a area with value already in RAM', async () => {
+    const newArea = await area.update('test-area', {
+      name: 'New name 2',
+    });
+    expect(newArea).to.have.property('name', 'New name 2');
+    expect(newArea).to.have.property('selector', 'test-area');
+    expect(area.areas).to.deep.equal([newArea]);
   });
   it('should return area not found', async () => {
     const promise = area.update('not-found-area', {
@@ -40,8 +50,12 @@ describe('area.update', () => {
 
 describe('area.destroy', () => {
   const area = new Area(event);
+  before(async () => {
+    await area.init();
+  });
   it('should destroy a area', async () => {
     await area.destroy('test-area');
+    expect(area.areas).to.deep.equal([]);
   });
   it('should return area not found', async () => {
     const promise = area.destroy('not-found-area');
