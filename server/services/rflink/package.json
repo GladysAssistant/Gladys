@@ -15,7 +15,7 @@
     "arm64"
   ],
   "dependencies": {
-    "serialport": "9.0.0",
-    "@serialport/parser-readline": "9.0.0"
+    "serialport": "9.1.0",
+    "@serialport/parser-readline": "9.0.7"
   }
 }
