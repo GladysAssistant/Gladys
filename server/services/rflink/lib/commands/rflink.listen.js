@@ -7,7 +7,7 @@ const logger = require('../../../../utils/logger');
 function listen() {
   this.usb.on('data', (data) => {
     this.message(data);
-    logger.log(`Rflink : message reçu : ${data}`);
+    logger.debug(`Rflink : message reçu : ${data}`);
   });
 }
 

@@ -10,7 +10,7 @@ const { EVENTS } = require('../../../../utils/constants');
  *  newValue(Object, 'temperature', 30)
  */
 function newValue(device, deviceFeature, state) {
-  logger.log(
+  logger.debug(
     `RFlink : value ${deviceFeature} of device rflink:${device.id}:${deviceFeature}:${device.switch} changed to ${state}`,
   );
   let value = state;
@@ -43,7 +43,6 @@ function newValue(device, deviceFeature, state) {
       break;
     case 'pressure':
       value = parseInt(value, 16);
-      logger.log(`baro : ${value}`);
       break;
 
     default:
@@ -56,12 +55,10 @@ function newValue(device, deviceFeature, state) {
         state: value,
       });
     } else {
-      logger.log('device id to change');
-      logger.log(device.id);
+      logger.log(`device id to change: ${device.id}`);
     }
   } else {
-    logger.log('device feature to change:');
-    logger.log(deviceFeature);
+    logger.log(`device feature to change: ${deviceFeature}`);
   }
 }
 
