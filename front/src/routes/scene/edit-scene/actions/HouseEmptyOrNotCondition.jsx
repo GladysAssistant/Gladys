@@ -72,7 +72,12 @@ class HouseEmptyOrNotCondition extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <Select options={houseOptions} value={selectedHouseOption} onChange={this.handleHouseChange} />
+          <Select
+            options={houseOptions}
+            class="scene-house-empty-or-not-choose-house"
+            value={selectedHouseOption}
+            onChange={this.handleHouseChange}
+          />
         </div>
       </div>
     );

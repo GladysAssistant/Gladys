@@ -56,7 +56,12 @@ class ChooseActionType extends Component {
           <label class="form-label">
             <Text id="editScene.selectActionType" />
           </label>
-          <Select onChange={this.handleChange} value={currentAction} options={options} />
+          <Select
+            class="choose-scene-action-type"
+            onChange={this.handleChange}
+            value={currentAction}
+            options={options}
+          />
         </div>
         <div class="form-group">
           <button onClick={this.changeBoxType} class="btn btn-success">
