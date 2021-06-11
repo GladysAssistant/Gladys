@@ -28,7 +28,6 @@ class MapComponent extends Component {
   };
 
   displayUsers = props => {
-    console.log(props.users);
     if (props.users) {
       props.users.forEach(user => {
         if (this.userMarkers[user.id]) {
