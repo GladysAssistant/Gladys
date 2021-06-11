@@ -1315,10 +1315,11 @@
     "radiusLabel": "Rayon (en mètre)",
     "radiusPlaceholder": "Entrez le rayon de votre zone en mètre",
     "colorLabel": "Couleur",
+    "mapLabel": "Cliquez sur la carte où votre zone doit être située",
     "createButton": "Créer une zone",
     "updateButton": "Mettre à jour la zone",
     "deleteButton": "Supprimer la zone",
-    "createAreaError": "Une erreur est survenue lors de la création de votre zone. Avez-vous bien rempli tous les champs ?",
+    "createAreaError": "Une erreur est survenue lors de la création de votre zone. Avez-vous bien rempli tous les champs, et cliqué sur la carte pour positionner votre zone ?",
     "deleteAreaError": "Impossible de supprimer cette zone. Rafraichissez cette page et réessayez.",
     "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer."
   },

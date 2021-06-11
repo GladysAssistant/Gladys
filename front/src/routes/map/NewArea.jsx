@@ -93,6 +93,9 @@ const NewAreaPage = ({ children, ...props }) => (
                 </div>
 
                 <div class="form-group">
+                  <label class="form-label">
+                    <Text id="newArea.mapLabel" />
+                  </label>
                   <NewAreaMap
                     radius={props.radius}
                     color={props.color}
