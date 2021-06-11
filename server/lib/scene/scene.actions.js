@@ -186,6 +186,8 @@ const actionsFunc = {
       }
     }
   },
+  [ACTIONS.HOUSE.IS_EMPTY]: async (self, action) => {},
+
   [ACTIONS.USER.SET_SEEN_AT_HOME]: async (self, action) => {
     await self.house.userSeen(action.house, action.user);
   },
