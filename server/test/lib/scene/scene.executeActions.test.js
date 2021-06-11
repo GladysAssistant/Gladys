@@ -473,6 +473,84 @@ describe('scene.executeActions', () => {
     );
     return chaiAssert.isRejected(promise, AbortScene);
   });
+  it('should abort scene, house empty is not verified', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      isEmpty: fake.resolves(false),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.HOUSE.IS_EMPTY,
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene);
+  });
+  it('should finish, house empty is verified', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      isEmpty: fake.resolves(true),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.HOUSE.IS_EMPTY,
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+  });
+  it('should abort scene, house not empty is not verified', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      isEmpty: fake.resolves(true),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.HOUSE.IS_NOT_EMPTY,
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene);
+  });
+  it('should finish scene, house not empty is verified', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      isEmpty: fake.resolves(false),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.HOUSE.IS_NOT_EMPTY,
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+  });
   it('should finish scene, condition is verified', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {

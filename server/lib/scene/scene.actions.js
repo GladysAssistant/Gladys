@@ -186,8 +186,18 @@ const actionsFunc = {
       }
     }
   },
-  [ACTIONS.HOUSE.IS_EMPTY]: async (self, action) => {},
-
+  [ACTIONS.HOUSE.IS_EMPTY]: async (self, action) => {
+    const houseEmpty = await self.house.isEmpty(action.house);
+    if (!houseEmpty) {
+      throw new AbortScene('HOUSE_IS_NOT_EMPTY');
+    }
+  },
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: async (self, action) => {
+    const houseEmpty = await self.house.isEmpty(action.house);
+    if (houseEmpty) {
+      throw new AbortScene('HOUSE_IS_EMPTY');
+    }
+  },
   [ACTIONS.USER.SET_SEEN_AT_HOME]: async (self, action) => {
     await self.house.userSeen(action.house, action.user);
   },
