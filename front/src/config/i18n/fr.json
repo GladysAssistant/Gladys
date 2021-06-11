@@ -960,6 +960,11 @@
       "scene": {
         "label": "Choisir une scène",
         "notice": "Les conditions de déclenchements de la scène appelée seront ignorées. Si une scène appelle une autre scène, et vice-versa, Gladys ne tombera pas dans une boucle infinie: chaque scène ne sera exécutée qu'une seule fois"
+      },
+      "houseEmptyOrNot": {
+        "houseIsEmptyDescription": "Si la maison est vide, cette scène continuera. Sinon, la scène s'arrêtera.",
+        "houseIsNotEmptyDescription": "Si la maison n'est pas vide, cette scène continuera. Sinon, la scène s'arrêtera.",
+        "houseLabel": "Maison"
       }
     },
     "actions": {
@@ -996,6 +1001,10 @@
       },
       "http": {
         "request": "Faire une requête HTTP"
+      },
+      "house": {
+        "is-empty": "Si la maison est vide",
+        "is-not-empty": "Si la maison n'est pas vide"
       }
     },
     "variables": {
