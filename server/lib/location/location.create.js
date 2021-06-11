@@ -1,6 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
 /**
  * @description Save the location of the user.
@@ -46,6 +46,16 @@ async function create(userSelector, location) {
     userSelector: user.selector,
     previousLocation,
     newLocation,
+  });
+  // send websocket event
+  this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.LOCATION.NEW,
+    payload: {
+      id: user.id,
+      last_latitude: createdLocation.latitude,
+      last_longitude: createdLocation.longitude,
+      last_location_changed: createdLocation.created_at,
+    },
   });
   return createdLocation.get({ plain: true });
 }

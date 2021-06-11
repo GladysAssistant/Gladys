@@ -547,7 +547,9 @@ describe('scene.executeActions', () => {
       sendToUser: fake.resolves(null),
     };
     const scope = {};
-    const todayAt12 = dayjs().hour(12);
+    const todayAt12 = dayjs()
+      .hour(12)
+      .minute(0);
     const fiveMinutesAgo = todayAt12.subtract(5, 'minute');
     const inFiveMinutes = todayAt12.add(5, 'minute');
     const clock = useFakeTimers(todayAt12.valueOf());
@@ -578,7 +580,9 @@ describe('scene.executeActions', () => {
   it('should abort scene because condition is not verified', async () => {
     const stateManager = new StateManager(event);
     const scope = {};
-    const todayAt12 = dayjs().hour(12);
+    const todayAt12 = dayjs()
+      .hour(12)
+      .minute(0);
     const fiveMinutesAgo = todayAt12.subtract(5, 'minute');
     const clock = useFakeTimers(todayAt12.valueOf());
     const promise = executeActions(
@@ -599,7 +603,9 @@ describe('scene.executeActions', () => {
   it('should abort scene because condition is not verified', async () => {
     const stateManager = new StateManager(event);
     const scope = {};
-    const todayAt12 = dayjs().hour(12);
+    const todayAt12 = dayjs()
+      .hour(12)
+      .minute(0);
     const inFiveMinutes = todayAt12.add(5, 'minute');
     const clock = useFakeTimers(todayAt12.valueOf());
     const promise = executeActions(
@@ -620,7 +626,9 @@ describe('scene.executeActions', () => {
   it('should abort scene because condition is not verified', async () => {
     const stateManager = new StateManager(event);
     const scope = {};
-    const todayAt12 = dayjs().hour(12);
+    const todayAt12 = dayjs()
+      .hour(12)
+      .minute(0);
     const tomorrow = todayAt12.add(1, 'day');
     const clock = useFakeTimers(todayAt12.valueOf());
     const promise = executeActions(

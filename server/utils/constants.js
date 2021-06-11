@@ -431,6 +431,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
   },
+  LOCATION: {
+    NEW: 'location.new',
+  },
   USER_PRESENCE: {
     LEFT_HOME: 'user.left-home',
     BACK_HOME: 'user.back-home',
