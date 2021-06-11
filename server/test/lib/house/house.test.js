@@ -2,12 +2,15 @@ const { expect } = require('chai');
 const assertChai = require('chai').assert;
 const sinon = require('sinon');
 
+const User = require('../../../lib/user');
+
 const { fake, assert } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const StateManager = require('../../../lib/state');
 const House = require('../../../lib/house');
+const Session = require('../../../lib/session');
 
 const event = {
   emit: fake.returns(null),
@@ -124,6 +127,59 @@ describe('House', () => {
     });
     it('should return not found', async () => {
       const promise = house.getRooms('house-not-found');
+      return assertChai.isRejected(promise, 'House not found');
+    });
+  });
+
+  describe('house.getUsersAtHome', () => {
+    const house = new House(event);
+    const state = new StateManager();
+    const session = new Session('secret');
+    const user = new User(session, state);
+    it('should get users in an empty house', async () => {
+      const users = await house.getUsersAtHome('test-house');
+      expect(users).to.deep.equal([]);
+    });
+    it('should get users in a house', async () => {
+      await user.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+        current_house_id: 'a741dfa6-24de-4b46-afc7-370772f068d5',
+      });
+      const users = await house.getUsersAtHome('test-house');
+      expect(users).to.deep.equal([
+        {
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          firstname: 'John',
+          lastname: 'Doe',
+          selector: 'john',
+          picture:
+            'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDABALCwsMCxAMDBAXDw0PFxoUEBAUGh4XFxcXFx4dFxoZGRoXHR0jJCYkIx0vLzIyLy9AQEBAQEBAQEBAQEBAQED/2wBDAREPDxETERUSEhUUERMRFBkUFRUUGSUZGRsZGSUvIh0dHR0iLyotJiYmLSo0NC8vNDRAQD5AQEBAQEBAQEBAQED/wAARCAAFAAUDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAP/xAAeEAABBAEFAAAAAAAAAAAAAAASAAEDEQITFSExQf/EABUBAQEAAAAAAAAAAAAAAAAAAAME/8QAFxEAAwEAAAAAAAAAAAAAAAAAADGSk//aAAwDAQACEQMRAD8AjjvOpI7PMdRk1YkQSDzd134iIgpluaP/2Q==',
+        },
+      ]);
+    });
+    it('should return not found', async () => {
+      const promise = house.getUsersAtHome('house-not-found');
+      return assertChai.isRejected(promise, 'House not found');
+    });
+  });
+
+  describe('house.isEmpty', () => {
+    const house = new House(event);
+    const state = new StateManager();
+    const session = new Session('secret');
+    const user = new User(session, state);
+    it('should return true', async () => {
+      const houseEmpty = await house.isEmpty('test-house');
+      expect(houseEmpty).to.equal(true);
+    });
+    it('should return false', async () => {
+      await user.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+        current_house_id: 'a741dfa6-24de-4b46-afc7-370772f068d5',
+      });
+      const houseEmpty = await house.isEmpty('test-house');
+      expect(houseEmpty).to.equal(false);
+    });
+    it('should return not found', async () => {
+      const promise = house.getUsersAtHome('house-not-found');
       return assertChai.isRejected(promise, 'House not found');
     });
   });

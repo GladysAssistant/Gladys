@@ -960,6 +960,11 @@
       "scene": {
         "label": "Select a scene",
         "notice": "The trigger conditions of the called scene will be ignored. If a scene calls another scene, and vice versa, Gladys will not fall into an infinite loop: each scene will be executed once."
+      },
+      "houseEmptyOrNot": {
+        "houseIsEmptyDescription": "If the house is empty, the scene will continue. Otherwise, the scene will stop.",
+        "houseIsNotEmptyDescription": "If the house is not empty, the scene will continue. Otherwise, the scene will stop.",
+        "houseLabel": "House"
       }
     },
     "actions": {
@@ -996,6 +1001,10 @@
       },
       "http": {
         "request": "Make a HTTP request"
+      },
+      "house": {
+        "is-empty": "If the house is empty",
+        "is-not-empty": "If the house is not empty"
       }
     },
     "variables": {
