@@ -24,14 +24,12 @@ class MapComponent extends Component {
         maxZoom: 19
       })
       .addTo(this.leafletMap);
-    this.displayHouses();
-    this.displayUsers();
-    this.getAreas();
+    this.displayAll(this.props);
   };
 
-  displayUsers = () => {
-    if (this.props.users) {
-      this.props.users.forEach(user => {
+  displayUsers = props => {
+    if (props.users) {
+      props.users.forEach(user => {
         if (this.userMarkers[user.id]) {
           this.userMarkers[user.id].remove();
         }
@@ -52,9 +50,20 @@ class MapComponent extends Component {
     }
   };
 
-  displayHouses = () => {
-    if (this.props.houses) {
-      this.props.houses.forEach(house => {
+  displayAll = props => {
+    this.markerArray = [];
+    this.displayHouses(props);
+    this.displayUsers(props);
+    this.displayAreas(props);
+    if (this.markerArray.length >= 1) {
+      const group = leaflet.featureGroup(this.markerArray);
+      this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
+    }
+  };
+
+  displayHouses = props => {
+    if (props.houses) {
+      props.houses.forEach(house => {
         if (this.houseMarkers[house.id]) {
           this.houseMarkers[house.id].remove();
         }
@@ -74,10 +83,9 @@ class MapComponent extends Component {
     }
   };
 
-  getAreas = async () => {
-    try {
-      const areas = await this.props.httpClient.get('/api/v1/area');
-      areas.forEach(area => {
+  displayAreas = async props => {
+    if (props.areas) {
+      props.areas.forEach(area => {
         if (this.areaMarkers[area.id]) {
           this.areaMarkers[area.id].remove();
         }
@@ -98,8 +106,6 @@ class MapComponent extends Component {
 
         this.markerArray.push(this.areaMarkers[area.id]);
       });
-    } catch (e) {
-      console.error(e);
     }
   };
 
@@ -136,14 +142,8 @@ class MapComponent extends Component {
     window.addEventListener('resize', this.updateDimensions.bind(this));
   }
 
-  componentDidUpdate() {
-    this.markerArray = [];
-    this.displayHouses();
-    this.displayUsers();
-    if (this.markerArray.length >= 1) {
-      const group = leaflet.featureGroup(this.markerArray);
-      this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
-    }
+  componentWillReceiveProps(nextProps) {
+    this.displayAll(nextProps);
   }
 
   componentWillUnmount() {

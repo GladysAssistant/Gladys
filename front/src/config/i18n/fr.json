@@ -1045,6 +1045,11 @@
       "scene": {
         "label": "Choisir une scène",
         "notice": "Les conditions de déclenchements de la scène appelée seront ignorées. Si une scène appelle une autre scène, et vice-versa, Gladys ne tombera pas dans une boucle infinie: chaque scène ne sera exécutée qu'une seule fois"
+      },
+      "houseEmptyOrNot": {
+        "houseIsEmptyDescription": "Si la maison est vide, cette scène continuera. Sinon, la scène s'arrêtera.",
+        "houseIsNotEmptyDescription": "Si la maison n'est pas vide, cette scène continuera. Sinon, la scène s'arrêtera.",
+        "houseLabel": "Maison"
       }
     },
     "actions": {
@@ -1081,6 +1086,10 @@
       },
       "http": {
         "request": "Faire une requête HTTP"
+      },
+      "house": {
+        "is-empty": "Si la maison est vide",
+        "is-not-empty": "Si la maison n'est pas vide"
       }
     },
     "variables": {
@@ -1400,10 +1409,11 @@
     "radiusLabel": "Rayon (en mètre)",
     "radiusPlaceholder": "Entrez le rayon de votre zone en mètre",
     "colorLabel": "Couleur",
+    "mapLabel": "Cliquez sur la carte où votre zone doit être située",
     "createButton": "Créer une zone",
     "updateButton": "Mettre à jour la zone",
     "deleteButton": "Supprimer la zone",
-    "createAreaError": "Une erreur est survenue lors de la création de votre zone. Avez-vous bien rempli tous les champs ?",
+    "createAreaError": "Une erreur est survenue lors de la création de votre zone. Avez-vous bien rempli tous les champs, et cliqué sur la carte pour positionner votre zone ?",
     "deleteAreaError": "Impossible de supprimer cette zone. Rafraichissez cette page et réessayez.",
     "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer."
   },

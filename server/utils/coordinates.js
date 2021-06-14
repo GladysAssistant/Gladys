@@ -34,8 +34,8 @@ function calculateDistanceBetweenTwoPoints(lat1, lon1, lat2, lon2) {
 
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const d = R * c;
-
-  return Math.round(d);
+  const distanceInMeter = d * 1000;
+  return Math.round(distanceInMeter);
 }
 
 module.exports = {

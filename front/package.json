@@ -50,7 +50,7 @@
     "dotenv": "^6.2.0",
     "get-value": "^3.0.1",
     "immutability-helper": "^3.0.0",
-    "leaflet": "^1.4.0",
+    "leaflet": "^1.7.1",
     "linkstate": "^1.1.1",
     "preact": "^10.3.2",
     "preact-cli-plugin-fast-async": "^1.0.1",

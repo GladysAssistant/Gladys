@@ -1045,6 +1045,11 @@
       "scene": {
         "label": "Select a scene",
         "notice": "The trigger conditions of the called scene will be ignored. If a scene calls another scene, and vice versa, Gladys will not fall into an infinite loop: each scene will be executed once."
+      },
+      "houseEmptyOrNot": {
+        "houseIsEmptyDescription": "If the house is empty, the scene will continue. Otherwise, the scene will stop.",
+        "houseIsNotEmptyDescription": "If the house is not empty, the scene will continue. Otherwise, the scene will stop.",
+        "houseLabel": "House"
       }
     },
     "actions": {
@@ -1081,6 +1086,10 @@
       },
       "http": {
         "request": "Make a HTTP request"
+      },
+      "house": {
+        "is-empty": "If the house is empty",
+        "is-not-empty": "If the house is not empty"
       }
     },
     "variables": {
@@ -1398,12 +1407,13 @@
     "nameLabel": "Name",
     "namePlaceholder": "Enter the name of the zone",
     "radiusLabel": "Radius (in meter)",
+    "mapLabel": "Click on the map to select you zone location",
     "radiusPlaceholder": "Enter the radius of your zone in meter",
     "colorLabel": "Color",
     "createButton": "Create zone",
     "updateButton": "Update zone",
     "deleteButton": "Delete zone",
-    "createAreaError": "Unable to create this zone: are you sure you filled every field?",
+    "createAreaError": "Unable to create this zone: are you sure you filled every field and clicked on the map to select your zone location?",
     "getAreaError": "Unable to get data from this zone. Please refresh this page to retry.",
     "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry."
   },
