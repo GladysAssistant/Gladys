@@ -1,39 +1,27 @@
 {
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
-  "name": "Switch 5",
+  "name": "Test 4",
   "model": "TH",
-  "external_id": "ewelink:10004535ae:0",
-  "selector": "ewelink:10004535ae:0",
+  "external_id": "ewelink:10004534ae",
+  "selector": "ewelink:10004534ae",
   "should_poll": true,
-  "poll_frequency": 60000,
+  "poll_frequency": 30000,
   "features": [
     {
-      "name": "Switch 5 On/Off",
-      "external_id": "ewelink:10004535ae:0:binary",
-      "selector": "ewelink:10004535ae:0:binary",
+      "name": "Test 4 On/Off",
+      "external_id": "ewelink:10004534ae:binary:1",
+      "selector": "ewelink:10004534ae:binary:1",
       "category": "switch",
       "type": "binary",
       "read_only": false,
-      "has_feedback": false,
+      "has_feedback": true,
       "min": 0,
       "max": 1
     },
     {
-      "name": "Switch 5 Temperature",
-      "external_id": "ewelink:10004535ae:0:temperature-sensor",
-      "selector": "ewelink:10004535ae:0:temperature-sensor",
-      "category": "temperature-sensor",
-      "type": "decimal",
-      "read_only": true,
-      "has_feedback": false,
-      "min": -20,
-      "max": 50,
-      "unit": "celsius"
-    },
-    {
-      "name": "Switch 5 Humidity",
-      "external_id": "ewelink:10004535ae:0:humidity-sensor",
-      "selector": "ewelink:10004535ae:0:humidity-sensor",
+      "name": "Test 4 Humidity",
+      "external_id": "ewelink:10004534ae:humidity",
+      "selector": "ewelink:10004534ae:humidity",
       "category": "humidity-sensor",
       "type": "decimal",
       "read_only": true,
@@ -41,16 +29,32 @@
       "min": 0,
       "max": 100,
       "unit": "percent"
+    },
+    {
+      "name": "Test 4 Temperature",
+      "external_id": "ewelink:10004534ae:temperature",
+      "selector": "ewelink:10004534ae:temperature",
+      "category": "temperature-sensor",
+      "type": "decimal",
+      "read_only": true,
+      "has_feedback": false,
+      "min": -100,
+      "max": 200,
+      "unit": "celsius"
     }
   ],
   "params": [
     {
       "name": "IP_ADDRESS",
-      "value": "192.168.0.5"
+      "value": "192.168.0.4"
     },
     {
       "name": "FIRMWARE",
       "value": "3.1.2"
+    },
+    {
+      "name": "ONLINE",
+      "value": "1"
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "online": true,
-  "name": "Switch 5",
-  "deviceid": "10004535ae",
+  "name": "Test 4",
+  "deviceid": "10004534ae",
   "apikey": "validApikey",
   "extra": {
     "extra": {
@@ -12,7 +12,7 @@
   "params": {
     "fwVersion": "3.1.2"
   },
-  "ip": "192.168.0.5",
+  "ip": "192.168.0.4",
   "brandName": "Sonoff",
   "productModel": "TH",
   "uiid": 15

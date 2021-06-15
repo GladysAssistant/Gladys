@@ -95,13 +95,6 @@ class EwelinkApi {
     }
     return Promise.resolve({ error: 401, msg: 'Authentication error' });
   }
-
-  checkDeviceUpdate(deviceId) {
-    if ((this.email === 'email@valid.ok' && this.password === 'S0m3Th1ngTru3') || this.at === 'validAccessToken') {
-      return Promise.resolve({ error: false, msg: 'Device does not exist' });
-    }
-    return Promise.resolve({ error: 401, msg: 'Authentication error' });
-  }
 }
 
 module.exports = EwelinkApi;

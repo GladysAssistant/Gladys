@@ -1,22 +1,22 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
+const sinon = require('sinon');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 const {
-  serviceId,
   event,
+  serviceId,
+  variableNok,
   variableNotConfigured,
   variableOk,
-  variableOkNoRegion,
   variableOkFalseRegion,
-  variableNok,
+  variableOkNoRegion,
 } = require('../../mocks/consts.test');
-const EweLinkApi = require('../../mocks/ewelink-api.mock.test');
+const EweLinkApiMock = require('../../mocks/ewelink-api.mock.test');
 
 const { assert } = sinon;
 
 const EwelinkService = proxyquire('../../../../../services/ewelink/index', {
-  'ewelink-api': EweLinkApi,
+  'ewelink-api': EweLinkApiMock,
 });
 
 describe('EweLinkHandler connect', () => {

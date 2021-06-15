@@ -10,7 +10,7 @@ const Promise = require('bluebird');
 function pollAll(pollFrequency) {
   return async () => {
     if (this.devicesByPollFrequency[pollFrequency]) {
-      return Promise.map(this.devicesByPollFrequency[pollFrequency], (device) => this.poll(device));
+      return Promise.map(this.devicesByPollFrequency[pollFrequency], (device) => this.poll(device), { concurrency: 1 });
     }
     return Promise.resolve();
   };

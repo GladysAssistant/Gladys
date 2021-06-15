@@ -8,8 +8,10 @@ const EWELINK_REGIONS = {
 
 const DEVICE_SERVICE_ID = 'ewelink';
 const DEVICE_EXTERNAL_ID_BASE = 'ewelink';
+
 const DEVICE_IP_ADDRESS = 'IP_ADDRESS';
 const DEVICE_FIRMWARE = 'FIRMWARE';
+const DEVICE_ONLINE = 'ONLINE';
 
 module.exports = {
   EWELINK_EMAIL_KEY,
@@ -20,4 +22,5 @@ module.exports = {
   DEVICE_EXTERNAL_ID_BASE,
   DEVICE_IP_ADDRESS,
   DEVICE_FIRMWARE,
+  DEVICE_ONLINE,
 };
