@@ -482,6 +482,19 @@
       "saveError": "There was an error saving the device.",
       "documentation": "Zigbee2mqtt documentation"
     },
+    "googleHome": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Do you want to connect Gladys Assistant to Google Home ?",
+      "description": "This integration will let you control your local Gladys Assistant devices with Google Home.",
+      "connectedAs": "Connected as",
+      "googleWillBeAble": "Google Home will be able:",
+      "seeDevices": "List all your devices",
+      "controlDevices": "Control all your devices",
+      "getNewDeviceValues": "Periodically refresh your device states",
+      "privacyPolicy": "Read Google's <a href=\"http://policies.google.com/?hl=en\">privacy policy</a>.",
+      "cancelButton": "Cancel",
+      "connectButton": "Link"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Control your Z-Wave devices.",

@@ -1,0 +1,96 @@
+import { Component } from 'preact';
+import { connect } from 'unistore/preact';
+import classnames from 'classnames';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
+import Layout from './Layout';
+import style from './style.css';
+
+@connect('user,session', {})
+class GoogleHomeGateway extends Component {
+  componentDidMount() {
+    console.log(this.props);
+  }
+
+  render(props, {}) {
+    return (
+      <Layout>
+        <div class="container mt-4">
+          <div class="row">
+            <div class={classnames('col mx-auto', style.colWidth)}>
+              <div class="text-center mb-6">
+                <h2>
+                  <Localizer>
+                    <img
+                      src="/assets/icons/favicon-96x96.png"
+                      class="header-brand-img"
+                      alt={<Text id="global.logoAlt" />}
+                    />
+                  </Localizer>
+                  <Text id="integration.googleHome.title" />
+                </h2>
+              </div>
+              <form class="card">
+                <div class="card-body p-6">
+                  <div class="card-title">
+                    <h3>
+                      <Text id="integration.googleHome.cardTitle" />
+                    </h3>
+                  </div>
+
+                  <p>
+                    <Text id="integration.googleHome.description" />
+                  </p>
+
+                  <p>
+                    <Text id="integration.googleHome.connectedAs" /> <b>{props.user && props.user.email}</b>
+                  </p>
+
+                  <div class="form-group">
+                    <h4>
+                      <Text id="integration.googleHome.googleWillBeAble" />
+                    </h4>
+                    <ul class="list-unstyled leading-loose">
+                      <li>
+                        <i class="fe fe-check text-success mr-2" aria-hidden="true" />{' '}
+                        <Text id="integration.googleHome.seeDevices" />
+                      </li>
+                      <li>
+                        <i class="fe fe-check text-success mr-2" aria-hidden="true" />{' '}
+                        <Text id="integration.googleHome.controlDevices" />
+                      </li>
+                      <li>
+                        <i class="fe fe-check text-success mr-2" aria-hidden="true" />{' '}
+                        <Text id="integration.googleHome.getNewDeviceValues" />
+                      </li>
+                    </ul>
+                  </div>
+
+                  <p>
+                    <MarkupText id="integration.googleHome.privacyPolicy" />
+                  </p>
+
+                  <div class="form-footer">
+                    <div class="row">
+                      <div class="col-6">
+                        <button class="btn btn-secondary btn-block">
+                          <Text id="integration.googleHome.cancelButton" />
+                        </button>
+                      </div>
+                      <div class="col-6">
+                        <button class="btn btn-primary btn-block">
+                          <Text id="integration.googleHome.connectButton" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+}
+
+export default GoogleHomeGateway;

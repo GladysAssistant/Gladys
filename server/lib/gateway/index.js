@@ -27,7 +27,7 @@ const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 
-const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager) {
+const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager, serviceManager) {
   this.variable = variable;
   this.event = event;
   this.system = system;
@@ -35,6 +35,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.config = config;
   this.user = user;
   this.stateManager = stateManager;
+  this.serviceManager = serviceManager;
   this.connected = false;
   this.restoreInProgress = false;
   this.usersKeys = [];
