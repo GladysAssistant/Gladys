@@ -8,7 +8,7 @@
     "start": "per-env",
     "start:production": "npm run -s serve",
     "start:development": "npm run -s dev",
-    "build": "cross-env NODE_ENV=production GLADYS_GATEWAY_API_URL=https://ca323f765137.ngrok.io GATEWAY_MODE=true preact build --template src/template.html --no-prerender",
+    "build": "cross-env NODE_ENV=production preact build --template src/template.html --no-prerender",
     "serve": "npm run build && preact serve",
     "dev": "preact watch -p 1444 --template src/template.html",
     "eslint": "eslint src cypress --ext .json --ext .js --ext .jsx",
