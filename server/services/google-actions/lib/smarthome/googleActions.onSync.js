@@ -5,14 +5,13 @@ const { syncDeviceConverter } = require('../utils/googleActions.syncDeviceConver
  * @description The function that will run for an SYNC request.
  * It should return a valid response or a Promise that resolves to valid response.
  * @param {Object} body - Request body.
- * @param {Object} headers - Request headers.
  * @returns {Promise} A valid response.
  * @example
  * googleActions.onSync({}, {});
  *
  * @see https://actions-on-google.github.io/actions-on-google-nodejs/interfaces/smarthome.smarthomeapp.html#onsync
  */
-async function onSync(body, headers) {
+async function onSync(body) {
   const { user, requestId } = body;
 
   logger.debug('GoogleActions: syncing...');

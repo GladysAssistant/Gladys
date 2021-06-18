@@ -1,6 +1,5 @@
 const logger = require('../../utils/logger');
 const GoogleActionsHandler = require('./lib');
-const GoogleActionsController = require('./api/googleActions.controller');
 
 module.exports = function GoogleActionsService(gladys, serviceId) {
   const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
@@ -13,8 +12,6 @@ module.exports = function GoogleActionsService(gladys, serviceId) {
    */
   async function start() {
     logger.info('starting GoogleActions service');
-    //  await googleActionsHandler.init();
-    logger.info('GoogleActions service well started');
   }
 
   /**
@@ -25,14 +22,11 @@ module.exports = function GoogleActionsService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('stopping GoogleActions service');
-    // await googleActionsHandler.stop();
-    logger.info('GoogleActions service well stopped');
   }
 
   return Object.freeze({
     start,
     stop,
     googleActionsHandler,
-    controllers: GoogleActionsController(googleActionsHandler),
   });
 };

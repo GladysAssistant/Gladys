@@ -31,7 +31,7 @@ async function onQuery(body, headers) {
   return {
     requestId: body.requestId,
     payload: {
-      agentUserId: body.user.selector,
+      agentUserId: body.user.id,
       devices,
     },
   };

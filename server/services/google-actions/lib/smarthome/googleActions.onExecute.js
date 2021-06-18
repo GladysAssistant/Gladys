@@ -134,7 +134,7 @@ async function onExecute(body, headers) {
   return {
     requestId: body.requestId,
     payload: {
-      agentUserId: body.user.selector,
+      agentUserId: body.user.id,
       commands,
     },
   };

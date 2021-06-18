@@ -82,12 +82,7 @@ async function handleNewMessage(data, rawMessage, cb) {
 
   // if the message is a Google Home request
   if (data.type === 'gladys-open-api' && data.action === 'google-home-request') {
-    const service = this.serviceManager.getService('google-actions');
-    data.data.user = {
-      id: rawMessage.local_user_id,
-    };
-    const response = await service.googleActionsHandler.dispatchQuery(data.data);
-    cb(response);
+    this.handleGoogleHomeMessage(data, rawMessage, cb);
   }
 }
 

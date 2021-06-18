@@ -10,6 +10,7 @@ const cryptoLib = new WebCrypto();
 
 const { backup } = require('./gateway.backup');
 const { checkIfBackupNeeded } = require('./gateway.checkIfBackupNeeded');
+const { handleGoogleHomeMessage } = require('./gateway.handleGoogleHomeMessage');
 const { handleNewMessage } = require('./gateway.handleNewMessage');
 const { login } = require('./gateway.login');
 const { loginTwoFactor } = require('./gateway.loginTwoFactor');
@@ -39,6 +40,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.connected = false;
   this.restoreInProgress = false;
   this.usersKeys = [];
+  this.usersConnectedGoogleHomeGateway = new Set();
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
@@ -52,6 +54,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
 
 Gateway.prototype.backup = backup;
 Gateway.prototype.checkIfBackupNeeded = checkIfBackupNeeded;
+Gateway.prototype.handleGoogleHomeMessage = handleGoogleHomeMessage;
 Gateway.prototype.handleNewMessage = handleNewMessage;
 Gateway.prototype.login = login;
 Gateway.prototype.loginTwoFactor = loginTwoFactor;
