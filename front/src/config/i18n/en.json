@@ -486,6 +486,7 @@
       "title": "Gladys Assistant",
       "cardTitle": "Do you want to connect Gladys Assistant to Google Home ?",
       "description": "This integration will let you control your local Gladys Assistant devices with Google Home.",
+      "error": "An error occured. Please retry !",
       "connectedAs": "Connected as",
       "googleWillBeAble": "Google Home will be able:",
       "seeDevices": "List all your devices",
