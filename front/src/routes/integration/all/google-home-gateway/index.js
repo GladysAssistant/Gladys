@@ -7,6 +7,26 @@ import style from './style.css';
 
 @connect('user,session', {})
 class GoogleHomeGateway extends Component {
+  cancel = e => {
+    e.preventDefault();
+    const redirectUrl = `${this.props.redirect_uri}?state=${this.props.state}&error=cancelled`;
+    window.location.replace(redirectUrl);
+  };
+  link = async e => {
+    e.preventDefault();
+    try {
+      const responseAuthorize = await this.props.session.gatewayClient.googleHomeAuthorize({
+        client_id: this.props.client_id,
+        redirect_uri: this.props.redirect_uri,
+        state: this.props.state
+      });
+      window.location.replace(responseAuthorize.redirectUrl);
+    } catch (e) {
+      console.error(e);
+      const redirectUrl = `${this.props.redirect_uri}?state=${this.props.state}&error=errored`;
+      window.location.replace(redirectUrl);
+    }
+  };
   componentDidMount() {
     console.log(this.props);
   }
@@ -72,12 +92,12 @@ class GoogleHomeGateway extends Component {
                   <div class="form-footer">
                     <div class="row">
                       <div class="col-6">
-                        <button class="btn btn-secondary btn-block">
+                        <button class="btn btn-secondary btn-block" onClick={this.cancel}>
                           <Text id="integration.googleHome.cancelButton" />
                         </button>
                       </div>
                       <div class="col-6">
-                        <button class="btn btn-primary btn-block">
+                        <button class="btn btn-primary btn-block" onClick={this.link}>
                           <Text id="integration.googleHome.connectButton" />
                         </button>
                       </div>

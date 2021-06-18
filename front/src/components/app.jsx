@@ -227,7 +227,7 @@ const AppRouter = connect(
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
 
-        <GoogleHomeGateway path="/dashboard/integration/device/google-home/connect" />
+        <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
