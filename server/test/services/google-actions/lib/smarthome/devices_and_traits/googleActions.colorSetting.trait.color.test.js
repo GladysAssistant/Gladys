@@ -39,9 +39,6 @@ const gladys = {
 };
 const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
 
-const headers = {
-  authentication: 'Bearer my-bearer-token',
-};
 let body;
 let expectedResult;
 

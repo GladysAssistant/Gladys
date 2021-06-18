@@ -1,5 +1,4 @@
 const logger = require('../../utils/logger');
-const { EVENTS } = require('../../utils/constants');
 
 /**
  * @description Init Gladys Gateway.
