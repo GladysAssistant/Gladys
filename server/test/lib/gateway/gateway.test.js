@@ -562,5 +562,137 @@ describe('gateway', () => {
         );
       });
     });
+    it('should handle a new gateway open api message: google-home-request', async function Test() {
+      this.timeout(10000);
+      const variable = {
+        setValue: fake.resolves(null),
+        destroy: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const serviceManager = {
+        getService: fake.returns({
+          googleActionsHandler: {
+            onSync: fake.resolves({ status: 200, onSync: true }),
+            onQuery: fake.resolves({ status: 200, onQuery: true }),
+            onExecute: fake.resolves({ status: 200, onExecute: true }),
+          },
+        }),
+      };
+      const eventGateway = {
+        emit: fake.returns(),
+        on: fake.returns(),
+      };
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager, serviceManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
+
+      const promiseSync = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.SYNC' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const promiseExecute = new Promise((resolve) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.EXECUTE' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const promiseDisconnect = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.DISCONNECT' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const promiseQuery = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.QUERY' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const promiseUnknown = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.UNKNOWN' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const [resultSync, resultQuery, resultExecute, resultUnkown, resultDisconnect] = await Promise.all([
+        promiseSync,
+        promiseQuery,
+        promiseExecute,
+        promiseUnknown,
+        promiseDisconnect,
+      ]);
+      expect(resultSync).to.deep.equal({ status: 200, onSync: true });
+      expect(resultQuery).to.deep.equal({ status: 200, onQuery: true });
+      expect(resultExecute).to.deep.equal({ status: 200, onExecute: true });
+      expect(resultUnkown).to.deep.equal({ status: 400 });
+      expect(resultDisconnect).to.deep.equal({});
+    });
   });
 });
