@@ -210,8 +210,8 @@ const features = {
     name: 'Light Temperature',
     read_only: false,
     has_feedback: false,
-    min: 0,
-    max: 65535,
+    min: 150,
+    max: 500,
     zigbeeField: 'color_temp',
   },
   color: {
