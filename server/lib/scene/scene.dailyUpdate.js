@@ -57,6 +57,19 @@ async function dailyUpdate() {
         .toDate();
       logger.info(`Sunrise today is at ${sunriseHour}:${sunriseMinute} today, in your timezone = ${this.timezone}`);
       logger.info(`Sunset today is at ${sunsetHour}:${sunsetMinute} today, in your timezone = ${this.timezone}`);
+      const sunrisePlus1Time = dayjs(sunriseTime)
+        .add(1, 'hour')
+        .toDate();
+      const sunriseMinus1Time = dayjs(sunriseTime)
+        .add(-1, 'hour')
+        .toDate();
+      const sunsetPlus1Time = dayjs(sunsetTime)
+        .add(1, 'hour')
+        .toDate();
+      const sunsetMinus1Time = dayjs(sunsetTime)
+        .add(-1, 'hour')
+        .toDate();
+
       const sunriseJob = this.schedule.scheduleJob(sunriseTime, () =>
         this.event.emit(EVENTS.TRIGGERS.CHECK, {
           type: EVENTS.TIME.SUNRISE,
@@ -69,6 +82,30 @@ async function dailyUpdate() {
       } else {
         logger.info(`The sun rose this morning. Not scheduling for today.`);
       }
+      const sunrisePlus1Job = this.schedule.scheduleJob(sunrisePlus1Time, () =>
+        this.event.emit(EVENTS.TRIGGERS.CHECK, {
+          type: EVENTS.TIME.SUNRISE_PLUS_1,
+          house,
+        }),
+      );
+      if (sunrisePlus1Job) {
+        logger.info(`Sunrise + 1 is scheduled, ${dayjs(sunrisePlus1Time).fromNow()}.`);
+        this.jobs.push(sunrisePlus1Job);
+      } else {
+        logger.info(`The sun rose this morning + 1. Not scheduling for today.`);
+      }
+      const sunriseMinus1Job = this.schedule.scheduleJob(sunriseMinus1Time, () =>
+        this.event.emit(EVENTS.TRIGGERS.CHECK, {
+          type: EVENTS.TIME.SUNRISE_MINUS_1,
+          house,
+        }),
+      );
+      if (sunriseMinus1Job) {
+        logger.info(`Sunrise - 1 is scheduled, ${dayjs(sunriseMinus1Time).fromNow()}.`);
+        this.jobs.push(sunriseMinus1Job);
+      } else {
+        logger.info(`The sun rose this morning - 1. Not scheduling for today.`);
+      }
 
       const sunsetJob = this.schedule.scheduleJob(sunsetTime, () =>
         this.event.emit(EVENTS.TRIGGERS.CHECK, {
@@ -76,10 +113,33 @@ async function dailyUpdate() {
           house,
         }),
       );
-
       if (sunsetJob) {
         logger.info(`Sunset is scheduled, ${dayjs(sunsetTime).fromNow()}.`);
         this.jobs.push(sunsetJob);
+      } else {
+        logger.info(`The sun has already set. Not scheduling for today.`);
+      }
+      const sunsetPlus1Job = this.schedule.scheduleJob(sunsetPlus1Time, () =>
+        this.event.emit(EVENTS.TRIGGERS.CHECK, {
+          type: EVENTS.TIME.SUNSET_PLUS_1,
+          house,
+        }),
+      );
+      if (sunsetPlus1Job) {
+        logger.info(`Sunset + 1 is scheduled, ${dayjs(sunsetPlus1Time).fromNow()}.`);
+        this.jobs.push(sunsetPlus1Job);
+      } else {
+        logger.info(`The sun has already set. Not scheduling for today.`);
+      }
+      const sunsetMinus1Job = this.schedule.scheduleJob(sunsetMinus1Time, () =>
+        this.event.emit(EVENTS.TRIGGERS.CHECK, {
+          type: EVENTS.TIME.SUNSET_MINUS_1,
+          house,
+        }),
+      );
+      if (sunsetMinus1Job) {
+        logger.info(`Sunset - 1 is scheduled, ${dayjs(sunsetMinus1Time).fromNow()}.`);
+        this.jobs.push(sunsetMinus1Job);
       } else {
         logger.info(`The sun has already set. Not scheduling for today.`);
       }
