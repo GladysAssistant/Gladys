@@ -6,6 +6,36 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
+    async checkStatus(state) {
+      let zwave2mqttStatus = {
+        zwave2mqttConfigured: false,
+        mqttExist: false,
+        mqttRunning: false,
+        zwave2mqttExist: false,
+        zwave2mqttRunning: false,
+        gladysConnected: false,
+        zwave2mqttConnected: false,
+        z2mEnabled: false,
+        dockerBased: false,
+        networkModeValid: false
+      };
+      try {
+        zwave2mqttStatus = await state.httpClient.get('/api/v1/service/zwave2mqtt/status');
+      } finally {
+        store.setState({
+          mqttExist: zwave2mqttStatus.mqttExist,
+          mqttRunning: zwave2mqttStatus.mqttRunning,
+          zwave2mqttExist: zwave2mqttStatus.zwave2mqttExist,
+          zwave2mqttRunning: zwave2mqttStatus.zwave2mqttRunning,
+          zwave2mqttConfigured: zwave2mqttStatus.zwave2mqttConfigured,
+          zwave2mqttConnected: zwave2mqttStatus.zwave2mqttConnected,
+          gladysConnected: zwave2mqttStatus.gladysConnected,
+          z2mEnabled: zwave2mqttStatus.z2mEnabled,
+          dockerBased: zwave2mqttStatus.dockerBased,
+          networkModeValid: zwave2mqttStatus.networkModeValid
+        });
+      }
+    },
     async getZwave2mqttDevices(state) {
       store.setState({
         getZwave2mqttStatus: RequestStatus.Getting
@@ -35,7 +65,7 @@ function createActions(store) {
         loading: true
       });
       try {
-        const discoveredDevices = await state.httpClient.get(`/api/v1/service/zwave2mqtt/discover`);
+        const discoveredDevices = await state.httpClient.get(`/api/v1/service/zwave2mqtt/device`);
         store.setState({
           discoveredDevices,
           loading: false,

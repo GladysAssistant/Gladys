@@ -18,7 +18,7 @@ async function handleGetNodesMessage(topic, message) {
       this.nodes[`nodeId_${element.id}`] = convertDevice(element, this.serviceId);
     });
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.SCAN_COMPLETE,
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.DISCOVER_COMPLETE,
       payload: convertedDevices,
     });
   }
@@ -30,19 +30,20 @@ async function handleGetNodesMessage(topic, message) {
 
 /**
  * @description Force scanning for devices.
- * @param {Object} options - Options used to scan.
  * @returns
- * @example scan(options);
+ * @example startDiscoveringDevices();
  */
-async function scan(options) {
+async function startDiscoveringDevices() {
   logger.info('Start ZWave scan...');
   this.scanInProgress = true;
 
   // Subscribe to Zwave2mqtt GetNodes
   this.mqttService.device.subscribe(ZWAVE_GATEWAY_PARAM_NAME.GET_NODES_TOPIC, handleGetNodesMessage.bind(this));
   this.mqttService.device.publish(ZWAVE_GATEWAY_PARAM_NAME.GET_NODES_REQUEST_TOPIC, JSON.stringify({ args: [] }));
+
+  return true;
 }
 
 module.exports = {
-  scan,
+  startDiscoveringDevices,
 };

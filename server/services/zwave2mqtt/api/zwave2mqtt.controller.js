@@ -46,11 +46,11 @@ module.exports = function Zwave2mqttController(zwave2mqttManager) {
 
   /**
    * @api {post} /api/v1/service/zwave2mqtt/discover Discover Zwave2mqtt devices.
-   * @apiName scan
+   * @apiName discover
    * @apiGroup Zwave2mqtt
    */
-  async function scan(req, res) {
-    await zwave2mqttManager.scan(req.body);
+  async function discover(req, res) {
+    await zwave2mqttManager.startDiscoveringDevices(req.body);
     res.json({
       success: true,
     });
@@ -94,7 +94,7 @@ module.exports = function Zwave2mqttController(zwave2mqttManager) {
     'post /api/v1/service/zwave2mqtt/discover': {
       authenticated: true,
       admin: true,
-      controller: asyncMiddleware(scan),
+      controller: asyncMiddleware(discover),
     },
     'get /api/v1/service/zwave2mqtt/config': {
       authenticated: true,

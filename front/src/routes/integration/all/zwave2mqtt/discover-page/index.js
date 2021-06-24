@@ -14,14 +14,14 @@ class Zwave2mqttIntegration extends Component {
     this.props.getIntegrationByName('zwave2mqtt');
 
     this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.DISCOVER,
+      WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.DISCOVER_COMPLETE,
       this.props.getDiscoveredZwave2mqttDevices
     );
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.DISCOVER,
+      WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.DISCOVER_COMPLETE,
       this.props.getDiscoveredZwave2mqttDevices
     );
   }
