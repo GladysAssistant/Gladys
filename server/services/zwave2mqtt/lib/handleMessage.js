@@ -8,9 +8,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
  * @example handleMessage('zwave2mqtt/zwave2mqtt:device/POWER', 'ON');
  */
 function handleMessage(topic, message) {
-  logger.debug(`Receive message from topic {topic}: {message}`);
-  // const splittedTopic = topic.split('/');
-  // events.forEach((event) => this.zwave2mqttHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event));
+  logger.debug(`Receive message from topic ${topic}: ${message}`);
   return null;
 }
 
