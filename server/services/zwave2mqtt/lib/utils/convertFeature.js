@@ -38,7 +38,7 @@ function convertFeature(device) {
         read_only: true,
         has_feedback: true,
         keep_history: true,
-        selector: externalId,
+        selector: device.name + ' ' + cmd.label,
       };
 
       if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_BASIC) {
