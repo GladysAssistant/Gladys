@@ -3,6 +3,8 @@ const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
+const { GENRES, UNKNOWN_CATEGORY } = require('../constants');
+const { getCommandClass } = require('../comClass/factory');
 
 /**
  * @description Return array of Nodes.
@@ -35,15 +37,16 @@ function getNodes() {
       const comclasses = Object.keys(node.classes);
       comclasses.forEach((comclass) => {
         const valuesClass = node.classes[comclass];
-        const indexes = Object.keys(valuesClass);
-        indexes.forEach((idx) => {
+        const commandClass = getCommandClass(parseInt(comclass, 10));
+
+        Object.keys(valuesClass).forEach((idx) => {
           const value = node.classes[comclass][idx];
-          const instances = Object.keys(value);
-          instances.forEach((inst) => {
-            const { min, max } = value[inst];
-            if (value[inst].genre === 'user') {
+          Object.keys(value).forEach((inst) => {
+            const { min, max, step } = commandClass.getMinMax(node, comclass, idx, inst);
+
+            if (value[inst].genre === GENRES.USER) {
               const { category, type } = getCategory(node, value[inst]);
-              if (category !== 'unknown') {
+              if (category !== UNKNOWN_CATEGORY) {
                 newDevice.features.push({
                   name: `${value[inst].label}`,
                   selector: slugify(
@@ -57,6 +60,7 @@ function getNodes() {
                   has_feedback: true,
                   min,
                   max,
+                  step,
                 });
               }
             } else {
@@ -68,6 +72,7 @@ function getNodes() {
           });
         });
       });
+
       return newDevice;
     })
     .sort(function sortByNodeReady(a, b) {

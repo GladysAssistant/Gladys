@@ -1758,7 +1758,8 @@
         "unit": null,
         "has_feedback": true,
         "min": 0,
-        "max": 0
+        "max": 0,
+        "step": 1
       },
       {
         "name": "Air Temperature",
@@ -1770,7 +1771,8 @@
         "unit": "celsius",
         "has_feedback": true,
         "min": 0,
-        "max": 0
+        "max": 0,
+        "step": 1
       },
       {
         "name": "Illuminance",
@@ -1782,7 +1784,8 @@
         "unit": "lux",
         "has_feedback": true,
         "min": 0,
-        "max": 0
+        "max": 0,
+        "step": 1
       },
       {
         "name": "Seismic Intensity",
@@ -1794,7 +1797,8 @@
         "unit": null,
         "has_feedback": true,
         "min": 0,
-        "max": 0
+        "max": 0,
+        "step": 1
       },
       {
         "name": "Battery Level",
@@ -1806,7 +1810,8 @@
         "unit": "percent",
         "has_feedback": true,
         "min": 0,
-        "max": 255
+        "max": 255,
+        "step": 1
       }
     ],
     "params": [

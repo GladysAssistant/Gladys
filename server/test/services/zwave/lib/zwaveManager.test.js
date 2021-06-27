@@ -5,7 +5,7 @@ const EventEmitter = require('events');
 const event = new EventEmitter();
 const ZwaveManager = require('../../../../services/zwave/lib');
 const ZwaveMock = require('../ZwaveMock.test');
-const nodesData = require('./nodesData.json');
+const nodesData = require('./nodesData')();
 const nodesExpectedResult = require('./nodesExpectedResult.json');
 
 describe('zwaveManager commands', () => {
@@ -107,26 +107,6 @@ describe('zwaveManager events', () => {
   });
   it('should receive value added', () => {
     zwaveManager.valueAdded(1, 10, {
-      value_id: '5-32-1-0',
-      node_id: 5,
-      class_id: 32,
-      type: 'byte',
-      genre: 'basic',
-      instance: 1,
-      index: 0,
-      label: 'Basic',
-      units: '',
-      help: '',
-      read_only: false,
-      write_only: false,
-      min: 0,
-      max: 255,
-      is_polled: false,
-      value: 0,
-    });
-  });
-  it('should receive value changed', () => {
-    zwaveManager.valueChanged(1, 10, {
       value_id: '5-32-1-0',
       node_id: 5,
       class_id: 32,
