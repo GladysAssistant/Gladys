@@ -55,7 +55,7 @@ function createActions(store) {
                     last_value: {
                       $set: value
                     },
-                    lastValueChanged: {
+                    last_value_changed: {
                       $set: new Date()
                     }
                   }
