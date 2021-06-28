@@ -107,8 +107,9 @@ describe('GoogleActions Handler - onSync - color', () => {
     expectedResult.payload.devices = {
       'device-1': {
         online: true,
-        status: 'ONLINE',
-        spectrumRgb: 73,
+        color: {
+          spectrumRgb: 73,
+        },
       },
     };
     expect(result).to.deep.eq(expectedResult);

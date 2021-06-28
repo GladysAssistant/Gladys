@@ -105,7 +105,6 @@ describe('GoogleActions Handler - onSync - brightness (switch)', () => {
     expectedResult.payload.devices = {
       'device-1': {
         online: true,
-        status: 'ONLINE',
         brightness: 73,
       },
     };

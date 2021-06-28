@@ -60,7 +60,6 @@ describe('GoogleActions Handler - onQuery', () => {
         devices: {
           'device-1': {
             online: true,
-            status: 'ONLINE',
             on: false,
           },
         },
