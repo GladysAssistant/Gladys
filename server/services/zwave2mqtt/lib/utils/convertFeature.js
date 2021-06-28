@@ -22,23 +22,23 @@ function convertFeature(device) {
     Object.keys(cmdClasses).forEach((cmdID) => {
       const cmd = cmdClasses[cmdID];
 
-      const externalId = getDeviceFeatureExternalId({
+      let externalId = getDeviceFeatureExternalId({
         node_id: device.id,
         class_id: cmd.commandClass,
         instance: cmd.endpoint,
-        propertyKey: cmd.property,
+        propertyKey: cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_METER ? `${cmd.property}/${cmd.propertyKey}` : cmd.property,
       });
 
-      const defaultFeature = {
+      let defaultFeature = {
         name: cmd.label,
         external_id: externalId,
-        min: 0,
-        max: 1,
+        min: cmd.min || 0,
+        max: cmd.max || 1,
         unit: cmd.unit,
-        read_only: true,
-        has_feedback: true,
+        read_only: cmd.targetValue !== undefined ? false : !cmd.writeable,
+        has_feedback: cmd.targetValue !== undefined,
         keep_history: true,
-        selector: device.name + ' ' + cmd.label,
+        selector: `${device.id} - ${device.name} ${cmd.label}`,
       };
 
       if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_BASIC) {
@@ -53,48 +53,8 @@ function convertFeature(device) {
         // Manufacturer managed by zwave2mqtt
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE) {
         // Central scene
-        /* features.push({
-            name: cmd.label,
-            category: DEVICE_FEATURE_CATEGORIES.BUTTON,
-            type: DEVICE_FEATURE_TYPES.BUTTON.CLICK, 
-            external_id: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property
-            }),
-            min: 0,
-            max: 1,
-            read_only: true,
-            has_feedback: true,
-            keep_history: true,
-            selector: cmd.label,
-          }); */
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_ALARM) {
-        // Notification 0x71
         // - Sensor status
-        /* features.push({
-            name: cmd.label,
-            category: DEVICE_FEATURE_CATEGORIES.UNKNOWN,
-            type: DEVICE_FEATURE_TYPES.UNKNOWN, 
-            external_id: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property
-            }),
-            min: 0,
-            max: 255,
-            read_only: true,
-            has_feedback: true,
-            keep_history: true,
-            selector: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property
-            }),
-          }); */
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_WAKE_UP) {
         // Wake up
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_BATTERY) {
@@ -102,85 +62,33 @@ function convertFeature(device) {
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_BINARY) {
         // "Binary Switch"
         if (cmd.property === 'currentValue') {
-          features.push({
-            name: cmd.label,
+          features.push(Object.assign({}, defaultFeature, {
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
             type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-            external_id: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property,
-            }),
-            min: 0,
-            max: 1,
-            read_only: false,
-            has_feedback: true,
-            keep_history: true,
-            selector: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property,
-            }),
-          });
+          }));
         }
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_MULTILEVEL) {
         // "Multilevel Switch"
         // duration
         if (cmd.property === 'currentValue') {
-          features.push({
-            name: cmd.label,
+          features.push(Object.assign({}, defaultFeature, {
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
             type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
-            external_id: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property,
-            }),
-            min: 0,
-            max: 255,
-            read_only: false,
-            has_feedback: true,
-            keep_history: true,
-            selector: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property,
-            }),
-          });
+          }));
+        } else if (cmd.property === 'targetValue') {
+          //
         }
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SCENE_ACTIVATION) {
         // "Scene Activation"
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SENSOR_BINARY) {
         // 'Binary Sensor'
         if (cmd.property === 'Motion') {
-          features.push({
-            name: cmd.label,
-            category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
+          features.push(Object.assign({}, defaultFeature, {
+            category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
             type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-            external_id: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property,
-            }),
-            min: 0,
-            max: 1,
-            unit: cmd.unit,
-            read_only: true,
-            has_feedback: true,
-            keep_history: true,
-            selector: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: cmd.property,
-            }),
-          });
-        } else if (cmd.propertyName === 'Any') {
+          }));
+        } else if (cmd.property === 'Any') {
+          //
         }
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SENSOR_MULTILEVEL) {
         // "Multilevel Sensor"
@@ -208,77 +116,23 @@ function convertFeature(device) {
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_METER) {
         // "Meter"
         if (cmd.propertyKeyName === 'Electric_A_Consumed') {
-          features.push({
-            name: cmd.label,
+          features.push(Object.assign({}, defaultFeature, {
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
             type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
-            external_id: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: `${cmd.property}/${cmd.propertyKey}`,
-            }),
-            min: 0,
             max: 10,
-            unit: cmd.unit,
-            read_only: true,
-            has_feedback: true,
-            keep_history: true,
-            selector: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: `${cmd.property}/${cmd.propertyKey}`,
-            }),
-          });
+          }));
         } else if (cmd.propertyKeyName === 'Electric_W_Consumed') {
-          features.push({
-            name: cmd.label,
+          features.push(Object.assign({}, defaultFeature, {
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
             type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
-            external_id: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: `${cmd.property}/${cmd.propertyKey}`,
-            }),
-            min: 0,
             max: 10000,
-            unit: cmd.unit,
-            read_only: true,
-            has_feedback: true,
-            keep_history: true,
-            selector: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: `${cmd.property}/${cmd.propertyKey}`,
-            }),
-          });
+          }));
         } else if (cmd.propertyKeyName === 'Electric_kWh_Consumed') {
-          features.push({
-            name: cmd.label,
+          features.push(Object.assign({}, defaultFeature, {
             category: DEVICE_FEATURE_CATEGORIES.SWITCH,
             type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
-            external_id: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: `${cmd.property}/${cmd.propertyKey}`,
-            }),
-            min: 0,
             max: 100,
-            unit: cmd.unit,
-            read_only: true,
-            has_feedback: true,
-            keep_history: true,
-            selector: getDeviceFeatureExternalId({
-              node_id: device.id,
-              class_id: cmd.commandClass,
-              instance: cmd.endpoint,
-              propertyKey: `${cmd.property}/${cmd.propertyKey}`,
-            }),
-          });
+          }));
         }
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR) {
         // "Color Switch"
