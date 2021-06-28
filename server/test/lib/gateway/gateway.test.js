@@ -695,4 +695,67 @@ describe('gateway', () => {
       expect(resultDisconnect).to.deep.equal({});
     });
   });
+  describe('gateway.forwardDeviceStateToGoogleHome', () => {
+    it('should forward an event to google home', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: (type) => {
+          const feature = {
+            id: 'f2e2d5ea-bcea-4092-b597-7b8fb723e070',
+            device_id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
+            name: 'Lampe luminosité',
+            selector: 'mqtt-brightness',
+            external_id: 'mqtt:brightness',
+            category: 'light',
+            type: 'brightness',
+            read_only: false,
+            keep_history: true,
+            has_feedback: false,
+            unit: null,
+            min: 0,
+            max: 100,
+            last_value: 97,
+            last_value_string: null,
+          };
+          if (type === 'deviceById') {
+            return {
+              id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
+              service_id: '54a4c447-0caa-4ed5-aa6f-5019e4b27754',
+              room_id: '89abf7bc-208c-411a-a69b-33a173753e81',
+              name: 'Lampe modified',
+              selector: 'mqtt-lampe',
+              model: null,
+              external_id: 'mqtt:lampe',
+              should_poll: false,
+              poll_frequency: null,
+              features: [feature],
+              params: [],
+            };
+          }
+          return feature;
+        },
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.googleHomeForwardStateTimeout = 1;
+      gateway.connected = true;
+      gateway.googleHomeConnected = true;
+      const oneEvent = {
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'my-car',
+      };
+      await gateway.forwardDeviceStateToGoogleHome(oneEvent);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          assert.calledWith(gateway.gladysGatewayClient.googleHomeReportState, {
+            devices: { states: { 'mqtt-lampe': { brightness: 97, online: true } } },
+          });
+          resolve();
+        }, 10);
+      });
+    });
+  });
 });

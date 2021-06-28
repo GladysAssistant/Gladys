@@ -2,8 +2,6 @@ const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 const { queryDeviceConverter } = require('../../services/google-actions/lib/utils/googleActions.queryDeviceConverter');
 
-const SEND_STATE_TIMEOUT = 5 * 1000;
-
 /**
  * @description send a current state to google
  * @param {Object} stateManager - The state manager.
@@ -14,26 +12,27 @@ const SEND_STATE_TIMEOUT = 5 * 1000;
  */
 async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeatureSelector) {
   logger.debug(`Gladys Gateway: Forwarding state to GoogleHome: ${deviceFeatureSelector}`);
-  // if the event is a DEVICE.NEW_STATE event
-  const gladysFeature = stateManager.get('deviceFeature', deviceFeatureSelector);
-  const gladysDevice = stateManager.get('deviceById', gladysFeature.device_id);
-
-  const device = queryDeviceConverter(gladysDevice);
-
-  const devices = {
-    states: {
-      [gladysDevice.selector]: device,
-    },
-  };
-
-  const payload = {
-    devices,
-  };
-
   try {
+    // if the event is a DEVICE.NEW_STATE event
+    const gladysFeature = stateManager.get('deviceFeature', deviceFeatureSelector);
+    const gladysDevice = stateManager.get('deviceById', gladysFeature.device_id);
+
+    const device = queryDeviceConverter(gladysDevice);
+
+    const devices = {
+      states: {
+        [gladysDevice.selector]: device,
+      },
+    };
+
+    const payload = {
+      devices,
+    };
+
     await gladysGatewayClient.googleHomeReportState(payload);
   } catch (e) {
     logger.warn(`Gladys Gateway: Unable to forward google home reportState`);
+    logger.warn(e);
   }
 }
 
@@ -62,7 +61,7 @@ async function forwardDeviceStateToGoogleHome(event) {
     }
     const newTimeout = setTimeout(() => {
       sendCurrentState(this.stateManager, this.gladysGatewayClient, event.device_feature);
-    }, SEND_STATE_TIMEOUT);
+    }, this.googleHomeForwardStateTimeout);
     this.forwardStateToGoogleHomeTimeouts.set(event.device_feature, newTimeout);
   }
   return null;

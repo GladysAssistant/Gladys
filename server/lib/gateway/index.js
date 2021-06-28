@@ -43,6 +43,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.usersKeys = [];
   this.googleHomeConnected = false;
   this.forwardStateToGoogleHomeTimeouts = new Map();
+  this.googleHomeForwardStateTimeout = 5 * 1000;
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
