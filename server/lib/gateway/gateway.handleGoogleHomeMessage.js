@@ -1,7 +1,6 @@
 const get = require('get-value');
 const logger = require('../../utils/logger');
-
-const GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY = 'GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY';
+const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Handle a new Gladys Google Home Gateway message.
@@ -25,14 +24,12 @@ async function handleGoogleHomeMessage(data, rawMessage, cb) {
       },
     };
     // save that the user is connected to gateway google home
-    if (!this.usersConnectedGoogleHomeGateway.has(rawMessage.local_user_id)) {
+    if (!this.googleHomeConnected) {
       await this.variable.setValue(
-        GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY,
+        SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY,
         rawMessage.sender_id,
-        null,
-        rawMessage.local_user_id,
       );
-      this.usersConnectedGoogleHomeGateway.add(rawMessage.local_user_id);
+      this.googleHomeConnected = true;
     }
     const firstOrderIntent = get(body, 'inputs.0.intent');
     let response;
@@ -43,8 +40,8 @@ async function handleGoogleHomeMessage(data, rawMessage, cb) {
     } else if (firstOrderIntent === 'action.devices.EXECUTE') {
       response = await service.googleActionsHandler.onExecute(body);
     } else if (firstOrderIntent === 'action.devices.DISCONNECT') {
-      await this.variable.destroy(GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY, null, rawMessage.local_user_id);
-      this.usersConnectedGoogleHomeGateway.delete(rawMessage.local_user_id);
+      await this.variable.destroy(SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY);
+      this.googleHomeConnected = false;
       response = {};
     } else {
       response = {

@@ -40,7 +40,7 @@ const colorSettingTrait = {
   ],
   states: [
     {
-      key: 'spectrumRgb',
+      key: 'color.spectrumRgb',
       readValue: (feature) => {
         return feature.last_value;
       },
@@ -52,7 +52,7 @@ const colorSettingTrait = {
       ],
     },
     {
-      key: 'temperatureK',
+      key: 'color.temperatureK',
       readValue: (feature) => {
         return feature.last_value * 70 + 2000;
       },

@@ -28,7 +28,9 @@ const execSubCommand = (
       );
     } else {
       const valueFunc = commands[parentParam + param];
-      if (!valueFunc) {
+      if (param === 'name') {
+        logger.debug(`Google Actions: "name" is not a command, doing nothing`);
+      } else if (!valueFunc) {
         // Param command key not found
         logger.error(`GoogleActions "${command} -> ${parentParam}${param}" command is not managed.`);
         // All devices are failure

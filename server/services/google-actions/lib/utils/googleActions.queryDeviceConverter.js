@@ -1,3 +1,4 @@
+const set = require('set-value');
 const { determineTrait } = require('./googleActions.determineTrait');
 
 /**
@@ -9,7 +10,6 @@ const { determineTrait } = require('./googleActions.determineTrait');
  */
 function queryDeviceConverter(gladysDevice) {
   const device = {
-    status: 'ONLINE',
     online: true,
   };
 
@@ -23,7 +23,7 @@ function queryDeviceConverter(gladysDevice) {
             !state.features || state.features.find((f) => f.category === feature.category && f.type === feature.type),
         )
         .forEach((state) => {
-          device[state.key] = state.readValue(feature);
+          set(device, state.key, state.readValue(feature));
         });
     }
   });
