@@ -151,6 +151,13 @@ const EVENTS = {
     EMPTY: 'house.empty',
     NO_LONGER_EMPTY: 'house.no-longer-empty',
   },
+  USER: {
+    NEW_LOCATION: 'user.new-location',
+  },
+  AREA: {
+    USER_ENTERED: 'area.user-entered',
+    USER_LEFT: 'area.user-left',
+  },
 };
 
 const LIFE_EVENTS = {
@@ -241,6 +248,10 @@ const ACTIONS = {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
     SET_OUT_OF_HOME: 'user.set-out-of-home',
     CHECK_PRESENCE: 'user.check-presence',
+  },
+  HOUSE: {
+    IS_EMPTY: 'house.is-empty',
+    IS_NOT_EMPTY: 'house.is-not-empty',
   },
   HTTP: {
     REQUEST: 'http.request',
@@ -423,6 +434,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+  },
+  LOCATION: {
+    NEW: 'location.new',
   },
   USER_PRESENCE: {
     LEFT_HOME: 'user.left-home',

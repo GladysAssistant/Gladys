@@ -37,6 +37,7 @@ import Device from '../routes/device';
 import IntegrationPage from '../routes/integration';
 import ChatPage from '../routes/chat';
 import MapPage from '../routes/map';
+import MapNewAreaPage from '../routes/map/NewArea';
 import CalendarPage from '../routes/calendar';
 import ScenePage from '../routes/scene';
 import NewScenePage from '../routes/scene/new-scene';
@@ -58,7 +59,8 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
-import CaldavPage from '../routes/integration/all/caldav';
+import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
+import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
 import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
@@ -176,7 +178,9 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
-        <CaldavPage path="/dashboard/integration/calendar/caldav" />
+        <Redirect path="/dashboard/integration/calendar/caldav" to="/dashboard/integration/calendar/caldav/account" />
+        <CalDAVAccountPage path="/dashboard/integration/calendar/caldav/account" />
+        <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
@@ -222,6 +226,8 @@ const AppRouter = connect(
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
+        <MapNewAreaPage path="/dashboard/maps/area/new" />
+        <MapNewAreaPage path="/dashboard/maps/area/edit/:areaSelector" />
         <CalendarPage path="/dashboard/calendar" />
         <ScenePage path="/dashboard/scene" />
         <NewScenePage path="/dashboard/scene/new" />

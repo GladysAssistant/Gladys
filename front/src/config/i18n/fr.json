@@ -19,6 +19,14 @@
     "metersPerSec": "m/s",
     "milesPerHour": "m/h"
   },
+  "color": {
+    "blue": "Bleu",
+    "red": "Rouge",
+    "green": "Vert",
+    "black": "Noir",
+    "yellow": "Jaune",
+    "purple": "Violet"
+  },
   "calendar": {
     "allDay": "Toute la journée",
     "previous": "précédent",
@@ -163,7 +171,7 @@
       "title": "Merci 🙏",
       "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\"> Pierre-Gilles Leymarie </a>, et j'ai fondé Gladys Assistant en 2013.",
       "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys 🙌 J'espère que vous apprécierez utiliser ce logiciel.",
-      "ifYouWantToSupportThisSotware": "Gladys étant mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/pricing\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSotware": "Gladys étant mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\">Gladys Plus</a>.",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
   },
@@ -188,7 +196,7 @@
       "dragAndDrop": "Glissez et déposez moi ici",
       "deleteButton": "Supprimer",
       "weather": {
-        "editHouseLabel": "Sélectionnez une maison. J'utiliserais les latitude/longitude pour obtenir la météo.",
+        "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
         "houseHasNoCoordinates": "Les coordonnées de votre maison ne sont pas définies. Accédez aux paramètres Gladys pour définir la position de votre maison.",
         "serviceNotConfigured": "Le service OpenWeather n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service OpenWeather.",
         "requestToThirdPartyFailed": "La requête à l'API OpenWeather a échouée. Votre instance Gladys est-elle connectée à Internet? Veuillez vous rendre dans le panneau de configuration de OpenWeather pour résoudre ce problème.",
@@ -204,7 +212,7 @@
       },
       "devicesInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
-        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seules les capteurs / et interrupteurs on/off sont supportés.",
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
@@ -253,8 +261,11 @@
     },
     "caldav": {
       "title": "CalDAV",
+      "accountTab": "Compte",
+      "syncTab": "Synchronisation",
       "description": "Synchonisez vos calendriers CalDAV.",
-      "introduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
+      "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
+      "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
@@ -309,6 +320,9 @@
       "synchronizationRequestCalendarsError": "Impossible de récupérer les calendriers CalDAV, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationRequestChangesError": "Impossible de récupérer les changements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationRequestEventsError": "Impossible de récupérer les détails des évènements, vérifiez la configuration et l'état du serveur CalDAV.",
+      "synchronizationNeeded": "Une première synchronisation est nécessaire pour lister les calendriers.",
+      "calendarChoiceSuccess": "Choix des calendriers enregistré avec succès.",
+      "calendarChoiceError": "Une erreur est survenue lors de la sauvegarde.",
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",
       "buttonSync": "Synchroniser"
@@ -855,7 +869,7 @@
     "addActionButton": "Nouvelle action",
     "noTriggersYet": "Aucun déclencheur n'a encore été ajouté. Il n'est pas obligatoire d'avoir un déclencheur dans une scène.",
     "noActionsYet": "Aucune action n'a encore été ajoutée. Cliquez sur le bouton + pour ajouter une action à cette scène.",
-    "triggersDescription": "Chaque déclencheur est indépendant. Lorsque l'un de ces déclencheurs est déclenché, la scène s'exécute.",
+    "triggersDescription": "Chaque déclencheur est indépendant. Lorsque les conditions de l'un ces déclencheurs sont respectées, la scène s'exécute.",
     "actionsDescription": "Toutes les actions de ce bloc s'exécuteront en parallèle. Pour effectuer une séquence d'actions, ajoutez des actions au bloc suivant.",
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
@@ -942,6 +956,15 @@
         "responseData": "Réponse",
         "tryButton": "Essayer",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
+      },
+      "scene": {
+        "label": "Choisir une scène",
+        "notice": "Les conditions de déclenchements de la scène appelée seront ignorées. Si une scène appelle une autre scène, et vice-versa, Gladys ne tombera pas dans une boucle infinie: chaque scène ne sera exécutée qu'une seule fois"
+      },
+      "houseEmptyOrNot": {
+        "houseIsEmptyDescription": "Si la maison est vide, cette scène continuera. Sinon, la scène s'arrêtera.",
+        "houseIsNotEmptyDescription": "Si la maison n'est pas vide, cette scène continuera. Sinon, la scène s'arrêtera.",
+        "houseLabel": "Maison"
       }
     },
     "actions": {
@@ -978,6 +1001,10 @@
       },
       "http": {
         "request": "Faire une requête HTTP"
+      },
+      "house": {
+        "is-empty": "Si la maison est vide",
+        "is-not-empty": "Si la maison n'est pas vide"
       }
     },
     "variables": {
@@ -1003,6 +1030,10 @@
       "house": {
         "empty": "La maison est vide",
         "no-longer-empty": "La maison n'est plus vide"
+      },
+      "area": {
+        "user-entered": "Utilisateur entre dans la zone",
+        "user-left": "Utilisateur quitte la zone"
       }
     },
     "triggersCard": {
@@ -1032,7 +1063,7 @@
         "intervalLabel": "Intervalle",
         "daysOfTheWeekLabel": "Jour de la semaine",
         "dayOfTheMonthLabel": "Jour du mois",
-        "dateFormat": "MM-dd-yyyy",
+        "dateFormat": "dd/MM/yyyy",
         "timeCaption": "Heure",
         "units": {
           "second": "seconde(s)",
@@ -1063,6 +1094,12 @@
         "houseEmptyDescription": "Ce déclencheur lancera la scène dès qu'un utilisateur quitte la maison et est le dernier à la quitter.",
         "houseNoLongerEmptyDescription": "Ce déclencheur lancera la scène dès qu'un utilisateur rentre à la maison et qu'elle était vide avant son retour.",
         "houseLabel": "Maison"
+      },
+      "area": {
+        "userEnteredDescription": "Ce déclencheur lancera la scène dès que l'utilisateur sélectionné entrera dans la zone sélectionnée. Vous pouvez créer des zones dans l'onglet plans.",
+        "userLeftDescription": "Ce déclencheur lancera la scène dès que l'utilisateur sélectionné quittera la zone sélectionnée. Vous pouvez créer des zones dans l'onglet plans.",
+        "userLabel": "Utilisateur",
+        "areaLabel": "Zone"
       }
     }
   },
@@ -1276,6 +1313,24 @@
       "exited": "Arrêté",
       "dead": "Mort"
     }
+  },
+  "newArea": {
+    "createNewZoneButton": "Créer une zone",
+    "cardTitleCreate": "Créer une nouvelle zone",
+    "cardTitleEdit": "Editer une zone",
+    "cardDescription": "Dans Gladys, vous pouvez définir des \"zones\". Ces zones sont utiles dans les scènes, où vous pouvez créer des scènes qui se déclenchent quand un utilisateur entre/quitte une zone.",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Entrez un nom pour votre zone",
+    "radiusLabel": "Rayon (en mètre)",
+    "radiusPlaceholder": "Entrez le rayon de votre zone en mètre",
+    "colorLabel": "Couleur",
+    "mapLabel": "Cliquez sur la carte où votre zone doit être située",
+    "createButton": "Créer une zone",
+    "updateButton": "Mettre à jour la zone",
+    "deleteButton": "Supprimer la zone",
+    "createAreaError": "Une erreur est survenue lors de la création de votre zone. Avez-vous bien rempli tous les champs, et cliqué sur la carte pour positionner votre zone ?",
+    "deleteAreaError": "Impossible de supprimer cette zone. Rafraichissez cette page et réessayez.",
+    "getAreaError": "Impossible de récupérer les informations de cette zone. Merci de rafraichir cette page et de réessayer."
   },
   "newScene": {
     "cardTitle": "Nouvelle scène",
@@ -1646,8 +1701,8 @@
   },
   "gatewayOpenApi": {
     "title": "Open API",
-    "description": "L'Open API vous permet d'envoyer des informations à Gladys en dehors de votre réseau. Pour l'instant, il vous permet d'envoyer uniquement des données Owntracks.",
-    "moreInformations": "<a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks\">Plus d'informations.</a>",
+    "description": "L'Open API vous permet d'envoyer des informations à Gladys en dehors de votre réseau.",
+    "moreInformations": "<a href=\"https://gladysassistant.com/fr/docs/plus/open-api\">Plus d'informations.</a>",
     "warningKeyDisappear": "Avertissement: vous ne verrez la clé qu'une seule fois. Copiez/collez votre clé et enregistrez-la quelque part.",
     "keyName": "Nom",
     "keyLastUsed": "Dernière utilisation",

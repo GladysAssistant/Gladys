@@ -4,9 +4,13 @@ import Profile from '../../../components/user/profile';
 
 const CreateLocalGladysAccount = ({ children, ...props }) => (
   <div>
-    <Link href="/signup" class="btn btn-secondary btn-sm float-left">
-      <Text id="global.backButton" />
-    </Link>
+    <div class="row">
+      <div class="col mb-4">
+        <Link href="/signup" class="btn btn-secondary btn-sm float-left">
+          <Text id="global.backButton" />
+        </Link>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-8 mx-auto">
         <h2>

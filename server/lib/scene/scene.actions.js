@@ -1,5 +1,6 @@
 const Promise = require('bluebird');
 const Handlebars = require('handlebars');
+const cloneDeep = require('lodash.clonedeep');
 const set = require('set-value');
 const get = require('get-value');
 const dayjs = require('dayjs');
@@ -109,7 +110,17 @@ const actionsFunc = {
       }
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
-  [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
+  [ACTIONS.SCENE.START]: async (self, action, scope) => {
+    if (scope.alreadyExecutedScenes && scope.alreadyExecutedScenes.has(action.scene)) {
+      logger.info(
+        `It looks the scene "${action.scene}" has already been triggered in this chain. Preventing running again to avoid loops.`,
+      );
+      return;
+    }
+    // we clone the scope so that the new scene is not polluting
+    // other scenes writing on the same scope: it needs to be a fresh object
+    self.execute(action.scene, cloneDeep(scope));
+  },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     await self.message.sendToUser(action.user, textWithVariables);
@@ -126,7 +137,9 @@ const actionsFunc = {
         oneConditionVerified = true;
       } else {
         logger.debug(
-          `Condition not verified. Condition = ${scope[condition.variable]} ${condition.operator} ${condition.value}`,
+          `Condition not verified. Condition: "${get(scope, condition.variable)} ${condition.operator} ${
+            condition.value
+          }"`,
         );
       }
     });
@@ -171,6 +184,18 @@ const actionsFunc = {
         );
         throw new AbortScene('CONDITION_IS_IN_DAYS_OF_WEEK_NOT_VERIFIED');
       }
+    }
+  },
+  [ACTIONS.HOUSE.IS_EMPTY]: async (self, action) => {
+    const houseEmpty = await self.house.isEmpty(action.house);
+    if (!houseEmpty) {
+      throw new AbortScene('HOUSE_IS_NOT_EMPTY');
+    }
+  },
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: async (self, action) => {
+    const houseEmpty = await self.house.isEmpty(action.house);
+    if (houseEmpty) {
+      throw new AbortScene('HOUSE_IS_EMPTY');
     }
   },
   [ACTIONS.USER.SET_SEEN_AT_HOME]: async (self, action) => {

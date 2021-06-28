@@ -1,5 +1,5 @@
 {
-  "extends": ["eslint-config-synacor", "prettier"],
+  "extends": ["eslint-config-synacor", "prettier", "plugin:cypress/recommended"],
   "rules": {
     "react/jsx-indent-props": ["enabled", 2],
     "brace-style": ["error", "1tbs"],
@@ -10,7 +10,7 @@
     "no-useless-concat": "error",
     "prefer-template": "error"
   },
-  "plugins": ["json", "preact-i18n"],
+  "plugins": ["json", "preact-i18n", "cypress"],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true

@@ -19,6 +19,14 @@
     "metersPerSec": "m/s",
     "milesPerHour": "m/h"
   },
+  "color": {
+    "blue": "Blue",
+    "red": "Red",
+    "green": "Green",
+    "black": "Black",
+    "yellow": "Yellow",
+    "purple": "Purple"
+  },
   "calendar": {
     "allDay": "All Day",
     "previous": "Previous",
@@ -163,7 +171,7 @@
       "title": "Allow me to thank you 🙏",
       "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\">Pierre-Gilles Leymarie</a>, and I founded Gladys Assistant in 2013.",
       "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys 🙌 I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
+      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\">Gladys Plus</a>.",
       "goToDashboardButton": "Go to Dashboard"
     }
   },
@@ -666,8 +674,11 @@
     },
     "caldav": {
       "title": "CalDAV",
+      "accountTab": "Account",
+      "syncTab": "Synchronization",
       "description": "Sync your CalDAV calendars.",
-      "introduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
+      "syncIntroduction": "Choose the calendars to synchronize.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
@@ -722,6 +733,9 @@
       "synchronizationRequestCalendarsError": "Can't fetch calendars, verify your configuration and CalDAV server state.",
       "synchronizationRequestChangesError": "Can't fetch changes, verify your configuration and CalDAV server state.",
       "synchronizationRequestEventsError": "Can't fetch events, verify your configuration and CalDAV server state.",
+      "synchronizationNeeded": "A first synchronization is necessary to list your calendars.",
+      "calendarChoiceSuccess": "Your choices have been saved.",
+      "calendarChoiceError": "An error occurred while saving.",
       "buttonSave": "Save",
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
@@ -942,6 +956,15 @@
         "responseData": "Response",
         "tryButton": "Try request",
         "requestError": "An error happened while making the request. Are you sure parameters are right?"
+      },
+      "scene": {
+        "label": "Select a scene",
+        "notice": "The trigger conditions of the called scene will be ignored. If a scene calls another scene, and vice versa, Gladys will not fall into an infinite loop: each scene will be executed once."
+      },
+      "houseEmptyOrNot": {
+        "houseIsEmptyDescription": "If the house is empty, the scene will continue. Otherwise, the scene will stop.",
+        "houseIsNotEmptyDescription": "If the house is not empty, the scene will continue. Otherwise, the scene will stop.",
+        "houseLabel": "House"
       }
     },
     "actions": {
@@ -978,6 +1001,10 @@
       },
       "http": {
         "request": "Make a HTTP request"
+      },
+      "house": {
+        "is-empty": "If the house is empty",
+        "is-not-empty": "If the house is not empty"
       }
     },
     "variables": {
@@ -1003,6 +1030,10 @@
       "house": {
         "empty": "House is empty",
         "no-longer-empty": "House is no longer empty"
+      },
+      "area": {
+        "user-entered": "User entered a zone",
+        "user-left": "User left a zone"
       }
     },
     "triggersCard": {
@@ -1063,6 +1094,12 @@
         "houseEmptyDescription": "This will trigger when a user leaves the house and is the last to leave.",
         "houseNoLongerEmptyDescription": "This will trigger when a user comes back home and home was empty before him.",
         "houseLabel": "House"
+      },
+      "area": {
+        "userEnteredDescription": "This scene will start when a user enters this zone. Zones can be created in the maps tab.",
+        "userLeftDescription": "This scene will start when a user left this zone. Zones can be created in the maps tab.",
+        "userLabel": "User",
+        "areaLabel": "Zone"
       }
     }
   },
@@ -1276,6 +1313,24 @@
       "exited": "Exited",
       "dead": "Dead"
     }
+  },
+  "newArea": {
+    "createNewZoneButton": "Create new zone",
+    "cardTitleCreate": "Create a new zone",
+    "cardTitleEdit": "Edit a zone",
+    "cardDescription": "In Gladys, you can defines \"zones\". Those zones are useful in scene, if you want to trigger a scenario when a user enters/leaves a zone.",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter the name of the zone",
+    "radiusLabel": "Radius (in meter)",
+    "mapLabel": "Click on the map to select you zone location",
+    "radiusPlaceholder": "Enter the radius of your zone in meter",
+    "colorLabel": "Color",
+    "createButton": "Create zone",
+    "updateButton": "Update zone",
+    "deleteButton": "Delete zone",
+    "createAreaError": "Unable to create this zone: are you sure you filled every field and clicked on the map to select your zone location?",
+    "getAreaError": "Unable to get data from this zone. Please refresh this page to retry.",
+    "deleteAreaError": "Unable to delete this zone. Please refresh this page and retry."
   },
   "newScene": {
     "cardTitle": "New scene",
@@ -1646,8 +1701,8 @@
   },
   "gatewayOpenApi": {
     "title": "Open API",
-    "description": "The Open API allows you to send information to Gladys outside of your network. For now, it allows you to send Owntracks data only.",
-    "moreInformations": "<a href=\"https://gladysassistant.com/en/docs/integrations/owntracks\">More information.</a>",
+    "description": "The Open API allows you to send information to Gladys outside of your network.",
+    "moreInformations": "<a href=\"https://gladysassistant.com/docs/plus/open-api\">More information.</a>",
     "warningKeyDisappear": "Warning: You'll see the key only once. Copy paste your key and save it somewhere.",
     "keyName": "Name",
     "keyLastUsed": "Last used",

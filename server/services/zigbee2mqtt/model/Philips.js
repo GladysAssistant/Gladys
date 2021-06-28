@@ -40,6 +40,7 @@ const Philips = {
     '7099860PH': [features.light, features.brightness], // color xy
     '3216231P5': [features.light, features.brightness, features.color_temperature],
     '8718696170625': [features.light, features.brightness],
+    '8718699673147': [features.light, features.brightness],
   },
 };
 
