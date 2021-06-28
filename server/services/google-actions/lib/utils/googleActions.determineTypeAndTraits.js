@@ -23,7 +23,9 @@ function determineTypeAndTraits(device) {
 
     const matchingTrait = determineTrait(feature);
     if (matchingTrait) {
-      traits.push(matchingTrait.key);
+      if (traits.indexOf(matchingTrait.key) === -1) {
+        traits.push(matchingTrait.key);
+      }
 
       if (typeof matchingTrait.generateAttributes === 'function') {
         attributes = { ...attributes, ...matchingTrait.generateAttributes(device) };
