@@ -61,7 +61,7 @@ SwitchMultilevelCommandClass.prototype = {
 
     if (valueChanged.index === INDEXES.INDEX_SWITCH_MULTILEVEL_TARGET) {
       logger.debug('Target value identified. Setting the level value instead');
-      const levelValue = comClass[INDEXES.INDEX_SWITCH_MULTILEVEL_LEVEL];
+      const levelValue = comClass[INDEXES.INDEX_SWITCH_MULTILEVEL_LEVEL][valueChanged.instance];
 
       // Clone levelValue to the expected object to set.
       // We need to clone the object to avoid future side effect with object

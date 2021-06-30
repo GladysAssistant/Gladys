@@ -42,7 +42,7 @@ function getNodes() {
         Object.keys(valuesClass).forEach((idx) => {
           const value = node.classes[comclass][idx];
           Object.keys(value).forEach((inst) => {
-            const { min, max, step } = commandClass.getMinMax(node, comclass, idx, inst);
+            const { min, max, step } = commandClass.getMinMax(node, comclass, parseInt(idx, 10), parseInt(inst, 10));
 
             if (value[inst].genre === GENRES.USER) {
               const { category, type } = getCategory(node, value[inst]);
