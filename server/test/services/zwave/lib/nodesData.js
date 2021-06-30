@@ -1893,6 +1893,6 @@ module.exports = () => {
         },
       },
       ready: true,
-    }
+    },
   };
 };

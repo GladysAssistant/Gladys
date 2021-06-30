@@ -93,15 +93,15 @@ describe('zwaveManager commands', () => {
     zwaveManager.setValue(
       {},
       {
-        external_id: externalId
+        external_id: externalId,
       },
-      14
+      14,
     );
 
     assert.calledOnceWithExactly(
       zwaveManager.zwave.setValue,
       { node_id: '1', class_id: '32', instance: '1', index: '1' },
-      14
+      14,
     );
   });
   it('should not do anything on setValue for unknown node', () => {
@@ -127,9 +127,9 @@ describe('zwaveManager commands', () => {
     zwaveManager.setValue(
       {},
       {
-        external_id: externalId
+        external_id: externalId,
       },
-      23
+      23,
     );
 
     assert.notCalled(zwaveManager.zwave.setValue);
