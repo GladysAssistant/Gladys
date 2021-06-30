@@ -7,6 +7,116 @@ const { GENRES, UNKNOWN_CATEGORY } = require('../constants');
 const { getCommandClass } = require('../comClass/factory');
 
 /**
+ * @description Parse a instance value to fill the device data.
+ *
+ * @param {Object} device - Device to store parsed data.
+ * @param {Object} node - The zWave node infos.
+ * @param {string} comClass - The commandClass number.
+ * @param {string} idx - CommandClass Index.
+ * @param {string} inst - Index Instance.
+ *
+ * @returns {undefined}
+ *
+ * @example
+ * processInstance(device, node, comClass, idx, '1');
+ */
+function processInstance(device, node, comClass, idx, inst) {
+  const value = node.classes[comClass][idx][inst];
+  if (value.genre !== GENRES.USER) {
+    device.params.push({
+      name: slugify(`${value.label}-${value.value_id}`),
+      value: value.value || '',
+    });
+
+    return;
+  }
+
+  const commandClass = getCommandClass(parseInt(comClass, 10));
+  const { min, max, step } = commandClass.getMinMax(node, comClass, parseInt(idx, 10), parseInt(inst, 10));
+  const { category, type } = getCategory(node, value);
+  if (category === UNKNOWN_CATEGORY) {
+    return;
+  }
+
+  device.features.push({
+    name: `${value.label}`,
+    selector: slugify(`zwave-${inst}-${idx}-${value.label}-${node.product}-node-${node.id}`),
+    category,
+    type,
+    external_id: getDeviceFeatureExternalId(value),
+    read_only: value.read_only,
+    unit: getUnit(value.units),
+    has_feedback: true,
+    min,
+    max,
+    step,
+  });
+}
+
+/**
+ * @description Parse all instances for the given index and
+ * fill the device data.
+ *
+ * @param {Object} device - Device to store parsed data.
+ * @param {Object} node - The zWave node infos.
+ * @param {string} comClass - The commandClass number.
+ * @param {string} idx - CommandClass Index.
+ *
+ * @example
+ * processInstances(device, node, comClass, '1');
+ */
+function processInstances(device, node, comClass, idx) {
+  Object.keys(node.classes[comClass][idx]).forEach((inst) => {
+    processInstance(device, node, comClass, idx, inst);
+  });
+}
+
+/**
+ * @description Parses all indexes for the given comClass and fill the device
+ * data.
+ *
+ * @param {Object} device - Device to store parsed data.
+ * @param {Object} node - The zWave node infos.
+ * @param {string} comClass - The commandClass number.
+ *
+ * @example
+ * processIndexes(device, node, '38');
+ */
+function processIndexes(device, node, comClass) {
+  Object.keys(node.classes[comClass]).forEach((idx) => {
+    processInstances(device, node, comClass, idx);
+  });
+}
+
+/**
+ * @description Create a device from infos of node.
+ *
+ * @param {Object} node - The node to parse.
+ * @param {string} serviceId - The zWave Manager serviceId.
+ * @returns {Object} The parsed Device.
+ *
+ * @example
+ * const device = createDeviceFromNode(node);
+ */
+function createDeviceFromNode(node, serviceId) {
+  const newDevice = {
+    name: node.product,
+    service_id: serviceId,
+    external_id: `zwave:node_id:${node.id}`,
+    ready: node.ready,
+    rawZwaveNode: node,
+    features: [],
+    params: [],
+  };
+
+  Object.keys(node.classes).forEach((comClass) => {
+    processIndexes(newDevice, node, comClass);
+  });
+
+  return newDevice;
+}
+
+/**
  * @description Return array of Nodes.
  * @returns {Array} Return list of nodes.
  * @example
@@ -23,58 +133,7 @@ function getNodes() {
 
   // foreach node in RAM, we format it with the gladys device format
   return nodes
-    .map((node) => {
-      const newDevice = {
-        name: node.product,
-        service_id: this.serviceId,
-        external_id: `zwave:node_id:${node.id}`,
-        ready: node.ready,
-        rawZwaveNode: node,
-        features: [],
-        params: [],
-      };
-
-      const comclasses = Object.keys(node.classes);
-      comclasses.forEach((comclass) => {
-        const valuesClass = node.classes[comclass];
-        const commandClass = getCommandClass(parseInt(comclass, 10));
-
-        Object.keys(valuesClass).forEach((idx) => {
-          const value = node.classes[comclass][idx];
-          Object.keys(value).forEach((inst) => {
-            const { min, max, step } = commandClass.getMinMax(node, comclass, parseInt(idx, 10), parseInt(inst, 10));
-
-            if (value[inst].genre === GENRES.USER) {
-              const { category, type } = getCategory(node, value[inst]);
-              if (category !== UNKNOWN_CATEGORY) {
-                newDevice.features.push({
-                  name: `${value[inst].label}`,
-                  selector: slugify(
-                    `zwave-${value[inst].instance}-${value[inst].index}-${value[inst].label}-${node.product}-node-${node.id}`,
-                  ),
-                  category,
-                  type,
-                  external_id: getDeviceFeatureExternalId(value[inst]),
-                  read_only: value[inst].read_only,
-                  unit: getUnit(value[inst].units),
-                  has_feedback: true,
-                  min,
-                  max,
-                  step,
-                });
-              }
-            } else {
-              newDevice.params.push({
-                name: slugify(`${value[inst].label}-${value[inst].value_id}`),
-                value: value[inst].value || '',
-              });
-            }
-          });
-        });
-      });
-
-      return newDevice;
-    })
+    .map((node) => createDeviceFromNode(node, this.serviceId))
     .sort(function sortByNodeReady(a, b) {
       return b.ready - a.ready || a.rawZwaveNode.id - b.rawZwaveNode.id;
     });
