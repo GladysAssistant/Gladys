@@ -91,4 +91,28 @@ describe('zWave value changed', () => {
     assert.calledOnce(event.emit);
     expect(event.emit.args[0][0]).equal(EVENTS.DEVICE.NEW_STATE);
   });
+
+  it('should not emit event on non-pertinent value', () => {
+    const valueChanged = {
+      value_id: '16-38-1-0',
+      node_id: 16,
+      class_id: 38,
+      type: 'byte',
+      genre: 'basic',
+      instance: 1,
+      index: 0,
+      label: 'Basic',
+      units: '',
+      help: '',
+      read_only: false,
+      write_only: false,
+      min: 0,
+      max: 255,
+      is_polled: false,
+      value: 14,
+    };
+    zwaveManager.valueChanged(valueChanged.node_id, valueChanged.class_id, valueChanged);
+
+    assert.notCalled(event.emit);
+  });
 });
