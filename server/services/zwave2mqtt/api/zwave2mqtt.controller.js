@@ -26,7 +26,7 @@ module.exports = function Zwave2mqttController(zwave2mqttManager) {
 
   /**
    * @api {post} /api/v1/service/zwave2mqtt/config Update Zwave2mqtt configuration.
-   * @apiName getConfiguration
+   * @apiName  updateConfiguration
    * @apiGroup Zwave2mqtt
    */
   async function updateConfiguration(req, res) {
