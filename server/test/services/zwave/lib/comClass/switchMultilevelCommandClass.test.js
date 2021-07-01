@@ -202,4 +202,12 @@ describe('zWave Command Class Switch Multi Level', () => {
   it('should returns node range for non-level index', () => {
     expect(switchMultilevelCommandClass.getMinMax(nodeV4, 38, 9, 1)).to.eql({ min: 0, max: 255, step: 1 });
   });
+
+  it('should return normalized value', () => {
+    expect(switchMultilevelCommandClass.getNormalizedValue(nodeV4, 38, 0, 1, 25)).equals(25);
+  });
+
+  it('should return transformed value', () => {
+    expect(switchMultilevelCommandClass.getTransformedValue(nodeV4, 38, 0, 1, 25)).equals(25);
+  });
 });

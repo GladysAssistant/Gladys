@@ -40,7 +40,7 @@ function transformValue(type, value) {
 }
 
 /**
- * @description Normalized a value (to be used by Gladys domain)
+ * @description Normalize a value (to be used by Gladys domain)
  *
  * @param {string} type - ZWave type.
  * @param {any} value - ZWave value.
