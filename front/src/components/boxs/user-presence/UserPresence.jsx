@@ -27,7 +27,6 @@ const UserPresence = ({ children, ...props }) => (
     <div
       class="card-body o-auto"
       style={{
-        maxHeight: '15rem',
         padding: '1rem'
       }}
     >
