@@ -29,6 +29,7 @@ const IKEA = {
     E1743: [features.button],
     'E1525/E1745': [features.motion],
     // E1746: [], // Signal repeater
+    LED1836G9: [features.light, features.brightness],
   },
 };
 
