@@ -40,7 +40,7 @@
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^3.2.9",
     "@jaames/iro": "^5.2.3",
-    "@yaireo/tagify": "^3.21.5",
+    "@yaireo/tagify": "^4.3.1",
     "axios": "^0.21.1",
     "classnames": "^2.2.6",
     "cropperjs": "^1.5.1",

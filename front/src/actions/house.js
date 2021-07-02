@@ -232,7 +232,7 @@ function createActions(store) {
               [house.id]: RequestStatus.ConflictError
             }
           });
-        } else if (status === 422 && url.includes('/room/')) {
+        } else if (status === 422 && url.includes('/room')) {
           store.setState({
             houseUpdateStatus: {
               [house.id]: RequestStatus.RoomValidationError
