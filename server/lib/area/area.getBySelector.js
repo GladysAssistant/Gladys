@@ -2,12 +2,12 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Delete an area.
+ * @description Get an area by selector.
  * @param {string} selector - Area selector.
  * @example
- * gladys.area.destroy('my-area');
+ * area.getBySelector('test-area');
  */
-async function destroy(selector) {
+async function getBySelector(selector) {
   const area = await db.Area.findOne({
     where: {
       selector,
@@ -18,17 +18,9 @@ async function destroy(selector) {
     throw new NotFoundError('Area not found');
   }
 
-  await area.destroy();
-
-  // remove the area from memory
-  const areaIndexInMemory = this.areas.findIndex((a) => a.id === area.id);
-  if (areaIndexInMemory !== -1) {
-    this.areas.splice(areaIndexInMemory, 1);
-  }
-
-  return null;
+  return area.get({ plain: true });
 }
 
 module.exports = {
-  destroy,
+  getBySelector,
 };

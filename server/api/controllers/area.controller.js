@@ -91,10 +91,33 @@ module.exports = function AreaController(gladys) {
     res.json(areas);
   }
 
+  /**
+   * @api {get} /api/v1/area/:selector getBySelector
+   * @apiName get
+   * @apiGroup Area
+   * @apiSuccessExample {json} Success-Response
+   * {
+   *   "id": "daff2ca0-5ab8-4e72-8561-c4ed9c7c6901",
+   *   "name": "Home",
+   *   "selector": "home",
+   *   "latitude": 48,
+   *   "longitude": 12,
+   *   "radius": 100,
+   *   "color": "#5042f4",
+   *   "updated_at": "2019-05-09T03:11:03.819Z",
+   *   "created_at": "2019-05-09T03:11:03.819Z"
+   * }
+   */
+  async function getBySelector(req, res) {
+    const area = await gladys.area.getBySelector(req.params.area_selector);
+    res.json(area);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
     update: asyncMiddleware(update),
     get: asyncMiddleware(get),
+    getBySelector: asyncMiddleware(getBySelector),
   });
 };

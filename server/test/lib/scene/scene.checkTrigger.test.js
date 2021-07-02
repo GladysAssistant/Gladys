@@ -333,6 +333,88 @@ describe('scene.checkTrigger', () => {
     });
   });
 
+  it('should execute scene with user entered area trigger', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.AREA.USER_ENTERED,
+          area: 'area-1',
+          user: 'tony',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.AREA.USER_ENTERED,
+      area: 'area-1',
+      user: 'tony',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
+  it('should execute scene with user left area trigger', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    sceneManager.addScene({
+      selector: 'my-scene',
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.AREA.USER_LEFT,
+          area: 'area-1',
+          user: 'tony',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.AREA.USER_LEFT,
+      area: 'area-1',
+      user: 'tony',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
   it('should not execute scene, condition not verified', async () => {
     const stateManager = new StateManager();
     const device = {
