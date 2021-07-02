@@ -34,6 +34,8 @@ class TurnOnLight extends Component {
   handleValueChange = e => {
     if (!isNaN(parseFloat(e.target.value))) {
       this.props.updateTriggerProperty(this.props.index, 'value', parseFloat(e.target.value));
+    } else if (e.target.value === '-') {
+      this.props.updateTriggerProperty(this.props.index, 'value', e.target.value);
     } else {
       this.props.updateTriggerProperty(this.props.index, 'value', null);
     }
