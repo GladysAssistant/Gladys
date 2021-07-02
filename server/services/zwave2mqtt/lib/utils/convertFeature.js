@@ -26,7 +26,7 @@ function convertFeature(device) {
         node_id: device.id,
         class_id: cmd.commandClass,
         instance: cmd.endpoint,
-        propertyKey: cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_METER ? `${cmd.property}/${cmd.propertyKey}` : cmd.property,
+        propertyKey: cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_METER ? `${cmd.property.toString().replace(' ', '_')}/${cmd.propertyKey}` : cmd.property.toString().replace(' ', '_'),
       });
 
       let defaultFeature = {
