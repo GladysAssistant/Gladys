@@ -68,7 +68,7 @@ const colorSettingTrait = {
     'action.devices.commands.ColorAbsolute': {
       'color.temperature': {
         writeValue: (paramValue) => {
-          return Math.round((paramValue - 2000) / 70);
+          return (paramValue - 2000) / 70;
         },
         features: [
           {
