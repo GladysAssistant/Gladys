@@ -46,7 +46,13 @@ function valueChanged(nodeId, comClass, value) {
   node.classes[comClass][changedValue.index][changedValue.instance] = changedValue;
   this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
     device_feature_external_id: getDeviceFeatureExternalId(changedValue),
-    state: changedValue.value,
+    state: commandClass.getNormalizedValue(
+      node,
+      comClass,
+      changedValue.index,
+      changedValue.instance,
+      changedValue.value,
+    ),
   });
 }
 

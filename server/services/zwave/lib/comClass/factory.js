@@ -1,7 +1,9 @@
 const defaultCommandClass = require('./defaultCommandClass');
+const alarmCommandClass = require('./alarmCommandClass');
 const switchMultilevelCommandClass = require('./switchMultilevelCommandClass');
 
 const commandClasses = {};
+commandClasses[alarmCommandClass.getId()] = alarmCommandClass;
 commandClasses[switchMultilevelCommandClass.getId()] = switchMultilevelCommandClass;
 
 const commandClassKnownIdList = Object.keys(commandClasses).map((comClass) => parseInt(comClass, 10));
