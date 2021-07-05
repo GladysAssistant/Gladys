@@ -1782,7 +1782,8 @@
         "unit": "lux",
         "has_feedback": true,
         "min": 0,
-        "max": 0
+        "max": 0,
+        "step": 1
       },
       {
         "name": "Seismic Intensity",
@@ -1794,7 +1795,8 @@
         "unit": null,
         "has_feedback": true,
         "min": 0,
-        "max": 0
+        "max": 0,
+        "step": 1
       },
       {
         "name": "Battery Level",
@@ -1806,7 +1808,8 @@
         "unit": "percent",
         "has_feedback": true,
         "min": 0,
-        "max": 255
+        "max": 255,
+        "step": 1
       }
     ],
     "params": [
@@ -1881,6 +1884,75 @@
       { "name": "protocol-version-15-134-1-1", "value": "4.05" },
       { "name": "application-version-15-134-1-2", "value": "3.02" }
     ]
+  },
+  {
+    "external_id": "zwave:node_id:16",
+    "features": [],
+    "name": "",
+    "params": [
+      {
+        "name": "target-value-16-38-1-9",
+        "value": 10
+      }
+    ],
+    "rawZwaveNode": {
+      "classes": {
+        "38": {
+          "0": {
+            "1": {
+              "class_id": 38,
+              "genre": "user",
+              "help": "The Current Level of the Device",
+              "index": 0,
+              "instance": 1,
+              "is_polled": false,
+              "label": "Level",
+              "max": 255,
+              "min": 0,
+              "node_id": 16,
+              "read_only": false,
+              "type": "byte",
+              "units": "",
+              "value": 10,
+              "value_id": "16-38-1-0",
+              "write_only": false
+            }
+          },
+          "9": {
+            "1": {
+              "class_id": 38,
+              "genre": "system",
+              "help": "",
+              "index": 9,
+              "instance": 1,
+              "is_polled": false,
+              "label": "Target Value",
+              "max": 255,
+              "min": 0,
+              "node_id": 16,
+              "read_only": true,
+              "type": "byte",
+              "units": "",
+              "value": 10,
+              "value_id": "16-38-1-9",
+              "write_only": false
+            }
+          }
+        }
+      },
+      "id": "16",
+      "loc": "",
+      "manufacturer": "",
+      "manufacturerid": "",
+      "name": "",
+      "product": "",
+      "productid": "",
+      "producttype": "",
+      "ready": true,
+      "type": ""
+    },
+    "ready": true,
+    "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc"
   },
   {
     "name": "",

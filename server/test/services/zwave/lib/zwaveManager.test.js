@@ -1,16 +1,22 @@
 const { expect } = require('chai');
-const { assert } = require('sinon');
+const { assert, fake } = require('sinon');
 const EventEmitter = require('events');
 
 const event = new EventEmitter();
 const ZwaveManager = require('../../../../services/zwave/lib');
+const { getDeviceFeatureExternalId } = require('../../../../services/zwave/lib/utils/externalId');
 const ZwaveMock = require('../ZwaveMock.test');
-const nodesData = require('./nodesData.json');
+const nodesData = require('./nodesData')();
 const nodesExpectedResult = require('./nodesExpectedResult.json');
 
 describe('zwaveManager commands', () => {
   const zwaveManager = new ZwaveManager(ZwaveMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   zwaveManager.connected = true;
+  zwaveManager.nodes = nodesData;
+  beforeEach(() => {
+    zwaveManager.zwave.setValue = fake.returns(null);
+  });
+
   it('should connect to zwave driver', () => {
     zwaveManager.connect('/dev/tty1');
     assert.calledWith(zwaveManager.zwave.connect, '/dev/tty1');
@@ -53,7 +59,6 @@ describe('zwaveManager commands', () => {
     });
   });
   it('should return array of nodes', () => {
-    zwaveManager.nodes = nodesData;
     const nodes = zwaveManager.getNodes();
     expect(nodes).to.deep.equal(nodesExpectedResult);
   });
@@ -64,6 +69,70 @@ describe('zwaveManager commands', () => {
   it('should disconnect again', () => {
     zwaveManager.disconnect();
     assert.calledOnce(zwaveManager.zwave.disconnect);
+  });
+  it('should send value on setValue', () => {
+    const value = {
+      value_id: '1-32-1-1',
+      node_id: 1,
+      class_id: 32,
+      type: 'byte',
+      genre: 'basic',
+      instance: 1,
+      index: 1,
+      label: 'Basic Target',
+      units: '',
+      help: '',
+      read_only: true,
+      write_only: false,
+      min: 0,
+      max: 255,
+      is_polled: false,
+      value: 0,
+    };
+    const externalId = getDeviceFeatureExternalId(value);
+    zwaveManager.setValue(
+      {},
+      {
+        external_id: externalId,
+      },
+      14,
+    );
+
+    assert.calledOnceWithExactly(
+      zwaveManager.zwave.setValue,
+      { node_id: '1', class_id: '32', instance: '1', index: '1' },
+      14,
+    );
+  });
+  it('should not do anything on setValue for unknown node', () => {
+    const value = {
+      value_id: '134-32-1-1',
+      node_id: 134,
+      class_id: 32,
+      type: 'byte',
+      genre: 'basic',
+      instance: 1,
+      index: 1,
+      label: 'Basic Target',
+      units: '',
+      help: '',
+      read_only: true,
+      write_only: false,
+      min: 0,
+      max: 255,
+      is_polled: false,
+      value: 0,
+    };
+    const externalId = getDeviceFeatureExternalId(value);
+    zwaveManager.setValue(
+      {},
+      {
+        external_id: externalId,
+      },
+      23,
+    );
+
+    assert.notCalled(zwaveManager.zwave.setValue);
   });
 });
 
@@ -107,26 +176,6 @@ describe('zwaveManager events', () => {
   });
   it('should receive value added', () => {
     zwaveManager.valueAdded(1, 10, {
-      value_id: '5-32-1-0',
-      node_id: 5,
-      class_id: 32,
-      type: 'byte',
-      genre: 'basic',
-      instance: 1,
-      index: 0,
-      label: 'Basic',
-      units: '',
-      help: '',
-      read_only: false,
-      write_only: false,
-      min: 0,
-      max: 255,
-      is_polled: false,
-      value: 0,
-    });
-  });
-  it('should receive value changed', () => {
-    zwaveManager.valueChanged(1, 10, {
       value_id: '5-32-1-0',
       node_id: 5,
       class_id: 32,

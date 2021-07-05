@@ -16,6 +16,7 @@ ZwaveMock.prototype.softReset = fake.returns(null);
 ZwaveMock.prototype.healNetwork = fake.returns(null);
 ZwaveMock.prototype.requestAllConfigParams = fake.returns(null);
 ZwaveMock.prototype.setNodeName = fake.returns(null);
+ZwaveMock.prototype.getNodeNeighbors = fake.returns(null);
 
 ZwaveMock.prototype.getControllerNodeId = fake.returns(1);
 ZwaveMock.prototype.getSUCNodeId = fake.returns(1);
