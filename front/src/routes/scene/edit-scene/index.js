@@ -44,6 +44,25 @@ class EditScene extends Component {
       this.setState({ saving: false });
     }
   };
+  switchActiveScene = async () => {
+    this.setState({ saving: true });
+    try {
+      const newState = update(this.state, {
+        scene: {
+          active: {
+            $set: !this.state.scene.active
+          }
+        }
+      });
+      await this.setState(newState);
+      await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, {
+        active: newState.scene.active
+      });
+      this.setState({ saving: false });
+    } catch (e) {
+      this.setState({ saving: false });
+    }
+  };
   saveScene = async e => {
     if (e) {
       e.preventDefault();
@@ -297,6 +316,7 @@ class EditScene extends Component {
           error={error}
           variables={variables}
           setVariables={this.setVariables}
+          switchActiveScene={this.switchActiveScene}
           toggleIsNameEditable={this.toggleIsNameEditable}
           isNameEditable={isNameEditable}
           updateSceneName={this.updateSceneName}
