@@ -26,7 +26,7 @@ function convertFeature(device) {
         node_id: device.id,
         class_id: cmd.commandClass,
         instance: cmd.endpoint,
-        propertyKey: cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_METER ? `${cmd.property.toString().replace(' ', '_')}/${cmd.propertyKey}` : cmd.property.toString().replace(' ', '_'),
+        propertyKey: cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_METER || cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE ? `${cmd.property.toString().replace(' ', '_')}/${cmd.propertyKey}` : cmd.property.toString().replace(' ', '_'),
       });
 
       let defaultFeature = {
@@ -53,6 +53,12 @@ function convertFeature(device) {
         // Manufacturer managed by zwave2mqtt
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE) {
         // Central scene
+        if (cmd.property === 'scene') {
+          features.push(Object.assign({}, defaultFeature, {
+            category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+            type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
+          }));
+        }
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_ALARM) {
         // - Sensor status
       } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_WAKE_UP) {
