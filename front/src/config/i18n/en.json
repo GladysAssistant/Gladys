@@ -178,6 +178,7 @@
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Edit",
+    "newDashboardButton": "New",
     "editDashboardCancelButton": "Cancel",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",

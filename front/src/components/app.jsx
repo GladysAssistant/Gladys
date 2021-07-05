@@ -166,6 +166,7 @@ const AppRouter = connect(
         <SignupConfigureHouse path="/signup/configure-house" />
         <SignupSuccess path="/signup/success" />
         <Dashboard path="/dashboard" />
+        <Dashboard path="/dashboard/:dashboardSelector" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
 

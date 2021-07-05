@@ -25,24 +25,7 @@ const Box = ({ children, ...props }) => {
 
 const EditBoxWithDragAndDrop = ({ children, ...props }) => (
   <div>
-    {props.dragEnable && (
-      <div
-        style={{
-          height: '50px',
-          padding: '10px',
-          borderStyle: 'dashed',
-          borderColor: 'grey',
-          marginBottom: '1.5rem'
-        }}
-      >
-        <p class="text-center">
-          <Text id="dashboard.boxes.dragAndDrop" />
-        </p>
-      </div>
-    )}
-    <div>
-      <Box {...props} />
-    </div>
+    <Box {...props} />
   </div>
 );
 

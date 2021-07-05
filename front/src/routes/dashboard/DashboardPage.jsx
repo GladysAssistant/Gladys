@@ -1,4 +1,6 @@
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
+import cx from 'classnames';
 import BoxColumns from './BoxColumns';
 import EditBoxColumns from './EditBoxColumns';
 import EmptyState from './EmptyState';
@@ -14,14 +16,41 @@ const DashboardPage = ({ children, ...props }) => (
       <div class="my-3 my-md-5">
         <div class="container" style={props.dashboardEditMode ? marginBottom : {}}>
           <div class="page-header">
-            <h1 class="page-title">
-              <Text id="dashboard.title" />
-            </h1>
+            <div class="page-title">
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" onClick={props.toggleDashboardDropdown}>
+                  {props.currentDashboard && props.currentDashboard.name}
+                </button>
+                <div
+                  class={cx('dropdown-menu', {
+                    show: props.dashboardDropdownOpened
+                  })}
+                >
+                  {props.dashboards.map((dashboard, index) => (
+                    <Link
+                      class="dropdown-item"
+                      href={`/dashboard/${dashboard.selector}`}
+                      onClick={props.redirectToDashboard}
+                    >
+                      {dashboard.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             <div class="page-options d-flex">
               {!props.dashboardEditMode && (
                 <button onClick={props.editDashboard} class="btn btn-outline-primary btn-sm ml-2">
                   <span>
                     <Text id="dashboard.editDashboardButton" /> <i class="fe fe-edit" />
+                  </span>
+                </button>
+              )}
+              {!props.dashboardEditMode && (
+                <button onClick={props.editDashboard} class="btn btn-outline-success btn-sm ml-2">
+                  <span>
+                    <Text id="dashboard.newDashboardButton" /> <i class="fe fe-plus" />
                   </span>
                 </button>
               )}
@@ -34,7 +63,7 @@ const DashboardPage = ({ children, ...props }) => (
           )}
           {props.dashboardNotConfigured && !props.dashboardEditMode && <EmptyState />}
           {!props.dashboardNotConfigured && !props.dashboardEditMode && (
-            <BoxColumns homeDashboard={props.homeDashboard} />
+            <BoxColumns homeDashboard={props.currentDashboard} />
           )}
           {props.dashboardEditMode && (
             <EditBoxColumns
@@ -43,9 +72,10 @@ const DashboardPage = ({ children, ...props }) => (
               moveBoxUp={props.moveBoxUp}
               moveBoxDown={props.moveBoxDown}
               addBox={props.addBox}
-              homeDashboard={props.homeDashboard}
+              homeDashboard={props.currentDashboard}
               updateNewSelectedBox={props.updateNewSelectedBox}
               removeBox={props.removeBox}
+              updateBoxConfig={props.updateBoxConfig}
             />
           )}
           {props.dashboardEditMode && <EditActions {...props} />}
