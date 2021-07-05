@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { COMMAND_CLASSES, INDEXES } = require('../constants');
-const DefaultCommandClass = require('./defaultCommandClass');
+const defaultCommandClass = require('./defaultCommandClass');
 
 /**
  * @description Test if provided comClass support V4 ZWave Swith.
@@ -78,7 +78,7 @@ function getChangedValue(node, valueChanged) {
   }
 
   // It's not the LEVEL neither the TARGET value. Return as it.
-  return DefaultCommandClass.getChangedValue(node, valueChanged);
+  return defaultCommandClass.getChangedValue(node, valueChanged);
 }
 
 /**
@@ -91,22 +91,21 @@ function getChangedValue(node, valueChanged) {
  *
  * @returns {Object} Returns min and max values for a given value.
  *
- * @example const {min, max, step} = commClass.getMinMax(node, comClassId, index, instance);
+ * @example const {min, max} = commClass.getMinMax(node, comClassId, index, instance);
  */
 function getMinMax(node, comClass, index, instance) {
   if (index === INDEXES.INDEX_SWITCH_MULTILEVEL_LEVEL) {
     return {
       min: 0,
       max: 99,
-      step: 1,
     };
   }
 
-  return DefaultCommandClass.getMinMax(node, comClass, index, instance);
+  return defaultCommandClass.getMinMax(node, comClass, index, instance);
 }
 
 module.exports = {
-  ...DefaultCommandClass,
+  ...defaultCommandClass,
   getId,
   getChangedValue,
   getMinMax,

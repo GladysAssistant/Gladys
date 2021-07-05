@@ -1,5 +1,5 @@
 const { COMMAND_CLASSES, INDEXES } = require('../constants');
-const DefaultCommandClass = require('./defaultCommandClass');
+const defaultCommandClass = require('./defaultCommandClass');
 
 /**
  * @description Get the command class ID.
@@ -31,11 +31,11 @@ function getNormalizedValue(node, comClass, index, instance, value) {
     return value === 6 ? 0 : 1;
   }
 
-  return DefaultCommandClass.getNormalizedValue(node, comClass, index, instance, value);
+  return defaultCommandClass.getNormalizedValue(node, comClass, index, instance, value);
 }
 
 module.exports = {
-  ...DefaultCommandClass,
+  ...defaultCommandClass,
   getId,
   getNormalizedValue,
 };

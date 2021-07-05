@@ -70,13 +70,12 @@ function getNormalizedValue(node, comClass, index, instance, value) {
  *
  * @returns {Object} Returns min and max values for a given value.
  *
- * @example const {min, max, step} = commClass.getMinMax(node, comClassId, index, instance);
+ * @example const {min, max} = commClass.getMinMax(node, comClassId, index, instance);
  */
 function getMinMax(node, comClass, index, instance) {
   return {
     min: node.classes[comClass][index][instance].min,
     max: node.classes[comClass][index][instance].max,
-    step: 1,
   };
 }
 
