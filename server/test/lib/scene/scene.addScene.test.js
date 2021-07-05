@@ -16,6 +16,7 @@ describe('SceneManager.addScene', () => {
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
+      active: true,
       triggers: [
         {
           type: EVENTS.TIME.CHANGED,
@@ -36,6 +37,7 @@ describe('SceneManager.addScene', () => {
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
+      active: true,
       triggers: [
         {
           type: EVENTS.TIME.CHANGED,
@@ -56,6 +58,7 @@ describe('SceneManager.addScene', () => {
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
+      active: true,
       triggers: [
         {
           type: EVENTS.TIME.CHANGED,
@@ -78,6 +81,7 @@ describe('SceneManager.addScene', () => {
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
+      active: true,
       triggers: [
         {
           type: EVENTS.TIME.CHANGED,
@@ -101,6 +105,7 @@ describe('SceneManager.addScene', () => {
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
+      active: true,
       triggers: [
         {
           type: EVENTS.TIME.CHANGED,
@@ -122,6 +127,7 @@ describe('SceneManager.addScene', () => {
       sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
+        active: true,
         triggers: [
           {
             type: EVENTS.TIME.CHANGED,
@@ -146,6 +152,7 @@ describe('SceneManager.addScene', () => {
       sceneManager.addScene({
         name: 'a-test-scene',
         icon: 'bell',
+        active: true,
         triggers: [
           {
             type: EVENTS.TIME.CHANGED,
@@ -166,6 +173,7 @@ describe('SceneManager.addScene', () => {
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
+      active: true,
       triggers: [
         {
           type: EVENTS.TIME.SUNRISE,
@@ -181,6 +189,7 @@ describe('SceneManager.addScene', () => {
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
+      active: true,
       triggers: [
         {
           type: EVENTS.TIME.SUNSET,
