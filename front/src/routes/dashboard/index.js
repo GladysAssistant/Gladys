@@ -12,7 +12,7 @@ extend('$auto', function(value, object) {
 });
 
 @connect(
-  'user,currentUrl,httpClient,dashboardEditMode,dashboardNotConfigured,editDashboardDragEnable,homeDashboard,gatewayInstanceNotFound',
+  'user,fullScreen,currentUrl,httpClient,dashboardEditMode,dashboardNotConfigured,editDashboardDragEnable,homeDashboard,gatewayInstanceNotFound',
   actions
 )
 class Dashboard extends Component {
@@ -252,6 +252,16 @@ class Dashboard extends Component {
     this.setDashboardConfigured();
   };
 
+  toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      this.props.setFullScreen(true);
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
+      this.props.setFullScreen(false);
+    }
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
@@ -292,6 +302,8 @@ class Dashboard extends Component {
         updateNewSelectedBox={this.updateNewSelectedBox}
         saveDashboard={this.saveDashboard}
         updateBoxConfig={this.updateBoxConfig}
+        toggleFullScreen={this.toggleFullScreen}
+        fullScreen={props.fullScreen}
       />
     );
   }

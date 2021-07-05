@@ -41,6 +41,16 @@ const DashboardPage = ({ children, ...props }) => (
 
             <div class="page-options d-flex">
               {!props.dashboardEditMode && (
+                <button onClick={props.toggleFullScreen} class="btn btn-outline-secondary btn-sm ml-2">
+                  <span>
+                    {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
+                    {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
+                    {!props.fullScreen && <i class="fe fe-maximize-2" />}
+                    {props.fullScreen && <i class="fe fe-minimize-2" />}
+                  </span>
+                </button>
+              )}
+              {!props.dashboardEditMode && (
                 <button onClick={props.editDashboard} class="btn btn-outline-primary btn-sm ml-2">
                   <span>
                     <Text id="dashboard.editDashboardButton" /> <i class="fe fe-edit" />

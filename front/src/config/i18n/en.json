@@ -179,6 +179,8 @@
     "title": "Dashboard",
     "editDashboardButton": "Edit",
     "newDashboardButton": "New",
+    "enableFullScreen": "Full screen",
+    "disableFullScreen": "Exit full screen",
     "editDashboardCancelButton": "Cancel",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",

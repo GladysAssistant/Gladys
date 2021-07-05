@@ -1,10 +1,14 @@
 import { RequestStatus } from '../../utils/consts';
-import update from 'immutability-helper';
 import get from 'get-value';
 import { DASHBOARD_TYPE } from '../../../../server/utils/constants';
 
 function createActions(store) {
   const actions = {
+    setFullScreen(state, fullScreen) {
+      store.setState({
+        fullScreen
+      });
+    },
     setDashboardConfigured(state) {
       const homeDashboard = state.homeDashboard;
       const dashboardConfigured =

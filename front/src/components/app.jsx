@@ -110,7 +110,7 @@ const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen',
   actions
 )(props => (
   <div id="app">
@@ -118,6 +118,7 @@ const AppRouter = connect(
       <Header
         currentUrl={props.currentUrl}
         user={props.user}
+        fullScreen={props.fullScreen}
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
         showDropDown={props.showDropDown}
