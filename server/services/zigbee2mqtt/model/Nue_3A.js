@@ -19,10 +19,10 @@ const Nue3A = {
     'HGZB-41': [features.switch],
     'MG-AUWS01': [features.switch],
     'HGZB-01A': [features.light, features.brightness],
-    'XY12S-15': [features.light, features.brightness, features.color_temperature], // color xy
+    'XY12S-15': [features.light, features.brightness, features.color_temperature, features.color],
     'HGZB-02A': [features.light, features.brightness],
     'HGZB-42-UK / HGZB-41': [features.switch],
-    'HGZB-06A': [features.light, features.brightness, features.color_temperature], // color xy
+    'HGZB-06A': [features.light, features.brightness, features.color_temperature, features.color],
   },
 };
 
