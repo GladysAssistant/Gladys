@@ -60,6 +60,7 @@
     "eslint-plugin-require-jsdoc": "^1.0.4",
     "jsdoc": "^3.6.7",
     "mocha": "^8.3.2",
+    "mocha-each": "^2.0.1",
     "mock-express-request": "^0.2.2",
     "nock": "^13.0.11",
     "nodemon": "^2.0.7",

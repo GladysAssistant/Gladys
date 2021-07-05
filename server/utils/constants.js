@@ -483,6 +483,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
   },
+  YEELIGHT: {
+    NEW_DEVICE: 'yeelight.new-device',
+  },
 };
 
 const DASHBOARD_TYPE = {

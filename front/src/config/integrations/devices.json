@@ -41,5 +41,9 @@
   {
     "key": "eWeLink",
     "img": "/assets/integrations/cover/ewelink.jpg"
+  },
+  {
+    "key": "yeelight",
+    "img": "/assets/integrations/cover/yeelight.jpg"
   }
 ]
