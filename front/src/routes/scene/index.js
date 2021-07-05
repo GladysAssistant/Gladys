@@ -45,29 +45,39 @@ class Scene extends Component {
     await this.getScenes();
   };
   switchActiveScene = async sceneIndex => {
-    await this.setActive(sceneIndex, !this.state.scenes[sceneIndex].active);
-  };
-  setActive = async (sceneIndex, value) => {
     this.setState({ saving: true });
     try {
-      const scene = this.state.scenes[sceneIndex];
-      const updateScene = await this.props.httpClient.patch(`/api/v1/scene/${scene.selector}`, {
-        active: value
-      });
-      this.setState(prevState => {
+      await this.setState(prevState => {
         const newState = update(prevState, {
           scenes: {
             [sceneIndex]: {
               active: {
-                $set: updateScene.active
+                $set: !prevState.scenes[sceneIndex].active
               }
             }
           }
         });
         return newState;
       });
+      const scene = this.state.scenes[sceneIndex];
+      await this.props.httpClient.patch(`/api/v1/scene/${scene.selector}`, {
+        active: scene.active
+      });
     } catch (e) {
       console.error(e);
+      // Rollback change if an error happened
+      await this.setState(prevState => {
+        const newState = update(prevState, {
+          scenes: {
+            [sceneIndex]: {
+              active: {
+                $set: !prevState.scenes[sceneIndex].active
+              }
+            }
+          }
+        });
+        return newState;
+      });
     }
     this.setState({ saving: false });
   };

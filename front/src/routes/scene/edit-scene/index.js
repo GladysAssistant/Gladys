@@ -47,20 +47,35 @@ class EditScene extends Component {
   switchActiveScene = async () => {
     this.setState({ saving: true });
     try {
-      const newState = update(this.state, {
-        scene: {
-          active: {
-            $set: !this.state.scene.active
+      await this.setState(prevState => {
+        const newState = update(prevState, {
+          scene: {
+            active: {
+              $set: !prevState.scene.active
+            }
           }
-        }
+        });
+        return newState;
       });
-      await this.setState(newState);
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, {
-        active: newState.scene.active
+        active: this.state.scene.active
       });
       this.setState({ saving: false });
     } catch (e) {
-      this.setState({ saving: false });
+      console.error(e);
+      await this.setState(prevState => {
+        const newState = update(prevState, {
+          saving: {
+            $set: false
+          },
+          scene: {
+            active: {
+              $set: !prevState.scene.active
+            }
+          }
+        });
+        return newState;
+      });
     }
   };
   saveScene = async e => {
