@@ -7,7 +7,8 @@ const logger = require('../../../../utils/logger');
  * @example
  * zwave.connect(driverPath);
  */
-function connect(driverPath) {
+async function connect(driverPath) {
+  const ZWaveJS = require('zwave-js');
   logger.debug(`Zwave : Connecting to USB = ${driverPath}`);
   // special case for macOS
   if (os.platform() === 'darwin') {
@@ -16,8 +17,26 @@ function connect(driverPath) {
     this.driverPath = driverPath;
   }
   this.ready = false;
-  this.zwave.connect(this.driverPath);
-  this.connected = true;
+  this.driver = new ZWaveJS.Driver(driverPath, {
+    logConfig: {
+      level: 'info'
+    }
+  });
+  this.driver.on('error', (e) => {
+    logger.debug(`ZWave Error: [${e.name}] ${e.message}`);
+  });
+
+  this.driver.on('driver ready', () => {
+    this.driverReady(`${this.driver.controller.homeId}`);
+    this.driver.controller.nodes.forEach((node) => {
+        logger.debug(node);
+    });
+  });
+
+  this.driver.controller.on('')
+
+  // this.zwave.connect(this.driverPath);
+  await this.driver.start();
 }
 
 module.exports = {

@@ -4,8 +4,7 @@ const ZwaveController = require('./api/zwave.controller');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 
 module.exports = function ZwaveService(gladys, serviceId) {
-  const Zwave = require('openzwave-shared');
-  const zwaveManager = new ZwaveManager(Zwave, gladys.event, serviceId);
+  const zwaveManager = new ZwaveManager(gladys.event, serviceId);
   /**
    * @public
    * @description This function starts the service
@@ -18,7 +17,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
     if (!zwaveDriverPath) {
       throw new ServiceNotConfiguredError('ZWAVE_DRIVER_PATH_NOT_FOUND');
     }
-    zwaveManager.connect(zwaveDriverPath);
+    await zwaveManager.connect(zwaveDriverPath);
   }
 
   /**
