@@ -1,5 +1,3 @@
-const fs = require('fs');
-
 // EVENTS
 const { driverReady } = require('./events/zwave.driverReady');
 const { driverFailed } = require('./events/zwave.driverFailed');
@@ -27,37 +25,25 @@ const { getNodeNeighbors } = require('./commands/zwave.getNodeNeighbors');
 const { removeNode } = require('./commands/zwave.removeNode');
 const { setValue } = require('./commands/zwave.setValue');
 
-const DEFAULT_ZWAVE_OPTIONS = {
-  Logging: false,
-  ConsoleOutput: false,
-  SaveConfiguration: true,
-  // NetworkKey: '0x49,0x43,0x1D,0xBD,0x03,0x6D,0x9D,0x8C,0x39,0x67,0x16,0x82,0xA8,0x67,0xEE,0x91',
-};
-
-// if openzwave config is installed in the etc folder
-if (fs.existsSync('/etc/openzwave')) {
-  DEFAULT_ZWAVE_OPTIONS.ConfigPath = '/etc/openzwave';
-}
-
-const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
-  this.zwave = new Zwave(DEFAULT_ZWAVE_OPTIONS);
+const ZwaveManager = function ZwaveManager(eventManager, serviceId) {
+  this.zwave = undefined;
   this.eventManager = eventManager;
   this.serviceId = serviceId;
   this.nodes = {};
   this.connected = false;
   this.scanInProgress = false;
-  // setup all events listener
-  this.zwave.on('driver ready', this.driverReady.bind(this));
-  this.zwave.on('driver failed', this.driverFailed.bind(this));
-  this.zwave.on('node added', this.nodeAdded.bind(this));
-  this.zwave.on('node removed', this.nodeRemoved.bind(this));
-  this.zwave.on('node event', this.nodeEvent.bind(this));
-  this.zwave.on('value added', this.valueAdded.bind(this));
-  this.zwave.on('value changed', this.valueChanged.bind(this));
-  this.zwave.on('node ready', this.nodeReady.bind(this));
-  this.zwave.on('notification', this.notification.bind(this));
-  this.zwave.on('scan complete', this.scanComplete.bind(this));
-  this.zwave.on('controller command', this.controllerCommand.bind(this));
+  // // setup all events listener
+  // this.zwave.on('driver ready', this.driverReady.bind(this));
+  // this.zwave.on('driver failed', this.driverFailed.bind(this));
+  // this.zwave.on('node added', this.nodeAdded.bind(this));
+  // this.zwave.on('node removed', this.nodeRemoved.bind(this));
+  // this.zwave.on('node event', this.nodeEvent.bind(this));
+  // this.zwave.on('value added', this.valueAdded.bind(this));
+  // this.zwave.on('value changed', this.valueChanged.bind(this));
+  // this.zwave.on('node ready', this.nodeReady.bind(this));
+  // this.zwave.on('notification', this.notification.bind(this));
+  // this.zwave.on('scan complete', this.scanComplete.bind(this));
+  // this.zwave.on('controller command', this.controllerCommand.bind(this));
 };
 
 // EVENTS

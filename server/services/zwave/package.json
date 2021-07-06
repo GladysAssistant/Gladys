@@ -13,6 +13,6 @@
   ],
   "scripts": {},
   "dependencies": {
-    "openzwave-shared": "^1.6.2"
+    "zwave-js": "^7.11.0"
   }
 }
