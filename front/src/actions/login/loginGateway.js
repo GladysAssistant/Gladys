@@ -8,14 +8,20 @@ import { route } from 'preact-router';
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
   const actions = {
-    init(state) {
-      store.setState({
+    init(state, returnUrl) {
+      const newState = {
         gatewayLoginStep2: false,
         gatewayLoginStatus: null,
         gatewayLoginEmail: null,
         gatewayLoginPassword: null,
         gatewayLoginTwoFactorCode: null
-      });
+      };
+      // If there is a return URL and the URL is relative to this domain
+      // (we want to avoid redirecting to another domain for security issues)
+      if (returnUrl && returnUrl.startsWith('/')) {
+        newState.gatewayLoginReturnUrl = returnUrl;
+      }
+      store.setState(newState);
     },
     async login(state, e) {
       if (e) {
@@ -86,7 +92,12 @@ function createActions(store) {
           state.session.saveUser(user);
           // get profile picture
           await actionsProfilePicture.loadProfilePicture(store.getState());
-          route('/dashboard');
+          // verify if we need to redirect to the previous page
+          if (state.gatewayLoginReturnUrl) {
+            route(state.gatewayLoginReturnUrl);
+          } else {
+            route('/dashboard');
+          }
         } else {
           route('/link-gateway-user');
         }

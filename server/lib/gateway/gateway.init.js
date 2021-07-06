@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Init Gladys Gateway.
@@ -26,6 +26,14 @@ async function init() {
       this.connected = true;
       // try to backup, if needed
       this.event.emit(EVENTS.GATEWAY.CHECK_IF_BACKUP_NEEDED);
+
+      // check if google home is connected
+      const value = await this.variable.getValue(
+        SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY,
+      );
+      if (value !== null) {
+        this.googleHomeConnected = true;
+      }
     }
   } catch (e) {
     logger.debug(e);

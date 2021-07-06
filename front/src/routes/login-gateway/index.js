@@ -6,7 +6,7 @@ import LoginGatewayPage from './LoginGatewayPage';
 @connect('gatewayLoginStep2,gatewayLoginStatus', actions)
 class Login extends Component {
   componentWillMount() {
-    this.props.init();
+    this.props.init(this.props.return_url);
   }
 
   render(props, {}) {

@@ -79,6 +79,11 @@ async function handleNewMessage(data, rawMessage, cb) {
     this.event.emit(EVENTS.DEVICE.NEW_STATE, data.data);
     cb({ status: 200 });
   }
+
+  // if the message is a Google Home request
+  if (data.type === 'gladys-open-api' && data.action === 'google-home-request') {
+    this.handleGoogleHomeMessage(data, rawMessage, cb);
+  }
 }
 
 module.exports = {
