@@ -1,0 +1,34 @@
+.iconDiv {
+  padding: 4px;
+  border-radius: 5px;
+}
+
+.editionMode {
+  opacity: 0.5;
+}
+
+.editionMode:hover {
+  opacity: 1;
+}
+
+.iconLabel {
+  cursor: pointer;
+  margin-bottom: 0;
+  font-size: 1.7em;
+}
+
+.textued-fe {
+  font-family: sans-serif !important;
+}
+
+.remoteGrid {
+  overflow: scroll;
+}
+
+.gridCell {
+  border-width: 1px;
+  border-style: dashed;
+  border-color: var(--light);
+  padding: 0px;
+  margin: 0px;
+}

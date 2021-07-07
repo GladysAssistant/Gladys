@@ -18,7 +18,6 @@ const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
-
 /**
  * @description Return object of routes.
  * @param {Object} gladys - Gladys object.

@@ -13,6 +13,8 @@ const boxesSchema = Joi.array().items(
       camera: Joi.string(),
       name: Joi.string(),
       modes: Joi.object(),
+      remote: Joi.string(),
+      device: Joi.string(),
       device_features: Joi.array().items(Joi.string()),
     }),
   ),
