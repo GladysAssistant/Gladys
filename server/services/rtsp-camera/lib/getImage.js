@@ -28,32 +28,56 @@ async function getImage(device) {
       this.gladys.config.tempFolder,
       `camera-${device.id}-${now.getMilliseconds()}-${now.getSeconds()}-${now.getMinutes()}-${now.getHours()}.jpg`,
     );
-    // we create a writestream
-    const writeStream = fse.createWriteStream(filePath);
-    // and send a camera thumbnail to this stream
-    this.ffmpeg(cameraUrlParam.value)
-      .format('image2')
-      .outputOptions('-vframes 1')
-      // resize the image with max width = 640
-      .outputOptions('-vf scale=640:-1')
-      //  Effective range for JPEG is 2-31 with 31 being the worst quality.
-      .outputOptions('-qscale:v 15')
-      .output(writeStream)
-      .on('end', async () => {
-        const image = await fse.readFile(filePath);
-        // convert binary data to base64 encoded string
-        const cameraImageBase = Buffer.from(image).toString('base64');
-        const cameraImage = `image/png;base64,${cameraImageBase}`;
-        resolve(cameraImage);
-        await fse.remove(filePath);
-      })
-      .on('error', async (err, stdout, stderr) => {
-        logger.debug(`Cannot process video: ${err.message}`);
-        logger.debug(stderr);
-        reject(err.message);
-        await fse.remove(filePath);
-      })
-      .run();
+
+    if (cameraUrlParam.value === 'pi-camera') {
+      // init the camera tool
+      const stillCamera = new this.picam.StillCamera();
+
+      stillCamera
+        .takeImage() // take image in high quality
+        .then((image) => {
+          fse.writeFileSync(filePath, image); // save the image in a file
+          // convert the image to base64 encoded string
+          const cameraImageBase = Buffer.from(image).toString('base64');
+          const cameraImage = `image/png;base64,${cameraImageBase}`;
+          resolve(cameraImage);
+          // remove the tmp file
+          fse.remove(filePath);
+        })
+        .catch((err) => {
+          logger.debug(`Cannot process video: ${err.message}`);
+          reject(err.message);
+          fse.remove(filePath);
+        });
+    } else {
+      // we create a writestream
+      const writeStream = fse.createWriteStream(filePath);
+      // and send a camera thumbnail to this stream
+      this.ffmpeg(cameraUrlParam.value)
+        .format('image2')
+        .outputOptions('-vframes 1')
+        // resize the image with max width = 640
+        .outputOptions('-vf scale=640:-1')
+        //  Effective range for JPEG is 2-31 with 31 being the worst quality.
+        .outputOptions('-qscale:v 15')
+        .output(writeStream)
+        .on('end', async () => {
+          const image = await fse.readFile(filePath);
+          // convert binary data to base64 encoded string
+          const cameraImageBase = Buffer.from(image).toString('base64');
+          const cameraImage = `image/png;base64,${cameraImageBase}`;
+          resolve(cameraImage);
+          await fse.remove(filePath);
+        })
+        .on('error', async (err, stdout, stderr) => {
+          logger.debug(`Cannot process video: ${err.message}`);
+          logger.debug(stderr);
+          reject(err.message);
+          await fse.remove(filePath);
+        })
+        .run();
+    }
+
     return null;
   });
 }
