@@ -45,6 +45,28 @@ describe('Scene view', () => {
       .click()
       .type('My House{enter}');
   });
+  it('Should disable scene', () => {
+    cy.visit('/dashboard/scene');
+
+    // Normally we shouldn't use CSS classes to identify element,
+    // but here we don't have much choice as there is no label
+    // on this element, and the checkbox is covered by this element
+    cy.get('.custom-switch-indicator').click();
+
+    cy.visit('/dashboard/scene/my-scene');
+
+    cy.get('[type="checkbox"]').should('not.be.checked');
+
+    cy.visit('/dashboard/scene');
+
+    cy.get('[type="checkbox"]').should('not.be.checked');
+
+    cy.get('.custom-switch-indicator').click();
+
+    cy.visit('/dashboard/scene');
+
+    cy.get('[type="checkbox"]').should('be.checked');
+  });
   it('Should delete existing scene', () => {
     cy.login();
     cy.visit('/dashboard/scene/my-scene');
