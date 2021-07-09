@@ -6,7 +6,6 @@ import DashboardPage from './DashboardPage';
 import actions from '../../actions/dashboard';
 import { RequestStatus } from '../../utils/consts';
 import get from 'get-value';
-import { DASHBOARD_TYPE } from '../../../../server/utils/constants';
 
 extend('$auto', function(value, object) {
   return object ? update(object, value) : update({}, value);
@@ -59,13 +58,18 @@ class Dashboard extends Component {
 
   getCurrentDashboard = async () => {
     try {
+      await this.setState({ loading: true });
       const currentDashboard = await this.props.httpClient.get(
         `/api/v1/dashboard/${this.state.currentDashboardSelector}`
       );
       this.setState({
-        currentDashboard
+        currentDashboard,
+        loading: false
       });
     } catch (e) {
+      this.setState({
+        loading: false
+      });
       console.error(e);
     }
   };
@@ -241,12 +245,33 @@ class Dashboard extends Component {
     }
   };
 
+  isBrowserFullScreenCompatible = () => {
+    return document.fullscreenEnabled || document.webkitFullscreenEnabled;
+  };
+
+  isFullScreen = () => {
+    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+  };
+
   toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
+    const isFullScreen = this.isFullScreen();
+    if (!isFullScreen) {
+      if (document.documentElement.requestFullscreen) {
+        // chrome & firefox
+        document.documentElement.requestFullscreen();
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        // safari
+        document.documentElement.webkitRequestFullscreen();
+      }
       this.props.setFullScreen(true);
-    } else if (document.exitFullscreen) {
-      document.exitFullscreen();
+    } else {
+      if (document.exitFullscreen) {
+        // chrome & firefox
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        // safari
+        document.webkitExitFullscreen();
+      }
       this.props.setFullScreen(false);
     }
   };
@@ -257,6 +282,7 @@ class Dashboard extends Component {
     this.state = {
       dashboardDropdownOpened: false,
       dashboardEditMode: false,
+      browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
       dashboards: [],
       newSelectedBoxType: {}
     };
@@ -272,13 +298,25 @@ class Dashboard extends Component {
     }
   }
 
-  render(props, { dashboardDropdownOpened, dashboards, currentDashboard, dashboardEditMode, gatewayInstanceNotFound }) {
+  render(
+    props,
+    {
+      dashboardDropdownOpened,
+      dashboards,
+      currentDashboard,
+      dashboardEditMode,
+      gatewayInstanceNotFound,
+      loading,
+      browserFullScreenCompatible
+    }
+  ) {
     const dashboardConfigured =
       currentDashboard &&
       currentDashboard.boxes &&
       ((currentDashboard.boxes[0] && currentDashboard.boxes[0].length > 0) ||
         (currentDashboard.boxes[1] && currentDashboard.boxes[1].length > 0) ||
         (currentDashboard.boxes[2] && currentDashboard.boxes[2].length > 0));
+    const dashboardListEmpty = !(dashboards && dashboards.length > 0);
     const dashboardNotConfigured = !dashboardConfigured;
     return (
       <DashboardPage
@@ -286,9 +324,12 @@ class Dashboard extends Component {
         dashboardDropdownOpened={dashboardDropdownOpened}
         dashboardEditMode={dashboardEditMode}
         dashboards={dashboards}
+        dashboardListEmpty={dashboardListEmpty}
         currentDashboard={currentDashboard}
         gatewayInstanceNotFound={gatewayInstanceNotFound}
+        loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
+        browserFullScreenCompatible={browserFullScreenCompatible}
         toggleDashboardDropdown={this.toggleDashboardDropdown}
         redirectToDashboard={this.redirectToDashboard}
         editDashboard={this.editDashboard}

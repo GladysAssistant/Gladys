@@ -187,6 +187,7 @@
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
+    "noDashboardSentenceBottom": "Click on the \"New\" button to create a new dashboard",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
     "editDashboardNameLabel": "Name",
     "boxTitle": {
