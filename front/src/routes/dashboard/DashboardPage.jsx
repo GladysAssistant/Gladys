@@ -16,28 +16,30 @@ const DashboardPage = ({ children, ...props }) => (
       <div class="my-3 my-md-5">
         <div class="container" style={props.dashboardEditMode ? marginBottom : {}}>
           <div class="page-header">
-            <div class="page-title">
-              <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" onClick={props.toggleDashboardDropdown}>
-                  {props.currentDashboard && props.currentDashboard.name}
-                </button>
-                <div
-                  class={cx('dropdown-menu', {
-                    show: props.dashboardDropdownOpened
-                  })}
-                >
-                  {props.dashboards.map((dashboard, index) => (
-                    <Link
-                      class="dropdown-item"
-                      href={`/dashboard/${dashboard.selector}`}
-                      onClick={props.redirectToDashboard}
-                    >
-                      {dashboard.name}
-                    </Link>
-                  ))}
+            {!props.dashboardEditMode && (
+              <div class="page-title">
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" onClick={props.toggleDashboardDropdown}>
+                    {props.currentDashboard && props.currentDashboard.name}
+                  </button>
+                  <div
+                    class={cx('dropdown-menu', {
+                      show: props.dashboardDropdownOpened
+                    })}
+                  >
+                    {props.dashboards.map((dashboard, index) => (
+                      <Link
+                        class="dropdown-item"
+                        href={`/dashboard/${dashboard.selector}`}
+                        onClick={props.redirectToDashboard}
+                      >
+                        {dashboard.name}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div class="page-options d-flex">
               {!props.dashboardEditMode && (
