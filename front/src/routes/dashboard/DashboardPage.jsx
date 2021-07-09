@@ -60,11 +60,11 @@ const DashboardPage = ({ children, ...props }) => (
                 </button>
               )}
               {!props.dashboardEditMode && (
-                <button onClick={props.editDashboard} class="btn btn-outline-success btn-sm ml-2">
+                <Link href="/dashboard/create/new" class="btn btn-outline-success btn-sm ml-2">
                   <span>
                     <Text id="dashboard.newDashboardButton" /> <i class="fe fe-plus" />
                   </span>
-                </button>
+                </Link>
               )}
             </div>
           </div>

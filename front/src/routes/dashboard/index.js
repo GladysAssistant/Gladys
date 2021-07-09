@@ -33,7 +33,7 @@ class Dashboard extends Component {
       if (this.props.dashboardSelector) {
         currentDashboardSelector = this.props.dashboardSelector;
       } else if (dashboards.length > 0) {
-        currentDashboardSelector = dashboards[0];
+        currentDashboardSelector = dashboards[0].selector;
       } else {
         this.setState({
           dashboardNotConfigured: true,

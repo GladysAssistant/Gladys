@@ -244,6 +244,12 @@
       }
     }
   },
+  "newDashboard": {
+    "cardTitle": "Create a new dashboard",
+    "description": "You can create as many dashboard as you want, so you can better organize the data you want to display.",
+    "nameLabel": "Name",
+    "createDashboardButton": "Create"
+  },
   "integration": {
     "root": {
       "title": "Integrations",
