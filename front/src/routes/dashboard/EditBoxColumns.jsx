@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import EditBox from './EditBox';
 import EditAddBoxButton from './EditAddBoxButton';
@@ -6,11 +6,31 @@ import style from './style.css';
 
 const EditBoxColumns = ({ children, ...props }) => (
   <div>
-    <div class="form-group">
-      <label class="form-label">
-        <Text id="dashboard.nameLabel" />
-      </label>
-      <input type="text" class="form-control" value="" />
+    <h2>
+      <Text id="dashboard.editDashboardTitle" />
+    </h2>
+    <div class="row">
+      <div class="col-md-12 mb-4">
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="dashboard.editDashboardNameLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="text"
+              class={cx('form-control', {
+                'is-invalid': props.dashboardNameError
+              })}
+              placeholder={<Text id="dashboard.editDashboardNameLabel" />}
+              value={props.homeDashboard.name}
+              onInput={props.updateCurrentDashboardName}
+            />
+          </Localizer>
+          <div class="invalid-feedback">
+            <Text id="dashboard.invalidName" />
+          </div>
+        </div>
+      </div>
     </div>
     <div class="d-flex flex-row flex-wrap justify-content-center pb-9">
       {props.homeDashboard &&

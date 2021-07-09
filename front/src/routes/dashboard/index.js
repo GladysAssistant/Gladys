@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { route } from 'preact-router';
 import update, { extend } from 'immutability-helper';
 import DashboardPage from './DashboardPage';
 import actions from '../../actions/dashboard';
@@ -11,10 +12,7 @@ extend('$auto', function(value, object) {
   return object ? update(object, value) : update({}, value);
 });
 
-@connect(
-  'user,fullScreen,currentUrl,httpClient,dashboardEditMode,dashboardNotConfigured,editDashboardDragEnable,homeDashboard,gatewayInstanceNotFound',
-  actions
-)
+@connect('user,fullScreen,currentUrl,httpClient', actions)
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
     this.setState(prevState => {
@@ -34,16 +32,6 @@ class Dashboard extends Component {
         currentDashboardSelector = this.props.dashboardSelector;
       } else if (dashboards.length > 0) {
         currentDashboardSelector = dashboards[0].selector;
-      } else {
-        this.setState({
-          dashboardNotConfigured: true,
-          currentDashboard: {
-            name: `${this.props.user.firstname} home`,
-            selector: `${this.props.user.selector}-home`,
-            type: DASHBOARD_TYPE.MAIN,
-            boxes: [[], [], []]
-          }
-        });
       }
       await this.setState({
         dashboards,
@@ -176,6 +164,17 @@ class Dashboard extends Component {
     this.setState(newState);
   };
 
+  updateCurrentDashboardName = e => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        name: {
+          $set: e.target.value
+        }
+      }
+    });
+    this.setState(newState);
+  };
+
   updateBoxConfig = (x, y, data) => {
     const newState = update(this.state, {
       currentDashboard: {
@@ -200,38 +199,15 @@ class Dashboard extends Component {
     });
   };
 
-  setDashboardConfigured = () => {
-    const currentDashboard = this.state.currentDashboard;
-    const dashboardConfigured =
-      currentDashboard &&
-      currentDashboard.boxes &&
-      ((currentDashboard.boxes[0] && currentDashboard.boxes[0].length > 0) ||
-        (currentDashboard.boxes[1] && currentDashboard.boxes[1].length > 0) ||
-        (currentDashboard.boxes[2] && currentDashboard.boxes[2].length > 0));
-    this.setState({
-      dashboardNotConfigured: !dashboardConfigured
-    });
-  };
-
   saveDashboard = async () => {
     this.setState({
       loading: true
     });
     try {
-      let currentDashboard;
-      if (this.state.currentDashboard.id) {
-        currentDashboard = await this.props.httpClient.patch(
-          `/api/v1/dashboard/${this.state.currentDashboard.selector}`,
-          this.state.currentDashboard
-        );
-      } else {
-        const dashboardToCreate = {
-          ...this.state.currentDashboard,
-          name: `${this.props.user.firstname} home`,
-          selector: `${this.props.user.selector}-home`
-        };
-        currentDashboard = await this.props.httpClient.post('/api/v1/dashboard', dashboardToCreate);
-      }
+      const currentDashboard = await this.props.httpClient.patch(
+        `/api/v1/dashboard/${this.state.currentDashboard.selector}`,
+        this.state.currentDashboard
+      );
       this.setState({
         currentDashboard,
         dashboardEditMode: false,
@@ -249,7 +225,20 @@ class Dashboard extends Component {
         });
       }
     }
-    this.setDashboardConfigured();
+  };
+
+  deleteCurrentDashboard = async () => {
+    try {
+      await this.props.httpClient.delete(`/api/v1/dashboard/${this.state.currentDashboard.selector}`);
+      await this.setState({
+        dashboardDropdownOpened: false,
+        dashboardEditMode: false
+      });
+      this.init();
+      route('/dashboard');
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   toggleFullScreen = () => {
@@ -283,7 +272,14 @@ class Dashboard extends Component {
     }
   }
 
-  render(props, { dashboardDropdownOpened, dashboards, currentDashboard, dashboardEditMode }) {
+  render(props, { dashboardDropdownOpened, dashboards, currentDashboard, dashboardEditMode, gatewayInstanceNotFound }) {
+    const dashboardConfigured =
+      currentDashboard &&
+      currentDashboard.boxes &&
+      ((currentDashboard.boxes[0] && currentDashboard.boxes[0].length > 0) ||
+        (currentDashboard.boxes[1] && currentDashboard.boxes[1].length > 0) ||
+        (currentDashboard.boxes[2] && currentDashboard.boxes[2].length > 0));
+    const dashboardNotConfigured = !dashboardConfigured;
     return (
       <DashboardPage
         {...props}
@@ -291,6 +287,8 @@ class Dashboard extends Component {
         dashboardEditMode={dashboardEditMode}
         dashboards={dashboards}
         currentDashboard={currentDashboard}
+        gatewayInstanceNotFound={gatewayInstanceNotFound}
+        dashboardNotConfigured={dashboardNotConfigured}
         toggleDashboardDropdown={this.toggleDashboardDropdown}
         redirectToDashboard={this.redirectToDashboard}
         editDashboard={this.editDashboard}
@@ -303,6 +301,8 @@ class Dashboard extends Component {
         saveDashboard={this.saveDashboard}
         updateBoxConfig={this.updateBoxConfig}
         toggleFullScreen={this.toggleFullScreen}
+        updateCurrentDashboardName={this.updateCurrentDashboardName}
+        deleteCurrentDashboard={this.deleteCurrentDashboard}
         fullScreen={props.fullScreen}
       />
     );

@@ -9,18 +9,6 @@ function createActions(store) {
         fullScreen
       });
     },
-    setDashboardConfigured(state) {
-      const homeDashboard = state.homeDashboard;
-      const dashboardConfigured =
-        homeDashboard &&
-        homeDashboard.boxes &&
-        ((homeDashboard.boxes[0] && homeDashboard.boxes[0].length > 0) ||
-          (homeDashboard.boxes[1] && homeDashboard.boxes[1].length > 0) ||
-          (homeDashboard.boxes[2] && homeDashboard.boxes[2].length > 0));
-      store.setState({
-        dashboardNotConfigured: !dashboardConfigured
-      });
-    },
 
     async getBoxes(state) {
       store.setState({

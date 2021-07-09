@@ -15,8 +15,8 @@ const DashboardPage = ({ children, ...props }) => (
     <div class="page-main">
       <div class="my-3 my-md-5">
         <div class="container" style={props.dashboardEditMode ? marginBottom : {}}>
-          <div class="page-header">
-            {!props.dashboardEditMode && (
+          {!props.dashboardEditMode && (
+            <div class="page-header">
               <div class="page-title">
                 <div class="dropdown">
                   <button class="btn btn-secondary dropdown-toggle" onClick={props.toggleDashboardDropdown}>
@@ -39,10 +39,8 @@ const DashboardPage = ({ children, ...props }) => (
                   </div>
                 </div>
               </div>
-            )}
 
-            <div class="page-options d-flex">
-              {!props.dashboardEditMode && (
+              <div class="page-options d-flex">
                 <button onClick={props.toggleFullScreen} class="btn btn-outline-secondary btn-sm ml-2">
                   <span>
                     {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
@@ -51,23 +49,19 @@ const DashboardPage = ({ children, ...props }) => (
                     {props.fullScreen && <i class="fe fe-minimize-2" />}
                   </span>
                 </button>
-              )}
-              {!props.dashboardEditMode && (
                 <button onClick={props.editDashboard} class="btn btn-outline-primary btn-sm ml-2">
                   <span>
                     <Text id="dashboard.editDashboardButton" /> <i class="fe fe-edit" />
                   </span>
                 </button>
-              )}
-              {!props.dashboardEditMode && (
                 <Link href="/dashboard/create/new" class="btn btn-outline-success btn-sm ml-2">
                   <span>
                     <Text id="dashboard.newDashboardButton" /> <i class="fe fe-plus" />
                   </span>
                 </Link>
-              )}
+              </div>
             </div>
-          </div>
+          )}
           {props.gatewayInstanceNotFound && (
             <div class="alert alert-warning">
               <Text id="dashboard.gatewayInstanceNotFoundError" />
@@ -79,6 +73,7 @@ const DashboardPage = ({ children, ...props }) => (
           )}
           {props.dashboardEditMode && (
             <EditBoxColumns
+              updateCurrentDashboardName={props.updateCurrentDashboardName}
               editDashboardDragEnable={props.editDashboardDragEnable}
               moveCard={props.moveCard}
               moveBoxUp={props.moveBoxUp}
