@@ -6,7 +6,6 @@ import { route } from 'preact-router';
 import cx from 'classnames';
 import { DASHBOARD_TYPE } from '../../../../../server/utils/constants';
 import style from './style.css';
-import { RequestStatus } from '../../../utils/consts';
 
 const NewDashboardPage = ({ children, ...props }) => (
   <div class={cx('container', style.containerWithMargin)}>
@@ -28,9 +27,14 @@ const NewDashboardPage = ({ children, ...props }) => (
                 <p>
                   <Text id="newDashboard.description" />
                 </p>
-                {props.createSceneStatus === RequestStatus.ConflictError && (
+                {props.dashboardAlreadyExistError && (
                   <div class="alert alert-danger">
                     <Text id="newDashboard.dashboardAlreadyExist" />
+                  </div>
+                )}
+                {props.unknownError && (
+                  <div class="alert alert-danger">
+                    <Text id="newDashboard.unknownError" />
                   </div>
                 )}
                 <div class="form-group">
@@ -41,24 +45,17 @@ const NewDashboardPage = ({ children, ...props }) => (
                     <input
                       type="text"
                       class={cx('form-control', {
-                        'is-invalid': props.dashboardNameError
+                        'is-invalid': props.dashboardAlreadyExistError || props.unknownError
                       })}
                       placeholder={<Text id="newDashboard.nameLabel" />}
                       value={props.name}
                       onInput={props.updateName}
                     />
                   </Localizer>
-                  <div class="invalid-feedback">
-                    <Text id="newDashboard.invalidName" />
-                  </div>
                 </div>
 
                 <div class="form-footer">
-                  <button
-                    onClick={props.createDashboard}
-                    class="btn btn-primary btn-block"
-                    disabled={props.createDashboardStatus === RequestStatus.Getting}
-                  >
+                  <button onClick={props.createDashboard} class="btn btn-primary btn-block">
                     <Text id="newDashboard.createDashboardButton" />
                   </button>
                 </div>
@@ -78,7 +75,11 @@ class Dashboard extends Component {
   };
   createDashboard = async e => {
     e.preventDefault();
-    await this.setState({ loading: true });
+    await this.setState({
+      loading: true,
+      dashboardAlreadyExistError: false,
+      unknownError: false
+    });
     try {
       const newDashboard = {
         name: this.state.name,
@@ -86,9 +87,14 @@ class Dashboard extends Component {
         boxes: [[], [], []]
       };
       const createDashboard = await this.props.httpClient.post('/api/v1/dashboard', newDashboard);
-      this.setState({ loading: false });
+      this.setState({ loading: false, dashboardAlreadyExistError: false, unknownError: false });
       route(`/dashboard/${createDashboard.selector}`);
     } catch (e) {
+      if (e.response && e.response.status === 409) {
+        this.setState({ dashboardAlreadyExistError: true });
+      } else {
+        this.setState({ unknownError: true });
+      }
       this.setState({ loading: false });
       console.error(e);
     }
@@ -101,11 +107,13 @@ class Dashboard extends Component {
       loading: false
     };
   }
-  render(props, { name, loading }) {
+  render(props, { name, loading, dashboardAlreadyExistError, unknownError }) {
     return (
       <NewDashboardPage
         name={name}
         loading={loading}
+        dashboardAlreadyExistError={dashboardAlreadyExistError}
+        unknownError={unknownError}
         updateName={this.updateName}
         createDashboard={this.createDashboard}
       />

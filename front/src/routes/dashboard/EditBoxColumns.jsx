@@ -9,6 +9,21 @@ const EditBoxColumns = ({ children, ...props }) => (
     <h2>
       <Text id="dashboard.editDashboardTitle" />
     </h2>
+    {props.dashboardAlreadyExistError && (
+      <div class="alert alert-danger">
+        <Text id="newDashboard.dashboardAlreadyExist" />
+      </div>
+    )}{' '}
+    {props.dashboardValidationError && (
+      <div class="alert alert-danger">
+        <Text id="newDashboard.validationError" />
+      </div>
+    )}
+    {props.unknownError && (
+      <div class="alert alert-danger">
+        <Text id="newDashboard.unknownError" />
+      </div>
+    )}
     <div class="row">
       <div class="col-md-12 mb-4">
         <div class="form-group">
@@ -18,17 +33,12 @@ const EditBoxColumns = ({ children, ...props }) => (
           <Localizer>
             <input
               type="text"
-              class={cx('form-control', {
-                'is-invalid': props.dashboardNameError
-              })}
+              class="form-control"
               placeholder={<Text id="dashboard.editDashboardNameLabel" />}
               value={props.homeDashboard.name}
               onInput={props.updateCurrentDashboardName}
             />
           </Localizer>
-          <div class="invalid-feedback">
-            <Text id="dashboard.invalidName" />
-          </div>
         </div>
       </div>
     </div>

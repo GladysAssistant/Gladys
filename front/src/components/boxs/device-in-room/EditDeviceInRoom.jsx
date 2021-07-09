@@ -20,8 +20,7 @@ const SUPPORTED_FEATURE_TYPES = [
 @connect('httpClient', {})
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {
-    this.props.updateBoxConfig(this.props.x, this.props.y, room.selector, { room });
-    this.updateDeviceFeatures([]);
+    this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
   };
 
   updateDeviceFeatures = selectedDeviceFeaturesOptions => {
@@ -79,11 +78,13 @@ class EditDeviceInRoom extends Component {
   };
 
   componentDidMount() {
-    this.getDeviceFeatures();
+    if (this.props.box.room) {
+      this.getDeviceFeatures();
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room) {
+    if (prevProps.box.room !== this.props.box.room && this.props.box.room) {
       this.getDeviceFeatures();
     }
   }

@@ -1,4 +1,3 @@
-import { Text } from 'preact-i18n';
 import EditWeatherBox from '../../components/boxs/weather/EditWeatherBox';
 import EditRoomTemperatureBox from '../../components/boxs/room-temperature/EditRoomTemperatureBox';
 import EditRoomHumidityBox from '../../components/boxs/room-humidity/EditRoomHumidityBox';

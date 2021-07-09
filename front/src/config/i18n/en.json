@@ -252,6 +252,9 @@
     "cardTitle": "Create a new dashboard",
     "description": "You can create as many dashboard as you want, so you can better organize the data you want to display.",
     "nameLabel": "Name",
+    "dashboardAlreadyExist": "A dashboard with this name already exists.",
+    "unknownError": "An unknown error occured. Please retry!",
+    "validationError": "Dashboard created is not valid, did you fill all the boxes correctly?",
     "createDashboardButton": "Create"
   },
   "integration": {

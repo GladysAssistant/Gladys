@@ -4,7 +4,6 @@ import { route } from 'preact-router';
 import update, { extend } from 'immutability-helper';
 import DashboardPage from './DashboardPage';
 import actions from '../../actions/dashboard';
-import { RequestStatus } from '../../utils/consts';
 import get from 'get-value';
 
 extend('$auto', function(value, object) {
@@ -205,7 +204,10 @@ class Dashboard extends Component {
 
   saveDashboard = async () => {
     this.setState({
-      loading: true
+      loading: true,
+      dashboardValidationError: false,
+      dashboardAlreadyExistError: false,
+      unknownError: false
     });
     try {
       const currentDashboard = await this.props.httpClient.patch(
@@ -215,17 +217,20 @@ class Dashboard extends Component {
       this.setState({
         currentDashboard,
         dashboardEditMode: false,
-        loading: false,
-        error: false
+        loading: false
       });
     } catch (e) {
       if (e.response && e.response.status === 422) {
         this.setState({
-          dashboardSavingStatus: RequestStatus.ValidationError
+          dashboardValidationError: true
+        });
+      } else if (e.response && e.response.status === 409) {
+        this.setState({
+          dashboardAlreadyExistError: true
         });
       } else {
         this.setState({
-          dashboardSavingStatus: RequestStatus.Error
+          unknownError: true
         });
       }
     }
@@ -307,7 +312,10 @@ class Dashboard extends Component {
       dashboardEditMode,
       gatewayInstanceNotFound,
       loading,
-      browserFullScreenCompatible
+      browserFullScreenCompatible,
+      dashboardValidationError,
+      dashboardAlreadyExistError,
+      unknownError
     }
   ) {
     const dashboardConfigured =
@@ -330,6 +338,9 @@ class Dashboard extends Component {
         loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
         browserFullScreenCompatible={browserFullScreenCompatible}
+        dashboardValidationError={dashboardValidationError}
+        dashboardAlreadyExistError={dashboardAlreadyExistError}
+        unknownError={unknownError}
         toggleDashboardDropdown={this.toggleDashboardDropdown}
         redirectToDashboard={this.redirectToDashboard}
         editDashboard={this.editDashboard}
