@@ -32,6 +32,7 @@ describe('bluetooth.applyOnPeripheral command', () => {
     bluetooth = new BluetoothMock();
     bluetoothManager = new BluetoothManager(gladys, serviceId);
     bluetoothManager.bluetooth = bluetooth;
+    bluetoothManager.ready = true;
 
     bluetooth.startScanning = () => {
       bluetooth.emit('discover', peripheral);

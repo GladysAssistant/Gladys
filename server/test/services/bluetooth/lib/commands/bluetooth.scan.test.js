@@ -63,7 +63,7 @@ describe('bluetooth.scan command', () => {
     } catch (e) {
       assert.notCalled(bluetooth.startScanning);
       assert.notCalled(stopScanning);
-      assert.calledOnce(stopScanningAsync);
+      assert.notCalled(stopScanningAsync);
     }
   });
 

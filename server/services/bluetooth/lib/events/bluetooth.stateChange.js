@@ -11,11 +11,13 @@ function stateChange(state) {
   switch (state) {
     case 'poweredOn':
       this.ready = true;
+      this.initPresenceScanner();
       break;
     default:
       this.ready = false;
       this.scanning = false;
       this.discoveredDevices = {};
+      this.stopScanPresence();
   }
 
   this.broadcastStatus();

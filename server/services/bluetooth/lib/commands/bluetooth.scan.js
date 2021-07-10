@@ -14,6 +14,10 @@ const { TIMERS } = require('../utils/bluetooth.constants');
  * bluetooth.scan(true);
  */
 async function scan(state, peripheralUuid = undefined) {
+  if (!this.ready) {
+    return Promise.reject(new Error('Bluetooth is not ready to scan for peripherals, check BLE adapter.'));
+  }
+
   if (state) {
     if (peripheralUuid) {
       logger.trace(`Bluetooth: scanning for ${peripheralUuid} peripheral`);

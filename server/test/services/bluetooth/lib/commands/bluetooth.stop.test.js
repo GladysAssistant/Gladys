@@ -12,7 +12,6 @@ const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 describe('bluetooth.stop command', () => {
   let bluetooth;
   let bluetoothManager;
-  let clock;
 
   beforeEach(() => {
     bluetooth = new BluetoothMock();
@@ -21,13 +20,10 @@ describe('bluetooth.stop command', () => {
     bluetoothManager.bluetooth = bluetooth;
     bluetoothManager.discoveredDevices = { any: 'any' };
     bluetoothManager.scanCounter = 12;
-
-    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
     bluetooth.removeAllListeners();
-    clock.restore();
     sinon.reset();
   });
 
@@ -46,10 +42,6 @@ describe('bluetooth.stop command', () => {
   });
 
   it('check only pending timers are well removed', async () => {
-    sinon.spy(clock, 'clearInterval');
-
-    bluetoothManager.presenceScanner.timer = setInterval(assert.fail, 5000);
-
     const scanPromise = {
       isPending: () => false,
       cancel: fake.returns(false),
@@ -59,14 +51,10 @@ describe('bluetooth.stop command', () => {
     await bluetoothManager.stop();
 
     assert.calledOnce(bluetooth.stopScanning);
-    assert.calledOnce(clock.clearInterval);
     assert.notCalled(scanPromise.cancel);
   });
 
   it('check timers are well removed', async () => {
-    sinon.spy(clock, 'clearInterval');
-
-    bluetoothManager.presenceScanner.timer = setInterval(assert.fail, 5000);
     const scanPromise = {
       isPending: () => true,
       cancel: fake.returns(false),
@@ -76,7 +64,6 @@ describe('bluetooth.stop command', () => {
     await bluetoothManager.stop();
 
     assert.calledOnce(bluetooth.stopScanning);
-    assert.calledOnce(clock.clearInterval);
     assert.calledOnce(scanPromise.cancel);
   });
 });
