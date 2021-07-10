@@ -18,6 +18,9 @@ const colorTemperature = require('./colorTemperature');
 const counter = require('./counter');
 const humidity = require('./humidity');
 const temperature = require('./temperature');
+const infrared = require('./infrared');
+const radioFrequency = require('./radioFrequency');
+const rfid = require('./rfid');
 
 const FEATURE_TEMPLATES = [
   power,
@@ -33,6 +36,9 @@ const FEATURE_TEMPLATES = [
   counter,
   humidity,
   temperature,
+  infrared,
+  radioFrequency,
+  rfid,
 ];
 
 const generateValue = (featureTemplate, value) => {
