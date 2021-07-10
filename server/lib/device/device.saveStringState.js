@@ -40,6 +40,7 @@ async function saveStringState(device, deviceFeature, newValue) {
     type: WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
     payload: {
       device: device.selector,
+      feature: deviceFeature.selector,
       last_value_string: newValue,
       last_value_changed: now,
     },

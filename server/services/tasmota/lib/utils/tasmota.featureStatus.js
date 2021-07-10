@@ -4,7 +4,8 @@ const { recursiveSearch, generateExternalId, generateValue } = require('../featu
 const sendEvent = (gladysEvent, deviceExternalId, featureTemplate, fullKey, command, value) => {
   const featureExternalId = generateExternalId(featureTemplate, command, fullKey);
 
-  gladysEvent.emit(EVENTS.DEVICE.NEW_STATE, {
+  const eventName = featureTemplate.eventName || EVENTS.DEVICE.NEW_STATE;
+  gladysEvent.emit(eventName, {
     device_feature_external_id: `tasmota:${deviceExternalId}:${featureExternalId}`,
     state: generateValue(featureTemplate, value),
   });
