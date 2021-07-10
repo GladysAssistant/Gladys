@@ -1,8 +1,16 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import { DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS_BY_CATEGORY
+} from '../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
 import get from 'get-value';
+
+const DEVICE_FEATURE_COMPATIBLE_CATEGORY = {
+  [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: [DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_CATEGORIES.SWITCH]
+};
 
 class UpdateDeviceFeature extends Component {
   updateName = e => this.props.updateFeatureProperty(this.props.featureIndex, 'name', e.target.value);
@@ -10,9 +18,13 @@ class UpdateDeviceFeature extends Component {
   updateMin = e => this.props.updateFeatureProperty(this.props.featureIndex, 'min', e.target.value);
   updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
+  updateCategory = e => this.props.updateFeatureProperty(this.props.featureIndex, 'category', e.target.value);
   deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
 
-  render({ feature, featureIndex, ...props }) {
+  render({ feature, featureIndex, canEditCategory, device, ...props }) {
+    const allowModifyCategory =
+      canEditCategory && canEditCategory(device, feature) && DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type];
+
     return (
       <div class="col-md-4">
         <div class="card">
@@ -36,6 +48,31 @@ class UpdateDeviceFeature extends Component {
                 />
               </Localizer>
             </div>
+            {allowModifyCategory && (
+              <div class="form-group form-label" for={`featureCategory_${featureIndex}`}>
+                <label>
+                  <Text id="editDeviceForm.featureCategoryLabel" />
+                </label>
+                <Localizer>
+                  <select
+                    id={`unit_${featureIndex}`}
+                    type="text"
+                    value={feature.category}
+                    onChange={this.updateCategory}
+                    class="form-control"
+                  >
+                    <option value="">
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    {DEVICE_FEATURE_COMPATIBLE_CATEGORY[feature.type].map(type => (
+                      <option value={type}>
+                        <Text id={`deviceFeatureCategory.${type}.shortCategoryName`}>{type}</Text>
+                      </option>
+                    ))}
+                  </select>
+                </Localizer>
+              </div>
+            )}
             {props.allowModifyFeatures && (
               <div class="form-group">
                 <label class="form-label" for={`externalid_${featureIndex}`}>
