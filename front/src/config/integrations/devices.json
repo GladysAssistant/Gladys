@@ -30,6 +30,10 @@
     "img": "/assets/integrations/cover/tasmota.jpg"
   },
   {
+    "key": "rflink",
+    "img": "/assets/integrations/cover/rflink.png"
+  },
+  {
     "key": "tpLink",
     "link": "tp-link",
     "img": "/assets/integrations/cover/tp-link.jpg"

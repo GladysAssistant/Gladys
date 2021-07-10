@@ -306,6 +306,27 @@ const DEVICE_FEATURE_CATEGORIES = {
   UNKNOWN: 'unknown',
 };
 
+const DEVICE_MODELS = {
+  TRISTATE: 'Tristate',
+  KAKU: 'Kaku',
+  NEWKAKU: 'Newkaku',
+  HOMEEASY: 'Homeeasy',
+  CONRAD: 'Conrad rsl2',
+  BLYSS: 'Blyss',
+  RTS: 'Rts',
+  AB400D: 'Ab400d',
+  IMPULS: 'Impuls',
+  EURODOMEST: 'Eurodomest',
+  X10: 'X10',
+  HOMECOMFORT: 'Homeconfort',
+  KOPPLA: 'Ikea koppla',
+  CHUANGO: 'Chuango',
+  SELECTPLUS: 'Selectplus',
+  DELTRONIC: 'Deltronic',
+  MERTIK: 'Mertik',
+  EV1527: 'Ev1527',
+};
+
 const DEVICE_FEATURE_TYPES = {
   LIGHT: {
     BINARY: 'binary',
@@ -317,6 +338,7 @@ const DEVICE_FEATURE_TYPES = {
     POWER: 'power',
     EFFECT_MODE: 'effect-mode',
     EFFECT_SPEED: 'effect-speed',
+    MODE: 'mode',
   },
   SENSOR: {
     DECIMAL: 'decimal',
@@ -461,6 +483,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
   },
+  RFLINK: {
+    NEW_MESSAGE: 'rflink.new-message',
+    DRIVER_FAILED: 'rflink.driver-failed',
+    DRIVER_READY: 'rflink.driver-ready',
+    NEW_DEVICE: 'rflink.new-device',
+  },
   ZIGBEE2MQTT: {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
@@ -533,6 +561,7 @@ const SESSION_TOKEN_TYPE_LIST = createList(SESSION_TOKEN_TYPES);
 const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
+const DEVICE_MODELS_LIST = createList(DEVICE_MODELS);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -548,6 +577,7 @@ module.exports.ACTIONS_STATUS = ACTIONS_STATUS;
 module.exports.USER_ROLE = USER_ROLE;
 module.exports.AVAILABLE_LANGUAGES = AVAILABLE_LANGUAGES;
 module.exports.SESSION_TOKEN_TYPES = SESSION_TOKEN_TYPES;
+module.exports.DEVICE_MODELS_LIST = DEVICE_MODELS_LIST;
 
 module.exports.EVENT_LIST = EVENT_LIST;
 module.exports.LIFE_EVENT_LIST = LIFE_EVENT_LIST;
