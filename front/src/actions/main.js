@@ -43,6 +43,10 @@ function createActions(store) {
       if (isUrlInArray(state.currentUrl, OPEN_PAGES)) {
         return null;
       }
+      await state.session.init();
+      if (!state.session.isConnected()) {
+        route(`/login${window.location.search}`);
+      }
       try {
         await state.session.init();
         if (!state.session.isConnected()) {
@@ -59,13 +63,13 @@ function createActions(store) {
         const gatewayErrorMessage = get(e, 'response.data.error_message');
         if (status === 401 || status === 403) {
           state.session.reset();
-          route('/login');
+          route(`/login${window.location.search}`);
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
-          route('/link-gateway-user');
+          route(`/link-gateway-user${window.location.search}`);
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
-          route('/link-gateway-user');
+          route(`/link-gateway-user${window.location.search}`);
         } else if (gatewayErrorMessage === 'NO_INSTANCE_FOUND') {
-          route('/link-gateway-user');
+          route(`/link-gateway-user${window.location.search}`);
         } else {
           console.error(e);
         }

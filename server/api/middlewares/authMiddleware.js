@@ -4,7 +4,7 @@ const { Error401 } = require('../../utils/httpErrors');
 module.exports = function AuthMiddleware(scope, gladys) {
   return asyncMiddleware(async (req, res, next) => {
     try {
-      const authHeader = req.headers.authorization;
+      const authHeader = req.get('Authorization');
       let userId;
 
       // if it's an access token

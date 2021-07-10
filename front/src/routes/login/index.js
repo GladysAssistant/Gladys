@@ -9,8 +9,8 @@ class Login extends Component {
     this.props.checkIfInstanceIsConfigured();
   }
 
-  render({}, {}) {
-    return <LoginPage />;
+  render(props) {
+    return <LoginPage {...props} />;
   }
 }
 

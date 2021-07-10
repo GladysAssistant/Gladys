@@ -43,6 +43,10 @@ const SessionModel = require('./session');
 const UserModel = require('./user');
 const VariableModel = require('./variable');
 
+// OAuth
+const OAuthClientModel = require('./oauth_client');
+const OAuthAuthorizationCodeModel = require('./oauth_authorization_code');
+
 const models = {
   Area: AreaModel(sequelize, Sequelize),
   Calendar: CalendarModel(sequelize, Sequelize),
@@ -64,6 +68,9 @@ const models = {
   Session: SessionModel(sequelize, Sequelize),
   User: UserModel(sequelize, Sequelize),
   Variable: VariableModel(sequelize, Sequelize),
+  // OAuth
+  OAuthClient: OAuthClientModel(sequelize, Sequelize),
+  OAuthAuthorizationCode: OAuthAuthorizationCodeModel(sequelize, Sequelize),
 };
 
 // Associate all model

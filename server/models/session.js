@@ -43,6 +43,10 @@ module.exports = (sequelize, DataTypes) => {
       useragent: {
         type: DataTypes.TEXT,
       },
+      client_id: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {},
   );

@@ -94,6 +94,7 @@
     "node-schedule": "^1.3.2",
     "node-webcrypto-ossl": "^1.0.48",
     "node-nlp": "^4.19.7",
+    "oauth2-server": "^3.0.1",
     "path-to-regexp": "^3.0.0",
     "queue": "^6.0.0",
     "semver": "^6.1.1",
