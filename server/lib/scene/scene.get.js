@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
-  fields: ['id', 'name', 'icon', 'selector', 'last_executed', 'updated_at'],
+  fields: ['id', 'name', 'icon', 'selector', 'active', 'last_executed', 'updated_at'],
   skip: 0,
   order_dir: 'ASC',
   order_by: 'name',

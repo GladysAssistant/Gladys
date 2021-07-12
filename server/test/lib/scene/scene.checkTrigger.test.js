@@ -20,6 +20,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -53,6 +54,48 @@ describe('scene.checkTrigger', () => {
       });
     });
   });
+  it('should not execute scene, scene not active', async () => {
+    const stateManager = new StateManager();
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: false,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_ON,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.DEVICE.NEW_STATE,
+          device_feature: 'light-1',
+          value: 12,
+          operator: '=',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'light-1',
+      last_value: 12,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.notCalled(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
   it('should execute scene', async () => {
     const stateManager = new StateManager();
     const device = {
@@ -61,6 +104,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -101,6 +145,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -141,6 +186,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -181,6 +227,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -220,6 +267,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -259,6 +307,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -300,6 +349,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -341,6 +391,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -382,6 +433,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -423,6 +475,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -464,6 +517,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -507,6 +561,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -550,6 +605,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -605,6 +661,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {
@@ -648,6 +705,7 @@ describe('scene.checkTrigger', () => {
     const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
     sceneManager.addScene({
       selector: 'my-scene',
+      active: true,
       actions: [
         [
           {

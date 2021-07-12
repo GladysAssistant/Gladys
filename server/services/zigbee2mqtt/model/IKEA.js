@@ -14,7 +14,7 @@ const IKEA = {
     LED1536G5: [features.light, features.brightness, features.color_temperature],
     LED1733G7: [features.light, features.brightness, features.color_temperature],
     LED1622G12: [features.light, features.brightness],
-    LED1624G9: [features.light, features.brightness], // color xy
+    LED1624G9: [features.light, features.brightness, features.color],
     LED1649C5: [features.light, features.brightness],
     LED1732G11: [features.light], // features.brightness, features.color_temperature], bright: 0->255, temp: 0->65535
     'ICTC-G-1': [features.brightness, features.switch_sensor],
@@ -29,6 +29,7 @@ const IKEA = {
     E1743: [features.button],
     'E1525/E1745': [features.motion],
     // E1746: [], // Signal repeater
+    LED1836G9: [features.light, features.brightness],
   },
 };
 
