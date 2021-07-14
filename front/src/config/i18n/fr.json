@@ -233,12 +233,12 @@
         "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment."
       },
       "userPresence": {
-        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes.",
+        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes, et sélectionner ici quels utilisateurs afficher.",
         "left": "Absent ({{since}})",
         "atHome": "A la maison",
         "neverSeenAtHome": "Jamais vu à la maison",
         "error": "Une erreur réseau s'est produite lors de la récupération de la liste des utilisateurs. Merci de rafraîchir la page.",
-        "emptyText": "Il n'y a aucun utilisateurs à afficher ici. Vous pouvez ajouter des utilisateurs dans les paramètres Gladys."
+        "emptyText": "Il n'y a aucun utilisateurs sélectionnés. Vous pouvez éditer cette box pour sélectionner des utilisateurs à afficher."
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
