@@ -37,7 +37,6 @@ describe('Dashboard', () => {
       .click();
   });
   it('Should delete dashboard', () => {
-    cy.visit('/dashboard');
     cy.contains('dashboard.editDashboardButton')
       .should('have.class', 'btn-outline-primary')
       .click();

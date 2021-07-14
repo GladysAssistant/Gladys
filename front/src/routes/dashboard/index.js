@@ -239,7 +239,14 @@ class Dashboard extends Component {
   deleteCurrentDashboard = async () => {
     try {
       await this.props.httpClient.delete(`/api/v1/dashboard/${this.state.currentDashboard.selector}`);
+      const dashboardIndex = this.state.dashboards.findIndex(d => d.id === this.state.currentDashboard.id);
+      const dashboards = update(this.state.dashboards, {
+        $splice: [[dashboardIndex, 1]]
+      });
+      const currentDashboard = dashboards.length > 0 ? dashboards[0] : null;
       await this.setState({
+        dashboards,
+        currentDashboard,
         dashboardDropdownOpened: false,
         dashboardEditMode: false
       });
