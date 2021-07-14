@@ -178,11 +178,18 @@
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Edit",
+    "newDashboardButton": "New",
+    "enableFullScreen": "Full screen",
+    "disableFullScreen": "Exit full screen",
+    "editDashboardTitle": "Edit dashboard",
+    "editDashboardDeleteButton": "Delete",
     "editDashboardCancelButton": "Cancel",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
+    "noDashboardSentenceBottom": "Click on the \"New\" button to create a new dashboard",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
+    "editDashboardNameLabel": "Name",
     "boxTitle": {
       "weather": "Weather",
       "temperature-in-room": "Temperature in room",
@@ -240,6 +247,15 @@
         "editBoxNamePlaceholder": "Name of the box"
       }
     }
+  },
+  "newDashboard": {
+    "cardTitle": "Create a new dashboard",
+    "description": "You can create as many dashboard as you want, so you can better organize the data you want to display.",
+    "nameLabel": "Name",
+    "dashboardAlreadyExist": "A dashboard with this name already exists.",
+    "unknownError": "An unknown error occured. Please retry!",
+    "validationError": "Dashboard created is not valid, did you fill all the boxes correctly?",
+    "createDashboardButton": "Create"
   },
   "integration": {
     "root": {

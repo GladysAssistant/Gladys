@@ -25,7 +25,7 @@ describe('Scene view', () => {
   });
   it('Should add new condition house empty', () => {
     cy.visit('/dashboard/scene/my-scene');
-    cy.contains('editScene.newAction')
+    cy.contains('editScene.addActionButton')
       .should('have.class', 'btn-outline-primary')
       .click();
 
