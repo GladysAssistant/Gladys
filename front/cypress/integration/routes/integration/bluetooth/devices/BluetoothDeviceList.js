@@ -1,4 +1,4 @@
-describe('Bluetooth device list', () => {
+describe.skip('Bluetooth device list', () => {
   const device = {
     name: 'Bluetooth Device',
     external_id: 'bluetooth:5544332211',
