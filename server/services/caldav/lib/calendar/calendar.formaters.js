@@ -8,15 +8,18 @@
  * formatRecurringEvents(event, gladysCalendar)
  */
 function formatRecurringEvents(event, gladysCalendar) {
-  let startDate = this.dayjs(event.start);
+  const { tz } = event.start;
+  let startDate = this.dayjs.tz(this.dayjs(event.start).format('YYYY-MM-DDTHH:mm:ss'), tz);
   let endDate;
 
   if (event.end) {
-    endDate = this.dayjs(event.end);
+    endDate = this.dayjs.tz(this.dayjs(event.end).format('YYYY-MM-DDTHH:mm:ss'), tz);
   } else if (event.duration) {
-    endDate = this.dayjs(event.start).add(this.dayjs.duration(event.duration));
+    endDate = this.dayjs
+      .tz(this.dayjs(event.start).format('YYYY-MM-DDTHH:mm:ss'), tz)
+      .add(this.dayjs.duration(event.duration));
   } else {
-    endDate = this.dayjs(event.start).add(1, 'days');
+    endDate = this.dayjs.tz(this.dayjs(event.start).format('YYYY-MM-DDTHH:mm:ss'), tz).add(1, 'days');
   }
 
   // Calculate the duration of the event for use with recurring events.
@@ -49,8 +52,7 @@ function formatRecurringEvents(event, gladysCalendar) {
     let curEvent = event;
     let showRecurrence = true;
     let curDuration = duration;
-
-    startDate = this.dayjs(date);
+    startDate = this.dayjs.tz(this.dayjs(date).format('YYYY-MM-DDTHH:mm:ss'), tz);
 
     // Use just the date of the recurrence to look up overrides and exceptions (i.e. chop off time information)
     const dateLookupKey = date.toISOString().substring(0, 10);
@@ -60,7 +62,7 @@ function formatRecurringEvents(event, gladysCalendar) {
       // We found an override, so for this recurrence, use a potentially different title,
       // start date, and duration.
       curEvent = curEvent.recurrences[dateLookupKey];
-      startDate = this.dayjs(curEvent.start);
+      startDate = this.dayjs.tz(this.dayjs(curEvent.start).format('YYYY-MM-DDTHH:mm:ss'), tz);
       curDuration = parseInt(this.dayjs(curEvent.end).format('x'), 10) - parseInt(startDate.format('x'), 10);
       if (curEvent.status === 'CANCELLED') {
         showRecurrence = false;
@@ -75,6 +77,10 @@ function formatRecurringEvents(event, gladysCalendar) {
     // Set the the title and the end date from either the regular event or the recurrence override.
     const recurrenceTitle = curEvent.summary;
     endDate = this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x');
+    endDate = this.dayjs.tz(
+      this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x').format('YYYY-MM-DDTHH:mm:ss'),
+      tz,
+    );
 
     // If this recurrence ends before the start of the date range, or starts after the end of the date range,
     // don't process it.
@@ -101,8 +107,8 @@ function formatRecurringEvents(event, gladysCalendar) {
         endDate = endDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
       }
 
-      newEvent.start = startDate.toISOString();
-      newEvent.end = endDate.toISOString();
+      newEvent.start = startDate.format();
+      newEvent.end = endDate.format();
 
       return newEvent;
     }
@@ -138,11 +144,15 @@ function formatEvents(caldavEvents, gladysCalendar) {
       };
 
       if (caldavEvent.start) {
-        newEvent.start = caldavEvent.start.toISOString();
+        newEvent.start = this.dayjs
+          .tz(this.dayjs(caldavEvent.start).format('YYYY-MM-DDTHH:mm:ss'), caldavEvent.start.tz)
+          .format();
       }
 
       if (caldavEvent.end) {
-        newEvent.end = caldavEvent.end.toISOString();
+        newEvent.end = this.dayjs
+          .tz(this.dayjs(caldavEvent.end).format('YYYY-MM-DDTHH:mm:ss'), caldavEvent.end.tz)
+          .format();
       }
 
       if (
