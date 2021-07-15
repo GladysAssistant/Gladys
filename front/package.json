@@ -9,6 +9,7 @@
     "start:production": "npm run -s serve",
     "start:development": "npm run -s dev",
     "build": "cross-env NODE_ENV=production preact build --template src/template.html --no-prerender",
+    "build-with-stats": "cross-env NODE_ENV=production preact build --template src/template.html --no-prerender --json",
     "serve": "npm run build && preact serve",
     "dev": "preact watch -p 1444 --template src/template.html",
     "eslint": "eslint src cypress --ext .json --ext .js --ext .jsx",
