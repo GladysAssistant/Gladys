@@ -136,6 +136,7 @@ jobs:
         run: |
           npm run build-with-stats
       - name: Upload bundle ci
+        working-directory: ./front
         run: npx relative-ci-agent
         env:
           RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY }}
