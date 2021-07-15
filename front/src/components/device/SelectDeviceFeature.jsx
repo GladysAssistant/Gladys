@@ -25,6 +25,10 @@ class SelectDeviceFeature extends Component {
             deviceFeaturesDictionnary[feature.selector] = feature;
             deviceDictionnary[feature.selector] = device;
 
+            if (this.props.exclude_read_only_device_features === true && feature.read_only) {
+              return;
+            }
+
             roomDeviceFeatures.push({
               value: feature.selector,
               label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
