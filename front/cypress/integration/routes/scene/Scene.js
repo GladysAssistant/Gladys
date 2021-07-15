@@ -1,6 +1,40 @@
 describe('Scene view', () => {
+  before(() => {
+    cy.login();
+    const serverUrl = Cypress.env('serverUrl');
+    cy.request({
+      method: 'GET',
+      url: `${serverUrl}/api/v1/room`
+    }).then(res => {
+      const device = {
+        name: 'One device',
+        external_id: 'one-device',
+        selector: 'one-device',
+        room_id: res.body[0].id,
+        features: [
+          {
+            name: 'Multilevel',
+            category: 'light',
+            type: 'temperature',
+            external_id: 'light-temperature',
+            selector: 'light-temperature',
+            read_only: false,
+            keep_history: true,
+            has_feedback: true,
+            min: 0,
+            max: 1
+          }
+        ]
+      };
+      cy.createDevice(device, 'mqtt');
+    });
+  });
   beforeEach(() => {
     cy.login();
+  });
+  after(() => {
+    // Delete all Bluetooth devices
+    cy.deleteDevices('mqtt');
   });
   it('Should create new scene', () => {
     cy.visit('/dashboard/scene');
@@ -44,6 +78,28 @@ describe('Scene view', () => {
     cy.get('.scene-house-empty-or-not-choose-house')
       .click()
       .type('My House{enter}');
+  });
+  it('Should add new condition device set value', () => {
+    cy.visit('/dashboard/scene/my-scene');
+    cy.contains('editScene.addActionButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
+
+    const i18n = Cypress.env('i18n');
+
+    cy.get('.choose-scene-action-type')
+      .click()
+      .type(`${i18n.editScene.actions.device['set-value']}{enter}`);
+
+    // I don't know why, but I'm unable to get this button with
+    // the text. Using the class but it's not recommended otherwise!!
+    cy.get('.btn-success').then(buttons => {
+      cy.wrap(buttons[1]).click();
+    });
+
+    cy.get('.select-device-feature')
+      .click()
+      .type('One device{enter}');
   });
   it('Should disable scene', () => {
     cy.visit('/dashboard/scene');
