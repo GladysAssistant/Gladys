@@ -925,6 +925,11 @@
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
       },
+      "deviceSetValue": {
+        "description": "Cette action vous permet de contrôler un appareil.",
+        "deviceLabel": "Appareil",
+        "valueLabel": "Valeur"
+      },
       "onlyContinueIf": {
         "variableLabel": "Variable",
         "operatorLabel": "Opérateur",
@@ -985,7 +990,8 @@
     },
     "actions": {
       "device": {
-        "get-value": "Récupérer le dernier état"
+        "get-value": "Récupérer le dernier état",
+        "set-value": "Contrôler un appareil"
       },
       "message": {
         "send": "Envoyer un message"
