@@ -1,5 +1,6 @@
 describe('Scene view', () => {
   before(() => {
+    cy.login();
     const serverUrl = Cypress.env('serverUrl');
     cy.request({
       method: 'GET',
