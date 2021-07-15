@@ -9,6 +9,8 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import { DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
+import '../../../../components/boxs/device-in-room/device-features/style.css';
+
 class DeviceSetValue extends Component {
   onDeviceFeatureChange = (deviceFeature, device) => {
     const { columnIndex, index } = this.props;
