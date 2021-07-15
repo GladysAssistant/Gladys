@@ -36,6 +36,38 @@ jobs:
         working-directory: ./front
         run: |
           npm run compare-translations
+  build-front:
+    name: Front build
+    needs:
+      - test-front
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: 📇 Use npm cache
+        uses: c-hive/gha-npm-cache@v1
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+      - name: 🏗️ Build front
+        working-directory: ./front
+        run: |
+          npm run build-with-stats
+      - name: Upload bundle ci
+        working-directory: ./front
+        run: npx relative-ci-agent
+        env:
+          RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY }}
+      - name: ↗️ Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: static
+          path: front/build
   test-server:
     name: Server test
     runs-on: ubuntu-20.04
