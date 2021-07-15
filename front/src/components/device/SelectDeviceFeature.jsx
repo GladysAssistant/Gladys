@@ -110,7 +110,15 @@ class SelectDeviceFeature extends Component {
     if (!deviceOptions) {
       return null;
     }
-    return <Select defaultValue={''} value={selectedOption} onChange={this.handleChange} options={deviceOptions} />;
+    return (
+      <Select
+        class="select-device-feature"
+        defaultValue={''}
+        value={selectedOption}
+        onChange={this.handleChange}
+        options={deviceOptions}
+      />
+    );
   }
 }
 
