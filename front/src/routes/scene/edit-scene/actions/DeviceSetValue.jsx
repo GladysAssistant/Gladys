@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
+import cx from 'classnames';
 import ColorPicker from '../../../../components/device/ColorPicker';
 
 import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeature';
@@ -93,7 +94,9 @@ class DeviceSetValue extends Component {
           type="range"
           value={this.props.action.value}
           onChange={this.handleNewValue}
-          class="form-control custom-range"
+          class={cx('form-control custom-range', {
+            'light-temperature': this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE
+          })}
           step="1"
           min={this.state.deviceFeature.min}
           max={this.state.deviceFeature.max}
