@@ -546,7 +546,12 @@
         "createGithubIssue": "Report a bug with this device"
       },
       "network": {
-        "title": "Z-Wave Network"
+        "title": "Z-Wave Network",
+        "nodeId": "ID",
+        "nodeName": "Name",
+        "nodeNeighbors": "Neighbors",
+        "nodeAsleep": "Node might be asleep or dead",
+        "node": "Node"
       },
       "settings": {
         "title": "Z-Wave Settings",
