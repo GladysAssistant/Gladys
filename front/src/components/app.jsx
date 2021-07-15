@@ -33,6 +33,7 @@ import SignupConfigureHouse from '../routes/signup/4-configure-house';
 import SignupSuccess from '../routes/signup/5-success';
 
 import Dashboard from '../routes/dashboard';
+import NewDashboard from '../routes/dashboard/new-dashboard';
 import Device from '../routes/device';
 import IntegrationPage from '../routes/integration';
 import ChatPage from '../routes/chat';
@@ -110,7 +111,7 @@ const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen',
   actions
 )(props => (
   <div id="app">
@@ -118,6 +119,7 @@ const AppRouter = connect(
       <Header
         currentUrl={props.currentUrl}
         user={props.user}
+        fullScreen={props.fullScreen}
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
         showDropDown={props.showDropDown}
@@ -166,6 +168,8 @@ const AppRouter = connect(
         <SignupConfigureHouse path="/signup/configure-house" />
         <SignupSuccess path="/signup/success" />
         <Dashboard path="/dashboard" />
+        <Dashboard path="/dashboard/:dashboardSelector" />
+        <NewDashboard path="/dashboard/create/new" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
 

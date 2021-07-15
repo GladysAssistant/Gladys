@@ -14,6 +14,7 @@ const boxesSchema = Joi.array().items(
       name: Joi.string(),
       modes: Joi.object(),
       device_features: Joi.array().items(Joi.string()),
+      users: Joi.array().items(Joi.string()),
     }),
   ),
 );
