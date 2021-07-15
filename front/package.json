@@ -66,9 +66,7 @@
     "tabler-ui": "0.0.32",
     "unistore": "^3.2.1",
     "useragent-parser-js": "^1.0.3",
-    "uuid": "^3.3.2",
-    "vis-data": "^7.0.0",
-    "vis-network": "^8.2.0"
+    "uuid": "^3.3.2"
   },
   "jest": {
     "coverageDirectory": "./coverage/",

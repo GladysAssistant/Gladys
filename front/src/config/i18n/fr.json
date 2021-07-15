@@ -673,7 +673,12 @@
         "createGithubIssue": "Signaler un bug avec cet appareil"
       },
       "network": {
-        "title": "Réseau Z-Wave"
+        "title": "Réseau Z-Wave",
+        "nodeId": "ID",
+        "nodeName": "Nom",
+        "nodeNeighbors": "Voisins",
+        "nodeAsleep": "Le noeud z-wave doit être en endormi ou mort.",
+        "node": "Noeud"
       },
       "settings": {
         "title": "Paramètres Z-Wave",
