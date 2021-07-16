@@ -1,4 +1,4 @@
-import 'tabler-ui/dist/assets/css/dashboard.css';
+import '@gladysassistant/theme-optimized/dashboard.css';
 import 'dayjs/locale/en';
 import 'dayjs/locale/fr';
 import './style';
