@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 import createStore from 'unistore';
 import get from 'get-value';
-import config from '../../config';
+import config from '../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
