@@ -63,7 +63,7 @@
     "qrcode": "^1.4.2",
     "react-big-calendar": "^0.22.1",
     "react-datepicker": "^3.8.0",
-    "react-select": "^3.2.0",
+    "react-select": "^4.3.1",
     "set-value": "^3.0.2",
     "unistore": "^3.5.2",
     "useragent-parser-js": "^1.0.3",
