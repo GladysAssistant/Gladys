@@ -30,7 +30,7 @@ const DeviceTab = ({ children, ...props }) => (
               type="text"
               class="form-control w-10"
               placeholder={<Text id="integration.zwave2mqtt.device.search" />}
-              onInput={props.debouncedSearch}
+              onInput={props.debouncedSearchDevicesKeyword}
             />
           </Localizer>
         </div>

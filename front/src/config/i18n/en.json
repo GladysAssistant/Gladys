@@ -517,7 +517,7 @@
       },
       "setup": {
         "title": "Configuration du service Zwave2mqtt",
-        "description": "Ce service utilise deux containers Docker (MQTT broker and Zwave2mqtt). Activer Zwave2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
+        "description": "Ce service utilise deux containers Docker (MQTT broker and Zwave2mqtt). Activer Zwave2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zwave2mqtt",
         "enableLabel": "Activation du service Zwave2mqtt",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zwave2mqtt depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zwave2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",

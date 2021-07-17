@@ -8,7 +8,7 @@ const { BadParameters } = require('../../../../utils/coreErrors');
  * getDeviceExternalId(value);
  */
 function getDeviceExternalId(value) {
-  return `zwave2mqtt:nodeID_${value.node_id}`;
+  return `zwave2mqtt:nodeID_${value.node_id}` + (value.endpoint > 0 ? `${value.endpoint}` : '');
 }
 
 /**

@@ -22,6 +22,14 @@ class Zwave2mqttDeviceBox extends Component {
     });
   };
 
+  updateFeature = e => {
+    this.props.updateDeviceFeature(this.props.listName, this.props.deviceIndex, 'feature_id', e.target.value);
+
+    this.setState({
+      loading: false
+    });
+  };
+
   saveDevice = async () => {
     this.setState({
       loading: true,
@@ -60,46 +68,7 @@ class Zwave2mqttDeviceBox extends Component {
     });
   };
 
-  /*
-  updateUsername = e => {
-    e.preventDefault();
-
-    this.setState({ username: e.target.value });
-  };
-
-  updatePassword = e => {
-    e.preventDefault();
-
-    this.setState({ password: e.target.value });
-  };
-  */
-
-  /*connectAndScan = async () => {
-    this.setState({
-      loading: true,
-      authErrorMessage: null
-    });
-    try {
-      const { device, httpClient } = this.props;
-      const { username, password } = this.state;
-      const options = {
-        singleAddress: device.external_id.replace('zwave2mqtt:', ''),
-        username,
-        password
-      };
-      await httpClient.post('/api/v1/service/zwave2mqtt/discover/http', options);
-    } catch (e) {
-      console.error(e);
-      this.setState({
-        authErrorMessage: 'integration.zwave2mqtt.discover.http.authError'
-      });
-    }
-    this.setState({
-      loading: false
-    });
-  };*/
-
-  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage, authErrorMessage }) {
+  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
     const validModel = device.features.length > 0 || device.needAuthentication;
 
     return (

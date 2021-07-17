@@ -15,7 +15,9 @@ async function handleGetNodesMessage(topic, message) {
   if (getNodes.success) {
     // Add features
     const convertedDevices = getNodes.result.forEach((element) => {
-      this.nodes[`nodeId_${element.id}`] = convertDevice(element, this.serviceId);
+      convertDevice(element, this.serviceId).forEach((device) => {
+        this.nodes[device.id] = device;
+      });
     });
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.DISCOVER_COMPLETE,

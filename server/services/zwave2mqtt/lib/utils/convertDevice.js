@@ -1,6 +1,8 @@
 const logger = require('../../../../utils/logger');
 const { convertFeature } = require('./convertFeature');
+const { getFeaturesByModel } = require('../model');
 const { getDeviceExternalId } = require('./externalId');
+const { getDeviceFeatureExternalId } = require('./externalId');
 
 // const { DEVICE_FEATURE_CATEGORIES } = require('../../../../../server/utils/constants');
 
@@ -26,7 +28,9 @@ const { getDeviceExternalId } = require('./externalId');
  * '6a37dd9d-48c7-4d09-a7bb-33f257edb78d');
  */
 function convertDevice(device, serviceId) {
+  const gladysDevices = new Array();
   const gladysDevice = {
+    id: `nodeId_${device.id}`,
     name: device.name || `${device.id} - ${device.productLabel}`,
     model: `${device.manufacturer} ${device.productLabel} ${device.productDescription}`,
     ready: device.ready,
@@ -38,13 +42,63 @@ function convertDevice(device, serviceId) {
     supported: true,
     params: [],
   };
+  gladysDevices.push(gladysDevice);
 
-  gladysDevice.features = convertFeature(device);
+  const features = getFeaturesByModel(device.deviceId);
+  let gladysDeviceEndpoints = {};
+  if (features.length === 0) {
+    gladysDevice.features = new Array();
+    const cmdClasses = device.values;
+    Object.keys(cmdClasses).forEach((cmdID) => {
+      const cmd = cmdClasses[cmdID];
+      let feature = convertFeature(device, cmd);
+      if(feature) {
+        if(cmd.endpoint > 0) {
+          // Multiple endpoint -> create one more device per endpoint
+          var gladysDeviceEndpoint = gladysDeviceEndpoints[cmd.endpoint];
+          if(gladysDeviceEndpoint == undefined) {
+            gladysDeviceEndpoint = {
+              id: `nodeId_${device.id}_${cmd.endpoint}`,
+              name: `${gladysDevice.name} - ${cmd.endpoint}`,
+              model: gladysDevice.model,
+              ready: device.ready,
+              should_poll: false,
+              external_id: getDeviceExternalId({
+                node_id: device.id,
+                endpoint: cmd.endpoint,
+              }),
+              service_id: serviceId,
+              supported: true,
+              params: [],
+            };
+            gladysDevices.push(gladysDeviceEndpoint);
+            gladysDeviceEndpoints[cmd.endpoint] = gladysDeviceEndpoint;
+            gladysDeviceEndpoint.features = new Array();
+          }
+
+          gladysDeviceEndpoint.features.push(feature);
+        } else {
+          gladysDevice.features.push(feature);
+        }
+      }
+    });
+  } else {
+    features.forEach((feature) => {
+      feature.external_id = getDeviceFeatureExternalId({
+        node_id: device.id,
+        class_id: feature.class_id,
+        instance: feature.instance,
+        propertyKey: feature.propertyKey,
+      });
+    });
+    gladysDevice.features = features;
+  }
 
   logger.debug(
     `Device ${device.id} managed by Gladys as ${gladysDevice.name} with ${gladysDevice.features.length} features`,
   );
-  return gladysDevice;
+
+  return gladysDevices;
 }
 
 module.exports = {

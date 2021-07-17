@@ -7,7 +7,7 @@ module.exports = function Zwave2mqttController(zwave2mqttManager) {
    * @apiName status
    * @apiGroup Zwave2mqtt
    */
-  function status(req, res) {
+  async function status(req, res) {
     res.json(zwave2mqttManager.status());
   }
 
