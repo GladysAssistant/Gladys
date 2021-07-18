@@ -52,11 +52,11 @@ function convertDevice(device, serviceId) {
     Object.keys(cmdClasses).forEach((cmdID) => {
       const cmd = cmdClasses[cmdID];
       let feature = convertFeature(device, cmd);
-      if(feature) {
-        if(cmd.endpoint > 0) {
+      if (feature) {
+        if (cmd.endpoint > 0) {
           // Multiple endpoint -> create one more device per endpoint
           var gladysDeviceEndpoint = gladysDeviceEndpoints[cmd.endpoint];
-          if(gladysDeviceEndpoint == undefined) {
+          if (gladysDeviceEndpoint == undefined) {
             gladysDeviceEndpoint = {
               id: `nodeId_${device.id}_${cmd.endpoint}`,
               name: `${gladysDevice.name} - ${cmd.endpoint}`,

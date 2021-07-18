@@ -15,7 +15,7 @@ function status() {
     zwave2mqttConnected: true,
     z2mEnabled: true,
     dockerBased: true,
-    networkModeValid: true
+    networkModeValid: true,
   };
 }
 

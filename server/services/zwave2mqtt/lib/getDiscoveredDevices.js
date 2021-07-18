@@ -4,8 +4,7 @@
  * @example getDiscoveredDevices()
  */
 async function getDiscoveredDevices() {
-  return Object.values(this.nodes)
-    .map((d) => this.mergeWithExistingDevice(d));
+  return Object.values(this.nodes).map((d) => this.mergeWithExistingDevice(d));
 }
 
 module.exports = {
