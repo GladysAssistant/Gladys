@@ -37,7 +37,6 @@ const DeviceTab = ({ children, ...props }) => (
       </div>
     </div>
     <div class="card-body">
-
       <div
         class={cx('dimmer', {
           active: props.getZwave2mqttStatus === RequestStatus.Getting

@@ -234,7 +234,7 @@ const AppRouter = connect(
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
-        
+
         <Zwave2mqttPage path="/dashboard/integration/device/zwave2mqtt" />
         <Zwave2mqttDiscoverPage path="/dashboard/integration/device/zwave2mqtt/discover" />
         <Zwave2mqttSettingsPage path="/dashboard/integration/device/zwave2mqtt/settings" />

@@ -9,9 +9,7 @@ const actions = store => {
         getCurrentZwave2mqttUrlStatus: RequestStatus.Getting
       });
       try {
-        const zwave2mqttUrl = await state.httpClient.get(
-          '/api/service/zwave2mqtt/variable/ZWAVE2MQTT_URL'
-        );
+        const zwave2mqttUrl = await state.httpClient.get('/api/service/zwave2mqtt/variable/ZWAVE2MQTT_URL');
         store.setState({
           zwave2mqttUrl: zwave2mqttUrl.value,
           getCurrentZwave2mqttUrlStatus: RequestStatus.Success

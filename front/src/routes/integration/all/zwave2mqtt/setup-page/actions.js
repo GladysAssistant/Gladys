@@ -4,9 +4,8 @@ import get from 'get-value';
 
 const createActions = store => {
   const serviceActions = createActionsService(store);
-  
-  const actions = {
 
+  const actions = {
     async startContainer(state) {
       let z2mEnabled = true;
       let error = false;
