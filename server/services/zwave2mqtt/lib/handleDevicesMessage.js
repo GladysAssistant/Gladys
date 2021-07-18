@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { EVENTS } = require('../../../utils/constants');
 const { convertValue } = require('./utils/convertValue');
 
 /**
@@ -24,11 +24,11 @@ function handleDevicesMessage(topic, message) {
           state: convertValue(feature.type, message),
         };
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
+        return newState;
       });
-    return true;
+  } else {
+    logger.warn(`Zwave2mqtt device ${nodeId} not configured in Gladys.`);
   }
-  logger.warn(`Zwave2mqtt device ${nodeId} not configured in Gladys.`);
-  return false;
 }
 
 module.exports = {

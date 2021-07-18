@@ -1,14 +1,13 @@
 const logger = require('../../../utils/logger');
 const { ZWAVE_GATEWAY_PARAM_NAME } = require('./constants');
 const { convertDevice } = require('./utils/convertDevice');
-const { getDiscoveredDevices } = require('./getDiscoveredDevices');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 /**
  * @description Handle getNodes response from zwave2mqtt
  * @param {String} topic - response topic used to scan.
  * @param {Object} message - getNodes response.
- * @returns {boolean}
+ * @example handleGetNodesMessage('zwave2mqtt/#', {});
  */
 async function handleGetNodesMessage(topic, message) {
   const getNodes = JSON.parse(message);
@@ -27,12 +26,10 @@ async function handleGetNodesMessage(topic, message) {
 
   this.scanInProgress = false;
   logger.info('Scanning ZWave done!');
-  return true;
 }
 
 /**
  * @description Force scanning for devices.
- * @returns
  * @example startDiscoveringDevices();
  */
 async function startDiscoveringDevices() {
@@ -42,8 +39,6 @@ async function startDiscoveringDevices() {
   // Subscribe to Zwave2mqtt GetNodes
   this.mqttService.device.subscribe(ZWAVE_GATEWAY_PARAM_NAME.GET_NODES_TOPIC, handleGetNodesMessage.bind(this));
   this.mqttService.device.publish(ZWAVE_GATEWAY_PARAM_NAME.GET_NODES_REQUEST_TOPIC, JSON.stringify({ args: [] }));
-
-  return true;
 }
 
 module.exports = {

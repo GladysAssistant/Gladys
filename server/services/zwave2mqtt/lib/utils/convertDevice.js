@@ -28,7 +28,7 @@ const { getDeviceFeatureExternalId } = require('./externalId');
  * '6a37dd9d-48c7-4d09-a7bb-33f257edb78d');
  */
 function convertDevice(device, serviceId) {
-  const gladysDevices = new Array();
+  const gladysDevices = [];
   const gladysDevice = {
     id: `nodeId_${device.id}`,
     name: device.name || `${device.id} - ${device.productLabel}`,
@@ -45,18 +45,18 @@ function convertDevice(device, serviceId) {
   gladysDevices.push(gladysDevice);
 
   const features = getFeaturesByModel(device.deviceId);
-  let gladysDeviceEndpoints = {};
+  const gladysDeviceEndpoints = {};
   if (features.length === 0) {
-    gladysDevice.features = new Array();
+    gladysDevice.features = [];
     const cmdClasses = device.values;
     Object.keys(cmdClasses).forEach((cmdID) => {
       const cmd = cmdClasses[cmdID];
-      let feature = convertFeature(device, cmd);
+      const feature = convertFeature(device, cmd);
       if (feature) {
         if (cmd.endpoint > 0) {
           // Multiple endpoint -> create one more device per endpoint
-          var gladysDeviceEndpoint = gladysDeviceEndpoints[cmd.endpoint];
-          if (gladysDeviceEndpoint == undefined) {
+          let gladysDeviceEndpoint = gladysDeviceEndpoints[cmd.endpoint];
+          if (gladysDeviceEndpoint === undefined) {
             gladysDeviceEndpoint = {
               id: `nodeId_${device.id}_${cmd.endpoint}`,
               name: `${gladysDevice.name} - ${cmd.endpoint}`,
@@ -73,7 +73,7 @@ function convertDevice(device, serviceId) {
             };
             gladysDevices.push(gladysDeviceEndpoint);
             gladysDeviceEndpoints[cmd.endpoint] = gladysDeviceEndpoint;
-            gladysDeviceEndpoint.features = new Array();
+            gladysDeviceEndpoint.features = [];
           }
 
           gladysDeviceEndpoint.features.push(feature);

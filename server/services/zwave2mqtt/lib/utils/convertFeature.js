@@ -3,7 +3,6 @@ const { getDeviceFeatureExternalId } = require('./externalId');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
-  DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
 const { COMMAND_CLASSES, INDEXES } = require('../constants');
 
@@ -18,7 +17,7 @@ const { COMMAND_CLASSES, INDEXES } = require('../constants');
 function convertFeature(device, cmd) {
   let feature;
 
-  let externalId = getDeviceFeatureExternalId({
+  const externalId = getDeviceFeatureExternalId({
     node_id: device.id,
     class_id: cmd.commandClass,
     instance: cmd.endpoint,
@@ -29,7 +28,7 @@ function convertFeature(device, cmd) {
         : cmd.property.toString().replace(' ', '_'),
   });
 
-  let defaultFeature = {
+  const defaultFeature = {
     name: cmd.label,
     external_id: externalId,
     min: cmd.min || 0,
