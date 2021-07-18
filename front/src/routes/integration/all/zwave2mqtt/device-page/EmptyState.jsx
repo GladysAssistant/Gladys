@@ -11,7 +11,7 @@ const EmptyState = () => (
       <div class="mt-5">
         <Link href="/dashboard/integration/device/zwave2mqtt/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.zwave2mqtt.mqttDiscoverTab" /> <i class="fe fe-globe" />
+            <Text id="integration.zwave2mqtt.discoverTab" /> <i class="fe fe-globe" />
           </button>
         </Link>
       </div>
