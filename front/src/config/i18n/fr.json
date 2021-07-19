@@ -164,7 +164,7 @@
       "cancelDeleteHouse": "Annuler",
       "conflictError": "Une maison avec le même non existe déjà.",
       "roomConflictError": "Une pièce avec le même non existe déjà.",
-      "validationError": "Erreur de validation : une maison ne peut pas avoir un nom vide.",
+      "validationError": "Erreur de validation : Le nom d'une maison doit-être compris entre 1 et 40 caractères.",
       "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères."
     },
     "success": {
@@ -178,11 +178,18 @@
   "dashboard": {
     "title": "Tableau de bord",
     "editDashboardButton": "Editer",
+    "newDashboardButton": "Nouveau",
     "editDashboardCancelButton": "Annuler",
+    "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "enableFullScreen": "Plein écran",
+    "disableFullScreen": "Quitter plein écran",
+    "editDashboardTitle": "Editer le tableau de bord",
     "emptyDashboardSentenceTop": "Votre tableau de bord n'est pas encore configuré.",
     "emptyDashboardSentenceBottom": "Cliquez sur le bouton \"Editer\" pour le compléter.",
+    "noDashboardSentenceBottom": "Cliquez sur le bouton \"Nouveau\" pour créer un tableau de bord.",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
+    "editDashboardNameLabel": "Nom",
     "boxTitle": {
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
@@ -226,12 +233,12 @@
         "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment."
       },
       "userPresence": {
-        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes.",
+        "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes, et sélectionner ici quels utilisateurs afficher.",
         "left": "Absent ({{since}})",
         "atHome": "A la maison",
         "neverSeenAtHome": "Jamais vu à la maison",
         "error": "Une erreur réseau s'est produite lors de la récupération de la liste des utilisateurs. Merci de rafraîchir la page.",
-        "emptyText": "Il n'y a aucun utilisateurs à afficher ici. Vous pouvez ajouter des utilisateurs dans les paramètres Gladys."
+        "emptyText": "Il n'y a aucun utilisateurs sélectionnés. Vous pouvez éditer cette box pour sélectionner des utilisateurs à afficher."
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
@@ -240,6 +247,15 @@
         "editBoxNamePlaceholder": "Nom de la box"
       }
     }
+  },
+  "newDashboard": {
+    "cardTitle": "Créer un tableau de bord",
+    "description": "Vous pouvez créer autant de tableau de bord que vous voulez pour pouvoir mieux organiser l'affichage de vos données.",
+    "nameLabel": "Nom",
+    "dashboardAlreadyExist": "Un tableau de bord avec ce nom existe déjà.",
+    "unknownError": "Une erreur inconnue s'est produite. Merci de réessayer !",
+    "validationError": "Le tableau de bord n'est pas valide, êtes-vous sûr d'avoir rempli tous les champs ?",
+    "createDashboardButton": "Créer"
   },
   "integration": {
     "root": {
@@ -742,7 +758,12 @@
         "createGithubIssue": "Signaler un bug avec cet appareil"
       },
       "network": {
-        "title": "Réseau Z-Wave"
+        "title": "Réseau Z-Wave",
+        "nodeId": "ID",
+        "nodeName": "Nom",
+        "nodeNeighbors": "Voisins",
+        "nodeAsleep": "Le noeud z-wave doit être en endormi ou mort.",
+        "node": "Noeud"
       },
       "settings": {
         "title": "Paramètres Z-Wave",
@@ -994,6 +1015,11 @@
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
         "deviceLabel": "Sélectionnez un appareil"
       },
+      "deviceSetValue": {
+        "description": "Cette action vous permet de contrôler un appareil.",
+        "deviceLabel": "Appareil",
+        "valueLabel": "Valeur"
+      },
       "onlyContinueIf": {
         "variableLabel": "Variable",
         "operatorLabel": "Opérateur",
@@ -1054,7 +1080,8 @@
     },
     "actions": {
       "device": {
-        "get-value": "Récupérer le dernier état"
+        "get-value": "Récupérer le dernier état",
+        "set-value": "Contrôler un appareil"
       },
       "message": {
         "send": "Envoyer un message"

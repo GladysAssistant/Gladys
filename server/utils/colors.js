@@ -64,9 +64,68 @@ function hexToInt(hexColor) {
   return parseInt(hexColor, 16);
 }
 
+/**
+ * @description Reverse Gamma correction applied in rgbToXy.
+ * @param {number} value - Color value.
+ * @returns {number} ReversedGammaCorrectedValue - Color with Gamma added.
+ * @example
+ * const value = getReversedGammaCorrectedValue(0,5);
+ * console.log(value === 0.73535698305);
+ */
+function getReversedGammaCorrectedValue(value) {
+  return value <= 0.0031308 ? 12.92 * value : (1.0 + 0.055) * value ** (1.0 / 2.4) - 0.055;
+}
+
+/**
+ * @description Converts XY color (CIE 1931 color space) to int.
+ * @param {number} x - X color.
+ * @param {number} y - Y color.
+ * @returns {number} Int color.
+ * @example
+ * const int = xyToInt(0.701, 0.299);
+ * console.log(int === 16711680);
+ */
+function xyToInt(x, y) {
+  const xy = {
+    x,
+    y,
+  };
+
+  // Compute XYZ values
+  const Y = 1.0;
+  const X = (Y / xy.y) * xy.x;
+  const Z = (Y / xy.y) * (1.0 - xy.x - xy.y);
+
+  // Convert to RGB using Wide RGB D50 conversion
+  let r = X * 1.656492 - Y * 0.354851 - Z * 0.255038;
+  let g = -X * 0.707196 + Y * 1.655397 + Z * 0.036152;
+  let b = X * 0.051713 - Y * 0.121364 + Z * 1.01153;
+
+  // Apply gamma Conversion
+  r = getReversedGammaCorrectedValue(r);
+  g = getReversedGammaCorrectedValue(g);
+  b = getReversedGammaCorrectedValue(b);
+
+  const max = Math.max(r, g, b);
+  if (max > 1) {
+    r /= max;
+    g /= max;
+    b /= max;
+  }
+
+  const red = Math.max(0, Math.round(r * 255));
+  const green = Math.max(0, Math.round(g * 255));
+  const blue = Math.max(0, Math.round(b * 255));
+
+  // Convert to int
+  // eslint-disable-next-line no-bitwise
+  return (red << 16) | (green << 8) | blue;
+}
+
 module.exports = {
   intToRgb,
   rgbToInt,
   intToHex,
   hexToInt,
+  xyToInt,
 };

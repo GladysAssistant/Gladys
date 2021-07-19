@@ -24,7 +24,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
