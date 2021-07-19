@@ -6,6 +6,8 @@ import EditBoxColumns from './EditBoxColumns';
 import EmptyState from './EmptyState';
 import EditActions from './EditActions';
 
+import style from './style.css';
+
 const marginBottom = {
   marginBottom: '10rem'
 };
@@ -45,9 +47,9 @@ const DashboardPage = ({ children, ...props }) => (
                     )}
                   </div>
 
-                  <div class="page-options d-flex">
+                  <div class="page-options d-flex align-content-between flex-wrap">
                     {!props.dashboardNotConfigured && props.browserFullScreenCompatible && (
-                      <button onClick={props.toggleFullScreen} class="btn btn-outline-secondary btn-sm ml-2">
+                      <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
                         <span>
                           {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
                           {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
@@ -57,13 +59,19 @@ const DashboardPage = ({ children, ...props }) => (
                       </button>
                     )}
                     {props.currentDashboard && (
-                      <button onClick={props.editDashboard} class="btn btn-outline-primary btn-sm ml-2">
+                      <button
+                        onClick={props.editDashboard}
+                        class={cx('btn btn-outline-primary ml-2', style.smallButtonOnBigScreen)}
+                      >
                         <span>
                           <Text id="dashboard.editDashboardButton" /> <i class="fe fe-edit" />
                         </span>
                       </button>
                     )}
-                    <Link href="/dashboard/create/new" class="btn btn-outline-success btn-sm ml-2">
+                    <Link
+                      href="/dashboard/create/new"
+                      class={cx('btn btn-outline-success ml-2', style.smallButtonOnBigScreen)}
+                    >
                       <span>
                         <Text id="dashboard.newDashboardButton" /> <i class="fe fe-plus" />
                       </span>
