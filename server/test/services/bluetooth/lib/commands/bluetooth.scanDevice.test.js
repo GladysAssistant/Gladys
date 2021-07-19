@@ -63,6 +63,7 @@ describe('bluetooth.scanDevice', () => {
     bluetoothManager = new BluetoothManager(gladys, serviceId);
     bluetoothManager.bluetooth = bluetooth;
     bluetoothManager.discoveredDevices[peripheral.uuid] = device;
+    bluetoothManager.ready = true;
 
     bluetooth.startScanning = () => {
       bluetooth.emit('discover', peripheral);
@@ -111,8 +112,8 @@ describe('bluetooth.scanDevice', () => {
       payload: device,
     });
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.STATE,
-      payload: { peripheralLookup: false, ready: false, scanning: false },
+      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER,
+      payload: device,
     });
   });
 
