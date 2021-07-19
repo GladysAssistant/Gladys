@@ -12,7 +12,8 @@ static
 gladys-backups
 qemu-*
 coverage
-
+stats.json
+size-plugin.json
 # VSCode
 .vscode
 .tmp

@@ -25,6 +25,10 @@ class SelectDeviceFeature extends Component {
             deviceFeaturesDictionnary[feature.selector] = feature;
             deviceDictionnary[feature.selector] = device;
 
+            if (this.props.exclude_read_only_device_features === true && feature.read_only) {
+              return;
+            }
+
             roomDeviceFeatures.push({
               value: feature.selector,
               label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
@@ -106,7 +110,15 @@ class SelectDeviceFeature extends Component {
     if (!deviceOptions) {
       return null;
     }
-    return <Select defaultValue={''} value={selectedOption} onChange={this.handleChange} options={deviceOptions} />;
+    return (
+      <Select
+        class="select-device-feature"
+        defaultValue={''}
+        value={selectedOption}
+        onChange={this.handleChange}
+        options={deviceOptions}
+      />
+    );
   }
 }
 
