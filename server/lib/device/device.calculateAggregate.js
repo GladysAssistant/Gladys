@@ -141,7 +141,7 @@ async function calculateAggregate(type) {
         return [new Date(deviceFeatureState.created_at), deviceFeatureState.value];
       });
 
-      // logger.debug(`Aggregate: On this interval (${key}), ${oneIntervalArray.length} events found.`);
+      logger.debug(`Aggregate: On this interval (${key}), ${oneIntervalArray.length} events found.`);
 
       // we downsample the data
       const downsampled = LTTB(dataForDownsampling, AGGREGATE_STATES_PER_INTERVAL);
