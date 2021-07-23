@@ -12,10 +12,13 @@ const { add } = require('./device.add');
 const { addFeature } = require('./device.addFeature');
 const { addParam } = require('./device.addParam');
 const { create } = require('./device.create');
+const { calculateAggregate } = require('./device.calculateAggregate');
 const { destroy } = require('./device.destroy');
 const { init } = require('./device.init');
 const { get } = require('./device.get');
 const { getBySelector } = require('./device.getBySelector');
+const { onDailyDeviceAggregateEvent } = require('./device.onDailyDeviceAggregateEvent');
+const { onHourlyDeviceAggregateEvent } = require('./device.onHourlyDeviceAggregateEvent');
 const { purgeStates } = require('./device.purgeStates');
 const { poll } = require('./device.poll');
 const { pollAll } = require('./device.pollAll');
@@ -55,16 +58,27 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(EVENTS.DEVICE.ADD_FEATURE, eventFunctionWrapper(this.addFeature.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.ADD_PARAM, eventFunctionWrapper(this.addParam.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.PURGE_STATES, eventFunctionWrapper(this.purgeStates.bind(this)));
+  this.eventManager.on(
+    EVENTS.DEVICE.CALCULATE_DAILY_AGGREGATE,
+    eventFunctionWrapper(this.onDailyDeviceAggregateEvent.bind(this)),
+  );
+  this.eventManager.on(
+    EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
+    eventFunctionWrapper(this.onHourlyDeviceAggregateEvent.bind(this)),
+  );
 };
 
 DeviceManager.prototype.add = add;
 DeviceManager.prototype.addFeature = addFeature;
 DeviceManager.prototype.addParam = addParam;
 DeviceManager.prototype.create = create;
+DeviceManager.prototype.calculateAggregate = calculateAggregate;
 DeviceManager.prototype.destroy = destroy;
 DeviceManager.prototype.init = init;
 DeviceManager.prototype.get = get;
 DeviceManager.prototype.getBySelector = getBySelector;
+DeviceManager.prototype.onDailyDeviceAggregateEvent = onDailyDeviceAggregateEvent;
+DeviceManager.prototype.onHourlyDeviceAggregateEvent = onHourlyDeviceAggregateEvent;
 DeviceManager.prototype.purgeStates = purgeStates;
 DeviceManager.prototype.poll = poll;
 DeviceManager.prototype.pollAll = pollAll;

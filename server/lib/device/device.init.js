@@ -8,6 +8,7 @@ const logger = require('../../utils/logger');
  * gladys.device.init();
  */
 async function init() {
+  // load all devices in RAM
   const devices = await db.Device.findAll({
     include: [
       {
@@ -34,6 +35,11 @@ async function init() {
     this.add(plainDevice);
     return plainDevice;
   });
+  // calculate aggregate data for device states
+  await this.calculateAggregate('hourly');
+  await this.calculateAggregate('monthly');
+  await this.calculateAggregate('daily');
+  // setup polling for device who need polling
   this.setupPoll();
   return plainDevices;
 }

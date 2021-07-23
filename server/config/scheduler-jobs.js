@@ -16,6 +16,16 @@ const jobs = [
     frequencyInSeconds: 4 * 60 * 60,
     event: EVENTS.DEVICE.PURGE_STATES,
   },
+  {
+    name: 'hourly-device-state-aggregate',
+    frequencyInSeconds: 60 * 60,
+    event: EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
+  },
+  {
+    name: 'daily-device-state-aggregate',
+    frequencyInSeconds: 24 * 60 * 60,
+    event: EVENTS.DEVICE.CALCULATE_DAILY_AGGREGATE,
+  },
 ];
 
 module.exports = jobs;
