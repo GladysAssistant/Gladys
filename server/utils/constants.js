@@ -501,6 +501,7 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  CHART: 'chart',
 };
 
 const ERROR_MESSAGES = {

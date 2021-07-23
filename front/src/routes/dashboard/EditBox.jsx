@@ -19,6 +19,8 @@ const Box = ({ children, ...props }) => {
       return <EditRoomHumidityBox {...props} />;
     case 'devices-in-room':
       return <EditDevicesInRoom {...props} />;
+    case 'chart':
+      return <EditDevicesInRoom {...props} />;
   }
 };
 
