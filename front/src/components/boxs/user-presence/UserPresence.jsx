@@ -1,9 +1,13 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import actions from '../../../actions/dashboard/boxes/userPresence';
 import { RequestStatus } from '../../../utils/consts';
+import update from 'immutability-helper';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+
+dayjs.extend(relativeTime);
 
 const zeroMarginBottom = {
   marginBottom: '0rem'
@@ -19,7 +23,7 @@ const UserPresence = ({ children, ...props }) => (
         </span>
       </h3>
     </div>
-    {props.DashboardUserPresenceGetUsersStatus === RequestStatus.Error && (
+    {props.dashboardUserPresenceGetUsersStatus === RequestStatus.Error && (
       <div class="card-alert alert alert-danger mb-0">
         <Text id="dashboard.boxes.userPresence.error" />
       </div>
@@ -27,13 +31,12 @@ const UserPresence = ({ children, ...props }) => (
     <div
       class="card-body o-auto"
       style={{
-        maxHeight: '15rem',
         padding: '1rem'
       }}
     >
       <div
         class={
-          props.DashboardUserPresenceGetUsersStatus === RequestStatus.Getting && !props.usersWithPresence
+          props.dashboardUserPresenceGetUsersStatus === RequestStatus.Getting && !props.usersWithPresence
             ? 'dimmer active'
             : 'dimmer'
         }
@@ -96,21 +99,75 @@ const UserPresence = ({ children, ...props }) => (
   </div>
 );
 
-@connect('usersWithPresence,user,DashboardUserPresenceGetUsersStatus,session', actions)
 class UserPresenceComponent extends Component {
+  userChanged = user => {
+    const userIndex = this.state.usersWithPresence.findIndex(u => u.selector === user.selector);
+    // if user is not found, we refresh the box
+    if (userIndex === -1) {
+      return this.getUsersWithPresence();
+    }
+    if (user.last_house_changed) {
+      user.last_house_changed_relative_to_now = dayjs(user.last_house_changed)
+        .locale(this.props.user.language)
+        .fromNow();
+    }
+    // if not, we update it
+    const newState = update(this.state, {
+      usersWithPresence: {
+        [userIndex]: {
+          $merge: user
+        }
+      }
+    });
+    this.setState(newState);
+  };
+  getUsersWithPresence = async () => {
+    this.setState({
+      dashboardUserPresenceGetUsersStatus: RequestStatus.Getting
+    });
+    try {
+      let usersWithPresence = await this.props.httpClient.get(
+        '/api/v1/user?fields=firstname,lastname,role,selector,picture,current_house_id,last_house_changed'
+      );
+      if (this.props.box.users) {
+        usersWithPresence = usersWithPresence.filter(user => this.props.box.users.indexOf(user.selector) !== -1);
+      }
+      // calculate relative date
+      usersWithPresence.forEach(user => {
+        if (user.last_house_changed) {
+          user.last_house_changed_relative_to_now = dayjs(user.last_house_changed)
+            .locale(this.props.user.language)
+            .fromNow();
+        }
+      });
+      this.setState({
+        usersWithPresence,
+        dashboardUserPresenceGetUsersStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      this.setState({
+        dashboardUserPresenceGetUsersStatus: RequestStatus.Error
+      });
+    }
+  };
   componentDidMount() {
-    this.props.getUsersWithPresence();
+    this.getUsersWithPresence();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, payload =>
-      this.props.userChanged(payload)
+      this.userChanged(payload)
     );
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, payload =>
-      this.props.userChanged(payload)
+      this.userChanged(payload)
     );
   }
 
-  render(props, {}) {
-    return <UserPresence {...props} />;
+  render(props, { usersWithPresence, dashboardUserPresenceGetUsersStatus }) {
+    return (
+      <UserPresence
+        usersWithPresence={usersWithPresence}
+        dashboardUserPresenceGetUsersStatus={dashboardUserPresenceGetUsersStatus}
+      />
+    );
   }
 }
 
-export default UserPresenceComponent;
+export default connect('httpClient,session,user', {})(UserPresenceComponent);
