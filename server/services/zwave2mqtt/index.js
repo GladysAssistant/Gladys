@@ -14,6 +14,7 @@ module.exports = function Zwave2mqttService(gladys, serviceId) {
   function start() {
     logger.info('Starting Zwave2mqtt service');
     zwave2mqttHandler.connect();
+    zwave2mqttHandler.startDiscoveringDevices();
   }
 
   /**

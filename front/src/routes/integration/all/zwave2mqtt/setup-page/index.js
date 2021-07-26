@@ -6,7 +6,7 @@ import SetupTab from './SetupTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,z2mEnabled,mqttExist,mqttRunning,dockerBased,networkModeValid,zwave2mqttExist,zwave2mqttRunning,gladysConnected,zwave2mqttConnected,zwave2mqttConfigured',
+  'user,session,mqttExist,mqttConfigured,mqttConnected,zwave2mqttExist,zwave2mqttConfigured,zwave2mqttConnected,dockerBased,networkModeValid',
   actions
 )
 class Zwave2mqttSetupPage extends Component {

@@ -1,9 +1,8 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
 const ZWAVE_GATEWAY_PARAM_NAME = {
-  DEVICE_TOPIC: 'zwave2mqtt/+',
-  DEVICE_INFO_TOPIC: 'zwave2mqtt/+/+/+',
-  API_TOPIC: 'zwave2mqtt/_CLIENTS/ZWAVE_GATEWAY-Domotix/api/+',
+  DEVICE_INFO_TOPIC: 'zwave2mqtt/#',
+  CLIENT_TOPIC: 'zwave2mqtt/_CLIENTS/ZWAVE_GATEWAY-Domotix',
   GET_NODES_REQUEST_TOPIC: 'zwave2mqtt/_CLIENTS/ZWAVE_GATEWAY-Domotix/api/getNodes/set',
   GET_NODES_TOPIC: 'zwave2mqtt/_CLIENTS/ZWAVE_GATEWAY-Domotix/api/getNodes',
 };

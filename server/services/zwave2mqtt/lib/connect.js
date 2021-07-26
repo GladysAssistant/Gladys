@@ -9,8 +9,15 @@ function connect() {
   this.mqttService = this.gladys.service.getService('mqtt');
 
   // Subscribe to Zwave2mqtt topics
-  this.mqttService.device.subscribe(ZWAVE_GATEWAY_PARAM_NAME.API_TOPIC, this.handleMessage.bind(this));
-  this.mqttService.device.subscribe(ZWAVE_GATEWAY_PARAM_NAME.DEVICE_INFO_TOPIC, this.handleDevicesMessage.bind(this));
+  this.mqttService.device.subscribe(ZWAVE_GATEWAY_PARAM_NAME.DEVICE_INFO_TOPIC, messageFilter.bind(this));
+}
+
+function messageFilter(topic, message) {
+  if(topic.startsWith(ZWAVE_GATEWAY_PARAM_NAME.CLIENT_TOPIC)) {
+      this.handleMessage(topic, message);
+  } else {
+      this.handleDevicesMessage(topic, message);
+  }
 }
 
 module.exports = {

@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { Text, MarkupText } from 'preact-i18n';
 import { RequestStatus } from '../../../../../utils/consts';
-import CheckStatus from './CheckStatus.js';
 import classNames from 'classnames/bind';
 import style from './style.css';
 
@@ -38,7 +37,6 @@ class SetupTab extends Component {
               <Text id="integration.zwave2mqtt.setup.error" />
             </p>
           )}
-          <CheckStatus />
 
           {props.zwave2mqttConnected && (
             <p class="alert alert-success">
@@ -107,10 +105,10 @@ class SetupTab extends Component {
                         <hr className={style.line} />
                         <i
                           className={cx('fe', {
-                            'fe-check': props.gladysConnected,
-                            'fe-x': !props.gladysConnected,
-                            greenIcon: props.gladysConnected,
-                            redIcon: !props.gladysConnected
+                            'fe-check': props.mqttConnected,
+                            'fe-x': !props.mqttConnected,
+                            greenIcon: props.mqttConnected,
+                            redIcon: !props.mqttConnected
                           })}
                         />
                         <hr className={style.line} />

@@ -1,6 +1,6 @@
 const { connect } = require('./connect');
 const { disconnect } = require('./disconnect');
-const { scan } = require('./scan');
+const { startDiscoveringDevices } = require('./startDiscoveringDevices');
 const { status } = require('./status');
 const { handleMessage } = require('./handleMessage');
 const { handleDevicesMessage } = require('./handleDevicesMessage');
@@ -30,7 +30,7 @@ const Zwave2mqttHandler = function Zwave2mqttHandler(gladys, serviceId) {
 
 Zwave2mqttHandler.prototype.connect = connect;
 Zwave2mqttHandler.prototype.disconnect = disconnect;
-Zwave2mqttHandler.prototype.scan = scan;
+Zwave2mqttHandler.prototype.startDiscoveringDevices = startDiscoveringDevices;
 Zwave2mqttHandler.prototype.status = status;
 Zwave2mqttHandler.prototype.handleMessage = handleMessage;
 Zwave2mqttHandler.prototype.handleDevicesMessage = handleDevicesMessage;

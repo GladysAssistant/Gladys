@@ -6,9 +6,41 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
+    async checkStatus(state) {
+      let zwave2mqttStatus = {
+        mqttExist: false,
+        mqttConfigured: false,
+        mqttRunning: false,
+        mqttConnected: false,
+        zwave2mqttExist: false,
+        zwave2mqttConfigured: false,
+        zwave2mqttRunning: false,
+        zwave2mqttConnected: false,
+        z2mEnabled: false,
+        dockerBased: false,
+        networkModeValid: false
+      };
+      try {
+        zwave2mqttStatus = await state.httpClient.get('/api/v1/service/zwave2mqtt/status');
+      } finally {
+        store.setState({
+          mqttExist: zwave2mqttStatus.mqttExist,
+          mqttConfigured: zwave2mqttStatus.zwave2mqttConfigured,
+          mqttRunning: zwave2mqttStatus.mqttRunning,
+          mqttConnected: zwave2mqttStatus.mqttConnected,
+          zwave2mqttExist: zwave2mqttStatus.zwave2mqttExist,
+          zwave2mqttConfigured: zwave2mqttStatus.zwave2mqttConfigured,
+          zwave2mqttRunning: zwave2mqttStatus.zwave2mqttRunning,
+          zwave2mqttConnected: zwave2mqttStatus.zwave2mqttConnected,
+          z2mEnabled: zwave2mqttStatus.z2mEnabled,
+          dockerBased: zwave2mqttStatus.dockerBased,
+          networkModeValid: zwave2mqttStatus.networkModeValid
+        });
+      }
+    },
     async getZwave2mqttDevices(state) {
       store.setState({
-        getZwave2mqttStatus: RequestStatus.Getting
+        getZwave2mqttDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
@@ -21,37 +53,33 @@ function createActions(store) {
         const zwave2mqttDevices = await state.httpClient.get('/api/v1/service/zwave2mqtt/device', options);
         store.setState({
           zwave2mqttDevices,
-          getZwave2mqttStatus: RequestStatus.Success
+          getZwave2mqttDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          philipsHueGetBridgesStatus: RequestStatus.Error,
-          getZwave2mqttStatus: e.message
+          getZwave2mqttDevicesStatus: RequestStatus.Error
         });
       }
     },
     async getDiscoveredZwave2mqttDevices(state) {
       store.setState({
-        loading: true
+        getDiscoveredZwave2mqttDevicesStatus: RequestStatus.Getting
       });
       try {
-        const discoveredDevices = await state.httpClient.get(`/api/v1/service/zwave2mqtt/discover`);
+        const discoveredDevices = await state.httpClient.get(`/api/v1/service/zwave2mqtt/device`);
         store.setState({
           discoveredDevices,
-          loading: false,
-          errorLoading: false
+          getDiscoveredZwave2mqttDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          discoveredDevices: undefined,
-          loading: false,
-          errorLoading: true
+          getDiscoveredZwave2mqttDevicesStatus: RequestStatus.Error
         });
       }
     },
     async getHouses(state) {
       store.setState({
-        housesGetStatus: RequestStatus.Getting
+        getHousesStatus: RequestStatus.Getting
       });
       try {
         const params = {
@@ -60,11 +88,11 @@ function createActions(store) {
         const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
         store.setState({
           housesWithRooms,
-          housesGetStatus: RequestStatus.Success
+          getHousesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          housesGetStatus: RequestStatus.Error
+          getHousesStatus: RequestStatus.Error
         });
       }
     },
@@ -119,7 +147,7 @@ function createActions(store) {
         zwave2mqttDevices
       });
     },
-    async search(state, e) {
+    async searchDeviceKeyword(state, e) {
       store.setState({
         zwave2mqttSearch: e.target.value
       });
@@ -151,41 +179,10 @@ function createActions(store) {
           errorLoading: true
         });
       }
-    },
-    async connectAndScan(state, deviceIndex, username, password) {
-      const device = state.discoveredDevices[deviceIndex];
-      const options = {
-        singleAddress: device.external_id.replace('zwave2mqtt:', ''),
-        username,
-        password
-      };
-      await state.httpClient.post('/api/v1/service/zwave2mqtt/discover', options);
-    },
-    addDiscoveredDevice(state, newDevice) {
-      const existingDevices = state.discoveredDevices || [];
-      const newDevices = [];
-
-      let added = false;
-      existingDevices.forEach(device => {
-        if (device.external_id === newDevice.external_id) {
-          newDevices.push(newDevice);
-          added = true;
-        } else {
-          newDevices.push(device);
-        }
-      });
-
-      if (!added) {
-        newDevices.push(newDevice);
-      }
-
-      store.setState({
-        discoveredDevices: newDevices,
-        loading: false
-      });
     }
   };
-  actions.debouncedSearch = debounce(actions.search, 200);
+
+  actions.debouncedSearchDevicesKeyword = debounce(actions.searchDevicesKeyword, 200);
 
   return Object.assign({}, integrationActions, actions);
 }
