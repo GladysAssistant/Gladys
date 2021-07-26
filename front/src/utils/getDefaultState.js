@@ -1,4 +1,4 @@
-import config from '../../config';
+import config from '../config';
 import { AVAILABLE_LANGUAGES_LIST, AVAILABLE_LANGUAGES } from '../../../server/utils/constants';
 import { getCurrentUrl } from 'preact-router';
 import { HttpClient } from '../utils/HttpClient';

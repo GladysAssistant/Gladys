@@ -3,7 +3,6 @@ import { RequestStatus } from '../../../../../utils/consts';
 
 const actions = store => {
   const serviceActions = createActionsService(store);
-  
   const actions = {
     async getCurrentZwave2mqttUrl(state) {
       store.setState({
