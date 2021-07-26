@@ -1,9 +1,10 @@
 {
-  "env": {
-    "test": {
-      "presets": [
-        ["preact-cli/babel", { "modules": "commonjs" }]
-      ]
-    }
-  }
+  "plugins": [
+    "istanbul",
+    ["@babel/plugin-proposal-decorators", { "legacy": true }],
+    ["@babel/plugin-proposal-class-properties", {"loose": true}]
+  ],
+  "presets": [
+    ["preact-cli/babel", { "modules": "commonjs" }]
+  ]
 }

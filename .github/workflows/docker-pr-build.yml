@@ -100,6 +100,7 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           fail_ci_if_error: true
+          flags: server
   cypress-run:
     name: Cypress run
     runs-on: ubuntu-20.04
@@ -139,9 +140,14 @@ jobs:
           install: false
           start: npm run start:cypress
           wait-on: 'http://localhost:1444'
+          wait-on-timeout: 120
           config-file: ./front/cypress/cypress.json
           project: ./front
           command: npm run cypress:run
+      - name: 📄 Codecov report upload
+        uses: codecov/codecov-action@v2
+        with:
+          flags: uitests
   build-front:
     if: github.event.pull_request.draft == false
     name: Front build
