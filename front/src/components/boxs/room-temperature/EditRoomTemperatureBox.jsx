@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import actions from '../../../actions/dashboard/edit-boxes/editTemperatureInRoom';
 import BaseEditBox from '../baseEditBox';
 
 import RoomSelector from '../../house/RoomSelector';
@@ -24,10 +23,15 @@ const EditRoomTemperatureBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('', actions)
+@connect('', {})
 class EditRoomTemperatureBoxComponent extends Component {
+  updateBoxRoom = (x, y, room) => {
+    this.props.updateBoxConfig(x, y, {
+      room
+    });
+  };
   render(props, {}) {
-    return <EditRoomTemperatureBox {...props} />;
+    return <EditRoomTemperatureBox {...props} updateBoxRoom={this.updateBoxRoom} />;
   }
 }
 
