@@ -83,3 +83,23 @@
   text-decoration: none;
   background-color: rgba(32, 107, 196, 0.06);
 }
+
+.textGreen {
+  color: #2fb344 !important;
+}
+
+.textRed {
+  color: #d63939 !important;
+}
+
+.textYellow {
+  color: #f59f00 !important;
+}
+
+.variationIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  font-size: 1.25rem;
+  vertical-align: bottom;
+  stroke-width: 1.5;
+}

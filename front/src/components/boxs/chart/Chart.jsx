@@ -1,20 +1,56 @@
-import { Component } from 'preact';
+import { Component, createRef } from 'preact';
+import { connect } from 'unistore/preact';
 import cx from 'classnames';
 import ApexCharts from 'apexcharts';
 import style from './style.css';
 
 class Chartbox extends Component {
+  chartRef = createRef();
   toggleDropdown = () => {
     this.setState({
       dropdown: !this.state.dropdown
     });
   };
-  componentDidMount() {
-    this.chart = new ApexCharts(document.getElementById('chart-revenue-bg'), {
+  getData = async () => {
+    try {
+      const data = await this.props.httpClient.get(
+        `/api/v1/device_feature/${this.state.deviceFeature}/aggregated_states`,
+        {
+          interval: 7 * 24 * 60
+        }
+      );
+      const series = [
+        {
+          name: this.state.title,
+          data: []
+        }
+      ];
+      const labels = [];
+      data.forEach(point => {
+        series[0].data.push(point.value);
+        labels.push(point.created_at);
+      });
+      const firstElement = data[0];
+      const lastElement = data[data.length - 1];
+      const variation = Math.round((100 * firstElement.value) / lastElement.value);
+      const lastValueRounded = Math.round(lastElement.value);
+      await this.setState({
+        series,
+        labels,
+        variation,
+        lastValueRounded
+      });
+      this.displayChart();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  displayChart = () => {
+    const options = {
       chart: {
         type: 'area',
         fontFamily: 'inherit',
-        height: 40.0,
+        height: this.state.height === 'small' ? 40.0 : 200,
         sparkline: {
           enabled: true
         },
@@ -34,9 +70,10 @@ class Chartbox extends Component {
         lineCap: 'round',
         curve: 'smooth'
       },
+      // series: this.state.series,
       series: [
         {
-          name: 'Profits',
+          name: 'Temperature',
           data: [
             37,
             35,
@@ -91,8 +128,8 @@ class Chartbox extends Component {
           padding: 4
         }
       },
+      // labels: this.state.labels,
       labels: [
-        '2020-06-20',
         '2020-06-21',
         '2020-06-22',
         '2020-06-23',
@@ -121,20 +158,40 @@ class Chartbox extends Component {
         '2020-07-16',
         '2020-07-17',
         '2020-07-18',
-        '2020-07-19'
+        '2020-07-19',
+        '2020-07-20'
       ],
       colors: ['#206bc4'],
       legend: {
         show: false
       }
-    }).render();
+    };
+    console.log(options);
+    if (this.chart) {
+      this.chart.updateOptions(options);
+    } else {
+      this.chart = new ApexCharts(this.chartRef.current, options).render();
+    }
+  };
+  constructor(props) {
+    super(props);
+    this.props = props;
+    this.state = {
+      deviceFeature: 'mqtt-temperature-dataset',
+      height: 'small',
+      title: 'Temperature',
+      unit: '°C'
+    };
   }
-  render(props, { dropdown }) {
+  componentDidMount() {
+    this.getData();
+  }
+  render(props, { title, unit, dropdown, variation, lastValueRounded }) {
     return (
       <div class="card">
         <div class="card-body">
           <div class="d-flex align-items-center">
-            <div class={style.subheader}>Temperature</div>
+            <div class={style.subheader}>{title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               <div class="dropdown">
                 <a class="dropdown-toggle text-muted" onClick={this.toggleDropdown}>
@@ -164,34 +221,80 @@ class Chartbox extends Component {
             </div>
           </div>
           <div class="d-flex align-items-baseline">
-            <div class="h1 mb-0 mr-2">22°C</div>
-            <div class={style.meAuto}>
+            <div class="h1 mb-0 mr-2">
+              {lastValueRounded}
+              {unit}
+            </div>
+            <div
+              class={cx(style.meAuto, {
+                [style.textGreen]: variation > 0,
+                [style.textYellow]: variation === 0,
+                [style.textRed]: variation < 0
+              })}
+            >
               <span class="text-green d-inline-flex align-items-center lh-1">
-                8%
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="icon ms-1"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  stroke-width="2"
-                  stroke="currentColor"
-                  fill="none"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                  <polyline points="3 17 9 11 13 15 21 7" />
-                  <polyline points="14 7 21 7 21 14" />
-                </svg>
+                {variation}%
+                {variation > 0 && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class={cx(style.variationIcon)}
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="3 17 9 11 13 15 21 7" />
+                    <polyline points="14 7 21 7 21 14" />
+                  </svg>
+                )}
+                {variation === 0 && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class={cx(style.variationIcon)}
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <line x1="5" y1="12" x2="19" y2="12" />
+                  </svg>
+                )}
+                {variation < 0 && (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class={cx(style.variationIcon)}
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    stroke-width="2"
+                    stroke="currentColor"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <polyline points="3 7 9 13 13 9 21 17" />
+                    <polyline points="21 10 21 17 14 17" />
+                  </svg>
+                )}
               </span>
             </div>
           </div>
         </div>
-        <div id="chart-revenue-bg" class="chart-sm" />
+        <div ref={this.chartRef} class="chart-sm" />
       </div>
     );
   }
 }
 
-export default Chartbox;
+export default connect('httpClient')(Chartbox);
