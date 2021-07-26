@@ -26,13 +26,16 @@ let server;
 const shutdown = async (signal) => {
   logger.info(`${signal} received.`);
   logger.info('Closing database connection.');
-  await db.sequelize.close();
-  if (server) {
-    logger.info('Closing server connections.');
-    server.close(() => {
+  try {
+    await db.sequelize.close();
+    if (server) {
+      logger.info('Closing server connections.');
+      server.close();
       process.exit(0);
-    });
-  } else {
+    } else {
+      process.exit(0);
+    }
+  } catch (e) {
     process.exit(0);
   }
 };
