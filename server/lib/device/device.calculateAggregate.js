@@ -73,12 +73,7 @@ async function calculateAggregate(type, jobId) {
   // foreach device feature
   // we use Promise.each to do it one by one to avoid overloading Gladys
   await Promise.each(deviceFeatures, async (deviceFeature, index) => {
-    const progress = Math.ceil((index * 100) / deviceFeatures.length);
-    if (previousProgress !== progress && jobId) {
-      await this.job.updateProgress(jobId, progress);
-      previousProgress = progress;
-    }
-    logger.debug(`Calculate aggregates values for device feature ${deviceFeature.selector}. Progress = ${progress} %`);
+    logger.debug(`Calculate aggregates values for device feature ${deviceFeature.selector}.`);
 
     const lastAggregate = deviceFeature[LAST_AGGREGATE_ATTRIBUTES[type]];
     const lastAggregateDate = lastAggregate ? new Date(lastAggregate) : null;
@@ -205,6 +200,11 @@ async function calculateAggregate(type, jobId) {
         },
       },
     );
+    const progress = Math.ceil((index * 100) / deviceFeatures.length);
+    if (previousProgress !== progress && jobId) {
+      await this.job.updateProgress(jobId, progress);
+      previousProgress = progress;
+    }
   });
   return null;
 }
