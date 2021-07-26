@@ -97,7 +97,7 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDeviceFeaturesAggregated(req, res) {
-    const states = gladys.device.getDeviceFeaturesAggregates(
+    const states = await gladys.device.getDeviceFeaturesAggregates(
       req.params.device_feature_selector,
       req.query.interval,
       req.query.maxStates,

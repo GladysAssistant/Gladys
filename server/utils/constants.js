@@ -60,6 +60,7 @@ const EVENTS = {
     PURGE_STATES: 'device.purge-states',
     CALCULATE_DAILY_AGGREGATE: 'device.calculate-daily-aggregate',
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
+    CALCULATE_MONTHLY_AGGREGATE: 'device.calculate-monthly-aggregate',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -524,6 +525,18 @@ const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
   [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.MONTHLY]: 5 * 365,
 };
 
+const JOB_TYPES = {
+  HOURLY_DEVICE_STATE_AGGREGATE: 'hourly-device-state-aggregate',
+  DAILY_DEVICE_STATE_AGGREGATE: 'daily-device-state-aggregate',
+  MONTHLY_DEVICE_STATE_AGGREGATE: 'monthly-device-state-aggregate',
+};
+
+const JOB_STATUS = {
+  IN_PROGRESS: 'in-progress',
+  SUCCESS: 'success',
+  FAILED: 'failed',
+};
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -552,6 +565,8 @@ const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
+const JOB_TYPES_LIST = createList(JOB_TYPES);
+const JOB_STATUS_LIST = createList(JOB_STATUS);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -605,3 +620,8 @@ module.exports.WEATHER_UNITS = WEATHER_UNITS;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
 module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;
 module.exports.DEFAULT_AGGREGATES_POLICY_IN_DAYS = DEFAULT_AGGREGATES_POLICY_IN_DAYS;
+
+module.exports.JOB_TYPES = JOB_TYPES;
+module.exports.JOB_TYPES_LIST = JOB_TYPES_LIST;
+module.exports.JOB_STATUS = JOB_STATUS;
+module.exports.JOB_STATUS_LIST = JOB_STATUS_LIST;

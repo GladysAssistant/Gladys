@@ -10,6 +10,7 @@ const Event = require('./event');
 const House = require('./house');
 const Gateway = require('./gateway');
 const Http = require('./http');
+const Job = require('./job');
 const Location = require('./location');
 const MessageHandler = require('./message');
 const Service = require('./service');
@@ -48,6 +49,7 @@ function Gladys(params = {}) {
   const variable = new Variable(event);
   const brain = new Brain();
   const cache = new Cache();
+  const job = new Job();
   const area = new Area(event);
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
@@ -60,7 +62,7 @@ function Gladys(params = {}) {
   const session = new Session(params.jwtSecret, cache);
   const user = new User(session, stateManager, variable);
   const location = new Location(user, event);
-  const device = new Device(event, message, stateManager, service, room, variable);
+  const device = new Device(event, message, stateManager, service, room, variable, job);
   const scene = new Scene(stateManager, event, device, message, variable, house, http);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
@@ -76,6 +78,7 @@ function Gladys(params = {}) {
     event,
     house,
     http,
+    job,
     gateway,
     location,
     message,

@@ -29,11 +29,12 @@ const AGGREGATE_STATES_PER_INTERVAL = 100;
 /**
  * @description Calculate Aggregates
  * @param {string} [type] - Type of the aggregate.
+ * @param {string} [jobId] - Id of the job in db.
  * @returns {Promise} - Resolve when finished.
  * @example
  * await calculateAggregate('monthly');
  */
-async function calculateAggregate(type) {
+async function calculateAggregate(type, jobId) {
   logger.debug(`Calculating aggregates device feature state for interval ${type}`);
   // First we get the retention policy of this aggregates type
   let retentionPolicyInDays = await this.variable.getValue(AGGREGATES_POLICY_RETENTION_VARIABLES[type]);
@@ -67,19 +68,31 @@ async function calculateAggregate(type) {
     raw: true,
   });
 
+  let previousProgress;
+
   // foreach device feature
   // we use Promise.each to do it one by one to avoid overloading Gladys
-  await Promise.each(deviceFeatures, async (deviceFeature) => {
-    logger.debug(`Calculate aggregates values for device feature ${deviceFeature.selector}`);
+  await Promise.each(deviceFeatures, async (deviceFeature, index) => {
+    const progress = Math.ceil((index * 100) / deviceFeatures.length);
+    if (previousProgress !== progress && jobId) {
+      await this.job.updateProgress(jobId, progress);
+      previousProgress = progress;
+    }
+    logger.debug(`Calculate aggregates values for device feature ${deviceFeature.selector}. Progress = ${progress} %`);
+
     const lastAggregate = deviceFeature[LAST_AGGREGATE_ATTRIBUTES[type]];
+    const lastAggregateDate = lastAggregate ? new Date(lastAggregate) : null;
     let startFrom;
     // if there was an aggregate and it's not older than
     // what the retention policy allow
-    if (lastAggregate && lastAggregate < minStartFrom) {
+    if (lastAggregateDate && lastAggregateDate < minStartFrom) {
+      logger.debug(`Choosing minStartFrom, ${lastAggregateDate}, ${minStartFrom}`);
       startFrom = minStartFrom;
-    } else if (lastAggregate && lastAggregate >= minStartFrom) {
-      startFrom = lastAggregate;
+    } else if (lastAggregateDate && lastAggregateDate >= minStartFrom) {
+      logger.debug(`Choosing lastAggregate, ${lastAggregateDate}, ${minStartFrom}`);
+      startFrom = lastAggregateDate;
     } else {
+      logger.debug(`Choosing Default, ${lastAggregateDate}, ${minStartFrom}`);
       startFrom = minStartFrom;
     }
 
@@ -141,7 +154,7 @@ async function calculateAggregate(type) {
         return [new Date(deviceFeatureState.created_at), deviceFeatureState.value];
       });
 
-      logger.debug(`Aggregate: On this interval (${key}), ${oneIntervalArray.length} events found.`);
+      // logger.debug(`Aggregate: On this interval (${key}), ${oneIntervalArray.length} events found.`);
 
       // we downsample the data
       const downsampled = LTTB(dataForDownsampling, AGGREGATE_STATES_PER_INTERVAL);

@@ -32,6 +32,7 @@ const DeviceFeatureModel = require('./device_feature');
 const DeviceParamModel = require('./device_param');
 const DeviceModel = require('./device');
 const HouseModel = require('./house');
+const JobModel = require('./job');
 const LifeEventModel = require('./life_event');
 const LocationModel = require('./location');
 const MessageModel = require('./message');
@@ -55,6 +56,7 @@ const models = {
   DeviceParam: DeviceParamModel(sequelize, Sequelize),
   Device: DeviceModel(sequelize, Sequelize),
   House: HouseModel(sequelize, Sequelize),
+  Job: JobModel(sequelize, Sequelize),
   LifeEvent: LifeEventModel(sequelize, Sequelize),
   Location: LocationModel(sequelize, Sequelize),
   Message: MessageModel(sequelize, Sequelize),

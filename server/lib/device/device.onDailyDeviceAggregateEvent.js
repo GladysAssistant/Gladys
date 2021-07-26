@@ -4,7 +4,6 @@
  * onDailyDeviceAggregateEvent()
  */
 async function onDailyDeviceAggregateEvent() {
-  await this.calculateAggregate('monthly');
   await this.calculateAggregate('daily');
 }
 

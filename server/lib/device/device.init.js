@@ -1,4 +1,5 @@
 const db = require('../../models');
+const { EVENTS } = require('../../utils/constants');
 const logger = require('../../utils/logger');
 
 /**
@@ -36,9 +37,7 @@ async function init() {
     return plainDevice;
   });
   // calculate aggregate data for device states
-  await this.calculateAggregate('hourly');
-  await this.calculateAggregate('monthly');
-  await this.calculateAggregate('daily');
+  this.eventManager.emit(EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE);
   // setup polling for device who need polling
   this.setupPoll();
   return plainDevices;
