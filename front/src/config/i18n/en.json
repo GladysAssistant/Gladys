@@ -1726,6 +1726,7 @@
     "nameLabel": "Name",
     "roomLabel": "Room",
     "featuresLabel": "Features",
+    "featureCategoryLabel": "Category",
     "noFeatures": "No features",
     "namePlaceholder": "Enter name",
     "externalIdLabel": "External ID",
