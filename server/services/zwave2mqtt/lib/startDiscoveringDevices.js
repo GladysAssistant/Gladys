@@ -5,8 +5,8 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 /**
  * @description Handle getNodes response from zwave2mqtt
- * @param {String} topic - response topic used to scan.
- * @param {Object} message - getNodes response.
+ * @param {string} topic - Response topic used to scan.
+ * @param {Object} message - GetNodes response.
  * @example handleGetNodesMessage('zwave2mqtt/#', {});
  */
 async function handleGetNodesMessage(topic, message) {

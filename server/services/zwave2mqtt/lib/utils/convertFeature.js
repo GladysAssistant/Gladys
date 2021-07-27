@@ -1,7 +1,7 @@
 const logger = require('../../../../utils/logger');
 const { getDeviceFeatureExternalId } = require('./externalId');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
-const { COMMAND_CLASSES, INDEXES } = require('../constants');
+const { COMMAND_CLASSES } = require('../constants');
 
 /**
  * @description Find for the features linked to the Z-Wave device.
@@ -114,6 +114,7 @@ function convertFeature(device, cmd) {
         max: 100,
       });
     } else if (cmd.property === 'Ultraviolet') {
+      // No category
     }
   } else if (cmd.commandClass === COMMAND_CLASSES.COMMAND_CLASS_METER) {
     // "Meter"
