@@ -1,9 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { getDeviceFeatureExternalId } = require('./externalId');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-} = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { COMMAND_CLASSES, INDEXES } = require('../constants');
 
 /**
