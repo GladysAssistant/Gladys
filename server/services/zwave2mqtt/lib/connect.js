@@ -1,5 +1,11 @@
 const { ZWAVE_GATEWAY_PARAM_NAME } = require('./constants');
 
+/**
+ * @description Filter client/zwave messages
+ * @param {string} topic - MQTT topic.
+ * @param {Object} message - The message sent.
+ * @example messageFilter('', {});
+ */
 function messageFilter(topic, message) {
   if (topic.startsWith(ZWAVE_GATEWAY_PARAM_NAME.CLIENT_TOPIC)) {
     this.handleMessage(topic, message);
