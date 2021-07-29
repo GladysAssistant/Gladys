@@ -244,6 +244,16 @@ const features = {
     max: 1000,
     zigbeeField: 'gas',
   },
+  co2: {
+    category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+    name: 'CO2 Concentration',
+    read_only: true,
+    has_feedback: false,
+    min: 0,
+    max: 10000,
+    zigbeeField: 'co2',
+  },
 };
 
 module.exports = {
