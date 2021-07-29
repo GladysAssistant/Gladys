@@ -9,7 +9,7 @@ const actions = store => {
         getCurrentZwave2mqttUrlStatus: RequestStatus.Getting
       });
       try {
-        const zwave2mqttUrl = await state.httpClient.get('/api/service/zwave2mqtt/variable/ZWAVE2MQTT_URL');
+        const zwave2mqttUrl = await state.httpClient.get('/api/v1/service/zwave2mqtt/variable/ZWAVE2MQTT_URL');
         store.setState({
           zwave2mqttUrl: zwave2mqttUrl.value,
           getCurrentZwave2mqttUrlStatus: RequestStatus.Success
@@ -25,16 +25,14 @@ const actions = store => {
         zwave2mqttUrl: e.target.value
       });
     },
-    async saveUrl(state) {
+    async saveZwave2mqttUrl(state) {
       store.setState({
         zwave2mqttSaveStatus: RequestStatus.Getting,
         zwave2mqttSavingInProgress: true
       });
       try {
-        // If Url contains '---------' then we remove ZWAVE2MQTT_URL variable
-        let zwave2mqttUrl = '';
-        await state.httpClient.post('/api/service/zwave2mqtt/variable/ZWAVE2MQTT_URL', {
-          value: zwave2mqttUrl
+        await state.httpClient.post('/api/v1/service/zwave2mqtt/variable/ZWAVE2MQTT_URL', {
+          value: state.zwave2mqttUrl
         });
         await state.httpClient.post('/api/v1/service/zwave2mqtt/connect');
         const zwave2mqttStatus = await state.httpClient.get('/api/v1/service/zwave2mqtt/status');

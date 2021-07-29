@@ -10,11 +10,9 @@ function createActions(store) {
       let zwave2mqttStatus = {
         mqttExist: false,
         mqttConfigured: false,
-        mqttRunning: false,
         mqttConnected: false,
         zwave2mqttExist: false,
         zwave2mqttConfigured: false,
-        zwave2mqttRunning: false,
         zwave2mqttConnected: false,
         z2mEnabled: false,
         dockerBased: false,
@@ -26,11 +24,9 @@ function createActions(store) {
         store.setState({
           mqttExist: zwave2mqttStatus.mqttExist,
           mqttConfigured: zwave2mqttStatus.zwave2mqttConfigured,
-          mqttRunning: zwave2mqttStatus.mqttRunning,
           mqttConnected: zwave2mqttStatus.mqttConnected,
           zwave2mqttExist: zwave2mqttStatus.zwave2mqttExist,
           zwave2mqttConfigured: zwave2mqttStatus.zwave2mqttConfigured,
-          zwave2mqttRunning: zwave2mqttStatus.zwave2mqttRunning,
           zwave2mqttConnected: zwave2mqttStatus.zwave2mqttConnected,
           z2mEnabled: zwave2mqttStatus.z2mEnabled,
           dockerBased: zwave2mqttStatus.dockerBased,

@@ -5,13 +5,11 @@
  */
 function status() {
   return {
-    mqttExist: true,
-    mqttConfigured: true,
-    mqttRunning: true,
-    mqttConnected: true,
+    mqttExist: this.mqttService !== undefined,
+    mqttConfigured: this.mqttService !== undefined ? this.mqttService.device.configured : false,
+    mqttConnected: this.mqttService !== undefined ? this.mqttService.device.connected : false,
     zwave2mqttExist: true,
     zwave2mqttConfigured: true,
-    zwave2mqttRunning: true,
     zwave2mqttConnected: true,
     z2mEnabled: true,
     dockerBased: true,

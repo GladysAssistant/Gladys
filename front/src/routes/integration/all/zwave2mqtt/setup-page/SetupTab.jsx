@@ -100,7 +100,7 @@ class SetupTab extends Component {
                         height="80"
                       />
                     </td>
-                    {props.mqttRunning && (
+                    {props.mqttExist && (
                       <td className={style.tdCenter}>
                         <hr className={style.line} />
                         <i
@@ -125,7 +125,7 @@ class SetupTab extends Component {
                         />
                       )}
                     </td>
-                    {props.zwave2mqttRunning && (
+                    {props.zwave2mqttExist && (
                       <td className={('text-center', style.tdCenter)}>
                         <hr className={style.line} />
                         <i
@@ -159,7 +159,7 @@ class SetupTab extends Component {
                     </td>
                     <td class="text-center" />
                     <td class="text-center">
-                      {props.mqttRunning && (
+                      {props.mqttConnected && (
                         <span class="tag tag-success">
                           <Text id={`systemSettings.containerState.running`} />
                         </span>
@@ -167,7 +167,7 @@ class SetupTab extends Component {
                     </td>
                     <td class="text-center" />
                     <td class="text-center">
-                      {props.zwave2mqttRunning && (
+                      {props.zwave2mqttConnected && (
                         <span class="tag tag-success">
                           <Text id={`systemSettings.containerState.running`} />
                         </span>
@@ -210,7 +210,7 @@ class SetupTab extends Component {
                       <Text id="integration.zwave2mqtt.setup.mqtt" />
                     </td>
                     <td>
-                      {props.mqttRunning && (
+                      {props.mqttConnected && (
                         <span class="tag tag-success">
                           <Text id={`systemSettings.containerState.running`} />
                         </span>
@@ -222,7 +222,7 @@ class SetupTab extends Component {
                       <Text id="integration.zwave2mqtt.setup.zwave2Mqtt" />
                     </td>
                     <td>
-                      {props.zwave2mqttRunning && (
+                      {props.zwave2mqttConnected && (
                         <span class="tag tag-success">
                           <Text id={`systemSettings.containerState.running`} />
                         </span>
@@ -255,7 +255,7 @@ class SetupTab extends Component {
                       <Text id="integration.zwave2mqtt.setup.gladysMqttLink" />
                     </td>
                     <td>
-                      {props.mqttRunning && (
+                      {props.mqttExist && (
                         <i
                           className={cx('fe', {
                             'fe-check': props.gladysConnected,
@@ -272,7 +272,7 @@ class SetupTab extends Component {
                       <Text id="integration.zwave2mqtt.setup.mqttZwaveLink" />
                     </td>
                     <td>
-                      {props.zwave2mqttRunning && (
+                      {props.zwave2mqttExist && (
                         <i
                           className={cx('fe', {
                             'fe-check': props.zwave2mqttConnected,

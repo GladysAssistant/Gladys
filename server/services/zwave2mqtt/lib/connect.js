@@ -1,3 +1,5 @@
+const logger = require('../../../utils/logger');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { ZWAVE_GATEWAY_PARAM_NAME } = require('./constants');
 
 /**
@@ -21,7 +23,13 @@ function messageFilter(topic, message) {
 function connect() {
   // Loads MQTT service
   this.mqttService = this.gladys.service.getService('mqtt');
-
+  if(!this.mqttService.device.configured) {
+    throw new ServiceNotConfiguredError('MQTT is not configured.');
+  }
+  if(!this.mqttService.device.connected) {
+    logger.info(`Zwave2mqtt is starting MQTT service.`);
+    this.mqttService.start(); 
+  }
   // Subscribe to Zwave2mqtt topics
   this.mqttService.device.subscribe(ZWAVE_GATEWAY_PARAM_NAME.DEVICE_INFO_TOPIC, messageFilter.bind(this));
 }

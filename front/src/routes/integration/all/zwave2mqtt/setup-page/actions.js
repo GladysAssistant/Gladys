@@ -15,12 +15,12 @@ const createActions = store => {
         zwave2mqttStatus: RequestStatus.Getting
       });
 
-      await state.httpClient.post('/api/service/zwave2mqtt/variable/ZWAVE2MQTT_ENABLED', {
+      await state.httpClient.post('/api/v1/service/zwave2mqtt/variable/ZWAVE2MQTT_ENABLED', {
         value: z2mEnabled
       });
 
       try {
-        await state.httpClient.post('/api/service/zwave2mqtt/connect');
+        await state.httpClient.post('/api/v1/service/zwave2mqtt/connect');
       } catch (e) {
         error = error | get(e, 'response.status');
       }

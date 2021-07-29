@@ -4,18 +4,26 @@ import actions from './actions';
 import Zwave2mqttPage from '../Zwave2mqttPage';
 import SettingsTab from './SettingsTab';
 import { RequestStatus } from '../../../../../utils/consts';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,zwave2mqttStatus,zwave2mqttUrl,getCurrentZwave2mqttUrlStatus,zwave2mqttGetStatusStatus,zwave2mqttSaveStatus,zwave2mqttSavingInProgress',
+  'user,session,zwave2mqttStatus,zwave2mqttUrl,getCurrentZwave2mqttUrlStatus,zwave2mqttGetStatusStatus,zwave2mqttSaveStatus,zwave2mqttSavingInProgress,mqttConfigured,zwave2mqttConfigured',
   actions
 )
 class Zwave2mqttSettingsPage extends Component {
-  componentWillMount() {
-    this.props.getStatus();
-    this.props.getCurrentZwave2mqttUrl();
+  async componentWillMount() {
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.STATUS_CHANGE, this.props.checkStatus);
+
+    await this.props.getCurrentZwave2mqttUrl();
+    await this.props.checkStatus();
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZWAVE2MQTT.STATUS_CHANGE,
+      this.props.checkStatus
+    );
+  }
 
   render(props, {}) {
     const loading =

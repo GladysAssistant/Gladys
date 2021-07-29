@@ -5,7 +5,7 @@ import actions from './actions';
 import { Text } from 'preact-i18n';
 
 @connect(
-  'user,session,mqttExist,mqttRunning,zwave2mqttExist,zwave2mqttRunning,gladysConnected,zwave2mqttConfigured,zwave2mqttConnected',
+  'user,session,mqttExist,mqttConfigured,mqttConnected,zwave2mqttExist,zwave2mqttConfigured,zwave2mqttConnected,gladysConnected',
   actions
 )
 class CheckStatus extends Component {
@@ -24,16 +24,18 @@ class CheckStatus extends Component {
     } else if (props.z2mEnabled) {
       if (!props.mqttExist) {
         messageKey = 'integration.zwave2mqtt.status.mqttNotInstalled';
-      } else if (!props.mqttRunning) {
-        messageKey = 'integration.zwave2mqtt.status.mqttNotRunning';
+      } else if (!props.mqttConfigured) {
+        messageKey = 'integration.zwave2mqtt.status.mqttNotConfigured';
+      } else if (!props.mqttConnected) {
+        messageKey = 'integration.zwave2mqtt.status.mqttNotConnected';
       } else if (!props.zwave2mqttExist) {
         messageKey = 'integration.zwave2mqtt.status.zwave2mqttNotInstalled';
-      } else if (!props.zwave2mqttRunning) {
-        messageKey = 'integration.zwave2mqtt.status.zwave2mqttNotRunning';
-      } else if (!props.gladysConnected) {
-        messageKey = 'integration.zwave2mqtt.status.gladysNotConnected';
+      } else if (!props.zwave2mqttConfigured) {
+        messageKey = 'integration.zwave2mqtt.status.zwave2mqttNotConfigured';
       } else if (!props.zwave2mqttConnected) {
         messageKey = 'integration.zwave2mqtt.status.zwave2mqttNotConnected';
+      } else if (!props.gladysConnected) {
+        messageKey = 'integration.zwave2mqtt.status.gladysNotConnected';
       }
     } else {
       return null;

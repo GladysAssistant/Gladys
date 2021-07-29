@@ -12,6 +12,16 @@ module.exports = function Zwave2mqttController(zwave2mqttManager) {
   }
 
   /**
+   * @api {get} /api/v1/service/zwave2mqtt/connect Connect to Zwave2mqtt service.
+   * @apiName connect
+   * @apiGroup Zwave2mqtt
+   */
+  async function connect(req, res) {
+    res.json(zwave2mqttManager.status());
+  }
+
+
+  /**
    * @api {get} /api/v1/service/zwave2mqtt/config Get Zwave2mqtt configuration.
    * @apiName getConfiguration
    * @apiGroup Zwave2mqtt
@@ -86,6 +96,10 @@ module.exports = function Zwave2mqttController(zwave2mqttManager) {
     'get /api/v1/service/zwave2mqtt/status': {
       authenticated: true,
       controller: asyncMiddleware(status),
+    },
+    'get /api/v1/service/zwave2mqtt/connect': {
+      authenticated: true,
+      controller: asyncMiddleware(connect),
     },
     'get /api/v1/service/zwave2mqtt/device': {
       authenticated: true,
