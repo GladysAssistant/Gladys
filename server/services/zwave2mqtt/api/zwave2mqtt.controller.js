@@ -20,7 +20,6 @@ module.exports = function Zwave2mqttController(zwave2mqttManager) {
     res.json(zwave2mqttManager.status());
   }
 
-
   /**
    * @api {get} /api/v1/service/zwave2mqtt/config Get Zwave2mqtt configuration.
    * @apiName getConfiguration
