@@ -4,6 +4,10 @@ import cx from 'classnames';
 import ApexCharts from 'apexcharts';
 import style from './style.css';
 
+const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
+const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
+const THREE_MONTHS_IN_MINUTES = 3 * 30 * 24 * 60;
+
 class Chartbox extends Component {
   chartRef = createRef();
   toggleDropdown = () => {
@@ -11,12 +15,34 @@ class Chartbox extends Component {
       dropdown: !this.state.dropdown
     });
   };
+  switchTo7DaysView = async e => {
+    e.preventDefault();
+    await this.setState({
+      interval: SEVEN_DAYS_IN_MINUTES,
+      dropdown: false
+    });
+    this.getData();
+  };
+  switchTo30DaysView = async e => {
+    await this.setState({
+      interval: THIRTY_DAYS_IN_MINUTES,
+      dropdown: false
+    });
+    this.getData();
+  };
+  switchTo3monthsView = async e => {
+    await this.setState({
+      interval: THREE_MONTHS_IN_MINUTES,
+      dropdown: false
+    });
+    this.getData();
+  };
   getData = async () => {
     try {
       const data = await this.props.httpClient.get(
-        `/api/v1/device_feature/${this.state.deviceFeature}/aggregated_states`,
+        `/api/v1/device_feature/${this.props.box.device_feature}/aggregated_states`,
         {
-          interval: 7 * 24 * 60
+          interval: this.state.interval
         }
       );
       const series = [
@@ -32,8 +58,8 @@ class Chartbox extends Component {
       });
       const firstElement = data[0];
       const lastElement = data[data.length - 1];
-      const variation = Math.round((100 * firstElement.value) / lastElement.value);
-      const lastValueRounded = Math.round(lastElement.value);
+      const variation = firstElement && lastElement ? Math.round((100 * firstElement.value) / lastElement.value) : null;
+      const lastValueRounded = lastElement ? Math.round(lastElement.value) : null;
       await this.setState({
         series,
         labels,
@@ -70,8 +96,8 @@ class Chartbox extends Component {
         lineCap: 'round',
         curve: 'smooth'
       },
-      // series: this.state.series,
-      series: [
+      series: this.state.series,
+      /* series: [
         {
           name: 'Temperature',
           data: [
@@ -107,7 +133,7 @@ class Chartbox extends Component {
             67
           ]
         }
-      ],
+      ],*/
       grid: {
         strokeDashArray: 4
       },
@@ -128,8 +154,8 @@ class Chartbox extends Component {
           padding: 4
         }
       },
-      // labels: this.state.labels,
-      labels: [
+      labels: this.state.labels,
+      /*labels: [
         '2020-06-21',
         '2020-06-22',
         '2020-06-23',
@@ -160,24 +186,24 @@ class Chartbox extends Component {
         '2020-07-18',
         '2020-07-19',
         '2020-07-20'
-      ],
+      ],*/
       colors: ['#206bc4'],
       legend: {
         show: false
       }
     };
-    console.log(options);
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
-      this.chart = new ApexCharts(this.chartRef.current, options).render();
+      this.chart = new ApexCharts(this.chartRef.current, options);
+      this.chart.render();
     }
   };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      deviceFeature: 'mqtt-temperature-dataset',
+      interval: 30 * 24 * 60,
       height: 'small',
       title: 'Temperature',
       unit: '°C'
@@ -186,7 +212,7 @@ class Chartbox extends Component {
   componentDidMount() {
     this.getData();
   }
-  render(props, { title, unit, dropdown, variation, lastValueRounded }) {
+  render(props, { title, unit, dropdown, variation, lastValueRounded, interval }) {
     return (
       <div class="card">
         <div class="card-body">
@@ -204,16 +230,26 @@ class Chartbox extends Component {
                 >
                   <a
                     class={cx(style.dropdownItemChart, {
-                      [style.active]: true
+                      [style.active]: interval === SEVEN_DAYS_IN_MINUTES
                     })}
-                    href="#"
+                    onClick={this.switchTo7DaysView}
                   >
                     Last 7 days
                   </a>
-                  <a class={cx(style.dropdownItemChart)} href="#">
+                  <a
+                    class={cx(style.dropdownItemChart, {
+                      [style.active]: interval === THIRTY_DAYS_IN_MINUTES
+                    })}
+                    onClick={this.switchTo30DaysView}
+                  >
                     Last 30 days
                   </a>
-                  <a class={cx(style.dropdownItemChart)} href="#">
+                  <a
+                    class={cx(style.dropdownItemChart, {
+                      [style.active]: interval === THREE_MONTHS_IN_MINUTES
+                    })}
+                    onClick={this.switchTo3monthsView}
+                  >
                     Last 3 months
                   </a>
                 </div>
