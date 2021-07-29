@@ -1,6 +1,6 @@
 import GladysGatewayClient from '@gladysassistant/gladys-gateway-js';
 
-import config from '../../config';
+import config from '../config';
 import { Dispatcher } from './Dispatcher';
 import keyValueStore from './keyValueStore';
 

@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const JIAWEN = {
   brand: 'JIAWEN',
   models: {
-    K2RGBW01: [features.light, features.brightness, features.color_temperature], // color xy
+    K2RGBW01: [features.light, features.brightness, features.color_temperature, features.color],
   },
 };
 

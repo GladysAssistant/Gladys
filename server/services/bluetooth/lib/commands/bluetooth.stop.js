@@ -8,12 +8,7 @@ const logger = require('../../../../utils/logger');
 async function stop() {
   this.discoveredDevices = {};
 
-  const { timer } = this.presenceScanner;
-  if (timer) {
-    logger.info(`Bluetooth configuration: stopping presence scanner`);
-    clearInterval(timer);
-    this.presenceScanner.timer = undefined;
-  }
+  this.stopScanPresence();
 
   logger.debug(`Bluetooth: Stop discovering`);
   this.bluetooth.stopScanning();

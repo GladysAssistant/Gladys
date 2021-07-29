@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const DresdenElektronik = {
   brand: 'Dresden Elektronik',
   models: {
-    Mega23M12: [features.light, features.brightness, features.color_temperature], // color xy
+    Mega23M12: [features.light, features.brightness, features.color_temperature, features.color],
     'XVV-Mega23M12': [features.light, features.brightness, features.color_temperature],
   },
 };
