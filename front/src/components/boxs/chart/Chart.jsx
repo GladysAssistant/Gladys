@@ -191,7 +191,7 @@ class Chartbox extends Component {
                 <div class="d-flex align-items-baseline">
                   <div class="h1 mb-0 mr-2">
                     {lastValueRounded}
-                    {props.unit}
+                    {props.box.unit !== undefined && <Text id={`deviceFeatureUnitShort.${props.box.unit}`} />}
                   </div>
                   <div
                     class={cx(style.meAuto, {

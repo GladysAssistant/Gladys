@@ -49,8 +49,6 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
     type = 'live';
   }
 
-  console.log(type);
-
   let rows;
 
   console.time('sql');
@@ -58,7 +56,6 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
     rows = await db.DeviceFeatureState.findAll({
       raw: true,
       attributes: ['created_at', 'value'],
-      logging: console.log,
       where: {
         device_feature_id: deviceFeature.id,
         created_at: {
@@ -71,7 +68,6 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
       raw: true,
       attributes: [[groupByFunction, 'created_at'], [fn('round', fn('avg', col('value')), 2), 'value']],
       group: [groupByFunction],
-      logging: console.log,
       where: {
         device_feature_id: deviceFeature.id,
         type,
@@ -81,8 +77,6 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
       },
     });
   }
-
-  console.log(rows);
   console.timeEnd('sql');
 
   const dataForDownsampling = rows.map((deviceFeatureState) => {
