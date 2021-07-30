@@ -38,6 +38,7 @@ const Weather = require('./weather');
  * @param {boolean} [params.disableUserLoading] - If true, disable the loading of users in RAM.
  * @param {boolean} [params.disableSchedulerLoading] - If true, disable the loading of the scheduler.
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
+ * @param {boolean} [params.disableDeviceStateAggregation] - If true, disable the aggregation of device states.
  * @example
  * const gladys = Gladys();
  */
@@ -114,7 +115,7 @@ function Gladys(params = {}) {
         await scene.init();
       }
       if (!params.disableDeviceLoading) {
-        await device.init();
+        await device.init(!params.disableDeviceStateAggregation);
       }
       if (!params.disableUserLoading) {
         await user.init();

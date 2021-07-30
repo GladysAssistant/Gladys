@@ -4,6 +4,7 @@ const EventEmitter = require('events');
 const { fake } = require('sinon');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
 
@@ -26,7 +27,8 @@ const insertStates = async (fixedHour = true) => {
   await queryInterface.bulkInsert('t_device_feature_state', deviceFeatureStateToInsert);
 };
 
-describe('Device.calculateAggregate', () => {
+describe('Device.calculateAggregate', function Before() {
+  this.timeout(60000);
   beforeEach(async () => {
     const queryInterface = db.sequelize.getQueryInterface();
     await queryInterface.bulkDelete('t_device_feature_state');
@@ -98,23 +100,24 @@ describe('Device.calculateAggregate', () => {
       attributes: ['value', 'created_at'],
       order: [['created_at', 'ASC']],
     });
-    // daily + monthly aggregates
-    expect(deviceFeatureStates.length).to.equal(100 + 3000);
+    // daily aggregates
+    expect(deviceFeatureStates.length).to.equal(3000);
   });
   it('should run the hourly aggregate task', async () => {
-    await insertStates(false);
+    await insertStates(true);
     const variable = {
       // we modify the retention policy to take the last 1000 days (it'll cover this last year)
       getValue: fake.resolves('1000'),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const job = new Job();
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.onHourlyDeviceAggregateEvent();
     const deviceFeatureStates = await db.DeviceFeatureStateAggregate.findAll({
       raw: true,
       attributes: ['value', 'created_at'],
       order: [['created_at', 'ASC']],
     });
-    // hourly monthly aggregates
-    expect(deviceFeatureStates.length).to.equal(3600);
+    // daily + hourly + monthly
+    expect(deviceFeatureStates.length).to.equal(3000 + 3000 + 100);
   });
 });

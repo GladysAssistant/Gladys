@@ -35,7 +35,7 @@ const SCRIPT_PATH = path.join(__dirname, 'device.calculcateAggregateChildProcess
  * await calculateAggregate('monthly');
  */
 async function calculateAggregate(type, jobId) {
-  logger.debug(`Calculating aggregates device feature state for interval ${type}`);
+  logger.info(`Calculating aggregates device feature state for interval ${type}`);
   // First we get the retention policy of this aggregates type
   let retentionPolicyInDays = await this.variable.getValue(AGGREGATES_POLICY_RETENTION_VARIABLES[type]);
 
@@ -73,7 +73,7 @@ async function calculateAggregate(type, jobId) {
     jobId,
   };
 
-  await new Promise((resolve, reject) => {
+  const promise = new Promise((resolve, reject) => {
     const childProcess = spawn('node', [SCRIPT_PATH, JSON.stringify(params)]);
 
     childProcess.stdout.on('data', async (data) => {
@@ -94,12 +94,16 @@ async function calculateAggregate(type, jobId) {
 
     childProcess.on('close', (code) => {
       if (code !== 0) {
+        logger.warn(`device.calculateAggregate: Exiting child process with code ${code}`);
         reject(code);
       } else {
+        logger.info(`device.calculateAggregate: Finishing processing for interval ${type} `);
         resolve();
       }
     });
   });
+
+  await promise;
 
   return null;
 }

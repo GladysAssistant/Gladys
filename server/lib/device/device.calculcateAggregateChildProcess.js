@@ -175,6 +175,13 @@ async function calculateAggregateChildProcess(params) {
 const params = JSON.parse(process.argv[2]);
 
 (async () => {
-  await calculateAggregateChildProcess(params);
-  process.exit(0);
+  try {
+    await db.sequelize.query('PRAGMA journal_mode=WAL;');
+    await calculateAggregateChildProcess(params);
+    await db.sequelize.close();
+    process.exit(0);
+  } catch (e) {
+    console.error(e);
+    process.exit(1);
+  }
 })();
