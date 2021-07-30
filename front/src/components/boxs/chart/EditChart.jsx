@@ -9,17 +9,13 @@ import { getDeviceFeatureName } from '../../../utils/device';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
-const SUPPORTED_FEATURE_TYPES = [
-  DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-  DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-  DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-  DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-  DEVICE_FEATURE_TYPES.SWITCH.DIMMER
-];
-
 class EditChart extends Component {
   updateBoxRoom = room => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_feature: null });
+  };
+
+  updateBoxTitle = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
   };
 
   updateDeviceFeatures = selectedDeviceFeaturesOption => {
@@ -55,7 +51,7 @@ class EditChart extends Component {
           };
           this.deviceFeatureBySelector.set(feature.selector, feature);
           // for now, we only supports binary on/off and sensors
-          if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
+          if (feature.type !== DEVICE_FEATURE_TYPES.LIGHT.BINARY) {
             roomDeviceFeatures.push(featureOption);
           }
           if (this.props.box.device_feature && this.props.box.device_feature === feature.selector) {
@@ -112,7 +108,7 @@ class EditChart extends Component {
               <label>
                 <Text id="dashboard.boxes.devicesInRoom.editRoomLabel" />
               </label>
-              <input type="text" class="form-control" value={props.box.title} />
+              <input type="text" class="form-control" value={props.box.title} onChange={this.updateBoxTitle} />
             </div>
             <div class="form-group">
               <label>
