@@ -1,10 +1,8 @@
-const { Op } = require('sequelize');
 const Promise = require('bluebird');
-const { LTTB } = require('downsample');
-const uuid = require('uuid');
+const path = require('path');
+const { spawn } = require('child_process');
 const logger = require('../../utils/logger');
-const db = require('../../models');
-const { chunk } = require('../../utils/chunks');
+
 const {
   DEVICE_FEATURE_STATE_AGGREGATE_TYPES,
   SYSTEM_VARIABLE_NAMES,
@@ -25,6 +23,8 @@ const AGGREGATES_POLICY_RETENTION_VARIABLES = {
 };
 
 const AGGREGATE_STATES_PER_INTERVAL = 100;
+
+const SCRIPT_PATH = path.join(__dirname, 'device.calculcateAggregateChildProcess.js');
 
 /**
  * @description Calculate Aggregates
@@ -63,149 +63,44 @@ async function calculateAggregate(type, jobId) {
     endAt = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), 0);
   }
 
-  // first we get all device features
-  const deviceFeatures = await db.DeviceFeature.findAll({
-    raw: true,
-  });
+  const params = {
+    AGGREGATE_STATES_PER_INTERVAL,
+    DEVICE_FEATURE_STATE_AGGREGATE_TYPES,
+    LAST_AGGREGATE_ATTRIBUTES,
+    type,
+    minStartFrom,
+    endAt,
+    jobId,
+  };
 
-  let previousProgress;
+  await new Promise((resolve, reject) => {
+    const childProcess = spawn('node', [SCRIPT_PATH, JSON.stringify(params)]);
 
-  // foreach device feature
-  // we use Promise.each to do it one by one to avoid overloading Gladys
-  await Promise.each(deviceFeatures, async (deviceFeature, index) => {
-    logger.debug(`Calculate aggregates values for device feature ${deviceFeature.selector}.`);
-
-    const lastAggregate = deviceFeature[LAST_AGGREGATE_ATTRIBUTES[type]];
-    const lastAggregateDate = lastAggregate ? new Date(lastAggregate) : null;
-    let startFrom;
-    // if there was an aggregate and it's not older than
-    // what the retention policy allow
-    if (lastAggregateDate && lastAggregateDate < minStartFrom) {
-      logger.debug(`Choosing minStartFrom, ${lastAggregateDate}, ${minStartFrom}`);
-      startFrom = minStartFrom;
-    } else if (lastAggregateDate && lastAggregateDate >= minStartFrom) {
-      logger.debug(`Choosing lastAggregate, ${lastAggregateDate}, ${minStartFrom}`);
-      startFrom = lastAggregateDate;
-    } else {
-      logger.debug(`Choosing Default, ${lastAggregateDate}, ${minStartFrom}`);
-      startFrom = minStartFrom;
-    }
-
-    // we get all the data from the last aggregate to beginning of current interval
-    const queryParams = {
-      raw: true,
-      where: {
-        device_feature_id: deviceFeature.id,
-        created_at: {
-          [Op.between]: [startFrom, endAt],
-        },
-      },
-      attributes: ['value', 'created_at'],
-      order: [['created_at', 'ASC']],
-    };
-
-    logger.debug(`Aggregate: Getting data from ${startFrom} to ${endAt}.`);
-
-    const deviceFeatureStates = await db.DeviceFeatureState.findAll(queryParams);
-
-    logger.debug(`Aggregate: Received ${deviceFeatureStates.length} device feature states.`);
-
-    const deviceFeatureStatePerInterval = new Map();
-
-    // Group each deviceFeature state by interval (same month, same day, same hour)
-    deviceFeatureStates.forEach((deviceFeatureState) => {
-      let options;
-      if (type === DEVICE_FEATURE_STATE_AGGREGATE_TYPES.MONTHLY) {
-        options = {
-          year: 'numeric',
-          month: '2-digit',
-        };
-      } else if (type === DEVICE_FEATURE_STATE_AGGREGATE_TYPES.DAILY) {
-        options = {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        };
-      } else if (type === DEVICE_FEATURE_STATE_AGGREGATE_TYPES.HOURLY) {
-        options = {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-        };
+    childProcess.stdout.on('data', async (data) => {
+      const text = data.toString();
+      logger.debug(`device.calculateAggregate stdout: ${data}`);
+      if (text && text.indexOf('updateProgress:') !== -1) {
+        const splitted = text.split(':');
+        const progress = parseInt(splitted[1], 10);
+        if (!Number.isNaN(progress)) {
+          await this.job.updateProgress(jobId, progress);
+        }
       }
-      // @ts-ignore
-      const key = new Date(deviceFeatureState.created_at).toLocaleDateString('en-US', options);
-      if (!deviceFeatureStatePerInterval.has(key)) {
-        deviceFeatureStatePerInterval.set(key, []);
-      }
-      deviceFeatureStatePerInterval.get(key).push(deviceFeatureState);
     });
 
-    let deviceFeatureStateAggregatesToInsert = [];
-
-    deviceFeatureStatePerInterval.forEach((oneIntervalArray, key) => {
-      const dataForDownsampling = oneIntervalArray.map((deviceFeatureState) => {
-        return [new Date(deviceFeatureState.created_at), deviceFeatureState.value];
-      });
-
-      // logger.debug(`Aggregate: On this interval (${key}), ${oneIntervalArray.length} events found.`);
-
-      // we downsample the data
-      const downsampled = LTTB(dataForDownsampling, AGGREGATE_STATES_PER_INTERVAL);
-
-      // then we format the data to insert it in the DB
-      deviceFeatureStateAggregatesToInsert = deviceFeatureStateAggregatesToInsert.concat(
-        // @ts-ignore
-        downsampled.map((d) => {
-          return {
-            id: uuid.v4(),
-            type,
-            device_feature_id: deviceFeature.id,
-            value: d[1],
-            created_at: d[0],
-            updated_at: d[0],
-          };
-        }),
-      );
+    childProcess.stderr.on('data', (data) => {
+      logger.warn(`device.calculateAggregate stderr: ${data}`);
     });
 
-    logger.debug(`Aggregates: Inserting ${deviceFeatureStateAggregatesToInsert.length} events in database`);
-
-    // we bulk insert the data
-    if (deviceFeatureStateAggregatesToInsert.length) {
-      const queryInterface = db.sequelize.getQueryInterface();
-      await db.sequelize.transaction(async (t) => {
-        await queryInterface.bulkDelete(
-          't_device_feature_state_aggregate',
-          {
-            type,
-            device_feature_id: deviceFeature.id,
-            created_at: { [Op.between]: [startFrom, endAt] },
-          },
-          { transaction: t },
-        );
-        const chunks = chunk(deviceFeatureStateAggregatesToInsert, 500);
-        logger.debug(`Aggregates: Inserting the data in ${chunks.length} chunks.`);
-        await Promise.each(chunks, async (deviceStatesToInsert) => {
-          await queryInterface.bulkInsert('t_device_feature_state_aggregate', deviceStatesToInsert, { transaction: t });
-        });
-      });
-    }
-    await db.DeviceFeature.update(
-      { [LAST_AGGREGATE_ATTRIBUTES[type]]: endAt },
-      {
-        where: {
-          id: deviceFeature.id,
-        },
-      },
-    );
-    const progress = Math.ceil((index * 100) / deviceFeatures.length);
-    if (previousProgress !== progress && jobId) {
-      await this.job.updateProgress(jobId, progress);
-      previousProgress = progress;
-    }
+    childProcess.on('close', (code) => {
+      if (code !== 0) {
+        reject(code);
+      } else {
+        resolve();
+      }
+    });
   });
+
   return null;
 }
 
