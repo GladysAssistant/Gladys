@@ -14,6 +14,14 @@ class EditChart extends Component {
     this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_feature: null });
   };
 
+  updateDefaultInterval = e => {
+    if (e.target.value && e.target.value.length) {
+      this.props.updateBoxConfig(this.props.x, this.props.y, { interval: e.target.value });
+    } else {
+      this.props.updateBoxConfig(this.props.x, this.props.y, { interval: undefined });
+    }
+  };
+
   updateBoxTitle = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
   };
@@ -130,14 +138,26 @@ class EditChart extends Component {
               </div>
             )}
             <div class="form-group">
-              <label>Group BY</label>
-              <select onChange={props.updateGroupBy} class="form-control">
+              <label>Default interval</label>
+              <select onChange={this.updateDefaultInterval} class="form-control">
                 <option>
                   <Text id="global.emptySelectOption" />
                 </option>
-                <option value="minutes">minutes</option>
-                <option value="hours">hours</option>
-                <option value="days">days</option>
+                <option value="last-hour">
+                  <Text id="dashboard.boxes.chart.lastHour" />
+                </option>
+                <option value="last-day">
+                  <Text id="dashboard.boxes.chart.lastDay" />
+                </option>
+                <option value="last-week">
+                  <Text id="dashboard.boxes.chart.lastSevenDays" />
+                </option>
+                <option value="last-month">
+                  <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                </option>
+                <option value="last-three-months">
+                  <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                </option>
               </select>
             </div>
           </div>

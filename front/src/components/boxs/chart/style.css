@@ -114,9 +114,11 @@
 }
 
 .smallEmptyState {
-  margin-top: 0rem;
+  margin-top: 0.5rem;
+  margin-bottom: 2.2rem;
 }
 
 .bigEmptyState {
   margin-top: 2.2rem;
+  margin-bottom: 2.2rem;
 }
