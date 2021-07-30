@@ -21,10 +21,12 @@ async function calculateAggregateChildProcess(params) {
     DEVICE_FEATURE_STATE_AGGREGATE_TYPES,
     LAST_AGGREGATE_ATTRIBUTES,
     type,
-    minStartFrom,
-    endAt,
     jobId,
   } = params;
+
+  const minStartFrom = new Date(params.minStartFrom);
+  const endAt = new Date(params.endAt);
+
   // first we get all device features
   const deviceFeatures = await db.DeviceFeature.findAll({
     raw: true,
@@ -166,7 +168,7 @@ async function calculateAggregateChildProcess(params) {
     if (previousProgress !== progress && jobId) {
       // we need to console.log to give the new progress
       // to the main process
-      console.log(`updateProgress:${progress}`);
+      console.log(`updateProgress:${progress}:updateProgress`);
       previousProgress = progress;
     }
   });

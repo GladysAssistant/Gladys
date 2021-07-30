@@ -80,8 +80,10 @@ async function calculateAggregate(type, jobId) {
       const text = data.toString();
       logger.debug(`device.calculateAggregate stdout: ${data}`);
       if (text && text.indexOf('updateProgress:') !== -1) {
-        const splitted = text.split(':');
-        const progress = parseInt(splitted[1], 10);
+        const position = text.indexOf('updateProgress:');
+        const before = text.substr(position + 15);
+        const splitted = before.split(':');
+        const progress = parseInt(splitted[0], 10);
         if (!Number.isNaN(progress)) {
           await this.job.updateProgress(jobId, progress);
         }
