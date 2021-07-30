@@ -196,7 +196,8 @@
       "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "chart": "Graphique"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -245,6 +246,14 @@
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box"
+      },
+      "chart": {
+        "lastHour": "Dernière heure",
+        "lastDay": "Dernière 24h",
+        "lastSevenDays": "Derniers 7 jours",
+        "lastThirtyDays": "Derniers 30 jours",
+        "lastThreeMonths": "Derniers 3 mois",
+        "noValue": "Pas de valeurs sur cet interval"
       }
     }
   },

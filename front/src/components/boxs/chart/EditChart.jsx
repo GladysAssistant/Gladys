@@ -24,8 +24,11 @@ class EditChart extends Component {
 
   updateDeviceFeatures = selectedDeviceFeaturesOption => {
     if (selectedDeviceFeaturesOption) {
+      const currentDeviceFeature = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOption.value);
       this.props.updateBoxConfig(this.props.x, this.props.y, {
-        device_feature: selectedDeviceFeaturesOption.value
+        device_feature: selectedDeviceFeaturesOption.value,
+        title: currentDeviceFeature && currentDeviceFeature.name ? currentDeviceFeature.name : undefined,
+        unit: currentDeviceFeature && currentDeviceFeature.unit ? currentDeviceFeature.unit : undefined
       });
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -50,6 +53,7 @@ class EditChart extends Component {
             value: feature.selector,
             label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
+          this.deviceFeatureBySelector.set(feature.selector, feature);
           // for now, we only supports binary on/off and sensors
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
             roomDeviceFeatures.push(featureOption);
@@ -80,6 +84,12 @@ class EditChart extends Component {
     }
   };
 
+  constructor(props) {
+    super(props);
+    this.props = props;
+    this.deviceFeatureBySelector = new Map();
+  }
+
   componentDidMount() {
     if (this.props.box.room) {
       this.getDeviceFeatures();
@@ -102,6 +112,12 @@ class EditChart extends Component {
               <label>
                 <Text id="dashboard.boxes.devicesInRoom.editRoomLabel" />
               </label>
+              <input type="text" class="form-control" value={props.box.title} />
+            </div>
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.devicesInRoom.editRoomLabel" />
+              </label>
               <RoomSelector selectedRoom={props.box.room} updateRoomSelection={this.updateBoxRoom} />
             </div>
             {deviceOptions && props.box.room && (
@@ -117,6 +133,17 @@ class EditChart extends Component {
                 />
               </div>
             )}
+            <div class="form-group">
+              <label>Group BY</label>
+              <select onChange={props.updateGroupBy} class="form-control">
+                <option>
+                  <Text id="global.emptySelectOption" />
+                </option>
+                <option value="minutes">minutes</option>
+                <option value="hours">hours</option>
+                <option value="days">days</option>
+              </select>
+            </div>
           </div>
         </div>
       </BaseEditBox>

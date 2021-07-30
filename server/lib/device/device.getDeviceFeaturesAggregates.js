@@ -1,4 +1,4 @@
-const { QueryTypes } = require('sequelize');
+const { QueryTypes, Op, fn, col } = require('sequelize');
 const { LTTB } = require('downsample');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
@@ -27,65 +27,71 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
   const sixtyMinutesAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+  const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+  const thirthyHoursAgo = new Date(now.getTime() - 30 * 60 * 60 * 1000);
   const thirthyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
 
-  const rows = await db.sequelize.query(
-    `
-        SELECT created_at, value FROM (
-            SELECT created_at, value
-            FROM t_device_feature_state
-            WHERE device_feature_id = :deviceFeatureId
-            AND created_at > DATETIME(:sixtyMinutesAgo)
-            AND created_at > DATETIME(:intervalDate)
+  let type;
+  let groupByFunction;
 
-            UNION ALL
+  if (intervalDate < sixMonthsAgo) {
+    type = 'monthly';
+    groupByFunction = fn('date', col('created_at'));
+  } else if (intervalDate < fiveDaysAgo) {
+    type = 'daily';
+    groupByFunction = fn('date', col('created_at'));
+    // groupByFunction = fn('strftime', '%Y-%m-%d %H:00:00', col('created_at'));
+  } else if (intervalDate < thirthyHoursAgo) {
+    type = 'hourly';
+    groupByFunction = fn('strftime', '%Y-%m-%d %H:00:00', col('created_at'));
+  } else {
+    type = 'live';
+  }
 
-            SELECT created_at, value
-            FROM t_device_feature_state_aggregate
-            WHERE type = 'hourly'
-            AND device_feature_id = :deviceFeatureId
-            AND created_at < DATETIME(:sixtyMinutesAgo)
-            AND created_at > DATETIME(:twentyFourHoursAgo)
-            AND created_at > DATETIME(:intervalDate)
+  console.log(type);
 
-            UNION ALL
+  let rows;
 
-            SELECT created_at, value
-            FROM t_device_feature_state_aggregate
-            WHERE type = 'daily'
-            AND device_feature_id = :deviceFeatureId
-            AND created_at < DATETIME(:twentyFourHoursAgo)
-            AND created_at > DATETIME(:thirthyDaysAgo)
-            AND created_at > DATETIME(:intervalDate)
-
-            UNION ALL
-
-            SELECT created_at, value
-            FROM t_device_feature_state_aggregate
-            WHERE type = 'monthly'
-            AND device_feature_id = :deviceFeatureId
-            AND created_at < DATETIME(:thirthyDaysAgo)
-            AND created_at > DATETIME(:intervalDate)
-        ) as subquery
-        ORDER BY created_at ASC
-    `,
-    {
-      replacements: {
-        deviceFeatureId: deviceFeature.id,
-        intervalDate,
-        sixtyMinutesAgo,
-        twentyFourHoursAgo,
-        thirthyDaysAgo,
-      },
+  console.time('sql');
+  if (type === 'live') {
+    rows = await db.DeviceFeatureState.findAll({
       raw: true,
-      type: QueryTypes.SELECT,
-    },
-  );
+      attributes: ['created_at', 'value'],
+      logging: console.log,
+      where: {
+        device_feature_id: deviceFeature.id,
+        created_at: {
+          [Op.gte]: intervalDate,
+        },
+      },
+    });
+  } else {
+    rows = await db.DeviceFeatureStateAggregate.findAll({
+      raw: true,
+      attributes: [[groupByFunction, 'created_at'], [fn('round', fn('avg', col('value')), 2), 'value']],
+      group: [groupByFunction],
+      logging: console.log,
+      where: {
+        device_feature_id: deviceFeature.id,
+        type,
+        created_at: {
+          [Op.gte]: intervalDate,
+        },
+      },
+    });
+  }
+
+  console.log(rows);
+  console.timeEnd('sql');
+
   const dataForDownsampling = rows.map((deviceFeatureState) => {
     return [new Date(deviceFeatureState.created_at), deviceFeatureState.value];
   });
 
+  console.time('LTTB');
   const downsampled = LTTB(dataForDownsampling, maxStates);
+  console.timeEnd('LTTB');
 
   // @ts-ignore
   return downsampled.map((e) => {

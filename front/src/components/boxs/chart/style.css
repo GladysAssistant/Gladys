@@ -15,6 +15,14 @@
   color: #656d77;
 }
 
+.subheaderBig {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.6;
+  color: #656d77;
+}
+
 .meAuto {
   margin-right: auto !important;
 }
@@ -103,4 +111,12 @@
   font-size: 1.25rem;
   vertical-align: bottom;
   stroke-width: 1.5;
+}
+
+.smallEmptyState {
+  margin-top: 0rem;
+}
+
+.bigEmptyState {
+  margin-top: 2.2rem;
 }
