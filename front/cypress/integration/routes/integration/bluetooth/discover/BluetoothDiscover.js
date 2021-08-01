@@ -1,6 +1,6 @@
 const peripherals = require('../../../../../fixtures/integration/routes/integration/bluetooth/peripherals.json');
 
-describe.skip('Bluetooth discover', () => {
+describe('Bluetooth discover', () => {
   before(() => {
     cy.login();
 
@@ -13,12 +13,14 @@ describe.skip('Bluetooth discover', () => {
       {
         fixture: 'integration/routes/integration/bluetooth/status_ready.json'
       }
-    );
+    ).as('status');
 
     cy.visit('/dashboard/integration/device/bluetooth/setup');
   });
 
   it('Check page', () => {
+    cy.wait('@status');
+
     // Check warning
     cy.get('.alert.alert-warning').should('have.length', 0);
 
@@ -70,6 +72,9 @@ describe.skip('Bluetooth discover', () => {
   });
 
   it('Auto stop scan', () => {
+    // Force status
+    cy.sendWebSocket({ type: 'bluetooth.status', payload: { ready: true, scanning: false } });
+
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       {
@@ -131,7 +136,11 @@ describe.skip('Bluetooth discover', () => {
   });
 
   it('Go to creation page', () => {
+    // Force required peripheral
     const peripheral = peripherals[0];
+    cy.sendWebSocket({ type: 'bluetooth.discover', payload: peripheral });
+    // Force status
+    cy.sendWebSocket({ type: 'bluetooth.status', payload: { ready: true, scanning: false } });
 
     cy.contains('button', 'integration.bluetooth.discover.createDeviceInGladys').click();
 
