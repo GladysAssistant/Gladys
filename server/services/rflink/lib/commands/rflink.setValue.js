@@ -4,7 +4,6 @@ const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 const { intToHex } = require('../../../../utils/colors');
 
-
 /**
  * @description Convert an integer to an 8 bits hexa code.
  * @param {string} value - A number.
@@ -39,7 +38,7 @@ function to8bitsHex(value) {
     }
   }
   return s;
-};
+}
 
 /**
  * @description Convert an integer from color picker to an 8 bits hexa color code.
@@ -53,8 +52,7 @@ function intTo8bitsColorHex(value) {
   // Find closest 8bit color code
   const colorCode = c2xterm.hex2xterm(hex);
   return to8bitsHex(colorCode);
-};
-
+}
 
 /**
  * @description Send a message to change a device's value.
@@ -106,7 +104,7 @@ function setValue(device, deviceFeature, state) {
     } else if (feature === 'brightness') {
       const featureIndex = device.features.findIndex((f) => f.type === 'color');
       const lastColorValue = intTo8bitsColorHex(device.features[featureIndex].last_value);
-      const hex = to8bitsHex(Math.round( (value*232)/100) );
+      const hex = to8bitsHex(Math.round((value * 232) / 100));
       msg = `10;MiLightv1;${id};${channel};${lastColorValue}${hex};BRIGHT;\n`;
     } else if (feature === 'power') {
       switch (state) {
