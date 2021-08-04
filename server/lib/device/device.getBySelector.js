@@ -4,7 +4,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * @description Get a device by selector.
  * @param {string} selector - Device selector.
  * @example
- * device.getBySelector('test-devivce');
+ * device.getBySelector('test-device');
  */
 function getBySelector(selector) {
   const device = this.stateManager.get('device', selector);

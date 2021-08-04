@@ -14,6 +14,8 @@ Todos
 
 3. Documentation
 
+4. Front tests (Cypress)
+
 
 
 ============
