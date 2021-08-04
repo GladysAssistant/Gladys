@@ -1,0 +1,62 @@
+==========
+How To
+==========
+
+
+
+==========
+Todos
+==========
+
+1. Real life test
+
+2. Videos to show this working
+
+3. Documentation
+
+
+
+============
+Known issues
+============
+
+At gladys server startup
+------------------------
+
+2021-06-28T15:09:46+0200 <error> index.js:15 (process.on) unhandledRejection catched: Promise {
+  <rejected> TypeError: Cannot read property 'event' of undefined
+      at SerialPort.returnOpenErr (../server/services/rflink/lib/commands/rflink.connect.js:36:21)
+      at SerialPort._error (../server/services/rflink/node_modules/@serialport/stream/lib/index.js:198:14)
+      at binding.open.then.err (../server/services/rflink/node_modules/@serialport/stream/lib/index.js:242:12) }
+2021-06-28T15:09:46+0200 <error> index.js:16 (process.on) TypeError: Cannot read property 'event' of undefined
+    at SerialPort.returnOpenErr (../server/services/rflink/lib/commands/rflink.connect.js:36:21)
+    at SerialPort._error (../server/services/rflink/node_modules/@serialport/stream/lib/index.js:198:14)
+    at binding.open.then.err (../server/services/rflink/node_modules/@serialport/stream/lib/index.js:242:12)
+
+
+Switch Chacon
+-------------
+
+In dashboard, use "All on-off" in a room is not handling switches
+
+
+MiLight deviceFeature
+---------------------
+
+"Mode" has no icon and cannot be sent to RFLinkGateway
+
+Milight device control
+----------------------
+
+Color is not managed properly :
+
+- solution 1 : find a better way to convert the color picker value to 8bits color  )
+
+- solution 2 : replace the glady color picker by a 8bits palette color picker (https://codepen.io/kevinli/pen/GRpXOvo) )
+
+===========
+Improvments
+===========
+
+* Show RFLink gateway status
+  10;status; => to display if RF and MiLight are ON on the RFLink gateway
