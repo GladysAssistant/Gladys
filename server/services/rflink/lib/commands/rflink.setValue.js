@@ -103,7 +103,10 @@ function setValue(device, deviceFeature, state) {
       msg = `10;MiLightv1;${id};${channel};${color}98;COLOR;\n`;
     } else if (feature === 'brightness') {
       const featureIndex = device.features.findIndex((f) => f.type === 'color');
-      const lastColorValue = intTo8bitsColorHex(device.features[featureIndex].last_value);
+      let lastColorValue = '34';
+      if (device.features[featureIndex].last_value) {
+        lastColorValue = intTo8bitsColorHex(device.features[featureIndex].last_value);
+      }
       const hex = to8bitsHex(Math.round((value * 232) / 100));
       msg = `10;MiLightv1;${id};${channel};${lastColorValue}${hex};BRIGHT;\n`;
     } else if (feature === 'power') {

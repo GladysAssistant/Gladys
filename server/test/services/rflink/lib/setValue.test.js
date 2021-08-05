@@ -4,6 +4,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const SerialPortMock = require('../SerialPortMock.test');
 const DEVICES = require('./devicesToTest.test');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+// const {intTo8bitsColorHex, to8bitsHex} = require('../../../../services/rflink/lib/commands/rflink.setValue.js');
 
 const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
   serialport: SerialPortMock,
@@ -136,13 +137,30 @@ describe('RFLinkHandler.setValue', () => {
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
   });
 
+  /*
+  it.only('should convert the value of the color picker', async () => {
+    // TODO
+    const code = to8bitsHex(161);
+    expect(code).to.equal('A1');
+
+    expect(to8bitsHex(177)).to.equal('B1');
+    expect(to8bitsHex(193)).to.equal('C1');
+    expect(to8bitsHex(209)).to.equal('D1');
+    expect(to8bitsHex(225)).to.equal('E1');
+    expect(to8bitsHex(241)).to.equal('F1');
+
+    expect(intTo8bitsColorHex(12642)).to.equal('');
+
+  });
+  */
+
   it('should send a message to change the color of a Milight device', async () => {
     const device = DEVICES[2];
     const deviceFeature = {
       external_id: '1:1:1:1:color',
     };
     const state = 10;
-    const expectedMsg = '10;MiLightv1;86aa70;000;10;COLOR;'; // cmd;model;deviceId;external_id last item;cmd
+    const expectedMsg = '10;MiLightv1;86aa70;000;098;COLOR;\n'; // cmd;model;deviceId;external_id last item;cmd
     await rflinkHandler.setValue(device, deviceFeature, state);
     assert.calledOnce(rflinkHandler.sendUsb.write);
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
@@ -154,7 +172,7 @@ describe('RFLinkHandler.setValue', () => {
       external_id: '1:1:1:1:brightness',
     };
     const state = 10;
-    const expectedMsg = '10;MiLightv1;86aa70;000;10;BRIGHT;'; // cmd;model;deviceId;external_id last item;cmd
+    const expectedMsg = '10;MiLightv1;86aa70;000;3417;BRIGHT;\n'; // cmd;model;deviceId;external_id last item;cmd
     await rflinkHandler.setValue(device, deviceFeature, state);
     assert.calledOnce(rflinkHandler.sendUsb.write);
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
