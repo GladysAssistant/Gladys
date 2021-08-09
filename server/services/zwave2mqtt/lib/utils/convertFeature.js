@@ -1,6 +1,10 @@
 const logger = require('../../../../utils/logger');
 const { getDeviceFeatureExternalId } = require('./externalId');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS_BY_CATEGORY,
+} = require('../../../../utils/constants');
 const { COMMAND_CLASSES } = require('../constants');
 
 /**
@@ -103,13 +107,15 @@ function convertFeature(device, cmd) {
     } else if (cmd.property === 'Humidity') {
       feature = Object.assign({}, defaultFeature, {
         category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS_BY_CATEGORY[DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR],
         max: 100,
       });
     } else if (cmd.property === 'Air temperature') {
       feature = Object.assign({}, defaultFeature, {
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS_BY_CATEGORY[DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR],
         min: -30,
         max: 100,
       });
