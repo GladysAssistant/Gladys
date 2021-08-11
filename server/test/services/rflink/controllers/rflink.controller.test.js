@@ -56,9 +56,8 @@ describe('POST /api/v1/service/rflink/connect', () => {
     const res = { json: fake.returns(true) };
     await controller['post /api/v1/service/rflink/connect'].controller(req, res);
     assert.calledOnce(gladys.variable.getValue);
-    // @Todo
-    // assert.calledOnce(rflinkHandler.connect);
-    // @Todo assert.calledOnce(res.json); KO for unknown reason :(
+    assert.calledOnce(rflinkHandler.connect);
+    assert.calledOnce(res.json);
   });
 
   it('should raise an error on connection when no path is given', async () => {
