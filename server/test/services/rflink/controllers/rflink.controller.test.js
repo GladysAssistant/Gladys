@@ -1,4 +1,5 @@
-const { assert, expect, fake, stub } = require('sinon');
+const { assert, fake, stub } = require('sinon');
+const { expect } = require('chai');
 const RFLinkController = require('../../../../services/rflink/api/rflink.controller');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
@@ -257,6 +258,24 @@ describe('POST /api/v1/service/rflink/remove', () => {
     };
     const res = { json: fake.returns(true) };
     await controller['post /api/v1/service/rflink/remove'].controller(req, res);
+    expect(rflinkHandler.newDevices).to.be.deep.equal([]);
+    assert.calledOnce(res.json);
+  });
+
+  it('should not remove a device from the new device list (because not found)', async () => {
+    const externalId = `rflink:86aa7:11`;
+    const device = {
+      external_id: externalId,
+    };
+    rflinkHandler.newDevices = [device];
+    const req = {
+      body: {
+        external_id: `rflink:86aa7:12`,
+      },
+    };
+    const res = { json: fake.returns(true) };
+    await controller['post /api/v1/service/rflink/remove'].controller(req, res);
+    expect(rflinkHandler.newDevices).to.be.deep.equal([device]);
     assert.calledOnce(res.json);
   });
 });
