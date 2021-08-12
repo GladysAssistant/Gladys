@@ -367,7 +367,6 @@ function message(msgRF) {
           this.newValue(msg, 'milight-mode', msg.cmd);
         }
       }
-      // const features =
     } else {
       logger.log(`${msg.id} n'est pas une id valide`);
     }
