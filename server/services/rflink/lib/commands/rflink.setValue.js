@@ -1,5 +1,5 @@
 const ObjToRF = require('../../api/rflink.parse.ObjToRF');
-const {intTo8bitsColorHex, to8bitsHex} = require('../utils/colors');
+const { intTo8bitsColorHex, to8bitsHex } = require('../utils/colors');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 
