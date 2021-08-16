@@ -11,7 +11,7 @@ const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
 
 const { assert, fake, stub } = sinon;
 
-describe('RFLinkHandler.setValue', () => {
+describe.only('RFLinkHandler.setValue', () => {
   let gladys;
   let rflinkHandler;
 
@@ -148,13 +148,27 @@ describe('RFLinkHandler.setValue', () => {
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
   });
 
-  it('should send a message to change the brightness of a Milight device', async () => {
+  it.only('should send a message to change the brightness of a Milight device', async () => {
     const device = DEVICES[2];
     const deviceFeature = {
       external_id: '1:1:1:1:brightness',
     };
     const state = 10;
     const expectedMsg = '10;MiLightv1;86aa70;000;3417;BRIGHT;\n'; // cmd;model;deviceId;external_id last item;cmd
+    await rflinkHandler.setValue(device, deviceFeature, state);
+    assert.calledOnce(rflinkHandler.sendUsb.write);
+    expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
+  });
+
+  it.only('should send a message to change the brightness of a Milight device and keep the previous color set', async () => {
+    const device = DEVICES[2];
+    const featureIndex = device.features.findIndex((f) => f.type === 'color');
+    device.features[featureIndex].last_value = '15666';
+    const deviceFeature = {
+      external_id: '1:1:1:1:brightness',
+    };
+    const state = 10;
+    const expectedMsg = '10;MiLightv1;86aa70;000;1717;BRIGHT;\n'; // cmd;model;deviceId;external_id last item;cmd
     await rflinkHandler.setValue(device, deviceFeature, state);
     assert.calledOnce(rflinkHandler.sendUsb.write);
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
