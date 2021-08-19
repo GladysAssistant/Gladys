@@ -55,10 +55,14 @@ const SettingsTab = ({ children, ...props }) => (
                   <Text id="global.emptySelectOption" />
                 </option>
                 {props.usbPorts &&
-                  props.usbPorts.map(usbPort => (
-                    <option value={usbPort.comPath} selected={props.RflinkPath === usbPort.comPath}>
-                      {usbPort.comName}
-                    </option>
+                  props.usbPorts.map(
+                    usbPort =>
+                      usbPort.comPath && (
+                        <option value={usbPort.comPath} selected={props.RflinkPath === usbPort.comPath}>
+                          {usbPort.comPath}
+                          {usbPort.comName ? ` - ${usbPort.comName}` : ''}
+                          {usbPort.comVID ? ` - ${usbPort.comVID}` : ''}
+                        </option>
                   ))}
               </select>
             </div>
