@@ -63,7 +63,8 @@ const SettingsTab = ({ children, ...props }) => (
                           {usbPort.comName ? ` - ${usbPort.comName}` : ''}
                           {usbPort.comVID ? ` - ${usbPort.comVID}` : ''}
                         </option>
-                  ))}
+                      )
+                  )}
               </select>
             </div>
             <div class="form-group">
