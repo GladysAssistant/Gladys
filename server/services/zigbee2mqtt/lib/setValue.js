@@ -1,3 +1,4 @@
+const { intToRgb } = require('../../../utils/colors');
 const { BadParameters } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 
@@ -5,7 +6,7 @@ const logger = require('../../../utils/logger');
  * @description Set the new device value from Gladys to MQTT.
  * @param {Object} device - Updated Gladys device.
  * @param {Object} deviceFeature - Updated Gladys device feature.
- * @param {string|number} value - The new device feature value.
+ * @param {string} value - The new device feature value.
  * @example
  * setValue(device, deviceFeature, 0);
  */
@@ -35,6 +36,11 @@ function setValue(device, deviceFeature, value) {
     case 'temperature':
       zigbeeValue = `{"color_temp": ${value}}`;
       break;
+    case 'color': {
+      const [r, g, b] = intToRgb(parseInt(value, 10));
+      zigbeeValue = `{"color": {"rgb": "${r},${g},${b}"}}`;
+      break;
+    }
     default:
       zigbeeValue = null;
   }
