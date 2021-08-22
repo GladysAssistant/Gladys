@@ -28,6 +28,7 @@ const IKEA = {
     'E1524/E1810': [features.switch_sensor],
     E1743: [features.button],
     'E1525/E1745': [features.motion],
+    LED1837R5: [features.light, features.brightness],
     // E1746: [], // Signal repeater
   },
 };
