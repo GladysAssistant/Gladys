@@ -6,13 +6,13 @@ const { features } = require('../utils/features');
 const Innr = {
   brand: 'Innr',
   models: {
-    'RB 185 C': [features.light, features.brightness, features.color_temperature], // color xy
-    'BY 185 C': [features.light, features.brightness, features.color_temperature], // color xy
-    'RB 250 C': [features.light, features.brightness, features.color_temperature], // color xy
+    'RB 185 C': [features.light, features.brightness, features.color_temperature, features.color],
+    'BY 185 C': [features.light, features.brightness, features.color_temperature, features.color],
+    'RB 250 C': [features.light, features.brightness, features.color_temperature, features.color],
     'RB 265': [features.light, features.brightness],
     'RB 278 T': [features.light, features.brightness],
-    'RB 285 C': [features.light, features.brightness, features.color_temperature], // color xy
-    'BY 285 C': [features.light, features.brightness, features.color_temperature], // color xy
+    'RB 285 C': [features.light, features.brightness, features.color_temperature, features.color],
+    'BY 285 C': [features.light, features.brightness, features.color_temperature, features.color],
     'RB 165': [features.light, features.brightness],
     'RB 175 W': [features.light, features.brightness],
     'RB 178 T': [features.light, features.brightness, features.color_temperature],

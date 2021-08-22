@@ -1,6 +1,6 @@
 const peripherals = require('../../../../../fixtures/integration/routes/integration/bluetooth/peripherals.json');
 
-describe('Bluetooth discover', () => {
+describe.skip('Bluetooth discover', () => {
   before(() => {
     cy.login();
 
