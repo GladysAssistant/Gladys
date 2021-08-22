@@ -2,77 +2,153 @@
 <html translate="no">
   <head>
     <meta charset="utf-8" />
-    <title><%= htmlWebpackPlugin.options.title %></title>
+    <title><% preact.title %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/assets/icons/apple-icon-57x57.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/assets/icons/apple-icon-60x60.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/icons/apple-icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/assets/icons/apple-icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/assets/icons/apple-icon-114x114.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/assets/icons/apple-icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/assets/icons/apple-icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/assets/icons/apple-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/apple-icon-180x180.png" />
     <link
-      rel="apple-touch-icon"
-      sizes="57x57"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-57x57.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2048-2732.jpg"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="60x60"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-60x60.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2732-2048.jpg"
+      media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="72x72"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-72x72.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1668-2388.jpg"
+      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="76x76"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-76x76.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2388-1668.jpg"
+      media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="114x114"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-114x114.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1536-2048.jpg"
+      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="120x120"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-120x120.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2048-1536.jpg"
+      media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="144x144"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-144x144.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1668-2224.jpg"
+      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="152x152"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-152x152.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2224-1668.jpg"
+      media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
     />
     <link
-      rel="apple-touch-icon"
-      sizes="180x180"
-      href="<%= htmlWebpackPlugin.files.publicPath %>assets/icons/apple-icon-180x180.png"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1620-2160.jpg"
+      media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
     />
-    <link rel="manifest" href="<%= htmlWebpackPlugin.files.publicPath %>manifest.json" />
-    <% if (htmlWebpackPlugin.options.manifest.theme_color) { %>
-    <meta name="theme-color" content="<%= htmlWebpackPlugin.options.manifest.theme_color %>" />
-    <% } %> <% for (var chunk of webpack.chunks) { %> <% if (chunk.names.length === 1 && chunk.names[0] === 'polyfills')
-    continue; %> <% for (var file of chunk.files) { %> <% if (htmlWebpackPlugin.options.preload &&
-    file.match(/\.(js|css)$/)) { %>
     <link
-      rel="preload"
-      href="<%= htmlWebpackPlugin.files.publicPath + file %>"
-      as="<%= file.match(/\.css$/)?'style':'script' %>"
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2160-1620.jpg"
+      media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
     />
-    <% } else if (file.match(/manifest\.json$/)) { %>
-    <link rel="manifest" href="<%= htmlWebpackPlugin.files.publicPath + file %>" />
-    <% } %> <% } %> <% } %>
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1284-2778.jpg"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2778-1284.jpg"
+      media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1170-2532.jpg"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2532-1170.jpg"
+      media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1125-2436.jpg"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2436-1125.jpg"
+      media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1242-2688.jpg"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2688-1242.jpg"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-828-1792.jpg"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1792-828.jpg"
+      media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1242-2208.jpg"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-2208-1242.jpg"
+      media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-750-1334.jpg"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1334-750.jpg"
+      media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-640-1136.jpg"
+      media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+    />
+    <link
+      rel="apple-touch-startup-image"
+      href="/assets/splash/apple-splash-1136-640.jpg"
+      media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+    />
+    <% preact.headEnd %>
   </head>
-
   <body>
-    <%= htmlWebpackPlugin.options.ssr({ url: '/' }) %>
-    <script defer src="<%= htmlWebpackPlugin.files.chunks['bundle'].entry %>"></script>
-    <script>
-      window.fetch ||
-        document.write('<script src="<%= htmlWebpackPlugin.files.chunks["polyfills"].entry %>"><\/script>');
-    </script>
+    <% preact.bodyEnd %>
   </body>
 </html>

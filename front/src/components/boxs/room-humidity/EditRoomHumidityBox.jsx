@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import actions from '../../../actions/dashboard/edit-boxes/editHumidityInRoom';
 import BaseEditBox from '../baseEditBox';
 
 import RoomSelector from '../../house/RoomSelector';
@@ -24,10 +23,15 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('', actions)
+@connect('', {})
 class EditRoomHumidityBoxComponent extends Component {
+  updateBoxRoom = (x, y, selector) => {
+    this.props.updateBoxConfig(x, y, {
+      room: selector
+    });
+  };
   render(props, {}) {
-    return <EditRoomHumidityBox {...props} />;
+    return <EditRoomHumidityBox {...props} updateBoxRoom={this.updateBoxRoom} />;
   }
 }
 

@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
-import config from '../../../config';
+import config from '../../config';
 
 const DashboardSettings = ({ children, ...props }) => (
   <div class="page">

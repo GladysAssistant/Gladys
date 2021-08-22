@@ -1,4 +1,3 @@
-import { Text } from 'preact-i18n';
 import EditWeatherBox from '../../components/boxs/weather/EditWeatherBox';
 import EditRoomTemperatureBox from '../../components/boxs/room-temperature/EditRoomTemperatureBox';
 import EditRoomHumidityBox from '../../components/boxs/room-humidity/EditRoomHumidityBox';
@@ -25,24 +24,7 @@ const Box = ({ children, ...props }) => {
 
 const EditBoxWithDragAndDrop = ({ children, ...props }) => (
   <div>
-    {props.dragEnable && (
-      <div
-        style={{
-          height: '50px',
-          padding: '10px',
-          borderStyle: 'dashed',
-          borderColor: 'grey',
-          marginBottom: '1.5rem'
-        }}
-      >
-        <p class="text-center">
-          <Text id="dashboard.boxes.dragAndDrop" />
-        </p>
-      </div>
-    )}
-    <div>
-      <Box {...props} />
-    </div>
+    <Box {...props} />
   </div>
 );
 

@@ -6,7 +6,8 @@ const EmptyState = ({ children, ...props }) => (
     <img src="/assets/images/undraw_personalization.svg" class={style.emptyStateImage} />
     <p class={style.emptyStateText}>
       <Text id="dashboard.emptyDashboardSentenceTop" />
-      <br /> <Text id="dashboard.emptyDashboardSentenceBottom" />
+      <br /> {!props.dashboardListEmpty && <Text id="dashboard.emptyDashboardSentenceBottom" />}
+      {props.dashboardListEmpty && <Text id="dashboard.noDashboardSentenceBottom" />}
     </p>
   </div>
 );

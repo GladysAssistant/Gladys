@@ -25,6 +25,9 @@ const Header = ({ ...props }) => {
   if (isUrlInArray(props.currentUrl, PAGES_WITHOUT_HEADER)) {
     return null;
   }
+  if (props.fullScreen) {
+    return null;
+  }
   return (
     <div>
       <div class="header py-4">

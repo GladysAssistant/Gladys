@@ -9,9 +9,8 @@ dayjs.extend(relativeTime);
 const IncomingMessage = ({ children, ...props }) => (
   <div class={style.incoming_msg}>
     <div class={style.incoming_msg_img}>
-      {' '}
       <Localizer>
-        <img src="/assets/icons/android-icon-192x192.png" alt={<Text id="chat.gladysAlt" />} />{' '}
+        <img src="/assets/icons/android-icon-192x192.png" alt={<Text id="chat.gladysAlt" />} />
       </Localizer>
     </div>
     <div class={style.received_msg}>
