@@ -10,6 +10,7 @@ const TuYa = {
     TS0011: [features.switch],
     TT001ZAV20: [features.temperature, features.humidity],
     SNTZ007: [features.door],
+    TS0503B: [features.light, features.brightness, features.color_temperature],
   },
 };
 
