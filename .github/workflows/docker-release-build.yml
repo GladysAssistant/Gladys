@@ -144,15 +144,15 @@ jobs:
         uses: actions/checkout@v2
       - name: 🐳 Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: docker/metadata-action@v3
         with:
           images: ${{ secrets.DOCKERHUB_REPO }}
-          label-custom: |
+          labels: |
             org.opencontainers.image.title=Gladys Assitant Production Image
-          tag-sha: true
-          tag-semver: |
-            {{raw}}
-            v{{major}}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern=v{{major}}
+            type=sha
       - name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: 🐳 Set up Docker Buildx
