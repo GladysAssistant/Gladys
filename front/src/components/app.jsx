@@ -88,6 +88,13 @@ import Zigbee2mqttSettingsPage from '../routes/integration/all/zigbee2mqtt/setti
 import Zigbee2mqttSetupPage from '../routes/integration/all/zigbee2mqtt/setup-page';
 import Zigbee2mqttEditPage from '../routes/integration/all/zigbee2mqtt/edit-page';
 
+// Zwave2mqtt
+import Zwave2mqttPage from '../routes/integration/all/zwave2mqtt/device-page';
+import Zwave2mqttDiscoverPage from '../routes/integration/all/zwave2mqtt/discover-page';
+import Zwave2mqttSettingsPage from '../routes/integration/all/zwave2mqtt/settings-page';
+import Zwave2mqttSetupPage from '../routes/integration/all/zwave2mqtt/setup-page';
+import Zwave2mqttEditPage from '../routes/integration/all/zwave2mqtt/edit-page';
+
 // Tasmota
 import TasmotaPage from '../routes/integration/all/tasmota/device-page';
 import TasmotaEditPage from '../routes/integration/all/tasmota/edit-page';
@@ -227,6 +234,12 @@ const AppRouter = connect(
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+
+        <Zwave2mqttPage path="/dashboard/integration/device/zwave2mqtt" />
+        <Zwave2mqttDiscoverPage path="/dashboard/integration/device/zwave2mqtt/discover" />
+        <Zwave2mqttSettingsPage path="/dashboard/integration/device/zwave2mqtt/settings" />
+        <Zwave2mqttSetupPage path="/dashboard/integration/device/zwave2mqtt/setup" />
+        <Zwave2mqttEditPage path="/dashboard/integration/device/zwave2mqtt/edit/:deviceSelector" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />

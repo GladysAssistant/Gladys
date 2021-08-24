@@ -1,5 +1,6 @@
 {
-  "name": "gladys-zwave",
+  "name": "gladys-zwave2mqtt",
+  "version": "1.0.0",
   "main": "index.js",
   "os": [
     "darwin",
@@ -11,8 +12,7 @@
     "arm",
     "arm64"
   ],
-  "scripts": {},
   "dependencies": {
-    "zwave-js": "^7.11.0"
+    "uuid": "^3.3.2"
   }
 }
