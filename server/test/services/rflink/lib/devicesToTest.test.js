@@ -57,14 +57,14 @@ const DEVICES = [
     service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
     name: `Prise `,
     selector: `rflink:86aa70:12`,
-    external_id: `rflink:milight:86aa70:00`,
+    external_id: `rflink:86aa70:00`,
     model: 'Tristate',
     should_poll: false,
     features: [
       {
         name: 'Power',
-        selector: `rflink:milight:86aa70:12:power`,
-        external_id: `rflink:milight:86aa70:12:power`,
+        selector: `rflink:86aa70:power:12:milight`,
+        external_id: `rflink:86aa70:power:12:milight`,
         rfcode: {
           value: 'CMD',
           cmd: 'ON',
@@ -79,8 +79,8 @@ const DEVICES = [
       },
       {
         name: 'color',
-        selector: `rflink:milight:86aa70:12:color`,
-        external_id: `rflink:milight:86aa70:12:color`,
+        selector: `rflink:86aa70:color:12:milight`,
+        external_id: `rflink:86aa70:color:12:milight`,
         rfcode: {
           value: 'RGBW',
           cmd: 'COLOR',
@@ -95,8 +95,8 @@ const DEVICES = [
       },
       {
         name: 'brightness',
-        selector: `rflink:milight:86aa70:12:brightness`,
-        external_id: `rflink:milight:86aa70:12:brightness`,
+        selector: `rflink:86aa70:brightness:12:milight`,
+        external_id: `rflink:86aa70:brightness:12:milight`,
         rfcode: {
           value: 'RGBW',
           cmd: 'BRIGHT',
@@ -111,11 +111,11 @@ const DEVICES = [
       },
       {
         name: 'milight-mode',
-        selector: `rflink:milight:86aa70:12:milight-mode`,
-        external_id: `rflink:milight:86aa70:12:milight-mode`,
+        selector: `rflink:86aa70:milight-mode:12:milight`,
+        external_id: `rflink:86aa70:milight-mode:12:milight`,
         rfcode: 'CMD',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-        type: DEVICE_FEATURE_TYPES.LIGHT.MODE,
+        type: DEVICE_FEATURE_TYPES.LIGHT.EFFECT_MODE,
         read_only: false,
         keep_history: true,
         has_feedback: false,

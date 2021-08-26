@@ -102,7 +102,7 @@ describe('RFLinkHandler.setValue', () => {
     // 10;MiLightv1;9926;00;fed0;ON;
     const device = DEVICES[2];
     const deviceFeature = {
-      external_id: '1:1:1:1:power',
+      external_id: `rflink:86aa70:power:12:milight`,
     };
     const state = 1;
     const expectedMsg = '10;MiLightv1;86aa70;000;34BC;ON;\n'; // cmd;model;deviceId;external_id last item;cmd
@@ -114,7 +114,7 @@ describe('RFLinkHandler.setValue', () => {
   it('should send a message to power off (state 0) a Milight device', async () => {
     const device = DEVICES[2];
     const deviceFeature = {
-      external_id: '1:1:1:1:power',
+      external_id: `rflink:86aa70:power:12:milight`,
     };
     const state = 0;
     const expectedMsg = '10;MiLightv1;86aa70;000;34BC;OFF;\n'; // cmd;model;deviceId;external_id last item;cmd
@@ -127,7 +127,7 @@ describe('RFLinkHandler.setValue', () => {
     // 10;MiLightv1;9926;00;fed0;ON;
     const device = DEVICES[2];
     const deviceFeature = {
-      external_id: '1:1:1:1:power',
+      external_id: `rflink:86aa70:power:12:milight`,
     };
     const state = 'undefined';
     const expectedMsg = '10;MiLightv1;86aa70;000;34BC;ON;\n'; // cmd;model;deviceId;external_id last item;cmd
@@ -139,7 +139,7 @@ describe('RFLinkHandler.setValue', () => {
   it('should send a message to change the color of a Milight device', async () => {
     const device = DEVICES[2];
     const deviceFeature = {
-      external_id: '1:1:1:1:color',
+      external_id: `rflink:86aa70:color:12:milight`,
     };
     const state = 10;
     const expectedMsg = '10;MiLightv1;86aa70;000;098;COLOR;\n'; // cmd;model;deviceId;external_id last item;cmd
@@ -151,7 +151,7 @@ describe('RFLinkHandler.setValue', () => {
   it('should send a message to change the brightness of a Milight device', async () => {
     const device = DEVICES[2];
     const deviceFeature = {
-      external_id: '1:1:1:1:brightness',
+      external_id: `rflink:86aa70:brightness:12:milight`,
     };
     const state = 10;
     const expectedMsg = '10;MiLightv1;86aa70;000;3417;BRIGHT;\n'; // cmd;model;deviceId;external_id last item;cmd
@@ -165,7 +165,7 @@ describe('RFLinkHandler.setValue', () => {
     const featureIndex = device.features.findIndex((f) => f.type === 'color');
     device.features[featureIndex].last_value = '15666';
     const deviceFeature = {
-      external_id: '1:1:1:1:brightness',
+      external_id: `rflink:86aa70:brightness:12:milight`,
     };
     const state = 10;
     const expectedMsg = '10;MiLightv1;86aa70;000;1717;BRIGHT;\n'; // cmd;model;deviceId;external_id last item;cmd
@@ -177,7 +177,7 @@ describe('RFLinkHandler.setValue', () => {
   it('should send a message to access milight-mode of a Milight device', async () => {
     const device = DEVICES[2];
     const deviceFeature = {
-      external_id: '1:1:1:1:milight-mode',
+      external_id: `rflink:86aa70:milight-mode:12:milight`,
     };
     const state = 4;
     const expectedMsg = '10;MiLightv1;86aa70;000;34BC;MODE4;\n'; // cmd;model;deviceId;external_id last item;cmd

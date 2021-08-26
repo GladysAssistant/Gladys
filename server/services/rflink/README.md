@@ -36,16 +36,12 @@ At gladys server startup
     at binding.open.then.err (../server/services/rflink/node_modules/@serialport/stream/lib/index.js:242:12)
 
 
-Switch Chacon
--------------
-
-In dashboard, use "All on-off" in a room is not handling switches
-
-
 MiLight deviceFeature
 ---------------------
 
-"Mode" has no icon and cannot be sent to RFLinkGateway
+"Mode" and "Disco" are not handled yet.
+MiLightv1;ID=9999;SWITCH=01;RGBW=dcb8;CMD=DISCO+;
+20;62;MiLightv1;ID=9999;SWITCH=01;RGBW=dcb8;CMD=MODE1
 
 Milight device control
 ----------------------
@@ -55,6 +51,18 @@ Color is not managed properly :
 - solution 1 : find a better way to convert the color picker value to 8bits color  )
 
 - solution 2 : replace the glady color picker by a 8bits palette color picker (https://codepen.io/kevinli/pen/GRpXOvo) )
+
+Memory leak
+-----------
+
+On device setting page, error in front console :
+debug.js?c91e:365 Can't call "this.setState" on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in the componentWillUnmount method.
+
+  in RflinkDeviceBox
+  in NodeTab
+  in RflinkDevicePage
+  ...
+  RflinkDeviceBox._this.deleteDevice	@	Device.jsx?46ce:31
 
 ===========
 Improvments

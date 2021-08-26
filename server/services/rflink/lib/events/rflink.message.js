@@ -20,7 +20,7 @@ function message(msgRF) {
   });
   logger.debug(`sending new message ${msgRF}`);
   const msg = RFtoObj(msgRF);
-  logger.debug(`message RFtoObj => ${msg}`);
+  logger.debug(`message RFtoObj => ${JSON.stringify(msg)}`);
   let newDevice;
   let doesntExistYet = true;
 
@@ -218,6 +218,7 @@ function message(msgRF) {
         if (
           msg.switch !== undefined &&
           msg.rgwb === undefined &&
+          msg.protocol !== 'MiLightv1' &&
           (msg.cmd === 'ON' ||
             msg.cmd === 'OFF' ||
             msg.cmd === 'ALLON' ||
@@ -243,16 +244,18 @@ function message(msgRF) {
         }
 
         if (
+          msg.protocol === 'MiLightv1' &&
           msg.cmd !== undefined &&
           (msg.rgbw !== undefined || msg.cmd.includes('MODE') === true || msg.cmd.includes('DISCO') === true)
         ) {
-          newDevice.selector = `rflink:milight:${msg.id}:${msg.switch}`;
-          newDevice.external_id = `rflink:milight:${msg.id}:${msg.switch}`;
+          newDevice.selector = `rflink:${msg.id}:${msg.switch}`;
+          newDevice.external_id = `rflink:${msg.id}:${msg.switch}`;
+          newDevice.name += `switch ${msg.id}-${msg.switch}`;
           newDevice.features.push(
             {
               name: 'Power',
-              selector: `rflink:milight:${msg.id}:${msg.switch}:power`,
-              external_id: `rflink:milight:${msg.id}:${msg.switch}:power`,
+              selector: `rflink:${msg.id}:power:${msg.switch}:milight`,
+              external_id: `rflink:${msg.id}:power:${msg.switch}:milight`,
               rfcode: {
                 value: 'CMD',
                 cmd: 'ON',
@@ -267,8 +270,8 @@ function message(msgRF) {
             },
             {
               name: 'color',
-              selector: `rflink:milight:${msg.id}:${msg.switch}:color`,
-              external_id: `rflink:milight:${msg.id}:${msg.switch}:color`,
+              selector: `rflink:${msg.id}:color:${msg.switch}:milight`,
+              external_id: `rflink:${msg.id}:color:${msg.switch}:milight`,
               rfcode: {
                 value: 'RGBW',
                 cmd: 'COLOR',
@@ -284,8 +287,8 @@ function message(msgRF) {
           );
           newDevice.features.push({
             name: 'brightness',
-            selector: `rflink:milight:${msg.id}:${msg.switch}:brightness`,
-            external_id: `rflink:milight:${msg.id}:${msg.switch}:brightness`,
+            selector: `rflink:${msg.id}:brightness:${msg.switch}:milight`,
+            external_id: `rflink:${msg.id}:brightness:${msg.switch}:milight`,
             rfcode: {
               value: 'RGBW',
               cmd: 'BRIGHT',
@@ -300,11 +303,11 @@ function message(msgRF) {
           });
           newDevice.features.push({
             name: 'milight-mode',
-            selector: `rflink:milight:${msg.id}:${msg.switch}:milight-mode`,
-            external_id: `rflink:milight:${msg.id}:${msg.switch}:milight-mode`,
+            selector: `rflink:${msg.id}:milight-mode:${msg.switch}:milight`,
+            external_id: `rflink:${msg.id}:milight-mode:${msg.switch}:milight`,
             rfcode: 'CMD',
             category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-            type: DEVICE_FEATURE_TYPES.LIGHT.MODE,
+            type: DEVICE_FEATURE_TYPES.LIGHT.EFFECT_MODE,
             read_only: false,
             keep_history: true,
             has_feedback: false,
