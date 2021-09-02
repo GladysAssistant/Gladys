@@ -634,6 +634,20 @@
       "saveError": "Une erreur s'est produite lors de la sauvegarde.",
       "documentation": "Documentation Zigbee2mqtt"
     },
+    "googleHome": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Voulez-vous connecter Gladys Assistant à Google ?",
+      "description": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
+      "error": "Une erreur est survenue. Merci de réessayer.",
+      "connectedAs": "Connecté en tant que",
+      "googleWillBeAble": "Google pourra :",
+      "seeDevices": "Lister les appareils présents chez vous",
+      "controlDevices": "Contrôler vos appareils",
+      "getNewDeviceValues": "Récupérer périodiquement les états de vos appareils",
+      "privacyPolicy": "Lire la <a href=\"http://policies.google.com/?hl=fr\">politique de confidentialité de Google</a>.",
+      "cancelButton": "Annuler",
+      "connectButton": "Lier"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Contrôlez vos appareils Z-Wave.",
