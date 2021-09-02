@@ -161,7 +161,7 @@ describe('GoogleActions Handler - onSync - color', () => {
       feature_type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
       status: 'pending',
       type: 'device.set-value',
-      value: 14,
+      value: 14.285714285714286,
     });
   });
 });
