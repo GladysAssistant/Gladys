@@ -1416,7 +1416,8 @@
     "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
     "gatewayConnectedSuccessDescription": "Your Gladys instance was successfully connected.",
     "gatewayConnectedSuccessBackupKey": "It'll backup automatically everyday, encrypted with the following key. So you can restore your instance later, please save this encryption key somewhere, outside of Gladys. Without this key, you will not be able to restore Gladys.",
-    "gatewayConnectedSuccessButton": "I saved the backup key!"
+    "gatewayConnectedSuccessButton": "I saved the backup key!",
+    "accountExpired": "Your Gladys Plus account has expired. To renew your subscription, you can go to the <a href=\"/dashboard/settings/billing\">billing tab</a>."
   },
   "gatewayPricing": {
     "pricingTitle": "Pricing",
