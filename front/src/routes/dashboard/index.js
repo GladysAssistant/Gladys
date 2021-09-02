@@ -289,6 +289,11 @@ class Dashboard extends Component {
     }
   };
 
+  onFullScreenChange = () => {
+    const isFullScreen = this.isFullScreen();
+    this.props.setFullScreen(isFullScreen);
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
@@ -303,12 +308,21 @@ class Dashboard extends Component {
 
   componentDidMount() {
     this.init();
+    document.addEventListener('fullscreenchange', this.onFullScreenChange, false);
+    document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
+    document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.currentUrl !== this.props.currentUrl) {
       this.init();
     }
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('fullscreenchange', this.onFullScreenChange, false);
+    document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
+    document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
   }
 
   render(
