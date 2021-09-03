@@ -40,7 +40,7 @@ function createActions(store) {
       });
     },
     redirectToLogin(state) {
-      const returnUrl = window.location.pathname;
+      const returnUrl = window.location.pathname + window.location.search;
       route(`/login?return_url=${encodeURIComponent(returnUrl)}`);
     },
     async checkSession(state) {
