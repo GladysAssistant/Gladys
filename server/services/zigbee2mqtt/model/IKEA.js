@@ -17,6 +17,7 @@ const IKEA = {
     LED1624G9: [features.light, features.brightness, features.color],
     LED1649C5: [features.light, features.brightness],
     LED1732G11: [features.light, features.brightness, features.color_temperature],
+    LED1924G9: [features.light, features.brightness, features.color_temperature, features.color],
     'ICTC-G-1': [features.brightness, features.switch_sensor],
     'ICPSHC24-10EU-IL-1': [features.light, features.brightness],
     'ICPSHC24-30EU-IL-1': [features.light, features.brightness],
