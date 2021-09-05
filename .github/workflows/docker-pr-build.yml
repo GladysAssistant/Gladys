@@ -95,7 +95,7 @@ jobs:
           npm run coverage
       - name: 🔐 Dependencies security audit
         working-directory: ./server
-        run: npm audit --production --audit-level=high
+        run: npm audit --production --audit-level=critical
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v1
   cypress-run:

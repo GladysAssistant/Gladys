@@ -39,6 +39,10 @@ function createActions(store) {
         showCollapsedMenu: !state.showCollapsedMenu
       });
     },
+    redirectToLogin(state) {
+      const returnUrl = window.location.pathname + window.location.search;
+      route(`/login?return_url=${encodeURIComponent(returnUrl)}`);
+    },
     async checkSession(state) {
       if (isUrlInArray(state.currentUrl, OPEN_PAGES)) {
         return null;
@@ -46,20 +50,29 @@ function createActions(store) {
       try {
         await state.session.init();
         if (!state.session.isConnected()) {
-          route('/login');
+          actions.redirectToLogin();
         }
         const tasks = [state.httpClient.get('/api/v1/me'), actionsProfilePicture.loadProfilePicture(state)];
         const [user] = await Promise.all(tasks);
         store.setState({
           user
         });
+        if (state.session.getGatewayUser) {
+          const gatewayUser = await state.session.getGatewayUser();
+          const now = new Date();
+          if (new Date(gatewayUser.current_period_end) < now) {
+            store.setState({
+              gatewayAccountExpired: true
+            });
+          }
+        }
       } catch (e) {
         const status = get(e, 'response.status');
         const error = get(e, 'response.data.error');
         const gatewayErrorMessage = get(e, 'response.data.error_message');
         if (status === 401 || status === 403) {
           state.session.reset();
-          route('/login');
+          actions.redirectToLogin();
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
           route('/link-gateway-user');
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
