@@ -36,7 +36,12 @@ class TurnOnLight extends Component {
     if (value.includes(',')) {
       value = value.replaceAll(',', '.');
     }
-    this.props.updateTriggerProperty(this.props.index, 'value', value);
+    const lastCharacter = value.length > 0 ? value[value.length - 1] : '';
+    if (!isNaN(parseFloat(e.target.value)) && lastCharacter !== '.') {
+      this.props.updateTriggerProperty(this.props.index, 'value', parseFloat(value));
+    } else {
+      this.props.updateTriggerProperty(this.props.index, 'value', value);
+    }
   };
   handleValueChangeBinary = newValue => () => {
     this.props.updateTriggerProperty(this.props.index, 'value', newValue);

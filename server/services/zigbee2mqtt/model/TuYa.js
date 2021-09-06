@@ -11,6 +11,7 @@ const TuYa = {
     TS0601_air_quality_sensor: [features.temperature, features.humidity, features.co2],
     TT001ZAV20: [features.temperature, features.humidity],
     SNTZ007: [features.door],
+    TS0503B: [features.light, features.brightness, features.color],
   },
 };
 

@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
 import update, { extend } from 'immutability-helper';
 import DashboardPage from './DashboardPage';
+import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
 import actions from '../../actions/dashboard';
 import get from 'get-value';
 
@@ -10,7 +11,7 @@ extend('$auto', function(value, object) {
   return object ? update(object, value) : update({}, value);
 });
 
-@connect('user,fullScreen,currentUrl,httpClient', actions)
+@connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', actions)
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
     this.setState(prevState => {
@@ -288,6 +289,11 @@ class Dashboard extends Component {
     }
   };
 
+  onFullScreenChange = () => {
+    const isFullScreen = this.isFullScreen();
+    this.props.setFullScreen(isFullScreen);
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
@@ -302,12 +308,21 @@ class Dashboard extends Component {
 
   componentDidMount() {
     this.init();
+    document.addEventListener('fullscreenchange', this.onFullScreenChange, false);
+    document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
+    document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.currentUrl !== this.props.currentUrl) {
       this.init();
     }
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('fullscreenchange', this.onFullScreenChange, false);
+    document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
+    document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
   }
 
   render(
@@ -333,6 +348,9 @@ class Dashboard extends Component {
         (currentDashboard.boxes[2] && currentDashboard.boxes[2].length > 0));
     const dashboardListEmpty = !(dashboards && dashboards.length > 0);
     const dashboardNotConfigured = !dashboardConfigured;
+    if (props.gatewayAccountExpired === true) {
+      return <GatewayAccountExpired />;
+    }
     return (
       <DashboardPage
         {...props}
