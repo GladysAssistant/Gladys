@@ -1,4 +1,4 @@
-const { QueryTypes, Op, fn, col } = require('sequelize');
+const { Op, fn, col } = require('sequelize');
 const { LTTB } = require('downsample');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
@@ -25,11 +25,8 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
 
   const now = new Date();
   const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
-  const sixtyMinutesAgo = new Date(now.getTime() - 60 * 60 * 1000);
-  const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
   const thirthyHoursAgo = new Date(now.getTime() - 30 * 60 * 60 * 1000);
-  const thirthyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
 
   let type;
@@ -51,7 +48,6 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
 
   let rows;
 
-  console.time('sql');
   if (type === 'live') {
     rows = await db.DeviceFeatureState.findAll({
       raw: true,
@@ -77,15 +73,12 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
       },
     });
   }
-  console.timeEnd('sql');
 
   const dataForDownsampling = rows.map((deviceFeatureState) => {
     return [new Date(deviceFeatureState.created_at), deviceFeatureState.value];
   });
 
-  console.time('LTTB');
   const downsampled = LTTB(dataForDownsampling, maxStates);
-  console.timeEnd('LTTB');
 
   // @ts-ignore
   return downsampled.map((e) => {
