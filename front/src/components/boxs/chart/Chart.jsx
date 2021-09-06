@@ -201,7 +201,8 @@ class Chartbox extends Component {
               >
                 {labels && labels.length > 0 && (
                   <span class="text-green d-inline-flex align-items-center lh-1">
-                    {variation}%
+                    {variation}
+                    <Text id="global.percent" />
                     {variation > 0 && (
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

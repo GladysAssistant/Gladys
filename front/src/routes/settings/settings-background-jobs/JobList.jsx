@@ -9,17 +9,17 @@ dayjs.extend(relativeTime);
 const JobList = ({ children, ...props }) => (
   <div class="card">
     <h3 class="card-header">
-      <Text id="systemSettings.jobsTitle" />
+      <Text id="jobsSettings.jobsTitle" />
     </h3>
     <div class="table-responsive">
       <table class="table table-hover table-outline table-vcenter text-nowrap card-table">
         <thead>
           <tr>
             <th>
-              <Text id="systemSettings.jobType" />
+              <Text id="jobsSettings.jobType" />
             </th>
             <th>
-              <Text id="systemSettings.jobStatus" />
+              <Text id="jobsSettings.jobStatus" />
             </th>
           </tr>
         </thead>
@@ -29,7 +29,7 @@ const JobList = ({ children, ...props }) => (
               <tr>
                 <td>
                   <div>
-                    <Text id={`systemSettings.jobTypes.${job.type}`} />
+                    <Text id={`jobsSettings.jobTypes.${job.type}`} />
                   </div>
                   <div>
                     <small>
@@ -47,7 +47,7 @@ const JobList = ({ children, ...props }) => (
                       'badge-danger': job.status === JOB_STATUS.FAILED
                     })}
                   >
-                    {job.status !== JOB_STATUS.IN_PROGRESS && <Text id={`systemSettings.jobStatuses.${job.status}`} />}
+                    {job.status !== JOB_STATUS.IN_PROGRESS && <Text id={`jobsSettings.jobStatuses.${job.status}`} />}
                     {job.status === JOB_STATUS.IN_PROGRESS && (
                       <span>
                         {job.progress} <Text id="global.percent" />

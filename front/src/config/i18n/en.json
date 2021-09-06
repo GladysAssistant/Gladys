@@ -248,6 +248,7 @@
         "editBoxNamePlaceholder": "Name of the box"
       },
       "chart": {
+        "defaultInterval": "Default interval",
         "lastHour": "Last hour",
         "lastDay": "Last 24 hours",
         "lastSevenDays": "Last 7 days",
@@ -1213,7 +1214,8 @@
     "serviceTab": "Services",
     "billingTab": "Billing",
     "gatewayUsersTab": "Plus Users",
-    "gatewayOpenApiTab": "Open API"
+    "gatewayOpenApiTab": "Open API",
+    "jobsTab": "Tasks"
   },
   "housesSettings": {
     "searchPlaceholder": "Search houses",
@@ -1331,6 +1333,21 @@
     "rateLimitError": "You have tried this form too many time. Please retry in 30 minutes or restart your Gladys instance now.",
     "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
     "networkError": "Network Error:  We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?"
+  },
+  "jobsSettings": {
+    "jobsTitle": "Background tasks",
+    "jobType": "Type",
+    "jobProgress": "%",
+    "jobStatus": "Status",
+    "jobTypes": {
+      "monthly-device-state-aggregate": "Monthly sensors aggregation",
+      "daily-device-state-aggregate": "Daily sensors aggregation",
+      "hourly-device-state-aggregate": "Hourly sensors aggregation"
+    },
+    "jobStatuses": {
+      "success": "Succès",
+      "failed": "Echec"
+    }
   },
   "systemSettings": {
     "connected": "Connected",

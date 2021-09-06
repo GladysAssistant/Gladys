@@ -248,6 +248,7 @@
         "editBoxNamePlaceholder": "Nom de la box"
       },
       "chart": {
+        "defaultInterval": "Interval par défaut",
         "lastHour": "Dernière heure",
         "lastDay": "Dernière 24h",
         "lastSevenDays": "Derniers 7 jours",
@@ -1333,6 +1334,21 @@
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community.",
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?"
   },
+  "jobsSettings": {
+    "jobsTitle": "Tâches en arrière-plan",
+    "jobType": "Type",
+    "jobProgress": "%",
+    "jobStatus": "Statut",
+    "jobTypes": {
+      "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
+      "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
+      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+    },
+    "jobStatuses": {
+      "success": "Succès",
+      "failed": "Echec"
+    }
+  },
   "systemSettings": {
     "connected": "Connecté",
     "ping": "{{time}} ms ping",
@@ -1355,19 +1371,6 @@
     "configurationTitle": "Configuration",
     "timezone": "Fuseau horaire",
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
-    "jobsTitle": "Tâches en arrière-plan",
-    "jobType": "Type",
-    "jobProgress": "%",
-    "jobStatus": "Statut",
-    "jobTypes": {
-      "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
-      "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
-      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
-    },
-    "jobStatuses": {
-      "success": "Succès",
-      "failed": "Echec"
-    },
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
