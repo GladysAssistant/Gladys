@@ -18,7 +18,7 @@ const jobs = [
   },
   {
     name: 'hourly-device-state-aggregate',
-    frequencyInSeconds: 60,
+    frequencyInSeconds: 60 * 60,
     event: EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
   },
   {
