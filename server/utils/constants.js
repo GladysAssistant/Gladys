@@ -428,6 +428,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
   },
+  JOB: {
+    NEW: 'job.new',
+    UPDATED: 'job.updated',
+  },
   MESSAGE: {
     NEW: 'message.new',
     SENT: 'message.sent',

@@ -1,6 +1,5 @@
 const db = require('../../models');
-const { JOB_STATUS } = require('../../utils/constants');
-
+const { JOB_STATUS, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 /**
  * @public
  * @description Start a job
@@ -17,7 +16,12 @@ async function start(type, data = {}) {
     progress: 0,
     data,
   });
-  return job;
+  const jobPlain = job.get({ plain: true });
+  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.JOB.NEW,
+    payload: jobPlain,
+  });
+  return jobPlain;
 }
 
 module.exports = {

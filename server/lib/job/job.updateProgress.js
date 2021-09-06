@@ -1,5 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
 
 /**
@@ -24,7 +25,12 @@ async function updateProgress(id, progress) {
   await job.update({
     progress,
   });
-  return job.get({ plain: true });
+  const jobUpdated = job.get({ plain: true });
+  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED,
+    payload: jobUpdated,
+  });
+  return jobUpdated;
 }
 
 module.exports = {
