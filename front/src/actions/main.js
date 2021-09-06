@@ -40,7 +40,7 @@ function createActions(store) {
       });
     },
     redirectToLogin(state) {
-      const returnUrl = window.location.pathname;
+      const returnUrl = window.location.pathname + window.location.search;
       route(`/login?return_url=${encodeURIComponent(returnUrl)}`);
     },
     async checkSession(state) {
@@ -57,6 +57,15 @@ function createActions(store) {
         store.setState({
           user
         });
+        if (state.session.getGatewayUser) {
+          const gatewayUser = await state.session.getGatewayUser();
+          const now = new Date();
+          if (new Date(gatewayUser.current_period_end) < now) {
+            store.setState({
+              gatewayAccountExpired: true
+            });
+          }
+        }
       } catch (e) {
         const status = get(e, 'response.status');
         const error = get(e, 'response.data.error');
