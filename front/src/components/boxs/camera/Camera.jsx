@@ -26,9 +26,7 @@ const CameraBox = ({ children, ...props }) => (
           <div class="loader" />
         </div>
       )}
-      <div class="row">
-        <h4>{props.box && props.box.name}</h4>
-      </div>
+      <h4>{props.box && props.box.name}</h4>
     </div>
   </div>
 );
@@ -58,9 +56,8 @@ class CameraBoxComponent extends Component {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Camera.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Camera.${props.x}_${props.y}`);
     const image = get(boxData, 'image');
-    const camera = get(boxData, 'camera');
     const error = boxStatus === RequestStatus.Error;
-    return <CameraBox {...props} image={image} camera={camera} boxStatus={boxStatus} error={error} />;
+    return <CameraBox {...props} image={image} boxStatus={boxStatus} error={error} />;
   }
 }
 
