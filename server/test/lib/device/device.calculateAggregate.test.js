@@ -109,7 +109,7 @@ describe('Device.calculateAggregate', function Before() {
       // we modify the retention policy to take the last 1000 days (it'll cover this last year)
       getValue: fake.resolves('1000'),
     };
-    const job = new Job();
+    const job = new Job(event);
     const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.onHourlyDeviceAggregateEvent();
     const deviceFeatureStates = await db.DeviceFeatureStateAggregate.findAll({
