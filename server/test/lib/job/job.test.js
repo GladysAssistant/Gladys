@@ -56,5 +56,13 @@ describe('Job', () => {
         expect(oneJob).to.have.property('type');
       });
     });
+    it('should get 0 job', async () => {
+      await job.start(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE);
+      const jobs = await job.get({
+        take: 0,
+      });
+      expect(jobs).to.be.instanceOf(Array);
+      expect(jobs).to.have.lengthOf(0);
+    });
   });
 });
