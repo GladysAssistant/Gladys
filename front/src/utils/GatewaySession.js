@@ -74,6 +74,10 @@ class GatewaySession {
     return this.user;
   }
 
+  async getGatewayUser() {
+    return this.gatewayClient.getMyself();
+  }
+
   saveLoginInformations(data) {
     keyValueStore.set(GATEWAY_REFRESH_TOKEN_KEY, data.refreshToken);
     keyValueStore.set(GATEWAY_ACCESS_TOKEN_KEY, data.accessToken);
