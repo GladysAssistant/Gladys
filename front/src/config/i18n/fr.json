@@ -1212,6 +1212,7 @@
     "backupTab": "Sauvegardes",
     "serviceTab": "Services",
     "billingTab": "Facturation",
+    "jobsTab": "Tâches",
     "gatewayUsersTab": "Utilisateurs Plus",
     "gatewayOpenApiTab": "Open API"
   },
@@ -1354,6 +1355,19 @@
     "configurationTitle": "Configuration",
     "timezone": "Fuseau horaire",
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
+    "jobsTitle": "Tâches en arrière-plan",
+    "jobType": "Type",
+    "jobProgress": "%",
+    "jobStatus": "Statut",
+    "jobTypes": {
+      "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
+      "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
+      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+    },
+    "jobStatuses": {
+      "success": "Succès",
+      "failed": "Echec"
+    },
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
