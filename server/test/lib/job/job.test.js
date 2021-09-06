@@ -65,4 +65,30 @@ describe('Job', () => {
       expect(jobs).to.have.lengthOf(0);
     });
   });
+  describe('job.wrapper', () => {
+    const job = new Job(event);
+    it('should test wrapper', async () => {
+      const wrapped = job.wrapper(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE, () => {});
+      await wrapped();
+      const jobs = await job.get();
+      expect(jobs).to.be.instanceOf(Array);
+      const lastJob = jobs[0];
+      expect(lastJob).to.have.property('status', JOB_STATUS.SUCCESS);
+    });
+    it('should test wrapper with failed job', async () => {
+      const wrapped = job.wrapper(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE, () => {
+        throw new Error('failed');
+      });
+      try {
+        await wrapped();
+      } catch (e) {
+        // normal
+      }
+
+      const jobs = await job.get();
+      expect(jobs).to.be.instanceOf(Array);
+      const lastJob = jobs[0];
+      expect(lastJob).to.have.property('status', JOB_STATUS.FAILED);
+    });
+  });
 });

@@ -120,4 +120,20 @@ describe('Device.calculateAggregate', function Before() {
     // daily + hourly + monthly
     expect(deviceFeatureStates.length).to.equal(3000 + 3000 + 100);
   });
+  it('should run the hourly aggregate task with failed job but not crash', async () => {
+    await insertStates(true);
+    const variable = {
+      // we modify the retention policy to take the last 1000 days (it'll cover this last year)
+      getValue: fake.resolves('1000'),
+    };
+    const job = new Job(event);
+    job.wrapper = () => {
+      return async () => {
+        throw new Error('something failed');
+      };
+    };
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
+    await device.onHourlyDeviceAggregateEvent();
+    // if it doesn't crash, it worked
+  });
 });
