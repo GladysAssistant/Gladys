@@ -1,9 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
-import {
-  DEVICE_FEATURE_TYPES_BY_CATEGORY,
-  DEVICE_FEATURE_UNITS_BY_CATEGORY
-} from '../../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';
 import get from 'get-value';
 
@@ -47,28 +44,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
               />
             </Localizer>
           </div>
-          {DEVICE_FEATURE_TYPES_BY_CATEGORY[feature.category] && (
-            <div class="form-group">
-              <label class="form-label" for={`externalid_${featureIndex}`}>
-                <Text id="editDeviceForm.typeLabel" />
-              </label>
-              <Localizer>
-                <select
-                  id={`unit_${featureIndex}`}
-                  type="text"
-                  value={feature.type}
-                  onChange={props.updateType}
-                  class="form-control"
-                >
-                  {DEVICE_FEATURE_TYPES_BY_CATEGORY[feature.category].map(type => (
-                    <option value={type}>
-                      <Text id={`deviceFeatureCategory.${feature.category}.${type}`}>{type}</Text>
-                    </option>
-                  ))}
-                </select>
-              </Localizer>
-            </div>
-          )}
+
           {DEVICE_FEATURE_UNITS_BY_CATEGORY[feature.category] && (
             <div class="form-group">
               <label class="form-label" for={`externalid_${featureIndex}`}>
@@ -182,9 +158,6 @@ class MqttFeatureBoxComponent extends Component {
   updateUnit = e => {
     this.props.updateFeatureProperty(e, 'unit', this.props.featureIndex);
   };
-  updateType = e => {
-    this.props.updateFeatureProperty(e, 'type', this.props.featureIndex);
-  };
   updateReadOnly = () => {
     const e = {
       target: {
@@ -223,7 +196,6 @@ class MqttFeatureBoxComponent extends Component {
         updateMin={this.updateMin}
         updateMax={this.updateMax}
         updateUnit={this.updateUnit}
-        updateType={this.updateType}
         updateReadOnly={this.updateReadOnly}
         deleteFeature={this.deleteFeature}
         copyMqttTopic={this.copyMqttTopic}
