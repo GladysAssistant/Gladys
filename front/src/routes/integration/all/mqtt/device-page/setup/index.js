@@ -101,37 +101,16 @@ class MqttDeviceSetupPage extends Component {
         value = `mqtt:${value}`;
       }
     }
-    if (property === 'type' && value !== null && value !== '') {
-      const category = this.state.device.features[featureIndex].category;
-      let valueUnit;
-      try {
-        valueUnit = DEVICE_FEATURE_UNITS_BY_CATEGORY_TYPES[value][category][0];
-      } catch (e) {
-        valueUnit = '';
+    device = update(this.state.device, {
+      features: {
+        [featureIndex]: {
+          [property]: {
+            $set: value
+          }
+        }
       }
-      device = update(this.state.device, {
-        features: {
-          [featureIndex]: {
-            [property]: {
-              $set: value
-            },
-            unit: {
-              $set: valueUnit
-            }
-          }
-        }
-      });
-    } else {
-      device = update(this.state.device, {
-        features: {
-          [featureIndex]: {
-            [property]: {
-              $set: value
-            }
-          }
-        }
-      });
-    }
+    });
+    
     if (property === 'external_id') {
       device = update(device, {
         features: {
