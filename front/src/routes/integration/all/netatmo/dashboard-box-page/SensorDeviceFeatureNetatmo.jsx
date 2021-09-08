@@ -1,4 +1,3 @@
-/* eslint-disable preact-i18n/no-unknown-key */
 import { Text, Localizer } from 'preact-i18n';
 import actions from './actions';
 import { connect } from 'unistore/preact';
