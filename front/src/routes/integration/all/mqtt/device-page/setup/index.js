@@ -110,7 +110,7 @@ class MqttDeviceSetupPage extends Component {
         }
       }
     });
-    
+
     if (property === 'external_id') {
       device = update(device, {
         features: {
