@@ -21,26 +21,6 @@ async function newStateEvent(event) {
   }
 }
 
-/**
- * @description Receive a new state event and save the new state.
- * @param {Object} event - The event object.
- * @param {Object} event.device_feature_external_id - The deviceFeature concerned.
- * @example
- * newStateNoChangedEvent({ device_feature_external_id: 'xx' });
- */
-async function newStateNoChangedEvent(event) {
-  try {
-    const deviceFeature = this.stateManager.get('deviceFeatureByExternalId', event.device_feature_external_id);
-    if (deviceFeature === null) {
-      throw new NotFoundError('DeviceFeature not found');
-    }
-    await this.saveLastStateChanged(deviceFeature);
-  } catch (e) {
-    logger.debug(e);
-  }
-}
-
 module.exports = {
   newStateEvent,
-  newStateNoChangedEvent,
 };

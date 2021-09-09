@@ -1,4 +1,3 @@
-const fse = require('fs-extra');
 const logger = require('../../utils/logger');
 const NetatmoManager = require('./lib');
 const NetatmoController = require('./api/netatmo.controller');
@@ -15,7 +14,6 @@ module.exports = function NetatmoService(gladys, serviceId) {
   async function start() {
     logger.info('Starting netatmo service');
     netatmoManager.connect();
-    await fse.ensureDir(gladys.config.tempFolder);
   }
 
   /**

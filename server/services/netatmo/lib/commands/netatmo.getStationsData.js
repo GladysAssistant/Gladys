@@ -1,10 +1,6 @@
 const axios = require('axios');
 const logger = require('../../../../utils/logger');
 
-/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-
-/* eslint-disable jsdoc/require-returns */
-/* eslint-disable jsdoc/require-description-complete-sentence */
 /**
  * @description Get station data
  * @param {string} mode - Data received

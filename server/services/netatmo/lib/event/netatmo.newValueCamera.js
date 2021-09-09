@@ -167,7 +167,7 @@ function newValueCamera(data) {
                     max: 100,
                   },
                   {
-                    name: `Détection intrusion - ${moduleName}`,
+                    name: `Intrusion detection - ${moduleName}`,
                     selector: `netatmo:${sidModule}:siren`,
                     external_id: `netatmo:${sidModule}:siren`,
                     category: DEVICE_FEATURE_CATEGORIES.SIREN,
@@ -205,7 +205,7 @@ function newValueCamera(data) {
                     max: 100,
                   },
                   {
-                    name: `Détection intrusion - ${moduleName}`,
+                    name: `DIntrusion detection - ${moduleName}`,
                     selector: `netatmo:${sidModule}:doorTag`,
                     external_id: `netatmo:${sidModule}:doorTag`,
                     category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,

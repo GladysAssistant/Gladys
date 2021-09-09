@@ -13,6 +13,7 @@ async function get() {
       {
         model: db.DeviceFeature,
         as: 'features',
+        attributes: ['name', 'selector'],
         where: {
           category: DEVICE_FEATURE_CATEGORIES.CAMERA,
         },
@@ -20,6 +21,7 @@ async function get() {
       {
         model: db.Room,
         as: 'room',
+        attributes: ['name', 'selector'],
       },
     ],
   });

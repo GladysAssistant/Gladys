@@ -1,4 +1,4 @@
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 const { NETATMO_VALUES } = require('../constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
@@ -92,16 +92,16 @@ async function updateThermostat(key, device, deviceSelector) {
       await this.updateFeature(key, device, deviceSelector, 'reachable', reachableValue);
     }
     if (batteryValue) {
-      await this.updateFeature(key, device, deviceSelector, 'battery', batteryValue);
+      await this.updateFeature(key, device, deviceSelector, DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_TYPES.SENSOR.INTEGER, batteryValue);
     }
     if (temperatureValue) {
-      await this.updateFeature(key, device, deviceSelector, 'temperature', temperatureValue);
+      await this.updateFeature(key, device, deviceSelector, DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, temperatureValue);
     }
     if (setpointTempValue) {
-      await this.updateFeature(key, device, deviceSelector, 'therm_setpoint_temperature', setpointTempValue);
+      await this.updateFeature(key, device, deviceSelector, DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, setpointTempValue);
     }
     if (setpointModeValue) {
-      await this.updateFeature(key, device, deviceSelector, 'therm_setpoint_mode', setpointModeValue);
+      await this.updateFeature(key, device, deviceSelector, DEVICE_FEATURE_CATEGORIES.SETPOINT, DEVICE_FEATURE_TYPES.SETPOINT.STRING, setpointModeValue);
     }
     if (heatPowerRequestValue) {
       await this.updateFeature(key, device, deviceSelector, 'heating_power_request', heatPowerRequestValue);

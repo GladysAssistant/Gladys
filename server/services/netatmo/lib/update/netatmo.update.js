@@ -1,6 +1,6 @@
 /* eslint-disable jsdoc/check-param-names */
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { getDeviceFeatureBySelector } = require('../../../../utils/device');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { getDeviceFeature } = require('../../../../utils/device');
 const { compareValue } = require('../utils/format');
 const logger = require('../../../../utils/logger');
 
@@ -14,10 +14,10 @@ const logger = require('../../../../utils/logger');
  * @example
  * updateNHC();
  */
-async function updateFeature(key, device, deviceSelector, featureType, newValue) {
+async function updateFeature(key, device, deviceSelector, featureCategory, featureType, newValue) {
   try {
     const featureTypeSelector = `${deviceSelector}-${featureType.replace(/_/gi, '-').toLowerCase()}`;
-    const feature = await getDeviceFeatureBySelector(device, featureTypeSelector);
+    const feature = await getDeviceFeature(device, featureCategory, featureType);
     if (compareValue(feature.last_value, newValue)) {
       if (feature.last_value !== null) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
