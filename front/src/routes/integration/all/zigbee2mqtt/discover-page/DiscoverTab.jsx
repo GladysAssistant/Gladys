@@ -54,8 +54,7 @@ const DiscoverTab = ({ children, ...props }) => (
           }
         >
           <Text id="integration.zigbee2mqtt.discover.scanButton" /> <i class="fe fe-radio" />
-        </button
-
+        </button>
       </div>
     </div>
     <div class="card-body">
