@@ -10,8 +10,10 @@ const logger = require('../../../../utils/logger');
  * valueAdded(9, {});
  */
 function valueAdded(nodeId, args) {
-  const {commandClass, endpoint, property, propertyKey, newValue } = args;
-  logger.debug(`Zwave : Value Added, nodeId = ${nodeId}, comClass = ${commandClass}, valueId = ${JSON.stringify(newValue)}`);
+  const { commandClass, endpoint, property, propertyKey, newValue } = args;
+  logger.debug(
+    `Zwave : Value Added, nodeId = ${nodeId}, comClass = ${commandClass}, valueId = ${JSON.stringify(newValue)}`,
+  );
   if (!this.nodes[nodeId].classes[commandClass]) {
     this.nodes[nodeId].classes[commandClass] = {};
   }

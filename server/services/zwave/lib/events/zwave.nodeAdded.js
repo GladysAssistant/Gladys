@@ -49,7 +49,6 @@ function nodeAdded(nodeId) {
     type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_ADDED,
     payload: nodeId,
   });
-
 }
 
 module.exports = {
