@@ -498,6 +498,20 @@
       "saveError": "There was an error saving the device.",
       "documentation": "Zigbee2mqtt documentation"
     },
+    "googleHome": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Do you want to connect Gladys Assistant to Google?",
+      "description": "By signin in, you are authorizing Google to access your devices.",
+      "error": "An error occured. Please retry !",
+      "connectedAs": "Connected as",
+      "googleWillBeAble": "Google will be able:",
+      "seeDevices": "List all your devices",
+      "controlDevices": "Control all your devices",
+      "getNewDeviceValues": "Periodically refresh your device states",
+      "privacyPolicy": "Read Google's <a href=\"http://policies.google.com/?hl=en\">privacy policy</a>.",
+      "cancelButton": "Cancel",
+      "connectButton": "Link"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Control your Z-Wave devices.",
@@ -1402,24 +1416,17 @@
     "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
     "gatewayConnectedSuccessDescription": "Your Gladys instance was successfully connected.",
     "gatewayConnectedSuccessBackupKey": "It'll backup automatically everyday, encrypted with the following key. So you can restore your instance later, please save this encryption key somewhere, outside of Gladys. Without this key, you will not be able to restore Gladys.",
-    "gatewayConnectedSuccessButton": "I saved the backup key!"
+    "gatewayConnectedSuccessButton": "I saved the backup key!",
+    "accountExpired": "Your Gladys Plus account has expired. To renew your subscription, you can go to the <a href=\"/dashboard/settings/billing\">billing tab</a>."
   },
   "gatewayPricing": {
-    "pricingTitle": "Pricing",
-    "pricingSentence": "Gladys Assistant is free to use, but you can subscribe to Gladys Plus for additional premium features!",
-    "free": "Free",
-    "gladysPlus": "Gladys Plus",
-    "currentPlan": "Current Plan",
-    "subscribeButton": "Subscribe (9.99€/month/house)",
-    "alreadyGladysPlusSubscriber": "Already a Gladys Plus Subscriber? Click here to login.",
-    "openSourceSoftware": "Open-Source Software",
-    "endToEndEncryptedRemoteAccess": "End-to-End Encrypted Remote Access",
-    "dailyEncryptedBackups": "Daily Encrypted Backups",
-    "oneClickRestore": "One-click Restore",
-    "remoteWebhooks": "Remote Webhooks",
-    "ownTracksApiServer": "Owntracks API Server",
-    "privateSlackCommunity": "Private Slack Community",
-    "supportOpenSourceSoftware": "Support Open-Source Software"
+    "pricingTitle": "Gladys Plus",
+    "pricingSentence": "Gladys Assistant is free to use, but you can subscribe to Gladys Plus for additional premium features like end-to-end encrypted remote access, automatic backups and access to a REST API accessible from anywhere in the world.",
+    "whyIsGladysPlusPaid": "Why is Gladys Plus paid and not free like Gladys?",
+    "whyIsGladysPlusPaidAnswer": "Gladys Plus is an online service that has cost: hosting, bandwidth, storage, development and maintenance. To support those costs, we prefer asking for a monthly fee rather than adding ads or selling users data: it's not the philosophy of the project. We respect our users privacy, and want them to own their data at home.",
+    "supportOpenSource": "By subscribing to Gladys Plus, you are supporting the development of a privacy-friendly & open-source alternative. Thanks for your support ! 🙂",
+    "knowMoreButton": "Read more about Gladys Plus",
+    "alreadyGladysPlusSubscriber": "Already a Gladys Plus Subscriber? Click here to login!"
   },
   "gatewayLogin": {
     "cardTitle": "Login to your Gladys Plus account",
@@ -1451,6 +1458,7 @@
     "confirmRestore": "Confirm",
     "cancelRestore": "Cancel",
     "restoreInProgressTitle": "Restoring backup in progress...",
+    "gladysRestartingTitle": "Gladys Assistant is restarting...",
     "backupNowButton": "Backup now",
     "backupStarted": "Backup started...",
     "notConfigured": "Gladys Plus need to be configured to enable backups. Go to the Gladys Plus tab to configure it.",
