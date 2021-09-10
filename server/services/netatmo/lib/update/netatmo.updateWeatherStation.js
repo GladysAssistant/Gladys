@@ -44,14 +44,20 @@ async function updateWeatherStation(key, device, deviceSelector) {
           const reachableModuleValue = module.reachable;
 
           try {
-            await this.updateFeature(sidModule, deviceModule, moduleSelector, 'battery', batteryPercentValue);
+            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+              device_feature_external_id: `netatmo:${key}:battery`,
+              state: batteryPercentValue,
+            });
           } catch (e) {
             logger.error(
               `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - battery percent - error : ${e}`,
             );
           }
           try {
-            await this.updateFeature(sidModule, deviceModule, moduleSelector, 'reachable', reachableModuleValue);
+            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+              device_feature_external_id: `netatmo:${key}:reachable`,
+              state: reachableModuleValue,
+            });
           } catch (e) {
             logger.error(
               `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - reachable - error : ${e}`,
@@ -65,14 +71,20 @@ async function updateWeatherStation(key, device, deviceSelector) {
               const sumRain24Value = module.dashboard_data.sum_rain_24;
 
               try {
-                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'rain', rainValue);
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `netatmo:${key}:rain`,
+                  state: rainValue,
+                });
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - rain - error : ${e}`,
                 );
               }
               try {
-                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'sum_rain_1', sumRain1Value);
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `netatmo:${key}:sum_rain_1`,
+                  state: sumRain1Value,
+                });
               } catch (e) {
                 logger.error(
                   `Netatmo : File netatmo.updateWeatherStation.js - Module Weather Station ${module.data_type} ${module.module_name} - sum rain 1 hour - error : ${e}`,

@@ -16,6 +16,9 @@ const logger = require('../../../../utils/logger');
  */
 async function updateFeature(key, device, deviceSelector, featureCategory, featureType, newValue) {
   try {
+    console.log(featureCategory)
+    console.log(newValue)
+    console.log(device)
     const featureTypeSelector = `${deviceSelector}-${featureType.replace(/_/gi, '-').toLowerCase()}`;
     const feature = await getDeviceFeature(device, featureCategory, featureType);
     if (compareValue(feature.last_value, newValue)) {

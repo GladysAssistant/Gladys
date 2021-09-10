@@ -89,22 +89,40 @@ async function updateThermostat(key, device, deviceSelector) {
     }
     // we save the common data of thermostats and valves
     if (reachableValue) {
-      await this.updateFeature(key, device, deviceSelector, 'reachable', reachableValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:reachable`,
+        state: reachableValue,
+      });
     }
     if (batteryValue) {
-      await this.updateFeature(key, device, deviceSelector, DEVICE_FEATURE_CATEGORIES.BATTERY, DEVICE_FEATURE_TYPES.SENSOR.INTEGER, batteryValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:battery`,
+        state: batteryValue,
+      });
     }
     if (temperatureValue) {
-      await this.updateFeature(key, device, deviceSelector, DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, temperatureValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:temperature`,
+        state: temperatureValue,
+      });
     }
     if (setpointTempValue) {
-      await this.updateFeature(key, device, deviceSelector, DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR, DEVICE_FEATURE_TYPES.SENSOR.DECIMAL, setpointTempValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:therm_setpoint_temperature`,
+        state: setpointTempValue,
+      });
     }
     if (setpointModeValue) {
-      await this.updateFeature(key, device, deviceSelector, DEVICE_FEATURE_CATEGORIES.SETPOINT, DEVICE_FEATURE_TYPES.SETPOINT.STRING, setpointModeValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:therm_setpoint_mode`,
+        state: setpointModeValue,
+      });
     }
     if (heatPowerRequestValue) {
-      await this.updateFeature(key, device, deviceSelector, 'heating_power_request', heatPowerRequestValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:heating_power_request`,
+        state: heatPowerRequestValue,
+      });
     }
   } catch (e) {
     throw new NotFoundError(`NETATMO : File netatmo.updateThermostat.js - error : ${e}`);

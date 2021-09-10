@@ -3,9 +3,9 @@ import ColorDeviceFeature from './device-features/ColorDeviceFeature';
 import SensorDeviceFeature from './device-features/SensorDeviceFeature';
 import MultilevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
-import BinaryDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/Dashboard-box-page/BinaryDeviceFeatureNetatmo';
-import SensorDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/Dashboard-box-page/SensorDeviceFeatureNetatmo';
-import CommandDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/Dashboard-box-page/CommandDeviceFeatureNetatmo';
+import BinaryDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/dashboard-box-page/BinaryDeviceFeatureNetatmo';
+import SensorDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/dashboard-box-page/SensorDeviceFeatureNetatmo';
+import CommandDeviceFeatureNetatmo from '../../../routes/integration/all/netatmo/dashboard-box-page/CommandDeviceFeatureNetatmo';
 
 const COMMAND_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.LIGHT.STRING,
