@@ -72,14 +72,20 @@ async function updateCamera(key, device, deviceSelector) {
           const lightValue = NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].light_mode_status.toUpperCase()];
           const sirenValue = NETATMO_VALUES.SECURITY.SIREN[this.devices[key].siren_status.toUpperCase()];
           try {
-            await this.updateFeature(key, device, deviceSelector, 'light', lightValue);
+            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+              device_feature_external_id: `netatmo:${key}:light`,
+              state: lightValue,
+            });
           } catch (e) {
             logger.error(
               `Netatmo : File netatmo.updateCamera.js - Camera NOC ${this.devices[key].name} - light - error : ${e}`,
             );
           }
           try {
-            await this.updateFeature(key, device, deviceSelector, 'siren', sirenValue);
+            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+              device_feature_external_id: `netatmo:${key}:siren`,
+              state: sirenValue,
+            });
           } catch (e) {
             logger.error(
               `Netatmo : File netatmo.updateCamera.js - Camera NOC ${this.devices[key].name} - siren - error : ${e}`,
@@ -103,7 +109,10 @@ async function updateCamera(key, device, deviceSelector) {
               // we save the common data of home coaches and weather stations
               if (module.type === 'NIS' || module.type === 'NACamDoorTag') {
                 const batteryValue = module.battery_percent;
-                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'battery', batteryValue);
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `netatmo:${key}:battery`,
+                  state: batteryValue,
+                });
               }
             } catch (e) {
               logger.error(
@@ -114,7 +123,10 @@ async function updateCamera(key, device, deviceSelector) {
               // we save other indoor sirens data
               if (module.type === 'NIS') {
                 const sirenValue = NETATMO_VALUES.SECURITY.SIREN[module.status.toUpperCase()];
-                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'siren', sirenValue);
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `netatmo:${key}:siren`,
+                  state: sirenValue,
+                });
               }
             } catch (e) {
               logger.error(
@@ -125,7 +137,10 @@ async function updateCamera(key, device, deviceSelector) {
               // we save other interior door / window opening detectors data
               if (module.type === 'NACamDoorTag') {
                 const doorTagValue = NETATMO_VALUES.SECURITY.DOOR_TAG[module.status.toUpperCase()];
-                await this.updateFeature(sidModule, deviceModule, moduleSelector, 'doorTag', doorTagValue);
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `netatmo:${key}:doorTag`,
+                  state: doorTagValue,
+                });
               }
             } catch (e) {
               logger.error(

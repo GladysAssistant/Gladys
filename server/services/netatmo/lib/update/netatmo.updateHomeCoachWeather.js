@@ -18,34 +18,50 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
     const noiseValue = this.devices[key].dashboard_data.Noise;
     const reachableValue = this.devices[key].reachable;
     try {
-      await this.updateFeature(key, device, deviceSelector, 'temperature', temperatureValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:temperature`,
+        state: temperatureValue,
+      });
     } catch (e) {
       logger.error(
         `Netatmo : File netatmo.updateHomeCoachWeather.js - ${this.devices[key].type} ${this.devices[key].station_name} - temperature - error : ${e}`,
       );
     }
     try {
-      await this.updateFeature(key, device, deviceSelector, 'humidity', humidityValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:humidity`,
+        state: humidityValue,
+      });
     } catch (e) {
       logger.error(
         `Netatmo : File netatmo.updateHomeCoachWeather.js - ${this.devices[key].type} ${this.devices[key].station_name} - humidity - error : ${e}`,
       );
     }
     try {
-      await this.updateFeature(key, device, deviceSelector, 'co2', co2Value);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:co2`,
+        state: co2Value,
+      });
     } catch (e) {
       logger.error(
         `Netatmo : File netatmo.updateHomeCoachWeather.js - ${this.devices[key].type} ${this.devices[key].station_name} - co2 - error : ${e}`,
       );
     }
     try {
-      await this.updateFeature(key, device, deviceSelector, 'pressure', pressureValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:pressure`,
+        state: pressureValue,
+      });
     } catch (e) {
       logger.error(
         `Netatmo : File netatmo.updateHomeCoachWeather.js - ${this.devices[key].type} ${this.devices[key].station_name} - pressure - error : ${e}`,
       );
     }
     try {
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:absolutePressure`,
+        state: absolutePressureValue,
+      });
       await this.updateFeature(key, device, deviceSelector, 'absolutePressure', absolutePressureValue);
     } catch (e) {
       logger.error(
@@ -53,14 +69,20 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
       );
     }
     try {
-      await this.updateFeature(key, device, deviceSelector, 'noise', noiseValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:noise`,
+        state: noiseValue,
+      });
     } catch (e) {
       logger.error(
         `Netatmo : File netatmo.updateHomeCoachWeather.js - ${this.devices[key].type} ${this.devices[key].station_name} - noise - error : ${e}`,
       );
     }
     try {
-      await this.updateFeature(key, device, deviceSelector, 'reachable', reachableValue);
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: `netatmo:${key}:reachable`,
+        state: reachableValue,
+      });
     } catch (e) {
       logger.error(
         `Netatmo : File netatmo.updateHomeCoachWeather.js - ${this.devices[key].type} ${this.devices[key].station_name} - reachable - error : ${e}`,
