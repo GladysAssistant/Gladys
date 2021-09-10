@@ -3,8 +3,6 @@ import get from 'get-value';
 import { getDeviceName } from './utils';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
-import style from './style.css';
-
 const MultiLevelDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
     props.updateValueWithDebounce(
@@ -41,7 +39,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
             type="range"
             value={props.deviceFeature.last_value}
             onChange={updateValue}
-            class={style.inputRange}
+            class="custom-range"
             step="1"
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}

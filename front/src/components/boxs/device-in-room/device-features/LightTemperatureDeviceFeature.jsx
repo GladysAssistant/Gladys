@@ -32,7 +32,7 @@ const LightTemperatureDeviceType = ({ children, ...props }) => {
             type="range"
             value={props.deviceFeature.last_value}
             onChange={updateValue}
-            class="custom-range"
+            class="custom-range light-temperature"
             step="1"
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}
