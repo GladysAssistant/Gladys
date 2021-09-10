@@ -25,7 +25,7 @@ async function restoreBackup(backupFilePath) {
   const closeAsync = promisify(potentialNewDb.close.bind(potentialNewDb));
   // Getting the new user
   const rows = await getAsync('SELECT id, email FROM t_user');
-  if (rows.length === 0) {
+  if (!rows || rows.length === 0) {
     throw new NotFoundError('NO_USER_FOUND_IN_NEW_DB');
   }
   // closing the new DB

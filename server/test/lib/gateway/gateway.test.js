@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
 const Promise = require('bluebird');
+const path = require('path');
 const { fake, assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
@@ -153,6 +154,39 @@ describe('gateway', () => {
       const gateway = new Gateway(variable, event, system, sequelize, config);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.restoreBackupEvent('this-path-does-not-exist');
+    });
+    it('should not restore a backup, sqlite file is not a Gladys DB', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_file_is_not_a_valid_db.db');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'SQLITE_ERROR: no such table: t_user');
+    });
+    it('should not restore a backup, sqlite file is not a Gladys DB', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_file_has_no_user_table.db');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'SQLITE_ERROR: no such table: t_user');
+    });
+    it('should not restore a backup, SQlite DB has no user', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_db_has_no_users.db');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'NO_USER_FOUND_IN_NEW_DB');
     });
   });
 
