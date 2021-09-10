@@ -36,30 +36,30 @@ async function updateNetatmo(typeUpdate) {
       (this.devices[key].type === 'NACamera' || this.devices[key].type === 'NOC')
     ) {
       // we save the data of cameras
-      await this.updateCamera(key, device, deviceSelector);
+      await this.updateCamera(key, device);
     } else if (
       (typeUpdate === 'All' || typeUpdate === 'Energy') &&
       (this.devices[key].type === 'NATherm1' || this.devices[key].type === 'NRV') &&
       device !== undefined
     ) {
       // we save the common data of thermostats and valves
-      await this.updateThermostat(key, device, deviceSelector);
+      await this.updateThermostat(key, device);
     } else if (
       (typeUpdate === 'All' || typeUpdate === 'HomeCoach_Weather') &&
       (this.devices[key].type === 'NHC' || this.devices[key].type === 'NAMain')
     ) {
       if (device !== undefined) {
         // we save the common data of home coaches and weather stations
-        await this.updateHomeCoachWeather(key, device, deviceSelector);
+        await this.updateHomeCoachWeather(key, device);
 
         if (this.devices[key].type === 'NHC') {
           // we save other home coach data
-          await this.updateNHC(key, device, deviceSelector);
+          await this.updateNHC(key, device);
         }
       }
       if (this.devices[key].type === 'NAMain') {
         // we save the other weather station data
-        await this.updateWeatherStation(key, device, deviceSelector);
+        await this.updateWeatherStation(key, device);
       }
     }
   });

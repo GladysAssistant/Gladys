@@ -4,14 +4,13 @@ const { NETATMO_VALUES } = require('../constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 
 /**
- * @description Poll value of a Netatmo devices
- * @param {string} key - Data received.
- * @param {Object} device - Data received.
- * @param {string} deviceSelector - Data received.
+ * @description Update Thermostat value
+ * @param {string} key - ID.
+ * @param {Object} device - Device.
  * @example
  * updateThermostat();
  */
-async function updateThermostat(key, device, deviceSelector) {
+async function updateThermostat(key, device) {
   try {
     let batteryValue;
     let temperatureValue;

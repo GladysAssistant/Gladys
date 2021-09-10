@@ -24,7 +24,6 @@ const { newValueCamera } = require('./event/netatmo.newValueCamera.js');
 const { newValueValve } = require('./event/netatmo.newValueValve.js');
 const { pollManual } = require('./event/netatmo.pollManual.js');
 
-const { DEVICE_POLL_FREQUENCIES } = require('../../../utils/constants');
 /**
  * @param {Object} gladys - The gladys object..
  * @param {Object} ffmpeg - Ffmpeg library.
@@ -45,7 +44,6 @@ const NetatmoManager = function NetatmoManager(gladys, ffmpeg, serviceId) {
   this.configured = false;
   this.baseUrl = 'https://api.netatmo.net';
   this.token = undefined;
-  this.pollFrequencies = DEVICE_POLL_FREQUENCIES;
   this.pollHomeCoachWeather = undefined;
   this.pollEnergy = undefined;
   this.pollSecurity = undefined;

@@ -2,14 +2,13 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../constants');
 
 /**
- * @description Poll value of a Netatmo devices
- * @param {string} key - Data received.
- * @param {Object} device - Data received.
- * @param {string} deviceSelector - Data received.
+ * @description Update value from home coach weather
+ * @param {string} key - ID.
+ * @param {Object} device - Device.
  * @example
  * updateHomeCoachWeather();
  */
-async function updateHomeCoachWeather(key, device, deviceSelector) {
+async function updateHomeCoachWeather(key, device) {
   try {
     const temperatureValue = this.devices[key].dashboard_data.Temperature;
     const humidityValue = this.devices[key].dashboard_data.Humidity;
@@ -63,7 +62,6 @@ async function updateHomeCoachWeather(key, device, deviceSelector) {
         device_feature_external_id: `netatmo:${key}:absolutePressure`,
         state: absolutePressureValue,
       });
-      await this.updateFeature(key, device, deviceSelector, 'absolutePressure', absolutePressureValue);
     } catch (e) {
       logger.error(
         `Netatmo : File netatmo.updateHomeCoachWeather.js - ${this.devices[key].type} ${this.devices[key].station_name} - absolute pressure - error : ${e}`,

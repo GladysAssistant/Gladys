@@ -4,14 +4,13 @@ const logger = require('../../../../utils/logger');
 const { NETATMO_VALUES, EVENTS } = require('../constants');
 
 /**
- * @description Poll value of a Netatmo devices
- * @param {string} key - Data received.
- * @param {Object} device - Data received.
- * @param {string} deviceSelector - Data received.
+ * @description Update value of the camera
+ * @param {string} key - Key of the device.
+ * @param {Object} device - Device json.
  * @example
  * updateCamera();
  */
-async function updateCamera(key, device, deviceSelector) {
+async function updateCamera(key, device) {
   // we process the data from the cameras
 
   try {
@@ -61,7 +60,10 @@ async function updateCamera(key, device, deviceSelector) {
       }
       try {
         const powerValue = NETATMO_VALUES.SECURITY.LIGHT[this.devices[key].alim_status.toUpperCase()];
-        await this.updateFeature(key, device, deviceSelector, 'power', powerValue);
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `netatmo:${key}:power`,
+          state: powerValue,
+        });
       } catch (e) {
         logger.error(
           `Netatmo : File netatmo.updateCamera.js - Camera ${this.devices[key].type} ${this.devices[key].name} - power - error : ${e}`,

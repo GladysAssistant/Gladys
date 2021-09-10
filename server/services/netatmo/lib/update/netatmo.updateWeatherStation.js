@@ -2,14 +2,13 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../constants');
 
 /**
- * @description Poll value of a Netatmo devices
- * @param {string} key - Data received.
- * @param {Object} device - Data received.
- * @param {string} deviceSelector - Data received.
+ * @description Update weather station value
+ * @param {string} key - ID.
+ * @param {Object} device - Device.
  * @example
  * updateWeatherStation();
  */
-async function updateWeatherStation(key, device, deviceSelector) {
+async function updateWeatherStation(key, device) {
   try {
     if (device !== undefined) {
       const minTempValue = this.devices[key].dashboard_data.min_temp;

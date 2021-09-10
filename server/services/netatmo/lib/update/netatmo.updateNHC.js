@@ -2,14 +2,13 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../constants');
 
 /**
- * @description Poll value of a Netatmo devices
- * @param {string} key - Data received.
- * @param {Object} device - Data received.
- * @param {string} deviceSelector - Data received.
+ * @description Update NHC value
+ * @param {string} key - ID.
+ * @param {Object} device - Device.
  * @example
  * updateNHC();
  */
-async function updateNHC(key, device, deviceSelector) {
+async function updateNHC(key, device) {
   // we save other home coach data
   try {
     const healthIndexValue = this.devices[key].dashboard_data.health_idx;
