@@ -17,6 +17,7 @@
     "axios": "^0.21.1",
     "bottleneck": "^2.19.5",
     "btoa": "^1.2.1",
-    "fluent-ffmpeg": "^2.1.2"
+    "fluent-ffmpeg": "^2.1.2",
+    "fs-extra": "^10.0.0"
   }
 }

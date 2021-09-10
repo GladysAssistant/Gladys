@@ -1,4 +1,4 @@
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 const { NETATMO_VALUES } = require('../constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');

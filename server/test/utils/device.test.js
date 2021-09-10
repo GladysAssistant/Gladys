@@ -79,24 +79,4 @@ describe('getDeviceFeature', () => {
       category: 'test',
     });
   });
-
-  describe('getDeviceFeatureBySelector', () => {
-    it('should get a feature', () => {
-      const feature = getDeviceFeatureBySelector(device, 'test');
-      expect(feature).to.deep.equal({
-        id: 1,
-        selector: 'test',
-        type: 'test',
-        category: 'test',
-      });
-    });
-    it('should return null', () => {
-      const value = getDeviceFeatureBySelector(device, 'not-found');
-      expect(value).to.equal(null);
-    });
-    it('should return null', () => {
-      const value = getDeviceFeatureBySelector({}, 'not-found');
-      expect(value).to.equal(null);
-    });
-  });
 });

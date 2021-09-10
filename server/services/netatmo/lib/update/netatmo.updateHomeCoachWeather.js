@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { EVENTS } = require('../constants');
 
 /**
  * @description Poll value of a Netatmo devices

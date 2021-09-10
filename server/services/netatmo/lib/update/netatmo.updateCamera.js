@@ -1,7 +1,7 @@
 const fse = require('fs-extra');
 const path = require('path');
 const logger = require('../../../../utils/logger');
-const { NETATMO_VALUES } = require('../constants');
+const { NETATMO_VALUES, EVENTS } = require('../constants');
 
 /**
  * @description Poll value of a Netatmo devices
@@ -99,12 +99,7 @@ async function updateCamera(key, device, deviceSelector) {
     if (this.devices[key].type === 'NACamera') {
       if (this.devices[key].modules !== undefined) {
         this.devices[key].modules.forEach(async (module) => {
-          const sidModule = module.id;
-          const moduleExternalId = `netatmo:${sidModule}`;
-          const moduleSelector = moduleExternalId.replace(/:/gi, '-');
-          let deviceModule;
           try {
-            deviceModule = await this.gladys.device.getBySelector(moduleSelector);
             try {
               // we save the common data of home coaches and weather stations
               if (module.type === 'NIS' || module.type === 'NACamDoorTag') {
