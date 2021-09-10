@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
-import actions from '../../../actions/dashboard/edit-boxes/editCamera';
 import BaseEditBox from '../baseEditBox';
 
 const EditCameraBox = ({ children, ...props }) => (
@@ -39,7 +38,7 @@ const EditCameraBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('cameras', actions)
+@connect('httpClient', {})
 class EditCameraBoxComponent extends Component {
   updateCamera = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -53,12 +52,31 @@ class EditCameraBoxComponent extends Component {
     });
   };
 
+  getCameras = async () => {
+    await this.setState({
+      loading: true
+    });
+    try {
+      const cameras = await this.props.httpClient.get('/api/v1/camera');
+      this.setState({
+        cameras,
+        loading: false
+      });
+    } catch (e) {
+      this.setState({
+        loading: false
+      });
+    }
+  };
+
   componentDidMount() {
-    this.props.getCameras();
+    this.getCameras();
   }
 
-  render(props, {}) {
-    return <EditCameraBox {...props} updateCamera={this.updateCamera} updateBoxName={this.updateBoxName} />;
+  render(props, { cameras }) {
+    return (
+      <EditCameraBox {...props} cameras={cameras} updateCamera={this.updateCamera} updateBoxName={this.updateBoxName} />
+    );
   }
 }
 

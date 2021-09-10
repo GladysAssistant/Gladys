@@ -1,5 +1,5 @@
 import { ERROR_MESSAGES } from '../../../server/utils/constants';
-import config from '../../config';
+import config from '../config';
 import { Dispatcher } from './Dispatcher';
 
 class Session {

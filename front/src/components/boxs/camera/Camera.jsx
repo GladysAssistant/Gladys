@@ -31,18 +31,27 @@ const CameraBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect('session,DashboardBoxDataCamera,DashboardBoxStatusCamera', actions)
 class CameraBoxComponent extends Component {
+  refreshData = () => {
+    this.props.getCameraImage(this.props.box, this.props.x, this.props.y);
+  };
   updateDeviceStateWebsocket = payload =>
     this.props.deviceFeatureWebsocketEvent(this.props.box, this.props.x, this.props.y, payload);
 
   componentDidMount() {
-    this.props.getCameraImage(this.props.box, this.props.x, this.props.y);
-
+    this.refreshData();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
       this.updateDeviceStateWebsocket
     );
+  }
+
+  componentDidUpdate(previousProps) {
+    const cameraChanged = get(previousProps, 'box.camera') !== get(this.props, 'box.camera');
+    const nameChanged = get(previousProps, 'box.name') !== get(this.props, 'box.name');
+    if (cameraChanged || nameChanged) {
+      this.refreshData();
+    }
   }
 
   componentWillUnmount() {
@@ -61,4 +70,4 @@ class CameraBoxComponent extends Component {
   }
 }
 
-export default CameraBoxComponent;
+export default connect('session,DashboardBoxDataCamera,DashboardBoxStatusCamera', actions)(CameraBoxComponent);
