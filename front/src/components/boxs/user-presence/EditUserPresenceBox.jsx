@@ -90,7 +90,13 @@ class EditUserPresence extends Component {
 
   render(props, { users, selectedUsers, loading }) {
     return (
-      <UserPresenceBox users={users} selectedUsers={selectedUsers} loading={loading} updateUsers={this.updateUsers} />
+      <UserPresenceBox
+        {...props}
+        users={users}
+        selectedUsers={selectedUsers}
+        loading={loading}
+        updateUsers={this.updateUsers}
+      />
     );
   }
 }
