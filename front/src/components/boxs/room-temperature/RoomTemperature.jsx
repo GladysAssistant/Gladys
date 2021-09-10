@@ -29,10 +29,20 @@ const RoomTemperatureBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect('DashboardBoxDataTemperatureInRoom,DashboardBoxStatusTemperatureInRoom', actions)
 class RoomTemperatureBoxComponent extends Component {
-  componentDidMount() {
+  refreshData = () => {
     this.props.getTemperatureInRoom(this.props.box, this.props.x, this.props.y);
+  };
+
+  componentDidMount() {
+    this.refreshData();
+  }
+
+  componentDidUpdate(previousProps) {
+    const roomChanged = get(previousProps, 'box.room') !== get(this.props, 'box.room');
+    if (roomChanged) {
+      this.refreshData();
+    }
   }
 
   render(props, {}) {
@@ -47,4 +57,7 @@ class RoomTemperatureBoxComponent extends Component {
   }
 }
 
-export default RoomTemperatureBoxComponent;
+export default connect(
+  'DashboardBoxDataTemperatureInRoom,DashboardBoxStatusTemperatureInRoom',
+  actions
+)(RoomTemperatureBoxComponent);
