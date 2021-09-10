@@ -162,7 +162,7 @@ describe('gateway', () => {
       };
       const gateway = new Gateway(variable, event, system, sequelize, config);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
-      const emptyFile = path.join(__dirname, 'this_file_is_not_a_valid_db.db');
+      const emptyFile = path.join(__dirname, 'this_file_is_not_a_valid_db.dbfile');
       const promise = gateway.restoreBackup(emptyFile);
       await assertChai.isRejected(promise, 'SQLITE_ERROR: no such table: t_user');
     });
@@ -173,7 +173,7 @@ describe('gateway', () => {
       };
       const gateway = new Gateway(variable, event, system, sequelize, config);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
-      const emptyFile = path.join(__dirname, 'this_file_has_no_user_table.db');
+      const emptyFile = path.join(__dirname, 'this_file_has_no_user_table.dbfile');
       const promise = gateway.restoreBackup(emptyFile);
       await assertChai.isRejected(promise, 'SQLITE_ERROR: no such table: t_user');
     });
@@ -184,7 +184,7 @@ describe('gateway', () => {
       };
       const gateway = new Gateway(variable, event, system, sequelize, config);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
-      const emptyFile = path.join(__dirname, 'this_db_has_no_users.db');
+      const emptyFile = path.join(__dirname, 'this_db_has_no_users.dbfile');
       const promise = gateway.restoreBackup(emptyFile);
       await assertChai.isRejected(promise, 'NO_USER_FOUND_IN_NEW_DB');
     });
