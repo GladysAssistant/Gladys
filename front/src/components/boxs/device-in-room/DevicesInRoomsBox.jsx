@@ -7,10 +7,6 @@ import get from 'get-value';
 
 import DeviceRow from './DeviceRow';
 
-const cardStyle = {
-  maxHeight: '20rem'
-};
-
 const minHeight = {
   minHeight: '6rem'
 };
@@ -42,14 +38,14 @@ const RoomCard = ({ children, ...props }) => {
         )}
       </div>
       {props.loading && (
-        <div class="card-body o-auto" style={cardStyle}>
+        <div class="card-body o-auto">
           <div class={props.loading ? 'dimmer active' : 'dimmer'}>
             <div class="loader" />
             <div class="dimmer-content">{props.loading && <div style={minHeight} />}</div>
           </div>
         </div>
       )}
-      <div class="table-responsive" style={cardStyle}>
+      <div class="table-responsive">
         <table class="table card-table table-vcenter">
           <tbody>
             {props.devices &&
@@ -69,6 +65,7 @@ const RoomCard = ({ children, ...props }) => {
                         deviceIndex={deviceIndex}
                         deviceFeatureIndex={deviceFeatureIndex}
                         updateValue={props.updateValue}
+                        updateValueWithDebounce={props.updateValueWithDebounce}
                       />
                     )
                 )
