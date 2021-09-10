@@ -1,22 +1,27 @@
 const logger = require('../../../../utils/logger');
 
 /**
+ * ValueAddedArgs.
+ *
  * @description When a value is added.
  * @param {number} nodeId - The ID of the node.
- * @param {number} comClass - Zwave comclass.
- * @param {Object} valueId - The value id.
+ * @param {Object} args - ValueAddedArgs.
  * @example
- * zwave.on('value added', this.valueAdded);
+ * valueAdded(9, {});
  */
-function valueAdded(nodeId, comClass, valueId) {
-  logger.debug(`Zwave : Value Added, nodeId = ${nodeId}, comClass = ${comClass}, valueId = ${JSON.stringify(valueId)}`);
-  if (!this.nodes[nodeId].classes[comClass]) {
-    this.nodes[nodeId].classes[comClass] = {};
+function valueAdded(nodeId, args) {
+  const { commandClass, endpoint, property, propertyKey, newValue } = args;
+  logger.debug(
+    `Zwave : Value Added, nodeId = ${nodeId}, comClass = ${commandClass}, valueId = ${JSON.stringify(newValue)}`,
+  );
+  if (!this.nodes[nodeId].classes[commandClass]) {
+    this.nodes[nodeId].classes[commandClass] = {};
   }
-  if (!this.nodes[nodeId].classes[comClass][valueId.index]) {
-    this.nodes[nodeId].classes[comClass][valueId.index] = {};
+  if (!this.nodes[nodeId].classes[commandClass][endpoint]) {
+    this.nodes[nodeId].classes[commandClass][endpoint] = {};
+    // New Endpoint - split allowed
   }
-  this.nodes[nodeId].classes[comClass][valueId.index][valueId.instance] = valueId;
+  this.nodes[nodeId].classes[commandClass][endpoint][property + propertyKey ? `/${propertyKey}` : ''] = newValue;
 }
 
 module.exports = {

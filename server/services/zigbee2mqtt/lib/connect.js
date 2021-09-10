@@ -13,7 +13,7 @@ async function connect({ mqttExternal, mqttUrl, mqttUsername, mqttPassword }) {
     // Loads MQTT service
     logger.log('Connecting Gladys to ', mqttUrl);
 
-    if(mqttExternal) {
+    if (mqttExternal) {
       this.mqttClient = this.mqttService.device.mqttClient;
     } else {
       this.mqttClient = this.mqttLibrary.connect(mqttUrl, {

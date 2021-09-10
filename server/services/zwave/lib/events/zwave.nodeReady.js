@@ -11,13 +11,13 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 function nodeReady(nodeId, nodeInfo) {
   logger.debug(`Zwave : Node Ready, nodeId = ${nodeId}`);
   this.nodes[nodeId].manufacturer = nodeInfo.manufacturer;
-  this.nodes[nodeId].manufacturerid = nodeInfo.manufacturerid;
+  this.nodes[nodeId].manufacturerid = nodeInfo.manufacturerId;
   this.nodes[nodeId].product = nodeInfo.product;
-  this.nodes[nodeId].producttype = nodeInfo.producttype;
-  this.nodes[nodeId].productid = nodeInfo.productid;
-  this.nodes[nodeId].type = nodeInfo.type;
+  this.nodes[nodeId].producttype = nodeInfo.productType;
+  this.nodes[nodeId].productid = nodeInfo.productId;
+  this.nodes[nodeId].type = nodeInfo.noedType;
   this.nodes[nodeId].name = nodeInfo.name;
-  this.nodes[nodeId].loc = nodeInfo.loc;
+  this.nodes[nodeId].loc = nodeInfo.location;
   this.nodes[nodeId].ready = true;
 
   // enable poll if needed
