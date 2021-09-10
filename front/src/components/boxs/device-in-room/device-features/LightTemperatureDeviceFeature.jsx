@@ -1,7 +1,5 @@
 import { getDeviceName } from './utils';
 
-import style from './style.css';
-
 const LightTemperatureDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
     props.updateValueWithDebounce(
