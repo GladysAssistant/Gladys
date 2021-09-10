@@ -21,8 +21,6 @@ process.on('uncaughtException', (error, promise) => {
   logger.error(error);
 });
 
-let server;
-
 const shutdown = async (signal) => {
   logger.info(`${signal} received.`);
   // We give Gladys 10 seconds to properly shutdown, otherwise we do it
@@ -53,7 +51,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
   await gladys.start();
 
   // start server
-  ({ server } = start(gladys, SERVER_PORT, {
+  start(gladys, SERVER_PORT, {
     serveFront: SERVE_FRONT,
-  }));
+  });
 })();
