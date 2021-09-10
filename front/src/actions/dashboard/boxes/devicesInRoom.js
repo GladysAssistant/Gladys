@@ -3,6 +3,7 @@ import createBoxActions from '../boxActions';
 import createDeviceActions from '../../device';
 import update from 'immutability-helper';
 import get from 'get-value';
+import debounce from 'debounce';
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../../server/utils/constants');
 
 const BOX_KEY = 'DevicesInRoom';
@@ -76,8 +77,11 @@ function createActions(store) {
       });
       await Promise.all(promises);
     },
-    async updateValue(state, x, y, device, deviceFeature, deviceIndex, featureIndex, action) {
-      await deviceActions.setValue(state, deviceFeature.selector, action);
+    async setValueDevice(state, deviceFeatureSelector, action) {
+      await deviceActions.setValue(state, deviceFeatureSelector, action);
+    },
+    async updateValueWithDebounce(state, x, y, device, deviceFeature, deviceIndex, featureIndex, action) {
+      console.log(`new value ${action}`);
       const data = boxActions.getBoxData(state, BOX_KEY, x, y);
       const newData = update(data, {
         room: {
@@ -103,10 +107,40 @@ function createActions(store) {
         hasBinaryLightDeviceFeature,
         roomLightStatus
       });
+      await actions.setValueDeviceDebounce(state, deviceFeature.selector, action);
+    },
+    async updateValue(state, x, y, device, deviceFeature, deviceIndex, featureIndex, action) {
+      const data = boxActions.getBoxData(state, BOX_KEY, x, y);
+      const newData = update(data, {
+        room: {
+          devices: {
+            [deviceIndex]: {
+              features: {
+                [featureIndex]: {
+                  last_value: {
+                    $set: action
+                  },
+                  last_value_changed: {
+                    $set: new Date()
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+      await deviceActions.setValue(state, deviceFeature.selector, action);
+      const { hasBinaryLightDeviceFeature, roomLightStatus } = getLightStatus(newData.room);
+      boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+        room: newData.room,
+        hasBinaryLightDeviceFeature,
+        roomLightStatus
+      });
     },
     deviceFeatureWebsocketEvent(state, x, y, payload) {
       const data = boxActions.getBoxData(state, BOX_KEY, x, y);
       const devices = get(data, 'room.devices');
+      console.log(`new websocket event ${payload.last_value}`);
       if (devices) {
         let found = false;
         let currentDeviceIndex = 0;
@@ -150,6 +184,7 @@ function createActions(store) {
       }
     }
   };
+  actions.setValueDeviceDebounce = debounce(actions.setValueDevice, 500);
   return Object.assign({}, actions, boxActions);
 }
 

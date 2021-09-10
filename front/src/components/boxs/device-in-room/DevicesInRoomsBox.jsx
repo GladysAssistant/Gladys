@@ -69,6 +69,7 @@ const RoomCard = ({ children, ...props }) => {
                         deviceIndex={deviceIndex}
                         deviceFeatureIndex={deviceFeatureIndex}
                         updateValue={props.updateValue}
+                        updateValueWithDebounce={props.updateValueWithDebounce}
                       />
                     )
                 )
