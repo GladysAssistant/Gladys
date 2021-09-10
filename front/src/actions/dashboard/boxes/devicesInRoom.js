@@ -81,7 +81,6 @@ function createActions(store) {
       await deviceActions.setValue(state, deviceFeatureSelector, action);
     },
     async updateValueWithDebounce(state, x, y, device, deviceFeature, deviceIndex, featureIndex, action) {
-      console.log(`new value ${action}`);
       const data = boxActions.getBoxData(state, BOX_KEY, x, y);
       const newData = update(data, {
         room: {
@@ -129,18 +128,17 @@ function createActions(store) {
           }
         }
       });
-      await deviceActions.setValue(state, deviceFeature.selector, action);
       const { hasBinaryLightDeviceFeature, roomLightStatus } = getLightStatus(newData.room);
       boxActions.mergeBoxData(state, BOX_KEY, x, y, {
         room: newData.room,
         hasBinaryLightDeviceFeature,
         roomLightStatus
       });
+      await deviceActions.setValue(state, deviceFeature.selector, action);
     },
     deviceFeatureWebsocketEvent(state, x, y, payload) {
       const data = boxActions.getBoxData(state, BOX_KEY, x, y);
       const devices = get(data, 'room.devices');
-      console.log(`new websocket event ${payload.last_value}`);
       if (devices) {
         let found = false;
         let currentDeviceIndex = 0;
