@@ -29,7 +29,7 @@ async function disconnect() {
   });
 
   // Stop MQTT container
-  if (z2mEnabled == '1') {
+  if (z2mEnabled === '1') {
     let dockerContainer = await this.gladys.system.getContainers({
       all: true,
       filters: { name: [mqttContainerDescriptor.name] },

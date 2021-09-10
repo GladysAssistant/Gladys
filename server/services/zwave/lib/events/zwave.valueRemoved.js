@@ -8,7 +8,7 @@ const logger = require('../../../../utils/logger');
  * zwave.on('value removed', this.valueRemoved);
  */
 function valueRemoved(nodeId, args) {
-  const { commandClass, endpoint, property, propertyKey, newValue } = args;
+  const { commandClass, endpoint, property, propertyKey/* , newValue */ } = args;
   logger.debug(
     `Zwave : Value removed, nodeId = ${nodeId}, comClass = ${commandClass}, index = ${endpoint}, instance = ${
       property + propertyKey ? `/${propertyKey}` : ''
