@@ -80,16 +80,26 @@ const RoomCard = ({ children, ...props }) => {
   );
 };
 
-@connect('session,user,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom', actions)
 class DevicesInRoomComponent extends Component {
+  refreshData = () => {
+    this.props.getDevicesInRoom(this.props.box, this.props.x, this.props.y);
+  };
   updateDeviceStateWebsocket = payload => this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload);
 
   componentDidMount() {
-    this.props.getDevicesInRoom(this.props.box, this.props.x, this.props.y);
+    this.refreshData();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
+  }
+
+  componentDidUpdate(previousProps) {
+    const roomChanged = get(previousProps, 'box.room') !== get(this.props, 'box.room');
+    const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
+    if (roomChanged || deviceFeaturesChanged) {
+      this.refreshData();
+    }
   }
 
   componentWillUnmount() {
@@ -121,4 +131,7 @@ class DevicesInRoomComponent extends Component {
   }
 }
 
-export default DevicesInRoomComponent;
+export default connect(
+  'session,user,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom',
+  actions
+)(DevicesInRoomComponent);
