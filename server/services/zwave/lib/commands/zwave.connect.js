@@ -1,8 +1,10 @@
 const os = require('os');
 const logger = require('../../../../utils/logger');
+
 const { driverReady } = require('../events/zwave.driverReady');
 const { nodeAdded } = require('../events/zwave.nodeAdded');
 const { nodeRemoved } = require('../events/zwave.nodeRemoved');
+const { nodeReady } = require('../events/zwave.nodeReady');
 
 /**
  * @description Connect to Zwave USB driver
@@ -19,7 +21,7 @@ async function connect(driverPath) {
   } else {
     this.driverPath = driverPath;
   }
-  this.ready = false; 
+  this.ready = false;
   this.driver = new ZWaveJS.Driver(driverPath, {
     logConfig: {
       level: 'info'
@@ -30,23 +32,28 @@ async function connect(driverPath) {
   });
 
   this.driver.on('driver ready', () => {
-    driverReady(`${this.driver.controller.homeId}`);
+    driverReady.bind(this)(`${this.driver.controller.homeId}`);
     this.driver.controller.nodes.forEach((node) => {
-        logger.debug(node);
+        nodeAdded.bind(this)(node.id);
+        if(node.ready) {
+          nodeReady.bind(this)(node.id, node);
+        }
     });
 
     this.driver.controller.on('node added', (node, result) => {
-        nodeAdded(node.id);
+        nodeAdded.bind(this)(node.id);
     });
 
     this.driver.controller.on('node removed', (node, replaced) => {
-        nodeRemoved(node.id);
+        nodeRemoved.bind(this)(node.id);
     });
 
   });
 
   // this.zwave.connect(this.driverPath);
   await this.driver.start();
+
+  this.connected = true;
 }
 
 module.exports = {

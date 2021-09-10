@@ -4,7 +4,7 @@ const ZwaveController = require('./api/zwave.controller');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 
 module.exports = function ZwaveService(gladys, serviceId) {
-  const zwaveManager = new ZwaveManager(gladys.event, serviceId);
+  const zwaveManager = new ZwaveManager(gladys, serviceId);
   /**
    * @public
    * @description This function starts the service
