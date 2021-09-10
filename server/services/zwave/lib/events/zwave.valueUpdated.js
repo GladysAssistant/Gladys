@@ -10,7 +10,7 @@ const { getDeviceFeatureExternalId } = require('../utils/externalId');
  * zwave.on('value updated', this.valueUpdated);
  */
 function valueUpdated(nodeId, args) {
-  const { commandClass, endpoint, property, propertyKey/* , prevValue */, newValue } = args;
+  const { commandClass, endpoint, property, propertyKey /* , prevValue */, newValue } = args;
   logger.debug(
     `Zwave : Value Updated, nodeId = ${nodeId}, comClass = ${commandClass}, value = ${JSON.stringify(newValue)}`,
   );

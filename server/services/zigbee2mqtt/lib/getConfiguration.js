@@ -39,10 +39,10 @@ async function getConfiguration() {
       mqttPassword,
     };
   }
-  
+
   const mqttExternal = true;
   return {
-      mqttExternal,
+    mqttExternal,
   };
 }
 
