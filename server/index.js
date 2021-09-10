@@ -25,16 +25,19 @@ let server;
 
 const shutdown = async (signal) => {
   logger.info(`${signal} received.`);
+  // We give Gladys 10 seconds to properly shutdown, otherwise we do it
+  setTimeout(() => {
+    logger.info('Timeout to shutdown expired, forcing shut down.');
+    process.exit();
+  }, 10 * 1000);
   logger.info('Closing database connection.');
-  await db.sequelize.close();
-  if (server) {
-    logger.info('Closing server connections.');
-    server.close(() => {
-      process.exit(0);
-    });
-  } else {
-    process.exit(0);
+  try {
+    await db.sequelize.close();
+  } catch (e) {
+    logger.info('Database is probably already closed');
+    logger.warn(e);
   }
+  process.exit();
 };
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
