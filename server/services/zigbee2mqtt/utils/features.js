@@ -234,6 +234,16 @@ const features = {
     max: 1000,
     zigbeeField: 'gas',
   },
+  co2: {
+    category: DEVICE_FEATURE_CATEGORIES.CO2_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    name: 'Carbon Sensor',
+    read_only: true,
+    has_feedback: false,
+    min: 0,
+    max: 1,
+    zigbeeField: 'carbon_monoxide',
+  },
 };
 
 module.exports = {
