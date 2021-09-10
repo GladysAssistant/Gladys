@@ -363,6 +363,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   BUTTON: {
     CLICK: 'click',
+    BINARY: 'binary',
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',

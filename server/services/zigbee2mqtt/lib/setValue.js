@@ -41,6 +41,9 @@ function setValue(device, deviceFeature, value) {
       zigbeeValue = `{"color": {"rgb": "${r},${g},${b}"}}`;
       break;
     }
+    case 'button_switch':
+      zigbeeValue = value ? `{"action": "ON"}` : `{"action": "OFF"}`;
+      break;
     default:
       zigbeeValue = null;
   }

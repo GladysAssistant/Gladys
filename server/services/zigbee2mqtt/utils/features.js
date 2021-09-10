@@ -120,6 +120,16 @@ const features = {
     max: 1,
     zigbeeField: 'action',
   },
+  button_switch: {
+    category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+    type: DEVICE_FEATURE_TYPES.BUTTON.BINARY,
+    name: 'Button',
+    read_only: false,
+    has_feedback: true,
+    min: 0,
+    max: 1,
+    zigbeeField: 'action',
+  },
   switch: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
