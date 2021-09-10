@@ -40,10 +40,20 @@ const RoomHumidityBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect('DashboardBoxDataHumidityInRoom,DashboardBoxStatusHumidityInRoom', actions)
 class RoomHumidityBoxComponent extends Component {
-  componentDidMount() {
+  refreshData = () => {
     this.props.getHumidityInRoom(this.props.box, this.props.x, this.props.y);
+  };
+
+  componentDidMount() {
+    this.refreshData();
+  }
+
+  componentDidUpdate(previousProps) {
+    const roomChanged = get(previousProps, 'box.room') !== get(this.props, 'box.room');
+    if (roomChanged) {
+      this.refreshData();
+    }
   }
 
   render(props, {}) {
@@ -56,4 +66,7 @@ class RoomHumidityBoxComponent extends Component {
   }
 }
 
-export default RoomHumidityBoxComponent;
+export default connect(
+  'DashboardBoxDataHumidityInRoom,DashboardBoxStatusHumidityInRoom',
+  actions
+)(RoomHumidityBoxComponent);
