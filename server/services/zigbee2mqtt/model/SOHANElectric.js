@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const SOHANElectric = {
   brand: 'SOHAN Electric',
   models: {
-    'RDCBC/Z': [features.switch_sensor],
+    'RDCBC/Z': [features.switch],
   },
 };
 

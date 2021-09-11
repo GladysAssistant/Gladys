@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const AVATTO = {
   brand: 'AVATTO',
   models: {
-    'ZGB-WS-EU': [features.switch_sensor],
+    'ZGB-WS-EU': [features.switch],
   },
 };
 

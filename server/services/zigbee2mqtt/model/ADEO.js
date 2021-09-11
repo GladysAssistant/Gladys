@@ -12,7 +12,7 @@ const ADEO = {
     '9CZA-M350ST-Q1A': [features.brightness, features.color, features.color_temperature, features.light],
     '9CZA-P470T-A1A': [features.brightness, features.color, features.color_temperature, features.light],
     'HR-C99C-Z-C045': [features.button],
-    LDSENK02F: [features.energy, features.power, features.switch_sensor],
+    LDSENK02F: [features.energy, features.power, features.switch],
   },
 };
 

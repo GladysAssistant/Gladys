@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Revolt = {
   brand: 'Revolt',
   models: {
-    'NX-4911': [features.door, features.switch_sensor, features.temperature],
+    'NX-4911': [features.door, features.switch, features.temperature],
   },
 };
 

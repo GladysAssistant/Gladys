@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Vizo = {
   brand: 'Vizo',
   models: {
-    'VZ-222S': [features.switch_sensor],
+    'VZ-222S': [features.switch],
   },
 };
 

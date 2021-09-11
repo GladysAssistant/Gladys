@@ -10,7 +10,7 @@ const Sylvania = {
     '71831': [features.brightness, features.color_temperature, features.light],
     '72567': [features.brightness, features.color_temperature, features.light],
     '72569': [features.brightness, features.color_temperature, features.light],
-    '72922-A': [features.switch_sensor],
+    '72922-A': [features.switch],
     '73693': [features.brightness, features.color, features.color_temperature, features.light],
     '73739': [features.brightness, features.color, features.color_temperature, features.light],
     '73740': [features.brightness, features.color_temperature, features.light],

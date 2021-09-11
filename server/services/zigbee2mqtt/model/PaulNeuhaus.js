@@ -9,7 +9,7 @@ const PaulNeuhaus = {
     '100.001.96': [features.brightness, features.color, features.color_temperature, features.light],
     '100.075.74': [features.brightness, features.color, features.color_temperature, features.light],
     '100.110.51': [features.brightness, features.color_temperature, features.light],
-    '100.425.90': [features.switch_sensor],
+    '100.425.90': [features.switch],
     '100.462.31': [features.button],
     '100.491.61': [features.brightness, features.color, features.color_temperature, features.light],
     'NLG-CCT light': [features.brightness, features.color_temperature, features.light],

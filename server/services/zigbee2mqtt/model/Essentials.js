@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Essentials = {
   brand: 'Essentials',
   models: {
-    '120112': [features.door, features.switch_sensor, features.temperature],
+    '120112': [features.door, features.switch, features.temperature],
   },
 };
 

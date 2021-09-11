@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const MatSeePlus = {
   brand: 'MatSee Plus',
   models: {
-    ATMS1602Z: [features.current, features.energy, features.power, features.switch_sensor, features.voltage],
+    ATMS1602Z: [features.current, features.energy, features.power, features.switch, features.voltage],
   },
 };
 

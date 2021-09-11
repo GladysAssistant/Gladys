@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Atsmart = {
   brand: 'Atsmart',
   models: {
-    Z6: [features.switch_sensor],
+    Z6: [features.switch],
   },
 };
 

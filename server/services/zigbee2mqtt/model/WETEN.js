@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const WETEN = {
   brand: 'WETEN',
   models: {
-    '1GNNTS': [features.switch_sensor],
+    '1GNNTS': [features.switch],
   },
 };
 

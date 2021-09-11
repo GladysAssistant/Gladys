@@ -26,7 +26,7 @@ const Sunricher = {
     ],
     'SR-ZG9040A-S': [features.brightness, features.light],
     'SR-ZG9080A': [features.door],
-    'SR-ZG9100A-S': [features.switch_sensor],
+    'SR-ZG9100A-S': [features.switch],
     'SRP-ZG9105-CC': [features.brightness, features.light],
     'ZG192910-4': [features.brightness, features.color_temperature, features.light],
     'ZG2819S-CCT': [features.button],
@@ -41,7 +41,7 @@ const Sunricher = {
     ],
     ZG2858A: [features.button],
     'ZG9101SAC-HP': [features.brightness, features.light],
-    'ZG9101SAC-HP-Switch': [features.switch_sensor],
+    'ZG9101SAC-HP-Switch': [features.switch],
   },
 };
 

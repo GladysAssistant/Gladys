@@ -7,7 +7,7 @@ const Envilar = {
   brand: 'Envilar',
   models: {
     'ZG102-BOX-UNIDIM': [features.brightness, features.light],
-    'ZG302-BOX-RELAY': [features.switch_sensor],
+    'ZG302-BOX-RELAY': [features.switch],
   },
 };
 

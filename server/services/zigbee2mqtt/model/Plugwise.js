@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Plugwise = {
   brand: 'Plugwise',
   models: {
-    '160-01': [features.energy, features.power, features.switch_sensor],
+    '160-01': [features.energy, features.power, features.switch],
   },
 };
 

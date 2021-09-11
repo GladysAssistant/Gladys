@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const Larkkey = {
   brand: 'Larkkey',
   models: {
-    PS080: [features.switch_sensor],
-    PS580: [features.switch_sensor],
+    PS080: [features.switch],
+    PS580: [features.switch],
     'ZSTY-SM-1DMZG-EU': [features.brightness, features.light],
     'ZSTY-SM-1SRZG-EU': [features.door],
   },

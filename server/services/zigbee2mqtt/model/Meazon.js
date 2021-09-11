@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const Meazon = {
   brand: 'Meazon',
   models: {
-    MEAZON_BIZY_PLUG: [features.current, features.power, features.switch_sensor, features.voltage],
-    MEAZON_DINRAIL: [features.current, features.power, features.switch_sensor, features.voltage],
+    MEAZON_BIZY_PLUG: [features.current, features.power, features.switch, features.voltage],
+    MEAZON_DINRAIL: [features.current, features.power, features.switch, features.voltage],
   },
 };
 

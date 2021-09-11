@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const HiHome = {
   brand: 'HiHome',
   models: {
-    'WZB-TRVL': [features.door, features.switch_sensor, features.temperature],
+    'WZB-TRVL': [features.door, features.switch, features.temperature],
   },
 };
 

@@ -7,7 +7,7 @@ const Vimar = {
   brand: 'Vimar',
   models: {
     '03906': [features.button],
-    '14592.0': [features.switch_sensor],
+    '14592.0': [features.switch],
     '14594': [features.door],
   },
 };

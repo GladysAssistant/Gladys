@@ -12,9 +12,9 @@ const Centralite = {
     '3328-G': [features.motion, features.temperature],
     '3400-D': [features.button, features.motion, features.temperature],
     '3420-G': [features.brightness, features.light],
-    '4200-C': [features.switch_sensor],
-    '4256251-RZHAC': [features.current, features.power, features.switch_sensor, features.voltage],
-    '4257050-RZHAC': [features.current, features.power, features.switch_sensor, features.voltage],
+    '4200-C': [features.switch],
+    '4256251-RZHAC': [features.current, features.power, features.switch, features.voltage],
+    '4257050-RZHAC': [features.current, features.power, features.switch, features.voltage],
     '4257050-ZHAC': [features.brightness, features.current, features.light, features.power, features.voltage],
   },
 };

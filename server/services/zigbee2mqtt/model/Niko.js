@@ -6,9 +6,9 @@ const { features } = require('../utils/features');
 const Niko = {
   brand: 'Niko',
   models: {
-    '170-33505': [features.current, features.power, features.switch_sensor, features.voltage],
+    '170-33505': [features.current, features.power, features.switch, features.voltage],
     '552-80401': [features.motion],
-    '552-80699': [features.energy, features.power, features.switch_sensor],
+    '552-80699': [features.energy, features.power, features.switch],
     '91004': [features.button],
   },
 };

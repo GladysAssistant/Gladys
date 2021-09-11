@@ -10,7 +10,7 @@ const AduroSmart = {
     '81825': [features.button],
     '81849': [features.brightness, features.light],
     '81855': [features.brightness, features.light],
-    BPU3: [features.switch_sensor],
+    BPU3: [features.switch],
   },
 };
 

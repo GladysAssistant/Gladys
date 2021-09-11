@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const EDP = {
   brand: 'EDP',
   models: {
-    'PLUG EDP RE:DY': [features.energy, features.power, features.switch_sensor],
-    'SWITCH EDP RE:DY': [features.switch_sensor],
+    'PLUG EDP RE:DY': [features.energy, features.power, features.switch],
+    'SWITCH EDP RE:DY': [features.switch],
   },
 };
 

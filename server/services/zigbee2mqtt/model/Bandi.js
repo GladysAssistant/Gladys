@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Bandi = {
   brand: 'Bandi',
   models: {
-    BDS03G1: [features.switch_sensor],
+    BDS03G1: [features.switch],
   },
 };
 

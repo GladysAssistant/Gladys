@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const MakeGood = {
   brand: 'MakeGood',
   models: {
-    'MG-ZG04W/B/G': [features.switch_sensor],
+    'MG-ZG04W/B/G': [features.switch],
   },
 };
 

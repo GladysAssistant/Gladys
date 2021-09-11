@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const IOTPerfect = {
   brand: 'IOTPerfect',
   models: {
-    'PF-PM02D-TYZ': [features.switch_sensor],
+    'PF-PM02D-TYZ': [features.switch],
   },
 };
 

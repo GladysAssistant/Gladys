@@ -16,7 +16,7 @@ const Linkind = {
     'ZS1100400-IN-V1A02': [features.motion],
     ZS110050078: [features.door],
     ZS130000178: [features.button],
-    ZS190000118: [features.switch_sensor],
+    ZS190000118: [features.switch],
     ZS230002: [features.button],
     ZS232000178: [features.button],
   },

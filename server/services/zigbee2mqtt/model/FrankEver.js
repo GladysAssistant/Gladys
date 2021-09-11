@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const FrankEver = {
   brand: 'FrankEver',
   models: {
-    FK_V02: [features.switch_sensor],
+    FK_V02: [features.switch],
   },
 };
 

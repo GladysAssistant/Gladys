@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Hive = {
   brand: 'Hive',
   models: {
-    '1613V': [features.energy, features.power, features.switch_sensor, features.temperature],
+    '1613V': [features.energy, features.power, features.switch, features.temperature],
     DWS003: [features.door, features.temperature],
     HALIGHTDIMWWB22: [features.brightness, features.light],
     HALIGHTDIMWWE14: [features.brightness, features.light],

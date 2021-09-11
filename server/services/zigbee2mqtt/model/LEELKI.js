@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const LEELKI = {
   brand: 'LEELKI',
   models: {
-    'WP33-EU': [features.switch_sensor],
+    'WP33-EU': [features.switch],
   },
 };
 

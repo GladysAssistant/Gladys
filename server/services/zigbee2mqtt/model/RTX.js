@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const RTX = {
   brand: 'RTX',
   models: {
-    'ZB-RT1': [features.door, features.switch_sensor, features.temperature],
-    ZVG1: [features.switch_sensor],
+    'ZB-RT1': [features.door, features.switch, features.temperature],
+    ZVG1: [features.switch],
   },
 };
 

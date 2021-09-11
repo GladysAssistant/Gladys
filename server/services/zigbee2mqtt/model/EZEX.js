@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const EZEX = {
   brand: 'eZEX',
   models: {
-    'ECW-100-A03': [features.switch_sensor],
+    'ECW-100-A03': [features.switch],
   },
 };
 

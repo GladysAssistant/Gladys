@@ -7,7 +7,7 @@ const Databytech = {
   brand: 'databyte.ch',
   models: {
     // DTB190502A1: [],
-    'ED2004-012': [features.switch_sensor],
+    'ED2004-012': [features.switch],
   },
 };
 

@@ -6,12 +6,12 @@ const { features } = require('../utils/features');
 const Hej = {
   brand: 'Hej',
   models: {
-    'GLSK3ZB-1711': [features.switch_sensor],
-    'GLSK3ZB-1712': [features.switch_sensor],
-    'GLSK3ZB-1713': [features.switch_sensor],
-    'GLSK6ZB-1714': [features.switch_sensor],
-    'GLSK6ZB-1715': [features.switch_sensor],
-    'GLSK6ZB-1716': [features.switch_sensor],
+    'GLSK3ZB-1711': [features.switch],
+    'GLSK3ZB-1712': [features.switch],
+    'GLSK3ZB-1713': [features.switch],
+    'GLSK6ZB-1714': [features.switch],
+    'GLSK6ZB-1715': [features.switch],
+    'GLSK6ZB-1716': [features.switch],
   },
 };
 

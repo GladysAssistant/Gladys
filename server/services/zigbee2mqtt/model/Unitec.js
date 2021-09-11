@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Unitec = {
   brand: 'Unitec',
   models: {
-    '30946': [features.door, features.switch_sensor, features.temperature],
+    '30946': [features.door, features.switch, features.temperature],
   },
 };
 

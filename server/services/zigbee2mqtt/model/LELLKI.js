@@ -6,12 +6,12 @@ const { features } = require('../utils/features');
 const LELLKI = {
   brand: 'LELLKI',
   models: {
-    CM001: [features.switch_sensor],
-    'JZ-ZB-001': [features.switch_sensor],
-    'JZ-ZB-002': [features.switch_sensor],
-    'JZ-ZB-003': [features.switch_sensor],
-    TS011F_plug: [features.current, features.energy, features.power, features.switch_sensor, features.voltage],
-    'WP33-EU': [features.switch_sensor],
+    CM001: [features.switch],
+    'JZ-ZB-001': [features.switch],
+    'JZ-ZB-002': [features.switch],
+    'JZ-ZB-003': [features.switch],
+    TS011F_plug: [features.current, features.energy, features.power, features.switch, features.voltage],
+    'WP33-EU': [features.switch],
   },
 };
 

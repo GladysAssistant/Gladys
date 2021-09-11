@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Saswell = {
   brand: 'Saswell',
   models: {
-    'SEA801-Zigbee/SEA802-Zigbee': [features.door, features.switch_sensor, features.temperature],
+    'SEA801-Zigbee/SEA802-Zigbee': [features.door, features.switch, features.temperature],
   },
 };
 

@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const SHOJZJ = {
   brand: 'SHOJZJ',
   models: {
-    '378RT': [features.door, features.switch_sensor, features.temperature],
+    '378RT': [features.door, features.switch, features.temperature],
   },
 };
 

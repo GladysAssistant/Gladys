@@ -11,7 +11,7 @@ const KMPCIL = {
       features.illuminance,
       features.motion,
       features.pressure,
-      features.switch_sensor,
+      features.switch,
       features.temperature,
     ],
   },

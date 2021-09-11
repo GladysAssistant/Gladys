@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Blaupunkt = {
   brand: 'Blaupunkt',
   models: {
-    'PSM-S1': [features.energy, features.power, features.switch_sensor],
+    'PSM-S1': [features.energy, features.power, features.switch],
     'SCM-S1': [features.door],
   },
 };

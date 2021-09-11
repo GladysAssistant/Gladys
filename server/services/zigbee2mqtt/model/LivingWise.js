@@ -9,8 +9,8 @@ const LivingWise = {
     'LVS-SC7': [features.button],
     'LVS-SM10ZW': [features.door],
     'LVS-SN10ZW_SN11': [features.motion],
-    'LVS-ZB15R': [features.switch_sensor],
-    'LVS-ZB15S': [features.switch_sensor],
+    'LVS-ZB15R': [features.switch],
+    'LVS-ZB15S': [features.switch],
     'LVS-ZB500D': [features.brightness, features.light],
   },
 };

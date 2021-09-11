@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const NET2GRID = {
   brand: 'NET2GRID',
   models: {
-    'N2G-SP': [features.energy, features.power, features.switch_sensor],
+    'N2G-SP': [features.energy, features.power, features.switch],
   },
 };
 

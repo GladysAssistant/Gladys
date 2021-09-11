@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const NinjaBlocks = {
   brand: 'Ninja Blocks',
   models: {
-    Z809AF: [features.energy, features.power, features.switch_sensor],
+    Z809AF: [features.energy, features.power, features.switch],
   },
 };
 

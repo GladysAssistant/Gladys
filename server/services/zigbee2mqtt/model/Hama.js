@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Hama = {
   brand: 'Hama',
   models: {
-    '00176592': [features.door, features.switch_sensor, features.temperature],
+    '00176592': [features.door, features.switch, features.temperature],
   },
 };
 

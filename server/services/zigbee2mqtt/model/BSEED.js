@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const BSEED = {
   brand: 'BSEED',
   models: {
-    TS0003: [features.switch_sensor],
+    TS0003: [features.switch],
   },
 };
 

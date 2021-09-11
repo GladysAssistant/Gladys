@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Anchor = {
   brand: 'Anchor',
   models: {
-    '67200BL': [features.switch_sensor],
+    '67200BL': [features.switch],
   },
 };
 

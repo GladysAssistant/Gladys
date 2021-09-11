@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const OnestiProductsAS = {
   brand: 'Onesti Products AS',
   models: {
-    'S4RX-110': [features.current, features.energy, features.power, features.switch_sensor, features.voltage],
+    'S4RX-110': [features.current, features.energy, features.power, features.switch, features.voltage],
     easyCodeTouch_v1: [features.door],
   },
 };

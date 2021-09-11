@@ -14,7 +14,7 @@ const Namron = {
     '4512701': [features.button],
     '4512702': [features.button],
     '4512703': [features.button],
-    '4512704': [features.switch_sensor],
+    '4512704': [features.switch],
     '4512705': [features.button],
     '4512706': [features.button],
     '4512719': [features.button],

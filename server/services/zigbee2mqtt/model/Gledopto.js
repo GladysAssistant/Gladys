@@ -65,7 +65,7 @@ const Gledopto = {
     'GL-S-007ZS': [features.brightness, features.color, features.color_temperature, features.light],
     'GL-S-008Z': [features.brightness, features.color, features.color_temperature, features.light],
     'GL-SD-001': [features.brightness, features.light],
-    'GL-W-001Z': [features.switch_sensor],
+    'GL-W-001Z': [features.switch],
   },
 };
 

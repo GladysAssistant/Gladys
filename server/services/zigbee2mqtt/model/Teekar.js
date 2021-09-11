@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Teekar = {
   brand: 'Teekar',
   models: {
-    'SWP86-01OG': [features.switch_sensor],
+    'SWP86-01OG': [features.switch],
   },
 };
 

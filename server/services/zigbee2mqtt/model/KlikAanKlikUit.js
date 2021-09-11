@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const KlikAanKlikUit = {
   brand: 'KlikAanKlikUit',
   models: {
-    'ZCC-3500': [features.switch_sensor],
+    'ZCC-3500': [features.switch],
   },
 };
 

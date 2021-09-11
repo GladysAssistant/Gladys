@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Honyar = {
   brand: 'Honyar',
   models: {
-    U86K31ND6: [features.switch_sensor],
+    U86K31ND6: [features.switch],
   },
 };
 

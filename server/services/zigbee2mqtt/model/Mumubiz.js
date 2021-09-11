@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Mumubiz = {
   brand: 'Mumubiz',
   models: {
-    'ZJSB9-80Z': [features.switch_sensor],
+    'ZJSB9-80Z': [features.switch],
   },
 };
 

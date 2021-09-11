@@ -7,7 +7,7 @@ const Securifi = {
   brand: 'Securifi',
   models: {
     B01M7Y8BP9: [features.button],
-    'PP-WHT-US': [features.current, features.power, features.switch_sensor, features.voltage],
+    'PP-WHT-US': [features.current, features.power, features.switch, features.voltage],
   },
 };
 

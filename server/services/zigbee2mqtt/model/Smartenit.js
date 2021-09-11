@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Smartenit = {
   brand: 'Smartenit',
   models: {
-    '4040B': [features.energy, features.power, features.switch_sensor],
+    '4040B': [features.energy, features.power, features.switch],
     'ZBHT-1': [features.humidity, features.temperature],
   },
 };

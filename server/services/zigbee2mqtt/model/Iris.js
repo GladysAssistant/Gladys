@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const Iris = {
   brand: 'Iris',
   models: {
-    '27087-03': [features.switch_sensor],
-    '3210-L': [features.current, features.power, features.switch_sensor, features.voltage],
+    '27087-03': [features.switch],
+    '3210-L': [features.current, features.power, features.switch, features.voltage],
     '3320-L': [features.door, features.temperature],
     '3326-L': [features.motion, features.temperature],
     '3450-L': [features.button],

@@ -8,9 +8,9 @@ const SalusControls = {
   models: {
     OS600: [features.door],
     // RE600: [],
-    SP600: [features.energy, features.power, features.switch_sensor],
-    SPE600: [features.energy, features.power, features.switch_sensor],
-    SR600: [features.switch_sensor],
+    SP600: [features.energy, features.power, features.switch],
+    SPE600: [features.energy, features.power, features.switch],
+    SR600: [features.switch],
     SW600: [features.door],
     WLS600: [features.water],
   },

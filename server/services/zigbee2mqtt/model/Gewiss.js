@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const Gewiss = {
   brand: 'Gewiss',
   models: {
-    GWA1521: [features.switch_sensor],
-    GWA1522: [features.switch_sensor],
+    GWA1521: [features.switch],
+    GWA1522: [features.switch],
     GWA1531: [features.door],
   },
 };
