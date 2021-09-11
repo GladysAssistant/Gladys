@@ -6,7 +6,8 @@ const { features } = require('../utils/features');
 const Swann = {
   brand: 'Swann',
   models: {
-    'SWO-KEF1PA': [features.switch_sensor],
+    'SWO-KEF1PA': [features.button],
+    'SWO-MOS1PA': [features.motion],
     'SWO-WDS1PA': [features.door],
   },
 };

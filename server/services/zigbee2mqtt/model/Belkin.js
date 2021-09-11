@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Belkin = {
   brand: 'Belkin',
   models: {
-    F7C033: [features.light, features.brightness],
+    F7C033: [features.brightness, features.light],
   },
 };
 

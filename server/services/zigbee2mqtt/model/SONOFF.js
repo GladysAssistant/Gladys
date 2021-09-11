@@ -6,10 +6,13 @@ const { features } = require('../utils/features');
 const SONOFF = {
   brand: 'SONOFF',
   models: {
+    BASICZBR3: [features.switch_sensor],
+    S31ZB: [features.switch_sensor],
     'SNZB-01': [features.button],
-    'SNZB-02': [features.temperature, features.humidity],
+    'SNZB-02': [features.humidity, features.temperature, features.voltage],
     'SNZB-03': [features.motion],
-    'SNZB-04': [features.door],
+    'SNZB-04': [features.door, features.voltage],
+    ZBMINI: [features.switch_sensor],
   },
 };
 

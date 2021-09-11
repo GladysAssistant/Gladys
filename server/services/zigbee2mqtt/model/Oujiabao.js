@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Oujiabao = {
   brand: 'Oujiabao',
   models: {
-    'CR701-YZ': [features.smoke, features.smoke],
+    'CR701-YZ': [features.smoke],
   },
 };
 

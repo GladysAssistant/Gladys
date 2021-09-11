@@ -6,7 +6,8 @@ const { features } = require('../utils/features');
 const HamptonBay = {
   brand: 'Hampton Bay',
   models: {
-    '99432': [features.switch_sensor],
+    '54668161': [features.brightness, features.color_temperature, features.light],
+    '99432': [features.brightness, features.light],
   },
 };
 

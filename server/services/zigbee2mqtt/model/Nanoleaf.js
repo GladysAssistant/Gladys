@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Nanoleaf = {
   brand: 'Nanoleaf',
   models: {
-    'NL08-0800': [features.light, features.brightness],
+    'NL08-0800': [features.brightness, features.light],
   },
 };
 

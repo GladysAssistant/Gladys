@@ -1,12 +1,18 @@
 const { features } = require('../utils/features');
 
 /**
- * RGBGenie managed models.
+ * RGB Genie managed models.
  */
 const RGBGenie = {
   brand: 'RGB Genie',
   models: {
-    'ZGRC-KEY-013': [features.switch_sensor],
+    'ZB-3009': [features.button],
+    'ZB-5001': [features.button],
+    'ZB-5004': [features.button],
+    'ZB-5028': [features.button],
+    'ZB-5121': [features.button],
+    'ZB-5122': [features.button],
+    'ZGRC-KEY-013': [features.button],
   },
 };
 

@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Danalock = {
   brand: 'Danalock',
   models: {
-    'V3-BTZB': [features.door],
+    'V3-BTZB/V3-BTZBE': [features.door],
   },
 };
 

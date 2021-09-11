@@ -6,8 +6,8 @@ const { features } = require('../utils/features');
 const SmartHomePty = {
   brand: 'Smart Home Pty',
   models: {
-    'HGZB-07A': [features.switch, features.color_temperature],
-    'HGZB-20-DE': [features.switch],
+    'HGZB-07A': [features.brightness, features.color, features.color_temperature, features.light],
+    'HGZB-20-DE': [features.switch_sensor],
   },
 };
 

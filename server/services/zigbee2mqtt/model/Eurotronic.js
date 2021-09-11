@@ -6,7 +6,7 @@ const { features } = require('../utils/features');
 const Eurotronic = {
   brand: 'Eurotronic',
   models: {
-    SPZB0001: [features.temperature], // features.heating],
+    SPZB0001: [features.temperature],
   },
 };
 

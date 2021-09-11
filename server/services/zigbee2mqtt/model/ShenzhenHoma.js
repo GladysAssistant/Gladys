@@ -6,9 +6,12 @@ const { features } = require('../utils/features');
 const ShenzhenHoma = {
   brand: 'Shenzhen Homa',
   models: {
-    'HLD812-Z-SC': [features.light, features.brightness],
-    'HLC610-Z': [features.light, features.brightness],
-    'HLC821-Z-SC': [features.light, features.brightness],
+    'HLC610-Z': [features.brightness, features.light],
+    'HLC614-ZLL': [features.switch_sensor],
+    'HLC821-Z-SC': [features.brightness, features.light],
+    'HLC833-Z-SC': [features.brightness, features.light],
+    'HLD503-Z-CT': [features.brightness, features.color_temperature, features.light],
+    'HLD812-Z-SC': [features.brightness, features.light],
   },
 };
 
