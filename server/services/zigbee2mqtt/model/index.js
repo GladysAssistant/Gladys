@@ -78,25 +78,4 @@ models.push(require('./Lonsonho').Lonsonho);
 models.push(require('./Lidl').Lidl);
 models.push(require('./Adeo').Adeo);
 
-/**
- * @description Get features by model name.
- * @param {string} modelName - Model name to find.
- * @returns {Array} Related features.
- * @example
- * getFeaturesByModel('1TST-EU');
- */
-function getFeaturesByModel(modelName) {
-  const model = models.find((m) => {
-    return m.models[modelName];
-  });
-
-  if (model) {
-    return model.models[modelName];
-  }
-
-  return [];
-}
-
-module.exports = {
-  getFeaturesByModel,
-};
+module.exports = models;

@@ -1,5 +1,24 @@
 const { features } = require('./features');
-const { getFeaturesByModel } = require('../model');
+const models = require('../model');
+
+/**
+ * @description Get features by model name.
+ * @param {string} modelName - Model name to find.
+ * @returns {Array} Related features.
+ * @example
+ * getFeaturesByModel('1TST-EU');
+ */
+function getFeaturesByModel(modelName) {
+  const model = models.find((m) => {
+    return m.models[modelName];
+  });
+
+  if (model) {
+    return model.models[modelName];
+  }
+
+  return [];
+}
 
 /**
  * @description Retreive feature related to device.
