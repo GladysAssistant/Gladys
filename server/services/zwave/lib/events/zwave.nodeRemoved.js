@@ -3,7 +3,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 
 /**
  * @description When a node is removed.
- * @param {object} node - The node removed.
+ * @param {Object} node - The node removed.
  * @example
  * zwave.on('node removed', this.nodeRemoved);
  */

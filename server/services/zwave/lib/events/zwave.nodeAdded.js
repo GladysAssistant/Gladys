@@ -3,7 +3,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 
 /**
  * @description When a node is added.
- * @param {object} node - The node added.
+ * @param {Object} node - The node added.
  * @example
  * zwave.on('node added', this.nodeAdded);
  */
@@ -24,7 +24,8 @@ function nodeAdded(node) {
     ready: false,
   };
 
-  node.on('ready', this.nodeReady.bind(this))
+  node
+    .on('ready', this.nodeReady.bind(this))
     .on('value added', this.valueAdded.bind(this))
     .on('value updated', this.valueUpdated.bind(this))
     .on('value notification', this.valueNotification.bind(this))

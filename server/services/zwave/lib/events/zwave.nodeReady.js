@@ -3,12 +3,12 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 
 /**
  * @description When a node is ready.
- * @param {object} node - Informations about the node.
+ * @param {Object} node - Informations about the node.
  * @example
  * zwave.on('node ready', this.nodeReady);
  */
 function nodeReady(node) {
-  logger.debug(`Zwave : Node Ready, nodeId = ${nodeId}`);
+  logger.debug(`Zwave : Node Ready, nodeId = ${node.id}`);
 
   const nodeId = node.id;
   this.nodes[nodeId].manufacturer = node.manufacturer;

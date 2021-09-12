@@ -48,7 +48,6 @@ async function connect(driverPath) {
     this.driver.controller.on('node removed', (node, replaced) => {
       nodeRemoved.bind(this)(node);
     });
-
   });
 
   // this.zwave.connect(this.driverPath);
