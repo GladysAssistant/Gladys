@@ -35,33 +35,20 @@ async function connect(driverPath) {
   this.driver.on('driver ready', () => {
     driverReady.bind(this)(`${this.driver.controller.homeId}`);
     this.driver.controller.nodes.forEach((node) => {
-<<<<<<< HEAD
       nodeAdded.bind(this)(node);
       if (node.ready) {
         nodeReady.bind(this)(node);
-=======
-      nodeAdded.bind(this)(node.id);
-      if (node.ready) {
-        nodeReady.bind(this)(node.id, node);
->>>>>>> 3b1c7c8c5adead09647fd7a5ca401d85c485c05f
       }
     });
 
     this.driver.controller.on('node added', (node, result) => {
-<<<<<<< HEAD
       nodeAdded.bind(this)(node);
     });
 
     this.driver.controller.on('node removed', (node, replaced) => {
       nodeRemoved.bind(this)(node);
-=======
-      nodeAdded.bind(this)(node.id);
     });
 
-    this.driver.controller.on('node removed', (node, replaced) => {
-      nodeRemoved.bind(this)(node.id);
->>>>>>> 3b1c7c8c5adead09647fd7a5ca401d85c485c05f
-    });
   });
 
   // this.zwave.connect(this.driverPath);
