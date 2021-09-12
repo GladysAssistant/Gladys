@@ -38,12 +38,12 @@ async function getConfiguration() {
       mqttUsername,
       mqttPassword,
     };
-  } else {
-    const mqttExternal = true;
-    return {
-      mqttExternal,
-    };
   }
+
+  const mqttExternal = true;
+  return {
+      mqttExternal,
+  };
 }
 
 module.exports = {

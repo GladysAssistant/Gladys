@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 const { CONFIGURATION } = require('./constants');
 const { generate } = require('../../../utils/password');
-const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { PlatformNotCompatible, ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
  * @description Prepares service and starts connection with broker if needed.
@@ -29,7 +29,7 @@ async function init() {
   if (z2mEnabled == null) {
     await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', '0', this.serviceId);
     this.z2mEnabled = false;
-  } else if (z2mEnabled == '1') {
+  } else if (z2mEnabled === '1') {
     this.z2mEnabled = true;
 
     // Test if dongle is present
@@ -38,7 +38,7 @@ async function init() {
     if (!zigbee2mqttDriverPath) {
       logger.info(`Zigbee2mqtt USB dongle not attached`);
       if (this.z2mEnabled) {
-        //await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
+        // await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
         this.z2mEnabled = false;
       }
     } else {
@@ -52,7 +52,7 @@ async function init() {
       });
       if (!this.usbConfigured) {
         logger.info(`Zigbee2mqtt USB dongle detached to ${zigbee2mqttDriverPath}`);
-        //await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
+        // await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
         this.z2mEnabled = false;
       }
     }
@@ -81,7 +81,7 @@ async function init() {
         generate(20, { number: true, lowercase: true, uppercase: true }),
         this.serviceId,
       );
-      //await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
+      // await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
       this.z2mEnabled = false;
     }
   
@@ -91,7 +91,7 @@ async function init() {
         await this.connect(configuration);
       }
     }
-  } else if (z2mEnabled == '2') {
+  } else if (z2mEnabled === '2') {
     // Loads MQTT service
     this.mqttService = this.gladys.service.getService('mqtt');
     if (!this.mqttService.device.configured) {
