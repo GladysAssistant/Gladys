@@ -9,17 +9,6 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
  */
 function nodeReady(node) {
   logger.debug(`Zwave : Node Ready, nodeId = ${nodeId}`);
-<<<<<<< Updated upstream
-  this.nodes[nodeId].manufacturer = nodeInfo.manufacturer;
-  this.nodes[nodeId].manufacturerid = nodeInfo.manufacturerId;
-  this.nodes[nodeId].product = nodeInfo.product;
-  this.nodes[nodeId].producttype = nodeInfo.productType;
-  this.nodes[nodeId].productid = nodeInfo.productId;
-  this.nodes[nodeId].type = nodeInfo.noedType;
-  this.nodes[nodeId].name = nodeInfo.name;
-<<<<<<< HEAD
-  this.nodes[nodeId].loc = nodeInfo.loc;
-=======
 
   const nodeId = node.id;
   this.nodes[nodeId].manufacturer = node.manufacturer;
@@ -30,10 +19,6 @@ function nodeReady(node) {
   this.nodes[nodeId].type = node.noedType;
   this.nodes[nodeId].name = node.name;
   this.nodes[nodeId].loc = node.location;
->>>>>>> Stashed changes
-=======
-  this.nodes[nodeId].loc = nodeInfo.location;
->>>>>>> 3b1c7c8c5adead09647fd7a5ca401d85c485c05f
   this.nodes[nodeId].ready = true;
 
   // enable poll if needed
