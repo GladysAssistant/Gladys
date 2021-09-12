@@ -8,17 +8,21 @@ const { DEFAULT } = require('./constants');
  * @example
  * connect();
  */
-async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
+async function connect({ mqttExternal, mqttUrl, mqttUsername, mqttPassword }) {
   if (this.mqttRunning) {
     // Loads MQTT service
     logger.log('Connecting Gladys to ', mqttUrl);
 
-    this.mqttClient = this.mqttLibrary.connect(mqttUrl, {
-      username: mqttUsername,
-      password: mqttPassword,
-      reconnectPeriod: 5000,
-      clientId: `gladys-main-instance-${Math.floor(Math.random() * 1000000)}`,
-    });
+    if (mqttExternal) {
+      this.mqttClient = this.mqttService.device.mqttClient;
+    } else {
+      this.mqttClient = this.mqttLibrary.connect(mqttUrl, {
+        username: mqttUsername,
+        password: mqttPassword,
+        reconnectPeriod: 5000,
+        clientId: `gladys-main-instance-${Math.floor(Math.random() * 1000000)}`,
+      });
+    }
 
     this.mqttClient.on('connect', () => {
       logger.info('Connected to MQTT container', mqttUrl);
