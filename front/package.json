@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^3.5.0",
-    "@gladysassistant/theme-optimized": "^1.0.2",
+    "@gladysassistant/theme-optimized": "^1.0.3",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "^4.5.0",
     "apexcharts": "^3.27.3",

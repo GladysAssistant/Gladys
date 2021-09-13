@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
 import { Text } from 'preact-i18n';
 import { RequestStatus } from '../../../utils/consts';
 import update from 'immutability-helper';
@@ -150,14 +151,38 @@ class UserPresenceComponent extends Component {
       });
     }
   };
+  refreshRelativeTime = () => {
+    if (this.state.usersWithPresence && this.state.usersWithPresence.length > 0) {
+      const usersWithPresence = this.state.usersWithPresence.map(user => {
+        user.last_house_changed_relative_to_now = dayjs(user.last_house_changed)
+          .locale(this.props.user.language)
+          .fromNow();
+        return user;
+      });
+      this.setState({ usersWithPresence });
+    }
+  };
   componentDidMount() {
     this.getUsersWithPresence();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, payload =>
-      this.userChanged(payload)
-    );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, payload =>
-      this.userChanged(payload)
-    );
+    // refresh every minute the relative time
+    this.interval = setInterval(() => {
+      this.refreshRelativeTime();
+    }, 60 * 1000);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, this.userChanged);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.userChanged);
+  }
+
+  componentDidUpdate(previousProps) {
+    const usersChanged = get(previousProps, 'box.users') !== get(this.props, 'box.users');
+    if (usersChanged) {
+      this.getUsersWithPresence();
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, this.userChanged);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.userChanged);
   }
 
   render(props, { usersWithPresence, dashboardUserPresenceGetUsersStatus }) {
