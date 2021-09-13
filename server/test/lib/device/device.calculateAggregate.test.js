@@ -58,6 +58,33 @@ describe('Device.calculateAggregate', function Before() {
     // Max number of events
     expect(deviceFeatureStates.length).to.equal(3600);
   });
+  it('should calculate hourly aggregate with retention policy instead of last aggregate', async () => {
+    await insertStates(false);
+    const deviceFeaturesInDb = await db.DeviceFeature.findAll();
+    deviceFeaturesInDb[0].update({
+      // old date
+      last_hourly_aggregate: new Date(2010, 10, 10),
+    });
+    const variable = {
+      // we modify the retention policy to take the last 5 days only (for testing)
+      getValue: fake.resolves('5'),
+    };
+    const device = new Device(event, {}, {}, {}, {}, variable);
+    await device.calculateAggregate('hourly');
+  });
+  it('should calculate hourly aggregate with last aggregate from device', async () => {
+    await insertStates(false);
+    const deviceFeaturesInDb = await db.DeviceFeature.findAll();
+    deviceFeaturesInDb[0].update({
+      last_hourly_aggregate: new Date(),
+    });
+    const variable = {
+      // we modify the retention policy to take the last 1000 days (for testing)
+      getValue: fake.resolves('1000'),
+    };
+    const device = new Device(event, {}, {}, {}, {}, variable);
+    await device.calculateAggregate('hourly');
+  });
   it('should calculate daily aggregate', async () => {
     await insertStates(true);
     const variable = {
