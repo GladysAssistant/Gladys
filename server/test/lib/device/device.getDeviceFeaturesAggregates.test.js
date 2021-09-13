@@ -1,5 +1,5 @@
 const EventEmitter = require('events');
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const uuid = require('uuid');
 const { fake } = require('sinon');
 const db = require('../../../models');
@@ -61,6 +61,16 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const states = await device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100);
     expect(states).to.have.lengthOf(100);
   });
+  it('should return last day states', async () => {
+    await insertStates(4 * 24 * 60);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const device = new Device(event, {}, {}, {}, {}, variable);
+    await device.calculateAggregate('hourly');
+    const states = await device.getDeviceFeaturesAggregates('test-device-feature', 3 * 24 * 60, 100);
+    expect(states).to.have.lengthOf(72);
+  });
   it('should return last month states', async () => {
     await insertStates(2 * 30 * 24 * 60);
     const variable = {
@@ -83,5 +93,13 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     await device.calculateAggregate('monthly');
     const states = await device.getDeviceFeaturesAggregates('test-device-feature', 365 * 24 * 60, 100);
     expect(states).to.have.lengthOf(100);
+  });
+  it('should return error, device feature doesnt exist', async () => {
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const device = new Device(event, {}, {}, {}, {}, variable);
+    const promise = device.getDeviceFeaturesAggregates('this-device-does-not-exist', 365 * 24 * 60, 100);
+    return assert.isRejected(promise, 'DeviceFeature not found');
   });
 });
