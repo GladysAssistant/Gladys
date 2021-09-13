@@ -44,7 +44,7 @@ class RelativeTime extends Component {
   }
 
   render(props, { relativeTime }) {
-    return <div>{relativeTime}</div>;
+    return relativeTime;
   }
 }
 

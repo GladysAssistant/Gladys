@@ -26,14 +26,18 @@ const SensorDeviceType = ({ children, ...props }) => (
     <td>{props.deviceFeature.name}</td>
     {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
       <td class="text-right">
-        {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
-        {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-        {props.deviceFeature.last_value !== null && (
-          <span>
-            {' '}
-            <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
+        <div>
+          {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
+          <span class="badge badge-warning">
+            {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
           </span>
-        )}
+          {props.deviceFeature.last_value !== null && (
+            <span>
+              {' '}
+              <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
+            </span>
+          )}
+        </div>
       </td>
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
@@ -44,10 +48,14 @@ const SensorDeviceType = ({ children, ...props }) => (
     )}
     {LAST_SEEN_SENSORS.includes(props.deviceFeature.category) && (
       <td class="text-right">
-        {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-        {props.deviceFeature.last_value_changed && (
-          <RelativeTime datetime={props.deviceFeature.last_value_changed} language={props.user.language} />
-        )}
+        <div>
+          {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+          {props.deviceFeature.last_value_changed && (
+            <span class="badge badge-info">
+              <RelativeTime datetime={props.deviceFeature.last_value_changed} language={props.user.language} />
+            </span>
+          )}
+        </div>
       </td>
     )}
   </tr>
