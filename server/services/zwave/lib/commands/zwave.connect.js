@@ -14,6 +14,7 @@ const { nodeReady } = require('../events/zwave.nodeReady');
  */
 async function connect(driverPath) {
   const ZWaveJS = require('zwave-js');
+
   logger.debug(`Zwave : Connecting to USB = ${driverPath}`);
   // special case for macOS
   if (os.platform() === 'darwin') {
@@ -34,18 +35,18 @@ async function connect(driverPath) {
   this.driver.on('driver ready', () => {
     driverReady.bind(this)(`${this.driver.controller.homeId}`);
     this.driver.controller.nodes.forEach((node) => {
-      nodeAdded.bind(this)(node.id);
+      nodeAdded.bind(this)(node);
       if (node.ready) {
-        nodeReady.bind(this)(node.id, node);
+        nodeReady.bind(this)(node);
       }
     });
 
     this.driver.controller.on('node added', (node, result) => {
-      nodeAdded.bind(this)(node.id);
+      nodeAdded.bind(this)(node);
     });
 
     this.driver.controller.on('node removed', (node, replaced) => {
-      nodeRemoved.bind(this)(node.id);
+      nodeRemoved.bind(this)(node);
     });
   });
 

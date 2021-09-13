@@ -9,7 +9,7 @@ const nodesData = require('./nodesData.json');
 const nodesExpectedResult = require('./nodesExpectedResult.json');
 
 describe('zwaveManager commands', () => {
-  const zwaveManager = new ZwaveManager(ZwaveMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+  const zwaveManager = new ZwaveManager(ZwaveMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   zwaveManager.connected = true;
   it('should connect to zwave driver', () => {
     zwaveManager.connect('/dev/tty1');
@@ -68,7 +68,7 @@ describe('zwaveManager commands', () => {
 });
 
 describe('zwaveManager events', () => {
-  const zwaveManager = new ZwaveManager(ZwaveMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+  const zwaveManager = new ZwaveManager(ZwaveMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   it('should receive controllerCommand', () => {
     zwaveManager.controllerCommand(1, 1, 1, 'message');
   });
@@ -125,8 +125,8 @@ describe('zwaveManager events', () => {
       value: 0,
     });
   });
-  it('should receive value changed', () => {
-    zwaveManager.valueChanged(1, 10, {
+  it('should receive value updated', () => {
+    zwaveManager.valueUpdated(1, 10, {
       value_id: '5-32-1-0',
       node_id: 5,
       class_id: 32,
