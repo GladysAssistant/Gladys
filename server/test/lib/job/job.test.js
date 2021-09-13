@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const chaiAssert = require('chai').assert;
 const sinon = require('sinon');
 
 const { fake, assert } = sinon;
@@ -23,6 +24,14 @@ describe('Job', () => {
         payload: newJob,
       });
     });
+    it('should not create a job, invalid type', async () => {
+      const promise = job.start('THIS_JOB_TYPES_DOESNT_EXIST');
+      return chaiAssert.isRejected(promise, 'Validation error: Validation isIn on type failed');
+    });
+    it('should not create a job, invalid data', async () => {
+      const promise = job.start(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE, []);
+      return chaiAssert.isRejected(promise, 'Validation error: "value" must be an object');
+    });
   });
   describe('job.finish', () => {
     const job = new Job(event);
@@ -44,6 +53,16 @@ describe('Job', () => {
         type: WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED,
         payload: updatedJob,
       });
+    });
+    it('should not update the progress a job, invalid progress', async () => {
+      const newJob = await job.start(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE);
+      const promise = job.updateProgress(newJob.id, 101);
+      return chaiAssert.isRejected(promise, 'Validation error: Validation max on progress failed');
+    });
+    it('should not update the progress a job, invalid progress', async () => {
+      const newJob = await job.start(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE);
+      const promise = job.updateProgress(newJob.id, -1);
+      return chaiAssert.isRejected(promise, 'Validation error: Validation min on progress failed');
     });
   });
   describe('job.get', () => {

@@ -14,16 +14,22 @@ module.exports = (sequelize, DataTypes) => {
       },
       type: {
         allowNull: false,
-        type: DataTypes.ENUM(JOB_TYPES_LIST),
+        type: DataTypes.STRING,
+        validate: {
+          isIn: [JOB_TYPES_LIST],
+        },
       },
       status: {
         allowNull: false,
-        type: DataTypes.ENUM(JOB_STATUS_LIST),
+        type: DataTypes.STRING,
+        validate: {
+          isIn: [JOB_STATUS_LIST],
+        },
       },
       progress: {
         allowNull: false,
         type: DataTypes.INTEGER,
-        validator: {
+        validate: {
           min: 0,
           max: 100,
         },
