@@ -151,9 +151,23 @@ class UserPresenceComponent extends Component {
       });
     }
   };
-
+  refreshRelativeTime = () => {
+    if (this.state.usersWithPresence && this.state.usersWithPresence.length > 0) {
+      const usersWithPresence = this.state.usersWithPresence.map(user => {
+        user.last_house_changed_relative_to_now = dayjs(user.last_house_changed)
+          .locale(this.props.user.language)
+          .fromNow();
+        return user;
+      });
+      this.setState({ usersWithPresence });
+    }
+  };
   componentDidMount() {
     this.getUsersWithPresence();
+    // refresh every minute the relative time
+    this.interval = setInterval(() => {
+      this.refreshRelativeTime();
+    }, 60 * 1000);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, this.userChanged);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.userChanged);
   }
@@ -166,6 +180,7 @@ class UserPresenceComponent extends Component {
   }
 
   componentWillUnmount() {
+    clearInterval(this.interval);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.BACK_HOME, this.userChanged);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME, this.userChanged);
   }
