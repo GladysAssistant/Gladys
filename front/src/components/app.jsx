@@ -17,6 +17,8 @@ import Login from '../routes/login';
 import Error from '../routes/error';
 import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
+
+// Gateway
 import LoginGateway from '../routes/login-gateway';
 import LinkGatewayUser from '../routes/gateway-setup';
 import SignupGateway from '../routes/signup-gateway';
@@ -24,6 +26,7 @@ import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
+import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -234,6 +237,7 @@ const AppRouter = connect(
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+        <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
         <MapNewAreaPage path="/dashboard/maps/area/new" />

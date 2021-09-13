@@ -710,6 +710,20 @@
       "saveError": "Une erreur s'est produite lors de la sauvegarde.",
       "documentation": "Documentation Zigbee2mqtt"
     },
+    "googleHome": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Voulez-vous connecter Gladys Assistant à Google ?",
+      "description": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
+      "error": "Une erreur est survenue. Merci de réessayer.",
+      "connectedAs": "Connecté en tant que",
+      "googleWillBeAble": "Google pourra :",
+      "seeDevices": "Lister les appareils présents chez vous",
+      "controlDevices": "Contrôler vos appareils",
+      "getNewDeviceValues": "Récupérer périodiquement les états de vos appareils",
+      "privacyPolicy": "Lire la <a href=\"http://policies.google.com/?hl=fr\">politique de confidentialité de Google</a>.",
+      "cancelButton": "Annuler",
+      "connectButton": "Lier"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Contrôlez vos appareils Z-Wave.",
@@ -1487,24 +1501,17 @@
     "gatewayConnectedSuccessTitle": "Gladys Plus est connecté avec succès !",
     "gatewayConnectedSuccessDescription": "Votre instance de Gladys s'est connectée avec succès.",
     "gatewayConnectedSuccessBackupKey": "Une sauvegarde sera faite chaque jour, encodée avec la clé suivante. Ainsi vous pourrez restaurer votre instance plus tard, merci d'enregistrer cette clé de chiffrement quelque part, en dehors de Gladys. Sans cette clé, il vous sera impossible de restaurer Gladys.",
-    "gatewayConnectedSuccessButton": "J'ai enregistré la clé de sauvegarde !"
+    "gatewayConnectedSuccessButton": "J'ai enregistré la clé de sauvegarde !",
+    "accountExpired": "Votre compte Gladys Plus a expiré. Pour réactiver votre compte, merci de mettre à jour votre moyen de paiement dans <a href=\"/dashboard/settings/billing\">l'onglet facturation</a>."
   },
   "gatewayPricing": {
-    "pricingTitle": "Tarification",
-    "pricingSentence": "Gladys Assistant est gratuit à utiliser, mais vous pouvez vous abonner à Gladys Plus pour des fonctionnalités supplémentaires !",
-    "free": "Gratuit",
-    "gladysPlus": "Gladys Plus",
-    "currentPlan": "Choix actuel",
-    "subscribeButton": "Abonnez-vous (9,99 € / mois)",
-    "alreadyGladysPlusSubscriber": "Déjà abonné Gladys Plus ? Cliquez ici pour vous identifier.",
-    "openSourceSoftware": "Logiciel Open-Source",
-    "endToEndEncryptedRemoteAccess": "Accès à distance chiffré de bout en bout",
-    "dailyEncryptedBackups": "Sauvegardes chiffrées quotidiennes",
-    "oneClickRestore": "Restauration en un clic",
-    "remoteWebhooks": "Webhooks à distance",
-    "ownTracksApiServer": "Serveur API Owntracks",
-    "privateSlackCommunity": "Communauté Slack privée",
-    "supportOpenSourceSoftware": "Support logiciel Open-Source"
+    "pricingTitle": "Gladys Plus",
+    "pricingSentence": "Gladys Assistant est gratuit à utiliser, mais vous pouvez vous abonner à Gladys Plus pour des fonctionnalités supplémentaires tel que l'accès à distance chiffré de bout en bout, les sauvegardes automatiques, l'accès à une API REST ouverte accessible de partout dans le monde.",
+    "whyIsGladysPlusPaid": "Pourquoi Gladys Plus est-il payant et pas gratuit comme Gladys ?",
+    "whyIsGladysPlusPaidAnswer": "Gladys Plus est un service en ligne qui a des coûts: hébergement, bande passante, stockage, développement et maintenance. Pour supporter ces coûts, nous préférons demander une modeste participation mensuelle plutôt que de mettre de la publicité, ou vendre les données des utilisateurs: ce n'est pas la philosophie du projet ! Nous sommes des fervents défenseurs du libre, et souhaitons que chacun reste propriétaire de ses données, surtout quand cela touche à un sujet aussi important que la maison connectée.",
+    "supportOpenSource": "En vous abonnant à Gladys Plus, vous supportez le développement d'une alternative open-source et respectueuse de la vie privée. Merci d'avance pour votre soutien ! 🙂",
+    "knowMoreButton": "En savoir plus sur Gladys Plus",
+    "alreadyGladysPlusSubscriber": "Déjà abonné Gladys Plus ? Cliquez ici pour vous identifier !"
   },
   "gatewayLogin": {
     "cardTitle": "Connexion à Gladys Plus",
@@ -1535,7 +1542,8 @@
     "restoreButton": "Restaurer",
     "confirmRestore": "Confirmer",
     "cancelRestore": "Annuler",
-    "restoreInProgressTitle": "Restauration de la sauvegarde en cours ...",
+    "restoreInProgressTitle": "Restauration de la sauvegarde en cours...",
+    "gladysRestartingTitle": "Gladys Assistant est entrain de redémarrer...",
     "backupNowButton": "Sauvegarder maintenant",
     "backupStarted": "Début de la sauvegarde...",
     "notConfigured": "Gladys Plus doit être configuré pour activer les sauvegardes. Accédez à l'onglet Gladys Plus pour le configurer.",
