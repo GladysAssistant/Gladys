@@ -18,11 +18,15 @@ const PAGES_WITHOUT_HEADER = [
   '/signup-gateway',
   '/subscribe-gateway',
   '/gateway-configure-two-factor',
-  '/confirm-email'
+  '/confirm-email',
+  '/dashboard/integration/device/google-home/authorize'
 ];
 
 const Header = ({ ...props }) => {
   if (isUrlInArray(props.currentUrl, PAGES_WITHOUT_HEADER)) {
+    return null;
+  }
+  if (props.fullScreen) {
     return null;
   }
   return (

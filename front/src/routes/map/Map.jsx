@@ -77,7 +77,6 @@ class MapComponent extends Component {
               })
             })
             .addTo(this.leafletMap);
-          this.markerArray.push(this.houseMarkers[house.id]);
         }
       });
     }
@@ -103,8 +102,6 @@ class MapComponent extends Component {
         this.areaMarkers[area.id].on('click', () => {
           route(`/dashboard/maps/area/edit/${area.selector}`);
         });
-
-        this.markerArray.push(this.areaMarkers[area.id]);
       });
     }
   };

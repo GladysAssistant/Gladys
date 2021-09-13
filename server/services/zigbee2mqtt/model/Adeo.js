@@ -6,9 +6,9 @@ const { features } = require('../utils/features');
 const Adeo = {
   brand: 'Adeo',
   models: {
-    '9CZA-A806ST-Q1A': [features.light, features.brightness, features.color_temperature], // color xy
-    '9CZA-M350ST-Q1A': [features.light, features.brightness, features.color_temperature], // color xy
-    '9CZA-G1521-Q1A': [features.light, features.brightness, features.color_temperature], // color xy
+    '9CZA-A806ST-Q1A': [features.light, features.brightness, features.color_temperature, features.color],
+    '9CZA-M350ST-Q1A': [features.light, features.brightness, features.color_temperature, features.color],
+    '9CZA-G1521-Q1A': [features.light, features.brightness, features.color_temperature, features.color],
   },
 };
 

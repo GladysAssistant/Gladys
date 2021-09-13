@@ -7,6 +7,15 @@
 	no-store,
 	must-revalidate'''
 
+[[headers]]
+  for = "/sw-esm.js"
+  [headers.values]
+	cache-control = '''
+	max-age=0,
+	no-cache,
+	no-store,
+	must-revalidate'''
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
