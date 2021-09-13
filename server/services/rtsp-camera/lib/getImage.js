@@ -42,7 +42,7 @@ async function getImage(device) {
       '-vf scale=640:-1', // resize the image with max width = 640
       '-qscale:v 15', //  Effective range for JPEG is 2-31 with 31 being the worst quality.
     ];
-    if (cameraRotationParam.value === 'on') {
+    if (cameraRotationParam.value === 1) {
       outputOptions.push('-vf hflip,vflip'); // Rotate 180
     }
     // and send a camera thumbnail to this stream
