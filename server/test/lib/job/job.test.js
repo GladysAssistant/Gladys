@@ -43,6 +43,10 @@ describe('Job', () => {
         payload: updatedJob,
       });
     });
+    it('should not finish job, job doesnt exist', async () => {
+      const promise = job.finish('JOB_DOESNT_EXIST', JOB_STATUS.SUCCESS, {});
+      return chaiAssert.isRejected(promise, 'Job not found');
+    });
   });
   describe('job.updateProgress', () => {
     const job = new Job(event);
