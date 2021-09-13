@@ -3,9 +3,8 @@ import { connect } from 'unistore/preact';
 import actions from '../../../actions/createScene';
 import NewScenePage from './NewScenePage';
 
-@connect('newScene,newSceneErrors,createSceneStatus', actions)
 class NewScene extends Component {
-  componentWillMount() {
+  componentDidMount() {
     this.props.initScene();
   }
 
@@ -14,4 +13,4 @@ class NewScene extends Component {
   }
 }
 
-export default NewScene;
+export default connect('newScene,newSceneErrors,createSceneStatus', actions)(NewScene);

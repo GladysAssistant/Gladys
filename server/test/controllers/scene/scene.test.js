@@ -42,6 +42,7 @@ describe('GET /api/v1/scene', () => {
             id: '3a30636c-b3f0-4251-a347-90787f0fe940',
             name: 'Test scene',
             icon: 'fe fe-bell',
+            active: true,
             selector: 'test-scene',
             last_executed: null,
             updated_at: '2019-02-12T07:49:07.556Z',

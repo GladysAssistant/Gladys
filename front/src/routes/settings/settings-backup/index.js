@@ -3,10 +3,6 @@ import { connect } from 'unistore/preact';
 import GatewayBackupPage from './GatewayBackupPage';
 import actions from '../../../actions/gateway';
 
-@connect(
-  'user,gatewayStatus,gatewayBackups,gatewayRestoreInProgress,gatewayCreateBackupStatus,gatewayRestoreErrored',
-  actions
-)
 class SettingsGateway extends Component {
   componentWillMount() {
     this.props.getStatus();
@@ -19,4 +15,7 @@ class SettingsGateway extends Component {
   }
 }
 
-export default SettingsGateway;
+export default connect(
+  'user,gatewayStatus,gatewayBackups,gatewayRestoreInProgress,gatewayCreateBackupStatus,gatewayRestoreErrored,gatewayGladysRestarting',
+  actions
+)(SettingsGateway);

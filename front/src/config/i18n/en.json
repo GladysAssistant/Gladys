@@ -178,11 +178,18 @@
   "dashboard": {
     "title": "Dashboard",
     "editDashboardButton": "Edit",
+    "newDashboardButton": "New",
+    "enableFullScreen": "Full screen",
+    "disableFullScreen": "Exit full screen",
+    "editDashboardTitle": "Edit dashboard",
+    "editDashboardDeleteButton": "Delete",
     "editDashboardCancelButton": "Cancel",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
+    "noDashboardSentenceBottom": "Click on the \"New\" button to create a new dashboard",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
+    "editDashboardNameLabel": "Name",
     "boxTitle": {
       "weather": "Weather",
       "temperature-in-room": "Temperature in room",
@@ -226,12 +233,12 @@
         "noHumidityRecorded": "No humidity recorded recently."
       },
       "userPresence": {
-        "description": "Display who's at home and who is not. You can change the user presence in scenes.",
+        "description": "Display who's at home and who is not. You can change the user presence in scenes, and select here the users displayed.",
         "left": "Left ({{since}})",
         "atHome": "At Home",
         "neverSeenAtHome": "Never Seen At Home",
         "error": "There was a network error fetching the list of user. Please refresh.",
-        "emptyText": "There are no users to display here. You can add users in Gladys settings."
+        "emptyText": "There are no users selected. You can edit this box to select the users to display."
       },
       "camera": {
         "editCameraLabel": "Select the camera you want to display here.",
@@ -240,6 +247,15 @@
         "editBoxNamePlaceholder": "Name of the box"
       }
     }
+  },
+  "newDashboard": {
+    "cardTitle": "Create a new dashboard",
+    "description": "You can create as many dashboard as you want, so you can better organize the data you want to display.",
+    "nameLabel": "Name",
+    "dashboardAlreadyExist": "A dashboard with this name already exists.",
+    "unknownError": "An unknown error occured. Please retry!",
+    "validationError": "Dashboard created is not valid, did you fill all the boxes correctly?",
+    "createDashboardButton": "Create"
   },
   "integration": {
     "root": {
@@ -482,6 +498,20 @@
       "saveError": "There was an error saving the device.",
       "documentation": "Zigbee2mqtt documentation"
     },
+    "googleHome": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Do you want to connect Gladys Assistant to Google?",
+      "description": "By signin in, you are authorizing Google to access your devices.",
+      "error": "An error occured. Please retry !",
+      "connectedAs": "Connected as",
+      "googleWillBeAble": "Google will be able:",
+      "seeDevices": "List all your devices",
+      "controlDevices": "Control all your devices",
+      "getNewDeviceValues": "Periodically refresh your device states",
+      "privacyPolicy": "Read Google's <a href=\"http://policies.google.com/?hl=en\">privacy policy</a>.",
+      "cancelButton": "Cancel",
+      "connectButton": "Link"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Control your Z-Wave devices.",
@@ -530,7 +560,12 @@
         "createGithubIssue": "Report a bug with this device"
       },
       "network": {
-        "title": "Z-Wave Network"
+        "title": "Z-Wave Network",
+        "nodeId": "ID",
+        "nodeName": "Name",
+        "nodeNeighbors": "Neighbors",
+        "nodeAsleep": "Node might be asleep or dead",
+        "node": "Node"
       },
       "settings": {
         "title": "Z-Wave Settings",
@@ -909,6 +944,11 @@
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",
         "deviceLabel": "Select a device"
       },
+      "deviceSetValue": {
+        "description": "This action let you control a device.",
+        "deviceLabel": "Device",
+        "valueLabel": "Value"
+      },
       "onlyContinueIf": {
         "variableLabel": "Variable",
         "operatorLabel": "Operator",
@@ -969,7 +1009,8 @@
     },
     "actions": {
       "device": {
-        "get-value": "Get device value"
+        "get-value": "Get device value",
+        "set-value": "Set device value"
       },
       "message": {
         "send": "Send Message"
@@ -1375,24 +1416,17 @@
     "gatewayConnectedSuccessTitle": "Gladys Plus connected with success!",
     "gatewayConnectedSuccessDescription": "Your Gladys instance was successfully connected.",
     "gatewayConnectedSuccessBackupKey": "It'll backup automatically everyday, encrypted with the following key. So you can restore your instance later, please save this encryption key somewhere, outside of Gladys. Without this key, you will not be able to restore Gladys.",
-    "gatewayConnectedSuccessButton": "I saved the backup key!"
+    "gatewayConnectedSuccessButton": "I saved the backup key!",
+    "accountExpired": "Your Gladys Plus account has expired. To renew your subscription, you can go to the <a href=\"/dashboard/settings/billing\">billing tab</a>."
   },
   "gatewayPricing": {
-    "pricingTitle": "Pricing",
-    "pricingSentence": "Gladys Assistant is free to use, but you can subscribe to Gladys Plus for additional premium features!",
-    "free": "Free",
-    "gladysPlus": "Gladys Plus",
-    "currentPlan": "Current Plan",
-    "subscribeButton": "Subscribe (9.99€/month/house)",
-    "alreadyGladysPlusSubscriber": "Already a Gladys Plus Subscriber? Click here to login.",
-    "openSourceSoftware": "Open-Source Software",
-    "endToEndEncryptedRemoteAccess": "End-to-End Encrypted Remote Access",
-    "dailyEncryptedBackups": "Daily Encrypted Backups",
-    "oneClickRestore": "One-click Restore",
-    "remoteWebhooks": "Remote Webhooks",
-    "ownTracksApiServer": "Owntracks API Server",
-    "privateSlackCommunity": "Private Slack Community",
-    "supportOpenSourceSoftware": "Support Open-Source Software"
+    "pricingTitle": "Gladys Plus",
+    "pricingSentence": "Gladys Assistant is free to use, but you can subscribe to Gladys Plus for additional premium features like end-to-end encrypted remote access, automatic backups and access to a REST API accessible from anywhere in the world.",
+    "whyIsGladysPlusPaid": "Why is Gladys Plus paid and not free like Gladys?",
+    "whyIsGladysPlusPaidAnswer": "Gladys Plus is an online service that has cost: hosting, bandwidth, storage, development and maintenance. To support those costs, we prefer asking for a monthly fee rather than adding ads or selling users data: it's not the philosophy of the project. We respect our users privacy, and want them to own their data at home.",
+    "supportOpenSource": "By subscribing to Gladys Plus, you are supporting the development of a privacy-friendly & open-source alternative. Thanks for your support ! 🙂",
+    "knowMoreButton": "Read more about Gladys Plus",
+    "alreadyGladysPlusSubscriber": "Already a Gladys Plus Subscriber? Click here to login!"
   },
   "gatewayLogin": {
     "cardTitle": "Login to your Gladys Plus account",
@@ -1424,6 +1458,7 @@
     "confirmRestore": "Confirm",
     "cancelRestore": "Cancel",
     "restoreInProgressTitle": "Restoring backup in progress...",
+    "gladysRestartingTitle": "Gladys Assistant is restarting...",
     "backupNowButton": "Backup now",
     "backupStarted": "Backup started...",
     "notConfigured": "Gladys Plus need to be configured to enable backups. Go to the Gladys Plus tab to configure it.",

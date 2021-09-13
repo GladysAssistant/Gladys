@@ -1,77 +1,62 @@
-import { Component } from 'preact';
 import { Text } from 'preact-i18n';
-import { Network } from 'vis-network';
 import { RequestStatus } from '../../../../../utils/consts';
 
-class NetworkTab extends Component {
-  setNetworkInput(input) {
-    this.networkInput = input;
-  }
+const NetworkTab = ({ children, ...props }) => {
+  const zwaveNotConfigured = props.zwaveGetNeighborsStatus === RequestStatus.ServiceNotConfigured;
+  const { zwaveNodesNeighbors } = props;
 
-  constructor(props) {
-    super(props);
-
-    this.setNetworkInput = this.setNetworkInput.bind(this);
-  }
-
-  componentDidUpdate() {
-    const { zwaveNodesNeighbors } = this.props;
-    if (zwaveNodesNeighbors) {
-      const nodes = zwaveNodesNeighbors.map(node => ({
-        id: node.id,
-        label: node.product
-      }));
-
-      const edges = [];
-
-      const alreadyIn = {};
-
-      zwaveNodesNeighbors.forEach(node => {
-        node.neighbors.forEach(neighborId => {
-          if (!alreadyIn[`${neighborId}-${node.id}`]) {
-            edges.push({
-              from: node.id,
-              to: neighborId
-            });
-            alreadyIn[`${node.id}-${neighborId}`] = true;
-          }
-        });
-      });
-
-      // provide the data in the vis format
-      let data = {
-        nodes,
-        edges
-      };
-      let options = {};
-      new Network(this.networkInput, data, options);
-    }
-  }
-
-  render(props) {
-    const zwaveNotConfigured = props.zwaveGetNeighborsStatus === RequestStatus.ServiceNotConfigured;
-    return (
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">
-            <Text id="integration.zwave.network.title" />
-          </h3>
-        </div>
-        {zwaveNotConfigured && (
-          <div class="alert alert-warning">
-            <Text id="integration.zwave.setup.zwaveNotConfiguredError" />
-          </div>
-        )}
-        <div
-          ref={this.setNetworkInput}
-          style={{
-            width: '100%',
-            height: '400px'
-          }}
-        />
+  return (
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">
+          <Text id="integration.zwave.network.title" />
+        </h3>
       </div>
-    );
-  }
-}
+      {zwaveNotConfigured && (
+        <div class="alert alert-warning">
+          <Text id="integration.zwave.setup.zwaveNotConfiguredError" />
+        </div>
+      )}
+      <table class="table card-table table-vcenter">
+        <thead>
+          <tr>
+            <th>
+              <Text id="integration.zwave.network.nodeId" />
+            </th>
+            <th>
+              <Text id="integration.zwave.network.nodeName" />
+            </th>
+            <th>
+              <Text id="integration.zwave.network.nodeNeighbors" />
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {zwaveNodesNeighbors &&
+            zwaveNodesNeighbors.map(node => (
+              <tr>
+                <td>{node.id}</td>
+                <td>
+                  {node.product}
+                  {!node.product && (
+                    <span class="badge badge-warning">
+                      <Text id="integration.zwave.network.nodeAsleep" />
+                    </span>
+                  )}
+                </td>
+                <td>
+                  {node.neighbors.map(neighbor => (
+                    <span class="badge badge-secondary mr-2">
+                      <Text id="integration.zwave.network.node" /> {neighbor}
+                    </span>
+                  ))}
+                </td>
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
 export default NetworkTab;

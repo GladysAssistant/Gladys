@@ -90,6 +90,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.ENUM(iconList),
       },
+      active: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
       selector: {
         allowNull: false,
         unique: true,

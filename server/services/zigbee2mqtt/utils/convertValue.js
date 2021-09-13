@@ -1,9 +1,10 @@
+const { xyToInt } = require('../../../utils/colors');
 const { BUTTON_STATUS } = require('../../../utils/constants');
 
 /**
  * @description Convert Zigbee2mqtt device value into Gladys value.
  * @param {string} feature - Device feature.
- * @param {number|string|boolean} value - Device value.
+ * @param {number|string|boolean|Object} value - Device value.
  * @returns {number|string|boolean} Gladys value.
  * @example
  * convertValue('state', 'ON');
@@ -16,6 +17,12 @@ function convertValue(feature, value) {
       result = value === 'ON' || value === 'true' || value === true ? 1 : 0;
       break;
     }
+
+    case 'color': {
+      result = xyToInt(value.x, value.y);
+      break;
+    }
+
     // Case for Button devices
     case 'click': {
       switch (value) {

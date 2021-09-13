@@ -31,7 +31,8 @@ function addScene(sceneRaw) {
   // first, if the scene actually exist, we cancel all triggers
   this.cancelTriggers(scene.selector);
   // Foreach triggger, we schedule jobs for triggers that need to be scheduled
-  if (scene.triggers) {
+  // only if the scene is active
+  if (scene.triggers && scene.active) {
     scene.triggers.forEach((trigger) => {
       // First, we had a trigger key, import to uniquely identify this trigger
       trigger.key = uuid.v4();
