@@ -1,10 +1,6 @@
 import { Text } from 'preact-i18n';
 import get from 'get-value';
-import cx from 'classnames';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-
-dayjs.extend(relativeTime);
+import RelativeTime from '../../../device/RelativeTime';
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
@@ -29,7 +25,7 @@ const SensorDeviceType = ({ children, ...props }) => (
     </td>
     <td>{props.deviceFeature.name}</td>
     {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
-      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
+      <td class="text-right">
         {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
         {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
         {props.deviceFeature.last_value !== null && (
@@ -47,12 +43,11 @@ const SensorDeviceType = ({ children, ...props }) => (
       </td>
     )}
     {LAST_SEEN_SENSORS.includes(props.deviceFeature.category) && (
-      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value_changed })}>
+      <td class="text-right">
         {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-        {props.deviceFeature.last_value_changed &&
-          dayjs(props.deviceFeature.last_value_changed)
-            .locale(props.user.language)
-            .fromNow()}
+        {props.deviceFeature.last_value_changed && (
+          <RelativeTime datetime={props.deviceFeature.last_value_changed} language={props.user.language} />
+        )}
       </td>
     )}
   </tr>
