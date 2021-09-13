@@ -26,27 +26,25 @@ async function getConfiguration() {
     }
   }
 
-  if (this.dockerBased) {
-    const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
-    const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
-    const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
-    const mqttExternal = false;
+  
+  const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
+  const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
+  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
+  const mqttExternal = !this.dockerBased;
 
-    return {
-      mqttExternal,
-      mqttUrl,
-      mqttUsername,
-      mqttPassword,
-    };
-  }
-
-  const mqttExternal = true;
   return {
+<<<<<<< HEAD
 <<<<<<< HEAD
     mqttExternal,
 =======
       mqttExternal,
 >>>>>>> origin/External-zigbee2mqtt
+=======
+    mqttExternal,
+    mqttUrl,
+    mqttUsername,
+    mqttPassword,
+>>>>>>> 76656e7e264afb121d4a48d10324e340d4939eea
   };
 }
 
