@@ -26,7 +26,6 @@ async function getConfiguration() {
     }
   }
 
-  
   const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
   const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
   const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
@@ -37,7 +36,6 @@ async function getConfiguration() {
     mqttUrl,
     mqttUsername,
     mqttPassword,
-
   };
 }
 
