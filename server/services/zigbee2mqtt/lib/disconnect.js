@@ -29,15 +29,7 @@ async function disconnect() {
   });
 
   // Stop MQTT container
-<<<<<<< HEAD
-<<<<<<< HEAD
   if (z2mEnabled === '1') {
-=======
-  if(z2mEnabled === '1') {
->>>>>>> origin/External-zigbee2mqtt
-=======
-  if (z2mEnabled === '1') {
->>>>>>> 76656e7e264afb121d4a48d10324e340d4939eea
     let dockerContainer = await this.gladys.system.getContainers({
       all: true,
       filters: { name: [mqttContainerDescriptor.name] },

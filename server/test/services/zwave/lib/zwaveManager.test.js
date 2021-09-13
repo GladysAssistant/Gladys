@@ -1,8 +1,6 @@
 const { expect } = require('chai');
 const { assert } = require('sinon');
-const EventEmitter = require('events');
 
-const event = new EventEmitter();
 const ZwaveManager = require('../../../../services/zwave/lib');
 const ZwaveMock = require('../ZwaveMock.test');
 const nodesData = require('./nodesData.json');

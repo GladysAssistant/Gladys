@@ -33,18 +33,11 @@ async function getConfiguration() {
   const mqttExternal = !this.dockerBased;
 
   return {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    mqttExternal,
-=======
-      mqttExternal,
->>>>>>> origin/External-zigbee2mqtt
-=======
     mqttExternal,
     mqttUrl,
     mqttUsername,
     mqttPassword,
->>>>>>> 76656e7e264afb121d4a48d10324e340d4939eea
+
   };
 }
 
