@@ -30,6 +30,10 @@ function createActions(store) {
           if (cameraUrlParam) {
             camera.cameraUrl = cameraUrlParam;
           }
+          const cameraRotationParam = camera.params.find(param => param.name === 'CAMERA_ROTATION');
+          if (cameraRotationParam) {
+            camera.cameraRotation = cameraRotationParam;
+          }
         });
         store.setState({
           rtspCameras,
@@ -88,6 +92,10 @@ function createActions(store) {
               name: 'CAMERA_URL',
               value: null
             },
+            cameraRotation: {
+              name: 'CAMERA_ROTATION',
+              value: null
+            },
             features: [
               {
                 name: null,
@@ -105,6 +113,10 @@ function createActions(store) {
             params: [
               {
                 name: 'CAMERA_URL',
+                value: null
+              },
+              {
+                name: 'CAMERA_ROTATION',
                 value: null
               }
             ]
@@ -141,6 +153,30 @@ function createActions(store) {
             [cameraUrlParamIndex]: {
               value: {
                 $set: trimmedValue
+              }
+            }
+          }
+        }
+      });
+      store.setState({
+        rtspCameras
+      });
+    },
+    updateCameraRotation(state, index, value) {
+      let cameraRotationParamIndex = state.rtspCameras[index].params.findIndex(
+        param => param.name === 'CAMERA_ROTATION'
+      );
+      const rtspCameras = update(state.rtspCameras, {
+        [index]: {
+          cameraRotation: {
+            value: {
+              $set: value
+            }
+          },
+          params: {
+            [cameraRotationParamIndex]: {
+              value: {
+                $set: value
               }
             }
           }

@@ -68,6 +68,12 @@ class RtspCameraBox extends Component {
   updateCameraUrl = e => {
     this.props.updateCameraUrl(this.props.cameraIndex, e.target.value);
   };
+  updateCameraRotation = e => {
+    let checked = this.props.camera.cameraRotate;
+    checked = !checked;
+    this.props.camera.cameraRotate = checked;
+    this.props.updateCameraRotation(this.props.cameraIndex, checked);
+  };
   updateCameraRoom = e => {
     const newRoom = e.target.value === '' ? null : e.target.value;
     this.props.updateCameraField(this.props.cameraIndex, 'room_id', newRoom);
@@ -171,6 +177,23 @@ class RtspCameraBox extends Component {
                   </Localizer>
                 </div>
                 <div class="form-group">
+                  <label class="custom-switch">
+                    <input
+                      type="checkbox"
+                      id="cameraRotate"
+                      name="cameraRotate"
+                      class="custom-switch-input"
+                      checked={props.camera.cameraRotate}
+                      onClick={this.updateCameraRotation}
+                    />
+                    {console.log(get(props, 'camera.cameraRotate.checked'))}
+                    <span class="custom-switch-indicator" />
+                    <span class="custom-switch-description">
+                      <Text id="integration.rtspCamera.rotate180Label" />
+                    </span>
+                  </label>
+                </div>
+                <div class="form-group">
                   <button onClick={this.testConnection} class="btn btn-info mr-2">
                     <Text id="integration.rtspCamera.testConnectionButton" />
                   </button>
@@ -186,8 +209,8 @@ class RtspCameraBox extends Component {
           </div>
         </div>
       </div>
+      
     );
   }
 }
-
 export default RtspCameraBox;
