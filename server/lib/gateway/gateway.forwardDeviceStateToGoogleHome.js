@@ -19,6 +19,13 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
 
     const device = queryDeviceConverter(gladysDevice);
 
+    // We want to avoid forwarding events that contains only {online: true}
+    const properties = Object.keys(device);
+    if (properties.length <= 1) {
+      logger.debug(`Gladys Gateway: Not forwarding state, device feature doesnt seems handled.`);
+      return;
+    }
+
     const devices = {
       states: {
         [gladysDevice.selector]: device,

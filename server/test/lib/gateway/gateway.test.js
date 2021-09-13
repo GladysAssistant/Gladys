@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
 const Promise = require('bluebird');
+const path = require('path');
 const { fake, assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
@@ -153,6 +154,39 @@ describe('gateway', () => {
       const gateway = new Gateway(variable, event, system, sequelize, config);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.restoreBackupEvent('this-path-does-not-exist');
+    });
+    it('should not restore a backup, sqlite file is not a Gladys DB', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_file_is_not_a_valid_db.dbfile');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'SQLITE_ERROR: no such table: t_user');
+    });
+    it('should not restore a backup, sqlite file is not a Gladys DB', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_file_has_no_user_table.dbfile');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'SQLITE_ERROR: no such table: t_user');
+    });
+    it('should not restore a backup, SQlite DB has no user', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_db_has_no_users.dbfile');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'NO_USER_FOUND_IN_NEW_DB');
     });
   });
 
@@ -753,6 +787,65 @@ describe('gateway', () => {
           assert.calledWith(gateway.gladysGatewayClient.googleHomeReportState, {
             devices: { states: { 'mqtt-lampe': { brightness: 97, online: true } } },
           });
+          resolve();
+        }, 10);
+      });
+    });
+    it('should not forward event to google home, event empty', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: (type) => {
+          const feature = {
+            id: 'f2e2d5ea-bcea-4092-b597-7b8fb723e070',
+            device_id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
+            name: 'Camera',
+            selector: 'mqtt-brightness',
+            external_id: 'mqtt:brightness',
+            category: 'camera',
+            type: 'camera',
+            read_only: false,
+            keep_history: true,
+            has_feedback: false,
+            unit: null,
+            min: 0,
+            max: 100,
+            last_value: 97,
+            last_value_string: null,
+          };
+          if (type === 'deviceById') {
+            return {
+              id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
+              service_id: '54a4c447-0caa-4ed5-aa6f-5019e4b27754',
+              room_id: '89abf7bc-208c-411a-a69b-33a173753e81',
+              name: 'Camera',
+              selector: 'camera',
+              model: null,
+              external_id: 'camera',
+              should_poll: false,
+              poll_frequency: null,
+              features: [feature],
+              params: [],
+            };
+          }
+          return feature;
+        },
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.googleHomeForwardStateTimeout = 1;
+      gateway.connected = true;
+      gateway.googleHomeConnected = true;
+      const oneEvent = {
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'my-car',
+      };
+      await gateway.forwardDeviceStateToGoogleHome(oneEvent);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          assert.notCalled(gateway.gladysGatewayClient.googleHomeReportState);
           resolve();
         }, 10);
       });
