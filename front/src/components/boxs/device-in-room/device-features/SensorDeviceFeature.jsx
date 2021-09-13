@@ -28,9 +28,7 @@ const SensorDeviceType = ({ children, ...props }) => (
       <td class="text-right">
         <div>
           {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
-          <span class="badge badge-warning">
-            {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-          </span>
+          {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
           {props.deviceFeature.last_value !== null && (
             <span>
               {' '}
@@ -51,9 +49,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         <div>
           {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
           {props.deviceFeature.last_value_changed && (
-            <span class="badge badge-info">
-              <RelativeTime datetime={props.deviceFeature.last_value_changed} language={props.user.language} />
-            </span>
+            <RelativeTime datetime={props.deviceFeature.last_value_changed} language={props.user.language} />
           )}
         </div>
       </td>
