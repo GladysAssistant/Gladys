@@ -22,6 +22,10 @@ const intervalByName = {
   'last-three-months': THREE_MONTHS_IN_MINUTES
 };
 
+const notNullNotUndefined = value => {
+  return value !== undefined && value !== null;
+};
+
 class Chartbox extends Component {
   toggleDropdown = () => {
     this.setState({
@@ -89,7 +93,10 @@ class Chartbox extends Component {
       });
       const firstElement = data[0];
       const lastElement = data[data.length - 1];
-      const variation = firstElement && lastElement ? Math.round((100 * firstElement.value) / lastElement.value) : null;
+      const variation =
+        firstElement && lastElement
+          ? Math.round(((lastElement.value - firstElement.value) / Math.abs(firstElement.value)) * 100)
+          : null;
       const lastValueRounded = lastElement ? Math.round(lastElement.value) : null;
       await this.setState({
         series,
@@ -216,7 +223,7 @@ class Chartbox extends Component {
           </div>
           {smallBox && (
             <div class="d-flex align-items-baseline">
-              {lastValueRounded && (
+              {notNullNotUndefined(lastValueRounded) && (
                 <div class="h1 mb-0 mr-2">
                   {lastValueRounded}
                   {props.box.unit !== undefined && <Text id={`deviceFeatureUnitShort.${props.box.unit}`} />}
@@ -230,7 +237,7 @@ class Chartbox extends Component {
                 })}
               >
                 {labels && labels.length > 0 && (
-                  <span class="text-green d-inline-flex align-items-center lh-1">
+                  <span class="d-inline-flex align-items-center lh-1">
                     {variation}
                     <Text id="global.percent" />
                     {variation > 0 && (

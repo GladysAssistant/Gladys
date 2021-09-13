@@ -197,7 +197,7 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
-      "chart": "Graphique"
+      "chart": "Graphique capteur"
     },
     "boxes": {
       "column": "Colonne {{index}}",
