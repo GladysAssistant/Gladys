@@ -108,7 +108,7 @@ class EditChart extends Component {
 
   render(props, { selectedDeviceFeaturesOption, deviceOptions, loading }) {
     return (
-      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room">
+      <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart">
         <div class={loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">
@@ -141,7 +141,7 @@ class EditChart extends Component {
               <label>
                 <Text id="dashboard.boxes.chart.defaultInterval" />
               </label>
-              <select onChange={this.updateDefaultInterval} class="form-control">
+              <select onChange={this.updateDefaultInterval} class="form-control" value={props.box.interval}>
                 <option>
                   <Text id="global.emptySelectOption" />
                 </option>

@@ -4,6 +4,8 @@ import cx from 'classnames';
 
 import { Text } from 'preact-i18n';
 import style from './style.css';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import get from 'get-value';
 import ApexChartComponent from './ApexChartComponent';
 
 const ONE_HOUR_IN_MINUTES = 60;
@@ -100,6 +102,14 @@ class Chartbox extends Component {
       console.error(e);
     }
   };
+  updateDeviceStateWebsocket = payload => {
+    if (
+      payload.device_feature_selector === this.props.box.device_feature &&
+      this.state.interval === intervalByName['last-hour']
+    ) {
+      this.getData();
+    }
+  };
   constructor(props) {
     super(props);
     this.props = props;
@@ -111,6 +121,26 @@ class Chartbox extends Component {
   }
   componentDidMount() {
     this.getData();
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceStateWebsocket
+    );
+  }
+  componentDidUpdate(previousProps) {
+    const intervalChanged = get(previousProps, 'box.interval') !== get(this.props, 'box.interval');
+    const deviceFeatureChanged = get(previousProps, 'box.device_feature') !== get(this.props, 'box.device_feature');
+    const titleChanged = get(previousProps, 'box.title') !== get(this.props, 'box.title');
+    const unitChanged = get(previousProps, 'box.unit') !== get(this.props, 'box.unit');
+    if (intervalChanged || deviceFeatureChanged || titleChanged || unitChanged) {
+      this.getData();
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceStateWebsocket
+    );
   }
   render(props, { loading, series, labels, dropdown, variation, lastValueRounded, interval }) {
     const smallBox = interval === ONE_HOUR_IN_MINUTES;
@@ -290,4 +320,4 @@ class Chartbox extends Component {
   }
 }
 
-export default connect('httpClient')(Chartbox);
+export default connect('httpClient,session')(Chartbox);
