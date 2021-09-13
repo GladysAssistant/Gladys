@@ -56,7 +56,7 @@ async function init() {
         this.z2mEnabled = false;
       }
     }
-  
+
     // Generate credentials for Gladys & Z2M for connection to broker
     const mqttPw = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
     if (!mqttPw) {
@@ -84,7 +84,7 @@ async function init() {
       // await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
       this.z2mEnabled = false;
     }
-  
+
     if (this.usbConfigured) {
       const configuration = await this.getConfiguration();
       if (this.z2mEnabled) {

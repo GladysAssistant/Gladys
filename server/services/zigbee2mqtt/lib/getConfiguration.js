@@ -11,7 +11,7 @@ async function getConfiguration() {
   // Run existing containers if Zigbee2mqtt is enabled
   logger.log('z2mEnabled state :', this.z2mEnabled);
   if (this.z2mEnabled) {
-    if(this.dockerBased) {
+    if (this.dockerBased) {
       logger.log('Installing & starting containers');
       await this.installMqttContainer();
       await this.installZ2mContainer();
@@ -26,23 +26,17 @@ async function getConfiguration() {
     }
   }
 
-  if(this.dockerBased) {
-    const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
-    const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
-    const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
-    const mqttExternal = false;
+  
+  const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
+  const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
+  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
+  const mqttExternal = !this.dockerBased;
 
-    return {
-      mqttExternal,
-      mqttUrl,
-      mqttUsername,
-      mqttPassword,
-    };
-  }
-
-  const mqttExternal = true;
   return {
-      mqttExternal,
+    mqttExternal,
+    mqttUrl,
+    mqttUsername,
+    mqttPassword,
   };
 }
 

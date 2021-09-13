@@ -3,21 +3,22 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 
 /**
  * @description When a node is ready.
- * @param {number} nodeId - The ID of the node.
- * @param {Object} nodeInfo - Informations about the node.
+ * @param {Object} node - Informations about the node.
  * @example
  * zwave.on('node ready', this.nodeReady);
  */
-function nodeReady(nodeId, nodeInfo) {
-  logger.debug(`Zwave : Node Ready, nodeId = ${nodeId}`);
-  this.nodes[nodeId].manufacturer = nodeInfo.manufacturer;
-  this.nodes[nodeId].manufacturerid = nodeInfo.manufacturerid;
-  this.nodes[nodeId].product = nodeInfo.product;
-  this.nodes[nodeId].producttype = nodeInfo.producttype;
-  this.nodes[nodeId].productid = nodeInfo.productid;
-  this.nodes[nodeId].type = nodeInfo.type;
-  this.nodes[nodeId].name = nodeInfo.name;
-  this.nodes[nodeId].loc = nodeInfo.loc;
+function nodeReady(node) {
+  logger.debug(`Zwave : Node Ready, nodeId = ${node.id}`);
+
+  const nodeId = node.id;
+  this.nodes[nodeId].manufacturer = node.manufacturer;
+  this.nodes[nodeId].manufacturerid = node.manufacturerId;
+  this.nodes[nodeId].product = node.product;
+  this.nodes[nodeId].producttype = node.productType;
+  this.nodes[nodeId].productid = node.productId;
+  this.nodes[nodeId].type = node.noedType;
+  this.nodes[nodeId].name = node.name;
+  this.nodes[nodeId].loc = node.location;
   this.nodes[nodeId].ready = true;
 
   // enable poll if needed

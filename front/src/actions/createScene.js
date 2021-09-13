@@ -52,7 +52,7 @@ function createActions(store) {
     initScene(state) {
       store.setState({
         newScene: {
-          name: null,
+          name: '',
           icon: null,
           actions: [[]]
         },
