@@ -42,7 +42,11 @@ async function getConfiguration() {
 
   const mqttExternal = true;
   return {
+<<<<<<< HEAD
     mqttExternal,
+=======
+      mqttExternal,
+>>>>>>> origin/External-zigbee2mqtt
   };
 }
 
