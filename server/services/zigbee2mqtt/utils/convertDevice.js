@@ -14,7 +14,12 @@ function convertDevice(device, serviceId) {
   const features = loadFeatures(device.friendly_name, device.model, device.powerSource === 'Battery');
 
   // Not managed device
-  if (features.length === 0 || (features.length === 1 && features[0].category === DEVICE_FEATURE_CATEGORIES.BATTERY)) {
+  if (
+    features.length === 0 ||
+    (features.length === 1 &&
+      (features[0].category === DEVICE_FEATURE_CATEGORIES.BATTERY ||
+        features[0].category === DEVICE_FEATURE_CATEGORIES.SIGNAL_STRENGTH))
+  ) {
     const gladysDevice = {
       name: device.friendly_name,
       external_id: `zigbee2mqtt:${device.friendly_name}`,

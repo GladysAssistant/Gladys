@@ -254,6 +254,17 @@ const features = {
     max: 10000,
     zigbeeField: 'co2',
   },
+  link_quality: {
+    category: DEVICE_FEATURE_CATEGORIES.SIGNAL_STRENGTH,
+    type: DEVICE_FEATURE_TYPES.SIGNAL_STRENGTH.LINK_QUALITY,
+    unit: DEVICE_FEATURE_UNITS.LQI,
+    name: 'Link Quality',
+    read_only: true,
+    has_feedback: false,
+    min: 0,
+    max: 255,
+    zigbeeField: 'linkquality',
+  },
 };
 
 module.exports = {

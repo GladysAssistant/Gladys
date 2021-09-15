@@ -1478,7 +1478,8 @@
     "volt": "Volt (V)",
     "ppm": "Parts per million (ppm)",
     "cm": "Centimeter (cm)",
-    "mm": "Millimeter (mm)"
+    "mm": "Millimeter (mm)",
+    "lqi": "Link quality (lqi)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1494,7 +1495,8 @@
     "volt": "V",
     "ppm": "ppm",
     "cm": "cm",
-    "mm": "mm"
+    "mm": "mm",
+    "lqi": "lqi"
   },
   "deviceFeatureCategory": {
     "light": {
@@ -1607,6 +1609,10 @@
       "acceleration-y": "Acceleration Y",
       "acceleration-z": "Acceleration Z",
       "bed-activity": "Bed Activity"
+    },
+    "link-quality": {
+      "shortCategoryName": "Link quality",
+      "integer": "Link quality"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

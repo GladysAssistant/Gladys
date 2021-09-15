@@ -4,7 +4,7 @@ const { loadFeatures } = require('../../../../services/zigbee2mqtt/utils/loadFea
 const name = 'Device';
 const model = 'WXKG11LM';
 
-const expectedFeaturesWithBattery = [
+const expectedFeaturesWithBatteryAndLinkQuality = [
   {
     category: 'button',
     type: 'click',
@@ -30,6 +30,19 @@ const expectedFeaturesWithBattery = [
     selector: 'zigbee2mqtt:Device:battery:integer:battery',
     zigbeeField: 'battery',
   },
+  {
+    category: 'signal-strength',
+    type: 'integer',
+    unit: 'lqi',
+    read_only: true,
+    has_feedback: false,
+    min: 0,
+    max: 255,
+    name: 'Link Quality',
+    external_id: 'zigbee2mqtt:Device:signal-strength:integer:linkquality',
+    selector: 'zigbee2mqtt:Device:signal-strength:integer:linkquality',
+    zigbeeField: 'linkquality',
+  },
 ];
 
 const expectedFeatures = [
@@ -48,11 +61,11 @@ const expectedFeatures = [
 ];
 
 describe('zigbee2mqttService loadFeatures', () => {
-  it('should return features with battery', () => {
+  it('should return features with battery and link quality', () => {
     const features = loadFeatures(name, model, true);
-    return assert.deepEqual(features, expectedFeaturesWithBattery);
+    return assert.deepEqual(features, expectedFeaturesWithBatteryAndLinkQuality);
   });
-  it('should return features without battery', () => {
+  it('should return features without battery and link quality', () => {
     const features = loadFeatures(name, model, false);
     return assert.deepEqual(features, expectedFeatures);
   });
