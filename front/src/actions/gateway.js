@@ -275,7 +275,8 @@ function createActions(store) {
         store.setState({
           gatewayRestoreInProgress: restoreStatus.restore_in_progress,
           gatewayRestoreErrored: restoreStatus.restore_errored,
-          gatewayRestoreStatusStatus: RequestStatus.Success
+          gatewayRestoreStatusStatus: RequestStatus.Success,
+          gatewayGladysRestarting: false
         });
       } catch (e) {
         store.setState({
@@ -293,12 +294,21 @@ function createActions(store) {
         } else if (restoreStatus.restore_errored) {
           store.setState({
             gatewayRestoreInProgress: false,
-            gatewayRestoreErrored: true
+            gatewayRestoreErrored: true,
+            gatewayGladysRestarting: false
           });
         } else {
           window.location = '/dashboard';
         }
       } catch (e) {
+        const status = get(e, 'response.status');
+        if (e.message === 'Network Error') {
+          store.setState({
+            gatewayGladysRestarting: true
+          });
+        } else if (status === 401) {
+          window.location = '/dashboard';
+        }
         setTimeout(() => {
           actions.waitForRestoreToFinish(state);
         }, 2000);
