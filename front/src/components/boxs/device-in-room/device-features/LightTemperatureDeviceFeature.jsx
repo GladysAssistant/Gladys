@@ -2,7 +2,7 @@ import { getDeviceName } from './utils';
 
 const LightTemperatureDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
-    props.updateValue(
+    props.updateValueWithDebounce(
       props.x,
       props.y,
       props.device,
@@ -30,7 +30,7 @@ const LightTemperatureDeviceType = ({ children, ...props }) => {
             type="range"
             value={props.deviceFeature.last_value}
             onChange={updateValue}
-            class="form-control custom-range light-temperature"
+            class="custom-range light-temperature"
             step="1"
             min={props.deviceFeature.min}
             max={props.deviceFeature.max}
