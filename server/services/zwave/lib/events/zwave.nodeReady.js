@@ -1,28 +1,38 @@
 const logger = require('../../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { valueAdded } = require('./zwave.valueAdded');
 
 /**
  * @description When a node is ready.
- * @param {Object} node - Informations about the node.
+ * @param {Object} zwaveNode - Informations about the node.
  * @example
  * zwave.on('node ready', this.nodeReady);
  */
-function nodeReady(node) {
-  logger.debug(`Zwave : Node Ready, nodeId = ${node.id}`);
+function nodeReady(zwaveNode) {
+  const nodeId = zwaveNode.id;
+  logger.debug(`Zwave : Node Ready, nodeId = ${nodeId}`);
 
-  const nodeId = node.id;
-  this.nodes[nodeId].manufacturer = node.manufacturer;
-  this.nodes[nodeId].manufacturerid = node.manufacturerId;
-  this.nodes[nodeId].product = node.product;
-  this.nodes[nodeId].producttype = node.productType;
-  this.nodes[nodeId].productid = node.productId;
-  this.nodes[nodeId].type = node.noedType;
-  this.nodes[nodeId].name = node.name;
-  this.nodes[nodeId].loc = node.location;
-  this.nodes[nodeId].ready = true;
+  const node = this.nodes[nodeId];
+  node.manufacturer = zwaveNode.manufacturer; // NOK
+  node.manufacturerid = zwaveNode.manufacturerId;
+  node.product = zwaveNode.label; // NOK
+  node.producttype = zwaveNode.productType;
+  node.productid = zwaveNode.productId;
+  node.firmwareVersion = zwaveNode.firmwareVersion; // NEW
+  node.type = zwaveNode.nodeType;
+  node.name = zwaveNode.name;
+  node.label = zwaveNode.label; // NEW
+  node.location = zwaveNode.location; // RENAME
+  node.status = zwaveNode.status;
+  node.ready = zwaveNode.ready;
+  node.classes = {};
+
+  zwaveNode.getDefinedValueIDs().forEach((data) => {
+    valueAdded.bind(this)(zwaveNode, data);
+  });
 
   // enable poll if needed
-  const comclasses = Object.keys(this.nodes[nodeId].classes);
+  /* const comclasses = Object.keys(this.nodes[nodeId].classes);
   comclasses.forEach((comclass) => {
     const values = this.nodes[nodeId].classes[comclass];
     // enable poll
@@ -34,7 +44,7 @@ function nodeReady(node) {
       default:
         break;
     }
-  });
+  }); */
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_READY,
     payload: this.nodes[nodeId],

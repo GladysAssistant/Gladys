@@ -5,6 +5,7 @@ const { driverReady } = require('../events/zwave.driverReady');
 const { nodeAdded } = require('../events/zwave.nodeAdded');
 const { nodeRemoved } = require('../events/zwave.nodeRemoved');
 const { nodeReady } = require('../events/zwave.nodeReady');
+const { scanComplete } = require('../events/zwave.scanComplete');
 
 /**
  * @description Connect to Zwave USB driver
@@ -49,6 +50,11 @@ async function connect(driverPath) {
       nodeRemoved.bind(this)(node);
     });
   });
+
+  this.driver.on('all nodes ready', () => {
+    scanComplete.bind(this)();
+  });
+
 
   // this.zwave.connect(this.driverPath);
   await this.driver.start();

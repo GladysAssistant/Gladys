@@ -12,12 +12,13 @@ const NOTIFICATION_TYPES = {
 
 /**
  * @description Notification about a node
- * @param {number} nodeId - The ID of the node.
+ * @param {Object} zwaveNode - Node.
  * @param {Object} notif - Number of the type of notification.
  * @example
  * zwave.on('notification', this.notification);
  */
-function notification(nodeId, notif) {
+function notification(zwaveNode, notif) {
+  const nodeId = zwaveNode.id;
   logger.debug(`Zwave : Notification, nodeId = ${nodeId}, notif = ${NOTIFICATION_TYPES[notif]}`);
 }
 

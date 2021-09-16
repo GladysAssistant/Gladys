@@ -1,12 +1,13 @@
 const { expect } = require('chai');
 const { assert } = require('sinon');
-
+// const EventEmitter = require('events');
+// const event = new EventEmitter();
 const ZwaveManager = require('../../../../services/zwave/lib');
 const ZwaveMock = require('../ZwaveMock.test');
 const nodesData = require('./nodesData.json');
 const nodesExpectedResult = require('./nodesExpectedResult.json');
 
-describe('zwaveManager commands', () => {
+describe.only('zwaveManager commands', () => {
   const zwaveManager = new ZwaveManager(ZwaveMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   zwaveManager.connected = true;
   it('should connect to zwave driver', () => {
@@ -15,15 +16,11 @@ describe('zwaveManager commands', () => {
   });
   it('should addNode', () => {
     zwaveManager.addNode();
-    assert.calledOnce(zwaveManager.zwave.addNode);
+    assert.calledOnce(this.driver.controller.beginInclusion);
   });
   it('should removeNode', () => {
     zwaveManager.removeNode();
-    assert.calledOnce(zwaveManager.zwave.removeNode);
-  });
-  it('should cancelControllerCommand', () => {
-    zwaveManager.cancelControllerCommand();
-    assert.calledOnce(zwaveManager.zwave.cancelControllerCommand);
+    assert.calledOnce(this.driver.controller.beginExclusion);
   });
   it('should heal network', () => {
     zwaveManager.healNetwork();
@@ -65,7 +62,7 @@ describe('zwaveManager commands', () => {
   });
 });
 
-describe('zwaveManager events', () => {
+describe.only('zwaveManager events', () => {
   const zwaveManager = new ZwaveManager(ZwaveMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   it('should receive controllerCommand', () => {
     zwaveManager.controllerCommand(1, 1, 1, 'message');
