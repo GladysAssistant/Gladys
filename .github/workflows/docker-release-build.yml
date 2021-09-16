@@ -148,9 +148,9 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_REPO }}
           labels: |
-            org.opencontainers.image.title=Gladys Assitant Production Image
+            org.opencontainers.image.title=Gladys Assistant Production Image
           tags: |
-            type=semver,pattern={{version}}
+            type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}
             type=sha
       - name: 💽 Set up QEMU

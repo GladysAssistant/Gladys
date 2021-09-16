@@ -60,7 +60,7 @@ jobs:
         with:
           images: ${{ secrets.DOCKERHUB_REPO }}
           labels: |
-            org.opencontainers.image.title=Gladys Assitant Preprod Image
+            org.opencontainers.image.title=Gladys Assistant Preprod Image
       - name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: 🐳 Set up Docker Buildx
