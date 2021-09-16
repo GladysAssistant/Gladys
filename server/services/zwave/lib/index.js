@@ -1,5 +1,4 @@
 const { addNode } = require('./commands/zwave.addNode');
-const { cancelControllerCommand } = require('./commands/zwave.cancelControllerCommand');
 const { connect } = require('./commands/zwave.connect');
 const { disconnect } = require('./commands/zwave.disconnect');
 const { getInfos } = require('./commands/zwave.getInfos');
@@ -21,6 +20,7 @@ const { nodeReady } = require('./events/zwave.nodeReady');
 const { notification } = require('./events/zwave.notification');
 const { scanComplete } = require('./events/zwave.scanComplete');
 const { controllerCommand } = require('./events/zwave.controllerCommand');
+const { valueNotification } = require('./events/zwave.valueNotification');
 
 const ZwaveManager = function ZwaveManager(gladys, serviceId) {
   this.zwave = undefined;
@@ -41,6 +41,7 @@ ZwaveManager.prototype.nodeEvent = nodeEvent;
 ZwaveManager.prototype.valueAdded = valueAdded;
 ZwaveManager.prototype.valueUpdated = valueUpdated;
 ZwaveManager.prototype.valueRemoved = valueRemoved;
+ZwaveManager.prototype.valueNotification = valueNotification;
 ZwaveManager.prototype.nodeReady = nodeReady;
 ZwaveManager.prototype.notification = notification;
 ZwaveManager.prototype.scanComplete = scanComplete;
@@ -49,7 +50,6 @@ ZwaveManager.prototype.controllerCommand = controllerCommand;
 // COMMANDS
 ZwaveManager.prototype.addNode = addNode;
 ZwaveManager.prototype.connect = connect;
-ZwaveManager.prototype.cancelControllerCommand = cancelControllerCommand;
 ZwaveManager.prototype.disconnect = disconnect;
 ZwaveManager.prototype.healNetwork = healNetwork;
 ZwaveManager.prototype.refreshNodeParams = refreshNodeParams;

@@ -4,13 +4,15 @@ const logger = require('../../../../utils/logger');
  * ValueAddedArgs.
  *
  * @description When a value is added.
- * @param {number} nodeId - The ID of the node.
- * @param {Object} args - ValueAddedArgs.
+ * @param {Object} zwaveNode - Node.
+ * @param {Object} args - ZWaveNodeValueAddedArgs.
  * @example
  * valueAdded(9, {});
  */
-function valueAdded(nodeId, args) {
+function valueAdded(zwaveNode, args) {
   const { commandClass, endpoint, property, propertyKey, newValue } = args;
+  const nodeId = zwaveNode.id;
+  const instance = property + (propertyKey ? `-${propertyKey}` : '');
   logger.debug(
     `Zwave : Value Added, nodeId = ${nodeId}, comClass = ${commandClass}, valueId = ${JSON.stringify(newValue)}`,
   );
@@ -21,7 +23,19 @@ function valueAdded(nodeId, args) {
     this.nodes[nodeId].classes[commandClass][endpoint] = {};
     // New Endpoint - split allowed
   }
-  this.nodes[nodeId].classes[commandClass][endpoint][property + propertyKey ? `/${propertyKey}` : ''] = newValue;
+
+  const metadata = zwaveNode.getValueMetadata(args);
+  this.nodes[nodeId].classes[commandClass][endpoint][instance] = {
+    genre: 'user',
+    min: metadata.min || 0,
+    max: metadata.max || 1,
+    label: metadata.label,
+    class_id: commandClass,
+    index: endpoint,
+    instance,
+    read_only: !metadata.writeable,
+    value: newValue
+  };
 }
 
 module.exports = {
