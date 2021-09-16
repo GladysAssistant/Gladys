@@ -98,6 +98,8 @@ jobs:
         run: npm audit --production --audit-level=critical
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
   build-front:
     name: Front build
     needs:
