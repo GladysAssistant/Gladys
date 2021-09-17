@@ -19,6 +19,15 @@ function getCategory(node, value) {
   let found = false;
   let categoryFound = null;
   let i = 0;
+
+  // TODO 
+  if(value.instance === 'targetValue') {
+    return {
+      category: UNKNOWN_CATEGORY,
+      type: UNKNOWN_TYPE,
+    };
+  }
+
   while (!found && i < CATEGORIES.length) {
     const category = CATEGORIES[i];
     const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.class_id) : true;

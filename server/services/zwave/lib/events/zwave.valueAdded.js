@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { GENRE } = require('../constants');
 
 /**
  * ValueAddedArgs.
@@ -10,11 +11,11 @@ const logger = require('../../../../utils/logger');
  * valueAdded(9, {});
  */
 function valueAdded(zwaveNode, args) {
-  const { commandClass, endpoint, property, propertyKey, newValue } = args;
+  const { commandClass, endpoint, property, propertyKey } = args;
   const nodeId = zwaveNode.id;
   const instance = property + (propertyKey ? `-${propertyKey}` : '');
   logger.debug(
-    `Zwave : Value Added, nodeId = ${nodeId}, comClass = ${commandClass}, valueId = ${JSON.stringify(newValue)}`,
+    `Zwave : Value Added, nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], instance = ${instance}`,
   );
   if (!this.nodes[nodeId].classes[commandClass]) {
     this.nodes[nodeId].classes[commandClass] = {};
@@ -26,15 +27,14 @@ function valueAdded(zwaveNode, args) {
 
   const metadata = zwaveNode.getValueMetadata(args);
   this.nodes[nodeId].classes[commandClass][endpoint][instance] = {
-    genre: 'user',
+    genre: GENRE[commandClass] || 'user',
     min: metadata.min || 0,
     max: metadata.max || 1,
     label: metadata.label,
     class_id: commandClass,
     index: endpoint,
     instance,
-    read_only: !metadata.writeable,
-    value: newValue
+    read_only: !metadata.writeable
   };
 }
 

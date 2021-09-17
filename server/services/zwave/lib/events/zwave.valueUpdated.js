@@ -10,24 +10,30 @@ const { getDeviceFeatureExternalId } = require('../utils/externalId');
  * zwave.on('value updated', this.valueUpdated);
  */
 function valueUpdated(node, args) {
-  const { commandClass, endpoint, property, propertyKey /* , prevValue */, newValue } = args;
+  const { commandClass, endpoint, property, propertyKey, prevValue, newValue } = args;
   const nodeId = node.id;
   const instance = property + (propertyKey ? `-${propertyKey}` : '');
   logger.debug(
-    `Zwave : Value Updated, nodeId = ${nodeId}, comClass = ${commandClass}, value = ${JSON.stringify(newValue)}`,
+    `Zwave : Value Updated, nodeId = ${nodeId}, comClass = ${commandClass}, prevValue = ${JSON.stringify(prevValue)}, newValue = ${JSON.stringify(newValue)}`,
   );
   if (this.nodes[nodeId].ready) {
     logger.debug(
-      'node%d: changed: %d:%s:%s->%s',
+      'node%d: changed: %d:%s:%s:%s->%s',
       nodeId,
       commandClass,
-      property + (propertyKey ? `/${propertyKey}` : ''),
+      endpoint,
+      instance,
       this.nodes[nodeId].classes[commandClass][endpoint][instance].value,
       newValue,
     );
     this.nodes[nodeId].classes[commandClass][endpoint][instance].value = newValue;
     this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: getDeviceFeatureExternalId(args),
+      device_feature_external_id: getDeviceFeatureExternalId({
+        nodeId,
+        commandClass,
+        endpoint: endpoint || 0, 
+        instance
+      }),
       state: newValue,
     });
   }

@@ -13,7 +13,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting zwave service');
-    const zwaveDriverPath = 'COM5'; // await gladys.variable.getValue('ZWAVE_DRIVER_PATH', serviceId);
+    const zwaveDriverPath = await gladys.variable.getValue('ZWAVE_DRIVER_PATH', serviceId);
     if (!zwaveDriverPath) {
       throw new ServiceNotConfiguredError('ZWAVE_DRIVER_PATH_NOT_FOUND');
     }

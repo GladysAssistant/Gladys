@@ -6,7 +6,7 @@
  * getDeviceFeatureExternalId(value);
  */
 function getDeviceFeatureExternalId(value) {
-  return `zwave:node_id:${value.node_id}:comclass:${value.class_id}:index:${value.index}:instance:${value.instance}`;
+  return `zwave:node_id:${value.nodeId}:comclass:${value.commandClass}:index:${value.endpoint}:instance:${value.instance}`;
 }
 
 /**

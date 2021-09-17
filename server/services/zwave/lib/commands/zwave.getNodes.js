@@ -35,9 +35,9 @@ function getNodes() {
       const comclasses = Object.keys(node.classes);
       comclasses.forEach((comclass) => {
         const valuesClass = node.classes[comclass];
-        const indexes = Object.keys(valuesClass);
-        indexes.forEach((idx) => {
-          const value = node.classes[comclass][idx];
+        const endpoints = Object.keys(valuesClass);
+        endpoints.forEach((endpoint) => {
+          const value = node.classes[comclass][endpoint];
           const instances = Object.keys(value);
           instances.forEach((inst) => {
             const { min, max } = value[inst];
