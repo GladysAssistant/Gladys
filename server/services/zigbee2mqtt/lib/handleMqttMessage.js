@@ -21,14 +21,12 @@ function handleMqttMessage(topic, message) {
   });
 
   switch (topic) {
-    case 'zigbee2mqtt/bridge/config/devices': {
+    case 'zigbee2mqtt/bridge/devices': {
       logger.log('Getting config devices from Zigbee2mqtt');
       const devices = JSON.parse(message);
       const convertedDevices = devices
         // Remove Coordinator
         .filter((d) => d.type !== TYPE_COORDINATOR)
-        // Remove Empty models
-        .filter((d) => d.model && d.model !== '')
         // Remove existing devices
         .filter((d) => {
           const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
