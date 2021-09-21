@@ -11,7 +11,7 @@ module.exports = function XiaomiService(gladys, serviceId) {
    * gladys.services.xiaomi.start();
    */
   async function start() {
-    logger.log('Starting Xiaomi service');
+    logger.info('Starting Xiaomi service');
     xiaomiManager.listen();
   }
 
@@ -22,7 +22,7 @@ module.exports = function XiaomiService(gladys, serviceId) {
    *  gladys.services.xiaomi.stop();
    */
   async function stop() {
-    logger.log('Stopping Xiaomi service');
+    logger.info('Stopping Xiaomi service');
   }
 
   return Object.freeze({

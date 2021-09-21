@@ -6,23 +6,29 @@ import Select from 'react-select';
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
-import actions from '../../../actions/dashboard/edit-boxes/editDevicesInRoom';
+const SUPPORTED_FEATURE_TYPES = [
+  DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+  DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+  DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+  DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+  DEVICE_FEATURE_TYPES.SWITCH.DIMMER
+];
 
-const SUPPORTED_FEATURE_TYPES = [DEVICE_FEATURE_TYPES.LIGHT.BINARY, DEVICE_FEATURE_TYPES.LIGHT.COLOR];
-
-@connect('httpClient', actions)
+@connect('httpClient', {})
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {
-    this.props.updateBoxRoom(this.props.x, this.props.y, room.selector);
-    this.updateDeviceFeatures([]);
+    this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
   };
 
   updateDeviceFeatures = selectedDeviceFeaturesOptions => {
     selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions || [];
     const deviceFeatures = selectedDeviceFeaturesOptions.map(option => option.value);
-    this.props.updateBoxDeviceFeatures(this.props.x, this.props.y, deviceFeatures);
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      device_features: deviceFeatures
+    });
     this.setState({ selectedDeviceFeaturesOptions });
   };
 
@@ -39,7 +45,7 @@ class EditDeviceInRoom extends Component {
         device.features.forEach(feature => {
           const featureOption = {
             value: feature.selector,
-            label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
           // for now, we only supports binary on/off and sensors
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
@@ -66,17 +72,19 @@ class EditDeviceInRoom extends Component {
       });
       await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
     } catch (e) {
-      console.log(e);
+      console.error(e);
       this.setState({ loading: false });
     }
   };
 
   componentDidMount() {
-    this.getDeviceFeatures();
+    if (this.props.box.room) {
+      this.getDeviceFeatures();
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room) {
+    if (prevProps.box.room !== this.props.box.room && this.props.box.room) {
       this.getDeviceFeatures();
     }
   }
@@ -114,4 +122,4 @@ class EditDeviceInRoom extends Component {
   }
 }
 
-export default EditDeviceInRoom;
+export default withIntlAsProp(EditDeviceInRoom);

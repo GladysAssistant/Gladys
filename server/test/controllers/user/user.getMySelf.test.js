@@ -15,6 +15,7 @@ describe('GET /api/v1/me', () => {
           selector: 'john',
           email: 'demo@demo.com',
           birthdate: '12/12/1990',
+          distance_unit_preference: 'metric',
           temperature_unit_preference: 'celsius',
           language: 'en',
           role: 'admin',

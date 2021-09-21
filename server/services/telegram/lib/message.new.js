@@ -1,3 +1,4 @@
+const uuid = require('uuid');
 const logger = require('../../../utils/logger');
 const { EVENTS } = require('../../../utils/constants');
 
@@ -30,8 +31,10 @@ async function newMessage(msg) {
     user_id: user.id,
     user,
     language: user.language,
-    date: msg.date,
+    created_at: new Date(msg.date * 1000).toISOString(),
     text: msg.text,
+    // We generate ID as uuidv4 as Telegram doesn't give this type of ID
+    id: uuid.v4(),
   };
   this.gladys.event.emit(EVENTS.MESSAGE.NEW, message);
   return null;

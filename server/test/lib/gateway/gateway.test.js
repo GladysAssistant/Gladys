@@ -1,5 +1,7 @@
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
+const Promise = require('bluebird');
+const path = require('path');
 const { fake, assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
@@ -13,7 +15,6 @@ const Gateway = proxyquire('../../../lib/gateway', {
 
 const getConfig = require('../../../utils/getConfig');
 const { EVENTS } = require('../../../utils/constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -52,6 +53,29 @@ describe('gateway', () => {
       assert.calledOnce(gateway.gladysGatewayClient.createInstance);
     });
   });
+  describe('gateway.init', () => {
+    const userKeys = [
+      {
+        id: '55b440f0-99fc-4ef8-bfe6-cd13adb4071e',
+        name: 'Tony',
+        rsa_public_key: 'fingerprint',
+        ecdsa_public_key: 'fingerprint',
+        gladys_4_user_id: 'df033006-ee42-4b94-a324-3f558171c493',
+        connected: false,
+        accepted: false,
+      },
+    ];
+    const variable = {
+      getValue: fake.resolves(JSON.stringify(userKeys)),
+      setValue: fake.resolves(null),
+    };
+    const gateway = new Gateway(variable, event, system, sequelize, config);
+    it('should login two factor to gladys gateway', async () => {
+      await gateway.init();
+      expect(gateway.connected).to.equal(true);
+      expect(gateway.usersKeys).to.deep.equal(userKeys);
+    });
+  });
 
   describe('gateway.backup', () => {
     it('should backup gladys', async () => {
@@ -63,6 +87,19 @@ describe('gateway', () => {
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.backup();
       assert.calledOnce(gateway.gladysGatewayClient.uploadBackup);
+    });
+    it('should backup gladys and test progress bar', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.gladysGatewayClient.uploadBackup = async (form, func) => {
+        func({ loaded: 1, total: 100 });
+        await Promise.delay(100);
+      };
+      await gateway.backup();
     });
     it('should not backup, no backup key found', async () => {
       const variable = {
@@ -117,6 +154,39 @@ describe('gateway', () => {
       const gateway = new Gateway(variable, event, system, sequelize, config);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.restoreBackupEvent('this-path-does-not-exist');
+    });
+    it('should not restore a backup, sqlite file is not a Gladys DB', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_file_is_not_a_valid_db.dbfile');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'SQLITE_ERROR: no such table: t_user');
+    });
+    it('should not restore a backup, sqlite file is not a Gladys DB', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_file_has_no_user_table.dbfile');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'SQLITE_ERROR: no such table: t_user');
+    });
+    it('should not restore a backup, SQlite DB has no user', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      const emptyFile = path.join(__dirname, 'this_db_has_no_users.dbfile');
+      const promise = gateway.restoreBackup(emptyFile);
+      await assertChai.isRejected(promise, 'NO_USER_FOUND_IN_NEW_DB');
     });
   });
 
@@ -254,7 +324,6 @@ describe('gateway', () => {
   describe('gateway.handleNewMessage', () => {
     it('should handle a new gateway message and reject it', async () => {
       const variable = {
-        getValue: fake.resolves('[]'),
         setValue: fake.resolves(null),
       };
       const gateway = new Gateway(variable, event, system, sequelize, config);
@@ -278,25 +347,24 @@ describe('gateway', () => {
     });
     it('should handle a new gateway message and reject it, user not accepted', async () => {
       const variable = {
-        getValue: fake.resolves(
-          JSON.stringify([
-            {
-              rsa_public_key: 'fingerprint',
-              ecdsa_public_key: 'fingerprint',
-              accepted: false,
-            },
-          ]),
-        ),
         setValue: fake.resolves(null),
       };
-      const user = {
-        getById: fake.resolves({
+      const eventGateway = new EventEmitter();
+      const stateManager = {
+        get: fake.returns({
           id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
         }),
       };
-      const eventGateway = new EventEmitter();
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: false,
+        },
+      ];
 
       return new Promise((resolve, reject) => {
         gateway.handleNewMessage(
@@ -321,23 +389,21 @@ describe('gateway', () => {
     });
     it('should handle a new gateway message and reject it, user not found', async () => {
       const variable = {
-        getValue: fake.resolves(
-          JSON.stringify([
-            {
-              rsa_public_key: 'fingerprint',
-              ecdsa_public_key: 'fingerprint',
-              accepted: true,
-            },
-          ]),
-        ),
         setValue: fake.resolves(null),
       };
-      const user = {
-        getById: fake.rejects(new NotFoundError('User "0cd30aef-9c4e-4a23-88e3-3547971296e5" not found')),
+      const stateManager = {
+        get: fake.returns(null),
       };
       const eventGateway = new EventEmitter();
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
 
       return new Promise((resolve, reject) => {
         gateway.handleNewMessage(
@@ -366,26 +432,23 @@ describe('gateway', () => {
     });
     it('should handle a new gateway message and handle it', async () => {
       const variable = {
-        getValue: fake.resolves(
-          JSON.stringify([
-            {
-              rsa_public_key: 'fingerprint',
-              ecdsa_public_key: 'fingerprint',
-              accepted: true,
-            },
-          ]),
-        ),
         setValue: fake.resolves(null),
       };
-      const user = {
-        getById: fake.resolves({
+      const stateManager = {
+        get: fake.returns({
           id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
         }),
       };
       const eventGateway = new EventEmitter();
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, user);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
-
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
       eventGateway.on(EVENTS.GATEWAY.NEW_MESSAGE_API_CALL, (one, two, three, four, five, cb) => {
         cb([
           {
@@ -417,6 +480,374 @@ describe('gateway', () => {
             resolve();
           },
         );
+      });
+    });
+    it('should handle a new gateway open api message: create-device-state', async () => {
+      const variable = {
+        setValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const eventGateway = {
+        emit: fake.returns(),
+        on: fake.returns(),
+      };
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
+
+      return new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'create-device-state',
+            data: {
+              device_feature_external_id: 'external-id',
+              state: 1,
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          (res) => {
+            try {
+              expect(res).to.deep.equal({
+                status: 200,
+              });
+              assert.calledWith(eventGateway.emit, EVENTS.DEVICE.NEW_STATE, {
+                device_feature_external_id: 'external-id',
+                state: 1,
+              });
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          },
+        );
+      });
+    });
+    it('should handle a new gateway open api message: create-owntracks-location', async () => {
+      const variable = {
+        setValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const eventGateway = {
+        emit: fake.returns(),
+        on: fake.returns(),
+      };
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
+
+      return new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'create-owntracks-location',
+            data: {
+              lat: 42,
+              lon: 42,
+              alt: 0,
+              acc: 100,
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          (res) => {
+            try {
+              expect(res).to.deep.equal({
+                status: 200,
+              });
+              assert.calledWith(eventGateway.emit, EVENTS.GATEWAY.NEW_MESSAGE_OWNTRACKS_LOCATION, {
+                lat: 42,
+                lon: 42,
+                alt: 0,
+                acc: 100,
+              });
+              resolve();
+            } catch (e) {
+              reject(e);
+            }
+          },
+        );
+      });
+    });
+    it('should handle a new gateway open api message: google-home-request', async function Test() {
+      this.timeout(10000);
+      const variable = {
+        setValue: fake.resolves(null),
+        destroy: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const serviceManager = {
+        getService: fake.returns({
+          googleActionsHandler: {
+            onSync: fake.resolves({ status: 200, onSync: true }),
+            onQuery: fake.resolves({ status: 200, onQuery: true }),
+            onExecute: fake.resolves({ status: 200, onExecute: true }),
+          },
+        }),
+      };
+      const eventGateway = {
+        emit: fake.returns(),
+        on: fake.returns(),
+      };
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager, serviceManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
+
+      const promiseSync = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.SYNC' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const promiseExecute = new Promise((resolve) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.EXECUTE' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const promiseDisconnect = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.DISCONNECT' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const promiseQuery = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.QUERY' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const promiseUnknown = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'google-home-request',
+            data: {
+              inputs: [{ intent: 'action.devices.UNKNOWN' }],
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const [resultSync, resultQuery, resultExecute, resultUnkown, resultDisconnect] = await Promise.all([
+        promiseSync,
+        promiseQuery,
+        promiseExecute,
+        promiseUnknown,
+        promiseDisconnect,
+      ]);
+      expect(resultSync).to.deep.equal({ status: 200, onSync: true });
+      expect(resultQuery).to.deep.equal({ status: 200, onQuery: true });
+      expect(resultExecute).to.deep.equal({ status: 200, onExecute: true });
+      expect(resultUnkown).to.deep.equal({ status: 400 });
+      expect(resultDisconnect).to.deep.equal({});
+    });
+  });
+  describe('gateway.forwardDeviceStateToGoogleHome', () => {
+    it('should forward an event to google home', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: (type) => {
+          const feature = {
+            id: 'f2e2d5ea-bcea-4092-b597-7b8fb723e070',
+            device_id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
+            name: 'Lampe luminosité',
+            selector: 'mqtt-brightness',
+            external_id: 'mqtt:brightness',
+            category: 'light',
+            type: 'brightness',
+            read_only: false,
+            keep_history: true,
+            has_feedback: false,
+            unit: null,
+            min: 0,
+            max: 100,
+            last_value: 97,
+            last_value_string: null,
+          };
+          if (type === 'deviceById') {
+            return {
+              id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
+              service_id: '54a4c447-0caa-4ed5-aa6f-5019e4b27754',
+              room_id: '89abf7bc-208c-411a-a69b-33a173753e81',
+              name: 'Lampe modified',
+              selector: 'mqtt-lampe',
+              model: null,
+              external_id: 'mqtt:lampe',
+              should_poll: false,
+              poll_frequency: null,
+              features: [feature],
+              params: [],
+            };
+          }
+          return feature;
+        },
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.googleHomeForwardStateTimeout = 1;
+      gateway.connected = true;
+      gateway.googleHomeConnected = true;
+      const oneEvent = {
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'my-car',
+      };
+      await gateway.forwardDeviceStateToGoogleHome(oneEvent);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          assert.calledWith(gateway.gladysGatewayClient.googleHomeReportState, {
+            devices: { states: { 'mqtt-lampe': { brightness: 97, online: true } } },
+          });
+          resolve();
+        }, 10);
+      });
+    });
+    it('should not forward event to google home, event empty', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const stateManager = {
+        get: (type) => {
+          const feature = {
+            id: 'f2e2d5ea-bcea-4092-b597-7b8fb723e070',
+            device_id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
+            name: 'Camera',
+            selector: 'mqtt-brightness',
+            external_id: 'mqtt:brightness',
+            category: 'camera',
+            type: 'camera',
+            read_only: false,
+            keep_history: true,
+            has_feedback: false,
+            unit: null,
+            min: 0,
+            max: 100,
+            last_value: 97,
+            last_value_string: null,
+          };
+          if (type === 'deviceById') {
+            return {
+              id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
+              service_id: '54a4c447-0caa-4ed5-aa6f-5019e4b27754',
+              room_id: '89abf7bc-208c-411a-a69b-33a173753e81',
+              name: 'Camera',
+              selector: 'camera',
+              model: null,
+              external_id: 'camera',
+              should_poll: false,
+              poll_frequency: null,
+              features: [feature],
+              params: [],
+            };
+          }
+          return feature;
+        },
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.googleHomeForwardStateTimeout = 1;
+      gateway.connected = true;
+      gateway.googleHomeConnected = true;
+      const oneEvent = {
+        type: EVENTS.DEVICE.NEW_STATE,
+        device_feature: 'my-car',
+      };
+      await gateway.forwardDeviceStateToGoogleHome(oneEvent);
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          assert.notCalled(gateway.gladysGatewayClient.googleHomeReportState);
+          resolve();
+        }, 10);
       });
     });
   });

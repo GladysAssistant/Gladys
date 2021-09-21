@@ -18,7 +18,10 @@ Docker.prototype.listImages = fake.resolves(images);
 Docker.prototype.createContainer = fake.resolves({ id: containers[0].Id });
 
 Docker.prototype.getContainer = fake.returns({
+  inspect: fake.resolves({ HostConfig: { NetworkMode: 'host' } }),
   restart: fake.resolves(true),
+  remove: fake.resolves(true),
+  stop: fake.resolves(true),
   exec: ({ Cmd }) => {
     const mockedStream = new stream.Readable();
     return fake.resolves({

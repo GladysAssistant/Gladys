@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
+import { USER_ROLE } from '../../../../server/utils/constants';
 
 const PAGES_WITHOUT_HEADER = [
   '/login',
@@ -17,11 +18,15 @@ const PAGES_WITHOUT_HEADER = [
   '/signup-gateway',
   '/subscribe-gateway',
   '/gateway-configure-two-factor',
-  '/confirm-email'
+  '/confirm-email',
+  '/dashboard/integration/device/google-home/authorize'
 ];
 
 const Header = ({ ...props }) => {
   if (isUrlInArray(props.currentUrl, PAGES_WITHOUT_HEADER)) {
+    return null;
+  }
+  if (props.fullScreen) {
     return null;
   }
   return (
@@ -48,8 +53,8 @@ const Header = ({ ...props }) => {
                   <span class="ml-2 d-none d-lg-block">
                     <span class="text-default">{props.user.firstname}</span>
                     <small class="text-muted d-block mt-1">
-                      {props.user.role === 'admin' && <Text id="profile.adminRole" />}
-                      {props.user.role !== 'admin' && <Text id="profile.userRole" />}
+                      {props.user.role === USER_ROLE.ADMIN && <Text id="profile.adminRole" />}
+                      {props.user.role !== USER_ROLE.ADMIN && <Text id="profile.userRole" />}
                     </small>
                   </span>
                 </a>
@@ -61,9 +66,11 @@ const Header = ({ ...props }) => {
                   <a class="dropdown-item" href="/dashboard/profile">
                     <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
                   </a>
-                  <a class="dropdown-item" href="/dashboard/settings/house">
-                    <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
-                  </a>
+                  {props.user.role === USER_ROLE.ADMIN && (
+                    <a class="dropdown-item" href="/dashboard/settings/house">
+                      <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
+                    </a>
+                  )}
                   <div class="dropdown-divider" />
                   <a
                     class="dropdown-item"
@@ -147,14 +154,16 @@ const Header = ({ ...props }) => {
                     <i class="fe fe-map" /> <Text id="header.maps" />
                   </Link>
                 </li>
-                <li class="nav-item">
-                  <Link
-                    href="/dashboard/scene"
-                    class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
-                  >
-                    <i class="fe fe-play" /> <Text id="header.scenes" />
-                  </Link>
-                </li>
+                {props.user.role === USER_ROLE.ADMIN && (
+                  <li class="nav-item">
+                    <Link
+                      href="/dashboard/scene"
+                      class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
+                    >
+                      <i class="fe fe-play" /> <Text id="header.scenes" />
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
           </div>

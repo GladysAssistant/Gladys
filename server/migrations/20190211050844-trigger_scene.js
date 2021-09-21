@@ -43,5 +43,5 @@ module.exports = {
     await queryInterface.addIndex('t_trigger_scene', ['trigger_id']);
     await queryInterface.addIndex('t_trigger_scene', ['scene_id']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_trigger_scene'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_trigger_scene'),
 };

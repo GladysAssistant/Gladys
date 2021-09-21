@@ -1,4 +1,5 @@
 const { ConversationContext } = require('node-nlp');
+
 const Handlebars = require('handlebars');
 const { NotFoundError } = require('../../utils/coreErrors');
 
@@ -12,11 +13,11 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * brain.getReply('en', 'light.turn-on.success');
  */
 function getReply(language, intent, context = new ConversationContext()) {
-  const text = this.nlpManager.getAnswer(language, intent, context);
-  if (!text) {
+  const text = this.nlpManager.findAllAnswers(language, intent);
+  if (text.length === 0) {
     throw new NotFoundError(`Answer with intent ${intent} and language ${language} not found`);
   }
-  return Handlebars.compile(text)(context);
+  return Handlebars.compile(text[0].answer)(context);
 }
 
 module.exports = {

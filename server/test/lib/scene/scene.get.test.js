@@ -12,6 +12,7 @@ describe('SceneManager.get', () => {
     scenes.forEach((oneScene) => {
       expect(oneScene).to.have.property('name');
       expect(oneScene).to.have.property('selector');
+      expect(oneScene).to.have.property('active');
       expect(oneScene).not.to.have.property('actions');
       expect(oneScene).to.have.property('updated_at');
       expect(oneScene).to.have.property('last_executed');
@@ -28,6 +29,7 @@ describe('SceneManager.get', () => {
         id: '3a30636c-b3f0-4251-a347-90787f0fe940',
         name: 'Test scene',
         icon: 'fe fe-bell',
+        active: true,
         selector: 'test-scene',
         last_executed: null,
         updated_at: new Date('2019-02-12T07:49:07.556Z'),

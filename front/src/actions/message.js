@@ -42,6 +42,22 @@ function createActions(store) {
         currentMessageTextInput: e.target.value
       });
     },
+    syncMessage(state, message) {
+      let newMessages = store.getState().messages;
+      // Check if message is already in the list
+      if (message.id && newMessages.find(m => m.id === message.id)) {
+        return;
+      }
+      newMessages = update(store.getState().messages, {
+        $push: [message]
+      });
+      newMessages = sortMessages(newMessages);
+      store.setState({
+        gladysIsTyping: false,
+        messages: newMessages
+      });
+      actions.scrollToBottom();
+    },
     pushMessage(state, message) {
       store.setState({
         gladysIsTyping: true
@@ -74,15 +90,16 @@ function createActions(store) {
       });
       const messageText = state.currentMessageTextInput;
       try {
+        const id = uuid.v4();
         const newMessage = {
           text: messageText,
-          created_at: new Date()
+          created_at: new Date(),
+          id
         };
-        const tempId = uuid.v4();
         // we first push the message
         const newState = update(state, {
           messages: {
-            $push: [Object.assign({}, newMessage, { tempId })]
+            $push: [newMessage]
           },
           MessageSendStatus: {
             $set: RequestStatus.Getting
@@ -93,15 +110,12 @@ function createActions(store) {
         });
         newState.messages = sortMessages(newState.messages);
         store.setState(newState);
-        actions.scrollToBottom();
         // then we send the message
-        const createdMessage = await state.httpClient.post('/api/v1/message', newMessage);
-        const messagesWithoutTempMessage = store.getState().messages.filter(message => message.tempId !== tempId);
-        messagesWithoutTempMessage.push(createdMessage);
+        await state.httpClient.post('/api/v1/message', newMessage);
         // then we remove the message loading
         const finalState = update(state, {
           messages: {
-            $set: sortMessages(messagesWithoutTempMessage)
+            $set: sortMessages(newState.messages)
           },
           MessageSendStatus: {
             $set: RequestStatus.Success

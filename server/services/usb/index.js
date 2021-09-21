@@ -30,7 +30,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
    * gladys.services.usb.stop();
    */
   async function stop() {
-    logger.log('stopping usb service');
+    logger.info('Stopping usb service');
   }
 
   return Object.freeze({

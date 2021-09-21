@@ -1,14 +1,14 @@
 .emptyStateDivBox {
   width: 60%;
   max-width: 400px;
-  margin-Left: auto;
+  margin-left: auto;
   margin-right: auto;
   margin-top: 80px;
   text-align: center;
 }
 
 .emptyStateImage {
-  margin-Left: auto;
+  margin-left: auto;
   margin-right: auto;
   display: block;
   width: 100%;
@@ -17,4 +17,31 @@
 
 .emptyStateText {
   margin-top: 20px;
+}
+
+@media (min-width: 992px) {
+  .removePaddingFirstCol {
+    padding-left: 0;
+  }
+
+  .removePaddingLastCol {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 992px) {
+  .removePadding {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+@media (min-width: 992px) {
+  .smallButtonOnBigScreen {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    min-width: 1.625rem;
+    line-height: 1.33333333;
+    border-radius: 3px;
+  }
 }

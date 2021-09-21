@@ -10,11 +10,17 @@ class SceneCard extends Component {
       await this.setState({ saving: true });
       await this.props.httpClient.post(`/api/v1/scene/${this.props.scene.selector}/start`);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
 
     // make sure the loader is displayed at least 200ms
     setTimeout(() => this.setState({ saving: false }), 200);
+  };
+
+  switchActiveScene = async () => {
+    await this.setState({ saving: true });
+    await this.props.switchActiveScene(this.props.index);
+    await this.setState({ saving: false });
   };
 
   render(props, { saving }) {
@@ -31,6 +37,19 @@ class SceneCard extends Component {
               <div class="card-body p-3 text-center">
                 <div class={style.scene_icon}>
                   <i class={`fe fe-${props.scene.icon}`} />
+                </div>
+                <div class={style.disableSceneButton}>
+                  <label class="custom-switch m-0">
+                    <input
+                      type="checkbox"
+                      name="active"
+                      value="1"
+                      className="custom-switch-input"
+                      checked={props.scene.active}
+                      onClick={this.switchActiveScene}
+                    />
+                    <span class="custom-switch-indicator" />
+                  </label>
                 </div>
                 <h4>{props.scene.name}</h4>
                 <div class="text-muted">{props.scene.description}</div>

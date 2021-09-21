@@ -8,11 +8,23 @@ const logger = require('../../../../utils/logger');
 async function stop() {
   this.discoveredDevices = {};
 
+  this.stopScanPresence();
+
   logger.debug(`Bluetooth: Stop discovering`);
-  await this.bluetooth.stopScanningAsync();
+  this.bluetooth.stopScanning();
 
   logger.debug(`Bluetooth: Removing all Bluetooth listeners`);
   this.bluetooth.removeAllListeners();
+
+  logger.debug(`Bluetooth: Reset service status`);
+  this.bluetooth = undefined;
+
+  if (this.scanPromise && this.scanPromise.isPending()) {
+    this.scanPromise.cancel();
+  }
+
+  this.scanPromise = undefined;
+  this.scanCounter = 0;
 }
 
 module.exports = {

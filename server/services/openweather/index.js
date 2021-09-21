@@ -31,7 +31,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
    * gladys.services.openWeather.stop();
    */
   async function stop() {
-    logger.log('stopping Open Weather service');
+    logger.info('Stopping Open Weather service');
   }
 
   /**
@@ -41,7 +41,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
    * @param {number} options.longitude - The longitude to get the weather from.
    * @param {number} options.offset - Get weather in the future, offset is in hour.
    * @param {string} [options.language] - The language of the report.
-   * @param {string} [options.units] - Unit of the weather [auto, si, us].
+   * @param {string} [options.units] - Unit of the weather [metric, us].
    * @example
    * gladys.services.openWeather.weather.get({
    *   latitude: 112,
@@ -52,12 +52,16 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
    * });
    */
   async function get(options) {
+    const optionsModified = {
+      ...options,
+      units: options.units === 'us' ? 'imperial' : 'metric',
+    };
     const DEFAULT = {
       language: 'en',
       units: 'metric',
       offset: 0,
     };
-    const optionsMerged = Object.assign({}, DEFAULT, options);
+    const optionsMerged = Object.assign({}, DEFAULT, optionsModified);
     const { latitude, longitude, language, units } = optionsMerged;
 
     if (!openWeatherApiKey) {

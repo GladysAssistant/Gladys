@@ -3,6 +3,9 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+import dayjs from 'dayjs';
+
+import { WEATHER_UNITS } from '../../../../../server/utils/constants';
 
 import actions from '../../../actions/dashboard/boxes/weather';
 import {
@@ -123,7 +126,7 @@ const WeatherBox = ({ children, ...props }) => (
                   fontSize: '30px'
                 }}
               >
-                {props.units === 'metric' ? 'C' : 'F'}
+                {props.units === WEATHER_UNITS.METRIC ? <Text id="global.celsius" /> : <Text id="global.fahrenheit" />}
               </span>
             </div>
           </div>
@@ -136,7 +139,7 @@ const WeatherBox = ({ children, ...props }) => (
             }}
           >
             <i
-              className={cx('fe', props.weather_icon)}
+              className={cx('fe', props.weatherIcon)}
               style={{
                 fontSize: '50px'
               }}
@@ -176,7 +179,11 @@ const WeatherBox = ({ children, ...props }) => (
                   color: 'grey'
                 }}
               >
-                {props.units === 'si' ? 'km/h' : 'm/h'}
+                {props.units === WEATHER_UNITS.METRIC ? (
+                  <Text id="global.metersPerSec" />
+                ) : (
+                  <Text id="global.milesPerHour" />
+                )}
               </span>
             </span>
           </div>
@@ -205,13 +212,31 @@ const WeatherBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect('DashboardBoxDataWeather,DashboardBoxStatusWeather', actions)
 class WeatherBoxComponent extends Component {
-  componentDidMount() {
-    // get the weather
+  refreshData = () => {
     this.props.getWeather(this.props.box, this.props.x, this.props.y);
+  };
+  componentDidMount() {
+    this.refreshData();
     // refresh weather every interval
-    setInterval(() => this.props.getWeather(this.props.box, this.props.x, this.props.y), BOX_REFRESH_INTERVAL_MS);
+    this.interval = setInterval(() => this.refreshData, BOX_REFRESH_INTERVAL_MS);
+  }
+
+  componentDidUpdate(previousProps) {
+    const houseChanged = get(previousProps, 'box.house') !== get(this.props, 'box.house');
+    const advancedWeatherChanged =
+      get(previousProps, 'box.modes.advancedWeather') !== get(this.props, 'box.modes.advancedWeather');
+    const dailyForecastChanged =
+      get(previousProps, 'box.modes.dailyForecast') !== get(this.props, 'box.modes.dailyForecast');
+    const hourlyForecastChanged =
+      get(previousProps, 'box.modes.hourlyForecast') !== get(this.props, 'box.modes.hourlyForecast');
+    if (houseChanged || advancedWeatherChanged || dailyForecastChanged || hourlyForecastChanged) {
+      this.refreshData();
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render(props, {}) {
@@ -226,7 +251,7 @@ class WeatherBoxComponent extends Component {
     const houseName = get(weatherObject, 'house.name');
 
     const weather = get(weatherObject, 'weather');
-    const weather_icon = get(weatherObject, 'weather_icon');
+    const weatherIcon = get(weatherObject, 'weatherIcon');
 
     let humidity, wind, hoursDisplay, daysDisplay;
     if (displayMode[GetWeatherModes.AdvancedWeather]) {
@@ -249,7 +274,7 @@ class WeatherBoxComponent extends Component {
                 {`${hour.datetime_beautiful}h`}
               </p>
               <p style={{ margin: 'auto', textAlign: 'center' }}>
-                <i className={cx('fe', hour.weather_icon)} style={{ fontSize: '20px' }} />
+                <i className={cx('fe', hour.weatherIcon)} style={{ fontSize: '20px' }} />
               </p>
               <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>
                 <Text id="global.degreeValue" fields={{ value: hour.temperature }} />
@@ -267,9 +292,13 @@ class WeatherBoxComponent extends Component {
         daysDisplay = days.map(day => {
           return (
             <div className="row" style={{ marginTop: '0.5em' }}>
-              <div className="col-5">{day.datetime_beautiful}</div>
+              <div className="col-5" style={{ textTransform: 'capitalize' }}>
+                {dayjs(day.datetime)
+                  .locale(props.user.language)
+                  .format('dddd')}
+              </div>
               <div className="col-3">
-                <i className={cx('fe', day.weather_icon)} style={{ fontSize: '20px' }} />
+                <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />
               </div>
               <div className="col-4" style={{ textAlign: 'right' }}>
                 <Text
@@ -287,7 +316,7 @@ class WeatherBoxComponent extends Component {
       <WeatherBox
         {...props}
         weather={weather}
-        weather_icon={weather_icon}
+        weatherIcon={weatherIcon}
         temperature={temperature}
         units={units}
         boxStatus={boxStatus}
@@ -303,4 +332,4 @@ class WeatherBoxComponent extends Component {
   }
 }
 
-export default WeatherBoxComponent;
+export default connect('DashboardBoxDataWeather,DashboardBoxStatusWeather,user', actions)(WeatherBoxComponent);

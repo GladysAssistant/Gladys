@@ -2,66 +2,66 @@ name: Pull request tests
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [master]
     types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - 
-        name: ⬇️ Checkout Gladys code
+      - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v2
-      - 
-        name: 💽 Setup nodejs
-        uses: actions/setup-node@v1
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
-      - 
-        name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
-      - 
-        name: 📦 Install Global NPM Packages
+          node-version: '14'
+      - name: 📇 Use npm cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
-      - 
-        name: 📦 Install NPM front packages
+      - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
           npm ci
-      - 
-        name: 🧐 Prettier check
+      - name: 🧐 Prettier check
         working-directory: ./front
         run: |
           npm run prettier-check
-      - 
-        name: 👕 ESlint
+      - name: 👕 ESlint
         working-directory: ./front
         run: |
           npm run eslint
-      - 
-        name: 🌐 Integration comparison
+      - name: 🌐 Integration comparison
         working-directory: ./front
         run: |
           npm run compare-translations
   test-server:
     name: Server test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - 
-        name: ⬇️ Checkout Gladys code
+      - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v2
-      - 
-        name: 💽 Setup nodejs
-        uses: actions/setup-node@v1
         with:
-          node-version: 12.x
-      - 
-        name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
-      - 
-        name: 🖥️ Setup OZW
+          fetch-depth: 2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: 📇 Use npm cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: 🖥️ Setup OZW
         run: |
           docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
           sudo docker cp dummy:/usr/local/include/openzwave /usr/local/include/openzwave
@@ -70,70 +70,98 @@ jobs:
           sudo docker cp dummy:/openzwave/config /usr/local/etc/openzwave
           sudo ldconfig
           docker rm -f dummy
-      - 
-        name: 💽 Install System Dependencies
+      - name: 💽 Install System Dependencies
         run: |
           sudo apt update
-          sudo apt-get install -y libudev-dev sqlite3 openssl
-      - 
-        name: 📦 Install Global NPM Packages
+          sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
+      - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
-      - 
-        name: 📦 Install NPM server packages
+      - name: 📦 Install NPM server packages
         working-directory: ./server
         run: |
           npm ci
-      - 
-        name: 🧐 Prettier check
+      - name: 🧐 Prettier check
         working-directory: ./server
         run: |
           npm run prettier-check
-      - 
-        name: 👕 ESlint
+      - name: 👕 ESlint
         working-directory: ./server
         run: |
           npm run eslint
-      - 
-        name: ✅ Test with coverage
+      - name: ✅ Test with coverage
         working-directory: ./server
         run: |
           npm run coverage
-      - 
-        name: 📄 Codecov report upload
+      - name: 🔐 Dependencies security audit
+        working-directory: ./server
+        run: npm audit --production --audit-level=critical
+      - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v1
+  cypress-run:
+    name: Cypress run
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: 📇 Use npm cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: 📦 Install NPM packages
+        run: |
+          npm ci
+      - name: ✅ Cypress run
+        uses: cypress-io/github-action@v2.8.2
+        with:
+          install: false
+          start: npm run start:cypress
+          wait-on: 'http://localhost:1444'
+          config-file: ./front/cypress/cypress.json
+          project: ./front
+          command: npm run cypress:run
   build-front:
     if: github.event.pull_request.draft == false
     name: Front build
     needs:
       - test-front
-      - test-server
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - 
-        name: ⬇️ Checkout code
+      - name: ⬇️ Checkout code
         uses: actions/checkout@v2
-      - 
-        name: 💽 Setup nodejs
-        uses: actions/setup-node@v1
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
         with:
-          node-version: 12.x
-      - 
-        name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
-      - 
-        name: 📦 Install NPM front packages
+          node-version: '14'
+      - name: 📇 Use npm cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
           npm ci
-      - 
-        name: 🏗️ Build front
+      - name: 🏗️ Build front
         working-directory: ./front
         run: |
-          npm run build
-      - 
-        name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v1
+          npm run build-with-stats
+      - name: Upload bundle ci
+        working-directory: ./front
+        run: npx relative-ci-agent
+        env:
+          RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY }}
+      - name: ↗️ Upload build artifact
+        uses: actions/upload-artifact@v2
         with:
           name: static
           path: front/build
@@ -141,27 +169,23 @@ jobs:
     if: github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
-      - 
-        name: ⬇️ Checkout code
+      - name: ⬇️ Checkout code
         uses: actions/checkout@v2
-      - 
-        name: 💽 Set up QEMU
+      - name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v1
-      - 
-        name: 🐳 Set up Docker Buildx
+      - name: 🐳 Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
         with:
           version: latest
-      - 
-        name: ↙️ Download build artifact
-        uses: actions/download-artifact@v1
+      - name: ↙️ Download build artifact
+        uses: actions/download-artifact@v2
         with:
           name: static
-      - 
-        name: 🐳 Build AMD64 images
+          path: static
+      - name: 🐳 Build AMD64 images
         uses: docker/build-push-action@v2
         with:
           context: .

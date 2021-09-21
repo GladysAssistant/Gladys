@@ -16,12 +16,9 @@ const { EVENTS } = require('../../utils/constants');
  */
 async function handleNewMessage(data, rawMessage, cb) {
   if (data.type === 'gladys-api-call') {
-    // first, we verify that the user has the right to control the instance
-    const usersKeys = JSON.parse(await this.variable.getValue('GLADYS_GATEWAY_USERS_KEYS'));
     const rsaPublicKey = await this.gladysGatewayClient.generateFingerprint(rawMessage.rsaPublicKeyRaw);
     const ecdsaPublicKey = await this.gladysGatewayClient.generateFingerprint(rawMessage.ecdsaPublicKeyRaw);
-
-    const found = usersKeys.find(
+    const found = this.usersKeys.find(
       (user) => user.rsa_public_key === rsaPublicKey && user.ecdsa_public_key === ecdsaPublicKey,
     );
 
@@ -41,7 +38,15 @@ async function handleNewMessage(data, rawMessage, cb) {
       return;
     }
     try {
-      const user = rawMessage.local_user_id ? await this.user.getById(rawMessage.local_user_id) : null;
+      let user = null;
+
+      if (rawMessage.local_user_id) {
+        user = this.stateManager.get('userById', rawMessage.local_user_id);
+        if (user === null) {
+          throw new NotFoundError(`User "${rawMessage.local_user_id}" not found`);
+        }
+      }
+
       this.event.emit(
         EVENTS.GATEWAY.NEW_MESSAGE_API_CALL,
         user,
@@ -67,6 +72,17 @@ async function handleNewMessage(data, rawMessage, cb) {
   if (data.type === 'gladys-open-api' && data.action === 'create-owntracks-location') {
     this.event.emit(EVENTS.GATEWAY.NEW_MESSAGE_OWNTRACKS_LOCATION, data.data);
     cb({ status: 200 });
+  }
+
+  // if the message is an open API create device state message
+  if (data.type === 'gladys-open-api' && data.action === 'create-device-state') {
+    this.event.emit(EVENTS.DEVICE.NEW_STATE, data.data);
+    cb({ status: 200 });
+  }
+
+  // if the message is a Google Home request
+  if (data.type === 'gladys-open-api' && data.action === 'google-home-request') {
+    this.handleGoogleHomeMessage(data, rawMessage, cb);
   }
 }
 

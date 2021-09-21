@@ -1,5 +1,5 @@
 import axios from 'axios';
-import config from '../../config';
+import config from '../config';
 
 const MAX_RETRY = 3;
 
@@ -27,6 +27,8 @@ export class HttpClient {
       }
     });
     this.session.setAccessToken(data.access_token);
+    // reconnect websocket
+    this.session.connect();
   }
 
   async executeQuery(method, url, query, body, retryCount = 0) {

@@ -6,10 +6,23 @@ const CalDAVController = require('./api/caldav.controller');
 module.exports = function CalDAVService(gladys, serviceId) {
   const ical = require('ical');
   const dav = require('dav-request');
-  const moment = require('moment');
+  const dayjs = require('dayjs');
+  const objectSupport = require('dayjs/plugin/objectSupport');
+  const duration = require('dayjs/plugin/duration');
+  const advancedFormat = require('dayjs/plugin/advancedFormat');
+  const isBetween = require('dayjs/plugin/isBetween');
+  const utc = require('dayjs/plugin/utc');
+  const timezone = require('dayjs/plugin/timezone');
   const xmlDom = require('xmldom');
 
-  const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, moment, xmlDom);
+  dayjs.extend(objectSupport);
+  dayjs.extend(duration);
+  dayjs.extend(advancedFormat);
+  dayjs.extend(isBetween);
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+
+  const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, dayjs, xmlDom);
 
   let interval;
 
@@ -48,7 +61,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
    * gladys.services.caldav.start();
    */
   async function start() {
-    logger.log('starting CalDAV service');
+    logger.info('Starting CalDAV service');
     interval = setInterval(syncAllUsers, 1000 * 60 * 30);
   }
 
@@ -60,7 +73,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
    * gladys.services.caldav.stop();
    */
   async function stop() {
-    logger.log('stopping CalDAV service');
+    logger.info('Stopping CalDAV service');
     clearInterval(interval);
   }
 

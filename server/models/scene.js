@@ -15,12 +15,20 @@ const actionSchema = Joi.array().items(
       devices: Joi.array().items(Joi.string()),
       user: Joi.string(),
       house: Joi.string(),
+      scene: Joi.string(),
       text: Joi.string(),
       value: Joi.number(),
+      minutes: Joi.number(),
       unit: Joi.string(),
       url: Joi.string().uri(),
       body: Joi.string(),
       method: Joi.string().valid('get', 'post', 'patch', 'put', 'delete'),
+      days_of_the_week: Joi.array().items(
+        Joi.string().valid('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'),
+      ),
+      before: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+      after: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+      request_response_keys: Joi.array().items(Joi.string()),
       headers: Joi.array().items(
         Joi.object().keys({
           key: Joi.string(),
@@ -49,6 +57,7 @@ const triggersSchema = Joi.array().items(
     operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
     value: Joi.number(),
     user: Joi.string(),
+    area: Joi.string(),
     scheduler_type: Joi.string().valid('every-month', 'every-week', 'every-day', 'interval', 'custom-time'),
     date: Joi.date().format('YYYY-MM-DD'),
     time: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
@@ -80,6 +89,11 @@ module.exports = (sequelize, DataTypes) => {
       icon: {
         allowNull: false,
         type: DataTypes.ENUM(iconList),
+      },
+      active: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
       },
       selector: {
         allowNull: false,

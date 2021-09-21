@@ -47,7 +47,13 @@ const Profile = ({ children, ...props }) => {
                   })}
                   value={props.newUser.firstname}
                   onInput={props.updateFirstname}
-                  placeholder={<Text id="profile.firstnamePlaceholder" />}
+                  placeholder={
+                    props.editingOtherUser ? (
+                      <Text id="profile.firstnameOtherUserPlaceholder" />
+                    ) : (
+                      <Text id="profile.firstnamePlaceholder" />
+                    )
+                  }
                 />
               </Localizer>
               <div class="invalid-feedback">
@@ -68,7 +74,13 @@ const Profile = ({ children, ...props }) => {
                   })}
                   value={props.newUser.lastname}
                   onInput={props.updateLastname}
-                  placeholder={<Text id="profile.lastnamePlaceholder" />}
+                  placeholder={
+                    props.editingOtherUser ? (
+                      <Text id="profile.lastnameOtherUserPlaceholder" />
+                    ) : (
+                      <Text id="profile.lastnamePlaceholder" />
+                    )
+                  }
                 />
               </Localizer>
               <div class="invalid-feedback">
@@ -99,7 +111,13 @@ const Profile = ({ children, ...props }) => {
             })}
             value={props.newUser.email}
             onInput={props.updateEmail}
-            placeholder={<Text id="profile.emailPlaceholder" />}
+            placeholder={
+              props.editingOtherUser ? (
+                <Text id="profile.emailOtherUserPlaceholder" />
+              ) : (
+                <Text id="profile.emailPlaceholder" />
+              )
+            }
           />
         </Localizer>
         <div class="invalid-feedback">
@@ -110,7 +128,7 @@ const Profile = ({ children, ...props }) => {
         <label class="form-label">
           <Text id="profile.languageLabel" />
         </label>
-        <select value={props.newUser.language} onChange={props.updateLanguage} class="form-control custom-select">
+        <select value={props.newUser.language} onChange={props.updateLanguage} class="form-control">
           <option value="en">
             <Text id="profile.english" />
           </option>
@@ -119,6 +137,26 @@ const Profile = ({ children, ...props }) => {
           </option>
         </select>
       </div>
+      {!props.disableRole && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="profile.roleLabel" />
+          </label>
+          <p>
+            <small>
+              <Text id="profile.roleDescription" />
+            </small>
+          </p>
+          <select value={props.newUser.role} onChange={props.updateRole} class="form-control">
+            <option value="admin">
+              <Text id="profile.adminRole" />
+            </option>
+            <option value="user">
+              <Text id="profile.userRole" />
+            </option>
+          </select>
+        </div>
+      )}
       <div class="form-group">
         <label class="form-label">
           <Text id="profile.birthdateLabel" />
@@ -188,6 +226,44 @@ const Profile = ({ children, ...props }) => {
           <Text id="profile.birthdateError" />
         </div>
       </div>
+      {!props.disablePreferences && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="signup.preferences.temperatureUnitsLabel" />
+          </label>
+          <select
+            value={props.newUser.temperature_unit_preference}
+            onInput={props.updateTemperatureUnit}
+            class="form-control"
+          >
+            <option value="celsius">
+              <Text id="signup.preferences.temperatureUnitsCelsius" />
+            </option>
+            <option value="fahrenheit">
+              <Text id="signup.preferences.temperatureUnitsFahrenheit" />
+            </option>
+          </select>
+        </div>
+      )}
+      {!props.disablePreferences && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="signup.preferences.distanceUnit" />
+          </label>
+          <select
+            value={props.newUser.distance_unit_preference}
+            onInput={props.updateDistanceUnit}
+            class="form-control"
+          >
+            <option value="metric">
+              <Text id="signup.preferences.distanceUnitMeter" />
+            </option>
+            <option value="us">
+              <Text id="signup.preferences.distanceUnitUs" />
+            </option>
+          </select>
+        </div>
+      )}
       {!props.disableProfilePicture && (
         <div class="form-group">
           <label class="form-label">
@@ -214,46 +290,66 @@ const Profile = ({ children, ...props }) => {
           )}
         </div>
       )}
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.passwordLabel" />
-        </label>
-        <Localizer>
-          <input
-            type="password"
-            class={cx('form-control', {
-              'is-invalid': get(props, 'errors.password'),
-              'is-valid': props.validPassword && !get(props, 'errors.password')
-            })}
-            value={props.newUser.password}
-            onInput={props.updatePassword}
-            placeholder={<Text id="profile.passwordPlaceholder" />}
-          />
-        </Localizer>
-        <div class="invalid-feedback">
-          <Text id="profile.passwordError" />
+      {!props.disablePassword && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="profile.passwordLabel" />
+          </label>
+          <Localizer>
+            <input
+              type="password"
+              class={cx('form-control', {
+                'is-invalid': get(props, 'errors.password'),
+                'is-valid': props.validPassword && !get(props, 'errors.password')
+              })}
+              value={props.newUser.password}
+              onInput={props.updatePassword}
+              placeholder={
+                props.editingOtherUser ? (
+                  <Text id="profile.passwordOtherUserPlaceholder" />
+                ) : (
+                  <Text id="profile.passwordPlaceholder" />
+                )
+              }
+            />
+          </Localizer>
+          <div class="invalid-feedback">
+            <Text id="profile.passwordError" />
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.passwordRepeatLabel" />
-        </label>
-        <Localizer>
-          <input
-            type="password"
-            class={cx('form-control', {
-              'is-invalid': get(props, 'errors.passwordRepeat'),
-              'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
-            })}
-            value={props.newUser.passwordRepeat}
-            onInput={props.updatePasswordRepeat}
-            placeholder={<Text id="profile.passwordRepeatPlaceholder" />}
-          />
-        </Localizer>
-        <div class="invalid-feedback">
-          <Text id="profile.passwordRepeatError" />
+      )}
+      {!props.disablePassword && (
+        <div class="form-group">
+          <label class="form-label">
+            {props.editingOtherUser ? (
+              <Text id="profile.passwordOtherUserRepeatLabel" />
+            ) : (
+              <Text id="profile.passwordRepeatLabel" />
+            )}
+          </label>
+          <Localizer>
+            <input
+              type="password"
+              class={cx('form-control', {
+                'is-invalid': get(props, 'errors.passwordRepeat'),
+                'is-valid': props.validPasswordRepeat && !get(props, 'errors.passwordRepeat')
+              })}
+              value={props.newUser.passwordRepeat}
+              onInput={props.updatePasswordRepeat}
+              placeholder={
+                props.editingOtherUser ? (
+                  <Text id="profile.passwordRepeatOtherUserPlaceholder" />
+                ) : (
+                  <Text id="profile.passwordRepeatPlaceholder" />
+                )
+              }
+            />
+          </Localizer>
+          <div class="invalid-feedback">
+            <Text id="profile.passwordRepeatError" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

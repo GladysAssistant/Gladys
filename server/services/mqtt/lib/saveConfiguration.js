@@ -1,5 +1,5 @@
 const { promisify } = require('util');
-const { CONFIGURATION } = require('./constants');
+const { CONFIGURATION, DEFAULT } = require('./constants');
 const { NotFoundError } = require('../../../utils/coreErrors');
 const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
@@ -65,6 +65,13 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
     await this.gladys.system.restartContainer(container.id);
     // wait 5 seconds for the container to restart
     await sleep(5 * 1000);
+
+    await updateOrDestroyVariable(
+      variable,
+      CONFIGURATION.MQTT_MOSQUITTO_VERSION,
+      DEFAULT.MOSQUITTO_VERSION,
+      this.serviceId,
+    );
   }
 
   return this.connect({ mqttUrl, mqttUsername, mqttPassword, useEmbeddedBroker });

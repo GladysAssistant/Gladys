@@ -3,6 +3,14 @@ const STATE = {
   OFF: 0,
 };
 
+const BUTTON_STATUS = {
+  CLICK: 1,
+  DOUBLE_CLICK: 2,
+  LONG_CLICK_PRESS: 3,
+  LONG_CLICK_RELEASE: 4,
+  LONG_CLICK: 5,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -33,6 +41,9 @@ const SERVICE_STATUS = {
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
+  GLADYS_GATEWAY_USERS_KEYS: 'GLADYS_GATEWAY_USERS_KEYS',
+  GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
+    'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   TIMEZONE: 'TIMEZONE',
 };
 
@@ -53,6 +64,7 @@ const EVENTS = {
     RESTORE_BACKUP: 'gateway.restore-backup',
     NEW_MESSAGE_API_CALL: 'gateway.new-message-api-call',
     NEW_MESSAGE_OWNTRACKS_LOCATION: 'gateway.new-message-owntracks-location',
+    USER_KEYS_CHANGED: 'gateway.user-keys-changed',
   },
   USER_SLEEP: {
     TIME_TO_WAKE_UP: 'user.time-to-wake-up',
@@ -105,12 +117,17 @@ const EVENTS = {
   },
   TIME: {
     CHANGED: 'time.changed',
+    SUNRISE: 'time.sunrise',
+    SUNSET: 'time.sunset',
   },
   TRIGGERS: {
     CHECK: 'trigger.check',
   },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
+  },
+  HUMIDITY_SENSOR: {
+    HUMIDITY_CHANGED: 'humidity.changed',
   },
   SCHEDULED_SCENE: {
     ENABLED: 'scheduled-scene.enabled',
@@ -128,6 +145,20 @@ const EVENTS = {
   WEBSOCKET: {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
+  },
+  HOUSE: {
+    CREATED: 'house.created',
+    UPDATED: 'house.updated',
+    DELETED: 'house.deleted',
+    EMPTY: 'house.empty',
+    NO_LONGER_EMPTY: 'house.no-longer-empty',
+  },
+  USER: {
+    NEW_LOCATION: 'user.new-location',
+  },
+  AREA: {
+    USER_ENTERED: 'area.user-entered',
+    USER_LEFT: 'area.user-left',
   },
 };
 
@@ -213,10 +244,16 @@ const ACTIONS = {
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
+    CHECK_TIME: 'condition.check-time',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
     SET_OUT_OF_HOME: 'user.set-out-of-home',
+    CHECK_PRESENCE: 'user.check-presence',
+  },
+  HOUSE: {
+    IS_EMPTY: 'house.is-empty',
+    IS_NOT_EMPTY: 'house.is-not-empty',
   },
   HTTP: {
     REQUEST: 'http.request',
@@ -231,8 +268,14 @@ const INTENTS = {
   TEMPERATURE_SENSOR: {
     GET_IN_ROOM: 'intent.temperature-sensor.get-in-room',
   },
+  HUMIDITY_SENSOR: {
+    GET_IN_ROOM: 'intent.humidity-sensor.get-in-room',
+  },
   WEATHER: {
     GET: 'intent.weather.get',
+    TOMORROW: 'intent.weather.tomorrow',
+    AFTER_TOMORROW: 'intent.weather.after-tomorrow',
+    DAY: 'intent.weather.day',
   },
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
@@ -330,6 +373,7 @@ const DEVICE_FEATURE_UNITS = {
   CELSIUS: 'celsius',
   FAHRENHEIT: 'fahrenheit',
   PERCENT: 'percent',
+  HECTO_PASCAL: 'hPa',
   PASCAL: 'pascal',
   LUX: 'lux',
   WATT: 'watt',
@@ -342,13 +386,17 @@ const DEVICE_FEATURE_UNITS = {
   CM: 'cm',
 };
 
+const WEATHER_UNITS = {
+  METRIC: 'metric',
+};
+
 const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
   [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [DEVICE_FEATURE_UNITS.MM, DEVICE_FEATURE_UNITS.CM],
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
-  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.PASCAL],
+  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.PASCAL, DEVICE_FEATURE_UNITS.HECTO_PASCAL],
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
 };
 
@@ -376,6 +424,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   MESSAGE: {
     NEW: 'message.new',
+    SENT: 'message.sent',
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
@@ -387,6 +436,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+  },
+  LOCATION: {
+    NEW: 'location.new',
   },
   USER_PRESENCE: {
     LEFT_HOME: 'user.left-home',
@@ -410,6 +462,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
+  },
+  ZIGBEE2MQTT: {
+    DISCOVER: 'zigbee2mqtt.discover',
+    STATUS_CHANGE: 'zigbee2mqtt.status-change',
+    MQTT_ERROR: 'zigbee2mqtt.mqtt-error',
+    PERMIT_JOIN: 'zigbee2mqtt.permit-join',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
@@ -439,6 +497,7 @@ const DASHBOARD_TYPE = {
 const DASHBOARD_BOX_TYPE = {
   WEATHER: 'weather',
   TEMPERATURE_IN_ROOM: 'temperature-in-room',
+  HUMIDITY_IN_ROOM: 'humidity-in-room',
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
@@ -481,6 +540,7 @@ const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
 
 module.exports.STATE = STATE;
+module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
@@ -525,3 +585,5 @@ module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+
+module.exports.WEATHER_UNITS = WEATHER_UNITS;

@@ -44,6 +44,7 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
       name: 'v4.0.0-alpha',
       created_at: '2018-10-16T02:21:25.901Z',
     }),
+    googleHomeReportState: fake.resolves(null),
     disconnect: fake.returns(null),
     newEventInstance: fake.returns(null),
     generateFingerprint: fake.resolves('fingerprint'),

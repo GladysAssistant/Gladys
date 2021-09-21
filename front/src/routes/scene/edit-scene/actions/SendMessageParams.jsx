@@ -30,7 +30,7 @@ class SendMessageParams extends Component {
       this.refreshSelectedOptions(this.props);
       return userOptions;
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
   handleChangeText = e => {
@@ -109,12 +109,7 @@ class SendMessageParams extends Component {
       mixTagsInterpolator: [OPENING_VARIABLE, CLOSING_VARIABLE]
     });
     const text = this.props.action.text || '';
-    if (text.search(OPENING_VARIABLE) !== -1 && text.search(CLOSING_VARIABLE) !== -1) {
-      const textFormatted = text.replaceAll(OPENING_VARIABLE, '[[').replaceAll(CLOSING_VARIABLE, ']]');
-      this.tagify.loadOriginalValues(textFormatted);
-    } else {
-      this.tagify.loadOriginalValues(text);
-    }
+    this.tagify.loadOriginalValues(text);
     this.tagify.on('input add remove change', e => {
       const text = get(this.tagify, 'DOM.input.innerText', '');
       this.parseText(text);
