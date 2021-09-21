@@ -13,7 +13,7 @@ async function getReply(message, language) {
   // first, we classify the message to understand the intent
   const { classification } = await this.brain.classify(message, language);
 
-  logger.debug(`Classified "${message.text}" with intent = "${classification.intent}".`);
+  logger.debug(`Classified "${message}" with intent = "${classification.intent}".`);
   logger.debug(classification);
   let reply = '';
   // if Gladys doesn't understand

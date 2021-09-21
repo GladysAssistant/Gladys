@@ -13,7 +13,7 @@ module.exports = function RhasspyService(gladys, serviceId) {
   async function start() {
     logger.log('Starting rhasspy service');
     rhasspyManager.init();
-    await rhasspyManager.installRhasspyContainer();
+    // await rhasspyManager.installRhasspyContainer();
     await rhasspyManager.listening();
   }
 

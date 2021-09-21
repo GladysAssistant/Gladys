@@ -11,7 +11,12 @@ async function listening() {
   ws.on('message', async (data) => {
     const obj = JSON.parse(data);
     const response = await this.gladys.message.getReply(obj.text, 'en');
-    await axios.post('http://0.0.0.0:12101/api/text-to-speech?play=true', response);
+    try {
+      await axios.post('http://0.0.0.0:12101/api/text-to-speech?play=true', response);
+    }
+    catch (e) {
+      logger.debug(`Rhasspy reponse: ${response}`);
+    }
   });
 }
 
