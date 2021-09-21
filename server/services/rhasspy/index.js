@@ -1,6 +1,6 @@
 const logger = require('../../utils/logger');
 const RhasspyManager = require('./lib');
-// const RhasspyController = require('./api/rhasspy.controller');
+const RhasspyController = require('./api/rhasspy.controller');
 
 module.exports = function RhasspyService(gladys, serviceId) {
   const rhasspyManager = new RhasspyManager(gladys, serviceId);
@@ -31,6 +31,6 @@ module.exports = function RhasspyService(gladys, serviceId) {
     start,
     stop,
     // device: rhasspyManager,
-    // controllers: RhasspyController(rhasspyManager),
+    controllers: RhasspyController(rhasspyManager),
   });
 };

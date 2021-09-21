@@ -63,7 +63,7 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
-import RhasspyPage from '../routes/integration/all/rhasspy';
+// import RhasspyPage from '../routes/integration/all/rhasspy';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
 import OpenWeatherPage from '../routes/integration/all/openweather';
@@ -186,7 +186,7 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
-        <RhasspyPage path="/dashboard/integration/communication/rhasspy" />
+        // <RhasspyPage path="/dashboard/integration/communication/rhasspy" />
         <Redirect path="/dashboard/integration/calendar/caldav" to="/dashboard/integration/calendar/caldav/account" />
         <CalDAVAccountPage path="/dashboard/integration/calendar/caldav/account" />
         <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />
