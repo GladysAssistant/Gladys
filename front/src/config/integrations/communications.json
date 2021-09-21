@@ -2,5 +2,9 @@
   {
     "key": "telegram",
     "img": "/assets/integrations/cover/telegram.jpg"
+  },
+  {
+    "key": "rhasspy",
+    "img": "/assets/integrations/cover/rhasspy.svg"
   }
 ]

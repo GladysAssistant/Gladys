@@ -252,6 +252,10 @@
       "apiKey": "Telegram Bot API Key",
       "saveButton": "Save"
     },
+    "rhasspy": {
+      "title": "Rhasspy",
+      "description": "Talk to Gladys through the voice."
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Control Philips Hue Lights.",

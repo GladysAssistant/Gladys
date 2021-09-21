@@ -55,6 +55,7 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
+import RhasspyPage from '../routes/integration/all/rhasspy';
 import CaldavPage from '../routes/integration/all/caldav';
 import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
@@ -165,6 +166,7 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
+        <RhasspyPage path="/dashboard/integration/communication/rhasspy" />
         <CaldavPage path="/dashboard/integration/calendar/caldav" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect
