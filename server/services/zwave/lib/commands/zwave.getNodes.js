@@ -2,9 +2,9 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
+const { getMinMax } = require('../utils/getMinMax');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 const { GENRES, UNKNOWN_CATEGORY } = require('../constants');
-const { getCommandClass } = require('../comClass/factory');
 
 /**
  * @description Parse a instance value to fill the device data.
@@ -31,8 +31,7 @@ function processInstance(device, node, comClass, idx, inst) {
     return;
   }
 
-  const commandClass = getCommandClass(parseInt(comClass, 10));
-  const { min, max, step } = commandClass.getMinMax(node, comClass, parseInt(idx, 10), parseInt(inst, 10));
+  const { min, max } = getMinMax(node, parseInt(comClass, 10), parseInt(idx, 10), parseInt(inst, 10));
   const { category, type } = getCategory(node, value);
   if (category === UNKNOWN_CATEGORY) {
     return;
@@ -48,8 +47,7 @@ function processInstance(device, node, comClass, idx, inst) {
     unit: getUnit(value.units),
     has_feedback: true,
     min,
-    max,
-    step,
+    max
   });
 }
 

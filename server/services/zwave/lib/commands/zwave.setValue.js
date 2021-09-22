@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { getNodeInfoByExternalId } = require('../utils/externalId');
-const { getCommandClass } = require('../comClass/factory');
+const { transformValue } = require('../utils/valueBinders');
 
 /**
  * @description Set value.
@@ -18,7 +18,7 @@ function setValue(device, deviceFeature, value) {
     return;
   }
 
-  const transformedValue = getCommandClass(comclass).getTransformedValue(node, comclass, index, instance, value);
+  const transformedValue = transformValue(node, comclass, index, instance, value);
 
   logger.debug(
     `Zwave : Setting value for device ${deviceFeature.external_id} ` +

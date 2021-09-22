@@ -1,3 +1,5 @@
+const { INDEXES, COMMAND_CLASSES } = require('../constants');
+
 const valueBinders = {
   bool: {
     transform: (value) => value !== '0' && !!value,
@@ -23,15 +25,19 @@ function hasBinder(type) {
  * @description Transform a Normalized value (used by Gladys domain) to
  * a zWave value.
  *
- * @param {string} type - ZWave type.
- * @param {any} value - Normalized value.
+ * @param {Object} node - Node of the value.
+ * @param {number} comClass - Command Class Id of the value.
+ * @param {number} index - Index of the value.
+ * @param {number} instance - Instance of the value.
+ * @param {any} value - Value to transform.
  *
  * @returns {any} The transformed value for zWave.
  *
  * @example
  *  const val = transformValue('bool', value);
  */
-function transformValue(type, value) {
+function transformValue(node, comClass, index, instance, value) {
+  const type = node.classes[comClass][index][instance].type;
   if (!hasBinder(type)) {
     return value;
   }
@@ -42,15 +48,27 @@ function transformValue(type, value) {
 /**
  * @description Normalize a value (to be used by Gladys domain)
  *
- * @param {string} type - ZWave type.
- * @param {any} value - ZWave value.
+ * @param {Object} node - Node of the value.
+ * @param {number} comClass - Command Class Id of the value.
+ * @param {number} index - Index of the value.
+ * @param {number} instance - Instance of the value.
+ * @param {any} value - Value to transform.
  *
  * @returns {any} The normalized value.
  *
  * @example
  *  const val = normalizeValue('bool', value);
  */
-function normalizeValue(type, value) {
+function normalizeValue(node, comClass, index, instance, value) {
+  if (comClass === COMMAND_CLASSES.COMMAND_CLASS_ALARM 
+    && index === INDEXES.INDEX_ALARM_ACCESS_CONTROL && node.productid === '0x4501') {
+      // AlarmCommandClass
+      // Zipato Mini Keypad RFID
+      return value === 6 ? 0 : 1;
+  }
+
+  const type = node.classes[comClass][index][instance].type;
+
   if (!hasBinder(type)) {
     return value;
   }

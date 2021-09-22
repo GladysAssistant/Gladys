@@ -2,8 +2,9 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 const { getMode } = require('../utils/getMode');
+const { getChangedValue } = require('../utils/getChangedValue');
+const { normalizeValue } = require('../utils/valueBinders');
 const { VALUE_MODES } = require('../constants');
-const { getCommandClass } = require('../comClass/factory');
 
 /**
  * @description When a value changed, update the in-memory node
@@ -26,8 +27,7 @@ function valueChanged(nodeId, comClass, value) {
     return;
   }
 
-  const commandClass = getCommandClass(comClass);
-  const changedValue = commandClass.getChangedValue(node, value);
+  const changedValue = getChangedValue(comClass, node, value);
 
   if (changedValue === null) {
     logger.debug('No matching changedValue.');
@@ -46,7 +46,7 @@ function valueChanged(nodeId, comClass, value) {
   node.classes[comClass][changedValue.index][changedValue.instance] = changedValue;
   this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
     device_feature_external_id: getDeviceFeatureExternalId(changedValue),
-    state: commandClass.getNormalizedValue(
+    state: normalizeValue(
       node,
       comClass,
       changedValue.index,
