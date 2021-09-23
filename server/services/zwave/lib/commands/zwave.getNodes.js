@@ -2,7 +2,8 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
-const { getDeviceFeatureExternalId } = require('../utils/externalId');
+const { getDeviceFeatureExternalId, getDeviceExternalId } = require('../utils/externalId');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Return array of Nodes.
@@ -25,7 +26,7 @@ function getNodes() {
       const newDevice = {
         name: node.product,
         service_id: this.serviceId,
-        external_id: `zwave:node_id:${node.id}`,
+        external_id: getDeviceExternalId({nodeId: node.id}),
         ready: node.ready,
         rawZwaveNode: node,
         features: [],
@@ -38,8 +39,8 @@ function getNodes() {
         const endpoints = Object.keys(valuesClass);
         endpoints.forEach((endpoint) => {
           const value = node.classes[comclass][endpoint];
-          const instances = Object.keys(value);
-          instances.forEach((inst) => {
+          const properties = Object.keys(value);
+          properties.forEach((inst) => {
             const { min, max } = value[inst];
             if (value[inst].genre === 'user') {
               const { category, type } = getCategory(node, value[inst]);
@@ -47,7 +48,7 @@ function getNodes() {
                 newDevice.features.push({
                   name: `${value[inst].label}`,
                   selector: slugify(
-                    `zwave-${value[inst].instance}-${value[inst].index}-${value[inst].label}-${node.product}-node-${node.id}`,
+                    `zwave-${value[inst].property}-${value[inst].endpoint}-${value[inst].label}-${node.product}-node-${node.id}`,
                   ),
                   category,
                   type,
@@ -58,7 +59,11 @@ function getNodes() {
                   min,
                   max,
                 });
-              }
+              } else if(value[inst].commandClass !== 112 && 
+                    value[inst].commandClass !== 114 && 
+                    value[inst].commandClass !== 134) {
+                  logger.info(`Unkown category/type for ${JSON.stringify(value[inst])}`);
+                }
             } else {
               newDevice.params.push({
                 name: slugify(`${value[inst].label}-${value[inst].value_id}`),

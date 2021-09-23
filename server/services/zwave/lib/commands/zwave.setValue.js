@@ -11,8 +11,8 @@ const { getNodeInfoByExternalId } = require('../utils/externalId');
  */
 function setValue(device, deviceFeature, value) {
   logger.debug(`Zwave : Setting value`);
-  const { nodeId, comclass, index, instance } = getNodeInfoByExternalId(deviceFeature.external_id);
-  this.zwave.setValue({ node_id: nodeId, class_id: comclass, instance, index }, value);
+  const { nodeId, commandClass, endpoint, property, propertyKey } = getNodeInfoByExternalId(deviceFeature.external_id);
+  this.zwave.setValue({ nodeId, commandClass, endpoint, property, propertyKey }, value);
 }
 
 module.exports = {
