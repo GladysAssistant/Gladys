@@ -72,11 +72,6 @@ class MapPage extends Component {
   }
 
   componentDidMount() {
-<<<<<<< HEAD
-    this.props.getUsersWithLocation();
-    this.props.getHousesWithLocation();
-    this.props.getAreasWithLocation();
-=======
     this.getUsersWithLocation();
     this.getHousesWithLocation();
     this.getAreas();
@@ -88,7 +83,6 @@ class MapPage extends Component {
       WEBSOCKET_MESSAGE_TYPES.LOCATION.NEW,
       this.updateUserLocationWebsocket
     );
->>>>>>> upstream/master
   }
 
   render(props, { housesWithLocation, usersWithLocation, areas }) {
@@ -97,16 +91,9 @@ class MapPage extends Component {
         <div class="page-main">
           <div class="my-3 my-md-5">
             <div class="map-header">
-<<<<<<< HEAD
-              <Map users={props.usersWithLocation} houses={props.housesWithLocation} areas={props.areasWithLocation} />
-=======
               <Map users={usersWithLocation} houses={housesWithLocation} areas={areas} />
->>>>>>> upstream/master
             </div>
           </div>
-        </div>
-        <div>
-            <Area />
         </div>
       </div>
     );
