@@ -17,7 +17,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
@@ -50,7 +55,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 🖥️ Setup OZW
         run: |
           docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
@@ -85,7 +95,7 @@ jobs:
           npm run coverage
       - name: 🔐 Dependencies security audit
         working-directory: ./server
-        run: npm audit --audit-level=high
+        run: npm audit --production --audit-level=critical
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v1
   build-front:
@@ -102,7 +112,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |

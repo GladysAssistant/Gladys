@@ -1,13 +1,20 @@
 const Promise = require('bluebird');
 const Handlebars = require('handlebars');
+const cloneDeep = require('lodash.clonedeep');
 const set = require('set-value');
 const get = require('get-value');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
@@ -103,7 +110,17 @@ const actionsFunc = {
       }
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
-  [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
+  [ACTIONS.SCENE.START]: async (self, action, scope) => {
+    if (scope.alreadyExecutedScenes && scope.alreadyExecutedScenes.has(action.scene)) {
+      logger.info(
+        `It looks the scene "${action.scene}" has already been triggered in this chain. Preventing running again to avoid loops.`,
+      );
+      return;
+    }
+    // we clone the scope so that the new scene is not polluting
+    // other scenes writing on the same scope: it needs to be a fresh object
+    self.execute(action.scene, cloneDeep(scope));
+  },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     await self.message.sendToUser(action.user, textWithVariables);
@@ -120,12 +137,65 @@ const actionsFunc = {
         oneConditionVerified = true;
       } else {
         logger.debug(
-          `Condition not verified. Condition = ${scope[condition.variable]} ${condition.operator} ${condition.value}`,
+          `Condition not verified. Condition: "${get(scope, condition.variable)} ${condition.operator} ${
+            condition.value
+          }"`,
         );
       }
     });
     if (oneConditionVerified === false) {
       throw new AbortScene('CONDITION_NOT_VERIFIED');
+    }
+  },
+  [ACTIONS.CONDITION.CHECK_TIME]: async (self, action, scope) => {
+    const now = dayjs.tz(dayjs(), self.timezone);
+    if (action.before) {
+      const beforeDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.before}`, self.timezone);
+      const isBeforeCondition = now.isBefore(beforeDate);
+      if (!isBeforeCondition) {
+        logger.debug(
+          `Check time before: ${now.format('HH:mm')} > ${beforeDate.format('HH:mm')} condition is not verified.`,
+        );
+        throw new AbortScene('CONDITION_IS_BEFORE_HOUR_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time before: ${now.format('HH:mm')} < ${beforeDate.format('HH:mm')} condition is valid.`);
+      }
+    }
+    if (action.after) {
+      const afterDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.after}`, self.timezone);
+      const isAfterCondition = now.isAfter(afterDate);
+      if (!isAfterCondition) {
+        logger.debug(
+          `Check time after: ${now.format('HH:mm')} > ${afterDate.format('HH:mm')} condition is not verified.`,
+        );
+        throw new AbortScene('CONDITION_IS_AFTER_HOUR_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time after: ${now.format('HH:mm')} > ${afterDate.format('HH:mm')} condition is valid.`);
+      }
+    }
+    if (action.days_of_the_week) {
+      const currentDayOfTheWeek = now.format('dddd').toLowerCase();
+      const isCurrentDayInCondition = action.days_of_the_week.indexOf(currentDayOfTheWeek) !== -1;
+      if (!isCurrentDayInCondition) {
+        logger.debug(
+          `Condition isInDayOfWeek not verified. Current day of the week = ${currentDayOfTheWeek}. Allowed days = ${action.days_of_the_week.join(
+            ',',
+          )}`,
+        );
+        throw new AbortScene('CONDITION_IS_IN_DAYS_OF_WEEK_NOT_VERIFIED');
+      }
+    }
+  },
+  [ACTIONS.HOUSE.IS_EMPTY]: async (self, action) => {
+    const houseEmpty = await self.house.isEmpty(action.house);
+    if (!houseEmpty) {
+      throw new AbortScene('HOUSE_IS_NOT_EMPTY');
+    }
+  },
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: async (self, action) => {
+    const houseEmpty = await self.house.isEmpty(action.house);
+    if (houseEmpty) {
+      throw new AbortScene('HOUSE_IS_EMPTY');
     }
   },
   [ACTIONS.USER.SET_SEEN_AT_HOME]: async (self, action) => {

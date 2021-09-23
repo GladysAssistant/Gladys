@@ -19,8 +19,12 @@ const triggersFunc = {
   [EVENTS.TIME.CHANGED]: (event, trigger) => event.key === trigger.key,
   [EVENTS.TIME.SUNRISE]: (event, trigger) => event.house.selector === trigger.house,
   [EVENTS.TIME.SUNSET]: (event, trigger) => event.house.selector === trigger.house,
+  [EVENTS.USER_PRESENCE.BACK_HOME]: (event, trigger) => event.house === trigger.house && event.user === trigger.user,
+  [EVENTS.USER_PRESENCE.LEFT_HOME]: (event, trigger) => event.house === trigger.house && event.user === trigger.user,
   [EVENTS.HOUSE.EMPTY]: (event, trigger) => event.house === trigger.house,
   [EVENTS.HOUSE.NO_LONGER_EMPTY]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.AREA.USER_ENTERED]: (event, trigger) => event.user === trigger.user && event.area === trigger.area,
+  [EVENTS.AREA.USER_LEFT]: (event, trigger) => event.user === trigger.user && event.area === trigger.area,
 };
 
 module.exports = {

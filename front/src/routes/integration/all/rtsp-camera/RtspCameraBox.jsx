@@ -46,11 +46,13 @@ class RtspCameraBox extends Component {
     try {
       await this.props.testConnection(this.props.cameraIndex);
       this.setState({
-        testConnectionError: null
+        testConnectionError: null,
+        testConnectionErrorMessage: null
       });
     } catch (e) {
       this.setState({
-        testConnectionError: RequestStatus.Error
+        testConnectionError: RequestStatus.Error,
+        testConnectionErrorMessage: get(e, 'response.data.error')
       });
     }
     this.setState({
@@ -72,7 +74,7 @@ class RtspCameraBox extends Component {
   };
   componentWillMount() {}
 
-  render(props, { loading, saveError, testConnectionError }) {
+  render(props, { loading, saveError, testConnectionError, testConnectionErrorMessage }) {
     return (
       <div class="col-md-4">
         <div class="card">
@@ -97,6 +99,7 @@ class RtspCameraBox extends Component {
                     <Text id="integration.rtspCamera.testConnectionError" />
                   </div>
                 )}
+                {testConnectionErrorMessage && <div class="alert alert-danger">{testConnectionErrorMessage}</div>}
                 <div class="form-group">
                   <label>
                     <Text id="integration.rtspCamera.nameLabel" />

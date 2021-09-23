@@ -1,8 +1,19 @@
+import { createElement } from 'preact';
+import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
+
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import ColorDeviceFeature from './device-features/ColorDeviceFeature';
 import SensorDeviceFeature from './device-features/SensorDeviceFeature';
-import MultilevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
-import BrightnessDeviceFeature from './device-features/BrightnessDeviceFeature';
+import MultiLevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
+import LightTemperatureDeviceFeature from './device-features/LightTemperatureDeviceFeature';
+
+const ROW_TYPE_BY_FEATURE_TYPE = {
+  [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: ColorDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SWITCH.DIMMER]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: LightTemperatureDeviceFeature
+};
 
 const DeviceRow = ({ children, ...props }) => {
   // if device is a sensor, we display the sensor deviceFeature
@@ -10,66 +21,14 @@ const DeviceRow = ({ children, ...props }) => {
     return <SensorDeviceFeature user={props.user} deviceFeature={props.deviceFeature} />;
   }
 
-  // else, it's not a sensor
-  // if it's a binary
-  if (props.deviceFeature.type === 'binary') {
-    return (
-      <BinaryDeviceFeature
-        x={props.x}
-        y={props.y}
-        device={props.device}
-        deviceFeature={props.deviceFeature}
-        roomIndex={props.roomIndex}
-        deviceIndex={props.deviceIndex}
-        deviceFeatureIndex={props.deviceFeatureIndex}
-        updateValue={props.updateValue}
-      />
-    );
+  const elementType = ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
+
+  if (!elementType) {
+    // if no related components, we return nothing
+    return null;
   }
-  if (props.deviceFeature.type === 'color') {
-    return (
-      <ColorDeviceFeature
-        x={props.x}
-        y={props.y}
-        device={props.device}
-        deviceFeature={props.deviceFeature}
-        roomIndex={props.roomIndex}
-        deviceIndex={props.deviceIndex}
-        deviceFeatureIndex={props.deviceFeatureIndex}
-        updateValue={props.updateValue}
-      />
-    );
-  }
-  if (props.deviceFeature.type === 'dimmer') {
-    return (
-      <MultilevelDeviceFeature
-        x={props.x}
-        y={props.y}
-        device={props.device}
-        deviceFeature={props.deviceFeature}
-        roomIndex={props.roomIndex}
-        deviceIndex={props.deviceIndex}
-        deviceFeatureIndex={props.deviceFeatureIndex}
-        updateValue={props.updateValue}
-      />
-    );
-  }
-  if (props.deviceFeature.type === 'brightness') {
-    return (
-      <BrightnessDeviceFeature
-        x={props.x}
-        y={props.y}
-        device={props.device}
-        deviceFeature={props.deviceFeature}
-        roomIndex={props.roomIndex}
-        deviceIndex={props.deviceIndex}
-        deviceFeatureIndex={props.deviceFeatureIndex}
-        updateValue={props.updateValue}
-      />
-    );
-  }
-  // if not, we return nothing
-  return null;
+
+  return createElement(elementType, props);
 };
 
 export default DeviceRow;

@@ -17,7 +17,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
@@ -50,7 +55,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 🖥️ Setup OZW
         run: |
           docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
@@ -85,9 +95,38 @@ jobs:
           npm run coverage
       - name: 🔐 Dependencies security audit
         working-directory: ./server
-        run: npm audit --audit-level=high
+        run: npm audit --production --audit-level=critical
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v1
+  cypress-run:
+    name: Cypress run
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: 📇 Use npm cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: 📦 Install NPM packages
+        run: |
+          npm ci
+      - name: ✅ Cypress run
+        uses: cypress-io/github-action@v2.8.2
+        with:
+          install: false
+          start: npm run start:cypress
+          wait-on: 'http://localhost:1444'
+          config-file: ./front/cypress/cypress.json
+          project: ./front
+          command: npm run cypress:run
   build-front:
     if: github.event.pull_request.draft == false
     name: Front build
@@ -102,7 +141,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
@@ -110,7 +154,12 @@ jobs:
       - name: 🏗️ Build front
         working-directory: ./front
         run: |
-          npm run build
+          npm run build-with-stats
+      - name: Upload bundle ci
+        working-directory: ./front
+        run: npx relative-ci-agent
+        env:
+          RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY }}
       - name: ↗️ Upload build artifact
         uses: actions/upload-artifact@v2
         with:

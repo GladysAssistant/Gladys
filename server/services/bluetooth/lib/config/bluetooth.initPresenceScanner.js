@@ -14,7 +14,7 @@ function initPresenceScanner() {
     clearInterval(timer);
     this.presenceScanner.timer = undefined;
   }
-  if (status === PRESENCE_STATUS.ENABLED) {
+  if (status === PRESENCE_STATUS.ENABLED && this.ready) {
     logger.info(`Bluetooth configuration: starting presence scanner`);
     this.scanPresence();
     this.presenceScanner.timer = setInterval(this.scanPresence.bind(this), frequency);

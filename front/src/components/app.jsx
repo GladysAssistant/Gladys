@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import { Router } from 'preact-router';
 import createStore from 'unistore';
 import get from 'get-value';
-import config from '../../config';
+import config from '../config';
 import { Provider, connect } from 'unistore/preact';
 import { IntlProvider } from 'preact-i18n';
 import translations from '../config/i18n';
@@ -17,6 +17,8 @@ import Login from '../routes/login';
 import Error from '../routes/error';
 import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
+
+// Gateway
 import LoginGateway from '../routes/login-gateway';
 import LinkGatewayUser from '../routes/gateway-setup';
 import SignupGateway from '../routes/signup-gateway';
@@ -24,6 +26,7 @@ import ConfigureTwoFactorGateway from '../routes/gateway-configure-two-factor';
 import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
+import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -33,10 +36,12 @@ import SignupConfigureHouse from '../routes/signup/4-configure-house';
 import SignupSuccess from '../routes/signup/5-success';
 
 import Dashboard from '../routes/dashboard';
+import NewDashboard from '../routes/dashboard/new-dashboard';
 import Device from '../routes/device';
 import IntegrationPage from '../routes/integration';
 import ChatPage from '../routes/chat';
 import MapPage from '../routes/map';
+import MapNewAreaPage from '../routes/map/NewArea';
 import CalendarPage from '../routes/calendar';
 import ScenePage from '../routes/scene';
 import NewScenePage from '../routes/scene/new-scene';
@@ -58,7 +63,8 @@ import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
-import CaldavPage from '../routes/integration/all/caldav';
+import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
+import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
 import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
@@ -108,7 +114,7 @@ const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
 const AppRouter = connect(
-  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu',
+  'currentUrl,user,profilePicture,showDropDown,showCollapsedMenu,fullScreen',
   actions
 )(props => (
   <div id="app">
@@ -116,6 +122,7 @@ const AppRouter = connect(
       <Header
         currentUrl={props.currentUrl}
         user={props.user}
+        fullScreen={props.fullScreen}
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
         showDropDown={props.showDropDown}
@@ -164,6 +171,8 @@ const AppRouter = connect(
         <SignupConfigureHouse path="/signup/configure-house" />
         <SignupSuccess path="/signup/success" />
         <Dashboard path="/dashboard" />
+        <Dashboard path="/dashboard/:dashboardSelector" />
+        <NewDashboard path="/dashboard/create/new" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
 
@@ -176,7 +185,9 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
-        <CaldavPage path="/dashboard/integration/calendar/caldav" />
+        <Redirect path="/dashboard/integration/calendar/caldav" to="/dashboard/integration/calendar/caldav/account" />
+        <CalDAVAccountPage path="/dashboard/integration/calendar/caldav/account" />
+        <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"
@@ -220,8 +231,12 @@ const AppRouter = connect(
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
 
+        <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
+
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
+        <MapNewAreaPage path="/dashboard/maps/area/new" />
+        <MapNewAreaPage path="/dashboard/maps/area/edit/:areaSelector" />
         <CalendarPage path="/dashboard/calendar" />
         <ScenePage path="/dashboard/scene" />
         <NewScenePage path="/dashboard/scene/new" />

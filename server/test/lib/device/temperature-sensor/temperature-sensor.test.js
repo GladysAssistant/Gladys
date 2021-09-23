@@ -70,26 +70,64 @@ describe('TemperatureSensor.command', () => {
         intent: 'temperature-sensor.get-in-room',
         entities: [
           {
-            sourceText: 'kitchen',
+            start: 25,
+            end: 31,
+            len: 7,
+            levenshtein: 0,
+            accuracy: 1,
             entity: 'room',
+            type: 'enum',
+            option: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+            sourceText: 'kitchen',
+            utteranceText: 'kitchen',
           },
         ],
       },
       {
-        room: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+        entities: {
+          room: {
+            start: 25,
+            end: 31,
+            len: 7,
+            levenshtein: 0,
+            accuracy: 1,
+            entity: 'room',
+            type: 'enum',
+            option: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+            sourceText: 'kitchen',
+            utteranceText: 'kitchen',
+          },
+        },
+        room: 'kitchen',
+        slotFill: undefined,
         user: {
           temperature_unit_preference: 'celsius',
         },
       },
     );
     assert.calledWith(messageManager.replyByIntent, message, 'temperature-sensor.get-in-room.success', {
-      room: '2398c689-8b47-43cc-ad32-e98d9be098b5',
-      roomName: 'kitchen',
-      temperature: 29,
-      unit: '°C',
+      entities: {
+        room: {
+          start: 25,
+          end: 31,
+          len: 7,
+          levenshtein: 0,
+          accuracy: 1,
+          entity: 'room',
+          type: 'enum',
+          option: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+          sourceText: 'kitchen',
+          utteranceText: 'kitchen',
+        },
+      },
+      room: 'kitchen',
+      slotFill: undefined,
       user: {
         temperature_unit_preference: 'celsius',
       },
+      roomName: 'kitchen',
+      temperature: 29,
+      unit: '°C',
     });
   });
   it('should return room not found', async () => {

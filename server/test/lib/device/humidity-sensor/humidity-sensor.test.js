@@ -48,8 +48,16 @@ describe('HumiditySensor.command', () => {
         intent: 'humidity-sensor.get-in-room',
         entities: [
           {
-            sourceText: 'kitchen',
+            start: 25,
+            end: 31,
+            len: 7,
+            levenshtein: 0,
+            accuracy: 1,
             entity: 'room',
+            type: 'enum',
+            option: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+            sourceText: 'kitchen',
+            utteranceText: 'kitchen',
           },
         ],
       },
@@ -97,17 +105,61 @@ describe('HumiditySensor.command', () => {
         intent: 'humidity-sensor.get-in-room',
         entities: [
           {
-            sourceText: 'no-value-room',
+            start: 25,
+            end: 31,
+            len: 7,
+            levenshtein: 0,
+            accuracy: 1,
             entity: 'room',
+            type: 'enum',
+            option: roomFound.id,
+            sourceText: roomFound.name,
+            utteranceText: roomFound.name,
           },
         ],
       },
       {
-        room: roomFound.id,
+        entities: {
+          room: {
+            start: 25,
+            end: 31,
+            len: 7,
+            levenshtein: 0,
+            accuracy: 1,
+            entity: 'room',
+            type: 'enum',
+            option: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+            sourceText: 'kitchen',
+            utteranceText: 'kitchen',
+          },
+        },
+        room: 'kitchen',
+        slotFill: undefined,
+        user: {
+          temperature_unit_preference: 'celsius',
+        },
       },
     );
     assert.calledWith(messageManager.replyByIntent, message, 'humidity-sensor.get-in-room.fail.no-results', {
-      room: roomFound.id,
+      entities: {
+        room: {
+          start: 25,
+          end: 31,
+          len: 7,
+          levenshtein: 0,
+          accuracy: 1,
+          entity: 'room',
+          type: 'enum',
+          option: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+          sourceText: 'kitchen',
+          utteranceText: 'kitchen',
+        },
+      },
+      room: 'kitchen',
+      slotFill: undefined,
+      user: {
+        temperature_unit_preference: 'celsius',
+      },
     });
   });
   it('should return error when incorrect intent', async () => {
@@ -129,8 +181,16 @@ describe('HumiditySensor.command', () => {
         intent: 'humidity-sensor.get-in-rooom',
         entities: [
           {
-            sourceText: 'no-value-room',
+            start: 25,
+            end: 31,
+            len: 7,
+            levenshtein: 0,
+            accuracy: 1,
             entity: 'room',
+            type: 'enum',
+            option: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+            sourceText: 'kitchen',
+            utteranceText: 'kitchen',
           },
         ],
       },

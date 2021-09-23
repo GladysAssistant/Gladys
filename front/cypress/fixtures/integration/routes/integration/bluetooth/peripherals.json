@@ -1,0 +1,76 @@
+[
+  {
+    "name": "SML c9",
+    "model": "smlc9",
+    "external_id": "bluetooth:0011223342",
+    "selector": "bluetooth-0011223342",
+    "params": [
+      {
+        "name": "loaded",
+        "value": true
+      },
+      {
+        "name": "manufacturer",
+        "value": "AwoX"
+      }
+    ],
+    "features": []
+  },
+  {
+    "name": "BLE Device 1",
+    "external_id": "bluetooth:0011223341",
+    "selector": "bluetooth-0011223341",
+    "service_id": "a810b8db-6d04-4697-bed3-c4b72c996278",
+    "service": {
+      "name": "bluetooth"
+    },
+    "params": [
+      {
+        "name": "loaded",
+        "value": false
+      }
+    ]
+  },
+  {
+    "name": "Peanut temperature",
+    "external_id": "bluetooth:0011223343",
+    "service_id": "a810b8db-6d04-4697-bed3-c4b72c996278",
+    "service": {
+      "name": "peanut"
+    },
+    "selector": "bluetooth-0011223343",
+    "params": [
+      {
+        "name": "loaded",
+        "value": true
+      },
+      {
+        "name": "manufacturer",
+        "value": "Peanut"
+      }
+    ],
+    "features": [
+      {
+        "name": "Battery",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": true,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": true,
+        "min": -100,
+        "max": 250
+      }
+    ]
+  }
+]

@@ -42,6 +42,8 @@ const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
   GLADYS_GATEWAY_USERS_KEYS: 'GLADYS_GATEWAY_USERS_KEYS',
+  GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
+    'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   TIMEZONE: 'TIMEZONE',
 };
 
@@ -151,6 +153,13 @@ const EVENTS = {
     EMPTY: 'house.empty',
     NO_LONGER_EMPTY: 'house.no-longer-empty',
   },
+  USER: {
+    NEW_LOCATION: 'user.new-location',
+  },
+  AREA: {
+    USER_ENTERED: 'area.user-entered',
+    USER_LEFT: 'area.user-left',
+  },
 };
 
 const LIFE_EVENTS = {
@@ -235,11 +244,16 @@ const ACTIONS = {
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
+    CHECK_TIME: 'condition.check-time',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
     SET_OUT_OF_HOME: 'user.set-out-of-home',
     CHECK_PRESENCE: 'user.check-presence',
+  },
+  HOUSE: {
+    IS_EMPTY: 'house.is-empty',
+    IS_NOT_EMPTY: 'house.is-not-empty',
   },
   HTTP: {
     REQUEST: 'http.request',
@@ -422,6 +436,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+  },
+  LOCATION: {
+    NEW: 'location.new',
   },
   USER_PRESENCE: {
     LEFT_HOME: 'user.left-home',

@@ -85,7 +85,7 @@ const EditHouse = ({ children, ...props }) => (
               onInput={props.updateNewRoomName}
               class="form-control"
               placeholder={<Text id="signup.configureHouse.roomNamePlaceHolder" />}
-            />{' '}
+            />
           </Localizer>
           <span class="input-group-append">
             <button onClick={props.addRoom} class="btn btn-primary" type="button">
