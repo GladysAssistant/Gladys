@@ -1,12 +1,12 @@
-const { expect } = require('chai');
-const { assert, fake } = require('sinon');
+// const { expect } = require('chai');
+const { /* assert, */ fake } = require('sinon');
 // const EventEmitter = require('events');
 
 // const event = new EventEmitter();
 const ZwaveManager = require('../../../../services/zwave/lib');
-const ZwaveMock = require('../ZwaveMock.test');
-const nodesData = require('./nodesData.json');
-const nodesExpectedResult = require('./nodesExpectedResult.json');
+// const ZwaveMock = require('../ZwaveMock.test');
+// const nodesData = require('./nodesData.json');
+// const nodesExpectedResult = require('./nodesExpectedResult.json');
 
 const gladys = {
   event: {
