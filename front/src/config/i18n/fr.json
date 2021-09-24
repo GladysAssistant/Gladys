@@ -254,7 +254,10 @@
         "lastSevenDays": "Derniers 7 jours",
         "lastThirtyDays": "Derniers 30 jours",
         "lastThreeMonths": "Derniers 3 mois",
-        "noValue": "Pas de valeurs sur cet interval"
+        "noValue": "Pas de valeurs sur cet interval",
+        "editNameLabel": "Entrez le nom de cette box.",
+        "editDeviceFeaturesLabel": "Sélectionnez l'appareil que vous voulez afficher ici.",
+        "editRoomLabel": "Sélectionnez la pièce"
       }
     }
   },

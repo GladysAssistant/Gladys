@@ -114,20 +114,20 @@ class EditChart extends Component {
           <div class="dimmer-content">
             <div class="form-group">
               <label>
-                <Text id="dashboard.boxes.devicesInRoom.editRoomLabel" />
+                <Text id="dashboard.boxes.chart.editNameLabel" />
               </label>
               <input type="text" class="form-control" value={props.box.title} onChange={this.updateBoxTitle} />
             </div>
             <div class="form-group">
               <label>
-                <Text id="dashboard.boxes.devicesInRoom.editRoomLabel" />
+                <Text id="dashboard.boxes.chart.editRoomLabel" />
               </label>
               <RoomSelector selectedRoom={props.box.room} updateRoomSelection={this.updateBoxRoom} />
             </div>
             {deviceOptions && props.box.room && (
               <div class="form-group">
                 <label>
-                  <Text id="dashboard.boxes.devicesInRoom.editDeviceFeaturesLabel" />
+                  <Text id="dashboard.boxes.chart.editDeviceFeaturesLabel" />
                 </label>
                 <Select
                   defaultValue={null}

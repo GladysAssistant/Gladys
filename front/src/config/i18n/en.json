@@ -254,7 +254,10 @@
         "lastSevenDays": "Last 7 days",
         "lastThirtyDays": "Last 30 days",
         "lastThreeMonths": "Last 3 months",
-        "noValue": "No values recorded on this interval"
+        "noValue": "No values recorded on this interval",
+        "editNameLabel": "Enter the name of this box.",
+        "editDeviceFeaturesLabel": "Select the device you want to display here.",
+        "editRoomLabel": "Select the room you want to display here"
       }
     }
   },
