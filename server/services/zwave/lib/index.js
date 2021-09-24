@@ -1,5 +1,4 @@
 const logger = require('../../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 const { addNode } = require('./commands/zwave.addNode');
 const { connect } = require('./commands/zwave.connect');

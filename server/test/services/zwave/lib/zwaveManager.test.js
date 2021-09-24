@@ -6,7 +6,6 @@ const { assert, fake } = require('sinon');
 const ZwaveManager = require('../../../../services/zwave/lib');
 const ZwaveMock = require('../ZwaveMock.test');
 const nodesData = require('./nodesData.json');
-const node16 = require('./node16.json');
 const nodesExpectedResult = require('./nodesExpectedResult.json');
 
 const gladys = {
