@@ -74,6 +74,7 @@ async function calculateAggregate(type, jobId) {
   };
 
   const promise = new Promise((resolve, reject) => {
+    let err = '';
     const childProcess = spawn('node', [SCRIPT_PATH, JSON.stringify(params)]);
 
     childProcess.stdout.on('data', async (data) => {
@@ -92,12 +93,14 @@ async function calculateAggregate(type, jobId) {
 
     childProcess.stderr.on('data', (data) => {
       logger.warn(`device.calculateAggregate stderr: ${data}`);
+      err += data;
     });
 
     childProcess.on('close', (code) => {
       if (code !== 0) {
         logger.warn(`device.calculateAggregate: Exiting child process with code ${code}`);
-        reject(code);
+        const error = new Error(err);
+        reject(error);
       } else {
         logger.info(`device.calculateAggregate: Finishing processing for interval ${type} `);
         resolve();

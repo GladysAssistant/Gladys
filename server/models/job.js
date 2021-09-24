@@ -1,7 +1,9 @@
 const Joi = require('joi');
 const { JOB_TYPES_LIST, JOB_STATUS_LIST } = require('../utils/constants');
 
-const dataSchema = Joi.object().keys({});
+const dataSchema = Joi.object().keys({
+  error: Joi.string(),
+});
 
 module.exports = (sequelize, DataTypes) => {
   const job = sequelize.define(

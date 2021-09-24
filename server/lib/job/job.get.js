@@ -30,7 +30,11 @@ async function get(options) {
   if (optionsWithDefault.take !== undefined) {
     queryParams.limit = optionsWithDefault.take;
   }
-  return db.Job.findAll(queryParams);
+  const jobs = await db.Job.findAll(queryParams);
+  jobs.forEach((job) => {
+    job.data = JSON.parse(job.data);
+  });
+  return jobs;
 }
 
 module.exports = {
