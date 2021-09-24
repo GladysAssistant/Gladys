@@ -38,6 +38,7 @@ const Weather = require('./weather');
  * @param {boolean} [params.disableUserLoading] - If true, disable the loading of users in RAM.
  * @param {boolean} [params.disableSchedulerLoading] - If true, disable the loading of the scheduler.
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
+ * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
  * @param {boolean} [params.disableDeviceStateAggregation] - If true, disable the aggregation of device states.
  * @example
  * const gladys = Gladys();
@@ -104,9 +105,15 @@ function Gladys(params = {}) {
 
       await system.init();
 
+      // this should be before device.init
+      if (!params.disableJobInit) {
+        await job.init();
+      }
+
       if (!params.disableBrainLoading) {
         await brain.load();
       }
+
       if (!params.disableService) {
         await service.load(gladys);
         await service.startAll();

@@ -1336,6 +1336,7 @@
   },
   "jobsSettings": {
     "jobsTitle": "Background tasks",
+    "jobsDescription": "This view is a bit more technical than the rest of Gladys Assistant. The goal of this view is to help you have a better idea of what's running in the background, and in case you wonder why something is wrong in Gladys, you can come here to debug what happened.",
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Status",
@@ -1343,6 +1344,9 @@
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
       "hourly-device-state-aggregate": "Hourly sensors aggregation"
+    },
+    "jobErrors": {
+      "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
     },
     "jobStatuses": {
       "success": "Success",

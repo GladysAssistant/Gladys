@@ -166,6 +166,9 @@ const EVENTS = {
     USER_ENTERED: 'area.user-entered',
     USER_LEFT: 'area.user-left',
   },
+  JOB: {
+    PURGE_OLD_JOBS: 'job.purge-old-jobs',
+  },
 };
 
 const LIFE_EVENTS = {
@@ -543,6 +546,11 @@ const JOB_STATUS = {
   FAILED: 'failed',
 };
 
+const JOB_ERROR_TYPES = {
+  PURGED_WHEN_RESTARTED: 'purged-when-restarted',
+  UNKNOWN_ERROR: 'unknown-error',
+};
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -573,6 +581,7 @@ const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
 const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
 const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
+const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -631,3 +640,5 @@ module.exports.JOB_TYPES = JOB_TYPES;
 module.exports.JOB_TYPES_LIST = JOB_TYPES_LIST;
 module.exports.JOB_STATUS = JOB_STATUS;
 module.exports.JOB_STATUS_LIST = JOB_STATUS_LIST;
+module.exports.JOB_ERROR_TYPES = JOB_ERROR_TYPES;
+module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;

@@ -1,8 +1,9 @@
 const Joi = require('joi');
-const { JOB_TYPES_LIST, JOB_STATUS_LIST } = require('../utils/constants');
+const { JOB_TYPES_LIST, JOB_STATUS_LIST, JOB_ERROR_TYPES_LIST } = require('../utils/constants');
 
 const dataSchema = Joi.object().keys({
   error: Joi.string(),
+  error_type: Joi.string().valid(JOB_ERROR_TYPES_LIST),
 });
 
 module.exports = (sequelize, DataTypes) => {

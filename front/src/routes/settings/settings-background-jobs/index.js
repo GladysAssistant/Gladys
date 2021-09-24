@@ -17,6 +17,14 @@ class SettingsSystem extends Component {
     }
   };
 
+  search = async e => {
+    const text = e.target.value;
+    await this.setState({
+      search: text
+    });
+    this.getJobs();
+  };
+
   newJob = payload => {
     const { jobs } = this.state;
     jobs.unshift(payload);

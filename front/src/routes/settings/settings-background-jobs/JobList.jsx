@@ -2,16 +2,22 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { JOB_STATUS } from '../../../../../server/utils/constants';
+import { JOB_STATUS, JOB_ERROR_TYPES } from '../../../../../server/utils/constants';
 import style from './style.css';
 
 dayjs.extend(relativeTime);
 
 const JobList = ({ children, ...props }) => (
   <div class="card">
-    <h3 class="card-header">
-      <Text id="jobsSettings.jobsTitle" />
-    </h3>
+    <div class="card-header">
+      <i class="fe fe-cpu mr-3" />
+      <h3 class="card-title">
+        <Text id="jobsSettings.jobsTitle" />
+      </h3>
+    </div>
+    <div class="card-body">
+      <Text id="jobsSettings.jobsDescription" />
+    </div>
     <div class="table-responsive">
       <table class="table table-hover table-outline table-vcenter card-table">
         <thead>
@@ -39,26 +45,16 @@ const JobList = ({ children, ...props }) => (
                         .fromNow()}
                     </small>
                   </div>
-                  {job.data && job.data.error && (
+                  {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
+                    <div class={style.errorDiv}>
+                      <pre class={style.errorDirectDiv}>
+                        <Text id={`jobsSettings.jobErrors.${job.data.error_type}`} />
+                      </pre>
+                    </div>
+                  )}
+                  {job.data && job.data.error_type === JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
                       <pre class={style.errorDirectDiv}>{job.data.error}</pre>
-                      {false && (
-                        <div class="accordion">
-                          <div class="card">
-                            <div class="card-header" id="headingOne">
-                              <h5 class="mb-0">
-                                <button class="btn btn-link">Display Error</button>
-                              </h5>
-                            </div>
-
-                            <div id="collapseOne" class="collapse show">
-                              <div class="card-body text-wrap">
-                                <pre class={style.errorDirectDiv}>{job.data.error}</pre>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      )}
                     </div>
                   )}
                 </td>

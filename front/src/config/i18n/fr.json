@@ -1336,13 +1336,18 @@
   },
   "jobsSettings": {
     "jobsTitle": "Tâches en arrière-plan",
+    "jobsDescription": "Cette vue est un peu plus technique que le reste de Gladys. Le but de cette vue est de pouvoir comprendre ce qui se passe en arrière-plan dans Gladys, et de mieux pouvoir comprendre ce qui s'est passé, ou mal passé. Nous essayons de traduire les erreurs connues, mais quand une erreur inconnue survient, nous l'affichons telle quelle pour vous permettre de débugger.",
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Statut",
+    "searchPlaceholder": "Par nom, par erreur...",
     "jobTypes": {
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
       "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+    },
+    "jobErrors": {
+      "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
     },
     "jobStatuses": {
       "success": "Succès",
