@@ -114,14 +114,7 @@ describe('Job', () => {
     it('should purge old jobs', async () => {
       await job.start(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE);
       const dateInThePast = new Date(new Date().getTime() - 10 * 24 * 60 * 60 * 1000);
-      await db.Job.update(
-        { created_at: dateInThePast },
-        {
-          where: {
-            type: JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE,
-          },
-        },
-      );
+      await db.Job.update({ created_at: dateInThePast }, { where: {} });
       await job.purge();
       const jobs = await job.get();
       expect(jobs).to.deep.equal([]);
