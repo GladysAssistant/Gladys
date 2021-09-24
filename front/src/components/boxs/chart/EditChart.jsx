@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
@@ -31,7 +31,6 @@ class EditChart extends Component {
       const currentDeviceFeature = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOption.value);
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_feature: selectedDeviceFeaturesOption.value,
-        title: currentDeviceFeature && currentDeviceFeature.name ? currentDeviceFeature.name : undefined,
         unit: currentDeviceFeature && currentDeviceFeature.unit ? currentDeviceFeature.unit : undefined
       });
     } else {
@@ -114,12 +113,6 @@ class EditChart extends Component {
           <div class="dimmer-content">
             <div class="form-group">
               <label>
-                <Text id="dashboard.boxes.chart.editNameLabel" />
-              </label>
-              <input type="text" class="form-control" value={props.box.title} onChange={this.updateBoxTitle} />
-            </div>
-            <div class="form-group">
-              <label>
                 <Text id="dashboard.boxes.chart.editRoomLabel" />
               </label>
               <RoomSelector selectedRoom={props.box.room} updateRoomSelection={this.updateBoxRoom} />
@@ -135,6 +128,22 @@ class EditChart extends Component {
                   onChange={this.updateDeviceFeatures}
                   options={deviceOptions}
                 />
+              </div>
+            )}
+            {deviceOptions && props.box.room && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.chart.editNameLabel" />
+                </label>
+                <Localizer>
+                  <input
+                    type="text"
+                    class="form-control"
+                    placeholder={<Text id="dashboard.boxes.chart.editNamePlaceholder" />}
+                    value={props.box.title}
+                    onChange={this.updateBoxTitle}
+                  />
+                </Localizer>
               </div>
             )}
             <div class="form-group">

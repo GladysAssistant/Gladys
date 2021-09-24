@@ -248,7 +248,7 @@
         "editBoxNamePlaceholder": "Nom de la box"
       },
       "chart": {
-        "defaultInterval": "Interval par défaut",
+        "defaultInterval": "Intervalle par défaut",
         "lastHour": "Dernière heure",
         "lastDay": "Dernière 24h",
         "lastSevenDays": "Derniers 7 jours",
@@ -256,8 +256,9 @@
         "lastThreeMonths": "Derniers 3 mois",
         "noValue": "Pas de valeurs sur cet interval",
         "editNameLabel": "Entrez le nom de cette box.",
-        "editDeviceFeaturesLabel": "Sélectionnez l'appareil que vous voulez afficher ici.",
-        "editRoomLabel": "Sélectionnez la pièce"
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord",
+        "editDeviceFeaturesLabel": "Sélectionnez l'appareil que vous voulez afficher",
+        "editRoomLabel": "Sélectionnez une pièce"
       }
     }
   },
