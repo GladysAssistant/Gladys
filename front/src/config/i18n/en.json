@@ -1345,8 +1345,8 @@
       "hourly-device-state-aggregate": "Hourly sensors aggregation"
     },
     "jobStatuses": {
-      "success": "Succès",
-      "failed": "Echec"
+      "success": "Success",
+      "failed": "Failure"
     }
   },
   "systemSettings": {
