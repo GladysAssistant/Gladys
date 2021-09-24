@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const chaiAssert = require('chai').assert;
 const sinon = require('sinon');
+const db = require('../../../models');
 
 const { fake, assert } = sinon;
 
@@ -10,6 +11,7 @@ const Job = require('../../../lib/job');
 
 const event = {
   emit: fake.returns(null),
+  on: fake.returns(null),
 };
 
 describe('Job', () => {
@@ -86,6 +88,43 @@ describe('Job', () => {
       });
       expect(jobs).to.be.instanceOf(Array);
       expect(jobs).to.have.lengthOf(0);
+    });
+  });
+  describe('job.init', () => {
+    const job = new Job(event);
+    it('should init jobs and mark unfinished jobs as failed', async () => {
+      const jobCreated = await job.start(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE);
+      await job.init();
+      const jobs = await job.get();
+      expect(jobs).to.be.instanceOf(Array);
+      const jobsFiltered = jobs
+        .filter((oneJob) => oneJob.id === jobCreated.id)
+        .map((oneJob) => ({ type: oneJob.type, status: oneJob.status, data: oneJob.data }));
+      expect(jobsFiltered).to.deep.equal([
+        {
+          type: 'daily-device-state-aggregate',
+          status: 'failed',
+          data: { error_type: 'purged-when-restarted' },
+        },
+      ]);
+    });
+  });
+  describe('job.purge', () => {
+    const job = new Job(event);
+    it('should purge old jobs', async () => {
+      await job.start(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE);
+      const dateInThePast = new Date(new Date().getTime() - 10 * 24 * 60 * 60 * 1000);
+      await db.Job.update(
+        { created_at: dateInThePast },
+        {
+          where: {
+            type: JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE,
+          },
+        },
+      );
+      await job.purge();
+      const jobs = await job.get();
+      expect(jobs).to.deep.equal([]);
     });
   });
   describe('job.wrapper', () => {
