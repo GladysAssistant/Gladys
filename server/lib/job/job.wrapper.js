@@ -18,7 +18,11 @@ function wrapper(type, func) {
       await this.finish(job.id, JOB_STATUS.SUCCESS);
     } catch (error) {
       if (job) {
-        await this.finish(job.id, JOB_STATUS.FAILED);
+        const data = {};
+        if (error && error.toString) {
+          data.error = error.toString();
+        }
+        await this.finish(job.id, JOB_STATUS.FAILED, data);
       }
       throw error;
     }
