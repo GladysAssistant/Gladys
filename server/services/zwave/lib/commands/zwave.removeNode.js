@@ -9,7 +9,7 @@ const REMOVE_NODE_TIMEOUT = 60 * 1000;
  */
 function removeNode() {
   logger.debug(`Zwave : Entering exclusion mode`);
-  this.driver.controller.startExclusion();
+  this.driver.controller.beginExclusion();
   setTimeout(this.driver.controller.stopExclusion, REMOVE_NODE_TIMEOUT);
 }
 

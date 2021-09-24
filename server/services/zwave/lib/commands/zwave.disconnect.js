@@ -6,9 +6,9 @@ const logger = require('../../../../utils/logger');
  * zwave.disconnect();
  */
 function disconnect() {
-  if (this.driverPath && this.connected) {
+  if (this.connected) {
     logger.debug(`Zwave : Disconnecting...`);
-    this.zwave.disconnect(this.driverPath);
+    this.driver.destroy();
   } else {
     logger.debug('Zwave: Not connected, disconnecting');
   }

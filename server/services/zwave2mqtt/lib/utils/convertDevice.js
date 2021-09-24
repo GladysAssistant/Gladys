@@ -84,12 +84,7 @@ function convertDevice(device, serviceId) {
     });
   } else {
     features.forEach((feature) => {
-      feature.external_id = getDeviceFeatureExternalId({
-        node_id: device.id,
-        class_id: feature.class_id,
-        instance: feature.instance,
-        propertyKey: feature.propertyKey,
-      });
+      feature.external_id = getDeviceFeatureExternalId(feature);
     });
     gladysDevice.features = features;
   }

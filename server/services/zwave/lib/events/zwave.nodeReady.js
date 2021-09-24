@@ -36,7 +36,7 @@ function nodeReady(zwaveNode) {
   comclasses.forEach((comclass) => {
     const values = this.nodes[nodeId].classes[comclass];
     // enable poll
-    switch (values.class_id) {
+    switch (values.commandClass) {
       case 0x25: // COMMAND_CLASS_SWITCH_BINARY
       case 0x26: // COMMAND_CLASS_SWITCH_MULTILEVEL
         this.zwave.enablePoll(nodeId, comclass);

@@ -3,14 +3,14 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 
 /**
  * @description When a node is added.
- * @param {Object} node - The node added.
+ * @param {Object} zwaveNode - The node added.
  * @example
  * zwave.on('node added', this.nodeAdded);
  */
-function nodeAdded(node) {
-  logger.debug(`Zwave : Node Added, nodeId = ${node.id}`);
+function nodeAdded(zwaveNode) {
+  const nodeId = zwaveNode.id;
+  logger.debug(`Zwave : Node Added, nodeId = ${nodeId}`);
 
-  const nodeId = node.id;
   this.nodes[nodeId] = {
     manufacturer: '',
     manufacturerid: '',
@@ -19,12 +19,12 @@ function nodeAdded(node) {
     productid: '',
     type: '',
     name: '',
-    loc: '',
+    location: '',
     classes: {},
     ready: false,
   };
 
-  node
+  zwaveNode
     .on('ready', this.nodeReady.bind(this))
     .on('value added', this.valueAdded.bind(this))
     .on('value updated', this.valueUpdated.bind(this))

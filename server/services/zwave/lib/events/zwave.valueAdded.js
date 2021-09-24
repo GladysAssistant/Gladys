@@ -1,4 +1,21 @@
 const logger = require('../../../../utils/logger');
+const { GENRE } = require('../constants');
+
+/**
+ *
+ * @description Get value metadata.
+ * @param {Object} zwaveNode - Node.
+ * @param {Object} args - ZWaveNodeValueAddedArgs.
+ * @returns {Object} ZWaveNode value metadata.
+ * @example
+ * getValueMetadata(9, {});
+ */
+function getValueMetadata(zwaveNode, args) {
+  if(zwaveNode.getValueMetadata ) {
+    return zwaveNode.getValueMetadata(args);
+  }
+  return zwaveNode.getValueMetadata;
+}
 
 /**
  * ValueAddedArgs.
@@ -10,12 +27,13 @@ const logger = require('../../../../utils/logger');
  * valueAdded(9, {});
  */
 function valueAdded(zwaveNode, args) {
-  const { commandClass, endpoint, property, propertyKey, newValue } = args;
+  logger.debug(`${zwaveNode.id}${JSON.stringify(args)}`);
+  const { commandClass, endpoint, property, propertyKey } = args;
   const nodeId = zwaveNode.id;
-  const instance = property + (propertyKey ? `-${propertyKey}` : '');
-  logger.debug(
-    `Zwave : Value Added, nodeId = ${nodeId}, comClass = ${commandClass}, valueId = ${JSON.stringify(newValue)}`,
-  );
+  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  /* logger.debug(
+    `Zwave : Value Added, nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}`,
+  ); */
   if (!this.nodes[nodeId].classes[commandClass]) {
     this.nodes[nodeId].classes[commandClass] = {};
   }
@@ -24,17 +42,17 @@ function valueAdded(zwaveNode, args) {
     // New Endpoint - split allowed
   }
 
-  const metadata = zwaveNode.getValueMetadata(args);
-  this.nodes[nodeId].classes[commandClass][endpoint][instance] = {
-    genre: 'user',
+  const metadata = getValueMetadata(zwaveNode, args);
+  this.nodes[nodeId].classes[commandClass][endpoint][fullProperty] = {
+    nodeId,
+    genre: GENRE[commandClass] || 'user',
     min: metadata.min || 0,
     max: metadata.max || 1,
-    label: metadata.label,
-    class_id: commandClass,
-    index: endpoint,
-    instance,
-    read_only: !metadata.writeable,
-    value: newValue
+    label: `${metadata.label}${  (endpoint && endpoint > 0) ? ` (${endpoint})` : ''}`,
+    commandClass,
+    endpoint,
+    property: fullProperty,
+    read_only: !metadata.writeable
   };
 }
 

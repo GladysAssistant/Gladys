@@ -10,16 +10,15 @@ const logger = require('../../../../utils/logger');
 function valueRemoved(node, args) {
   const { commandClass, endpoint, property, propertyKey /* , newValue */ } = args;
   const nodeId = node.id;
+  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
   logger.debug(
-    `Zwave : Value removed, nodeId = ${nodeId}, comClass = ${commandClass}, index = ${endpoint}, instance = ${
-      property + propertyKey ? `/${propertyKey}` : ''
-    }`,
+    `Zwave : Value removed, nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}`,
   );
   if (
     this.nodes[nodeId].classes[commandClass] &&
-    this.nodes[nodeId].classes[commandClass][endpoint][property + propertyKey ? `/${propertyKey}` : '']
+    this.nodes[nodeId].classes[commandClass][endpoint][fullProperty]
   ) {
-    delete this.nodes[nodeId].classes[commandClass][endpoint][property + propertyKey ? `/${propertyKey}` : ''];
+    delete this.nodes[nodeId].classes[commandClass][endpoint][fullProperty];
   }
 }
 

@@ -1,3 +1,6 @@
+const logger = require('../../../utils/logger');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+
 const { addNode } = require('./commands/zwave.addNode');
 const { connect } = require('./commands/zwave.connect');
 const { disconnect } = require('./commands/zwave.disconnect');
@@ -12,7 +15,6 @@ const { driverFailed } = require('./events/zwave.driverFailed');
 const { driverReady } = require('./events/zwave.driverReady');
 const { nodeAdded } = require('./events/zwave.nodeAdded');
 const { nodeRemoved } = require('./events/zwave.nodeRemoved');
-const { nodeEvent } = require('./events/zwave.nodeEvent');
 const { valueAdded } = require('./events/zwave.valueAdded');
 const { valueUpdated } = require('./events/zwave.valueUpdated');
 const { valueRemoved } = require('./events/zwave.valueRemoved');
@@ -21,15 +23,29 @@ const { notification } = require('./events/zwave.notification');
 const { scanComplete } = require('./events/zwave.scanComplete');
 const { controllerCommand } = require('./events/zwave.controllerCommand');
 const { valueNotification } = require('./events/zwave.valueNotification');
+const { cancelControllerCommand } = require('./commands/zwave.cancelControllerCommand');
 
-const ZwaveManager = function ZwaveManager(gladys, serviceId) {
-  this.zwave = undefined;
+const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
   this.gladys = gladys;
   this.eventManager = gladys.event;
   this.serviceId = serviceId;
+  this.ZWaveJS = ZWaveJS;
   this.nodes = {};
   this.connected = false;
   this.scanInProgress = false;
+
+  this.mqttService = this.gladys.service.getService('mqtt');
+  this.mqttService.device.subscribe('zwavejsmqtt/#', (topic, message) => {
+    logger.info(`Message recevied from topic ${topic}`);
+    const { type, node, args } = JSON.parse(message);
+    if(type === 'value added') {
+      valueAdded(node, args);
+    } else if(type === 'value notification') {
+      notification(node, args);
+    } else if(type === 'notification') {
+      valueNotification(node, args);
+    }
+  });
 };
 
 // EVENTS
@@ -37,7 +53,6 @@ ZwaveManager.prototype.driverReady = driverReady;
 ZwaveManager.prototype.driverFailed = driverFailed;
 ZwaveManager.prototype.nodeAdded = nodeAdded;
 ZwaveManager.prototype.nodeRemoved = nodeRemoved;
-ZwaveManager.prototype.nodeEvent = nodeEvent;
 ZwaveManager.prototype.valueAdded = valueAdded;
 ZwaveManager.prototype.valueUpdated = valueUpdated;
 ZwaveManager.prototype.valueRemoved = valueRemoved;
@@ -58,5 +73,6 @@ ZwaveManager.prototype.getNodes = getNodes;
 ZwaveManager.prototype.getNodeNeighbors = getNodeNeighbors;
 ZwaveManager.prototype.removeNode = removeNode;
 ZwaveManager.prototype.setValue = setValue;
+ZwaveManager.prototype.cancelControllerCommand = cancelControllerCommand;
 
 module.exports = ZwaveManager;

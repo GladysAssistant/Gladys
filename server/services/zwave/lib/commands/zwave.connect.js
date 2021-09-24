@@ -14,8 +14,7 @@ const { scanComplete } = require('../events/zwave.scanComplete');
  * zwave.connect(driverPath);
  */
 async function connect(driverPath) {
-  const ZWaveJS = require('zwave-js');
-
+  const tmpZWaveJS = this.ZWaveJS;
   logger.debug(`Zwave : Connecting to USB = ${driverPath}`);
   // special case for macOS
   if (os.platform() === 'darwin') {
@@ -24,7 +23,7 @@ async function connect(driverPath) {
     this.driverPath = driverPath;
   }
   this.ready = false;
-  this.driver = new ZWaveJS.Driver(driverPath, {
+  this.driver = new tmpZWaveJS.Driver(driverPath, {
     logConfig: {
       level: 'info',
     },

@@ -3,18 +3,18 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 /**
  * @description Getting neighbors of all nodes.
- * @returns {Array} Return array of nodes and their neighbors.
+ * @returns {Promise<Object>} Return node and its neighbors.
  * @example
  * zwave.getNodeNeighbors();
  */
-function getNodeNeighbors() {
+ async function getNodeNeighbors() {
   if (!this.connected) {
     throw new ServiceNotConfiguredError('ZWAVE_DRIVER_NOT_RUNNING');
   }
   logger.debug(`Zwave : Getting node neighbors...`);
   const nodeIds = Object.keys(this.nodes);
-  const nodes = nodeIds.map((nodeId) => {
-    const neighbors = []; // this.zwave.getNodeNeighbors(nodeId);
+  const nodes = nodeIds.map(async (nodeId) => {
+    const neighbors = []; // await this.driver.controller.getNodeNeighbors(nodeId);
     return {
       id: nodeId,
       manufacturer: this.nodes[nodeId].manufacturer,
