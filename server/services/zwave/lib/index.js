@@ -1,5 +1,4 @@
 const logger = require('../../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 const { addNode } = require('./commands/zwave.addNode');
 const { connect } = require('./commands/zwave.connect');
@@ -38,11 +37,11 @@ const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
   this.mqttService.device.subscribe('zwavejsmqtt/#', (topic, message) => {
     logger.info(`Message recevied from topic ${topic}`);
     const { type, node, args } = JSON.parse(message);
-    if(type === 'value added') {
+    if (type === 'value added') {
       valueAdded(node, args);
-    } else if(type === 'value notification') {
+    } else if (type === 'value notification') {
       notification(node, args);
-    } else if(type === 'notification') {
+    } else if (type === 'notification') {
       valueNotification(node, args);
     }
   });

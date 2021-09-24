@@ -11,7 +11,7 @@ const { GENRE } = require('../constants');
  * getValueMetadata(9, {});
  */
 function getValueMetadata(zwaveNode, args) {
-  if(zwaveNode.getValueMetadata ) {
+  if (zwaveNode.getValueMetadata) {
     return zwaveNode.getValueMetadata(args);
   }
   return zwaveNode.getValueMetadata;
@@ -48,11 +48,11 @@ function valueAdded(zwaveNode, args) {
     genre: GENRE[commandClass] || 'user',
     min: metadata.min || 0,
     max: metadata.max || 1,
-    label: `${metadata.label}${  (endpoint && endpoint > 0) ? ` (${endpoint})` : ''}`,
+    label: `${metadata.label}${endpoint && endpoint > 0 ? ` (${endpoint})` : ''}`,
     commandClass,
     endpoint,
     property: fullProperty,
-    read_only: !metadata.writeable
+    read_only: !metadata.writeable,
   };
 }
 

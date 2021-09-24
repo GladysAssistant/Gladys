@@ -5,7 +5,7 @@
  * @example
  * getDeviceExternalId(value);
  */
- function getDeviceExternalId(value) {
+function getDeviceExternalId(value) {
   return `zwave:node_id:${value.nodeId}`;
 }
 

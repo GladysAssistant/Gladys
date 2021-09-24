@@ -5,7 +5,6 @@ const { assert, fake } = require('sinon');
 const ZwaveManager = require('../../../../services/zwave/lib');
 const ZwaveMock = require('../ZwaveMock.test');
 const nodesData = require('./nodesData.json');
-const node16 = require('./node16.json');
 const nodesExpectedResult = require('./nodesExpectedResult.json');
 
 const gladys = {
@@ -16,13 +15,11 @@ const gladys = {
     getService: () => {
       return {
         device: {
-          subscribe: () => {
-
-          }
-        }
+          subscribe: () => {},
+        },
       };
-    }
-  }
+    },
+  },
 };
 const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
@@ -35,7 +32,7 @@ describe('zwaveManager commands', () => {
     assert.calledWith(ZwaveMock.prototype.constructor, '/dev/tty1', {
       logConfig: {
         level: 'info',
-      }
+      },
     });
     assert.calledOnce(zwaveManager.driver.start);
   });
@@ -99,7 +96,7 @@ describe('zwaveManager events', () => {
     zwaveManager.driverFailed();
   });
   it('should receive notification', () => {
-    zwaveManager.notification({id: 1}, 1);
+    zwaveManager.notification({ id: 1 }, 1);
   });
   it('should receive scanComplete', () => {
     zwaveManager.scanComplete();
@@ -110,7 +107,7 @@ describe('zwaveManager events', () => {
       id: 1,
       on: (event) => {
         events.push(event);
-      }
+      },
     });
     assert.match(zwaveManager.nodes[1] !== undefined, true);
     assert.match(zwaveManager.nodes[1].classes !== undefined, true);
@@ -123,7 +120,7 @@ describe('zwaveManager events', () => {
     assert.match(events.indexOf('notification') > -1, true);
   });
   it('should receive node removed', () => {
-    zwaveManager.nodeRemoved({id: 1});
+    zwaveManager.nodeRemoved({ id: 1 });
   });
   it('should receive node ready info', () => {
     zwaveManager.nodes[1] = {
@@ -143,7 +140,7 @@ describe('zwaveManager events', () => {
       location: '',
       getDefinedValueIDs: () => {
         return [];
-      }
+      },
     });
   });
   it('should receive value added', () => {
@@ -151,25 +148,28 @@ describe('zwaveManager events', () => {
     zwaveManager.nodes[1] = {
       id: 1,
       ready: true,
-      classes: {}
+      classes: {},
     };
-    zwaveManager.valueAdded({
-      id: 1,
-      getValueMetadata: () => {
-        return {
-          min: 0,
-          max: 4,
-          label: '',
-          writeable: false
-        };
-      }
-    }, {
-      commandClassName: 'Scene Activation',
-      commandClass,
-      endpoint,
-      property,
-      propertyName: property
-    });
+    zwaveManager.valueAdded(
+      {
+        id: 1,
+        getValueMetadata: () => {
+          return {
+            min: 0,
+            max: 4,
+            label: '',
+            writeable: false,
+          };
+        },
+      },
+      {
+        commandClassName: 'Scene Activation',
+        commandClass,
+        endpoint,
+        property,
+        propertyName: property,
+      },
+    );
     assert.match(zwaveManager.nodes[1].classes !== undefined, true);
     assert.match(zwaveManager.nodes[1].classes[commandClass] !== undefined, true);
     assert.match(zwaveManager.nodes[1].classes[commandClass][endpoint] !== undefined, true);
@@ -180,25 +180,31 @@ describe('zwaveManager events', () => {
     assert.match(zwaveManager.nodes[1].classes[commandClass][endpoint][property].read_only, true);
   });
   it('should receive value updated', () => {
-    zwaveManager.valueUpdated({
-      id: 1
-    }, {
-      commandClassName: 'Scene Activation',
-      commandClass: 43,
-      endpoint: 0,
-      property: 'sceneId',
-      propertyName: 'sceneId'
-    });
+    zwaveManager.valueUpdated(
+      {
+        id: 1,
+      },
+      {
+        commandClassName: 'Scene Activation',
+        commandClass: 43,
+        endpoint: 0,
+        property: 'sceneId',
+        propertyName: 'sceneId',
+      },
+    );
   });
   it('should receive value removed', () => {
-    zwaveManager.valueRemoved({
-      id: 1
-    }, {
-      commandClassName: 'Scene Activation',
-      commandClass: 43,
-      endpoint: 0,
-      property: 'sceneId',
-      propertyName: 'sceneId'
-    });
+    zwaveManager.valueRemoved(
+      {
+        id: 1,
+      },
+      {
+        commandClassName: 'Scene Activation',
+        commandClass: 43,
+        endpoint: 0,
+        property: 'sceneId',
+        propertyName: 'sceneId',
+      },
+    );
   });
 });

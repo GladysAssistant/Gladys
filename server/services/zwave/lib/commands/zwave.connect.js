@@ -54,7 +54,6 @@ async function connect(driverPath) {
     scanComplete.bind(this)();
   });
 
-
   // this.zwave.connect(this.driverPath);
   await this.driver.start();
 

@@ -20,8 +20,8 @@ function getCategory(node, value) {
   let categoryFound = null;
   let i = 0;
 
-  // TODO 
-  if(value.property === 'currentValue') {
+  // TODO
+  if (value.property === 'currentValue') {
     return {
       category: UNKNOWN_CATEGORY,
       type: UNKNOWN_TYPE,
