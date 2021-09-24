@@ -1,4 +1,3 @@
-import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
