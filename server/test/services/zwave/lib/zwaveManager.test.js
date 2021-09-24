@@ -24,6 +24,7 @@ const gladys = {
 };
 const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
+
 describe('zwaveManager commands', () => {
   const zwaveManager = new ZwaveManager(gladys, serviceId);
   zwaveManager.ZWaveJS = ZwaveMock;
