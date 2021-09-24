@@ -1,14 +1,14 @@
 // const { expect } = require('chai');
-const { /* assert, */ fake } = require('sinon');
+// const { assert, fake } = require('sinon');
 // const EventEmitter = require('events');
 
 // const event = new EventEmitter();
-const ZwaveManager = require('../../../../services/zwave/lib');
+// const ZwaveManager = require('../../../../services/zwave/lib');
 // const ZwaveMock = require('../ZwaveMock.test');
 // const nodesData = require('./nodesData.json');
 // const nodesExpectedResult = require('./nodesExpectedResult.json');
 
-const gladys = {
+/* const gladys = {
   event: {
     emit: fake.returns(null),
   },
@@ -21,13 +21,12 @@ const gladys = {
       };
     },
   },
-};
-const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
+}; */
+// const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
 describe('zwaveManager fake', () => {
-  const zwaveManager = new ZwaveManager(gladys, serviceId);
   it('should connect to zwave driver', () => {
-    zwaveManager.scanComplete = true;
+    
   });
 });
 
