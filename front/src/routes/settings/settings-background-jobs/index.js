@@ -8,7 +8,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 class SettingsSystem extends Component {
   getJobs = async () => {
     try {
-      const jobs = await this.props.httpClient.get(`/api/v1/job`);
+      const jobs = await this.props.httpClient.get(`/api/v1/job?take=500`);
       this.setState({
         jobs
       });
