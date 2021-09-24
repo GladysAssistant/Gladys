@@ -7,7 +7,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
  * @example
  * zwave.getNodeNeighbors();
  */
- async function getNodeNeighbors() {
+async function getNodeNeighbors() {
   if (!this.connected) {
     throw new ServiceNotConfiguredError('ZWAVE_DRIVER_NOT_RUNNING');
   }

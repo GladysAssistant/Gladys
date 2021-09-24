@@ -32,8 +32,8 @@ function valueUpdated(zwaveNode, args) {
       device_feature_external_id: getDeviceFeatureExternalId({
         nodeId,
         commandClass,
-        endpoint: endpoint || 0, 
-        property: fullProperty
+        endpoint: endpoint || 0,
+        property: fullProperty,
       }),
       state: newValue,
     });

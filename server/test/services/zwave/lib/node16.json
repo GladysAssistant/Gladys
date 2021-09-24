@@ -1,967 +1,940 @@
 {
-    "16": {
-        "manufacturerid": "",
-        "producttype": "",
-        "productid": "",
-        "firmwareVersion": "",
-        "label": "",
-        "type": "",
-        "name": "",
-        "location": "",
-        "classes": {
-            "43": {
-                "sceneId": {
-                    "commandClassName": "Scene Activation",
-                    "commandClass": 43,
-                    "endpoint": 0,
-                    "property": "sceneId",
-                    "propertyName": "sceneId"
-                },
-                "dimmingDuration": {
-                    "commandClassName": "Scene Activation",
-                    "commandClass": 43,
-                    "endpoint": 0,
-                    "property": "dimmingDuration",
-                    "propertyName": "dimmingDuration"
-                }
-            },
-            "91": {
-                "slowRefresh": {
-                    "commandClassName": "Central Scene",
-                    "commandClass": 91,
-                    "endpoint": 0,
-                    "property": "slowRefresh",
-                    "propertyName": "slowRefresh"
-                },
-                "scene-001": {
-                    "commandClassName": "Central Scene",
-                    "commandClass": 91,
-                    "endpoint": 0,
-                    "property": "scene",
-                    "propertyKey": "001",
-                    "propertyName": "scene",
-                    "propertyKeyName": "001"
-                },
-                "scene-002": {
-                    "commandClassName": "Central Scene",
-                    "commandClass": 91,
-                    "endpoint": 0,
-                    "property": "scene",
-                    "propertyKey": "002",
-                    "propertyName": "scene",
-                    "propertyKeyName": "002"
-                },
-                "scene-003": {
-                    "commandClassName": "Central Scene",
-                    "commandClass": 91,
-                    "endpoint": 0,
-                    "property": "scene",
-                    "propertyKey": "003",
-                    "propertyName": "scene",
-                    "propertyKeyName": "003"
-                },
-                "scene-004": {
-                    "commandClassName": "Central Scene",
-                    "commandClass": 91,
-                    "endpoint": 0,
-                    "property": "scene",
-                    "propertyKey": "004",
-                    "propertyName": "scene",
-                    "propertyKeyName": "004"
-                }
-            },
-            "112": {
-                "1": {
-                    "1": {
-                        "value_id": "15-112-1-1",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "byte",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 1,
-                        "label": "Motion detection - sensitivity",
-                        "units": "",
-                        "help": "The lower the value, the more sensitive the PIR sensor is. Available settings: 8 - 255 Default setting: 15",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 255,
-                        "is_polled": false,
-                        "value": 15
-                    }
-                },
-                "2": {
-                    "1": {
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "byte",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 2,
-                        "label": "Motion detection - blind time",
-                        "units": "",
-                        "help": "PIR sensor is blind (insensitive) to motion after last detection for the amount of time specified in this parameter. Shorter time periods allow to detect motion more frequently, but the battery will be drained faster. Available settings: 0 - 15 (0.5-8 seconds). Formula to calculate the time: time [s] = 0.5 x (value+1)) Default setting: 3",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 15,
-                        "is_polled": false,
-                        "value": 3
-                    }
-                },
-                "3": {
-                    "1": {
-                        "value_id": "15-112-1-3",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 3,
-                        "label": "Motion detection - pulse counter",
-                        "units": "",
-                        "help": "This parameter determines the number of moves required for the PIR sensor to report motion. The higher the value, the less sensitive the PIR sensor is. It is not recommended to modify this parameter settings! Default setting: 1 (2 pulses)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 3,
-                        "is_polled": false,
-                        "values": [
-                            "1 pulse",
-                            "2 pulses",
-                            "3 pulses",
-                            "4 pulses"
-                        ],
-                        "value": "2 pulses"
-                    }
-                },
-                "4": {
-                    "1": {
-                        "value_id": "15-112-1-4",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 4,
-                        "label": "Motion detection - window time",
-                        "units": "",
-                        "help": "Period of time during which the number of moves set in parameter 3 must be detected in order for the PIR sensor to report motion. The higher the value, the more sensitive the PIR sensor is. It is not recommended to modify this parameter setting! Default setting: 2 (12 seconds)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 3,
-                        "is_polled": false,
-                        "values": [
-                            "4 seconds",
-                            "8 seconds",
-                            "12 seconds",
-                            "16 seconds"
-                        ],
-                        "value": "12 seconds"
-                    }
-                },
-                "6": {
-                    "1": {
-                        "value_id": "15-112-1-6",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 6,
-                        "label": "Motion detection - alarm cancellation delay",
-                        "units": "seconds",
-                        "help": "Time period after which the motion alarm will be cancelled in the main controller and associated devices. Any motion detected during this period resets the timer. Available settings: 1 - 65535 Default setting: 30 (30 seconds)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 1,
-                        "max": 65535,
-                        "is_polled": false,
-                        "value": 30
-                    }
-                },
-                "8": {
-                    "1": {
-                        "value_id": "15-112-1-8",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 8,
-                        "label": "Motion detection - operating mode",
-                        "units": "",
-                        "help": "This parameter determines in which part of day the PIR sensor will be active. This parameter influences only the motion reports and associations. Tamper, light intensity and temperature measurements will be still active, regardless of this parameter settings. Default setting: 0 (always active)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 2,
-                        "is_polled": false,
-                        "values": [
-                            "PIR sensor always active",
-                            "PIR sensor active during the day only",
-                            "PIR sensor active during the night only"
-                        ],
-                        "value": "PIR sensor always active"
-                    }
-                },
-                "9": {
-                    "1": {
-                        "value_id": "15-112-1-9",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 9,
-                        "label": "Motion detection - night/day",
-                        "units": "lux",
-                        "help": "This parameter defines the difference between night and day in terms of light intensity, used in parameter 8. Available settings: 1 - 65535 Default setting: 200 (200 lux)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 1,
-                        "max": 65535,
-                        "is_polled": false,
-                        "value": 200
-                    }
-                },
-                "12": {
-                    "1": {
-                        "value_id": "15-112-1-12",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 12,
-                        "label": "BASIC command class configuration",
-                        "units": "",
-                        "help": "This parameter determines the command frames sent to 2nd association group (assigned to PIR sensor). Default setting: 0 (ON and OFF)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 2,
-                        "is_polled": false,
-                        "values": [
-                            "BASIC On and OFF",
-                            "Only the BASIC On",
-                            "Only the BASIC OFF"
-                        ],
-                        "value": "BASIC On and OFF"
-                    }
-                },
-                "14": {
-                    "1": {
-                        "value_id": "15-112-1-14",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 14,
-                        "label": "BASIC ON command frame value",
-                        "units": "",
-                        "help": "The command frame sent at the moment of motion detection. Further motion detections, during the cancellation time, will not result in sending the association. Available settings: 0 - 255 Default setting: 255",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 255,
-                        "is_polled": false,
-                        "value": 255
-                    }
-                },
-                "16": {
-                    "1": {
-                        "value_id": "15-112-1-16",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 16,
-                        "label": "BASIC OFF command frame value",
-                        "units": "",
-                        "help": "The command frame sent at the moment of motion alarm cancellation, after cancellation delay time specified in parameter 6. Available settings: 0 - 255 Default setting: 0",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 255,
-                        "is_polled": false,
-                        "value": 0
-                    }
-                },
-                "18": {
-                    "1": {
-                        "value_id": "15-112-1-18",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "byte",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 18,
-                        "label": "Associations in Z-Wave network security mode",
-                        "units": "",
-                        "help": "This parameter defines how commands are sent in specified association groups: as secure or non-secure. Parameter is active only in Z-Wave network security mode. It does not apply to 1st group Lifeline. Available settings 0 - 15: 0 - none of the groups sent as secure 1 - 2nd group sent as secure. 2 - 3rd group sent as secure. 4 - 4th group sent as secure. 8 - 5th group sent as secure.",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 15,
-                        "is_polled": false,
-                        "value": 15
-                    }
-                },
-                "20": {
-                    "1": {
-                        "value_id": "15-112-1-20",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "byte",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 20,
-                        "label": "Tamper - sensitivity",
-                        "units": "",
-                        "help": "This parameter determines the change in force acting on the device, that will result in reporting tamper alarm - g-force acceleration. Available settings: 0 - 121 (0.08 - 2g; multiply by 0.016g; 0 = tamper inactive) Default setting: 20 (0.4g)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 121,
-                        "is_polled": false,
-                        "value": 20
-                    }
-                },
-                "22": {
-                    "1": {
-                        "value_id": "15-112-1-22",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 22,
-                        "label": "Tamper - alarm cancellation delay",
-                        "units": "seconds",
-                        "help": "Time period after which a tamper alarm will be cancelled in the main controller and associated devices. Any tampering detected during this period will not extend the delay. Available settings: 1 - 65535 Default setting: 30 (seconds)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 1,
-                        "max": 32767,
-                        "is_polled": false,
-                        "value": 30
-                    }
-                },
-                "24": {
-                    "1": {
-                        "value_id": "15-112-1-24",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 24,
-                        "label": "Tamper - operating modes",
-                        "units": "",
-                        "help": "This parameter determines function of the tamper and sent reports. It is an advanced feature serving much more functions than just detection of tampering. Default setting: 0 (Tamper)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 2,
-                        "is_polled": false,
-                        "values": [
-                            "Tamper only",
-                            "Tamper and earthquake detector",
-                            "Tamper and orientation in space"
-                        ],
-                        "value": "Tamper only"
-                    }
-                },
-                "25": {
-                    "1": {
-                        "value_id": "15-112-1-25",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 25,
-                        "label": "Tamper - alarm cancellation",
-                        "units": "",
-                        "help": "This parameter allows to disable cancellation of the tamper alarm. Default setting: 0 (Tamper).",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 1,
-                        "is_polled": false,
-                        "values": [
-                            "Do not send tamper cancellation report",
-                            "Send tamper cancellation report"
-                        ],
-                        "value": "Send tamper cancellation report"
-                    }
-                },
-                "28": {
-                    "1": {
-                        "value_id": "15-112-1-28",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 28,
-                        "label": "Tamper alarm broadcast mode",
-                        "units": "",
-                        "help": "The parameter determines whether the tamper alarm frame will or will not be sent in broadcast mode. Alarm frames sent in broadcast mode can be received by all of the devices within range (if they accept such frames), but not repeated by them. Default setting: 0",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 1,
-                        "is_polled": false,
-                        "values": [
-                            "Tamper alarm sent to 3rd association group",
-                            "Tamper alarm sent in broadcast mode"
-                        ],
-                        "value": "Tamper alarm sent to 3rd association group"
-                    }
-                },
-                "29": {
-                    "1": {
-                        "value_id": "15-112-1-29",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 29,
-                        "label": "Tamper - backward compatible broadcast mode",
-                        "units": "",
-                        "help": "The parameter determines whether the backward compatible tamper alarm frame will or will not be sent in broadcast mode. Alarm frames sent in broadcast mode can be received by all of the devices within range (if they accept such frames), but not repeated by them. This parameter provides backward compatibility with controllers not supporting Z-Wave+. Default setting: 0",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 1,
-                        "is_polled": false,
-                        "values": [
-                            "Backward compatible tamper alarm sent to 5th association group",
-                            "Backward compatible tamper alarm sent in broadcast mode"
-                        ],
-                        "value": "Backward compatible tamper alarm sent to 5th association group"
-                    }
-                },
-                "40": {
-                    "1": {
-                        "value_id": "15-112-1-40",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 40,
-                        "label": "Luminance report - threshold",
-                        "units": "lux",
-                        "help": "This parameter determines the change in light intensity level resulting in luminance report being sent to the main controller. Available settings: 0 - reports are not sent. 1-32767 (luminance in lux). Default setting: 200 (200 lux).",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 32767,
-                        "is_polled": false,
-                        "value": 200
-                    }
-                },
-                "42": {
-                    "1": {
-                        "value_id": "15-112-1-42",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 42,
-                        "label": "Luminance reports - interval",
-                        "units": "seconds",
-                        "help": "Time interval between consecutive luminance reports. The reports are sent even if there is no change in the light intensity. Available settings: 0 - 32767. 0 - periodical reports are not sent. 1-32767 (in seconds).",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 32767,
-                        "is_polled": false,
-                        "value": 0
-                    }
-                },
-                "60": {
-                    "1": {
-                        "value_id": "15-112-1-60",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 60,
-                        "label": "Temperature report - threshold",
-                        "units": "",
-                        "help": "This parameter determines the change in measured temperature that will result in new temperature report being sent to the main controller. Available settings: 0 - 255 (0.1 - 25.5C; 0 = reports are not sent) Default setting: 10 (1C)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 255,
-                        "is_polled": false,
-                        "value": 10
-                    }
-                },
-                "62": {
-                    "1": {
-                        "value_id": "15-112-1-62",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 62,
-                        "label": "Temperature measuring - interval",
-                        "units": "seconds",
-                        "help": "Time interval between consecutive temperature measurements. The shorter the time, the more frequently the temperature will be measured, but the battery life will shorten. Available settings: 0 - 32767 (1 - 32767 seconds; 0 = temperature is not measured) Default setting: 900 (900 seconds).",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 32767,
-                        "is_polled": false,
-                        "value": 900
-                    }
-                },
-                "64": {
-                    "1": {
-                        "value_id": "15-112-1-64",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 64,
-                        "label": "Temperature report - interval",
-                        "units": "seconds",
-                        "help": "Time interval between consecutive temperature reports. The reports are sent even if there is no change in the temperature. Available settings: 0 - 32767 (1 - 32767 seconds; 0 = periodical reports are not sent) Default setting: 0",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 32767,
-                        "is_polled": false,
-                        "value": 0
-                    }
-                },
-                "66": {
-                    "1": {
-                        "value_id": "15-112-1-66",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 66,
-                        "label": "Temperature offset",
-                        "units": "",
-                        "help": "The value to be added to the actual temperature, measured by the sensor (temperature compensation). Available settings: 0 - 100 (0 to 100C) or 64536 - 65535 (-100 to -0.10C) Default setting: 0",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 65535,
-                        "is_polled": false,
-                        "value": 0
-                    }
-                },
-                "80": {
-                    "1": {
-                        "value_id": "15-112-1-80",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 80,
-                        "label": "Visual LED indicator - signalling mode",
-                        "units": "",
-                        "help": "This parameter determines the way in which visual indicator behaves after motion has been detected. Default setting: 10 (Flashlight mode)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 26,
-                        "is_polled": false,
-                        "values": [
-                            "LED inactive.",
-                            "1 long blink, LED colour depends on the temperature. Set by parameters 86 and 87.",
-                            "Flashlight mode - LED glows in white for 10 seconds.",
-                            "Long blink White.",
-                            "Long blink Red.",
-                            "Long blink Green.",
-                            "Long blink Blue.",
-                            "Long blink Yellow.",
-                            "Long blink Cyan.",
-                            "Long blink Magenta.",
-                            "Long blink, then short blink, LED colour depends on the temperature. Set by parameters 86 and 87.",
-                            "Flashlight mode - LED glows in white through 10 seconds.  Each next detected motion extends the glowing by next 10 seconds.",
-                            "Long blink, then short blinks White.",
-                            "Long blink, then short blinks Red.",
-                            "Long blink, then short blinks Green.",
-                            "Long blink, then short blinks Blue.",
-                            "Long blink, then short blinks Yellow.",
-                            "Long blink, then short blinks Cyan",
-                            "Long blink, then short blinks Magenta",
-                            "Long blink, then 2 short blinks, LED colour depends on the temperature. Set by parameters 86 and 87.",
-                            "Long blink, then 2 short blinks White",
-                            "Long blink, then 2 short blinks Red",
-                            "Long blink, then 2 short blinks Green",
-                            "Long blink, then 2 short blinks Blue",
-                            "Long blink, then 2 short blinks Yellow",
-                            "Long blink, then 2 short blinks Cyan",
-                            "Long blink, then 2 short blinks Magenta"
-                        ],
-                        "value": "Long blink, then short blink, LED colour depends on the temperature. Set by parameters 86 and 87."
-                    }
-                },
-                "81": {
-                    "1": {
-                        "value_id": "15-112-1-81",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "byte",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 81,
-                        "label": "Visual LED indicator - brightness",
-                        "units": "%",
-                        "help": "This parameter determines the brightness of the visual LED indicator when indicating motion. Available settings: 0 - brightness determined by the luminance (parameters 82 and 83). 1-100 (1-100%) Default setting: 50 (50 %)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 100,
-                        "is_polled": false,
-                        "value": 50
-                    }
-                },
-                "82": {
-                    "1": {
-                        "value_id": "15-112-1-82",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 82,
-                        "label": "Visual LED indicator - luminance for low indicator brightness",
-                        "units": "lux",
-                        "help": "Light intensity level below which brightness of visual indicator is set to 1%. Available settings: 0 to value of parameter 83 (in lux). Default setting: 100.",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 32767,
-                        "is_polled": false,
-                        "value": 100
-                    }
-                },
-                "83": {
-                    "1": {
-                        "value_id": "15-112-1-83",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "short",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 83,
-                        "label": "Visual LED indicator - luminance for high indicator brightness",
-                        "units": "lux",
-                        "help": "Light intensity level above which brightness of visual indicator is set to 100%. Available settings: value of parameter 82 to 32767 (in lux) Default setting: 1000 (1000 lux) NOTE The value of the parameter 83 must be higher than the value of the parameter 82.",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 32767,
-                        "is_polled": false,
-                        "value": 1000
-                    }
-                },
-                "86": {
-                    "1": {
-                        "value_id": "15-112-1-86",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "byte",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 86,
-                        "label": "Visual LED indicator - temperature for blue colour",
-                        "units": "Celsius",
-                        "help": "This parameter is determines minimal temperature that will result in blue visual indicator colour. Relevant only when parameter 80 has been properly configured. Available settings: 0 to value of parameter 87 (in Celsius degree) Default setting: 18 (18C)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 255,
-                        "is_polled": false,
-                        "value": 18
-                    }
-                },
-                "87": {
-                    "1": {
-                        "value_id": "15-112-1-87",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "byte",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 87,
-                        "label": "Visual LED indicator - temperature for red colour",
-                        "units": "Celsius",
-                        "help": "This parameter is determines minimal temperature that will result in red visual indicator colour. Relevant only when parameter 80 has been properly configured. Available settings: value of parameter 86 to 255 (in Celsius degree) Default setting: 28 (28C)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 255,
-                        "is_polled": false,
-                        "value": 28
-                    }
-                },
-                "89": {
-                    "1": {
-                        "value_id": "15-112-1-89",
-                        "node_id": 16,
-                        "commandClass": 112,
-                        "type": "list",
-                        "genre": "config",
-                        "instance": 1,
-                        "endpoint": 89,
-                        "label": "Visual LED indicator - tamper alarm",
-                        "units": "",
-                        "help": "Indicating mode resembles a police car (white, red and blue). Default setting: 1 (on)",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 1,
-                        "is_polled": false,
-                        "values": [
-                            "Tamper alarm is not indicated",
-                            "Tamper alarm is indicated"
-                        ],
-                        "value": "Tamper alarm is indicated"
-                    }
-                }
-            },
-            "114": {
-                "0": {
-                    "manufacturerId": {
-                        "node_id": 16,
-                        "commandClass": 114,
-                        "commandClassName": "Manufacturer Specific",
-                        "endpoint": 0,
-                        "property": "manufacturerId",
-                        "propertyName": "manufacturerId",
-                        "type": "int",
-                        "genre": "system",
-                        "label": "Loaded Config Revision",
-                        "units": "",
-                        "help": "Revision of the Config file currently loaded",
-                        "read_only": true,
-                        "write_only": false,
-                        "min": -2147483648,
-                        "max": 2147483647,
-                        "is_polled": false,
-                        "value": 11
-                    },
-                    "productType": {
-                        "node_id": 16,
-                        "commandClass": 114,
-                        "commandClassName": "Manufacturer Specific",
-                        "endpoint": 0,
-                        "property": "productType",
-                        "propertyName": "productType",
-                        "type": "int",
-                        "genre": "system",
-                        "label": "Loaded Config Revision",
-                        "units": "",
-                        "help": "Revision of the Config file currently loaded",
-                        "read_only": true,
-                        "write_only": false,
-                        "min": -2147483648,
-                        "max": 2147483647,
-                        "is_polled": false,
-                        "value": 11
-                    },
-                    "productId": {
-                        "node_id": 16,
-                        "commandClass": 114,
-                        "commandClassName": "Manufacturer Specific",
-                        "endpoint": 0,
-                        "property": "productId",
-                        "propertyName": "productId",
-                        "type": "int",
-                        "genre": "system",
-                        "label": "Loaded Config Revision",
-                        "units": "",
-                        "help": "Revision of the Config file currently loaded",
-                        "read_only": true,
-                        "write_only": false,
-                        "min": -2147483648,
-                        "max": 2147483647,
-                        "is_polled": false,
-                        "value": 11
-                    }
-                }
-            },
-            "128": {
-                "0": {
-                    "level": {
-                        "node_id": 16,
-                        "commandClass": 128,
-                        "commandClassName": "Manufacturer Specific",
-                        "endpoint": 0,
-                        "property": "level",
-                        "propertyName": "level",
-                        "type": "integer",
-                        "genre": "user",
-                        "label": "Battery Level",
-                        "help": "Current Battery Level",
-                        "read_only": true,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 100,
-                        "is_polled": false,
-                        "value": 100
-                    },
-                    "isLow": {
-                        "node_id": 16,
-                        "commandClass": 128,
-                        "endpoint": 0,
-                        "property": "isLow",
-                        "propertyName": "isLow",
-                        "type": "integer",
-                        "genre": "user",
-                        "label": "Low battery level",
-                        "read_only": true,
-                        "min": 0,
-                        "max": 1
-                    }
-                }
-            },
-            "132": {
-                "0": {
-                    "wakeUpInterval": {
-                        "node_id": 16,
-                        "commandClass": 132,
-                        "commandClassName": "Wake Up",
-                        "endpoint": 0,
-                        "property": "wakeUpInterval",
-                        "propertyName": "wakeUpInterval",
-                        "type": "int",
-                        "genre": "system",
-                        "label": "Wake-up Interval",
-                        "units": "Seconds",
-                        "help": "How often the Device will Wake up to check for pending commands",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": -2147483648,
-                        "max": 2147483647,
-                        "is_polled": false,
-                        "value": 7200
-                    },
-                    "controllerNodeId": {
-                        "node_id": 16,
-                        "commandClass": 132,
-                        "commandClassName": "Wake Up",
-                        "endpoint": 0,
-                        "property": "controllerNodeId",
-                        "propertyName": "controllerNodeId",
-                        "type": "int",
-                        "genre": "system",
-                        "label": "Wake-up Interval",
-                        "units": "Seconds",
-                        "help": "How often the Device will Wake up to check for pending commands",
-                        "read_only": false,
-                        "write_only": false,
-                        "min": -2147483648,
-                        "max": 2147483647,
-                        "is_polled": false,
-                        "value": 7200
-                    }
-                }
-            },
-            "134": {
-                "0": {
-                    "libraryType": {
-                        "node_id": 16,
-                        "commandClass": 134,
-                        "commandClassName": "Version",
-                        "endpoint": 0,
-                        "property": "libraryType",
-                        "propertyName": "libraryType",
-                        "type": "string",
-                        "genre": "system",
-                        "label": "Library Version",
-                        "units": "",
-                        "help": "Z-Wave Library Version",
-                        "read_only": true,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 0,
-                        "is_polled": false,
-                        "value": "3"
-                    },
-                    "protocolVersion": {
-                        "node_id": 16,
-                        "commandClass": 134,
-                        "commandClassName": "Version",
-                        "endpoint": 0,
-                        "property": "protocolVersion",
-                        "propertyName": "protocolVersion",
-                        "type": "string",
-                        "genre": "system",
-                        "label": "Library Version",
-                        "units": "",
-                        "help": "Z-Wave Library Version",
-                        "read_only": true,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 0,
-                        "is_polled": false,
-                        "value": "3"
-                    },
-                    "firmwareVersions": {
-                        "node_id": 16,
-                        "commandClass": 134,
-                        "commandClassName": "Version",
-                        "endpoint": 0,
-                        "property": "firmwareVersions",
-                        "propertyName": "firmwareVersions",
-                        "type": "string",
-                        "genre": "system",
-                        "label": "Library Version",
-                        "units": "",
-                        "help": "Z-Wave Library Version",
-                        "read_only": true,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 0,
-                        "is_polled": false,
-                        "value": "3"
-                    },
-                    "hardwareVersion": {
-                        "node_id": 16,
-                        "commandClass": 134,
-                        "commandClassName": "Version",
-                        "endpoint": 0,
-                        "property": "hardwareVersion",
-                        "propertyName": "hardwareVersion",
-                        "type": "string",
-                        "genre": "system",
-                        "label": "Library Version",
-                        "units": "",
-                        "help": "Z-Wave Library Version",
-                        "read_only": true,
-                        "write_only": false,
-                        "min": 0,
-                        "max": 0,
-                        "is_polled": false,
-                        "value": "3"
-                    }
-                }
-            }
+  "16": {
+    "manufacturerid": "",
+    "producttype": "",
+    "productid": "",
+    "firmwareVersion": "",
+    "label": "",
+    "type": "",
+    "name": "",
+    "location": "",
+    "classes": {
+      "43": {
+        "sceneId": {
+          "commandClassName": "Scene Activation",
+          "commandClass": 43,
+          "endpoint": 0,
+          "property": "sceneId",
+          "propertyName": "sceneId"
         },
-        "ready": true
-    }
+        "dimmingDuration": {
+          "commandClassName": "Scene Activation",
+          "commandClass": 43,
+          "endpoint": 0,
+          "property": "dimmingDuration",
+          "propertyName": "dimmingDuration"
+        }
+      },
+      "91": {
+        "slowRefresh": {
+          "commandClassName": "Central Scene",
+          "commandClass": 91,
+          "endpoint": 0,
+          "property": "slowRefresh",
+          "propertyName": "slowRefresh"
+        },
+        "scene-001": {
+          "commandClassName": "Central Scene",
+          "commandClass": 91,
+          "endpoint": 0,
+          "property": "scene",
+          "propertyKey": "001",
+          "propertyName": "scene",
+          "propertyKeyName": "001"
+        },
+        "scene-002": {
+          "commandClassName": "Central Scene",
+          "commandClass": 91,
+          "endpoint": 0,
+          "property": "scene",
+          "propertyKey": "002",
+          "propertyName": "scene",
+          "propertyKeyName": "002"
+        },
+        "scene-003": {
+          "commandClassName": "Central Scene",
+          "commandClass": 91,
+          "endpoint": 0,
+          "property": "scene",
+          "propertyKey": "003",
+          "propertyName": "scene",
+          "propertyKeyName": "003"
+        },
+        "scene-004": {
+          "commandClassName": "Central Scene",
+          "commandClass": 91,
+          "endpoint": 0,
+          "property": "scene",
+          "propertyKey": "004",
+          "propertyName": "scene",
+          "propertyKeyName": "004"
+        }
+      },
+      "112": {
+        "1": {
+          "1": {
+            "value_id": "15-112-1-1",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "byte",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 1,
+            "label": "Motion detection - sensitivity",
+            "units": "",
+            "help": "The lower the value, the more sensitive the PIR sensor is. Available settings: 8 - 255 Default setting: 15",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 255,
+            "is_polled": false,
+            "value": 15
+          }
+        },
+        "2": {
+          "1": {
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "byte",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 2,
+            "label": "Motion detection - blind time",
+            "units": "",
+            "help": "PIR sensor is blind (insensitive) to motion after last detection for the amount of time specified in this parameter. Shorter time periods allow to detect motion more frequently, but the battery will be drained faster. Available settings: 0 - 15 (0.5-8 seconds). Formula to calculate the time: time [s] = 0.5 x (value+1)) Default setting: 3",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 15,
+            "is_polled": false,
+            "value": 3
+          }
+        },
+        "3": {
+          "1": {
+            "value_id": "15-112-1-3",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 3,
+            "label": "Motion detection - pulse counter",
+            "units": "",
+            "help": "This parameter determines the number of moves required for the PIR sensor to report motion. The higher the value, the less sensitive the PIR sensor is. It is not recommended to modify this parameter settings! Default setting: 1 (2 pulses)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 3,
+            "is_polled": false,
+            "values": ["1 pulse", "2 pulses", "3 pulses", "4 pulses"],
+            "value": "2 pulses"
+          }
+        },
+        "4": {
+          "1": {
+            "value_id": "15-112-1-4",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 4,
+            "label": "Motion detection - window time",
+            "units": "",
+            "help": "Period of time during which the number of moves set in parameter 3 must be detected in order for the PIR sensor to report motion. The higher the value, the more sensitive the PIR sensor is. It is not recommended to modify this parameter setting! Default setting: 2 (12 seconds)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 3,
+            "is_polled": false,
+            "values": ["4 seconds", "8 seconds", "12 seconds", "16 seconds"],
+            "value": "12 seconds"
+          }
+        },
+        "6": {
+          "1": {
+            "value_id": "15-112-1-6",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 6,
+            "label": "Motion detection - alarm cancellation delay",
+            "units": "seconds",
+            "help": "Time period after which the motion alarm will be cancelled in the main controller and associated devices. Any motion detected during this period resets the timer. Available settings: 1 - 65535 Default setting: 30 (30 seconds)",
+            "read_only": false,
+            "write_only": false,
+            "min": 1,
+            "max": 65535,
+            "is_polled": false,
+            "value": 30
+          }
+        },
+        "8": {
+          "1": {
+            "value_id": "15-112-1-8",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 8,
+            "label": "Motion detection - operating mode",
+            "units": "",
+            "help": "This parameter determines in which part of day the PIR sensor will be active. This parameter influences only the motion reports and associations. Tamper, light intensity and temperature measurements will be still active, regardless of this parameter settings. Default setting: 0 (always active)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 2,
+            "is_polled": false,
+            "values": [
+              "PIR sensor always active",
+              "PIR sensor active during the day only",
+              "PIR sensor active during the night only"
+            ],
+            "value": "PIR sensor always active"
+          }
+        },
+        "9": {
+          "1": {
+            "value_id": "15-112-1-9",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 9,
+            "label": "Motion detection - night/day",
+            "units": "lux",
+            "help": "This parameter defines the difference between night and day in terms of light intensity, used in parameter 8. Available settings: 1 - 65535 Default setting: 200 (200 lux)",
+            "read_only": false,
+            "write_only": false,
+            "min": 1,
+            "max": 65535,
+            "is_polled": false,
+            "value": 200
+          }
+        },
+        "12": {
+          "1": {
+            "value_id": "15-112-1-12",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 12,
+            "label": "BASIC command class configuration",
+            "units": "",
+            "help": "This parameter determines the command frames sent to 2nd association group (assigned to PIR sensor). Default setting: 0 (ON and OFF)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 2,
+            "is_polled": false,
+            "values": ["BASIC On and OFF", "Only the BASIC On", "Only the BASIC OFF"],
+            "value": "BASIC On and OFF"
+          }
+        },
+        "14": {
+          "1": {
+            "value_id": "15-112-1-14",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 14,
+            "label": "BASIC ON command frame value",
+            "units": "",
+            "help": "The command frame sent at the moment of motion detection. Further motion detections, during the cancellation time, will not result in sending the association. Available settings: 0 - 255 Default setting: 255",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 255,
+            "is_polled": false,
+            "value": 255
+          }
+        },
+        "16": {
+          "1": {
+            "value_id": "15-112-1-16",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 16,
+            "label": "BASIC OFF command frame value",
+            "units": "",
+            "help": "The command frame sent at the moment of motion alarm cancellation, after cancellation delay time specified in parameter 6. Available settings: 0 - 255 Default setting: 0",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 255,
+            "is_polled": false,
+            "value": 0
+          }
+        },
+        "18": {
+          "1": {
+            "value_id": "15-112-1-18",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "byte",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 18,
+            "label": "Associations in Z-Wave network security mode",
+            "units": "",
+            "help": "This parameter defines how commands are sent in specified association groups: as secure or non-secure. Parameter is active only in Z-Wave network security mode. It does not apply to 1st group Lifeline. Available settings 0 - 15: 0 - none of the groups sent as secure 1 - 2nd group sent as secure. 2 - 3rd group sent as secure. 4 - 4th group sent as secure. 8 - 5th group sent as secure.",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 15,
+            "is_polled": false,
+            "value": 15
+          }
+        },
+        "20": {
+          "1": {
+            "value_id": "15-112-1-20",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "byte",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 20,
+            "label": "Tamper - sensitivity",
+            "units": "",
+            "help": "This parameter determines the change in force acting on the device, that will result in reporting tamper alarm - g-force acceleration. Available settings: 0 - 121 (0.08 - 2g; multiply by 0.016g; 0 = tamper inactive) Default setting: 20 (0.4g)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 121,
+            "is_polled": false,
+            "value": 20
+          }
+        },
+        "22": {
+          "1": {
+            "value_id": "15-112-1-22",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 22,
+            "label": "Tamper - alarm cancellation delay",
+            "units": "seconds",
+            "help": "Time period after which a tamper alarm will be cancelled in the main controller and associated devices. Any tampering detected during this period will not extend the delay. Available settings: 1 - 65535 Default setting: 30 (seconds)",
+            "read_only": false,
+            "write_only": false,
+            "min": 1,
+            "max": 32767,
+            "is_polled": false,
+            "value": 30
+          }
+        },
+        "24": {
+          "1": {
+            "value_id": "15-112-1-24",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 24,
+            "label": "Tamper - operating modes",
+            "units": "",
+            "help": "This parameter determines function of the tamper and sent reports. It is an advanced feature serving much more functions than just detection of tampering. Default setting: 0 (Tamper)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 2,
+            "is_polled": false,
+            "values": ["Tamper only", "Tamper and earthquake detector", "Tamper and orientation in space"],
+            "value": "Tamper only"
+          }
+        },
+        "25": {
+          "1": {
+            "value_id": "15-112-1-25",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 25,
+            "label": "Tamper - alarm cancellation",
+            "units": "",
+            "help": "This parameter allows to disable cancellation of the tamper alarm. Default setting: 0 (Tamper).",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 1,
+            "is_polled": false,
+            "values": ["Do not send tamper cancellation report", "Send tamper cancellation report"],
+            "value": "Send tamper cancellation report"
+          }
+        },
+        "28": {
+          "1": {
+            "value_id": "15-112-1-28",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 28,
+            "label": "Tamper alarm broadcast mode",
+            "units": "",
+            "help": "The parameter determines whether the tamper alarm frame will or will not be sent in broadcast mode. Alarm frames sent in broadcast mode can be received by all of the devices within range (if they accept such frames), but not repeated by them. Default setting: 0",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 1,
+            "is_polled": false,
+            "values": ["Tamper alarm sent to 3rd association group", "Tamper alarm sent in broadcast mode"],
+            "value": "Tamper alarm sent to 3rd association group"
+          }
+        },
+        "29": {
+          "1": {
+            "value_id": "15-112-1-29",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 29,
+            "label": "Tamper - backward compatible broadcast mode",
+            "units": "",
+            "help": "The parameter determines whether the backward compatible tamper alarm frame will or will not be sent in broadcast mode. Alarm frames sent in broadcast mode can be received by all of the devices within range (if they accept such frames), but not repeated by them. This parameter provides backward compatibility with controllers not supporting Z-Wave+. Default setting: 0",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 1,
+            "is_polled": false,
+            "values": [
+              "Backward compatible tamper alarm sent to 5th association group",
+              "Backward compatible tamper alarm sent in broadcast mode"
+            ],
+            "value": "Backward compatible tamper alarm sent to 5th association group"
+          }
+        },
+        "40": {
+          "1": {
+            "value_id": "15-112-1-40",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 40,
+            "label": "Luminance report - threshold",
+            "units": "lux",
+            "help": "This parameter determines the change in light intensity level resulting in luminance report being sent to the main controller. Available settings: 0 - reports are not sent. 1-32767 (luminance in lux). Default setting: 200 (200 lux).",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 32767,
+            "is_polled": false,
+            "value": 200
+          }
+        },
+        "42": {
+          "1": {
+            "value_id": "15-112-1-42",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 42,
+            "label": "Luminance reports - interval",
+            "units": "seconds",
+            "help": "Time interval between consecutive luminance reports. The reports are sent even if there is no change in the light intensity. Available settings: 0 - 32767. 0 - periodical reports are not sent. 1-32767 (in seconds).",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 32767,
+            "is_polled": false,
+            "value": 0
+          }
+        },
+        "60": {
+          "1": {
+            "value_id": "15-112-1-60",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 60,
+            "label": "Temperature report - threshold",
+            "units": "",
+            "help": "This parameter determines the change in measured temperature that will result in new temperature report being sent to the main controller. Available settings: 0 - 255 (0.1 - 25.5C; 0 = reports are not sent) Default setting: 10 (1C)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 255,
+            "is_polled": false,
+            "value": 10
+          }
+        },
+        "62": {
+          "1": {
+            "value_id": "15-112-1-62",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 62,
+            "label": "Temperature measuring - interval",
+            "units": "seconds",
+            "help": "Time interval between consecutive temperature measurements. The shorter the time, the more frequently the temperature will be measured, but the battery life will shorten. Available settings: 0 - 32767 (1 - 32767 seconds; 0 = temperature is not measured) Default setting: 900 (900 seconds).",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 32767,
+            "is_polled": false,
+            "value": 900
+          }
+        },
+        "64": {
+          "1": {
+            "value_id": "15-112-1-64",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 64,
+            "label": "Temperature report - interval",
+            "units": "seconds",
+            "help": "Time interval between consecutive temperature reports. The reports are sent even if there is no change in the temperature. Available settings: 0 - 32767 (1 - 32767 seconds; 0 = periodical reports are not sent) Default setting: 0",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 32767,
+            "is_polled": false,
+            "value": 0
+          }
+        },
+        "66": {
+          "1": {
+            "value_id": "15-112-1-66",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 66,
+            "label": "Temperature offset",
+            "units": "",
+            "help": "The value to be added to the actual temperature, measured by the sensor (temperature compensation). Available settings: 0 - 100 (0 to 100C) or 64536 - 65535 (-100 to -0.10C) Default setting: 0",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 65535,
+            "is_polled": false,
+            "value": 0
+          }
+        },
+        "80": {
+          "1": {
+            "value_id": "15-112-1-80",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 80,
+            "label": "Visual LED indicator - signalling mode",
+            "units": "",
+            "help": "This parameter determines the way in which visual indicator behaves after motion has been detected. Default setting: 10 (Flashlight mode)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 26,
+            "is_polled": false,
+            "values": [
+              "LED inactive.",
+              "1 long blink, LED colour depends on the temperature. Set by parameters 86 and 87.",
+              "Flashlight mode - LED glows in white for 10 seconds.",
+              "Long blink White.",
+              "Long blink Red.",
+              "Long blink Green.",
+              "Long blink Blue.",
+              "Long blink Yellow.",
+              "Long blink Cyan.",
+              "Long blink Magenta.",
+              "Long blink, then short blink, LED colour depends on the temperature. Set by parameters 86 and 87.",
+              "Flashlight mode - LED glows in white through 10 seconds.  Each next detected motion extends the glowing by next 10 seconds.",
+              "Long blink, then short blinks White.",
+              "Long blink, then short blinks Red.",
+              "Long blink, then short blinks Green.",
+              "Long blink, then short blinks Blue.",
+              "Long blink, then short blinks Yellow.",
+              "Long blink, then short blinks Cyan",
+              "Long blink, then short blinks Magenta",
+              "Long blink, then 2 short blinks, LED colour depends on the temperature. Set by parameters 86 and 87.",
+              "Long blink, then 2 short blinks White",
+              "Long blink, then 2 short blinks Red",
+              "Long blink, then 2 short blinks Green",
+              "Long blink, then 2 short blinks Blue",
+              "Long blink, then 2 short blinks Yellow",
+              "Long blink, then 2 short blinks Cyan",
+              "Long blink, then 2 short blinks Magenta"
+            ],
+            "value": "Long blink, then short blink, LED colour depends on the temperature. Set by parameters 86 and 87."
+          }
+        },
+        "81": {
+          "1": {
+            "value_id": "15-112-1-81",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "byte",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 81,
+            "label": "Visual LED indicator - brightness",
+            "units": "%",
+            "help": "This parameter determines the brightness of the visual LED indicator when indicating motion. Available settings: 0 - brightness determined by the luminance (parameters 82 and 83). 1-100 (1-100%) Default setting: 50 (50 %)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 100,
+            "is_polled": false,
+            "value": 50
+          }
+        },
+        "82": {
+          "1": {
+            "value_id": "15-112-1-82",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 82,
+            "label": "Visual LED indicator - luminance for low indicator brightness",
+            "units": "lux",
+            "help": "Light intensity level below which brightness of visual indicator is set to 1%. Available settings: 0 to value of parameter 83 (in lux). Default setting: 100.",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 32767,
+            "is_polled": false,
+            "value": 100
+          }
+        },
+        "83": {
+          "1": {
+            "value_id": "15-112-1-83",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "short",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 83,
+            "label": "Visual LED indicator - luminance for high indicator brightness",
+            "units": "lux",
+            "help": "Light intensity level above which brightness of visual indicator is set to 100%. Available settings: value of parameter 82 to 32767 (in lux) Default setting: 1000 (1000 lux) NOTE The value of the parameter 83 must be higher than the value of the parameter 82.",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 32767,
+            "is_polled": false,
+            "value": 1000
+          }
+        },
+        "86": {
+          "1": {
+            "value_id": "15-112-1-86",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "byte",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 86,
+            "label": "Visual LED indicator - temperature for blue colour",
+            "units": "Celsius",
+            "help": "This parameter is determines minimal temperature that will result in blue visual indicator colour. Relevant only when parameter 80 has been properly configured. Available settings: 0 to value of parameter 87 (in Celsius degree) Default setting: 18 (18C)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 255,
+            "is_polled": false,
+            "value": 18
+          }
+        },
+        "87": {
+          "1": {
+            "value_id": "15-112-1-87",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "byte",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 87,
+            "label": "Visual LED indicator - temperature for red colour",
+            "units": "Celsius",
+            "help": "This parameter is determines minimal temperature that will result in red visual indicator colour. Relevant only when parameter 80 has been properly configured. Available settings: value of parameter 86 to 255 (in Celsius degree) Default setting: 28 (28C)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 255,
+            "is_polled": false,
+            "value": 28
+          }
+        },
+        "89": {
+          "1": {
+            "value_id": "15-112-1-89",
+            "node_id": 16,
+            "commandClass": 112,
+            "type": "list",
+            "genre": "config",
+            "instance": 1,
+            "endpoint": 89,
+            "label": "Visual LED indicator - tamper alarm",
+            "units": "",
+            "help": "Indicating mode resembles a police car (white, red and blue). Default setting: 1 (on)",
+            "read_only": false,
+            "write_only": false,
+            "min": 0,
+            "max": 1,
+            "is_polled": false,
+            "values": ["Tamper alarm is not indicated", "Tamper alarm is indicated"],
+            "value": "Tamper alarm is indicated"
+          }
+        }
+      },
+      "114": {
+        "0": {
+          "manufacturerId": {
+            "node_id": 16,
+            "commandClass": 114,
+            "commandClassName": "Manufacturer Specific",
+            "endpoint": 0,
+            "property": "manufacturerId",
+            "propertyName": "manufacturerId",
+            "type": "int",
+            "genre": "system",
+            "label": "Loaded Config Revision",
+            "units": "",
+            "help": "Revision of the Config file currently loaded",
+            "read_only": true,
+            "write_only": false,
+            "min": -2147483648,
+            "max": 2147483647,
+            "is_polled": false,
+            "value": 11
+          },
+          "productType": {
+            "node_id": 16,
+            "commandClass": 114,
+            "commandClassName": "Manufacturer Specific",
+            "endpoint": 0,
+            "property": "productType",
+            "propertyName": "productType",
+            "type": "int",
+            "genre": "system",
+            "label": "Loaded Config Revision",
+            "units": "",
+            "help": "Revision of the Config file currently loaded",
+            "read_only": true,
+            "write_only": false,
+            "min": -2147483648,
+            "max": 2147483647,
+            "is_polled": false,
+            "value": 11
+          },
+          "productId": {
+            "node_id": 16,
+            "commandClass": 114,
+            "commandClassName": "Manufacturer Specific",
+            "endpoint": 0,
+            "property": "productId",
+            "propertyName": "productId",
+            "type": "int",
+            "genre": "system",
+            "label": "Loaded Config Revision",
+            "units": "",
+            "help": "Revision of the Config file currently loaded",
+            "read_only": true,
+            "write_only": false,
+            "min": -2147483648,
+            "max": 2147483647,
+            "is_polled": false,
+            "value": 11
+          }
+        }
+      },
+      "128": {
+        "0": {
+          "level": {
+            "node_id": 16,
+            "commandClass": 128,
+            "commandClassName": "Manufacturer Specific",
+            "endpoint": 0,
+            "property": "level",
+            "propertyName": "level",
+            "type": "integer",
+            "genre": "user",
+            "label": "Battery Level",
+            "help": "Current Battery Level",
+            "read_only": true,
+            "write_only": false,
+            "min": 0,
+            "max": 100,
+            "is_polled": false,
+            "value": 100
+          },
+          "isLow": {
+            "node_id": 16,
+            "commandClass": 128,
+            "endpoint": 0,
+            "property": "isLow",
+            "propertyName": "isLow",
+            "type": "integer",
+            "genre": "user",
+            "label": "Low battery level",
+            "read_only": true,
+            "min": 0,
+            "max": 1
+          }
+        }
+      },
+      "132": {
+        "0": {
+          "wakeUpInterval": {
+            "node_id": 16,
+            "commandClass": 132,
+            "commandClassName": "Wake Up",
+            "endpoint": 0,
+            "property": "wakeUpInterval",
+            "propertyName": "wakeUpInterval",
+            "type": "int",
+            "genre": "system",
+            "label": "Wake-up Interval",
+            "units": "Seconds",
+            "help": "How often the Device will Wake up to check for pending commands",
+            "read_only": false,
+            "write_only": false,
+            "min": -2147483648,
+            "max": 2147483647,
+            "is_polled": false,
+            "value": 7200
+          },
+          "controllerNodeId": {
+            "node_id": 16,
+            "commandClass": 132,
+            "commandClassName": "Wake Up",
+            "endpoint": 0,
+            "property": "controllerNodeId",
+            "propertyName": "controllerNodeId",
+            "type": "int",
+            "genre": "system",
+            "label": "Wake-up Interval",
+            "units": "Seconds",
+            "help": "How often the Device will Wake up to check for pending commands",
+            "read_only": false,
+            "write_only": false,
+            "min": -2147483648,
+            "max": 2147483647,
+            "is_polled": false,
+            "value": 7200
+          }
+        }
+      },
+      "134": {
+        "0": {
+          "libraryType": {
+            "node_id": 16,
+            "commandClass": 134,
+            "commandClassName": "Version",
+            "endpoint": 0,
+            "property": "libraryType",
+            "propertyName": "libraryType",
+            "type": "string",
+            "genre": "system",
+            "label": "Library Version",
+            "units": "",
+            "help": "Z-Wave Library Version",
+            "read_only": true,
+            "write_only": false,
+            "min": 0,
+            "max": 0,
+            "is_polled": false,
+            "value": "3"
+          },
+          "protocolVersion": {
+            "node_id": 16,
+            "commandClass": 134,
+            "commandClassName": "Version",
+            "endpoint": 0,
+            "property": "protocolVersion",
+            "propertyName": "protocolVersion",
+            "type": "string",
+            "genre": "system",
+            "label": "Library Version",
+            "units": "",
+            "help": "Z-Wave Library Version",
+            "read_only": true,
+            "write_only": false,
+            "min": 0,
+            "max": 0,
+            "is_polled": false,
+            "value": "3"
+          },
+          "firmwareVersions": {
+            "node_id": 16,
+            "commandClass": 134,
+            "commandClassName": "Version",
+            "endpoint": 0,
+            "property": "firmwareVersions",
+            "propertyName": "firmwareVersions",
+            "type": "string",
+            "genre": "system",
+            "label": "Library Version",
+            "units": "",
+            "help": "Z-Wave Library Version",
+            "read_only": true,
+            "write_only": false,
+            "min": 0,
+            "max": 0,
+            "is_polled": false,
+            "value": "3"
+          },
+          "hardwareVersion": {
+            "node_id": 16,
+            "commandClass": 134,
+            "commandClassName": "Version",
+            "endpoint": 0,
+            "property": "hardwareVersion",
+            "propertyName": "hardwareVersion",
+            "type": "string",
+            "genre": "system",
+            "label": "Library Version",
+            "units": "",
+            "help": "Z-Wave Library Version",
+            "read_only": true,
+            "write_only": false,
+            "min": 0,
+            "max": 0,
+            "is_polled": false,
+            "value": "3"
+          }
+        }
+      }
+    },
+    "ready": true
+  }
 }

@@ -13,10 +13,10 @@ function addNode(secure = false) {
   // this.driver.controller.beginInclusion(secure ?
   //   this.ZWaveJS.InclusionStrategy.Defalut : this.ZWaveJS.InclusionStrategy.Insecure);
   this.driver.controller.beginInclusion();
-  setTimeout((() => {
+  setTimeout(() => {
     this.driver.controller.stopInclusion();
     this.scanInProgress = false;
-  }), ADD_NODE_TIMEOUT);
+  }, ADD_NODE_TIMEOUT);
 }
 
 module.exports = {

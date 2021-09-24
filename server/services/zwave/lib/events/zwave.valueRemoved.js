@@ -14,10 +14,7 @@ function valueRemoved(node, args) {
   logger.debug(
     `Zwave : Value removed, nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}`,
   );
-  if (
-    this.nodes[nodeId].classes[commandClass] &&
-    this.nodes[nodeId].classes[commandClass][endpoint][fullProperty]
-  ) {
+  if (this.nodes[nodeId].classes[commandClass] && this.nodes[nodeId].classes[commandClass][endpoint][fullProperty]) {
     delete this.nodes[nodeId].classes[commandClass][endpoint][fullProperty];
   }
 }

@@ -26,7 +26,7 @@ function getNodes() {
       const newDevice = {
         name: node.product,
         service_id: this.serviceId,
-        external_id: getDeviceExternalId({nodeId: node.id}),
+        external_id: getDeviceExternalId({ nodeId: node.id }),
         ready: node.ready,
         rawZwaveNode: node,
         features: [],
@@ -59,11 +59,13 @@ function getNodes() {
                   min,
                   max,
                 });
-              } else if(value[inst].commandClass !== 112 && 
-                    value[inst].commandClass !== 114 && 
-                    value[inst].commandClass !== 134) {
-                  logger.info(`Unkown category/type for ${JSON.stringify(value[inst])}`);
-                }
+              } else if (
+                value[inst].commandClass !== 112 &&
+                value[inst].commandClass !== 114 &&
+                value[inst].commandClass !== 134
+              ) {
+                logger.info(`Unkown category/type for ${JSON.stringify(value[inst])}`);
+              }
             } else {
               newDevice.params.push({
                 name: slugify(`${value[inst].label}-${value[inst].value_id}`),
