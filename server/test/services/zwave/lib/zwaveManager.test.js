@@ -24,9 +24,7 @@
 // const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
 describe('zwaveManager fake', () => {
-  it('should connect to zwave driver', () => {
-    
-  });
+  it('should connect to zwave driver', () => {});
 });
 
 /* describe('zwaveManager commands', () => {
