@@ -48,7 +48,7 @@ function valueAdded(zwaveNode, args) {
     genre: GENRE[commandClass] || 'user',
     min: metadata.min || 0,
     max: metadata.max || 1,
-    label: metadata.label,
+    label: `${metadata.label}${  (endpoint && endpoint > 0) ? ` (${endpoint})` : ''}`,
     commandClass,
     endpoint,
     property: fullProperty,
