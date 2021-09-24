@@ -1340,7 +1340,6 @@
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Statut",
-    "searchPlaceholder": "Par nom, par erreur...",
     "jobTypes": {
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
