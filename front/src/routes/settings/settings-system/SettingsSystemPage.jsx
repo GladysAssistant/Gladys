@@ -2,11 +2,6 @@ import { Text } from 'preact-i18n';
 import SettingsLayout from '../SettingsLayout';
 import cx from 'classnames';
 import Select from 'react-select';
-import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
-
-const updateSystemProperty = (property, func) => e => {
-  func(property, parseInt(e.target.value, 10));
-};
 
 const SystemPage = ({ children, ...props }) => (
   <SettingsLayout>
