@@ -1751,6 +1751,7 @@
   "gatewayTwoFactorAuth": {
     "title": "Gladys Gateway",
     "configureTitle": "Configure Two-Factor Authentication",
+    "configureButton": "Configure 2FA",
     "securityIsImportant": "The security of your Gladys Gateway account is really important to us.",
     "securityApps": "To ensure that your account remains secure, please enable two-factor authentication using a two-factor app like Authy on <a href=\"https://itunes.apple.com/us/app/authy/id494168017?mt=8\">iOS</a> or <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "The 2FA code you provided is not valid.",
