@@ -26,6 +26,14 @@ function nodeAdded(zwaveNode) {
 
   zwaveNode
     .on('ready', this.nodeReady.bind(this))
+    .on('interview started', this.nodeInterviewStarted.bind(this))
+    .on('interview stage completed', this.nodeInterviewStageCompleted.bind(this))
+    .on('interview completed', this.nodeInterviewCompleted.bind(this))
+    .on('interview failed', this.nodeInterviewFailed.bind(this))
+    .on('wake up', this.nodeWakeUp.bind(this))
+    .on('sleep', this.nodeSleep.bind(this))
+    .on('alive', this.nodeAlive.bind(this))
+    .on('dead', this.nodeDead.bind(this))
     .on('value added', this.valueAdded.bind(this))
     .on('value updated', this.valueUpdated.bind(this))
     .on('value notification', this.valueNotification.bind(this))

@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { bindValue } = require('../utils/bindValue').default;
 const { getNodeInfoByExternalId } = require('../utils/externalId');
 
 /**
@@ -10,9 +11,11 @@ const { getNodeInfoByExternalId } = require('../utils/externalId');
  * zwave.setValue();
  */
 function setValue(device, deviceFeature, value) {
-  logger.debug(`Zwave : Setting value`);
   const { nodeId, commandClass, endpoint, property, propertyKey } = getNodeInfoByExternalId(deviceFeature.external_id);
-  this.zwave.setValue({ nodeId, commandClass, endpoint, property, propertyKey }, value);
+  logger.debug(`Zwave : Setting value`);
+  this.driver.controller.nodes.getOrThrow(nodeId)
+    .setValue({ nodeId, commandClass, endpoint, property, propertyKey }, 
+      bindValue({ nodeId, commandClass, endpoint, property, propertyKey }, value));
 }
 
 module.exports = {
