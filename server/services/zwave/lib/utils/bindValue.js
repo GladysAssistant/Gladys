@@ -1,4 +1,4 @@
-import { COMMAND_CLASSES } from '../constants';
+const { COMMAND_CLASSES } = require('../constants');
 
 /**
  * @description Bind value
