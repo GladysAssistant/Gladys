@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { bindValue } = require('../utils/bindValue').default;
+const { bindValue } = require('../utils/bindValue');
 const { getNodeInfoByExternalId } = require('../utils/externalId');
 
 /**
