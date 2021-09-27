@@ -13,9 +13,12 @@ const { getNodeInfoByExternalId } = require('../utils/externalId');
 function setValue(device, deviceFeature, value) {
   const { nodeId, commandClass, endpoint, property, propertyKey } = getNodeInfoByExternalId(deviceFeature.external_id);
   logger.debug(`Zwave : Setting value`);
-  this.driver.controller.nodes.getOrThrow(nodeId)
-    .setValue({ nodeId, commandClass, endpoint, property, propertyKey }, 
-      bindValue({ nodeId, commandClass, endpoint, property, propertyKey }, value));
+  this.driver.controller.nodes
+    .getOrThrow(nodeId)
+    .setValue(
+      { nodeId, commandClass, endpoint, property, propertyKey },
+      bindValue({ nodeId, commandClass, endpoint, property, propertyKey }, value),
+    );
 }
 
 module.exports = {

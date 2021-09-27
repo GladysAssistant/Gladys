@@ -17,8 +17,7 @@ function bindValue(valueId, value) {
   ) {
     return value === 6 ? 0 : 1;
   } */
-  if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_BINARY
-  ) {
+  if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_BINARY) {
     return value === 1;
   }
   return value;
