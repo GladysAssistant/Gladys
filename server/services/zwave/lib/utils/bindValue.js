@@ -23,6 +23,6 @@ function bindValue(valueId, value) {
   return value;
 }
 
-export default {
+module.exports = {
   bindValue,
 };
