@@ -22,6 +22,23 @@ class EditChart extends Component {
     }
   };
 
+  updateChartType = e => {
+    if (e.target.value && e.target.value.length) {
+      this.props.updateBoxConfig(this.props.x, this.props.y, { chart_type: e.target.value });
+    } else {
+      this.props.updateBoxConfig(this.props.x, this.props.y, { chart_type: undefined });
+    }
+  };
+
+  updateDisplayAxes = e => {
+    if (e.target.value && e.target.value.length) {
+      const valueBoolean = e.target.value === 'yes';
+      this.props.updateBoxConfig(this.props.x, this.props.y, { display_axes: valueBoolean });
+    } else {
+      this.props.updateBoxConfig(this.props.x, this.props.y, { display_axes: undefined });
+    }
+  };
+
   updateBoxTitle = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
   };
@@ -146,6 +163,45 @@ class EditChart extends Component {
                 </Localizer>
               </div>
             )}
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.chart.chartType" />
+              </label>
+              <select onChange={this.updateChartType} class="form-control" value={props.box.chart_type}>
+                <option>
+                  <Text id="global.emptySelectOption" />
+                </option>
+                <option value="line">
+                  <Text id="dashboard.boxes.chart.line" />
+                </option>
+                <option value="area">
+                  <Text id="dashboard.boxes.chart.area" />
+                </option>
+                <option value="bar">
+                  <Text id="dashboard.boxes.chart.bar" />
+                </option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.chart.displayAxes" />
+              </label>
+              <select
+                onChange={this.updateDisplayAxes}
+                class="form-control"
+                value={props.box.display_axes ? 'yes' : 'no'}
+              >
+                <option>
+                  <Text id="global.emptySelectOption" />
+                </option>
+                <option value="yes">
+                  <Text id="dashboard.boxes.chart.yes" />
+                </option>
+                <option value="no">
+                  <Text id="dashboard.boxes.chart.no" />
+                </option>
+              </select>
+            </div>
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.chart.defaultInterval" />

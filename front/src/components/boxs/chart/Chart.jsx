@@ -298,6 +298,19 @@ class Chartbox extends Component {
               </div>
             </div>
           )}
+          {labels && labels.length > 0 && props.box.display_axes === true && (
+            <div class="mt-4">
+              <ApexChartComponent
+                series={series}
+                interval={interval}
+                user={props.user}
+                size={smallBox ? 'small' : 'big'}
+                labels={labels}
+                chart_type={props.box.chart_type}
+                display_axes={props.box.display_axes}
+              />
+            </div>
+          )}
         </div>
 
         <div class={loading ? 'dimmer active' : 'dimmer'}>
@@ -317,13 +330,15 @@ class Chartbox extends Component {
                 </div>
               </div>
             )}
-            {labels && labels.length > 0 && (
+            {labels && labels.length > 0 && props.box.display_axes === false && (
               <ApexChartComponent
                 series={series}
                 interval={interval}
                 user={props.user}
-                height={smallBox ? 40 : 80}
+                size={smallBox ? 'small' : 'big'}
                 labels={labels}
+                chart_type={props.box.chart_type}
+                display_axes={props.box.display_axes}
               />
             )}
           </div>

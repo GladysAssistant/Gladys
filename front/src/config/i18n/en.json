@@ -258,7 +258,14 @@
         "editNameLabel": "Enter the name of this box.",
         "editDeviceFeaturesLabel": "Select the device you want to display here.",
         "editRoomLabel": "Select the room you want to display here",
-        "editNamePlaceholder": "Name displayed on the dashboard"
+        "editNamePlaceholder": "Name displayed on the dashboard",
+        "chartType": "Select the type of chart to display",
+        "line": "Line",
+        "area": "Area",
+        "bar": "Bar",
+        "displayAxes": "Display axes?",
+        "yes": "Yes",
+        "no": "No"
       }
     }
   },

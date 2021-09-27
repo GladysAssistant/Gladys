@@ -18,6 +18,8 @@ const boxesSchema = Joi.array().items(
       unit: Joi.string(),
       title: Joi.string(),
       interval: Joi.string(),
+      display_axes: Joi.boolean(),
+      chart_type: Joi.string(),
       users: Joi.array().items(Joi.string()),
     }),
   ),
