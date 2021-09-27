@@ -1379,6 +1379,8 @@
     "configurationTitle": "Configuration",
     "timezone": "Timezone",
     "timezoneText": "The timezone is used in scheduled scene.",
+    "deviceStateRetentionTime": "Keep Device State History",
+    "deviceStateRetentionTimeDescription": "How long Gladys will keep your device states in database.",
     "containerState": {
       "created": "Created",
       "restarting": "Restarting",
