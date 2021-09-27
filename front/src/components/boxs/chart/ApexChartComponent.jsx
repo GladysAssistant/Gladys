@@ -1,5 +1,9 @@
 import { Component, createRef } from 'preact';
 import ApexCharts from 'apexcharts';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
@@ -55,6 +59,18 @@ class ApexChartComponent extends Component {
         show: false
       }
     };
+    if (this.props.interval === 60 || this.props.interval === 24 * 60) {
+      const formatter = value => {
+        return dayjs(value)
+          .locale(this.props.user.language)
+          .fromNow();
+      };
+      options.tooltip = {
+        x: {
+          formatter
+        }
+      };
+    }
     return options;
   };
   displayChart = () => {

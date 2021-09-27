@@ -318,7 +318,13 @@ class Chartbox extends Component {
               </div>
             )}
             {labels && labels.length > 0 && (
-              <ApexChartComponent series={series} height={smallBox ? 40 : 80} labels={labels} />
+              <ApexChartComponent
+                series={series}
+                interval={interval}
+                user={props.user}
+                height={smallBox ? 40 : 80}
+                labels={labels}
+              />
             )}
           </div>
         </div>
@@ -327,4 +333,4 @@ class Chartbox extends Component {
   }
 }
 
-export default connect('httpClient,session')(Chartbox);
+export default connect('httpClient,session,user')(Chartbox);
