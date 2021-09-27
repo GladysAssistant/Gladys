@@ -238,12 +238,93 @@ class ApexChartComponent extends Component {
     }
     return options;
   };
+  getStepLineChartOptions = () => {
+    let height;
+    if (this.props.size === 'small' && !this.props.display_axes) {
+      height = 40;
+    } else if (this.props.size === 'big' && !this.props.display_axes) {
+      height = 80;
+    } else {
+      height = 200;
+    }
+    const options = {
+      chart: {
+        type: 'line',
+        fontFamily: 'inherit',
+        height,
+        parentHeightOffset: 0,
+        sparkline: {
+          enabled: !this.props.display_axes
+        },
+        toolbar: {
+          show: false
+        },
+        animations: {
+          enabled: false
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      fill: {
+        opacity: 1
+      },
+      stroke: {
+        width: 2,
+        curve: 'stepline'
+      },
+      series: this.props.series,
+      grid: {
+        strokeDashArray: 4,
+        padding: {
+          left: -4
+        }
+      },
+      xaxis: {
+        labels: {
+          padding: 0
+        },
+        tooltip: {
+          enabled: false
+        },
+        axisBorder: {
+          show: false
+        },
+        type: 'datetime'
+      },
+      yaxis: {
+        labels: {
+          padding: 4
+        }
+      },
+      labels: this.props.labels,
+      colors: ['#206bc4'],
+      legend: {
+        show: false
+      }
+    };
+    if (this.props.interval === 60 || this.props.interval === 24 * 60) {
+      const formatter = value => {
+        return dayjs(value)
+          .locale(this.props.user.language)
+          .fromNow();
+      };
+      options.tooltip = {
+        x: {
+          formatter
+        }
+      };
+    }
+    return options;
+  };
   displayChart = () => {
     let options;
     if (this.props.chart_type === 'area') {
       options = this.getAreaChartOptions();
     } else if (this.props.chart_type === 'line') {
       options = this.getLineChartOptions();
+    } else if (this.props.chart_type === 'stepline') {
+      options = this.getStepLineChartOptions();
     } else if (this.props.chart_type === 'bar') {
       options = this.getBarChartOptions();
     } else {

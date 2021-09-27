@@ -174,6 +174,9 @@ class EditChart extends Component {
                 <option value="line">
                   <Text id="dashboard.boxes.chart.line" />
                 </option>
+                <option value="stepline">
+                  <Text id="dashboard.boxes.chart.stepline" />
+                </option>
                 <option value="area">
                   <Text id="dashboard.boxes.chart.area" />
                 </option>

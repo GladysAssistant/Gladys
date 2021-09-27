@@ -263,6 +263,7 @@
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
+        "stepline": "Step Line",
         "displayAxes": "Display axes?",
         "yes": "Yes",
         "no": "No"
