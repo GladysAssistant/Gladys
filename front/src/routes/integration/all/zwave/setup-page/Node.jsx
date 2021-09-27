@@ -111,7 +111,7 @@ class ZwaveNode extends Component {
                       <div class="tags">
                         {props.node.features.map(feature => (
                           <span class="tag">
-                            <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
+                            <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} /> {feature.name}
                             <div class="tag-addon">
                               <i
                                 class={`fe fe-${get(

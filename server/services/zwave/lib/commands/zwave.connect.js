@@ -7,6 +7,8 @@ const { nodeRemoved } = require('../events/zwave.nodeRemoved');
 const { nodeReady } = require('../events/zwave.nodeReady');
 const { scanComplete } = require('../events/zwave.scanComplete');
 
+const DRIVER_READY_TIMEOUT = 60 * 1000;
+
 /**
  * @description Connect to Zwave USB driver
  * @param {string} driverPath - Path to the USB driver.
@@ -48,6 +50,17 @@ async function connect(driverPath) {
     this.driver.controller.on('node removed', (node, replaced) => {
       nodeRemoved.bind(this)(node);
     });
+
+    this.driver.controller.on('heal network progress', (statuses) => {
+      statuses.forEach((nodeId, status) => {
+        logger.info(`Heal network on-going for node ${nodeId}: ${status}`);
+      });
+    });
+    this.driver.controller.on('heal network done', (statuses) => {
+      statuses.forEach((nodeId, status) => {
+        logger.info(`Heal network done for node ${nodeId}: ${status}`);
+      });
+    });
   });
 
   this.driver.on('all nodes ready', () => {
@@ -56,6 +69,10 @@ async function connect(driverPath) {
 
   // this.zwave.connect(this.driverPath);
   await this.driver.start();
+
+  setTimeout(() => {
+    scanComplete.bind(this)();
+  }, DRIVER_READY_TIMEOUT);
 
   this.connected = true;
 }

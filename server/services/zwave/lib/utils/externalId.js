@@ -29,13 +29,13 @@ function getDeviceFeatureExternalId(value) {
  */
 function getNodeInfoByExternalId(externalId) {
   const array = externalId.split(':');
-  const nodeId = array[2];
-  const comclass = array[4];
-  const endpoint = array[6];
+  const nodeId = parseInt(array[2], 10);
+  const commandClass = parseInt(array[4], 10);
+  const endpoint = parseInt(array[6], 10);
   const property = array[8];
   return {
     nodeId,
-    comclass,
+    commandClass,
     endpoint,
     property,
   };

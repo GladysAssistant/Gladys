@@ -1,5 +1,3 @@
-const logger = require('../../../utils/logger');
-
 const { addNode } = require('./commands/zwave.addNode');
 const { connect } = require('./commands/zwave.connect');
 const { disconnect } = require('./commands/zwave.disconnect');
@@ -23,6 +21,13 @@ const { scanComplete } = require('./events/zwave.scanComplete');
 const { controllerCommand } = require('./events/zwave.controllerCommand');
 const { valueNotification } = require('./events/zwave.valueNotification');
 const { cancelControllerCommand } = require('./commands/zwave.cancelControllerCommand');
+const { nodeWakeUp, nodeSleep, nodeDead, nodeAlive } = require('./events/zwave.nodeState');
+const {
+  nodeInterviewCompleted,
+  nodeInterviewFailed,
+  nodeInterviewStageCompleted,
+  nodeInterviewStarted,
+} = require('./events/zwave.nodeInterview');
 
 const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
   this.gladys = gladys;
@@ -33,7 +38,7 @@ const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
   this.connected = false;
   this.scanInProgress = false;
 
-  this.mqttService = this.gladys.service.getService('mqtt');
+  /* this.mqttService = this.gladys.service.getService('mqtt');
   this.mqttService.device.subscribe('zwavejsmqtt/#', (topic, message) => {
     logger.info(`Message recevied from topic ${topic}`);
     const { type, node, args } = JSON.parse(message);
@@ -44,7 +49,7 @@ const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
     } else if (type === 'notification') {
       valueNotification(node, args);
     }
-  });
+  }); */
 };
 
 // EVENTS
@@ -60,6 +65,14 @@ ZwaveManager.prototype.nodeReady = nodeReady;
 ZwaveManager.prototype.notification = notification;
 ZwaveManager.prototype.scanComplete = scanComplete;
 ZwaveManager.prototype.controllerCommand = controllerCommand;
+ZwaveManager.prototype.nodeSleep = nodeSleep;
+ZwaveManager.prototype.nodeDead = nodeDead;
+ZwaveManager.prototype.nodeAlive = nodeAlive;
+ZwaveManager.prototype.nodeWakeUp = nodeWakeUp;
+ZwaveManager.prototype.nodeInterviewStarted = nodeInterviewStarted;
+ZwaveManager.prototype.nodeInterviewFailed = nodeInterviewFailed;
+ZwaveManager.prototype.nodeInterviewCompleted = nodeInterviewCompleted;
+ZwaveManager.prototype.nodeInterviewStageCompleted = nodeInterviewStageCompleted;
 
 // COMMANDS
 ZwaveManager.prototype.addNode = addNode;
