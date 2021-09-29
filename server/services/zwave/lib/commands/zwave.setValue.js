@@ -23,7 +23,7 @@ function setValue(device, deviceFeature, value) {
         noEvent: true,
         // Don't throw when there is an invalid Value ID in the cache
         // noThrow: true,
-    }
+      },
     );
 }
 

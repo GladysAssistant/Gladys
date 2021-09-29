@@ -23,7 +23,7 @@ function valueUpdated(zwaveNode, args) {
       this.nodes[nodeId].classes[commandClass][endpoint][fullProperty].value,
       newValue,
     );
-    if(prevValue !== newValue) {
+    if (prevValue !== newValue) {
       this.nodes[nodeId].classes[commandClass][endpoint][fullProperty].value = newValue;
       const deviceFeatureExternalId = getDeviceFeatureExternalId({
         nodeId,
