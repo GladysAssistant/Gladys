@@ -26,15 +26,19 @@ function valueNotification(zwaveNode, args) {
       value,
     );
     this.nodes[nodeId].classes[commandClass][endpoint || 0][fullProperty].value = value;
-    this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: getDeviceFeatureExternalId({
-        nodeId,
-        commandClass,
-        endpoint: endpoint || 0,
-        property: fullProperty,
-      }),
-      state: value,
+    const deviceFeatureExternalId = getDeviceFeatureExternalId({
+      nodeId,
+      commandClass,
+      endpoint: endpoint || 0,
+      property: fullProperty,
     });
+    const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
+    if (deviceFeature) {
+      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: deviceFeatureExternalId,
+        state: value,
+      });
+    }
   }
 }
 

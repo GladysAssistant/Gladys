@@ -10,7 +10,7 @@ const { getDeviceFeatureExternalId } = require('../utils/externalId');
  * zwave.on('value updated', this.valueUpdated);
  */
 function valueUpdated(zwaveNode, args) {
-  const { commandClass, endpoint, property, propertyKey, newValue } = args;
+  const { commandClass, endpoint, property, propertyKey, prevValue, newValue } = args;
   const nodeId = zwaveNode.id;
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
   if (this.nodes[nodeId].ready) {
@@ -23,16 +23,22 @@ function valueUpdated(zwaveNode, args) {
       this.nodes[nodeId].classes[commandClass][endpoint][fullProperty].value,
       newValue,
     );
-    this.nodes[nodeId].classes[commandClass][endpoint][fullProperty].value = newValue;
-    this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: getDeviceFeatureExternalId({
+    if(prevValue !== newValue) {
+      this.nodes[nodeId].classes[commandClass][endpoint][fullProperty].value = newValue;
+      const deviceFeatureExternalId = getDeviceFeatureExternalId({
         nodeId,
         commandClass,
         endpoint: endpoint || 0,
         property: fullProperty,
-      }),
-      state: newValue,
-    });
+      });
+      const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
+      if (deviceFeature) {
+        this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: deviceFeatureExternalId,
+          state: newValue,
+        });
+      }
+    }
   }
 }
 
