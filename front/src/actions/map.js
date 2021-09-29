@@ -1,5 +1,4 @@
 import { RequestStatus } from '../utils/consts';
-import update from 'immutability-helper';
 
 function createActions(store) {
   const actions = {
