@@ -17,28 +17,27 @@ function handleMqttMessage(topic, message) {
   if (topic.startsWith('owntracks')) {
     logger.debug(`MQTT : Gladys has a message for ${user} from Owntracks on ${topic} :${message}.`);
     const obj = JSON.parse(message);
-    if(obj['_type'] === 'location') {
+    if (obj['_type'] === 'location') {
+      // TODO : check is user exists or get user id using the selector
+      (async () => {
+        const users = await this.gladys.user.get({
+          selector: user,
+          take: 1,
+          skip: 0,
+        });
 
-       // TODO : check is user exists or get user id using the selector
-      ;(async () => {
-         const users = await this.gladys.user.get({
-         'selector': user,
-         'take': 1,
-         'skip': 0 });
-
-         if (users) {
-           const data = {
-            'user_id'  : users[0].id,
-            'latitude' : obj.lat,
-            'longitude': obj.lon,
-            'accuracy' : obj.acc,
-            'altitude' : obj.alt,
+        if (users) {
+          const data = {
+            user_id: users[0].id,
+            latitude: obj.lat,
+            longitude: obj.lon,
+            accuracy: obj.acc,
+            altitude: obj.alt,
           };
           await this.gladys.location.handleNewGatewayOwntracksLocation(data);
-         }
-
-       })();
-   }
+        }
+      })();
+    }
   }
 }
 

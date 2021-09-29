@@ -26,7 +26,7 @@ describe('OwntracksHandler - connect', () => {
     owntracksHandler.connect();
 
     assert.calledWith(gladys.service.getService, 'mqtt');
-    assert.callCount(mqttService.device.subscribe, 2);
+    assert.callCount(mqttService.device.subscribe, 1);
     mqttService.device.subscribe.firstCall.calledWith(
       'owntracks/+/+',
       owntracksHandler.handleMqttMessage.bind(owntracksHandler),

@@ -9,7 +9,6 @@ function connect() {
 
   // Subscribe to Owntracks topics
   this.mqttService.device.subscribe('owntracks/+/+', this.handleMqttMessage.bind(this));
-  
 }
 
 module.exports = {

@@ -1,14 +1,9 @@
-import {render as htmlrendering} from 'preact-render-to-string';
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import update from 'immutability-helper';
 import { route } from 'preact-router';
-import actions from '../../actions/map';
-
 import leaflet from 'leaflet';
 
-import 'leaflet/dist/leaflet.css';
 import style from './style.css';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
@@ -20,7 +15,6 @@ class MapComponent extends Component {
       this.leafletMap.remove();
     }
     this.leafletMap = leaflet.map(this.map).setView(DEFAULT_COORDS, 2);
-
 
     leaflet
       .tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {

@@ -2,7 +2,6 @@ const logger = require('../../utils/logger');
 const OwntracksHandler = require('./lib');
 
 module.exports = function OwntracksService(gladys, serviceId) {
-
   const owntracksHandler = new OwntracksHandler(gladys, serviceId);
 
   /**

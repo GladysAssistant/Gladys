@@ -439,38 +439,38 @@
   },
   "post /api/v1/area": {
     "id": "f23c5d70-5108-473d-b257-a9c537bc1d79",
-     "name": "Avengers Headquarter",
-     "latitude": 42.001345689029755,
-     "longitude": 12.1014404296875,
-     "radius": 1227.5412605931826,
-     "color": "#50ffff",
-     "updated_at": "2020-10-30T20:59:42.629Z",
-     "created_at": "2020-10-30T20:59:42.629Z",
-     "selector": "avengers-headquarter"
+    "name": "Avengers Headquarter",
+    "latitude": 42.001345689029755,
+    "longitude": 12.1014404296875,
+    "radius": 1227.5412605931826,
+    "color": "#50ffff",
+    "updated_at": "2020-10-30T20:59:42.629Z",
+    "created_at": "2020-10-30T20:59:42.629Z",
+    "selector": "avengers-headquarter"
   },
   "get /api/v1/area": [
     {
-    "id": "cc86aaf3-cbc6-44c9-9e3d-ca2f6909691d",
-     "name": "avengers-headquarter",
-     "selector": "other2",
-     "latitude": 42.001345689029755,
-     "longitude": 12.1014404296875,
-     "radius": 1227.5412605931826,
-     "color": "#5042f4",
-     "created_at": "2020-10-21T20:51:23.889Z",
-     "updated_at": "2020-10-21T20:51:23.889Z"
-  },
-  {
-    "id": "e3229fc2-73fc-404d-aeb0-9aaa66f34466",
-    "name": "Zone51",
-    "selector": "zone51",
-    "latitude": 37.23,  
-    "longitude": -115.81,
-    "radius": 2500,
-    "color": "#5042f4",
-    "created_at": "2020-10-30T20:57:23.130Z",
-    "updated_at": "2020-10-30T20:57:23.130Z"
-  }
+      "id": "cc86aaf3-cbc6-44c9-9e3d-ca2f6909691d",
+      "name": "avengers-headquarter",
+      "selector": "other2",
+      "latitude": 42.001345689029755,
+      "longitude": 12.1014404296875,
+      "radius": 1227.5412605931826,
+      "color": "#5042f4",
+      "created_at": "2020-10-21T20:51:23.889Z",
+      "updated_at": "2020-10-21T20:51:23.889Z"
+    },
+    {
+      "id": "e3229fc2-73fc-404d-aeb0-9aaa66f34466",
+      "name": "Zone51",
+      "selector": "zone51",
+      "latitude": 37.23,
+      "longitude": -115.81,
+      "radius": 2500,
+      "color": "#5042f4",
+      "created_at": "2020-10-30T20:57:23.130Z",
+      "updated_at": "2020-10-30T20:57:23.130Z"
+    }
   ],
   "get /api/v1/room?expand=devices": [
     {

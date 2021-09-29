@@ -1,5 +1,5 @@
 import { RequestStatus } from '../utils/consts';
-import update, { extend } from 'immutability-helper';
+import update from 'immutability-helper';
 
 function createActions(store) {
   const actions = {
@@ -55,24 +55,6 @@ function createActions(store) {
         });
       }
     },
-
-    updateAreaLocation(state, latitude, longitude, radius, areaIndex) {
-      console.log('Update location');
-      const newState = update(state, {
-            latitude: {
-              $set: latitude
-            },
-            longitude: {
-              $set: longitude
-            },
-            radius: {
-              $set: radius
-            }
-          }
-    );
-      store.setState(newState);
-    },
-
     onTitleChange(state, event) {
       store.setState({
         title: event.target.value

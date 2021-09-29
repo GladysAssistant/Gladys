@@ -19,5 +19,4 @@ OwntracksHandler.prototype.connect = connect;
 OwntracksHandler.prototype.disconnect = disconnect;
 OwntracksHandler.prototype.handleMqttMessage = handleMqttMessage;
 
-
 module.exports = OwntracksHandler;

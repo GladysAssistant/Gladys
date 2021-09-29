@@ -9,7 +9,7 @@ const OwntracksService = proxyquire('../../../services/owntracks/index', {
   './lib': OwntracksMock,
 });
 
-describe.only('OwntracksService', () => {
+describe('OwntracksService', () => {
   const owntracksService = OwntracksService({}, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
 
   beforeEach(() => {
