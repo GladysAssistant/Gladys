@@ -1,10 +1,11 @@
 import { Component } from 'preact';
+import leaflet from 'leaflet';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import { route } from 'preact-router';
-import leaflet from 'leaflet';
 
+import 'leaflet/dist/leaflet.css';
 import style from './style.css';
+import { route } from 'preact-router';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 

@@ -2,7 +2,6 @@ module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
 module.exports.openweather = require('./openweather');
 module.exports.mqtt = require('./mqtt');
-module.exports.xiaomi = require('./owntracks');
 module.exports['philips-hue'] = require('./philips-hue');
 module.exports['rtsp-camera'] = require('./rtsp-camera');
 module.exports.telegram = require('./telegram');
