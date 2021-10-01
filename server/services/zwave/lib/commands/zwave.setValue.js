@@ -18,12 +18,6 @@ function setValue(device, deviceFeature, value) {
     .setValue(
       { nodeId, commandClass, endpoint, property, propertyKey },
       bindValue({ nodeId, commandClass, endpoint, property, propertyKey }, value),
-      {
-        // Don't emit the added/updated events, as this will spam applications with untranslated events
-        noEvent: true,
-        // Don't throw when there is an invalid Value ID in the cache
-        // noThrow: true,
-      },
     );
 }
 
