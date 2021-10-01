@@ -76,6 +76,7 @@ async function dailyUpdate() {
           house,
         }),
       );
+
       if (sunsetJob) {
         logger.info(`Sunset is scheduled, ${dayjs(sunsetTime).fromNow()}.`);
         this.jobs.push(sunsetJob);
