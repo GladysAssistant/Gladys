@@ -70,27 +70,6 @@ const actions = store => {
         zigbee2mqttSavingInProgress: false
       });
     },
-    async connectExternalMQTT(state) {
-      store.setState({
-        zigbee2mqttSaveStatus: RequestStatus.Getting,
-        zigbee2mqttSavingInProgress: true
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/zigbee2mqtt/connect');
-        const zigbee2mqttStatus = await state.httpClient.get('/api/v1/service/zigbee2mqtt/status');
-        store.setState({
-          zigbee2mqttStatus,
-          zigbee2mqttSaveStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          zigbee2mqttSaveStatus: RequestStatus.Error
-        });
-      }
-      store.setState({
-        zigbee2mqttSavingInProgress: false
-      });
-    },
     async getStatus(state) {
       store.setState({
         zigbee2mqttGetStatusStatus: RequestStatus.Getting

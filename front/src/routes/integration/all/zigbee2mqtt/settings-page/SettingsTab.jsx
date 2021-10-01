@@ -66,11 +66,6 @@ const SettingsTab = ({ children, ...props }) => (
               <i class="fe fe-save" /> <Text id="integration.zigbee2mqtt.settings.saveButton" />
             </button>
           </div>
-          <div class="form-group">
-            <button class="btn btn-success" onClick={props.connectExternalMQTT}>
-              <i class="fe fe-save" /> <Text id="integration.zigbee2mqtt.settings.saveButton" />
-            </button>
-          </div>
         </div>
       </div>
     </div>

@@ -10,8 +10,8 @@ const logger = require('../../../../utils/logger');
 function nodeInterviewStarted(zwaveNode, args) {
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
-  logger.debug(`Zwave : Value is alive, nodeId = ${nodeId}`);
-  node.ready = true;
+  logger.debug(`Zwave : Interview Started, nodeId = ${nodeId}`);
+  node.status = 'nodeInterviewStarted';
 }
 
 /**
@@ -24,8 +24,8 @@ function nodeInterviewStarted(zwaveNode, args) {
 function nodeInterviewStageCompleted(zwaveNode, args) {
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
-  logger.debug(`Zwave : Node is dead, nodeId = ${nodeId}`);
-  node.ready = false;
+  logger.debug(`Zwave : Interview Completed, nodeId = ${nodeId}`);
+  node.status = 'nodeInterviewStageCompleted';
 }
 
 /**
@@ -37,7 +37,9 @@ function nodeInterviewStageCompleted(zwaveNode, args) {
  */
 function nodeInterviewCompleted(zwaveNode, args) {
   const nodeId = zwaveNode.id;
-  logger.debug(`Zwave : Node Sleep, nodeId = ${nodeId}`);
+  const node = this.nodes[nodeId];
+  logger.debug(`Zwave : Interview Completed, nodeId = ${nodeId}`);
+  node.status = 'nodeInterviewCompleted';
 }
 
 /**
@@ -49,7 +51,9 @@ function nodeInterviewCompleted(zwaveNode, args) {
  */
 function nodeInterviewFailed(zwaveNode, args) {
   const nodeId = zwaveNode.id;
-  logger.debug(`Zwave : Node WakeUp, nodeId = ${nodeId}`);
+  const node = this.nodes[nodeId];
+  logger.debug(`Zwave : Interview Failed, nodeId = ${nodeId}`);
+  node.status = 'nodeInterviewFailed';
 }
 
 module.exports = {
