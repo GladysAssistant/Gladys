@@ -12,7 +12,9 @@ async function getConfiguration() {
   logger.log('z2mEnabled state :', this.z2mEnabled);
   if (this.z2mEnabled) {
     logger.log('Installing & starting containers');
+
     await this.installMqttContainer();
+
     await this.installZ2mContainer();
 
     if (this.mqttRunning && this.zigbee2mqttRunning) {
