@@ -473,13 +473,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
     MQTT_ERROR: 'zigbee2mqtt.mqtt-error',
     PERMIT_JOIN: 'zigbee2mqtt.permit-join',
   },
-  ZWAVE2MQTT: {
-    NEW_DEVICE: 'zwave2mqtt.new-device',
-    DISCOVER: 'zwave2mqtt.discover',
-    DISCOVER_COMPLETE: 'zwave2mqtt.discover-complete',
-    STATUS_CHANGE: 'zwave2mqtt.status-change',
-    MQTT_ERROR: 'zwave2mqtt.mqtt-error',
-  },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
   },
