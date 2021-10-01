@@ -11,7 +11,7 @@ const logger = require('../../../utils/logger');
 async function disconnect() {
   let container;
 
-  const z2mEnabled = await this.gladys.variable.getValue('ZIGBEE2MQTT_ENABLED', this.serviceId);
+  await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
   this.z2mEnabled = false;
 
   // Disconnect from MQTT broker

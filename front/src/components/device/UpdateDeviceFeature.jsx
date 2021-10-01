@@ -12,7 +12,7 @@ class UpdateDeviceFeature extends Component {
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
   deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
 
-  render({ feature, featureIndex, canEditCategory, device, ...props }) {
+  render({ feature, featureIndex, ...props }) {
     return (
       <div class="col-md-4">
         <div class="card">
