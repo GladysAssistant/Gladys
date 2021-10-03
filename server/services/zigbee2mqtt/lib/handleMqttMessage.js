@@ -4,8 +4,6 @@ const { convertDevice } = require('../utils/convertDevice');
 const { convertValue } = require('../utils/convertValue');
 const { convertFeature } = require('../utils/convertFeature');
 
-const TYPE_COORDINATOR = 'Coordinator';
-
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
@@ -26,7 +24,7 @@ function handleMqttMessage(topic, message) {
       const devices = JSON.parse(message);
       const convertedDevices = devices
         // Remove Coordinator
-        .filter((d) => d.type !== TYPE_COORDINATOR)
+        .filter((d) => d.supported)
         // Remove existing devices
         .filter((d) => {
           const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
@@ -37,6 +35,8 @@ function handleMqttMessage(topic, message) {
         })
         // Add features
         .map((d) => convertDevice(d, this.serviceId));
+
+      this.discoveredDevices = convertedDevices;
 
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
