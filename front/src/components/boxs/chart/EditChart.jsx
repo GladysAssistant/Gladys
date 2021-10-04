@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import get from 'get-value';
 
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
@@ -116,8 +117,11 @@ class EditChart extends Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room && this.props.box.room) {
+  componentDidUpdate(previousProps) {
+    const deviceFeatureChanged = get(previousProps, 'box.device_feature') !== get(this.props, 'box.device_feature');
+    const unitChanged = get(previousProps, 'box.unit') !== get(this.props, 'box.unit');
+    const roomChanged = get(previousProps, 'box.room') !== get(this.props, 'box.room');
+    if (deviceFeatureChanged || unitChanged || roomChanged) {
       this.getDeviceFeatures();
     }
   }
