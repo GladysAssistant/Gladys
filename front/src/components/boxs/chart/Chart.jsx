@@ -13,13 +13,15 @@ const ONE_DAY_IN_MINUTES = 24 * 60;
 const SEVEN_DAYS_IN_MINUTES = 7 * 24 * 60;
 const THIRTY_DAYS_IN_MINUTES = 30 * 24 * 60;
 const THREE_MONTHS_IN_MINUTES = 3 * 30 * 24 * 60;
+const ONE_YEAR_IN_MINUTES = 365 * 24 * 60;
 
 const intervalByName = {
   'last-hour': ONE_HOUR_IN_MINUTES,
   'last-day': ONE_DAY_IN_MINUTES,
   'last-week': SEVEN_DAYS_IN_MINUTES,
   'last-month': THIRTY_DAYS_IN_MINUTES,
-  'last-three-months': THREE_MONTHS_IN_MINUTES
+  'last-three-months': THREE_MONTHS_IN_MINUTES,
+  'last-year': ONE_YEAR_IN_MINUTES
 };
 
 const notNullNotUndefined = value => {
@@ -93,6 +95,13 @@ class Chartbox extends Component {
   switchTo3monthsView = async e => {
     await this.setState({
       interval: THREE_MONTHS_IN_MINUTES,
+      dropdown: false
+    });
+    this.getData();
+  };
+  switchToYearlyView = async e => {
+    await this.setState({
+      interval: ONE_YEAR_IN_MINUTES,
       dropdown: false
     });
     this.getData();
@@ -207,6 +216,7 @@ class Chartbox extends Component {
                   {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
                   {interval === THIRTY_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThirtyDays" />}
                   {interval === THREE_MONTHS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastThreeMonths" />}
+                  {interval === ONE_YEAR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastYear" />}
                 </a>
                 <div
                   class={cx(style.dropdownMenuChart, {
@@ -252,6 +262,14 @@ class Chartbox extends Component {
                     onClick={this.switchTo3monthsView}
                   >
                     <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                  </a>
+                  <a
+                    class={cx(style.dropdownItemChart, {
+                      [style.active]: interval === ONE_YEAR_IN_MINUTES
+                    })}
+                    onClick={this.switchToYearlyView}
+                  >
+                    <Text id="dashboard.boxes.chart.lastYear" />
                   </a>
                 </div>
               </div>

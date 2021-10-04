@@ -233,6 +233,9 @@ class EditChart extends Component {
                 <option value="last-three-months">
                   <Text id="dashboard.boxes.chart.lastThreeMonths" />
                 </option>
+                <option value="last-year">
+                  <Text id="dashboard.boxes.chart.lastYear" />
+                </option>
               </select>
             </div>
             <div class="form-group">

@@ -254,6 +254,7 @@
         "lastSevenDays": "Derniers 7 jours",
         "lastThirtyDays": "Derniers 30 jours",
         "lastThreeMonths": "Derniers 3 mois",
+        "lastYear": "Dernière année",
         "noValue": "Pas de valeurs sur cet interval",
         "editNameLabel": "Entrez le nom de cette box.",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
