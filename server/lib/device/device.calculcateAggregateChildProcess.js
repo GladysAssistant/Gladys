@@ -139,21 +139,15 @@ async function calculateAggregateChildProcess(params) {
     // we bulk insert the data
     if (deviceFeatureStateAggregatesToInsert.length) {
       const queryInterface = db.sequelize.getQueryInterface();
-      await db.sequelize.transaction(async (t) => {
-        await queryInterface.bulkDelete(
-          't_device_feature_state_aggregate',
-          {
-            type,
-            device_feature_id: deviceFeature.id,
-            created_at: { [Op.between]: [startFrom, endAt] },
-          },
-          { transaction: t },
-        );
-        const chunks = chunk(deviceFeatureStateAggregatesToInsert, 500);
-        console.log(`Aggregates: Inserting the data in ${chunks.length} chunks.`);
-        await Promise.each(chunks, async (deviceStatesToInsert) => {
-          await queryInterface.bulkInsert('t_device_feature_state_aggregate', deviceStatesToInsert, { transaction: t });
-        });
+      await queryInterface.bulkDelete('t_device_feature_state_aggregate', {
+        type,
+        device_feature_id: deviceFeature.id,
+        created_at: { [Op.between]: [startFrom, endAt] },
+      });
+      const chunks = chunk(deviceFeatureStateAggregatesToInsert, 500);
+      console.log(`Aggregates: Inserting the data in ${chunks.length} chunks.`);
+      await Promise.each(chunks, async (deviceStatesToInsert) => {
+        await queryInterface.bulkInsert('t_device_feature_state_aggregate', deviceStatesToInsert);
       });
     }
     await db.DeviceFeature.update(
