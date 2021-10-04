@@ -5,6 +5,7 @@ import Select from 'react-select';
 import get from 'get-value';
 
 import BaseEditBox from '../baseEditBox';
+import Chart from './Chart';
 import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
@@ -233,6 +234,12 @@ class EditChart extends Component {
                   <Text id="dashboard.boxes.chart.lastThreeMonths" />
                 </option>
               </select>
+            </div>
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.chart.preview" />
+              </label>
+              <Chart box={props.box} />
             </div>
           </div>
         </div>

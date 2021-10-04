@@ -266,7 +266,8 @@
         "stepline": "Step Line",
         "displayAxes": "Display axes?",
         "yes": "Yes",
-        "no": "No"
+        "no": "No",
+        "preview": "Preview"
       }
     }
   },

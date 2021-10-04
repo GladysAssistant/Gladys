@@ -117,6 +117,11 @@ class Chartbox extends Component {
       this.getData();
     }
   };
+  updateInterval = async interval => {
+    await this.setState({
+      interval: intervalByName[this.props.box.interval]
+    });
+  };
   constructor(props) {
     super(props);
     this.props = props;
@@ -133,11 +138,14 @@ class Chartbox extends Component {
       this.updateDeviceStateWebsocket
     );
   }
-  componentDidUpdate(previousProps) {
+  async componentDidUpdate(previousProps) {
     const intervalChanged = get(previousProps, 'box.interval') !== get(this.props, 'box.interval');
     const deviceFeatureChanged = get(previousProps, 'box.device_feature') !== get(this.props, 'box.device_feature');
     const titleChanged = get(previousProps, 'box.title') !== get(this.props, 'box.title');
     const unitChanged = get(previousProps, 'box.unit') !== get(this.props, 'box.unit');
+    if (intervalChanged) {
+      await this.updateInterval(this.props.box.interval);
+    }
     if (intervalChanged || deviceFeatureChanged || titleChanged || unitChanged) {
       this.getData();
     }

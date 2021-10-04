@@ -266,7 +266,8 @@
         "stepline": "Ligne droite",
         "displayAxes": "Afficher les axes ?",
         "yes": "Oui",
-        "no": "Non"
+        "no": "Non",
+        "preview": "Prévisualisation"
       }
     }
   },
