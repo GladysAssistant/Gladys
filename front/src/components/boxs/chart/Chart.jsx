@@ -26,6 +26,33 @@ const notNullNotUndefined = value => {
   return value !== undefined && value !== null;
 };
 
+const roundWith2DecimalIfNeeded = value => {
+  if (!notNullNotUndefined(value)) {
+    return null;
+  }
+  // we want to avoid displaying "15.00" if it's just 15
+  if (Number.isInteger(value)) {
+    return Math.round(value);
+  }
+  return parseFloat(value).toFixed(2);
+};
+
+const calculateVariation = (firstElement, lastElement) => {
+  if (!notNullNotUndefined(firstElement) || !notNullNotUndefined(lastElement)) {
+    return null;
+  }
+  if (firstElement.value === 0 && lastElement.value === 0) {
+    return 0;
+  }
+  if (firstElement.value === 0 && lastElement.value > firstElement.value) {
+    return Infinity;
+  }
+  if (firstElement.value === 0 && lastElement.value < firstElement.value) {
+    return -Infinity;
+  }
+  return Math.round(((lastElement.value - firstElement.value) / Math.abs(firstElement.value)) * 100);
+};
+
 class Chartbox extends Component {
   toggleDropdown = () => {
     this.setState({
@@ -91,20 +118,21 @@ class Chartbox extends Component {
         series[0].data.push(point.value);
         labels.push(point.created_at);
       });
-      const firstElement = data[0];
-      const lastElement = data[data.length - 1];
-      const variation =
-        firstElement && lastElement
-          ? Math.round(((lastElement.value - firstElement.value) / Math.abs(firstElement.value)) * 100)
-          : null;
-      const lastValueRounded = lastElement ? Math.round(lastElement.value) : null;
-      await this.setState({
+
+      const newState = {
         series,
         labels,
-        variation,
-        lastValueRounded,
         loading: false
-      });
+      };
+
+      if (data.length > 0) {
+        const firstElement = data[0];
+        const lastElement = data[data.length - 1];
+        newState.variation = calculateVariation(firstElement, lastElement);
+        newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
+      }
+
+      await this.setState(newState);
     } catch (e) {
       console.error(e);
     }
