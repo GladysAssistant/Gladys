@@ -1,12 +1,33 @@
 import { Component, createRef } from 'preact';
 import ApexCharts from 'apexcharts';
 import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import LocalizedFormat from 'dayjs/plugin/LocalizedFormat';
 
-dayjs.extend(relativeTime);
+dayjs.extend(LocalizedFormat);
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
+  addDateFormatter(options) {
+    let formatter;
+    if (this.props.interval <= 24 * 60) {
+      formatter = value => {
+        return dayjs(value)
+          .locale(this.props.user.language)
+          .format('LLL');
+      };
+    } else {
+      formatter = value => {
+        return dayjs(value)
+          .locale(this.props.user.language)
+          .format('LL');
+      };
+    }
+    options.tooltip = {
+      x: {
+        formatter
+      }
+    };
+  }
   getBarChartOptions = () => {
     const options = {
       chart: {
@@ -53,7 +74,8 @@ class ApexChartComponent extends Component {
       },
       xaxis: {
         labels: {
-          padding: 0
+          padding: 0,
+          datetimeUTC: false
         },
         tooltip: {
           enabled: false
@@ -74,6 +96,7 @@ class ApexChartComponent extends Component {
         show: false
       }
     };
+    this.addDateFormatter(options);
     return options;
   };
   getAreaChartOptions = () => {
@@ -122,7 +145,8 @@ class ApexChartComponent extends Component {
       },
       xaxis: {
         labels: {
-          padding: 0
+          padding: 0,
+          datetimeUTC: false
         },
         tooltip: {
           enabled: false
@@ -143,18 +167,9 @@ class ApexChartComponent extends Component {
         show: false
       }
     };
-    if (this.props.interval === 60 || this.props.interval === 24 * 60) {
-      const formatter = value => {
-        return dayjs(value)
-          .locale(this.props.user.language)
-          .fromNow();
-      };
-      options.tooltip = {
-        x: {
-          formatter
-        }
-      };
-    }
+
+    this.addDateFormatter(options);
+
     return options;
   };
   getLineChartOptions = () => {
@@ -203,7 +218,8 @@ class ApexChartComponent extends Component {
       },
       xaxis: {
         labels: {
-          padding: 0
+          padding: 0,
+          datetimeUTC: false
         },
         tooltip: {
           enabled: false
@@ -224,18 +240,7 @@ class ApexChartComponent extends Component {
         show: false
       }
     };
-    if (this.props.interval === 60 || this.props.interval === 24 * 60) {
-      const formatter = value => {
-        return dayjs(value)
-          .locale(this.props.user.language)
-          .fromNow();
-      };
-      options.tooltip = {
-        x: {
-          formatter
-        }
-      };
-    }
+    this.addDateFormatter(options);
     return options;
   };
   getStepLineChartOptions = () => {
@@ -282,7 +287,8 @@ class ApexChartComponent extends Component {
       },
       xaxis: {
         labels: {
-          padding: 0
+          padding: 0,
+          datetimeUTC: false
         },
         tooltip: {
           enabled: false
@@ -303,18 +309,7 @@ class ApexChartComponent extends Component {
         show: false
       }
     };
-    if (this.props.interval === 60 || this.props.interval === 24 * 60) {
-      const formatter = value => {
-        return dayjs(value)
-          .locale(this.props.user.language)
-          .fromNow();
-      };
-      options.tooltip = {
-        x: {
-          formatter
-        }
-      };
-    }
+    this.addDateFormatter(options);
     return options;
   };
   displayChart = () => {
