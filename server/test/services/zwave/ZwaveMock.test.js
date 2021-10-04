@@ -4,7 +4,11 @@ const EventEmitter = require('events');
 const ZwaveMock = function ZwaveMock(options) {};
 
 ZwaveMock.prototype = Object.create(new EventEmitter());
-
+ZwaveMock.prototype.Driver = fake.returns({
+  on: (event, callback) => {
+    fake.returns(null);
+  },
+});
 ZwaveMock.prototype.addNode = fake.returns(null);
 ZwaveMock.prototype.removeNode = fake.returns(null);
 ZwaveMock.prototype.connect = fake.returns(null);

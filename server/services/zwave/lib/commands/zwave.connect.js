@@ -15,7 +15,7 @@ const DRIVER_READY_TIMEOUT = 60 * 1000;
  * @example
  * zwave.connect(driverPath);
  */
-async function connect(driverPath) {
+function connect(driverPath) {
   const zZWaveJS = this.ZWaveJS;
   logger.debug(`Zwave : Connecting to USB = ${driverPath}`);
   // special case for macOS
@@ -68,7 +68,7 @@ async function connect(driverPath) {
   });
 
   // this.zwave.connect(this.driverPath);
-  await this.driver.start();
+  this.driver.start();
 
   setTimeout(() => {
     scanComplete.bind(this)();
