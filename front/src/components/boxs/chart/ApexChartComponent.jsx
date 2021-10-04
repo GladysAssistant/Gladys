@@ -1,9 +1,9 @@
 import { Component, createRef } from 'preact';
 import ApexCharts from 'apexcharts';
 import dayjs from 'dayjs';
-import LocalizedFormat from 'dayjs/plugin/LocalizedFormat';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
 
-dayjs.extend(LocalizedFormat);
+dayjs.extend(localizedFormat);
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
