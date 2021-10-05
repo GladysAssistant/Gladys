@@ -1,5 +1,6 @@
 const { EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
+const { unbindValue } = require('../utils/bindValue');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
 /**
@@ -14,7 +15,7 @@ function valueNotification(zwaveNode, args) {
   const { commandClass, endpoint, property, propertyKey, value } = args;
   const nodeId = zwaveNode.id;
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
-  logger.debug(`Zwave : Value Notification, nodeId = ${nodeId}, notif = ${JSON.stringify(args)}`);
+  const valueUnbind = unbindValue(args, value);
   if (this.nodes[nodeId].ready) {
     logger.debug(
       'node%d: changed: %d:%s:%s %s->%s',
@@ -23,18 +24,22 @@ function valueNotification(zwaveNode, args) {
       endpoint || 0,
       fullProperty,
       this.nodes[nodeId].classes[commandClass][endpoint || 0][fullProperty].value,
-      value,
+      valueUnbind,
     );
-    this.nodes[nodeId].classes[commandClass][endpoint || 0][fullProperty].value = value;
-    this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: getDeviceFeatureExternalId({
-        nodeId,
-        commandClass,
-        endpoint: endpoint || 0,
-        property: fullProperty,
-      }),
-      state: value,
+    this.nodes[nodeId].classes[commandClass][endpoint || 0][fullProperty].value = valueUnbind;
+    const deviceFeatureExternalId = getDeviceFeatureExternalId({
+      nodeId,
+      commandClass,
+      endpoint: endpoint || 0,
+      property: fullProperty,
     });
+    const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
+    if (deviceFeature) {
+      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: deviceFeatureExternalId,
+        state: valueUnbind,
+      });
+    }
   }
 }
 

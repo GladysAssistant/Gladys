@@ -49,9 +49,7 @@ const DiscoverTab = ({ children, ...props }) => (
         <button
           class="btn btn-outline-primary"
           onClick={props.discover}
-          disabled={
-            props.discoverZigbee2mqtt || !props.z2mEnabled || (!props.usbConfigured && !props.zigbee2mqttConnected)
-          }
+          disabled={props.discoverZigbee2mqtt || !props.z2mEnabled || !props.usbConfigured}
         >
           <Text id="integration.zigbee2mqtt.discover.scanButton" /> <i class="fe fe-radio" />
         </button>

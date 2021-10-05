@@ -38,8 +38,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.zigbee2mqttConnected = false;
   this.z2mEnabled = false;
   this.z2mPermitJoin = false;
-  this.networkModeValid = false;
-  this.dockerBased = false;
+  this.networkModeValid = true;
+  this.dockerBased = true;
 };
 
 Zigbee2mqttManager.prototype.init = init;

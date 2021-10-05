@@ -10,7 +10,7 @@ const logger = require('../../../../utils/logger');
 function nodeAlive(zwaveNode, args) {
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
-  logger.debug(`Zwave : Value is alive, nodeId = ${nodeId}`);
+  logger.debug(`Zwave : Node is alive, nodeId = ${nodeId}`);
   node.ready = true;
 }
 
