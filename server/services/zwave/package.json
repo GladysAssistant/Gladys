@@ -13,6 +13,6 @@
   ],
   "scripts": {},
   "dependencies": {
-    "zwave-js": "^7.11.0"
+    "zwave-js": "^8.4.1"
   }
 }
