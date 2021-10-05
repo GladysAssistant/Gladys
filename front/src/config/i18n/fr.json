@@ -1457,7 +1457,8 @@
     "restoreButton": "Restaurer",
     "confirmRestore": "Confirmer",
     "cancelRestore": "Annuler",
-    "restoreInProgressTitle": "Restauration de la sauvegarde en cours ...",
+    "restoreInProgressTitle": "Restauration de la sauvegarde en cours...",
+    "gladysRestartingTitle": "Gladys Assistant est entrain de redémarrer...",
     "backupNowButton": "Sauvegarder maintenant",
     "backupStarted": "Début de la sauvegarde...",
     "notConfigured": "Gladys Plus doit être configuré pour activer les sauvegardes. Accédez à l'onglet Gladys Plus pour le configurer.",
@@ -1750,6 +1751,7 @@
   "gatewayTwoFactorAuth": {
     "title": "Gladys Gateway",
     "configureTitle": "Configurer l'authentification Two-Factor (\"2FA\")",
+    "configureButton": "Configurer la 2FA",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
     "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",

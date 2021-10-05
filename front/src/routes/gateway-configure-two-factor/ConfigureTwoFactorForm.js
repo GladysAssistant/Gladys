@@ -27,7 +27,7 @@ const ConfigureTwoFactorForm = ({ children, ...props }) => (
 
                   <div class="form-footer">
                     <button onClick={props.nextStep} class="btn btn-primary btn-block">
-                      <Text id="gatewayTwoFactorAuth.configureTitle" />
+                      <Text id="gatewayTwoFactorAuth.configureButton" />
                     </button>
                   </div>
                 </div>

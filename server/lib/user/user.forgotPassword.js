@@ -1,4 +1,5 @@
 const db = require('../../models');
+const logger = require('../../utils/logger');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 const TOKEN_VALIDITY_IN_SECONDS = 60 * 60; // 1 hour
@@ -19,6 +20,10 @@ async function forgotPassword(email, useragent) {
   });
 
   if (user === null) {
+    const users = await db.User.findAll();
+    const usersListString = users.map((oneUser) => oneUser.email).join(',');
+    logger.info('Just received a forgot password requests but the user is not found');
+    logger.info(`Here is the list of users in database: ${usersListString}`);
     throw new NotFoundError('User not found');
   }
 
