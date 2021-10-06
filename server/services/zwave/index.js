@@ -7,7 +7,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
   const ZWaveJS = require('zwave-js');
 
   const zwaveManager = new ZwaveManager(gladys, ZWaveJS, serviceId);
-  
+
   /**
    * @public
    * @description This function starts the service
