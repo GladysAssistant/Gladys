@@ -11,12 +11,16 @@ module.exports = function CalDAVService(gladys, serviceId) {
   const duration = require('dayjs/plugin/duration');
   const advancedFormat = require('dayjs/plugin/advancedFormat');
   const isBetween = require('dayjs/plugin/isBetween');
+  const utc = require('dayjs/plugin/utc');
+  const timezone = require('dayjs/plugin/timezone');
   const xmlDom = require('xmldom');
 
   dayjs.extend(objectSupport);
   dayjs.extend(duration);
   dayjs.extend(advancedFormat);
   dayjs.extend(isBetween);
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
 
   const calDavHandler = new CalDAVHandler(gladys, serviceId, ical, dav, dayjs, xmlDom);
 
