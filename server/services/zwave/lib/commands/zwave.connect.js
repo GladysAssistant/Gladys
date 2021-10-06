@@ -15,8 +15,7 @@ const DRIVER_READY_TIMEOUT = 60 * 1000;
  * @example
  * zwave.connect(driverPath);
  */
-function connect(driverPath) {
-  const zZWaveJS = this.ZWaveJS;
+async function connect(driverPath) {
   logger.debug(`Zwave : Connecting to USB = ${driverPath}`);
   // special case for macOS
   if (os.platform() === 'darwin') {
@@ -25,7 +24,7 @@ function connect(driverPath) {
     this.driverPath = driverPath;
   }
   this.ready = false;
-  this.driver = new zZWaveJS.Driver(driverPath, {
+  this.driver = new this.ZWaveJS.Driver(driverPath, {
     logConfig: {
       level: 'info',
     },
@@ -67,8 +66,8 @@ function connect(driverPath) {
     scanComplete.bind(this)();
   });
 
-  // this.zwave.connect(this.driverPath);
-  this.driver.start();
+  // Crash server if port is not available
+  await this.driver.start();
 
   setTimeout(() => {
     scanComplete.bind(this)();
