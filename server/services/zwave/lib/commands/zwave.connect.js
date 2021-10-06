@@ -67,7 +67,10 @@ async function connect(driverPath) {
   });
 
   // Crash server if port is not available
-  await this.driver.start();
+  await this.driver.start()
+    .catch(e => 
+      logger.fatal(`Unable to start Z-Wave service ${e}`)
+    );
 
   setTimeout(() => {
     scanComplete.bind(this)();
