@@ -13,15 +13,17 @@ async function getNodeNeighbors() {
   }
   logger.debug(`Zwave : Getting node neighbors...`);
   const nodeIds = Object.keys(this.nodes);
-  const nodes = await Promise.all(nodeIds.map(async (nodeId) => {
-    const neighbors = await this.driver.controller.getNodeNeighbors(nodeId);
-    return {
-      id: nodeId,
-      manufacturer: this.nodes[nodeId].manufacturer,
-      product: this.nodes[nodeId].product,
-      neighbors,
-    };
-  }));
+  const nodes = await Promise.all(
+    nodeIds.map(async (nodeId) => {
+      const neighbors = await this.driver.controller.getNodeNeighbors(nodeId);
+      return {
+        id: nodeId,
+        manufacturer: this.nodes[nodeId].manufacturer,
+        product: this.nodes[nodeId].product,
+        neighbors,
+      };
+    }),
+  );
   return nodes;
 }
 

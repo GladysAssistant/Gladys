@@ -10,9 +10,9 @@ const { scanComplete } = require('../events/zwave.scanComplete');
 const DRIVER_READY_TIMEOUT = 60 * 1000;
 
 /**
- * @description Connect to Zwave USB driver
+ * @description Connect to Zwave USB driver.
  * @param {string} driverPath - Path to the USB driver.
- * @returns {Promise}
+ * @returns {Promise} Void.
  * @example
  * zwave.connect(driverPath);
  */
@@ -68,10 +68,7 @@ async function connect(driverPath) {
   });
 
   // Crash server if port is not available
-  await this.driver.start()
-    .catch(e => 
-      logger.fatal(`Unable to start Z-Wave service ${e}`)
-    );
+  await this.driver.start().catch((e) => logger.fatal(`Unable to start Z-Wave service ${e}`));
 
   setTimeout(() => {
     scanComplete.bind(this)();
