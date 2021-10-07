@@ -8,10 +8,10 @@ const gladys = {
     getValue: fake.resolves('result'),
   },
   location: {
-    handleNewGatewayOwntracksLocation5: fake.returns(null),
+    handleNewOwntracksLocation: fake.returns(null),
   },
   user: {
-    get: fake.returns([
+    getBySelector: fake.returns([
       {
         id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
         firstname: 'John',

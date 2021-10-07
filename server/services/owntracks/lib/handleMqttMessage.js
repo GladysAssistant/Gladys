@@ -8,35 +8,24 @@ const logger = require('../../../utils/logger');
  * @param {Object} message - The message sent.
  * @returns {undefined}
  * @example
- * handleMqttMessage('owntracks/location/deviceId', data);
+ * handleMqttMessage('owntracks/location/user_selector', data);
  */
-function handleMqttMessage(topic, message) {
+async function handleMqttMessage(topic, message) {
   const splittedTopic = topic.split('/');
-  const user = splittedTopic[2];
+  const userSelector = splittedTopic[2];
 
   if (topic.startsWith('owntracks')) {
-    logger.debug(`MQTT : Gladys has a message for ${user} from Owntracks on ${topic} :${message}.`);
+    logger.debug(`MQTT : Gladys has a message for ${userSelector} from Owntracks on ${topic} :${message}.`);
     const obj = JSON.parse(message);
     if (obj['_type'] === 'location') {
-      // TODO : check is user exists or get user id using the selector
-      (async () => {
-        const users = await this.gladys.user.get({
-          selector: user,
-          take: 1,
-          skip: 0,
-        });
-
-        if (users) {
-          const data = {
-            user_id: users[0].id,
-            latitude: obj.lat,
-            longitude: obj.lon,
-            accuracy: obj.acc,
-            altitude: obj.alt,
-          };
-          await this.gladys.location.handleNewGatewayOwntracksLocation(data);
-        }
-      })();
+      const user = await this.gladys.user.getBySelector(userSelector);
+      const data = {
+        latitude: obj.lat,
+        longitude: obj.lon,
+        accuracy: obj.acc,
+        altitude: obj.alt,
+      };
+      this.gladys.location.handleNewOwntracksLocation(user, data);
     }
   }
 }

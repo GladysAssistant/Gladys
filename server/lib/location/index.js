@@ -1,4 +1,5 @@
 const { create } = require('./location.create');
+const { handleNewOwntracksLocation } = require('./location.handleNewOwntracksLocation');
 const { handleNewGatewayOwntracksLocation } = require('./location.handleNewGatewayOwntracksLocation');
 const { get } = require('./location.get');
 const { getLast } = require('./location.getLast');
@@ -17,6 +18,7 @@ const Location = function Location(user, event) {
 Location.prototype.create = create;
 Location.prototype.get = get;
 Location.prototype.getLast = getLast;
+Location.prototype.handleNewOwntracksLocation = handleNewOwntracksLocation;
 Location.prototype.handleNewGatewayOwntracksLocation = handleNewGatewayOwntracksLocation;
 
 module.exports = Location;

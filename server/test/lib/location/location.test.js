@@ -82,6 +82,32 @@ describe('location.getLast', () => {
   });
 });
 
+describe('location.handleNewOwntracksLocation', () => {
+  it('should create location', async () => {
+    const user = {
+      selector: 'john',
+    };
+    const location = new Location(user, event);
+    const data = {
+      latitude: 42,
+      longitude: 42,
+      altitude: 10,
+    };
+    const oneLocation = await location.handleNewOwntracksLocation(user, data);
+    expect(oneLocation).to.have.property('latitude');
+    expect(oneLocation).to.have.property('longitude');
+    expect(oneLocation).to.have.property('user_id', '0cd30aef-9c4e-4a23-88e3-3547971296e5');
+  });
+  it('should return bad parameters error', async () => {
+    const user = {
+      selector: 'john',
+    };
+    const location = new Location(user, event);
+    const promise = location.handleNewOwntracksLocation(user, null);
+    return assert.isRejected(promise);
+  });
+});
+
 describe('location.handleNewGatewayOwntracksLocation', () => {
   it('should create location', async () => {
     const location = new Location(
