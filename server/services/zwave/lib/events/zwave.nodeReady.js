@@ -20,7 +20,7 @@ function nodeReady(zwaveNode) {
   node.productid = zwaveNode.productId;
   node.firmwareVersion = zwaveNode.firmwareVersion; // NEW
   node.type = zwaveNode.nodeType;
-  node.name = zwaveNode.name;
+  node.name = `${zwaveNode.name || zwaveNode.label} (${nodeId})`;
   node.label = zwaveNode.label; // NEW
   node.location = zwaveNode.location; // RENAME
   node.status = zwaveNode.status;
