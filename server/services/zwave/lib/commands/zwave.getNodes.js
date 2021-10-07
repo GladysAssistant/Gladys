@@ -24,11 +24,19 @@ function getNodes() {
   return nodes
     .map((node) => {
       const newDevice = {
-        name: node.product,
+        name: node.name,
         service_id: this.serviceId,
         external_id: getDeviceExternalId({ nodeId: node.id }),
         ready: node.ready,
-        rawZwaveNode: node,
+        rawZwaveNode: {
+          id: node.id,
+          type: node.type,
+          manufacturer: node.manufacturer,
+          product: node.product,
+          producttype: node.producttype,
+          productid: node.productid,
+          keysClasses: Object.keys(node.classes),
+        },
         features: [],
         params: [],
       };
