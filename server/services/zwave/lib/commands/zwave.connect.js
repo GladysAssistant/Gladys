@@ -12,6 +12,7 @@ const DRIVER_READY_TIMEOUT = 60 * 1000;
 /**
  * @description Connect to Zwave USB driver
  * @param {string} driverPath - Path to the USB driver.
+ * @returns {Promise}
  * @example
  * zwave.connect(driverPath);
  */

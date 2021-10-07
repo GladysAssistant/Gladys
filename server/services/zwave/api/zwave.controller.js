@@ -46,7 +46,7 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
    * @apiGroup Zwave
    */
   async function getNodeNeighbors(req, res) {
-    const nodes = zwaveManager.getNodeNeighbors();
+    const nodes = await zwaveManager.getNodeNeighbors();
     res.json(nodes);
   }
 
