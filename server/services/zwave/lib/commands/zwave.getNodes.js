@@ -31,10 +31,7 @@ function getNodes() {
         rawZwaveNode: {
           id: node.id,
           type: node.type,
-          manufacturer: node.manufacturer,
           product: node.product,
-          producttype: node.producttype,
-          productid: node.productid,
           keysClasses: Object.keys(node.classes),
         },
         features: [],

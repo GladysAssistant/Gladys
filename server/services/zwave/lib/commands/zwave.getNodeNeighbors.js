@@ -18,7 +18,7 @@ async function getNodeNeighbors() {
       const neighbors = await this.driver.controller.getNodeNeighbors(nodeId);
       return {
         id: nodeId,
-        manufacturer: this.nodes[nodeId].manufacturer,
+        manufacturerId: this.nodes[nodeId].manufacturerId,
         product: this.nodes[nodeId].product,
         neighbors,
       };

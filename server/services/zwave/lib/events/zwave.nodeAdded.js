@@ -12,14 +12,11 @@ function nodeAdded(zwaveNode) {
   logger.debug(`Zwave : Node Added, nodeId = ${nodeId}`);
 
   this.nodes[nodeId] = {
-    manufacturer: '',
-    manufacturerid: '',
-    product: '',
-    producttype: '',
-    productid: '',
-    type: '',
-    name: '',
-    location: '',
+    product: `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`,
+    type: zwaveNode.nodeType,
+    firmwareVersion: zwaveNode.firmwareVersion,
+    name: `${zwaveNode.name || zwaveNode.label || `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`} (${nodeId})`,
+    location: zwaveNode.location,
     classes: {},
     ready: false,
   };
@@ -38,6 +35,7 @@ function nodeAdded(zwaveNode) {
     .on('value updated', this.valueUpdated.bind(this))
     .on('value notification', this.valueNotification.bind(this))
     .on('value removed', this.valueRemoved.bind(this))
+    .on('metadata update', this.metadataUpdate.bind(this))
     .on('notification', this.notification.bind(this));
 
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
