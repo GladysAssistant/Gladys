@@ -28,6 +28,7 @@ const {
   nodeInterviewStageCompleted,
   nodeInterviewStarted,
 } = require('./events/zwave.nodeInterview');
+const { metadataUpdate } = require('./events/zwave.metadataUpdate');
 
 const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
   this.gladys = gladys;
@@ -61,6 +62,7 @@ ZwaveManager.prototype.valueAdded = valueAdded;
 ZwaveManager.prototype.valueUpdated = valueUpdated;
 ZwaveManager.prototype.valueRemoved = valueRemoved;
 ZwaveManager.prototype.valueNotification = valueNotification;
+ZwaveManager.prototype.metadataUpdate = metadataUpdate;
 ZwaveManager.prototype.nodeReady = nodeReady;
 ZwaveManager.prototype.notification = notification;
 ZwaveManager.prototype.scanComplete = scanComplete;
