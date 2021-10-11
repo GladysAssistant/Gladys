@@ -111,11 +111,20 @@ class Chartbox extends Component {
   getData = async () => {
     let deviceFeatures = this.props.box.device_features;
     if (!deviceFeatures) {
+      // migrate all box (one device feature)
       if (this.props.box.device_feature) {
         deviceFeatures = [this.props.box.device_feature];
       } else {
         return;
       }
+    }
+    // if there is no device selected
+    if (deviceFeatures.length === 0) {
+      await this.setState({
+        emptySeries: true,
+        loading: false
+      });
+      return;
     }
     await this.setState({ loading: true });
     try {
