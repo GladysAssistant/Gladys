@@ -59,7 +59,7 @@ describe('GET /api/v1/device/:device_selector', () => {
   });
 });
 
-describe('GET /api/v1/device_feature/:device_feature_selector/aggregated_states', () => {
+describe('GET /api/v1/device_feature/aggregated_states', () => {
   beforeEach(async function BeforeEach() {
     this.timeout(10000);
     await insertStates(365 * 24 * 60);
@@ -74,28 +74,32 @@ describe('GET /api/v1/device_feature/:device_feature_selector/aggregated_states'
   });
   it('should get device aggregated state by selector', async function Test() {
     await authenticatedRequest
-      .get('/api/v1/device_feature/test-device-feature/aggregated_states')
+      .get('/api/v1/device_feature/aggregated_states')
       .query({
         interval: 365 * 24 * 60,
         max_states: 100,
+        device_features: 'test-device-feature',
       })
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.lengthOf(100);
+        expect(res.body).to.have.lengthOf(1);
+        expect(res.body[0].values).to.have.lengthOf(100);
       });
   });
-  it('should get device aggregated state by selector', async function Test() {
+  it('should get device aggregated state', async function Test() {
     await authenticatedRequest
-      .get('/api/v1/device_feature/test-device-feature/aggregated_states')
+      .get('/api/v1/device_feature/aggregated_states')
       .query({
         interval: 365 * 24 * 60,
         max_states: 5,
+        device_features: 'test-device-feature',
       })
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        res.body.forEach((state) => {
+        expect(res.body).to.have.lengthOf(1);
+        res.body[0].values.forEach((state) => {
           expect(state).to.have.property('created_at');
           expect(state).to.have.property('value');
         });

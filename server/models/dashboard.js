@@ -19,6 +19,7 @@ const boxesSchema = Joi.array().items(
       title: Joi.string(),
       interval: Joi.string(),
       display_axes: Joi.boolean(),
+      display_variation: Joi.boolean(),
       chart_type: Joi.string(),
       users: Joi.array().items(Joi.string()),
     }),

@@ -48,8 +48,8 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     };
     const device = new Device(event, {}, {}, {}, {}, variable);
     await device.calculateAggregate('hourly');
-    const states = await device.getDeviceFeaturesAggregates('test-device-feature', 60, 100);
-    expect(states).to.have.lengthOf(100);
+    const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 60, 100);
+    expect(values).to.have.lengthOf(100);
   });
   it('should return last day states', async () => {
     await insertStates(48 * 60);
@@ -58,8 +58,8 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     };
     const device = new Device(event, {}, {}, {}, {}, variable);
     await device.calculateAggregate('hourly');
-    const states = await device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100);
-    expect(states).to.have.lengthOf(100);
+    const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100);
+    expect(values).to.have.lengthOf(100);
   });
   it('should return last day states', async () => {
     await insertStates(4 * 24 * 60);
@@ -68,8 +68,8 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     };
     const device = new Device(event, {}, {}, {}, {}, variable);
     await device.calculateAggregate('hourly');
-    const states = await device.getDeviceFeaturesAggregates('test-device-feature', 3 * 24 * 60, 100);
-    expect(states).to.have.lengthOf(72);
+    const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 3 * 24 * 60, 100);
+    expect(values).to.have.lengthOf(72);
   });
   it('should return last month states', async () => {
     await insertStates(2 * 30 * 24 * 60);
@@ -79,8 +79,8 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const device = new Device(event, {}, {}, {}, {}, variable);
     await device.calculateAggregate('hourly');
     await device.calculateAggregate('daily');
-    const states = await device.getDeviceFeaturesAggregates('test-device-feature', 30 * 24 * 60, 100);
-    expect(states).to.have.lengthOf(30);
+    const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 30 * 24 * 60, 100);
+    expect(values).to.have.lengthOf(30);
   });
   it('should return last year states', async () => {
     await insertStates(2 * 365 * 24 * 60);
@@ -91,8 +91,8 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     await device.calculateAggregate('hourly');
     await device.calculateAggregate('daily');
     await device.calculateAggregate('monthly');
-    const states = await device.getDeviceFeaturesAggregates('test-device-feature', 365 * 24 * 60, 100);
-    expect(states).to.have.lengthOf(100);
+    const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 365 * 24 * 60, 100);
+    expect(values).to.have.lengthOf(100);
   });
   it('should return error, device feature doesnt exist', async () => {
     const variable = {

@@ -8,16 +8,18 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * @param {string} selector - Device selector.
  * @param {number} intervalInMinutes - Interval.
  * @param {number} maxStates - Number of elements to return max.
- * @returns {Promise<Array>} - Resolve with an array of data.
+ * @returns {Promise<Object>} - Resolve with an array of data.
  * @example
  * device.getDeviceFeaturesAggregates('test-devivce');
  */
 async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxStates = 100) {
+  console.time(`getDeviceFeaturesAggregates.findingDeviceFeatureInDb(${selector})`);
   const deviceFeature = await db.DeviceFeature.findOne({
     where: {
       selector,
     },
   });
+  console.timeEnd(`getDeviceFeaturesAggregates.findingDeviceFeatureInDb(${selector})`);
 
   if (deviceFeature === null) {
     throw new NotFoundError('DeviceFeature not found');
@@ -49,6 +51,7 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   let rows;
 
   if (type === 'live') {
+    console.time(`getDeviceFeaturesAggregates.gettingRowsFromLiveDb(${selector})`);
     rows = await db.DeviceFeatureState.findAll({
       raw: true,
       attributes: ['created_at', 'value'],
@@ -59,7 +62,9 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
         },
       },
     });
+    console.timeEnd(`getDeviceFeaturesAggregates.gettingRowsFromLiveDb(${selector})`);
   } else {
+    console.time(`getDeviceFeaturesAggregates.gettingRowsFromAggregatedDb(${selector})`);
     rows = await db.DeviceFeatureStateAggregate.findAll({
       raw: true,
       attributes: [[groupByFunction, 'created_at'], [fn('round', fn('avg', col('value')), 2), 'value']],
@@ -72,21 +77,33 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
         },
       },
     });
+    console.timeEnd(`getDeviceFeaturesAggregates.gettingRowsFromAggregatedDb(${selector})`);
   }
 
+  console.time(`getDeviceFeaturesAggregates.buildingDownsamplingArray(${selector})`);
   const dataForDownsampling = rows.map((deviceFeatureState) => {
     return [new Date(deviceFeatureState.created_at), deviceFeatureState.value];
   });
+  console.timeEnd(`getDeviceFeaturesAggregates.buildingDownsamplingArray(${selector})`);
 
+  console.time(`getDeviceFeaturesAggregates.downsamplingData(${selector})`);
   const downsampled = LTTB(dataForDownsampling, maxStates);
+  console.timeEnd(`getDeviceFeaturesAggregates.downsamplingData(${selector})`);
 
   // @ts-ignore
-  return downsampled.map((e) => {
+  const values = downsampled.map((e) => {
     return {
       created_at: e[0],
       value: e[1],
     };
   });
+
+  return {
+    deviceFeature: {
+      name: deviceFeature.name,
+    },
+    values,
+  };
 }
 
 module.exports = {

@@ -92,13 +92,13 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/device_feature/:device_feature_selector/aggregated_states getDeviceFeaturesAggregated
+   * @api {get} /api/v1/device_feature/aggregated_states getDeviceFeaturesAggregated
    * @apiName getDeviceFeaturesAggregated
    * @apiGroup Device
    */
   async function getDeviceFeaturesAggregated(req, res) {
-    const states = await gladys.device.getDeviceFeaturesAggregates(
-      req.params.device_feature_selector,
+    const states = await gladys.device.getDeviceFeaturesAggregatesMulti(
+      req.query.device_features.split(','),
       req.query.interval,
       req.query.max_states,
     );
