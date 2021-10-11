@@ -305,6 +305,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
+  SIGNAL: 'signal',
   UNKNOWN: 'unknown',
 };
 
@@ -363,6 +364,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   BUTTON: {
     CLICK: 'click',
+  },
+  SIGNAL: {
+    QUALITY: 'integer',
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',
