@@ -28,6 +28,8 @@ const notNullNotUndefined = value => {
   return value !== undefined && value !== null;
 };
 
+const average = arr => arr.reduce((p, c) => p + c, 0) / arr.length;
+
 const roundWith2DecimalIfNeeded = value => {
   if (!notNullNotUndefined(value)) {
     return null;
@@ -39,20 +41,20 @@ const roundWith2DecimalIfNeeded = value => {
   return parseFloat(value).toFixed(2);
 };
 
-const calculateVariation = (firstElement, lastElement) => {
-  if (!notNullNotUndefined(firstElement) || !notNullNotUndefined(lastElement)) {
+const calculateVariation = (firstValue, lastValue) => {
+  if (!notNullNotUndefined(firstValue) || !notNullNotUndefined(lastValue)) {
     return null;
   }
-  if (firstElement.value === 0 && lastElement.value === 0) {
+  if (firstValue === 0 && lastValue === 0) {
     return 0;
   }
-  if (firstElement.value === 0 && lastElement.value > firstElement.value) {
+  if (firstValue === 0 && lastValue > firstValue) {
     return Infinity;
   }
-  if (firstElement.value === 0 && lastElement.value < firstElement.value) {
+  if (firstValue === 0 && lastValue < firstValue) {
     return -Infinity;
   }
-  return Math.round(((lastElement.value - firstElement.value) / Math.abs(firstElement.value)) * 100);
+  return Math.round(((lastValue - firstValue) / Math.abs(firstValue)) * 100);
 };
 
 class Chartbox extends Component {
@@ -107,38 +109,49 @@ class Chartbox extends Component {
     this.getData();
   };
   getData = async () => {
+    if (!this.props.box.device_features) {
+      return;
+    }
     await this.setState({ loading: true });
     try {
-      const data = await this.props.httpClient.get(
-        `/api/v1/device_feature/${this.props.box.device_feature}/aggregated_states`,
-        {
-          interval: this.state.interval,
-          max_states: 100
-        }
-      );
-      const series = [
-        {
-          name: this.props.box.title,
-          data: []
-        }
-      ];
-      const labels = [];
-      data.forEach(point => {
-        series[0].data.push(point.value);
-        labels.push(point.created_at);
+      const data = await this.props.httpClient.get(`/api/v1/device_feature/aggregated_states`, {
+        interval: this.state.interval,
+        max_states: 100,
+        device_features: this.props.box.device_features.join(',')
+      });
+      const series = data.map(oneFeature => {
+        return {
+          name: oneFeature.deviceFeature.name,
+          data: oneFeature.values.map(value => ({
+            x: value.created_at,
+            y: value.value
+          }))
+        };
       });
 
       const newState = {
         series,
-        labels,
+        labels: [],
         loading: false
       };
 
       if (data.length > 0) {
-        const firstElement = data[0];
-        const lastElement = data[data.length - 1];
-        newState.variation = calculateVariation(firstElement, lastElement);
-        newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
+        const lastValuesArray = [];
+        const variationArray = [];
+        data.forEach(oneFeature => {
+          const { values } = oneFeature;
+          if (values.length === 0) {
+            return;
+          }
+          const firstElement = values[0];
+          const lastElement = values[values.length - 1];
+          const variation = calculateVariation(firstElement.value, lastElement.value);
+          const lastValue = lastElement.value;
+          variationArray.push(variation);
+          lastValuesArray.push(lastValue);
+        });
+        newState.variation = average(variationArray);
+        newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
       }
 
       await this.setState(newState);
@@ -177,13 +190,13 @@ class Chartbox extends Component {
   }
   async componentDidUpdate(previousProps) {
     const intervalChanged = get(previousProps, 'box.interval') !== get(this.props, 'box.interval');
-    const deviceFeatureChanged = get(previousProps, 'box.device_feature') !== get(this.props, 'box.device_feature');
+    const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
     const titleChanged = get(previousProps, 'box.title') !== get(this.props, 'box.title');
     const unitChanged = get(previousProps, 'box.unit') !== get(this.props, 'box.unit');
     if (intervalChanged) {
       await this.updateInterval(this.props.box.interval);
     }
-    if (intervalChanged || deviceFeatureChanged || titleChanged || unitChanged) {
+    if (intervalChanged || deviceFeaturesChanged || titleChanged || unitChanged) {
       this.getData();
     }
   }
@@ -195,19 +208,12 @@ class Chartbox extends Component {
     );
   }
   render(props, { loading, series, labels, dropdown, variation, lastValueRounded, interval }) {
-    const smallBox = interval === ONE_HOUR_IN_MINUTES;
+    const displayVariation = props.box.display_variation;
     return (
       <div class="card">
         <div class="card-body">
           <div class="d-flex align-items-center">
-            <div
-              class={cx({
-                [style.subheader]: smallBox,
-                [style.subheaderBig]: !smallBox
-              })}
-            >
-              {props.box.title}
-            </div>
+            <div class={cx(style.subheader)}>{props.box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               <div class="dropdown">
                 <a class="dropdown-toggle text-muted" onClick={this.toggleDropdown}>
@@ -275,9 +281,10 @@ class Chartbox extends Component {
               </div>
             </div>
           </div>
-          {smallBox && (
+
+          {displayVariation && (
             <div class="d-flex align-items-baseline">
-              {notNullNotUndefined(lastValueRounded) && (
+              {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                 <div class="h1 mb-0 mr-2">
                   {lastValueRounded}
                   {props.box.unit !== undefined && <Text id={`deviceFeatureUnitShort.${props.box.unit}`} />}
@@ -290,9 +297,9 @@ class Chartbox extends Component {
                   [style.textRed]: variation < 0
                 })}
               >
-                {labels && labels.length > 0 && (
+                {series && series.length > 0 && variation !== undefined && (
                   <span class="d-inline-flex align-items-center lh-1">
-                    {variation}
+                    {roundWith2DecimalIfNeeded(variation)}
                     <Text id="global.percent" />
                     {variation > 0 && (
                       <svg
@@ -352,13 +359,13 @@ class Chartbox extends Component {
               </div>
             </div>
           )}
-          {labels && labels.length > 0 && props.box.display_axes === true && (
+          {series && series.length > 0 && props.box.display_axes === true && (
             <div class="mt-4">
               <ApexChartComponent
                 series={series}
                 interval={interval}
                 user={props.user}
-                size={smallBox ? 'small' : 'big'}
+                size={'big'}
                 labels={labels}
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}
@@ -367,10 +374,18 @@ class Chartbox extends Component {
           )}
         </div>
 
-        <div class={loading ? 'dimmer active' : 'dimmer'}>
+        <div
+          class={cx('dimmer', {
+            active: loading
+          })}
+        >
           <div class="loader" />
-          <div class="dimmer-content">
-            {labels && labels.length === 0 && (
+          <div
+            class={cx('dimmer-content', {
+              [style.minSizeChartLoading]: loading
+            })}
+          >
+            {series && series.length === 0 && (
               <div
                 class={cx('text-center', {
                   [style.smallEmptyState]: smallBox,
@@ -384,12 +399,12 @@ class Chartbox extends Component {
                 </div>
               </div>
             )}
-            {labels && labels.length > 0 && props.box.display_axes === false && (
+            {series && series.length > 0 && props.box.display_axes === false && (
               <ApexChartComponent
                 series={series}
                 interval={interval}
                 user={props.user}
-                size={smallBox ? 'small' : 'big'}
+                size={'big'}
                 labels={labels}
                 chart_type={props.box.chart_type}
                 display_axes={props.box.display_axes}

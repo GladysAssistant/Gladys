@@ -266,6 +266,7 @@
         "bar": "Bar",
         "stepline": "Step Line",
         "displayAxes": "Display axes?",
+        "displayVariation": "Display variation?",
         "yes": "Yes",
         "no": "No",
         "preview": "Preview"
@@ -1534,7 +1535,7 @@
     "hectoPascal": "hPa",
     "lux": "lx",
     "watt": "W",
-    "kilowatt": "KW",
+    "kilowatt": "kW",
     "kilowatt-hour": "kWh",
     "ampere": "A",
     "volt": "V",

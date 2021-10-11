@@ -23,6 +23,10 @@
   color: #656d77;
 }
 
+.minSizeChartLoading {
+  min-height: 8rem;
+}
+
 .meAuto {
   margin-right: auto !important;
 }
