@@ -71,11 +71,9 @@ class RtspCameraBox extends Component {
   updateCameraRotation = e => {
     let newValue;
     if (e.target.checked) {
-      newValue = 1;
-      console.log('Je suis actif');
+      newValue = '1';
     } else {
-      newValue = 0;
-      console.log('Je suis inactif');
+      newValue = '0';
     }
     this.props.updateCameraRotation(this.props.cameraIndex, newValue);
   };
@@ -191,7 +189,6 @@ class RtspCameraBox extends Component {
                       checked={props.camera.cameraRotation.value === '1'}
                       onClick={this.updateCameraRotation}
                     />
-                    {console.log(props.camera.cameraRotation.value)}
                     <span class="custom-switch-indicator" />
                     <span class="custom-switch-description">
                       <Text id="integration.rtspCamera.rotate180Label" />
