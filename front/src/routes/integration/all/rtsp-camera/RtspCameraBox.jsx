@@ -69,12 +69,7 @@ class RtspCameraBox extends Component {
     this.props.updateCameraUrl(this.props.cameraIndex, e.target.value);
   };
   updateCameraRotation = e => {
-    let newValue;
-    if (e.target.checked) {
-      newValue = '1';
-    } else {
-      newValue = '0';
-    }
+    const newValue = e.target.checked ? '1' : '0';
     this.props.updateCameraRotation(this.props.cameraIndex, newValue);
   };
   updateCameraRoom = e => {
