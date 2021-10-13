@@ -111,6 +111,8 @@ describe('room.getBySelector', () => {
       expect(device).to.have.property('name');
       expect(device).to.have.property('selector');
       expect(device).to.have.property('features');
+      expect(device).to.have.property('service');
+      expect(device.service).to.have.property('name');
     });
   });
   it('should return room not found', async () => {
@@ -153,6 +155,8 @@ describe('room.get', () => {
         expect(oneDevice).to.have.property('name');
         expect(oneDevice).to.have.property('selector');
         expect(oneDevice).to.have.property('features');
+        expect(oneDevice).to.have.property('service');
+        expect(oneDevice.service).to.have.property('name');
         expect(oneDevice).not.to.have.property('id');
         expect(oneDevice).not.to.have.property('room_id');
         expect(oneDevice).not.to.have.property('created_at');
