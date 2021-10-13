@@ -5,6 +5,8 @@ import actions from '../../../actions/dashboard/boxes/temperatureInRoom';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import get from 'get-value';
 
+const isNotNullOrUndefined = value => value !== undefined && value !== null;
+
 const RoomTemperatureBox = ({ children, ...props }) => (
   <div class="card p-3">
     <div class="d-flex align-items-center">
@@ -12,13 +14,13 @@ const RoomTemperatureBox = ({ children, ...props }) => (
         <i class="fe fe-thermometer" />
       </span>
       <div>
-        {props.temperature && (
+        {isNotNullOrUndefined(props.temperature) && (
           <h4 class="m-0">
             <Text id="global.degreeValue" fields={{ value: Math.round(props.temperature) }} />
             {props.unit === 'celsius' ? 'C' : 'F'}
           </h4>
         )}
-        {!props.temperature && (
+        {!isNotNullOrUndefined(props.temperature) && (
           <p class="m-0">
             <Text id="dashboard.boxes.temperatureInRoom.noTemperatureRecorded" />
           </p>
