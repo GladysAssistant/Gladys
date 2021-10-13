@@ -7,7 +7,15 @@ import get from 'get-value';
 import BaseEditBox from '../baseEditBox';
 import Chart from './Chart';
 import { getDeviceFeatureName } from '../../../utils/device';
+import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
+
+const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
+  [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
+  [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true,
+  [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: true,
+  [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: true
+};
 
 class EditChart extends Component {
   updateDefaultInterval = e => {
@@ -82,7 +90,10 @@ class EditChart extends Component {
             label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
           this.deviceFeatureBySelector.set(feature.selector, feature);
-          deviceFeaturesOptions.push(featureOption);
+          // We don't support all devices for this view
+          if (!FEATURES_THAT_ARE_NOT_COMPATIBLE[feature.type]) {
+            deviceFeaturesOptions.push(featureOption);
+          }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);
           }
