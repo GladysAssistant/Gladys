@@ -18,7 +18,8 @@ const DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES = {
   zigbee2mqtt: true,
   zwave: true,
   ewelink: true,
-  tasmota: true
+  tasmota: true,
+  bluetooth: true
 };
 
 const getDeviceFeatureName = (dictionnary, device, deviceFeature) => {
