@@ -12,6 +12,5 @@ function metadataUpdate(zwaveNode) {
 }
 
 module.exports = {
-    metadataUpdate,
-  };
-  
+  metadataUpdate,
+};

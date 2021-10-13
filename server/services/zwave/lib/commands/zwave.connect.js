@@ -29,6 +29,9 @@ async function connect(driverPath) {
     logConfig: {
       level: 'info',
     },
+    /* storage: {
+      cacheDir: '/home/rpochet/Public/Gladys/zwave-js/cache',
+    } */
   });
   this.driver.on('error', (e) => {
     logger.debug(`ZWave Error: [${e.name}] ${e.message}`);

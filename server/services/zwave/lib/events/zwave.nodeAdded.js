@@ -12,11 +12,6 @@ function nodeAdded(zwaveNode) {
   logger.debug(`Zwave : Node Added, nodeId = ${nodeId}`);
 
   this.nodes[nodeId] = {
-    product: `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`,
-    type: zwaveNode.nodeType,
-    firmwareVersion: zwaveNode.firmwareVersion,
-    name: `${zwaveNode.name || zwaveNode.label || `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`} (${nodeId})`,
-    location: zwaveNode.location,
     classes: {},
     ready: false,
   };

@@ -15,6 +15,7 @@ const createGithubUrl = node => {
     product: rawZwaveNode.product,
     producttype: rawZwaveNode.producttype,
     productid: rawZwaveNode.productid,
+    deviceDatabaseUrl: rawZwaveNode.deviceDatabaseUrl,
     classes: rawZwaveNode.keysClasses
   };
   const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.manufacturer} ${rawZwaveNode.product}"`);
@@ -138,6 +139,15 @@ class ZwaveNode extends Component {
                       onClick={displayRawNode(props.node)}
                     >
                       <Text id="integration.zwave.setup.createGithubIssue" />
+                    </a>
+                  </div>
+                  <div>
+                    <a
+                      href={props.node.deviceDatabaseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Text id="integration.zwave.setup.deviceDatabaseUrl" />
                     </a>
                   </div>
                 </div>

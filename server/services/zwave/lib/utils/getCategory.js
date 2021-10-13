@@ -24,10 +24,7 @@ function getCategory(node, value) {
     const category = CATEGORIES[i];
     const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.commandClass) : true;
     const validEndpoint = category.INDEXES ? category.INDEXES.includes(value.endpoint) : true;
-    const invalidProperty = category.EXCLUDED_PROPERTIES
-      ? category.EXCLUDED_PROPERTIES.includes(value.property)
-      : false;
-    const validProperty = !invalidProperty && category.PROPERTIES ? category.PROPERTIES.includes(value.property) : true;
+    const validProperty = category.PROPERTIES ? category.PROPERTIES.includes(value.property) : true;
     const validProductId = category.PRODUCT_IDS ? category.PRODUCT_IDS.includes(node.productid) : true;
     const validProductType = category.PRODUCT_TYPES ? category.PRODUCT_TYPES.includes(node.producttype) : true;
     found = validComClass && validEndpoint && validProperty && validProductId && validProductType;

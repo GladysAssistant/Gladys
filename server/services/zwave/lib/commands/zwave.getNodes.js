@@ -33,6 +33,7 @@ function getNodes() {
           type: node.type,
           product: node.product,
           keysClasses: Object.keys(node.classes),
+          deviceDatabaseUrl: node.deviceDatabaseUrl,
         },
         features: [],
         params: [],
@@ -64,11 +65,7 @@ function getNodes() {
                   min,
                   max,
                 });
-              } else if (
-                value[inst].commandClass !== 112 &&
-                value[inst].commandClass !== 114 &&
-                value[inst].commandClass !== 134
-              ) {
+              } else {
                 logger.info(`Unkown category/type for ${JSON.stringify(value[inst])}`);
               }
             } else {
