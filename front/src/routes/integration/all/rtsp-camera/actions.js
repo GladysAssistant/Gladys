@@ -94,7 +94,7 @@ function createActions(store) {
             },
             cameraRotation: {
               name: 'CAMERA_ROTATION',
-              value: null
+              value: '0'
             },
             features: [
               {
@@ -117,7 +117,7 @@ function createActions(store) {
               },
               {
                 name: 'CAMERA_ROTATION',
-                value: null
+                value: '0'
               }
             ]
           }
@@ -190,6 +190,14 @@ function createActions(store) {
       const camera = state.rtspCameras[index];
       camera.features[0].name = camera.name;
       const newCamera = await state.httpClient.post(`/api/v1/device`, camera);
+      const cameraUrlParam = newCamera.params.find(param => param.name === 'CAMERA_URL');
+      if (cameraUrlParam) {
+        newCamera.cameraUrl = cameraUrlParam;
+      }
+      const cameraRotationParam = newCamera.params.find(param => param.name === 'CAMERA_ROTATION');
+      if (cameraRotationParam) {
+        newCamera.cameraRotation = cameraRotationParam;
+      }
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           $set: newCamera
