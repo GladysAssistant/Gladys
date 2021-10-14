@@ -1,4 +1,4 @@
-const { Op, fn, col } = require('sequelize');
+const { Op, fn, col, literal } = require('sequelize');
 const { LTTB } = require('downsample');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
@@ -13,13 +13,9 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * device.getDeviceFeaturesAggregates('test-devivce');
  */
 async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxStates = 100) {
-  console.time(`getDeviceFeaturesAggregates.findingDeviceFeatureInDb(${selector})`);
-  const deviceFeature = await db.DeviceFeature.findOne({
-    where: {
-      selector,
-    },
-  });
-  console.timeEnd(`getDeviceFeaturesAggregates.findingDeviceFeatureInDb(${selector})`);
+  console.time(`getDeviceFeaturesAggregates.findingDeviceFeatureInRAM(${selector})`);
+  const deviceFeature = this.stateManager.get('deviceFeature', selector);
+  console.timeEnd(`getDeviceFeaturesAggregates.findingDeviceFeatureInRAM(${selector})`);
 
   if (deviceFeature === null) {
     throw new NotFoundError('DeviceFeature not found');
@@ -29,6 +25,7 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
   const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
   const thirthyHoursAgo = new Date(now.getTime() - 30 * 60 * 60 * 1000);
+  const tenHoursAgo = new Date(now.getTime() - 10 * 60 * 60 * 1000);
   const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
 
   let type;
@@ -40,10 +37,14 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   } else if (intervalDate < fiveDaysAgo) {
     type = 'daily';
     groupByFunction = fn('date', col('created_at'));
-    // groupByFunction = fn('strftime', '%Y-%m-%d %H:00:00', col('created_at'));
   } else if (intervalDate < thirthyHoursAgo) {
     type = 'hourly';
     groupByFunction = fn('strftime', '%Y-%m-%d %H:00:00', col('created_at'));
+  } else if (intervalDate < tenHoursAgo) {
+    type = 'hourly';
+    // this will extract date rounded to the 5 minutes
+    // So if the user queries 24h, he'll get 24 * 12 = 288 items
+    groupByFunction = literal(`datetime(strftime('%s', created_at) - strftime('%s', created_at) % 300, 'unixepoch')`);
   } else {
     type = 'live';
   }
@@ -77,6 +78,9 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
         },
       },
     });
+    console.log(
+      `getDeviceFeaturesAggregates: Aggregate by ${type}, from ${intervalDate}, ${rows.length} rows returned`,
+    );
     console.timeEnd(`getDeviceFeaturesAggregates.gettingRowsFromAggregatedDb(${selector})`);
   }
 

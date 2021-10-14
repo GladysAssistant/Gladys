@@ -46,7 +46,13 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable);
     await device.calculateAggregate('hourly');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 60, 100);
     expect(values).to.have.lengthOf(100);
@@ -56,7 +62,13 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable);
     await device.calculateAggregate('hourly');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100);
     expect(values).to.have.lengthOf(100);
@@ -66,7 +78,13 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable);
     await device.calculateAggregate('hourly');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 3 * 24 * 60, 100);
     expect(values).to.have.lengthOf(72);
@@ -76,7 +94,13 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable);
     await device.calculateAggregate('hourly');
     await device.calculateAggregate('daily');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 30 * 24 * 60, 100);
@@ -87,7 +111,13 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable);
     await device.calculateAggregate('hourly');
     await device.calculateAggregate('daily');
     await device.calculateAggregate('monthly');
@@ -98,7 +128,10 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const stateManager = {
+      get: fake.returns(null),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable);
     const promise = device.getDeviceFeaturesAggregates('this-device-does-not-exist', 365 * 24 * 60, 100);
     return assert.isRejected(promise, 'DeviceFeature not found');
   });
