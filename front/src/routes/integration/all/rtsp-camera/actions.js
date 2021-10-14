@@ -12,6 +12,17 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
+    async getRstpCameraParams(camera) {
+      const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
+      if (cameraUrlParam) {
+        camera.cameraUrl = cameraUrlParam;
+      }
+      const cameraRotationParam = camera.params.find(param => param.name === 'CAMERA_ROTATION');
+      if (cameraRotationParam) {
+        camera.cameraRotation = cameraRotationParam;
+      }
+      return camera;
+    },
     async getRtspCameraDevices(state) {
       store.setState({
         getRtspCameraStatus: RequestStatus.Getting
@@ -24,16 +35,9 @@ function createActions(store) {
           options.search = state.rtspCameraSearch;
         }
         const rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
-        // find camera url
+        // find camera params
         rtspCameras.forEach(camera => {
-          const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
-          if (cameraUrlParam) {
-            camera.cameraUrl = cameraUrlParam;
-          }
-          const cameraRotationParam = camera.params.find(param => param.name === 'CAMERA_ROTATION');
-          if (cameraRotationParam) {
-            camera.cameraRotation = cameraRotationParam;
-          }
+          camera = actions.getRstpCameraParams(camera);
         });
         store.setState({
           rtspCameras,
@@ -66,7 +70,8 @@ function createActions(store) {
       }
     },
     async createOrUpdateCamera(state, index) {
-      const camera = await state.httpClient.post(`/api/v1/device`, state.rtspCameras[index]);
+      let camera = await state.httpClient.post(`/api/v1/device`, state.rtspCameras[index]);
+      camera = actions.getRstpCameraParams(camera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           $set: camera
@@ -189,15 +194,8 @@ function createActions(store) {
     async saveCamera(state, index) {
       const camera = state.rtspCameras[index];
       camera.features[0].name = camera.name;
-      const newCamera = await state.httpClient.post(`/api/v1/device`, camera);
-      const cameraUrlParam = newCamera.params.find(param => param.name === 'CAMERA_URL');
-      if (cameraUrlParam) {
-        newCamera.cameraUrl = cameraUrlParam;
-      }
-      const cameraRotationParam = newCamera.params.find(param => param.name === 'CAMERA_ROTATION');
-      if (cameraRotationParam) {
-        newCamera.cameraRotation = cameraRotationParam;
-      }
+      let newCamera = await state.httpClient.post(`/api/v1/device`, camera);
+      newCamera = await actions.getRstpCameraParams(newCamera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           $set: newCamera
