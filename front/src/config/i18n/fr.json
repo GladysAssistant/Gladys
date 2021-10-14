@@ -263,7 +263,7 @@
         "chartType": "Sélectionner le type de graphique",
         "line": "Ligne",
         "area": "Aire",
-        "bar": "Barre",
+        "bar": "Histogramme",
         "stepline": "Ligne droite",
         "displayAxes": "Afficher les axes ?",
         "displayVariation": "Afficher la variation ?",
