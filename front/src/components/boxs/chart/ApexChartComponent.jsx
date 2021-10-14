@@ -5,9 +5,7 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 dayjs.extend(localizedFormat);
 
-//const COLORS = ['#206bc4'];
 const COLORS = ['#206bc4', '#FF7878', '#E0C097', '#F7D59C'];
-//const COLORS = ['#206bc4', '#9D84B7', '#B2F9FC', '#D5D5D5'];
 
 class ApexChartComponent extends Component {
   chartRef = createRef();
@@ -96,7 +94,8 @@ class ApexChartComponent extends Component {
       },
       colors: COLORS,
       legend: {
-        show: false
+        show: this.props.display_axes,
+        position: 'bottom'
       }
     };
     this.addDateFormatter(options);
@@ -166,7 +165,8 @@ class ApexChartComponent extends Component {
       },
       colors: COLORS,
       legend: {
-        show: false
+        show: this.props.display_axes,
+        position: 'bottom'
       }
     };
 
@@ -206,8 +206,7 @@ class ApexChartComponent extends Component {
         opacity: 1
       },
       stroke: {
-        width: [2, 1],
-        dashArray: [0, 3],
+        width: 2,
         lineCap: 'round',
         curve: 'smooth'
       },
@@ -238,7 +237,8 @@ class ApexChartComponent extends Component {
       },
       colors: COLORS,
       legend: {
-        show: false
+        show: this.props.display_axes,
+        position: 'bottom'
       }
     };
     this.addDateFormatter(options);
@@ -306,7 +306,8 @@ class ApexChartComponent extends Component {
       },
       colors: COLORS,
       legend: {
-        show: false
+        show: this.props.display_axes,
+        position: 'bottom'
       }
     };
     this.addDateFormatter(options);

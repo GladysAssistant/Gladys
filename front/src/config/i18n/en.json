@@ -269,7 +269,8 @@
         "displayVariation": "Display variation?",
         "yes": "Yes",
         "no": "No",
-        "preview": "Preview"
+        "preview": "Preview",
+        "showPreviewButton": "Show preview"
       }
     }
   },

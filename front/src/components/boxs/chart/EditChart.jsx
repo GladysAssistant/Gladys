@@ -18,6 +18,12 @@ const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
 };
 
 class EditChart extends Component {
+  showPreview = () => {
+    this.setState({
+      displayPreview: true
+    });
+  };
+
   updateDefaultInterval = e => {
     if (e.target.value && e.target.value.length) {
       this.props.updateBoxConfig(this.props.x, this.props.y, { interval: e.target.value });
@@ -138,7 +144,7 @@ class EditChart extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
+  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview }) {
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart">
         <div class={loading ? 'dimmer active' : 'dimmer'}>
@@ -262,7 +268,14 @@ class EditChart extends Component {
               <label>
                 <Text id="dashboard.boxes.chart.preview" />
               </label>
-              <Chart box={props.box} />
+              {displayPreview && <Chart box={props.box} />}
+              {!displayPreview && (
+                <div>
+                  <button class="btn btn-secondary" onClick={this.showPreview}>
+                    <Text id="dashboard.boxes.chart.showPreviewButton" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
