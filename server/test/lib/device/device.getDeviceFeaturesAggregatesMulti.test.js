@@ -46,7 +46,13 @@ describe('Device.getDeviceFeaturesAggregatesMulti', function Describe() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const stateManager = {
+      get: fake.returns({
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        name: 'my-feature',
+      }),
+    };
+    const device = new Device(event, {}, stateManager, {}, {}, variable);
     await device.calculateAggregate('hourly');
     const response = await device.getDeviceFeaturesAggregatesMulti(['test-device-feature'], 60, 100);
     expect(response).to.be.instanceOf(Array);
