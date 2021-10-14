@@ -31,26 +31,3 @@ describe('POST /api/v1/service/rtsp-camera/camera/test', () => {
     assert.calledWith(rtspCameraService.getImage, device);
   });
 });
-
-describe('POST /api/v1/service/rtsp-camera/camera/test', () => {
-  it('should return an image at 180°', async () => {
-    const device = {
-      params: [
-        {
-          name: 'CAMERA_URL',
-          value: 'test',
-        },
-        {
-          name: 'CAMERA_ROTATION',
-          value: '1',
-        },
-      ],
-    };
-    const rtspCameraController = RtspCameraController(rtspCameraService);
-    const req = {
-      body: device,
-    };
-    await rtspCameraController['post /api/v1/service/rtsp-camera/camera/test'].controller(req, res);
-    assert.calledWith(rtspCameraService.getImage, device);
-  });
-});
