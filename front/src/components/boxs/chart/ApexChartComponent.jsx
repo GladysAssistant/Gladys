@@ -94,7 +94,6 @@ class ApexChartComponent extends Component {
           padding: 4
         }
       },
-      //   labels: this.props.labels,
       colors: COLORS,
       legend: {
         show: false
@@ -165,7 +164,6 @@ class ApexChartComponent extends Component {
           padding: 4
         }
       },
-      //   labels: this.props.labels,
       colors: COLORS,
       legend: {
         show: false
@@ -238,7 +236,6 @@ class ApexChartComponent extends Component {
           padding: 4
         }
       },
-      // labels: this.props.labels,
       colors: COLORS,
       legend: {
         show: false
@@ -307,7 +304,6 @@ class ApexChartComponent extends Component {
           padding: 4
         }
       },
-      // labels: this.props.labels,
       colors: COLORS,
       legend: {
         show: false
@@ -340,20 +336,12 @@ class ApexChartComponent extends Component {
     this.displayChart();
   }
   componentDidUpdate(nextProps) {
-    const labelsDifferent = nextProps.labels !== this.props.labels;
     const seriesDifferent = nextProps.series !== this.props.series;
     const chartTypeDifferent = nextProps.chart_type !== this.props.chart_type;
     const displayAxesDifferent = nextProps.display_axes !== this.props.display_axes;
     const intervalDifferent = nextProps.interval !== this.props.interval;
     const sizeDifferent = nextProps.size !== this.props.size;
-    if (
-      labelsDifferent ||
-      seriesDifferent ||
-      chartTypeDifferent ||
-      displayAxesDifferent ||
-      intervalDifferent ||
-      sizeDifferent
-    ) {
+    if (seriesDifferent || chartTypeDifferent || displayAxesDifferent || intervalDifferent || sizeDifferent) {
       this.displayChart();
     }
   }

@@ -151,7 +151,6 @@ class Chartbox extends Component {
 
       const newState = {
         series,
-        labels: [],
         loading: false,
         emptySeries
       };
@@ -380,7 +379,7 @@ class Chartbox extends Component {
               </div>
             </div>
           )}
-          {emptySeries === false && props.box.display_axes === true && (
+          {emptySeries === false && props.box.display_axes && (
             <div class="mt-4">
               <ApexChartComponent
                 series={series}
@@ -414,7 +413,7 @@ class Chartbox extends Component {
                 </div>
               </div>
             )}
-            {emptySeries === false && props.box.display_axes === false && (
+            {emptySeries === false && !props.box.display_axes && (
               <ApexChartComponent
                 series={series}
                 interval={interval}
