@@ -12,7 +12,7 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async getRstpCameraParams(camera) {
+    async complete(camera) {
       const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
       if (cameraUrlParam) {
         camera.cameraUrl = cameraUrlParam;
@@ -37,7 +37,7 @@ function createActions(store) {
         const rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
         // find camera params
         rtspCameras.forEach(camera => {
-          camera = actions.getRstpCameraParams(camera);
+          camera = actions.complete(camera);
         });
         store.setState({
           rtspCameras,
@@ -71,7 +71,7 @@ function createActions(store) {
     },
     async createOrUpdateCamera(state, index) {
       let camera = await state.httpClient.post(`/api/v1/device`, state.rtspCameras[index]);
-      camera = actions.getRstpCameraParams(camera);
+      camera = actions.complete(camera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           $set: camera
@@ -195,7 +195,7 @@ function createActions(store) {
       const camera = state.rtspCameras[index];
       camera.features[0].name = camera.name;
       let newCamera = await state.httpClient.post(`/api/v1/device`, camera);
-      newCamera = await actions.getRstpCameraParams(newCamera);
+      newCamera = await actions.complete(newCamera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           $set: newCamera
