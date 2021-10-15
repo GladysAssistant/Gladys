@@ -346,6 +346,17 @@ const SCENE_VALUES = {
   1: BUTTON_STATUS.LONG_CLICK_RELEASE,
 };
 
+const NODE_STATES = {
+  ALIVE: 'alive',
+  DEAD: 'dead',
+  SLEEP: 'sleep',
+  WAKE_UP: 'wakeUp',
+  INTERVIEW_STARTED: 'interviewStarted',
+  INTERVIEW_STAGE_COMPLETED: 'interviewStageCompleted',
+  INTERVIEW_COMPLETED: 'interviewCompleted',
+  INTERVIEW_FAILED: 'interviewFailed',
+};
+
 module.exports = {
   COMMAND_CLASSES,
   PROPERTIES,
@@ -354,4 +365,5 @@ module.exports = {
   UNKNOWN_CATEGORY: DEVICE_FEATURE_CATEGORIES.UNKNOWN,
   UNKNOWN_TYPE: DEVICE_FEATURE_TYPES.SENSOR.UNKNOWN,
   SCENE_VALUES,
+  NODE_STATES,
 };

@@ -142,11 +142,7 @@ class ZwaveNode extends Component {
                     </a>
                   </div>
                   <div>
-                    <a
-                      href={props.node.deviceDatabaseUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href={props.node.deviceDatabaseUrl} target="_blank" rel="noopener noreferrer">
                       <Text id="integration.zwave.setup.deviceDatabaseUrl" />
                     </a>
                   </div>

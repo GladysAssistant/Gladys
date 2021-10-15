@@ -1,55 +1,58 @@
 const logger = require('../../../../utils/logger');
+const { NODE_STATES } = require('../constants');
 
 /**
- * @description When a value is removed.
- * @param {Object} zwaveNode - Node.
- * @param {Object} args - Zwave ValueRemovedArgs.
+ * @description When a node is alive.
+ * @param {Object} zwaveNode - ZWave Node.
  * @example
- * zwave.on('value removed', this.valueRemoved);
+ * zwave.on('alive', this.nodeAlive);
  */
-function nodeAlive(zwaveNode, args) {
+function nodeAlive(zwaveNode) {
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
-  logger.debug(`Zwave : Node is alive, nodeId = ${nodeId}`);
+  logger.debug(`Node is alive, nodeId = ${nodeId}`);
   node.ready = true;
+  node.state = NODE_STATES.ALIVE;
 }
 
 /**
- * @description When a value is dead.
+ * @description When a node is dead.
  * @param {Object} zwaveNode - Zwave Node.
- * @param {Object} args - Zwave ValueRemovedArgs.
  * @example
- * zwave.on('value removed', this.valueRemoved);
+ * zwave.on('dead', this.nodeDead);
  */
-function nodeDead(zwaveNode, args) {
+function nodeDead(zwaveNode) {
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
-  logger.debug(`Zwave : Node is dead, nodeId = ${nodeId}`);
+  logger.debug(`Node is dead, nodeId = ${nodeId}`);
   node.ready = false;
+  node.state = NODE_STATES.DEAD;
 }
 
 /**
  * @description When a value go to sleep.
  * @param {Object} zwaveNode - Zwave Node.
- * @param {Object} args - Zwave ValueRemovedArgs.
  * @example
- * zwave.on('value removed', this.valueRemoved);
+ * zwave.on('sleep', this.nodeSleep);
  */
-function nodeSleep(zwaveNode, args) {
+function nodeSleep(zwaveNode) {
   const nodeId = zwaveNode.id;
-  logger.debug(`Zwave : Node Sleep, nodeId = ${nodeId}`);
+  const node = this.nodes[nodeId];
+  logger.debug(`Node Sleep, nodeId = ${nodeId}`);
+  node.state = NODE_STATES.SLEEP;
 }
 
 /**
  * @description When a value wakes up.
  * @param {Object} zwaveNode - Zwave Node.
- * @param {Object} args - Zwave ValueRemovedArgs.
  * @example
- * zwave.on('value removed', this.valueRemoved);
+ * zwave.on('wake up', this.nodeWakeUp);
  */
-function nodeWakeUp(zwaveNode, args) {
+function nodeWakeUp(zwaveNode) {
   const nodeId = zwaveNode.id;
-  logger.debug(`Zwave : Node WakeUp, nodeId = ${nodeId}`);
+  const node = this.nodes[nodeId];
+  logger.debug(`Node WakeUp, nodeId = ${nodeId}`);
+  node.state = NODE_STATES.WAKE_UP;
 }
 
 module.exports = {
