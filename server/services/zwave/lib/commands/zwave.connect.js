@@ -1,4 +1,5 @@
 const os = require('os');
+const path = require('path');
 const logger = require('../../../../utils/logger');
 
 const { driverReady } = require('../events/zwave.driverReady');
@@ -27,11 +28,14 @@ async function connect(driverPath) {
   this.ready = false;
   this.driver = new this.ZWaveJS.Driver(driverPath, {
     logConfig: {
-      level: 'info',
+      level: 'debug',
+      logToFile: true,
+      filename: path.resolve(this.gladys.config.servicesFolder('zwave'), 'logs', `zwave-${process.pid}.log`),
+      forceConsole: true,
     },
-    /* storage: {
-      cacheDir: '/home/rpochet/Public/Gladys/zwave-js/cache',
-    } */
+    storage: {
+      cacheDir: path.resolve(this.gladys.config.servicesFolder('zwave'), 'cache'),
+    },
   });
   this.driver.on('error', (e) => {
     logger.debug(`ZWave Error: [${e.name}] ${e.message}`);
