@@ -1565,6 +1565,10 @@
       "shortCategoryName": "Capteur température",
       "decimal": "Température"
     },
+    "device-temperature-sensor": {
+      "shortCategoryName": "Température de l'appareil",
+      "decimal": "Température"
+    },
     "motion-sensor": {
       "shortCategoryName": "Détecteur de mouvement",
       "push": "Détecteur de mouvement",
@@ -1708,6 +1712,7 @@
     "nameLabel": "Nom",
     "roomLabel": "Pièce",
     "featuresLabel": "Fonctionnalités",
+    "featureCategoryLabel": "Catégorie",
     "noFeatures": "Aucune fonctionnalité",
     "namePlaceholder": "Entrez un nom",
     "externalIdLabel": "ID externe",
