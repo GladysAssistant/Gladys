@@ -15,12 +15,11 @@ const { NotFoundError } = require('../../utils/coreErrors');
 async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxStates = 100) {
   console.time(`getDeviceFeaturesAggregates.findingDeviceFeatureInRAM(${selector})`);
   const deviceFeature = this.stateManager.get('deviceFeature', selector);
-  const device = this.stateManager.get('deviceById', deviceFeature.device_id);
-  console.timeEnd(`getDeviceFeaturesAggregates.findingDeviceFeatureInRAM(${selector})`);
-
   if (deviceFeature === null) {
     throw new NotFoundError('DeviceFeature not found');
   }
+  const device = this.stateManager.get('deviceById', deviceFeature.device_id);
+  console.timeEnd(`getDeviceFeaturesAggregates.findingDeviceFeatureInRAM(${selector})`);
 
   const now = new Date();
   const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
