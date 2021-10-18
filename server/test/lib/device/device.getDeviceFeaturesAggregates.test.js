@@ -52,10 +52,16 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
         name: 'my-feature',
       }),
     };
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
-    await device.calculateAggregate('hourly');
-    const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 60, 100);
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable);
+    await deviceInstance.calculateAggregate('hourly');
+    const { values, device, deviceFeature } = await deviceInstance.getDeviceFeaturesAggregates(
+      'test-device-feature',
+      60,
+      100,
+    );
     expect(values).to.have.lengthOf(100);
+    expect(device).to.have.property('name');
+    expect(deviceFeature).to.have.property('name');
   });
   it('should return last day states', async () => {
     await insertStates(48 * 60);

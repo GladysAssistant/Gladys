@@ -138,7 +138,7 @@ class Chartbox extends Component {
 
       const series = data.map(oneFeature => {
         return {
-          name: oneFeature.deviceFeature.name,
+          name: oneFeature.device.name,
           data: oneFeature.values.map(value => {
             emptySeries = false;
             return {
