@@ -9,26 +9,6 @@ module.exports = {
     max: 1,
   },
   names: {
-    /*
-    auto_lock: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-      },
-    },
-    away_mode: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.FAN,
-        type: DEVICE_FEATURE_TYPES.FAN.BINARY,
-      },
-    },
-    carbon_monoxide: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.MONOXIDE_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-      },
-    },
-    */
     contact: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,

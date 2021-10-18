@@ -29,7 +29,6 @@ function convertDevice(device, serviceId) {
   };
 
   logger.debug(`Device ${name} / model ${model} ${supported ? '' : 'NOT'} managed by Gladys`);
-  logger.debug(gladysDevice);
   return gladysDevice;
 }
 

@@ -41,12 +41,6 @@ module.exports = {
         max: 500,
       },
     },
-    /*
-    confort_temperature: {
-      feature: {
-      },
-    },
-    */
     current: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -76,7 +70,7 @@ module.exports = {
     },
     cpu_temperature: {
       feature: {
-        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        category: DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
         min: -100,
@@ -85,7 +79,7 @@ module.exports = {
     },
     device_temperature: {
       feature: {
-        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        category: DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
         min: -100,
@@ -118,16 +112,6 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
       },
     },
-    /*
-    hue: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-        type: DEVICE_FEATURE_TYPES.LIGHT.HUE,
-        min: 150?,
-        max: 500?,
-      },
-    },
-    */
     humidity: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
@@ -163,17 +147,6 @@ module.exports = {
         max: 150,
       },
     },
-    /*
-    position: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
-        type: DEVICE_FEATURE_TYPES.CURTAIN.POSITION,
-        unit: DEVICE_FEATURE_UNITS.PERCENT,
-        min: 0,
-        max: 100,
-      },
-    },
-    */
     power: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -188,16 +161,6 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.HECTO_PASCAL,
       },
     },
-    /*
-    saturation: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-        type: DEVICE_FEATURE_TYPES.LIGHT.SATURATION,
-        min: 150?,
-        max: 500?,
-      },
-    },
-    */
     temperature: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,

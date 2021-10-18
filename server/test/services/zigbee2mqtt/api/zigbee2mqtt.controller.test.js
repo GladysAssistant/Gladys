@@ -29,16 +29,16 @@ describe('zigbee2mqtt API', () => {
     sinon.reset();
   });
 
-  it('get /api/v1/service/zigbee2mqtt/devices', async () => {
+  it('get /api/v1/service/zigbee2mqtt/device', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
     };
 
-    await controller['get /api/v1/service/zigbee2mqtt/devices'].controller(req, res);
+    await controller['get /api/v1/service/zigbee2mqtt/device'].controller(req, res);
 
     assert.calledOnce(zigbee2mqttManager.getDiscoveredDevices);
-    assert.calledWith(res.json, { devices: ['device'] });
+    assert.calledWith(res.json, ['device']);
   });
 
   it('get /api/v1/service/zigbee2mqtt/status', async () => {

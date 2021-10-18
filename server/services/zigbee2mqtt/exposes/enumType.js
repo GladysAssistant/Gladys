@@ -13,27 +13,5 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.BUTTON.CLICK,
       },
     },
-    /*
-    fan_mode: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.FAN,
-        type: DEVICE_FEATURE_TYPES.FAN.SPEED,
-      },
-    },
-    state: {
-        feature: {
-          category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
-          type: DEVICE_FEATURE_TYPES.CURTAIN.STATE,
-          min: 0,
-          max: 2,
-        },
-    }
-    system_mode: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.FAN,
-        type: DEVICE_FEATURE_TYPES.FAN.MODE,
-      },
-    },
-    */
   },
 };
