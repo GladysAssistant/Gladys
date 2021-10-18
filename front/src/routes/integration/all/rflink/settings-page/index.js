@@ -7,7 +7,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,usbPorts,rflinkPath,rflinkStatus,getRflinkUsbPortStatus,getCurrentRflinkPathStatus,rflinkGetStatusStatus,rflinkFailed,rflinkDisconnectStatus,connectRflinkStatus,RflinkConnectionInProgress,currentMilightGateway,currentMilightZone',
+  'user,session,usbPorts,RflinkPath,rflinkStatus,getRflinkUsbPortStatus,getCurrentRflinkPathStatus,rflinkGetStatusStatus,rflinkFailed,rflinkDisconnectStatus,connectRflinkStatus,RflinkConnectionInProgress,currentMilightGateway,currentMilightZone',
   actions
 )
 class RflinkSettingsPage extends Component {
