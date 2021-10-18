@@ -8,6 +8,7 @@ const DEFAULT_OPTIONS = {
 };
 
 const DEVICE_ATTRIBUTES = ['name', 'selector'];
+
 const DEVICE_FEATURES_ATTRIBUTES = [
   'name',
   'selector',
@@ -20,6 +21,8 @@ const DEVICE_FEATURES_ATTRIBUTES = [
   'last_value',
   'last_value_changed',
 ];
+
+const SERVICE_ATTRIBUTES = ['id', 'name'];
 
 /**
  * @description Get all rooms
@@ -35,11 +38,18 @@ async function get(options) {
       model: db.Device,
       as: 'devices',
       attributes: DEVICE_ATTRIBUTES,
-      include: {
-        model: db.DeviceFeature,
-        as: 'features',
-        attributes: DEVICE_FEATURES_ATTRIBUTES,
-      },
+      include: [
+        {
+          model: db.DeviceFeature,
+          as: 'features',
+          attributes: DEVICE_FEATURES_ATTRIBUTES,
+        },
+        {
+          model: db.Service,
+          as: 'service',
+          attributes: SERVICE_ATTRIBUTES,
+        },
+      ],
     });
   }
   const queryParams = {
