@@ -1602,6 +1602,10 @@
       "shortCategoryName": "Temperature sensor",
       "decimal": "Temperature"
     },
+    "device-temperature-sensor": {
+      "shortCategoryName": "Device temperature sensor",
+      "decimal": "Temperature"
+    },
     "motion-sensor": {
       "shortCategoryName": "Motion sensor",
       "push": "Motion (push)",
@@ -1745,6 +1749,7 @@
     "nameLabel": "Name",
     "roomLabel": "Room",
     "featuresLabel": "Features",
+    "featureCategoryLabel": "Category",
     "noFeatures": "No features",
     "namePlaceholder": "Enter name",
     "externalIdLabel": "External ID",
