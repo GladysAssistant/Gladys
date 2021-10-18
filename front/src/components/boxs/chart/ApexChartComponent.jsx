@@ -2,6 +2,10 @@ import { Component, createRef } from 'preact';
 import ApexCharts from 'apexcharts';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
+import { getApexChartBarOptions } from './ApexChartBarOptions';
+import { getApexChartAreaOptions } from './ApexChartAreaOptions';
+import { getApexChartLineOptions } from './ApexChartLineOptions';
+import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
 
 dayjs.extend(localizedFormat);
 
@@ -31,73 +35,11 @@ class ApexChartComponent extends Component {
     };
   }
   getBarChartOptions = () => {
-    const options = {
-      chart: {
-        type: 'bar',
-        fontFamily: 'inherit',
-        height: this.props.display_axes ? 200 : 100,
-        parentHeightOffset: 0,
-        toolbar: {
-          show: false
-        },
-        sparkline: {
-          enabled: !this.props.display_axes
-        },
-        animations: {
-          enabled: false
-        },
-        stacked: true
-      },
-      plotOptions: {
-        bar: {
-          columnWidth: '100%'
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      fill: {
-        opacity: 1
-      },
+    const options = getApexChartBarOptions({
+      displayAxes: this.props.display_axes,
       series: this.props.series,
-      grid: {
-        padding: {
-          top: -20,
-          right: 0,
-          left: -4,
-          bottom: -4
-        },
-        strokeDashArray: 4,
-        xaxis: {
-          lines: {
-            show: true
-          }
-        }
-      },
-      xaxis: {
-        labels: {
-          padding: 0,
-          datetimeUTC: false
-        },
-        tooltip: {
-          enabled: false
-        },
-        axisBorder: {
-          show: false
-        },
-        type: 'datetime'
-      },
-      yaxis: {
-        labels: {
-          padding: 4
-        }
-      },
-      colors: COLORS,
-      legend: {
-        show: this.props.display_axes,
-        position: 'bottom'
-      }
-    };
+      COLORS
+    });
     this.addDateFormatter(options);
     return options;
   };
@@ -110,66 +52,12 @@ class ApexChartComponent extends Component {
     } else {
       height = 200;
     }
-    const options = {
-      chart: {
-        type: 'area',
-        fontFamily: 'inherit',
-        height,
-        parentHeightOffset: 0,
-        sparkline: {
-          enabled: !this.props.display_axes
-        },
-        toolbar: {
-          show: false
-        },
-        animations: {
-          enabled: false
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      fill: {
-        opacity: 0.16,
-        type: 'solid'
-      },
-      stroke: {
-        width: 2,
-        lineCap: 'round',
-        curve: 'smooth'
-      },
+    const options = getApexChartAreaOptions({
+      height,
       series: this.props.series,
-      grid: {
-        strokeDashArray: 4,
-        padding: {
-          left: -4
-        }
-      },
-      xaxis: {
-        labels: {
-          padding: 0,
-          datetimeUTC: false
-        },
-        tooltip: {
-          enabled: false
-        },
-        axisBorder: {
-          show: false
-        },
-        type: 'datetime'
-      },
-      yaxis: {
-        labels: {
-          padding: 4
-        }
-      },
-      colors: COLORS,
-      legend: {
-        show: this.props.display_axes,
-        position: 'bottom'
-      }
-    };
-
+      displayAxes: this.props.display_axes,
+      COLORS
+    });
     this.addDateFormatter(options);
 
     return options;
@@ -183,64 +71,12 @@ class ApexChartComponent extends Component {
     } else {
       height = 200;
     }
-    const options = {
-      chart: {
-        type: 'line',
-        fontFamily: 'inherit',
-        height,
-        parentHeightOffset: 0,
-        sparkline: {
-          enabled: !this.props.display_axes
-        },
-        toolbar: {
-          show: false
-        },
-        animations: {
-          enabled: false
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      fill: {
-        opacity: 1
-      },
-      stroke: {
-        width: 2,
-        lineCap: 'round',
-        curve: 'smooth'
-      },
-      series: this.props.series,
-      grid: {
-        strokeDashArray: 4,
-        padding: {
-          left: -4
-        }
-      },
-      xaxis: {
-        labels: {
-          padding: 0,
-          datetimeUTC: false
-        },
-        tooltip: {
-          enabled: false
-        },
-        axisBorder: {
-          show: false
-        },
-        type: 'datetime'
-      },
-      yaxis: {
-        labels: {
-          padding: 4
-        }
-      },
-      colors: COLORS,
-      legend: {
-        show: this.props.display_axes,
-        position: 'bottom'
-      }
-    };
+    const options = getApexChartLineOptions({
+      height,
+      COLORS,
+      displayAxes: this.props.display_axes,
+      series: this.props.series
+    });
     this.addDateFormatter(options);
     return options;
   };
@@ -253,63 +89,12 @@ class ApexChartComponent extends Component {
     } else {
       height = 200;
     }
-    const options = {
-      chart: {
-        type: 'line',
-        fontFamily: 'inherit',
-        height,
-        parentHeightOffset: 0,
-        sparkline: {
-          enabled: !this.props.display_axes
-        },
-        toolbar: {
-          show: false
-        },
-        animations: {
-          enabled: false
-        }
-      },
-      dataLabels: {
-        enabled: false
-      },
-      fill: {
-        opacity: 1
-      },
-      stroke: {
-        width: 2,
-        curve: 'stepline'
-      },
-      series: this.props.series,
-      grid: {
-        strokeDashArray: 4,
-        padding: {
-          left: -4
-        }
-      },
-      xaxis: {
-        labels: {
-          padding: 0,
-          datetimeUTC: false
-        },
-        tooltip: {
-          enabled: false
-        },
-        axisBorder: {
-          show: false
-        },
-        type: 'datetime'
-      },
-      yaxis: {
-        labels: {
-          padding: 4
-        }
-      },
-      colors: COLORS,
-      legend: {
-        show: this.props.display_axes,
-        position: 'bottom'
-      }
-    };
+    const options = getApexChartStepLineOptions({
+      height,
+      COLORS,
+      displayAxes: this.props.display_axes,
+      series: this.props.series
+    });
     this.addDateFormatter(options);
     return options;
   };
@@ -326,6 +111,7 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
+    console.log(options);
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
