@@ -85,7 +85,7 @@ const features = {
     read_only: true,
     has_feedback: false,
     min: 0,
-    max: 1000,
+    max: 100000,
     zigbeeField: 'illuminance_lux',
   },
   humidity: {
