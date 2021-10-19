@@ -68,7 +68,6 @@ const FeatureTab = ({ children, ...props }) => (
                         </option>
                       ))
                     )}
-
                   </select>
                   <button
                     onClick={props.addFeature}

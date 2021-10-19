@@ -484,7 +484,6 @@ const DEVICE_FEATURE_TYPES = {
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
-
 };
 
 const DEVICE_FEATURE_UNITS = {

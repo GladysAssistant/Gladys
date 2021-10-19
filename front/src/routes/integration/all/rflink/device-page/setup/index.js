@@ -125,7 +125,6 @@ class RflinkDeviceSetupPage extends Component {
     this.state = {
       loading: true
     };
-
     this.selectFeature = this.selectFeature.bind(this);
     this.addFeature = this.addFeature.bind(this);
     this.deleteFeature = this.deleteFeature.bind(this);
@@ -185,7 +184,7 @@ class RflinkDeviceSetupPage extends Component {
           {...state}
           selectFeature={this.selectFeature}
           addFeature={this.addFeature}
-          allowModifyFeatures={true}
+          allowModifyFeatures={'allowModifyFeatures'}
           deleteFeature={this.deleteFeature}
           updateDeviceProperty={this.updateDeviceProperty}
           updateFeatureProperty={this.updateFeatureProperty}
