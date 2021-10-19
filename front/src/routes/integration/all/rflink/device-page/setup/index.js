@@ -185,6 +185,7 @@ class RflinkDeviceSetupPage extends Component {
           {...state}
           selectFeature={this.selectFeature}
           addFeature={this.addFeature}
+          allowModifyFeatures={true}
           deleteFeature={this.deleteFeature}
           updateDeviceProperty={this.updateDeviceProperty}
           updateFeatureProperty={this.updateFeatureProperty}

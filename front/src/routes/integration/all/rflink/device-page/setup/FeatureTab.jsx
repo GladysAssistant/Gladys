@@ -55,28 +55,30 @@ const FeatureTab = ({ children, ...props }) => (
             <div>
               <RflinkDeviceForm {...props} />
 
-              <div class="form-group form-inline">
-                <select class="form-control" onChange={props.selectFeature}>
-                  <option value="" selected={!props.selectedFeature}>
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  {DEVICE_FEATURE_CATEGORIES_LIST.map(category =>
-                    Object.keys(DeviceFeatureCategoriesIcon[category]).map(type => (
-                      <option value={`${category}|${type}`}>
-                        <Text id={`deviceFeatureCategory.${category}.${type}`} />
-                      </option>
-                    ))
-                  )}
-                </select>
-                <button
-                  onClick={props.addFeature}
-                  class="btn btn-outline-success ml-2"
-                  disabled={!props.selectedFeature}
-                >
-                  <Text id="integration.rflink.feature.addButton" />
-                </button>
-              </div>
+              {props.allowModifyFeatures && (
+                <div class="form-group form-inline">
+                  <select class="form-control" onChange={props.selectFeature}>
+                    <option value="" selected={!props.selectedFeature}>
+                      <Text id="global.emptySelectOption" />
+                    </option>
+                    {DEVICE_FEATURE_CATEGORIES_LIST.map(category =>
+                      Object.keys(DeviceFeatureCategoriesIcon[category]).map(type => (
+                        <option value={`${category}|${type}`}>
+                          <Text id={`deviceFeatureCategory.${category}.${type}`} />
+                        </option>
+                      ))
+                    )}
 
+                  </select>
+                  <button
+                    onClick={props.addFeature}
+                    class="btn btn-outline-success ml-2"
+                    disabled={!props.selectedFeature}
+                  >
+                    <Text id="integration.rflink.feature.addButton" />
+                  </button>
+                </div>
+              )}
               <div class="row">
                 {props.device &&
                   props.device.features.map((feature, index) => (
