@@ -52,7 +52,7 @@ function getNodes() {
               const { category, type } = getCategory(node, value[inst]);
               if (category !== 'unknown') {
                 newDevice.features.push({
-                  name: `${value[inst].label}`,
+                  name: `${value[inst].label} (${node.id})`,
                   selector: slugify(
                     `zwave-${value[inst].property}-${value[inst].endpoint}-${value[inst].label}-${node.product}-node-${node.id}`,
                   ),

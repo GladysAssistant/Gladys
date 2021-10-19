@@ -126,9 +126,21 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
    * @apiGroup Zwave
    */
   async function refreshNodeParams(req, res) {
-    zwaveManager.refreshNodeParams();
+    zwaveManager.refreshNodeParams(req.body.nodeId);
     res.json({
       success: true,
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/service/zwave/params/update Update device configuration
+   * @apiName updateConfiguration
+   * @apiGroup Zwave
+   */
+  async function updateConfiguration(req, res) {
+    const result = await zwaveManager.updateConfiguration();
+    res.json({
+      success: result,
     });
   }
 
@@ -183,6 +195,11 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(cancelControllerCommand),
+    },
+    'post /api/v1/service/zwave/params/update': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(updateConfiguration),
     },
   };
 };
