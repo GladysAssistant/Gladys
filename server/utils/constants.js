@@ -119,10 +119,6 @@ const EVENTS = {
     CHANGED: 'time.changed',
     SUNRISE: 'time.sunrise',
     SUNSET: 'time.sunset',
-    SUNRISE_PLUS_1: 'time.sunrise-1',
-    SUNRISE_MINUS_1: 'time.sunrise+1',
-    SUNSET_PLUS_1: 'time.sunset-1',
-    SUNSET_MINUS_1: 'time.sunset+1',
   },
   TRIGGERS: {
     CHECK: 'trigger.check',
