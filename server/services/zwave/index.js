@@ -25,16 +25,16 @@ module.exports = function ZwaveService(gladys, serviceId) {
     const s2AccessControl = await gladys.variable.getValue('S2_AccessControl', serviceId);
     const s0Legacy = await gladys.variable.getValue('S0_Legacy', serviceId);
     const securityKeys = {};
-    if(s2Unauthenticated) {
+    if (s2Unauthenticated) {
       securityKeys.S2_Unauthenticated = Buffer.from(s2Unauthenticated, 'hex');
     }
-    if(s2Authenticated) {
+    if (s2Authenticated) {
       securityKeys.S2_Authenticated = Buffer.from(s2Authenticated, 'hex');
     }
-    if(s2AccessControl) {
+    if (s2AccessControl) {
       securityKeys.S2_AccessControl = Buffer.from(s2AccessControl, 'hex');
     }
-    if(s0Legacy) {
+    if (s0Legacy) {
       securityKeys.S0_Legacy = Buffer.from(s0Legacy, 'hex');
     }
     await zwaveManager.connect(zwaveDriverPath, securityKeys);

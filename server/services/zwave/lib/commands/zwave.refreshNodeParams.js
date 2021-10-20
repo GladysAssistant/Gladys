@@ -12,9 +12,7 @@ function refreshNodeParams(nodeId) {
     throw new ServiceNotConfiguredError('ZWAVE_DRIVER_NOT_RUNNING');
   }
   logger.info(`Zwave : Request all params of nodeId = ${nodeId}`);
-  this.driver.controller.nodes
-    .get(nodeId)
-    .refreshValues();
+  this.driver.controller.nodes.get(nodeId).refreshValues();
 }
 
 module.exports = {

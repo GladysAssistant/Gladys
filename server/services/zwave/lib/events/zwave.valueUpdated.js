@@ -12,7 +12,7 @@ const { PROPERTIES } = require('../constants');
  * zwave.on('value updated', this.valueUpdated);
  */
 function valueUpdated(zwaveNode, args) {
-  const { commandClass, endpoint, property, propertyKey, prevValue, newValue } = args;
+  const { commandClass, endpoint, property, propertyKey, /* prevValue, */ newValue } = args;
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
   let fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
