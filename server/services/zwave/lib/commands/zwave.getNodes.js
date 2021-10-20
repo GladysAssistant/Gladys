@@ -24,11 +24,17 @@ function getNodes() {
   return nodes
     .map((node) => {
       const newDevice = {
-        name: node.product,
+        name: node.name,
         service_id: this.serviceId,
         external_id: getDeviceExternalId({ nodeId: node.id }),
         ready: node.ready,
-        rawZwaveNode: node,
+        rawZwaveNode: {
+          id: node.id,
+          type: node.type,
+          product: node.product,
+          keysClasses: Object.keys(node.classes),
+          deviceDatabaseUrl: node.deviceDatabaseUrl,
+        },
         features: [],
         params: [],
       };
@@ -46,7 +52,7 @@ function getNodes() {
               const { category, type } = getCategory(node, value[inst]);
               if (category !== 'unknown') {
                 newDevice.features.push({
-                  name: `${value[inst].label}`,
+                  name: `${value[inst].label} (${node.id})`,
                   selector: slugify(
                     `zwave-${value[inst].property}-${value[inst].endpoint}-${value[inst].label}-${node.product}-node-${node.id}`,
                   ),
@@ -59,11 +65,7 @@ function getNodes() {
                   min,
                   max,
                 });
-              } else if (
-                value[inst].commandClass !== 112 &&
-                value[inst].commandClass !== 114 &&
-                value[inst].commandClass !== 134
-              ) {
+              } else {
                 logger.info(`Unkown category/type for ${JSON.stringify(value[inst])}`);
               }
             } else {

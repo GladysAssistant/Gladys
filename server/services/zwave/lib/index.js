@@ -28,6 +28,9 @@ const {
   nodeInterviewStageCompleted,
   nodeInterviewStarted,
 } = require('./events/zwave.nodeInterview');
+const { metadataUpdate } = require('./events/zwave.metadataUpdate');
+const { statisticsUpdated } = require('./events/zwave.statisticsUpdated');
+const { updateConfiguration } = require('./commands/zwave.updateConfiguration');
 
 const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
   this.gladys = gladys;
@@ -61,6 +64,7 @@ ZwaveManager.prototype.valueAdded = valueAdded;
 ZwaveManager.prototype.valueUpdated = valueUpdated;
 ZwaveManager.prototype.valueRemoved = valueRemoved;
 ZwaveManager.prototype.valueNotification = valueNotification;
+ZwaveManager.prototype.metadataUpdate = metadataUpdate;
 ZwaveManager.prototype.nodeReady = nodeReady;
 ZwaveManager.prototype.notification = notification;
 ZwaveManager.prototype.scanComplete = scanComplete;
@@ -73,6 +77,7 @@ ZwaveManager.prototype.nodeInterviewStarted = nodeInterviewStarted;
 ZwaveManager.prototype.nodeInterviewFailed = nodeInterviewFailed;
 ZwaveManager.prototype.nodeInterviewCompleted = nodeInterviewCompleted;
 ZwaveManager.prototype.nodeInterviewStageCompleted = nodeInterviewStageCompleted;
+ZwaveManager.prototype.statisticsUpdated = statisticsUpdated;
 
 // COMMANDS
 ZwaveManager.prototype.addNode = addNode;
@@ -86,5 +91,6 @@ ZwaveManager.prototype.getNodeNeighbors = getNodeNeighbors;
 ZwaveManager.prototype.removeNode = removeNode;
 ZwaveManager.prototype.setValue = setValue;
 ZwaveManager.prototype.cancelControllerCommand = cancelControllerCommand;
+ZwaveManager.prototype.updateConfiguration = updateConfiguration;
 
 module.exports = ZwaveManager;

@@ -5,28 +5,22 @@ const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
 /**
  * @description Notification about a node
- * @param {Object} zwaveNode - Node.
+ * @param {Object} zwaveNode - ZWave Node.
  * @param {Object} args - ZWave ValueNotificationArgs.
  * @example
  * zwave.on('value notification', this.valueNotification);
  */
 function valueNotification(zwaveNode, args) {
-  logger.debug(`${zwaveNode.id}${JSON.stringify(args)}`);
   const { commandClass, endpoint, property, propertyKey, value } = args;
   const nodeId = zwaveNode.id;
+  const node = this.nodes[nodeId];
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
   const valueUnbind = unbindValue(args, value);
-  if (this.nodes[nodeId].ready) {
+  if (node.ready) {
     logger.debug(
-      'node%d: changed: %d:%s:%s %s->%s',
-      nodeId,
-      commandClass,
-      endpoint || 0,
-      fullProperty,
-      this.nodes[nodeId].classes[commandClass][endpoint || 0][fullProperty].value,
-      valueUnbind,
+      `Value Notification: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${valueUnbind}`,
     );
-    this.nodes[nodeId].classes[commandClass][endpoint || 0][fullProperty].value = valueUnbind;
+    node.classes[commandClass][endpoint || 0][fullProperty].value = valueUnbind;
     const deviceFeatureExternalId = getDeviceFeatureExternalId({
       nodeId,
       commandClass,

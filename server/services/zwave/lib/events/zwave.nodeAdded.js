@@ -12,14 +12,6 @@ function nodeAdded(zwaveNode) {
   logger.debug(`Zwave : Node Added, nodeId = ${nodeId}`);
 
   this.nodes[nodeId] = {
-    manufacturer: '',
-    manufacturerid: '',
-    product: '',
-    producttype: '',
-    productid: '',
-    type: '',
-    name: '',
-    location: '',
     classes: {},
     ready: false,
   };
@@ -38,22 +30,9 @@ function nodeAdded(zwaveNode) {
     .on('value updated', this.valueUpdated.bind(this))
     .on('value notification', this.valueNotification.bind(this))
     .on('value removed', this.valueRemoved.bind(this))
-    .on('notification', this.notification.bind(this));
-
-  /*
-  // Is called when a node wakes up
-    .on('wake up', this.onNodeWakeUp.bind(this))
-  // Is called when a node goes to sleep
-	  .on('sleep', this.onNodeSleep.bind(this))
-  // Is called when a previously dead node starts communicating again
-	  .on('alive', this.onNodeAlive.bind(this))
-  // Is called when a node is marked as dead
-	  .on('dead', this.onNodeDead.bind(this))
-  // Is called when a node interview is completed
-	  .on('interview completed', this.onNodeInterviewCompleted.bind(this))
-  // This is called when a node's firmware was updated
-	  .on('firmware update finished', this.onNodeFirmwareUpdated.bind(this))
-  */
+    .on('metadata update', this.metadataUpdate.bind(this))
+    .on('notification', this.notification.bind(this))
+    .on('statistics updated', this.statistics.bind(this));
 
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_ADDED,

@@ -1,4 +1,5 @@
 const os = require('os');
+const path = require('path');
 const logger = require('../../../../utils/logger');
 
 const { driverReady } = require('../events/zwave.driverReady');
@@ -10,12 +11,14 @@ const { scanComplete } = require('../events/zwave.scanComplete');
 const DRIVER_READY_TIMEOUT = 60 * 1000;
 
 /**
- * @description Connect to Zwave USB driver
+ * @description Connect to Zwave USB driver.
  * @param {string} driverPath - Path to the USB driver.
+ * @param {Object} securityKeys - Zwave security keys.
+ * @returns {Promise} Void.
  * @example
  * zwave.connect(driverPath);
  */
-async function connect(driverPath) {
+async function connect(driverPath, securityKeys) {
   logger.debug(`Zwave : Connecting to USB = ${driverPath}`);
   // special case for macOS
   if (os.platform() === 'darwin') {
@@ -24,10 +27,18 @@ async function connect(driverPath) {
     this.driverPath = driverPath;
   }
   this.ready = false;
+
   this.driver = new this.ZWaveJS.Driver(driverPath, {
     logConfig: {
-      level: 'info',
+      level: 'debug',
+      logToFile: true,
+      filename: path.resolve(this.gladys.config.servicesFolder('zwave'), 'logs', `zwave-${process.pid}.log`),
+      forceConsole: true,
     },
+    storage: {
+      cacheDir: path.resolve(this.gladys.config.servicesFolder('zwave'), 'cache'),
+    },
+    securityKeys,
   });
   this.driver.on('error', (e) => {
     logger.debug(`ZWave Error: [${e.name}] ${e.message}`);
@@ -66,8 +77,7 @@ async function connect(driverPath) {
     scanComplete.bind(this)();
   });
 
-  // Crash server if port is not available
-  await this.driver.start();
+  await this.driver.start().catch((e) => logger.fatal(`Unable to start Z-Wave service ${e}`));
 
   setTimeout(() => {
     scanComplete.bind(this)();

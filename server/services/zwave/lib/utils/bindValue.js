@@ -1,4 +1,4 @@
-const { COMMAND_CLASSES } = require('../constants');
+const { COMMAND_CLASSES, SCENE_VALUES } = require('../constants');
 
 /**
  * @description Bind value
@@ -34,6 +34,9 @@ function bindValue(valueId, value) {
 function unbindValue(valueId, value) {
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_BINARY) {
     return value ? 1 : 0;
+  }
+  if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE) {
+    return SCENE_VALUES[value];
   }
   return value;
 }

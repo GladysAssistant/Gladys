@@ -2,20 +2,21 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description When a value is removed.
- * @param {Object} node - Node.
+ * @param {Object} zwaveNode - ZWave Node.
  * @param {Object} args - Zwave ValueRemovedArgs.
  * @example
  * zwave.on('value removed', this.valueRemoved);
  */
-function valueRemoved(node, args) {
+function valueRemoved(zwaveNode, args) {
   const { commandClass, endpoint, property, propertyKey /* , newValue */ } = args;
-  const nodeId = node.id;
+  const nodeId = zwaveNode.id;
+  const node = this.nodes[nodeId];
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
   logger.debug(
-    `Zwave : Value removed, nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}`,
+    `Value Removed: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}`,
   );
-  if (this.nodes[nodeId].classes[commandClass] && this.nodes[nodeId].classes[commandClass][endpoint][fullProperty]) {
-    delete this.nodes[nodeId].classes[commandClass][endpoint][fullProperty];
+  if (node.classes[commandClass] && node.classes[commandClass][endpoint][fullProperty]) {
+    delete node.classes[commandClass][endpoint][fullProperty];
   }
 }
 
