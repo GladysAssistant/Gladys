@@ -77,11 +77,12 @@ async function connect(driverPath, securityKeys) {
     scanComplete.bind(this)();
   });
 
-  await this.driver.start()
-    .then((res) => 
+  await this.driver
+    .start()
+    .then((res) =>
       setTimeout(() => {
         scanComplete.bind(this)();
-      }, DRIVER_READY_TIMEOUT)
+      }, DRIVER_READY_TIMEOUT),
     )
     .catch((e) => logger.fatal(`Unable to start Z-Wave service ${e}`));
 
