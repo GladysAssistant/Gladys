@@ -3,6 +3,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertDevice } = require('../utils/convertDevice');
 const { convertValue } = require('../utils/convertValue');
 const { convertFeature } = require('../utils/convertFeature');
+const { isUpdatable } = require('../../../utils/device');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -25,16 +26,18 @@ function handleMqttMessage(topic, message) {
       const convertedDevices = devices
         // Remove Coordinator
         .filter((d) => d.supported)
-        // Remove existing devices
-        .filter((d) => {
-          const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
-          if (existingDevice) {
-            return false;
-          }
-          return true;
-        })
         // Add features
-        .map((d) => convertDevice(d, this.serviceId));
+        .map((d) => convertDevice(d, this.serviceId))
+        // Check if updatable
+        .map((d) => {
+          const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
+          const device = { ...(existingDevice || {}), ...d };
+          if (existingDevice) {
+            device.updatable = isUpdatable(device, existingDevice);
+          }
+
+          return device;
+        });
 
       this.discoveredDevices = convertedDevices;
 

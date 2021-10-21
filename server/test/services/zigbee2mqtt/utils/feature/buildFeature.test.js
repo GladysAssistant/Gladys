@@ -94,7 +94,7 @@ describe('zigbee2mqtt buildFeature', () => {
       name: 'Property',
       external_id: 'zigbee2mqtt:deviceName:switch:binary:property',
       selector: 'zigbee2mqtt-devicename-switch-binary-property',
-      unit: undefined,
+      unit: null,
     };
 
     expect(result).deep.eq(expectedResult);
@@ -119,7 +119,7 @@ describe('zigbee2mqtt buildFeature', () => {
       name: 'Property',
       external_id: 'zigbee2mqtt:deviceName:switch:binary:property',
       selector: 'zigbee2mqtt-devicename-switch-binary-property',
-      unit: undefined,
+      unit: null,
     };
 
     expect(result).deep.eq(expectedResult);
@@ -144,7 +144,7 @@ describe('zigbee2mqtt buildFeature', () => {
       name: 'Property',
       external_id: 'zigbee2mqtt:deviceName:switch:binary:property',
       selector: 'zigbee2mqtt-devicename-switch-binary-property',
-      unit: undefined,
+      unit: null,
     };
 
     expect(result).deep.eq(expectedResult);
@@ -169,7 +169,7 @@ describe('zigbee2mqtt buildFeature', () => {
       name: 'Property',
       external_id: 'zigbee2mqtt:deviceName:switch:binary:property',
       selector: 'zigbee2mqtt-devicename-switch-binary-property',
-      unit: undefined,
+      unit: null,
     };
 
     expect(result).deep.eq(expectedResult);
@@ -194,7 +194,7 @@ describe('zigbee2mqtt buildFeature', () => {
       name: 'Property',
       external_id: 'zigbee2mqtt:deviceName:switch:binary:property',
       selector: 'zigbee2mqtt-devicename-switch-binary-property',
-      unit: undefined,
+      unit: null,
     };
 
     expect(result).deep.eq(expectedResult);
@@ -219,7 +219,7 @@ describe('zigbee2mqtt buildFeature', () => {
       name: 'Property',
       external_id: 'zigbee2mqtt:deviceName:switch:binary:property',
       selector: 'zigbee2mqtt-devicename-switch-binary-property',
-      unit: undefined,
+      unit: null,
     };
 
     expect(result).deep.eq(expectedResult);

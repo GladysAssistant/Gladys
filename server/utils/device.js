@@ -68,8 +68,48 @@ function getDeviceFeature(device, category, type) {
   return null;
 }
 
+const matchFeature = (features, feature) => {
+  return features.findIndex((f) => f.external_id === feature.external_id);
+};
+
+const matchParam = (params, param) => {
+  return params.findIndex((p) => p.name === param.name && p.value === param.value);
+};
+
+/**
+ * @description Compare newDevice with exisingDevice on features and parameters
+ * to tell if device can be updated.
+ *
+ * @param {Object} newDevice - New device.
+ * @param {Object} existingDevice - Existing device.
+ * @returns {boolean} Is new device is different on feature or parameters?
+ * @example
+ * isUpdatable({}, {})
+ */
+function isUpdatable(newDevice, existingDevice = {}) {
+  const { features, params } = newDevice;
+  const existingFeatures = existingDevice.features || [];
+  const existingParams = existingDevice.params || [];
+
+  let updatable = existingFeatures.length !== features.length || existingParams.length !== params.length;
+  let i = 0;
+  while (!updatable && features[i]) {
+    updatable = matchFeature(existingFeatures, features[i]) < 0;
+    i += 1;
+  }
+
+  i = 0;
+  while (!updatable && params[i]) {
+    updatable = matchParam(existingParams, params[i]) < 0;
+    i += 1;
+  }
+
+  return updatable;
+}
+
 module.exports = {
   getDeviceParam,
   setDeviceParam,
   getDeviceFeature,
+  isUpdatable,
 };
