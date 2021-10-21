@@ -9,13 +9,13 @@ const slug = require('limax');
  */
 function slugify(str) {
   const slugOptions = {
-    separator: '-', 
-    replacement: '-', 
-    maintainCase: false, 
-    separateNumbers: false, 
-    tone: false, 
+    separator: '-',
+    replacement: '-',
+    maintainCase: false,
+    separateNumbers: false,
+    tone: false,
   };
-  const newString=slug(str, slugOptions);
+  const newString = slug(str, slugOptions);
   return newString;
 }
 
