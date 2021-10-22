@@ -24,7 +24,7 @@ function driverReady(homeId) {
     .minute(0)
     .tz(this.timezone)
     .toDate();
-  this.updateConfigJob = this.schedule.scheduleJob(todayAtMidnightInMyTimeZone, () => updateConfiguration());
+  this.updateConfigJob = this.schedule.scheduleJob(todayAtMidnightInMyTimeZone, updateConfiguration.bind(this));
 
   this.scanInProgress = true;
   this.ready = true;
