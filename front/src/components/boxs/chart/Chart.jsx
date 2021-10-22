@@ -181,8 +181,9 @@ class Chartbox extends Component {
   };
   updateDeviceStateWebsocket = payload => {
     if (
-      payload.device_feature_selector === this.props.box.device_feature &&
-      this.state.interval === intervalByName['last-hour']
+      this.state.interval === intervalByName['last-hour'] &&
+      this.props.box.device_features &&
+      this.props.box.device_features.includes(payload.device_feature_selector)
     ) {
       this.getData();
     }
