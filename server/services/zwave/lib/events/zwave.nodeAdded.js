@@ -12,8 +12,10 @@ function nodeAdded(zwaveNode) {
   logger.debug(`Zwave : Node Added, nodeId = ${nodeId}`);
 
   this.nodes[nodeId] = {
+    nodeId,
     classes: {},
     ready: false,
+    endpoints: zwaveNode.getAllEndpoints(),
   };
 
   zwaveNode
@@ -32,7 +34,7 @@ function nodeAdded(zwaveNode) {
     .on('value removed', this.valueRemoved.bind(this))
     .on('metadata update', this.metadataUpdate.bind(this))
     .on('notification', this.notification.bind(this))
-    .on('statistics updated', this.statistics.bind(this));
+    .on('statistics updated', this.statisticsUpdated.bind(this));
 
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_ADDED,

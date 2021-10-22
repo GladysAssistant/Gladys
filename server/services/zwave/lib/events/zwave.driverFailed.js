@@ -8,10 +8,10 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
  */
 function driverFailed() {
   logger.error(`Zwave : Failed to start driver.`);
-  
+
   this.connected = false;
   this.ready = false;
-  
+
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.DRIVER_FAILED,
     payload: {},

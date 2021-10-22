@@ -15,7 +15,7 @@ dayjs.extend(timezone);
  * @example
  * zwave.on('driver ready', this.driverReady);
  */
- function driverReady(homeId) {
+function driverReady(homeId) {
   logger.info(`Zwave : Driver is ready. homeId = ${homeId}`);
 
   // Schedule DB config update
