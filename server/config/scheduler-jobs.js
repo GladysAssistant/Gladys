@@ -22,11 +22,6 @@ const jobs = [
     event: EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
   },
   {
-    name: 'daily-device-state-aggregate',
-    frequencyInSeconds: 24 * 60 * 60,
-    event: EVENTS.DEVICE.CALCULATE_DAILY_AGGREGATE,
-  },
-  {
     name: 'daily-purge-of-old-jobs',
     frequencyInSeconds: 24 * 60 * 60,
     event: EVENTS.JOB.PURGE_OLD_JOBS,

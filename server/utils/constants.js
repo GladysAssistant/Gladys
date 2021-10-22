@@ -60,9 +60,7 @@ const EVENTS = {
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
     PURGE_STATES: 'device.purge-states',
-    CALCULATE_DAILY_AGGREGATE: 'device.calculate-daily-aggregate',
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
-    CALCULATE_MONTHLY_AGGREGATE: 'device.calculate-monthly-aggregate',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',

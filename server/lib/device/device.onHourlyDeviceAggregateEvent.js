@@ -4,7 +4,7 @@ const logger = require('../../utils/logger');
 /**
  * @description It's time to do the daily device state aggregate
  * @example
- * onDailyDeviceAggregateEvent()
+ * onHourlyDeviceAggregateEvent()
  */
 async function onHourlyDeviceAggregateEvent() {
   const startHourlyAggregate = this.job.wrapper(JOB_TYPES.HOURLY_DEVICE_STATE_AGGREGATE, async (jobId) => {

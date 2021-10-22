@@ -115,21 +115,6 @@ describe('Device.calculateAggregate', function Before() {
     // 1 month * 100
     expect(deviceFeatureStates.length).to.equal(100);
   });
-  it('should run the daily aggregate task', async () => {
-    await insertStates(true);
-    const variable = {
-      getValue: fake.resolves(null),
-    };
-    const device = new Device(event, {}, {}, {}, {}, variable);
-    await device.onDailyDeviceAggregateEvent();
-    const deviceFeatureStates = await db.DeviceFeatureStateAggregate.findAll({
-      raw: true,
-      attributes: ['value', 'created_at'],
-      order: [['created_at', 'ASC']],
-    });
-    // daily aggregates
-    expect(deviceFeatureStates.length).to.equal(3000);
-  });
   it('should run the hourly aggregate task', async () => {
     await insertStates(true);
     const variable = {
