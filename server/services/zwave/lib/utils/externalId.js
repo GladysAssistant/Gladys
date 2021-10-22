@@ -1,12 +1,23 @@
 /**
+ * @description Return name of device
+ * @param {Object} node - The zwave value.
+ * @returns {string} Return name.
+ * @example
+ * getDeviceName(node);
+ */
+function getDeviceName(node) {
+  return `${node.name}${node.endpoint > 0 ? ` [${node.endpoint}]` : ''}`;
+}
+
+/**
  * @description Return external id of device
- * @param {Object} value - The zwave value.
+ * @param {Object} node - The zwave value.
  * @returns {string} Return external id.
  * @example
- * getDeviceExternalId(value);
+ * getDeviceExternalId(node);
  */
-function getDeviceExternalId(value) {
-  return `zwave:node_id:${value.nodeId}`;
+function getDeviceExternalId(node) {
+  return `zwave:node_id:${node.nodeId}${node.endpoint > 0 ? `_${node.endpoint}` : ''}`;
 }
 
 /**
@@ -42,6 +53,7 @@ function getNodeInfoByExternalId(externalId) {
 }
 
 module.exports = {
+  getDeviceName,
   getDeviceExternalId,
   getDeviceFeatureExternalId,
   getNodeInfoByExternalId,

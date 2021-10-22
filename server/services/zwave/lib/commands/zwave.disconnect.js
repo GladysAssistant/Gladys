@@ -5,10 +5,10 @@ const logger = require('../../../../utils/logger');
  * @example
  * zwave.disconnect();
  */
-function disconnect() {
+async function disconnect() {
   if (this.connected) {
     logger.debug(`Zwave : Disconnecting...`);
-    this.driver.destroy();
+    await this.driver.destroy();
   } else {
     logger.debug('Zwave: Not connected, disconnecting');
   }
