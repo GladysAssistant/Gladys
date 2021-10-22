@@ -3,7 +3,7 @@ export class DemoHttpClient {
     if (this.responses) {
       return this.responses;
     }
-    this.responses = await import('../config/demo.json');
+    this.responses = await (await import('../config/demo')).default;
     return this.responses;
   };
   setToken(refreshToken, accessToken) {}
