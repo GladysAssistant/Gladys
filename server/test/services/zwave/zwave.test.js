@@ -1,6 +1,7 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
+const { test } = require('../../../config/config');
 const ZwaveMock = require('./ZwaveMock.test');
 
 const ZwaveService = proxyquire('../../../services/zwave/index', {
@@ -12,6 +13,7 @@ const gladys = {
   variable: {
     getValue: () => Promise.resolve('test'),
   },
+  config: test
 };
 
 describe('zwaveService', () => {
