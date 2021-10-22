@@ -137,7 +137,7 @@ function formatEvents(caldavEvents, gladysCalendar) {
       const newEvent = {
         external_id: caldavEvent.uid,
         selector: caldavEvent.uid,
-        name: caldavEvent.summary,
+        name: caldavEvent.summary || '',
         location: caldavEvent.location,
         url: caldavEvent.href,
         calendar_id: gladysCalendar.id,
