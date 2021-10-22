@@ -14,12 +14,7 @@ import get from 'get-value';
  * but it's irrelevant to do it for all.
  */
 const DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES = {
-  mqtt: true,
-  zigbee2mqtt: true,
-  zwave: true,
-  ewelink: true,
-  tasmota: true,
-  bluetooth: true
+  mqtt: true
 };
 
 const getDeviceFeatureName = (dictionnary, device, deviceFeature) => {
