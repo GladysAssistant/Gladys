@@ -111,7 +111,6 @@ class ApexChartComponent extends Component {
     } else {
       options = this.getAreaChartOptions();
     }
-    console.log(options);
     if (this.chart) {
       this.chart.updateOptions(options);
     } else {
