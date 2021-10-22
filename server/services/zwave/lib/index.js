@@ -1,3 +1,5 @@
+const schedule = require('node-schedule');
+
 const { addNode } = require('./commands/zwave.addNode');
 const { connect } = require('./commands/zwave.connect');
 const { disconnect } = require('./commands/zwave.disconnect');
@@ -40,6 +42,7 @@ const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
   this.nodes = {};
   this.connected = false;
   this.scanInProgress = false;
+  this.schedule = schedule;
 
   /* this.mqttService = this.gladys.service.getService('mqtt');
   this.mqttService.device.subscribe('zwavejsmqtt/#', (topic, message) => {
