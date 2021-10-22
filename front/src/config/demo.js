@@ -583,7 +583,9 @@ const data = {
       receiver_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       text: "It's a clear day today. Temperature outside is 26°C.",
       is_read: true,
-      created_at: '2019-02-12T07:45:07.556Z'
+      created_at: dayjs()
+        .subtract(1, 'hour')
+        .toDate()
     },
     {
       id: '247b1dd0-6fab-47a8-a9c8-1405deae0ae8',
@@ -591,7 +593,10 @@ const data = {
       receiver_id: null,
       text: "What's the weather like?",
       is_read: true,
-      created_at: '2019-02-12T07:44:07.556Z'
+      created_at: dayjs()
+        .subtract(1, 'hour')
+        .subtract(1, 'seconds')
+        .toDate()
     },
     {
       id: '247b1dd0-6fab-47a8-a9c8-1405deae0ae8',
@@ -599,7 +604,10 @@ const data = {
       receiver_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       text: "It's 24°C in the kitchen.",
       is_read: true,
-      created_at: '2019-02-12T07:49:07.557Z'
+      created_at: dayjs()
+        .subtract(1, 'hour')
+        .subtract(2, 'seconds')
+        .toDate()
     },
     {
       id: '247b1dd0-6fab-47a8-a9c8-1405deae0ae8',
@@ -607,7 +615,10 @@ const data = {
       receiver_id: null,
       text: "What's the temperature in the kitchen?",
       is_read: true,
-      created_at: '2019-02-12T07:49:07.556Z'
+      created_at: dayjs()
+        .subtract(1, 'hour')
+        .subtract(3, 'seconds')
+        .toDate()
     }
   ],
   'post /api/v1/message': {
@@ -2290,6 +2301,98 @@ const data = {
           value: 33
         }
       ]
+    }
+  ],
+  'get /api/v1/job?take=500': [
+    {
+      id: 'f69252f4-1216-4021-8fc0-83234da71a4a',
+      type: 'monthly-device-state-aggregate',
+      status: 'success',
+      progress: 100,
+      data: {},
+      created_at: dayjs()
+        .subtract(1, 'hour')
+        .toDate()
+    },
+    {
+      id: 'b2d590aa-40d7-435a-910a-cf370dde06a9',
+      type: 'daily-device-state-aggregate',
+      status: 'success',
+      progress: 98,
+      data: {},
+      created_at: dayjs()
+        .subtract(1, 'hour')
+        .toDate()
+    },
+    {
+      id: 'd1e7ee47-229c-4b9f-bbaa-201db860cc25',
+      type: 'hourly-device-state-aggregate',
+      status: 'success',
+      progress: 100,
+      data: {},
+      created_at: dayjs()
+        .subtract(1, 'hour')
+        .toDate()
+    },
+    {
+      id: '06411e01-a909-4531-9246-2e935c16ba69',
+      type: 'monthly-device-state-aggregate',
+      status: 'success',
+      progress: 100,
+      data: {},
+      created_at: dayjs()
+        .subtract(2, 'hour')
+        .toDate()
+    },
+    {
+      id: '10469873-569a-4dfb-b35c-4468c26542a4',
+      type: 'daily-device-state-aggregate',
+      status: 'success',
+      progress: 100,
+      data: {},
+      created_at: dayjs()
+        .subtract(2, 'hour')
+        .toDate()
+    },
+    {
+      id: '5307b306-8d95-41e3-9ec6-a5c29d386c9b',
+      type: 'hourly-device-state-aggregate',
+      status: 'success',
+      progress: 100,
+      data: {},
+      created_at: dayjs()
+        .subtract(2, 'hour')
+        .toDate()
+    },
+    {
+      id: 'c3da516f-3565-4b00-be82-ddd00fe39a12',
+      type: 'monthly-device-state-aggregate',
+      status: 'success',
+      progress: 100,
+      data: {},
+      created_at: dayjs()
+        .subtract(3, 'hour')
+        .toDate()
+    },
+    {
+      id: '5ca896b5-e810-48f5-bfb6-f3039a6776c5',
+      type: 'daily-device-state-aggregate',
+      status: 'success',
+      progress: 100,
+      data: {},
+      created_at: dayjs()
+        .subtract(3, 'hour')
+        .toDate()
+    },
+    {
+      id: 'ae916efe-6209-49cb-a2fc-323f3ab5f91d',
+      type: 'hourly-device-state-aggregate',
+      status: 'success',
+      progress: 100,
+      data: {},
+      created_at: dayjs()
+        .subtract(3, 'hour')
+        .toDate()
     }
   ]
 };
