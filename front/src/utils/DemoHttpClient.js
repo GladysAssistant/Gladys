@@ -12,8 +12,8 @@ export class DemoHttpClient {
     await this.getDemoFile();
     const key = `get ${url}`;
     if (!this.responses[key]) {
-      console.error(`${key} not found in demo.json`);
-      throw new Error(`${key} not found in demo.json`);
+      console.error(`${key} not found in demo.js`);
+      throw new Error(`${key} not found in demo.js`);
     }
     return Promise.resolve(this.responses[key]);
   }
@@ -22,8 +22,8 @@ export class DemoHttpClient {
     await this.getDemoFile();
     const key = `post ${url}`;
     if (!this.responses[key]) {
-      console.error(`${key} not found in demo.json`);
-      throw new Error(`${key} not found in demo.json`);
+      console.error(`${key} not found in demo.js`);
+      throw new Error(`${key} not found in demo.js`);
     }
     return Promise.resolve(this.responses[key]);
   }
@@ -32,8 +32,8 @@ export class DemoHttpClient {
     await this.getDemoFile();
     const key = `patch ${url}`;
     if (!this.responses[key]) {
-      console.error(`${key} not found in demo.json`);
-      throw new Error(`${key} not found in demo.json`);
+      console.error(`${key} not found in demo.js`);
+      throw new Error(`${key} not found in demo.js`);
     }
     return Promise.resolve(this.responses[key]);
   }
