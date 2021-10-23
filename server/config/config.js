@@ -38,7 +38,7 @@ module.exports = {
       max: 5,
     },
     backupsFolder: './gladys-backups',
-    serviceFolder: (service) => {
+    servicesFolder: (service) => {
       return `./gladys-services/${service}`;
     },
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',
@@ -61,7 +61,7 @@ module.exports = {
       max: 5,
     },
     backupsFolder: process.env.BACKUP_FOLDER || '/var/lib/gladysassistant/backups',
-    serviceFolder: (service) => {
+    servicesFolder: (service) => {
       return (process.env.SERVICE_FOLDER || '/var/lib/gladysassistant/services/') + service;
     },
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',
