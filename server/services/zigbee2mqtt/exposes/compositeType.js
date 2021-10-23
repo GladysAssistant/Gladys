@@ -7,6 +7,8 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+        has_feedback: true,
+        read_only: false,
         min: 0,
         max: 16777215,
       },
