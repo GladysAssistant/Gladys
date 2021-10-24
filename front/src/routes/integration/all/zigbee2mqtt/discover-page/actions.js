@@ -13,7 +13,7 @@ function createActions(store) {
       });
 
       try {
-        const zigbee2mqttDevices = await state.httpClient.get('/api/v1/service/zigbee2mqtt/device');
+        const zigbee2mqttDevices = await state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered');
         store.setState({ zigbee2mqttDevices, discoverZigbee2mqtt: false });
       } catch (e) {
         store.setState({

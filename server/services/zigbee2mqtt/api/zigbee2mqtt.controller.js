@@ -3,7 +3,7 @@ const logger = require('../../../utils/logger');
 
 module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   /**
-   * @api {get} /api/v1/service/zigbee2mqtt/device Get discovered Zigbee2mqtt devices
+   * @api {get} /api/v1/service/zigbee2mqtt/discovered Get discovered Zigbee2mqtt devices
    * @apiName getDiscoveredDevices
    * @apiGroup Zigbee2mqtt
    */
@@ -101,7 +101,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   return {
-    'get /api/v1/service/zigbee2mqtt/device': {
+    'get /api/v1/service/zigbee2mqtt/discovered': {
       authenticated: true,
       controller: asyncMiddleware(getDiscoveredDevices),
     },

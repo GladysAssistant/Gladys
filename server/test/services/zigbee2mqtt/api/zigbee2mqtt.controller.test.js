@@ -29,13 +29,13 @@ describe('zigbee2mqtt API', () => {
     sinon.reset();
   });
 
-  it('get /api/v1/service/zigbee2mqtt/device', async () => {
+  it('get /api/v1/service/zigbee2mqtt/discovered', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
     };
 
-    await controller['get /api/v1/service/zigbee2mqtt/device'].controller(req, res);
+    await controller['get /api/v1/service/zigbee2mqtt/discovered'].controller(req, res);
 
     assert.calledOnce(zigbee2mqttManager.getDiscoveredDevices);
     assert.calledWith(res.json, ['device']);
