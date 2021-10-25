@@ -13,7 +13,7 @@ const gladys = {
   variable: {
     getValue: () => Promise.resolve('test'),
   },
-  config: test
+  config: test,
 };
 
 describe('zwaveService', () => {
