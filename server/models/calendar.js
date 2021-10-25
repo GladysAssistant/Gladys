@@ -17,6 +17,10 @@ module.exports = (sequelize, DataTypes) => {
           key: 'id',
         },
       },
+      shared_users: {
+        allowNull: true,
+        type: DataTypes.TEXT,
+      },
       service_id: {
         allowNull: true,
         type: DataTypes.UUID,

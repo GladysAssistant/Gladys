@@ -54,7 +54,20 @@ async function getEvents(userId, options) {
         as: 'calendar',
         attributes: ['name', 'selector'],
         where: {
-          user_id: userId,
+          [Op.or]: [
+            {
+              user_id: userId,
+            },
+            ...(options.shared
+              ? [
+                  {
+                    shared_users: {
+                      [Op.like]: `%${userId}%`,
+                    },
+                  },
+                ]
+              : []),
+          ],
         },
       },
     ],

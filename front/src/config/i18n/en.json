@@ -737,9 +737,11 @@
       "title": "CalDAV",
       "accountTab": "Account",
       "syncTab": "Synchronization",
+      "shareTab": "Sharing",
       "description": "Sync your CalDAV calendars.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "syncIntroduction": "Choose the calendars to synchronize.",
+      "shareIntroduction": "Share your calendars with others Gladys users.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
