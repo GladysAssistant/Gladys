@@ -25,6 +25,8 @@ async function createEvent(calendarSelector, calendarEvent) {
   calendarEvent.calendar_id = calendar.id;
   const createdCalendarEvent = await db.CalendarEvent.create(calendarEvent);
 
+  this.createScheduledEvent(createdCalendarEvent);
+
   return createdCalendarEvent.get({ plain: true });
 }
 

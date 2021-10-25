@@ -132,6 +132,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: calendarController.getEvents,
     },
+    'get /api/v1/calendar/schedule': {
+      authenticated: true,
+      controller: calendarController.getScheduledEvents,
+    },
     'patch /api/v1/calendar/:calendar_selector': {
       authenticated: true,
       controller: calendarController.update,
