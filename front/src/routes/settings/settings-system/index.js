@@ -40,11 +40,42 @@ class SettingsSystem extends Component {
     }
   };
 
+  updateDeviceStateHistory = async e => {
+    await this.setState({
+      deviceStateHistoryInDays: e.target.value,
+      savingDeviceStateHistory: true
+    });
+    try {
+      await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS}`, {
+        value: e.target.value
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    await this.setState({
+      savingDeviceStateHistory: false
+    });
+  };
+
+  getDeviceStateHistoryPreference = async () => {
+    try {
+      const { value } = await this.props.httpClient.get(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS}`
+      );
+      this.setState({
+        deviceStateHistoryInDays: value
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   componentDidMount() {
     this.props.getInfos();
     this.props.getDiskSpace();
     this.props.getContainers();
     this.getTimezone();
+    this.getDeviceStateHistoryPreference();
     // we start the ping a little bit after to give it some time to breathe
     this.refreshPingIntervalId = setInterval(() => {
       this.props.ping();
@@ -55,7 +86,7 @@ class SettingsSystem extends Component {
     clearInterval(this.refreshPingIntervalId);
   }
 
-  render(props, { selectedTimezone }) {
+  render(props, { selectedTimezone, deviceStateHistoryInDays }) {
     const isDocker = get(props, 'systemInfos.is_docker');
     const upgradeDownloadInProgress = props.downloadUpgradeStatus === RequestStatus.Getting;
     const upgradeDownloadFinished = props.downloadUpgradeStatus === RequestStatus.Success;
@@ -71,6 +102,8 @@ class SettingsSystem extends Component {
         timezoneOptions={timezones}
         updateTimezone={this.updateTimezone}
         selectedTimezone={selectedTimezone}
+        deviceStateHistoryInDays={deviceStateHistoryInDays}
+        updateDeviceStateHistory={this.updateDeviceStateHistory}
       />
     );
   }
