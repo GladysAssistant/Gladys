@@ -23,8 +23,6 @@ async function updateEvent(selector, calendarEvent) {
 
   await existingCalendarEvent.update(calendarEvent);
 
-  this.createScheduledEvent(existingCalendarEvent);
-
   return existingCalendarEvent.get({ plain: true });
 }
 
