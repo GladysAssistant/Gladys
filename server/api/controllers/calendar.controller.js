@@ -193,6 +193,16 @@ module.exports = function CalendarController(gladys) {
     res.json(calendarEvents);
   }
 
+  /**
+   * @api {get} /api/v1/calendar/schedule get schedule events
+   * @apiName listJobs
+   * @apiGroup Calendar
+   */
+  async function getScheduledEvents(req, res) {
+    const scheduledEvents = await gladys.calendar.getScheduledEvents(req.user.id);
+    res.json(scheduledEvents);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
@@ -202,5 +212,6 @@ module.exports = function CalendarController(gladys) {
     createEvent: asyncMiddleware(createEvent),
     updateEvent: asyncMiddleware(updateEvent),
     destroyEvent: asyncMiddleware(destroyEvent),
+    getScheduledEvents: asyncMiddleware(getScheduledEvents),
   });
 };
