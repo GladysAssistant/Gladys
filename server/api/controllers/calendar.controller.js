@@ -194,9 +194,16 @@ module.exports = function CalendarController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/calendar/schedule get schedule events
-   * @apiName listJobs
+   * @api {get} /api/v1/calendar/schedule get scheduled events
+   * @apiName getScheduledEvents
    * @apiGroup Calendar
+   * @apiSuccessExample {json} Success-Example
+   * [
+   *   {
+   *     "name": "Job name",
+   *     "nextInvocation": "2021-10-26T22:00:00.000Z"
+   *   }
+   * ]
    */
   async function getScheduledEvents(req, res) {
     const scheduledEvents = await gladys.calendar.getScheduledEvents(req.user.id);
