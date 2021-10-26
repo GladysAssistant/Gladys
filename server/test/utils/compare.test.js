@@ -75,6 +75,25 @@ describe('compare.>=', () => {
   });
 });
 
+describe('compare.~=', () => {
+  it('should return false', () => {
+    const value = compare('~=', 1, 2);
+    expect(value).to.equal(false);
+  });
+  it('should return true', () => {
+    const value = compare('~=', 1, 1);
+    expect(value).to.equal(true);
+  });
+  it('should return true', () => {
+    const value = compare('~=', 'test', '[a-z]');
+    expect(value).to.equal(true);
+  });
+  it('should return false', () => {
+    const value = compare('~=', 'test1', '^[a-z]$');
+    expect(value).to.equal(false);
+  });
+});
+
 describe('compare.unknown', () => {
   it('should throw an error', () => {
     expect(() => {

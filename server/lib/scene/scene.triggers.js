@@ -25,12 +25,15 @@ const triggersFunc = {
   [EVENTS.HOUSE.NO_LONGER_EMPTY]: (event, trigger) => event.house === trigger.house,
   [EVENTS.AREA.USER_ENTERED]: (event, trigger) => event.user === trigger.user && event.area === trigger.area,
   [EVENTS.AREA.USER_LEFT]: (event, trigger) => event.user === trigger.user && event.area === trigger.area,
-  [EVENTS.CALENDAR.EVENT_START]: (event, trigger) =>
-    event.user === trigger.user && event.calendarEvent.name === trigger.calendarEvent.name,
-  [EVENTS.CALENDAR.EVENT_END]: (event, trigger) =>
-    event.user === trigger.user && event.calendarEvent.name === trigger.calendarEvent.name,
-  [EVENTS.CALENDAR.EVENT_REMINDER]: (event, trigger) =>
-    event.user === trigger.user && event.calendarEvent.name === trigger.calendarEvent.name,
+  [EVENTS.CALENDAR.EVENT_START]: (event, trigger) => {
+    return compare('~=', event.calendarEvent.name, trigger.event);
+  },
+  [EVENTS.CALENDAR.EVENT_END]: (event, trigger) => {
+    return compare('~=', event.calendarEvent.name, trigger.event);
+  },
+  [EVENTS.CALENDAR.EVENT_REMINDER]: (event, trigger) => {
+    return compare('~=', event.calendarEvent.name, trigger.event);
+  },
 };
 
 module.exports = {

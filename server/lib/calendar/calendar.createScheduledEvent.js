@@ -19,8 +19,7 @@ dayjs.extend(relativeTime);
 async function createScheduledEvent(calendarEvent) {
   const now = dayjs();
   const foreseenSchedule = dayjs()
-    .endOf('week')
-    .add(14, 'day');
+    .add(2, 'day');
 
   // Event start datetime
   if (calendarEvent.start) {

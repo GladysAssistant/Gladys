@@ -21,6 +21,10 @@ function compare(operator, a, b) {
       return a >= b;
     case '!=':
       return a !== b;
+    case '~=': {
+      const exp = new RegExp(b, 'g');
+      return a.toString().match(exp) !== null;
+    }
     default:
       throw new Error(`Operator ${operator} not found`);
   }

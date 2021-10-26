@@ -1076,6 +1076,11 @@
       "area": {
         "user-entered": "Utilisateur entre dans la zone",
         "user-left": "Utilisateur quitte la zone"
+      },
+      "calendar": {
+        "event-start": "Evènement démarre",
+        "event-reminder": "Evènement rappel",
+        "event-end": "Evènement se termine"
       }
     },
     "triggersCard": {
@@ -1142,6 +1147,15 @@
         "userLeftDescription": "Ce déclencheur lancera la scène dès que l'utilisateur sélectionné quittera la zone sélectionnée. Vous pouvez créer des zones dans l'onglet plans.",
         "userLabel": "Utilisateur",
         "areaLabel": "Zone"
+      },
+      "calendar": {
+        "eventStartDescription": "Ce déclencheur lancera la scène dès que l'évênement sélectionné démarre.",
+        "eventReminderDescription": "Ce déclencheur lancera la scène au rappel de l'évênement sélectionné.",
+        "eventEndDescription": "Ce déclencheur lancera la scène dès que l'évênement sélectionné se termine.",
+        "userLabel": "Utilisateur",
+        "calendarLabel": "Calendrier",
+        "eventLabel": "Event",
+        "eventPlaceholder": "Event"
       }
     }
   },
