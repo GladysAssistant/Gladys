@@ -16,7 +16,6 @@ const Calendar = function Calendar(service, eventManager) {
   this.service = service;
   this.eventManager = eventManager;
   this.schedule = schedule;
-  this.jobs = [];
 };
 
 Calendar.prototype.create = create;

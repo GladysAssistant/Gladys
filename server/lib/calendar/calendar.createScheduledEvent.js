@@ -32,7 +32,6 @@ async function createScheduledEvent(calendarEvent) {
       );
       if (eventStartJob) {
         logger.info(`Calendar event ${calendarEvent.name} start is scheduled, ${eventStartTime.fromNow()}.`);
-        this.jobs.push(eventStartJob);
       }
     }
   }
@@ -49,7 +48,6 @@ async function createScheduledEvent(calendarEvent) {
       );
       if (eventEndJob) {
         logger.info(`Calendar event ${calendarEvent.name} end is scheduled, ${eventEndTime.fromNow()}.`);
-        this.jobs.push(eventEndJob);
       }
     }
   }

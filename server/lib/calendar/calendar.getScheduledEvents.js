@@ -1,5 +1,4 @@
 const dayjs = require('dayjs');
-const logger = require('../../utils/logger');
 
 /**
  * @description List calendar jobs.
@@ -9,14 +8,15 @@ const logger = require('../../utils/logger');
  */
 async function getScheduledEvents() {
   const { scheduledJobs } = this.schedule;
+  const res = [];
   Object.entries(scheduledJobs).forEach((jobEntry) => {
     const [name, job] = jobEntry;
-    logger.info(`Schedule job: ${name} at ${dayjs(job.nextInvocation())}`);
+    res.push({
+      name,
+      nextInvocation: dayjs(job.nextInvocation())
+    });
   });
-  return {
-    scheduledJobs,
-    jobs: this.jobs,
-  };
+  return res;
 }
 
 module.exports = {
