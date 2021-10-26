@@ -1532,6 +1532,10 @@
       "shortCategoryName": "Temperature sensor",
       "decimal": "Temperature"
     },
+    "device-temperature-sensor": {
+      "shortCategoryName": "Device temperature sensor",
+      "decimal": "Temperature"
+    },
     "motion-sensor": {
       "shortCategoryName": "Motion sensor",
       "push": "Motion (push)",
