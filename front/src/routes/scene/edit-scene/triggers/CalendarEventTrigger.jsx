@@ -61,7 +61,7 @@ class CalendarEventTrigger extends Component {
       const userOption = this.state.userOptions.find(option => option.value === nextProps.trigger.user);
 
       if (userOption) {
-        selectedOption = userOption
+        selectedOption = userOption;
       }
     }
     if (nextProps.trigger.calendar && this.state.calendarOptions) {
