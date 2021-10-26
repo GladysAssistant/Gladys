@@ -40,6 +40,7 @@ const ShareTab = ({ children, ...props }) => (
                                     {calendar.name}
                                     <Select
                                       name={calendar.selector}
+                                      styles={{ menu: provided => ({ ...provided, zIndex: '100' }) }}
                                       defaultValue={[]}
                                       value={
                                         props.calendarsSharing?.hasOwnProperty(calendar.selector)
