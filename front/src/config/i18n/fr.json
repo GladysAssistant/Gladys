@@ -710,8 +710,7 @@
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
         "unknowNode": "Noeud inconnu",
         "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page.",
-        "createGithubIssue": "Signaler un bug avec cet appareil",
-        "deviceDatabaseUrl": "Lien vers Z-Wave JS DB de l'appareil"
+        "createGithubIssue": "Signaler un bug avec cet appareil"
       },
       "network": {
         "title": "Réseau Z-Wave",
