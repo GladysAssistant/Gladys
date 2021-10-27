@@ -1,70 +1,35 @@
-// const { expect } = require('chai');
-const { assert, fake } = require('sinon');
-// const EventEmitter = require('events');
+const { expect } = require('chai');
+const { assert } = require('sinon');
+const EventEmitter = require('events');
 
+const event = new EventEmitter();
 const ZwaveManager = require('../../../../services/zwave/lib');
-
-// const event = new EventEmitter();
 const ZwaveMock = require('../ZwaveMock.test');
-// const nodesData = require('./nodesData.json');
-// const nodesExpectedResult = require('./nodesExpectedResult.json');
+const nodesData = require('./nodesData.json');
+const nodesExpectedResult = require('./nodesExpectedResult.json');
 
-const gladys = {
-  event: {
-    emit: fake.returns(null),
-  },
-  service: {
-    getService: () => {
-      return {
-        device: {
-          subscribe: () => {},
-        },
-      };
-    },
-  },
-};
-const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
-
-describe('zwaveManager lifecycle', () => {
-  const zwaveManager = new ZwaveManager(gladys, ZwaveMock, serviceId);
-  it('should intialize variable', () => {
-    assert.match(zwaveManager.serviceId, serviceId);
-    assert.match(zwaveManager.connected, false);
-    assert.match(zwaveManager.scanInProgress, false);
-    assert.match(zwaveManager.nodes, {});
-  });
-  /* it('should connect to zwave driver', () => {
-    zwaveManager.connect('COM5');
-
-    assert.calledOnce(zwaveManager.driver.start);
-    assert.match(zwaveManager.connected, true);
-  }); */
-});
-
-/* describe('zwaveManager commands', () => {
-  const zwaveManager = new ZwaveManager(gladys, serviceId);
-  zwaveManager.ZWaveJS = ZwaveMock;
+describe('zwaveManager commands', () => {
+  const zwaveManager = new ZwaveManager(ZwaveMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   zwaveManager.connected = true;
   it('should connect to zwave driver', () => {
     zwaveManager.connect('/dev/tty1');
-    assert.calledWith(ZwaveMock.prototype.constructor, '/dev/tty1', {
-      logConfig: {
-        level: 'info',
-      },
-    });
-    assert.calledOnce(zwaveManager.driver.start);
+    assert.calledWith(zwaveManager.zwave.connect, '/dev/tty1');
   });
   it('should addNode', () => {
     zwaveManager.addNode();
-    assert.calledOnce(zwaveManager.driver.controller.beginInclusion);
+    assert.calledOnce(zwaveManager.zwave.addNode);
   });
   it('should removeNode', () => {
     zwaveManager.removeNode();
-    assert.calledOnce(zwaveManager.driver.controller.beginExclusion);
+    assert.calledOnce(zwaveManager.zwave.removeNode);
+  });
+  it('should cancelControllerCommand', () => {
+    zwaveManager.cancelControllerCommand();
+    assert.calledOnce(zwaveManager.zwave.cancelControllerCommand);
   });
   it('should heal network', () => {
     zwaveManager.healNetwork();
-    assert.calledOnce(zwaveManager.driver.controller.beginHealingNetwork);
+    assert.calledOnce(zwaveManager.zwave.healNetwork);
   });
   it('should return node neighbors', () => {
     const nodes = zwaveManager.getNodeNeighbors();
@@ -72,7 +37,7 @@ describe('zwaveManager lifecycle', () => {
   });
   it('should refresh node params', () => {
     zwaveManager.refreshNodeParams(1);
-    assert.calledWith(zwaveManager.driver.requestAllConfigParams, 1);
+    assert.calledWith(zwaveManager.zwave.requestAllConfigParams, 1);
   });
   it('should return Z-Wave informations', () => {
     const infos = zwaveManager.getInfos();
@@ -94,16 +59,16 @@ describe('zwaveManager lifecycle', () => {
   });
   it('should disconnect', () => {
     zwaveManager.disconnect();
-    assert.calledOnce(zwaveManager.driver.destroy);
+    assert.calledOnce(zwaveManager.zwave.disconnect);
   });
   it('should disconnect again', () => {
     zwaveManager.disconnect();
-    assert.calledOnce(zwaveManager.driver.destroy);
+    assert.calledOnce(zwaveManager.zwave.disconnect);
   });
-}); */
+});
 
-/* describe('zwaveManager events', () => {
-  const zwaveManager = new ZwaveManager(gladys, serviceId);
+describe('zwaveManager events', () => {
+  const zwaveManager = new ZwaveManager(ZwaveMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   it('should receive controllerCommand', () => {
     zwaveManager.controllerCommand(1, 1, 1, 'message');
   });
@@ -113,116 +78,74 @@ describe('zwaveManager lifecycle', () => {
   it('should receive driverFailed', () => {
     zwaveManager.driverFailed();
   });
+  it('should receive node event', () => {
+    zwaveManager.nodeEvent(1, {});
+  });
   it('should receive notification', () => {
-    zwaveManager.notification({ id: 1 }, 1);
+    zwaveManager.notification(1, 1);
   });
   it('should receive scanComplete', () => {
     zwaveManager.scanComplete();
   });
   it('should receive node added', () => {
-    const events = [];
-    zwaveManager.nodeAdded({
-      id: 1,
-      on: (event) => {
-        events.push(event);
-      },
-    });
-    assert.match(zwaveManager.nodes[1] !== undefined, true);
-    assert.match(zwaveManager.nodes[1].classes !== undefined, true);
-    assert.match(events.length, 6);
-    assert.match(events.indexOf('ready') > -1, true);
-    assert.match(events.indexOf('value added') > -1, true);
-    assert.match(events.indexOf('value updated') > -1, true);
-    assert.match(events.indexOf('value notification') > -1, true);
-    assert.match(events.indexOf('value removed') > -1, true);
-    assert.match(events.indexOf('notification') > -1, true);
+    zwaveManager.nodeAdded(1);
   });
   it('should receive node removed', () => {
-    zwaveManager.nodeRemoved({ id: 1 });
+    zwaveManager.nodeRemoved(2);
   });
   it('should receive node ready info', () => {
-    zwaveManager.nodes[1] = {
-      id: 1,
-      ready: true,
-      classes: {},
-    };
-    zwaveManager.nodeReady({
-      id: 1,
+    zwaveManager.nodeReady(1, {
       manufacturer: 'Aeotec',
       manufacturerid: '0x0086',
-      label: 'Z-Stick S2',
+      product: 'Z-Stick S2',
       producttype: '0x0002',
       productid: '0x0001',
-      type: 1,
+      type: 'Static PC Controller',
       name: '',
-      location: '',
-      getDefinedValueIDs: () => {
-        return [];
-      },
+      loc: '',
     });
   });
   it('should receive value added', () => {
-    const { commandClass, endpoint, property } = { commandClass: 43, endpoint: 0, property: 'sceneId' };
-    zwaveManager.nodes[1] = {
-      id: 1,
-      ready: true,
-      classes: {},
-    };
-    zwaveManager.valueAdded(
-      {
-        id: 1,
-        getValueMetadata: () => {
-          return {
-            min: 0,
-            max: 4,
-            label: '',
-            writeable: false,
-          };
-        },
-      },
-      {
-        commandClassName: 'Scene Activation',
-        commandClass,
-        endpoint,
-        property,
-        propertyName: property,
-      },
-    );
-    assert.match(zwaveManager.nodes[1].classes !== undefined, true);
-    assert.match(zwaveManager.nodes[1].classes[commandClass] !== undefined, true);
-    assert.match(zwaveManager.nodes[1].classes[commandClass][endpoint] !== undefined, true);
-    assert.match(zwaveManager.nodes[1].classes[commandClass][endpoint][property] !== undefined, true);
-    assert.match(zwaveManager.nodes[1].classes[commandClass][endpoint][property].min, 0);
-    assert.match(zwaveManager.nodes[1].classes[commandClass][endpoint][property].max, 4);
-    assert.match(zwaveManager.nodes[1].classes[commandClass][endpoint][property].label, '');
-    assert.match(zwaveManager.nodes[1].classes[commandClass][endpoint][property].read_only, true);
+    zwaveManager.valueAdded(1, 10, {
+      value_id: '5-32-1-0',
+      node_id: 5,
+      class_id: 32,
+      type: 'byte',
+      genre: 'basic',
+      instance: 1,
+      index: 0,
+      label: 'Basic',
+      units: '',
+      help: '',
+      read_only: false,
+      write_only: false,
+      min: 0,
+      max: 255,
+      is_polled: false,
+      value: 0,
+    });
   });
-  it('should receive value updated', () => {
-    zwaveManager.valueUpdated(
-      {
-        id: 1,
-      },
-      {
-        commandClassName: 'Scene Activation',
-        commandClass: 43,
-        endpoint: 0,
-        property: 'sceneId',
-        propertyName: 'sceneId',
-      },
-    );
+  it('should receive value changed', () => {
+    zwaveManager.valueChanged(1, 10, {
+      value_id: '5-32-1-0',
+      node_id: 5,
+      class_id: 32,
+      type: 'byte',
+      genre: 'basic',
+      instance: 1,
+      index: 0,
+      label: 'Basic',
+      units: '',
+      help: '',
+      read_only: false,
+      write_only: false,
+      min: 0,
+      max: 255,
+      is_polled: false,
+      value: 0,
+    });
   });
   it('should receive value removed', () => {
-    zwaveManager.valueRemoved(
-      {
-        id: 1,
-      },
-      {
-        commandClassName: 'Scene Activation',
-        commandClass: 43,
-        endpoint: 0,
-        property: 'sceneId',
-        propertyName: 'sceneId',
-      },
-    );
+    zwaveManager.valueRemoved(1, 10, 0, 0);
   });
-}); */
+});

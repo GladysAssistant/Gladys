@@ -4,7 +4,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const ZwaveMock = require('./ZwaveMock.test');
 
 const ZwaveService = proxyquire('../../../services/zwave/index', {
-  'zwave-js': ZwaveMock,
+  'openzwave-shared': ZwaveMock,
 });
 
 const gladys = {
