@@ -9,8 +9,7 @@ module.exports.usb = require('./usb');
 module.exports.xiaomi = require('./xiaomi');
 module.exports.zwave = require('./zwave');
 module.exports.tasmota = require('./tasmota');
-// Error: ENODEV, No such device -> crash server
-// module.exports.bluetooth = require('./bluetooth');
+module.exports.bluetooth = require('./bluetooth');
 module.exports.ewelink = require('./ewelink');
 module.exports['tp-link'] = require('./tp-link');
 module.exports.zigbee2mqtt = require('./zigbee2mqtt');
