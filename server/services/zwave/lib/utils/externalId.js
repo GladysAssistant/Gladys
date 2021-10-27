@@ -1,15 +1,4 @@
 /**
- * @description Return external id of device
- * @param {Object} value - The zwave value.
- * @returns {string} Return external id.
- * @example
- * getDeviceExternalId(value);
- */
-function getDeviceExternalId(value) {
-  return `zwave:node_id:${value.nodeId}`;
-}
-
-/**
  * @description Return external id of deviceFeature
  * @param {Object} value - The zwave value.
  * @returns {string} Return external id.
@@ -17,7 +6,7 @@ function getDeviceExternalId(value) {
  * getDeviceFeatureExternalId(value);
  */
 function getDeviceFeatureExternalId(value) {
-  return `zwave:node_id:${value.nodeId}:comclass:${value.commandClass}:endpoint:${value.endpoint}:property:${value.property}`;
+  return `zwave:node_id:${value.node_id}:comclass:${value.class_id}:index:${value.index}:instance:${value.instance}`;
 }
 
 /**
@@ -29,20 +18,19 @@ function getDeviceFeatureExternalId(value) {
  */
 function getNodeInfoByExternalId(externalId) {
   const array = externalId.split(':');
-  const nodeId = parseInt(array[2], 10);
-  const commandClass = parseInt(array[4], 10);
-  const endpoint = parseInt(array[6], 10);
-  const property = array[8];
+  const nodeId = array[2];
+  const comclass = array[4];
+  const index = array[6];
+  const instance = array[8];
   return {
     nodeId,
-    commandClass,
-    endpoint,
-    property,
+    comclass,
+    index,
+    instance,
   };
 }
 
 module.exports = {
-  getDeviceExternalId,
   getDeviceFeatureExternalId,
   getNodeInfoByExternalId,
 };

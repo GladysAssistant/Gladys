@@ -2,21 +2,19 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description When a value is removed.
- * @param {Object} zwaveNode - ZWave Node.
- * @param {Object} args - Zwave ValueRemovedArgs.
+ * @param {number} nodeId - The ID of the node.
+ * @param {number} comClass - Zwave comclass.
+ * @param {number} index - The index of the value.
+ * @param {number} instance - The instance of the value.
  * @example
  * zwave.on('value removed', this.valueRemoved);
  */
-function valueRemoved(zwaveNode, args) {
-  const { commandClass, endpoint, property, propertyKey /* , newValue */ } = args;
-  const nodeId = zwaveNode.id;
-  const node = this.nodes[nodeId];
-  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+function valueRemoved(nodeId, comClass, index, instance) {
   logger.debug(
-    `Value Removed: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}`,
+    `Zwave : Value removed, nodeId = ${nodeId}, comClass = ${comClass}, index = ${index}, instance = ${instance}`,
   );
-  if (node.classes[commandClass] && node.classes[commandClass][endpoint][fullProperty]) {
-    delete node.classes[commandClass][endpoint][fullProperty];
+  if (this.nodes[nodeId].classes[comClass] && this.nodes[nodeId].classes[comClass][index][instance]) {
+    delete this.nodes[nodeId].classes[comClass][index][instance];
   }
 }
 

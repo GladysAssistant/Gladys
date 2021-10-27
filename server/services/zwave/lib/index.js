@@ -1,61 +1,63 @@
-const schedule = require('node-schedule');
+const fs = require('fs');
 
-const { addNode } = require('./commands/zwave.addNode');
-const { connect } = require('./commands/zwave.connect');
-const { disconnect } = require('./commands/zwave.disconnect');
-const { getInfos } = require('./commands/zwave.getInfos');
-const { getNodeNeighbors } = require('./commands/zwave.getNodeNeighbors');
-const { getNodes } = require('./commands/zwave.getNodes');
-const { healNetwork } = require('./commands/zwave.healNetwork');
-const { refreshNodeParams } = require('./commands/zwave.refreshNodeParams');
-const { removeNode } = require('./commands/zwave.removeNode');
-const { setValue } = require('./commands/zwave.setValue');
-const { driverFailed } = require('./events/zwave.driverFailed');
+// EVENTS
 const { driverReady } = require('./events/zwave.driverReady');
+const { driverFailed } = require('./events/zwave.driverFailed');
 const { nodeAdded } = require('./events/zwave.nodeAdded');
 const { nodeRemoved } = require('./events/zwave.nodeRemoved');
+const { nodeEvent } = require('./events/zwave.nodeEvent');
 const { valueAdded } = require('./events/zwave.valueAdded');
-const { valueUpdated } = require('./events/zwave.valueUpdated');
+const { valueChanged } = require('./events/zwave.valueChanged');
 const { valueRemoved } = require('./events/zwave.valueRemoved');
 const { nodeReady } = require('./events/zwave.nodeReady');
 const { notification } = require('./events/zwave.notification');
 const { scanComplete } = require('./events/zwave.scanComplete');
 const { controllerCommand } = require('./events/zwave.controllerCommand');
-const { valueNotification } = require('./events/zwave.valueNotification');
-const { cancelControllerCommand } = require('./commands/zwave.cancelControllerCommand');
-const { nodeWakeUp, nodeSleep, nodeDead, nodeAlive } = require('./events/zwave.nodeState');
-const {
-  nodeInterviewCompleted,
-  nodeInterviewFailed,
-  nodeInterviewStageCompleted,
-  nodeInterviewStarted,
-} = require('./events/zwave.nodeInterview');
-const { metadataUpdate } = require('./events/zwave.metadataUpdate');
-const { statisticsUpdated } = require('./events/zwave.statisticsUpdated');
-const { updateConfiguration } = require('./commands/zwave.updateConfiguration');
 
-const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
-  this.gladys = gladys;
-  this.eventManager = gladys.event;
+// COMMANDS
+const { addNode } = require('./commands/zwave.addNode');
+const { connect } = require('./commands/zwave.connect');
+const { cancelControllerCommand } = require('./commands/zwave.cancelControllerCommand');
+const { disconnect } = require('./commands/zwave.disconnect');
+const { healNetwork } = require('./commands/zwave.healNetwork');
+const { refreshNodeParams } = require('./commands/zwave.refreshNodeParams');
+const { getInfos } = require('./commands/zwave.getInfos');
+const { getNodes } = require('./commands/zwave.getNodes');
+const { getNodeNeighbors } = require('./commands/zwave.getNodeNeighbors');
+const { removeNode } = require('./commands/zwave.removeNode');
+const { setValue } = require('./commands/zwave.setValue');
+
+const DEFAULT_ZWAVE_OPTIONS = {
+  Logging: false,
+  ConsoleOutput: false,
+  SaveConfiguration: true,
+  // NetworkKey: '0x49,0x43,0x1D,0xBD,0x03,0x6D,0x9D,0x8C,0x39,0x67,0x16,0x82,0xA8,0x67,0xEE,0x91',
+};
+
+// if openzwave config is installed in the etc folder
+if (fs.existsSync('/etc/openzwave')) {
+  DEFAULT_ZWAVE_OPTIONS.ConfigPath = '/etc/openzwave';
+}
+
+const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
+  this.zwave = new Zwave(DEFAULT_ZWAVE_OPTIONS);
+  this.eventManager = eventManager;
   this.serviceId = serviceId;
-  this.ZWaveJS = ZWaveJS;
   this.nodes = {};
   this.connected = false;
   this.scanInProgress = false;
-  this.schedule = schedule;
-
-  /* this.mqttService = this.gladys.service.getService('mqtt');
-  this.mqttService.device.subscribe('zwavejsmqtt/#', (topic, message) => {
-    logger.info(`Message recevied from topic ${topic}`);
-    const { type, node, args } = JSON.parse(message);
-    if (type === 'value added') {
-      valueAdded(node, args);
-    } else if (type === 'value notification') {
-      notification(node, args);
-    } else if (type === 'notification') {
-      valueNotification(node, args);
-    }
-  }); */
+  // setup all events listener
+  this.zwave.on('driver ready', this.driverReady.bind(this));
+  this.zwave.on('driver failed', this.driverFailed.bind(this));
+  this.zwave.on('node added', this.nodeAdded.bind(this));
+  this.zwave.on('node removed', this.nodeRemoved.bind(this));
+  this.zwave.on('node event', this.nodeEvent.bind(this));
+  this.zwave.on('value added', this.valueAdded.bind(this));
+  this.zwave.on('value changed', this.valueChanged.bind(this));
+  this.zwave.on('node ready', this.nodeReady.bind(this));
+  this.zwave.on('notification', this.notification.bind(this));
+  this.zwave.on('scan complete', this.scanComplete.bind(this));
+  this.zwave.on('controller command', this.controllerCommand.bind(this));
 };
 
 // EVENTS
@@ -63,28 +65,19 @@ ZwaveManager.prototype.driverReady = driverReady;
 ZwaveManager.prototype.driverFailed = driverFailed;
 ZwaveManager.prototype.nodeAdded = nodeAdded;
 ZwaveManager.prototype.nodeRemoved = nodeRemoved;
+ZwaveManager.prototype.nodeEvent = nodeEvent;
 ZwaveManager.prototype.valueAdded = valueAdded;
-ZwaveManager.prototype.valueUpdated = valueUpdated;
+ZwaveManager.prototype.valueChanged = valueChanged;
 ZwaveManager.prototype.valueRemoved = valueRemoved;
-ZwaveManager.prototype.valueNotification = valueNotification;
-ZwaveManager.prototype.metadataUpdate = metadataUpdate;
 ZwaveManager.prototype.nodeReady = nodeReady;
 ZwaveManager.prototype.notification = notification;
 ZwaveManager.prototype.scanComplete = scanComplete;
 ZwaveManager.prototype.controllerCommand = controllerCommand;
-ZwaveManager.prototype.nodeSleep = nodeSleep;
-ZwaveManager.prototype.nodeDead = nodeDead;
-ZwaveManager.prototype.nodeAlive = nodeAlive;
-ZwaveManager.prototype.nodeWakeUp = nodeWakeUp;
-ZwaveManager.prototype.nodeInterviewStarted = nodeInterviewStarted;
-ZwaveManager.prototype.nodeInterviewFailed = nodeInterviewFailed;
-ZwaveManager.prototype.nodeInterviewCompleted = nodeInterviewCompleted;
-ZwaveManager.prototype.nodeInterviewStageCompleted = nodeInterviewStageCompleted;
-ZwaveManager.prototype.statisticsUpdated = statisticsUpdated;
 
 // COMMANDS
 ZwaveManager.prototype.addNode = addNode;
 ZwaveManager.prototype.connect = connect;
+ZwaveManager.prototype.cancelControllerCommand = cancelControllerCommand;
 ZwaveManager.prototype.disconnect = disconnect;
 ZwaveManager.prototype.healNetwork = healNetwork;
 ZwaveManager.prototype.refreshNodeParams = refreshNodeParams;
@@ -93,7 +86,5 @@ ZwaveManager.prototype.getNodes = getNodes;
 ZwaveManager.prototype.getNodeNeighbors = getNodeNeighbors;
 ZwaveManager.prototype.removeNode = removeNode;
 ZwaveManager.prototype.setValue = setValue;
-ZwaveManager.prototype.cancelControllerCommand = cancelControllerCommand;
-ZwaveManager.prototype.updateConfiguration = updateConfiguration;
 
 module.exports = ZwaveManager;

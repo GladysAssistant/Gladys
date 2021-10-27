@@ -11,7 +11,7 @@ function healNetwork() {
     throw new ServiceNotConfiguredError('ZWAVE_DRIVER_NOT_RUNNING');
   }
   logger.debug(`Zwave : Heal network.`);
-  this.driver.controller.beginHealingNetwork();
+  this.zwave.healNetwork();
 }
 
 module.exports = {

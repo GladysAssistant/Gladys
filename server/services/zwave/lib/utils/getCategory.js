@@ -10,24 +10,22 @@ const { CATEGORIES, UNKNOWN_CATEGORY, UNKNOWN_TYPE } = require('../constants');
  *  productid: '',
  *  producttype: ''
  * }, {
- *  commandClass: 49,
+ *  class_id: 49,
  *  index: 1,
- *  fullProperty: 'currentValue',
+ *  instance: 1,
  * });
  */
 function getCategory(node, value) {
   let found = false;
   let categoryFound = null;
   let i = 0;
-
   while (!found && i < CATEGORIES.length) {
     const category = CATEGORIES[i];
-    const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.commandClass) : true;
-    const validEndpoint = category.INDEXES ? category.INDEXES.includes(value.endpoint) : true;
-    const validProperty = category.PROPERTIES ? category.PROPERTIES.includes(value.property) : true;
+    const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.class_id) : true;
+    const validIndex = category.INDEXES ? category.INDEXES.includes(value.index) : true;
     const validProductId = category.PRODUCT_IDS ? category.PRODUCT_IDS.includes(node.productid) : true;
     const validProductType = category.PRODUCT_TYPES ? category.PRODUCT_TYPES.includes(node.producttype) : true;
-    found = validComClass && validEndpoint && validProperty && validProductId && validProductType;
+    found = validComClass && validIndex && validProductId && validProductType;
     if (found) {
       categoryFound = {
         category: category.CATEGORY,

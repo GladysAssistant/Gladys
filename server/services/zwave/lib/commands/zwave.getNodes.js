@@ -2,8 +2,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
-const { getDeviceFeatureExternalId, getDeviceExternalId } = require('../utils/externalId');
-const logger = require('../../../../utils/logger');
+const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
 /**
  * @description Return array of Nodes.
@@ -24,17 +23,11 @@ function getNodes() {
   return nodes
     .map((node) => {
       const newDevice = {
-        name: node.name,
+        name: node.product,
         service_id: this.serviceId,
-        external_id: getDeviceExternalId({ nodeId: node.id }),
+        external_id: `zwave:node_id:${node.id}`,
         ready: node.ready,
-        rawZwaveNode: {
-          id: node.id,
-          type: node.type,
-          product: node.product,
-          keysClasses: Object.keys(node.classes),
-          deviceDatabaseUrl: node.deviceDatabaseUrl,
-        },
+        rawZwaveNode: node,
         features: [],
         params: [],
       };
@@ -42,19 +35,19 @@ function getNodes() {
       const comclasses = Object.keys(node.classes);
       comclasses.forEach((comclass) => {
         const valuesClass = node.classes[comclass];
-        const endpoints = Object.keys(valuesClass);
-        endpoints.forEach((endpoint) => {
-          const value = node.classes[comclass][endpoint];
-          const properties = Object.keys(value);
-          properties.forEach((inst) => {
+        const indexes = Object.keys(valuesClass);
+        indexes.forEach((idx) => {
+          const value = node.classes[comclass][idx];
+          const instances = Object.keys(value);
+          instances.forEach((inst) => {
             const { min, max } = value[inst];
             if (value[inst].genre === 'user') {
               const { category, type } = getCategory(node, value[inst]);
               if (category !== 'unknown') {
                 newDevice.features.push({
-                  name: `${value[inst].label} (${node.id})`,
+                  name: `${value[inst].label}`,
                   selector: slugify(
-                    `zwave-${value[inst].property}-${value[inst].endpoint}-${value[inst].label}-${node.product}-node-${node.id}`,
+                    `zwave-${value[inst].instance}-${value[inst].index}-${value[inst].label}-${node.product}-node-${node.id}`,
                   ),
                   category,
                   type,
@@ -65,8 +58,6 @@ function getNodes() {
                   min,
                   max,
                 });
-              } else {
-                logger.info(`Unkown category/type for ${JSON.stringify(value[inst])}`);
               }
             } else {
               newDevice.params.push({

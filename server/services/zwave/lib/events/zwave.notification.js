@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
 
-/* const NOTIFICATION_TYPES = {
+const NOTIFICATION_TYPES = {
   0: 'Message complete',
   1: 'Timeout',
   2: 'Nop',
@@ -8,19 +8,17 @@ const logger = require('../../../../utils/logger');
   4: 'Node sleep',
   5: 'Node dead',
   6: 'Node alive',
-}; */
+};
 
 /**
  * @description Notification about a node
- * @param {Object} zwaveNode - ZWave Node.
- * @param {Object} commandClass - CommandClass.
- * @param {Object} args - CommandClass arguments.
+ * @param {number} nodeId - The ID of the node.
+ * @param {Object} notif - Number of the type of notification.
  * @example
  * zwave.on('notification', this.notification);
  */
-function notification(zwaveNode, commandClass, args) {
-  const nodeId = zwaveNode.id;
-  logger.debug(`Value Notification: nodeId = ${nodeId}, comClass = ${commandClass}: ${args}`);
+function notification(nodeId, notif) {
+  logger.debug(`Zwave : Notification, nodeId = ${nodeId}, notif = ${NOTIFICATION_TYPES[notif]}`);
 }
 
 module.exports = {

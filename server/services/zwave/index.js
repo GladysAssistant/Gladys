@@ -4,10 +4,8 @@ const ZwaveController = require('./api/zwave.controller');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 
 module.exports = function ZwaveService(gladys, serviceId) {
-  const ZWaveJS = require('zwave-js');
-
-  const zwaveManager = new ZwaveManager(gladys, ZWaveJS, serviceId);
-
+  const Zwave = require('openzwave-shared');
+  const zwaveManager = new ZwaveManager(Zwave, gladys.event, serviceId);
   /**
    * @public
    * @description This function starts the service
@@ -20,24 +18,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
     if (!zwaveDriverPath) {
       throw new ServiceNotConfiguredError('ZWAVE_DRIVER_PATH_NOT_FOUND');
     }
-    const s2Unauthenticated = await gladys.variable.getValue('S2_Unauthenticated', serviceId);
-    const s2Authenticated = await gladys.variable.getValue('S2_Authenticated', serviceId);
-    const s2AccessControl = await gladys.variable.getValue('S2_AccessControl', serviceId);
-    const s0Legacy = await gladys.variable.getValue('S0_Legacy', serviceId);
-    const securityKeys = {};
-    if (s2Unauthenticated) {
-      securityKeys.S2_Unauthenticated = Buffer.from(s2Unauthenticated, 'hex');
-    }
-    if (s2Authenticated) {
-      securityKeys.S2_Authenticated = Buffer.from(s2Authenticated, 'hex');
-    }
-    if (s2AccessControl) {
-      securityKeys.S2_AccessControl = Buffer.from(s2AccessControl, 'hex');
-    }
-    if (s0Legacy) {
-      securityKeys.S0_Legacy = Buffer.from(s0Legacy, 'hex');
-    }
-    await zwaveManager.connect(zwaveDriverPath, securityKeys);
+    zwaveManager.connect(zwaveDriverPath);
   }
 
   /**
