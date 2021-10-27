@@ -24,11 +24,14 @@ async function createScheduledEvent(calendarEvent) {
   if (calendarEvent.start) {
     const eventStartTime = dayjs(calendarEvent.start).tz(this.timezone);
     if (eventStartTime.isAfter(now) && eventStartTime.isBefore(foreseenSchedule)) {
-      const eventStartJob = this.schedule.scheduleJob(eventStartTime.toDate(), () =>
-        this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
-          type: EVENTS.CALENDAR.EVENT_START,
-          calendarEvent,
-        }),
+      const eventStartJob = this.schedule.scheduleJob(
+        `${calendarEvent.external_id}_start`,
+        eventStartTime.toDate(),
+        () =>
+          this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
+            type: EVENTS.CALENDAR.EVENT_START,
+            calendarEvent,
+          }),
       );
       if (eventStartJob) {
         logger.info(`Calendar event ${calendarEvent.name} start is scheduled, ${eventStartTime.fromNow()}.`);
@@ -40,7 +43,7 @@ async function createScheduledEvent(calendarEvent) {
   if (calendarEvent.end) {
     const eventEndTime = dayjs(calendarEvent.end).tz(this.timezone);
     if (eventEndTime.isAfter(now) && eventEndTime.isBefore(foreseenSchedule)) {
-      const eventEndJob = this.schedule.scheduleJob(eventEndTime.toDate(), () =>
+      const eventEndJob = this.schedule.scheduleJob(`${calendarEvent.external_id}_end`, eventEndTime.toDate(), () =>
         this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
           type: EVENTS.CALENDAR.EVENT_END,
           calendarEvent,
