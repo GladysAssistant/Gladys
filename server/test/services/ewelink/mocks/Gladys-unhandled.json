@@ -2,10 +2,10 @@
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
   "name": "Sonoff Unknown",
   "model": "UNKNOWN",
-  "external_id": "ewelink:10004534ae:0",
-  "selector": "ewelink:10004534ae:0",
+  "external_id": "ewelink:10004535ae",
+  "selector": "ewelink:10004535ae",
   "should_poll": true,
-  "poll_frequency": 86400000,
+  "poll_frequency": 30000,
   "features": [],
   "params": [
     {
@@ -15,6 +15,10 @@
     {
       "name": "FIRMWARE",
       "value": "?.?.?"
+    },
+    {
+      "name": "ONLINE",
+      "value": "1"
     }
   ]
 }

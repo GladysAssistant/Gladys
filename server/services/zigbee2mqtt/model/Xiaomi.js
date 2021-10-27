@@ -36,6 +36,7 @@ const Xiaomi = {
     LLKZMK11LM: [features.switch, features.power],
     ZNMS12LM: [features.switch_sensor, features.door],
     WXKG06LM: [features.button],
+    GZCGQ01LM: [features.illuminance, features.illuminance_lux],
   },
 };
 

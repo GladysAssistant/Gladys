@@ -1,5 +1,30 @@
 const { expect } = require('chai');
+const uuid = require('uuid');
+const EventEmitter = require('events');
+const { fake } = require('sinon');
+const db = require('../../../models');
+const Device = require('../../../lib/device');
+
 const { authenticatedRequest } = require('../request.test');
+
+const insertStates = async (intervalInMinutes) => {
+  const queryInterface = db.sequelize.getQueryInterface();
+  const deviceFeatureStateToInsert = [];
+  const now = new Date();
+  const statesToInsert = 2000;
+  for (let i = 0; i < statesToInsert; i += 1) {
+    const startAt = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
+    const date = new Date(startAt.getTime() + ((intervalInMinutes * 60 * 1000) / statesToInsert) * i);
+    deviceFeatureStateToInsert.push({
+      id: uuid.v4(),
+      device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      value: i,
+      created_at: date,
+      updated_at: date,
+    });
+  }
+  await queryInterface.bulkInsert('t_device_feature_state', deviceFeatureStateToInsert);
+};
 
 describe('POST /api/v1/device', () => {
   it('should create device', async () => {
@@ -30,6 +55,54 @@ describe('GET /api/v1/device/:device_selector', () => {
         expect(res.body).to.have.property('selector', 'test-device');
         expect(res.body).to.have.property('features');
         expect(res.body).to.have.property('params');
+      });
+  });
+});
+
+describe('GET /api/v1/device_feature/aggregated_states', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await insertStates(365 * 24 * 60);
+    const variable = {
+      getValue: fake.resolves(null),
+    };
+    const event = new EventEmitter();
+    const device = new Device(event, {}, {}, {}, {}, variable);
+    await device.calculateAggregate('hourly');
+    await device.calculateAggregate('daily');
+    await device.calculateAggregate('monthly');
+  });
+  it('should get device aggregated state by selector', async function Test() {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/aggregated_states')
+      .query({
+        interval: 365 * 24 * 60,
+        max_states: 100,
+        device_features: 'test-device-feature',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(1);
+        expect(res.body[0].values).to.have.lengthOf(100);
+      });
+  });
+  it('should get device aggregated state', async function Test() {
+    await authenticatedRequest
+      .get('/api/v1/device_feature/aggregated_states')
+      .query({
+        interval: 365 * 24 * 60,
+        max_states: 5,
+        device_features: 'test-device-feature',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(1);
+        res.body[0].values.forEach((state) => {
+          expect(state).to.have.property('created_at');
+          expect(state).to.have.property('value');
+        });
       });
   });
 });

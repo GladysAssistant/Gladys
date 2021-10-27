@@ -10,6 +10,7 @@ const Event = require('./event');
 const House = require('./house');
 const Gateway = require('./gateway');
 const Http = require('./http');
+const Job = require('./job');
 const Location = require('./location');
 const MessageHandler = require('./message');
 const Service = require('./service');
@@ -37,6 +38,8 @@ const Weather = require('./weather');
  * @param {boolean} [params.disableUserLoading] - If true, disable the loading of users in RAM.
  * @param {boolean} [params.disableSchedulerLoading] - If true, disable the loading of the scheduler.
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
+ * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
+ * @param {boolean} [params.disableDeviceStateAggregation] - If true, disable the aggregation of device states.
  * @example
  * const gladys = Gladys();
  */
@@ -48,6 +51,7 @@ function Gladys(params = {}) {
   const variable = new Variable(event);
   const brain = new Brain();
   const cache = new Cache();
+  const job = new Job(event);
   const area = new Area(event);
   const dashboard = new Dashboard();
   const stateManager = new StateManager(event);
@@ -60,7 +64,7 @@ function Gladys(params = {}) {
   const session = new Session(params.jwtSecret, cache);
   const user = new User(session, stateManager, variable);
   const location = new Location(user, event);
-  const device = new Device(event, message, stateManager, service, room, variable);
+  const device = new Device(event, message, stateManager, service, room, variable, job);
   const scene = new Scene(stateManager, event, device, message, variable, house, http);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
@@ -76,6 +80,7 @@ function Gladys(params = {}) {
     event,
     house,
     http,
+    job,
     gateway,
     location,
     message,
@@ -100,9 +105,15 @@ function Gladys(params = {}) {
 
       await system.init();
 
+      // this should be before device.init
+      if (!params.disableJobInit) {
+        await job.init();
+      }
+
       if (!params.disableBrainLoading) {
         await brain.load();
       }
+
       if (!params.disableService) {
         await service.load(gladys);
         await service.startAll();
@@ -111,7 +122,7 @@ function Gladys(params = {}) {
         await scene.init();
       }
       if (!params.disableDeviceLoading) {
-        await device.init();
+        await device.init(!params.disableDeviceStateAggregation);
       }
       if (!params.disableUserLoading) {
         await user.init();
