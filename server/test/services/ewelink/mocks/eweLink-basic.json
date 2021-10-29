@@ -1,0 +1,19 @@
+{
+  "online": true,
+  "name": "Test 6",
+  "deviceid": "10004536ae",
+  "apikey": "validApikey",
+  "extra": {
+    "extra": {
+      "uiid": 6,
+      "model": "PSA-BHA-GL"
+    }
+  },
+  "params": {
+    "fwVersion": "3.3.0"
+  },
+  "ip": "192.168.0.6",
+  "brandName": "Sonoff",
+  "productModel": "Basic",
+  "uiid": 7
+}

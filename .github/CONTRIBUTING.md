@@ -39,7 +39,7 @@ We actively welcome your pull requests:
 4. Ensure the test suite passes. (`npm test`)
 5. Make sure your code lints. (`npm run eslint`)
 6. Make sure your code is pretty (`npm run prettier`)
-7. Make sure you add fake requests data for the demo mode (`front/src/config/demo.json`) so that the demo website is working without a backend. (if needed) See [https://demo.gladysassistant.com](https://demo.gladysassistant.com).
+7. Make sure you add fake requests data for the demo mode (`front/src/config/demo.js`) so that the demo website is working without a backend. (if needed) See [https://demo.gladysassistant.com](https://demo.gladysassistant.com).
 8. Issue that pull request!
 
 ## Any contributions you make will be under the Apache 2.0 License
