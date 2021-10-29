@@ -167,6 +167,11 @@ const EVENTS = {
   JOB: {
     PURGE_OLD_JOBS: 'job.purge-old-jobs',
   },
+  CALENDAR: {
+    EVENT_START: 'calendar.event-start',
+    EVENT_END: 'calendar.event-end',
+    EVENT_REMINDER: 'calendar.event-reminder',
+  },
 };
 
 const LIFE_EVENTS = {
