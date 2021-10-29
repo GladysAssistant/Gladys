@@ -200,22 +200,11 @@ module.exports = function CalendarController(gladys) {
    * @apiSuccessExample {json} Success-Example
    * [
    *   {
-   *     "id": "f014c7e2-4e7d-422d-ac83-02d688e686b0",
-   *     "calendar_id": "8afba93a-e94f-4255-9d8b-db9e605e10b6",
-   *     "name": "Code on Gladys",
-   *     "selector": "code-on-gladys",
-   *     "external_id": null,
-   *     "location": null,
-   *     "start": "2019-05-09T00:00:00.000Z",
-   *     "end": "2019-05-09T23:00:00.000Z",
-   *     "full_day": false,
-   *     "created_at": "2019-05-09T03:22:47.150Z",
-   *     "updated_at": "2019-05-09T03:22:47.150Z",
-   *     "calendar": {
-   *       "name": "My calendar",
-   *       "selector": "my-calendar"
-   *     }
-   *   }
+   *     "type":"calendar",
+   *     "data":"<Anonymous Job 1>",
+   *     "status":"in-progress",
+   *     "created_at":"2021-10-29T22:00:00.000Z"
+   *   },
    * ]
    */
   async function getScheduledEvents(req, res) {
