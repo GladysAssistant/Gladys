@@ -17,6 +17,17 @@ class SettingsSystem extends Component {
     }
   };
 
+  getScheduledJobs = async () => {
+    try {
+      const scheduledJobs = await this.props.httpClient.get(`/api/v1/calendar/schedule?take=500`);
+      this.setState({
+        scheduledJobs
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   search = async e => {
     const text = e.target.value;
     await this.setState({
@@ -48,12 +59,14 @@ class SettingsSystem extends Component {
     super(props);
     this.props = props;
     this.state = {
-      jobs: []
+      jobs: [],
+      scheduledJobs: []
     };
   }
 
   componentDidMount() {
     this.getJobs();
+    this.getScheduledJobs();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.NEW, this.newJob);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
   }
@@ -63,8 +76,8 @@ class SettingsSystem extends Component {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.JOB.UPDATED, this.jobUpdated);
   }
 
-  render(props, { jobs }) {
-    return <SettingsBackgroundJobs jobs={jobs} user={props.user} />;
+  render(props, { jobs, scheduledJobs }) {
+    return <SettingsBackgroundJobs jobs={jobs} scheduledJobs={scheduledJobs} user={props.user} />;
   }
 }
 

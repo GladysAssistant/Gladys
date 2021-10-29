@@ -152,6 +152,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: calendarController.destroyEvent,
     },
+    'get /api/v1/calendar/schedule': {
+      authenticated: true,
+      controller: calendarController.getScheduledEvents,
+    },
     // camera
     'get /api/v1/camera': {
       authenticated: true,

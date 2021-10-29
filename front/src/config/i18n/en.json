@@ -1375,7 +1375,8 @@
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
-      "hourly-device-state-aggregate": "Hourly sensors aggregation"
+      "hourly-device-state-aggregate": "Hourly sensors aggregation",
+      "calendar": "Calendar"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."

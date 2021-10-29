@@ -1,7 +1,7 @@
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc'); // dependent on utc plugin
 const timezone = require('dayjs/plugin/timezone');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { JOB_STATUS, JOB_TYPES } = require('../../utils/constants');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -19,8 +19,10 @@ async function getScheduledEvents() {
   Object.entries(scheduledJobs).forEach((scheduledJob) => {
     const [name, job] = scheduledJob;
     res.push({
-      name,
-      nextInvocation: dayjs(job.nextInvocation()),
+      type: JOB_TYPES.CALENDAR,
+      data: name,
+      status: JOB_STATUS.IN_PROGRESS,
+      created_at: dayjs(job.nextInvocation()),
     });
   });
   return res;
