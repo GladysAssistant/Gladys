@@ -112,6 +112,17 @@ const DashboardSettings = ({ children, ...props }) => (
                   </Link>
 
                   <Link
+                    href="/dashboard/settings/jobs"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-cpu" />
+                    </span>
+                    <Text id="settings.jobsTab" />
+                  </Link>
+
+                  <Link
                     href="/dashboard/settings/service"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"

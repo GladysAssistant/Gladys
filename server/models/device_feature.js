@@ -78,6 +78,15 @@ module.exports = (sequelize, DataTypes) => {
       last_value_changed: {
         type: DataTypes.DATE,
       },
+      last_hourly_aggregate: {
+        type: DataTypes.DATE,
+      },
+      last_daily_aggregate: {
+        type: DataTypes.DATE,
+      },
+      last_monthly_aggregate: {
+        type: DataTypes.DATE,
+      },
     },
     {},
   );
