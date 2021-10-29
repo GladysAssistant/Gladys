@@ -1,3 +1,5 @@
+const schedule = require('node-schedule');
+
 const { create } = require('./calendar.create');
 const { createScheduledEvent } = require('./calendar.createScheduledEvent');
 const { destroy } = require('./calendar.destroy');
@@ -10,8 +12,10 @@ const { destroyEvents } = require('./calendar.destroyEvents');
 const { updateEvent } = require('./calendar.updateEvent');
 const { getScheduledEvents } = require('./calendar.getScheduledEvents');
 
-const Calendar = function Calendar(service) {
+const Calendar = function Calendar(service, eventManager) {
   this.service = service;
+  this.eventManager = eventManager;
+  this.schedule = schedule;
 };
 
 Calendar.prototype.create = create;
