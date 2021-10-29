@@ -29,6 +29,7 @@ describe('CaldavService', () => {
     expect(caldavService)
       .to.have.property('start')
       .and.be.instanceOf(Function);
+    expect(gladys.user.get.callCount).to.equal(1);
   });
 
   it('should stop service', async () => {
@@ -40,7 +41,7 @@ describe('CaldavService', () => {
 
   it('should sync all users service', async () => {
     await caldavService.syncAllUsers();
-    expect(gladys.user.get.callCount).to.equal(1);
+    expect(gladys.user.get.callCount).to.equal(2);
     expect(gladys.service.getLocalServiceByName.args).to.eql([['caldav']]);
     expect(gladys.variable.getValue.args).to.eql([
       ['CALDAV_URL', '6d1bd783-ab5c-4d90-8551-6bc5fcd02212', '9de05cca-85bd-4218-a715-c2fa8e934408'],
