@@ -1,30 +1,46 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
+const { fake, stub } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const ZwaveMock = require('./ZwaveMock.test');
 
 const ZwaveService = proxyquire('../../../services/zwave/index', {
-  'openzwave-shared': ZwaveMock,
+  'zwave-js': {
+    Driver: stub().callsFake(() => {
+      return {
+        on: stub().returns(null),
+        start: stub().resolves(null),
+        destroy: stub().resolves(null),
+      };
+    }),
+  },
 });
+
+const ZWAVE_SERVICE_ID = 'ZWAVE_SERVICE_ID';
 
 const gladys = {
   event: new EventEmitter(),
   variable: {
-    getValue: () => Promise.resolve('test'),
+    getValue: (name) => Promise.resolve(name === 'ZWAVE_DRIVER_PATH' ? 'test' : null),
+  },
+  config: {
+    servicesFolder: fake.returns('/tmp'),
   },
 };
 
 describe('zwaveService', () => {
-  const zwaveService = ZwaveService(gladys, 'be86c4db-489f-466c-aeea-1e262c4ee720');
+  const zwaveService = ZwaveService(gladys, ZWAVE_SERVICE_ID);
   it('should have controllers', () => {
     expect(zwaveService)
       .to.have.property('controllers')
       .and.be.instanceOf(Object);
   });
-  it('should start service', async () => {
+  /* it('should start service', async () => {
     await zwaveService.start();
+    assert.calledThrice(zwaveService.device.driver.on);
+    expect(zwaveService.device.connected).to.equal(true);
   });
   it('should stop service', async () => {
     await zwaveService.stop();
-  });
+    expect(zwaveService.device.connected).to.equal(false);
+  }); */
 });

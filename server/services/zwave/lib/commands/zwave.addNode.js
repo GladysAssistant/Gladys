@@ -10,8 +10,11 @@ const ADD_NODE_TIMEOUT = 60 * 1000;
  */
 function addNode(secure = false) {
   logger.debug(`Zwave : Entering inclusion mode`);
-  this.zwave.addNode(secure);
-  setTimeout(this.cancelControllerCommand.bind(this), ADD_NODE_TIMEOUT);
+  this.driver.controller.beginInclusion(!secure);
+  setTimeout(() => {
+    this.driver.controller.stopInclusion();
+    this.scanInProgress = false;
+  }, ADD_NODE_TIMEOUT);
 }
 
 module.exports = {

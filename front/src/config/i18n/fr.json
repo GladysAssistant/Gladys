@@ -726,7 +726,8 @@
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
         "unknowNode": "Noeud inconnu",
         "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page.",
-        "createGithubIssue": "Signaler un bug avec cet appareil"
+        "createGithubIssue": "Signaler un bug avec cet appareil",
+        "deviceDatabaseUrl": "Lien vers Z-Wave JS DB de l'appareil"
       },
       "network": {
         "title": "Réseau Z-Wave",
@@ -1717,7 +1718,8 @@
     "motion-sensor": {
       "shortCategoryName": "Détecteur de mouvement",
       "push": "Détecteur de mouvement",
-      "binary": "Détection mouvement Oui/Non"
+      "binary": "Détection mouvement Oui/Non",
+      "integer": "Détection mouvement"
     },
     "presence-sensor": {
       "shortCategoryName": "Détecteur de présence",
@@ -1799,6 +1801,11 @@
     "humidity-sensor": {
       "shortCategoryName": "Capteur d'humidité",
       "decimal": "Humidité (pourcentage)"
+    },
+    "ultraviolet-sensor": {
+      "shortCategoryName": "Capteur UV",
+      "integer": "UV entière",
+      "decimal": "UV décimale"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",

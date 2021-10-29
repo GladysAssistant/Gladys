@@ -29,6 +29,7 @@ describe('CaldavService', () => {
     expect(caldavService)
       .to.have.property('start')
       .and.be.instanceOf(Function);
+    expect(gladys.user.get.callCount).to.equal(0);
   });
 
   it('should stop service', async () => {
