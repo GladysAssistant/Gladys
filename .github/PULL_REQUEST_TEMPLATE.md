@@ -7,9 +7,10 @@ To ensure your Pull Request can be accepted as fast as possible, make sure to re
 - [ ] Is the linter passing? (`npm run eslint` on both front/server)
 - [ ] Did you run prettier? (`npm run prettier` on both front/server)
 - [ ] If you are adding a new features/services, did you run integration comparator? (`npm run compare-translations` on front)
+- [ ] Did you test this pull request in real life? With real devices? If this development is a big feature or a new service, we recommend that you provide a Docker image to [the community](https://community.gladysassistant.com/) for testing before merging.
 - [ ] If your changes modify the API (REST or Node.js), did you modify the API documentation? (Documentation is based on comments in code)
 - [ ] If you are adding a new features/services which needs explanation, did you modify the user documentation? See [the GitHub repo](https://github.com/GladysAssistant/v4-website) and the [website](https://gladysassistant.com).
-- [ ] Did you add fake requests data for the demo mode (`front/src/config/demo.json`) so that the demo website is working without a backend? (if needed) See [https://demo.gladysassistant.com](https://demo.gladysassistant.com).
+- [ ] Did you add fake requests data for the demo mode (`front/src/config/demo.js`) so that the demo website is working without a backend? (if needed) See [https://demo.gladysassistant.com](https://demo.gladysassistant.com).
 
 NOTE: these things are not required to open a PR and can be done afterwards / while the PR is open.
 

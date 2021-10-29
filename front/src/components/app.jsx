@@ -60,6 +60,7 @@ import SettingsBackup from '../routes/settings/settings-backup';
 import SettingsBilling from '../routes/settings/settings-billing';
 import SettingsGatewayUsers from '../routes/settings/settings-gateway-users';
 import SettingsGatewayOpenApi from '../routes/settings/settings-gateway-open-api';
+import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs';
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
@@ -257,6 +258,7 @@ const AppRouter = connect(
         <SettingsGateway path="/dashboard/settings/gateway" />
         <SettingsServicePage path="/dashboard/settings/service" />
         <SettingsBackup path="/dashboard/settings/backup" />
+        <SettingsBackgroundJobs path="/dashboard/settings/jobs" />
         <Error type="404" default />
       </Router>
     </Layout>

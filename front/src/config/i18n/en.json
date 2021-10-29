@@ -196,7 +196,8 @@
       "humidity-in-room": "Humidity in room",
       "user-presence": "User presence",
       "camera": "Camera",
-      "devices-in-room": "Devices in room"
+      "devices-in-room": "Devices in room",
+      "chart": "Chart"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -245,6 +246,31 @@
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box"
+      },
+      "chart": {
+        "defaultInterval": "Default interval",
+        "lastHour": "Last hour",
+        "lastDay": "Last 24 hours",
+        "lastSevenDays": "Last 7 days",
+        "lastThirtyDays": "Last 30 days",
+        "lastThreeMonths": "Last 3 months",
+        "lastYear": "Last year",
+        "noValue": "No values recorded on this interval",
+        "editNameLabel": "Enter the name of this box",
+        "editDeviceFeaturesLabel": "Select the device you want to display here",
+        "editRoomLabel": "Select the room you want to display here",
+        "editNamePlaceholder": "Name displayed on the dashboard",
+        "chartType": "Select the type of chart to display",
+        "line": "Line",
+        "area": "Area",
+        "bar": "Bar",
+        "stepline": "Step Line",
+        "displayAxes": "Display axes?",
+        "displayVariation": "Display variation?",
+        "yes": "Yes",
+        "no": "No",
+        "preview": "Preview",
+        "showPreviewButton": "Show preview"
       }
     }
   },
@@ -934,10 +960,12 @@
       "updateButton": "Update",
       "alreadyCreatedButton": "Already created",
       "deleteButton": "Delete",
-      "unmanagedModelButton": "Model not managed",
+      "unmanagedModelButton": "Model not managed or available",
       "status": {
         "notConnected": "Gladys failed to connect to eWeLink cloud account, please go to ",
-        "setupPageLink": "eWeLink configuration page."
+        "setupPageLink": "eWeLink configuration page.",
+        "online": "Online",
+        "offline": "Offline"
       },
       "device": {
         "title": "Devices in Gladys",
@@ -1289,7 +1317,8 @@
     "serviceTab": "Services",
     "billingTab": "Billing",
     "gatewayUsersTab": "Plus Users",
-    "gatewayOpenApiTab": "Open API"
+    "gatewayOpenApiTab": "Open API",
+    "jobsTab": "Tasks"
   },
   "housesSettings": {
     "searchPlaceholder": "Search houses",
@@ -1408,6 +1437,25 @@
     "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
     "networkError": "Network Error:  We didn't succeed in contacting your Gladys instance. Are you connected to the network? Is your Gladys instance running?"
   },
+  "jobsSettings": {
+    "jobsTitle": "Background tasks",
+    "jobsDescription": "This view is a bit more technical than the rest of Gladys Assistant. The goal of this view is to help you have a better idea of what's running in the background, and in case you wonder why something is wrong in Gladys, you can come here to debug what happened.",
+    "jobType": "Type",
+    "jobProgress": "%",
+    "jobStatus": "Status",
+    "jobTypes": {
+      "monthly-device-state-aggregate": "Monthly sensors aggregation",
+      "daily-device-state-aggregate": "Daily sensors aggregation",
+      "hourly-device-state-aggregate": "Hourly sensors aggregation"
+    },
+    "jobErrors": {
+      "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
+    },
+    "jobStatuses": {
+      "success": "Success",
+      "failed": "Failure"
+    }
+  },
   "systemSettings": {
     "connected": "Connected",
     "ping": "{{time}} ms ping",
@@ -1430,6 +1478,8 @@
     "configurationTitle": "Configuration",
     "timezone": "Timezone",
     "timezoneText": "The timezone is used in scheduled scene.",
+    "deviceStateRetentionTime": "Keep Device State History",
+    "deviceStateRetentionTimeDescription": "How long Gladys will keep your device states in database.",
     "containerState": {
       "created": "Created",
       "restarting": "Restarting",
@@ -1573,7 +1623,7 @@
     "hectoPascal": "hPa",
     "lux": "lx",
     "watt": "W",
-    "kilowatt": "KW",
+    "kilowatt": "kW",
     "kilowatt-hour": "kWh",
     "ampere": "A",
     "volt": "V",

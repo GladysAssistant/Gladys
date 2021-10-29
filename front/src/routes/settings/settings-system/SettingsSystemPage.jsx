@@ -136,6 +136,70 @@ const SystemPage = ({ children, ...props }) => (
               </p>
               <Select options={props.timezoneOptions} onChange={props.updateTimezone} value={props.selectedTimezone} />
             </form>
+            <form class="mt-4">
+              <label>
+                <Text id="systemSettings.deviceStateRetentionTime" />
+              </label>
+              <p>
+                <small>
+                  <Text id="systemSettings.deviceStateRetentionTimeDescription" />
+                </small>
+              </p>
+              <div class="custom-controls-stacked">
+                <label class="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    class="custom-control-input"
+                    name="device-state-history-radio"
+                    onChange={props.updateDeviceStateHistory}
+                    value="7"
+                    checked={props.deviceStateHistoryInDays === '7'}
+                  />
+                  <div class="custom-control-label">
+                    <Text id="signup.preferences.deviceStateHistoryDuration.durationOneWeek" />
+                  </div>
+                </label>
+                <label class="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    class="custom-control-input"
+                    name="device-state-history-radio"
+                    onChange={props.updateDeviceStateHistory}
+                    value="30"
+                    checked={props.deviceStateHistoryInDays === '30'}
+                  />
+                  <div class="custom-control-label">
+                    <Text id="signup.preferences.deviceStateHistoryDuration.durationOneMonth" />
+                  </div>
+                </label>
+                <label class="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    class="custom-control-input"
+                    name="device-state-history-radio"
+                    onChange={props.updateDeviceStateHistory}
+                    value="90"
+                    checked={props.deviceStateHistoryInDays === '90'}
+                  />
+                  <div class="custom-control-label">
+                    <Text id="signup.preferences.deviceStateHistoryDuration.durationThreeMonth" />
+                  </div>
+                </label>
+                <label class="custom-control custom-radio">
+                  <input
+                    type="radio"
+                    class="custom-control-input"
+                    name="device-state-history-radio"
+                    onChange={props.updateDeviceStateHistory}
+                    value="-1"
+                    checked={props.deviceStateHistoryInDays === '-1'}
+                  />
+                  <div class="custom-control-label">
+                    <Text id="signup.preferences.deviceStateHistoryDuration.unlimited" />
+                  </div>
+                </label>
+              </div>
+            </form>
           </div>
         </div>
       </div>

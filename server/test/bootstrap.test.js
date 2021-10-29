@@ -20,6 +20,7 @@ before(async function before() {
     disableService: true,
     disableBrainLoading: true,
     disableSchedulerLoading: true,
+    disableDeviceStateAggregation: true,
     jwtSecret: 'secret',
   };
   const gladys = Gladys(config);

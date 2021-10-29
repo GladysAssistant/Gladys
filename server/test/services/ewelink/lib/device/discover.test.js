@@ -1,41 +1,41 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
+const sinon = require('sinon');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 const {
-  serviceId,
   event,
+  serviceId,
+  stateManagerWith0Devices,
+  stateManagerWith2Devices,
   variableNotConfigured,
   variableOk,
-  stateManagerWith0Devices,
-  stateManagerWith3Devices,
 } = require('../../mocks/consts.test');
-const GladysPowDevice = require('../../mocks/Gladys-pow.json');
+const Gladys2ChDevice = require('../../mocks/Gladys-2ch.json');
 const GladysOfflineDevice = require('../../mocks/Gladys-offline.json');
+const GladysPowDevice = require('../../mocks/Gladys-pow.json');
+const GladysThDevice = require('../../mocks/Gladys-th.json');
 const GladysUnhandledDevice = require('../../mocks/Gladys-unhandled.json');
-const Gladys2Ch1Device = require('../../mocks/Gladys-2ch1.json');
-const Gladys2Ch2Device = require('../../mocks/Gladys-2ch2.json');
-const EweLinkApi = require('../../mocks/ewelink-api.mock.test');
-const EweLinkApiEmpty = require('../../mocks/ewelink-api-empty.mock.test');
+const EweLinkApiMock = require('../../mocks/ewelink-api.mock.test');
+const EweLinkApiEmptyMock = require('../../mocks/ewelink-api-empty.mock.test');
 
 const { assert } = sinon;
 
 const EwelinkService = proxyquire('../../../../../services/ewelink/index', {
-  'ewelink-api': EweLinkApi,
+  'ewelink-api': EweLinkApiMock,
 });
 const EwelinkServiceEmpty = proxyquire('../../../../../services/ewelink/index', {
-  'ewelink-api': EweLinkApiEmpty,
+  'ewelink-api': EweLinkApiEmptyMock,
 });
 
-const gladysWithoutDevices = {
+const gladysWith0Devices = {
   variable: variableOk,
   event,
   stateManager: stateManagerWith0Devices,
 };
-const gladysWithThreeDevice = {
+const gladysWith2Devices = {
   variable: variableOk,
   event,
-  stateManager: stateManagerWith3Devices,
+  stateManager: stateManagerWith2Devices,
 };
 
 describe('EweLinkHandler discover', () => {
@@ -44,23 +44,25 @@ describe('EweLinkHandler discover', () => {
   });
 
   it('should found 5 devices, 5 of wich are new unknown devices', async () => {
-    const eweLinkService = EwelinkService(gladysWithoutDevices, serviceId);
+    const eweLinkService = EwelinkService(gladysWith0Devices, serviceId);
     const newDevices = await eweLinkService.device.discover();
+    expect(newDevices.length).to.equal(5);
     expect(newDevices).to.have.deep.members([
-      GladysPowDevice,
-      GladysOfflineDevice,
+      Gladys2ChDevice,
       GladysUnhandledDevice,
-      Gladys2Ch1Device,
-      Gladys2Ch2Device,
+      GladysThDevice,
+      GladysOfflineDevice,
+      GladysPowDevice,
     ]);
   });
-  it('should found 5 devices, 3 of wich are already in Gladys and 1 are a new unknown device', async () => {
-    const eweLinkService = EwelinkService(gladysWithThreeDevice, serviceId);
+  it('should found 5 devices, 2 of wich are already in Gladys and 3 are a new unknown device', async () => {
+    const eweLinkService = EwelinkService(gladysWith2Devices, serviceId);
     const newDevices = await eweLinkService.device.discover();
-    expect(newDevices).to.have.deep.members([GladysOfflineDevice, GladysUnhandledDevice]);
+    expect(newDevices.length).to.equal(3);
+    expect(newDevices).to.have.deep.members([GladysOfflineDevice, GladysThDevice, GladysUnhandledDevice]);
   });
   it('should found 0 devices', async () => {
-    const eweLinkService = EwelinkServiceEmpty(gladysWithoutDevices, serviceId);
+    const eweLinkService = EwelinkServiceEmpty(gladysWith0Devices, serviceId);
     const newDevices = await eweLinkService.device.discover();
     expect(newDevices).to.have.deep.members([]);
   });

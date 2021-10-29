@@ -196,7 +196,8 @@
       "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "chart": "Graphique"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -245,6 +246,31 @@
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box"
+      },
+      "chart": {
+        "defaultInterval": "Intervalle par défaut",
+        "lastHour": "Dernière heure",
+        "lastDay": "Dernière 24h",
+        "lastSevenDays": "Derniers 7 jours",
+        "lastThirtyDays": "Derniers 30 jours",
+        "lastThreeMonths": "Derniers 3 mois",
+        "lastYear": "Dernière année",
+        "noValue": "Pas de valeurs sur cet interval",
+        "editNameLabel": "Entrez le nom de cette box",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord",
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
+        "editRoomLabel": "Sélectionnez une pièce",
+        "chartType": "Sélectionner le type de graphique",
+        "line": "Ligne",
+        "area": "Aire",
+        "bar": "Histogramme",
+        "stepline": "Ligne droite",
+        "displayAxes": "Afficher les axes ?",
+        "displayVariation": "Afficher la variation ?",
+        "yes": "Oui",
+        "no": "Non",
+        "preview": "Prévisualisation",
+        "showPreviewButton": "Afficher une prévisualisation"
       }
     }
   },
@@ -934,10 +960,12 @@
       "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "unmanagedModelButton": "Modèle non pris en charge",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
       "status": {
         "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud eWeLink, plus d'informations sur la ",
-        "setupPageLink": "page de configuration eWeLink."
+        "setupPageLink": "page de configuration eWeLink.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
       },
       "device": {
         "title": "Appareils eWeLink dans Gladys",
@@ -1288,6 +1316,7 @@
     "backupTab": "Sauvegardes",
     "serviceTab": "Services",
     "billingTab": "Facturation",
+    "jobsTab": "Tâches",
     "gatewayUsersTab": "Utilisateurs Plus",
     "gatewayOpenApiTab": "Open API"
   },
@@ -1408,6 +1437,25 @@
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community.",
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?"
   },
+  "jobsSettings": {
+    "jobsTitle": "Tâches en arrière-plan",
+    "jobsDescription": "Cette vue est un peu plus technique que le reste de Gladys. Le but de cette vue est de pouvoir comprendre ce qui se passe en arrière-plan dans Gladys, et de mieux pouvoir comprendre ce qui s'est passé, ou mal passé. Nous essayons de traduire les erreurs connues, mais quand une erreur inconnue survient, nous l'affichons telle quelle pour vous permettre de débugger.",
+    "jobType": "Type",
+    "jobProgress": "%",
+    "jobStatus": "Statut",
+    "jobTypes": {
+      "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
+      "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
+      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+    },
+    "jobErrors": {
+      "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
+    },
+    "jobStatuses": {
+      "success": "Succès",
+      "failed": "Echec"
+    }
+  },
   "systemSettings": {
     "connected": "Connecté",
     "ping": "{{time}} ms ping",
@@ -1430,6 +1478,8 @@
     "configurationTitle": "Configuration",
     "timezone": "Fuseau horaire",
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
+    "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
+    "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -1573,7 +1623,7 @@
     "hectoPascal": "hPa",
     "lux": "lx",
     "watt": "W",
-    "kilowatt": "KW",
+    "kilowatt": "kW",
     "kilowatt-hour": "kWh",
     "ampere": "A",
     "volt": "V",
