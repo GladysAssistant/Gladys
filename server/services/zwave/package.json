@@ -13,6 +13,8 @@
   ],
   "scripts": {},
   "dependencies": {
-    "openzwave-shared": "^1.6.2"
+    "dayjs": "^1.10.7",
+    "node-schedule": "^2.0.0",
+    "zwave-js": "^8.11.6"
   }
 }

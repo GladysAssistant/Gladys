@@ -11,14 +11,11 @@ const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const createGithubUrl = node => {
   const { rawZwaveNode } = node;
   const deviceToSend = {
-    manufacturer: rawZwaveNode.manufacturer,
-    manufacturerid: rawZwaveNode.manufacturerid,
     product: rawZwaveNode.product,
-    producttype: rawZwaveNode.producttype,
-    productid: rawZwaveNode.productid,
-    classes: Object.keys(rawZwaveNode.classes)
+    deviceDatabaseUrl: rawZwaveNode.deviceDatabaseUrl,
+    classes: rawZwaveNode.keysClasses
   };
-  const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.manufacturer} ${rawZwaveNode.product}"`);
+  const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.product}"`);
   const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(deviceToSend, null, 2)}\n\`\`\``);
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
@@ -108,7 +105,6 @@ class ZwaveNode extends Component {
                       <label>
                         <Text id="integration.zwave.setup.features" />
                       </label>
-
                       <DeviceFeatures features={props.node.features} />
                     </div>
                   )}
@@ -125,6 +121,11 @@ class ZwaveNode extends Component {
                       onClick={displayRawNode(props.node)}
                     >
                       <Text id="integration.zwave.setup.createGithubIssue" />
+                    </a>
+                  </div>
+                  <div>
+                    <a href={props.node.deviceDatabaseUrl} target="_blank" rel="noopener noreferrer">
+                      <Text id="integration.zwave.setup.deviceDatabaseUrl" />
                     </a>
                   </div>
                 </div>

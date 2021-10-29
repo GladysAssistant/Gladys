@@ -1,3 +1,4 @@
+const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { CATEGORIES, UNKNOWN_CATEGORY, UNKNOWN_TYPE } = require('../constants');
 
 /**
@@ -7,29 +8,36 @@ const { CATEGORIES, UNKNOWN_CATEGORY, UNKNOWN_TYPE } = require('../constants');
  * @returns {Object} Return the category in Gladys.
  * @example
  * const { category, type } = getCategory({
- *  productid: '',
- *  producttype: ''
+ *  product: '',
+ *  type: ''
  * }, {
- *  class_id: 49,
- *  index: 1,
- *  instance: 1,
+ *  commandClass: 49,
+ *  endpoint: 1,
+ *  fullProperty: 'currentValue',
  * });
  */
 function getCategory(node, value) {
   let found = false;
   let categoryFound = null;
   let i = 0;
+
   while (!found && i < CATEGORIES.length) {
     const category = CATEGORIES[i];
-    const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.class_id) : true;
-    const validIndex = category.INDEXES ? category.INDEXES.includes(value.index) : true;
-    const validProductId = category.PRODUCT_IDS ? category.PRODUCT_IDS.includes(node.productid) : true;
-    const validProductType = category.PRODUCT_TYPES ? category.PRODUCT_TYPES.includes(node.producttype) : true;
-    found = validComClass && validIndex && validProductId && validProductType;
+    const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.commandClass) : true;
+    const validEndpoint = category.INDEXES ? category.INDEXES.includes(value.endpoint) : true;
+    const validProperty = category.PROPERTIES ? category.PROPERTIES.includes(value.property) : true;
+    const validProductId = category.PRODUCT_IDS ? category.PRODUCT_IDS.includes(node.product) : true;
+    const validProductType = category.PRODUCT_TYPES ? category.PRODUCT_TYPES.includes(node.product) : true;
+    found = validComClass && validEndpoint && validProperty && validProductId && validProductType;
     if (found) {
       categoryFound = {
         category: category.CATEGORY,
         type: category.TYPE,
+        min: category.MIN,
+        max: category.MAX,
+        hasFeedback: true, // TODO
+        should_poll: false,
+        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
       };
     }
     i += 1;
