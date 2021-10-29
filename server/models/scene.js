@@ -38,7 +38,7 @@ const actionSchema = Joi.array().items(
       conditions: Joi.array().items({
         variable: Joi.string().required(),
         operator: Joi.string()
-          .valid('=', '!=', '>', '>=', '<', '<=')
+          .valid('=', '!=', '>', '>=', '<', '<=', '~=')
           .required(),
         value: Joi.number(),
       }),
@@ -54,7 +54,7 @@ const triggersSchema = Joi.array().items(
     house: Joi.string(),
     device: Joi.string(),
     device_feature: Joi.string(),
-    operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<='),
+    operator: Joi.string().valid('=', '!=', '>', '>=', '<', '<=', '~='),
     value: Joi.number(),
     user: Joi.string(),
     area: Joi.string(),
