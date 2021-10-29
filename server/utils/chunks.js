@@ -7,13 +7,19 @@
  * @returns {Array} - Return array of chunks.
  */
 function chunk(items, size) {
-  const chunks = [];
-  const clonedItems = [].concat(...items);
-
-  while (clonedItems.length) {
-    chunks.push(clonedItems.splice(0, size));
+  if (!Number.isInteger(size)) {
+    throw new Error('Chunk size must be an integer.');
   }
 
+  if (size < 1) {
+    throw new Error('Chunk size must be greater than 0.');
+  }
+
+  const chunks = [];
+  let i = 0;
+  while (i < items.length) {
+    chunks.push(items.slice(i, (i += size)));
+  }
   return chunks;
 }
 
