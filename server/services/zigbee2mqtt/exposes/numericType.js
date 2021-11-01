@@ -100,12 +100,6 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    formaldehyd: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-      },
-    },
     gas: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
