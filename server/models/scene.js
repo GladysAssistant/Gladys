@@ -14,6 +14,8 @@ const actionSchema = Joi.array().items(
       device: Joi.string(),
       devices: Joi.array().items(Joi.string()),
       user: Joi.string(),
+      calendar: Joi.string(),
+      event: Joi.string(),
       house: Joi.string(),
       scene: Joi.string(),
       text: Joi.string(),

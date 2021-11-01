@@ -244,6 +244,50 @@ const actionsFunc = {
       await self.house.userLeft(action.house, action.user);
     }
   },
+  [ACTIONS.CALENDAR.EVENT]: async (self, action, scope) => {
+    const now = dayjs.tz(dayjs(), self.timezone);
+    const user = await self.user.get({
+      selector: action.user
+    });
+    const calendar = await self.calendar.get(user[0].id, {
+      selector: action.calendar
+    });
+    const events = await self.calendar.getEventsForDate(user[0].id, now, {
+      calendarId: calendar[0].id,
+    });
+    const found = events.filter((event) => {
+      return compare('~=', event.name, action.event);
+    })
+    .reduce((accumulator, element) => {
+      return accumulator + 1;
+    }, 0) > 0;
+
+    if (!found) {
+      throw new AbortScene('CONDITION_CHECK_CALEDNAR_EVENT_NOT_VERIFIED');
+    }
+  },
+  [ACTIONS.CALENDAR.NOT_EVENT]: async (self, action, scope) => {
+    const now = dayjs.tz(dayjs(), self.timezone);
+    const user = await self.user.get({
+      selector: action.user
+    });
+    const calendar = await self.calendar.get(user[0].id, {
+      selector: action.calendar
+    });
+    const events = await self.calendar.getEventsForDate(user[0].id, now, {
+      calendarId: calendar[0].id,
+    });
+    const found = events.filter((event) => {
+      return compare('~=', event.name, action.event);
+    })
+    .reduce((accumulator, element) => {
+      return accumulator + 1;
+    }, 0) > 0;
+
+    if (found) {
+      throw new AbortScene('CONDITION_CHECK_CALENDAR_NOT_EVENT_NOT_VERIFIED');
+    }
+  },
 };
 
 module.exports = {

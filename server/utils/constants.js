@@ -270,6 +270,10 @@ const ACTIONS = {
   HTTP: {
     REQUEST: 'http.request',
   },
+  CALENDAR: {
+    EVENT: 'calendar.event',
+    NOT_EVENT: 'calendar.not-event',
+  },
 };
 
 const INTENTS = {

@@ -64,13 +64,13 @@ function Gladys(params = {}) {
   const session = new Session(params.jwtSecret, cache);
   const user = new User(session, stateManager, variable);
   const location = new Location(user, event);
+  const calendar = new Calendar(service);
   const device = new Device(event, message, stateManager, service, room, variable, job);
-  const scene = new Scene(stateManager, event, device, message, variable, house, http);
+  const scene = new Scene(stateManager, event, device, message, variable, house, http, calendar, user);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager, service);
-  const calendar = new Calendar(service);
-
+  
   const gladys = {
     version: '0.1.0', // todo, read package.json
     area,

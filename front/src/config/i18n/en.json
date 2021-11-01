@@ -1033,6 +1033,14 @@
         "houseIsEmptyDescription": "If the house is empty, the scene will continue. Otherwise, the scene will stop.",
         "houseIsNotEmptyDescription": "If the house is not empty, the scene will continue. Otherwise, the scene will stop.",
         "houseLabel": "House"
+      },
+      "checkCalendarEvent": {
+        "userLabel": "User",
+        "calendarLabel": "Calendar",
+        "eventLabel": "Event",
+        "eventPlaceholder": "Event",
+        "calendarEventDescription": "If the calendar event is on-going, the scene will continue. Otherwise, the scene will stop.",
+        "notCalendarEventDescription": "If the calendar event is not on-going, the scene will continue. Otherwise, the scene will stop."
       }
     },
     "actions": {
@@ -1074,6 +1082,10 @@
       "house": {
         "is-empty": "If the house is empty",
         "is-not-empty": "If the house is not empty"
+      },
+      "calendar": {
+        "event": "If the event is on-going",
+        "not-event": "If the event is not on-going"
       }
     },
     "variables": {

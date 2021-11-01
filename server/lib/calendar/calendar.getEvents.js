@@ -66,6 +66,51 @@ async function getEvents(userId, options) {
   return plainCalendarEvents;
 }
 
+/**
+ * @description Get calendar events on-going at a given date.
+ * @param {string} userId - The user id.
+ * @param {Object} date - Date of on-going events.
+ * @param {Object} options - Options of the query.
+ * @example
+ * gladys.calendar.getEventsForDate();
+ */
+ async function getEventsForDate(userId, date, options) {
+  const where = {};
+
+  where.start = {
+    [Op.lte]: new Date(date),
+  };
+
+  where.end = {
+    [Op.gte]: new Date(date),
+  };
+
+  if (options.calendarId) {
+    where.calendar_id = {
+      [Op.eq]: options.calendarId,
+    };
+  }
+
+  const calendarEvents = await db.CalendarEvent.findAll({
+    include: [
+      {
+        model: db.Calendar,
+        as: 'calendar',
+        attributes: ['name', 'selector'],
+        where: {
+          user_id: userId,
+        },
+      },
+    ],
+    where,
+  });
+
+  const plainCalendarEvents = calendarEvents.map((calendarEvent) => calendarEvent.get({ plain: true }));
+
+  return plainCalendarEvents;
+}
+
 module.exports = {
   getEvents,
+  getEventsForDate,
 };

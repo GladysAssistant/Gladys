@@ -1033,6 +1033,14 @@
         "houseIsEmptyDescription": "Si la maison est vide, cette scène continuera. Sinon, la scène s'arrêtera.",
         "houseIsNotEmptyDescription": "Si la maison n'est pas vide, cette scène continuera. Sinon, la scène s'arrêtera.",
         "houseLabel": "Maison"
+      },
+      "checkCalendarEvent": {
+        "userLabel": "Utilisateur",
+        "calendarLabel": "Calendrier",
+        "eventLabel": "Event",
+        "eventPlaceholder": "Event",
+        "calendarEventDescription": "Si l'évènement est en cours, cette scène continuera. Sinon, la scène s'arrêtera.",
+        "notCalendarEventDescription": "Si l'évènement n'est pas en cours, cette scène continuera. Sinon, la scène s'arrêtera."
       }
     },
     "actions": {
@@ -1074,6 +1082,10 @@
       "house": {
         "is-empty": "Si la maison est vide",
         "is-not-empty": "Si la maison n'est pas vide"
+      },
+      "calendar": {
+        "event": "Si l'évènement est en cours",
+        "not-event": "Si l'évènement n'est pas en cours"
       }
     },
     "variables": {

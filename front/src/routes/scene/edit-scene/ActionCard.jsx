@@ -19,6 +19,7 @@ import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
+import CheckCalendarEvent from './actions/CheckCalendarEvent';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -233,6 +234,14 @@ const ActionCard = ({ children, ...props }) => (
         )}
         {props.action.type === ACTIONS.DEVICE.SET_VALUE && (
           <DeviceSetValue
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.CALENDAR.EVENT && (
+          <CheckCalendarEvent
             action={props.action}
             columnIndex={props.columnIndex}
             index={props.index}

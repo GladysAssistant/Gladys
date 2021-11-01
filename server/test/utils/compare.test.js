@@ -92,6 +92,14 @@ describe('compare.~=', () => {
     const value = compare('~=', 'test1', '^[a-z]$');
     expect(value).to.equal(false);
   });
+  it('should return true mix', () => {
+    const value1 = compare('~=', 'Papa/maman', 'Papa');
+    expect(value1).to.equal(true);
+    const value2 = compare('~=', 'Papa/maman', 'Maman');
+    expect(value2).to.equal(true);
+    const value3 = compare('~=', 'Papa/maman', 'Papa/maman');
+    expect(value3).to.equal(true);
+  });
 });
 
 describe('compare.unknown', () => {
