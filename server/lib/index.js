@@ -70,7 +70,7 @@ function Gladys(params = {}) {
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager, service);
-  
+
   const gladys = {
     version: '0.1.0', // todo, read package.json
     area,

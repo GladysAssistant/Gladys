@@ -74,7 +74,7 @@ async function getEvents(userId, options) {
  * @example
  * gladys.calendar.getEventsForDate();
  */
- async function getEventsForDate(userId, date, options) {
+async function getEventsForDate(userId, date, options) {
   const where = {};
 
   where.start = {
