@@ -94,6 +94,12 @@ export const GetWeatherModes = {
   DailyForecast: 'dailyForecast'
 };
 
+export const NextcloudTalkStatus = {
+  Getting: 'Getting',
+  Success: 'Success',
+  Error: 'Error'
+};
+
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';
 export const DASHBOARD_BOX_DATA_KEY = 'DashboardBoxData';
 

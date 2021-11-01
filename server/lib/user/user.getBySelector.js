@@ -22,6 +22,7 @@ async function getBySelector(selector) {
   const userPlain = user.get({ plain: true });
   delete userPlain.password;
   delete userPlain.telegram_user_id;
+  delete userPlain.nextcloud_talk_token;
   return userPlain;
 }
 

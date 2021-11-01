@@ -79,6 +79,7 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -186,6 +187,11 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
+        <Redirect
+          path="/dashboard/integration/communication/nextcloudtalk"
+          to="/dashboard/integration/communication/nextcloud-talk"
+        />
+        <NextcloudTalkPage path="/dashboard/integration/communication/nextcloud-talk" />
         <Redirect path="/dashboard/integration/calendar/caldav" to="/dashboard/integration/calendar/caldav/account" />
         <CalDAVAccountPage path="/dashboard/integration/calendar/caldav/account" />
         <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />

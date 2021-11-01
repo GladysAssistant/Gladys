@@ -316,6 +316,20 @@
       "apiKey": "Telegram Bot API Key",
       "saveButton": "Save"
     },
+    "nextcloudTalk": {
+      "title": "Nextcloud Talk",
+      "description": "Speak with Gladys thanks to Nextcloud Talk.",
+      "introduction": "To speak through Nextcloud Talk, you need a specific Nextcloud account for your bot.",
+      "url": "Nextcloud host",
+      "urlInfo": "Enter your Nextcloud base URL.",
+      "username": "Username Nextcloud bot account",
+      "usernameInfo": "Enter Nextcloud bot account username.",
+      "password": "Password Nextcloud bot account",
+      "passwordInfo": "Enter Nextcloud bot account password.",
+      "configurationError": "Failed to save configration.",
+      "configurationSuccess": "Successfully saved configuration.",
+      "buttonSave": "Save"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Control Philips Hue Lights.",

@@ -443,6 +443,20 @@
       "apiKey": "Clé API du Bot Telegram",
       "saveButton": "Sauvegarder"
     },
+    "nextcloudTalk": {
+      "title": "Nextcloud Talk",
+      "description": "Parlez à Gladys grâce à Nextcloud Talk.",
+      "introduction": "Pour communiquer via Talk il vous créer un compte spécifique Nextcloud représentant votre bot.",
+      "url": "URL de l'instance Nextcloud",
+      "urlInfo": "Entrez l'url de base de votre instance Nextcloud.",
+      "username": "Nom d'utilisateur bot Nextcloud",
+      "usernameInfo": "Entrez le nom d'utilisateur du compte Nextcloud représentant le bot Gladys.",
+      "password": "Mot de passe bot Nextcloud",
+      "passwordInfo": "Entrez le mot de passe du compte Nextcloud représentant le bot.",
+      "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
+      "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
+      "buttonSave": "Sauvegarder"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Contrôler les lumières Philips Hue.",

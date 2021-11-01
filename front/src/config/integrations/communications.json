@@ -2,5 +2,9 @@
   {
     "key": "telegram",
     "img": "/assets/integrations/cover/telegram.jpg"
+  },
+  {
+    "key": "nextcloudTalk",
+    "img": "/assets/integrations/cover/nextcloud-talk.jpg"
   }
 ]
