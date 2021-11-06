@@ -1,6 +1,5 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
-import Select from 'react-select';
 import { CalDAVStatus } from '../../../../../utils/consts';
 
 const ShareTab = ({ children, ...props }) => (
@@ -36,25 +35,20 @@ const ShareTab = ({ children, ...props }) => (
                             {props.caldavCalendars &&
                               props.caldavCalendars.map(calendar => {
                                 return (
-                                  <label class="custom-switch" style={{ display: 'block', marginBottom: '10px' }}>
-                                    {calendar.name}
-                                    <Select
+                                  <label class="custom-switch" style={{ display: 'block', marginBottom: '5px' }}>
+                                    <input
+                                      type="checkbox"
                                       name={calendar.selector}
-                                      styles={{ menu: provided => ({ ...provided, zIndex: '100' }) }}
-                                      defaultValue={[]}
-                                      value={
-                                        props.calendarsSharing?.hasOwnProperty(calendar.selector)
-                                          ? props.gladysUsers.filter(u =>
-                                              props.calendarsSharing[calendar.selector]?.split(',')?.includes(u.value)
-                                            )
-                                          : props.gladysUsers.filter(u =>
-                                              calendar.shared_users?.split(',')?.includes(u.value)
-                                            )
+                                      class="custom-switch-input"
+                                      checked={
+                                        props.calendarsSharing
+                                          ? props.calendarsSharing[calendar.selector]
+                                          : calendar.shared
                                       }
-                                      isMulti
-                                      onChange={props.updateCalendarSharing}
-                                      options={props.gladysUsers}
+                                      onClick={props.updateCalendarSharing}
                                     />
+                                    <span class="custom-switch-indicator" style={{ marginRight: '5px' }} />
+                                    {calendar.name}
                                   </label>
                                 );
                               })}

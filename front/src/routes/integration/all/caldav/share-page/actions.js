@@ -1,11 +1,11 @@
 import { CalDAVStatus } from '../../../../../utils/consts';
 
 const actions = store => ({
-  updateCalendarSharing(state, newValue, changes) {
+  updateCalendarSharing(state, e) {
     store.setState({
       calendarsSharing: {
         ...state.calendarsSharing,
-        [changes.name]: newValue.map(selected => selected.value).join(',')
+        [e.target.name]: e.target.checked
       }
     });
   },
@@ -60,7 +60,7 @@ const actions = store => ({
         Object.keys(state.calendarsSharing).map(selector => {
           return state.httpClient.patch(`/api/v1/calendar/${selector}`, {
             // selector
-            shared_users: state.calendarsSharing[selector]
+            shared: state.calendarsSharing[selector]
           });
         })
       );

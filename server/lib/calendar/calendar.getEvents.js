@@ -61,9 +61,7 @@ async function getEvents(userId, options) {
             ...(options.shared
               ? [
                   {
-                    shared_users: {
-                      [Op.like]: `%${userId}%`,
-                    },
+                    shared: true,
                   },
                 ]
               : []),
