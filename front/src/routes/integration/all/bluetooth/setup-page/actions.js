@@ -1,12 +1,10 @@
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../utils/consts';
 
-import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsBluetooth from '../commons/actions';
 
 const createActions = store => {
-  const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const bluetoothActions = createActionsBluetooth(store);
   const actions = {
@@ -70,7 +68,7 @@ const createActions = store => {
       }
     }
   };
-  return Object.assign({}, actions, houseActions, integrationActions, bluetoothActions);
+  return Object.assign({}, actions, integrationActions, bluetoothActions);
 };
 
 export default createActions;

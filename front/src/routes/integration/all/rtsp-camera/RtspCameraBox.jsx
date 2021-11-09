@@ -4,6 +4,7 @@ import get from 'get-value';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import { DEVICE_POLL_FREQUENCIES } from '../../../../../../server/utils/constants';
+import DeviceRoomSelector from '../../../../components/device/form/DeviceRoomSelector';
 
 class RtspCameraBox extends Component {
   saveCamera = async () => {
@@ -122,21 +123,7 @@ class RtspCameraBox extends Component {
                   <label>
                     <Text id="integration.rtspCamera.roomLabel" />
                   </label>
-                  <select onChange={this.updateCameraRoom} class="form-control">
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {props.housesWithRooms &&
-                      props.housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.camera.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  <DeviceRoomSelector selectedRoomId={props.camera.room_id} updateRoom={this.updateCameraRoom} />
                 </div>
                 <div class="form-group">
                   <label>

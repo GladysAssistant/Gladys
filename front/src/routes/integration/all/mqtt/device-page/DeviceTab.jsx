@@ -59,7 +59,6 @@ const DeviceTab = ({ children, ...props }) => (
                 <Device
                   device={mqttDevice}
                   deviceIndex={index}
-                  houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}

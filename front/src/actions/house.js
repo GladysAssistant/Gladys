@@ -16,6 +16,11 @@ function sortRoomsInHouses(houses) {
 function createActions(store) {
   const actions = {
     async getHouses(state) {
+      // Avoid multiple calls on same page
+      if (state.housesGetStatus) {
+        return;
+      }
+
       store.setState({
         housesGetStatus: RequestStatus.Getting
       });

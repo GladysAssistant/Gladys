@@ -5,6 +5,7 @@ import { Link } from 'preact-router/match';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import DeviceRoomSelector from '../../../../../components/device/form/DeviceRoomSelector';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
@@ -106,21 +107,11 @@ class Zigbee2mqttBox extends Component {
                   <label class="form-label" for={`room_${props.deviceIndex}`}>
                     <Text id="integration.zigbee2mqtt.roomLabel" />
                   </label>
-                  <select onChange={this.updateRoom} class="form-control" id={`room_${props.deviceIndex}`}>
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {props.houses &&
-                      props.houses.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  <DeviceRoomSelector
+                    selectedRoomId={props.device.room_id}
+                    inputId={`room_${props.deviceIndex}`}
+                    updateRoom={this.updateRoom}
+                  />
                 </div>
 
                 <div class="form-group">

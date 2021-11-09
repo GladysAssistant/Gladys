@@ -4,15 +4,14 @@ import actions from './actions';
 import MqttPage from '../MqttPage';
 import DeviceTab from './DeviceTab';
 
-@connect('session,user,mqttDevices,houses,getMqttDevicesStatus', actions)
+@connect('session,user,mqttDevices,getMqttDevicesStatus', actions)
 class MqttDevicePage extends Component {
   componentWillMount() {
     this.props.getMqttDevices();
-    this.props.getHouses();
     this.props.getIntegrationByName('mqtt');
   }
 
-  render(props, {}) {
+  render(props) {
     return (
       <MqttPage>
         <DeviceTab {...props} />

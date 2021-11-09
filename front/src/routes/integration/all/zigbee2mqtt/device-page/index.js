@@ -4,15 +4,14 @@ import actions from './actions';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import DeviceTab from './DeviceTab';
 
-@connect('user,zigbee2mqttDevices,houses,getZigbee2mqttStatus', actions)
+@connect('user,zigbee2mqttDevices,getZigbee2mqttStatus', actions)
 class Zigbee2mqttIntegration extends Component {
   componentWillMount() {
     this.props.getZigbee2mqttDevices(100, 0);
-    this.props.getHouses();
     this.props.getIntegrationByName('zigbee2mqtt');
   }
 
-  render(props, {}) {
+  render(props) {
     return (
       <Zigbee2mqttPage user={props.user}>
         <DeviceTab {...props} />

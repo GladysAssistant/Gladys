@@ -4,14 +4,13 @@ import actions from './actions';
 import ZwavePage from '../ZwavePage';
 import NodeTab from './NodeTab';
 
-@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
+@connect('session,user,zwaveDevices,getZwaveDevicesStatus', actions)
 class ZwaveNodePage extends Component {
   componentWillMount() {
     this.props.getZWaveDevices();
-    this.props.getHouses();
   }
 
-  render(props, {}) {
+  render(props) {
     return (
       <ZwavePage>
         <NodeTab {...props} />

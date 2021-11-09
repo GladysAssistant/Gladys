@@ -124,25 +124,6 @@ function createActions(store) {
         });
       }
     },
-    async getHouses(state) {
-      store.setState({
-        housesGetStatus: RequestStatus.Getting
-      });
-      try {
-        const params = {
-          expand: 'rooms'
-        };
-        const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
-        store.setState({
-          housesWithRooms,
-          housesGetStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          housesGetStatus: RequestStatus.Error
-        });
-      }
-    },
     updateDeviceField(state, listName, index, field, value) {
       const devices = update(state[listName], {
         [index]: {

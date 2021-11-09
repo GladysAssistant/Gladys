@@ -51,7 +51,6 @@ const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevi
                 <BluetoothDevice
                   device={bluetoothDevice}
                   deviceIndex={index}
-                  houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}

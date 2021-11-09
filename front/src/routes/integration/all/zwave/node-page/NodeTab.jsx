@@ -55,7 +55,6 @@ const NodeTab = ({ children, ...props }) => (
                 <Device
                   device={zwaveDevice}
                   deviceIndex={index}
-                  houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}

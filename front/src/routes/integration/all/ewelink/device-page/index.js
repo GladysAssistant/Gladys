@@ -4,15 +4,14 @@ import actions from '../actions';
 import EweLinkPage from '../EweLinkPage';
 import DeviceTab from './DeviceTab';
 
-@connect('user,eweLinkDevices,housesWithRooms,getEweLinkStatus', actions)
+@connect('user,eweLinkDevices,getEweLinkStatus', actions)
 class EweLinkIntegration extends Component {
   componentWillMount() {
     this.props.getEweLinkDevices();
-    this.props.getHouses();
     this.props.getIntegrationByName('ewelink');
   }
 
-  render(props, {}) {
+  render(props) {
     return (
       <EweLinkPage user={props.user}>
         <DeviceTab {...props} />

@@ -44,6 +44,9 @@
   "device": {
     "noFeatures": "Aucune fonctionnalité"
   },
+  "house": {
+    "loadingHouseError": "Une erreur est survenue lors du chargement des maisons."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Bienvenue",

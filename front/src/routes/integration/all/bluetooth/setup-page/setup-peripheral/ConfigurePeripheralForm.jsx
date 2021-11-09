@@ -13,8 +13,9 @@ import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../
 import actions from '../actions';
 import UpdateDeviceFeature from '../../../../../../components/device/UpdateDeviceFeature';
 import BluetoothPeripheralFeatures from '../BluetoothPeripheralFeatures';
+import DeviceRoomSelector from '../../../../../../components/device/form/DeviceRoomSelector';
 
-@connect('session,httpClient,houses,currentIntegration', actions)
+@connect('session,httpClient,currentIntegration', actions)
 class ConfigurePeripheralForm extends Component {
   updateName = e => {
     this.setState({
@@ -137,7 +138,7 @@ class ConfigurePeripheralForm extends Component {
     this.props.getIntegrationByName('bluetooth');
   }
 
-  render({ houses, bluetoothSaveStatus, currentIntegration = {} }, { device, presenceSensorIndex }) {
+  render({ bluetoothSaveStatus, currentIntegration = {} }, { device, presenceSensorIndex }) {
     const deviceService = get(device, 'service_id');
     const bluetoothDevice = !deviceService || deviceService === currentIntegration.id;
     const disableForm = bluetoothSaveStatus === RequestStatus.Getting || !bluetoothDevice;
@@ -185,21 +186,12 @@ class ConfigurePeripheralForm extends Component {
               <label for="room" class="form-label">
                 <Text id="integration.bluetooth.device.roomLabel" />
               </label>
-              <select name="room" onChange={this.updateRoom} class="form-control" disabled={disableForm}>
-                <option value="">
-                  <Text id="global.emptySelectOption" />
-                </option>
-                {houses &&
-                  houses.map(house => (
-                    <optgroup label={house.name}>
-                      {house.rooms.map(room => (
-                        <option selected={room.id === device.room_id} value={room.id}>
-                          {room.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-              </select>
+              <DeviceRoomSelector
+                selectedRoomId={device.room_id}
+                inputId="room"
+                updateRoom={this.updateRoom}
+                disabled={disableForm}
+              />
             </div>
           </div>
 

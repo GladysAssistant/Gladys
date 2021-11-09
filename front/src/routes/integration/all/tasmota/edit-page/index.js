@@ -5,7 +5,7 @@ import UpdateDevice from '../../../../../components/device';
 import { LIGHT_MODULES } from '../../../../../../../server/services/tasmota/lib/features/modules';
 import { DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
+@connect('user,session,httpClient,currentIntegration', {})
 class EditTasmotaDevice extends Component {
   canEditCategory = (device, feature) => {
     if (feature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
@@ -15,7 +15,7 @@ class EditTasmotaDevice extends Component {
     return false;
   };
 
-  render(props, {}) {
+  render(props) {
     return (
       <TasmotaPage user={props.user}>
         <UpdateDevice

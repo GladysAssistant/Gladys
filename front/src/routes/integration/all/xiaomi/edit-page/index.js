@@ -6,9 +6,9 @@ import EditPage from './EditPage';
 
 const XIAOMI_PAGE_PATH = '/dashboard/integration/device/xiaomi';
 
-@connect('user,session,httpClient,currentIntegration,houses', actions)
+@connect('user,session,httpClient,currentIntegration', actions)
 class EditXiaomiDevice extends Component {
-  render(props, {}) {
+  render(props) {
     return (
       <XiaomiLayout>
         <EditPage integrationName="xiaomi" allowModifyFeatures={false} previousPage={XIAOMI_PAGE_PATH} {...props} />

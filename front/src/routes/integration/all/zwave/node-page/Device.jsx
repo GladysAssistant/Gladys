@@ -12,6 +12,7 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 import { RequestStatus } from '../../../../../utils/consts';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import DeviceRoomSelector from '../../../../../components/device/form/DeviceRoomSelector';
 
 class ZWaveDeviceBox extends Component {
   refreshDeviceProperty = () => {
@@ -65,7 +66,7 @@ class ZWaveDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, mostRecentValueAt, loading, error }) {
+  render(props, { batteryLevel, mostRecentValueAt, loading }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -103,22 +104,7 @@ class ZWaveDeviceBox extends Component {
                   <label>
                     <Text id="integration.zwave.device.roomLabel" />
                   </label>
-                  <select onChange={this.updateRoom} class="form-control">
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {props.houses &&
-                      props.houses.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms &&
-                            house.rooms.map(room => (
-                              <option selected={room.id === props.device.room_id} value={room.id}>
-                                {room.name}
-                              </option>
-                            ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  <DeviceRoomSelector selectedRoomId={props.device.room_id} updateRoom={this.updateRoom} />
                 </div>
                 <div class="form-group">
                   <label>

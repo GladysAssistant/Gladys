@@ -14,7 +14,7 @@ import CheckBluetoothPanel from '../../commons/CheckBluetoothPanel';
 
 import style from '../../style.css';
 
-@connect('session,httpClient,houses,bluetoothStatus', actions)
+@connect('session,httpClient,bluetoothStatus', actions)
 class BluetoothConnnectPage extends Component {
   updatePeripheral = peripheral => {
     if (peripheral.uuid === this.state.peripheral.uuid) {
@@ -50,7 +50,6 @@ class BluetoothConnnectPage extends Component {
 
   async componentWillMount() {
     this.props.getStatus();
-    this.props.getHouses();
 
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER, this.updatePeripheral);
 

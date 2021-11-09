@@ -10,7 +10,7 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
 
-@connect('session,user,httpClient,houses,currentIntegration', actions)
+@connect('session,user,httpClient,currentIntegration', actions)
 class MqttDeviceSetupPage extends Component {
   selectFeature(selectedFeatureOption) {
     if (selectedFeatureOption && selectedFeatureOption.value) {
@@ -203,7 +203,6 @@ class MqttDeviceSetupPage extends Component {
   }
 
   async componentWillMount() {
-    this.props.getHouses();
     this.getDeviceFeaturesOptions();
     await this.props.getIntegrationByName('mqtt');
 

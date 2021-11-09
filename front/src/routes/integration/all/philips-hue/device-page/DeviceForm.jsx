@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import DeviceRoomSelector from '../../../../../components/device/form/DeviceRoomSelector';
 
 class PhilipsHueDeviceForm extends Component {
   updateName = e => {
@@ -39,21 +40,7 @@ class PhilipsHueDeviceForm extends Component {
           <label class="form-label" for="room">
             <Text id="integration.mqtt.device.roomLabel" />
           </label>
-          <select onChange={this.updateRoom} class="form-control" id="room">
-            <option value="">
-              <Text id="global.emptySelectOption" />
-            </option>
-            {props.houses &&
-              props.houses.map(house => (
-                <optgroup label={house.name}>
-                  {house.rooms.map(room => (
-                    <option selected={room.id === props.device.room_id} value={room.id}>
-                      {room.name}
-                    </option>
-                  ))}
-                </optgroup>
-              ))}
-          </select>
+          <DeviceRoomSelector selectedRoomId={props.device.room_id} inputId="room" updateRoom={this.updateRoom} />
         </div>
 
         <div class="form-group">

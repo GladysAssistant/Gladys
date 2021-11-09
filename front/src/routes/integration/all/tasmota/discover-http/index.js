@@ -5,11 +5,10 @@ import TasmotaPage from '../TasmotaPage';
 import DiscoverTab from './DiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect('user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading', actions)
+@connect('user,session,httpClient,discoveredDevices,loading,errorLoading', actions)
 class TasmotaIntegration extends Component {
   async componentWillMount() {
     this.props.getDiscoveredTasmotaDevices('http');
-    this.props.getHouses();
     this.props.getIntegrationByName('tasmota');
 
     this.props.session.dispatcher.addListener(

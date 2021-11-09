@@ -3,11 +3,9 @@ import update from 'immutability-helper';
 import uuid from 'uuid';
 import debounce from 'debounce';
 import createActionsIntegration from '../../../../../actions/integration';
-import createActionsHouse from '../../../../../actions/house';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
-  const houseActions = createActionsHouse(store);
   const actions = {
     async getZigbee2mqttDevices(state, take, skip) {
       store.setState({
@@ -116,7 +114,7 @@ function createActions(store) {
   };
   actions.debouncedSearch = debounce(actions.search, 200);
 
-  return Object.assign({}, integrationActions, houseActions, actions);
+  return Object.assign({}, integrationActions, actions);
 }
 
 export default createActions;

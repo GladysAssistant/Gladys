@@ -4,14 +4,13 @@ import actions from './actions';
 import BluetoothPage from '../BluetoothPage';
 import BluetoothDeviceTab from './BluetoothDeviceTab';
 
-@connect('session,user,bluetoothDevices,houses,getBluetoothDevicesStatus', actions)
+@connect('session,user,bluetoothDevices,getBluetoothDevicesStatus', actions)
 class BluetoothDevicePage extends Component {
   componentWillMount() {
     this.props.getBluetoothDevices();
-    this.props.getHouses();
   }
 
-  render(props, {}) {
+  render(props) {
     return (
       <BluetoothPage>
         <BluetoothDeviceTab {...props} />

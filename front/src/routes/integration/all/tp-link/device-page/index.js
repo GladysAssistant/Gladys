@@ -6,18 +6,17 @@ import DevicePage from './DevicePage';
 import FoundDevices from './FoundDevices';
 
 @connect(
-  'session,user,tpLinkDevices,houses,getTpLinkDevicesStatus,tpLinkNewDevices,getTpLinkCreateDeviceStatus,getTpLinkNewDevicesStatus',
+  'session,user,tpLinkDevices,getTpLinkDevicesStatus,tpLinkNewDevices,getTpLinkCreateDeviceStatus,getTpLinkNewDevicesStatus',
   actions
 )
 class TpLinkDevicePage extends Component {
   componentWillMount() {
     this.props.getTpLinkDevices();
-    this.props.getHouses();
     this.props.getTpLinkNewDevices();
     this.props.getIntegrationByName('tp-link');
   }
 
-  render(props, {}) {
+  render(props) {
     return (
       <TpLinkPage>
         {props.tpLinkDevices && props.tpLinkDevices.length ? <DevicePage {...props} /> : <div />}

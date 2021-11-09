@@ -6,7 +6,7 @@ import ZwavePage from '../ZwavePage';
 import NodeOperationPage from './AddRemoveNode';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
+@connect('session,user,zwaveDevices,getZwaveDevicesStatus', actions)
 class ZwaveNodeOperationPage extends Component {
   nodeAddedListener = () => {
     this.setState({

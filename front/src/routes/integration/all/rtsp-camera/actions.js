@@ -55,25 +55,6 @@ function createActions(store) {
         });
       }
     },
-    async getHouses(state) {
-      store.setState({
-        housesGetStatus: RequestStatus.Getting
-      });
-      try {
-        const params = {
-          expand: 'rooms'
-        };
-        const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
-        store.setState({
-          housesWithRooms,
-          housesGetStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          housesGetStatus: RequestStatus.Error
-        });
-      }
-    },
     async createOrUpdateCamera(state, index) {
       let camera = await state.httpClient.post(`/api/v1/device`, state.rtspCameras[index]);
       camera = actions.complete(camera);

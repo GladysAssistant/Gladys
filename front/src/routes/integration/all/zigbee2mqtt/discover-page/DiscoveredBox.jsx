@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import DeviceRoomSelector from '../../../../../components/device/form/DeviceRoomSelector';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 
@@ -98,20 +99,11 @@ class DiscoveredBox extends Component {
                       <label class="form-label" for={`room_${deviceIndex}`}>
                         <Text id="integration.zigbee2mqtt.roomLabel" />
                       </label>
-                      <select onChange={this.updateRoom} class="form-control" id={`room_${deviceIndex}`}>
-                        <option value="">
-                          <Text id="global.emptySelectOption" />
-                        </option>
-                        {houses.map(house => (
-                          <optgroup label={house.name}>
-                            {house.rooms.map(room => (
-                              <option selected={room.id === device.room_id} value={room.id}>
-                                {room.name}
-                              </option>
-                            ))}
-                          </optgroup>
-                        ))}
-                      </select>
+                      <DeviceRoomSelector
+                        selectedRoomId={device.room_id}
+                        inputId={`room_${deviceIndex}`}
+                        updateRoom={this.updateRoom}
+                      />
                     </div>
 
                     <div class="form-group">

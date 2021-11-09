@@ -44,6 +44,9 @@
   "device": {
     "noFeatures": "No features"
   },
+  "house": {
+    "loadingHouseError": "Error loading houses."
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Welcome",

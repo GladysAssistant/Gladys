@@ -1,12 +1,10 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 import { BRIDGE_MODEL } from '../../../../../../../server/services/philips-hue/lib/utils/consts';
-import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 
 function createActions(store) {
-  const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async getPhilipsHueDevices(state) {
@@ -118,7 +116,7 @@ function createActions(store) {
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
-  return Object.assign({}, houseActions, integrationActions, actions);
+  return Object.assign({}, integrationActions, actions);
 }
 
 export default createActions;

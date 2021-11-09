@@ -5,9 +5,9 @@ import UpdateDevice from '../../../../../components/device';
 
 const BLUETOOTH_PAGE_PATH = '/dashboard/integration/device/bluetooth';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
+@connect('user,session,httpClient,currentIntegration', {})
 class BluetoothEditDevicePage extends Component {
-  render(props, {}) {
+  render(props) {
     return (
       <BluetoothPage>
         <UpdateDevice

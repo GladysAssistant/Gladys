@@ -5,6 +5,7 @@ import { Link } from 'preact-router';
 
 import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/ewelink/lib/utils/constants';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import DeviceRoomSelector from '../../../../components/device/form/DeviceRoomSelector';
 
 class EweLinkDeviceBox extends Component {
   updateName = e => {
@@ -53,7 +54,7 @@ class EweLinkDeviceBox extends Component {
     });
   };
 
-  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
+  render({ deviceIndex, device, editable, ...props }, { loading, errorMessage }) {
     const validModel = device.features && device.features.length > 0;
     const online = device.params.find(param => param.name === DEVICE_ONLINE).value === '1';
     const firmware = device.params.find(param => param.name === DEVICE_FIRMWARE).value;
@@ -121,26 +122,12 @@ class EweLinkDeviceBox extends Component {
                   <label class="form-label" for={`room_${deviceIndex}`}>
                     <Text id="integration.eWeLink.roomLabel" />
                   </label>
-                  <select
-                    id={`room_${deviceIndex}`}
-                    onChange={this.updateRoom}
-                    class="form-control"
+                  <DeviceRoomSelector
+                    selectedRoomId={device.room_id}
+                    updateRoom={this.updateRoom}
+                    inputId={`room_${deviceIndex}`}
                     disabled={!editable || !validModel}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {housesWithRooms &&
-                      housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  />
                 </div>
 
                 {validModel && (

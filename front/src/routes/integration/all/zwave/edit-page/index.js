@@ -6,9 +6,9 @@ import UpdateDevice from '../../../../../components/device';
 
 const ZWAVE_PAGE_PATH = '/dashboard/integration/device/zwave';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
+@connect('user,session,httpClient,currentIntegration', {})
 class EditZwaveDevice extends Component {
-  render(props, {}) {
+  render(props) {
     return (
       <ZwavePage>
         <UpdateDevice {...props} integrationName="zwave" allowModifyFeatures={false} previousPage={ZWAVE_PAGE_PATH} />

@@ -1,14 +1,13 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-// import actions from '../actions';
 import Zigbee2mqttPage from '../Zigbee2mqttPage.js';
 import UpdateDevice from '../../../../../components/device';
 
 const ZIGBEE2MQTT_PAGE_PATH = '/dashboard/integration/device/zigbee2mqtt';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
+@connect('user,session,httpClient,currentIntegration', {})
 class EditZigbee2mqttDevice extends Component {
-  render(props, {}) {
+  render(props) {
     return (
       <Zigbee2mqttPage user={props.user}>
         <UpdateDevice

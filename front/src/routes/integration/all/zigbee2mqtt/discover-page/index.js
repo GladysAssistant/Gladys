@@ -7,7 +7,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 @connect(
-  'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled',
+  'user,session,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,zigbee2mqttFrontend,usbConfigured,z2mEnabled',
   actions
 )
 class Zigbee2mqttIntegration extends Component {
@@ -24,7 +24,6 @@ class Zigbee2mqttIntegration extends Component {
     this.props.checkStatus();
     this.props.getPermitJoin();
     this.props.setDiscoveredDevices(undefined);
-    this.props.getHouses();
     this.props.getIntegrationByName('zigbee2mqtt');
     this.props.getDiscoveredDevices();
   }

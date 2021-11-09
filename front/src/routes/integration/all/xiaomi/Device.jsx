@@ -8,6 +8,7 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/consta
 import { RequestStatus } from '../../../../utils/consts';
 import BatteryLevelFeature from '../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import DeviceRoomSelector from '../../../../components/device/form/DeviceRoomSelector';
 
 class XiaomiDeviceBox extends Component {
   refreshDeviceProperty = () => {
@@ -102,21 +103,7 @@ class XiaomiDeviceBox extends Component {
                   <label>
                     <Text id="integration.xiaomi.device.roomLabel" />
                   </label>
-                  <select onChange={this.updateRoom} class="form-control">
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {props.houses &&
-                      props.houses.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  <DeviceRoomSelector selectedRoomId={props.device.room_id} updateRoom={this.updateRoom} />
                 </div>
                 <div class="form-group">
                   <label>

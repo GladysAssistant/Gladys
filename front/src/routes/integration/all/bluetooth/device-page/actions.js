@@ -1,10 +1,8 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
-import createActionsHouse from '../../../../../actions/house';
 import debounce from 'debounce';
 
 function createActions(store) {
-  const houseActions = createActionsHouse(store);
   const actions = {
     async getBluetoothDevices(state) {
       store.setState({
@@ -67,7 +65,7 @@ function createActions(store) {
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
-  return Object.assign({}, houseActions, actions);
+  return Object.assign({}, actions);
 }
 
 export default createActions;

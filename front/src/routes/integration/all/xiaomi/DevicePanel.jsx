@@ -51,7 +51,6 @@ const DevicePanel = ({ children, ...props }) => (
                 <Device
                   device={xiaomiDevice}
                   deviceIndex={index}
-                  houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}

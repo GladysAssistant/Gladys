@@ -3,9 +3,9 @@ import { connect } from 'unistore/preact';
 import EweLinkPage from '../EweLinkPage';
 import UpdateDevice from '../../../../../components/device';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
+@connect('user,session,httpClient,currentIntegration', {})
 class EditEweLinkDevice extends Component {
-  render(props, {}) {
+  render(props) {
     return (
       <EweLinkPage user={props.user}>
         <UpdateDevice

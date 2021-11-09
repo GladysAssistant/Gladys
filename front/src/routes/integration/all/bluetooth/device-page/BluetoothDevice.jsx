@@ -8,6 +8,7 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 import { RequestStatus } from '../../../../../utils/consts';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import DeviceRoomSelector from '../../../../../components/device/form/DeviceRoomSelector';
 
 class BluetoothDevice extends Component {
   refreshDeviceProperty = () => {
@@ -54,7 +55,7 @@ class BluetoothDevice extends Component {
     this.refreshDeviceProperty();
   }
 
-  render({ device, houses, ...props }, { batteryLevel, loading }) {
+  render({ device }, { batteryLevel, loading }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -92,21 +93,7 @@ class BluetoothDevice extends Component {
                   <label>
                     <Text id="integration.bluetooth.device.roomLabel" />
                   </label>
-                  <select onChange={this.updateRoom} class="form-control">
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {houses &&
-                      houses.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  <DeviceRoomSelector selectedRoomId={device.room_id} updateRoom={this.updateRoom} />
                 </div>
                 <div class="form-group">
                   <label>

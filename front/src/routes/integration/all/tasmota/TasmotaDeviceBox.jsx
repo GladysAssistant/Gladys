@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { Link } from 'preact-router';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import DeviceRoomSelector from '../../../../components/device/form/DeviceRoomSelector';
 
 class TasmotaDeviceBox extends Component {
   updateName = e => {
@@ -97,7 +98,7 @@ class TasmotaDeviceBox extends Component {
     });
   };
 
-  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage, authErrorMessage }) {
+  render({ deviceIndex, device, editable, ...props }, { loading, errorMessage, authErrorMessage }) {
     const validModel = device.features.length > 0 || device.needAuthentication;
     // default value is 'mqtt'
     const deviceProtocol = ((device.params || []).find(p => p.name === 'protocol') || { value: 'mqtt' }).value;
@@ -192,26 +193,12 @@ class TasmotaDeviceBox extends Component {
                   <label class="form-label" for={`room_${deviceIndex}`}>
                     <Text id="integration.tasmota.roomLabel" />
                   </label>
-                  <select
-                    onChange={this.updateRoom}
-                    class="form-control"
-                    id={`room_${deviceIndex}`}
+                  <DeviceRoomSelector
+                    selectedRoomId={device.room_id}
+                    inputId={`room_${deviceIndex}`}
+                    updateRoom={this.updateRoom}
                     disabled={!editable || !validModel}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {housesWithRooms &&
-                      housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
+                  />
                 </div>
 
                 <div class="form-group">
