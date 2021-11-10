@@ -52,7 +52,7 @@ class TurnOnLight extends Component {
   getBinaryOperator = () => (
     <div class="col-2">
       <div class="text-center" style={{ marginTop: '10px' }}>
-        <i class="fe fe-arrow-right" style={{ fontSize: '20px' }} />
+        <i class="icon-arrow-right" style={{ fontSize: '20px' }} />
       </div>
     </div>
   );

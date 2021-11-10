@@ -8,14 +8,14 @@ const someTriggers = [
     id: '6a37dd9d-48c7-4d09-a7bb-33f257edb78d',
     name: 'Wake Up',
     description: 'If user "Tony" needs to wake up, start scene "Wake Up"',
-    icon: 'fe fe-bell',
+    icon: 'icon-bell',
     img: '/assets/integrations/cover/wemo.jpg'
   },
   {
     id: '064df5f5-6813-4ad5-836c-2967b2b8dcd9',
     name: 'Back At Home',
     description: 'If user "Pepper" is coming back home, start scene "Back At Home"',
-    icon: 'fe fe-home',
+    icon: 'icon-home',
     img: '/assets/integrations/cover/wemo.jpg'
   }
 ];
@@ -43,7 +43,7 @@ const TriggerPage = connect(
               </select>
               <div class="input-icon ml-2">
                 <span class="input-icon-addon">
-                  <i class="fe fe-search" />
+                  <i class="icon-search" />
                 </span>
                 <Localizer>
                   <input
@@ -55,7 +55,7 @@ const TriggerPage = connect(
                 </Localizer>
               </div>
               <button class="btn btn-outline-primary ml-2">
-                <Text id="scene.newButton" /> <i class="fe fe-plus" />
+                <Text id="scene.newButton" /> <i class="icon-plus" />
               </button>
             </div>
           </div>

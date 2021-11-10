@@ -9,7 +9,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
     <div class="col-md-6">
       <div class="card">
         <div class="card-header">
-          <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
+          <i class={`mr-2 icon-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
           <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
         </div>
         <div class="card-body">

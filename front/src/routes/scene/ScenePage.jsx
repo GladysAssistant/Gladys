@@ -25,7 +25,7 @@ const ScenePage = ({ children, ...props }) => (
               </select>
               <div class="input-icon ml-2">
                 <span class="input-icon-addon">
-                  <i class="fe fe-search" />
+                  <i class="icon-search" />
                 </span>
                 <Localizer>
                   <input
@@ -37,7 +37,7 @@ const ScenePage = ({ children, ...props }) => (
                 </Localizer>
               </div>
               <Link href="/dashboard/scene/new" class="btn btn-outline-primary ml-2">
-                <Text id="scene.newButton" /> <i class="fe fe-plus" />
+                <Text id="scene.newButton" /> <i class="icon-plus" />
               </Link>
             </div>
           </div>

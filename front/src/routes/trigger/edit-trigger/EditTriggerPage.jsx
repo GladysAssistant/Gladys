@@ -9,11 +9,11 @@ const actionsColumns = [
     actions: [
       {
         type: 'Lock the door',
-        icon: 'fe fe-lock'
+        icon: 'icon-lock'
       },
       {
         type: 'Lock the windows',
-        icon: 'fe fe-lock'
+        icon: 'icon-lock'
       }
     ]
   },
@@ -21,7 +21,7 @@ const actionsColumns = [
     actions: [
       {
         type: 'Wait',
-        icon: 'fe fe-clock'
+        icon: 'icon-clock'
       }
     ]
   },
@@ -29,7 +29,7 @@ const actionsColumns = [
     actions: [
       {
         type: 'Arm Home',
-        icon: 'fe fe-home'
+        icon: 'icon-home'
       }
     ]
   }
@@ -59,10 +59,10 @@ const ScenePage = connect(
             </h1>
             <div class="page-options d-flex">
               <button class="btn btn-sm btn-primary ml-2">
-                <Text id="editScene.runButton" /> <i class="fe fe-play" />
+                <Text id="editScene.runButton" /> <i class="icon-play" />
               </button>
               <button class="btn btn-sm btn-danger ml-2">
-                <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
+                <Text id="editScene.deleteButton" /> <i class="icon-trash" />
               </button>
             </div>
           </div>

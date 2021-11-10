@@ -13,7 +13,7 @@ const TriggerGroup = ({ children, ...props }) => (
         </h4>
         <div class="card-options">
           <button class="btn btn-outline-primary" onClick={props.addTrigger}>
-            <Text id="editScene.addNewTriggerButton" /> <i class="fe fe-plus" />
+            <Text id="editScene.addNewTriggerButton" /> <i class="icon-plus" />
           </button>
         </div>
       </div>

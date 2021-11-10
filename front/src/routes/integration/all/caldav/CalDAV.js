@@ -19,7 +19,7 @@ const CalDAV = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-radio" />
+                      <i class="icon-radio" />
                     </span>
                     <Text id="integration.caldav.accountTab" />
                   </Link>
@@ -30,7 +30,7 @@ const CalDAV = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-sliders" />
+                      <i class="icon-sliders" />
                     </span>
                     <Text id="integration.caldav.syncTab" />
                   </Link>

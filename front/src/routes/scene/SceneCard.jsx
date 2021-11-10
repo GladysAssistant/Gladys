@@ -36,7 +36,7 @@ class SceneCard extends Component {
             <div class="dimmer-content">
               <div class="card-body p-3 text-center">
                 <div class={style.scene_icon}>
-                  <i class={`fe fe-${props.scene.icon}`} />
+                  <i class={`icon-${props.scene.icon}`} />
                 </div>
                 <div class={style.disableSceneButton}>
                   <label class="custom-switch m-0">
@@ -57,11 +57,11 @@ class SceneCard extends Component {
               <div class="card-footer">
                 <div class="btn-list text-center">
                   <Link href={`${props.currentUrl}/${props.scene.selector}`} class="btn btn-outline-primary btn-sm">
-                    <i class="fe fe-edit" />
+                    <i class="icon-edit" />
                     <Text id="scene.editButton" />
                   </Link>
                   <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
-                    <i class="fe fe-play" />
+                    <i class="icon-play" />
                     <Text id="scene.startButton" />
                   </button>
                 </div>

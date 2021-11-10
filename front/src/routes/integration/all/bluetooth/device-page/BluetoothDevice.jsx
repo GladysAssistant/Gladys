@@ -65,7 +65,7 @@ class BluetoothDevice extends Component {
                 <div class="tag tag-green">
                   <Text id="global.percentValue" fields={{ value: batteryLevel }} />
                   <span class="tag-addon">
-                    <i class="fe fe-battery" />
+                    <i class="icon-battery" />
                   </span>
                 </div>
               </div>
@@ -124,7 +124,7 @@ class BluetoothDevice extends Component {
                           <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                           <div class="tag-addon">
                             <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
+                              class={`icon-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
                             />
                           </div>
                         </span>

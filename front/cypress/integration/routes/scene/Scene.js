@@ -49,7 +49,7 @@ describe('Scene view', () => {
       cy.wrap(inputs[0]).type('My scene');
     });
 
-    cy.get('.fe-activity').click();
+    cy.get('.icon-activity').click();
 
     cy.contains('newScene.createSceneButton')
       .should('have.class', 'btn-primary')

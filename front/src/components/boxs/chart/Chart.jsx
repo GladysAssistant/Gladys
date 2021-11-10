@@ -409,7 +409,7 @@ class Chartbox extends Component {
               <div class={cx('text-center', style.bigEmptyState)}>
                 <div />
                 <div>
-                  <i class="fe fe-alert-circle mr-2" />
+                  <i class="icon-alert-circle mr-2" />
                   <Text id="dashboard.boxes.chart.noValue" />
                 </div>
               </div>

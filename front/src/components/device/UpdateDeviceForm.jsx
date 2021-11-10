@@ -90,7 +90,7 @@ class UpdateDeviceForm extends Component {
                 <span class="tag">
                   <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
                   <div class="tag-addon">
-                    <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
+                    <i class={`icon-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
                   </div>
                 </span>
               ))}

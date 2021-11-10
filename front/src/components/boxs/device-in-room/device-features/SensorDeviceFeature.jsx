@@ -17,7 +17,7 @@ const SensorDeviceType = ({ children, ...props }) => (
   <tr>
     <td>
       <i
-        class={`mr-2 fe fe-${get(
+        class={`mr-2 icon-${get(
           DeviceFeatureCategoriesIcon,
           `${props.deviceFeature.category}.${props.deviceFeature.type}`
         )}`}
@@ -40,8 +40,8 @@ const SensorDeviceType = ({ children, ...props }) => (
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
       <td class="text-right">
-        {props.deviceFeature.last_value === 1 && <i class="fe fe-shield" />}
-        {props.deviceFeature.last_value === 0 && <i class="fe fe-shield-off" />}
+        {props.deviceFeature.last_value === 1 && <i class="icon-shield" />}
+        {props.deviceFeature.last_value === 0 && <i class="icon-shield-off" />}
       </td>
     )}
     {LAST_SEEN_SENSORS.includes(props.deviceFeature.category) && (

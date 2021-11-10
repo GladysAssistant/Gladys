@@ -10,7 +10,7 @@ const SystemPage = ({ children, ...props }) => (
         <div class="card p-3">
           <div class="d-flex align-items-center">
             <span class="stamp stamp-md bg-blue mr-3">
-              <i class="fe fe-activity" />
+              <i class="icon-activity" />
             </span>
             <div>
               <h4 class="m-0">
@@ -28,7 +28,7 @@ const SystemPage = ({ children, ...props }) => (
         <div class="card p-3">
           <div class="d-flex align-items-center">
             <span class="stamp stamp-md bg-green mr-3">
-              <i class="fe fe-hard-drive" />
+              <i class="icon-hard-drive" />
             </span>
             <div>
               <h4 class="m-0">
@@ -49,7 +49,7 @@ const SystemPage = ({ children, ...props }) => (
         <div class="card p-3">
           <div class="d-flex align-items-center">
             <span class="stamp stamp-md bg-red mr-3">
-              <i class="fe fe-heart" />
+              <i class="icon-heart" />
             </span>
             <div>
               <h4 class="m-0">
@@ -65,7 +65,7 @@ const SystemPage = ({ children, ...props }) => (
         <div class="card p-3">
           <div class="d-flex align-items-center">
             <span class="stamp stamp-md bg-yellow mr-3">
-              <i class="fe fe-git-commit" />
+              <i class="icon-git-commit" />
             </span>
             <div>
               <h4 class="m-0">

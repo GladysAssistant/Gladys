@@ -10,11 +10,11 @@ const TriggerCards = ({ children, ...props }) => (
           <div class="card-body p-3 text-center">
             <div class="text-right text-green">
               <a href="#" class="icon" data-toggle="card-remove">
-                <i class="fe fe-trash" />
+                <i class="icon-trash" />
               </a>
             </div>
             <div class={style.scene_icon}>
-              <i class={`fe fe-${scene.icon}`} />
+              <i class={`icon-${scene.icon}`} />
             </div>
             <h4>{scene.name}</h4>
             <div class="text-muted">{scene.description}</div>
@@ -22,7 +22,7 @@ const TriggerCards = ({ children, ...props }) => (
           <div class="card-footer">
             <div class="btn-list text-center">
               <Link href={`${props.currentUrl}/${scene.id}`} class="btn btn-outline-primary btn-sm">
-                <i class="fe fe-edit" />
+                <i class="icon-edit" />
                 <Text id="scene.editButton" />
               </Link>
             </div>

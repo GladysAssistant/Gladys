@@ -21,7 +21,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
     <tr>
       <td>
         <i
-          class={`fe fe-${get(
+          class={`icon-${get(
             DeviceFeatureCategoriesIcon,
             `${props.deviceFeature.category}.${props.deviceFeature.type}`,
             { default: 'arrow-right' }

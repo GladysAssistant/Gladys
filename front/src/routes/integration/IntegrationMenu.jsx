@@ -18,7 +18,7 @@ const IntegrationMenu = connect(
         class="list-group-item list-group-item-action d-flex align-items-center"
       >
         <span class="icon mr-3">
-          <i class="fe fe-hash" />
+          <i class="icon-hash" />
         </span>
         <Text id="integration.root.menu.all" />
       </Link>
@@ -30,7 +30,7 @@ const IntegrationMenu = connect(
           class="list-group-item list-group-item-action d-flex align-items-center"
         >
           <span class="icon mr-3">
-            <i class={`fe fe-${category.icon}`} />
+            <i class={`icon-${category.icon}`} />
           </span>
           <Text id={`integration.root.menu.${category.type}`} />
         </Link>

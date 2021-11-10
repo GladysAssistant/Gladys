@@ -107,8 +107,8 @@ class SetupTab extends Component {
                         <hr className={style.line} />
                         <i
                           className={cx('fe', {
-                            'fe-check': props.gladysConnected,
-                            'fe-x': !props.gladysConnected,
+                            'icon-check': props.gladysConnected,
+                            'icon-x': !props.gladysConnected,
                             greenIcon: props.gladysConnected,
                             redIcon: !props.gladysConnected
                           })}
@@ -132,8 +132,8 @@ class SetupTab extends Component {
                         <hr className={style.line} />
                         <i
                           className={cx('fe', {
-                            'fe-check': props.zigbee2mqttConnected,
-                            'fe-x': !props.zigbee2mqttConnected,
+                            'icon-check': props.zigbee2mqttConnected,
+                            'icon-x': !props.zigbee2mqttConnected,
                             greenIcon: props.zigbee2mqttConnected,
                             redIcon: !props.zigbee2mqttConnected
                           })}
@@ -260,8 +260,8 @@ class SetupTab extends Component {
                       {props.mqttRunning && (
                         <i
                           className={cx('fe', {
-                            'fe-check': props.gladysConnected,
-                            'fe-x': !props.gladysConnected,
+                            'icon-check': props.gladysConnected,
+                            'icon-x': !props.gladysConnected,
                             greenIcon: props.gladysConnected,
                             redIcon: !props.gladysConnected
                           })}
@@ -277,8 +277,8 @@ class SetupTab extends Component {
                       {props.zigbee2mqttRunning && (
                         <i
                           className={cx('fe', {
-                            'fe-check': props.zigbee2mqttConnected,
-                            'fe-x': !props.zigbee2mqttConnected,
+                            'icon-check': props.zigbee2mqttConnected,
+                            'icon-x': !props.zigbee2mqttConnected,
                             greenIcon: props.zigbee2mqttConnected,
                             redIcon: !props.zigbee2mqttConnected
                           })}

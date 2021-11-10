@@ -54,7 +54,7 @@ const ConfigureHouseTab = ({ children, ...props }) => (
               <span class="tag">
                 {room}
                 <a onClick={removeRoomLocal(index, props.removeRoom)} class="tag-addon">
-                  <i class="fe fe-x" />
+                  <i class="icon-x" />
                 </a>
               </span>
             ))}

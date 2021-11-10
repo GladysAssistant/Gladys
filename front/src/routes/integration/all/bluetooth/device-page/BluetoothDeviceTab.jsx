@@ -23,7 +23,7 @@ const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevi
         </select>
         <div class="input-icon ml-2">
           <span class="input-icon-addon">
-            <i class="fe fe-search" />
+            <i class="icon-search" />
           </span>
           <Localizer>
             <input

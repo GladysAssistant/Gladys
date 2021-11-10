@@ -78,8 +78,8 @@ class SetupForm extends Component {
               <span class="input-icon-addon cursor-pointer" onClick={this.showPassword}>
                 <i
                   class={cx('fe', {
-                    'fe-eye': !showPassword,
-                    'fe-eye-off': showPassword
+                    'icon-eye': !showPassword,
+                    'icon-eye-off': showPassword
                   })}
                 />
               </span>

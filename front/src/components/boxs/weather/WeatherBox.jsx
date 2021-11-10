@@ -35,7 +35,7 @@ const WeatherBox = ({ children, ...props }) => (
         </h4>
         <div class="card-body">
           <p class="alert alert-danger">
-            <i class="fe fe-bell" />
+            <i class="icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.houseHasNoCoordinates" />
             </span>
@@ -50,7 +50,7 @@ const WeatherBox = ({ children, ...props }) => (
         </h4>
         <div class="card-body">
           <p class="alert alert-danger">
-            <i class="fe fe-bell" />
+            <i class="icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.serviceNotConfigured" />
             </span>
@@ -65,7 +65,7 @@ const WeatherBox = ({ children, ...props }) => (
         </h4>
         <div class="card-body">
           <p class="alert alert-danger">
-            <i class="fe fe-bell" />
+            <i class="icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.unknownError" />
             </span>
@@ -90,7 +90,7 @@ const WeatherBox = ({ children, ...props }) => (
         </h4>
         <div class="card-body">
           <p class="alert alert-danger">
-            <i class="fe fe-bell" />
+            <i class="icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.requestToThirdPartyFailed" />{' '}
               <Link href="/dashboard/integration/weather/openweather">
@@ -150,7 +150,7 @@ const WeatherBox = ({ children, ...props }) => (
           <div className="col-9" style={{ padding: '0' }}>
             <span>
               <i
-                class="fe fe-droplet"
+                class="icon-droplet"
                 style={{
                   fpaddingRight: '5px'
                 }}
@@ -167,7 +167,7 @@ const WeatherBox = ({ children, ...props }) => (
             </span>
             <span className="float-right">
               <i
-                class="fe fe-wind"
+                class="icon-wind"
                 style={{
                   paddingRight: '5px'
                 }}

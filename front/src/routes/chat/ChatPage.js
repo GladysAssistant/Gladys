@@ -59,7 +59,7 @@ const IntegrationPage = connect(
                               onClick={sendMessage}
                               disabled={!currentMessageTextInput || currentMessageTextInput.length === 0}
                             >
-                              <i class="fe fe-send" />
+                              <i class="icon-send" />
                             </button>
                           </div>
                         </div>

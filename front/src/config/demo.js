@@ -633,7 +633,7 @@ const data = {
     {
       id: '5f515235-2a00-45f7-993f-cb24b463feec',
       selector: 'wake-up',
-      icon: 'fe fe-bell',
+      icon: 'icon-bell',
       active: true,
       name: 'Wake Up',
       description: "Tony's wake up scene"
@@ -678,7 +678,7 @@ const data = {
   'get /api/v1/scene/wake-up': {
     id: '5f515235-2a00-45f7-993f-cb24b463feec',
     selector: 'wake-up',
-    icon: 'fe fe-bell',
+    icon: 'icon-bell',
     active: true,
     name: 'Wake Up',
     triggers: [
