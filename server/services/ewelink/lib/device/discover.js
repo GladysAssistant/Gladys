@@ -1,7 +1,8 @@
 const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
-const { DEVICE_EXTERNAL_ID_BASE, EWELINK_REGION_KEY } = require('../utils/constants');
-const models = require('../models');
+const features = require('../features');
+const { EWELINK_REGION_KEY } = require('../utils/constants');
+const { getExternalId } = require('../utils/externalId');
 
 /**
  * @description Retrieve eWelink devices from cloud.
@@ -17,6 +18,7 @@ async function discover() {
   const region = await this.gladys.variable.getValue(EWELINK_REGION_KEY, this.serviceId);
   const connection = new this.EweLinkApi({ at: this.accessToken, region });
   const discoveredDevices = await connection.getDevices();
+  logger.debug(`eWeLink: Get devices: ${JSON.stringify(discoveredDevices)}`);
   await this.throwErrorIfNeeded(discoveredDevices, true);
 
   const unknownDevices = [];
@@ -25,41 +27,25 @@ async function discover() {
   logger.info(`eWeLink: ${discoveredDevices.length} device(s) found while retrieving from the cloud !`);
   if (discoveredDevices.length) {
     // ...check, for each of them, ...
-    await Promise.map(discoveredDevices, async (discoveredDevice) => {
-      const uiid = discoveredDevice.uiid.toString();
-      if (Object.keys(models).includes(uiid)) {
-        // ...if the model is supported, ...
-        const channels = await connection.getDeviceChannelCount(discoveredDevice.deviceid);
-        await this.throwErrorIfNeeded(channels, true);
+    await Promise.map(
+      discoveredDevices,
+      async (discoveredDevice) => {
+        // ...if it is already in Gladys...
+        const deviceInGladys = this.gladys.stateManager.get('deviceByExternalId', getExternalId(discoveredDevice));
+        if (deviceInGladys) {
+          logger.debug(`eWeLink: Device "${discoveredDevice.deviceid}" is already in Gladys !`);
+        } else {
+          const channels = await connection.getDeviceChannelCount(discoveredDevice.deviceid);
+          logger.debug(`eWeLink: Get device channel count "${discoveredDevice.deviceid}": ${JSON.stringify(channels)}`);
 
-        // ...for each channel of the device...
-        for (let channel = 1; channel <= channels.switchesAmount; channel += 1) {
-          let deviceId = `${DEVICE_EXTERNAL_ID_BASE}:${discoveredDevice.deviceid}:${channel}`;
-          if (channels.switchesAmount === 1) {
-            deviceId = `${DEVICE_EXTERNAL_ID_BASE}:${discoveredDevice.deviceid}:0`;
-          }
-
-          // ...if it is already in Gladys...
-          const deviceInGladys = this.gladys.stateManager.get('deviceByExternalId', deviceId);
-          if (deviceInGladys) {
-            logger.debug(`eWeLink: Device "${discoveredDevice.deviceid}" is already in Gladys !`);
-          } else {
-            logger.debug(
-              `eWeLink: Device "${discoveredDevice.deviceid}" found, uiid: ${uiid}, model: "${discoveredDevice.productModel}", channel: ${channel}/${channels.switchesAmount}"`,
-            );
-            if (channels.switchesAmount === 1) {
-              unknownDevices.push(models[uiid].getDevice(this.serviceId, discoveredDevice));
-            } else {
-              unknownDevices.push(models[uiid].getDevice(this.serviceId, discoveredDevice, channel));
-            }
-          }
+          logger.debug(
+            `eWeLink: Device "${discoveredDevice.deviceid}" found, uiid: ${discoveredDevice.uiid}, model: "${discoveredDevice.productModel}, switches: ${channels.switchesAmount}`,
+          );
+          unknownDevices.push(features.getDevice(this.serviceId, discoveredDevice, channels.switchesAmount));
         }
-      } else {
-        // ...else the device is not yet handled.
-        logger.info(`eWeLink: Device model "${discoveredDevice.model}" not handled yet !`);
-        unknownDevices.push(models.unhandled.getDevice(this.serviceId, discoveredDevice));
-      }
-    });
+      },
+      { concurrency: 1 },
+    );
   }
   return unknownDevices;
 }

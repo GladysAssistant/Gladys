@@ -5,6 +5,8 @@ import actions from '../../../actions/dashboard/boxes/humidityInRoom';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import get from 'get-value';
 
+const isNotNullOrUndefined = value => value !== undefined && value !== null;
+
 const RoomHumidityBox = ({ children, ...props }) => (
   <div class="card p-3">
     <div class="d-flex align-items-center">
@@ -24,12 +26,12 @@ const RoomHumidityBox = ({ children, ...props }) => (
         </span>
       )}
       <div>
-        {props.humidity && (
+        {isNotNullOrUndefined(props.humidity) && (
           <h4 class="m-0">
             <Text id="global.percentValue" fields={{ value: Math.round(props.humidity) }} />
           </h4>
         )}
-        {!props.humidity && (
+        {!isNotNullOrUndefined(props.humidity) && (
           <p class="m-0">
             <Text id="dashboard.boxes.humidityInRoom.noHumidityRecorded" />
           </p>
@@ -40,10 +42,20 @@ const RoomHumidityBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect('DashboardBoxDataHumidityInRoom,DashboardBoxStatusHumidityInRoom', actions)
 class RoomHumidityBoxComponent extends Component {
-  componentDidMount() {
+  refreshData = () => {
     this.props.getHumidityInRoom(this.props.box, this.props.x, this.props.y);
+  };
+
+  componentDidMount() {
+    this.refreshData();
+  }
+
+  componentDidUpdate(previousProps) {
+    const roomChanged = get(previousProps, 'box.room') !== get(this.props, 'box.room');
+    if (roomChanged) {
+      this.refreshData();
+    }
   }
 
   render(props, {}) {
@@ -56,4 +68,7 @@ class RoomHumidityBoxComponent extends Component {
   }
 }
 
-export default RoomHumidityBoxComponent;
+export default connect(
+  'DashboardBoxDataHumidityInRoom,DashboardBoxStatusHumidityInRoom',
+  actions
+)(RoomHumidityBoxComponent);
