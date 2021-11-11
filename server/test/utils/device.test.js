@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { getDeviceParam, setDeviceParam, getDeviceFeature, isUpdatable } = require('../../utils/device');
+const { getDeviceParam, setDeviceParam, getDeviceFeature, hasDeviceChanged } = require('../../utils/device');
 
 const device = {
   features: [
@@ -95,9 +95,9 @@ describe('getDeviceFeature', () => {
   });
 });
 
-describe('isUpdatable', () => {
+describe('hasDeviceChanged', () => {
   it('should be same device', () => {
-    const updatable = isUpdatable(device, device);
+    const updatable = hasDeviceChanged(device, device);
     expect(updatable).to.equal(false);
   });
 
@@ -128,7 +128,7 @@ describe('isUpdatable', () => {
         },
       ],
     };
-    const updatable = isUpdatable(newDevice, device);
+    const updatable = hasDeviceChanged(newDevice, device);
     expect(updatable).to.equal(true);
   });
 
@@ -153,7 +153,7 @@ describe('isUpdatable', () => {
         },
       ],
     };
-    const updatable = isUpdatable(newDevice, device);
+    const updatable = hasDeviceChanged(newDevice, device);
     expect(updatable).to.equal(true);
   });
 
@@ -184,7 +184,7 @@ describe('isUpdatable', () => {
         },
       ],
     };
-    const updatable = isUpdatable(newDevice, device);
+    const updatable = hasDeviceChanged(newDevice, device);
     expect(updatable).to.equal(true);
   });
 
@@ -211,7 +211,7 @@ describe('isUpdatable', () => {
         },
       ],
     };
-    const updatable = isUpdatable(newDevice, device);
+    const updatable = hasDeviceChanged(newDevice, device);
     expect(updatable).to.equal(true);
   });
 });

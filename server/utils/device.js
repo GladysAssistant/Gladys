@@ -77,39 +77,40 @@ const matchParam = (params, param) => {
 };
 
 /**
- * @description Compare newDevice with exisingDevice on features and parameters
- * to tell if device can be updated.
+ * @description Compares both argument devices and check if any changes occurred on following attributes:
+ *  - features: check for added or deleted features (based only on external_id)
+ *  - params: check for added, updated or deleted (based on name and value)
  *
  * @param {Object} newDevice - New device.
  * @param {Object} existingDevice - Existing device.
- * @returns {boolean} Is new device is different on feature or parameters?
+ * @returns {boolean} Indicates if the new device is different from the existing one.
  * @example
- * isUpdatable({}, {})
+ * hasDeviceChanged({ features: [(3)], params: [ ... ]}, { features: [(0)], params: [ ... ]})
  */
-function isUpdatable(newDevice, existingDevice = {}) {
+function hasDeviceChanged(newDevice, existingDevice = {}) {
   const { features, params } = newDevice;
   const existingFeatures = existingDevice.features || [];
   const existingParams = existingDevice.params || [];
 
-  let updatable = existingFeatures.length !== features.length || existingParams.length !== params.length;
+  let deviceChanged = existingFeatures.length !== features.length || existingParams.length !== params.length;
   let i = 0;
-  while (!updatable && features[i]) {
-    updatable = matchFeature(existingFeatures, features[i]) < 0;
+  while (!deviceChanged && features[i]) {
+    deviceChanged = matchFeature(existingFeatures, features[i]) < 0;
     i += 1;
   }
 
   i = 0;
-  while (!updatable && params[i]) {
-    updatable = matchParam(existingParams, params[i]) < 0;
+  while (!deviceChanged && params[i]) {
+    deviceChanged = matchParam(existingParams, params[i]) < 0;
     i += 1;
   }
 
-  return updatable;
+  return deviceChanged;
 }
 
 module.exports = {
   getDeviceParam,
   setDeviceParam,
   getDeviceFeature,
-  isUpdatable,
+  hasDeviceChanged,
 };

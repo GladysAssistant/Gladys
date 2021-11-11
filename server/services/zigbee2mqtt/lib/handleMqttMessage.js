@@ -3,7 +3,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { convertDevice } = require('../utils/convertDevice');
 const { convertValue } = require('../utils/convertValue');
 const { convertFeature } = require('../utils/convertFeature');
-const { isUpdatable } = require('../../../utils/device');
+const { hasDeviceChanged } = require('../../../utils/device');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -33,7 +33,7 @@ function handleMqttMessage(topic, message) {
           const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
           const device = { ...(existingDevice || {}), ...d };
           if (existingDevice) {
-            device.updatable = isUpdatable(device, existingDevice);
+            device.updatable = hasDeviceChanged(device, existingDevice);
           }
 
           return device;

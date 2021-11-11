@@ -1,4 +1,4 @@
-const { isUpdatable } = require('../../../utils/device');
+const { hasDeviceChanged } = require('../../../utils/device');
 
 /**
  * @description Get all discovered devices, and if device already created, the Gladys device.
@@ -11,7 +11,7 @@ function mergeWithExistingDevice(tasmotaDevice) {
   const existing = this.gladys.stateManager.get('deviceByExternalId', tasmotaDevice.external_id);
   if (existing) {
     const device = { ...existing, ...tasmotaDevice };
-    const updatable = isUpdatable(device, existing);
+    const updatable = hasDeviceChanged(device, existing);
     if (updatable) {
       device.updatable = updatable;
     }
