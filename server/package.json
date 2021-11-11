@@ -7,7 +7,7 @@
     "npm": "6.x"
   },
   "scripts": {
-    "postinstall": "node ./cli/install_service_dependencies.js",
+    "postinstall": "node -r dotenv/config ./cli/install_service_dependencies.js",
     "pretest": "npm run eslint",
     "test": "cross-env NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
     "test-without-lint": "cross-env NODE_ENV=test ./node_modules/mocha/bin/mocha --recursive ./test/bootstrap.test.js \"./test/**/*.test.js\" --exit",
