@@ -1,3 +1,5 @@
+require('dotenv').config(); // eslint-disable-line
+
 const { lstatSync, readdirSync } = require('fs');
 const { join } = require('path');
 const { execSync } = require('child_process');
@@ -21,5 +23,10 @@ directories.forEach((directory) => {
     });
   } catch (e) {
     logger.warn(e);
+
+    const silentFail = process.env.INSTALL_SERVICES_SILENT_FAIL === 'true';
+    if (!silentFail) {
+      throw e;
+    }
   }
 });
