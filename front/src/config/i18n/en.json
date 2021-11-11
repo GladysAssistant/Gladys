@@ -43,6 +43,7 @@
     "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
+    "searchPlaceHolder": "Search devices",
     "noFeatures": "No features",
     "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
   },
@@ -368,7 +369,6 @@
         "title": "Devices in Gladys",
         "deviceOnNetworkTitle": "Devices detected on network",
         "connectButton": "Connect/Reconnect",
-        "search": "Search devices",
         "noDevices": "No Philips Hue device added yet.",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
         "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab.",
@@ -407,7 +407,6 @@
       "httpDiscoverTab": "HTTP discover",
       "device": {
         "title": "Tasmota devices in Gladys",
-        "search": "Search devices",
         "editButton": "Edit",
         "noDeviceFound": "No Tasmota device found.",
         "protocolLabel": "Protocol",
@@ -470,7 +469,6 @@
         "noNameLabel": "No name",
         "roomLabel": "Room",
         "featuresLabel": "Features",
-        "search": "Search devices",
         "connectButton": "Connect/Reconnect",
         "scanButton": "Scan network",
         "saveButton": "Save",
@@ -534,7 +532,6 @@
       },
       "device": {
         "title": "Zigbee2mqtt devices",
-        "search": "Search devices",
         "editButton": "Edit"
       },
       "discover": {
@@ -613,7 +610,6 @@
       "description": "This integration is deprecated, we are migrating to zwave-js-ui.",
       "device": {
         "title": "Legacy Open-Zwave Devices",
-        "search": "Search devices",
         "convertToMqtt": "Convert to MQTT device",
         "oldIntegrationWarning": "This integration was based on Open-Zwave and is now DEPRECATED. We are migrating to Zwave-js-ui, but in the meantime we recommend that you use Node-RED + Zwave-js-ui + Gladys. <br /> <br /> If you want to help us develop this integration, join-us on the <a href=\"https://en-community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">forum</a>!",
         "noDevices": "No Z-Wave devices added yet.",
@@ -650,7 +646,6 @@
       },
       "device": {
         "title": "MQTT Devices",
-        "search": "Search devices",
         "noDevices": "No MQTT devices added yet.",
         "noNameLabel": "No name",
         "nameLabel": "Name",
@@ -738,7 +733,6 @@
       },
       "device": {
         "title": "Broadlink devices",
-        "searchPlaceholder": "Search for devices",
         "newButton": "Create",
         "noRemoteFound": "No Broadlink device or remote found.",
         "saveError": "There was an error saving the device.",
@@ -846,7 +840,6 @@
       "device": {
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
-        "searchPlaceholder": "Search Xiaomi devices",
         "sidLabel": "Xiaomi SID",
         "ipLabel": "IP Address",
         "roomLabel": "Room",
@@ -950,7 +943,6 @@
       "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
       "device": {
         "title": "Bluetooth Devices",
-        "search": "Search devices",
         "noDevices": "No Bluetooth devices added yet.",
         "nameLabel": "Name",
         "namePlaceholder": "Enter device name",
@@ -1022,7 +1014,6 @@
       },
       "device": {
         "title": "Devices in Gladys",
-        "search": "Search devices",
         "updates": "Check updates",
         "editButton": "Edit",
         "noDeviceFound": "No eWeLink device found.",
@@ -1440,8 +1431,6 @@
   "housesSettings": {
     "searchPlaceholder": "Search houses",
     "newButton": "New",
-    "orderDirAsc": "A - Z",
-    "orderDirDesc": "Z - A",
     "defaultNewHouseName": "New House",
     "noHouseFound": "No houses found."
   },
@@ -1658,8 +1647,6 @@
   "scene": {
     "title": "Scenes",
     "emptySceneSentenceTop": "Can't find any scenes.",
-    "orderDirAsc": "A - Z",
-    "orderDirDesc": "Z - A",
     "newButton": "New",
     "editButton": "Edit",
     "startButton": "Start",

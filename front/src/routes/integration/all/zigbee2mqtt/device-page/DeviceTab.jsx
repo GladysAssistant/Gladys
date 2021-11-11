@@ -6,6 +6,7 @@ import Zigbee2mqttBox from './Zigbee2mqttBox';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import CheckStatus from '../commons/CheckStatus';
+import CardFilter from '../../../../../components/layout/CardFilter';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -14,27 +15,15 @@ const DeviceTab = ({ children, ...props }) => (
         <Text id="integration.zigbee2mqtt.device.title" />
       </h1>
       <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.zigbee2mqtt.device.search" />}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
+        <Localizer>
+          <CardFilter
+            changeOrderDir={props.changeOrderDir}
+            orderValue={props.getZigbee2mqttOrderDir}
+            search={props.debouncedSearch}
+            searchValue={props.zigbee2mqttSearch}
+            searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
+          />
+        </Localizer>
       </div>
     </div>
     <div class="card-body">
