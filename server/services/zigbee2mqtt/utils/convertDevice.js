@@ -1,6 +1,6 @@
-const { loadFeatures } = require('./loadFeatures');
 const logger = require('../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../../server/utils/constants');
+const { mapDefinition } = require('./features/mapDefinition');
 
 /**
  * @description Converts an MQTT device to a Gladys device.
@@ -8,38 +8,27 @@ const { DEVICE_FEATURE_CATEGORIES } = require('../../../../server/utils/constant
  * @param {string} serviceId - Service ID.
  * @returns {Object} Device for Gladys.
  * @example
- * convertDevice({ friendly_name: 'name', model: 'featureMapper' }, '6a37dd9d-48c7-4d09-a7bb-33f257edb78d');
+ * convertDevice({ friendly_name: 'name', definition: {} }, '6a37dd9d-48c7-4d09-a7bb-33f257edb78d');
  */
 function convertDevice(device, serviceId) {
-  const features = loadFeatures(device.friendly_name, device.model, device.powerSource === 'Battery');
+  const { friendly_name: name, definition = {} } = device;
+  const { model } = definition;
+  const features = mapDefinition(name, definition);
 
-  // Not managed device
-  if (features.length === 0 || (features.length === 1 && features[0].category === DEVICE_FEATURE_CATEGORIES.BATTERY)) {
-    const gladysDevice = {
-      name: device.friendly_name,
-      external_id: `zigbee2mqtt:${device.friendly_name}`,
-      model: device.model,
-      features,
-      should_poll: false,
-      service_id: serviceId,
-      supported: false,
-    };
-    logger.debug(`Device ${device.friendly_name} / model ${device.model} NOT managed by Gladys`);
-    logger.debug(gladysDevice);
-    return gladysDevice;
-  }
+  // Device is not managed if no feature found, or only battery feature is available.
+  const supported = features.findIndex((f) => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY) >= 0;
 
   const gladysDevice = {
-    name: device.friendly_name,
-    external_id: `zigbee2mqtt:${device.friendly_name}`,
-    model: device.model,
+    name,
+    model,
+    external_id: `zigbee2mqtt:${name}`,
     features,
     should_poll: false,
     service_id: serviceId,
-    supported: true,
+    supported,
   };
-  logger.debug(`Device ${device.friendly_name} / model ${device.model} managed by Gladys`);
-  logger.debug(gladysDevice);
+
+  logger.debug(`Device ${name} / model ${model} ${supported ? '' : 'NOT'} managed by Gladys`);
   return gladysDevice;
 }
 
