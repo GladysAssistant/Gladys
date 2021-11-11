@@ -124,5 +124,13 @@
 
 .bigEmptyState {
   margin-top: 0rem;
-  margin-bottom: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.smallTextEmptyState {
+  margin-top: 1rem;
+  font-size: 12px;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  text-align: justify;
 }

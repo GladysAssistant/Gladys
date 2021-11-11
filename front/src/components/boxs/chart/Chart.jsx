@@ -6,6 +6,7 @@ import { Text } from 'preact-i18n';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
 
 const ONE_HOUR_IN_MINUTES = 60;
@@ -56,6 +57,8 @@ const calculateVariation = (firstValue, lastValue) => {
   }
   return Math.round(((lastValue - firstValue) / Math.abs(firstValue)) * 100);
 };
+
+const allEqual = arr => arr.every(val => val === arr[0]);
 
 class Chartbox extends Component {
   toggleDropdown = () => {
@@ -136,9 +139,12 @@ class Chartbox extends Component {
 
       let emptySeries = true;
 
-      const series = data.map(oneFeature => {
+      const series = data.map((oneFeature, index) => {
+        const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
+        const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
+        const name = oneUnitTranslated ? `${oneFeature.device.name} (${oneUnitTranslated})` : oneFeature.device.name;
         return {
-          name: oneFeature.device.name,
+          name,
           data: oneFeature.values.map(value => {
             emptySeries = false;
             return {
@@ -156,22 +162,44 @@ class Chartbox extends Component {
       };
 
       if (data.length > 0) {
-        const lastValuesArray = [];
-        const variationArray = [];
-        data.forEach(oneFeature => {
+        // Before now, there was a "unit" attribute in this box instead of "units",
+        // so we need to support "unit" as some users may already have the box with that param
+        const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
+        // We check if all deviceFeatures selected are in the same unit
+        const allUnitsAreSame = this.props.box.units ? allEqual(this.props.box.units) : false;
+
+        // If all deviceFeatures selected are in the same unit
+        // We do a average of all values
+        if (allUnitsAreSame) {
+          const lastValuesArray = [];
+          const variationArray = [];
+          data.forEach(oneFeature => {
+            const { values } = oneFeature;
+            if (values.length === 0) {
+              return;
+            }
+            const firstElement = values[0];
+            const lastElement = values[values.length - 1];
+            const variation = calculateVariation(firstElement.value, lastElement.value);
+            const lastValue = lastElement.value;
+            variationArray.push(variation);
+            lastValuesArray.push(lastValue);
+          });
+          newState.variation = average(variationArray);
+          newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
+          newState.unit = unit;
+        } else {
+          // If not, we only display the first value
+          const oneFeature = data[0];
           const { values } = oneFeature;
-          if (values.length === 0) {
-            return;
+          if (values.length > 0) {
+            const firstElement = values[0];
+            const lastElement = values[values.length - 1];
+            newState.variation = calculateVariation(firstElement.value, lastElement.value);
+            newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
+            newState.unit = unit;
           }
-          const firstElement = values[0];
-          const lastElement = values[values.length - 1];
-          const variation = calculateVariation(firstElement.value, lastElement.value);
-          const lastValue = lastElement.value;
-          variationArray.push(variation);
-          lastValuesArray.push(lastValue);
-        });
-        newState.variation = average(variationArray);
-        newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
+        }
       }
 
       await this.setState(newState);
@@ -228,7 +256,7 @@ class Chartbox extends Component {
       this.updateDeviceStateWebsocket
     );
   }
-  render(props, { loading, series, labels, dropdown, variation, lastValueRounded, interval, emptySeries }) {
+  render(props, { loading, series, labels, dropdown, variation, lastValueRounded, interval, emptySeries, unit }) {
     const displayVariation = props.box.display_variation;
     return (
       <div class="card">
@@ -308,7 +336,7 @@ class Chartbox extends Component {
               {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                 <div class="h1 mb-0 mr-2">
                   {lastValueRounded}
-                  {props.box.unit !== undefined && <Text id={`deviceFeatureUnitShort.${props.box.unit}`} />}
+                  {unit !== undefined && <Text id={`deviceFeatureUnitShort.${unit}`} />}
                 </div>
               )}
               <div
@@ -412,6 +440,9 @@ class Chartbox extends Component {
                   <i class="fe fe-alert-circle mr-2" />
                   <Text id="dashboard.boxes.chart.noValue" />
                 </div>
+                <div class={style.smallTextEmptyState}>
+                  <Text id="dashboard.boxes.chart.noValueWarning" />
+                </div>
               </div>
             )}
             {emptySeries === false && !props.box.display_axes && (
@@ -431,4 +462,4 @@ class Chartbox extends Component {
   }
 }
 
-export default connect('httpClient,session,user')(Chartbox);
+export default withIntlAsProp(connect('httpClient,session,user')(Chartbox));
