@@ -1,7 +1,11 @@
+import config from '../config';
+
 export class DemoHttpClient {
   getDemoFile = async () => {
     // Set a timer to see loaders
-    await new Promise(r => setTimeout(r, 200));
+    if (config.demoRequestTime > 0) {
+      await new Promise(r => setTimeout(r, config.demoRequestTime));
+    }
 
     if (this.responses) {
       return this.responses;
