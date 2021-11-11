@@ -3,6 +3,7 @@ import cx from 'classnames';
 
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 
 const createDevice = (props, device) => () => {
   props.createDevice(device);
@@ -44,12 +45,10 @@ const FoundDevices = ({ children, ...props }) => (
         <div class="dimmer-content">
           {props.getTpLinkNewDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.tpLinkNewDevices && props.tpLinkNewDevices.length === 0 && (
-              <div class="col-md-12">
-                <div class="alert alert-info">
-                  <Text id="integration.tpLink.device.noDevicesFound" />
-                </div>
-              </div>
+            {(!props.tpLinkNewDevices || props.tpLinkNewDevices.length === 0) && (
+              <EmptyDeviceList>
+                <Text id="integration.tpLink.device.noDevicesFound" />
+              </EmptyDeviceList>
             )}
             {props.tpLinkNewDevices &&
               props.tpLinkNewDevices.map((device, index) => (

@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import EmptyState from './EmptyState';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 import DiscoveredBox from './DiscoveredBox';
 import style from './style.css';
 import CheckStatus from '../commons/CheckStatus';
@@ -51,7 +51,11 @@ const DiscoverTab = ({ children, ...props }) => (
               props.zigbee2mqttDevices.map((device, index) => (
                 <DiscoveredBox {...props} device={device} deviceIndex={index} />
               ))}
-            {(!props.zigbee2mqttDevices || props.zigbee2mqttDevices.length === 0) && <EmptyState />}
+            {(!props.zigbee2mqttDevices || props.zigbee2mqttDevices.length === 0) && (
+              <EmptyDeviceList>
+                <Text id="integration.zigbee2mqtt.discover.noDeviceDiscovered" />
+              </EmptyDeviceList>
+            )}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
-import EmptyState from './EmptyState';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 import Zigbee2mqttBox from './Zigbee2mqttBox';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
@@ -52,7 +52,11 @@ const DeviceTab = ({ children, ...props }) => (
               props.zigbee2mqttDevices.map((device, index) => (
                 <Zigbee2mqttBox {...props} device={device} deviceIndex={index} />
               ))}
-            {props.zigbee2mqttDevices && props.zigbee2mqttDevices.length === 0 && <EmptyState />}
+            {(!props.zigbee2mqttDevices || props.zigbee2mqttDevices.length === 0) && (
+              <EmptyDeviceList>
+                <Text id="integration.zigbee2mqtt.noDeviceFound" />
+              </EmptyDeviceList>
+            )}
           </div>
         </div>
       </div>

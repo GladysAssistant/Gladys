@@ -6,6 +6,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
 import { Link } from 'preact-router/match';
 import CheckMqttPanel from '../commons/CheckMqttPanel';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -66,7 +67,11 @@ const DeviceTab = ({ children, ...props }) => (
                   user={props.user}
                 />
               ))}
-            {props.mqttDevices && props.mqttDevices.length === 0 && <Text id="integration.mqtt.device.noDevices" />}
+            {props.mqttDevices && props.mqttDevices.length === 0 && (
+              <EmptyDeviceList>
+                <Text id="integration.mqtt.device.noDevices" />
+              </EmptyDeviceList>
+            )}
           </div>
         </div>
       </div>

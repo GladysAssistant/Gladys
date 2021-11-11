@@ -1,9 +1,9 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 import { RequestStatus } from '../../../../../utils/consts';
 import BluetoothDevice from './BluetoothDevice';
-import EmptyState from '../EmptyState';
 import style from '../style.css';
 
 const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevices, ...props }) => (
@@ -58,7 +58,9 @@ const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevi
                 />
               ))}
             {(!bluetoothDevices || bluetoothDevices.length === 0) && (
-              <EmptyState id="integration.bluetooth.device.noDevices" />
+              <EmptyDeviceList>
+                <Text id="integration.bluetooth.device.noDevices" />
+              </EmptyDeviceList>
             )}
           </div>
         </div>

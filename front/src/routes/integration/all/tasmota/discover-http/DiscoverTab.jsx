@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import EmptyState from '../EmptyState';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 import style from '../style.css';
 import TasmotaDeviceBox from '../TasmotaDeviceBox';
 import SearchForm from './SearchForm';
@@ -42,7 +42,12 @@ const DeviceTab = props => (
                   listName="discoveredDevices"
                 />
               ))}
-            {!props.discoveredDevices || (props.discoveredDevices.length === 0 && <EmptyState />)}
+            {!props.discoveredDevices ||
+              (props.discoveredDevices.length === 0 && (
+                <EmptyDeviceList>
+                  <Text id="integration.tasmota.discover.noDeviceFound" />
+                </EmptyDeviceList>
+              ))}
           </div>
         </div>
       </div>

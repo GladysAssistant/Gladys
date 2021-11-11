@@ -2,7 +2,7 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
-import EmptyState from './EmptyState';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 import style from './style.css';
 import EweLinkDeviceBox from '../EweLinkDeviceBox';
 
@@ -55,7 +55,12 @@ const DeviceTab = ({ children, ...props }) => (
                   listName="discoveredDevices"
                 />
               ))}
-            {!props.discoveredDevices || (props.discoveredDevices.length === 0 && <EmptyState />)}
+            {!props.discoveredDevices ||
+              (props.discoveredDevices.length === 0 && (
+                <EmptyDeviceList>
+                  <Text id="integration.eWeLink.discover.noDeviceFound" />
+                </EmptyDeviceList>
+              ))}
           </div>
         </div>
       </div>

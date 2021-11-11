@@ -3,6 +3,7 @@ import cx from 'classnames';
 
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 
 const createDevice = (props, device) => () => {
   props.createDevice(device);
@@ -35,12 +36,10 @@ const FoundDevices = ({ children, ...props }) => (
         <div class="dimmer-content">
           {props.getPhilipsHueNewDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
-            {props.philipsHueNewDevices && props.philipsHueNewDevices.length === 0 && (
-              <div class="col-md-12">
-                <div class="alert alert-info">
-                  <Text id="integration.philipsHue.device.noDevicesFound" />
-                </div>
-              </div>
+            {(!props.philipsHueNewDevices || props.philipsHueNewDevices.length === 0) && (
+              <EmptyDeviceList>
+                <Text id="integration.philipsHue.device.noDevicesFound" />
+              </EmptyDeviceList>
             )}
             {props.philipsHueNewDevices &&
               props.philipsHueNewDevices.map((device, index) => (
@@ -74,8 +73,10 @@ const FoundDevices = ({ children, ...props }) => (
                   </div>
                 </div>
               ))}
-            {props.philipsHueDevices && props.philipsHueDevices.length === 0 && (
-              <Text id="integration.philipsHue.device.noDevices" />
+            {(!props.philipsHueDevices || props.philipsHueDevices.length === 0) && (
+              <EmptyDeviceList>
+                <Text id="integration.philipsHue.device.noDevices" />
+              </EmptyDeviceList>
             )}
           </div>
         </div>

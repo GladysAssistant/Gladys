@@ -233,3 +233,7 @@ body {
 .device-features {
   min-height: 70px;
 }
+.device-list-empty {
+  margin-top: 35px;
+  margin-bottom: 35px;
+}

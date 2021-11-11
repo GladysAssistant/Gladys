@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import Device from './Device';
 import style from './style.css';
+import EmptyDeviceList from '../../../../components/device/view/EmptyDeviceList';
 
 const DevicePanel = ({ children, ...props }) => (
   <div class="card">
@@ -57,10 +58,10 @@ const DevicePanel = ({ children, ...props }) => (
                   deleteDevice={props.deleteDevice}
                 />
               ))}
-            {props.xiaomiDevices && props.xiaomiDevices.length === 0 && (
-              <p class="text-center">
+            {(!props.xiaomiDevices || props.xiaomiDevices.length === 0) && (
+              <EmptyDeviceList>
                 <Text id="integration.xiaomi.device.noDevices" />
-              </p>
+              </EmptyDeviceList>
             )}
           </div>
         </div>

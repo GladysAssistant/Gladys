@@ -4,6 +4,7 @@ import cx from 'classnames';
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -57,7 +58,9 @@ const DeviceTab = ({ children, ...props }) => (
                 />
               ))}
             {props.philipsHueDevices && props.philipsHueDevices.length === 0 && (
-              <Text id="integration.philipsHue.device.noDevices" />
+              <EmptyDeviceList>
+                <Text id="integration.philipsHue.device.noDevices" />
+              </EmptyDeviceList>
             )}
           </div>
         </div>

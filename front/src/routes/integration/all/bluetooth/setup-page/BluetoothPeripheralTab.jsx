@@ -1,11 +1,12 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import style from '../style.css';
-import BluetoothPeripheral from './BluetoothPeripheral';
+import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 import { RequestStatus } from '../../../../../utils/consts';
-import EmptyState from '../EmptyState';
 import CheckBluetoothPanel from '../commons/CheckBluetoothPanel';
+import BluetoothPeripheral from './BluetoothPeripheral';
+
+import style from '../style.css';
 
 const BluetoothPeripheralTab = ({
   scan,
@@ -48,7 +49,9 @@ const BluetoothPeripheralTab = ({
           <div class="dimmer-content">
             <div class="row">
               {bluetoothStatus.ready && bluetoothPeripherals.length === 0 && (
-                <EmptyState id="integration.bluetooth.discover.noDeviceFound" />
+                <EmptyDeviceList>
+                  <Text id="integration.bluetooth.discover.noDeviceFound" />
+                </EmptyDeviceList>
               )}
               {bluetoothStatus.ready &&
                 bluetoothPeripherals.map((peripheral, index) => (

@@ -2,7 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import RtspCameraBox from './RtspCameraBox';
-import EmptyState from './EmptyState';
+import EmptyDeviceList from '../../../../components/device/view/EmptyDeviceList';
 import { RequestStatus } from '../../../../utils/consts';
 import style from './style.css';
 
@@ -68,7 +68,11 @@ const RtspCameraPage = ({ children, ...props }) => (
                               deleteCamera={props.deleteCamera}
                             />
                           ))}
-                        {props.rtspCameras && props.rtspCameras.length === 0 && <EmptyState />}
+                        {props.rtspCameras && props.rtspCameras.length === 0 && (
+                          <EmptyDeviceList>
+                            <Text id="integration.rtspCamera.noCameraFound" />
+                          </EmptyDeviceList>
+                        )}
                       </div>
                     </div>
                   </div>
