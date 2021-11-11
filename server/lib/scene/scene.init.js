@@ -17,9 +17,9 @@ async function init() {
   }
   // get all scenes
   const scenes = await db.Scene.findAll();
-  const plainScenes = scenes.map((scene) => {
+  const plainScenes = scenes.map(async (scene) => {
     const plainScene = scene.get({ plain: true });
-    this.addScene(plainScene);
+    await this.addScene(plainScene);
     return plainScene;
   });
 
@@ -30,7 +30,7 @@ async function init() {
   rule.minute = 0;
   rule.second = 0;
 
-  this.schedule.scheduleJob(rule, this.dailyUpdate.bind(this));
+  this.schedule.scheduleJob('sunrise/sunset', rule, this.dailyUpdate.bind(this));
   await this.dailyUpdate();
 
   return plainScenes;

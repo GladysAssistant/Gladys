@@ -1,8 +1,18 @@
 const cloneDeep = require('lodash.clonedeep');
 const uuid = require('uuid');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc'); // dependent on utc plugin
+const timezone = require('dayjs/plugin/timezone');
+const relativeTime = require('dayjs/plugin/relativeTime');
+const logger = require('../../utils/logger');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
+const { compare } = require('../../utils/compare');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(relativeTime);
 
 const MAX_VALUE_SET_INTERVAL = 2 ** 31 - 1;
 
@@ -33,7 +43,7 @@ function addScene(sceneRaw) {
   // Foreach triggger, we schedule jobs for triggers that need to be scheduled
   // only if the scene is active
   if (scene.triggers && scene.active) {
-    scene.triggers.forEach((trigger) => {
+    scene.triggers.forEach(async (trigger) => {
       // First, we had a trigger key, import to uniquely identify this trigger
       trigger.key = uuid.v4();
       if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
@@ -90,6 +100,75 @@ function addScene(sceneRaw) {
           throw new BadParameters(`${trigger.interval} ${trigger.unit} is too big for an interval`);
         }
         trigger.jsInterval = setInterval(() => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger), intervalMilliseconds);
+      } else if (
+        trigger.type === EVENTS.CALENDAR.EVENT_START ||
+        trigger.type === EVENTS.CALENDAR.EVENT_END ||
+        trigger.type === EVENTS.CALENDAR.EVENT_REMINDER
+      ) {
+        const now = dayjs();
+        const foreseenSchedule = dayjs().add(1, 'day');
+        const user = await this.user.get({
+          selector: trigger.user,
+        });
+        const calendar = await this.calendar.get(user[0].id, {
+          selector: trigger.calendar,
+        });
+        const events = await this.calendar.getEvents(user[0].id, {
+          from: now,
+          calendarId: calendar[0].id,
+          name: trigger.event,
+          take: 1,
+        });
+        const calendarEvent = events.length > 0 ? events[0] : undefined;
+        /* for (let index = 0; index < events.length; index += 1) {
+          calendarEvent = events[index];
+          if(compare('~=', calendarEvent.name, trigger.event)) {
+            break;
+          }
+        } */
+        if (calendarEvent) {
+          // Event start datetime
+          if (calendarEvent.start) {
+            const eventStartTime = dayjs(calendarEvent.start).tz(this.timezone);
+            if (eventStartTime.isAfter(now) && eventStartTime.isBefore(foreseenSchedule)) {
+              trigger.eventStartJob = this.schedule.scheduleJob(
+                `${calendarEvent.external_id}_start`,
+                eventStartTime.toDate(),
+                () => {
+                  this.event.emit(EVENTS.TRIGGERS.CHECK, {
+                    type: EVENTS.CALENDAR.EVENT_START,
+                    calendarEvent,
+                  });
+                  this.addScene(sceneRaw);
+                }
+              );
+              if (trigger.eventStartJob) {
+                logger.info(`Calendar event ${calendarEvent.name} start is scheduled, ${eventStartTime.fromNow()}.`);
+              }
+            }
+          }
+
+          // Event end datetime
+          if (calendarEvent.end) {
+            const eventEndTime = dayjs(calendarEvent.end).tz(this.timezone);
+            if (eventEndTime.isAfter(now) && eventEndTime.isBefore(foreseenSchedule)) {
+              trigger.eventEndJob = this.schedule.scheduleJob(
+                `${calendarEvent.external_id}_end`,
+                eventEndTime.toDate(),
+                () => {
+                  this.event.emit(EVENTS.TRIGGERS.CHECK, {
+                    type: EVENTS.CALENDAR.EVENT_END,
+                    calendarEvent,
+                  });
+                  this.addScene(sceneRaw);
+                }
+              );
+              if (trigger.eventEndJob) {
+                logger.info(`Calendar event ${calendarEvent.name} end is scheduled, ${eventEndTime.fromNow()}.`);
+              }
+            }
+          }
+        }
       }
     });
   }

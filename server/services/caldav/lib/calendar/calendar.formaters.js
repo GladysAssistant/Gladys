@@ -75,7 +75,7 @@ function formatRecurringEvents(event, gladysCalendar) {
     }
 
     // Set the the title and the end date from either the regular event or the recurrence override.
-    const recurrenceTitle = curEvent.summary;
+    const recurrenceTitle = curEvent.summary || '';
     endDate = this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x');
     endDate = this.dayjs.tz(
       this.dayjs(parseInt(startDate.format('x'), 10) + curDuration, 'x').format('YYYY-MM-DDTHH:mm:ss'),

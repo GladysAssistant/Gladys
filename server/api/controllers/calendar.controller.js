@@ -193,32 +193,12 @@ module.exports = function CalendarController(gladys) {
     res.json(calendarEvents);
   }
 
-  /**
-   * @api {get} /api/v1/calendar/schedule get scheduled events
-   * @apiName getScheduledEvents
-   * @apiGroup Calendar
-   * @apiSuccessExample {json} Success-Example
-   * [
-   *   {
-   *     "type":"calendar",
-   *     "data":"<Anonymous Job 1>",
-   *     "status":"in-progress",
-   *     "created_at":"2021-10-29T22:00:00.000Z"
-   *   },
-   * ]
-   */
-  async function getScheduledEvents(req, res) {
-    const calendarEvents = await gladys.calendar.getScheduledEvents(req.user.id, req.query);
-    res.json(calendarEvents);
-  }
-
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
     update: asyncMiddleware(update),
     get: asyncMiddleware(get),
     getEvents: asyncMiddleware(getEvents),
-    getScheduledEvents: asyncMiddleware(getScheduledEvents),
     createEvent: asyncMiddleware(createEvent),
     updateEvent: asyncMiddleware(updateEvent),
     destroyEvent: asyncMiddleware(destroyEvent),

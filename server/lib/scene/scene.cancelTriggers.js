@@ -15,6 +15,18 @@ function cancelTriggers(sceneSelector) {
         clearInterval(trigger.jsInterval);
         delete trigger.jsInterval;
       }
+      if (trigger.eventStartJob) {
+        trigger.eventStartJob.cancel();
+        delete trigger.eventStartJob;
+      }
+      if (trigger.eventEndJob) {
+        trigger.eventEndJob.cancel();
+        delete trigger.eventEndJob;
+      }
+      if (trigger.eventReminderJob) {
+        trigger.eventReminderJob.cancel();
+        delete trigger.eventReminderJob;
+      }
     });
   }
 }
