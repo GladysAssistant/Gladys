@@ -412,6 +412,9 @@ class Chartbox extends Component {
                   <i class="fe fe-alert-circle mr-2" />
                   <Text id="dashboard.boxes.chart.noValue" />
                 </div>
+                <div class={style.smallTextEmptyState}>
+                  <Text id="dashboard.boxes.chart.noValueWarning" />
+                </div>
               </div>
             )}
             {emptySeries === false && !props.box.display_axes && (
