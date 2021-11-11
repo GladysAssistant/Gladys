@@ -161,42 +161,44 @@ class Chartbox extends Component {
         emptySeries
       };
 
-      // Before now, there was a "unit" attribute in this box instead of "units",
-      // so we need to support "unit" as some users may already have the box with that param
-      const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
-      // We check if all deviceFeatures selected are in the same unit
-      const allUnitsAreSame = this.props.box.units ? allEqual(this.props.box.units) : false;
+      if (data.length > 0) {
+        // Before now, there was a "unit" attribute in this box instead of "units",
+        // so we need to support "unit" as some users may already have the box with that param
+        const unit = this.props.box.units ? this.props.box.units[0] : this.props.box.unit;
+        // We check if all deviceFeatures selected are in the same unit
+        const allUnitsAreSame = this.props.box.units ? allEqual(this.props.box.units) : false;
 
-      // If all deviceFeatures selected are in the same unit
-      // We do a average of all values
-      if (data.length > 0 && allUnitsAreSame) {
-        const lastValuesArray = [];
-        const variationArray = [];
-        data.forEach(oneFeature => {
-          const { values } = oneFeature;
-          if (values.length === 0) {
-            return;
-          }
-          const firstElement = values[0];
-          const lastElement = values[values.length - 1];
-          const variation = calculateVariation(firstElement.value, lastElement.value);
-          const lastValue = lastElement.value;
-          variationArray.push(variation);
-          lastValuesArray.push(lastValue);
-        });
-        newState.variation = average(variationArray);
-        newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
-        newState.unit = unit;
-      } else if (data.length > 0) {
-        // If not, we only display the first value
-        const oneFeature = data[0];
-        const { values } = oneFeature;
-        if (values.length > 0) {
-          const firstElement = values[0];
-          const lastElement = values[values.length - 1];
-          newState.variation = calculateVariation(firstElement.value, lastElement.value);
-          newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
+        // If all deviceFeatures selected are in the same unit
+        // We do a average of all values
+        if (allUnitsAreSame) {
+          const lastValuesArray = [];
+          const variationArray = [];
+          data.forEach(oneFeature => {
+            const { values } = oneFeature;
+            if (values.length === 0) {
+              return;
+            }
+            const firstElement = values[0];
+            const lastElement = values[values.length - 1];
+            const variation = calculateVariation(firstElement.value, lastElement.value);
+            const lastValue = lastElement.value;
+            variationArray.push(variation);
+            lastValuesArray.push(lastValue);
+          });
+          newState.variation = average(variationArray);
+          newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
           newState.unit = unit;
+        } else {
+          // If not, we only display the first value
+          const oneFeature = data[0];
+          const { values } = oneFeature;
+          if (values.length > 0) {
+            const firstElement = values[0];
+            const lastElement = values[values.length - 1];
+            newState.variation = calculateVariation(firstElement.value, lastElement.value);
+            newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
+            newState.unit = unit;
+          }
         }
       }
 
