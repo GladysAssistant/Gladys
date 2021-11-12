@@ -1,7 +1,6 @@
 import { Text } from 'preact-i18n';
-import get from 'get-value';
 
-import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 const BluetoothPeripheralFeatures = ({ children, device }) => {
   const { features = [] } = device;
@@ -11,26 +10,7 @@ const BluetoothPeripheralFeatures = ({ children, device }) => {
       <label class="form-label">
         <Text id="integration.bluetooth.device.featuresLabel" />
       </label>
-      <div>
-        {features.length === 0 && (
-          <div class="text-center font-italic">
-            <Text id="integration.bluetooth.device.noFeatureDiscovered" />
-          </div>
-        )}
-        {features.length > 0 &&
-          (children || (
-            <div class="tags">
-              {features.map(feature => (
-                <span class="tag">
-                  <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                  <div class="tag-addon">
-                    <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
-                  </div>
-                </span>
-              ))}
-            </div>
-          ))}
-      </div>
+      <div>{children || <DeviceFeatures features={features} />}</div>
     </div>
   );
 };

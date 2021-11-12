@@ -1918,6 +1918,7 @@ const data = {
       external_id: 'bluetooth:0011223341',
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       selector: 'bluetooth-0011223341',
+      features: [],
       params: [
         {
           name: 'loaded',
@@ -1930,6 +1931,7 @@ const data = {
       model: 'smlc9',
       external_id: 'bluetooth:0011223342',
       selector: 'bluetooth-0011223342',
+      features: [],
       params: [
         {
           name: 'loaded',
@@ -1988,6 +1990,7 @@ const data = {
     name: 'BLE Device 1',
     external_id: 'bluetooth:0011223341',
     selector: 'bluetooth-0011223341',
+    features: [],
     params: [
       {
         name: 'loaded',
@@ -2000,6 +2003,7 @@ const data = {
     model: 'smlc9',
     external_id: 'bluetooth:0011223342',
     selector: 'bluetooth-0011223342',
+    features: [],
     params: [
       {
         name: 'loaded',

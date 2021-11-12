@@ -3,7 +3,8 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
 
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 
@@ -108,21 +109,7 @@ class ZwaveNode extends Component {
                         <Text id="integration.zwave.setup.features" />
                       </label>
 
-                      <div class="tags">
-                        {props.node.features.map(feature => (
-                          <span class="tag">
-                            <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                            <div class="tag-addon">
-                              <i
-                                class={`fe fe-${get(
-                                  DeviceFeatureCategoriesIcon,
-                                  `${feature.category}.${feature.type}`
-                                )}`}
-                              />
-                            </div>
-                          </span>
-                        ))}
-                      </div>
+                      <DeviceFeatures features={props.node.features} />
                     </div>
                   )}
                   <div class="form-group">

@@ -1,8 +1,8 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
-import { DeviceFeatureCategoriesIcon } from '../../utils/consts';
-import get from 'get-value';
+
 import { DEVICE_POLL_FREQUENCIES } from '../../../../server/utils/constants';
+import DeviceFeatures from './view/DeviceFeatures';
 
 const maxWidth = {
   maxWidth: '400px'
@@ -83,19 +83,7 @@ class UpdateDeviceForm extends Component {
           <label class="form-label">
             <Text id="editDeviceForm.featuresLabel" />
           </label>
-          <div class="tags">
-            {props.device &&
-              props.device.features &&
-              props.device.features.map(feature => (
-                <span class="tag">
-                  <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                  <div class="tag-addon">
-                    <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
-                  </div>
-                </span>
-              ))}
-            {(!props.device.features || props.device.features.length === 0) && <Text id="editDeviceForm.noFeatures" />}
-          </div>
+          <DeviceFeatures features={props.device.features} />
         </div>
       </div>
     );

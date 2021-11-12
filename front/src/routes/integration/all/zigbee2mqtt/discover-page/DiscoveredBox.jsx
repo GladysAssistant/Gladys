@@ -1,8 +1,9 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
-import get from 'get-value';
+
+import { RequestStatus } from '../../../../../utils/consts';
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 
@@ -131,23 +132,7 @@ class DiscoveredBox extends Component {
                       <label class="form-label">
                         <Text id="integration.zigbee2mqtt.featuresLabel" />
                       </label>
-                      <div class="tags">
-                        {props.device &&
-                          props.device.features &&
-                          props.device.features.map(feature => (
-                            <span class="tag">
-                              <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                              <div class="tag-addon">
-                                <i
-                                  class={`fe fe-${get(
-                                    DeviceFeatureCategoriesIcon,
-                                    `${feature.category}.${feature.type}`
-                                  )}`}
-                                />
-                              </div>
-                            </span>
-                          ))}
-                      </div>
+                      <DeviceFeatures features={props.device.features} />
                     </div>
 
                     <div class="form-group">
