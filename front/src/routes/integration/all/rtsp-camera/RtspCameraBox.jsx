@@ -181,7 +181,7 @@ class RtspCameraBox extends Component {
                       id="cameraRotate"
                       name="cameraRotate"
                       class="custom-switch-input"
-                      checked={props.camera.cameraRotation.value === '1'}
+                      checked={get(props, 'camera.cameraRotation.value') === '1'}
                       onClick={this.updateCameraRotation}
                     />
                     <span class="custom-switch-indicator" />
