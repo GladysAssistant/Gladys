@@ -41,6 +41,9 @@
     "event": "événement",
     "noEventsInRange": "Aucuns évènements trouvés dans cette période."
   },
+  "device": {
+    "noFeatures": "Aucune fonctionnalité"
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Bienvenue",
@@ -196,7 +199,8 @@
       "humidity-in-room": "Humidité de la pièce",
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
-      "devices-in-room": "Appareils de la pièce"
+      "devices-in-room": "Appareils de la pièce",
+      "chart": "Graphique"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -245,6 +249,32 @@
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box"
+      },
+      "chart": {
+        "defaultInterval": "Intervalle par défaut",
+        "lastHour": "Dernière heure",
+        "lastDay": "Dernières 24h",
+        "lastSevenDays": "Derniers 7 jours",
+        "lastThirtyDays": "Derniers 30 jours",
+        "lastThreeMonths": "Derniers 3 mois",
+        "lastYear": "Dernière année",
+        "noValue": "Pas de valeurs sur cet intervalle.",
+        "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être aggrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
+        "editNameLabel": "Entrez le nom de cette box",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord",
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
+        "editRoomLabel": "Sélectionnez une pièce",
+        "chartType": "Sélectionner le type de graphique",
+        "line": "Ligne",
+        "area": "Aire",
+        "bar": "Histogramme",
+        "stepline": "Ligne droite",
+        "displayAxes": "Afficher les axes ?",
+        "displayVariation": "Afficher la variation ?",
+        "yes": "Oui",
+        "no": "Non",
+        "preview": "Prévisualisation",
+        "showPreviewButton": "Afficher une prévisualisation"
       }
     }
   },
@@ -354,7 +384,6 @@
         "title": "Appareils Bluetooth",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil Bluetooth n'a encore été ajouté.",
-        "noFeatures": "Aucune fonctionnalité",
         "nameLabel": "Nom de l'appareil",
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
@@ -363,7 +392,6 @@
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
-        "noFeatureDiscovered": "Aucune fonctionnalité détectée.",
         "featureNamePlaceholder": "Nom de la fonctionnalité",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
@@ -534,7 +562,6 @@
         "noNameLabel": "Pas de nom",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
-        "noFeatures": "Aucune fonctionnalité",
         "search": "Recherche d'appareils",
         "connectButton": "Connecter/Reconnecter",
         "scanButton": "Recherche sur le réseau",
@@ -607,7 +634,6 @@
         "device": "({{nbDevices}}) Appareils",
         "permitJoin": "Autoriser l'association",
         "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
-        "scanButton": "Scanner",
         "serverNoResponse": "Gladys n'est pas accessible.",
         "serverNoResponseWebSocker": "Gladys n'est pas accessible. Veuillez actualiser la page.",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
@@ -655,7 +681,6 @@
         "nameLabel": "Nom",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
-        "noFeatures": "Pas de fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "editButton": "Editer",
@@ -677,7 +702,6 @@
         "createDeviceInGladys": "Connecter dans Gladys",
         "features": "Fonctionnalités",
         "params": "Paramètre",
-        "noFeatures": "Aucune fonctionnalité",
         "nodeId": "Noeud",
         "zwaveNotConfiguredError": "Ce service Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
@@ -747,7 +771,6 @@
         "externalIdLabel": "ID externe",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
-        "noFeatures": "Aucune fonctionnalité",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "returnButton": "Retour",
@@ -816,8 +839,7 @@
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
-        "editButton": "Editer les détails",
-        "noFeatures": "Aucune fonctionnalité"
+        "editButton": "Editer les détails"
       },
       "setup": {
         "title": "Aucun appareil Xiaomi dans Gladys",
@@ -850,10 +872,12 @@
       "updateButton": "Mettre à jour",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
-      "unmanagedModelButton": "Modèle non pris en charge",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
       "status": {
         "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud eWeLink, plus d'informations sur la ",
-        "setupPageLink": "page de configuration eWeLink."
+        "setupPageLink": "page de configuration eWeLink.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
       },
       "device": {
         "title": "Appareils eWeLink dans Gladys",
@@ -1204,6 +1228,7 @@
     "backupTab": "Sauvegardes",
     "serviceTab": "Services",
     "billingTab": "Facturation",
+    "jobsTab": "Tâches",
     "gatewayUsersTab": "Utilisateurs Plus",
     "gatewayOpenApiTab": "Open API"
   },
@@ -1324,6 +1349,25 @@
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community.",
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?"
   },
+  "jobsSettings": {
+    "jobsTitle": "Tâches en arrière-plan",
+    "jobsDescription": "Cette vue est un peu plus technique que le reste de Gladys. Le but de cette vue est de pouvoir comprendre ce qui se passe en arrière-plan dans Gladys, et de mieux pouvoir comprendre ce qui s'est passé, ou mal passé. Nous essayons de traduire les erreurs connues, mais quand une erreur inconnue survient, nous l'affichons telle quelle pour vous permettre de débugger.",
+    "jobType": "Type",
+    "jobProgress": "%",
+    "jobStatus": "Statut",
+    "jobTypes": {
+      "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
+      "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
+      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+    },
+    "jobErrors": {
+      "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
+    },
+    "jobStatuses": {
+      "success": "Succès",
+      "failed": "Echec"
+    }
+  },
   "systemSettings": {
     "connected": "Connecté",
     "ping": "{{time}} ms ping",
@@ -1346,6 +1390,8 @@
     "configurationTitle": "Configuration",
     "timezone": "Fuseau horaire",
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
+    "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
+    "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -1476,6 +1522,7 @@
     "kilowatt": "Kilowatt",
     "kilowatt-hour": "Kilowatt heure (kWh)",
     "ampere": "Ampère (A)",
+    "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "ppm": "Partie par million (ppm)",
     "cm": "Centimètre (cm)",
@@ -1489,9 +1536,10 @@
     "hectoPascal": "hPa",
     "lux": "lx",
     "watt": "W",
-    "kilowatt": "KW",
+    "kilowatt": "kW",
     "kilowatt-hour": "kWh",
     "ampere": "A",
+    "millivolt": "mV",
     "volt": "V",
     "ppm": "ppm",
     "cm": "cm",
@@ -1516,6 +1564,10 @@
     },
     "temperature-sensor": {
       "shortCategoryName": "Capteur température",
+      "decimal": "Température"
+    },
+    "device-temperature-sensor": {
+      "shortCategoryName": "Température de l'appareil",
       "decimal": "Température"
     },
     "motion-sensor": {
@@ -1662,7 +1714,6 @@
     "roomLabel": "Pièce",
     "featuresLabel": "Fonctionnalités",
     "featureCategoryLabel": "Catégorie",
-    "noFeatures": "Aucune fonctionnalité",
     "namePlaceholder": "Entrez un nom",
     "externalIdLabel": "ID externe",
     "externalIdPlaceholder": "Entrez une ID externe",
