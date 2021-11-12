@@ -21,5 +21,6 @@ directories.forEach((directory) => {
     });
   } catch (e) {
     logger.warn(e);
+    throw e;
   }
 });
