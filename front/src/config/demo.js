@@ -1205,6 +1205,10 @@ const data = {
         {
           name: 'CAMERA_URL',
           value: 'http://camera-url'
+        },
+        {
+          name: 'CAMERA_ROTATION',
+          value: '0'
         }
       ]
     }
