@@ -1,10 +1,10 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/ewelink/lib/utils/constants';
-import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import get from 'get-value';
 import { Link } from 'preact-router';
+
+import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/ewelink/lib/utils/constants';
+import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class EweLinkDeviceBox extends Component {
   updateName = e => {
@@ -148,18 +148,7 @@ class EweLinkDeviceBox extends Component {
                     <label class="form-label">
                       <Text id="integration.eWeLink.device.featuresLabel" />
                     </label>
-                    <div class="tags">
-                      {device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    </div>
+                    <DeviceFeatures features={device.features} />
                   </div>
                 )}
 
