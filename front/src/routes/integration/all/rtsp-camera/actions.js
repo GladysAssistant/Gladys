@@ -20,6 +20,11 @@ function createActions(store) {
       const cameraRotationParam = camera.params.find(param => param.name === 'CAMERA_ROTATION');
       if (cameraRotationParam) {
         camera.cameraRotation = cameraRotationParam;
+      } else {
+        // Backward compatibility if param not exist, create it.
+        const rotationParam = { name: 'CAMERA_ROTATION', value: '0' };
+        camera.cameraRotation = rotationParam;
+        camera.params.push(rotationParam);
       }
       return camera;
     },
