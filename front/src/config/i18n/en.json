@@ -1035,7 +1035,6 @@
         "houseLabel": "House"
       },
       "checkCalendarEvent": {
-        "userLabel": "User",
         "calendarLabel": "Calendar",
         "eventLabel": "Event",
         "eventPlaceholder": "Event",

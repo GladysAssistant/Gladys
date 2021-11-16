@@ -5,40 +5,23 @@ import { Text, Localizer } from 'preact-i18n';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
-@connect('httpClient', {})
+@connect('httpClient,user', {})
 class CheckCalendarEvent extends Component {
   getOptions = async () => {
     try {
-      const [users, calendars] = await Promise.all([
-        this.props.httpClient.get('/api/v1/user'),
-        this.props.httpClient.get('/api/v1/calendar')
-      ]);
-      const userOptions = [];
-      users.forEach(user => {
-        userOptions.push({
-          label: user.firstname,
-          value: user.selector
-        });
-      });
+      const calendars = await this.props.httpClient.get('/api/v1/calendar');
       const calendarOptions = [];
       calendars.forEach(calendar => {
         calendarOptions.push({
           label: calendar.name,
-          value: calendar.selector
+          value: calendar.id
         });
       });
-      await this.setState({ userOptions, calendarOptions });
+      await this.setState({ calendarOptions });
       this.refreshSelectedOptions(this.props);
-      return userOptions;
+      return calendarOptions;
     } catch (e) {
       console.error(e);
-    }
-  };
-  handleChange = selectedOption => {
-    if (selectedOption && selectedOption.value) {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', selectedOption.value);
-    } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', null);
     }
   };
   handleCalendarChange = selectedOption => {
@@ -53,15 +36,7 @@ class CheckCalendarEvent extends Component {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'event', value);
   };
   refreshSelectedOptions = nextProps => {
-    let selectedOption = '';
     let selectedCalendarOption = '';
-    if (nextProps.action.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.action.user);
-
-      if (userOption) {
-        selectedOption = userOption;
-      }
-    }
     if (nextProps.action.calendar && this.state.calendarOptions) {
       const calendarOption = this.state.calendarOptions.find(option => option.value === nextProps.action.calendar);
 
@@ -69,16 +44,16 @@ class CheckCalendarEvent extends Component {
         selectedCalendarOption = calendarOption;
       }
     }
-    this.setState({ selectedOption, selectedCalendarOption, event: nextProps.action.event });
+    this.setState({ selectedCalendarOption, event: nextProps.action.event });
   };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      selectedOption: '',
       selectedCalendarOption: '',
       event: ''
     };
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'user', this.props.user.id);
   }
   componentDidMount() {
     this.getOptions();
@@ -86,7 +61,7 @@ class CheckCalendarEvent extends Component {
   componentWillReceiveProps(nextProps) {
     this.refreshSelectedOptions(nextProps);
   }
-  render(props, { selectedOption, userOptions, calendarOptions, selectedCalendarOption, event }) {
+  render(props, { calendarOptions, selectedCalendarOption, event }) {
     return (
       <div>
         <p>
@@ -97,15 +72,6 @@ class CheckCalendarEvent extends Component {
             <Text id="editScene.actionsCard.checkCalendarEvent.notCalendarEventDescription" />
           )}
         </p>
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="editScene.actionsCard.checkCalendarEvent.userLabel" />
-            <span class="form-required">
-              <Text id="global.requiredField" />
-            </span>
-          </label>
-          <Select options={userOptions} value={selectedOption} onChange={this.handleChange} />
-        </div>
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.actionsCard.checkCalendarEvent.calendarLabel" />

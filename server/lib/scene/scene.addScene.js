@@ -8,7 +8,6 @@ const logger = require('../../utils/logger');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
-const { compare } = require('../../utils/compare');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -106,16 +105,11 @@ function addScene(sceneRaw) {
         trigger.type === EVENTS.CALENDAR.EVENT_REMINDER
       ) {
         const now = dayjs();
-        const foreseenSchedule = dayjs().add(1, 'day');
-        const user = await this.user.get({
-          selector: trigger.user,
-        });
-        const calendar = await this.calendar.get(user[0].id, {
-          selector: trigger.calendar,
-        });
-        const events = await this.calendar.getEvents(user[0].id, {
+        const foreseenSchedule = dayjs().add(1, 'year');
+        const events = await this.calendar.getEvents(trigger.user, {
           from: now,
-          calendarId: calendar[0].id,
+          to: foreseenSchedule,
+          calendarId: trigger.calendar,
           name: trigger.event,
           take: 1,
         });
@@ -130,42 +124,38 @@ function addScene(sceneRaw) {
           // Event start datetime
           if (calendarEvent.start) {
             const eventStartTime = dayjs(calendarEvent.start).tz(this.timezone);
-            if (eventStartTime.isAfter(now) && eventStartTime.isBefore(foreseenSchedule)) {
-              trigger.eventStartJob = this.schedule.scheduleJob(
-                `${calendarEvent.external_id}_start`,
-                eventStartTime.toDate(),
-                () => {
-                  this.event.emit(EVENTS.TRIGGERS.CHECK, {
-                    type: EVENTS.CALENDAR.EVENT_START,
-                    calendarEvent,
-                  });
-                  this.addScene(sceneRaw);
-                }
-              );
-              if (trigger.eventStartJob) {
-                logger.info(`Calendar event ${calendarEvent.name} start is scheduled, ${eventStartTime.fromNow()}.`);
-              }
+            trigger.eventStartJob = this.schedule.scheduleJob(
+              `${calendarEvent.external_id}_start`,
+              eventStartTime.toDate(),
+              () => {
+                this.event.emit(EVENTS.TRIGGERS.CHECK, {
+                  type: EVENTS.CALENDAR.EVENT_START,
+                  calendarEvent,
+                });
+                this.addScene(sceneRaw);
+              },
+            );
+            if (trigger.eventStartJob) {
+              logger.info(`Calendar event ${calendarEvent.name} start is scheduled, ${eventStartTime.fromNow()}.`);
             }
           }
 
           // Event end datetime
           if (calendarEvent.end) {
             const eventEndTime = dayjs(calendarEvent.end).tz(this.timezone);
-            if (eventEndTime.isAfter(now) && eventEndTime.isBefore(foreseenSchedule)) {
-              trigger.eventEndJob = this.schedule.scheduleJob(
-                `${calendarEvent.external_id}_end`,
-                eventEndTime.toDate(),
-                () => {
-                  this.event.emit(EVENTS.TRIGGERS.CHECK, {
-                    type: EVENTS.CALENDAR.EVENT_END,
-                    calendarEvent,
-                  });
-                  this.addScene(sceneRaw);
-                }
-              );
-              if (trigger.eventEndJob) {
-                logger.info(`Calendar event ${calendarEvent.name} end is scheduled, ${eventEndTime.fromNow()}.`);
-              }
+            trigger.eventEndJob = this.schedule.scheduleJob(
+              `${calendarEvent.external_id}_end`,
+              eventEndTime.toDate(),
+              () => {
+                this.event.emit(EVENTS.TRIGGERS.CHECK, {
+                  type: EVENTS.CALENDAR.EVENT_END,
+                  calendarEvent,
+                });
+                this.addScene(sceneRaw);
+              },
+            );
+            if (trigger.eventEndJob) {
+              logger.info(`Calendar event ${calendarEvent.name} end is scheduled, ${eventEndTime.fromNow()}.`);
             }
           }
         }

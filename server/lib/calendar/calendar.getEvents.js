@@ -9,45 +9,7 @@ const db = require('../../models');
  * gladys.calendar.getEvents();
  */
 async function getEvents(userId, options) {
-  const where = {};
-
-  if (options.from || options.to) {
-    const oneWeekAgo = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
-    // Default from date is one week ago
-    const fromDate = options.from ? new Date(options.from) : new Date(oneWeekAgo);
-    // default end date is now
-    const toDate = options.to ? new Date(options.to) : new Date();
-    where.start = {
-      [Op.gte]: new Date(fromDate),
-      [Op.lte]: new Date(toDate),
-    };
-  }
-
-  if (options.selector) {
-    where.selector = {
-      [Op.eq]: options.selector,
-    };
-  }
-
-  if (options.url) {
-    where.url = {
-      [Op.eq]: options.url,
-    };
-  }
-
-  if (options.externalId) {
-    where.external_id = {
-      [Op.eq]: options.externalId,
-    };
-  }
-
-  if (options.calendarId) {
-    where.calendar_id = {
-      [Op.eq]: options.calendarId,
-    };
-  }
-
-  const calendarEvents = await db.CalendarEvent.findAll({
+  const queryParams = {
     include: [
       {
         model: db.Calendar,
@@ -58,8 +20,63 @@ async function getEvents(userId, options) {
         },
       },
     ],
-    where,
-  });
+    where: {},
+    order: [[ 'start', 'ASC' ]]
+  };
+
+  if (options.from && options.to) {
+    queryParams.where.start = {
+      [Op.between]:[new Date(options.from), new Date(options.to)],
+    };
+  } else if (options.from && options.to === undefined) {
+    queryParams.where.start = {
+      [Op.gte]: new Date(options.from),
+    };
+  } else if (options.to && options.from === undefined) {
+    queryParams.where.start = {
+      [Op.lte]: new Date(options.to),
+    };
+  }
+
+  if (options.selector) {
+    queryParams.where.selector = {
+      [Op.eq]: options.selector,
+    };
+  }
+
+  if (options.name) {
+    queryParams.where.name = {
+      [Op.eq]: options.name,
+    };
+  }
+
+  if (options.url) {
+    queryParams.where.url = {
+      [Op.eq]: options.url,
+    };
+  }
+
+  if (options.externalId) {
+    queryParams.where.external_id = {
+      [Op.eq]: options.externalId,
+    };
+  }
+
+  if (options.calendarId) {
+    queryParams.where.calendar_id = {
+      [Op.eq]: options.calendarId,
+    };
+  }
+
+  if (options.order_by) {
+    queryParams.order.push([ options.order_by, options.order_dir || 'ASC' ]);
+  }
+
+  if (options.take) {
+    queryParams.limit = options.take;
+  }
+
+  const calendarEvents = await db.CalendarEvent.findAll(queryParams);
 
   const plainCalendarEvents = calendarEvents.map((calendarEvent) => calendarEvent.get({ plain: true }));
 
@@ -75,15 +92,18 @@ async function getEvents(userId, options) {
  * gladys.calendar.getEventsForDate();
  */
 async function getEventsForDate(userId, date, options) {
-  const where = {};
-
-  where.start = {
-    [Op.lte]: new Date(date),
+  const where = {
+    start: {
+      [Op.lte]: new Date(date),
+    },
+    end: {
+      [Op.gte]: new Date(date),
+    },
   };
 
-  where.end = {
-    [Op.gte]: new Date(date),
-  };
+  const order = [
+    ['start', 'ASC']
+  ];
 
   if (options.calendarId) {
     where.calendar_id = {
@@ -103,6 +123,7 @@ async function getEventsForDate(userId, date, options) {
       },
     ],
     where,
+    order,
   });
 
   const plainCalendarEvents = calendarEvents.map((calendarEvent) => calendarEvent.get({ plain: true }));
