@@ -1,9 +1,9 @@
 import SettingsLayout from '../SettingsLayout';
 import JobList from './JobList';
 
-const SettingsBackgroubJobsPage = ({ jobs, scheduledJobs, user }) => (
+const SettingsBackgroubJobsPage = ({ jobs, user }) => (
   <SettingsLayout>
-    <JobList jobs={jobs} scheduledJobs={scheduledJobs} user={user} />
+    <JobList jobs={jobs} user={user} />
   </SettingsLayout>
 );
 

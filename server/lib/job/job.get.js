@@ -1,4 +1,6 @@
+const dayjs = require('dayjs');
 const db = require('../../models');
+const { JOB_TYPES, JOB_STATUS } = require('../../utils/constants');
 
 const DEFAULT_OPTIONS = {
   expand: [],
@@ -34,6 +36,20 @@ async function get(options) {
   jobs.forEach((job) => {
     job.data = JSON.parse(job.data);
   });
+
+  const { scheduledJobs } = this.schedule;
+  Object.entries(scheduledJobs).forEach((scheduledJob) => {
+    const [name, job] = scheduledJob;
+    jobs.push({
+      type: JOB_TYPES.CALENDAR,
+      data: {
+        name,
+      },
+      status: JOB_STATUS.IN_PROGRESS,
+      created_at: dayjs(job.nextInvocation()),
+    });
+  });
+  
   return jobs;
 }
 

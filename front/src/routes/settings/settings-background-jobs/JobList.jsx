@@ -32,7 +32,7 @@ const JobList = ({ children, ...props }) => (
         </thead>
         <tbody>
           {props.jobs &&
-            props.jobs.map(job => (
+            props.jobs.filter(job => job.type !== 'calendar').map(job => (
               <tr>
                 <td>
                   <div>
@@ -44,6 +44,11 @@ const JobList = ({ children, ...props }) => (
                         .locale(props.user.language)
                         .fromNow()}
                     </small>
+                    {job.data && job.data.name && (
+                      <div class={style.errorDiv}>
+                        {job.data.name}
+                      </div>
+                    )}
                   </div>
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                     <div class={style.errorDiv}>
@@ -92,8 +97,8 @@ const JobList = ({ children, ...props }) => (
           </tr>
         </thead>
         <tbody>
-          {props.scheduledJobs &&
-            props.scheduledJobs.map(job => (
+          {props.jobs &&
+            props.jobs.filter(job => job.type === 'calendar').map(job => (
               <tr>
                 <td>
                   <div>
