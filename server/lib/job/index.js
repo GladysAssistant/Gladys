@@ -1,3 +1,5 @@
+const schedule = require('node-schedule');
+
 const { start } = require('./job.start');
 const { get } = require('./job.get');
 const { init } = require('./job.init');
@@ -11,6 +13,7 @@ const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 const Job = function Job(eventManager) {
   this.eventManager = eventManager;
   this.eventManager.on(EVENTS.JOB.PURGE_OLD_JOBS, eventFunctionWrapper(this.purge.bind(this)));
+  this.schedule = schedule;
 };
 
 Job.prototype.start = start;
