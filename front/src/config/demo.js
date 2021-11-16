@@ -705,11 +705,17 @@ const data = {
       ]
     ]
   },
+  'get /api/v1/service/zwave/status': {
+    connected: true,
+    scanInProgress: false,
+    ready: true
+  },
   'get /api/v1/service/zwave/node': [
     {
       name: 'ZME_UZB1 USB Stick',
       features: [],
       params: [],
+      ready: true,
       rawZwaveNode: {
         id: 1,
         manufacturer: 'Z-Wave.Me',
@@ -717,7 +723,8 @@ const data = {
         product: 'ZME_UZB1 USB Stick',
         producttype: '0x0400',
         productid: '0x0001',
-        type: 'Static PC Controller'
+        type: 'Static PC Controller',
+        classes: []
       }
     }
   ],
@@ -910,6 +917,94 @@ const data = {
           name: 'Pressure Sensor',
           read_only: true,
           selector: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure',
+          type: 'decimal'
+        }
+      ]
+    }
+  ],
+  'get /api/v1/service/zigbee2mqtt/discovered': [
+    {
+      name: 'Aqara Sensor',
+      external_id: 'zigbee2mqtt:0x00158d0005828ece',
+      selector: 'zigbee2mqtt-0x00158d0005828ece',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      model: 'WSDCGQ11LM',
+      supported: true,
+      created_at: '2019-02-12T07:49:07.556Z',
+      params: [
+        {
+          name: 'model',
+          value: 'WSDCGQ11LM'
+        }
+      ],
+      features: [
+        {
+          category: 'pressure-sensor',
+          external_id: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure',
+          name: 'Pressure Sensor',
+          read_only: true,
+          selector: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure',
+          type: 'decimal'
+        }
+      ]
+    },
+    {
+      model: 'WXKG01LM',
+      name: '0x00158d00033e88d5',
+      service_id: 'f87b7af2-ca8e-44fc-b754-444354b42fee',
+      should_poll: false,
+      supported: true,
+      external_id: 'zigbee2mqtt:0x00158d00033e88d5',
+      features: [
+        {
+          category: 'battery',
+          external_id: 'zigbee2mqtt:0x00158d00033e88d5:battery:integer:battery',
+          has_feedback: false,
+          max: 100,
+          min: 0,
+          name: 'Battery',
+          read_only: true,
+          selector: 'zigbee2mqtt-0x00158d00033e88d5-battery-integer-battery',
+          type: 'integer',
+          unit: 'percent'
+        },
+        {
+          category: 'button',
+          external_id: 'zigbee2mqtt:0x00158d00033e88d5:button:click:action',
+          has_feedback: false,
+          max: 7,
+          min: 0,
+          name: 'Action',
+          read_only: true,
+          selector: 'zigbee2mqtt-0x00158d00033e88d5-button-click-action',
+          type: 'click',
+          unit: null
+        },
+        {
+          category: 'switch',
+          external_id: 'zigbee2mqtt:0x00158d00033e88d5:switch:voltage:voltage',
+          has_feedback: false,
+          max: 10000,
+          min: 0,
+          name: 'Voltage',
+          read_only: true,
+          selector: 'zigbee2mqtt-0x00158d00033e88d5-switch-voltage-voltage',
+          type: 'voltage',
+          unit: 'millivolt'
+        }
+      ]
+    },
+    {
+      name: 'Unsupported device',
+      external_id: 'zigbee2mqtt:0x00158d0005828ece',
+      selector: 'zigbee2mqtt-0x00158d0005828ece',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      supported: false,
+      features: [
+        {
+          category: 'battery',
+          name: 'Pressure Sensor',
+          read_only: true,
           type: 'decimal'
         }
       ]
@@ -1823,6 +1918,7 @@ const data = {
       external_id: 'bluetooth:0011223341',
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       selector: 'bluetooth-0011223341',
+      features: [],
       params: [
         {
           name: 'loaded',
@@ -1835,6 +1931,7 @@ const data = {
       model: 'smlc9',
       external_id: 'bluetooth:0011223342',
       selector: 'bluetooth-0011223342',
+      features: [],
       params: [
         {
           name: 'loaded',
@@ -1893,6 +1990,7 @@ const data = {
     name: 'BLE Device 1',
     external_id: 'bluetooth:0011223341',
     selector: 'bluetooth-0011223341',
+    features: [],
     params: [
       {
         name: 'loaded',
@@ -1905,6 +2003,7 @@ const data = {
     model: 'smlc9',
     external_id: 'bluetooth:0011223342',
     selector: 'bluetooth-0011223342',
+    features: [],
     params: [
       {
         name: 'loaded',
@@ -1959,7 +2058,7 @@ const data = {
     name: 'ewelink',
     selector: 'ewelink'
   },
-  'get api/v1/service/ewelink/device': [
+  'get /api/v1/service/ewelink/device': [
     {
       id: '28e8ad03-70a8-431f-93cb-df916019c509',
       room_id: '568981d0-1a4d-40ea-af97-dd4037d2b344',
@@ -1996,6 +2095,10 @@ const data = {
           device_id: '28e8ad03-70a8-431f-93cb-df916019c509',
           name: 'FIRMWARE',
           value: '3.3.0'
+        },
+        {
+          name: 'ONLINE',
+          value: '1'
         }
       ],
       room: {
@@ -2010,7 +2113,7 @@ const data = {
       }
     }
   ],
-  'get api/v1/service/ewelink/discover': [
+  'get /api/v1/service/ewelink/discover': [
     {
       service_id: '45c792a5-051b-4e6f-b746-2dd4c77d9d31',
       name: 'Switch 2',
@@ -2040,6 +2143,10 @@ const data = {
         {
           name: 'FIRMWARE',
           value: '3.2.1'
+        },
+        {
+          name: 'ONLINE',
+          value: '1'
         }
       ]
     }

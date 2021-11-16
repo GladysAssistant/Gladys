@@ -504,6 +504,7 @@ const DEVICE_FEATURE_UNITS = {
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
   AMPERE: 'ampere',
+  MILLI_VOLT: 'millivolt',
   VOLT: 'volt',
   PPM: 'ppm',
   MM: 'mm',

@@ -3,14 +3,14 @@ const logger = require('../../../utils/logger');
 
 module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   /**
-   * @api {post} /api/v1/service/zigbee2mqtt/discover Launch Zigbee2mqtt devices discovery
-   * @apiName discover
+   * @api {get} /api/v1/service/zigbee2mqtt/discovered Get discovered Zigbee2mqtt devices
+   * @apiName getDiscoveredDevices
    * @apiGroup Zigbee2mqtt
    */
-  async function discover(req, res) {
-    logger.log('Launching devices discovery');
-    await zigbee2mqttManager.discoverDevices();
-    res.json({ status: 'discovering' });
+  async function getDiscoveredDevices(req, res) {
+    logger.log('Get discovered devices');
+    const devices = zigbee2mqttManager.getDiscoveredDevices();
+    res.json(devices);
   }
 
   /**
@@ -101,9 +101,9 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   return {
-    'post /api/v1/service/zigbee2mqtt/discover': {
+    'get /api/v1/service/zigbee2mqtt/discovered': {
       authenticated: true,
-      controller: asyncMiddleware(discover),
+      controller: asyncMiddleware(getDiscoveredDevices),
     },
     'get /api/v1/service/zigbee2mqtt/status': {
       authenticated: true,

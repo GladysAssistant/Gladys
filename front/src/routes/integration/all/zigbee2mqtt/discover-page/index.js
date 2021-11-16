@@ -26,6 +26,7 @@ class Zigbee2mqttIntegration extends Component {
     this.props.setDiscoveredDevices(undefined);
     this.props.getHouses();
     this.props.getIntegrationByName('zigbee2mqtt');
+    this.props.getDiscoveredDevices();
   }
 
   componentWillUnmount() {
