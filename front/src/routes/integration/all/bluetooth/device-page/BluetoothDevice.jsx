@@ -5,9 +5,9 @@ import get from 'get-value';
 import { Link } from 'preact-router';
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
-
-import style from '../style.css';
+import { RequestStatus } from '../../../../../utils/consts';
+import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 class BluetoothDevice extends Component {
   refreshDeviceProperty = () => {
@@ -62,12 +62,7 @@ class BluetoothDevice extends Component {
             {device.name}
             {batteryLevel && (
               <div class="page-options d-flex">
-                <div class="tag tag-green">
-                  <Text id="global.percentValue" fields={{ value: batteryLevel }} />
-                  <span class="tag-addon">
-                    <i class="fe fe-battery" />
-                  </span>
-                </div>
+                <BatteryLevelFeature batteryLevel={batteryLevel} />
               </div>
             )}
           </div>
@@ -117,25 +112,7 @@ class BluetoothDevice extends Component {
                   <label>
                     <Text id="integration.bluetooth.device.featuresLabel" />
                   </label>
-                  {device.features && (
-                    <div class="tags">
-                      {device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  {(!device.features || device.features.length === 0) && (
-                    <div class={cx('text-center', 'font-italic', 'mt-3', style.featureListBody)}>
-                      <Text id="integration.bluetooth.device.noFeatureDiscovered" />
-                    </div>
-                  )}
+                  <DeviceFeatures features={device.features} />
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">

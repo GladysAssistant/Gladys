@@ -1,0 +1,246 @@
+[
+  {
+    "definition": null,
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": ["genBasic", "genTime", "genOta"],
+          "output": ["genPowerCfg", "genPollCtrl", "ssIasZone"]
+        },
+        "configured_reportings": []
+      },
+      "242": {
+        "bindings": [],
+        "clusters": {
+          "input": [],
+          "output": ["greenPower"]
+        },
+        "configured_reportings": []
+      }
+    },
+    "friendly_name": "Coordinator",
+    "ieee_address": "0x00212effff06ddd8",
+    "interview_completed": true,
+    "interviewing": false,
+    "network_address": 0,
+    "supported": false,
+    "type": "Coordinator"
+  },
+  {
+    "definition": {
+      "description": "MiJia wireless switch",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Triggered action (e.g. a button click)",
+          "name": "action",
+          "property": "action",
+          "type": "enum",
+          "values": ["single", "double", "triple", "quadruple", "hold", "release", "many"]
+        },
+        {
+          "access": 1,
+          "description": "Voltage of the battery in millivolts",
+          "name": "voltage",
+          "property": "voltage",
+          "type": "numeric",
+          "unit": "mV"
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "WXKG01LM",
+      "supports_ota": false,
+      "vendor": "Xiaomi"
+    },
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": [],
+          "output": []
+        },
+        "configured_reportings": []
+      }
+    },
+    "friendly_name": "0x00158d00033e88d5",
+    "ieee_address": "0x00158d00033e88d5",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "LUMI",
+    "model_id": "lumi.sensor_switch",
+    "network_address": 44173,
+    "power_source": "Battery",
+    "supported": true,
+    "type": "EndDevice"
+  },
+  {
+    "date_code": "20180525",
+    "definition": {
+      "description": "Aqara wireless switch",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Voltage of the battery in millivolts",
+          "name": "voltage",
+          "property": "voltage",
+          "type": "numeric",
+          "unit": "mV"
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "WXKG11LM",
+      "supports_ota": false,
+      "vendor": "Xiaomi"
+    },
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": ["genBasic", "genMultistateInput", "genIdentify"],
+          "output": ["genBasic"]
+        },
+        "configured_reportings": []
+      }
+    },
+    "friendly_name": "0x00158d0004019127",
+    "ieee_address": "0x00158d0004019127",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "LUMI",
+    "model_id": "lumi.remote.b1acn01",
+    "network_address": 47250,
+    "power_source": "Battery",
+    "software_build_id": "3000-0001",
+    "supported": true,
+    "type": "EndDevice"
+  },
+  {
+    "date_code": "20161129",
+    "definition": {
+      "description": "Aqara temperature, humidity and pressure sensor",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Measured temperature value",
+          "name": "temperature",
+          "property": "temperature",
+          "type": "numeric",
+          "unit": "°C"
+        },
+        {
+          "access": 1,
+          "description": "Measured relative humidity",
+          "name": "humidity",
+          "property": "humidity",
+          "type": "numeric",
+          "unit": "%"
+        },
+        {
+          "access": 1,
+          "description": "The measured atmospheric pressure",
+          "name": "pressure",
+          "property": "pressure",
+          "type": "numeric",
+          "unit": "hPa"
+        },
+        {
+          "access": 1,
+          "description": "Voltage of the battery in millivolts",
+          "name": "voltage",
+          "property": "voltage",
+          "type": "numeric",
+          "unit": "mV"
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "WSDCGQ11LM",
+      "supports_ota": false,
+      "vendor": "Xiaomi"
+    },
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": [
+            "genBasic",
+            "genIdentify",
+            "msTemperatureMeasurement",
+            "msPressureMeasurement",
+            "msRelativeHumidity"
+          ],
+          "output": ["genBasic", "genGroups"]
+        },
+        "configured_reportings": []
+      }
+    },
+    "friendly_name": "0x00158d00045b2740",
+    "ieee_address": "0x00158d00045b2740",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "LUMI",
+    "model_id": "lumi.weather",
+    "network_address": 23007,
+    "power_source": "Battery",
+    "software_build_id": "3000-0001",
+    "supported": true,
+    "type": "EndDevice"
+  }
+]

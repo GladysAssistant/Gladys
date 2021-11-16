@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const { expect, assert } = require('chai');
+const sinon = require('sinon');
 const uuid = require('uuid');
 const { fake } = require('sinon');
 const db = require('../../../models');
@@ -28,6 +29,8 @@ const insertStates = async (intervalInMinutes) => {
 
 describe('Device.getDeviceFeaturesAggregates', function Describe() {
   this.timeout(15000);
+
+  let clock;
   beforeEach(async () => {
     const queryInterface = db.sequelize.getQueryInterface();
     await queryInterface.bulkDelete('t_device_feature_state');
@@ -40,6 +43,13 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
       },
       { where: {} },
     );
+
+    clock = sinon.useFakeTimers({
+      now: 1635131280000,
+    });
+  });
+  afterEach(() => {
+    clock.restore();
   });
   it('should return last hour states', async () => {
     await insertStates(120);
