@@ -3,7 +3,8 @@ const local = {
   localApiUrl: process.env.LOCAL_API_URL || 'http://localhost:1443',
   webSocketUrl: process.env.WEBSOCKET_URL || 'ws://localhost:1443',
   gatewayMode: process.env.GATEWAY_MODE === 'true',
-  demoMode: process.env.DEMO_MODE === 'true'
+  demoMode: process.env.DEMO_MODE === 'true',
+  demoRequestTime: process.env.DEMO_REQUEST_TIME || 0
 };
 
 const prod = {
@@ -11,7 +12,8 @@ const prod = {
   localApiUrl: process.env.LOCAL_API_URL,
   webSocketUrl: process.env.WEBSOCKET_URL,
   gatewayMode: process.env.GATEWAY_MODE === 'true',
-  demoMode: process.env.DEMO_MODE === 'true'
+  demoMode: process.env.DEMO_MODE === 'true',
+  demoRequestTime: process.env.DEMO_REQUEST_TIME || 0
 };
 
 const config = process.env.NODE_ENV === 'production' ? prod : local;

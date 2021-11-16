@@ -67,14 +67,19 @@ class EditChart extends Component {
       const deviceFeaturesSelectors = selectedDeviceFeaturesOptions.map(
         selectedDeviceFeaturesOption => selectedDeviceFeaturesOption.value
       );
-      const firstDeviceFeature = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOptions[0].value);
+      const units = selectedDeviceFeaturesOptions.map(selectedDeviceFeaturesOption => {
+        const deviceFeature = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOption.value);
+        return deviceFeature.unit;
+      });
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_features: deviceFeaturesSelectors,
-        unit: firstDeviceFeature && firstDeviceFeature.unit ? firstDeviceFeature.unit : undefined
+        units,
+        unit: undefined
       });
     } else {
       this.props.updateBoxConfig(this.props.x, this.props.y, {
         device_features: [],
+        units: [],
         unit: undefined
       });
     }
@@ -138,8 +143,8 @@ class EditChart extends Component {
 
   componentDidUpdate(previousProps) {
     const deviceFeatureChanged = get(previousProps, 'box.device_feature') !== get(this.props, 'box.device_feature');
-    const unitChanged = get(previousProps, 'box.unit') !== get(this.props, 'box.unit');
-    if (deviceFeatureChanged || unitChanged) {
+    const unitsChanged = get(previousProps, 'box.units') !== get(this.props, 'box.units');
+    if (deviceFeatureChanged || unitsChanged) {
       this.getDeviceFeatures();
     }
   }

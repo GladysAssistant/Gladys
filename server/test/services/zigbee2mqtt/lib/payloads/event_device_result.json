@@ -1,0 +1,106 @@
+[
+  {
+    "name": "0x00158d0004019127",
+    "model": "WXKG11LM",
+    "external_id": "zigbee2mqtt:0x00158d0004019127",
+    "features": [
+      {
+        "name": "Battery",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "external_id": "zigbee2mqtt:0x00158d0004019127:battery:integer:battery",
+        "selector": "zigbee2mqtt-0x00158d0004019127-battery-integer-battery"
+      },
+      {
+        "name": "Voltage",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 10000,
+        "category": "switch",
+        "type": "voltage",
+        "unit": "millivolt",
+        "external_id": "zigbee2mqtt:0x00158d0004019127:switch:voltage:voltage",
+        "selector": "zigbee2mqtt-0x00158d0004019127-switch-voltage-voltage"
+      }
+    ],
+    "should_poll": false,
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
+    "supported": true
+  },
+  {
+    "name": "0x00158d00045b2740",
+    "model": "WSDCGQ11LM",
+    "external_id": "zigbee2mqtt:0x00158d00045b2740",
+    "features": [
+      {
+        "name": "Battery",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:battery:integer:battery",
+        "selector": "zigbee2mqtt-0x00158d00045b2740-battery-integer-battery"
+      },
+      {
+        "name": "Temperature",
+        "read_only": true,
+        "has_feedback": false,
+        "min": -100,
+        "max": 150,
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:temperature-sensor:decimal:temperature",
+        "selector": "zigbee2mqtt-0x00158d00045b2740-temperature-sensor-decimal-temperature"
+      },
+      {
+        "name": "Humidity",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:humidity-sensor:decimal:humidity",
+        "selector": "zigbee2mqtt-0x00158d00045b2740-humidity-sensor-decimal-humidity"
+      },
+      {
+        "name": "Pressure",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 10000,
+        "category": "pressure-sensor",
+        "type": "decimal",
+        "unit": "hPa",
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:pressure-sensor:decimal:pressure",
+        "selector": "zigbee2mqtt-0x00158d00045b2740-pressure-sensor-decimal-pressure"
+      },
+      {
+        "name": "Voltage",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 10000,
+        "category": "switch",
+        "type": "voltage",
+        "unit": "millivolt",
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:switch:voltage:voltage",
+        "selector": "zigbee2mqtt-0x00158d00045b2740-switch-voltage-voltage"
+      }
+    ],
+    "should_poll": false,
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
+    "supported": true
+  }
+]

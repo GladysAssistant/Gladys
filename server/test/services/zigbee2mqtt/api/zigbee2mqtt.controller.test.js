@@ -11,7 +11,7 @@ const gladys = {
   event,
 };
 const zigbee2mqttManager = {
-  discoverDevices: fake.resolves(true),
+  getDiscoveredDevices: fake.returns(['device']),
   status: fake.returns(true),
   init: fake.returns(true),
   installMqttContainer: fake.returns(true),
@@ -29,16 +29,16 @@ describe('zigbee2mqtt API', () => {
     sinon.reset();
   });
 
-  it('post /api/v1/service/zigbee2mqtt/discover', async () => {
+  it('get /api/v1/service/zigbee2mqtt/discovered', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
     };
 
-    await controller['post /api/v1/service/zigbee2mqtt/discover'].controller(req, res);
+    await controller['get /api/v1/service/zigbee2mqtt/discovered'].controller(req, res);
 
-    assert.calledOnce(zigbee2mqttManager.discoverDevices);
-    assert.calledWith(res.json, { status: 'discovering' });
+    assert.calledOnce(zigbee2mqttManager.getDiscoveredDevices);
+    assert.calledWith(res.json, ['device']);
   });
 
   it('get /api/v1/service/zigbee2mqtt/status', async () => {
