@@ -246,14 +246,8 @@ const actionsFunc = {
   },
   [ACTIONS.CALENDAR.EVENT]: async (self, action, scope) => {
     const now = dayjs.tz(dayjs(), self.timezone);
-    const user = await self.user.get({
-      selector: action.user,
-    });
-    const calendar = await self.calendar.get(user[0].id, {
-      selector: action.calendar,
-    });
-    const events = await self.calendar.getEventsForDate(user[0].id, now, {
-      calendarId: calendar[0].id,
+    const events = await self.calendar.getEventsForDate(action.user, now, {
+      calendarId: action.calendar,
     });
     const found =
       events
@@ -270,14 +264,8 @@ const actionsFunc = {
   },
   [ACTIONS.CALENDAR.NOT_EVENT]: async (self, action, scope) => {
     const now = dayjs.tz(dayjs(), self.timezone);
-    const user = await self.user.get({
-      selector: action.user,
-    });
-    const calendar = await self.calendar.get(user[0].id, {
-      selector: action.calendar,
-    });
-    const events = await self.calendar.getEventsForDate(user[0].id, now, {
-      calendarId: calendar[0].id,
+    const events = await self.calendar.getEventsForDate(action.user, now, {
+      calendarId: action.calendar,
     });
     const found =
       events

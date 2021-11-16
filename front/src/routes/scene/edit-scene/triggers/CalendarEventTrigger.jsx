@@ -10,39 +10,24 @@ import { EVENTS } from '../../../../../../server/utils/constants';
 class CalendarEventTrigger extends Component {
   getOptions = async () => {
     try {
-      const [users, calendars] = await Promise.all([
-        this.props.httpClient.get('/api/v1/user'),
-        this.props.httpClient.get('/api/v1/calendar')
-      ]);
-      const userOptions = [];
-      users.forEach(user => {
-        userOptions.push({
-          label: user.firstname,
-          value: user.selector
-        });
+      const calendars = await this.props.httpClient.get('/api/v1/calendar', {
+        shared: true
       });
       const calendarOptions = [];
       calendars.forEach(calendar => {
         calendarOptions.push({
           label: calendar.name,
-          value: calendar.selector
+          value: calendar.id
         });
       });
-      await this.setState({ userOptions, calendarOptions });
+      await this.setState({ calendarOptions });
       this.refreshSelectedOptions(this.props);
-      return userOptions;
+      return calendarOptions;
     } catch (e) {
       console.error(e);
     }
   };
 
-  handleUserChange = selectedOption => {
-    if (selectedOption && selectedOption.value) {
-      this.props.updateTriggerProperty(this.props.index, 'user', selectedOption.value);
-    } else {
-      this.props.updateTriggerProperty(this.props.index, 'user', null);
-    }
-  };
   handleCalendarChange = selectedOption => {
     if (selectedOption && selectedOption.value) {
       this.props.updateTriggerProperty(this.props.index, 'calendar', selectedOption.value);
@@ -55,15 +40,7 @@ class CalendarEventTrigger extends Component {
     this.props.updateTriggerProperty(this.props.index, 'event', value);
   };
   refreshSelectedOptions = nextProps => {
-    let selectedOption = '';
     let selectedCalendarOption = '';
-    if (nextProps.trigger.user && this.state.userOptions) {
-      const userOption = this.state.userOptions.find(option => option.value === nextProps.trigger.user);
-
-      if (userOption) {
-        selectedOption = userOption;
-      }
-    }
     if (nextProps.trigger.calendar && this.state.calendarOptions) {
       const calendarOption = this.state.calendarOptions.find(option => option.value === nextProps.trigger.calendar);
 
@@ -71,15 +48,15 @@ class CalendarEventTrigger extends Component {
         selectedCalendarOption = calendarOption;
       }
     }
-    this.setState({ selectedOption, selectedCalendarOption });
+    this.setState({ selectedCalendarOption });
   };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      selectedOption: '',
       selectedCalendarOption: ''
     };
+    this.props.updateTriggerProperty(this.props.index, 'user', this.props.user.id);
   }
   componentDidMount() {
     this.getOptions();
@@ -88,7 +65,7 @@ class CalendarEventTrigger extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { userOptions, selectedOption, calendarOptions, selectedCalendarOption }) {
+  render(props, { calendarOptions, selectedCalendarOption }) {
     return (
       <div>
         <p>
@@ -102,15 +79,6 @@ class CalendarEventTrigger extends Component {
             <Text id="editScene.triggersCard.calendar.eventEndDescription" />
           )}
         </p>
-        <div class="form-group">
-          <label class="form-label">
-            <Text id="editScene.triggersCard.calendar.userLabel" />
-            <span class="form-required">
-              <Text id="global.requiredField" />
-            </span>
-          </label>
-          <Select options={userOptions} value={selectedOption} onChange={this.handleUserChange} />
-        </div>
         <div class="form-group">
           <label class="form-label">
             <Text id="editScene.triggersCard.calendar.calendarLabel" />

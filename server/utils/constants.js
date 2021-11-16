@@ -168,6 +168,7 @@ const EVENTS = {
     PURGE_OLD_JOBS: 'job.purge-old-jobs',
   },
   CALENDAR: {
+    SYNCHRONIZED: 'synchronized',
     EVENT_START: 'calendar.event-start',
     EVENT_END: 'calendar.event-end',
     EVENT_REMINDER: 'calendar.event-reminder',

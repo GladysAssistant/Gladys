@@ -201,4 +201,52 @@ describe('SceneManager.addScene', () => {
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
   });
+  it('should add a scene with a calendar event trigger, start', async () => {
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
+    const scene = sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.CALENDAR.EVENT_START,
+          calendar: 'calendar',
+        },
+      ],
+      actions: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('eventStartJob');
+  });
+  it('should add a scene with a calendar event trigger, end', async () => {
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
+    const scene = sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.CALENDAR.EVENT_END,
+          calendar: 'calendar',
+        },
+      ],
+      actions: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('eventEndJob');
+  });
+  it('should add a scene with a calendar event trigger, reminder', async () => {
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
+    const scene = sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.CALENDAR.EVENT_REMINDER,
+          calendar: 'calendar',
+        },
+      ],
+      actions: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('eventReminderJob');
+  });
 });

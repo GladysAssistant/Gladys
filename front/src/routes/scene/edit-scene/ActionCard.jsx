@@ -248,6 +248,14 @@ const ActionCard = ({ children, ...props }) => (
             updateActionProperty={props.updateActionProperty}
           />
         )}
+        {props.action.type === ACTIONS.CALENDAR.NOT_EVENT && (
+          <CheckCalendarEvent
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
       </div>
     </div>
   </div>
