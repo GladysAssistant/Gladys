@@ -3,6 +3,9 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
+const zigbeeDevices = require('./payloads/mqtt_devices_get.json');
+const expectedDevicesPayload = require('./payloads/event_device_result.json');
+
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {});
@@ -21,103 +24,7 @@ const gladys = {
   },
 };
 
-const zigbeeDevices = `[
-    {
-        "type":"Coordinator"
-    },
-    {
-        "friendly_name":"0x00158d0005828ece",
-        "model":"WSDCGQ11LM",
-        "powerSource":"Battery",
-        "type":"EndDevice"
-    },
-    {
-        "friendly_name":"0x00158d0005828eca",
-        "model":"fakeModel",
-        "type":"EndDevice"
-    },
-    {
-        "friendly_name":"0x00158d0005828ece",
-        "model":"WSDCGQ11LM",
-        "powerSource":"Battery",
-        "type":"EndDevice"
-    }
-  ]`;
-
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
-const expectedDevicesPayload = [
-  {
-    external_id: 'zigbee2mqtt:0x00158d0005828eca',
-    features: [],
-    model: 'fakeModel',
-    name: '0x00158d0005828eca',
-    service_id: 'f87b7af2-ca8e-44fc-b754-444354b42fee',
-    should_poll: false,
-    supported: false,
-  },
-  {
-    external_id: 'zigbee2mqtt:0x00158d0005828ece',
-    features: [
-      {
-        category: 'temperature-sensor',
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:temperature-sensor:decimal:temperature',
-        has_feedback: false,
-        max: 125,
-        min: -50,
-        read_only: true,
-        name: 'Temperature',
-        selector: 'zigbee2mqtt:0x00158d0005828ece:temperature-sensor:decimal:temperature',
-        type: 'decimal',
-        unit: 'celsius',
-        zigbeeField: 'temperature',
-      },
-      {
-        category: 'humidity-sensor',
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:humidity-sensor:decimal:humidity',
-        has_feedback: false,
-        max: 100,
-        min: 0,
-        read_only: true,
-        name: 'Humidity',
-        selector: 'zigbee2mqtt:0x00158d0005828ece:humidity-sensor:decimal:humidity',
-        type: 'decimal',
-        unit: 'percent',
-        zigbeeField: 'humidity',
-      },
-      {
-        category: 'pressure-sensor',
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure',
-        has_feedback: false,
-        max: 10000,
-        min: 0,
-        name: 'Pressure Sensor',
-        read_only: true,
-        selector: 'zigbee2mqtt:0x00158d0005828ece:pressure-sensor:decimal:pressure',
-        type: 'decimal',
-        unit: 'hPa',
-        zigbeeField: 'pressure',
-      },
-      {
-        category: 'battery',
-        external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
-        has_feedback: false,
-        max: 100,
-        min: 0,
-        read_only: true,
-        name: 'Battery',
-        selector: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
-        type: 'integer',
-        unit: 'percent',
-        zigbeeField: 'battery',
-      },
-    ],
-    model: 'WSDCGQ11LM',
-    name: '0x00158d0005828ece',
-    service_id: 'f87b7af2-ca8e-44fc-b754-444354b42fee',
-    should_poll: false,
-    supported: true,
-  },
-];
 
 describe('zigbee2mqtt handleMqttMessage', () => {
   // PREPARE
@@ -141,7 +48,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       .returns(false);
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
     // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/config/devices', zigbeeDevices);
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify(zigbeeDevices));
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,

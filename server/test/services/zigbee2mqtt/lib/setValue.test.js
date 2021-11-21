@@ -44,6 +44,10 @@ const featureTemperature = {
   type: 'temperature',
 };
 
+const featureColor = {
+  type: 'color',
+};
+
 const featureUnknown = {
   type: 'unknown',
 };
@@ -106,5 +110,10 @@ describe('zigbee2mqtt setValue', () => {
     // EXECUTE
     await zigbee2MqttService.device.setValue(device, featureTemperature, 56);
     assert.calledOnceWithExactly(mqtt.publish, `zigbee2mqtt/device-test/set`, `{"color_temp": 56}`);
+  });
+  it('set value good topic color', async () => {
+    // EXECUTE
+    await zigbee2MqttService.device.setValue(device, featureColor, 255);
+    assert.calledOnceWithExactly(mqtt.publish, `zigbee2mqtt/device-test/set`, `{"color": {"rgb": "0,0,255"}}`);
   });
 });

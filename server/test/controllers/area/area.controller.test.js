@@ -66,3 +66,25 @@ describe('GET /api/v1/area', () => {
       });
   });
 });
+
+describe('GET /api/v1/area/:selector', () => {
+  it('should get one area by selector', async () => {
+    await authenticatedRequest
+      .get('/api/v1/area/test-area')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal({
+          id: '939ff9b0-d349-483e-9a16-04e3ff03f1cd',
+          name: 'Test area',
+          selector: 'test-area',
+          latitude: 10,
+          longitude: 10,
+          radius: 1000,
+          color: '#0000',
+          created_at: '2019-02-12T07:49:07.556Z',
+          updated_at: '2019-02-12T07:49:07.556Z',
+        });
+      });
+  });
+});

@@ -78,7 +78,7 @@ class ColorDeviceType extends Component {
 
   render({ device, deviceFeature }, { open }) {
     const deviceLastValue = deviceFeature.last_value;
-    const color = deviceLastValue === null ? undefined : `#${intToHex(deviceLastValue)}`;
+    const color = !deviceLastValue ? undefined : `#${intToHex(deviceLastValue)}`;
 
     return (
       <Fragment>

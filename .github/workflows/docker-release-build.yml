@@ -17,7 +17,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
@@ -50,7 +55,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 🖥️ Setup OZW
         run: |
           docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
@@ -85,9 +95,11 @@ jobs:
           npm run coverage
       - name: 🔐 Dependencies security audit
         working-directory: ./server
-        run: npm audit --production --audit-level=high
+        run: npm audit --production --audit-level=critical
       - name: 📄 Codecov report upload
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: true
   build-front:
     name: Front build
     needs:
@@ -102,7 +114,12 @@ jobs:
         with:
           node-version: '14'
       - name: 📇 Use npm cache
-        uses: c-hive/gha-npm-cache@v1
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
@@ -129,15 +146,15 @@ jobs:
         uses: actions/checkout@v2
       - name: 🐳 Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: docker/metadata-action@v3
         with:
           images: ${{ secrets.DOCKERHUB_REPO }}
-          label-custom: |
-            org.opencontainers.image.title=Gladys Assitant Production Image
-          tag-sha: true
-          tag-semver: |
-            {{raw}}
-            v{{major}}
+          labels: |
+            org.opencontainers.image.title=Gladys Assistant Production Image
+          tags: |
+            type=semver,pattern=v{{version}}
+            type=semver,pattern=v{{major}}
+            type=sha
       - name: 💽 Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: 🐳 Set up Docker Buildx

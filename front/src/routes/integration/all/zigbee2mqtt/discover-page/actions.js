@@ -2,42 +2,28 @@ import update from 'immutability-helper';
 import createActionsIntegration from '../../../../../actions/integration';
 import createActionsHouse from '../../../../../actions/house';
 
-let scanTimer;
-
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const houseActions = createActionsHouse(store);
   const actions = {
-    async discover(state) {
+    async getDiscoveredDevices(state) {
       store.setState({
         discoverZigbee2mqtt: true,
         discoverZigbee2mqttError: null
       });
-      if (state.session.websocketConnected) {
-        try {
-          await state.httpClient.post('/api/v1/service/zigbee2mqtt/discover');
-          scanTimer = setTimeout(store.setState, 5000, {
-            discoverZigbee2mqtt: false,
-            discoverZigbee2mqttError: null
-          });
-        } catch (e) {
-          clearTimeout(scanTimer);
-          store.setState({
-            zigbee2mqttDevices: [],
-            discoverZigbee2mqtt: false,
-            discoverZigbee2mqttError: 'integration.zigbee2mqtt.discover.serverNoResponse'
-          });
-        }
-      } else {
+
+      try {
+        const zigbee2mqttDevices = await state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered');
+        store.setState({ zigbee2mqttDevices, discoverZigbee2mqtt: false });
+      } catch (e) {
         store.setState({
           zigbee2mqttDevices: [],
           discoverZigbee2mqtt: false,
-          discoverZigbee2mqttError: 'integration.zigbee2mqtt.discover.serverNoResponseWebSocker'
+          discoverZigbee2mqttError: 'integration.zigbee2mqtt.discover.serverNoResponse'
         });
       }
     },
     setDiscoveredDevices(state, zigbee2mqttDevices) {
-      clearTimeout(scanTimer);
       store.setState({
         zigbee2mqttDevices,
         discoverZigbee2mqtt: false,

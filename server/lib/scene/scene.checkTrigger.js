@@ -17,8 +17,12 @@ function checkTrigger(event) {
 
   // foreach scenes we have in RAM
   sceneSelectors.forEach((sceneSelector) => {
-    // we check if the scene has triggers
-    if (this.scenes[sceneSelector].triggers && this.scenes[sceneSelector].triggers instanceof Array) {
+    // we check if the scene has triggers and is active
+    if (
+      this.scenes[sceneSelector].triggers &&
+      this.scenes[sceneSelector].triggers instanceof Array &&
+      this.scenes[sceneSelector].active
+    ) {
       // if yes, we loop on each trigger
       this.scenes[sceneSelector].triggers.forEach((trigger) => {
         logger.debug(`Checking trigger ${trigger.type}...`);

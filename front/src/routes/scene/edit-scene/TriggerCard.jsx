@@ -6,6 +6,7 @@ import ChooseTriggerType from './triggers/ChooseTriggerTypeCard';
 import SunriseSunsetTrigger from './triggers/SunriseSunsetTrigger';
 import UserPresenceTrigger from './triggers/UserPresenceTrigger';
 import HouseEmptyOrNot from './triggers/HouseEmptyOrNot';
+import UserEnteredOrLeftArea from './triggers/UserEnteredOrLeftArea';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 
@@ -24,6 +25,8 @@ const TriggerCard = ({ children, ...props }) => (
       {props.trigger.type === EVENTS.USER_PRESENCE.LEFT_HOME && <i class="fe fe-home" />}
       {props.trigger.type === EVENTS.HOUSE.EMPTY && <i class="fe fe-home" />}
       {props.trigger.type === EVENTS.HOUSE.NO_LONGER_EMPTY && <i class="fe fe-home" />}
+      {props.trigger.type === EVENTS.AREA.USER_ENTERED && <i class="fe fe-compass" />}
+      {props.trigger.type === EVENTS.AREA.USER_LEFT && <i class="fe fe-compass" />}
       {props.trigger.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i
@@ -101,6 +104,20 @@ const TriggerCard = ({ children, ...props }) => (
       )}
       {props.trigger.type === EVENTS.USER_PRESENCE.LEFT_HOME && (
         <UserPresenceTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.AREA.USER_ENTERED && (
+        <UserEnteredOrLeftArea
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.AREA.USER_LEFT && (
+        <UserEnteredOrLeftArea
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}

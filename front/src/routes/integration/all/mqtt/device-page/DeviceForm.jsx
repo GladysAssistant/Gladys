@@ -1,8 +1,8 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
-import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
-import get from 'get-value';
 import dayjs from 'dayjs';
+
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 class MqttDeviceForm extends Component {
   updateName = e => {
@@ -77,21 +77,7 @@ class MqttDeviceForm extends Component {
           <label class="form-label">
             <Text id="integration.mqtt.device.featuresLabel" />
           </label>
-          <div class="tags">
-            {props.device &&
-              props.device.features &&
-              props.device.features.map(feature => (
-                <span class="tag">
-                  <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                  <div class="tag-addon">
-                    <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
-                  </div>
-                </span>
-              ))}
-            {(!props.device.features || props.device.features.length === 0) && (
-              <Text id="integration.mqtt.device.noFeatures" />
-            )}
-          </div>
+          <DeviceFeatures features={props.device.features} />
           <p class="mt-4">
             {props.mostRecentValueAt ? (
               <Text

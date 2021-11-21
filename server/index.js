@@ -1,10 +1,10 @@
-const Gladys = require('./lib');
-const db = require('./models');
-const { start } = require('./api/');
-
 if (process.env.NODE_ENV === 'development') {
   require('dotenv').config(); // eslint-disable-line
 }
+
+const Gladys = require('./lib');
+const db = require('./models');
+const { start } = require('./api/');
 
 const SERVER_PORT = parseInt(process.env.SERVER_PORT, 10) || 1443;
 const SERVE_FRONT = process.env.NODE_ENV === 'production' ? true : process.env.SERVE_FRONT === 'true';
@@ -21,20 +21,21 @@ process.on('uncaughtException', (error, promise) => {
   logger.error(error);
 });
 
-let server;
-
 const shutdown = async (signal) => {
   logger.info(`${signal} received.`);
+  // We give Gladys 10 seconds to properly shutdown, otherwise we do it
+  setTimeout(() => {
+    logger.info('Timeout to shutdown expired, forcing shut down.');
+    process.exit();
+  }, 10 * 1000);
   logger.info('Closing database connection.');
-  await db.sequelize.close();
-  if (server) {
-    logger.info('Closing server connections.');
-    server.close(() => {
-      process.exit(0);
-    });
-  } else {
-    process.exit(0);
+  try {
+    await db.sequelize.close();
+  } catch (e) {
+    logger.info('Database is probably already closed');
+    logger.warn(e);
   }
+  process.exit();
 };
 
 process.on('SIGTERM', () => shutdown('SIGTERM'));
@@ -50,7 +51,7 @@ process.on('SIGINT', () => shutdown('SIGINT'));
   await gladys.start();
 
   // start server
-  ({ server } = start(gladys, SERVER_PORT, {
+  start(gladys, SERVER_PORT, {
     serveFront: SERVE_FRONT,
-  }));
+  });
 })();

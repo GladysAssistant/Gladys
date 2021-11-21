@@ -1,10 +1,15 @@
 import { Component } from 'preact';
 import leaflet from 'leaflet';
+import { Text } from 'preact-i18n';
+import { connect } from 'unistore/preact';
+
 import 'leaflet/dist/leaflet.css';
 import style from './style.css';
+import { route } from 'preact-router';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
+@connect('httpClient', {})
 class MapComponent extends Component {
   initMap = () => {
     if (this.leafletMap) {
@@ -19,14 +24,12 @@ class MapComponent extends Component {
         maxZoom: 19
       })
       .addTo(this.leafletMap);
-
-    this.displayHouses();
-    this.displayUsers();
+    this.displayAll(this.props);
   };
 
-  displayUsers = () => {
-    if (this.props.users) {
-      this.props.users.forEach(user => {
+  displayUsers = props => {
+    if (props.users) {
+      props.users.forEach(user => {
         if (this.userMarkers[user.id]) {
           this.userMarkers[user.id].remove();
         }
@@ -47,9 +50,20 @@ class MapComponent extends Component {
     }
   };
 
-  displayHouses = () => {
-    if (this.props.houses) {
-      this.props.houses.forEach(house => {
+  displayAll = props => {
+    this.markerArray = [];
+    this.displayHouses(props);
+    this.displayUsers(props);
+    this.displayAreas(props);
+    if (this.markerArray.length >= 1) {
+      const group = leaflet.featureGroup(this.markerArray);
+      this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
+    }
+  };
+
+  displayHouses = props => {
+    if (props.houses) {
+      props.houses.forEach(house => {
         if (this.houseMarkers[house.id]) {
           this.houseMarkers[house.id].remove();
         }
@@ -63,45 +77,94 @@ class MapComponent extends Component {
               })
             })
             .addTo(this.leafletMap);
-          this.markerArray.push(this.houseMarkers[house.id]);
         }
       });
     }
   };
 
+  displayAreas = async props => {
+    if (props.areas) {
+      props.areas.forEach(area => {
+        if (this.areaMarkers[area.id]) {
+          this.areaMarkers[area.id].remove();
+        }
+        this.areaMarkers[area.id] = leaflet
+          .circle([area.latitude, area.longitude], {
+            radius: area.radius,
+            color: area.color,
+            fillColor: area.color,
+            fillOpacity: 0.2
+          })
+          .addTo(this.leafletMap);
+
+        this.areaMarkers[area.id].bindTooltip(area.name).openTooltip();
+
+        this.areaMarkers[area.id].on('click', () => {
+          route(`/dashboard/maps/area/edit/${area.selector}`);
+        });
+      });
+    }
+  };
+
+  openNewAreaView = () => {
+    route('/dashboard/maps/area/new');
+  };
+
   setMapRef = map => {
     this.map = map;
   };
+  updateDimensions = () => {
+    const largeWindowOffset = 120;
+    const smallWindowOffset = 65;
+    const height =
+      window.innerWidth >= 992 ? window.innerHeight - largeWindowOffset : window.innerHeight - smallWindowOffset;
+    this.setState({ height });
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
     this.userMarkers = {};
     this.houseMarkers = {};
+    this.areaMarkers = {};
     this.markerArray = [];
+  }
+
+  componentWillMount() {
+    this.updateDimensions();
   }
 
   componentDidMount() {
     this.initMap();
+    window.addEventListener('resize', this.updateDimensions.bind(this));
   }
 
-  componentDidUpdate() {
-    this.markerArray = [];
-    this.displayHouses();
-    this.displayUsers();
-    if (this.markerArray.length >= 1) {
-      const group = leaflet.featureGroup(this.markerArray);
-      this.leafletMap.fitBounds(group.getBounds(), { padding: [150, 150] });
-    }
+  componentWillReceiveProps(nextProps) {
+    this.displayAll(nextProps);
   }
 
   componentWillUnmount() {
     if (this.leafletMap) {
       this.leafletMap.remove();
     }
+    window.removeEventListener('resize', this.updateDimensions.bind(this));
   }
 
-  render(props) {
-    return <div ref={this.setMapRef} style="height: 500px;" />;
+  render(props, { height }) {
+    return (
+      <div ref={this.setMapRef} style={{ height: `${height}px` }}>
+        <div class="leaflet-top leaflet-right">
+          <button
+            href="/dashboard/maps/area/new"
+            class="btn btn-primary"
+            onClick={this.openNewAreaView}
+            style={{ marginTop: '10px', marginRight: '10px', pointerEvents: 'auto' }}
+          >
+            <Text id="newArea.createNewZoneButton" />
+          </button>
+        </div>
+      </div>
+    );
   }
 }
 

@@ -21,7 +21,7 @@ module.exports = {
   },
   test: {
     dialect: 'sqlite',
-    storage: process.env.SQLITE_FILE_PATH || ':memory:',
+    storage: process.env.SQLITE_FILE_PATH || './gladys-test.db',
     logging: false,
     define: {
       underscored: true,

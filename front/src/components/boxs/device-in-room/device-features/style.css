@@ -1,3 +1,18 @@
 .deviceRowPopover {
   top: auto;
 }
+
+/* Chrome */
+input[type='range'][class~='light-temperature']::-webkit-slider-runnable-track {
+  background: linear-gradient(to right, rgb(178, 212, 251), rgb(243, 166, 60));
+}
+
+/* Firefox */
+input[type='range'][class~='light-temperature']::-moz-range-progress {
+  background: linear-gradient(to right, rgb(178, 212, 251), rgb(243, 166, 60));
+}
+
+/* Edge */
+input[type='range'][class~='light-temperature']::-ms-fill-lower {
+  background: linear-gradient(to right, rgb(178, 212, 251), rgb(243, 166, 60));
+}

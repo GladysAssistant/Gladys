@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
-import config from '../../../config';
+import config from '../../config';
 
 const DashboardSettings = ({ children, ...props }) => (
   <div class="page">
@@ -109,6 +109,17 @@ const DashboardSettings = ({ children, ...props }) => (
                       <i class="fe fe-database" />
                     </span>
                     <Text id="settings.backupTab" />
+                  </Link>
+
+                  <Link
+                    href="/dashboard/settings/jobs"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-cpu" />
+                    </span>
+                    <Text id="settings.jobsTab" />
                   </Link>
 
                   <Link

@@ -40,8 +40,13 @@ const SERVICE_STATUS = {
 
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
+  DEVICE_STATE_MONTHLY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_MONTHLY_AGGREGATES_RETENTION_IN_DAYS',
+  DEVICE_STATE_DAILY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_DAILY_AGGREGATES_RETENTION_IN_DAYS',
+  DEVICE_STATE_HOURLY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_HOURLY_AGGREGATES_RETENTION_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
   GLADYS_GATEWAY_USERS_KEYS: 'GLADYS_GATEWAY_USERS_KEYS',
+  GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
+    'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   TIMEZONE: 'TIMEZONE',
 };
 
@@ -55,6 +60,7 @@ const EVENTS = {
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
     PURGE_STATES: 'device.purge-states',
+    CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -151,6 +157,16 @@ const EVENTS = {
     EMPTY: 'house.empty',
     NO_LONGER_EMPTY: 'house.no-longer-empty',
   },
+  USER: {
+    NEW_LOCATION: 'user.new-location',
+  },
+  AREA: {
+    USER_ENTERED: 'area.user-entered',
+    USER_LEFT: 'area.user-left',
+  },
+  JOB: {
+    PURGE_OLD_JOBS: 'job.purge-old-jobs',
+  },
 };
 
 const LIFE_EVENTS = {
@@ -242,6 +258,10 @@ const ACTIONS = {
     SET_OUT_OF_HOME: 'user.set-out-of-home',
     CHECK_PRESENCE: 'user.check-presence',
   },
+  HOUSE: {
+    IS_EMPTY: 'house.is-empty',
+    IS_NOT_EMPTY: 'house.is-not-empty',
+  },
   HTTP: {
     REQUEST: 'http.request',
   },
@@ -293,6 +313,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   CUBE: 'cube',
   BUTTON: 'button',
   HEALTH: 'health',
+  SIGNAL: 'signal',
+  DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   UNKNOWN: 'unknown',
 };
 
@@ -372,6 +394,9 @@ const DEVICE_FEATURE_TYPES = {
     PULSE_WAVE_VELOCITY: 'pulse-wave-velocity',
     UNKNOWN: 'unknown',
   },
+  SIGNAL: {
+    QUALITY: 'integer',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -388,6 +413,7 @@ const DEVICE_FEATURE_UNITS = {
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
   AMPERE: 'ampere',
+  MILLI_VOLT: 'millivolt',
   VOLT: 'volt',
   PPM: 'ppm',
   KILOGRAM: 'kg',
@@ -411,6 +437,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.PASCAL, DEVICE_FEATURE_UNITS.HECTO_PASCAL],
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
+  [DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR]: [
+    DEVICE_FEATURE_UNITS.CELSIUS,
+    DEVICE_FEATURE_UNITS.FAHRENHEIT,
+  ],
 };
 
 const ACTIONS_STATUS = {
@@ -437,6 +467,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_STATE: 'device.new-state',
     NEW_STRING_STATE: 'device.new-string-state',
   },
+  JOB: {
+    NEW: 'job.new',
+    UPDATED: 'job.updated',
+  },
   MESSAGE: {
     NEW: 'message.new',
     SENT: 'message.sent',
@@ -451,6 +485,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+  },
+  LOCATION: {
+    NEW: 'location.new',
   },
   USER_PRESENCE: {
     LEFT_HOME: 'user.left-home',
@@ -510,6 +547,7 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  CHART: 'chart',
 };
 
 const ERROR_MESSAGES = {
@@ -518,6 +556,35 @@ const ERROR_MESSAGES = {
   REQUEST_TO_THIRD_PARTY_FAILED: 'REQUEST_TO_THIRD_PARTY_FAILED',
   INVALID_ACCESS_TOKEN: 'INVALID_ACCESS_TOKEN',
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
+};
+
+const DEVICE_FEATURE_STATE_AGGREGATE_TYPES = {
+  MONTHLY: 'monthly',
+  DAILY: 'daily',
+  HOURLY: 'hourly',
+};
+
+const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
+  [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.HOURLY]: 6 * 30,
+  [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.DAILY]: 365,
+  [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.MONTHLY]: 5 * 365,
+};
+
+const JOB_TYPES = {
+  HOURLY_DEVICE_STATE_AGGREGATE: 'hourly-device-state-aggregate',
+  DAILY_DEVICE_STATE_AGGREGATE: 'daily-device-state-aggregate',
+  MONTHLY_DEVICE_STATE_AGGREGATE: 'monthly-device-state-aggregate',
+};
+
+const JOB_STATUS = {
+  IN_PROGRESS: 'in-progress',
+  SUCCESS: 'success',
+  FAILED: 'failed',
+};
+
+const JOB_ERROR_TYPES = {
+  PURGED_WHEN_RESTARTED: 'purged-when-restarted',
+  UNKNOWN_ERROR: 'unknown-error',
 };
 
 const createList = (obj) => {
@@ -547,6 +614,10 @@ const SESSION_TOKEN_TYPE_LIST = createList(SESSION_TOKEN_TYPES);
 const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
+const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
+const JOB_TYPES_LIST = createList(JOB_TYPES);
+const JOB_STATUS_LIST = createList(JOB_STATUS);
+const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -596,3 +667,14 @@ module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
 
 module.exports.WEATHER_UNITS = WEATHER_UNITS;
+
+module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
+module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;
+module.exports.DEFAULT_AGGREGATES_POLICY_IN_DAYS = DEFAULT_AGGREGATES_POLICY_IN_DAYS;
+
+module.exports.JOB_TYPES = JOB_TYPES;
+module.exports.JOB_TYPES_LIST = JOB_TYPES_LIST;
+module.exports.JOB_STATUS = JOB_STATUS;
+module.exports.JOB_STATUS_LIST = JOB_STATUS_LIST;
+module.exports.JOB_ERROR_TYPES = JOB_ERROR_TYPES;
+module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;

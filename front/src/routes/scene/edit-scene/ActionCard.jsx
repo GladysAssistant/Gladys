@@ -8,6 +8,7 @@ import { ACTIONS } from '../../../../../server/utils/constants';
 import ChooseActionTypeParams from './actions/ChooseActionTypeCard';
 import DelayActionParams from './actions/DelayActionParams';
 import DeviceGetValueParams from './actions/DeviceGetValueParams';
+import DeviceSetValue from './actions/DeviceSetValue';
 import SendMessageParams from './actions/SendMessageParams';
 import OnlyContinueIfParams from './actions/only-continue-if/OnlyContinueIfParams';
 import TurnOnOffLightParams from './actions/TurnOnOffLightParams';
@@ -17,6 +18,7 @@ import UserPresence from './actions/UserPresence';
 import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
+import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -36,7 +38,10 @@ const ACTION_ICON = {
   [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
   [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-home',
   [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch',
-  [ACTIONS.SCENE.START]: 'fe fe-fast-forward'
+  [ACTIONS.SCENE.START]: 'fe fe-fast-forward',
+  [ACTIONS.HOUSE.IS_EMPTY]: 'fe fe-home',
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
+  [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio'
 };
 
 const ActionCard = ({ children, ...props }) => (
@@ -208,6 +213,30 @@ const ActionCard = ({ children, ...props }) => (
             variables={props.variables}
             setVariables={props.setVariables}
             scene={props.scene}
+          />
+        )}
+        {props.action.type === ACTIONS.HOUSE.IS_EMPTY && (
+          <HouseEmptyOrNotCondition
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.HOUSE.IS_NOT_EMPTY && (
+          <HouseEmptyOrNotCondition
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.DEVICE.SET_VALUE && (
+          <DeviceSetValue
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
           />
         )}
       </div>

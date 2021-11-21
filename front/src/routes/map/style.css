@@ -4,4 +4,9 @@
   border-color: #5eba00;
 }
 
-.houseIconImage {}
+.houseIconImage {
+}
+
+.containerWithMargin {
+  margin-top: 3rem;
+}
