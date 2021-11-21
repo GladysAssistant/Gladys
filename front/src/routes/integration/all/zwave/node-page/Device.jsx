@@ -9,7 +9,9 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(relativeTime);
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
+import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 class ZWaveDeviceBox extends Component {
   refreshDeviceProperty = () => {
@@ -71,12 +73,7 @@ class ZWaveDeviceBox extends Component {
             {props.device.name}
             {batteryLevel && (
               <div class="page-options d-flex">
-                <div class="tag tag-green">
-                  <Text id="global.percentValue" fields={{ value: batteryLevel }} />
-                  <span class="tag-addon">
-                    <i class="fe fe-battery" />
-                  </span>
-                </div>
+                <BatteryLevelFeature batteryLevel={batteryLevel} />
               </div>
             )}
           </div>
@@ -127,23 +124,7 @@ class ZWaveDeviceBox extends Component {
                   <label>
                     <Text id="integration.zwave.device.featuresLabel" />
                   </label>
-                  <div class="tags">
-                    {props.device &&
-                      props.device.features &&
-                      props.device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    {(!props.device.features || props.device.features.length === 0) && (
-                      <Text id="integration.zwave.device.noFeatures" />
-                    )}
-                  </div>
+                  <DeviceFeatures features={props.device.features} />
                   <p class="mt-4">
                     {mostRecentValueAt ? (
                       <Text

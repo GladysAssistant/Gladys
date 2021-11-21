@@ -1,0 +1,29 @@
+.errorDiv {
+  padding-top: 1rem;
+  width: 40rem;
+}
+
+@media (max-width: 1280px) {
+  .errorDiv {
+    width: 30rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .errorDiv {
+    width: 30rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .errorDiv {
+    width: 20rem;
+  }
+}
+
+.errorDirectDiv {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  white-space: pre-line;
+  hyphens: auto;
+}

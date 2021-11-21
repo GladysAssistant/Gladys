@@ -1,10 +1,10 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { DEVICE_FIRMWARE } from '../../../../../../server/services/ewelink/lib/utils/constants';
-import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import get from 'get-value';
 import { Link } from 'preact-router';
+
+import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/ewelink/lib/utils/constants';
+import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class EweLinkDeviceBox extends Component {
   updateName = e => {
@@ -55,17 +55,24 @@ class EweLinkDeviceBox extends Component {
 
   render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
     const validModel = device.features && device.features.length > 0;
+    const online = device.params.find(param => param.name === DEVICE_ONLINE).value === '1';
+    const firmware = device.params.find(param => param.name === DEVICE_FIRMWARE).value;
 
     return (
       <div class="col-md-6">
         <div class="card">
           <div class="card-header">
-            {device.name}
-            {device.params.find(param => param.name === DEVICE_FIRMWARE) && (
-              <div class="page-options d-flex">
-                <div class="tag tag-blue">{device.params.find(param => param.name === DEVICE_FIRMWARE).value}</div>
+            <Localizer>
+              <div title={<Text id={`integration.eWeLink.status.${online ? 'online' : 'offline'}`} />}>
+                <i class={`fe fe-radio text-${online ? 'success' : 'danger'}`} />
+                &nbsp;{device.name}
               </div>
-            )}
+            </Localizer>
+            <div class="page-options d-flex">
+              {device.params.find(param => param.name === DEVICE_FIRMWARE) && (
+                <div class="tag tag-blue">{`Firmware: ${firmware}`}</div>
+              )}
+            </div>
           </div>
           <div
             class={cx('dimmer', {
@@ -101,15 +108,13 @@ class EweLinkDeviceBox extends Component {
                   <label class="form-label" for={`model_${deviceIndex}`}>
                     <Text id="integration.eWeLink.modelLabel" />
                   </label>
-                  <Localizer>
-                    <input
-                      id={`model_${deviceIndex}`}
-                      type="text"
-                      value={device.model}
-                      class="form-control"
-                      disabled="true"
-                    />
-                  </Localizer>
+                  <input
+                    id={`model_${deviceIndex}`}
+                    type="text"
+                    value={device.model}
+                    class="form-control"
+                    disabled="true"
+                  />
                 </div>
 
                 <div class="form-group">
@@ -143,18 +148,7 @@ class EweLinkDeviceBox extends Component {
                     <label class="form-label">
                       <Text id="integration.eWeLink.device.featuresLabel" />
                     </label>
-                    <div class="tags">
-                      {device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    </div>
+                    <DeviceFeatures features={device.features} />
                   </div>
                 )}
 

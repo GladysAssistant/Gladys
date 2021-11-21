@@ -22,7 +22,7 @@ const EditScenePage = ({ children, ...props }) => (
             </h1>
             <h1 class="page-title">
               {props.isNameEditable ? (
-                <form onSubmit={this.saveScene}>
+                <form onSubmit={props.saveScene}>
                   <div class="input-group">
                     <Localizer>
                       <input
@@ -45,6 +45,17 @@ const EditScenePage = ({ children, ...props }) => (
                 <span onClick={props.toggleIsNameEditable}>{props.scene.name}</span>
               )}
             </h1>
+            <label class="custom-switch m-0 ml-4">
+              <input
+                type="checkbox"
+                name="active"
+                value="1"
+                class="custom-switch-input"
+                checked={props.scene.active}
+                onClick={props.switchActiveScene}
+              />
+              <span class="custom-switch-indicator" />
+            </label>
             <div class="page-options d-flex">
               <button onClick={props.startScene} class="btn btn-sm btn-primary ml-2">
                 <Text id="editScene.startButton" /> <i class="fe fe-play" />

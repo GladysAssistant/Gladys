@@ -5,6 +5,7 @@ const DashboardController = require('./controllers/dashboard.controller');
 const DeviceController = require('./controllers/device.controller');
 const UserController = require('./controllers/user.controller');
 const PingController = require('./controllers/ping.controller');
+const JobController = require('./controllers/job.controller');
 const GatewayController = require('./controllers/gateway.controller');
 const HouseController = require('./controllers/house.controller');
 const HttpController = require('./controllers/http.controller');
@@ -34,6 +35,7 @@ function getRoutes(gladys) {
   const dashboardController = DashboardController(gladys);
   const deviceController = DeviceController(gladys);
   const lightController = LightController(gladys);
+  const jobController = JobController(gladys);
   const locationController = LocationController(gladys);
   const userController = UserController(gladys);
   const houseController = HouseController(gladys);
@@ -106,6 +108,10 @@ function getRoutes(gladys) {
     'get /api/v1/area': {
       authenticated: true,
       controller: areaController.get,
+    },
+    'get /api/v1/area/:area_selector': {
+      authenticated: true,
+      controller: areaController.getBySelector,
     },
     'patch /api/v1/area/:area_selector': {
       authenticated: true,
@@ -211,6 +217,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: deviceController.setValueFeature,
     },
+    'get /api/v1/device_feature/aggregated_states': {
+      authenticated: true,
+      controller: deviceController.getDeviceFeaturesAggregated,
+    },
     // house
     'post /api/v1/house': {
       authenticated: true,
@@ -238,6 +248,12 @@ function getRoutes(gladys) {
     'post /api/v1/house/:house_selector/user/:user_selector/seen': {
       authenticated: true,
       controller: houseController.userSeen,
+    },
+    // job
+    'get /api/v1/job': {
+      authenticated: true,
+      admin: true,
+      controller: jobController.get,
     },
     // http
     'post /api/v1/http/request': {

@@ -212,13 +212,31 @@ const WeatherBox = ({ children, ...props }) => (
   </div>
 );
 
-@connect('DashboardBoxDataWeather,DashboardBoxStatusWeather,user', actions)
 class WeatherBoxComponent extends Component {
-  componentDidMount() {
-    // get the weather
+  refreshData = () => {
     this.props.getWeather(this.props.box, this.props.x, this.props.y);
+  };
+  componentDidMount() {
+    this.refreshData();
     // refresh weather every interval
-    setInterval(() => this.props.getWeather(this.props.box, this.props.x, this.props.y), BOX_REFRESH_INTERVAL_MS);
+    this.interval = setInterval(() => this.refreshData, BOX_REFRESH_INTERVAL_MS);
+  }
+
+  componentDidUpdate(previousProps) {
+    const houseChanged = get(previousProps, 'box.house') !== get(this.props, 'box.house');
+    const advancedWeatherChanged =
+      get(previousProps, 'box.modes.advancedWeather') !== get(this.props, 'box.modes.advancedWeather');
+    const dailyForecastChanged =
+      get(previousProps, 'box.modes.dailyForecast') !== get(this.props, 'box.modes.dailyForecast');
+    const hourlyForecastChanged =
+      get(previousProps, 'box.modes.hourlyForecast') !== get(this.props, 'box.modes.hourlyForecast');
+    if (houseChanged || advancedWeatherChanged || dailyForecastChanged || hourlyForecastChanged) {
+      this.refreshData();
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render(props, {}) {
@@ -314,4 +332,4 @@ class WeatherBoxComponent extends Component {
   }
 }
 
-export default WeatherBoxComponent;
+export default connect('DashboardBoxDataWeather,DashboardBoxStatusWeather,user', actions)(WeatherBoxComponent);
