@@ -8,7 +8,7 @@ module.exports = {
         {
           id: '3a30636c-b3f0-4251-a347-90787f0fe940',
           name: 'Test scene',
-          icon: 'fe fe-bell',
+          icon: 'icon-bell',
           selector: 'test-scene',
           actions: JSON.stringify([
             [
