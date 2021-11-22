@@ -49,7 +49,7 @@ async function get(options) {
       created_at: dayjs(job.nextInvocation()),
     });
   });
-  
+
   return jobs;
 }
 

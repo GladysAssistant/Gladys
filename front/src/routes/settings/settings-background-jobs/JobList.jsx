@@ -123,6 +123,11 @@ const JobList = ({ children, ...props }) => (
                       <pre class={style.errorDirectDiv}>{job.data.error}</pre>
                     </div>
                   )}
+                  {job.data && job.data.name && (
+                    <div>
+                      <small>{job.data.name}</small>
+                    </div>
+                  )}
                 </td>
                 <td>
                   <span

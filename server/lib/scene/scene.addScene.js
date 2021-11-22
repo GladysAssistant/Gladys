@@ -8,6 +8,11 @@ const logger = require('../../utils/logger');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
+const { compare } = require('../../utils/compare');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(relativeTime);
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -78,7 +83,7 @@ function addScene(sceneRaw) {
             throw new BadParameters(`${trigger.scheduler_type} not supported`);
         }
         trigger.nodeScheduleJob = this.schedule.scheduleJob(rule, () =>
-          this.event.emit(EVENTS.TRIGGERS.CHECK, trigger),
+          this.eventManager.emit(EVENTS.TRIGGERS.CHECK, trigger),
         );
       } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'interval') {
         let intervalMilliseconds;
@@ -98,7 +103,10 @@ function addScene(sceneRaw) {
         if (intervalMilliseconds > MAX_VALUE_SET_INTERVAL) {
           throw new BadParameters(`${trigger.interval} ${trigger.unit} is too big for an interval`);
         }
-        trigger.jsInterval = setInterval(() => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger), intervalMilliseconds);
+        trigger.jsInterval = setInterval(
+          () => this.eventManager.emit(EVENTS.TRIGGERS.CHECK, trigger),
+          intervalMilliseconds,
+        );
       } else if (
         trigger.type === EVENTS.CALENDAR.EVENT_START ||
         trigger.type === EVENTS.CALENDAR.EVENT_END ||
@@ -128,7 +136,7 @@ function addScene(sceneRaw) {
               `${calendarEvent.external_id}_start`,
               eventStartTime.toDate(),
               () => {
-                this.event.emit(EVENTS.TRIGGERS.CHECK, {
+                this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
                   type: EVENTS.CALENDAR.EVENT_START,
                   calendarEvent,
                 });
@@ -147,7 +155,7 @@ function addScene(sceneRaw) {
               `${calendarEvent.external_id}_end`,
               eventEndTime.toDate(),
               () => {
-                this.event.emit(EVENTS.TRIGGERS.CHECK, {
+                this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
                   type: EVENTS.CALENDAR.EVENT_END,
                   calendarEvent,
                 });
