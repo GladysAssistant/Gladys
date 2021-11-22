@@ -17,7 +17,7 @@ const WEATHER_ICONS = {
   night: 'icon-moon'
 };
 
-const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'icon-question' });
+const translateWeatherToIcon = weather => get(WEATHER_ICONS, weather, { default: 'icon-question' });
 
 function createActions(store) {
   const boxActions = createBoxActions(store);
@@ -30,15 +30,15 @@ function createActions(store) {
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('D MMM');
-        weather.weatherIcon = translateWeatherToFeIcon(weather.weather);
+        weather.weatherIcon = translateWeatherToIcon(weather.weather);
 
         weather.hours.map(hour => {
-          hour.weatherIcon = translateWeatherToFeIcon(hour.weather);
+          hour.weatherIcon = translateWeatherToIcon(hour.weather);
           hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
         });
         weather.days.shift();
         weather.days.map(day => {
-          day.weather_icon = translateWeatherToFeIcon(day.weather);
+          day.weather_icon = translateWeatherToIcon(day.weather);
           day.datetime_beautiful = dayjs(day.datetime).format('dddd');
         });
 
