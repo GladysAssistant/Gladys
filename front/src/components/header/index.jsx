@@ -130,7 +130,7 @@ const Header = ({ ...props }) => {
                     href="/dashboard/integration"
                     class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
                   >
-                    <i class="icon-grid" /> <Text id="header.integrations" />
+                    <i class="icon-layout-grid" /> <Text id="header.integrations" />
                   </Link>
                 </li>
                 <li class="nav-item">

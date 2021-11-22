@@ -128,7 +128,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon-grid" />
+                      <i class="icon-layout-grid" />
                     </span>
                     <Text id="settings.serviceTab" />
                   </Link>
