@@ -1,4 +1,6 @@
-require('dotenv').config(); // eslint-disable-line
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config(); // eslint-disable-line
+}
 
 const { lstatSync, readdirSync } = require('fs');
 const { join } = require('path');
