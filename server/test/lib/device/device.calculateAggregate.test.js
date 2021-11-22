@@ -1,7 +1,9 @@
 const { expect } = require('chai');
 const uuid = require('uuid');
 const EventEmitter = require('events');
-const { fake } = require('sinon');
+const sinon = require('sinon');
+
+const { fake } = sinon;
 const db = require('../../../models');
 const Device = require('../../../lib/device');
 const Job = require('../../../lib/job');
@@ -29,6 +31,7 @@ const insertStates = async (fixedHour = true) => {
 
 describe('Device.calculateAggregate', function Before() {
   this.timeout(60000);
+  let clock;
   beforeEach(async () => {
     const queryInterface = db.sequelize.getQueryInterface();
     await queryInterface.bulkDelete('t_device_feature_state');
@@ -41,6 +44,12 @@ describe('Device.calculateAggregate', function Before() {
       },
       { where: {} },
     );
+    clock = sinon.useFakeTimers({
+      now: 1635131280000,
+    });
+  });
+  afterEach(() => {
+    clock.restore();
   });
   it('should calculate hourly aggregate', async () => {
     await insertStates(false);
