@@ -1515,7 +1515,7 @@
     "fahrenheit": "Fahrenheit (°F)",
     "percent": "Percent (%)",
     "pascal": "Pascal (Pa)",
-    "hectoPascal": "Hectopascal (hPa)",
+    "hPa": "Hectopascal (hPa)",
     "lux": "Lux",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
@@ -1532,7 +1532,7 @@
     "fahrenheit": "°F",
     "percent": "%",
     "pascal": "Pa",
-    "hectoPascal": "hPa",
+    "hPa": "hPa",
     "lux": "lx",
     "watt": "W",
     "kilowatt": "kW",
@@ -1659,6 +1659,10 @@
       "acceleration-y": "Acceleration Y",
       "acceleration-z": "Acceleration Z",
       "bed-activity": "Bed Activity"
+    },
+    "signal": {
+      "shortCategoryName": "Signal",
+      "integer": "Signal strength"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
