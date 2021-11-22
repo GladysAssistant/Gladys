@@ -8,7 +8,6 @@ const logger = require('../../utils/logger');
 
 const { BadParameters } = require('../../utils/coreErrors');
 const { EVENTS } = require('../../utils/constants');
-const { compare } = require('../../utils/compare');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
