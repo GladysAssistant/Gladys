@@ -14,7 +14,8 @@ const WEATHER_ICONS = {
   fog: 'icon-cloud-fog',
   sleet: 'icon-cloud-drizzle',
   wind: 'icon-wind',
-  night: 'icon-moon'
+  night: 'icon-moon',
+  thunderstorm: 'icon-cloud-lightning'
 };
 
 const translateWeatherToIcon = weather => get(WEATHER_ICONS, weather, { default: 'icon-question' });
