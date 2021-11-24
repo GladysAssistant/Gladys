@@ -17,7 +17,7 @@ const SensorDeviceType = ({ children, ...props }) => (
   <tr>
     <td>
       <i
-        class={`mr-2 icon-${get(
+        class={`mr-2 icon icon-${get(
           DeviceFeatureCategoriesIcon,
           `${props.deviceFeature.category}.${props.deviceFeature.type}`
         )}`}
