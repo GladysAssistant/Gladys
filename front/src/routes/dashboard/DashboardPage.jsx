@@ -53,8 +53,8 @@ const DashboardPage = ({ children, ...props }) => (
                         <span>
                           {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
                           {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
-                          {!props.fullScreen && <i class="icon icon-maximize-2" />}
-                          {props.fullScreen && <i class="icon icon-minimize-2" />}
+                          {!props.fullScreen && <i class="lucide icon-maximize-2" />}
+                          {props.fullScreen && <i class="lucide icon-minimize-2" />}
                         </span>
                       </button>
                     )}
@@ -64,7 +64,7 @@ const DashboardPage = ({ children, ...props }) => (
                         class={cx('btn btn-outline-primary ml-2', style.smallButtonOnBigScreen)}
                       >
                         <span>
-                          <Text id="dashboard.editDashboardButton" /> <i class="icon icon-edit" />
+                          <Text id="dashboard.editDashboardButton" /> <i class="lucide icon-edit" />
                         </span>
                       </button>
                     )}
@@ -73,7 +73,7 @@ const DashboardPage = ({ children, ...props }) => (
                       class={cx('btn btn-outline-success ml-2', style.smallButtonOnBigScreen)}
                     >
                       <span>
-                        <Text id="dashboard.newDashboardButton" /> <i class="icon icon-plus" />
+                        <Text id="dashboard.newDashboardButton" /> <i class="lucide icon-plus" />
                       </span>
                     </Link>
                   </div>

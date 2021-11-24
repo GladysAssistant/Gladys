@@ -21,7 +21,7 @@ class DiscoverTab extends Component {
           </h1>
           <div class="page-options d-flex">
             <button onClick={this.searchDevices} class="btn btn-outline-primary ml-2" disabled={props.loading}>
-              <Text id="integration.tasmota.discover.mqtt.scan" /> <i class="icon icon-radio" />
+              <Text id="integration.tasmota.discover.mqtt.scan" /> <i class="lucide icon-radio" />
             </button>
           </div>
         </div>

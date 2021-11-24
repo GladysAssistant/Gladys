@@ -43,7 +43,7 @@ const TriggerPage = connect(
               </select>
               <div class="input-icon ml-2">
                 <span class="input-icon-addon">
-                  <i class="icon icon-search" />
+                  <i class="lucide icon-search" />
                 </span>
                 <Localizer>
                   <input
@@ -55,7 +55,7 @@ const TriggerPage = connect(
                 </Localizer>
               </div>
               <button class="btn btn-outline-primary ml-2">
-                <Text id="scene.newButton" /> <i class="icon icon-plus" />
+                <Text id="scene.newButton" /> <i class="lucide icon-plus" />
               </button>
             </div>
           </div>

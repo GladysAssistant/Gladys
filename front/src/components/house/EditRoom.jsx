@@ -33,7 +33,7 @@ class EditRoom extends Component {
           />
           <div class="input-group-append" onClick={this.removeRoomLocal} style={{ cursor: 'pointer' }}>
             <div class="input-group-text">
-              <i class="icon icon-x" />
+              <i class="lucide icon-x" />
             </div>
           </div>
         </div>

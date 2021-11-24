@@ -12,7 +12,7 @@ const CameraBox = ({ children, ...props }) => (
     {props.error && (
       <div>
         <p class="alert alert-danger">
-          <i class="icon icon-bell" />
+          <i class="lucide icon-bell" />
           <span class="pl-2">
             <Text id="dashboard.boxes.camera.noImageToShow" />
           </span>

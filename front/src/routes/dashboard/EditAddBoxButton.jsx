@@ -29,7 +29,7 @@ const EditAddBoxButton = ({ children, ...props }) => (
     </div>
     <div class="col-4">
       <button onClick={addBox(props.addBox, props.x, props.type)} class="btn btn-block btn-outline-primary">
-        <i class="icon icon-plus" />
+        <i class="lucide icon-plus" />
       </button>
     </div>
   </div>

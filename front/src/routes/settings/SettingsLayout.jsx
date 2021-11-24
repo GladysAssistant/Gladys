@@ -21,7 +21,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-home" />
+                      <i class="lucide icon-home" />
                     </span>
                     <Text id="settings.housesTab" />
                   </Link>
@@ -34,7 +34,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     })}
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-user" />
+                      <i class="lucide icon-user" />
                     </span>
                     <Text id="settings.usersTab" />
                   </Link>
@@ -45,7 +45,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-smartphone" />
+                      <i class="lucide icon-smartphone" />
                     </span>
                     <Text id="settings.sessionsTab" />
                   </Link>
@@ -56,7 +56,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-globe" />
+                      <i class="lucide icon-globe" />
                     </span>
                     <Text id="settings.gatewayTab" />
                   </Link>
@@ -68,7 +68,7 @@ const DashboardSettings = ({ children, ...props }) => (
                       class="list-group-item list-group-item-action d-flex align-items-center"
                     >
                       <span class="icon mr-3">
-                        <i class="icon icon-user" />
+                        <i class="lucide icon-user" />
                       </span>
                       <Text id="settings.gatewayUsersTab" />
                     </Link>
@@ -81,7 +81,7 @@ const DashboardSettings = ({ children, ...props }) => (
                       class="list-group-item list-group-item-action d-flex align-items-center"
                     >
                       <span class="icon mr-3">
-                        <i class="icon icon-globe" />
+                        <i class="lucide icon-globe" />
                       </span>
                       <Text id="settings.gatewayOpenApiTab" />
                     </Link>
@@ -94,7 +94,7 @@ const DashboardSettings = ({ children, ...props }) => (
                       class="list-group-item list-group-item-action d-flex align-items-center"
                     >
                       <span class="icon mr-3">
-                        <i class="icon icon-credit-card" />
+                        <i class="lucide icon-credit-card" />
                       </span>
                       <Text id="settings.billingTab" />
                     </Link>
@@ -106,7 +106,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-database" />
+                      <i class="lucide icon-database" />
                     </span>
                     <Text id="settings.backupTab" />
                   </Link>
@@ -117,7 +117,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-cpu" />
+                      <i class="lucide icon-cpu" />
                     </span>
                     <Text id="settings.jobsTab" />
                   </Link>
@@ -128,7 +128,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-layout-grid" />
+                      <i class="lucide icon-layout-grid" />
                     </span>
                     <Text id="settings.serviceTab" />
                   </Link>
@@ -139,7 +139,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-power" />
+                      <i class="lucide icon-power" />
                     </span>
                     <Text id="settings.systemTab" />
                   </Link>

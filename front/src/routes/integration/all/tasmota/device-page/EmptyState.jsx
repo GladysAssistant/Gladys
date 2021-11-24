@@ -11,12 +11,12 @@ const EmptyState = () => (
       <div class="mt-5">
         <Link href="/dashboard/integration/device/tasmota/mqtt">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.tasmota.mqttDiscoverTab" /> <i class="icon icon-radio" />
+            <Text id="integration.tasmota.mqttDiscoverTab" /> <i class="lucide icon-radio" />
           </button>
         </Link>
         <Link href="/dashboard/integration/device/tasmota/http">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.tasmota.httpDiscoverTab" /> <i class="icon icon-globe" />
+            <Text id="integration.tasmota.httpDiscoverTab" /> <i class="lucide icon-globe" />
           </button>
         </Link>
       </div>

@@ -25,7 +25,7 @@ const SessionDeviceLabel = ({ session }) => {
 
   return (
     <div>
-      <i class={`icon icon-${icon} mr-2`} />
+      <i class={`lucide icon-${icon} mr-2`} />
       {label}
     </div>
   );

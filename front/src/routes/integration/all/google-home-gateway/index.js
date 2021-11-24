@@ -89,15 +89,15 @@ class GoogleHomeGateway extends Component {
                         </h4>
                         <ul class="list-unstyled leading-loose">
                           <li>
-                            <i class="icon icon-check text-success mr-2" aria-hidden="true" />{' '}
+                            <i class="lucide icon-check text-success mr-2" aria-hidden="true" />{' '}
                             <Text id="integration.googleHome.seeDevices" />
                           </li>
                           <li>
-                            <i class="icon icon-check text-success mr-2" aria-hidden="true" />{' '}
+                            <i class="lucide icon-check text-success mr-2" aria-hidden="true" />{' '}
                             <Text id="integration.googleHome.controlDevices" />
                           </li>
                           <li>
-                            <i class="icon icon-check text-success mr-2" aria-hidden="true" />{' '}
+                            <i class="lucide icon-check text-success mr-2" aria-hidden="true" />{' '}
                             <Text id="integration.googleHome.getNewDeviceValues" />
                           </li>
                         </ul>

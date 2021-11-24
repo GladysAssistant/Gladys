@@ -19,7 +19,7 @@ const PhilipsHuePage = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-radio" />
+                      <i class="lucide icon-radio" />
                     </span>
                     <Text id="integration.philipsHue.deviceTab" />
                   </Link>
@@ -30,7 +30,7 @@ const PhilipsHuePage = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-sliders" />
+                      <i class="lucide icon-sliders" />
                     </span>
                     <Text id="integration.philipsHue.setupTab" />
                   </Link>

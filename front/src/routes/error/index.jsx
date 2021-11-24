@@ -14,7 +14,7 @@ const Error = ({ type, url }) => (
           <Text id="errorPage.description" />
         </p>
         <a class="btn btn-primary" href="javascript:history.back()">
-          <i class="icon icon-arrow-left mr-2" />
+          <i class="lucide icon-arrow-left mr-2" />
           <Text id="errorPage.goBack" />
         </a>
       </div>

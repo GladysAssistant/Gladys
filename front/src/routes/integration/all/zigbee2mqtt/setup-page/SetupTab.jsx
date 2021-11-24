@@ -106,7 +106,7 @@ class SetupTab extends Component {
                       <td className={style.tdCenter}>
                         <hr className={style.line} />
                         <i
-                          className={cx('icon', {
+                          className={cx('lucide', {
                             'icon-check': props.gladysConnected,
                             'icon-x': !props.gladysConnected,
                             greenIcon: props.gladysConnected,
@@ -131,7 +131,7 @@ class SetupTab extends Component {
                       <td className={('text-center', style.tdCenter)}>
                         <hr className={style.line} />
                         <i
-                          className={cx('icon', {
+                          className={cx('lucide', {
                             'icon-check': props.zigbee2mqttConnected,
                             'icon-x': !props.zigbee2mqttConnected,
                             greenIcon: props.zigbee2mqttConnected,
@@ -259,7 +259,7 @@ class SetupTab extends Component {
                     <td>
                       {props.mqttRunning && (
                         <i
-                          className={cx('icon', {
+                          className={cx('lucide', {
                             'icon-check': props.gladysConnected,
                             'icon-x': !props.gladysConnected,
                             greenIcon: props.gladysConnected,
@@ -276,7 +276,7 @@ class SetupTab extends Component {
                     <td>
                       {props.zigbee2mqttRunning && (
                         <i
-                          className={cx('icon', {
+                          className={cx('lucide', {
                             'icon-check': props.zigbee2mqttConnected,
                             'icon-x': !props.zigbee2mqttConnected,
                             greenIcon: props.zigbee2mqttConnected,

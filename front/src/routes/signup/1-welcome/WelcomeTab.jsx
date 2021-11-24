@@ -36,14 +36,14 @@ const WelcomeStep = () => (
       <div class="row" style={margin70px}>
         <div class="col text-center">
           <Link class="btn btn-info btn-block" href="/signup/create-account-gladys-gateway">
-            <i class="icon icon-download-cloud" /> <Text id="signup.welcome.buttonCreateAccountGladysGateway" />
+            <i class="lucide icon-download-cloud" /> <Text id="signup.welcome.buttonCreateAccountGladysGateway" />
           </Link>
         </div>
       </div>
       <div class="row" style={margin20px}>
         <div class="col text-center">
           <Link class="btn btn-success btn-block" href="/signup/create-account-local">
-            <i class="icon icon-mail" /> <Text id="signup.welcome.buttonCreateAccountWithEmail" />
+            <i class="lucide icon-mail" /> <Text id="signup.welcome.buttonCreateAccountWithEmail" />
           </Link>
         </div>
       </div>

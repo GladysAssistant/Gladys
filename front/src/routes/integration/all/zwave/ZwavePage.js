@@ -19,7 +19,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-radio" />
+                      <i class="lucide icon-radio" />
                     </span>
                     <Text id="integration.zwave.deviceTab" />
                   </Link>
@@ -30,7 +30,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-sliders" />
+                      <i class="lucide icon-sliders" />
                     </span>
                     <Text id="integration.zwave.setupTab" />
                   </Link>
@@ -41,7 +41,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-wifi" />
+                      <i class="lucide icon-wifi" />
                     </span>
                     <Text id="integration.zwave.networkTab" />
                   </Link>
@@ -52,7 +52,7 @@ const DashboardSettings = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon icon-settings" />
+                      <i class="lucide icon-settings" />
                     </span>
                     <Text id="integration.zwave.settingsTab" />
                   </Link>

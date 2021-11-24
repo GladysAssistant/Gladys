@@ -24,7 +24,7 @@ const DeviceTab = ({ children, ...props }) => (
         </select>
         <div class="input-icon ml-2">
           <span class="input-icon-addon">
-            <i class="icon icon-search" />
+            <i class="lucide icon-search" />
           </span>
           <Localizer>
             <input
@@ -37,7 +37,7 @@ const DeviceTab = ({ children, ...props }) => (
         </div>
         <Link href="/dashboard/integration/device/mqtt/edit">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="scene.newButton" /> <i class="icon icon-plus" />
+            <Text id="scene.newButton" /> <i class="lucide icon-plus" />
           </button>
         </Link>
       </div>

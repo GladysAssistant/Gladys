@@ -17,7 +17,7 @@ const LightTemperatureDeviceType = ({ children, ...props }) => {
   return (
     <tr>
       <td>
-        <i class="icon icon-thermometer" />
+        <i class="lucide icon-thermometer" />
       </td>
       <td>{getDeviceName(props.device, props.deviceFeature)}</td>
 

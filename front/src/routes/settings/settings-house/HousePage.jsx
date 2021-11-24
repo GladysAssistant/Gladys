@@ -24,7 +24,7 @@ const HousePage = ({ children, ...props }) => (
         </select>
         <div class="input-icon ml-2">
           <span class="input-icon-addon">
-            <i class="icon icon-search" />
+            <i class="lucide icon-search" />
           </span>
           <Localizer>
             <input
@@ -36,7 +36,7 @@ const HousePage = ({ children, ...props }) => (
           </Localizer>
         </div>
         <button onClick={props.addHouse} class="btn btn-outline-primary ml-2">
-          <Text id="housesSettings.newButton" /> <i class="icon icon-plus" />
+          <Text id="housesSettings.newButton" /> <i class="lucide icon-plus" />
         </button>
       </div>
     </div>

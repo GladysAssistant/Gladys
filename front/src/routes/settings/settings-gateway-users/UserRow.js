@@ -25,7 +25,7 @@ const UserRow = ({ children, ...props }) => {
         {new Date(props.user.created_at).toLocaleDateString(props.user.language, dateDisplayOptions)}
       </td>
       <td class="w-1">
-        <i style={{ cursor: 'pointer' }} onClick={revokeUser} class="icon icon-trash-2" />
+        <i style={{ cursor: 'pointer' }} onClick={revokeUser} class="lucide icon-trash-2" />
       </td>
     </tr>
   );

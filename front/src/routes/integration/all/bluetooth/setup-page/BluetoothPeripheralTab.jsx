@@ -32,7 +32,7 @@ const BluetoothPeripheralTab = ({
             onClick={scan}
             disabled={!bluetoothStatus.ready || bluetoothStatus.peripheralLookup}
           >
-            <Text id="integration.bluetooth.discover.scanButton" /> <i class="icon icon-radio" />
+            <Text id="integration.bluetooth.discover.scanButton" /> <i class="lucide icon-radio" />
           </button>
         </div>
       </div>

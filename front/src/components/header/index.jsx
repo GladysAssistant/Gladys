@@ -64,11 +64,11 @@ const Header = ({ ...props }) => {
                   })}
                 >
                   <a class="dropdown-item" href="/dashboard/profile">
-                    <i class="dropdown-icon icon-user" /> <Text id="header.profile" />
+                    <i class="dropdown-lucide icon-user" /> <Text id="header.profile" />
                   </a>
                   {props.user.role === USER_ROLE.ADMIN && (
                     <a class="dropdown-item" href="/dashboard/settings/house">
-                      <i class="dropdown-icon icon-settings" /> <Text id="header.settings" />
+                      <i class="dropdown-lucide icon-settings" /> <Text id="header.settings" />
                     </a>
                   )}
                   <div class="dropdown-divider" />
@@ -78,10 +78,10 @@ const Header = ({ ...props }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <i class="dropdown-icon icon-help-circle" /> <Text id="header.needHelp" />
+                    <i class="dropdown-lucide icon-help-circle" /> <Text id="header.needHelp" />
                   </a>
                   <a class="dropdown-item" href="" onClick={props.logout}>
-                    <i class="dropdown-icon icon-log-out" /> <Text id="header.signOut" />
+                    <i class="dropdown-lucide icon-log-out" /> <Text id="header.signOut" />
                   </a>
                 </div>
               </div>
@@ -112,7 +112,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard'
                     })}
                   >
-                    <i class="icon icon-home" /> <Text id="header.home" />
+                    <i class="lucide icon-home" /> <Text id="header.home" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -122,7 +122,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/chat'
                     })}
                   >
-                    <i class="icon icon-message-square" /> <Text id="header.chat" />
+                    <i class="lucide icon-message-square" /> <Text id="header.chat" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -130,7 +130,7 @@ const Header = ({ ...props }) => {
                     href="/dashboard/integration"
                     class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
                   >
-                    <i class="icon icon-layout-grid" /> <Text id="header.integrations" />
+                    <i class="lucide icon-layout-grid" /> <Text id="header.integrations" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -140,7 +140,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/calendar'
                     })}
                   >
-                    <i class="icon icon-calendar" /> <Text id="header.calendar" />
+                    <i class="lucide icon-calendar" /> <Text id="header.calendar" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -151,7 +151,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/maps'
                     })}
                   >
-                    <i class="icon icon-map" /> <Text id="header.maps" />
+                    <i class="lucide icon-map" /> <Text id="header.maps" />
                   </Link>
                 </li>
                 {props.user.role === USER_ROLE.ADMIN && (
@@ -160,7 +160,7 @@ const Header = ({ ...props }) => {
                       href="/dashboard/scene"
                       class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
                     >
-                      <i class="icon icon-play" /> <Text id="header.scenes" />
+                      <i class="lucide icon-play" /> <Text id="header.scenes" />
                     </Link>
                   </li>
                 )}
