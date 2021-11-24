@@ -16,7 +16,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
   return (
     <tr>
       <td>
-        <i class="icon-toggle-right" />
+        <i class="icon icon-toggle-right" />
       </td>
       <td>{getDeviceName(props.device, props.deviceFeature)}</td>
       <td class="text-right">

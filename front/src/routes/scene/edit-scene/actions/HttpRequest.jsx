@@ -62,7 +62,7 @@ class Header extends Component {
         </div>
         <div class="col-2">
           <button class="btn btn-danger" onClick={this.deleteHeader}>
-            <i class="icon-trash" />
+            <i class="icon icon-trash" />
           </button>
         </div>
       </div>
@@ -239,7 +239,7 @@ class HttpRequestAction extends Component {
                     />
                   ))}
                 <button class="btn btn-secondary" onClick={this.addNewHeader}>
-                  <i class="icon-plus" />
+                  <i class="icon icon-plus" />
                 </button>
               </div>
               {displayBody && (

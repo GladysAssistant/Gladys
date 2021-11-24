@@ -10,7 +10,7 @@ dayjs.extend(relativeTime);
 const JobList = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      <i class="icon-cpu mr-3" />
+      <i class="icon icon-cpu mr-3" />
       <h3 class="card-title">
         <Text id="jobsSettings.jobsTitle" />
       </h3>

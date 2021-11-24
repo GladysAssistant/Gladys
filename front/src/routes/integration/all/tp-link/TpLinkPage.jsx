@@ -19,7 +19,7 @@ const TpLinkPage = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon-radio" />
+                      <i class="icon icon-radio" />
                     </span>
                     <Text id="integration.tpLink.deviceTab" />
                   </Link>

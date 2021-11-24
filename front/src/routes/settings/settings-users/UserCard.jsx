@@ -49,25 +49,25 @@ class SettingsUsers extends Component {
             <div class="btn-list text-center">
               {!confirmUserDeletion && (
                 <Link href={`/dashboard/settings/user/edit/${user.selector}`} class="btn btn-outline-primary btn-sm">
-                  <i class="icon-edit" />
+                  <i class="icon icon-edit" />
                   <Text id="usersSettings.editUserButton" />
                 </Link>
               )}
               {!confirmUserDeletion && loggedUser.id !== user.id && (
                 <button class="btn btn-outline-danger btn-sm" onClick={this.confirmUserDeletion}>
-                  <i class="icon-trash" />
+                  <i class="icon icon-trash" />
                   <Text id="usersSettings.deleteUserButton" />
                 </button>
               )}
               {confirmUserDeletion && (
                 <button class="btn btn-danger btn-sm" onClick={this.deleteUser}>
-                  <i class="icon-trash" />
+                  <i class="icon icon-trash" />
                   <Text id="usersSettings.confirmDeleteUserButton" />
                 </button>
               )}
               {confirmUserDeletion && (
                 <button class="btn btn-secondary btn-sm" onClick={this.cancelDeletion}>
-                  <i class="icon-x-circle" />
+                  <i class="icon icon-x-circle" />
                   <Text id="usersSettings.cancelDeleteUser" />
                 </button>
               )}

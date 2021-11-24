@@ -18,7 +18,7 @@ const DeviceTab = ({ children, ...props }) => (
           class="btn btn-outline-primary ml-2"
           disabled={props.loading}
         >
-          <Text id="integration.eWeLink.discover.scan" /> <i class="icon-radio" />
+          <Text id="integration.eWeLink.discover.scan" /> <i class="icon icon-radio" />
         </button>
       </div>
     </div>

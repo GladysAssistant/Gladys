@@ -7,7 +7,7 @@ const DeviceFeature = ({ feature }) => (
   <span class="tag">
     <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
     <div class="tag-addon">
-      <i class={`icon-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
+      <i class={`icon icon-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
     </div>
   </span>
 );

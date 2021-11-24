@@ -59,10 +59,10 @@ const ScenePage = connect(
             </h1>
             <div class="page-options d-flex">
               <button class="btn btn-sm btn-primary ml-2">
-                <Text id="editScene.runButton" /> <i class="icon-play" />
+                <Text id="editScene.runButton" /> <i class="icon icon-play" />
               </button>
               <button class="btn btn-sm btn-danger ml-2">
-                <Text id="editScene.deleteButton" /> <i class="icon-trash" />
+                <Text id="editScene.deleteButton" /> <i class="icon icon-trash" />
               </button>
             </div>
           </div>

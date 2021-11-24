@@ -112,7 +112,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard'
                     })}
                   >
-                    <i class="icon-home" /> <Text id="header.home" />
+                    <i class="icon icon-home" /> <Text id="header.home" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -122,7 +122,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/chat'
                     })}
                   >
-                    <i class="icon-message-square" /> <Text id="header.chat" />
+                    <i class="icon icon-message-square" /> <Text id="header.chat" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -130,7 +130,7 @@ const Header = ({ ...props }) => {
                     href="/dashboard/integration"
                     class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
                   >
-                    <i class="icon-layout-grid" /> <Text id="header.integrations" />
+                    <i class="icon icon-layout-grid" /> <Text id="header.integrations" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -140,7 +140,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/calendar'
                     })}
                   >
-                    <i class="icon-calendar" /> <Text id="header.calendar" />
+                    <i class="icon icon-calendar" /> <Text id="header.calendar" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -151,7 +151,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/maps'
                     })}
                   >
-                    <i class="icon-map" /> <Text id="header.maps" />
+                    <i class="icon icon-map" /> <Text id="header.maps" />
                   </Link>
                 </li>
                 {props.user.role === USER_ROLE.ADMIN && (
@@ -160,7 +160,7 @@ const Header = ({ ...props }) => {
                       href="/dashboard/scene"
                       class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
                     >
-                      <i class="icon-play" /> <Text id="header.scenes" />
+                      <i class="icon icon-play" /> <Text id="header.scenes" />
                     </Link>
                   </li>
                 )}

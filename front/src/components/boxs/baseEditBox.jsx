@@ -20,13 +20,13 @@ const BaseEditBox = ({ children, ...props }) => (
       </h3>
       <div class="card-options">
         <a onClick={moveBoxUp(props.moveBoxUp, props.x, props.y)} class="card-options-collapse">
-          <i class="icon-chevron-up" />
+          <i class="icon icon-chevron-up" />
         </a>
         <a onClick={moveBoxDown(props.moveBoxDown, props.x, props.y)} class="card-options-collapse">
-          <i class="icon-chevron-down" />
+          <i class="icon icon-chevron-down" />
         </a>
         <a onClick={removeBox(props.removeBox, props.x, props.y)} class="card-options-remove">
-          <i class="icon-x" />
+          <i class="icon icon-x" />
         </a>
       </div>
     </div>

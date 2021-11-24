@@ -58,13 +58,13 @@ const EditScenePage = ({ children, ...props }) => (
             </label>
             <div class="page-options d-flex">
               <button onClick={props.startScene} class="btn btn-sm btn-primary ml-2">
-                <Text id="editScene.startButton" /> <i class="icon-play" />
+                <Text id="editScene.startButton" /> <i class="icon icon-play" />
               </button>
               <button onClick={props.saveScene} disabled={props.saving} class="btn btn-sm btn-success ml-2">
-                <Text id="editScene.saveButton" /> <i class="icon-save" />
+                <Text id="editScene.saveButton" /> <i class="icon icon-save" />
               </button>
               <button onClick={props.deleteScene} class="btn btn-sm btn-danger ml-2">
-                <Text id="editScene.deleteButton" /> <i class="icon-trash" />
+                <Text id="editScene.deleteButton" /> <i class="icon icon-trash" />
               </button>
             </div>
           </div>
@@ -86,7 +86,7 @@ const EditScenePage = ({ children, ...props }) => (
             <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
               <div class="col-lg-12">
                 <div class="text-center">
-                  <i class="icon-arrow-down" />
+                  <i class="icon icon-arrow-down" />
                 </div>
               </div>
             </div>
@@ -116,7 +116,7 @@ const EditScenePage = ({ children, ...props }) => (
                 <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
                   <div class="col-lg-12">
                     <div class="text-center">
-                      <i class="icon-arrow-down" />
+                      <i class="icon icon-arrow-down" />
                     </div>
                   </div>
                 </div>

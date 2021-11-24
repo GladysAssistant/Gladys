@@ -17,7 +17,7 @@ const ActionGroup = ({ children, ...props }) => (
         </h4>
         <div class="card-options">
           <button onClick={addActionToColumn(props.index, props.addAction)} class="btn btn-outline-primary">
-            <Text id="editScene.addActionButton" /> <i class="icon-plus" />
+            <Text id="editScene.addActionButton" /> <i class="icon icon-plus" />
           </button>
         </div>
       </div>

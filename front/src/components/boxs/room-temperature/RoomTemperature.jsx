@@ -11,7 +11,7 @@ const RoomTemperatureBox = ({ children, ...props }) => (
   <div class="card p-3">
     <div class="d-flex align-items-center">
       <span class="stamp stamp-md bg-blue mr-3">
-        <i class="icon-thermometer" />
+        <i class="icon icon-thermometer" />
       </span>
       <div>
         {isNotNullOrUndefined(props.temperature) && (

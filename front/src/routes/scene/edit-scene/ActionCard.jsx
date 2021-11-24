@@ -55,7 +55,7 @@ const ActionCard = ({ children, ...props }) => (
     <div class="card">
       <div class="card-header">
         {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
-        {props.action.type === null && <i class="icon-plus-circle" />}
+        {props.action.type === null && <i class="icon icon-plus-circle" />}
         <div class="card-title">
           <i
             class={props.action.icon}
@@ -72,14 +72,14 @@ const ActionCard = ({ children, ...props }) => (
         <div class="card-options">
           {false && (
             <a class="card-options-collapse">
-              <i class="icon-chevron-down" />
+              <i class="icon icon-chevron-down" />
             </a>
           )}
           <a
             onClick={deleteActionFromColumn(props.columnIndex, props.index, props.deleteAction)}
             class="card-options-remove"
           >
-            <i class="icon-x" />
+            <i class="icon icon-x" />
           </a>
         </div>
       </div>

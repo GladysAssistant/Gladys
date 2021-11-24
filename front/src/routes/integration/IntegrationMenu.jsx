@@ -18,7 +18,7 @@ const IntegrationMenu = connect(
         class="list-group-item list-group-item-action d-flex align-items-center"
       >
         <span class="icon mr-3">
-          <i class="icon-hash" />
+          <i class="icon icon-hash" />
         </span>
         <Text id="integration.root.menu.all" />
       </Link>
@@ -29,8 +29,8 @@ const IntegrationMenu = connect(
           href={`/dashboard/integration/${category.type}`}
           class="list-group-item list-group-item-action d-flex align-items-center"
         >
-          <span class="icon mr-3">
-            <i class={`icon-${category.icon}`} />
+          <span class="mr-3">
+            <i class={`icon icon-${category.icon}`} />
           </span>
           <Text id={`integration.root.menu.${category.type}`} />
         </Link>

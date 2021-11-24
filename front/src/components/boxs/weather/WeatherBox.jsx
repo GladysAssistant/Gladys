@@ -35,7 +35,7 @@ const WeatherBox = ({ children, ...props }) => (
         </h4>
         <div class="card-body">
           <p class="alert alert-danger">
-            <i class="icon-bell" />
+            <i class="icon icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.houseHasNoCoordinates" />
             </span>
@@ -50,7 +50,7 @@ const WeatherBox = ({ children, ...props }) => (
         </h4>
         <div class="card-body">
           <p class="alert alert-danger">
-            <i class="icon-bell" />
+            <i class="icon icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.serviceNotConfigured" />
             </span>
@@ -65,7 +65,7 @@ const WeatherBox = ({ children, ...props }) => (
         </h4>
         <div class="card-body">
           <p class="alert alert-danger">
-            <i class="icon-bell" />
+            <i class="icon icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.unknownError" />
             </span>
@@ -90,7 +90,7 @@ const WeatherBox = ({ children, ...props }) => (
         </h4>
         <div class="card-body">
           <p class="alert alert-danger">
-            <i class="icon-bell" />
+            <i class="icon icon-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.weather.requestToThirdPartyFailed" />{' '}
               <Link href="/dashboard/integration/weather/openweather">
@@ -139,7 +139,7 @@ const WeatherBox = ({ children, ...props }) => (
             }}
           >
             <i
-              className={cx('fe', props.weatherIcon)}
+              className={cx('icon', props.weatherIcon)}
               style={{
                 fontSize: '50px'
               }}
@@ -150,7 +150,7 @@ const WeatherBox = ({ children, ...props }) => (
           <div className="col-9" style={{ padding: '0' }}>
             <span>
               <i
-                class="icon-droplet"
+                class="icon icon-droplet"
                 style={{
                   fpaddingRight: '5px'
                 }}
@@ -167,7 +167,7 @@ const WeatherBox = ({ children, ...props }) => (
             </span>
             <span className="float-right">
               <i
-                class="icon-wind"
+                class="icon icon-wind"
                 style={{
                   paddingRight: '5px'
                 }}
@@ -274,7 +274,7 @@ class WeatherBoxComponent extends Component {
                 {`${hour.datetime_beautiful}h`}
               </p>
               <p style={{ margin: 'auto', textAlign: 'center' }}>
-                <i className={cx('fe', hour.weatherIcon)} style={{ fontSize: '20px' }} />
+                <i className={cx('icon', hour.weatherIcon)} style={{ fontSize: '20px' }} />
               </p>
               <p style={{ margin: 'auto', textAlign: 'center', fontSize: '12px' }}>
                 <Text id="global.degreeValue" fields={{ value: hour.temperature }} />
@@ -298,7 +298,7 @@ class WeatherBoxComponent extends Component {
                   .format('dddd')}
               </div>
               <div className="col-3">
-                <i className={cx('fe', day.weatherIcon)} style={{ fontSize: '20px' }} />
+                <i className={cx('icon', day.weatherIcon)} style={{ fontSize: '20px' }} />
               </div>
               <div className="col-4" style={{ textAlign: 'right' }}>
                 <Text

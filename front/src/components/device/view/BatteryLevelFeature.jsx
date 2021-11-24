@@ -11,7 +11,7 @@ const BatteryLevelFeature = ({ batteryLevel }) => (
   >
     <Text id="global.percentValue" fields={{ value: batteryLevel }} />
     <span class="tag-addon">
-      <i class="icon-battery" />
+      <i class="icon icon-battery" />
     </span>
   </div>
 );

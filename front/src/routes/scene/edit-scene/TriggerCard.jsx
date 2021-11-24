@@ -17,17 +17,17 @@ const deleteTriggerFromList = (deleteTrigger, index) => () => {
 const TriggerCard = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      {props.trigger.type === EVENTS.DEVICE.NEW_STATE && <i class="icon-activity" />}
-      {props.trigger.type === EVENTS.TIME.CHANGED && <i class="icon-watch" />}
-      {props.trigger.type === EVENTS.TIME.SUNSET && <i class="icon-sunset" />}
-      {props.trigger.type === EVENTS.TIME.SUNRISE && <i class="icon-sunrise" />}
-      {props.trigger.type === EVENTS.USER_PRESENCE.BACK_HOME && <i class="icon-home" />}
-      {props.trigger.type === EVENTS.USER_PRESENCE.LEFT_HOME && <i class="icon-home" />}
-      {props.trigger.type === EVENTS.HOUSE.EMPTY && <i class="icon-home" />}
-      {props.trigger.type === EVENTS.HOUSE.NO_LONGER_EMPTY && <i class="icon-home" />}
-      {props.trigger.type === EVENTS.AREA.USER_ENTERED && <i class="icon-compass" />}
-      {props.trigger.type === EVENTS.AREA.USER_LEFT && <i class="icon-compass" />}
-      {props.trigger.type === null && <i class="icon-plus-circle" />}
+      {props.trigger.type === EVENTS.DEVICE.NEW_STATE && <i class="icon icon-activity" />}
+      {props.trigger.type === EVENTS.TIME.CHANGED && <i class="icon icon-watch" />}
+      {props.trigger.type === EVENTS.TIME.SUNSET && <i class="icon icon-sunset" />}
+      {props.trigger.type === EVENTS.TIME.SUNRISE && <i class="icon icon-sunrise" />}
+      {props.trigger.type === EVENTS.USER_PRESENCE.BACK_HOME && <i class="icon icon-home" />}
+      {props.trigger.type === EVENTS.USER_PRESENCE.LEFT_HOME && <i class="icon icon-home" />}
+      {props.trigger.type === EVENTS.HOUSE.EMPTY && <i class="icon icon-home" />}
+      {props.trigger.type === EVENTS.HOUSE.NO_LONGER_EMPTY && <i class="icon icon-home" />}
+      {props.trigger.type === EVENTS.AREA.USER_ENTERED && <i class="icon icon-compass" />}
+      {props.trigger.type === EVENTS.AREA.USER_LEFT && <i class="icon icon-compass" />}
+      {props.trigger.type === null && <i class="icon icon-plus-circle" />}
       <div class="card-title">
         <i
           class={props.trigger.icon}
@@ -41,11 +41,11 @@ const TriggerCard = ({ children, ...props }) => (
       <div class="card-options">
         {false && (
           <a class="card-options-collapse">
-            <i class="icon-chevron-down" />
+            <i class="icon icon-chevron-down" />
           </a>
         )}
         <a onClick={deleteTriggerFromList(props.deleteTrigger, props.index)} class="card-options-remove">
-          <i class="icon-x" />
+          <i class="icon icon-x" />
         </a>
       </div>
     </div>

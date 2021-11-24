@@ -19,7 +19,7 @@ const UserPage = ({ children, ...props }) => (
         </select>
         <div class="input-icon ml-2">
           <span class="input-icon-addon">
-            <i class="icon-search" />
+            <i class="icon icon-search" />
           </span>
           <Localizer>
             <input
@@ -32,7 +32,7 @@ const UserPage = ({ children, ...props }) => (
           </Localizer>
         </div>
         <Link href="/dashboard/settings/user/new" class="btn btn-outline-primary ml-2">
-          <Text id="usersSettings.newUserButton" /> <i class="icon-plus" />
+          <Text id="usersSettings.newUserButton" /> <i class="icon icon-plus" />
         </Link>
       </div>
     </div>

@@ -19,7 +19,7 @@ const BluetoothPage = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon-link" />
+                      <i class="icon icon-link" />
                     </span>
                     <Text id="integration.bluetooth.deviceTab" />
                   </Link>
@@ -30,7 +30,7 @@ const BluetoothPage = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon-radio" />
+                      <i class="icon icon-radio" />
                     </span>
                     <Text id="integration.bluetooth.discoverTab" />
                   </Link>
@@ -41,7 +41,7 @@ const BluetoothPage = ({ children, ...props }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="icon-settings" />
+                      <i class="icon icon-settings" />
                     </span>
                     <Text id="integration.bluetooth.setupTab" />
                   </Link>

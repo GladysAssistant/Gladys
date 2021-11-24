@@ -6,13 +6,13 @@ const EditActions = props => (
       <div class="row align-items-center flex-row-reverse">
         <div class="col-auto">
           <button onClick={props.cancelDashboardEdit} class="btn btn-outline-secondary btn-sm ml-2">
-            <Text id="dashboard.editDashboardCancelButton" /> <i class="icon-slash" />
+            <Text id="dashboard.editDashboardCancelButton" /> <i class="icon icon-slash" />
           </button>
           <button onClick={props.deleteCurrentDashboard} class="btn btn-outline-danger btn-sm ml-2">
-            <Text id="dashboard.editDashboardDeleteButton" /> <i class="icon-trash" />
+            <Text id="dashboard.editDashboardDeleteButton" /> <i class="icon icon-trash" />
           </button>
           <button onClick={props.saveDashboard} class="btn btn-outline-primary btn-sm ml-2">
-            <Text id="dashboard.editDashboardSaveButton" /> <i class="icon-check" />
+            <Text id="dashboard.editDashboardSaveButton" /> <i class="icon icon-check" />
           </button>
         </div>
       </div>
