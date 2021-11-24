@@ -64,11 +64,11 @@ const Header = ({ ...props }) => {
                   })}
                 >
                   <a class="dropdown-item" href="/dashboard/profile">
-                    <i class="dropdown-lucide icon-user" /> <Text id="header.profile" />
+                    <i class="dropdown-icon lucide icon-user" /> <Text id="header.profile" />
                   </a>
                   {props.user.role === USER_ROLE.ADMIN && (
                     <a class="dropdown-item" href="/dashboard/settings/house">
-                      <i class="dropdown-lucide icon-settings" /> <Text id="header.settings" />
+                      <i class="dropdown-icon lucide icon-settings" /> <Text id="header.settings" />
                     </a>
                   )}
                   <div class="dropdown-divider" />
@@ -78,10 +78,10 @@ const Header = ({ ...props }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <i class="dropdown-lucide icon-help-circle" /> <Text id="header.needHelp" />
+                    <i class="dropdown-icon lucide icon-help-circle" /> <Text id="header.needHelp" />
                   </a>
                   <a class="dropdown-item" href="" onClick={props.logout}>
-                    <i class="dropdown-lucide icon-log-out" /> <Text id="header.signOut" />
+                    <i class="dropdown-icon lucide icon-log-out" /> <Text id="header.signOut" />
                   </a>
                 </div>
               </div>
