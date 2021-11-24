@@ -6,7 +6,7 @@
   },
   "scripts": {
     "start": "per-env",
-    "start:production": "npm run -s serve",
+    "start:production": "npm run -s serve --host",
     "start:development": "npm run -s dev",
     "build": "cross-env NODE_ENV=production preact build --template src/template.html --no-prerender --no-inline-css",
     "postbuild": "cp ./old-sw.js ./build/sw.js",
@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^3.5.0",
-    "@gladysassistant/theme-optimized": "VonOx/theme-optimized#lucide-migration",
+    "@gladysassistant/theme-optimized": "git://github.com/VonOx/theme-optimized#lucide-migration",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "^4.5.0",
     "apexcharts": "^3.29.0",
