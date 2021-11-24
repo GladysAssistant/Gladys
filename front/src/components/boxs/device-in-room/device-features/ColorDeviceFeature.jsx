@@ -84,7 +84,7 @@ class ColorDeviceType extends Component {
       <Fragment>
         <tr>
           <td>
-            <i class="lucide icon-circle" />
+            <i class="lucide icon-palette" />
           </td>
           <td>{getDeviceName(device, deviceFeature)}</td>
           <td class="text-right">

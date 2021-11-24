@@ -40,8 +40,8 @@ const SensorDeviceType = ({ children, ...props }) => (
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
       <td class="text-right">
-        {props.deviceFeature.last_value === 1 && <i class="lucide icon-shield" />}
-        {props.deviceFeature.last_value === 0 && <i class="lucide icon-shield-off" />}
+        {props.deviceFeature.last_value === 1 && <i class="lucide icon-shield-check" />}
+        {props.deviceFeature.last_value === 0 && <i class="lucide icon-shield-close" />}
       </td>
     )}
     {LAST_SEEN_SENSORS.includes(props.deviceFeature.category) && (

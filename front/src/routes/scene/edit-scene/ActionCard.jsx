@@ -25,23 +25,23 @@ const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
 };
 
 const ACTION_ICON = {
-  [ACTIONS.LIGHT.TURN_ON]: 'icon-toggle-right',
-  [ACTIONS.LIGHT.TURN_OFF]: 'icon-toggle-left',
-  [ACTIONS.SWITCH.TURN_ON]: 'icon-toggle-right',
-  [ACTIONS.SWITCH.TURN_OFF]: 'icon-toggle-left',
-  [ACTIONS.TIME.DELAY]: 'icon-clock',
-  [ACTIONS.MESSAGE.SEND]: 'icon-message-square',
-  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'icon-shuffle',
-  [ACTIONS.DEVICE.GET_VALUE]: 'icon-refresh-cw',
-  [ACTIONS.USER.SET_SEEN_AT_HOME]: 'icon-home',
-  [ACTIONS.USER.SET_OUT_OF_HOME]: 'icon-home',
-  [ACTIONS.HTTP.REQUEST]: 'icon-link',
-  [ACTIONS.USER.CHECK_PRESENCE]: 'icon-home',
-  [ACTIONS.CONDITION.CHECK_TIME]: 'icon-watch',
-  [ACTIONS.SCENE.START]: 'icon-fast-forward',
-  [ACTIONS.HOUSE.IS_EMPTY]: 'icon-home',
-  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'icon-home',
-  [ACTIONS.DEVICE.SET_VALUE]: 'icon-radio'
+  [ACTIONS.LIGHT.TURN_ON]: 'lucide icon-toggle-right',
+  [ACTIONS.LIGHT.TURN_OFF]: 'lucide icon-toggle-left',
+  [ACTIONS.SWITCH.TURN_ON]: 'lucide icon-toggle-right',
+  [ACTIONS.SWITCH.TURN_OFF]: 'lucide icon-toggle-left',
+  [ACTIONS.TIME.DELAY]: 'lucide icon-clock',
+  [ACTIONS.MESSAGE.SEND]: 'lucide icon-message-square',
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'lucide icon-shuffle',
+  [ACTIONS.DEVICE.GET_VALUE]: 'lucide icon-refresh-cw',
+  [ACTIONS.USER.SET_SEEN_AT_HOME]: 'lucide icon-home',
+  [ACTIONS.USER.SET_OUT_OF_HOME]: 'lucide icon-home',
+  [ACTIONS.HTTP.REQUEST]: 'lucide icon-link',
+  [ACTIONS.USER.CHECK_PRESENCE]: 'lucide icon-home',
+  [ACTIONS.CONDITION.CHECK_TIME]: 'lucide icon-watch',
+  [ACTIONS.SCENE.START]: 'lucide icon-fast-forward',
+  [ACTIONS.HOUSE.IS_EMPTY]: 'lucide icon-home',
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'lucide icon-home',
+  [ACTIONS.DEVICE.SET_VALUE]: 'lucide icon-radio'
 };
 
 const ActionCard = ({ children, ...props }) => (
