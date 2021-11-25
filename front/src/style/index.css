@@ -230,3 +230,6 @@ body {
   pointer-events: auto;
   cursor: pointer;
 }
+.device-features {
+  min-height: 70px;
+}

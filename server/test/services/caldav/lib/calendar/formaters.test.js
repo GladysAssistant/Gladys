@@ -122,6 +122,7 @@ describe('CalDAV formaters', () => {
               new Date('2020-09-27T00:00:00Z'),
               new Date('2021-09-27T00:00:00Z'),
             ]),
+          after: sinon.stub().returns(new Date('2019-09-27T00:00:00Z')),
         },
         href: 'https://caldav.host.com/home/recur-event2',
       },
@@ -201,6 +202,7 @@ describe('CalDAV formaters', () => {
         location: 'Stade Roland-Garros',
         rrule: {
           between: sinon.stub().returns([new Date('2019-06-01T09:00:00Z'), new Date('2019-06-15T09:00:00Z')]),
+          after: sinon.stub().returns(new Date('2019-06-01T09:00:00Z')),
         },
         recurrences: {
           '2017-06-02T12:00:00Z': {},
@@ -225,6 +227,7 @@ describe('CalDAV formaters', () => {
               new Date('2020-09-27T00:00:00Z'),
               new Date('2021-09-27T00:00:00Z'),
             ]),
+          after: sinon.stub().returns(new Date('2019-09-27T00:00:00Z')),
         },
         href: 'https://caldav.host.com/home/recur-event2',
       },
@@ -242,6 +245,7 @@ describe('CalDAV formaters', () => {
               new Date('2019-06-17T09:00:00Z'),
               new Date('2019-06-24T09:00:00Z'),
             ]),
+          after: sinon.stub().returns(new Date('2019-06-10T09:00:00Z')),
         },
         recurrences: {
           '2019-06-10': {
@@ -271,6 +275,7 @@ describe('CalDAV formaters', () => {
         location: 'Jardin',
         rrule: {
           between: sinon.stub().returns([new Date('2019-06-20T16:00:00Z'), new Date('2019-06-21T16:00:00Z')]),
+          after: sinon.stub().returns(new Date('2019-06-20T16:00:00Z')),
         },
         href: 'https://caldav.host.com/home/recur-event4',
       },

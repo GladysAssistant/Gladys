@@ -1,10 +1,9 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import get from 'get-value';
 
-import style from './style.css';
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../utils/consts';
+import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class XiaomiSensor extends Component {
   createDevice = async () => {
@@ -45,18 +44,7 @@ class XiaomiSensor extends Component {
               <div class="card-body">
                 {props.sensor.features.length > 0 && (
                   <div class="form-group">
-                    <div class={cx('tags', style.tagsList)}>
-                      {props.sensor.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    </div>
+                    <DeviceFeatures features={props.sensor.features} />
                   </div>
                 )}
                 <div class="form-group">

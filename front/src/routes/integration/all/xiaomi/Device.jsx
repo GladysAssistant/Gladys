@@ -3,8 +3,11 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
+
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../utils/consts';
+import BatteryLevelFeature from '../../../../components/device/view/BatteryLevelFeature';
+import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class XiaomiDeviceBox extends Component {
   refreshDeviceProperty = () => {
@@ -69,12 +72,7 @@ class XiaomiDeviceBox extends Component {
             <h3 class="card-title">{props.device.name}</h3>
             {batteryLevel && (
               <div class="page-options d-flex">
-                <div class="tag tag-green">
-                  <Text id="global.percentValue" fields={{ value: batteryLevel }} />
-                  <span class="tag-addon">
-                    <i class="fe fe-battery" />
-                  </span>
-                </div>
+                <BatteryLevelFeature batteryLevel={batteryLevel} />
               </div>
             )}
           </div>
@@ -124,23 +122,7 @@ class XiaomiDeviceBox extends Component {
                   <label>
                     <Text id="integration.xiaomi.device.featuresLabel" />
                   </label>
-                  <div class="tags">
-                    {props.device &&
-                      props.device.features &&
-                      props.device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    {(!props.device.features || props.device.features.length === 0) && (
-                      <Text id="integration.xiaomi.device.noFeatures" />
-                    )}
-                  </div>
+                  <DeviceFeatures features={props.device.features} />
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">

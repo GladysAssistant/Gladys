@@ -17,7 +17,6 @@ describe('zigbee2mqtt convertDevice', () => {
       features: [],
       should_poll: false,
       service_id: serviceId,
-      supported: false,
     };
     return assert.deepEqual(result, notManagedGladysDevice);
   });
@@ -54,12 +53,11 @@ describe('zigbee2mqtt convertDevice', () => {
           name: 'Action',
           selector: `zigbee2mqtt-xiaomi-aqara-sensor-button-click-action`,
           type: 'click',
-          unit: undefined,
+          unit: null,
         },
       ],
       should_poll: false,
       service_id: serviceId,
-      supported: true,
     };
     return assert.deepEqual(result, managedGladysDevice);
   });

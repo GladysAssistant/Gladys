@@ -47,6 +47,11 @@ function formatRecurringEvents(event, gladysCalendar) {
     });
   }
 
+  // Diff between start date & first occurence to handle Timezone issue in rrule lib
+  const startDiff = event.rrule.after(startDate.toDate(), true) - startDate.toDate();
+  // Initial local offset to handle daylight saving time (DST)
+  const initLocalOffset = startDate.utcOffset();
+
   // Loop through the set of date entries to see which recurrences should be printed.
   return dates.map((date, i) => {
     let curEvent = event;
@@ -103,9 +108,13 @@ function formatRecurringEvents(event, gladysCalendar) {
       }
 
       if (newEvent.full_day) {
-        startDate = startDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
-        endDate = endDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 });
+        startDate = startDate.subtract(startDiff, 'ms');
+        endDate = endDate.subtract(startDiff, 'ms');
       }
+
+      // update start/end with DST offset
+      startDate = startDate.add(initLocalOffset - startDate.utcOffset(), 'm');
+      endDate = endDate.add(initLocalOffset - endDate.utcOffset(), 'm');
 
       newEvent.start = startDate.format();
       newEvent.end = endDate.format();

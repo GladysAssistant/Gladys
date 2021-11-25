@@ -41,6 +41,9 @@
     "event": "Event",
     "noEventsInRange": "There are no events in this range."
   },
+  "device": {
+    "noFeatures": "No features"
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Welcome",
@@ -433,7 +436,6 @@
         "noNameLabel": "No name",
         "roomLabel": "Room",
         "featuresLabel": "Features",
-        "noFeatures": "No features",
         "search": "Search devices",
         "connectButton": "Connect/Reconnect",
         "scanButton": "Scan network",
@@ -503,7 +505,6 @@
       },
       "discover": {
         "title": "Zigbee2mqtt discover",
-        "device": "({{nbDevices}}) Devices",
         "permitJoin": "Permit joining",
         "noDeviceDiscovered": "No new device discovered, please click on scan button.",
         "serverNoResponse": "Gladys server is not available.",
@@ -520,6 +521,7 @@
       "featuresLabel": "Features",
       "saveButton": "Save",
       "deleteButton": "Delete",
+      "updateButton": "Update",
       "alreadyExistsButton": "Already created",
       "saveError": "There was an error saving the device.",
       "documentation": "Zigbee2mqtt documentation"
@@ -553,7 +555,6 @@
         "nameLabel": "Name",
         "roomLabel": "Room",
         "featuresLabel": "Features",
-        "noFeatures": "No features",
         "saveButton": "Save",
         "deleteButton": "Delete",
         "editButton": "Edit",
@@ -575,7 +576,6 @@
         "createDeviceInGladys": "Connect in Gladys",
         "features": "Features",
         "params": "Params",
-        "noFeatures": "No features",
         "nodeId": "Node",
         "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
         "createDeviceError": "There was an error while creating this device in Gladys.",
@@ -645,7 +645,6 @@
         "externalIdLabel": "External ID",
         "roomLabel": "Room",
         "featuresLabel": "Features",
-        "noFeatures": "No features",
         "saveButton": "Save",
         "deleteButton": "Delete",
         "returnButton": "Return back",
@@ -714,8 +713,7 @@
         "featuresLabel": "Features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "editButton": "Edit details",
-        "noFeatures": "No features"
+        "editButton": "Edit details"
       },
       "setup": {
         "title": "Xiaomi devices not in Gladys",
@@ -812,7 +810,6 @@
         "title": "Bluetooth Devices",
         "search": "Search devices",
         "noDevices": "No Bluetooth devices added yet.",
-        "noFeatures": "No features",
         "nameLabel": "Name",
         "namePlaceholder": "Enter device name",
         "roomLabel": "Room",
@@ -821,7 +818,6 @@
         "modelLabel": "Model",
         "presenceSensorLabel": "Use this device as presence sensor",
         "featuresLabel": "Features",
-        "noFeatureDiscovered": "No features discovered.",
         "featureNamePlaceholder": "Enter feature name",
         "saveButton": "Save",
         "deleteButton": "Delete",
@@ -1545,7 +1541,7 @@
     "fahrenheit": "Fahrenheit (°F)",
     "percent": "Percent (%)",
     "pascal": "Pascal (Pa)",
-    "hectoPascal": "Hectopascal (hPa)",
+    "hPa": "Hectopascal (hPa)",
     "lux": "Lux",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
@@ -1562,7 +1558,7 @@
     "fahrenheit": "°F",
     "percent": "%",
     "pascal": "Pa",
-    "hectoPascal": "hPa",
+    "hPa": "hPa",
     "lux": "lx",
     "watt": "W",
     "kilowatt": "kW",
@@ -1690,6 +1686,10 @@
       "acceleration-z": "Acceleration Z",
       "bed-activity": "Bed Activity"
     },
+    "signal": {
+      "shortCategoryName": "Signal",
+      "integer": "Signal strength"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
@@ -1743,7 +1743,6 @@
     "roomLabel": "Room",
     "featuresLabel": "Features",
     "featureCategoryLabel": "Category",
-    "noFeatures": "No features",
     "namePlaceholder": "Enter name",
     "externalIdLabel": "External ID",
     "externalIdPlaceholder": "Enter external ID",
