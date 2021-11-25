@@ -505,7 +505,6 @@
       },
       "discover": {
         "title": "Zigbee2mqtt discover",
-        "device": "({{nbDevices}}) Devices",
         "permitJoin": "Permit joining",
         "noDeviceDiscovered": "No new device discovered, please click on scan button.",
         "serverNoResponse": "Gladys server is not available.",
@@ -522,6 +521,7 @@
       "featuresLabel": "Features",
       "saveButton": "Save",
       "deleteButton": "Delete",
+      "updateButton": "Update",
       "alreadyExistsButton": "Already created",
       "saveError": "There was an error saving the device.",
       "documentation": "Zigbee2mqtt documentation"
