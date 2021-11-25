@@ -909,7 +909,6 @@ const data = {
           value: 'WSDCGQ11LM'
         }
       ],
-      supported: true,
       features: [
         {
           category: 'pressure-sensor',
@@ -929,7 +928,7 @@ const data = {
       selector: 'zigbee2mqtt-0x00158d0005828ece',
       room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
       model: 'WSDCGQ11LM',
-      supported: true,
+      updatable: true,
       created_at: '2019-02-12T07:49:07.556Z',
       params: [
         {
@@ -953,7 +952,6 @@ const data = {
       name: '0x00158d00033e88d5',
       service_id: 'f87b7af2-ca8e-44fc-b754-444354b42fee',
       should_poll: false,
-      supported: true,
       external_id: 'zigbee2mqtt:0x00158d00033e88d5',
       features: [
         {
@@ -999,7 +997,6 @@ const data = {
       external_id: 'zigbee2mqtt:0x00158d0005828ece',
       selector: 'zigbee2mqtt-0x00158d0005828ece',
       room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
-      supported: false,
       features: [
         {
           category: 'battery',

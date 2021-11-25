@@ -11,12 +11,7 @@ const DeviceTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
-        <tr>
-          <td class="text-right">
-            <Text id="integration.zigbee2mqtt.device.title" />
-          </td>
-          <td>{props.zigbee2mqttDevices && <div>&nbsp;{`(${props.zigbee2mqttDevices.length})`}</div>}</td>
-        </tr>
+        <Text id="integration.zigbee2mqtt.device.title" />
       </h1>
       <div class="page-options d-flex">
         <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">

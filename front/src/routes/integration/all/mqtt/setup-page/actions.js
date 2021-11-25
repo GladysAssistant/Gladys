@@ -4,6 +4,18 @@ import { RequestStatus } from '../../../../../utils/consts';
 const createActions = store => {
   const integrationActions = createActionsIntegration(store);
   const actions = {
+    async loadStatus(state) {
+      let mqttStatus = {
+        connected: false
+      };
+      try {
+        mqttStatus = await state.httpClient.get('/api/v1/service/mqtt/status');
+      } finally {
+        store.setState({
+          mqttConnected: mqttStatus.connected
+        });
+      }
+    },
     async loadProps(state) {
       let configuration = {};
       try {
@@ -44,8 +56,6 @@ const createActions = store => {
         store.setState({
           connectMqttStatus: RequestStatus.Success
         });
-
-        setTimeout(() => store.setState({ connectMqttStatus: undefined }), 3000);
       } catch (e) {
         store.setState({
           connectMqttStatus: RequestStatus.Error,
@@ -57,16 +67,9 @@ const createActions = store => {
       // display 3 seconds a message "MQTT connected"
       store.setState({
         mqttConnected: true,
+        connectMqttStatus: undefined,
         mqttConnectionError: undefined
       });
-      setTimeout(
-        () =>
-          store.setState({
-            mqttConnected: false,
-            connectMqttStatus: undefined
-          }),
-        3000
-      );
     },
     displayMqttError(state, error) {
       store.setState({
