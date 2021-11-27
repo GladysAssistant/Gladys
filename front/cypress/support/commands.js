@@ -36,6 +36,13 @@ Cypress.on('window:before:load', window => {
 
       cypressWebSockets.push(this);
     }
+
+    onmessage(event) {
+      return new Cypress.Promise(resolve => {
+        this.onmessage(event);
+        resolve(event);
+      });
+    }
   };
 });
 
