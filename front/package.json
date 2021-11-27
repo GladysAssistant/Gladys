@@ -51,7 +51,7 @@
     "axios": "^0.21.1",
     "classnames": "^2.3.1",
     "cropperjs": "^1.5.12",
-    "date-fns": "^2.23.0",
+    "date-fns": "^2.22.1",
     "dayjs": "^1.10.6",
     "debounce": "^1.2.1",
     "dotenv": "^6.2.0",
