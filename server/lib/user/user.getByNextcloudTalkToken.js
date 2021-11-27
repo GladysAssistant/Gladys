@@ -14,13 +14,25 @@ const { NotFoundError } = require('../../utils/coreErrors');
 async function getByNextcloudTalkToken(nextcloudTalkToken) {
   const user = await db.User.findOne({
     where: { nextcloud_talk_token: nextcloudTalkToken },
-    attributes: ['id', 'language'],
-    raw: true,
+    attributes: [
+      'id',
+      'firstname',
+      'lastname',
+      'selector',
+      'email',
+      'language',
+      'birthdate',
+      'role',
+      'temperature_unit_preference',
+      'distance_unit_preference',
+      'created_at',
+      'updated_at',
+    ],
   });
   if (user === null) {
     throw new NotFoundError(`User with nextcloud_talk_token "${nextcloudTalkToken}" not found`);
   }
-  return user;
+  return user.get({ plain: true });
 }
 
 module.exports = {

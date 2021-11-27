@@ -24,6 +24,7 @@ async function getById(id) {
       'role',
       'temperature_unit_preference',
       'distance_unit_preference',
+      'nextcloud_talk_token',
       'created_at',
       'updated_at',
     ],

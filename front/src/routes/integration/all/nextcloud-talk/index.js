@@ -5,7 +5,7 @@ import NextcloudTalkPage from './NextcloudTalk';
 import { RequestStatus } from '../../../../utils/consts';
 
 @connect(
-  'user,nextcloudUrl,nextcloudBotUsername,nextcloudBotPassword,nextcloudTalkSaveSettingsStatus,nextcloudTalkGetSettingsStatus',
+  'user,nextcloudUrl,nextcloudBotUsername,nextcloudBotPassword,nextcloudBotToken,nextcloudTalkSaveSettingsStatus,nextcloudTalkGetSettingsStatus',
   actions
 )
 class NextcloudTalkIntegration extends Component {

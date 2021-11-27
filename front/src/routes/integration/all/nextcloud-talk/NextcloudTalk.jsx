@@ -69,6 +69,21 @@ const NextcloudTalkPage = ({ children, ...props }) => (
                           />
                         </Localizer>
                       </div>
+                      <div class="form-group">
+                        <div class="form-label">
+                          <Text id={`integration.nextcloudTalk.token`} />
+                        </div>
+                        <Text id={`integration.nextcloudTalk.tokenInfo`} />
+                        <Localizer>
+                          <input
+                            type="text"
+                            class="form-control"
+                            placeholder={<Text id={`integration.nextcloudTalk.token`} />}
+                            onInput={props.updateNextcloudBotToken}
+                            value={props.nextcloudBotToken}
+                          />
+                        </Localizer>
+                      </div>
                       {props.nextcloudTalkSaveSettingsStatus === NextcloudTalkStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.nextcloudTalk.configurationError" />

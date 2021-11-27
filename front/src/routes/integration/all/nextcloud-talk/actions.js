@@ -16,6 +16,11 @@ const actions = store => ({
       nextcloudBotPassword: e.target.value
     });
   },
+  updateNextcloudBotToken(state, e) {
+    store.setState({
+      nextcloudBotToken: e.target.value
+    });
+  },
   async getNextcloudTalkSetting(state) {
     store.setState({
       nextcloudTalkGetSettingsStatus: NextcloudTalkStatus.Getting
@@ -24,11 +29,13 @@ const actions = store => ({
     let nextcloudUrl = '';
     let nextcloudBotUsername = '';
     let nextcloudBotPassword = '';
+    let nextcloudBotToken = '';
 
     store.setState({
       nextcloudUrl,
       nextcloudBotUsername,
-      nextcloudBotPassword
+      nextcloudBotPassword,
+      nextcloudBotToken
     });
 
     try {
@@ -53,6 +60,9 @@ const actions = store => ({
       );
       nextcloudBotPassword = password;
 
+      const { nextcloud_talk_token: token } = await state.httpClient.get('/api/v1/me');
+      nextcloudBotToken = token;
+
       store.setState({
         nextcloudTalkGetSettingsStatus: NextcloudTalkStatus.Success
       });
@@ -65,7 +75,8 @@ const actions = store => ({
     store.setState({
       nextcloudUrl,
       nextcloudBotUsername,
-      nextcloudBotPassword
+      nextcloudBotPassword,
+      nextcloudBotToken
     });
   },
   async saveNextcloudTalkSettings(state) {
@@ -88,6 +99,8 @@ const actions = store => ({
         value: state.nextcloudBotPassword,
         userRelated: true
       });
+      // save Nextcloud Talk token
+      await state.httpClient.patch('/api/v1/me', { nextcloud_talk_token: state.nextcloudBotToken });
       // start service
       await state.httpClient.post('/api/v1/service/nextcloud-talk/start');
 

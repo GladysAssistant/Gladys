@@ -326,6 +326,8 @@
       "usernameInfo": "Enter Nextcloud bot account username.",
       "password": "Password Nextcloud bot account",
       "passwordInfo": "Enter Nextcloud bot account password.",
+      "token": "Bot conversation token",
+      "tokenInfo": "Enter conversation token between your Nextcloud account and the bot account.",
       "configurationError": "Failed to save configration.",
       "configurationSuccess": "Successfully saved configuration.",
       "buttonSave": "Save"
