@@ -164,12 +164,6 @@ module.exports = {
         max: 150,
       },
     },
-    vibration: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-      },
-    },
     voltage: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
