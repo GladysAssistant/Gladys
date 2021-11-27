@@ -197,7 +197,6 @@ const AppRouter = connect(
           path="/dashboard/integration/device/philips-hue"
           to="/dashboard/integration/device/philips-hue/device"
         />
-        <Redirect path="/dashboard/integration/device/rflink" to="/dashboard/integration/device/rflink/device" />
         <PhilipsHueSetupPage path="/dashboard/integration/device/philips-hue/setup" />
         <PhilipsHueDevicePage path="/dashboard/integration/device/philips-hue/device" />
         <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
@@ -225,6 +224,7 @@ const AppRouter = connect(
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
         <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
+        <Redirect path="/dashboard/integration/device/rflink" to="/dashboard/integration/device/rflink/device" />
         <RflinkDevicePage path="/dashboard/integration/device/rflink/device" />
         <RflinkSettingsPage path="/dashboard/integration/device/rflink/settings" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/" />
