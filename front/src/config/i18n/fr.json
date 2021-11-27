@@ -715,7 +715,6 @@
       },
       "discover": {
         "title": "Découverte du réseau Zigbee",
-        "device": "({{nbDevices}}) Appareils",
         "permitJoin": "Autoriser l'association",
         "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "serverNoResponse": "Gladys n'est pas accessible.",
@@ -732,6 +731,7 @@
       "featuresLabel": "Fonctionnalités",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
+      "updateButton": "Mettre à jour",
       "alreadyExistsButton": "Déjà créé",
       "saveError": "Une erreur s'est produite lors de la sauvegarde.",
       "documentation": "Documentation Zigbee2mqtt"
@@ -904,7 +904,7 @@
         "passwordPlaceholder": "Entrez le mot de passe du broker MQTT",
         "saveLabel": "Sauvegarder la configuration",
         "error": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
-        "connecting": "Configuration enregistrée. Maintenant, connectez-vous à votre broker MQTT...",
+        "connecting": "Configuration enregistrée. Connexion au broker MQTT en cours...",
         "connected": "Connecté au broker MQTT avec succès !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
         "disconnected": "Déconnecté du broker MQTT."
@@ -1600,7 +1600,7 @@
     "fahrenheit": "Fahrenheit (°F)",
     "percent": "Pourcent (%)",
     "pascal": "Pascal (Pa)",
-    "hectoPascal": "Hectopascal (hPa)",
+    "hPa": "Hectopascal (hPa)",
     "lux": "Lux",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
@@ -1617,7 +1617,7 @@
     "fahrenheit": "°F",
     "percent": "%",
     "pascal": "Pa",
-    "hectoPascal": "hPa",
+    "hPa": "hPa",
     "lux": "lx",
     "watt": "W",
     "kilowatt": "kW",
@@ -1744,6 +1744,10 @@
       "acceleration-y": "Accélération Y",
       "acceleration-z": "Accélération Z",
       "bed-activity": "Activité Lit"
+    },
+    "signal": {
+      "shortCategoryName": "Signal",
+      "integer": "Intensité du signal"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
