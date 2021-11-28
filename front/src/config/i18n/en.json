@@ -311,7 +311,7 @@
       "settingsTab": "Settings",
       "deviceTab": "Devices",
       "roomLabel": "Room",
-      "urlPlaceholder": "url",
+      "namePlaceholder": "Enter the name of your device",
       "settings": {
         "title": "RFLink Usb Settings",
         "description": "To use RFLink in Gladys, you need to have a RFLink gateway connected to your Gladys instance.",

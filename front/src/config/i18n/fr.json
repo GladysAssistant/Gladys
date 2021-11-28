@@ -436,7 +436,7 @@
       "settingsTab": "Paramètres",
       "deviceTab": "Appareils",
       "roomLabel": "Pièce",
-      "urlPlaceholder": "url",
+      "namePlaceholder": "Entrez le nom de votre appareil",
       "settings": {
         "title": "Configurations USB",
         "description": "Pour utiliser le module RFLink dans Gladys, vous devez avoir une passerelle RFLink connectée à votre instance Gladys.",

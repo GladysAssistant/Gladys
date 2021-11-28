@@ -86,7 +86,7 @@ class RflinkDeviceBox extends Component {
                       value={props.device.name}
                       onInput={this.updateName}
                       class="form-control"
-                      placeholder={<Text id="integration.rflink.urlPlaceholder" />}
+                      placeholder={<Text id="integration.rflink.namePlaceholder" />}
                     />
                   </Localizer>
                 </div>
