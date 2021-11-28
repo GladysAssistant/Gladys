@@ -54,6 +54,7 @@ describe('POST /api/v1/service/rflink/connect', () => {
 
   beforeEach(() => {
     controller = RFLinkController(gladys, rflinkHandler, serviceId);
+    sinon.reset();
   });
 
   afterEach(() => {
@@ -65,10 +66,11 @@ describe('POST /api/v1/service/rflink/connect', () => {
     const res = {
       json: fake.returns(null),
     };
+    gladys.variable.getValue = stub().withArgs('RFLINK_PATH').resolves('//tty');
     await controller['post /api/v1/service/rflink/connect'].controller(req, res);
     assert.calledOnce(gladys.variable.getValue);
-    // @Todo assert.calledOnce(rflinkHandler.connect);
-    // @Todo assert.calledOnce(res.json);
+    assert.calledOnce(rflinkHandler.connect);
+    assert.calledWith(res.json, { success: true });
   });
 
   it('should raise an error on connection when no path is given', async () => {
@@ -84,8 +86,8 @@ describe('POST /api/v1/service/rflink/connect', () => {
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
     }
-    // @Todo assert.calledOnce(rflinkHandler.connect);
-    // @Todo assert.calledOnce(res.json); KO for unknown reason :(
+    assert.notCalled(rflinkHandler.connect);
+    assert.notCalled(res.json);
   });
 });
 
@@ -128,7 +130,7 @@ describe('POST /api/v1/service/rflink/pair', () => {
     };
     await controller['post /api/v1/service/rflink/pair'].controller(req, res);
     assert.calledOnce(gladys.variable.getValue);
-    // @Todo assert.calledOnce(res.json);
+    assert.calledOnce(res.json);
   });
 
   it('should send a milight pairing command even without a milight zone defined nor a gateway', async () => {
@@ -145,8 +147,8 @@ describe('POST /api/v1/service/rflink/pair', () => {
       json: fake.returns(null),
     };
     await controller['post /api/v1/service/rflink/pair'].controller(req, res);
-    // assert.calledWith(rflinkHandler.pair, rflinkHandler.currentMilightGateway, 1);
-    // @Todo assert.calledOnce(res.json);
+    assert.calledWith(rflinkHandler.pair, rflinkHandler.currentMilightGateway, 1);
+    assert.calledOnce(res.json);
   });
 });
 
@@ -154,6 +156,7 @@ describe('POST /api/v1/service/rflink/unpair', () => {
   let controller;
 
   beforeEach(() => {
+    sinon.reset();
     controller = RFLinkController(gladys, rflinkHandler, serviceId);
   });
 
@@ -170,9 +173,9 @@ describe('POST /api/v1/service/rflink/unpair', () => {
       json: fake.returns(null),
     };
     await controller['post /api/v1/service/rflink/unpair'].controller(req, res);
-    // assert.calledWith(rflinkHandler.unpair, rflinkHandler.currentMilightGateway, 1);
-    // @ Todo assert.calledOnce(rflinkHandler.unpair);
-    // @ Todo assert.calledOnce(res.json);
+    assert.calledWith(rflinkHandler.unpair, rflinkHandler.currentMilightGateway, 1);
+    assert.calledOnce(rflinkHandler.unpair);
+    assert.calledOnce(res.json);
   });
 
   it('should send a milight unpairing command', async () => {
@@ -185,8 +188,8 @@ describe('POST /api/v1/service/rflink/unpair', () => {
       json: fake.returns(null),
     };
     await controller['post /api/v1/service/rflink/unpair'].controller(req, res);
-    // @ Todo assert.calledOnce(rflinkHandler.unpair);
-    // @ Todo assert.calledOnce(res.json);
+    assert.calledOnce(rflinkHandler.unpair);
+    assert.calledOnce(res.json);
   });
 });
 

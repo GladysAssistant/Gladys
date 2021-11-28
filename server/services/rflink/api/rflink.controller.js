@@ -25,7 +25,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
     }
     RFlinkManager.connect(rflinkPath);
-    res.json({ succes: true });
+    res.json({ success: true });
   }
 
   /**
