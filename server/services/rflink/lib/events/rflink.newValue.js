@@ -55,10 +55,10 @@ function newValue(device, deviceFeature, state) {
         state: value,
       });
     } else {
-      logger.log(`device id to change: ${device.id}`);
+      logger.debug(`device id to change: ${device.id}`);
     }
   } else {
-    logger.log(`device feature to change: ${deviceFeature}`);
+    logger.debug(`device feature to change: ${deviceFeature}`);
   }
 }
 
