@@ -6,6 +6,10 @@ module.exports = {
     return value;
   },
   readValue: (expose, value) => {
+    if (expose.name === 'lqi') {
+      return Math.round((value * 5) / 255);
+    }
+
     return value;
   },
   feature: {
@@ -137,6 +141,14 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
         min: -100,
         max: 150,
+      },
+    },
+    lqi: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIGNAL,
+        type: DEVICE_FEATURE_TYPES.SIGNAL.QUALITY,
+        min: 0,
+        max: 5,
       },
     },
     power: {
