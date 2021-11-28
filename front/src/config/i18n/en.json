@@ -321,7 +321,7 @@
         "refreshButton": "Refresh USB list",
         "notConnected": "Gladys is not connected to any Rflink Gateway.",
         "connectedWithSuccess": "RFLink Gateway connected with success.",
-        "connecting": "Trying to connect to RFLink Gateway ...",
+        "connecting": "Trying to connect to RFLink Gateway...",
         "driverFailedError": "An error occured while trying to connect to RFLink Gateway.",
         "rflinkUsbDriverPathLabel": "Select the rflink gateway usb path :",
         "zone1": "1",
