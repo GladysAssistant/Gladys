@@ -14,7 +14,7 @@ module.exports = function NextcloudTalkService(gladys, serviceId) {
     logger.info('Starting Nextcloud Talk service');
     const tokens = await gladys.user.getNextcloudTalkTokens();
 
-    if (!tokens) {
+    if (!tokens || tokens.length === 0) {
       throw new ServiceNotConfiguredError('No Nextcloud token found. Not starting Nextcloud Talk service');
     }
     await messageHandler.connect(tokens);

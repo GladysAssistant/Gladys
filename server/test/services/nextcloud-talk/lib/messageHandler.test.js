@@ -18,6 +18,7 @@ const gladys = {
     getValue: fake.resolves('test-value'),
   },
   http: {},
+  bots: ['test'],
 };
 
 describe('NextcloudTalk.message', () => {
