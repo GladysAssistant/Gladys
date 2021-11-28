@@ -189,12 +189,14 @@ class SetupTab extends Component {
             <div class="col-auto">
               <table class="table table-responsive table-borderless table-sm">
                 <thead class="text-center">
-                  <th>
-                    <Text id="systemSettings.containers" />
-                  </th>
-                  <th>
-                    <Text id="integration.zigbee2mqtt.setup.status" />
-                  </th>
+                  <tr>
+                    <th>
+                      <Text id="systemSettings.containers" />
+                    </th>
+                    <th>
+                      <Text id="integration.zigbee2mqtt.setup.status" />
+                    </th>
+                  </tr>
                 </thead>
                 <tbody class="text-center">
                   <tr>
@@ -244,12 +246,14 @@ class SetupTab extends Component {
             <div class="col-auto">
               <table class="table table-responsive table-borderless table-sm">
                 <thead class="text-center">
-                  <th>
-                    <Text id="integration.zigbee2mqtt.setup.link" />
-                  </th>
-                  <th>
-                    <Text id="integration.zigbee2mqtt.setup.status" />
-                  </th>
+                  <tr>
+                    <th>
+                      <Text id="integration.zigbee2mqtt.setup.link" />
+                    </th>
+                    <th>
+                      <Text id="integration.zigbee2mqtt.setup.status" />
+                    </th>
+                  </tr>
                 </thead>
                 <tbody class="text-center">
                   <tr>
