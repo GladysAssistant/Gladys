@@ -860,9 +860,9 @@ const data = {
           keep_history: true,
           has_feedback: false,
           min: 0,
-          max: 1,
-        },
-      ],
+          max: 1
+        }
+      ]
     }
   ],
   'get /api/v1/service/rflink/variable/RFLINK_PATH': {},
@@ -880,28 +880,28 @@ const data = {
         external_id: `rflink:86aa70:switch:10`,
         rfcode: 'CMD',
         category: 'switch',
-        type: 'binary',
-      },
+        type: 'binary'
+      }
     ]
   },
   'get /api/v1/service/rflink/newDevices': [
     {
-      id: "fbedb47f-4d25-4381-8923-2633b23192a0",
-      service_id: "a810b8db-6d04-4697-bed3-c4b72c996279",
-      room_id: "cecc52c7-3e67-4b75-9b13-9a8867b0443d",
-      name: "PC bureau",
-      selector: "rflink:1234",
-      external_id: "rflink:86aa6:switch:10",
+      id: 'fbedb47f-4d25-4381-8923-2633b23192a0',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'PC bureau',
+      selector: 'rflink:1234',
+      external_id: 'rflink:86aa6:switch:10',
       should_poll: false,
       poll_frequency: null,
-      created_at: "2019-02-12T07:49:07.556Z",
-      updated_at: "2019-02-12T07:49:07.556Z",
+      created_at: '2019-02-12T07:49:07.556Z',
+      updated_at: '2019-02-12T07:49:07.556Z',
       features: [
         {
-          name: "power",
-          selector: "switch-test",
-          category: "switch",
-          type: "binary"
+          name: 'power',
+          selector: 'switch-test',
+          category: 'switch',
+          type: 'binary'
         }
       ]
     }
@@ -911,7 +911,8 @@ const data = {
     lastCommand: '20;OK',
     connected: true,
     scanInProgress: false,
-    ready: true,},
+    ready: true
+  },
   'get /api/v1/service/zwave/device': [
     {
       id: 'fbedb47f-4d25-4381-8923-2633b23192a0',

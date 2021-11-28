@@ -66,7 +66,9 @@ describe('POST /api/v1/service/rflink/connect', () => {
     const res = {
       json: fake.returns(null),
     };
-    gladys.variable.getValue = stub().withArgs('RFLINK_PATH').resolves('//tty');
+    gladys.variable.getValue = stub()
+      .withArgs('RFLINK_PATH')
+      .resolves('//tty');
     await controller['post /api/v1/service/rflink/connect'].controller(req, res);
     assert.calledOnce(gladys.variable.getValue);
     assert.calledOnce(rflinkHandler.connect);
