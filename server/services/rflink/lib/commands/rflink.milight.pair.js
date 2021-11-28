@@ -83,7 +83,7 @@ function pair(currentMilightGateway, milightZone) {
           external_id: `rflink:milight:${currentMilightGateway}:${number}:milight-mode`,
           rfcode: 'CMD',
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-          type: DEVICE_FEATURE_TYPES.LIGHT.MODE,
+          type: DEVICE_FEATURE_TYPES.LIGHT.EFFECT_MODE,
           read_only: false,
           keep_history: true,
           has_feedback: false,
