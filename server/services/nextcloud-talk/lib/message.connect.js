@@ -2,7 +2,7 @@
  * @description Connect Nextcloud Talk
  * @param {Array} tokens - Nextcloud Talk tokens.
  * @example
- * connect([{ nextcloud_talk_token: 'test' }]);
+ * connect(['token1','token2']);
  */
 async function connect(tokens) {
   // if a bots exist, we disconnect
@@ -10,7 +10,7 @@ async function connect(tokens) {
     await this.disconnect();
   }
 
-  tokens.forEach(async ({ nextcloud_talk_token: token }) => {
+  tokens.forEach(async (token) => {
     const bot = new this.NextcloudTalkBot(this.gladys, this.serviceId, token);
     bot.startPolling();
     bot.on('message', this.newMessage.bind(this));

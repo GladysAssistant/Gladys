@@ -1,7 +1,6 @@
 const logger = require('../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 const MessageHandler = require('./lib');
-// const TelegramControllers = require('./api/telegram.controller');
 
 module.exports = function NextcloudTalkService(gladys, serviceId) {
   const messageHandler = new MessageHandler(gladys, serviceId);
@@ -36,6 +35,5 @@ module.exports = function NextcloudTalkService(gladys, serviceId) {
     start,
     stop,
     message: messageHandler,
-    // controllers: TelegramControllers(messageHandler),
   });
 };

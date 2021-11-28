@@ -17,6 +17,7 @@ describe('user.getById', () => {
       temperature_unit_preference: 'celsius',
       distance_unit_preference: 'metric',
       role: 'admin',
+      nextcloud_talk_token: 'a1b2d3',
       created_at: new Date('2019-02-12T07:49:07.556Z'),
       updated_at: new Date('2019-02-12T07:49:07.556Z'),
     });

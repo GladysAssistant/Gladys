@@ -18,8 +18,7 @@ async function getNextcloudTalkTokens() {
     where,
   });
 
-  const tokens = users.map((user) => user.get({ plain: true }));
-
+  const tokens = users.map((user) => user.get({ plain: true }).nextcloud_talk_token);
   return tokens;
 }
 

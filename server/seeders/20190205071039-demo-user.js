@@ -18,6 +18,7 @@ module.exports = {
           temperature_unit_preference: 'celsius',
           distance_unit_preference: 'metric',
           telegram_user_id: '555555555',
+          nextcloud_talk_token: 'a1b2d3',
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
