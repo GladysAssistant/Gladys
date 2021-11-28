@@ -24,6 +24,16 @@ const gladys = {
 describe('NextcloudTalk.message', () => {
   const messageHandler = new MessageHandler(gladys, 'a03a5e92-236a-4465-9bd5-530247d76959');
   it('should connect', () => {
+    gladys.http.request = fake.resolves({
+      headers: {
+        'x-chat-last-given': 1,
+      },
+      data: {
+        ocs: {
+          data: [{ id: 2 }],
+        },
+      },
+    });
     messageHandler.connect(['testToken1']);
   });
   it('should handle new message', async () => {

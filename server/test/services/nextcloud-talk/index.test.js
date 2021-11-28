@@ -1,16 +1,8 @@
-const sinon = require('sinon');
-const { expect } = require('chai');
-
 const NextcloudTalkService = require('../../../services/nextcloud-talk');
 
 const gladys = {
   user: {
-    getNextcloudTalkTokens: sinon
-      .stub()
-      .onFirstCall()
-      .resolves(['testToken'])
-      .onSecondCall()
-      .resolves([]),
+    getNextcloudTalkTokens: () => Promise.resolve(['testToken']),
   },
 };
 
@@ -21,11 +13,5 @@ describe('nextcloud-talk', () => {
   });
   it('should stop service', async () => {
     await nextcloudTalkService.stop();
-  });
-  it('should failed start service', async () => {
-    await expect(nextcloudTalkService.start()).to.be.rejectedWith(
-      Error,
-      'No Nextcloud token found. Not starting Nextcloud Talk service',
-    );
   });
 });
