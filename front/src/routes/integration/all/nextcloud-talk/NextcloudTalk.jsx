@@ -1,6 +1,6 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { NextcloudTalkStatus } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../utils/consts';
 
 const NextcloudTalkPage = ({ children, ...props }) => (
   <div class="page">
@@ -84,12 +84,12 @@ const NextcloudTalkPage = ({ children, ...props }) => (
                           />
                         </Localizer>
                       </div>
-                      {props.nextcloudTalkSaveSettingsStatus === NextcloudTalkStatus.Error && (
+                      {props.nextcloudTalkSaveSettingsStatus === RequestStatus.Error && (
                         <div class="alert alert-danger">
                           <Text id="integration.nextcloudTalk.configurationError" />
                         </div>
                       )}
-                      {props.nextcloudTalkSaveSettingsStatus === NextcloudTalkStatus.Success && (
+                      {props.nextcloudTalkSaveSettingsStatus === RequestStatus.Success && (
                         <p class="alert alert-info">
                           <Text id="integration.nextcloudTalk.configurationSuccess" />
                         </p>

@@ -23,21 +23,39 @@ describe('message.sendToUser', () => {
   it('should send message to and send telegram message', async () => {
     const event = new EventEmitter();
     const stateManager = new StateManager();
-    let send;
+    const send = fake.resolves(true);
     const service = {
-      getService: () => {
-        send = fake.resolves(true);
-        return {
-          message: {
-            send,
-          },
-        };
-      },
+      getService: fake.returns({
+        message: {
+          send,
+        },
+      }),
     };
     const messageHandler = new MessageHandler(event, {}, service, stateManager);
     stateManager.setState('user', 'test-user', {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       telegram_user_id: 'one-id',
+    });
+    const message = await messageHandler.sendToUser('test-user', 'coucou');
+    expect(message).to.have.property('id');
+    expect(message).to.have.property('text', 'coucou');
+    assert.calledOnce(send);
+  });
+  it('should send message and send nextcloud talk message', async () => {
+    const event = new EventEmitter();
+    const stateManager = new StateManager();
+    const send = fake.resolves(true);
+    const service = {
+      getService: fake.returns({
+        message: {
+          send,
+        },
+      }),
+    };
+    const messageHandler = new MessageHandler(event, {}, service, stateManager);
+    stateManager.setState('user', 'test-user', {
+      id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+      nextcloud_talk_token: 'a1z2e3',
     });
     const message = await messageHandler.sendToUser('test-user', 'coucou');
     expect(message).to.have.property('id');

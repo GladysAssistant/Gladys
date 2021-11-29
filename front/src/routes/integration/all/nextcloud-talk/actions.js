@@ -1,4 +1,4 @@
-import { NextcloudTalkStatus } from '../../../../utils/consts';
+import { RequestStatus } from '../../../../utils/consts';
 
 const actions = store => ({
   updateNextcloudUrl(state, e) {
@@ -22,16 +22,13 @@ const actions = store => ({
     });
   },
   async getNextcloudTalkSetting(state) {
-    store.setState({
-      nextcloudTalkGetSettingsStatus: NextcloudTalkStatus.Getting
-    });
-
     let nextcloudUrl = '';
     let nextcloudBotUsername = '';
     let nextcloudBotPassword = '';
     let nextcloudBotToken = '';
 
     store.setState({
+      nextcloudTalkGetSettingsStatus: RequestStatus.Getting,
       nextcloudUrl,
       nextcloudBotUsername,
       nextcloudBotPassword,
@@ -64,11 +61,11 @@ const actions = store => ({
       nextcloudBotToken = token;
 
       store.setState({
-        nextcloudTalkGetSettingsStatus: NextcloudTalkStatus.Success
+        nextcloudTalkGetSettingsStatus: RequestStatus.Success
       });
     } catch (e) {
       store.setState({
-        nextcloudTalkGetSettingsStatus: NextcloudTalkStatus.Error
+        nextcloudTalkGetSettingsStatus: RequestStatus.Error
       });
     }
 
@@ -81,7 +78,7 @@ const actions = store => ({
   },
   async saveNextcloudTalkSettings(state) {
     store.setState({
-      nextcloudTalkSaveSettingsStatus: NextcloudTalkStatus.Getting
+      nextcloudTalkSaveSettingsStatus: RequestStatus.Getting
     });
     try {
       // save Nextcloud url
@@ -105,11 +102,11 @@ const actions = store => ({
       await state.httpClient.post('/api/v1/service/nextcloud-talk/start');
 
       store.setState({
-        nextcloudTalkSaveSettingsStatus: NextcloudTalkStatus.Success
+        nextcloudTalkSaveSettingsStatus: RequestStatus.Success
       });
     } catch (e) {
       store.setState({
-        nextcloudTalkSaveSettingsStatus: NextcloudTalkStatus.Error
+        nextcloudTalkSaveSettingsStatus: RequestStatus.Error
       });
     }
   }
