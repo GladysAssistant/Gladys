@@ -1,6 +1,6 @@
-const dayjs = require('dayjs');
+// const dayjs = require('dayjs');
 const db = require('../../models');
-const { JOB_TYPES, JOB_STATUS } = require('../../utils/constants');
+// const { JOB_TYPES, JOB_STATUS } = require('../../utils/constants');
 
 const DEFAULT_OPTIONS = {
   expand: [],
@@ -37,7 +37,7 @@ async function get(options) {
     job.data = JSON.parse(job.data);
   });
 
-  const { scheduledJobs } = this.schedule;
+  /* const { scheduledJobs } = this.schedule;
   Object.entries(scheduledJobs).forEach((scheduledJob) => {
     const [name, job] = scheduledJob;
     jobs.push({
@@ -48,7 +48,7 @@ async function get(options) {
       status: JOB_STATUS.IN_PROGRESS,
       created_at: dayjs(job.nextInvocation()),
     });
-  });
+  }); */
 
   return jobs;
 }

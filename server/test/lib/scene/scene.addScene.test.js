@@ -205,6 +205,7 @@ describe('SceneManager.addScene', () => {
     const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
+      selector: 'a-test-scene',
       icon: 'bell',
       active: true,
       triggers: [
@@ -215,12 +216,13 @@ describe('SceneManager.addScene', () => {
       ],
       actions: [],
     });
-    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('eventStartJob');
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('type').equal('calendar.event-start');
   });
   it('should add a scene with a calendar event trigger, end', async () => {
     const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
+      selector: 'a-test-scene',
       icon: 'bell',
       active: true,
       triggers: [
@@ -231,7 +233,7 @@ describe('SceneManager.addScene', () => {
       ],
       actions: [],
     });
-    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('eventEndJob');
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('type').equal('calendar.event-end');
   });
   it('should add a scene with a calendar event trigger, reminder', async () => {
     const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
@@ -247,6 +249,6 @@ describe('SceneManager.addScene', () => {
       ],
       actions: [],
     });
-    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('eventReminderJob');
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('type').equal('calendar.event-reminder');
   });
 });
