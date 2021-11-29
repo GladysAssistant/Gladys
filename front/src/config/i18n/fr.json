@@ -1538,6 +1538,24 @@
     "cm": "cm",
     "mm": "mm"
   },
+  "deviceFeatureValue": {
+    "type": {
+      "binary": {
+        "other": "Aucune valeur reçue",
+        "zero": "Inactif",
+        "one": "Actif"
+      }
+    },
+    "category": {
+      "co-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Sain",
+          "one": "CO détecté"
+        }
+      }
+    }
+  },
   "deviceFeatureCategory": {
     "light": {
       "shortCategoryName": "Lumière",

@@ -1,8 +1,9 @@
 import { Text } from 'preact-i18n';
 import get from 'get-value';
+
 import RelativeTime from '../../../device/RelativeTime';
 
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
 const SPECIAL_SENSORS = [
   DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
@@ -12,6 +13,7 @@ const SPECIAL_SENSORS = [
 const LAST_SEEN_SENSORS = [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR];
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import BinaryDeviceValue from './sensor-value/BinaryDeviceValue';
 
 const SensorDeviceType = ({ children, ...props }) => (
   <tr>
@@ -26,16 +28,21 @@ const SensorDeviceType = ({ children, ...props }) => (
     <td>{props.deviceFeature.name}</td>
     {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
       <td class="text-right">
-        <div>
-          {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
-          {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-          {props.deviceFeature.last_value !== null && (
-            <span>
-              {' '}
-              <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
-            </span>
-          )}
-        </div>
+        {DEVICE_FEATURE_TYPES.SENSOR.BINARY === props.deviceFeature.type && (
+          <BinaryDeviceValue feature={props.deviceFeature} />
+        )}
+        {DEVICE_FEATURE_TYPES.SENSOR.BINARY !== props.deviceFeature.type && (
+          <div>
+            {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
+            {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+            {props.deviceFeature.last_value !== null && (
+              <span>
+                {' '}
+                <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
+              </span>
+            )}
+          </div>
+        )}
       </td>
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
