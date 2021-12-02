@@ -1002,7 +1002,6 @@
     "editNamePlaceholder": "Enter a scene name",
     "startButton": "Start",
     "saveButton": "Save",
-    "runButton": "Run",
     "deleteButton": "Delete",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
@@ -1017,11 +1016,6 @@
     "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
     "addNewTriggerButton": "Add new trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
-    "triggerCard": {
-      "title": "Triggers",
-      "searchPlaceholder": "Search triggers",
-      "leavingHomeTitle": "Leaving home"
-    },
     "actionsCard": {
       "delay": {
         "label": " This block will wait the specified duration.",

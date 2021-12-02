@@ -46,7 +46,6 @@ import CalendarPage from '../routes/calendar';
 import ScenePage from '../routes/scene';
 import NewScenePage from '../routes/scene/new-scene';
 import EditScenePage from '../routes/scene/edit-scene';
-import TriggerPage from '../routes/trigger';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
 import SettingsHousePage from '../routes/settings/settings-house';
@@ -247,7 +246,6 @@ const AppRouter = connect(
         <ScenePage path="/dashboard/scene" />
         <NewScenePage path="/dashboard/scene/new" />
         <EditScenePage path="/dashboard/scene/:scene_selector" />
-        <TriggerPage path="/dashboard/trigger" />
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
         <SettingsHousePage path="/dashboard/settings/house" />
