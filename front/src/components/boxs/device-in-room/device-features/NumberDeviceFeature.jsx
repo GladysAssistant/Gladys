@@ -3,7 +3,7 @@ import get from 'get-value';
 import { getDeviceName } from './utils';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
-const MultiLevelDeviceType = ({ children, ...props }) => {
+const NumberDeviceFeature = ({ children, ...props }) => {
   function updateValue(e) {
     props.updateValueWithDebounce(
       props.x,
@@ -47,4 +47,4 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
   );
 };
 
-export default MultiLevelDeviceType;
+export default NumberDeviceFeature;
