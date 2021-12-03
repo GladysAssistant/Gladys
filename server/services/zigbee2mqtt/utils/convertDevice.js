@@ -1,5 +1,3 @@
-const logger = require('../../../utils/logger');
-const { DEVICE_FEATURE_CATEGORIES } = require('../../../../server/utils/constants');
 const { mapDefinition } = require('./features/mapDefinition');
 
 /**
@@ -15,9 +13,6 @@ function convertDevice(device, serviceId) {
   const { model } = definition;
   const features = mapDefinition(name, definition);
 
-  // Device is not managed if no feature found, or only battery feature is available.
-  const supported = features.findIndex((f) => f.category !== DEVICE_FEATURE_CATEGORIES.BATTERY) >= 0;
-
   const gladysDevice = {
     name,
     model,
@@ -25,10 +20,8 @@ function convertDevice(device, serviceId) {
     features,
     should_poll: false,
     service_id: serviceId,
-    supported,
   };
 
-  logger.debug(`Device ${name} / model ${model} ${supported ? '' : 'NOT'} managed by Gladys`);
   return gladysDevice;
 }
 

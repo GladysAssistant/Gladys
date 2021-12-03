@@ -16,6 +16,49 @@ class SetupTab extends Component {
   };
 
   render(props) {
+    let alertMessage = null;
+
+    const { connectMqttStatus, mqttConnected, mqttConnectionError } = props;
+    switch (connectMqttStatus) {
+      case RequestStatus.Error:
+        // Error while updating setup
+        alertMessage = (
+          <p class="alert alert-danger">
+            <Text id="integration.mqtt.setup.error" />
+          </p>
+        );
+        break;
+      case RequestStatus.Success:
+        // Updating setup with success = connecting...
+        alertMessage = (
+          <p class="alert alert-info">
+            <Text id="integration.mqtt.setup.connecting" />
+          </p>
+        );
+        break;
+      default:
+        if (mqttConnectionError === 'DISCONNECTED') {
+          alertMessage = (
+            <p class="alert alert-info">
+              <Text id="integration.mqtt.setup.disconnected" />
+            </p>
+          );
+        } else if (mqttConnectionError || mqttConnected === false) {
+          alertMessage = (
+            <p class="alert alert-danger">
+              <Text id="integration.mqtt.setup.connectionError" />
+            </p>
+          );
+        } else if (mqttConnected) {
+          // Well connected
+          alertMessage = (
+            <p class="alert alert-success">
+              <Text id="integration.mqtt.setup.connected" />
+            </p>
+          );
+        }
+    }
+
     return (
       <div class="card">
         <div class="card-header">
@@ -34,32 +77,7 @@ class SetupTab extends Component {
               <p>
                 <MarkupText id="integration.mqtt.setup.mqttDescription" />
               </p>
-              {props.connectMqttStatus === RequestStatus.Error && (
-                <p class="alert alert-danger">
-                  <Text id="integration.mqtt.setup.error" />
-                </p>
-              )}
-              {props.connectMqttStatus === RequestStatus.Success && !props.mqttConnected && (
-                <p class="alert alert-info">
-                  <Text id="integration.mqtt.setup.connecting" />
-                </p>
-              )}
-              {props.mqttConnected && (
-                <p class="alert alert-success">
-                  <Text id="integration.mqtt.setup.connected" />
-                </p>
-              )}
-              {props.mqttConnectionError && props.mqttConnectionError !== 'DISCONNECTED' && (
-                <p class="alert alert-danger">
-                  <Text id="integration.mqtt.setup.connectionError" />
-                </p>
-              )}
-
-              {props.mqttConnectionError === 'DISCONNECTED' && (
-                <p class="alert alert-info">
-                  <Text id="integration.mqtt.setup.disconnected" />
-                </p>
-              )}
+              {alertMessage}
 
               <div class="form-group">
                 <label for="embeddedBroker" class="form-label">

@@ -17,10 +17,10 @@ describe('Bluetooth discover - state change', () => {
 
   it('Enabled by WebSocket', () => {
     // Handle WebSocket message
-    cy.sendWebSocket({ type: 'bluetooth.status', payload: { ready: true } });
-
-    // Check warning
-    cy.get('.alert.alert-warning').should('have.length', 0);
+    cy.sendWebSocket({ type: 'bluetooth.status', payload: { ready: true } })
+      // Check warning
+      .get('.alert.alert-warning')
+      .should('have.length', 0);
 
     // Check scan button is enabled (and is the only button)
     cy.contains('integration.bluetooth.discover.scanButton').should('not.be.disabled');
@@ -28,10 +28,9 @@ describe('Bluetooth discover - state change', () => {
 
   it('Disabled by WebSocket', () => {
     // Handle WebSocket message
-    cy.sendWebSocket({ type: 'bluetooth.status', payload: { ready: false } });
-
-    // Check warning
-    cy.get('.alert.alert-warning')
+    cy.sendWebSocket({ type: 'bluetooth.status', payload: { ready: false } })
+      // Check warning
+      .get('.alert.alert-warning')
       .should('have.length', 1)
       .i18n('integration.bluetooth.bluetoothNotReadyError');
 

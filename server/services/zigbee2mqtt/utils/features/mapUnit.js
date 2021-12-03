@@ -32,7 +32,7 @@ function mapUnit(deviceUnit, featureUnit) {
     case '°F':
       return DEVICE_FEATURE_UNITS.FAHRENHEIT;
     default:
-      return featureUnit;
+      return featureUnit || null;
   }
 }
 
