@@ -1538,6 +1538,24 @@
     "cm": "cm",
     "mm": "mm"
   },
+  "deviceFeatureValue": {
+    "type": {
+      "binary": {
+        "other": "Aucune valeur reçue",
+        "zero": "Inactif",
+        "one": "Actif"
+      }
+    },
+    "category": {
+      "co-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Sain",
+          "one": "CO détecté"
+        }
+      }
+    }
+  },
   "deviceFeatureCategory": {
     "light": {
       "shortCategoryName": "Lumière",
@@ -1601,6 +1619,10 @@
       "shortCategoryName": "Détecteur de fumée",
       "binary": "Capteur de fumée - Oui/Non",
       "decimal": "Valeur de fumée décimale"
+    },
+    "co-sensor": {
+      "shortCategoryName": "Capteur de monxyde de carbon (CO)",
+      "binary": "Détection de CO"
     },
     "co2-sensor": {
       "shortCategoryName": "Capteur de Co2",
