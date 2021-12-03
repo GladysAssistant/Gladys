@@ -61,6 +61,12 @@ module.exports = {
         },
       },
     },
+    vibration: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      },
+    },
     water_leak: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,

@@ -917,7 +917,6 @@
     "editNamePlaceholder": "Enter a scene name",
     "startButton": "Start",
     "saveButton": "Save",
-    "runButton": "Run",
     "deleteButton": "Delete",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
@@ -932,11 +931,6 @@
     "actionsDescription": "All actions in this block will run in parallel. To make a sequence of actions, add actions to the next block.",
     "addNewTriggerButton": "Add trigger",
     "saveSceneError": "There was an error saving your scene. Please check that all actions/triggers are filled and correct.",
-    "triggerCard": {
-      "title": "Triggers",
-      "searchPlaceholder": "Search triggers",
-      "leavingHomeTitle": "Leaving home"
-    },
     "actionsCard": {
       "delay": {
         "label": " This block will wait the specified duration.",
@@ -1544,6 +1538,24 @@
     "cm": "cm",
     "mm": "mm"
   },
+  "deviceFeatureValue": {
+    "type": {
+      "binary": {
+        "other": "No value received",
+        "zero": "Inactive",
+        "one": "Active"
+      }
+    },
+    "category": {
+      "co-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Healthy",
+          "one": "CO detected"
+        }
+      }
+    }
+  },
   "deviceFeatureCategory": {
     "light": {
       "shortCategoryName": "Light",
@@ -1607,6 +1619,10 @@
       "shortCategoryName": "Smoke sensor",
       "binary": "Smoke (on/off)",
       "decimal": "Density (decimal)"
+    },
+    "co-sensor": {
+      "shortCategoryName": "Carbon Monoxide (CO) Sensor",
+      "binary": "CO (binary)"
     },
     "co2-sensor": {
       "shortCategoryName": "Co2 Sensor",
