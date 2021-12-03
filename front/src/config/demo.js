@@ -139,7 +139,8 @@ const data = {
             'tv-lamp-brightness',
             'mqtt-living-room-switch',
             'mqtt-living-room-dimmer',
-            'mqtt-living-room-temp'
+            'mqtt-living-room-temp',
+            'co-living-room'
           ]
         }
       ],
@@ -262,6 +263,24 @@ const data = {
     name: 'Living Room',
     selector: 'living-room',
     devices: [
+      {
+        id: 'e9cc8a96-56b8-41b6-ba99-4c200272abf6',
+        name: 'Main sensors',
+        selector: 'main-sensors',
+        features: [
+          {
+            name: 'CO',
+            selector: 'co-living-room',
+            category: 'co-sensor',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      },
       {
         id: 'b32daa9a-8f77-4394-b4f3-ffea215062d2',
         name: 'Main Lamp',
