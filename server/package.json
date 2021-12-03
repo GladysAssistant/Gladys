@@ -102,7 +102,7 @@
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0",
     "set-value": "^3.0.2",
-    "sqlite3": "git+https://github.com/mapbox/node-sqlite3.git#593c9d",
+    "sqlite3": "npm:@vscode/sqlite3@^5.0.7",
     "suncalc": "^1.8.0",
     "tracer": "^1.1.4",
     "umzug": "^2.2.0",
