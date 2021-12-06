@@ -48,7 +48,7 @@ const actions = store => ({
       const mapOfDeviceImgByName = new Map();
       mapOfDeviceImgByName.set('Withings - Withings WBS01', 'sleep-analyzer-single.png');
       mapOfDeviceImgByName.set('Withings - WS30', 'sleep-analyzer-single.png');
-      mapOfDeviceImgByName.set('Withings - Kid Scale', 'KidScale.jpeg');
+      mapOfDeviceImgByName.set('Withings - Kid Scale', 'KidScale.jpg');
       mapOfDeviceImgByName.set('Withings - Smart Body Analyzer', 'body-plus-black-kg.jpg');
       mapOfDeviceImgByName.set('Withings - Body+', 'body-plus-black-kg.jpg');
       mapOfDeviceImgByName.set('Withings - Body Cardio', 'body-cardio-black-kg.jpg');

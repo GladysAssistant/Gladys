@@ -119,7 +119,7 @@ function buildFeature(currentGroup, device, currentFeatures) {
       const gladysDeviceId = device.id;
 
       // Choose type of feature
-      // (cf: https://developer.withings.com/oauth2/#tag/measure )
+      // (cf: https://developer.withings.com/api-reference#operation/measure-getmeas )
       let featureType;
       let featureName;
       let featureUnit;
