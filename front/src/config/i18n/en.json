@@ -858,15 +858,15 @@
     },
     "oauth2": {
       "buttonConnect": "Connect now",
-      "apiKeyLabel": "Then, enter your client_id and secret_id key here:",
-      "errorEmptyConfig": "Client Id and Secret Id must not be empty !",
-      "errorServiceId": "Service Id of current integration must not be found !",
-      "errorAuthorizationUri": "Error in authorization provider !",
+      "apiKeyLabel": "Then, enter your client id and client secret key here:",
+      "errorEmptyConfig": "Client id and client secret must not be empty!",
+      "errorServiceId": "Service Id of current integration must not be found!",
+      "errorAuthorizationUri": "Error in authorization provider connection configuration!",
       "clientId": "Account client id",
-      "secretId": "Account secret id",
-      "instructions": "In this stage please fill in the given client_id and secret_id key below and click on connect button.",
+      "secretId": "Account client secret",
+      "instructions": "In this stage please fill in the given client id and client secret key below and click on connect button.",
       "delete": "To delete your account configuration clic on 'Unconnect' button (all data will be deleted).",
-      "buttonUnConnect": "Unconnect"
+      "unconnectButton": "Unconnect"
     },
     "withings": {
       "settings": {

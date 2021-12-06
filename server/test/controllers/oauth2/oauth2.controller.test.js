@@ -43,7 +43,7 @@ describe('POST /api/v1/service/oauth2/client/authorization-uri', () => {
   });
 });
 
-describe('POST /api/v1/service/oauth2/client/token-access-uri', () => {
+describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
   it('should get token access uri', async () => {
     const req = {
       integrationName: 'test',
@@ -55,7 +55,7 @@ describe('POST /api/v1/service/oauth2/client/token-access-uri', () => {
     };
 
     await buildOauth2Request
-      .post('/api/v1/service/oauth2/client/token-access-uri')
+      .post('/api/v1/service/oauth2/client/access-token-uri')
       .send(req)
       .expect('Content-Type', /json/)
       .expect(200)
@@ -67,7 +67,7 @@ describe('POST /api/v1/service/oauth2/client/token-access-uri', () => {
 });
 
 // failled call
-describe('POST /api/v1/service/oauth2/client/token-access-uri', () => {
+describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
   it('should get token access uri', async () => {
     const req = {
       integrationName: 'test',
@@ -76,7 +76,7 @@ describe('POST /api/v1/service/oauth2/client/token-access-uri', () => {
     };
 
     await buildOauth2Request
-      .post('/api/v1/service/oauth2/client/token-access-uri')
+      .post('/api/v1/service/oauth2/client/access-token-uri')
       .send(req)
       .expect('Content-Type', /json/)
       .expect(200)
@@ -87,7 +87,7 @@ describe('POST /api/v1/service/oauth2/client/token-access-uri', () => {
   });
 });
 
-describe('GET /api/v1/service/oauth2/client/current-config', () => {
+describe('GET /api/v1/service/oauth2/client', () => {
   it('should get token access uri', async () => {
     const req = {
       integrationName: 'test',
@@ -98,7 +98,7 @@ describe('GET /api/v1/service/oauth2/client/current-config', () => {
     };
 
     await buildOauth2Request
-      .get('/api/v1/service/oauth2/client/current-config')
+      .get('/api/v1/service/oauth2/client')
       .query(req)
       .expect('Content-Type', /json/)
       .expect(200)
