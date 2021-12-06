@@ -1,0 +1,77 @@
+const sinon = require('sinon');
+const { expect } = require('chai');
+const get = require('get-value');
+
+const { assert, fake } = sinon;
+const AlexaHandler = require('../../../../services/alexa/lib');
+
+const gladys = {
+  stateManager: {
+    state: {
+      device: {},
+    },
+  },
+};
+const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
+
+describe('alexa.onDiscovery', () => {
+  beforeEach(() => {
+    sinon.reset();
+    gladys.stateManager.state.device = {};
+  });
+
+  it('return one light with on/off capability', async () => {
+    gladys.stateManager.state.device = {
+      device_1: {
+        get: fake.returns({
+          name: 'Device 1',
+          selector: 'device-1',
+          external_id: 'device-1-external-id',
+          features: [
+            {
+              category: 'light',
+              type: 'binary',
+            },
+          ],
+          model: 'device-model',
+          room: {
+            name: 'living-room',
+          },
+        }),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const result = alexaHandler.onDiscovery();
+    const exptectedResult = {
+      event: {
+        header: {
+          namespace: 'Alexa.Discovery',
+          name: 'Discover.Response',
+          payloadVersion: '3',
+          messageId: get(result, 'event.header.messageId'),
+        },
+        payload: {
+          endpoints: [
+            {
+              endpointId: 'device-1',
+              friendlyName: 'Device 1',
+              displayCategories: ['LIGHT'],
+              capabilities: [
+                {
+                  type: 'AlexaInterface',
+                  interface: 'Alexa.PowerController',
+                  version: '3',
+                  properties: { supported: [{ name: 'powerState' }], proactivelyReported: true, retrievable: true },
+                },
+              ],
+              connections: [],
+            },
+          ],
+        },
+      },
+    };
+    expect(result).to.deep.eq(exptectedResult);
+    assert.calledOnce(gladys.stateManager.state.device.device_1.get);
+  });
+});
