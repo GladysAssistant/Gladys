@@ -1,5 +1,5 @@
 import { RequestStatus } from '../../utils/consts';
-import { OAUTH2 } from '../../../server/utils/constants';
+import { OAUTH2 } from '../../../../server/utils/constants';
 
 const actions = store => ({
   updateIntegrationName(state, e) {

@@ -43,7 +43,7 @@ async function refreshTokenAccess(serviceId, gladys, userId) {
       json: true,
     },
   };
-  console.log('credentials: ', credentials);
+  
   try {
     const client = new ClientCredentials(credentials);
     let authResult = await client.createToken(accessToken);
@@ -95,7 +95,7 @@ async function refreshTokenAccess(serviceId, gladys, userId) {
 async function executeOauth2HTTPQuery(serviceId, userId, queryType, queryUrl, queryParams) {
   // Refresh token access if needed
   const accesToken = await refreshTokenAccess(serviceId, this.gladys, userId);
-  console.log('accesToken: ', accesToken);
+  
   const headerConfig = {
     headers: {
       Authorization: `${accesToken.token.token_type} ${accesToken.token.access_token}`,

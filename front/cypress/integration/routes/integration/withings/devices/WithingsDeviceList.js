@@ -4,7 +4,7 @@ describe('Withings device list', () => {
     external_id: 'c43dbbbd-1091-44e7-b122-68911483d28b',
     selector: 'withings-body-c43dbbbd-1091-44e7-b122-68911483d28b',
     should_poll: 1,
-    poll_frequency: 86400000, 
+    poll_frequency: 86400000,
     features: [
       {
         name: 'Battery',
@@ -40,7 +40,7 @@ describe('Withings device list', () => {
     external_id: 'c43dbbbd-1091-44e7-b144-68911483d28b',
     selector: 'withings-body+-c43dbbbd-1091-44e7-b144-68911483d28b',
     should_poll: 1,
-    poll_frequency: 86400000, 
+    poll_frequency: 86400000,
     features: [
       {
         name: 'Battery',
@@ -98,7 +98,8 @@ describe('Withings device list', () => {
         name: 'Fat Mass Weight',
         category: 'health',
         type: 'fat-mass-weight',
-        external_id: 'withings-Fat Mass Weight:c43dbbbd-1091-44e7-b144-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
+        external_id:
+          'withings-Fat Mass Weight:c43dbbbd-1091-44e7-b144-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
         selector: 'withings-Fat Mass Weight-c43dbbbd-1091-44e7-b144-68911483d28b',
         read_only: true,
         keep_history: true,
@@ -141,7 +142,7 @@ describe('Withings device list', () => {
     external_id: 'c43dbbbd-1091-44e7-b166-68911483d28b',
     selector: 'withings-body+-c43dbbbd-1091-44e7-b166-68911483d28b',
     should_poll: 1,
-    poll_frequency: 86400000, 
+    poll_frequency: 86400000,
     features: [
       {
         name: 'Battery',
@@ -199,7 +200,8 @@ describe('Withings device list', () => {
         name: 'Fat Mass Weight',
         category: 'health',
         type: 'fat-mass-weight',
-        external_id: 'withings-Fat Mass Weight:c43dbbbd-1091-44e7-b166-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
+        external_id:
+          'withings-Fat Mass Weight:c43dbbbd-1091-44e7-b166-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
         selector: 'withings-Fat Mass Weight-c43dbbbd-1091-44e7-b166-68911483d28b',
         read_only: true,
         keep_history: true,
@@ -255,7 +257,7 @@ describe('Withings device list', () => {
     external_id: 'c43dbbbd-1091-44e7-b177-68911483d28b',
     selector: 'withings-body-c43dbbbd-1091-44e7-b177-68911483d28b',
     should_poll: 1,
-    poll_frequency: 86400000, 
+    poll_frequency: 86400000,
     features: [
       {
         name: 'Heart Pulse',
@@ -278,7 +280,7 @@ describe('Withings device list', () => {
     external_id: 'c43dbbbd-1091-44e7-b199-68911483d28b',
     selector: 'withings-bpm-c43dbbbd-1091-44e7-b199-68911483d28b',
     should_poll: 1,
-    poll_frequency: 86400000, 
+    poll_frequency: 86400000,
     features: [
       {
         name: 'Heart Pulse',
@@ -297,7 +299,8 @@ describe('Withings device list', () => {
         name: 'Pulse Wave Velocity',
         category: 'health',
         type: 'pulse-wave-velocity',
-        external_id: 'withings-Pulse Wave Velocity:c43dbbbd-1091-44e7-b199-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
+        external_id:
+          'withings-Pulse Wave Velocity:c43dbbbd-1091-44e7-b199-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
         selector: 'withings-Pulse Wave Velocity-c43dbbbd-1091-44e7-b199-68911483d28b',
         read_only: true,
         keep_history: true,
@@ -314,7 +317,7 @@ describe('Withings device list', () => {
     external_id: 'c43dbbbd-1091-44e7-b120-68911483d28b',
     selector: 'withings-bpm-c43dbbbd-1091-44e7-b120-68911483d28b',
     should_poll: 1,
-    poll_frequency: 86400000, 
+    poll_frequency: 86400000,
     features: [
       {
         name: 'Heart Pulse',
@@ -333,7 +336,8 @@ describe('Withings device list', () => {
         name: 'Pulse Wave Velocity',
         category: 'health',
         type: 'pulse-wave-velocity',
-        external_id: 'withings-Pulse Wave Velocity:c43dbbbd-1091-44e7-b120-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
+        external_id:
+          'withings-Pulse Wave Velocity:c43dbbbd-1091-44e7-b120-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
         selector: 'withings-Pulse Wave Velocity-c43dbbbd-1091-44e7-b120-68911483d28b',
         read_only: true,
         keep_history: true,
@@ -346,7 +350,8 @@ describe('Withings device list', () => {
         name: 'Systolic Blood Pressure',
         category: 'health',
         type: 'systolic-blood-pressure',
-        external_id: 'withings-Systolic Blood Pressure:c43dbbbd-1091-44e7-b120-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
+        external_id:
+          'withings-Systolic Blood Pressure:c43dbbbd-1091-44e7-b120-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
         selector: 'withings-Systolic Blood Pressure-c43dbbbd-1091-44e7-b120-68911483d28b',
         read_only: true,
         keep_history: true,
@@ -359,7 +364,8 @@ describe('Withings device list', () => {
         name: 'Diastolic Blood Pressure',
         category: 'health',
         type: 'diastolic-blood-pressure',
-        external_id: 'withings-Diastolic Blood Pressure:c43dbbbd-1091-44e7-b120-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
+        external_id:
+          'withings-Diastolic Blood Pressure:c43dbbbd-1091-44e7-b120-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
         selector: 'withings-Diastolic Blood Pressure-c43dbbbd-1091-44e7-b120-68911483d28b',
         read_only: true,
         keep_history: true,
@@ -376,7 +382,7 @@ describe('Withings device list', () => {
     external_id: 'c43dbbbd-1091-44e7-b121-68911483d28b',
     selector: 'withings-thermo-c43dbbbd-1091-44e7-b121-68911483d28b',
     should_poll: 1,
-    poll_frequency: 86400000, 
+    poll_frequency: 86400000,
     features: [
       {
         name: 'Temperature',
@@ -395,7 +401,8 @@ describe('Withings device list', () => {
         name: 'Body Temperature',
         category: 'health',
         type: 'body-temperature',
-        external_id: 'withings-Body Temperature:c43dbbbd-1091-44e7-b121-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
+        external_id:
+          'withings-Body Temperature:c43dbbbd-1091-44e7-b121-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
         selector: 'withings-Body Temperature-c43dbbbd-1091-44e7-b121-68911483d28b',
         read_only: true,
         keep_history: true,
@@ -408,7 +415,8 @@ describe('Withings device list', () => {
         name: 'Skin Temperature',
         category: 'health',
         type: 'skin-temperature',
-        external_id: 'withings-Skin Temperature:c43dbbbd-1091-44e7-b121-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
+        external_id:
+          'withings-Skin Temperature:c43dbbbd-1091-44e7-b121-68911483d28b:0d9226e1-e794-4d46-9d0e-ed91725a8c9e',
         selector: 'withings-Skin Temperature-c43dbbbd-1091-44e7-b121-68911483d28b',
         read_only: true,
         keep_history: true,
@@ -419,7 +427,7 @@ describe('Withings device list', () => {
       }
     ]
   };
-  
+
   before(() => {
     cy.login();
 
@@ -427,14 +435,14 @@ describe('Withings device list', () => {
     cy.createDevice(deviceBody, 'withings');
     cy.createDevice(deviceBodyPlus, 'withings');
     cy.createDevice(deviceBodyCardio, 'withings');
-    
-    cy.createDevice(deviceSleep1, 'withings'); 
+
+    cy.createDevice(deviceSleep1, 'withings');
 
     cy.createDevice(deviceBPM1, 'withings');
     cy.createDevice(deviceBPM2, 'withings');
 
     cy.createDevice(deviceThermo, 'withings');
-    
+
     cy.visit('/dashboard/integration/health/withings/device');
   });
 
@@ -448,7 +456,7 @@ describe('Withings device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('img').should('have.attr', 'src',  '/assets/images/withings/body-black-kg.jpg');
+        cy.get('img').should('have.attr', 'src', '/assets/images/withings/body-black-kg.jpg');
         cy.get('select').should('have.value', '');
         cy.get('span').should('exist');
         cy.get('.fe-battery').should('exist');
@@ -461,7 +469,7 @@ describe('Withings device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('img').should('have.attr', 'src',  '/assets/images/withings/body-plus-black-kg.jpg');
+        cy.get('img').should('have.attr', 'src', '/assets/images/withings/body-plus-black-kg.jpg');
         cy.get('select').should('have.value', '');
         cy.get('span').should('exist');
         cy.get('.fe-battery').should('exist');
@@ -475,12 +483,12 @@ describe('Withings device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('img').should('have.attr', 'src',  '/assets/images/withings/body-cardio-black-kg.jpg');
+        cy.get('img').should('have.attr', 'src', '/assets/images/withings/body-cardio-black-kg.jpg');
         cy.get('select').should('have.value', '');
         cy.get('span').should('exist');
         cy.get('.fe-battery').should('exist');
         cy.get('.fe-grid').should('exist');
-        cy.get('.fe-percent').should('exist'); 
+        cy.get('.fe-percent').should('exist');
         cy.get('.fe-activity').should('exist');
       });
   });
@@ -490,7 +498,7 @@ describe('Withings device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('img').should('have.attr', 'src',  '/assets/images/withings/sleep-analyzer-single.png');
+        cy.get('img').should('have.attr', 'src', '/assets/images/withings/sleep-analyzer-single.png');
         cy.get('select').should('have.value', '');
         cy.get('span').should('exist');
         cy.get('.fe-activity').should('exist');
@@ -502,7 +510,7 @@ describe('Withings device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('img').should('have.attr', 'src',  '/assets/images/withings/thermo-c.jpg');
+        cy.get('img').should('have.attr', 'src', '/assets/images/withings/thermo-c.jpg');
         cy.get('select').should('have.value', '');
         cy.get('span').should('exist');
         cy.get('.fe-thermometer').should('exist');
@@ -514,7 +522,7 @@ describe('Withings device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('img').should('have.attr', 'src',  '/assets/images/withings/bpm-core.jpg');
+        cy.get('img').should('have.attr', 'src', '/assets/images/withings/bpm-core.jpg');
         cy.get('select').should('have.value', '');
         cy.get('span').should('exist');
         cy.get('.fe-activity').should('exist');
@@ -526,7 +534,7 @@ describe('Withings device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('img').should('have.attr', 'src',  '/assets/images/withings/bpm-connect.jpg');
+        cy.get('img').should('have.attr', 'src', '/assets/images/withings/bpm-connect.jpg');
         cy.get('select').should('have.value', '');
         cy.get('span').should('exist');
         cy.get('.fe-activity').should('exist');
@@ -544,8 +552,8 @@ describe('Withings device list', () => {
 
         cy.contains('button', 'integration.withings.device.saveButton').click();
       });
-      // Check redirected to edit page
-      cy.location('pathname').should('eq', '/dashboard/integration/health/withings/device');
+    // Check redirected to edit page
+    cy.location('pathname').should('eq', '/dashboard/integration/health/withings/device');
   });
 
   it('Check updated device', () => {
@@ -557,5 +565,4 @@ describe('Withings device list', () => {
         cy.get('select option:selected').should('have.text', rooms[0].name);
       });
   });
-
 });

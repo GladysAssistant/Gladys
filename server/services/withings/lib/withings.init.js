@@ -276,10 +276,9 @@ async function init(userId) {
   const { serviceId } = this;
   const oauth2Manager = new OAuth2Manager(this.gladys);
 
-  const userResult = await oauth2Manager.executeQuery(
+  const userResult = await oauth2Manager.executeOauth2HTTPQuery(
     serviceId,
-    userId,
-    this.integrationName,
+    userId, 
     'get',
     `${this.withingsUrl}/v2/user`,
     'action=getdevice',
@@ -296,10 +295,9 @@ async function init(userId) {
     }
   });
 
-  const measureResult = await oauth2Manager.executeQuery(
+  const measureResult = await oauth2Manager.executeOauth2HTTPQuery(
     serviceId,
-    userId,
-    this.integrationName,
+    userId, 
     'get',
     `${this.withingsUrl}/measure`,
     'action=getmeas',

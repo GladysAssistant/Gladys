@@ -14,7 +14,7 @@ const OAuth2Manager = require('../../../lib/oauth2');
  */
 async function deleteVar(integrationName, userId) {
   const oauth2Manager = new OAuth2Manager(this.gladys);
-  const oauth2SaveVarResult = await oauth2Manager.deleteVar(integrationName, this.serviceId, userId);
+  const oauth2SaveVarResult = await oauth2Manager.deleteClient(this.serviceId, userId);
   return oauth2SaveVarResult;
 }
 
