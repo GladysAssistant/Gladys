@@ -37,7 +37,6 @@ async function updateBySelector(selector, newUser) {
   const userPlainCopied = { ...userPlain };
   delete userPlainCopied.password;
   delete userPlainCopied.telegram_user_id;
-  delete userPlainCopied.nextcloud_talk_token;
   return userPlainCopied;
 }
 

@@ -1,10 +1,11 @@
 const uuid = require('uuid');
-const logger = require('../../../utils/logger');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Send Nextcloud Talk message.
  * @param {string} token - Nextcloud Talk token.
  * @param {Object} message - Message object to send.
+ * @returns {Promise} - Resolve.
  * @example
  * send('1abcd2ef', {
  *   text: 'Hey'
@@ -13,11 +14,19 @@ const logger = require('../../../utils/logger');
 async function send(token, message) {
   logger.debug(`Sending Nextcloud Talk message to user with token = ${token}.`);
 
-  const user = await this.gladys.user.getByNextcloudTalkToken(token);
+  const userBot = this.bots.find((bot) => bot.token === token);
 
-  const NEXTCLOUD_URL = await this.gladys.variable.getValue('NEXTCLOUD_URL', this.serviceId, user.id);
-  const NEXTCLOUD_BOT_USERNAME = await this.gladys.variable.getValue('NEXTCLOUD_BOT_USERNAME', this.serviceId, user.id);
-  const NEXTCLOUD_BOT_PASSWORD = await this.gladys.variable.getValue('NEXTCLOUD_BOT_PASSWORD', this.serviceId, user.id);
+  const NEXTCLOUD_URL = await this.gladys.variable.getValue('NEXTCLOUD_URL', this.serviceId, userBot.userId);
+  const NEXTCLOUD_BOT_USERNAME = await this.gladys.variable.getValue(
+    'NEXTCLOUD_BOT_USERNAME',
+    this.serviceId,
+    userBot.userId,
+  );
+  const NEXTCLOUD_BOT_PASSWORD = await this.gladys.variable.getValue(
+    'NEXTCLOUD_BOT_PASSWORD',
+    this.serviceId,
+    userBot.userId,
+  );
 
   const headers = {
     Authorization: `Basic ${Buffer.from(`${NEXTCLOUD_BOT_USERNAME}:${NEXTCLOUD_BOT_PASSWORD}`).toString('base64')}`,

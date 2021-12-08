@@ -1,4 +1,4 @@
-const { assert, fake } = require('sinon');
+const { assert, fake, stub } = require('sinon');
 const { expect } = require('chai');
 const assertChai = require('chai').assert;
 const EventEmitter = require('events');
@@ -25,11 +25,15 @@ describe('message.sendToUser', () => {
     const stateManager = new StateManager();
     const send = fake.resolves(true);
     const service = {
-      getService: fake.returns({
-        message: {
-          send,
-        },
-      }),
+      getService: stub()
+        .onFirstCall()
+        .returns({
+          message: {
+            send,
+          },
+        })
+        .onSecondCall()
+        .returns(false),
     };
     const messageHandler = new MessageHandler(event, {}, service, stateManager);
     stateManager.setState('user', 'test-user', {
@@ -46,13 +50,20 @@ describe('message.sendToUser', () => {
     const stateManager = new StateManager();
     const send = fake.resolves(true);
     const service = {
-      getService: fake.returns({
-        message: {
-          send,
-        },
-      }),
+      getService: stub()
+        .onFirstCall()
+        .returns(false)
+        .onSecondCall()
+        .returns({
+          message: {
+            send,
+          },
+        }),
     };
-    const messageHandler = new MessageHandler(event, {}, service, stateManager);
+    const variable = {
+      getValue: fake.resolves('a1z2e3'),
+    };
+    const messageHandler = new MessageHandler(event, {}, service, stateManager, variable);
     stateManager.setState('user', 'test-user', {
       id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       nextcloud_talk_token: 'a1z2e3',

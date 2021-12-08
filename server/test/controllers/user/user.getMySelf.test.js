@@ -19,7 +19,6 @@ describe('GET /api/v1/me', () => {
           temperature_unit_preference: 'celsius',
           language: 'en',
           role: 'admin',
-          nextcloud_talk_token: 'a1b2d3',
           created_at: '2019-02-12T07:49:07.556Z',
           updated_at: '2019-02-12T07:49:07.556Z',
         });

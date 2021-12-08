@@ -1,8 +1,8 @@
-const { connect } = require('./message.connect');
-const { newMessage } = require('./message.new');
-const { send } = require('./message.send');
-const { disconnect } = require('./message.disconnect');
-const NextcloudTalkBot = require('./message.bot');
+const { connect } = require('./message/message.connect');
+const { newMessage } = require('./message/message.new');
+const { send } = require('./message/message.send');
+const { disconnect } = require('./message/message.disconnect');
+const NextcloudTalkBot = require('./message/message.bot');
 
 /**
  * @description Add ability to send/receive Nextcloud Talk message.

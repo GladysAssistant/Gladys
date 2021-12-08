@@ -1,6 +1,6 @@
 const uuid = require('uuid');
-const logger = require('../../../utils/logger');
-const { EVENTS } = require('../../../utils/constants');
+const logger = require('../../../../utils/logger');
+const { EVENTS } = require('../../../../utils/constants');
 
 /**
  * @description Called when a new Nextcloud Talk message arrives.
@@ -13,8 +13,8 @@ async function newMessage(msg) {
   logger.debug(`new message from Nextcloud Talk, ${msg.message}`);
 
   const nextcloudTalkToken = msg.token;
-
-  const user = await this.gladys.user.getByNextcloudTalkToken(nextcloudTalkToken);
+  const userBot = this.bots.find((bot) => bot.token === nextcloudTalkToken);
+  const user = await this.gladys.user.getById(userBot.userId);
 
   const message = {
     source: 'nextcloud-talk',

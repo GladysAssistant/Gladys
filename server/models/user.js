@@ -87,11 +87,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         unique: true,
       },
-      nextcloud_talk_token: {
-        allowNull: true,
-        type: DataTypes.STRING,
-        unique: true,
-      },
       last_latitude: {
         allowNull: true,
         type: DataTypes.DOUBLE,

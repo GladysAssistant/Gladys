@@ -6,7 +6,7 @@ const { EVENTS } = require('../../../../utils/constants');
 
 const gladys = {
   user: {
-    getByNextcloudTalkToken: fake.resolves({
+    getById: fake.resolves({
       id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6',
       language: 'fr',
     }),
@@ -18,7 +18,7 @@ const gladys = {
     getValue: fake.resolves('test-value'),
   },
   http: {},
-  bots: ['test'],
+  bots: [{ token: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }],
 };
 
 describe('NextcloudTalk.message', () => {
@@ -34,7 +34,7 @@ describe('NextcloudTalk.message', () => {
         },
       },
     });
-    messageHandler.connect(['testToken1']);
+    messageHandler.connect([{ value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }]);
   });
   it('should handle new message', async () => {
     const msg = {

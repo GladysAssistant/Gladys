@@ -1,12 +1,13 @@
 const EventEmitter = require('events');
 const get = require('get-value');
-const logger = require('../../../utils/logger');
+const logger = require('../../../../utils/logger');
 
 class NextcloudTalkBot extends EventEmitter {
-  constructor(gladys, serviceId, token) {
+  constructor(gladys, serviceId, userId, token) {
     super();
     this.gladys = gladys;
     this.serviceId = serviceId;
+    this.userId = userId;
     this.token = token;
     this.isPolling = false;
   }
@@ -14,7 +15,7 @@ class NextcloudTalkBot extends EventEmitter {
   async startPolling() {
     logger.debug(`Start polling Nextcloud Talk for token: ${this.token}`);
 
-    const user = await this.gladys.user.getByNextcloudTalkToken(this.token);
+    const user = await this.gladys.user.getById(this.userId);
 
     if (!this.NEXTCLOUD_URL) {
       this.NEXTCLOUD_URL = await this.gladys.variable.getValue('NEXTCLOUD_URL', this.serviceId, user.id);

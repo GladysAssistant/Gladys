@@ -15,7 +15,6 @@ module.exports = {
       onDelete: 'CASCADE',
     });
     const users = await db.User.findAll({
-      attributes: { exclude: ['nextcloud_talk_token'] },
       where: {
         role: USER_ROLE.ADMIN,
       },

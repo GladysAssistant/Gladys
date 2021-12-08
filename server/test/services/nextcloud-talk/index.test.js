@@ -1,8 +1,8 @@
 const NextcloudTalkService = require('../../../services/nextcloud-talk');
 
 const gladys = {
-  user: {
-    getNextcloudTalkTokens: () => Promise.resolve(['testToken']),
+  variable: {
+    getVariables: () => Promise.resolve([{ user_id: 'f0de00a8-8ba7-4a4e-8f5a-7a21e94f36a8', value: 'testToken' }]),
   },
 };
 

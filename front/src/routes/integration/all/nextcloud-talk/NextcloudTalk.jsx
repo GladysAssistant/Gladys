@@ -79,8 +79,8 @@ const NextcloudTalkPage = ({ children, ...props }) => (
                             type="text"
                             class="form-control"
                             placeholder={<Text id={`integration.nextcloudTalk.token`} />}
-                            onInput={props.updateNextcloudBotToken}
-                            value={props.nextcloudBotToken}
+                            onInput={props.updateNextcloudTalkToken}
+                            value={props.nextcloudTalkToken}
                           />
                         </Localizer>
                       </div>
