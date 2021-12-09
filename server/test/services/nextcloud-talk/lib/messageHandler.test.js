@@ -29,12 +29,21 @@ describe('NextcloudTalk.message', () => {
       },
       data: {
         ocs: {
-          data: [{ id: 2 }],
+          data: [{ id: 2, actorId: 'userbot' }],
         },
       },
     });
     messageHandler.bots = [{ token: 'testToken1' }];
     messageHandler.connect([{ value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }]);
+  });
+  it('should poll once', async () => {
+    const bot = new messageHandler.NextcloudTalkBot(gladys);
+    bot.NEXTCLOUD_BOT_USERNAME = 'user1';
+    const emit = fake.resolves();
+    bot.emit = emit;
+    await bot.poll(2);
+    expect(emit.args[0][0]).eq('message');
+    expect(emit.args[0][1]).eql({ id: 2, actorId: 'userbot' });
   });
   it('should stop polling', () => {
     const bot = new messageHandler.NextcloudTalkBot();
