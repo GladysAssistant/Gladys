@@ -27,6 +27,7 @@ describe('nextcloud-talk', () => {
       },
     };
     const nextcloudTalkService = NextcloudTalkService(gladys, 'a4a59a7d-0001-4958-a794-37e38790142f');
+    nextcloudTalkService.message.bots = [{ stopPolling: () => {} }];
     await nextcloudTalkService.stop();
   });
 });

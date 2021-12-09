@@ -18,7 +18,6 @@ const gladys = {
     getValue: fake.resolves('test-value'),
   },
   http: {},
-  bots: [{ token: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }],
 };
 
 describe('NextcloudTalk.message', () => {
@@ -34,7 +33,14 @@ describe('NextcloudTalk.message', () => {
         },
       },
     });
+    messageHandler.bots = [{ token: 'testToken1' }];
     messageHandler.connect([{ value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }]);
+  });
+  it('should stop polling', () => {
+    const bot = new messageHandler.NextcloudTalkBot();
+    bot.isPolling = true;
+    bot.stopPolling();
+    expect(bot.isPolling).equal(false);
   });
   it('should handle new message', async () => {
     const msg = {
