@@ -863,7 +863,7 @@
       "errorServiceId": "Service Id of current integration must not be found!",
       "errorAuthorizationUri": "Error in authorization provider connection configuration!",
       "clientId": "Account client id",
-      "secretId": "Account client secret",
+      "secret": "Account client secret",
       "instructions": "In this stage please fill in the given client id and client secret key below and click on connect button.",
       "delete": "To delete your account configuration clic on 'Unconnect' button (all data will be deleted).",
       "unconnectButton": "Unconnect"

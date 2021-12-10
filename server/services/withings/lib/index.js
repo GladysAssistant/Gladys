@@ -1,9 +1,7 @@
 // COMMANDS
 const { init } = require('./withings.init');
-const { saveVar } = require('./withings.saveVar');
 const { deleteVar } = require('./withings.deleteVar');
 const { deleteDevices } = require('./withings.deleteDevices');
-const { getServiceId } = require('./withings.getServiceId');
 const { poll } = require('./withings.poll');
 
 /**
@@ -28,10 +26,8 @@ const WithingsHandler = function WithingsHandler(gladys, serviceId, withingsServ
 
 // COMMANDS
 WithingsHandler.prototype.init = init;
-WithingsHandler.prototype.saveVar = saveVar;
 WithingsHandler.prototype.deleteVar = deleteVar;
 WithingsHandler.prototype.deleteDevices = deleteDevices;
-WithingsHandler.prototype.getServiceId = getServiceId;
 WithingsHandler.prototype.poll = poll;
 
 module.exports = WithingsHandler;

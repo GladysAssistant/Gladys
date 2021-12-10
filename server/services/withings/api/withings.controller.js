@@ -16,27 +16,8 @@ module.exports = function WithingsController(withingsHandler) {
   }
 
   /**
-   * @description Save clientId and secretId of withings oauth2 api.
-   * @api {post} /api/v1/service/withings/saveVar Save clientId and secretId of withings oauth2 api.
-   * @apiName saveVar
-   * @apiGroup Withings
-   */
-  async function saveVar(req, res) {
-    const resultSaveVar = await withingsHandler.saveVar(
-      req.body.clientId,
-      req.body.secretId,
-      req.body.integrationName,
-      req.user.id,
-    );
-    res.json({
-      success: true,
-      result: resultSaveVar,
-    });
-  }
-
-  /**
-   * @description Delete clientId and secretId of withings oauth2 api.
-   * @api {get} /api/v1/service/withings/deleteConfig Delete clientId and secretId of withings oauth2 api.
+   * @description Delete clientId and secret of withings oauth2 api.
+   * @api {get} /api/v1/service/withings/deleteConfig Delete clientId and secret of withings oauth2 api.
    * @apiName deleteConfig
    * @apiGroup Withings
    */
@@ -48,36 +29,14 @@ module.exports = function WithingsController(withingsHandler) {
     });
   }
 
-  /**
-   * @description Return the withings service id.
-   * @api {get} /api/v1/service/withings/getServiceId Return the withings service id.
-   * @apiName getServiceId
-   * @apiGroup Withings
-   */
-  function getServiceId(req, res) {
-    const resultServiceId = withingsHandler.getServiceId();
-    res.json({
-      success: true,
-      result: resultServiceId,
-    });
-  }
-
   return {
     'post /api/v1/service/withings/init': {
       authenticated: true,
       controller: asyncMiddleware(init),
     },
-    'post /api/v1/service/withings/saveVar': {
-      authenticated: true,
-      controller: asyncMiddleware(saveVar),
-    },
     'get /api/v1/service/withings/deleteConfig': {
       authenticated: true,
       controller: asyncMiddleware(deleteConfig),
-    },
-    'get /api/v1/service/withings/getServiceId': {
-      authenticated: true,
-      controller: getServiceId,
     },
   };
 };

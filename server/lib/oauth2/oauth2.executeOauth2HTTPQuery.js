@@ -16,22 +16,22 @@ const { OAUTH2 } = require('../../utils/constants');
  */
 async function refreshTokenAccess(serviceId, gladys, userId) {
   const clientId = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_ID}`, serviceId, userId);
-  const secretId = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_SECRET}`, serviceId, userId);
+  const secret = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_SECRET}`, serviceId, userId);
   const accessToken = JSON.parse(await gladys.variable.getValue(`${OAUTH2.VARIABLE.ACCESS_TOKEN}`, serviceId, userId));
 
   logger.trace('accessToken: ', accessToken);
   // Find provider configuration
-  const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, serviceId, userId);
-  const tokenPath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_PATH}`, serviceId, userId);
-  const authorizeHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_HOST}`, serviceId, userId);
-  const authorizePath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_PATH}`, serviceId, userId);
-  const integrationScope = await gladys.variable.getValue(`${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`, serviceId, userId);
+  const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, serviceId);
+  const tokenPath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_PATH}`, serviceId);
+  const authorizeHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_HOST}`, serviceId);
+  const authorizePath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_PATH}`, serviceId);
+  const integrationScope = await gladys.variable.getValue(`${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`, serviceId);
 
   // Init credentials based on integration name
   const credentials = {
     client: {
       id: `${clientId}`,
-      secret: `${secretId}`,
+      secret: `${secret}`,
     },
     auth: {
       tokenHost,
@@ -43,7 +43,7 @@ async function refreshTokenAccess(serviceId, gladys, userId) {
       json: true,
     },
   };
-  
+
   try {
     const client = new ClientCredentials(credentials);
     let authResult = await client.createToken(accessToken);
@@ -54,7 +54,7 @@ async function refreshTokenAccess(serviceId, gladys, userId) {
       try {
         const refreshParams = {
           client_id: clientId,
-          client_secret: secretId,
+          client_secret: secret,
           scope: integrationScope,
         };
 
@@ -95,7 +95,7 @@ async function refreshTokenAccess(serviceId, gladys, userId) {
 async function executeOauth2HTTPQuery(serviceId, userId, queryType, queryUrl, queryParams) {
   // Refresh token access if needed
   const accesToken = await refreshTokenAccess(serviceId, this.gladys, userId);
-  
+
   const headerConfig = {
     headers: {
       Authorization: `${accesToken.token.token_type} ${accesToken.token.access_token}`,

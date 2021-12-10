@@ -12,41 +12,24 @@ module.exports = function OAuth2Controller(gladys) {
    */
   async function buildAuthorizationUri(req, res) {
     // Find provider configuration
-    const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, req.body.serviceId, req.user.id);
-    const authorizeHost = await gladys.variable.getValue(
-      `${OAUTH2.VARIABLE.AUTHORIZE_HOST}`,
-      req.body.serviceId,
-      req.user.id,
-    );
-    const authorizePath = await gladys.variable.getValue(
-      `${OAUTH2.VARIABLE.AUTHORIZE_PATH}`,
-      req.body.serviceId,
-      req.user.id,
-    );
-    const integrationScope = await gladys.variable.getValue(
-      `${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`,
-      req.body.serviceId,
-      req.user.id,
-    );
+    const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, req.body.serviceId);
+    const authorizeHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_HOST}`, req.body.serviceId);
+    const authorizePath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_PATH}`, req.body.serviceId);
+    const integrationScope = await gladys.variable.getValue(`${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`, req.body.serviceId);
     const redirectUriSuffix = await gladys.variable.getValue(
       `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`,
       req.body.serviceId,
-      req.user.id,
     );
 
     // Get variale client id and client secret
     const clientId = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_ID}`, req.body.serviceId, req.user.id);
-    const secretId = await gladys.variable.getValue(
-      `${OAUTH2.VARIABLE.CLIENT_SECRET}`,
-      req.body.serviceId,
-      req.user.id,
-    );
+    const secret = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_SECRET}`, req.body.serviceId, req.user.id);
 
     // Init credentials based on integration name
     const credentials = {
       client: {
         id: clientId,
-        secret: secretId,
+        secret,
       },
       auth: {
         tokenHost,
@@ -76,43 +59,26 @@ module.exports = function OAuth2Controller(gladys) {
    */
   async function buildAccesTokenUri(req, res) {
     // Find provider configuration
-    const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, req.body.serviceId, req.user.id);
-    const tokenPath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_PATH}`, req.body.serviceId, req.user.id);
-    const authorizeHost = await gladys.variable.getValue(
-      `${OAUTH2.VARIABLE.AUTHORIZE_HOST}`,
-      req.body.serviceId,
-      req.user.id,
-    );
-    const authorizePath = await gladys.variable.getValue(
-      `${OAUTH2.VARIABLE.AUTHORIZE_PATH}`,
-      req.body.serviceId,
-      req.user.id,
-    );
-    const grantType = await gladys.variable.getValue(`${OAUTH2.VARIABLE.GRANT_TYPE}`, req.body.serviceId, req.user.id);
+    const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, req.body.serviceId);
+    const tokenPath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_PATH}`, req.body.serviceId);
+    const authorizeHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_HOST}`, req.body.serviceId);
+    const authorizePath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_PATH}`, req.body.serviceId);
+    const grantType = await gladys.variable.getValue(`${OAUTH2.VARIABLE.GRANT_TYPE}`, req.body.serviceId);
     const redirectUriSuffix = await gladys.variable.getValue(
       `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`,
       req.body.serviceId,
-      req.user.id,
     );
 
     const { authorizationCode } = req.body;
 
-    const clientId = await gladys.variable.getValue(
-      `${req.body.integrationName.toUpperCase()}${OAUTH2.VARIABLE.CLIENT_ID}`,
-      req.body.serviceId,
-      req.user.id,
-    );
-    const secretId = await gladys.variable.getValue(
-      `${req.body.integrationName.toUpperCase()}${OAUTH2.VARIABLE.CLIENT_SECRET}`,
-      req.body.serviceId,
-      req.user.id,
-    );
+    const clientId = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_ID}`, req.body.serviceId, req.user.id);
+    const secret = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_SECRET}`, req.body.serviceId, req.user.id);
 
     // Init credentials based on integration name
     const credentials = {
       client: {
         id: clientId,
-        secret: secretId,
+        secret,
       },
       auth: {
         tokenHost,
@@ -121,11 +87,12 @@ module.exports = function OAuth2Controller(gladys) {
         authorizePath,
       },
     };
+
     // Build token access request
     const tokenConfig = {
       code: authorizationCode,
       client_id: clientId,
-      client_secret: secretId,
+      client_secret: secret,
       grant_type: grantType,
       redirect_uri: `${req.headers.referer}${redirectUriSuffix}`,
     };
@@ -136,7 +103,7 @@ module.exports = function OAuth2Controller(gladys) {
 
       // Save accessToken
       await gladys.variable.setValue(
-        `${req.body.integrationName.toUpperCase()}${OAUTH2.VARIABLE.ACCESS_TOKEN}`,
+        `${OAUTH2.VARIABLE.ACCESS_TOKEN}`,
         JSON.stringify(authResult),
         req.body.serviceId,
         req.user.id,

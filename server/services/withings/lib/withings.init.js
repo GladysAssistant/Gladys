@@ -278,7 +278,7 @@ async function init(userId) {
 
   const userResult = await oauth2Manager.executeOauth2HTTPQuery(
     serviceId,
-    userId, 
+    userId,
     'get',
     `${this.withingsUrl}/v2/user`,
     'action=getdevice',
@@ -297,7 +297,7 @@ async function init(userId) {
 
   const measureResult = await oauth2Manager.executeOauth2HTTPQuery(
     serviceId,
-    userId, 
+    userId,
     'get',
     `${this.withingsUrl}/measure`,
     'action=getmeas',

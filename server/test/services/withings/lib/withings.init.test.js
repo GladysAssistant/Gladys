@@ -3,6 +3,7 @@ const { OAuth2Server } = require('oauth2-mock-server');
 const { fake } = require('sinon');
 const ServerMock = require('mock-http-server');
 const WithingsHandler = require('../../../../services/withings/lib');
+const { OAUTH2 } = require('../../../../utils/constants.js');
 
 const serverOauth2 = new OAuth2Server();
 const server = new ServerMock({ host: 'localhost', port: 9192 }, null);
@@ -20,17 +21,38 @@ const gladys = {
   },
   event: { emit: fake.returns(null) },
   variable: {
-    getValue: fake.returns(
-      '{' +
-        '"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4",' +
-        '"expires_in":10800,' +
-        '"token_type":"Bearer",' +
-        '"scope":"user.info,user.metrics,user.activity,user.sleepevents",' +
-        '"refresh_token":"11757dc7fd8d25889f5edfd373d1f525f53d4942",' +
-        '"userid":"33669966",' +
-        '"expires_at":"2020-11-13T20:46:50.042Z"' +
-        '}',
-    ),
+    getValue: function returnValue(key, serviceId) {
+      switch (key) {
+        case `${OAUTH2.VARIABLE.TOKEN_HOST}`:
+          return 'http://localhost:9292';
+        case `${OAUTH2.VARIABLE.TOKEN_PATH}`:
+          return '/oauth2/token';
+        case `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`:
+          return 'ashboard/integration/health/test/settings';
+        case `${OAUTH2.VARIABLE.AUTHORIZE_HOST}`:
+          return 'http://localhost:9292';
+        case `${OAUTH2.VARIABLE.AUTHORIZE_PATH}`:
+          return '/oauth2_user/authorize2';
+        case `${OAUTH2.VARIABLE.GRANT_TYPE}`:
+          return 'authorization_code';
+        case `${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`:
+          return 'user.info,user.metrics,user.activity,user.sleepevents';
+        case `${OAUTH2.VARIABLE.ACCESS_TOKEN}`:
+          return (
+            '{' +
+            '"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4",' +
+            '"expires_in":10800,' +
+            '"token_type":"Bearer",' +
+            '"scope":"user.info,user.metrics,user.activity,user.sleepevents",' +
+            '"refresh_token":"11757dc7fd8d25889f5edfd373d1f525f53d4942",' +
+            '"userid":"33669966",' +
+            '"expires_at":"2020-11-13T20:46:50.042Z"' +
+            '}'
+          );
+        default:
+          return '';
+      }
+    },
     setValue: fake.returns(null),
     destroy: fake.returns(null),
   },

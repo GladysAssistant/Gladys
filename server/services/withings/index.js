@@ -1,9 +1,10 @@
 const logger = require('../../utils/logger');
 const WithingsHandler = require('./lib/index');
 const WithingsController = require('./api/withings.controller');
+const { OAUTH2 } = require('../../utils/constants.js');
 
 module.exports = function WithingsService(gladys, serviceId) {
-  const withingsHandler = new WithingsHandler(gladys, serviceId, 'https://wbsapi.withings.net');
+  const withingsHandler = new WithingsHandler(gladys, serviceId, 'https://wbsapi.withings.net', 'withings');
 
   /**
    * @public
@@ -13,6 +14,27 @@ module.exports = function WithingsService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting Withings service');
+
+    // check if variable necessary to oauth2 connection is in variable table
+    const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, serviceId);
+    if (!tokenHost) {
+      // Init variable in db
+      await gladys.variable.setValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, 'https://account.withings.com', serviceId);
+      await gladys.variable.setValue(`${OAUTH2.VARIABLE.TOKEN_PATH}`, '/oauth2/token', serviceId);
+      await gladys.variable.setValue(`${OAUTH2.VARIABLE.AUTHORIZE_HOST}`, 'https://account.withings.com', serviceId);
+      await gladys.variable.setValue(`${OAUTH2.VARIABLE.AUTHORIZE_PATH}`, '/oauth2_user/authorize2', serviceId);
+      await gladys.variable.setValue(
+        `${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`,
+        'user.info,user.metrics,user.activity,user.sleepevents',
+        serviceId,
+      );
+      await gladys.variable.setValue(`${OAUTH2.VARIABLE.GRANT_TYPE}`, 'authorization_code', serviceId);
+      await gladys.variable.setValue(
+        `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`,
+        'dashboard/integration/health/withings/settings',
+        serviceId,
+      );
+    }
   }
 
   /**

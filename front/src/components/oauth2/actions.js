@@ -12,9 +12,9 @@ const actions = store => ({
       clientId: e.target.value
     });
   },
-  updateSecretId(state, e) {
+  updateSecret(state, e) {
     store.setState({
-      secretId: e.target.value
+      secret: e.target.value
     });
   },
   async getCurrentConfig(state) {
@@ -25,7 +25,7 @@ const actions = store => ({
     const returnServiceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
 
     const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
-      serviceId: returnServiceId.result.serviceId
+      serviceId: returnServiceId
     });
 
     if (returnGetConfig) {
@@ -47,7 +47,7 @@ const actions = store => ({
       oauth2GetStatus: RequestStatus.Getting
     });
     try {
-      if (!state.secretId || !state.clientId) {
+      if (!state.secret || !state.clientId) {
         store.setState({
           oauth2GetStatus: RequestStatus.Error,
           oauth2ErrorMsg: 'errorEmptyConfig'
@@ -58,18 +58,22 @@ const actions = store => ({
       const serviceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
 
       // Save Oauth2 variables
-      await state.httpClient.post(`/api/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_ID}`, {
+      await state.httpClient.post(`/api/v1/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_ID}`, {
         value: state.clientId,
-        secretId: state.secretId
+        userRelated: true
       });
 
-      await state.httpClient.post(`/api/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_SECRET}`, {
-        value: state.secretId
-      });
+      await state.httpClient.post(
+        `/api/v1/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_SECRET}`,
+        {
+          value: state.secret,
+          userRelated: true
+        }
+      );
 
       const returnValue = await state.httpClient.post('/api/v1/service/oauth2/client/authorization-uri', {
         clientId: state.clientId,
-        secretId: state.secretId,
+        secret: state.secret,
         integrationName: state.integrationName,
         serviceId
       });

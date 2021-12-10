@@ -3,6 +3,7 @@ const uuid = require('uuid');
 const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const OAuth2Manager = require('../../../lib/oauth2');
 const logger = require('../../../utils/logger');
+const { OAUTH2 } = require('../../../utils/constants.js');
 
 /**
  * @description Poll value of a withings device.
@@ -25,7 +26,11 @@ async function poll(device) {
     await Promise.map(
       users,
       async (user) => {
-        const withingsClienId = await this.gladys.variable.getValue('WITHINGS_CLIENT_ID', this.serviceId, user.id);
+        const withingsClienId = await this.gladys.variable.getValue(
+          `${OAUTH2.VARIABLE.CLIENT_ID}`,
+          this.serviceId,
+          user.id,
+        );
 
         if (withingsClienId) {
           await Promise.each(device.features, async (feature) => {
@@ -94,10 +99,9 @@ async function poll(device) {
             if (withingsType > 0) {
               logger.debug('Current feature last value changed: ', feature.last_value_changed);
 
-              const measureResult = await oauth2Manager.executeQuery(
+              const measureResult = await oauth2Manager.executeOauth2HTTPQuery(
                 this.serviceId,
                 user.id,
-                this.integrationName,
                 'get',
                 `${this.withingsUrl}/measure`,
                 `action=getmeas&meastype=${withingsType}&category=1&lastupdate=${feature.last_value_changed.getTime() /
@@ -140,10 +144,9 @@ async function poll(device) {
             }
 
             if (withingsType === -1) {
-              const userResult = await oauth2Manager.executeQuery(
+              const userResult = await oauth2Manager.executeOauth2HTTPQuery(
                 this.serviceId,
                 user.id,
-                this.integrationName,
                 'get',
                 `${this.withingsUrl}/v2/user`,
                 'action=getdevice',

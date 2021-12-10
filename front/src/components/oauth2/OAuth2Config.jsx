@@ -55,9 +55,9 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                               <input
                                 type="text"
                                 class="form-control"
-                                placeholder={<Text id={`integration.oauth2.secretId`} />}
-                                onInput={props.updateSecretId}
-                                value={props.secretId}
+                                placeholder={<Text id={`integration.oauth2.secret`} />}
+                                onInput={props.updateSecret}
+                                value={props.secret}
                               />
                             </Localizer>
                           </div>

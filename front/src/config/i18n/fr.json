@@ -863,7 +863,7 @@
       "errorServiceId": "Service Id de l'intégration courante n'a pas été trouvé !",
       "errorAuthorizationUri": "Erreur dans la configuration du provider pour l'autorisation de connexion !",
       "clientId": "Client id du compte",
-      "secretId": "Client secret du compte",
+      "secret": "Client secret du compte",
       "instructions": "À cette étape, veuillez remplir les champs client id et client secret ci-dessous et cliquez sur le bouton de connexion.",
       "delete": "Pour supprimer vos configuration de compte cliquer sur le bouton 'Déconneter' (toutes les données associées seront supprimées).",
       "unconnectButton": "Déconnecter"
