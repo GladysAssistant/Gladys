@@ -1,4 +1,5 @@
 const { fake } = require('sinon');
+const { assert } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 
 class WithingsHandler {}
@@ -33,5 +34,25 @@ describe('withingsService', () => {
   });
   it('should stop service', async () => {
     await withingsService.stop();
+  });
+
+  let countSetValueCount = 0;
+  const withingsServiceWithoutDBVar = WithingsService(
+    {
+      variable: {
+        getValue: fake.returns(null),
+        setValue: function returnValue(key, serviceId, userId) {
+          countSetValueCount += 1;
+        },
+      },
+    },
+    '3ac129d9-a610-42f8-924f-3fe708001b3d',
+  );
+  it('should start service (without db var)', async () => {
+    await withingsServiceWithoutDBVar.start();
+    assert.equal(countSetValueCount, 7);
+  });
+  it('should stop service (without db var)', async () => {
+    await withingsServiceWithoutDBVar.stop();
   });
 });
