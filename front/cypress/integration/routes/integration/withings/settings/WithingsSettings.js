@@ -52,7 +52,7 @@ describe('Withings settings page', () => {
   });
 
   it('Check unconnect', () => {
-    cy.contains('button', 'integration.oauth2.buttonUnConnect').click();
+    cy.contains('button', 'integration.oauth2.unconnectButton').click();
 
     cy.get('.markup').i18n('integration.oauth2.instructions');
 
