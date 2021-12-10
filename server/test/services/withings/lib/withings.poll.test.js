@@ -67,6 +67,8 @@ const gladys = {
   event: { emit: fake.returns(null) },
 };
 
+let batteryValue = 'low';
+
 describe('WithingsHandler poll', () => {
   const withingsHandler = new WithingsHandler(
     gladys,
@@ -90,7 +92,7 @@ describe('WithingsHandler poll', () => {
                 type: 'string',
                 model: 'string',
                 model_id: 0,
-                battery: 'low',
+                battery: batteryValue,
                 deviceid: 'withingsDevideId',
                 timezone: 'string',
                 last_session_date: 0,
@@ -284,6 +286,18 @@ describe('WithingsHandler poll', () => {
 
     // 18 feature - 1 feature unknown = 17 state to save
     assert.callCount(gladys.device.saveHistoricalState, 17);
+    assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
+
+    batteryValue = 'medium';
+    await withingsHandler.poll(deviceToPoll);
+    assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
+
+    batteryValue = 'high';
+    await withingsHandler.poll(deviceToPoll);
+    assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
+
+    batteryValue = 'n/a';
+    await withingsHandler.poll(deviceToPoll);
     assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
   });
 });
