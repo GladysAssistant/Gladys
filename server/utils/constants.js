@@ -376,7 +376,6 @@ const DEVICE_FEATURE_TYPES = {
     CLICK: 'click',
   },
   HEALTH: {
-    BATTERY: 'battery',
     WEIGHT: 'weight',
     HEIGHT: 'height',
     FAT_FREE_MASS: 'fat-free-mass',

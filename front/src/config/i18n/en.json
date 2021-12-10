@@ -1556,12 +1556,16 @@
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
     "kilowatt-hour": "Kilowatt hour (kWh)",
+    "kg": "Kilogramme (kg)",
     "ampere": "Ampere (A)",
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "ppm": "Parts per million (ppm)",
     "cm": "Centimeter (cm)",
-    "mm": "Millimeter (mm)"
+    "mm": "Millimeter (mm)",
+    "mmHg": "Millimeters of mercury (mmHg)",
+    "bpm": "Beats per minute (bpm)",
+    "m/s": "Meters per second (m/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1723,6 +1727,8 @@
       "bed-activity": "Bed Activity"
     },
     "health": {
+      "shortCategoryName": "Health",
+      "unknown": "Unknown",
       "weight": "Weight",
       "height": "Height",
       "fat-free-mass": "Fat Free Mass",
