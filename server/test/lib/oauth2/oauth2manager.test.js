@@ -125,3 +125,18 @@ describe('oauth2manager failled test', () => {
     return assert.equal(result.success, false);
   });
 });
+
+describe('oauth2manager failled test', () => {
+  // check error
+  const manager = new OAuth2Manager(gladys);
+
+  it('oauth manager get error on refresh token test ', async () => {
+    const queryType = 'get';
+    const queryUrl = `${testUrl}/userinfo`;
+    const queryParams = 'param1=testParam';
+
+    const result = await manager.executeOauth2HTTPQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
+
+    return assert.equal(result, null);
+  });
+});
