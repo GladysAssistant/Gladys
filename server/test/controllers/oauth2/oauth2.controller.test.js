@@ -1,4 +1,4 @@
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const { OAuth2Server } = require('oauth2-mock-server');
 
 const { buildOauth2Request } = require('./oauth2.request.test');
@@ -9,7 +9,7 @@ const server = new OAuth2Server();
 describe('POST /api/v1/service/oauth2/client/authorization-uri', () => {
   before(async function testBefore() {
     // Generate a new RSA key and add it to the keystore
-    await server.issuer.keys.generateRSA();
+    await server.issuer.keys.generate('RS256');
     // Start the server
     await server.start(9292, 'localhost');
     logger.debug('Issuer URL:', server.issuer.url);
@@ -44,6 +44,17 @@ describe('POST /api/v1/service/oauth2/client/authorization-uri', () => {
 });
 
 describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
+  before(async function testBefore() {
+    // Generate a new RSA key and add it to the keystore
+    await server.issuer.keys.generate('RS256');
+    // Start the server
+    await server.start(9292, 'localhost');
+    logger.debug('Issuer URL:', server.issuer.url);
+  });
+
+  after(async function testAfter() {
+    await server.stop();
+  });
   it('should get token access uri', async () => {
     const req = {
       integrationName: 'test',
@@ -62,6 +73,7 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
       .then((res) => {
         expect(res.body).to.have.property('success');
         expect(res.body).to.have.property('result');
+        assert.equal(res.body.success, true);
       });
   });
 });
@@ -83,11 +95,23 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
       .then((res) => {
         expect(res.body).to.have.property('success');
         expect(res.body).to.have.property('result');
+        assert.equal(res.body.success, false);
       });
   });
 });
 
 describe('GET /api/v1/service/oauth2/client', () => {
+  before(async function testBefore() {
+    // Generate a new RSA key and add it to the keystore
+    await server.issuer.keys.generate('RS256');
+    // Start the server
+    await server.start(9292, 'localhost');
+    logger.debug('Issuer URL:', server.issuer.url);
+  });
+
+  after(async function testAfter() {
+    await server.stop();
+  });
   it('should get token access uri', async () => {
     const req = {
       integrationName: 'test',
@@ -105,6 +129,7 @@ describe('GET /api/v1/service/oauth2/client', () => {
       .then((res) => {
         expect(res.body).to.have.property('success');
         expect(res.body).to.have.property('clientId');
+        assert.equal(res.body.success, true);
       });
   });
 });

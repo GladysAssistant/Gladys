@@ -283,7 +283,7 @@ describe('WithingsHandler init', () => {
 
     // Start fake oatuh2 server
     // Generate a new RSA key and add it to the keystore
-    serverOauth2.issuer.keys.generateRSA();
+    serverOauth2.issuer.keys.generate('RS256');
     // Start the server
     serverOauth2.start(9292, 'localhost');
   });

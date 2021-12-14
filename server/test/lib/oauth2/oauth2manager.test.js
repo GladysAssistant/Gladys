@@ -11,24 +11,26 @@ const server = new OAuth2Server();
 const testServiceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
 const testUserId = '0cd30aef-9c4e-4a23-88e3-3547971296e5';
 
+const testUrl = 'http://localhost:9292';
+
 const gladys = {
   variable: {
     getValue: function getValue(key, serviceId, userId) {
       switch (key) {
         case `${OAUTH2.VARIABLE.TOKEN_HOST}`:
-          return 'http://localhost:9292';
+          return testUrl;
         case `${OAUTH2.VARIABLE.TOKEN_PATH}`:
-          return '/oauth2/token';
+          return '/token';
         case `${OAUTH2.VARIABLE.AUTHORIZE_HOST}`:
-          return 'http://localhost:9292';
+          return testUrl;
         case `${OAUTH2.VARIABLE.AUTHORIZE_PATH}`:
-          return '/oauth2_user/authorize2';
+          return '/authorize2';
         case `${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`:
           return 'user.info,user.metrics,user.activity,user.sleepevents';
         case `${OAUTH2.VARIABLE.GRANT_TYPE}`:
           return 'authorization_code';
         case `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`:
-          return 'dashboard/integration/health/test/settings';
+          return '/dashboard/integration/health/test/settings';
         case `${OAUTH2.VARIABLE.ACCESS_TOKEN}`:
           return (
             '{"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4","expires_in":10800,' +
@@ -53,7 +55,7 @@ const gladys = {
 describe('oauth2manager test', () => {
   before(async function testBefore() {
     // Generate a new RSA key and add it to the keystore
-    await server.issuer.keys.generateRSA();
+    await server.issuer.keys.generate('RS256');
     // Start the server
     await server.start(9292, 'localhost');
     logger.debug('Issuer URL:', server.issuer.url);
@@ -67,7 +69,7 @@ describe('oauth2manager test', () => {
 
   it('oauth manager get executeOauth2HTTPQuery test ', async () => {
     const queryType = 'get';
-    const queryUrl = 'http://localhost:9292/userinfo';
+    const queryUrl = `${testUrl}/userinfo`;
     const queryParams = 'param1=testParam';
 
     const result = await manager.executeOauth2HTTPQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
@@ -77,7 +79,7 @@ describe('oauth2manager test', () => {
 
   it('oauth manager post executeOauth2HTTPQuery test ', async () => {
     const queryType = 'post';
-    const queryUrl = 'http://localhost:9292/revoke';
+    const queryUrl = `${testUrl}/revoke`;
     const queryParams = 'param1=testParam';
 
     logger.debug(manager);
@@ -88,7 +90,7 @@ describe('oauth2manager test', () => {
 
   it('oauth manager get error executeOauth2HTTPQuery test ', async () => {
     const queryType = 'get';
-    const queryUrl = 'http://localhost:9292/revoke';
+    const queryUrl = `${testUrl}/revoke`;
     const queryParams = 'param1=testParam';
 
     const result = await manager.executeOauth2HTTPQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
@@ -98,7 +100,7 @@ describe('oauth2manager test', () => {
 
   it('oauth manager get error executeOauth2HTTPQuery test (bad integration name) ', async () => {
     const queryType = 'get';
-    const queryUrl = 'http://localhost:9292/revoke';
+    const queryUrl = `${testUrl}/revoke`;
     const queryParams = 'param1=testParam';
 
     const result = await manager.executeOauth2HTTPQuery(testServiceId, 'fakeUserId', queryType, queryUrl, queryParams);
