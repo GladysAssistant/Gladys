@@ -315,6 +315,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   BUTTON: 'button',
   SIGNAL: 'signal',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
+  TELEVISION: 'television',
   UNKNOWN: 'unknown',
 };
 
@@ -376,6 +377,35 @@ const DEVICE_FEATURE_TYPES = {
   SIGNAL: {
     QUALITY: 'integer',
   },
+  TELEVISION: {
+    BINARY: 'binary',
+    SOURCE: 'source',
+    GUIDE: 'guide',
+    MENU: 'menu',
+    TOOLS: 'tools',
+    INFO: 'info',
+    ENTER: 'enter',
+    RETURN: 'return',
+    EXIT: 'exit',
+    LEFT: 'left',
+    RIGHT: 'right',
+    UP: 'up',
+    DOWN: 'down',
+    CHANNEL_UP: 'channel-up',
+    CHANNEL_DOWN: 'channel-down',
+    CHANNEL_PREVIOUS: 'channel-previous',
+    CHANNEL: 'channel',
+    VOLUME_UP: 'volume-up',
+    VOLUME_DOWN: 'volume-down',
+    VOLUME_MUTE: 'volume-mute',
+    VOLUME: 'volume',
+    PLAY: 'play',
+    PAUSE: 'pause',
+    STOP: 'stop',
+    REWIND: 'rewind',
+    FORWARD: 'forward',
+    RECORD: 'record',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -404,6 +434,14 @@ const WEATHER_UNITS = {
 };
 
 const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.SWITCH]: [
+    DEVICE_FEATURE_UNITS.AMPERE,
+    DEVICE_FEATURE_UNITS.MILLI_VOLT,
+    DEVICE_FEATURE_UNITS.VOLT,
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  ],
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.CO_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
