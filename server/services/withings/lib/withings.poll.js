@@ -19,20 +19,20 @@ async function poll(device) {
     logger.debug('Features : ', device.features);
 
     const oauth2Manager = new OAuth2Manager(this.gladys);
-    const withingsDeviceId = device.params.find((oneParam) => oneParam.name === 'withingsDeviceId').value;
+    const withingsDeviceId = device.params.find((oneParam) => oneParam.name === 'WITHINGS_DEVICE_ID').value;
 
     // Get all users of gladys
     const users = await this.gladys.user.get();
     await Promise.map(
       users,
       async (user) => {
-        const withingsClienId = await this.gladys.variable.getValue(
+        const withingsClientId = await this.gladys.variable.getValue(
           `${OAUTH2.VARIABLE.CLIENT_ID}`,
           this.serviceId,
           user.id,
         );
 
-        if (withingsClienId) {
+        if (withingsClientId) {
           await Promise.each(device.features, async (feature) => {
             // Convert type to int wihings
             // (cf https://developer.withings.com/oauth2/#tag/measure%2Fpaths%2Fhttps%3A~1~1wbsapi.withings.net~1measure%3Faction%3Dgetmeas%2Fget)

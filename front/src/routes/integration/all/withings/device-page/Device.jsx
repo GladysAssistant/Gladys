@@ -81,7 +81,7 @@ class WithingsDeviceBox extends Component {
                       <img
                         class="card-img-top"
                         style="aspect-ratio: 1 / 1;"
-                        src={`/assets/images/withings/${props.withingsImgMap.get(props.device.name)}`}
+                        src={`/assets/images/withings/${props.withingsImgMap.get(props.device.model)}`}
                         alt={<Text id="global.logoAlt" />}
                       />
                     </Localizer>

@@ -3,7 +3,7 @@ const { fake } = require('sinon');
 const WithingsHandler = require('../../../../services/withings/lib');
 
 const gladys = {
-  device: { destroyBySelectorPattern: fake.returns(null) },
+  device: { destroyByServiceId: fake.returns(null) },
 };
 
 describe('WithingsHandler deleteDevices', () => {

@@ -45,38 +45,42 @@ const actions = store => ({
       const withingsDevicesReceived = await state.httpClient.get('/api/v1/service/withings/device', options);
 
       // Build map of device image by device name
-      const mapOfDeviceImgByName = new Map();
-      mapOfDeviceImgByName.set('Withings - Withings WBS01', 'sleep-analyzer-single.png');
-      mapOfDeviceImgByName.set('Withings - WS30', 'sleep-analyzer-single.png');
-      mapOfDeviceImgByName.set('Withings - Kid Scale', 'KidScale.jpg');
-      mapOfDeviceImgByName.set('Withings - Smart Body Analyzer', 'body-plus-black-kg.jpg');
-      mapOfDeviceImgByName.set('Withings - Body+', 'body-plus-black-kg.jpg');
-      mapOfDeviceImgByName.set('Withings - Body Cardio', 'body-cardio-black-kg.jpg');
-      mapOfDeviceImgByName.set('Withings - Body', 'body-black-kg.jpg');
-      mapOfDeviceImgByName.set('Withings - Smart Baby Monitor', 'SmartBabyMonitor.jpg');
-      mapOfDeviceImgByName.set('Withings - Withings Home', 'home.jpg');
-      mapOfDeviceImgByName.set('Withings - Withings Blood Pressure Monitor V1', 'bpm-connect.jpg');
-      mapOfDeviceImgByName.set('Withings - Withings Blood Pressure Monitor V2', 'bpm-connect.jpg');
-      mapOfDeviceImgByName.set('Withings - Withings Blood Pressure Monitor V3', 'bpm-connect.jpg');
-      mapOfDeviceImgByName.set('Withings - BPM Core', 'bpm-core.jpg');
-      mapOfDeviceImgByName.set('Withings - BPM Connect', 'bpm-connect.jpg');
-      mapOfDeviceImgByName.set('Withings - Pulse', 'pulse-hr-black.jpg');
-      mapOfDeviceImgByName.set('Withings - Activite', 'go.jpg');
-      mapOfDeviceImgByName.set('Withings - Activite (Pop, Steel)', 'steel-white.jpg');
-      mapOfDeviceImgByName.set('Withings - Withings Go', 'go.jpg');
-      mapOfDeviceImgByName.set('Withings - Activite Steel HR', 'steel-hr-36b.jpg');
-      mapOfDeviceImgByName.set('Withings - Activite Steel HR Sport Edition', 'steel-hr-sport-40b.jpg');
-      mapOfDeviceImgByName.set('Withings - Pulse HR', 'pulse-hr-black.jpg');
-      mapOfDeviceImgByName.set('Withings - Move', 'move-ecg-white-kg.jpg');
-      mapOfDeviceImgByName.set('Withings - Move ECG', 'move-ecg-white-kg.jpg');
-      mapOfDeviceImgByName.set('Withings - Aura Dock', 'Aura_2.jpg');
-      mapOfDeviceImgByName.set('Withings - Aura Sensor', 'Aura_2.jpg');
-      mapOfDeviceImgByName.set('Withings - Aura Sensor V2', 'Aura_2.jpg');
-      mapOfDeviceImgByName.set('Withings - Thermo', 'thermo-c.jpg');
+      const mapOfDeviceImgByModel = new Map();
+      mapOfDeviceImgByModel.set('Kid Scale', 'KidScale.jpg');
+      mapOfDeviceImgByModel.set('WBS08', 'body-cardio-black-kg.jpg');
+      mapOfDeviceImgByModel.set('WBS10', 'body-cardio-black-kg.jpg');
+      mapOfDeviceImgByModel.set('WBS11', 'body-cardio-black-kg.jpg');
+      mapOfDeviceImgByModel.set('WS30', 'body-cardio-black-kg.jpg');
+      mapOfDeviceImgByModel.set('Smart Body Analyzer', 'body-cardio-black-kg.jpg');
+      mapOfDeviceImgByModel.set('Withings WBS01', 'body-plus-black-kg.jpg');
+      mapOfDeviceImgByModel.set('Body+', 'body-plus-black-kg.jpg');
+      mapOfDeviceImgByModel.set('Body Cardio', 'body-cardio-black-kg.jpg');
+      mapOfDeviceImgByModel.set('Body', 'body-black-kg.jpg');
+      mapOfDeviceImgByModel.set('Smart Baby Monitor', 'SmartBabyMonitor.jpg');
+      mapOfDeviceImgByModel.set('Withings Home', 'home.jpg');
+      mapOfDeviceImgByModel.set('Withings Blood Pressure Monitor V1', 'bpm-connect.jpg');
+      mapOfDeviceImgByModel.set('Withings Blood Pressure Monitor V2', 'bpm-connect.jpg');
+      mapOfDeviceImgByModel.set('Withings Blood Pressure Monitor V3', 'bpm-connect.jpg');
+      mapOfDeviceImgByModel.set('BPM Core', 'bpm-core.jpg');
+      mapOfDeviceImgByModel.set('BPM Connect', 'bpm-connect.jpg');
+      mapOfDeviceImgByModel.set('BPM Connect Pro', 'bpm-connect.jpg');
+      mapOfDeviceImgByModel.set('Pulse', 'pulse-hr-black.jpg');
+      mapOfDeviceImgByModel.set('Activite', 'go.jpg');
+      mapOfDeviceImgByModel.set('Activite (Pop, Steel)', 'steel-white.jpg');
+      mapOfDeviceImgByModel.set('Withings Go', 'go.jpg');
+      mapOfDeviceImgByModel.set('Activite Steel HR', 'steel-hr-36b.jpg');
+      mapOfDeviceImgByModel.set('Activite Steel HR Sport Edition', 'steel-hr-sport-40b.jpg');
+      mapOfDeviceImgByModel.set('Pulse HR', 'pulse-hr-black.jpg');
+      mapOfDeviceImgByModel.set('Move', 'move-ecg-white-kg.jpg');
+      mapOfDeviceImgByModel.set('Move ECG', 'move-ecg-white-kg.jpg');
+      mapOfDeviceImgByModel.set('Aura Dock', 'Aura_2.jpg');
+      mapOfDeviceImgByModel.set('Aura Sensor', 'Aura_2.jpg');
+      mapOfDeviceImgByModel.set('Aura Sensor V2', 'Aura_2.jpg');
+      mapOfDeviceImgByModel.set('Thermo', 'thermo-c.jpg');
 
       store.setState({
         withingsGetStatus: RequestStatus.Success,
-        withingsImgMap: mapOfDeviceImgByName,
+        withingsImgMap: mapOfDeviceImgByModel,
         withingsDevices: withingsDevicesReceived
       });
     } catch (e) {

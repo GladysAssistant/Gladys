@@ -1,6 +1,7 @@
 describe('Withings device list', () => {
   const deviceBody = {
     name: 'Withings - Body',
+    model: 'Body',
     external_id: 'c43dbbbd-1091-44e7-b122-68911483d28b',
     selector: 'withings-body-c43dbbbd-1091-44e7-b122-68911483d28b',
     should_poll: 1,
@@ -37,6 +38,7 @@ describe('Withings device list', () => {
 
   const deviceBodyPlus = {
     name: 'Withings - Body+',
+    model: 'Body+',
     external_id: 'c43dbbbd-1091-44e7-b144-68911483d28b',
     selector: 'withings-body+-c43dbbbd-1091-44e7-b144-68911483d28b',
     should_poll: 1,
@@ -139,6 +141,7 @@ describe('Withings device list', () => {
 
   const deviceBodyCardio = {
     name: 'Withings - Body Cardio',
+    model: 'Body Cardio',
     external_id: 'c43dbbbd-1091-44e7-b166-68911483d28b',
     selector: 'withings-body+-c43dbbbd-1091-44e7-b166-68911483d28b',
     should_poll: 1,
@@ -252,8 +255,9 @@ describe('Withings device list', () => {
     ]
   };
 
-  const deviceSleep1 = {
+  const deviceScale = {
     name: 'Withings - Withings WBS01',
+    model: 'Withings WBS01',
     external_id: 'c43dbbbd-1091-44e7-b177-68911483d28b',
     selector: 'withings-body-c43dbbbd-1091-44e7-b177-68911483d28b',
     should_poll: 1,
@@ -277,6 +281,7 @@ describe('Withings device list', () => {
 
   const deviceBPM1 = {
     name: 'Withings - BPM Core',
+    model: 'BPM Core',
     external_id: 'c43dbbbd-1091-44e7-b199-68911483d28b',
     selector: 'withings-bpm-c43dbbbd-1091-44e7-b199-68911483d28b',
     should_poll: 1,
@@ -314,6 +319,7 @@ describe('Withings device list', () => {
 
   const deviceBPM2 = {
     name: 'Withings - BPM Connect',
+    model: 'BPM Connect',
     external_id: 'c43dbbbd-1091-44e7-b120-68911483d28b',
     selector: 'withings-bpm-c43dbbbd-1091-44e7-b120-68911483d28b',
     should_poll: 1,
@@ -379,6 +385,7 @@ describe('Withings device list', () => {
 
   const deviceThermo = {
     name: 'Withings - Thermo',
+    model: 'Thermo',
     external_id: 'c43dbbbd-1091-44e7-b121-68911483d28b',
     selector: 'withings-thermo-c43dbbbd-1091-44e7-b121-68911483d28b',
     should_poll: 1,
@@ -436,7 +443,7 @@ describe('Withings device list', () => {
     cy.createDevice(deviceBodyPlus, 'withings');
     cy.createDevice(deviceBodyCardio, 'withings');
 
-    cy.createDevice(deviceSleep1, 'withings');
+    cy.createDevice(deviceScale, 'withings');
 
     cy.createDevice(deviceBPM1, 'withings');
     cy.createDevice(deviceBPM2, 'withings');
@@ -493,12 +500,12 @@ describe('Withings device list', () => {
       });
   });
 
-  it('Check Withings - Sleep device', () => {
-    cy.contains('.card-header', deviceSleep1.name)
+  it('Check Withings - Scale device', () => {
+    cy.contains('.card-header', deviceScale.name)
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('img').should('have.attr', 'src', '/assets/images/withings/sleep-analyzer-single.png');
+        cy.get('img').should('have.attr', 'src', '/assets/images/withings/body-plus-black-kg.jpg');
         cy.get('select').should('have.value', '');
         cy.get('span').should('exist');
         cy.get('.fe-activity').should('exist');

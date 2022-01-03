@@ -1,6 +1,6 @@
 const db = require('../../models');
 const logger = require('../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENTS } = require('../../utils/constants');
 
 /**
  * @description Save hstorical device feature state in DB.
@@ -40,7 +40,6 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
     await db.DeviceFeature.update(
       {
         last_value: historicalState.value,
-        last_value_string: historicalState.value,
         last_value_changed: historicalState.created_at,
       },
       {
@@ -51,22 +50,10 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
     );
 
     deviceFeature.last_value = historicalState.value;
-    deviceFeature.last_value_string = deviceFeature.last_value_string;
     deviceFeature.last_value_changed = historicalState.updated_at;
 
     // save local state in RAM
     this.stateManager.setState('deviceFeature', deviceFeature.selector, deviceFeature);
-
-    // send websocket event
-    this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
-      payload: {
-        device: device.selector,
-        last_value: historicalState.value,
-        last_value_string: historicalState.value,
-        last_value_changed: historicalState.updated_at,
-      },
-    });
 
     // check if there is a trigger matching
     this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {

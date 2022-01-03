@@ -10,7 +10,7 @@ const server = new ServerMock({ host: 'localhost', port: 9192 }, null);
 const gladys = {
   device: {
     create: fake.returns(null),
-    destroyBySelectorPattern: fake.returns(null),
+    destroyByServiceId: fake.returns(null),
     saveHistoricalState: function shs(device, featureBattery, featureState) {
       device.featureBattery = featureBattery;
       device.featureBattery = featureState;
@@ -317,25 +317,25 @@ describe('WithingsHandler init', () => {
 
     let paramCreated = firstResult.value.params;
     await assert.equal(paramCreated.length, 1);
-    await assert.equal(paramCreated[0].name, 'withingsDeviceId');
+    await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId');
 
     await assert.equal(secondResult.value.name, 'Withings - string');
     paramCreated = secondResult.value.params;
     await assert.equal(paramCreated.length, 1);
-    await assert.equal(paramCreated[0].name, 'withingsDeviceId');
+    await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId2');
 
     await assert.equal(thirdResult.value.name, 'Withings - string');
     paramCreated = thirdResult.value.params;
     await assert.equal(paramCreated.length, 1);
-    await assert.equal(paramCreated[0].name, 'withingsDeviceId');
+    await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId3');
 
     await assert.equal(fourResult.value.name, 'Withings - string');
     paramCreated = fourResult.value.params;
     await assert.equal(paramCreated.length, 1);
-    await assert.equal(paramCreated[0].name, 'withingsDeviceId');
+    await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId4');
   });
 });

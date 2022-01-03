@@ -5,7 +5,7 @@
  * withings.deleteDevices();
  */
 async function deleteDevices() {
-  await this.gladys.device.destroyBySelectorPattern('withings');
+  await this.gladys.device.destroyByServiceId(this.serviceId);
   return { success: true };
 }
 

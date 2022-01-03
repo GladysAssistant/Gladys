@@ -24,7 +24,7 @@ function buildNewDevice(withingsDevice, serviceId) {
   // Build params for all device
   const newParams = [
     {
-      name: 'withingsDeviceId',
+      name: 'WITHINGS_DEVICE_ID',
       value: withingsDevice.deviceid,
     },
   ];
