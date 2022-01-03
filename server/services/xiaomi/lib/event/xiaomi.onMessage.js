@@ -36,6 +36,7 @@ function onMessage(msg, rsinfo) {
     case 'sensor_cube.aqgl01':
       this.newValueCube(message, data);
       break;
+    case 'sensor_switch.aq2':
     case 'switch':
       this.newValueSwitch(message, data);
       break;
