@@ -917,7 +917,6 @@
     "editNamePlaceholder": "Entrez un nom de scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
-    "runButton": "Jouer",
     "deleteButton": "Supprimer",
     "triggersTitle": "Déclencheurs",
     "newTrigger": "Nouveau déclencheur",
@@ -932,11 +931,6 @@
     "actionsDescription": "Toutes les actions de ce bloc s'exécuteront en parallèle. Pour effectuer une séquence d'actions, ajoutez des actions au bloc suivant.",
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
-    "triggerCard": {
-      "title": "Déclencheurs",
-      "searchPlaceholder": "Chercher un déclencheur",
-      "leavingHomeTitle": "Départ la maison"
-    },
     "actionsCard": {
       "delay": {
         "label": " Ce bloc attendra la durée spécifiée.",
@@ -1544,6 +1538,24 @@
     "cm": "cm",
     "mm": "mm"
   },
+  "deviceFeatureValue": {
+    "type": {
+      "binary": {
+        "other": "Aucune valeur reçue",
+        "zero": "Inactif",
+        "one": "Actif"
+      }
+    },
+    "category": {
+      "co-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Sain",
+          "one": "CO détecté"
+        }
+      }
+    }
+  },
   "deviceFeatureCategory": {
     "light": {
       "shortCategoryName": "Lumière",
@@ -1608,6 +1620,10 @@
       "binary": "Capteur de fumée - Oui/Non",
       "decimal": "Valeur de fumée décimale"
     },
+    "co-sensor": {
+      "shortCategoryName": "Capteur de monxyde de carbon (CO)",
+      "binary": "Détection de CO"
+    },
     "co2-sensor": {
       "shortCategoryName": "Capteur de Co2",
       "decimal": "Niveau de CO2"
@@ -1663,6 +1679,36 @@
     "signal": {
       "shortCategoryName": "Signal",
       "integer": "Intensité du signal"
+    },
+    "television": {
+      "shortCategoryName": "Télévision",
+      "binary": "Power",
+      "source": "Source",
+      "channel": "Chaîne",
+      "guide": "Guide",
+      "menu": "Menu",
+      "volume-up": "Augmenter volume",
+      "volume-mute": "Muet",
+      "volume-down": "Diminuer volume",
+      "volume": "Volume",
+      "channel-up": "Chaîne suivante",
+      "channel-previous": "Dernière chaîne",
+      "channel-down": "Chaîne précédente",
+      "tools": "Outils",
+      "info": "Info",
+      "return": "Retour",
+      "exit": "Quitter",
+      "up": "Haut",
+      "down": "Bas",
+      "left": "Gauche",
+      "right": "Droite",
+      "enter": "Entrer",
+      "rewind": "Retour rapide",
+      "forward": "Avance rapide",
+      "play": "Lecture",
+      "pause": "Pause",
+      "stop": "Stop",
+      "record": "Enregistrer"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
