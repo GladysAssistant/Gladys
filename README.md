@@ -82,4 +82,4 @@ Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.gi
 
 ## Copyright & License
 
-Copyright (c) 2013-2021 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
+Copyright (c) 2013-2022 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
