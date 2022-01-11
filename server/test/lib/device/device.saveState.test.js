@@ -1,6 +1,8 @@
+const { expect } = require('chai');
 const { assert, stub, useFakeTimers } = require('sinon');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const { BadParameters } = require('../../../utils/coreErrors');
 
 describe('Device.saveState', () => {
   it('should saveState and keep history', async () => {
@@ -115,5 +117,29 @@ describe('Device.saveState', () => {
       );
     }
     await Promise.all(promises);
+  });
+  it('should not save NaN as state', async () => {
+    const event = {
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const device = new Device(event, {}, stateManager);
+
+    const nanValue = parseInt('NaN value', 10);
+
+    try {
+      await device.saveState(
+        {
+          id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+          selector: 'test-device-feature',
+          has_feedback: false,
+          keep_history: false,
+        },
+        nanValue,
+      );
+      assert.fail('NaN device state should fail');
+    } catch (e) {
+      expect(e).instanceOf(BadParameters);
+    }
   });
 });

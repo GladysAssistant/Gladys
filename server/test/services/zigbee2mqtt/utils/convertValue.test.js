@@ -43,9 +43,12 @@ describe('zigbee2mqtt convertValue', () => {
     const result = convertValue('unknown feature', 4);
     return assert.deepEqual(result, 4);
   });
-  it('should return unknown feature string', () => {
-    const result = convertValue('unknown feature', 'closed');
-    return assert.equal(result, 'closed');
+  it('should throw exception on string value', () => {
+    assert.throw(
+      () => convertValue('unknown feature', 'closed'),
+      Error,
+      `Zigbee2mqqt don't handle value "closed" for feature "unknown feature".`,
+    );
   });
   it('should throw Exception', () => {
     assert.throw(
