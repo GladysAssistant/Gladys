@@ -2,6 +2,7 @@ const os = require('os');
 const Serialport = require('serialport');
 const Readline = require('@serialport/parser-readline');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -12,6 +13,13 @@ const logger = require('../../../../utils/logger');
  * rflink.connect(Path);
  */
 function connect(Path) {
+  this.connected = false;
+  this.ready = false;
+  this.scanInProgress = false;
+
+  if (!Path) {
+    throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
+  }
   // special case for macOS
   if (os.platform() === 'darwin') {
     this.Path = Path.replace('/dev/tty.', '/dev/cu.');
@@ -30,9 +38,6 @@ function connect(Path) {
 
     this.sendUsb.open(function returnOpenErr(err) {
       if (err) {
-        this.connected = false;
-        this.ready = false;
-        this.scanInProgress = false;
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED,
         });
@@ -50,10 +55,10 @@ function connect(Path) {
     logger.debug(`Rflink : Connecting to USB = ${Path}`);
     this.connected = true;
     this.ready = true;
+    this.scanInProgress = true;
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_READY,
     });
-
     this.listen();
   } catch (error) {
     this.connected = false;

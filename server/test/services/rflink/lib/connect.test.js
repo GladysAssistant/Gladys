@@ -3,19 +3,19 @@ const { expect } = require('chai');
 const os = require('os');
 const proxyquire = require('proxyquire').noCallThru();
 const SerialPortMock = require('../SerialPortMock.test');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
   serialport: SerialPortMock,
 });
 
 const { assert, fake, stub } = sinon;
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 let rflinkHandler;
 let gladys;
 
-describe('RFLinkHandler.connect', () => {
+describe.only('RFLinkHandler.connect', () => {
   gladys = {
     event: {
       emit: fake.returns(null),
@@ -35,6 +35,7 @@ describe('RFLinkHandler.connect', () => {
     expect(rflinkHandler.Path).to.be.equal('/tty1');
     expect(rflinkHandler.connected).to.be.equal(true);
     expect(rflinkHandler.ready).to.be.equal(true);
+    expect(rflinkHandler.scanInProgress).to.be.equal(true);
   });
 
   it('should adapt the path depending on the os platform', async () => {
@@ -46,12 +47,18 @@ describe('RFLinkHandler.connect', () => {
   });
 
   it('should fail connection with a non defined path', async () => {
+    rflinkHandler.listen = stub();
     const path = '';
     try {
       await rflinkHandler.connect(path);
+      assert.fail();
     } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
+      assert.match(e.message, 'RFLINK_PATH_NOT_FOUND');
     }
+    assert.notCalled(rflinkHandler.listen);
+    expect(rflinkHandler.connected).to.be.equal(false);
+    expect(rflinkHandler.ready).to.be.equal(false);
+    expect(rflinkHandler.scanInProgress).to.be.equal(false);
   });
 
   it('should raise an error on opening connection error', async () => {

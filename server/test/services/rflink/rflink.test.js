@@ -58,6 +58,7 @@ describe('RFlinkService', () => {
     };
     try {
       await rflinkService.start();
+      assert.fail();
     } catch (e) {
       expect(e).to.be.instanceOf(Error);
     }

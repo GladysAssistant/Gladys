@@ -18,8 +18,8 @@
     "arm64"
   ],
   "dependencies": {
-    "serialport": "9.1.0",
-    "@serialport/parser-readline": "9.0.7",
+    "serialport": "9.2.8",
+    "@serialport/parser-readline": "9.2.4",
     "color2xterm": "1.0.0"
   }
 }

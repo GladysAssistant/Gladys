@@ -1,6 +1,5 @@
 /* eslint-disable prefer-destructuring */
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 
 module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
@@ -21,15 +20,17 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
    */
   async function connect(req, res) {
     const rflinkPath = await gladys.variable.getValue('RFLINK_PATH', serviceId);
-    if (!rflinkPath) {
-      throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
+    try {
+      RFlinkManager.connect(rflinkPath);
+    } catch (e) {
+      log.error('RFLink gateway cannot connect : no usb path configured')
+      res.json({ success: false });
     }
-    RFlinkManager.connect(rflinkPath);
     res.json({ success: true });
   }
 
   /**
-   * @api {post} /api/v1/service/rflink/disconnect discconnect the gateway
+   * @api {post} /api/v1/service/rflink/disconnect disconnect the gateway
    * @apiName disconnect
    * @apiGroup RFlink
    */

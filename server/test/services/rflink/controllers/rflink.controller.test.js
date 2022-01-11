@@ -3,7 +3,6 @@ const sinon = require('sinon');
 const { assert, fake, stub } = sinon;
 const { expect } = require('chai');
 const RFLinkController = require('../../../../services/rflink/api/rflink.controller');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const serviceId = '6d1bd783-ab5c-4d90-8551-6bc5fcd02212';
 const gladys = {
@@ -28,9 +27,9 @@ const gladys = {
 const rflinkHandler = {
   gladys: fake.returns(gladys),
   serviceId: fake.returns(serviceId),
-  connected: fake.returns(false),
-  ready: fake.returns(false),
-  scanInProgress: fake.returns(false),
+  connected: false,
+  ready: false,
+  scanInProgress: false,
   newDevices: [],
   devices: fake.returns([]),
   currentMilightGateway: fake.returns('F746'),
@@ -49,7 +48,7 @@ const rflinkHandler = {
   },
 };
 
-describe('POST /api/v1/service/rflink/connect', () => {
+describe.only('POST /api/v1/service/rflink/connect', () => {
   let controller;
 
   beforeEach(() => {
@@ -76,20 +75,19 @@ describe('POST /api/v1/service/rflink/connect', () => {
   });
 
   it('should raise an error on connection when no path is given', async () => {
+    rflinkHandler.connect = fake.throws(new Error('path null'));
     gladys.variable.getValue = stub()
-      .withArgs('RFLINK_PATH')
-      .resolves(undefined);
-    controller = RFLinkController(gladys, rflinkHandler);
-
+      .withArgs('RFLINK_PATH', serviceId)
+      .resolves('');
     const req = {};
-    const res = { json: fake.returns(true) };
-    try {
-      await controller['post /api/v1/service/rflink/connect'].controller(req, res);
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    }
-    assert.notCalled(rflinkHandler.connect);
-    assert.notCalled(res.json);
+    const res = {
+      json: fake.returns(null),
+    };
+    await controller['post /api/v1/service/rflink/connect'].controller(req, res);
+    assert.calledOnce(rflinkHandler.connect);
+    // assert.calledWith(res.json, { success: false });
+    console.log(res.json);
+    expect(rflinkHandler.connected).to.be.deep.equal(false);
   });
 });
 
