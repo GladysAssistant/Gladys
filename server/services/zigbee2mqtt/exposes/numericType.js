@@ -115,14 +115,6 @@ module.exports = {
         max: 100,
       },
     },
-    illuminance: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-        min: 0,
-        max: 100000,
-      },
-    },
     illuminance_lux: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
@@ -162,12 +154,6 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
         min: -100,
         max: 150,
-      },
-    },
-    vibration: {
-      feature: {
-        category: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
-        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
       },
     },
     voltage: {

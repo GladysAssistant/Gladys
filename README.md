@@ -67,6 +67,7 @@ Thanks goes to these wonderful people 👏
     <td align="center"><a href="https://github.com/callemand"><img src="https://avatars2.githubusercontent.com/u/11317212?v=4?s=100" width="100px;" alt=""/><br /><sub><b>callemand</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=callemand" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/thebradleysanders"><img src="https://avatars2.githubusercontent.com/u/10698631?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brad Sanders</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=thebradleysanders" title="Documentation">📖</a></td>
     <td align="center"><a href="http://robmccann.co.uk"><img src="https://avatars.githubusercontent.com/u/412744?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rob McCann</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=rob-mccann" title="Code">💻</a></td>
+    <td align="center"><a href="https://bandism.net/"><img src="https://avatars.githubusercontent.com/u/22633385?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ikko Ashimine</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=eltociear" title="Documentation">📖</a></td>
   </tr>
 </table>
 
@@ -81,4 +82,4 @@ Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.gi
 
 ## Copyright & License
 
-Copyright (c) 2013-2021 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
+Copyright (c) 2013-2022 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).
