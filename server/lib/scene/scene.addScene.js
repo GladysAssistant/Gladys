@@ -102,10 +102,7 @@ function addScene(sceneRaw) {
         if (intervalMilliseconds > MAX_VALUE_SET_INTERVAL) {
           throw new BadParameters(`${trigger.interval} ${trigger.unit} is too big for an interval`);
         }
-        trigger.jsInterval = setInterval(
-          () => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger),
-          intervalMilliseconds,
-        );
+        trigger.jsInterval = setInterval(() => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger), intervalMilliseconds);
       } else if (
         trigger.type === EVENTS.CALENDAR.EVENT_START ||
         trigger.type === EVENTS.CALENDAR.EVENT_END ||
