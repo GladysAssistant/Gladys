@@ -22,7 +22,7 @@ const EditScenePage = ({ children, ...props }) => (
             </h1>
             <h1 class="page-title">
               {props.isNameEditable ? (
-                <form onSubmit={this.saveScene}>
+                <form onSubmit={props.saveScene}>
                   <div class="input-group">
                     <Localizer>
                       <input

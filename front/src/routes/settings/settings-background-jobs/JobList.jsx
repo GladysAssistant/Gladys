@@ -32,55 +32,53 @@ const JobList = ({ children, ...props }) => (
         </thead>
         <tbody>
           {props.jobs &&
-            props.jobs.filter(job => job.type !== 'calendar').map(job => (
-              <tr>
-                <td>
-                  <div>
-                    <Text id={`jobsSettings.jobTypes.${job.type}`} />
-                  </div>
-                  <div>
-                    <small>
-                      {dayjs(job.created_at)
-                        .locale(props.user.language)
-                        .fromNow()}
-                    </small>
-                    {job.data && job.data.name && (
+            props.jobs
+              .filter(job => job.type !== 'calendar')
+              .map(job => (
+                <tr>
+                  <td>
+                    <div>
+                      <Text id={`jobsSettings.jobTypes.${job.type}`} />
+                    </div>
+                    <div>
+                      <small>
+                        {dayjs(job.created_at)
+                          .locale(props.user.language)
+                          .fromNow()}
+                      </small>
+                      {job.data && job.data.name && <div class={style.errorDiv}>{job.data.name}</div>}
+                    </div>
+                    {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
                       <div class={style.errorDiv}>
-                        {job.data.name}
+                        <pre class={style.errorDirectDiv}>
+                          <Text id={`jobsSettings.jobErrors.${job.data.error_type}`} />
+                        </pre>
                       </div>
                     )}
-                  </div>
-                  {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
-                    <div class={style.errorDiv}>
-                      <pre class={style.errorDirectDiv}>
-                        <Text id={`jobsSettings.jobErrors.${job.data.error_type}`} />
-                      </pre>
-                    </div>
-                  )}
-                  {job.data && job.data.error_type === JOB_ERROR_TYPES.UNKNOWN_ERROR && (
-                    <div class={style.errorDiv}>
-                      <pre class={style.errorDirectDiv}>{job.data.error}</pre>
-                    </div>
-                  )}
-                </td>
-                <td>
-                  <span
-                    class={cx('badge', {
-                      'badge-success': job.status === JOB_STATUS.SUCCESS,
-                      'badge-primary': job.status === JOB_STATUS.IN_PROGRESS,
-                      'badge-danger': job.status === JOB_STATUS.FAILED
-                    })}
-                  >
-                    {job.status !== JOB_STATUS.IN_PROGRESS && <Text id={`jobsSettings.jobStatuses.${job.status}`} />}
-                    {job.status === JOB_STATUS.IN_PROGRESS && (
-                      <span>
-                        {job.progress} <Text id="global.percent" />
-                      </span>
+                    {job.data && job.data.error_type === JOB_ERROR_TYPES.UNKNOWN_ERROR && (
+                      <div class={style.errorDiv}>
+                        <pre class={style.errorDirectDiv}>{job.data.error}</pre>
+                      </div>
                     )}
-                  </span>
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>
+                    <span
+                      class={cx('badge', {
+                        'badge-success': job.status === JOB_STATUS.SUCCESS,
+                        'badge-primary': job.status === JOB_STATUS.IN_PROGRESS,
+                        'badge-danger': job.status === JOB_STATUS.FAILED
+                      })}
+                    >
+                      {job.status !== JOB_STATUS.IN_PROGRESS && <Text id={`jobsSettings.jobStatuses.${job.status}`} />}
+                      {job.status === JOB_STATUS.IN_PROGRESS && (
+                        <span>
+                          {job.progress} <Text id="global.percent" />
+                        </span>
+                      )}
+                    </span>
+                  </td>
+                </tr>
+              ))}
         </tbody>
       </table>
     </div>
@@ -98,50 +96,57 @@ const JobList = ({ children, ...props }) => (
         </thead>
         <tbody>
           {props.jobs &&
-            props.jobs.filter(job => job.type === 'calendar').map(job => (
-              <tr>
-                <td>
-                  <div>
-                    <Text id={`jobsSettings.jobTypes.${job.type}`} />
-                  </div>
-                  <div>
-                    <small>
-                      {dayjs(job.created_at)
-                        .locale(props.user.language)
-                        .fromNow()}
-                    </small>
-                  </div>
-                  {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
-                    <div class={style.errorDiv}>
-                      <pre class={style.errorDirectDiv}>
-                        <Text id={`jobsSettings.jobErrors.${job.data.error_type}`} />
-                      </pre>
+            props.jobs
+              .filter(job => job.type === 'calendar')
+              .map(job => (
+                <tr>
+                  <td>
+                    <div>
+                      <Text id={`jobsSettings.jobTypes.${job.type}`} />
                     </div>
-                  )}
-                  {job.data && job.data.error_type === JOB_ERROR_TYPES.UNKNOWN_ERROR && (
-                    <div class={style.errorDiv}>
-                      <pre class={style.errorDirectDiv}>{job.data.error}</pre>
+                    <div>
+                      <small>
+                        {dayjs(job.created_at)
+                          .locale(props.user.language)
+                          .fromNow()}
+                      </small>
                     </div>
-                  )}
-                </td>
-                <td>
-                  <span
-                    class={cx('badge', {
-                      'badge-success': job.status === JOB_STATUS.SUCCESS,
-                      'badge-primary': job.status === JOB_STATUS.IN_PROGRESS,
-                      'badge-danger': job.status === JOB_STATUS.FAILED
-                    })}
-                  >
-                    {job.status !== JOB_STATUS.IN_PROGRESS && <Text id={`jobsSettings.jobStatuses.${job.status}`} />}
-                    {job.status === JOB_STATUS.IN_PROGRESS && (
-                      <span>
-                        {job.progress} <Text id="global.percent" />
-                      </span>
+                    {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
+                      <div class={style.errorDiv}>
+                        <pre class={style.errorDirectDiv}>
+                          <Text id={`jobsSettings.jobErrors.${job.data.error_type}`} />
+                        </pre>
+                      </div>
                     )}
-                  </span>
-                </td>
-              </tr>
-            ))}
+                    {job.data && job.data.error_type === JOB_ERROR_TYPES.UNKNOWN_ERROR && (
+                      <div class={style.errorDiv}>
+                        <pre class={style.errorDirectDiv}>{job.data.error}</pre>
+                      </div>
+                    )}
+                    {job.data && job.data.name && (
+                      <div>
+                        <small>{job.data.name}</small>
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    <span
+                      class={cx('badge', {
+                        'badge-success': job.status === JOB_STATUS.SUCCESS,
+                        'badge-primary': job.status === JOB_STATUS.IN_PROGRESS,
+                        'badge-danger': job.status === JOB_STATUS.FAILED
+                      })}
+                    >
+                      {job.status !== JOB_STATUS.IN_PROGRESS && <Text id={`jobsSettings.jobStatuses.${job.status}`} />}
+                      {job.status === JOB_STATUS.IN_PROGRESS && (
+                        <span>
+                          {job.progress} <Text id="global.percent" />
+                        </span>
+                      )}
+                    </span>
+                  </td>
+                </tr>
+              ))}
         </tbody>
       </table>
     </div>

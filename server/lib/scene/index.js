@@ -22,7 +22,7 @@ const DEFAULT_TIMEZONE = 'Europe/Paris';
 
 const SceneManager = function SceneManager(
   stateManager,
-  eventManager,
+  event,
   device,
   message,
   variable,
@@ -32,7 +32,7 @@ const SceneManager = function SceneManager(
   user,
 ) {
   this.stateManager = stateManager;
-  this.eventManager = eventManager;
+  this.event = event;
   this.device = device;
   this.message = message;
   this.variable = variable;
@@ -49,16 +49,16 @@ const SceneManager = function SceneManager(
   this.sunCalc = sunCalc;
   this.schedule = schedule;
   this.jobs = [];
-  this.eventManager.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
-  this.eventManager.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
+  this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
+  this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
   // on timezone change, reload all scenes
-  this.eventManager.on(EVENTS.SYSTEM.TIMEZONE_CHANGED, eventFunctionWrapper(this.init.bind(this)));
+  this.event.on(EVENTS.SYSTEM.TIMEZONE_CHANGED, eventFunctionWrapper(this.init.bind(this)));
 
-  this.eventManager.on(EVENTS.HOUSE.CREATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
-  this.eventManager.on(EVENTS.HOUSE.UPDATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
-  this.eventManager.on(EVENTS.HOUSE.DELETED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
+  this.event.on(EVENTS.HOUSE.CREATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
+  this.event.on(EVENTS.HOUSE.UPDATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
+  this.event.on(EVENTS.HOUSE.DELETED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
 
-  this.eventManager.on(EVENTS.CALENDAR.SYNCHRONIZED, eventFunctionWrapper(this.init.bind(this)));
+  this.event.on(EVENTS.CALENDAR.SYNCHRONIZED, eventFunctionWrapper(this.init.bind(this)));
 };
 
 SceneManager.prototype.addScene = addScene;

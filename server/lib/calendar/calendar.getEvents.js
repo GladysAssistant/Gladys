@@ -21,12 +21,12 @@ async function getEvents(userId, options) {
       },
     ],
     where: {},
-    order: [[ 'start', 'ASC' ]]
+    order: [['start', 'ASC']],
   };
 
   if (options.from && options.to) {
     queryParams.where.start = {
-      [Op.between]:[new Date(options.from), new Date(options.to)],
+      [Op.between]: [new Date(options.from), new Date(options.to)],
     };
   } else if (options.from && options.to === undefined) {
     queryParams.where.start = {
@@ -69,7 +69,7 @@ async function getEvents(userId, options) {
   }
 
   if (options.order_by) {
-    queryParams.order.push([ options.order_by, options.order_dir || 'ASC' ]);
+    queryParams.order.push([options.order_by, options.order_dir || 'ASC']);
   }
 
   if (options.take) {
@@ -101,9 +101,7 @@ async function getEventsForDate(userId, date, options) {
     },
   };
 
-  const order = [
-    ['start', 'ASC']
-  ];
+  const order = [['start', 'ASC']];
 
   if (options.calendarId) {
     where.calendar_id = {
