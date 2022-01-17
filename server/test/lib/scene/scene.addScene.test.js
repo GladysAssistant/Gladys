@@ -216,7 +216,9 @@ describe('SceneManager.addScene', () => {
       ],
       actions: [],
     });
-    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('type').equal('calendar.event-start');
+    expect(sceneManager.scenes[scene.selector].triggers[0])
+      .to.have.property('type')
+      .equal('calendar.event-start');
   });
   it('should add a scene with a calendar event trigger, end', async () => {
     const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
@@ -233,7 +235,9 @@ describe('SceneManager.addScene', () => {
       ],
       actions: [],
     });
-    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('type').equal('calendar.event-end');
+    expect(sceneManager.scenes[scene.selector].triggers[0])
+      .to.have.property('type')
+      .equal('calendar.event-end');
   });
   it('should add a scene with a calendar event trigger, reminder', async () => {
     const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
@@ -249,6 +253,8 @@ describe('SceneManager.addScene', () => {
       ],
       actions: [],
     });
-    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('type').equal('calendar.event-reminder');
+    expect(sceneManager.scenes[scene.selector].triggers[0])
+      .to.have.property('type')
+      .equal('calendar.event-reminder');
   });
 });
