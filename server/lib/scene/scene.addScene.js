@@ -82,7 +82,7 @@ function addScene(sceneRaw) {
             throw new BadParameters(`${trigger.scheduler_type} not supported`);
         }
         trigger.nodeScheduleJob = this.schedule.scheduleJob(rule, () =>
-          this.eventManager.emit(EVENTS.TRIGGERS.CHECK, trigger),
+          this.event.emit(EVENTS.TRIGGERS.CHECK, trigger),
         );
       } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'interval') {
         let intervalMilliseconds;
@@ -103,7 +103,7 @@ function addScene(sceneRaw) {
           throw new BadParameters(`${trigger.interval} ${trigger.unit} is too big for an interval`);
         }
         trigger.jsInterval = setInterval(
-          () => this.eventManager.emit(EVENTS.TRIGGERS.CHECK, trigger),
+          () => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger),
           intervalMilliseconds,
         );
       } else if (
@@ -135,7 +135,7 @@ function addScene(sceneRaw) {
               `${calendarEvent.external_id}_start`,
               eventStartTime.toDate(),
               () => {
-                this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
+                this.event.emit(EVENTS.TRIGGERS.CHECK, {
                   type: EVENTS.CALENDAR.EVENT_START,
                   calendarEvent,
                 });
@@ -154,7 +154,7 @@ function addScene(sceneRaw) {
               `${calendarEvent.external_id}_end`,
               eventEndTime.toDate(),
               () => {
-                this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
+                this.event.emit(EVENTS.TRIGGERS.CHECK, {
                   type: EVENTS.CALENDAR.EVENT_END,
                   calendarEvent,
                 });
