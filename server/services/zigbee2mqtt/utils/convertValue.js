@@ -35,6 +35,9 @@ function convertValue(feature, value) {
         case 'hold':
           result = BUTTON_STATUS.LONG_CLICK;
           break;
+        case 'long':
+          result = BUTTON_STATUS.LONG_CLICK;
+          break;
         default:
           result = value;
       }
