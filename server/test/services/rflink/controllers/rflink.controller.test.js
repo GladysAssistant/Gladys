@@ -48,7 +48,7 @@ const rflinkHandler = {
   },
 };
 
-describe.only('POST /api/v1/service/rflink/connect', () => {
+describe('POST /api/v1/service/rflink/connect', () => {
   let controller;
 
   beforeEach(() => {
@@ -86,7 +86,6 @@ describe.only('POST /api/v1/service/rflink/connect', () => {
     await controller['post /api/v1/service/rflink/connect'].controller(req, res);
     assert.calledOnce(rflinkHandler.connect);
     // assert.calledWith(res.json, { success: false });
-    console.log(res.json);
     expect(rflinkHandler.connected).to.be.deep.equal(false);
   });
 });

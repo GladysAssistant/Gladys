@@ -3,7 +3,6 @@ const { expect } = require('chai');
 const os = require('os');
 const proxyquire = require('proxyquire').noCallThru();
 const SerialPortMock = require('../SerialPortMock.test');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
   serialport: SerialPortMock,
@@ -15,7 +14,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 let rflinkHandler;
 let gladys;
 
-describe.only('RFLinkHandler.connect', () => {
+describe('RFLinkHandler.connect', () => {
   gladys = {
     event: {
       emit: fake.returns(null),
@@ -63,12 +62,10 @@ describe.only('RFLinkHandler.connect', () => {
 
   it('should raise an error on opening connection error', async () => {
     // @TODO : serial port open should raise an error to test the open callback function code
+
     const path = '/tty1';
     await rflinkHandler.connect(path);
-    /*
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED,
-    });
-    */
+
+
   });
 });

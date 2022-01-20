@@ -23,7 +23,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
     try {
       RFlinkManager.connect(rflinkPath);
     } catch (e) {
-      log.error('RFLink gateway cannot connect : no usb path configured')
+      logger.error('RFLink gateway cannot connect : no usb path configured');
       res.json({ success: false });
     }
     res.json({ success: true });
