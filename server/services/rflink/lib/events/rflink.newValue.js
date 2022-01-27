@@ -35,7 +35,7 @@ function newValue(device, deviceFeature, state) {
       value /= 10;
       break;
     case 'battery':
-      value = 'non géré';
+      value = 'NA';
       break;
     case 'uv':
     case 'light-intensity':
