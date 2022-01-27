@@ -55,10 +55,10 @@ const DEVICES = [
     id: '86aa70',
     switch: 'switch',
     service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-    name: `Prise `,
+    name: `MiLightv1 switch 86aa70-12`,
     selector: `rflink:86aa70:12`,
-    external_id: `rflink:86aa70:00`,
-    model: 'Tristate',
+    external_id: `rflink:86aa70:12`,
+    model: 'Milightv1',
     should_poll: false,
     features: [
       {
