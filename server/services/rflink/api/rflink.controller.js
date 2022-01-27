@@ -5,7 +5,7 @@ const logger = require('../../../utils/logger');
 module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
   /**
    * @api {get} /api/v1/service/rflink/newDevices get rflink devices
-   * @apiName getDevices
+   * @apiName newDevices
    * @apiGroup RFlink
    */
   async function getNewDevices(req, res) {
@@ -74,7 +74,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
     RFlinkManager.pair(currentMilightGateway, milightZone);
 
     res.json({
-      succes: true,
+      success: true,
       currentMilightGateway,
       milightZone,
     });
@@ -98,7 +98,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
 
     RFlinkManager.unpair(currentMilightGateway, milightZone);
     res.json({
-      succes: true,
+      success: true,
       currentMilightGateway,
       milightZone,
     });
@@ -114,7 +114,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
     logger.debug(`Command send to port : ${command}`);
     RFlinkManager.sendUsb.write(command);
     res.json({
-      succes: true,
+      success: true,
     });
   }
 
