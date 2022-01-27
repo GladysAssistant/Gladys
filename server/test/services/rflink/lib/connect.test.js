@@ -65,7 +65,5 @@ describe('RFLinkHandler.connect', () => {
 
     const path = '/tty1';
     await rflinkHandler.connect(path);
-
-
   });
 });
