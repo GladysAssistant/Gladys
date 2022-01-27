@@ -61,7 +61,7 @@ describe('RFLinkHandler.message', () => {
 
   it('should add a new milight device', async () => {
     // this "super" device is a sample of all the paramater that could be handled
-    const msgRF = '20;e5;Oregon BTHR;ID=5a6d;RGBW=50;SWITCH=11;CMD=MODE';
+    const msgRF = '20;29;MiLightv1;ID=5a6d;SWITCH=01;RGBW=07c8;CMD=MODE;';
     await rflinkHandler.message(msgRF);
     assert.calledOnce(rflinkHandler.addNewDevice);
   });
@@ -152,25 +152,25 @@ describe('RFLinkHandler.message', () => {
   });
 
   it('should handle a message with a cmd MODE value of an existing milight device', async () => {
-    const msgRF = '20;47;Cresta;ID=8001;CMD=MODE;';
+    const msgRF = '20;47;MiLightv1;ID=8001;CMD=MODE;';
     const device = { external_id: 'rflink:8001:undefined' };
     // store device
     rflinkHandler.newDevices = [device];
     await rflinkHandler.message(msgRF);
 
-    const msg = { protocol: 'Cresta', features: [], id: '8001', cmd: 'MODE' };
+    const msg = { protocol: 'MiLightv1', features: [], id: '8001', cmd: 'MODE' };
     assert.notCalled(rflinkHandler.addNewDevice);
     assert.calledWith(rflinkHandler.newValue, msg, 'milight-mode', msg.cmd);
   });
 
   it('should handle a message with a cmd DISCO value of an existing milight device', async () => {
-    const msgRF = '20;47;Cresta;ID=8001;CMD=DISCO;';
+    const msgRF = '20;47;MiLightv1;ID=8001;CMD=DISCO;';
     const device = { external_id: 'rflink:8001:undefined' };
     // store device
     rflinkHandler.newDevices = [device];
     await rflinkHandler.message(msgRF);
 
-    const msg = { protocol: 'Cresta', features: [], id: '8001', cmd: 'DISCO' };
+    const msg = { protocol: 'MiLightv1', features: [], id: '8001', cmd: 'DISCO' };
     assert.notCalled(rflinkHandler.addNewDevice);
     assert.calledWith(rflinkHandler.newValue, msg, 'milight-mode', msg.cmd);
   });
