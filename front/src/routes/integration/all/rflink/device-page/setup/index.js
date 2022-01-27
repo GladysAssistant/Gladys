@@ -7,13 +7,23 @@ import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
+import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
 
 @connect('session,user,httpClient,houses,currentIntegration', actions)
 class RflinkDeviceSetupPage extends Component {
-  selectFeature(e) {
-    this.setState({
-      selectedFeature: e.target.value
-    });
+  selectFeature(selectedFeatureOption) {
+    if (selectedFeatureOption && selectedFeatureOption.value) {
+      this.setState({
+        selectedFeature: selectedFeatureOption.value,
+        selectedFeatureOption
+      });
+    } else {
+      this.setState({
+        selectedFeature: null,
+        selectedFeatureOption: null
+      });
+    }
   }
 
   addFeature() {
@@ -54,11 +64,28 @@ class RflinkDeviceSetupPage extends Component {
   }
 
   updateDeviceProperty(deviceIndex, property, value) {
-    const device = update(this.state.device, {
+    let device;
+    if (property === 'external_id' && !value.startsWith('mqtt:')) {
+      if (value.length < 5) {
+        value = 'mqtt:';
+      } else {
+        value = `mqtt:${value}`;
+      }
+    }
+
+    device = update(this.state.device, {
       [property]: {
         $set: value
       }
     });
+
+    if (property === 'external_id') {
+      device = update(device, {
+        selector: {
+          $set: value
+        }
+      });
+    }
 
     this.setState({
       device
@@ -67,15 +94,16 @@ class RflinkDeviceSetupPage extends Component {
 
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
-    if (property === 'external_id' && !value.startsWith('rflink:')) {
+    let device;
+    if (property === 'external_id' && !value.startsWith('mqtt:')) {
       if (value.length < 5) {
-        value = 'rflink:';
+        value = 'mqtt:';
       } else {
-        value = `rflink:${value}`;
+        value = `mqtt:${value}`;
       }
     }
 
-    const device = update(this.state.device, {
+    device = update(this.state.device, {
       features: {
         [featureIndex]: {
           [property]: {
@@ -84,6 +112,18 @@ class RflinkDeviceSetupPage extends Component {
         }
       }
     });
+
+    if (property === 'external_id') {
+      device = update(device, {
+        features: {
+          [featureIndex]: {
+            selector: {
+              $set: value
+            }
+          }
+        }
+      });
+    }
 
     this.setState({
       device
@@ -119,6 +159,36 @@ class RflinkDeviceSetupPage extends Component {
     }
   }
 
+  getDeviceFeaturesOptions = () => {
+    const deviceFeaturesOptions = [];
+    Object.keys(DEVICE_FEATURE_CATEGORIES).forEach(category => {
+      const categoryValue = DEVICE_FEATURE_CATEGORIES[category];
+      if (get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}`)) {
+        const categoryFeatureTypeOptions = [];
+
+        const types = Object.keys(get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}`));
+
+        types.forEach(type => {
+          const typeValue = type;
+          if (
+            get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`) &&
+            typeValue !== 'shortCategoryName'
+          ) {
+            categoryFeatureTypeOptions.push({
+              value: `${categoryValue}|${typeValue}`,
+              label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.${typeValue}`)
+            });
+          }
+        });
+        deviceFeaturesOptions.push({
+          label: get(this.props.intl.dictionary, `deviceFeatureCategory.${categoryValue}.shortCategoryName`),
+          options: categoryFeatureTypeOptions
+        });
+      }
+    });
+    this.setState({ deviceFeaturesOptions });
+  };
+
   constructor(props) {
     super(props);
 
@@ -135,6 +205,7 @@ class RflinkDeviceSetupPage extends Component {
 
   async componentWillMount() {
     this.props.getHouses();
+    this.getDeviceFeaturesOptions();
     await this.props.getIntegrationByName('rflink');
 
     let { deviceSelector } = this.props;
@@ -175,7 +246,7 @@ class RflinkDeviceSetupPage extends Component {
       loading: false
     });
   }
-  //<RflinkPage integration={integrationConfig[props.user.language].rflink}>
+
   render(props, state) {
     return (
       <RflinkPage>
@@ -195,4 +266,4 @@ class RflinkDeviceSetupPage extends Component {
   }
 }
 
-export default RflinkDeviceSetupPage;
+export default withIntlAsProp(RflinkDeviceSetupPage);
