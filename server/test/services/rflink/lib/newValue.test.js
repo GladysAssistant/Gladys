@@ -73,7 +73,7 @@ describe('RFLinkHandler.newValue', () => {
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
-      state: 'non géré',
+      state: 'NA',
     });
   });
 

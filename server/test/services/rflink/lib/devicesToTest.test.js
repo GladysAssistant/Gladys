@@ -55,16 +55,16 @@ const DEVICES = [
     id: '86aa70',
     switch: 'switch',
     service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-    name: `MiLightv1 switch 86aa70-12`,
-    selector: `rflink:86aa70:12`,
-    external_id: `rflink:86aa70:12`,
+    name: `MiLightv1 switch 86aa70-00`,
+    selector: `rflink:86aa70:00`,
+    external_id: `rflink:86aa70:00`,
     model: 'Milightv1',
     should_poll: false,
     features: [
       {
         name: 'Power',
-        selector: `rflink:86aa70:power:12:milight`,
-        external_id: `rflink:86aa70:power:12:milight`,
+        selector: `rflink:86aa70:power:00:milight`,
+        external_id: `rflink:86aa70:power:00:milight`,
         rfcode: {
           value: 'CMD',
           cmd: 'ON',
@@ -79,8 +79,8 @@ const DEVICES = [
       },
       {
         name: 'color',
-        selector: `rflink:86aa70:color:12:milight`,
-        external_id: `rflink:86aa70:color:12:milight`,
+        selector: `rflink:86aa70:color:00:milight`,
+        external_id: `rflink:86aa70:color:00:milight`,
         rfcode: {
           value: 'RGBW',
           cmd: 'COLOR',
@@ -95,8 +95,8 @@ const DEVICES = [
       },
       {
         name: 'brightness',
-        selector: `rflink:86aa70:brightness:12:milight`,
-        external_id: `rflink:86aa70:brightness:12:milight`,
+        selector: `rflink:86aa70:brightness:00:milight`,
+        external_id: `rflink:86aa70:brightness:00:milight`,
         rfcode: {
           value: 'RGBW',
           cmd: 'BRIGHT',
@@ -111,8 +111,8 @@ const DEVICES = [
       },
       {
         name: 'milight-mode',
-        selector: `rflink:86aa70:milight-mode:12:milight`,
-        external_id: `rflink:86aa70:milight-mode:12:milight`,
+        selector: `rflink:86aa70:milight-mode:00:milight`,
+        external_id: `rflink:86aa70:milight-mode:00:milight`,
         rfcode: 'CMD',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.EFFECT_MODE,
