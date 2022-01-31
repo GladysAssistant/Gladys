@@ -188,12 +188,16 @@ const actionsFunc = {
       const conditionVerified = isBeforeCondition || isAfterCondition;
       if (!conditionVerified) {
         throw new AbortScene('CONDITION_BEFORE_OR_AFTER_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time: Condition OR verified.`);
       }
     } else {
       // Otherwise, the condition is a AND
       const conditionVerified = isBeforeCondition && isAfterCondition;
       if (!conditionVerified) {
         throw new AbortScene('CONDITION_BEFORE_AND_AFTER_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time: Condition AND verified.`);
       }
     }
     if (action.days_of_the_week) {
