@@ -177,7 +177,7 @@ const actionsFunc = {
       }
     }
 
-    // if the beforeDate is not before the afterDate
+    // if the afterDate is not before the beforeDate
     // It means the user is trying to do a cross-day time check
     // Example: AFTER 23:00 and BEFORE 8:00.
     // This means H > 23 OR h < 8
