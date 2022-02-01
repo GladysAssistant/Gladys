@@ -1,7 +1,6 @@
-const { assert, fake, useFakeTimers } = require('sinon');
+const { assert, fake } = require('sinon');
 const chaiAssert = require('chai').assert;
 const { expect } = require('chai');
-const dayjs = require('dayjs');
 const EventEmitter = require('events');
 const cloneDeep = require('lodash.clonedeep');
 const { ACTIONS } = require('../../../utils/constants');
@@ -11,6 +10,9 @@ const { executeActions } = require('../../../lib/scene/scene.executeActions');
 const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
+
+// WE ARE SLOWLY MOVING ALL TESTS FROM THIS BIG FILE
+// TO A SMALLER SET OF FILE IN THE "ACTIONS" FOLDER.
 
 describe('scene.executeActions', () => {
   it('should execute light turn on', async () => {
@@ -618,111 +620,6 @@ describe('scene.executeActions', () => {
       scope,
     );
     assert.calledWith(message.sendToUser, 'pepper', 'Temperature in the living room is 15 °C.');
-  });
-  it('should execute condition.check-time, and send message because condition is true', async () => {
-    const stateManager = new StateManager(event);
-    const message = {
-      sendToUser: fake.resolves(null),
-    };
-    const scope = {};
-    const todayAt12 = dayjs()
-      .hour(12)
-      .minute(0);
-    const fiveMinutesAgo = todayAt12.subtract(5, 'minute');
-    const inFiveMinutes = todayAt12.add(5, 'minute');
-    const clock = useFakeTimers(todayAt12.valueOf());
-    await executeActions(
-      { stateManager, event, message },
-      [
-        [
-          {
-            type: ACTIONS.CONDITION.CHECK_TIME,
-            after: fiveMinutesAgo.format('hh:mm'),
-            before: inFiveMinutes.format('hh:mm'),
-            days_of_the_week: [todayAt12.format('dddd').toLowerCase()],
-          },
-        ],
-        [
-          {
-            type: ACTIONS.MESSAGE.SEND,
-            user: 'pepper',
-            text: 'hello',
-          },
-        ],
-      ],
-      scope,
-    );
-    assert.calledWith(message.sendToUser, 'pepper', 'hello');
-    clock.restore();
-  });
-  it('should abort scene because condition is not verified', async () => {
-    const stateManager = new StateManager(event);
-    const scope = {};
-    const todayAt12 = dayjs()
-      .hour(12)
-      .minute(0);
-    const fiveMinutesAgo = todayAt12.subtract(5, 'minute');
-    const clock = useFakeTimers(todayAt12.valueOf());
-    const promise = executeActions(
-      { stateManager, event },
-      [
-        [
-          {
-            type: ACTIONS.CONDITION.CHECK_TIME,
-            before: fiveMinutesAgo.format('hh:mm'),
-          },
-        ],
-      ],
-      scope,
-    );
-    await chaiAssert.isRejected(promise, AbortScene);
-    clock.restore();
-  });
-  it('should abort scene because condition is not verified', async () => {
-    const stateManager = new StateManager(event);
-    const scope = {};
-    const todayAt12 = dayjs()
-      .hour(12)
-      .minute(0);
-    const inFiveMinutes = todayAt12.add(5, 'minute');
-    const clock = useFakeTimers(todayAt12.valueOf());
-    const promise = executeActions(
-      { stateManager, event },
-      [
-        [
-          {
-            type: ACTIONS.CONDITION.CHECK_TIME,
-            after: inFiveMinutes.format('hh:mm'),
-          },
-        ],
-      ],
-      scope,
-    );
-    await chaiAssert.isRejected(promise, AbortScene);
-    clock.restore();
-  });
-  it('should abort scene because condition is not verified', async () => {
-    const stateManager = new StateManager(event);
-    const scope = {};
-    const todayAt12 = dayjs()
-      .hour(12)
-      .minute(0);
-    const tomorrow = todayAt12.add(1, 'day');
-    const clock = useFakeTimers(todayAt12.valueOf());
-    const promise = executeActions(
-      { stateManager, event },
-      [
-        [
-          {
-            type: ACTIONS.CONDITION.CHECK_TIME,
-            days_of_the_week: [tomorrow.format('dddd').toLowerCase()],
-          },
-        ],
-      ],
-      scope,
-    );
-    await chaiAssert.isRejected(promise, AbortScene);
-    clock.restore();
   });
 
   it('should execute action scene.start', async () => {
