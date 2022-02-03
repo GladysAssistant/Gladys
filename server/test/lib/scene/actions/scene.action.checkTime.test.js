@@ -150,7 +150,6 @@ describe('scene.action.checkTime', () => {
         scope,
       );
     } catch (e) {
-      console.log(e);
       throw e;
     }
     clock.restore();
