@@ -1,5 +1,27 @@
 describe('Withings settings page', () => {
   before(() => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/oauth2/client/authorization-uri`
+      },
+      req => {
+        req.reply(res => {
+          res.body.authorizationUri = `/dashboard/integration/health/withings/settings`;
+        });
+      }
+    );
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/withings/init`
+      },
+      {
+        body: []
+      }
+    );
+
     cy.login();
 
     cy.visit('/dashboard/integration/health/withings/settings');
@@ -19,19 +41,6 @@ describe('Withings settings page', () => {
       .last()
       .clear()
       .type('FakeSecret');
-
-    const serverUrl = Cypress.env('serverUrl');
-    cy.intercept(
-      {
-        method: 'POST',
-        url: `${serverUrl}/api/v1/service/oauth2/client/authorization-uri`
-      },
-      req => {
-        req.reply(res => {
-          res.body.authorizationUri = `/dashboard/integration/health/withings/settings`;
-        });
-      }
-    );
 
     cy.contains('button', 'integration.oauth2.buttonConnect').click();
 
