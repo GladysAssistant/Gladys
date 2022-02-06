@@ -27,9 +27,7 @@ const actions = store => ({
     const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
       serviceId: returnServiceId
     });
-
     if (returnGetConfig) {
-      // Case of config found
       store.setState({
         clientIdInDb: returnGetConfig.clientId,
         oauth2ErrorMsg: null,

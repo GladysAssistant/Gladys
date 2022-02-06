@@ -11,6 +11,7 @@ const gladys = {
   device: {
     create: fake.returns(null),
     destroyByServiceId: fake.returns(null),
+    get: fake.returns(null),
     saveHistoricalState: function shs(device, featureBattery, featureState) {
       device.featureBattery = featureBattery;
       device.featureBattery = featureState;
@@ -302,38 +303,38 @@ describe('WithingsHandler init', () => {
 
     const result = await withingsHandler.init('0cd30aef-9c4e-4a23-88e3-3547971296e5');
 
-    const firstResult = result.next();
-    const secondResult = result.next();
-    const thirdResult = result.next();
-    const fourResult = result.next();
+    const firstResult = result[0];
+    const secondResult = result[1];
+    const thirdResult = result[2];
+    const fourResult = result[3];
 
-    await assert.equal(firstResult.value.name, 'Withings - string');
-    await assert.equal(firstResult.value.service_id, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
-    await assert.equal(firstResult.value.should_poll, true);
-    await assert.equal(firstResult.value.poll_frequency, 86400000);
+    await assert.equal(firstResult.name, 'Withings - string');
+    await assert.equal(firstResult.service_id, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
+    await assert.equal(firstResult.should_poll, true);
+    await assert.equal(firstResult.poll_frequency, 86400000);
 
-    const featureCreated = firstResult.value.features;
+    const featureCreated = firstResult.features;
     await assert.equal(featureCreated.length, 18);
 
-    let paramCreated = firstResult.value.params;
+    let paramCreated = firstResult.params;
     await assert.equal(paramCreated.length, 1);
     await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId');
 
-    await assert.equal(secondResult.value.name, 'Withings - string');
-    paramCreated = secondResult.value.params;
+    await assert.equal(secondResult.name, 'Withings - string');
+    paramCreated = secondResult.params;
     await assert.equal(paramCreated.length, 1);
     await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId2');
 
-    await assert.equal(thirdResult.value.name, 'Withings - string');
-    paramCreated = thirdResult.value.params;
+    await assert.equal(thirdResult.name, 'Withings - string');
+    paramCreated = thirdResult.params;
     await assert.equal(paramCreated.length, 1);
     await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId3');
 
-    await assert.equal(fourResult.value.name, 'Withings - string');
-    paramCreated = fourResult.value.params;
+    await assert.equal(fourResult.name, 'Withings - string');
+    paramCreated = fourResult.params;
     await assert.equal(paramCreated.length, 1);
     await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId4');

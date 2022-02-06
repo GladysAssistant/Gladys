@@ -111,7 +111,7 @@ async function poll(device) {
 
               if (measureResult.data.body.measuregrps) {
                 const mapOfMeasuresGrpsByWithingsDeviceId = new Map();
-                await Promise.each(measureResult.data.body.measuregrps, async (element) => {
+                measureResult.data.body.measuregrps.forEach((element) => {
                   if (element) {
                     // Build map of measuregrps by withings device id
                     const measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid) || [];

@@ -1,5 +1,5 @@
-const { expect } = require('chai');
-const { fake } = require('sinon');
+const { fake, assert } = require('sinon');
+
 const WithingsHandler = require('../../../../services/withings/lib');
 
 const gladys = {
@@ -10,7 +10,7 @@ describe('WithingsHandler deleteDevices', () => {
   const withingsHandler = new WithingsHandler(gladys, null, null, null);
 
   it('delete devices', async () => {
-    const result = await withingsHandler.deleteDevices();
-    expect(result).to.eql({ success: true });
+    await withingsHandler.deleteDevices();
+    assert.calledWith(gladys.device.destroyByServiceId, withingsHandler.serviceId);
   });
 });

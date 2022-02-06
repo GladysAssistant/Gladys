@@ -44,8 +44,6 @@ describe('Withings settings page', () => {
 
     cy.get('.alert-info').contains('FakeClientId');
 
-    cy.get('.alert-info').i18n('integration.withings.settings.afterIntegration');
-
     cy.get('.alert-info').i18n('integration.withings.settings.instructionsToUse');
 
     cy.contains('p', 'integration.oauth2.delete').should('exist');

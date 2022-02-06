@@ -10,8 +10,7 @@ module.exports = function WithingsController(withingsHandler) {
   async function init(req, res) {
     const resultInit = await withingsHandler.init(req.user.id);
     res.json({
-      success: true,
-      result: resultInit,
+      withingsDevices: resultInit,
     });
   }
 

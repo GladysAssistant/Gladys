@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const Promise = require('bluebird');
 const db = require('../../models');
 
 /**
@@ -20,14 +20,15 @@ async function destroyByServiceId(serviceId) {
       },
     ],
     where: {
-      service_id: { [Op.eq]: `${serviceId}` },
+      service_id: serviceId,
     },
   });
 
-  devices.map(async (device) => {
-    device.destroy(device.selector);
-  });
-
+  if (devices) {
+    await Promise.each(devices, async (device) => {
+      await device.destroy(device.selector);
+    });
+  }
   return null;
 }
 

@@ -13,6 +13,11 @@ const WithingsDevices = ({ children, ...props }) => (
           <div class="row">
             <div class="col-lg-12">
               <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <Text id="integration.withings.device.title" />
+                  </h3>
+                </div>
                 <div class="card-body">
                   <div
                     class={cx('dimmer', {
@@ -21,9 +26,6 @@ const WithingsDevices = ({ children, ...props }) => (
                   >
                     <div class="loader" />
                     <div class="dimmer-content">
-                      <h2>
-                        <Text id="integration.withings.device.title" />
-                      </h2>
                       <div class="card-body">
                         <div
                           class={cx('dimmer', {
@@ -48,6 +50,7 @@ const WithingsDevices = ({ children, ...props }) => (
                                     houses={props.houses}
                                     updateDeviceProperty={props.updateDeviceProperty}
                                     saveDevice={props.saveDevice}
+                                    deleteDevice={props.deleteDevice}
                                     user={props.user}
                                   />
                                 ))}

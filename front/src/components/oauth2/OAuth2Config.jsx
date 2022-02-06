@@ -10,6 +10,11 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
           <div class="row">
             <div class="col-lg-12">
               <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <Text id={`integration.${integrationName}.settings.title`} />
+                  </h3>
+                </div>
                 <div class="card-body">
                   <div
                     class={cx('dimmer', {
@@ -19,9 +24,6 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                     <div class="loader" />
                     {props.oauth2GetStatus !== RequestStatus.Getting && !props.clientIdInDb && (
                       <div class="dimmer-content">
-                        <h2>
-                          <Text id={`integration.${integrationName}.settings.title`} />
-                        </h2>
                         {props.oauth2ErrorMsg && (
                           <div class="alert alert-danger">
                             <Text id={`integration.oauth2.${props.oauth2ErrorMsg}`} />
@@ -73,9 +75,6 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                     )}
                     {props.oauth2GetStatus === RequestStatus.Success && props.clientIdInDb && (
                       <div class="dimmer-content">
-                        <h2>
-                          <Text id={`integration.${integrationName}.settings.title`} />
-                        </h2>
                         <div class="alert alert-info">
                           <p>
                             <Text id={`integration.${integrationName}.settings.complete`} />
@@ -85,9 +84,6 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                               <Text id={`integration.${integrationName}.settings.clientId`} />
                             </b>
                             {props.clientIdInDb}
-                          </p>
-                          <p>
-                            <Text id={`integration.${integrationName}.settings.afterIntegration`} />
                           </p>
                           <p>
                             <Text id={`integration.${integrationName}.settings.instructionsToUse`} />
@@ -103,6 +99,8 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                             </button>
                           </span>
                         </div>
+
+                        {children}
                       </div>
                     )}
                   </div>

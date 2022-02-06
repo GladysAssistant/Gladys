@@ -16,7 +16,7 @@ class WithingsDeviceBox extends Component {
       return null;
     }
     const batteryLevelDeviceFeature = this.props.device.features.find(
-      deviceFeature => deviceFeature.type === DEVICE_FEATURE_CATEGORIES.BATTERY
+      deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
     let mostRecentValueAt = null;
@@ -39,9 +39,23 @@ class WithingsDeviceBox extends Component {
     }
     this.setState({ loading: false });
   };
+  deleteDevice = async () => {
+    this.setState({ loading: true });
+    try {
+      if (this.props.forConnect) {
+        await this.props.deleteDevice(this.props.device, null);
+      } else {
+        await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
+      }
+    } catch (e) {
+      this.setState({ error: RequestStatus.Error });
+    }
+    this.setState({ loading: false });
+  };
   updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
+
   componentWillMount() {
     this.refreshDeviceProperty();
   }
@@ -87,26 +101,28 @@ class WithingsDeviceBox extends Component {
                     </Localizer>
                   )}
                 </div>
-                <div class="form-group">
-                  <label>
-                    <Text id="integration.withings.device.roomLabel" />
-                  </label>
-                  <select onChange={this.updateRoom} class="form-control">
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {props.houses &&
-                      props.houses.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === props.device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
-                </div>
+                {!props.forConnect && (
+                  <div class="form-group">
+                    <label>
+                      <Text id="integration.withings.device.roomLabel" />
+                    </label>
+                    <select onChange={this.updateRoom} class="form-control">
+                      <option value="">
+                        <Text id="global.emptySelectOption" />
+                      </option>
+                      {props.houses &&
+                        props.houses.map(house => (
+                          <optgroup label={house.name}>
+                            {house.rooms.map(room => (
+                              <option selected={room.id === props.device.room_id} value={room.id}>
+                                {room.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                    </select>
+                  </div>
+                )}
                 <div class="form-group">
                   <label>
                     <Text id="integration.withings.device.featuresLabel" />
@@ -128,25 +144,44 @@ class WithingsDeviceBox extends Component {
                       <Text id="integration.withings.device.noFeatures" />
                     )}
                   </div>
-                  <p class="mt-4">
-                    {mostRecentValueAt ? (
-                      <Text
-                        id="integration.withings.device.mostRecentValueAt"
-                        fields={{
-                          mostRecentValueAt: dayjs(mostRecentValueAt)
-                            .locale(props.user.language)
-                            .fromNow()
-                        }}
-                      />
-                    ) : (
-                      <Text id="integration.withings.device.noValueReceived" />
-                    )}
-                  </p>
+                  {!props.forConnect && (
+                    <p class="mt-4">
+                      {mostRecentValueAt ? (
+                        <Text
+                          id="integration.withings.device.mostRecentValueAt"
+                          fields={{
+                            mostRecentValueAt: dayjs(mostRecentValueAt)
+                              .locale(props.user.language)
+                              .fromNow()
+                          }}
+                        />
+                      ) : (
+                        <Text id="integration.withings.device.noValueReceived" />
+                      )}
+                    </p>
+                  )}
                 </div>
                 <div class="form-group">
-                  <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.withings.device.saveButton" />
-                  </button>
+                  {props.forConnect && props.device.inDB && (
+                    <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
+                      <Text id="integration.withings.device.deleteDeviceInGladys" />
+                    </button>
+                  )}
+                  {props.forConnect && !props.device.inDB && (
+                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
+                      <Text id="integration.withings.device.createDeviceInGladys" />
+                    </button>
+                  )}
+                  {!props.forConnect && (
+                    <>
+                      <button onClick={this.saveDevice} class="btn btn-success mr-2">
+                        <Text id="integration.withings.device.saveButton" />
+                      </button>
+                      <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
+                        <Text id="integration.withings.device.deleteButton" />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

@@ -1,5 +1,6 @@
 const logger = require('../../utils/logger');
 const { OAUTH2 } = require('../../utils/constants');
+const { Error500 } = require('../../utils/httpErrors');
 
 /**
  * @description Delete client_id and secrei_id of current oauth2 integration.
@@ -20,7 +21,7 @@ async function deleteClient(serviceId, userId) {
     await this.gladys.variable.destroy(`${OAUTH2.VARIABLE.ACCESS_TOKEN}`, serviceId, userId);
   } catch (error) {
     logger.error(error.message);
-    return { success: false, errorMsg: error.message };
+    throw new Error500(error);
   }
 
   return { success: true };

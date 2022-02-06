@@ -1,10 +1,11 @@
 const { OAuth2Server } = require('oauth2-mock-server');
-const { assert } = require('chai');
+const { assert, expect } = require('chai');
 const { fake } = require('sinon');
 
 const OAuth2Manager = require('../../../lib/oauth2');
 const logger = require('../../../utils/logger');
 const { OAUTH2 } = require('../../../utils/constants');
+const { Error500 } = require('../../../utils/httpErrors');
 
 const server = new OAuth2Server();
 
@@ -108,7 +109,7 @@ describe('oauth2manager test', () => {
     return assert.equal(result, null);
   });
 
-  it('oauth manager get error deleteVar test ', async () => {
+  it('oauth manager  deleteClient test ', async () => {
     const result = await manager.deleteClient(testServiceId, testUserId);
     logger.debug(result);
     return assert.equal(result.success, true);
@@ -119,10 +120,14 @@ describe('oauth2manager failled test', () => {
   // check error
   const manager = new OAuth2Manager(null);
 
-  it('oauth manager get error deleteVar failled test ', async () => {
-    const result = await manager.deleteClient(testServiceId, testUserId);
-    logger.debug(result);
-    return assert.equal(result.success, false);
+  it('oauth manager get error deleteClient failled test ', async () => {
+    try {
+      const result = await manager.deleteClient(testServiceId, testUserId);
+      logger.debug(result);
+      assert.fail('should have Error500 error');
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error500);
+    }
   });
 });
 

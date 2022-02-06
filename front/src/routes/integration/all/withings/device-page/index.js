@@ -12,6 +12,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 class WithingsDevicePage extends Component {
   componentWillMount() {
     this.props.getWithingsDevice();
+    this.props.updateWithingsDeviceImg();
     this.props.getHouses();
   }
 

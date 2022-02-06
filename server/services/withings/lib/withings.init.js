@@ -8,6 +8,8 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
 
+const withingsDeviceIdName = 'WITHINGS_DEVICE_ID';
+
 /**
  * @description Build a new gladys device from withings device.
  *
@@ -24,7 +26,7 @@ function buildNewDevice(withingsDevice, serviceId) {
   // Build params for all device
   const newParams = [
     {
-      name: 'WITHINGS_DEVICE_ID',
+      name: withingsDeviceIdName,
       value: withingsDevice.deviceid,
     },
   ];
@@ -327,19 +329,39 @@ async function init(userId) {
     });
   });
 
-  // Save device with feature
+  // get device in db to know device already connected
   const { gladys } = this;
+  const devicesInDB = await gladys.device.get({ service: 'withings' });
+
+  // Save device with feature
+  const devicesResult = [];
   await mapOfDeviceByWithingsDeviceId.forEach((value, key) => {
     if (key) {
-      const arrayOfFeatures = mapOfFeatureByWithingsDeviceId.get(key);
-      // Assign features to device
-      value.features = value.features.concat(arrayOfFeatures);
-      // Save all device (with feature)
-      gladys.device.create(value);
+      let matchDeviceInDB;
+      if (devicesInDB) {
+        const currentDeviceParam = value.params.filter((element) => element.name === withingsDeviceIdName);
+        if (currentDeviceParam) {
+          const currentWithingsDeviceId = currentDeviceParam.value;
+
+          matchDeviceInDB = devicesInDB.find(
+            (element) =>
+              element.params.find((param) => param.name === withingsDeviceIdName).VALUE === currentWithingsDeviceId,
+          );
+        }
+      }
+      if (matchDeviceInDB) {
+        matchDeviceInDB.inDB = true;
+        devicesResult.push(matchDeviceInDB);
+      } else {
+        const arrayOfFeatures = mapOfFeatureByWithingsDeviceId.get(key);
+        // Assign features to device
+        value.features = value.features.concat(arrayOfFeatures);
+        devicesResult.push(value);
+      }
     }
   });
 
-  return mapOfDeviceByWithingsDeviceId.values();
+  return devicesResult;
 }
 
 module.exports = {
