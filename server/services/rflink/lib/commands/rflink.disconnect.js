@@ -8,8 +8,9 @@ const logger = require('../../../../utils/logger');
 function disconnect() {
   if (this.Path && this.connected) {
     logger.debug(`Rflink : Disconnecting...`);
+    this.sendUsb.close();
   } else {
-    logger.debug('Rflink: Not connected, disconnecting');
+    logger.debug('Rflink: Not connected');
   }
   this.connected = false;
   this.ready = false;
