@@ -90,7 +90,7 @@ function handleMqttMessage(topic, message) {
               try {
                 const newState = {
                   device_feature_external_id: `${feature.external_id}`,
-                  state: convertValue(feature.type, incomingFeatures[zigbeeFeatureField]),
+                  state: convertValue(device, feature.type, zigbeeFeatureField, incomingFeatures[zigbeeFeatureField]),
                 };
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
               } catch (e) {

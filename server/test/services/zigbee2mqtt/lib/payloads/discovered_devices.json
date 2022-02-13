@@ -1,6 +1,7 @@
 [
   {
     "external_id": "zigbee2mqtt:0x00158d00033e88d5",
+    "params": [],
     "features": [
       {
         "category": "battery",
@@ -47,6 +48,7 @@
   {
     "name": "0x00158d0004019127",
     "model": "WXKG11LM",
+    "params": [],
     "external_id": "zigbee2mqtt:0x00158d0004019127",
     "features": [
       {
@@ -80,6 +82,7 @@
   {
     "name": "0x00158d00045b2740",
     "model": "WSDCGQ11LM",
+    "params": [{ "name": "feature_map_alarm", "value": "{\"0\":false,\"1\":true,\"false\":0,\"true\":1}" }],
     "external_id": "zigbee2mqtt:0x00158d00045b2740",
     "features": [
       {
@@ -117,6 +120,18 @@
         "unit": "percent",
         "external_id": "zigbee2mqtt:0x00158d00045b2740:humidity-sensor:decimal:humidity",
         "selector": "zigbee2mqtt-0x00158d00045b2740-humidity-sensor-decimal-humidity"
+      },
+      {
+        "name": "Alarm",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 1,
+        "category": "siren",
+        "type": "binary",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:siren:binary:alarm",
+        "selector": "zigbee2mqtt-0x00158d00045b2740-siren-binary-alarm"
       },
       {
         "name": "Pressure",

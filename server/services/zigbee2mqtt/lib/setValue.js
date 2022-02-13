@@ -1,5 +1,6 @@
 const { intToRgb } = require('../../../utils/colors');
 const { BadParameters } = require('../../../utils/coreErrors');
+const { convertParametersValue } = require('../utils/parameters/convertParameterValue');
 
 /**
  * @description Set the new device value from Gladys to MQTT.
@@ -25,19 +26,23 @@ function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Zigbee2mqtt device external_id is invalid : "${externalId}" have no Zigbee property`);
   }
 
+  // Looks mapping from parameters
+  let zigbeeValue = convertParametersValue(device, property, value);
+
   // Convert Gladys value to Zigbee value
-  let zigbeeValue;
-  switch (deviceFeature.type) {
-    case 'binary':
-      zigbeeValue = value ? `ON` : `OFF`;
-      break;
-    case 'color': {
-      const [r, g, b] = intToRgb(parseInt(value, 10));
-      zigbeeValue = { rgb: `${r},${g},${b}` };
-      break;
+  if (zigbeeValue === undefined) {
+    switch (deviceFeature.type) {
+      case 'binary':
+        zigbeeValue = value ? `ON` : `OFF`;
+        break;
+      case 'color': {
+        const [r, g, b] = intToRgb(parseInt(value, 10));
+        zigbeeValue = { rgb: `${r},${g},${b}` };
+        break;
+      }
+      default:
+        zigbeeValue = value;
     }
-    default:
-      zigbeeValue = value;
   }
 
   // Send message to Zigbee2mqtt topics

@@ -1,17 +1,27 @@
 const { xyToInt } = require('../../../utils/colors');
 const { BUTTON_STATUS } = require('../../../utils/constants');
+const { convertParametersValue } = require('./parameters/convertParameterValue');
 
 /**
  * @description Convert Zigbee2mqtt device value into Gladys value.
+ * @param {Object} device - Gladys device.
  * @param {string} feature - Device feature.
+ * @param {string} property - Zigbee device feature property.
  * @param {number|string|boolean|Object} value - Device value.
  * @returns {number|string|boolean} Gladys value.
  * @example
- * convertValue('state', 'ON');
+ * convertValue({ params: [...] }, 'binary', 'alarm', 'ON');
  */
-function convertValue(feature, value) {
+function convertValue(device, feature, property, value) {
   let result;
 
+  // Looks mapping from parameters
+  const matchingParamValue = convertParametersValue(device, property, value);
+  if (matchingParamValue !== undefined) {
+    return matchingParamValue;
+  }
+
+  // Or fallback to default mapper
   switch (feature) {
     case 'binary': {
       result = value === 'ON' || value === 'true' || value === true ? 1 : 0;

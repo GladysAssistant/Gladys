@@ -1,4 +1,5 @@
 const { mapDefinition } = require('./features/mapDefinition');
+const { mapDefinitionParameters } = require('./parameters/mapDefinitionParameters');
 
 /**
  * @description Converts an MQTT device to a Gladys device.
@@ -12,6 +13,7 @@ function convertDevice(device, serviceId) {
   const { friendly_name: name, definition = {} } = device;
   const { model } = definition;
   const features = mapDefinition(name, definition);
+  const params = mapDefinitionParameters(definition);
 
   const gladysDevice = {
     name,
@@ -20,6 +22,7 @@ function convertDevice(device, serviceId) {
     features,
     should_poll: false,
     service_id: serviceId,
+    params,
   };
 
   return gladysDevice;
