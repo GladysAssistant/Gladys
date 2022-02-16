@@ -24,8 +24,7 @@ async function getNetworkMode() {
       cleanResult = cmdResult;
       logger.debug(`Cgroups V1 detected ${cleanResult}`);
     }
-
-const [containerId] = cleanResult.split('\n');
+    const [containerId] = cleanResult.split('\n');
     const gladysContainer = this.dockerode.getContainer(containerId);
     const gladysContainerInspect = await gladysContainer.inspect();
     this.networkMode = get(gladysContainerInspect, 'HostConfig.NetworkMode', { default: 'unknown' });
