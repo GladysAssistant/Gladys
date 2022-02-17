@@ -1759,6 +1759,7 @@
       "shortCategoryName": "Setpoint",
       "decimal": "Setpoint temperature",
       "string": "Setpoint mode"
+    },
     "device-temperature-sensor": {
       "shortCategoryName": "Device temperature sensor",
       "decimal": "Temperature"
