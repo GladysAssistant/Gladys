@@ -1,13 +1,20 @@
 const Promise = require('bluebird');
 const Handlebars = require('handlebars');
+const cloneDeep = require('lodash.clonedeep');
 const set = require('set-value');
 const get = require('get-value');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+const timezone = require('dayjs/plugin/timezone');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
@@ -103,7 +110,17 @@ const actionsFunc = {
       }
       setTimeout(resolve, timeToWaitMilliseconds);
     }),
-  [ACTIONS.SCENE.START]: async (self, action, scope) => self.execute(action.scene, scope),
+  [ACTIONS.SCENE.START]: async (self, action, scope) => {
+    if (scope.alreadyExecutedScenes && scope.alreadyExecutedScenes.has(action.scene)) {
+      logger.info(
+        `It looks the scene "${action.scene}" has already been triggered in this chain. Preventing running again to avoid loops.`,
+      );
+      return;
+    }
+    // we clone the scope so that the new scene is not polluting
+    // other scenes writing on the same scope: it needs to be a fresh object
+    self.execute(action.scene, cloneDeep(scope));
+  },
   [ACTIONS.MESSAGE.SEND]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     await self.message.sendToUser(action.user, textWithVariables);
@@ -120,12 +137,92 @@ const actionsFunc = {
         oneConditionVerified = true;
       } else {
         logger.debug(
-          `Condition not verified. Condition = ${scope[condition.variable]} ${condition.operator} ${condition.value}`,
+          `Condition not verified. Condition: "${get(scope, condition.variable)} ${condition.operator} ${
+            condition.value
+          }"`,
         );
       }
     });
     if (oneConditionVerified === false) {
       throw new AbortScene('CONDITION_NOT_VERIFIED');
+    }
+  },
+  [ACTIONS.CONDITION.CHECK_TIME]: async (self, action, scope) => {
+    const now = dayjs.tz(dayjs(), self.timezone);
+    let beforeDate;
+    let afterDate;
+    let isBeforeCondition = true;
+    let isAfterCondition = true;
+
+    if (action.before) {
+      beforeDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.before}`, self.timezone);
+      isBeforeCondition = now.isBefore(beforeDate);
+      if (!isBeforeCondition) {
+        logger.debug(
+          `Check time before: ${now.format('HH:mm')} < ${beforeDate.format('HH:mm')} condition is not verified.`,
+        );
+      } else {
+        logger.debug(`Check time before: ${now.format('HH:mm')} < ${beforeDate.format('HH:mm')} condition is valid.`);
+      }
+    }
+    if (action.after) {
+      afterDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.after}`, self.timezone);
+      isAfterCondition = now.isAfter(afterDate);
+      if (!isAfterCondition) {
+        logger.debug(
+          `Check time after: ${now.format('HH:mm')} > ${afterDate.format('HH:mm')} condition is not verified.`,
+        );
+      } else {
+        logger.debug(`Check time after: ${now.format('HH:mm')} > ${afterDate.format('HH:mm')} condition is valid.`);
+      }
+    }
+
+    // if the afterDate is not before the beforeDate
+    // It means the user is trying to do a cross-day time check
+    // Example: AFTER 23:00 and BEFORE 8:00.
+    // This means H > 23 OR h < 8
+    // Putting a AND has no sense because it'll simply not work
+    // Example: H > 23 AND H < 8 is always wrong.
+    if (action.before && action.after && !afterDate.isBefore(beforeDate)) {
+      // So the condition is a OR in this case
+      const conditionVerified = isBeforeCondition || isAfterCondition;
+      if (!conditionVerified) {
+        throw new AbortScene('CONDITION_BEFORE_OR_AFTER_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time: Condition OR verified.`);
+      }
+    } else {
+      // Otherwise, the condition is a AND
+      const conditionVerified = isBeforeCondition && isAfterCondition;
+      if (!conditionVerified) {
+        throw new AbortScene('CONDITION_BEFORE_AND_AFTER_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time: Condition AND verified.`);
+      }
+    }
+    if (action.days_of_the_week) {
+      const currentDayOfTheWeek = now.format('dddd').toLowerCase();
+      const isCurrentDayInCondition = action.days_of_the_week.indexOf(currentDayOfTheWeek) !== -1;
+      if (!isCurrentDayInCondition) {
+        logger.debug(
+          `Condition isInDayOfWeek not verified. Current day of the week = ${currentDayOfTheWeek}. Allowed days = ${action.days_of_the_week.join(
+            ',',
+          )}`,
+        );
+        throw new AbortScene('CONDITION_IS_IN_DAYS_OF_WEEK_NOT_VERIFIED');
+      }
+    }
+  },
+  [ACTIONS.HOUSE.IS_EMPTY]: async (self, action) => {
+    const houseEmpty = await self.house.isEmpty(action.house);
+    if (!houseEmpty) {
+      throw new AbortScene('HOUSE_IS_NOT_EMPTY');
+    }
+  },
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: async (self, action) => {
+    const houseEmpty = await self.house.isEmpty(action.house);
+    if (houseEmpty) {
+      throw new AbortScene('HOUSE_IS_EMPTY');
     }
   },
   [ACTIONS.USER.SET_SEEN_AT_HOME]: async (self, action) => {
@@ -151,6 +248,28 @@ const actionsFunc = {
       headersObject,
     );
     set(scope, `${columnIndex}.${rowIndex}`, response);
+  },
+  [ACTIONS.USER.CHECK_PRESENCE]: async (self, action, scope, columnIndex, rowIndex) => {
+    let deviceSeenRecently = false;
+    // we want to see if a device was seen before now - XX minutes
+    const thresholdDate = new Date(Date.now() - action.minutes * 60 * 1000);
+    // foreach selected device
+    action.device_features.forEach((deviceFeatureSelector) => {
+      // we get the time when the device was last seen
+      const deviceFeature = self.stateManager.get('deviceFeature', deviceFeatureSelector);
+      // if it's recent, we save true
+      if (deviceFeature.last_value_changed > thresholdDate) {
+        deviceSeenRecently = true;
+      }
+    });
+    // if no device was seen, the user has left home
+    if (deviceSeenRecently === false) {
+      logger.info(
+        `CheckUserPresence action: No devices of the user "${action.user}" were seen in the last ${action.minutes} minutes.`,
+      );
+      logger.info(`CheckUserPresence action: Set "${action.user}" to left home of house "${action.house}"`);
+      await self.house.userLeft(action.house, action.user);
+    }
   },
 };
 

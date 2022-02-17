@@ -1,7 +1,7 @@
 {
   "lights": [
     {
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -71,7 +71,7 @@
       "modelid": "LTW012",
       "manufacturername": "Philips",
       "productname": "Hue ambiance candle",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -124,7 +124,7 @@
       "modelid": "LTW012",
       "manufacturername": "Philips",
       "productname": "Hue ambiance candle",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -177,7 +177,7 @@
       "modelid": "LTW010",
       "manufacturername": "Philips",
       "productname": "Hue ambiance lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -234,7 +234,7 @@
       "modelid": "LST002",
       "manufacturername": "Philips",
       "productname": "Hue lightstrip plus",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -293,7 +293,7 @@
       "modelid": "LCT024",
       "manufacturername": "Philips",
       "productname": "Hue play",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -356,7 +356,7 @@
       "modelid": "LCT015",
       "manufacturername": "Philips",
       "productname": "Hue color lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -413,7 +413,7 @@
       "modelid": "LWB010",
       "manufacturername": "Philips",
       "productname": "Hue white lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -459,7 +459,7 @@
       "modelid": "UNKWOWN-MODEL",
       "manufacturername": "Philips",
       "productname": "Hue white lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -507,7 +507,7 @@
       "modelid": "LTW001",
       "manufacturername": "Philips",
       "productname": "Hue ambiance lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -562,7 +562,7 @@
       "modelid": "LCT010",
       "manufacturername": "Philips",
       "productname": "Hue color lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -621,7 +621,7 @@
       "modelid": "GL-C-008",
       "manufacturername": "GLEDOPTO",
       "productname": "Extended color light",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": false,
           "control": {
@@ -664,7 +664,7 @@
       "modelid": "SP 120",
       "manufacturername": "innr",
       "productname": "On/Off plug",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": false,
           "control": {},
@@ -706,7 +706,7 @@
       "modelid": "LLC010",
       "manufacturername": "Philips",
       "productname": "Hue iris",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -751,7 +751,7 @@
       "modelid": "Plug 01",
       "manufacturername": "OSRAM",
       "productname": "On/Off plug",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": false,
           "control": {},
@@ -788,7 +788,7 @@
       "modelid": "LWB006",
       "manufacturername": "Philips",
       "productname": "Hue white lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -838,7 +838,7 @@
       "modelid": "LCA001",
       "manufacturername": "Philips",
       "productname": "Hue color lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -894,7 +894,7 @@
       "modelid": "LWG004",
       "manufacturername": "Philips",
       "productname": "Hue white spot",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -940,7 +940,7 @@
       "modelid": "TRADFRI bulb E27 W opal 1000lm",
       "manufacturername": "IKEA of Sweden",
       "productname": "Dimmable light",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": false,
           "control": {},
@@ -977,7 +977,7 @@
       "modelid": "TRADFRI bulb E14 W op/ch 400lm",
       "manufacturername": "IKEA of Sweden",
       "productname": "Dimmable light",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": false,
           "control": {},
@@ -1019,7 +1019,7 @@
       "modelid": "LLC001",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "LivingColors",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1061,7 +1061,7 @@
       "modelid": "LTW013",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue ambiance spot",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1111,7 +1111,7 @@
       "modelid": "LWO001",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue filament bulb",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1141,7 +1141,7 @@
       "id": 24
     },
     {
-      "_rawData": {
+      "_data": {
         "state": {
           "on": true,
           "bri": 254,
@@ -1200,7 +1200,7 @@
       "modelid": "LWA001",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue white lamp",
-      "_rawData": {
+      "_data": {
         "state": {
           "on": true,
           "bri": 254,
@@ -1264,7 +1264,7 @@
       "modelid": "CLA60 TW OSRAM",
       "manufacturername": "OSRAM",
       "productname": "Color temperature light",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": false,
           "control": {
@@ -1312,7 +1312,7 @@
       "modelid": "LLC020",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue go",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1363,7 +1363,7 @@
       "modelid": "LWG001",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue white spot",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1418,7 +1418,7 @@
       "modelid": "LLC020",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue go",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1469,7 +1469,7 @@
       "modelid": "LWG001",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue white spot",
-      "_rawData": {
+      "_data": {
         "state": {
           "on": true,
           "bri": 1,
@@ -1533,7 +1533,7 @@
       "modelid": "LTG002",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue ambiance spot",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1589,7 +1589,7 @@
       "modelid": "LCT012",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue color candle",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1644,7 +1644,7 @@
       "modelid": "LTA001",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue ambiance lamp",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1700,7 +1700,7 @@
       "modelid": "LCT003",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue color spot",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1735,7 +1735,7 @@
       "mappedColorGamut": "B"
     },
     {
-      "_rawData": {
+      "_data": {
         "state": {
           "on": false,
           "alert": "select",
@@ -1799,7 +1799,7 @@
       "modelid": "LCL001",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue lightstrip plus",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1852,7 +1852,7 @@
       "modelid": "Classic A60 W clear - LIGHTIFY",
       "manufacturername": "OSRAM",
       "productname": "Dimmable light",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": false,
           "control": {},
@@ -1895,7 +1895,7 @@
       "modelid": "440400982841",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue Play",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -1954,7 +1954,7 @@
       "modelid": "LCS001",
       "manufacturername": "Signify Netherlands B.V.",
       "productname": "Hue outdoor spot",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": true,
           "control": {
@@ -2013,7 +2013,7 @@
       "modelid": "RB 285 C",
       "manufacturername": "innr",
       "productname": "Extended color light",
-      "_rawData": {
+      "_data": {
         "capabilities": {
           "certified": false,
           "control": {

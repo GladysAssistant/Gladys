@@ -10,6 +10,7 @@ const db = require('../../models');
  * @param {string} message.source - The name of the service where the message comes from.
  * @param {string} message.source_user_id - The user id for the source service.
  * @param {Object} message.user - A user object.
+ * @param {Object} message.id - Id of the message.
  * @example
  * message.create(message);
  */
@@ -32,6 +33,7 @@ async function create(message) {
     sender_id: message.user.id,
     receiver_id: null,
     is_read: true,
+    id: message.id,
   };
 
   await db.Message.create(messageToInsert);

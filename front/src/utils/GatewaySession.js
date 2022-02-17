@@ -1,6 +1,6 @@
 import GladysGatewayClient from '@gladysassistant/gladys-gateway-js';
 
-import config from '../../config';
+import config from '../config';
 import { Dispatcher } from './Dispatcher';
 import keyValueStore from './keyValueStore';
 
@@ -58,6 +58,7 @@ class GatewaySession {
         }
       });
       this.ready = true;
+      this.websocketConnected = true;
       this.dispatcher.dispatch('GLADYS_GATEWAY_CONNECTED');
     }
   }
@@ -71,6 +72,10 @@ class GatewaySession {
       this.user = JSON.parse(data);
     }
     return this.user;
+  }
+
+  async getGatewayUser() {
+    return this.gatewayClient.getMyself();
   }
 
   saveLoginInformations(data) {

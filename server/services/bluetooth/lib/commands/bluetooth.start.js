@@ -2,15 +2,15 @@ const Promise = require('bluebird');
 
 const logger = require('../../../../utils/logger');
 
-const { TIMERS } = require('../device/bluetooth.information');
+const { VARIABLES } = require('../utils/bluetooth.constants');
 
 /**
  * @description Starts to Bluetooth device.
- * @returns {any} Null.
+ * @returns {Promise} Null.
  * @example
- * bluetooth.start();
+ * await bluetooth.start();
  */
-function start() {
+async function start() {
   logger.debug(`Bluetooth: Listening Bluetooth events`);
 
   this.bluetooth = require('@abandonware/noble');
@@ -24,9 +24,23 @@ function start() {
 
   // Handle new peripheral discovered
   this.bluetooth.on('discover', this.discover.bind(this));
-  this.bluetooth.on('connect', (peripheral) => Promise.delay(TIMERS.CONNECTION).then(() => peripheral.disconnect()));
 
-  this.connectDevices();
+  // Load configuration
+  const scanPresenceStatus = await this.gladys.variable.getValue(VARIABLES.PRESENCE_STATUS, this.serviceId);
+  if (scanPresenceStatus !== null) {
+    this.presenceScanner.status = scanPresenceStatus;
+  } else {
+    await this.gladys.variable.setValue(VARIABLES.PRESENCE_STATUS, this.presenceScanner.status, this.serviceId);
+  }
+
+  const scanFrequency = await this.gladys.variable.getValue(VARIABLES.PRESENCE_FREQUENCY, this.serviceId);
+  if (scanFrequency !== null) {
+    this.presenceScanner.frequency = scanFrequency;
+  } else {
+    await this.gladys.variable.setValue(VARIABLES.PRESENCE_FREQUENCY, this.presenceScanner.frequency, this.serviceId);
+  }
+
+  this.initPresenceScanner();
 
   return null;
 }

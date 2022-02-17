@@ -15,8 +15,8 @@
   "dependencies": {
     "bluebird": "^3.7.0",
     "dav-request": "^1.8.0",
-    "ical": "^0.6.0",
-    "moment": "^2.24.0",
-    "xmldom": "^0.1.27"
+    "dayjs": "^1.10.7",
+    "ical": "^0.8.0",
+    "xmldom": "^0.6.0"
   }
 }

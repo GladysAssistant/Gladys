@@ -58,5 +58,5 @@ module.exports = {
     await queryInterface.addIndex('t_calendar_event', ['start']);
     await queryInterface.addIndex('t_calendar_event', ['end']);
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_calendar_event'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_calendar_event'),
 };

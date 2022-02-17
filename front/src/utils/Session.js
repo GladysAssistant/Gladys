@@ -1,5 +1,5 @@
 import { ERROR_MESSAGES } from '../../../server/utils/constants';
-import config from '../../config';
+import config from '../config';
 import { Dispatcher } from './Dispatcher';
 
 class Session {
@@ -36,6 +36,9 @@ class Session {
 
   connect() {
     const websocketUrl = config.webSocketUrl || window.location.origin.replace('http', 'ws');
+    if (this.ws && this.ws.close) {
+      this.ws.close();
+    }
     this.ws = new WebSocket(websocketUrl);
     this.ws.onopen = () => {
       this.websocketConnected = true;
@@ -62,7 +65,7 @@ class Session {
       if (e.reason === ERROR_MESSAGES.INVALID_ACCESS_TOKEN) {
         delete this.user.access_token;
         this.saveUser(this.user);
-      } else {
+      } else if (e.code !== 1005 && e.code !== 1000) {
         setTimeout(() => {
           this.connect();
         }, 1000);

@@ -14,6 +14,15 @@ const boxesSchema = Joi.array().items(
       name: Joi.string(),
       modes: Joi.object(),
       device_features: Joi.array().items(Joi.string()),
+      device_feature: Joi.string(),
+      unit: Joi.string(),
+      units: Joi.array().items(Joi.string().allow(null)),
+      title: Joi.string(),
+      interval: Joi.string(),
+      display_axes: Joi.boolean(),
+      display_variation: Joi.boolean(),
+      chart_type: Joi.string(),
+      users: Joi.array().items(Joi.string()),
     }),
   ),
 );
@@ -31,6 +40,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
         type: DataTypes.STRING,
+      },
+      user_id: {
+        allowNull: false,
+        type: DataTypes.UUID,
+        references: {
+          model: 't_user',
+          key: 'id',
+        },
       },
       type: {
         allowNull: false,

@@ -8,12 +8,14 @@ const fakes = {
   on: fake.returns(STATE_ON),
   off: fake.returns(STATE_ON),
   rgb: fake.returns(null),
+  brightness: fake.returns(null),
 };
 
 class LightState {}
 LightState.prototype.on = fakes.on;
 LightState.prototype.off = fakes.off;
 LightState.prototype.rgb = fakes.rgb;
+LightState.prototype.brightness = fakes.brightness;
 
 const hueApi = {
   users: {
@@ -70,7 +72,7 @@ const MockedPhilipsHueClient = {
       }),
     },
     discovery: {
-      nupnpSearch: () =>
+      upnpSearch: () =>
         Promise.resolve([
           {
             name: 'Philips Hue Bridge',

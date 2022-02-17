@@ -4,9 +4,9 @@
  * bluetooth.getStatus();
  */
 function getStatus() {
-  const { ready, scanning, peripheralLookup } = this;
+  const { ready, scanning, peripheralLookup, bluetooth } = this;
   const status = {
-    ready,
+    ready: bluetooth !== undefined && ready,
     scanning,
     peripheralLookup,
   };

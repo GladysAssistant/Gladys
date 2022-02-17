@@ -1,5 +1,6 @@
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const logger = require('../../utils/logger');
+const { BadParameters } = require('../../utils/coreErrors');
 
 const LOGIN_SESSION_VALIDITY_IN_SECONDS = 30 * 24 * 60 * 60;
 
@@ -72,6 +73,44 @@ module.exports = function UserController(gladys) {
     }
     const users = await gladys.user.get(options);
     res.json(users);
+  }
+
+  /**
+   * @api {get} /api/v1/user/:user_selector getUserBySelector
+   * @apiName getUserBySelector
+   * @apiGroup User
+   *
+   */
+  async function getUserBySelector(req, res) {
+    const user = await gladys.user.getBySelector(req.params.user_selector);
+    res.json(user);
+  }
+
+  /**
+   * @api {patch} /api/v1/user/:user_selector updateUser
+   * @apiName updateUser
+   * @apiGroup User
+   *
+   */
+  async function update(req, res) {
+    const user = await gladys.user.updateBySelector(req.params.user_selector, req.body);
+    res.json(user);
+  }
+
+  /**
+   * @api {delete} /api/v1/user/:user_selector deleteUser
+   * @apiName deleteUser
+   * @apiGroup User
+   *
+   */
+  async function deleteUser(req, res) {
+    if (req.user.selector === req.params.user_selector) {
+      throw new BadParameters('You cannot delete yourself');
+    }
+    await gladys.user.destroy(req.params.user_selector);
+    res.json({
+      success: true,
+    });
   }
 
   /**
@@ -169,6 +208,9 @@ module.exports = function UserController(gladys) {
     login: asyncMiddleware(login),
     getMySelf: asyncMiddleware(getMySelf),
     getUsers: asyncMiddleware(getUsers),
+    getUserBySelector: asyncMiddleware(getUserBySelector),
+    update: asyncMiddleware(update),
+    deleteUser: asyncMiddleware(deleteUser),
     getMyPicture: asyncMiddleware(getMyPicture),
     updateMySelf: asyncMiddleware(updateMySelf),
     getAccessToken: asyncMiddleware(getAccessToken),

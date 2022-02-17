@@ -26,6 +26,9 @@ const gladys = {
   device: {
     get: () => [],
   },
+  variable: {
+    getValue: () => 'value',
+  },
 };
 
 describe('BluetoothService', () => {
@@ -52,6 +55,6 @@ describe('BluetoothService', () => {
     // No more listener
     expect(bluetooth.eventNames()).is.lengthOf(0);
 
-    assert.calledOnce(bluetooth.stopScanningAsync);
+    assert.calledOnce(bluetooth.stopScanning);
   });
 });

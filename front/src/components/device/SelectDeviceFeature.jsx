@@ -3,6 +3,7 @@ import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
 import { getDeviceFeatureName } from '../../utils/device';
+import withIntlAsProp from '../../utils/withIntlAsProp';
 
 @connect('httpClient', {})
 class SelectDeviceFeature extends Component {
@@ -24,9 +25,13 @@ class SelectDeviceFeature extends Component {
             deviceFeaturesDictionnary[feature.selector] = feature;
             deviceDictionnary[feature.selector] = device;
 
+            if (this.props.exclude_read_only_device_features === true && feature.read_only) {
+              return;
+            }
+
             roomDeviceFeatures.push({
               value: feature.selector,
-              label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
+              label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
             });
           });
         });
@@ -47,12 +52,6 @@ class SelectDeviceFeature extends Component {
       });
       await this.setState({ deviceOptions, deviceFeaturesDictionnary, deviceDictionnary });
       await this.refreshSelectedOptions(this.props);
-      if (this.state.selectedOption && this.state.selectedOption.value) {
-        this.props.onDeviceFeatureChange(
-          deviceFeaturesDictionnary[this.state.selectedOption.value],
-          deviceDictionnary[this.state.selectedOption.value]
-        );
-      }
       return deviceOptions;
     } catch (e) {
       console.error(e);
@@ -71,6 +70,7 @@ class SelectDeviceFeature extends Component {
   };
   refreshSelectedOptions = async nextProps => {
     let selectedOption = '';
+    const { selectedOption: originalSelected } = this.state;
     if (nextProps.value && this.state.deviceOptions) {
       let deviceOption;
       let i = 0;
@@ -83,7 +83,19 @@ class SelectDeviceFeature extends Component {
         selectedOption = deviceOption;
       }
     }
+
     await this.setState({ selectedOption });
+
+    if (originalSelected !== selectedOption) {
+      if (selectedOption) {
+        this.props.onDeviceFeatureChange(
+          this.state.deviceFeaturesDictionnary[selectedOption.value],
+          this.state.deviceDictionnary[selectedOption.value]
+        );
+      } else {
+        this.props.onDeviceFeatureChange(null, null);
+      }
+    }
   };
   constructor(props) {
     super(props);
@@ -105,8 +117,16 @@ class SelectDeviceFeature extends Component {
     if (!deviceOptions) {
       return null;
     }
-    return <Select defaultValue={''} value={selectedOption} onChange={this.handleChange} options={deviceOptions} />;
+    return (
+      <Select
+        class="select-device-feature"
+        defaultValue={''}
+        value={selectedOption}
+        onChange={this.handleChange}
+        options={deviceOptions}
+      />
+    );
   }
 }
 
-export default SelectDeviceFeature;
+export default withIntlAsProp(SelectDeviceFeature);

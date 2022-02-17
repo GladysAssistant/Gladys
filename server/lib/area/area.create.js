@@ -14,7 +14,9 @@ const db = require('../../models');
  * });
  */
 async function create(area) {
-  return db.Area.create(area);
+  const areaCreated = await db.Area.create(area);
+  this.areas.push(areaCreated);
+  return areaCreated;
 }
 
 module.exports = {

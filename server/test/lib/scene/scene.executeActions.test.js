@@ -2,6 +2,7 @@ const { assert, fake } = require('sinon');
 const chaiAssert = require('chai').assert;
 const { expect } = require('chai');
 const EventEmitter = require('events');
+const cloneDeep = require('lodash.clonedeep');
 const { ACTIONS } = require('../../../utils/constants');
 const { AbortScene } = require('../../../utils/coreErrors');
 const { executeActions } = require('../../../lib/scene/scene.executeActions');
@@ -9,6 +10,9 @@ const { executeActions } = require('../../../lib/scene/scene.executeActions');
 const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
+
+// WE ARE SLOWLY MOVING ALL TESTS FROM THIS BIG FILE
+// TO A SMALLER SET OF FILE IN THE "ACTIONS" FOLDER.
 
 describe('scene.executeActions', () => {
   it('should execute light turn on', async () => {
@@ -325,6 +329,60 @@ describe('scene.executeActions', () => {
     );
     assert.calledWith(house.userLeft, 'my-house', 'john');
   });
+  it('should execute action user.checkPresence and not call userLeft because user was seen', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device', {
+      last_value_changed: Date.now(),
+    });
+    const house = {
+      userSeen: fake.resolves(null),
+      userLeft: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.CHECK_PRESENCE,
+            user: 'john',
+            house: 'my-house',
+            minutes: 10,
+            device_features: ['my-device'],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.notCalled(house.userLeft);
+  });
+  it('should execute action user.checkPresence and call userLeft because user was not seen', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device', {
+      last_value_changed: Date.now() - 15 * 60 * 1000,
+    });
+    const house = {
+      userSeen: fake.resolves(null),
+      userLeft: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.CHECK_PRESENCE,
+            user: 'john',
+            house: 'my-house',
+            minutes: 10,
+            device_features: ['my-device'],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(house.userLeft, 'my-house', 'john');
+  });
   it('should execute action http.request', async () => {
     const stateManager = new StateManager(event);
     const http = {
@@ -417,6 +475,84 @@ describe('scene.executeActions', () => {
     );
     return chaiAssert.isRejected(promise, AbortScene);
   });
+  it('should abort scene, house empty is not verified', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      isEmpty: fake.resolves(false),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.HOUSE.IS_EMPTY,
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene);
+  });
+  it('should finish, house empty is verified', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      isEmpty: fake.resolves(true),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.HOUSE.IS_EMPTY,
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+  });
+  it('should abort scene, house not empty is not verified', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      isEmpty: fake.resolves(true),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.HOUSE.IS_NOT_EMPTY,
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene);
+  });
+  it('should finish scene, house not empty is verified', async () => {
+    const stateManager = new StateManager(event);
+    const house = {
+      isEmpty: fake.resolves(false),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.HOUSE.IS_NOT_EMPTY,
+            house: 'my-house',
+          },
+        ],
+      ],
+      scope,
+    );
+  });
   it('should finish scene, condition is verified', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
@@ -484,5 +620,57 @@ describe('scene.executeActions', () => {
       scope,
     );
     assert.calledWith(message.sendToUser, 'pepper', 'Temperature in the living room is 15 °C.');
+  });
+
+  it('should execute action scene.start', async () => {
+    const stateManager = new StateManager(event);
+
+    const execute = fake.resolves(undefined);
+
+    const scope = {
+      alreadyExecutedScenes: new Set(),
+    };
+
+    await executeActions(
+      { stateManager, event, execute },
+      [
+        [
+          {
+            type: ACTIONS.SCENE.START,
+            scene: 'other_scene_selector',
+          },
+        ],
+      ],
+      scope,
+    );
+    const clonedScope = cloneDeep(scope);
+    // we try to pollute the scope, and see if the called scene was affected by this pollution
+    // it should not affect a running scene
+    scope.test = 1;
+    assert.calledWith(execute, 'other_scene_selector', clonedScope);
+  });
+
+  it('should not execute action scene.start when the scene has already been called as part of this chain', async () => {
+    const stateManager = new StateManager(event);
+
+    const execute = fake.resolves(undefined);
+
+    const scope = {
+      alreadyExecutedScenes: new Set(['other_scene_selector']),
+    };
+
+    await executeActions(
+      { stateManager, event, execute },
+      [
+        [
+          {
+            type: ACTIONS.SCENE.START,
+            scene: 'other_scene_selector',
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.notCalled(execute);
   });
 });

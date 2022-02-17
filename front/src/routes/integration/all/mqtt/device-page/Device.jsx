@@ -7,6 +7,7 @@ import get from 'get-value';
 import { RequestStatus } from '../../../../../utils/consts';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import MqttDeviceForm from './DeviceForm';
+import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 
 class MqttDeviceBox extends Component {
   saveDevice = async () => {
@@ -58,12 +59,7 @@ class MqttDeviceBox extends Component {
             {props.device.name || <Text id="integration.mqtt.device.noNameLabel" />}{' '}
             {batteryLevel && (
               <div class="page-options d-flex">
-                <div class="tag tag-green">
-                  <Text id="global.percentValue" fields={{ value: batteryLevel }} />
-                  <span class="tag-addon">
-                    <i class="fe fe-battery" />
-                  </span>
-                </div>
+                <BatteryLevelFeature batteryLevel={batteryLevel} />
               </div>
             )}
           </div>

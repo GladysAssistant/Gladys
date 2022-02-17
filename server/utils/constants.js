@@ -3,6 +3,14 @@ const STATE = {
   OFF: 0,
 };
 
+const BUTTON_STATUS = {
+  CLICK: 1,
+  DOUBLE_CLICK: 2,
+  LONG_CLICK_PRESS: 3,
+  LONG_CLICK_RELEASE: 4,
+  LONG_CLICK: 5,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -32,8 +40,13 @@ const SERVICE_STATUS = {
 
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
+  DEVICE_STATE_MONTHLY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_MONTHLY_AGGREGATES_RETENTION_IN_DAYS',
+  DEVICE_STATE_DAILY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_DAILY_AGGREGATES_RETENTION_IN_DAYS',
+  DEVICE_STATE_HOURLY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_HOURLY_AGGREGATES_RETENTION_IN_DAYS',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
   GLADYS_GATEWAY_USERS_KEYS: 'GLADYS_GATEWAY_USERS_KEYS',
+  GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
+    'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   TIMEZONE: 'TIMEZONE',
 };
 
@@ -48,6 +61,7 @@ const EVENTS = {
     NEW_STATE: 'device.new-state',
     NEW_STATE_NO_CHANGED: 'device.new-state-no-changed',
     PURGE_STATES: 'device.purge-states',
+    CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -108,12 +122,17 @@ const EVENTS = {
   },
   TIME: {
     CHANGED: 'time.changed',
+    SUNRISE: 'time.sunrise',
+    SUNSET: 'time.sunset',
   },
   TRIGGERS: {
     CHECK: 'trigger.check',
   },
   TEMPERATURE_SENSOR: {
     TEMPERATURE_CHANGED: 'temperature.changed',
+  },
+  HUMIDITY_SENSOR: {
+    HUMIDITY_CHANGED: 'humidity.changed',
   },
   SCHEDULED_SCENE: {
     ENABLED: 'scheduled-scene.enabled',
@@ -131,6 +150,23 @@ const EVENTS = {
   WEBSOCKET: {
     SEND: 'websocket.send',
     SEND_ALL: 'websocket.send-all',
+  },
+  HOUSE: {
+    CREATED: 'house.created',
+    UPDATED: 'house.updated',
+    DELETED: 'house.deleted',
+    EMPTY: 'house.empty',
+    NO_LONGER_EMPTY: 'house.no-longer-empty',
+  },
+  USER: {
+    NEW_LOCATION: 'user.new-location',
+  },
+  AREA: {
+    USER_ENTERED: 'area.user-entered',
+    USER_LEFT: 'area.user-left',
+  },
+  JOB: {
+    PURGE_OLD_JOBS: 'job.purge-old-jobs',
   },
 };
 
@@ -216,10 +252,16 @@ const ACTIONS = {
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
+    CHECK_TIME: 'condition.check-time',
   },
   USER: {
     SET_SEEN_AT_HOME: 'user.set-seen-at-home',
     SET_OUT_OF_HOME: 'user.set-out-of-home',
+    CHECK_PRESENCE: 'user.check-presence',
+  },
+  HOUSE: {
+    IS_EMPTY: 'house.is-empty',
+    IS_NOT_EMPTY: 'house.is-not-empty',
   },
   HTTP: {
     REQUEST: 'http.request',
@@ -234,8 +276,14 @@ const INTENTS = {
   TEMPERATURE_SENSOR: {
     GET_IN_ROOM: 'intent.temperature-sensor.get-in-room',
   },
+  HUMIDITY_SENSOR: {
+    GET_IN_ROOM: 'intent.humidity-sensor.get-in-room',
+  },
   WEATHER: {
     GET: 'intent.weather.get',
+    TOMORROW: 'intent.weather.tomorrow',
+    AFTER_TOMORROW: 'intent.weather.after-tomorrow',
+    DAY: 'intent.weather.day',
   },
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
@@ -254,10 +302,14 @@ const DEVICE_FEATURE_CATEGORIES = {
   OPENING_SENSOR: 'opening-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
+<<<<<<< HEAD
   WINDSPEED_SENSOR: 'windspeed-sensor',
   RAINFALL_SENSOR: 'rainfall-sensor',
   ANGLE_SENSOR: 'angle-sensor',
   NOISE_SENSOR: 'noise-sensor',
+=======
+  CO_SENSOR: 'co-sensor',
+>>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
   LEAK_SENSOR: 'leak-sensor',
@@ -269,8 +321,14 @@ const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROL: 'access-control',
   CUBE: 'cube',
   BUTTON: 'button',
+<<<<<<< HEAD
   SETPOINT: 'setpoint',
   INDEX: 'index',
+=======
+  SIGNAL: 'signal',
+  DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
+  TELEVISION: 'television',
+>>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
   UNKNOWN: 'unknown',
 };
 
@@ -298,7 +356,6 @@ const DEVICE_FEATURE_TYPES = {
   SWITCH: {
     BINARY: 'binary',
     POWER: 'power',
-    POWERHOUR: 'power-hour',
     ENERGY: 'energy',
     VOLTAGE: 'voltage',
     CURRENT: 'current',
@@ -333,6 +390,7 @@ const DEVICE_FEATURE_TYPES = {
   BUTTON: {
     CLICK: 'click',
   },
+<<<<<<< HEAD
   INDEX: {
     INTEGER: 'integer',
     DIMMER: 'dimmer',
@@ -341,6 +399,39 @@ const DEVICE_FEATURE_TYPES = {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
     STRING: 'string',
+=======
+  SIGNAL: {
+    QUALITY: 'integer',
+  },
+  TELEVISION: {
+    BINARY: 'binary',
+    SOURCE: 'source',
+    GUIDE: 'guide',
+    MENU: 'menu',
+    TOOLS: 'tools',
+    INFO: 'info',
+    ENTER: 'enter',
+    RETURN: 'return',
+    EXIT: 'exit',
+    LEFT: 'left',
+    RIGHT: 'right',
+    UP: 'up',
+    DOWN: 'down',
+    CHANNEL_UP: 'channel-up',
+    CHANNEL_DOWN: 'channel-down',
+    CHANNEL_PREVIOUS: 'channel-previous',
+    CHANNEL: 'channel',
+    VOLUME_UP: 'volume-up',
+    VOLUME_DOWN: 'volume-down',
+    VOLUME_MUTE: 'volume-mute',
+    VOLUME: 'volume',
+    PLAY: 'play',
+    PAUSE: 'pause',
+    STOP: 'stop',
+    REWIND: 'rewind',
+    FORWARD: 'forward',
+    RECORD: 'record',
+>>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',
@@ -351,7 +442,11 @@ const DEVICE_FEATURE_UNITS = {
   CELSIUS: 'celsius',
   FAHRENHEIT: 'fahrenheit',
   PERCENT: 'percent',
+<<<<<<< HEAD
   MILLIBAR: 'millibar',
+=======
+  HECTO_PASCAL: 'hPa',
+>>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
   PASCAL: 'pascal',
   INCH_MERCURY: 'inch-mercury',
   MILLIMETER_MERCURY: 'millimeter-mercury',
@@ -360,6 +455,7 @@ const DEVICE_FEATURE_UNITS = {
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
   AMPERE: 'ampere',
+  MILLI_VOLT: 'millivolt',
   VOLT: 'volt',
   PPM: 'ppm',
   MM: 'mm',
@@ -452,8 +548,21 @@ const DEVICE_FEATURE_TYPES_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR]: [DEVICE_FEATURE_TYPES.SENSOR.STRING, DEVICE_FEATURE_TYPES.SENSOR.DECIMAL],
 };
 
+const WEATHER_UNITS = {
+  METRIC: 'metric',
+};
+
 const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
+  [DEVICE_FEATURE_CATEGORIES.SWITCH]: [
+    DEVICE_FEATURE_UNITS.AMPERE,
+    DEVICE_FEATURE_UNITS.MILLI_VOLT,
+    DEVICE_FEATURE_UNITS.VOLT,
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  ],
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: [DEVICE_FEATURE_UNITS.PERCENT],
+<<<<<<< HEAD
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM, DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [
     DEVICE_FEATURE_UNITS.INCH,
@@ -484,6 +593,18 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.INCH_HOUR,
     DEVICE_FEATURE_UNITS.MILLIMETER,
     DEVICE_FEATURE_UNITS.MILLIMETER_HOUR,
+=======
+  [DEVICE_FEATURE_CATEGORIES.CO_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
+  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: [DEVICE_FEATURE_UNITS.PPM],
+  [DEVICE_FEATURE_CATEGORIES.DISTANCE_SENSOR]: [DEVICE_FEATURE_UNITS.MM, DEVICE_FEATURE_UNITS.CM],
+  [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
+  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [DEVICE_FEATURE_UNITS.PASCAL, DEVICE_FEATURE_UNITS.HECTO_PASCAL],
+  [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
+  [DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR]: [
+    DEVICE_FEATURE_UNITS.CELSIUS,
+    DEVICE_FEATURE_UNITS.FAHRENHEIT,
+>>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
   ],
 };
 
@@ -515,8 +636,13 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_STATE_NO_CHANGED: 'device.new-state-no-changed',
     NEW_STRING_STATE: 'device.new-string-state',
   },
+  JOB: {
+    NEW: 'job.new',
+    UPDATED: 'job.updated',
+  },
   MESSAGE: {
     NEW: 'message.new',
+    SENT: 'message.sent',
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
@@ -528,6 +654,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SCENE: {
     EXECUTING_ACTION: 'scene.executing-action',
     FINISHED_EXECUTING_ACTION: 'scene.finished-executing-action',
+  },
+  LOCATION: {
+    NEW: 'location.new',
   },
   USER_PRESENCE: {
     LEFT_HOME: 'user.left-home',
@@ -551,6 +680,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
+  },
+  ZIGBEE2MQTT: {
+    DISCOVER: 'zigbee2mqtt.discover',
+    STATUS_CHANGE: 'zigbee2mqtt.status-change',
+    MQTT_ERROR: 'zigbee2mqtt.mqtt-error',
+    PERMIT_JOIN: 'zigbee2mqtt.permit-join',
   },
   XIAOMI: {
     NEW_DEVICE: 'xiaomi.new-device',
@@ -584,9 +719,11 @@ const DASHBOARD_TYPE = {
 const DASHBOARD_BOX_TYPE = {
   WEATHER: 'weather',
   TEMPERATURE_IN_ROOM: 'temperature-in-room',
+  HUMIDITY_IN_ROOM: 'humidity-in-room',
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  CHART: 'chart',
 };
 
 const ERROR_MESSAGES = {
@@ -595,6 +732,35 @@ const ERROR_MESSAGES = {
   REQUEST_TO_THIRD_PARTY_FAILED: 'REQUEST_TO_THIRD_PARTY_FAILED',
   INVALID_ACCESS_TOKEN: 'INVALID_ACCESS_TOKEN',
   NO_CONNECTED_TO_THE_INTERNET: 'NO_CONNECTED_TO_THE_INTERNET',
+};
+
+const DEVICE_FEATURE_STATE_AGGREGATE_TYPES = {
+  MONTHLY: 'monthly',
+  DAILY: 'daily',
+  HOURLY: 'hourly',
+};
+
+const DEFAULT_AGGREGATES_POLICY_IN_DAYS = {
+  [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.HOURLY]: 6 * 30,
+  [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.DAILY]: 365,
+  [DEVICE_FEATURE_STATE_AGGREGATE_TYPES.MONTHLY]: 5 * 365,
+};
+
+const JOB_TYPES = {
+  HOURLY_DEVICE_STATE_AGGREGATE: 'hourly-device-state-aggregate',
+  DAILY_DEVICE_STATE_AGGREGATE: 'daily-device-state-aggregate',
+  MONTHLY_DEVICE_STATE_AGGREGATE: 'monthly-device-state-aggregate',
+};
+
+const JOB_STATUS = {
+  IN_PROGRESS: 'in-progress',
+  SUCCESS: 'success',
+  FAILED: 'failed',
+};
+
+const JOB_ERROR_TYPES = {
+  PURGED_WHEN_RESTARTED: 'purged-when-restarted',
+  UNKNOWN_ERROR: 'unknown-error',
 };
 
 const createList = (obj) => {
@@ -624,8 +790,13 @@ const SESSION_TOKEN_TYPE_LIST = createList(SESSION_TOKEN_TYPES);
 const DEVICE_FEATURE_UNITS_LIST = createList(DEVICE_FEATURE_UNITS);
 const DASHBOARD_TYPE_LIST = createList(DASHBOARD_TYPE);
 const DASHBOARD_BOX_TYPE_LIST = createList(DASHBOARD_BOX_TYPE);
+const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STATE_AGGREGATE_TYPES);
+const JOB_TYPES_LIST = createList(JOB_TYPES);
+const JOB_STATUS_LIST = createList(JOB_STATUS);
+const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 
 module.exports.STATE = STATE;
+module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
@@ -672,3 +843,16 @@ module.exports.DASHBOARD_BOX_TYPE = DASHBOARD_BOX_TYPE;
 module.exports.DASHBOARD_BOX_TYPE_LIST = DASHBOARD_BOX_TYPE_LIST;
 
 module.exports.ERROR_MESSAGES = ERROR_MESSAGES;
+
+module.exports.WEATHER_UNITS = WEATHER_UNITS;
+
+module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES = DEVICE_FEATURE_STATE_AGGREGATE_TYPES;
+module.exports.DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST;
+module.exports.DEFAULT_AGGREGATES_POLICY_IN_DAYS = DEFAULT_AGGREGATES_POLICY_IN_DAYS;
+
+module.exports.JOB_TYPES = JOB_TYPES;
+module.exports.JOB_TYPES_LIST = JOB_TYPES_LIST;
+module.exports.JOB_STATUS = JOB_STATUS;
+module.exports.JOB_STATUS_LIST = JOB_STATUS_LIST;
+module.exports.JOB_ERROR_TYPES = JOB_ERROR_TYPES;
+module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;

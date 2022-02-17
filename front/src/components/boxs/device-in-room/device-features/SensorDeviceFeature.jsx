@@ -1,15 +1,12 @@
 /* eslint-disable preact-i18n/no-unknown-key */
 import { Text } from 'preact-i18n';
 import get from 'get-value';
-import cx from 'classnames';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+
+import RelativeTime from '../../../device/RelativeTime';
+
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
-const { getCardinalDirection } = require('../../../../utils/cardinalPoints');
 
-dayjs.extend(relativeTime);
-
-const SPECIAL_SENSORS_CATEGORY = [
+const SPECIAL_SENSORS = [
   DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
   DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
   DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -20,6 +17,7 @@ const SPECIAL_SENSORS_CATEGORY_TYPE = [DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR + 
 const LAST_SEEN_SENSORS = [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR, DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR];
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import BinaryDeviceValue from './sensor-value/BinaryDeviceValue';
 
 const SensorDeviceType = ({ children, ...props }) => (
   <tr>
@@ -32,17 +30,25 @@ const SensorDeviceType = ({ children, ...props }) => (
       />
     </td>
     <td>{props.deviceFeature.name}</td>
-    {SPECIAL_SENSORS_CATEGORY.indexOf(props.deviceFeature.category) === -1 &&
-      SPECIAL_SENSORS_TYPE.indexOf(props.deviceFeature.type) === -1 &&
-      SPECIAL_SENSORS_CATEGORY_TYPE.indexOf(props.deviceFeature.category + props.deviceFeature.type) === -1 && (
-        <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value !== null })}>
-          {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
-          {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-          {props.deviceFeature.last_value !== null && (
-            <span> {<Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />}</span>
-          )}
-        </td>
-      )}
+    {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
+      <td class="text-right">
+        {DEVICE_FEATURE_TYPES.SENSOR.BINARY === props.deviceFeature.type && (
+          <BinaryDeviceValue feature={props.deviceFeature} />
+        )}
+        {DEVICE_FEATURE_TYPES.SENSOR.BINARY !== props.deviceFeature.type && (
+          <div>
+            {props.deviceFeature.last_value !== null && props.deviceFeature.last_value}
+            {props.deviceFeature.last_value === null && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+            {props.deviceFeature.last_value !== null && (
+              <span>
+                {' '}
+                <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
+              </span>
+            )}
+          </div>
+        )}
+      </td>
+    )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR && (
       <td class="text-right">
         {props.deviceFeature.last_value === 1 && <i class="fe fe-shield" />}
@@ -51,12 +57,13 @@ const SensorDeviceType = ({ children, ...props }) => (
       </td>
     )}
     {LAST_SEEN_SENSORS.includes(props.deviceFeature.category) && (
-      <td class={cx('text-right', { 'text-nowrap': props.deviceFeature.last_value_changed })}>
-        {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
-        {props.deviceFeature.last_value_changed &&
-          dayjs(props.deviceFeature.last_value_changed)
-            .locale(props.user.language)
-            .fromNow()}
+      <td class="text-right">
+        <div>
+          {!props.deviceFeature.last_value_changed && <Text id="dashboard.boxes.devicesInRoom.noValue" />}
+          {props.deviceFeature.last_value_changed && (
+            <RelativeTime datetime={props.deviceFeature.last_value_changed} language={props.user.language} />
+          )}
+        </div>
       </td>
     )}
     {props.deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SWITCH &&

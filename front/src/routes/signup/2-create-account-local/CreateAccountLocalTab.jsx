@@ -4,9 +4,13 @@ import Profile from '../../../components/user/profile';
 
 const CreateLocalGladysAccount = ({ children, ...props }) => (
   <div>
-    <Link href="/signup" class="btn btn-secondary btn-sm float-left">
-      <Text id="global.backButton" />
-    </Link>
+    <div class="row">
+      <div class="col mb-4">
+        <Link href="/signup" class="btn btn-secondary btn-sm float-left">
+          <Text id="global.backButton" />
+        </Link>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-8 mx-auto">
         <h2>
@@ -15,7 +19,7 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
         <p>
           <Text id="signup.createLocalAccount.description" />
         </p>
-        <Profile {...props} />
+        <Profile {...props} disablePreferences disableRole />
         <div class="form-group">
           <button onClick={props.createUser} class="btn btn-success">
             <Text id="signup.createLocalAccount.createAccountButton" />

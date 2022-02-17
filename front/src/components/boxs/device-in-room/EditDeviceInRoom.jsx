@@ -6,29 +6,31 @@ import Select from 'react-select';
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
+import withIntlAsProp from '../../../utils/withIntlAsProp';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
-
-import actions from '../../../actions/dashboard/edit-boxes/editDevicesInRoom';
 
 const SUPPORTED_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.LIGHT.BINARY,
   DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-  DEVICE_FEATURE_TYPES.LIGHT.STRING,
-  DEVICE_FEATURE_TYPES.SETPOINT.DECIMAL,
-  DEVICE_FEATURE_TYPES.SETPOINT.STRING
+  DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+  DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+  DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
+  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL,
+  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME
 ];
 
-@connect('httpClient', actions)
+@connect('httpClient', {})
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {
-    this.props.updateBoxRoom(this.props.x, this.props.y, room.selector);
-    this.updateDeviceFeatures([]);
+    this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
   };
 
   updateDeviceFeatures = selectedDeviceFeaturesOptions => {
     selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions || [];
     const deviceFeatures = selectedDeviceFeaturesOptions.map(option => option.value);
-    this.props.updateBoxDeviceFeatures(this.props.x, this.props.y, deviceFeatures);
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      device_features: deviceFeatures
+    });
     this.setState({ selectedDeviceFeaturesOptions });
   };
 
@@ -41,19 +43,27 @@ class EditDeviceInRoom extends Component {
         const deviceOptions = [];
         const selectedDeviceFeaturesOptions = [];
 
-        room.devices.forEach(device => {
-          const roomDeviceFeatures = [];
-          device.features.forEach(feature => {
-            const featureOption = {
-              value: feature.selector,
-              label: getDeviceFeatureName(this.context.intl.dictionary, device, feature)
-            };
-            // for now, we only supports binary on/off and sensors
-            if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
-              roomDeviceFeatures.push(featureOption);
-            }
-            if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
-              selectedDeviceFeaturesOptions.push(featureOption);
+      room.devices.forEach(device => {
+        const roomDeviceFeatures = [];
+        device.features.forEach(feature => {
+          const featureOption = {
+            value: feature.selector,
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+          };
+          // for now, we only supports binary on/off and sensors
+          if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
+            roomDeviceFeatures.push(featureOption);
+          }
+          if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
+            selectedDeviceFeaturesOptions.push(featureOption);
+          }
+        });
+        if (roomDeviceFeatures.length > 0) {
+          roomDeviceFeatures.sort((a, b) => {
+            if (a.label < b.label) {
+              return -1;
+            } else if (a.label > b.label) {
+              return 1;
             }
           });
           if (roomDeviceFeatures.length > 0) {
@@ -80,11 +90,13 @@ class EditDeviceInRoom extends Component {
   };
 
   componentDidMount() {
-    this.getDeviceFeatures();
+    if (this.props.box.room) {
+      this.getDeviceFeatures();
+    }
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room) {
+    if (prevProps.box.room !== this.props.box.room && this.props.box.room) {
       this.getDeviceFeatures();
     }
   }
@@ -122,4 +134,4 @@ class EditDeviceInRoom extends Component {
   }
 }
 
-export default EditDeviceInRoom;
+export default withIntlAsProp(EditDeviceInRoom);

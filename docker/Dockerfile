@@ -2,7 +2,7 @@ ARG TARGET
 ARG VERSION
 ARG BUILD_DATE
 
-FROM $TARGET/node:12-alpine
+FROM $TARGET/node:14-alpine
 
 LABEL \
   org.label-schema.build-date=$BUILD_DATE \
@@ -36,7 +36,8 @@ WORKDIR /src
 ADD . /src
 COPY ./static /src/server/static
 WORKDIR /src/server
-RUN apk add --no-cache --virtual .build-deps make gcc g++ python git libffi-dev linux-headers \
+RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 git libffi-dev linux-headers \
+    && ln -s /usr/bin/python3 /usr/bin/python && ln -s /usr/bin/pip3 /usr/bin/pip \
     && npm ci --unsafe-perm --production \
     && npm cache clean --force \
     && apk del .build-deps

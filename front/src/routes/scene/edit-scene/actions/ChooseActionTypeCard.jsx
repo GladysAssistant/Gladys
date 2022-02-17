@@ -1,7 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
-import { Text } from 'preact-i18n';
+import { Text, withText } from 'preact-i18n';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
@@ -16,9 +16,20 @@ const ACTION_LIST = [
   ACTIONS.CONDITION.ONLY_CONTINUE_IF,
   ACTIONS.USER.SET_SEEN_AT_HOME,
   ACTIONS.USER.SET_OUT_OF_HOME,
-  ACTIONS.HTTP.REQUEST
+  ACTIONS.USER.CHECK_PRESENCE,
+  ACTIONS.HTTP.REQUEST,
+  ACTIONS.CONDITION.CHECK_TIME,
+  ACTIONS.SCENE.START,
+  ACTIONS.HOUSE.IS_EMPTY,
+  ACTIONS.HOUSE.IS_NOT_EMPTY,
+  ACTIONS.DEVICE.SET_VALUE
 ];
 
+const TRANSLATIONS = ACTION_LIST.reduce((acc, action) => {
+  acc[`editScene.actions.${action}`] = `editScene.actions.${action}`;
+  return acc;
+}, {});
+@withText(TRANSLATIONS)
 @connect('httpClient', {})
 class ChooseActionType extends Component {
   state = {
@@ -35,6 +46,11 @@ class ChooseActionType extends Component {
     }
   };
   render(props, { currentAction }) {
+    const options = ACTION_LIST.map(action => ({
+      value: action,
+      label: props[`editScene.actions.${action}`]
+    }));
+
     return (
       <div>
         <div class="form-group">
@@ -42,12 +58,10 @@ class ChooseActionType extends Component {
             <Text id="editScene.selectActionType" />
           </label>
           <Select
+            class="choose-scene-action-type"
             onChange={this.handleChange}
             value={currentAction}
-            options={ACTION_LIST.map(action => ({
-              value: action,
-              label: <Text id={`editScene.actions.${action}`} />
-            }))}
+            options={options}
           />
         </div>
         <div class="form-group">

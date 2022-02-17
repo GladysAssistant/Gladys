@@ -1,3 +1,5 @@
+const logger = require('../../utils/logger');
+
 /**
  * @description Shutdown Gladys instance.
  * @example
@@ -5,7 +7,12 @@
  */
 async function shutdown() {
   // gracefully shutdown db
-  await this.sequelize.close();
+  try {
+    await this.sequelize.close();
+  } catch (e) {
+    logger.info('Database is probably already closed');
+    logger.warn(e);
+  }
   // exit
   process.exit();
 }

@@ -20,6 +20,7 @@ before(async function before() {
     disableService: true,
     disableBrainLoading: true,
     disableSchedulerLoading: true,
+    disableDeviceStateAggregation: true,
     jwtSecret: 'secret',
   };
   const gladys = Gladys(config);
@@ -42,7 +43,7 @@ before(async function before() {
   // @ts-ignore
   global.TEST_BACKEND_APP = server.start(gladys, SERVER_PORT, {
     serveFront: false,
-  });
+  }).app;
   // @ts-ignore
   global.TEST_GLADYS_INSTANCE = gladys;
 });

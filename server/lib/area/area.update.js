@@ -22,8 +22,17 @@ async function update(selector, area) {
   }
 
   await existingArea.update(area);
+  const plainArea = existingArea.get({ plain: true });
 
-  return existingArea.get({ plain: true });
+  // we update the area in memory
+  const areaIndexInMemory = this.areas.findIndex((a) => a.id === plainArea.id);
+  if (areaIndexInMemory !== -1) {
+    this.areas[areaIndexInMemory] = plainArea;
+  } else {
+    this.areas.push(plainArea);
+  }
+
+  return plainArea;
 }
 
 module.exports = {

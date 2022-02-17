@@ -12,7 +12,7 @@ const GatewayPage = ({ children, ...props }) => (
           <GatewayBackupList {...props} />
         )}
         {props.gatewayRestoreInProgress && get(props, 'gatewayStatus.configured') === true && (
-          <GatewayRestoreInProgress />
+          <GatewayRestoreInProgress gatewayGladysRestarting={props.gatewayGladysRestarting} />
         )}
         {get(props, 'gatewayStatus.configured') === false && <GatewayNotConfigured />}
       </div>

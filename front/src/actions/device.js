@@ -54,7 +54,7 @@ function createActions(store) {
               [deviceIndex]: {
                 features: {
                   [deviceFeatureIndex]: {
-                    lastValue: {
+                    last_value: {
                       $set: value
                     }
                   }

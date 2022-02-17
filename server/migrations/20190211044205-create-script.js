@@ -30,5 +30,5 @@ module.exports = {
       },
     });
   },
-  down: (queryInterface, Sequelize) => queryInterface.dropTable('t_script'),
+  down: async (queryInterface, Sequelize) => queryInterface.dropTable('t_script'),
 };

@@ -1,8 +1,10 @@
 import WeatherBox from '../../components/boxs/weather/WeatherBox';
 import RoomTemperatureBox from '../../components/boxs/room-temperature/RoomTemperature';
+import RoomHumidityBox from '../../components/boxs/room-humidity/RoomHumidity';
 import CameraBox from '../../components/boxs/camera/Camera';
 import AtHomeBox from '../../components/boxs/user-presence/UserPresence';
 import DevicesInRoomsBox from '../../components/boxs/device-in-room/DevicesInRoomsBox';
+import ChartBox from '../../components/boxs/chart/Chart';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -14,8 +16,12 @@ const Box = ({ children, ...props }) => {
       return <CameraBox {...props} />;
     case 'temperature-in-room':
       return <RoomTemperatureBox {...props} />;
+    case 'humidity-in-room':
+      return <RoomHumidityBox {...props} />;
     case 'devices-in-room':
       return <DevicesInRoomsBox {...props} />;
+    case 'chart':
+      return <ChartBox {...props} />;
   }
 };
 
