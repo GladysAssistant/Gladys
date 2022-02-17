@@ -15,7 +15,9 @@ async function getNetworkMode() {
 
   if (!this.networkMode) {
     // eslint-disable-next-line no-useless-escape
-    const cmdResult = await exec('cat /proc/self/cgroup | grep -o -e "docker/.*\|docker-.*.scope" | head -n 1 | sed -e "s/.scope//g;s/docker-//g;s!docker/!!g"');
+    const cmdResult = await exec(
+      'cat /proc/self/cgroup | grep -o -e "docker/.*|docker-.*.scope" | head -n 1 | sed -e "s/.scope//g;s/docker-//g;s!docker/!!g"',
+    );
     const [containerId] = cmdResult.split('\n');
     const gladysContainer = this.dockerode.getContainer(containerId);
     const gladysContainerInspect = await gladysContainer.inspect();
