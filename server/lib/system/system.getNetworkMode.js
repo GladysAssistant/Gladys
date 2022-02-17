@@ -15,16 +15,17 @@ async function getNetworkMode() {
   }
 
   if (!this.networkMode) {
-    const cmdResult = await exec('head -1 /proc/self/cgroup | cut -d/ -f3');
-    let [cleanResult];
-    if (cmdResult.indexOf('docker') > -1) {
-      cleanResult = cmdResult.split(/[-/.]+/)[1];
-      logger.debug(`Cgroups V2 detected ${cleanResult}`);
+    let containerId;
+    containerId = await exec('cat /proc/self/cgroup | grep -o -e "docker/.*" | head -n 1 | sed -e "s!docker/!!g"');
+    if (containerId) {
+      logger.debug(`cgroupsv1 detected containerId ${containerId}`);
     } else {
-      cleanResult = cmdResult;
-      logger.debug(`Cgroups V1 detected ${cleanResult}`);
+      // eslint-disable-next-line no-useless-escape
+      containerId = await exec(
+        'cat /proc/self/cgroup | grep -o  -e "docker-.*.scope" | head -n 1 | sed "s/docker-(.*).scope/\\1/"',
+      );
+      logger.debug(`cgroupsv2 detected containerId ${containerId}`);
     }
-    const [containerId] = cleanResult.split('\n');
     const gladysContainer = this.dockerode.getContainer(containerId);
     const gladysContainerInspect = await gladysContainer.inspect();
     this.networkMode = get(gladysContainerInspect, 'HostConfig.NetworkMode', { default: 'unknown' });
