@@ -1603,20 +1603,11 @@
     "percent": "Pourcent (%)",
     "millibar": "Millibar (mbar)",
     "pascal": "Pascal (Pa)",
-<<<<<<< HEAD
-    "inch-mercury": "Pouce de mercure (inHg)",
-    "millimeter-mercury": "Millimètre de mercure (mmHg)",
-    "lux": "Luxmen (lux)",
-    "watt": "Watt (W)",
-    "kilowatt": "Kilowatt (kW)",
-    "kilowatt-hour": "Kilowatt heure (kW/h)",
-=======
     "hPa": "Hectopascal (hPa)",
     "lux": "Lux",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
     "kilowatt-hour": "Kilowatt heure (kWh)",
->>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
     "ampere": "Ampère (A)",
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
@@ -1641,12 +1632,7 @@
     "null": "",
     "millibar": "mbar",
     "pascal": "Pa",
-<<<<<<< HEAD
-    "inch-mercury": "inHg",
-    "millimeter-mercury": "mmHg",
-=======
     "hPa": "hPa",
->>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
     "lux": "lx",
     "watt": "W",
     "kilowatt": "kW",
@@ -1707,16 +1693,9 @@
       "shortCategoryName": "Capteur température",
       "decimal": "Température"
     },
-<<<<<<< HEAD
-    "setpoint": {
-      "shortCategoryName": "Consigne",
-      "decimal": "Température de consigne",
-      "string": "Mode de consigne"
-=======
     "device-temperature-sensor": {
       "shortCategoryName": "Température de l'appareil",
       "decimal": "Température"
->>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
     },
     "motion-sensor": {
       "shortCategoryName": "Détecteur de mouvement",

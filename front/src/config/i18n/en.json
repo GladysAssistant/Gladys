@@ -884,8 +884,6 @@
         "magnet": "Magnet Sensor"
       }
     },
-<<<<<<< HEAD
-=======
     "caldav": {
       "title": "CalDAV",
       "accountTab": "Account",
@@ -954,7 +952,6 @@
       "buttonCleanUp": "Clean Up",
       "buttonSync": "Sync now"
     },
->>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
     "bluetooth": {
       "title": "Bluetooth",
       "description": "Control your Bluetooth devices.",
@@ -1668,14 +1665,8 @@
     "percent": "Percent (%)",
     "millibar": "Millibar (mbar)",
     "pascal": "Pascal (Pa)",
-<<<<<<< HEAD
-    "inch-mercury": "Inch of mercury (inHg)",
-    "millimeter-mercury": "Millimeter of mercury (mmHg)",
-    "lux": "Luxmen (lux)",
-=======
     "hPa": "Hectopascal (hPa)",
     "lux": "Lux",
->>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
     "kilowatt-hour": "Kilowatt hour (kWh)",
@@ -1703,12 +1694,7 @@
     "null": "",
     "millibar": "mbar",
     "pascal": "Pa",
-<<<<<<< HEAD
-    "inch-mercury": "inHg",
-    "millimeter-mercury": "mmHg",
-=======
     "hPa": "hPa",
->>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
     "lux": "lx",
     "watt": "W",
     "kilowatt": "kW",
@@ -1769,16 +1755,13 @@
       "shortCategoryName": "Temperature sensor",
       "decimal": "Temperature"
     },
-<<<<<<< HEAD
     "setpoint": {
       "shortCategoryName": "Setpoint",
       "decimal": "Setpoint temperature",
       "string": "Setpoint mode"
-=======
     "device-temperature-sensor": {
       "shortCategoryName": "Device temperature sensor",
       "decimal": "Temperature"
->>>>>>> 3bea939b69696fbe9abf027ae28223654f768f22
     },
     "motion-sensor": {
       "shortCategoryName": "Motion sensor",
