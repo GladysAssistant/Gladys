@@ -1,7 +1,6 @@
 const get = require('get-value');
 const { PlatformNotCompatible } = require('../../utils/coreErrors');
 const { exec } = require('../../utils/childProcess');
-const logger = require('../../utils/logger');
 
 /**
  * @description Get Gladys network into Docker environment.
@@ -15,17 +14,9 @@ async function getNetworkMode() {
   }
 
   if (!this.networkMode) {
-    let containerId;
-    containerId = await exec('cat /proc/self/cgroup | grep -o -e "docker/.*" | head -n 1 | sed -e "s!docker/!!g"');
-    if (containerId) {
-      logger.debug(`cgroupsv1 detected containerId ${containerId}`);
-    } else {
-      // eslint-disable-next-line no-useless-escape
-      containerId = await exec(
-        'cat /proc/self/cgroup | grep -o  -e "docker-.*.scope" | head -n 1 | sed "s/docker-(.*).scope/\\1/"',
-      );
-      logger.debug(`cgroupsv2 detected containerId ${containerId}`);
-    }
+    // eslint-disable-next-line no-useless-escape
+    const cmdResult = await exec('cat /proc/self/cgroup | grep -o -e "docker/.*\|docker-.*.scope" | head -n 1 | sed -e "s/.scope//g;s/docker-//g;s!docker/!!g"');
+    const [containerId] = cmdResult.split('\n');
     const gladysContainer = this.dockerode.getContainer(containerId);
     const gladysContainerInspect = await gladysContainer.inspect();
     this.networkMode = get(gladysContainerInspect, 'HostConfig.NetworkMode', { default: 'unknown' });
