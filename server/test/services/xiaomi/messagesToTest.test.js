@@ -1,4 +1,4 @@
-/*  
+/*
     case '86sw2':
       this.newValueDuplexWirelessSwitch(message, data);
       break;
@@ -88,6 +88,14 @@ const MESSAGES = [
     }),
   },
   // SWITCH
+  {
+    sid: `1245${(counter += 1)}`,
+    model: 'sensor_switch.aq2',
+    data: JSON.stringify({
+      status: 'click',
+      voltage: 3000,
+    }),
+  },
   {
     sid: `1245${(counter += 1)}`,
     model: 'switch',
