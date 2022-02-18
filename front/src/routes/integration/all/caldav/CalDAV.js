@@ -34,6 +34,17 @@ const CalDAV = ({ children, ...props }) => (
                     </span>
                     <Text id="integration.caldav.syncTab" />
                   </Link>
+
+                  <Link
+                    href="/dashboard/integration/calendar/caldav/share"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-sliders" />
+                    </span>
+                    <Text id="integration.caldav.shareTab" />
+                  </Link>
                 </div>
               </div>
             </div>
