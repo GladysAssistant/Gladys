@@ -17,6 +17,10 @@ describe('POST /api/v1/service/rtsp-camera/camera/test', () => {
           name: 'CAMERA_URL',
           value: 'test',
         },
+        {
+          name: 'CAMERA_ROTATION',
+          value: '0',
+        },
       ],
     };
     const rtspCameraController = RtspCameraController(rtspCameraService);
