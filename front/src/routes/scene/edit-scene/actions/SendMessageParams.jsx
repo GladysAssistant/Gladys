@@ -103,7 +103,8 @@ class SendMessageParams extends Component {
       dropdown: {
         enabled: 1,
         position: 'text',
-        mapValueTo: 'title'
+        mapValueTo: 'title',
+        maxItems: 200
       },
       whitelist: this.state.variableWhileList,
       mixTagsInterpolator: [OPENING_VARIABLE, CLOSING_VARIABLE]
