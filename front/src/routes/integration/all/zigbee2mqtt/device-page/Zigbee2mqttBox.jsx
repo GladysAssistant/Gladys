@@ -1,9 +1,10 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
-import get from 'get-value';
 import { Link } from 'preact-router/match';
-import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../utils/consts';
+
+import { RequestStatus } from '../../../../../utils/consts';
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 class Zigbee2mqttBox extends Component {
   updateName = e => {
@@ -126,20 +127,7 @@ class Zigbee2mqttBox extends Component {
                   <label class="form-label">
                     <Text id="integration.zigbee2mqtt.featuresLabel" />
                   </label>
-                  <div class="tags">
-                    {props.device &&
-                      props.device.features &&
-                      props.device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                  </div>
+                  <DeviceFeatures features={props.device.features} />
                 </div>
 
                 <div class="form-group">

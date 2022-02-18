@@ -8,7 +8,7 @@ const { convertFeature } = require('../utils/convertFeature');
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
  * @param {Object} message - The message sent.
- * @returns {Object} Device.
+ * @returns {Object} Null.
  * @example
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */
@@ -25,14 +25,6 @@ function handleMqttMessage(topic, message) {
       const convertedDevices = devices
         // Remove Coordinator
         .filter((d) => d.supported)
-        // Remove existing devices
-        .filter((d) => {
-          const existingDevice = this.gladys.stateManager.get('deviceByExternalId', `zigbee2mqtt:${d.friendly_name}`);
-          if (existingDevice) {
-            return false;
-          }
-          return true;
-        })
         // Add features
         .map((d) => convertDevice(d, this.serviceId));
 
@@ -40,7 +32,7 @@ function handleMqttMessage(topic, message) {
 
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
-        payload: convertedDevices,
+        payload: this.getDiscoveredDevices(),
       });
       break;
     }
@@ -95,11 +87,15 @@ function handleMqttMessage(topic, message) {
             // Find the feature regarding the field name
             const feature = convertFeature(device.features, zigbeeFeatureField);
             if (feature) {
-              const newState = {
-                device_feature_external_id: `${feature.external_id}`,
-                state: convertValue(feature.type, incomingFeatures[zigbeeFeatureField]),
-              };
-              this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
+              try {
+                const newState = {
+                  device_feature_external_id: `${feature.external_id}`,
+                  state: convertValue(feature.type, incomingFeatures[zigbeeFeatureField]),
+                };
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
+              } catch (e) {
+                logger.error(`Failed to convert value for device ${deviceName}:`, e);
+              }
             } else {
               logger.warn(`Zigbee2mqtt device ${deviceName}, feature ${zigbeeFeatureField} not configured in Gladys.`);
             }
@@ -112,6 +108,7 @@ function handleMqttMessage(topic, message) {
       }
     }
   }
+  return null;
 }
 
 module.exports = {

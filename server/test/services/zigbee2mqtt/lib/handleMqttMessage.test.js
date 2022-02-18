@@ -99,6 +99,26 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     assert.calledOnce(gladys.event.emit);
   });
 
+  it('it should log error when bad message but not crash service', async () => {
+    // PREPARE
+    stateManagerGetStub = sinon.stub();
+    stateManagerGetStub.onFirstCall().returns({
+      features: [
+        {
+          external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
+          type: 'battery',
+        },
+      ],
+    });
+    zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"battery":"LOCK"}`);
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+    });
+  });
+
   it('it should get bad topic', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/anytopic/wrongtopic', `anymessage`);

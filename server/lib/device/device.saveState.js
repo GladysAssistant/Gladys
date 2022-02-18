@@ -1,6 +1,7 @@
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { BadParameters } = require('../../utils/coreErrors');
 
 /**
  * @description Save new device feature state in DB.
@@ -13,6 +14,10 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
  * }, 12);
  */
 async function saveState(deviceFeature, newValue) {
+  if (Number.isNaN(newValue)) {
+    throw new BadParameters(`device.saveState of NaN value on ${deviceFeature.selector}`);
+  }
+
   logger.debug(`device.saveState of deviceFeature ${deviceFeature.selector}`);
   const now = new Date();
   const previousDeviceFeature = this.stateManager.get('deviceFeature', deviceFeature.selector);

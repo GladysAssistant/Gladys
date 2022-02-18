@@ -1,6 +1,6 @@
 const peripherals = require('../../../../../fixtures/integration/routes/integration/bluetooth/peripherals.json');
 
-describe.skip('Bluetooth discover', () => {
+describe('Bluetooth discover', () => {
   before(() => {
     cy.login();
 
@@ -13,12 +13,14 @@ describe.skip('Bluetooth discover', () => {
       {
         fixture: 'integration/routes/integration/bluetooth/status_ready.json'
       }
-    );
+    ).as('status');
 
     cy.visit('/dashboard/integration/device/bluetooth/setup');
   });
 
   it('Check page', () => {
+    cy.wait('@status');
+
     // Check warning
     cy.get('.alert.alert-warning').should('have.length', 0);
 
@@ -70,33 +72,14 @@ describe.skip('Bluetooth discover', () => {
   });
 
   it('Auto stop scan', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    cy.intercept(
-      {
-        method: 'POST',
-        url: `${serverUrl}/api/v1/service/bluetooth/scan`
-      },
-      {
-        fixture: 'integration/routes/integration/bluetooth/status_scanning.json'
-      }
-    ).as('scan');
-
-    cy.contains('integration.bluetooth.discover.scanButton')
-      .should('have.class', 'btn-outline-primary')
-      .click()
-      .should('have.class', 'btn-outline-danger');
-
-    cy.wait('@scan');
-
-    cy.sendWebSocket({ type: 'bluetooth.status', payload: { ready: true, scanning: false } });
-
-    cy.contains('integration.bluetooth.discover.scanButton').should('have.class', 'btn-outline-primary');
+    cy.sendWebSocket({ type: 'bluetooth.status', payload: { ready: true, scanning: false } })
+      .contains('integration.bluetooth.discover.scanButton')
+      .should('have.class', 'btn-outline-primary');
   });
 
   it('Receive new ready device', () => {
-    cy.sendWebSocket({ type: 'bluetooth.discover', payload: peripherals[0] });
-
-    cy.contains('button', 'integration.bluetooth.discover.createDeviceInGladys')
+    cy.sendWebSocket({ type: 'bluetooth.discover', payload: peripherals[0] })
+      .contains('button', 'integration.bluetooth.discover.createDeviceInGladys')
       .should('have.length', 1)
       .should('not.be.disabled');
   });
@@ -115,25 +98,27 @@ describe.skip('Bluetooth discover', () => {
       peripheral.service.id = serviceId;
     });
 
-    cy.sendWebSocket({ type: 'bluetooth.discover', payload: peripheral });
-
-    cy.contains('button', 'integration.bluetooth.discover.updateDeviceInGladys')
+    cy.sendWebSocket({ type: 'bluetooth.discover', payload: peripheral })
+      .contains('button', 'integration.bluetooth.discover.updateDeviceInGladys')
       .should('have.length', 1)
       .should('not.be.disabled');
   });
 
   it('Receive new already binded device', () => {
-    cy.sendWebSocket({ type: 'bluetooth.discover', payload: peripherals[2] });
-
-    cy.contains('button', 'peanut')
+    cy.sendWebSocket({ type: 'bluetooth.discover', payload: peripherals[2] })
+      .contains('button', 'peanut')
       .should('have.length', 1)
       .should('be.disabled');
   });
 
   it('Go to creation page', () => {
+    // Force required peripheral
     const peripheral = peripherals[0];
-
-    cy.contains('button', 'integration.bluetooth.discover.createDeviceInGladys').click();
+    cy.sendWebSocket({ type: 'bluetooth.discover', payload: peripheral })
+      // Force status
+      .sendWebSocket({ type: 'bluetooth.status', payload: { ready: true, scanning: false } })
+      .contains('button', 'integration.bluetooth.discover.createDeviceInGladys')
+      .click();
 
     cy.location('pathname').should('eq', `/dashboard/integration/device/bluetooth/setup/${peripheral.selector}`);
   });

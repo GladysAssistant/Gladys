@@ -47,8 +47,7 @@ function convertValue(feature, value) {
           result = value ? 1 : 0;
           break;
         }
-        case 'number':
-        case 'string': {
+        case 'number': {
           result = value;
           break;
         }

@@ -41,6 +41,9 @@
     "event": "événement",
     "noEventsInRange": "Aucuns évènements trouvés dans cette période."
   },
+  "device": {
+    "noFeatures": "Aucune fonctionnalité"
+  },
   "login": {
     "title": "Gladys Assistant",
     "welcome": "Bienvenue",
@@ -383,7 +386,6 @@
         "title": "Appareils Bluetooth",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil Bluetooth n'a encore été ajouté.",
-        "noFeatures": "Aucune fonctionnalité",
         "nameLabel": "Nom de l'appareil",
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
@@ -392,7 +394,6 @@
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
-        "noFeatureDiscovered": "Aucune fonctionnalité détectée.",
         "featureNamePlaceholder": "Nom de la fonctionnalité",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
@@ -562,7 +563,6 @@
         "noNameLabel": "Pas de nom",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
-        "noFeatures": "Aucune fonctionnalité",
         "search": "Recherche d'appareils",
         "connectButton": "Connecter/Reconnecter",
         "scanButton": "Recherche sur le réseau",
@@ -632,7 +632,6 @@
       },
       "discover": {
         "title": "Découverte du réseau Zigbee",
-        "device": "({{nbDevices}}) Appareils",
         "permitJoin": "Autoriser l'association",
         "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "serverNoResponse": "Gladys n'est pas accessible.",
@@ -649,6 +648,7 @@
       "featuresLabel": "Fonctionnalités",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
+      "updateButton": "Mettre à jour",
       "alreadyExistsButton": "Déjà créé",
       "saveError": "Une erreur s'est produite lors de la sauvegarde.",
       "documentation": "Documentation Zigbee2mqtt"
@@ -682,7 +682,6 @@
         "nameLabel": "Nom",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
-        "noFeatures": "Pas de fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "editButton": "Editer",
@@ -704,7 +703,6 @@
         "createDeviceInGladys": "Connecter dans Gladys",
         "features": "Fonctionnalités",
         "params": "Paramètre",
-        "noFeatures": "Aucune fonctionnalité",
         "nodeId": "Noeud",
         "zwaveNotConfiguredError": "Ce service Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
@@ -774,7 +772,6 @@
         "externalIdLabel": "ID externe",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
-        "noFeatures": "Aucune fonctionnalité",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "returnButton": "Retour",
@@ -824,7 +821,7 @@
         "passwordPlaceholder": "Entrez le mot de passe du broker MQTT",
         "saveLabel": "Sauvegarder la configuration",
         "error": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
-        "connecting": "Configuration enregistrée. Maintenant, connectez-vous à votre broker MQTT...",
+        "connecting": "Configuration enregistrée. Connexion au broker MQTT en cours...",
         "connected": "Connecté au broker MQTT avec succès !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
         "disconnected": "Déconnecté du broker MQTT."
@@ -843,8 +840,7 @@
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
-        "editButton": "Editer les détails",
-        "noFeatures": "Aucune fonctionnalité"
+        "editButton": "Editer les détails"
       },
       "setup": {
         "title": "Aucun appareil Xiaomi dans Gladys",
@@ -923,7 +919,6 @@
     "editNamePlaceholder": "Entrez un nom de scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
-    "runButton": "Jouer",
     "deleteButton": "Supprimer",
     "triggersTitle": "Déclencheurs",
     "newTrigger": "Nouveau déclencheur",
@@ -938,11 +933,6 @@
     "actionsDescription": "Toutes les actions de ce bloc s'exécuteront en parallèle. Pour effectuer une séquence d'actions, ajoutez des actions au bloc suivant.",
     "addNewTriggerButton": "Nouveau déclencheur",
     "saveSceneError": "Une erreur s'est produite lors de l'enregistrement de votre scène. Veuillez vérifier que toutes les actions / déclencheurs sont remplis et corrects.",
-    "triggerCard": {
-      "title": "Déclencheurs",
-      "searchPlaceholder": "Chercher un déclencheur",
-      "leavingHomeTitle": "Départ la maison"
-    },
     "actionsCard": {
       "delay": {
         "label": " Ce bloc attendra la durée spécifiée.",
@@ -1521,7 +1511,7 @@
     "fahrenheit": "Fahrenheit (°F)",
     "percent": "Pourcent (%)",
     "pascal": "Pascal (Pa)",
-    "hectoPascal": "Hectopascal (hPa)",
+    "hPa": "Hectopascal (hPa)",
     "lux": "Lux",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
@@ -1538,7 +1528,7 @@
     "fahrenheit": "°F",
     "percent": "%",
     "pascal": "Pa",
-    "hectoPascal": "hPa",
+    "hPa": "hPa",
     "lux": "lx",
     "watt": "W",
     "kilowatt": "kW",
@@ -1549,6 +1539,24 @@
     "ppm": "ppm",
     "cm": "cm",
     "mm": "mm"
+  },
+  "deviceFeatureValue": {
+    "type": {
+      "binary": {
+        "other": "Aucune valeur reçue",
+        "zero": "Inactif",
+        "one": "Actif"
+      }
+    },
+    "category": {
+      "co-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Sain",
+          "one": "CO détecté"
+        }
+      }
+    }
   },
   "deviceFeatureCategory": {
     "light": {
@@ -1614,6 +1622,10 @@
       "binary": "Capteur de fumée - Oui/Non",
       "decimal": "Valeur de fumée décimale"
     },
+    "co-sensor": {
+      "shortCategoryName": "Capteur de monxyde de carbon (CO)",
+      "binary": "Détection de CO"
+    },
     "co2-sensor": {
       "shortCategoryName": "Capteur de Co2",
       "decimal": "Niveau de CO2"
@@ -1665,6 +1677,40 @@
       "acceleration-y": "Accélération Y",
       "acceleration-z": "Accélération Z",
       "bed-activity": "Activité Lit"
+    },
+    "signal": {
+      "shortCategoryName": "Signal",
+      "integer": "Intensité du signal"
+    },
+    "television": {
+      "shortCategoryName": "Télévision",
+      "binary": "Power",
+      "source": "Source",
+      "channel": "Chaîne",
+      "guide": "Guide",
+      "menu": "Menu",
+      "volume-up": "Augmenter volume",
+      "volume-mute": "Muet",
+      "volume-down": "Diminuer volume",
+      "volume": "Volume",
+      "channel-up": "Chaîne suivante",
+      "channel-previous": "Dernière chaîne",
+      "channel-down": "Chaîne précédente",
+      "tools": "Outils",
+      "info": "Info",
+      "return": "Retour",
+      "exit": "Quitter",
+      "up": "Haut",
+      "down": "Bas",
+      "left": "Gauche",
+      "right": "Droite",
+      "enter": "Entrer",
+      "rewind": "Retour rapide",
+      "forward": "Avance rapide",
+      "play": "Lecture",
+      "pause": "Pause",
+      "stop": "Stop",
+      "record": "Enregistrer"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
@@ -1719,7 +1765,6 @@
     "roomLabel": "Pièce",
     "featuresLabel": "Fonctionnalités",
     "featureCategoryLabel": "Catégorie",
-    "noFeatures": "Aucune fonctionnalité",
     "namePlaceholder": "Entrez un nom",
     "externalIdLabel": "ID externe",
     "externalIdPlaceholder": "Entrez une ID externe",

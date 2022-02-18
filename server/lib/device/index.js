@@ -48,7 +48,7 @@ const DeviceManager = function DeviceManager(
   this.variable = variable;
   this.job = job;
 
-  // initalize all types of device feature categories
+  // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, this);
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
