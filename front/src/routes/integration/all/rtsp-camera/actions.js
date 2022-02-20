@@ -12,6 +12,22 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
+    async complete(camera) {
+      const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
+      if (cameraUrlParam) {
+        camera.cameraUrl = cameraUrlParam;
+      }
+      const cameraRotationParam = camera.params.find(param => param.name === 'CAMERA_ROTATION');
+      if (cameraRotationParam) {
+        camera.cameraRotation = cameraRotationParam;
+      } else {
+        // Backward compatibility if param not exist, create it.
+        const rotationParam = { name: 'CAMERA_ROTATION', value: '0' };
+        camera.cameraRotation = rotationParam;
+        camera.params.push(rotationParam);
+      }
+      return camera;
+    },
     async getRtspCameraDevices(state) {
       store.setState({
         getRtspCameraStatus: RequestStatus.Getting
@@ -24,12 +40,9 @@ function createActions(store) {
           options.search = state.rtspCameraSearch;
         }
         const rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
-        // find camera url
+        // find camera params
         rtspCameras.forEach(camera => {
-          const cameraUrlParam = camera.params.find(param => param.name === 'CAMERA_URL');
-          if (cameraUrlParam) {
-            camera.cameraUrl = cameraUrlParam;
-          }
+          camera = actions.complete(camera);
         });
         store.setState({
           rtspCameras,
@@ -62,7 +75,8 @@ function createActions(store) {
       }
     },
     async createOrUpdateCamera(state, index) {
-      const camera = await state.httpClient.post(`/api/v1/device`, state.rtspCameras[index]);
+      let camera = await state.httpClient.post(`/api/v1/device`, state.rtspCameras[index]);
+      camera = actions.complete(camera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           $set: camera
@@ -88,6 +102,10 @@ function createActions(store) {
               name: 'CAMERA_URL',
               value: null
             },
+            cameraRotation: {
+              name: 'CAMERA_ROTATION',
+              value: '0'
+            },
             features: [
               {
                 name: null,
@@ -106,6 +124,10 @@ function createActions(store) {
               {
                 name: 'CAMERA_URL',
                 value: null
+              },
+              {
+                name: 'CAMERA_ROTATION',
+                value: '0'
               }
             ]
           }
@@ -150,10 +172,35 @@ function createActions(store) {
         rtspCameras
       });
     },
+    updateCameraRotation(state, index, value) {
+      let cameraRotationParamIndex = state.rtspCameras[index].params.findIndex(
+        param => param.name === 'CAMERA_ROTATION'
+      );
+      const rtspCameras = update(state.rtspCameras, {
+        [index]: {
+          cameraRotation: {
+            value: {
+              $set: value
+            }
+          },
+          params: {
+            [cameraRotationParamIndex]: {
+              value: {
+                $set: value
+              }
+            }
+          }
+        }
+      });
+      store.setState({
+        rtspCameras
+      });
+    },
     async saveCamera(state, index) {
       const camera = state.rtspCameras[index];
       camera.features[0].name = camera.name;
-      const newCamera = await state.httpClient.post(`/api/v1/device`, camera);
+      let newCamera = await state.httpClient.post(`/api/v1/device`, camera);
+      newCamera = await actions.complete(newCamera);
       const rtspCameras = update(state.rtspCameras, {
         [index]: {
           $set: newCamera

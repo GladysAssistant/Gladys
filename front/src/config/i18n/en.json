@@ -447,6 +447,7 @@
       "testConnectionButton": "Test connection",
       "saveButton": "Save",
       "deleteButton": "Delete",
+      "rotate180Label": "180° Rotation",
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
@@ -820,9 +821,11 @@
       "title": "CalDAV",
       "accountTab": "Account",
       "syncTab": "Synchronization",
+      "shareTab": "Sharing",
       "description": "Sync your CalDAV calendars.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
-      "syncIntroduction": "Choose the calendars to synchronize.",
+      "syncIntroduction": "Choose calendars to synchronize.",
+      "shareIntroduction": "Choose calendars you want to share with other Gladys users.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {

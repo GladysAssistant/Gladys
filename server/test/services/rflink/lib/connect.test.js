@@ -59,5 +59,4 @@ describe('RFLinkHandler.connect', () => {
     expect(rflinkHandler.ready).to.be.equal(false);
     expect(rflinkHandler.scanInProgress).to.be.equal(false);
   });
-
 });

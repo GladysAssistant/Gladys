@@ -20,9 +20,9 @@ describe('RFLink device edit', () => {
         keep_history: true,
         has_feedback: false,
         min: 0,
-        max: 1,
-      },
-    ],
+        max: 1
+      }
+    ]
   };
 
   before(() => {

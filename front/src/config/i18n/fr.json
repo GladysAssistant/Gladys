@@ -309,9 +309,11 @@
       "title": "CalDAV",
       "accountTab": "Compte",
       "syncTab": "Synchronisation",
+      "shareTab": "Partage",
       "description": "Synchonisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
+      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de Gladys.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
@@ -367,7 +369,7 @@
       "synchronizationRequestChangesError": "Impossible de récupérer les changements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationRequestEventsError": "Impossible de récupérer les détails des évènements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationNeeded": "Une première synchronisation est nécessaire pour lister les calendriers.",
-      "calendarChoiceSuccess": "Choix des calendriers enregistré avec succès.",
+      "calendarChoiceSuccess": "Choix enregistrés avec succès.",
       "calendarChoiceError": "Une erreur est survenue lors de la sauvegarde.",
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",
@@ -572,6 +574,7 @@
       "testConnectionButton": "Tester",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
+      "rotate180Label": "Rotation 180°",
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
       "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
     },

@@ -62,6 +62,7 @@ const RtspCameraPage = ({ children, ...props }) => (
                               housesWithRooms={props.housesWithRooms}
                               updateCameraField={props.updateCameraField}
                               updateCameraUrl={props.updateCameraUrl}
+                              updateCameraRotation={props.updateCameraRotation}
                               testConnection={props.testConnection}
                               saveCamera={props.saveCamera}
                               deleteCamera={props.deleteCamera}

@@ -65,6 +65,7 @@ import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs'
 import TelegramPage from '../routes/integration/all/telegram';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
+import CalDAVSharePage from '../routes/integration/all/caldav/share-page';
 import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
@@ -191,6 +192,7 @@ const AppRouter = connect(
         <Redirect path="/dashboard/integration/calendar/caldav" to="/dashboard/integration/calendar/caldav/account" />
         <CalDAVAccountPage path="/dashboard/integration/calendar/caldav/account" />
         <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />
+        <CalDAVSharePage path="/dashboard/integration/calendar/caldav/share" />
         <OpenWeatherPage path="/dashboard/integration/weather/openweather" />
         <Redirect
           path="/dashboard/integration/device/philips-hue"

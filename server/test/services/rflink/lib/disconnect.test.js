@@ -7,7 +7,7 @@ const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
   serialport: SerialPortMock,
 });
 
-const { assert, fake } = sinon;
+const { fake } = sinon;
 const { expect } = chai;
 
 describe('RFLinkHandler.disconnect', () => {
@@ -27,5 +27,4 @@ describe('RFLinkHandler.disconnect', () => {
     expect(rflinkHandler.ready).to.equal(false);
     expect(rflinkHandler.scanInProgress).to.equal(false);
   });
-
 });
