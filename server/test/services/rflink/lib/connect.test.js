@@ -60,10 +60,4 @@ describe('RFLinkHandler.connect', () => {
     expect(rflinkHandler.scanInProgress).to.be.equal(false);
   });
 
-  it('should raise an error on opening connection error', async () => {
-    // @TODO : serial port open should raise an error to test the open callback function code
-
-    const path = '/tty1';
-    await rflinkHandler.connect(path);
-  });
 });
