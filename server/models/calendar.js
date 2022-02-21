@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
           key: 'id',
         },
       },
+      shared: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       service_id: {
         allowNull: true,
         type: DataTypes.UUID,

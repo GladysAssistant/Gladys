@@ -9,6 +9,12 @@ module.exports = {
     max: 1,
   },
   names: {
+    alarm: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      },
+    },
     contact: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,

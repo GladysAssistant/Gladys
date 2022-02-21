@@ -78,7 +78,9 @@ class Map extends Component {
                         defaultView="week"
                         culture={props.user.language}
                         messages={this.props.intl.dictionary.calendar}
-                        scrollToTime={dayjs().subtract(2, 'hour')}
+                        scrollToTime={dayjs()
+                          .subtract(2, 'hour')
+                          .toDate()}
                         eventPropGetter={this.eventPropGetter}
                       />
                     </div>
