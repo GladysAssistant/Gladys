@@ -4,6 +4,7 @@ const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
+const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
 
 /**
  * @description Get camera image.
@@ -22,6 +23,12 @@ async function getImage(device) {
     if (!cameraUrlParam.value || cameraUrlParam.value.length === 0) {
       return reject(new NotFoundError('CAMERA_URL_SHOULD_NOT_BE_EMPTY'));
     }
+    // we find the camera rotation in the device
+    let cameraRotationParam =
+      device.params && device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_ROTATION);
+    if (!cameraRotationParam) {
+      cameraRotationParam = '0';
+    }
     // we create a temp folder
     const now = new Date();
     const filePath = path.join(
@@ -30,14 +37,18 @@ async function getImage(device) {
     );
     // we create a writestream
     const writeStream = fse.createWriteStream(filePath);
+    const outputOptions = [
+      '-vframes 1',
+      '-vf scale=640:-1', // resize the image with max width = 640
+      '-qscale:v 15', //  Effective range for JPEG is 2-31 with 31 being the worst quality.
+    ];
+    if (cameraRotationParam.value === '1') {
+      outputOptions.push('-vf hflip,vflip'); // Rotate 180
+    }
     // and send a camera thumbnail to this stream
     this.ffmpeg(cameraUrlParam.value)
       .format('image2')
-      .outputOptions('-vframes 1')
-      // resize the image with max width = 640
-      .outputOptions('-vf scale=640:-1')
-      //  Effective range for JPEG is 2-31 with 31 being the worst quality.
-      .outputOptions('-qscale:v 15')
+      .outputOptions(outputOptions)
       .output(writeStream)
       .on('end', async () => {
         const image = await fse.readFile(filePath);

@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const db = require('../../models');
 
 /**
@@ -9,7 +10,18 @@ const db = require('../../models');
  */
 async function get(userId, options = {}) {
   const where = {
-    user_id: userId,
+    [Op.or]: [
+      {
+        user_id: userId,
+      },
+      ...(options.shared
+        ? [
+            {
+              shared: true,
+            },
+          ]
+        : []),
+    ],
   };
 
   if (options.serviceId) {

@@ -9,9 +9,12 @@ function createActions(store) {
       try {
         const events = await state.httpClient.get('/api/v1/calendar/event', {
           from,
-          to
+          to,
+          shared: true
         });
-        const calendars = await state.httpClient.get('/api/v1/calendar');
+        const calendars = await state.httpClient.get('/api/v1/calendar', {
+          shared: true
+        });
         const eventsFormated = events.map(event => {
           return {
             title: event.name,
