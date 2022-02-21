@@ -60,13 +60,9 @@ describe('RFLink device edit', () => {
         cy.get('input')
           .first()
           .clear()
-          .type('Prise');
-        cy.get('select').select(rooms[0].name);
-        cy.get('input')
-          .last()
-          .clear()
-          .type('Sensor');
+          .type('Switch Living room');
 
+        cy.get('select').select(rooms[0].name);
         cy.contains('button', 'integration.rflink.device.saveButton').click();
       });
   });
@@ -75,11 +71,11 @@ describe('RFLink device edit', () => {
     cy.contains('button', 'global.backButton').click();
 
     const { rooms } = Cypress.env('house');
-    cy.contains('.card-header', 'Prise')
+    cy.contains('.card-header', 'Switch Living room')
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.get('input').should('have.value', 'Prise');
+        cy.get('input').should('have.value', 'Switch Living room');
         cy.get('select option:selected').should('have.text', rooms[0].name);
       });
   });
