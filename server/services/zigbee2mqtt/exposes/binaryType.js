@@ -39,6 +39,12 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
       },
     },
+    carbon_monoxide: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      },
+    },
     presence: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR,
