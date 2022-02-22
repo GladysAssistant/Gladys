@@ -181,5 +181,4 @@ describe('RFLinkHandler.message', () => {
     assert.notCalled(rflinkHandler.newValue);
     assert.notCalled(rflinkHandler.addNewDevice);
   });
-
 });
