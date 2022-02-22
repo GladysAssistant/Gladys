@@ -29,6 +29,14 @@ describe('user.update', () => {
     const res = await user.login('demo@demo.com', 'mybigpassword');
     expect(res).to.have.property('id', '0cd30aef-9c4e-4a23-88e3-3547971296e5');
   });
+  it('should update user telegram_user_id', async () => {
+    const num = 6072774859;
+    await user.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      telegram_user_id: num.toString(),
+    });
+    const res = await user.getByTelegramUserId('6072774859');
+    expect(res).to.have.property('id', '0cd30aef-9c4e-4a23-88e3-3547971296e5');
+  });
   it('should return error, password too short', async () => {
     const promise = user.update('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
       password: 'test12',
