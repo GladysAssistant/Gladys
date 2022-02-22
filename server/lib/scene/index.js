@@ -5,6 +5,7 @@ const queue = require('queue');
 const { addScene } = require('./scene.addScene');
 const { create } = require('./scene.create');
 const { checkTrigger } = require('./scene.checkTrigger');
+const { checkCalendarTriggers } = require('./scene.checkCalendarTriggers');
 const { init } = require('./scene.init');
 const { cancelTriggers } = require('./scene.cancelTriggers');
 const { destroy } = require('./scene.destroy');
@@ -45,11 +46,13 @@ const SceneManager = function SceneManager(stateManager, event, device, message,
   this.event.on(EVENTS.HOUSE.CREATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
   this.event.on(EVENTS.HOUSE.UPDATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
   this.event.on(EVENTS.HOUSE.DELETED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
+  this.event.on(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING, eventFunctionWrapper(this.checkCalendarTriggers.bind(this)));
 };
 
 SceneManager.prototype.addScene = addScene;
 SceneManager.prototype.cancelTriggers = cancelTriggers;
 SceneManager.prototype.create = create;
+SceneManager.prototype.checkCalendarTriggers = checkCalendarTriggers;
 SceneManager.prototype.checkTrigger = checkTrigger;
 SceneManager.prototype.destroy = destroy;
 SceneManager.prototype.get = get;

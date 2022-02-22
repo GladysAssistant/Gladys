@@ -51,6 +51,10 @@ const SYSTEM_VARIABLE_NAMES = {
 };
 
 const EVENTS = {
+  CALENDAR: {
+    EVENT_IS_COMING: 'calendar.event-is-coming',
+    CHECK_IF_EVENT_IS_COMING: 'calendar.check-if-event-is-coming',
+  },
   DEVICE: {
     NEW: 'device.new',
     CREATE: 'device.create',
