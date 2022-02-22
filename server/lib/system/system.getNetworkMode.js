@@ -1,7 +1,7 @@
 const get = require('get-value');
+const fs = require('fs');
 const { PlatformNotCompatible, DockerNoContainerId } = require('../../utils/coreErrors');
 const { exec } = require('../../utils/childProcess');
-const fs = require('fs');
 
 /**
  * @description Get Gladys network into Docker environment.
