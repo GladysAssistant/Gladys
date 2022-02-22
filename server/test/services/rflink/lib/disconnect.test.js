@@ -7,24 +7,43 @@ const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
   serialport: SerialPortMock,
 });
 
-const { fake } = sinon;
+const { assert, fake, stub } = sinon;
 const { expect } = chai;
 
 describe('RFLinkHandler.disconnect', () => {
-  beforeEach(() => {
-    sinon.reset();
-  });
+  let rflinkHandler;
+  let gladys;
 
-  it('should disconnect and set right state of handler', async () => {
-    const gladys = {
+  beforeEach(() => {
+    gladys = {
       event: {
         emit: fake.returns(null),
       },
     };
-    const rflinkHandler = new RFLinkHandler(gladys, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
+    rflinkHandler = new RFLinkHandler(gladys, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
+    sinon.reset();
+  });
+
+  it('should disconnect by closing opened port and set right state of handler', async () => {
+    rflinkHandler.Path = '/tty';
+    rflinkHandler.connected = true;
+    rflinkHandler.sendUsb = { close: stub().resolves(true) };
     await rflinkHandler.disconnect();
+    assert.calledOnce(rflinkHandler.sendUsb.close);
     expect(rflinkHandler.connected).to.equal(false);
     expect(rflinkHandler.ready).to.equal(false);
     expect(rflinkHandler.scanInProgress).to.equal(false);
   });
+
+  it('should set right state of handler and do nothing else since port is not opened', async () => {
+    rflinkHandler.Path = '';
+    rflinkHandler.connected = false;
+    rflinkHandler.sendUsb = { close: stub().resolves(true) };
+    await rflinkHandler.disconnect();
+    assert.notCalled(rflinkHandler.sendUsb.close);
+    expect(rflinkHandler.connected).to.equal(false);
+    expect(rflinkHandler.ready).to.equal(false);
+    expect(rflinkHandler.scanInProgress).to.equal(false);
+  });
+
 });

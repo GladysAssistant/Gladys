@@ -182,10 +182,4 @@ describe('RFLinkHandler.message', () => {
     assert.notCalled(rflinkHandler.addNewDevice);
   });
 
-  it('should log a non valid id', async () => {
-    const msgRF = '20;ba;Oregon UVN128/138;IDea7c;CO2=0030;BAT=OK;';
-    await rflinkHandler.message(msgRF);
-    assert.notCalled(rflinkHandler.newValue);
-    assert.notCalled(rflinkHandler.addNewDevice);
-  });
 });

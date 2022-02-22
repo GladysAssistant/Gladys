@@ -90,6 +90,19 @@ describe('RFLinkHandler.newValue', () => {
     });
   });
 
+  it('should update a device with a new uv value', async () => {
+    const device = DEVICES[0];
+    const deviceFeature = 'uv';
+    const state = 'ON';
+
+    await rflinkHandler.newValue(device, deviceFeature, state);
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: `rflink:${device.id}:${deviceFeature}:${device.switch}`,
+      state: 1,
+    });
+  });
+
   it('should update a device with a new pressure', async () => {
     const device = DEVICES[0];
     const deviceFeature = 'pressure';
