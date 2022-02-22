@@ -1096,6 +1096,9 @@
       "area": {
         "user-entered": "User entered a zone",
         "user-left": "User left a zone"
+      },
+      "calendar": {
+        "event-is-coming": "Calendar event is coming"
       }
     },
     "triggersCard": {
@@ -1162,6 +1165,24 @@
         "userLeftDescription": "This scene will start when a user left this zone. Zones can be created in the maps tab.",
         "userLabel": "User",
         "areaLabel": "Zone"
+      },
+      "calendarEventIsComing": {
+        "description": "This will trigger the scene when a calendar event matches the conditions.",
+        "calendarLabel": "Look in the following calendars",
+        "nameLabel": "If the name",
+        "isExactly": "is exactly",
+        "contains": "contains",
+        "startsWith": "starts with",
+        "endsWith": "ends with",
+        "hasAnyName": "has any name",
+        "namePlaceholder": "Text to match",
+        "durationName": "And the event is",
+        "startingIn": "Starting in",
+        "endingIn": "Ending in",
+        "durationPlaceholder": "Duration",
+        "minute": "minutes",
+        "hour": "hours",
+        "day": "days"
       }
     }
   },
