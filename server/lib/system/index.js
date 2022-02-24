@@ -33,6 +33,7 @@ const System = function System(sequelize, event, config) {
   this.dockerode = null;
   this.event.on(EVENTS.SYSTEM.DOWNLOAD_UPGRADE, eventFunctionWrapper(this.downloadUpgrade.bind(this)));
   this.networkMode = null;
+  this.containerId = null;
 };
 
 System.prototype.downloadUpgrade = downloadUpgrade;

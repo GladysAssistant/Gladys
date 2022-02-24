@@ -33,13 +33,6 @@ class PlatformNotCompatible extends Error {
   }
 }
 
-class DockerNoContainerId extends Error {
-  constructor(message) {
-    super();
-    this.message = message;
-  }
-}
-
 class BadParameters extends Error {
   constructor(message) {
     super();
@@ -61,6 +54,5 @@ module.exports = {
   BadParameters,
   NoValuesFoundError,
   PlatformNotCompatible,
-  DockerNoContainerId,
   AbortScene,
 };
