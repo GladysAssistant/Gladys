@@ -20,7 +20,7 @@ const house = {
   get: fake.resolves([]),
 };
 
-describe.only('scene.checkCalendarTriggers', () => {
+describe('scene.checkCalendarTriggers', () => {
   const stateManager = new StateManager();
   const calendar = new Calendar();
   let sceneManager;
