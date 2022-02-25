@@ -48,6 +48,7 @@ class ChooseTriggerType extends Component {
             <Text id="editScene.selectTriggerLabel" />
           </label>
           <Select
+            class="choose-scene-trigger-type"
             value={currentTrigger}
             options={TRIGGER_LIST.map(trigger => ({
               value: trigger,
