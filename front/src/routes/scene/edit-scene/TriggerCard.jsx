@@ -130,6 +130,8 @@ const TriggerCard = ({ children, ...props }) => (
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}
+          variables={props.variables}
+          setVariablesTrigger={props.setVariablesTrigger}
         />
       )}
     </div>

@@ -1074,6 +1074,12 @@
         "get-value": {
           "last_value": "Dernière valeur de l'appareil"
         }
+      },
+      "calendar": {
+        "eventName": "Nom de l'évènement",
+        "eventLocation": "Lieu de l'évènement",
+        "eventStart": "Date de début",
+        "eventEnd": "Date de fin"
       }
     },
     "triggers": {

@@ -2,9 +2,11 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
 import cx from 'classnames';
+import get from 'get-value';
 import { Text, Localizer } from 'preact-i18n';
 import { RequestStatus } from '../../../../utils/consts';
 import Select from 'react-select';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import style from './style.css';
 
@@ -81,8 +83,46 @@ class CalendarEventIsComing extends Component {
     this.setState({ selectedCalendarsOptions });
   };
 
+  setVariables = () => {
+    const EVENT_NAME_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventName');
+    const EVENT_LOCATION_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventLocation');
+    const EVENT_START_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventStart');
+    const EVENT_END_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventEnd');
+    this.props.setVariablesTrigger(this.props.index, [
+      {
+        name: 'calendarEvent.name',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_NAME_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvent.location',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_LOCATION_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvent.start',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_START_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvent.end',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_END_VARIABLE,
+        data: {}
+      }
+    ]);
+  };
+
   componentDidMount() {
     this.getCalendars();
+    this.setVariables();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -226,4 +266,4 @@ class CalendarEventIsComing extends Component {
   }
 }
 
-export default connect('httpClient,user', {})(CalendarEventIsComing);
+export default connect('httpClient,user', {})(withIntlAsProp(CalendarEventIsComing));

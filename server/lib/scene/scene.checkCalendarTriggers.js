@@ -1,9 +1,16 @@
 const { Op } = require('sequelize');
 const Promise = require('bluebird');
 const dayjs = require('dayjs');
+
+require('dayjs/locale/en');
+require('dayjs/locale/fr');
+
+const LocalizedFormat = require('dayjs/plugin/localizedFormat');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
+
+dayjs.extend(LocalizedFormat);
 
 /**
  * @description Run every minute to check if a calendar event match
@@ -45,6 +52,13 @@ async function checkCalendarTriggers() {
         {
           model: db.Calendar,
           as: 'calendar',
+          include: [
+            {
+              model: db.User,
+              as: 'creator',
+              attributes: ['firstname', 'language'],
+            },
+          ],
         },
       ],
       where: {
@@ -89,12 +103,27 @@ async function checkCalendarTriggers() {
     const eventsMatching = await db.CalendarEvent.findAll(queryParams);
     // foreach event matching
     await Promise.each(eventsMatching, (eventMatching) => {
-      idsOfEventsMatching.push(eventMatching.id);
+      const eventRaw = eventMatching.get({ plain: true });
+      idsOfEventsMatching.push(eventRaw.id);
+      console.log(eventRaw);
+      const eventFormatted = {
+        name: eventRaw.name,
+        location: eventRaw.location,
+        start: dayjs(eventRaw.start)
+          .tz(this.timezone)
+          .locale(eventRaw.calendar.creator.language)
+          .format('LLL'),
+        end: dayjs(eventRaw.start)
+          .tz(this.timezone)
+          .locale(eventRaw.calendar.creator.language)
+          .format('LLL'),
+      };
+      console.log(eventFormatted);
       // we start the scene of this trigger
       this.execute(sceneSelector, {
         triggerEvent: {
           type: EVENTS.CALENDAR.EVENT_IS_COMING,
-          calendarEvent: eventMatching,
+          calendarEvent: eventFormatted,
         },
       });
     });

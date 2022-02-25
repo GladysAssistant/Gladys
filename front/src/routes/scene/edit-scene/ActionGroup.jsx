@@ -51,6 +51,7 @@ const ActionGroup = ({ children, ...props }) => (
                   deleteAction={props.deleteAction}
                   actionsGroupsBefore={props.actionsGroupsBefore}
                   variables={props.variables}
+                  triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
                   scene={props.scene}
                 />

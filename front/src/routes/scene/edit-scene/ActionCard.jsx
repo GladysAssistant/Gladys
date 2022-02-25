@@ -139,6 +139,7 @@ const ActionCard = ({ children, ...props }) => (
             updateActionProperty={props.updateActionProperty}
             actionsGroupsBefore={props.actionsGroupsBefore}
             variables={props.variables}
+            triggersVariables={props.triggersVariables}
           />
         )}
         {props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF && (
