@@ -1,12 +1,19 @@
-const { fake, useFakeTimers } = require('sinon');
+const { assert, fake, useFakeTimers } = require('sinon');
 const { expect } = require('chai');
 const dayjs = require('dayjs');
+
+require('dayjs/locale/en');
+require('dayjs/locale/fr');
+const LocalizedFormat = require('dayjs/plugin/localizedFormat');
+
 const EventEmitter = require('events');
 
 const { EVENTS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
 const Calendar = require('../../../lib/calendar');
+
+dayjs.extend(LocalizedFormat);
 
 const event = new EventEmitter();
 const house = {
@@ -18,21 +25,27 @@ describe('scene.checkCalendarTriggers', () => {
   const calendar = new Calendar();
   let sceneManager;
   let clock;
+  const startDate = dayjs()
+    .add(10, 'minute')
+    .toDate();
+  const endDate = dayjs()
+    .add(50, 'minute')
+    .toDate();
   beforeEach(async () => {
     clock = useFakeTimers(new Date());
     sceneManager = new SceneManager(stateManager, event, {}, {}, {}, house, {});
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
       name: 'my test event',
-      start: dayjs()
-        .add(10, 'minute')
-        .toDate(),
+      start: startDate,
+      end: endDate,
     });
   });
   afterEach(() => {
     clock.restore();
   });
   it('should check if calendar events are matching the trigger - contains true', async () => {
+    sceneManager.execute = fake.returns(null);
     await sceneManager.create({
       name: 'check-events',
       icon: 'bell',
@@ -51,6 +64,23 @@ describe('scene.checkCalendarTriggers', () => {
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+    assert.calledWith(sceneManager.execute, 'check-events', {
+      triggerEvent: {
+        type: EVENTS.CALENDAR.EVENT_IS_COMING,
+        calendarEvent: {
+          name: 'my test event',
+          location: null,
+          start: dayjs(startDate)
+            .tz('Europe/Paris')
+            .locale('en')
+            .format('LLL'),
+          end: dayjs(startDate)
+            .tz('Europe/Paris')
+            .locale('en')
+            .format('LLL'),
+        },
+      },
+    });
   });
   it('should check if calendar events are matching the trigger - contains false', async () => {
     await sceneManager.create({

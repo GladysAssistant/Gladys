@@ -105,7 +105,7 @@ async function checkCalendarTriggers() {
     await Promise.each(eventsMatching, (eventMatching) => {
       const eventRaw = eventMatching.get({ plain: true });
       idsOfEventsMatching.push(eventRaw.id);
-      console.log(eventRaw);
+
       const eventFormatted = {
         name: eventRaw.name,
         location: eventRaw.location,
@@ -118,7 +118,7 @@ async function checkCalendarTriggers() {
           .locale(eventRaw.calendar.creator.language)
           .format('LLL'),
       };
-      console.log(eventFormatted);
+
       // we start the scene of this trigger
       this.execute(sceneSelector, {
         triggerEvent: {
