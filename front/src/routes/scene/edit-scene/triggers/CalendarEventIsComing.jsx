@@ -1,10 +1,12 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
-import get from 'get-value';
+import cx from 'classnames';
 import { Text, Localizer } from 'preact-i18n';
 import { RequestStatus } from '../../../../utils/consts';
 import Select from 'react-select';
+
+import style from './style.css';
 
 class CalendarEventIsComing extends Component {
   getCalendars = async () => {
@@ -88,7 +90,6 @@ class CalendarEventIsComing extends Component {
   }
 
   render({ trigger }, { calendarsOptions, selectedCalendarsOptions }) {
-    console.log(trigger);
     return (
       <div>
         <div class="row">
@@ -116,10 +117,10 @@ class CalendarEventIsComing extends Component {
         </div>
         <div class="row">
           <div class="col-sm-4">
-            <div class="form-label">
-              <Text id="editScene.triggersCard.calendarEventIsComing.nameLabel" />
-            </div>
             <div class="form-group">
+              <div class="form-label">
+                <Text id="editScene.triggersCard.calendarEventIsComing.nameLabel" />
+              </div>
               <select
                 class="form-control"
                 onChange={this.handleComparator}
@@ -150,9 +151,8 @@ class CalendarEventIsComing extends Component {
             <div class="col-sm-8">
               <Localizer>
                 <input
-                  style={{ marginTop: 27 }}
                   type="text"
-                  class="form-control"
+                  class={cx('form-control', style.calendarEventIsComingMarginInputMargin)}
                   onChange={this.handleNameChange}
                   value={trigger.calendar_event_name}
                   placeholder={<Text id="editScene.triggersCard.calendarEventIsComing.namePlaceholder" />}
@@ -161,13 +161,12 @@ class CalendarEventIsComing extends Component {
             </div>
           )}
         </div>
-        <div class="row">
+        <div class={cx('row', style.calendarEventIsComingGroupMargin)}>
           <div class="col-sm-4">
-            <div class="form-label">
-              <Text id="editScene.triggersCard.calendarEventIsComing.durationName" />
-            </div>
-
             <div class="form-group">
+              <div class="form-label">
+                <Text id="editScene.triggersCard.calendarEventIsComing.durationName" />
+              </div>
               <select
                 class="form-control"
                 onChange={this.handleCalendarEventAttributeChange}
@@ -187,22 +186,22 @@ class CalendarEventIsComing extends Component {
           </div>
 
           <div class="col-sm-4">
-            <Localizer>
-              <input
-                style={{ marginTop: 27 }}
-                type="number"
-                class="form-control"
-                onChange={this.handleDurationChange}
-                value={trigger.duration}
-                placeholder={<Text id="editScene.triggersCard.calendarEventIsComing.durationPlaceholder" />}
-              />
-            </Localizer>
+            <div class="form-group">
+              <Localizer>
+                <input
+                  class={cx('form-control', style.calendarEventIsComingMarginInputMargin)}
+                  type="number"
+                  onChange={this.handleDurationChange}
+                  value={trigger.duration}
+                  placeholder={<Text id="editScene.triggersCard.calendarEventIsComing.durationPlaceholder" />}
+                />
+              </Localizer>
+            </div>
           </div>
           <div class="col-sm-4">
             <div class="form-group">
               <select
-                style={{ marginTop: 27 }}
-                class="form-control"
+                class={cx('form-control', style.calendarEventIsComingMarginInputMargin)}
                 onChange={this.handleUnitChange}
                 value={trigger.unit}
               >
