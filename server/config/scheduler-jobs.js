@@ -26,11 +26,6 @@ const jobs = [
     frequencyInSeconds: 24 * 60 * 60,
     event: EVENTS.JOB.PURGE_OLD_JOBS,
   },
-  {
-    name: 'check-every-minutes-if-calendar-event-is-coming',
-    frequencyInSeconds: 60,
-    event: EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING,
-  },
 ];
 
 module.exports = jobs;

@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const Promise = require('bluebird');
 const dayjs = require('dayjs');
 const db = require('../../models');
+const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 
 /**
@@ -11,6 +12,9 @@ const { EVENTS } = require('../../utils/constants');
  * gladys.scene.checkCalendarTriggers()
  */
 async function checkCalendarTriggers() {
+  // getting a fixed value for now, as soon as possible in the function
+  const now = dayjs.tz(dayjs(), this.timezone);
+  logger.info(`Checking calendar triggers at ${now}`);
   // First, we try to constitute a list of triggers
   // related to calendars events
   const calendarEventTriggers = [];
@@ -30,7 +34,10 @@ async function checkCalendarTriggers() {
   });
   const idsOfEventsMatching = [];
   await Promise.each(calendarEventTriggers, async ({ sceneSelector, trigger }) => {
-    const generatedDate = dayjs().add(trigger.duration, trigger.unit);
+    logger.debug(
+      `Checking calendar trigger ${trigger.calendar_event_name_comparator} ${trigger.calendar_event_name} ${trigger.duration} ${trigger.unit}`,
+    );
+    const generatedDate = now.add(trigger.duration, trigger.unit);
     const twentyFiveSecondBefore = new Date(generatedDate.valueOf() - 25 * 1000);
     const twentyFiveSecondAfter = new Date(generatedDate.valueOf() + 25 * 1000);
     const queryParams = {
