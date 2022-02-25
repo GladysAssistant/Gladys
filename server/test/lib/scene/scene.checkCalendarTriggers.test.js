@@ -20,19 +20,20 @@ const house = {
   get: fake.resolves([]),
 };
 
-describe('scene.checkCalendarTriggers', () => {
+describe.only('scene.checkCalendarTriggers', () => {
   const stateManager = new StateManager();
   const calendar = new Calendar();
   let sceneManager;
   let clock;
-  const startDate = dayjs()
+  const now = new Date();
+  const startDate = dayjs(now)
     .add(10, 'minute')
     .toDate();
-  const endDate = dayjs()
+  const endDate = dayjs(now)
     .add(50, 'minute')
     .toDate();
   beforeEach(async () => {
-    clock = useFakeTimers(new Date());
+    clock = useFakeTimers(now);
     sceneManager = new SceneManager(stateManager, event, {}, {}, {}, house, {});
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
