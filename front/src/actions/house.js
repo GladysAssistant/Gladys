@@ -9,8 +9,8 @@ import debounce from 'debounce';
 import get from 'get-value';
 import uuid from 'uuid';
 
-function sortRoomsInHouses(houses) {
-  houses.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
+function sortRoomsInHouses(housesWithRooms) {
+  housesWithRooms.forEach(house => house.rooms.sort((r1, r2) => r1.name.localeCompare(r2.name)));
 }
 
 function createActions(store) {
@@ -33,10 +33,10 @@ function createActions(store) {
         if (state.housesSearch && state.housesSearch.length) {
           params.search = state.housesSearch;
         }
-        const houses = await state.httpClient.get(`/api/v1/house`, params);
-        sortRoomsInHouses(houses);
+        const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
+        sortRoomsInHouses(housesWithRooms);
         store.setState({
-          houses,
+          housesWithRooms,
           housesGetStatus: RequestStatus.Success
         });
       } catch (e) {
@@ -59,7 +59,7 @@ function createActions(store) {
     },
     updateHouseName(state, name, houseIndex) {
       const newState = update(state, {
-        houses: {
+        housesWithRooms: {
           [houseIndex]: {
             name: {
               $set: name
@@ -71,7 +71,7 @@ function createActions(store) {
     },
     updateHouseLocation(state, latitude, longitude, houseIndex) {
       const newState = update(state, {
-        houses: {
+        housesWithRooms: {
           [houseIndex]: {
             latitude: {
               $set: latitude
@@ -88,14 +88,14 @@ function createActions(store) {
       if (name.length === 0) {
         return null;
       }
-      if (state.houses[houseIndex].rooms.find(room => room.name.toLowerCase() === name.toLowerCase())) {
+      if (state.housesWithRooms[houseIndex].rooms.find(room => room.name.toLowerCase() === name.toLowerCase())) {
         return null;
       }
       const newRoom = {
         name
       };
       const newState = update(state, {
-        houses: {
+        housesWithRooms: {
           [houseIndex]: {
             rooms: {
               $push: [newRoom]
@@ -108,7 +108,7 @@ function createActions(store) {
     removeRoom(state, houseIndex, roomIndex) {
       let action;
       // if the room already exist in DB, we set the flag to "to_delete" true.
-      if (state.houses[houseIndex].rooms[roomIndex].id) {
+      if (state.housesWithRooms[houseIndex].rooms[roomIndex].id) {
         action = {
           [roomIndex]: {
             to_delete: {
@@ -123,7 +123,7 @@ function createActions(store) {
         };
       }
       const newState = update(state, {
-        houses: {
+        housesWithRooms: {
           [houseIndex]: {
             rooms: action
           }
@@ -133,7 +133,7 @@ function createActions(store) {
     },
     editRoom(state, houseIndex, roomIndex, property, value) {
       const newState = update(state, {
-        houses: {
+        housesWithRooms: {
           [houseIndex]: {
             rooms: {
               [roomIndex]: {
@@ -152,7 +152,7 @@ function createActions(store) {
     },
     addHouse(state) {
       const newState = update(state, {
-        houses: {
+        housesWithRooms: {
           $unshift: [
             {
               id: uuid.v4(),
@@ -170,7 +170,7 @@ function createActions(store) {
       store.setState({
         houseUpdateStatus: RequestStatus.Getting
       });
-      const house = state.houses[houseIndex];
+      const house = state.housesWithRooms[houseIndex];
       try {
         let houseCreatedOrUpdated;
 
@@ -197,7 +197,7 @@ function createActions(store) {
         const roomsWithoutDeleted = rooms.filter(room => room.selector !== undefined);
 
         const newState = update(state, {
-          houses: {
+          housesWithRooms: {
             [houseIndex]: {
               id: {
                 $set: houseCreatedOrUpdated.id
@@ -262,13 +262,13 @@ function createActions(store) {
       store.setState({
         houseUpdateStatus: RequestStatus.Getting
       });
-      const house = state.houses[houseIndex];
+      const house = state.housesWithRooms[houseIndex];
       try {
         if (house.created_at && house.selector) {
           await state.httpClient.delete(`/api/v1/house/${house.selector}`);
         }
         const newState = update(state, {
-          houses: {
+          housesWithRooms: {
             $splice: [[houseIndex, 1]]
           },
           houseUpdateStatus: {

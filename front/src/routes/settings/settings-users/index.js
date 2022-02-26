@@ -2,10 +2,9 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import UserPage from './UserPage';
-import actions from '../../../actions/house';
 import SettingsLayout from '../SettingsLayout';
 
-@connect('currentUrl,httpClient,user', actions)
+@connect('currentUrl,httpClient,user')
 class SettingsUsers extends Component {
   getUsers = async () => {
     try {

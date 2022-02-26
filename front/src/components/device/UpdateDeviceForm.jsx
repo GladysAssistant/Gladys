@@ -39,7 +39,7 @@ class UpdateDeviceForm extends Component {
             <Text id="editDeviceForm.roomLabel" />
           </label>
           <DeviceRoomSelector
-            houses={props.houses}
+            housesWithRooms={props.housesWithRooms}
             selectedRoomId={props.device.room_id}
             inputId="room"
             updateRoom={this.updateRoom}

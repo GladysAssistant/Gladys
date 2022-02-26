@@ -6,13 +6,20 @@ import cx from 'classnames';
 import actions from '../../../actions/house';
 import { RequestStatus } from '../../../utils/consts';
 
-@connect('houses,housesGetStatus', actions)
+@connect('housesWithRooms,housesGetStatus', actions)
 class DeviceRoomSelector extends Component {
   componentWillMount() {
     this.props.getHouses();
   }
 
-  render({ houses = [], housesGetStatus = RequestStatus.Getting, selectedRoomId, updateRoom, disabled, inputId }) {
+  render({
+    housesWithRooms = [],
+    housesGetStatus = RequestStatus.Getting,
+    selectedRoomId,
+    updateRoom,
+    disabled,
+    inputId
+  }) {
     if (housesGetStatus === RequestStatus.Error) {
       return (
         <div class="alert alert-danger py-2">
@@ -33,7 +40,7 @@ class DeviceRoomSelector extends Component {
             <option value="">
               <Text id="global.emptySelectOption" />
             </option>
-            {houses.map(house => (
+            {housesWithRooms.map(house => (
               <optgroup label={house.name}>
                 {house.rooms.map(room => (
                   <option selected={room.id === selectedRoomId} value={room.id}>

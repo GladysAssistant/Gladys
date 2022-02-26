@@ -10,7 +10,7 @@ const loaderHeight = {
   height: '20rem'
 };
 
-const HousePage = ({ children, ...props }) => (
+const HousePage = ({ children, housesWithRooms = [], ...props }) => (
   <SettingsLayout>
     <div class="page-header">
       <div class="page-options d-flex">
@@ -49,17 +49,16 @@ const HousePage = ({ children, ...props }) => (
     <div>
       <div class={props.housesGetStatus === RequestStatus.Getting ? 'dimmer active' : 'dimmer'}>
         <div class="dimmer-content">
-          {props.houses &&
-            props.houses.map((house, index) => (
-              <House
-                {...props}
-                key={house.id}
-                house={house}
-                houseIndex={index}
-                houseUpdateStatus={get(props.houseUpdateStatus, house.id)}
-              />
-            ))}
-          {props.houses && props.houses.length === 0 && <EmptySearch housesSearch={props.housesSearch} />}
+          {props.housesWithRooms.map((house, index) => (
+            <House
+              {...props}
+              key={house.id}
+              house={house}
+              houseIndex={index}
+              houseUpdateStatus={get(props.houseUpdateStatus, house.id)}
+            />
+          ))}
+          {props.housesWithRooms.length === 0 && <EmptySearch housesSearch={props.housesSearch} />}
         </div>
       </div>
     </div>
