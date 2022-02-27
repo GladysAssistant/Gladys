@@ -15,14 +15,16 @@ async function getNetworkMode() {
   }
 
   if (!this.networkMode) {
-    if (fs.existsSync(`/var/lib/gladysassistant/containerId`)) {
-      this.containerId = fs.readFileSync('/var/lib/gladysassistant/containerId', 'utf8');
-    } else {
-      // eslint-disable-next-line no-useless-escape
-      this.containerId = await exec(
-        'cat /proc/self/cgroup | grep -o -e "docker.*" | head -n 1 | sed -e "s/.scope//g;s/docker-//g;s!docker/!!g"',
-      );
-    }
+    fs.access(`/var/lib/gladysassistant/containerId`, fs.constants.F_OK, (err) => {
+      if (err) {
+        // eslint-disable-next-line no-useless-escape
+        this.containerId = exec(
+          'cat /proc/self/cgroup | grep -o -e "docker.*" | head -n 1 | sed -e "s/.scope//g;s/docker-//g;s!docker/!!g"',
+        );
+      } else {
+        this.containerId = fs.readFile('/var/lib/gladysassistant/containerId', 'utf8');
+      }
+    });
     const gladysContainer = this.dockerode.getContainer(this.containerId);
     const gladysContainerInspect = await gladysContainer.inspect();
     this.networkMode = get(gladysContainerInspect, 'HostConfig.NetworkMode', { default: 'unknown' });
