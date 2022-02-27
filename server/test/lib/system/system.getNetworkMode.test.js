@@ -4,11 +4,17 @@ const sinon = require('sinon');
 const { fake, assert } = sinon;
 
 const proxyquire = require('proxyquire').noCallThru();
-
+const fs = require('fs');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const DockerodeMock = require('./DockerodeMock.test');
 
-const fsMock = {};
+let fsError = false;
+const fsMock = {
+  ...fs,
+  access: (file, options, callback) => {
+    callback(fsError);
+  },
+};
 const getNetworkMode = proxyquire('../../../lib/system/system.getNetworkMode', {
   '../../utils/childProcess': { exec: () => 'containerId' },
   fs: fsMock,
@@ -44,6 +50,7 @@ describe('system.getNetworkMode', () => {
 
   afterEach(() => {
     sinon.reset();
+    fsError = false;
   });
 
   it('should failed as not on docker env', async () => {
@@ -57,20 +64,16 @@ describe('system.getNetworkMode', () => {
   });
 
   it('should get cidfile content', async () => {
-    fsMock.access = fake.returns(true);
     fsMock.readFile = fake.returns('8c0b4110ae930dbe26b258de9bc34a03f98056ed6f27f991d32919bfe401d7c5');
     const network = await system.getNetworkMode();
     expect(network).to.eq('host');
     assert.calledOnce(system.dockerode.getContainer);
-
-    assert.calledOnce(fsMock.access);
-    assert.calledWith(fsMock.access, '/var/lib/gladysassistant/containerId');
-
     assert.calledOnce(fsMock.readFile);
     assert.calledWith(fsMock.readFile, '/var/lib/gladysassistant/containerId', 'utf8');
   });
 
   it('should check network', async () => {
+    fsError = true;
     const network = await system.getNetworkMode();
     expect(network).to.eq('host');
     assert.calledOnce(system.dockerode.getContainer);
