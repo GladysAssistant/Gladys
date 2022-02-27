@@ -1074,6 +1074,12 @@
         "get-value": {
           "last_value": "Dernière valeur de l'appareil"
         }
+      },
+      "calendar": {
+        "eventName": "Nom de l'évènement",
+        "eventLocation": "Lieu de l'évènement",
+        "eventStart": "Date de début",
+        "eventEnd": "Date de fin"
       }
     },
     "triggers": {
@@ -1096,6 +1102,9 @@
       "area": {
         "user-entered": "Utilisateur entre dans la zone",
         "user-left": "Utilisateur quitte la zone"
+      },
+      "calendar": {
+        "event-is-coming": "Un évènement dans le calendrier arrive"
       }
     },
     "triggersCard": {
@@ -1162,6 +1171,24 @@
         "userLeftDescription": "Ce déclencheur lancera la scène dès que l'utilisateur sélectionné quittera la zone sélectionnée. Vous pouvez créer des zones dans l'onglet plans.",
         "userLabel": "Utilisateur",
         "areaLabel": "Zone"
+      },
+      "calendarEventIsComing": {
+        "description": "Ce déclencheur lancera la scène lorsqu'un évènement dans l'un des calendriers sélectionnés répondra aux différentes contraintes.",
+        "calendarLabel": "Dans les calendriers suivants",
+        "nameLabel": "Si le nom",
+        "isExactly": "est exactement",
+        "contains": "contient",
+        "startsWith": "commence par",
+        "endsWith": "finit par",
+        "hasAnyName": "a n'importe quel nom",
+        "namePlaceholder": "Texte",
+        "durationName": "Et l'évènement",
+        "startingIn": "commence dans",
+        "endingIn": "finit dans",
+        "durationPlaceholder": "Durée",
+        "minute": "minutes",
+        "hour": "heures",
+        "day": "jours"
       }
     }
   },

@@ -81,6 +81,8 @@ const EditScenePage = ({ children, ...props }) => (
                 deleteTrigger={props.deleteTrigger}
                 updateTriggerProperty={props.updateTriggerProperty}
                 saving={props.saving}
+                variables={props.variables}
+                setVariablesTrigger={props.setVariablesTrigger}
               />
             </div>
             <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
@@ -109,6 +111,7 @@ const EditScenePage = ({ children, ...props }) => (
                     $splice: [[index, props.scene.actions.length - index]]
                   })}
                   variables={props.variables}
+                  triggersVariables={props.triggersVariables}
                   setVariables={props.setVariables}
                 />
               </div>
