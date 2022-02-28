@@ -1173,8 +1173,8 @@
         "areaLabel": "Zone"
       },
       "calendarEventIsComing": {
-        "description": "Ce déclencheur lancera la scène lorsqu'un évènement dans l'un des calendriers sélectionnés répondra aux différentes contraintes.",
-        "calendarLabel": "Dans les calendriers suivants",
+        "description": "Ce déclencheur lancera la scène lorsqu'un évènement dans l'un des calendriers sélectionnés répondra aux différentes contraintes. Seuls les calendriers partagés sont affichés.",
+        "calendarLabel": "Dans les calendriers partagés suivants",
         "nameLabel": "Si le nom",
         "isExactly": "est exactement",
         "contains": "contient",

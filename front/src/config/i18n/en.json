@@ -1173,8 +1173,8 @@
         "areaLabel": "Zone"
       },
       "calendarEventIsComing": {
-        "description": "This will trigger the scene when a calendar event matches the conditions.",
-        "calendarLabel": "Look in the following calendars",
+        "description": "This will trigger the scene when a calendar event matches the conditions. Only shared calendars are displayed here.",
+        "calendarLabel": "Look in the following shared calendars",
         "nameLabel": "If the name",
         "isExactly": "is exactly",
         "contains": "contains",
