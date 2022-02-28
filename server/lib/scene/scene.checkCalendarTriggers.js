@@ -69,6 +69,7 @@ async function checkCalendarTriggers() {
         '$calendar.selector$': {
           [Op.in]: trigger.calendars,
         },
+        '$calendar.shared$': true,
       },
     };
     // eslint-disable-next-line default-case
