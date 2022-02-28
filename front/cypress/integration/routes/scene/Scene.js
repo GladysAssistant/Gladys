@@ -101,6 +101,30 @@ describe('Scene view', () => {
       .click()
       .type('One device{enter}');
   });
+  it('Should add new calendar event trigger', () => {
+    cy.visit('/dashboard/scene/my-scene');
+    cy.contains('editScene.addNewTriggerButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
+
+    const i18n = Cypress.env('i18n');
+
+    cy.get('.choose-scene-trigger-type')
+      .click()
+      .type(`${i18n.editScene.triggers.calendar['event-is-coming'].split(' ')[0]}{enter}`);
+
+    // I don't know why, but I'm unable to get this button with
+    // the text. Using the class but it's not recommended otherwise!!
+    cy.get('.btn-success').then(buttons => {
+      cy.wrap(buttons[1]).click();
+    });
+
+    cy.get('select').then(selects => {
+      cy.wrap(selects[0]).select('contains');
+      cy.wrap(selects[1]).select('start');
+      cy.wrap(selects[2]).select('minute');
+    });
+  });
   it('Should disable scene', () => {
     cy.visit('/dashboard/scene');
 

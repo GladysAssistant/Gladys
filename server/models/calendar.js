@@ -17,6 +17,11 @@ module.exports = (sequelize, DataTypes) => {
           key: 'id',
         },
       },
+      shared: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       service_id: {
         allowNull: true,
         type: DataTypes.UUID,
@@ -75,6 +80,14 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'calendar_id',
       sourceKey: 'id',
       as: 'calendar_events',
+    });
+  };
+
+  calendar.associate = (models) => {
+    calendar.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      targetKey: 'id',
+      as: 'creator',
     });
   };
 

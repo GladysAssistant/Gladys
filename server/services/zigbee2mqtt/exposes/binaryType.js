@@ -9,6 +9,12 @@ module.exports = {
     max: 1,
   },
   names: {
+    alarm: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIREN,
+        type: DEVICE_FEATURE_TYPES.SIREN.BINARY,
+      },
+    },
     contact: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
@@ -30,6 +36,12 @@ module.exports = {
     interlock: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      },
+    },
+    carbon_monoxide: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
       },
     },

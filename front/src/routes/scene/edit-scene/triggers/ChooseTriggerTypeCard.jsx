@@ -15,7 +15,8 @@ const TRIGGER_LIST = [
   EVENTS.HOUSE.EMPTY,
   EVENTS.HOUSE.NO_LONGER_EMPTY,
   EVENTS.AREA.USER_ENTERED,
-  EVENTS.AREA.USER_LEFT
+  EVENTS.AREA.USER_LEFT,
+  EVENTS.CALENDAR.EVENT_IS_COMING
 ];
 
 @connect('httpClient', {})
@@ -47,6 +48,7 @@ class ChooseTriggerType extends Component {
             <Text id="editScene.selectTriggerLabel" />
           </label>
           <Select
+            class="choose-scene-trigger-type"
             value={currentTrigger}
             options={TRIGGER_LIST.map(trigger => ({
               value: trigger,

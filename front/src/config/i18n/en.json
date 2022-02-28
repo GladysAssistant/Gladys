@@ -362,6 +362,7 @@
       "testConnectionButton": "Test connection",
       "saveButton": "Save",
       "deleteButton": "Delete",
+      "rotate180Label": "180° Rotation",
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
@@ -735,9 +736,11 @@
       "title": "CalDAV",
       "accountTab": "Account",
       "syncTab": "Synchronization",
+      "shareTab": "Sharing",
       "description": "Sync your CalDAV calendars.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
-      "syncIntroduction": "Choose the calendars to synchronize.",
+      "syncIntroduction": "Choose calendars to synchronize.",
+      "shareIntroduction": "Choose calendars you want to share with other Gladys users.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
@@ -1116,6 +1119,12 @@
         "get-value": {
           "last_value": "Device last value"
         }
+      },
+      "calendar": {
+        "eventName": "Event name",
+        "eventLocation": "Event location",
+        "eventStart": "Start date",
+        "eventEnd": "End date"
       }
     },
     "triggers": {
@@ -1138,6 +1147,9 @@
       "area": {
         "user-entered": "User entered a zone",
         "user-left": "User left a zone"
+      },
+      "calendar": {
+        "event-is-coming": "Calendar event is coming"
       }
     },
     "triggersCard": {
@@ -1204,6 +1216,24 @@
         "userLeftDescription": "This scene will start when a user left this zone. Zones can be created in the maps tab.",
         "userLabel": "User",
         "areaLabel": "Zone"
+      },
+      "calendarEventIsComing": {
+        "description": "This will trigger the scene when a calendar event matches the conditions.",
+        "calendarLabel": "Look in the following calendars",
+        "nameLabel": "If the name",
+        "isExactly": "is exactly",
+        "contains": "contains",
+        "startsWith": "starts with",
+        "endsWith": "ends with",
+        "hasAnyName": "has any name",
+        "namePlaceholder": "Text to match",
+        "durationName": "And the event is",
+        "startingIn": "Starting in",
+        "endingIn": "Ending in",
+        "durationPlaceholder": "Duration",
+        "minute": "minutes",
+        "hour": "hours",
+        "day": "days"
       }
     }
   },

@@ -9,7 +9,8 @@ function createActions(store) {
       try {
         const events = await state.httpClient.get('/api/v1/calendar/event', {
           from,
-          to
+          to,
+          shared: true
         });
         const calendars = await state.httpClient.get('/api/v1/calendar');
         const eventsFormated = events.map(event => {
