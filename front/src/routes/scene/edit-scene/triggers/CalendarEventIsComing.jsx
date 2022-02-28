@@ -10,6 +10,8 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import style from './style.css';
 
+const isNullOrUndefined = variable => variable === null || variable === undefined;
+
 class CalendarEventIsComing extends Component {
   getCalendars = async () => {
     this.setState({
@@ -49,14 +51,14 @@ class CalendarEventIsComing extends Component {
     if (e.target.value) {
       this.props.updateTriggerProperty(this.props.index, 'calendar_event_attribute', e.target.value);
     } else {
-      this.props.updateTriggerProperty(this.props.index, 'calendar_event_attribute', null);
+      this.props.updateTriggerProperty(this.props.index, 'calendar_event_attribute', 'start');
     }
   };
   handleUnitChange = e => {
     if (e.target.value) {
       this.props.updateTriggerProperty(this.props.index, 'unit', e.target.value);
     } else {
-      this.props.updateTriggerProperty(this.props.index, 'unit', null);
+      this.props.updateTriggerProperty(this.props.index, 'unit', 'minute');
     }
   };
   handleNameChange = e => {
@@ -67,7 +69,7 @@ class CalendarEventIsComing extends Component {
     if (!isNaN(parseInt(value, 10))) {
       this.props.updateTriggerProperty(this.props.index, 'duration', parseInt(value, 10));
     } else {
-      this.props.updateTriggerProperty(this.props.index, 'duration', null);
+      this.props.updateTriggerProperty(this.props.index, 'duration', 0);
     }
   };
   refreshSelectedOptions = trigger => {
@@ -120,7 +122,26 @@ class CalendarEventIsComing extends Component {
     ]);
   };
 
+  initTriggerIfNeeded = () => {
+    if (isNullOrUndefined(get(this.props, 'trigger.unit'))) {
+      this.props.updateTriggerProperty(this.props.index, 'unit', 'minute');
+    }
+    if (isNullOrUndefined(get(this.props, 'trigger.duration'))) {
+      this.props.updateTriggerProperty(this.props.index, 'duration', 0);
+    }
+    if (isNullOrUndefined(get(this.props, 'trigger.calendar_event_attribute'))) {
+      this.props.updateTriggerProperty(this.props.index, 'calendar_event_attribute', 'start');
+    }
+    if (isNullOrUndefined(get(this.props, 'trigger.calendar_event_name_comparator'))) {
+      this.props.updateTriggerProperty(this.props.index, 'calendar_event_name_comparator', 'contains');
+    }
+    if (isNullOrUndefined(get(this.props, 'trigger.calendars'))) {
+      this.props.updateTriggerProperty(this.props.index, []);
+    }
+  };
+
   componentDidMount() {
+    this.initTriggerIfNeeded();
     this.getCalendars();
     this.setVariables();
   }
@@ -166,9 +187,6 @@ class CalendarEventIsComing extends Component {
                 onChange={this.handleComparator}
                 value={trigger.calendar_event_name_comparator}
               >
-                <option value="">
-                  <Text id="global.emptySelectOption" />
-                </option>
                 <option value="is-exactly">
                   <Text id="editScene.triggersCard.calendarEventIsComing.isExactly" />
                 </option>
@@ -212,9 +230,6 @@ class CalendarEventIsComing extends Component {
                 onChange={this.handleCalendarEventAttributeChange}
                 value={trigger.calendar_event_attribute}
               >
-                <option value="">
-                  <Text id="global.emptySelectOption" />
-                </option>
                 <option value="start">
                   <Text id="editScene.triggersCard.calendarEventIsComing.startingIn" />
                 </option>
@@ -245,9 +260,6 @@ class CalendarEventIsComing extends Component {
                 onChange={this.handleUnitChange}
                 value={trigger.unit}
               >
-                <option value="">
-                  <Text id="global.emptySelectOption" />
-                </option>
                 <option value="minute">
                   <Text id="editScene.triggersCard.calendarEventIsComing.minute" />
                 </option>

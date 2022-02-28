@@ -24,6 +24,7 @@ function createActions(store) {
         });
         store.setState({
           eventsFormated,
+          calendars,
           DeviceGetStatus: CalendarGetEventsStatus.Success
         });
       } catch (e) {
