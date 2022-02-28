@@ -19,8 +19,8 @@ module.exports = function WithingsService(gladys, serviceId) {
     const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, serviceId);
     if (!tokenHost) {
       // Init variable in db
-      await gladys.variable.setValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, 'https://account.withings.com', serviceId);
-      await gladys.variable.setValue(`${OAUTH2.VARIABLE.TOKEN_PATH}`, '/oauth2/token', serviceId);
+      await gladys.variable.setValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, 'https://wbsapi.withings.net', serviceId);
+      await gladys.variable.setValue(`${OAUTH2.VARIABLE.TOKEN_PATH}`, '/v2/oauth2', serviceId);
       await gladys.variable.setValue(`${OAUTH2.VARIABLE.AUTHORIZE_HOST}`, 'https://account.withings.com', serviceId);
       await gladys.variable.setValue(`${OAUTH2.VARIABLE.AUTHORIZE_PATH}`, '/oauth2_user/authorize2', serviceId);
       await gladys.variable.setValue(

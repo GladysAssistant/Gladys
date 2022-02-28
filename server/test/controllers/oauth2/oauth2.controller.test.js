@@ -37,7 +37,6 @@ describe('POST /api/v1/service/oauth2/client/authorization-uri', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.property('success');
         expect(res.body).to.have.property('authorizationUri');
       });
   });
@@ -71,16 +70,15 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.property('success');
         expect(res.body).to.have.property('result');
-        assert.equal(res.body.success, true);
+        assert.equal(res.body.result.expires_in, 3600);
       });
   });
 });
 
 // failled call
 describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
-  it('should get token access uri', async () => {
+  it('should get 500 HTTP error on token access uri', async () => {
     const req = {
       integrationName: 'test',
       serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
@@ -91,12 +89,7 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
       .post('/api/v1/service/oauth2/client/access-token-uri')
       .send(req)
       .expect('Content-Type', /json/)
-      .expect(200)
-      .then((res) => {
-        expect(res.body).to.have.property('success');
-        expect(res.body).to.have.property('result');
-        assert.equal(res.body.success, false);
-      });
+      .expect(500);
   });
 });
 
@@ -127,9 +120,8 @@ describe('GET /api/v1/service/oauth2/client', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.property('success');
         expect(res.body).to.have.property('clientId');
-        assert.equal(res.body.success, true);
+        assert.equal(res.body.clientId, 'OAUTH2_CLIENT_ID');
       });
   });
 });

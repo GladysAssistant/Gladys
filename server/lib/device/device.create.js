@@ -120,16 +120,6 @@ async function create(device) {
       feature.device_id = deviceToReturn.id;
       const featureCreated = await db.DeviceFeature.create(feature, { transaction });
 
-      // if feature state are attached, save feature state
-      if (feature.feature_state) {
-        feature.feature_state.forEach(async (state) => {
-          if (state.created_at) {
-            state.device_feature_id = featureCreated.id;
-            db.DeviceFeatureState.create(state, { transaction });
-          }
-        });
-      }
-
       return featureCreated.get({ plain: true });
     });
     deviceToReturn.features = newFeatures;

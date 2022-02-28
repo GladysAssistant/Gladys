@@ -2,6 +2,7 @@ const { AuthorizationCode } = require('simple-oauth2');
 const logger = require('../../utils/logger');
 const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const { OAUTH2 } = require('../../utils/constants');
+const { Error500 } = require('../../utils/httpErrors');
 
 module.exports = function OAuth2Controller(gladys) {
   /**
@@ -46,7 +47,6 @@ module.exports = function OAuth2Controller(gladys) {
     });
 
     res.json({
-      success: true,
       authorizationUri: authorizationUriResult,
     });
   }
@@ -93,6 +93,7 @@ module.exports = function OAuth2Controller(gladys) {
       code: authorizationCode,
       client_id: clientId,
       client_secret: secret,
+      action: 'requesttoken',
       grant_type: grantType,
       redirect_uri: `${req.headers.referer}${redirectUriSuffix}`,
     };
@@ -101,25 +102,30 @@ module.exports = function OAuth2Controller(gladys) {
       const client = new AuthorizationCode(credentials);
       const authResult = await client.getToken(tokenConfig, { json: true });
 
-      // Save accessToken
-      await gladys.variable.setValue(
-        `${OAUTH2.VARIABLE.ACCESS_TOKEN}`,
-        JSON.stringify(authResult),
-        req.body.serviceId,
-        req.user.id,
-      );
+      if (authResult.token) {
+        if (authResult.token.status && authResult.token.status !== 0) {
+          throw new Error500('Oauth2 get token response is not with status 0');
+        }
 
-      res.json({
-        success: true,
-        result: authResult,
-      });
+        let jsonResult;
+        if (authResult.token.body) {
+          jsonResult = JSON.stringify(authResult.token.body);
+        } else {
+          jsonResult = JSON.stringify(authResult.token);
+        }
+
+        // Save accessToken
+        await gladys.variable.setValue(`${OAUTH2.VARIABLE.ACCESS_TOKEN}`, jsonResult, req.body.serviceId, req.user.id);
+
+        res.json({
+          result: authResult,
+        });
+      }
     } catch (error) {
+      await gladys.variable.destroy(`${OAUTH2.VARIABLE.CLIENT_ID}`, req.body.serviceId, req.user.id);
+      await gladys.variable.destroy(`${OAUTH2.VARIABLE.CLIENT_SECRET}`, req.body.serviceId, req.user.id);
       logger.error(error);
-
-      res.json({
-        success: false,
-        result: error.message,
-      });
+      throw new Error500(error);
     }
   }
 
@@ -135,7 +141,6 @@ module.exports = function OAuth2Controller(gladys) {
     const resultClientId = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_ID}`, serviceId, req.user.id);
 
     res.json({
-      success: true,
       clientId: resultClientId,
     });
   }

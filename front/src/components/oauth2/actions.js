@@ -75,7 +75,8 @@ const actions = store => ({
         integrationName: state.integrationName,
         serviceId
       });
-      if (returnValue.success === true) {
+
+      if (returnValue.authorizationUri) {
         window.location = returnValue.authorizationUri;
       } else {
         store.setState({

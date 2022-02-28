@@ -56,6 +56,7 @@ const actions = store => ({
     const deviceSaved = await state.httpClient.post('/api/v1/device', device);
     device.inDB = true;
     device.selector = deviceSaved.selector;
+    await state.httpClient.get('/api/v1/service/withings/poll');
   },
   async deleteDevice(state, device, index) {
     await state.httpClient.delete(`/api/v1/device/${device.selector}`);

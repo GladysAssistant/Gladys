@@ -3,7 +3,7 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 module.exports = function WithingsController(withingsHandler) {
   /**
    * @description Init gladys devices with withings devices.
-   * @api {post} /api/v1/service/withings/init Init gladys devices ith withings devices.
+   * @api {post} /api/v1/service/withings/init Init gladys devices with withings devices.
    * @apiName init
    * @apiGroup Withings
    */
@@ -12,6 +12,16 @@ module.exports = function WithingsController(withingsHandler) {
     res.json({
       withingsDevices: resultInit,
     });
+  }
+
+  /**
+   * @description Poll withings devices (used to initialize featuer state on gladys device creation).
+   * @api {get} /api/v1/service/withings/poll Poll withings devices.
+   * @apiName poll
+   * @apiGroup Withings
+   */
+  async function poll(req, res) {
+    await withingsHandler.poll();
   }
 
   /**
@@ -36,6 +46,10 @@ module.exports = function WithingsController(withingsHandler) {
     'get /api/v1/service/withings/deleteConfig': {
       authenticated: true,
       controller: asyncMiddleware(deleteConfig),
+    },
+    'get /api/v1/service/withings/poll': {
+      authenticated: true,
+      controller: asyncMiddleware(poll),
     },
   };
 };

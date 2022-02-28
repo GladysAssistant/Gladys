@@ -1,6 +1,5 @@
 const db = require('../../models');
 const logger = require('../../utils/logger');
-const { EVENTS } = require('../../utils/constants');
 
 /**
  * @description Save hstorical device feature state in DB.
@@ -54,14 +53,6 @@ async function saveHistoricalState(device, deviceFeature, historicalState) {
 
     // save local state in RAM
     this.stateManager.setState('deviceFeature', deviceFeature.selector, deviceFeature);
-
-    // check if there is a trigger matching
-    this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
-      type: EVENTS.DEVICE.NEW_STATE,
-      device_feature: deviceFeature.selector,
-      last_value: historicalState.value,
-      last_value_changed: historicalState.updated_at,
-    });
   }
 }
 

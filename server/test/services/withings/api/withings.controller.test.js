@@ -3,6 +3,7 @@ const WithingsController = require('../../../../services/withings/api/withings.c
 
 const withingsHandler = {
   init: fake.resolves({ device: { name: 'testServiceID' } }),
+  poll: fake.resolves({}),
   deleteVar: fake.resolves({ success: true }),
   deleteDevices: fake.resolves({ success: true }),
 };
@@ -17,6 +18,17 @@ describe('WithingsController POST /api/v1/service/withings/init', () => {
     await controller['post /api/v1/service/withings/init'].controller(req, res);
     assert.calledOnce(withingsHandler.init);
     assert.calledOnce(res.json);
+  });
+});
+
+describe('WithingsController GET /api/v1/service/withings/poll', () => {
+  const controller = WithingsController(withingsHandler);
+
+  it('should poll', async () => {
+    const res = { json: fake.returns(null) };
+
+    await controller['get /api/v1/service/withings/poll'].controller({}, res);
+    assert.calledOnce(withingsHandler.poll);
   });
 });
 

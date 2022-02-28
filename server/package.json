@@ -105,7 +105,7 @@
     "sequelize": "^6.5.0",
     "sequelize-cli": "^6.2.0",
     "set-value": "^3.0.2",
-    "simple-oauth2": "^4.2.0",
+    "simple-oauth2": "^4.3.0",
     "sqlite3": "^5.0.2",
     "suncalc": "^1.8.0",
     "tracer": "^1.1.4",

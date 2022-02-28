@@ -99,14 +99,17 @@ async function poll(device) {
             if (withingsType > 0) {
               logger.debug('Current feature last value changed: ', feature.last_value_changed);
 
+              // Fix date to start poll in tmestamp
+              let dateToPoll = 0;
+              if (feature.last_value_changed) {
+                dateToPoll = feature.last_value_changed.getTime();
+              }
               const measureResult = await oauth2Manager.executeOauth2HTTPQuery(
                 this.serviceId,
                 user.id,
                 'get',
                 `${this.withingsUrl}/measure`,
-                `action=getmeas&meastype=${withingsType}&category=1&lastupdate=${feature.last_value_changed.getTime() /
-                  1000 +
-                  1}`,
+                `action=getmeas&meastype=${withingsType}&category=1&lastupdate=${dateToPoll / 1000 + 1}`,
               );
 
               if (measureResult.data.body.measuregrps) {
