@@ -39,7 +39,8 @@
     "date": "date",
     "time": "heure",
     "event": "événement",
-    "noEventsInRange": "Aucuns évènements trouvés dans cette période."
+    "noEventsInRange": "Aucuns évènements trouvés dans cette période.",
+    "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
     "noFeatures": "Aucune fonctionnalité"

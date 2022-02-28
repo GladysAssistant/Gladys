@@ -39,7 +39,8 @@
     "date": "Date",
     "time": "Time",
     "event": "Event",
-    "noEventsInRange": "There are no events in this range."
+    "noEventsInRange": "There are no events in this range.",
+    "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
     "noFeatures": "No features"
