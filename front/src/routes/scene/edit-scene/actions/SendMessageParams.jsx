@@ -57,7 +57,6 @@ class SendMessageParams extends Component {
     const variableWhileList = [];
     let variablesKey = '';
     let variableReady = null;
-    console.log('refreshVariables', nextProps);
     // Action variables
     nextProps.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
       actionGroup.forEach((action, index) => {
@@ -115,7 +114,6 @@ class SendMessageParams extends Component {
     if (this.tagify) {
       this.tagify.destroy();
     }
-    console.log(this.state.variableWhileList);
     this.tagify = new Tagify(this.tagifyInputRef, {
       mode: 'mix',
       pattern: new RegExp(OPENING_VARIABLE),
