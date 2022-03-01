@@ -8,8 +8,8 @@ const {
 } = require('../../../../utils/constants');
 
 /**
- * @description when a message is received by the rflink gateway
- * @param {string} msgRF - The message.
+ * @description Event triggered when a message is received by the rflink gateway
+ * @param {string} msgRF - The message from the RFLink Gateway.
  * @example
  * rflink.message(msg);
  */

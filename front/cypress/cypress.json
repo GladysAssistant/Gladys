@@ -3,7 +3,7 @@
   "screenshotOnRunFailure": false,
   "defaultCommandTimeout": 30000,
   "pageLoadTimeout": 120000,
-  "baseUrl": "http://localhost:1444",
+  "baseUrl": "http://192.168.0.36:1444",
   "env": {
     "house": {
       "name": "My House",

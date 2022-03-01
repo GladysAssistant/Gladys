@@ -23,10 +23,10 @@ module.exports = (on, config) => {
   const language = process.env.LANGUAGE || 'en';
   config.env.language = language;
 
-  const serverUrl = process.env.LOCAL_API_URL || 'http://localhost:1443';
+  const serverUrl = process.env.LOCAL_API_URL || 'http://192.168.0.36:1443';
   config.env.serverUrl = serverUrl;
 
-  const websocketUrl = process.env.WEBSOCKET_URL || 'ws://localhost:1443';
+  const websocketUrl = process.env.WEBSOCKET_URL || 'ws://192.168.0.36:1443';
   config.env.websocketUrl = websocketUrl;
 
   const i18n = require(`../../src/config/i18n/${language}.json`);
