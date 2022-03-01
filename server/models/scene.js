@@ -28,6 +28,17 @@ const actionSchema = Joi.array().items(
       ),
       before: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
       after: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+      calendar_event_name_comparator: Joi.string().valid(
+        'is-exactly',
+        'contains',
+        'starts-with',
+        'ends-with',
+        'has-any-name',
+      ),
+      calendars: Joi.array().items(Joi.string()),
+      calendar_event_name: Joi.string(),
+      stop_scene_if_event_found: Joi.boolean(),
+      stop_scene_if_event_not_found: Joi.boolean(),
       request_response_keys: Joi.array().items(Joi.string()),
       headers: Joi.array().items(
         Joi.object().keys({
