@@ -24,8 +24,8 @@ describe('POST /api/v1/service/oauth2/client/authorization-uri', () => {
       header: {
         referer: 'fake-referer',
       },
-      integrationName: 'test',
-      serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      integration_name: 'test',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       user: {
         id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       },
@@ -56,9 +56,9 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
   });
   it('should get token access uri', async () => {
     const req = {
-      integrationName: 'test',
-      serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      authorizationCode: 'fake-code',
+      integration_name: 'test',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      authorization_code: 'fake-code',
       user: {
         id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       },
@@ -80,9 +80,9 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
 describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
   it('should get 500 HTTP error on token access uri', async () => {
     const req = {
-      integrationName: 'test',
-      serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
-      authorizationCode: 'fake-code',
+      integration_name: 'test',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      authorization_code: 'fake-code',
     };
 
     await buildOauth2Request
@@ -107,8 +107,8 @@ describe('GET /api/v1/service/oauth2/client', () => {
   });
   it('should get token access uri', async () => {
     const req = {
-      integrationName: 'test',
-      serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      integration_name: 'test',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       user: {
         id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       },
@@ -120,8 +120,8 @@ describe('GET /api/v1/service/oauth2/client', () => {
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.property('clientId');
-        assert.equal(res.body.clientId, 'OAUTH2_CLIENT_ID');
+        expect(res.body).to.have.property('client_id');
+        assert.equal(res.body.client_id, 'OAUTH2_CLIENT_ID');
       });
   });
 });

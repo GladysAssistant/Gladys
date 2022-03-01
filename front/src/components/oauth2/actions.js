@@ -25,11 +25,11 @@ const actions = store => ({
     const returnServiceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
 
     const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
-      serviceId: returnServiceId
+      service_id: returnServiceId
     });
     if (returnGetConfig) {
       store.setState({
-        clientIdInDb: returnGetConfig.clientId,
+        clientIdInDb: returnGetConfig.client_id,
         oauth2ErrorMsg: null,
         oauth2GetStatus: RequestStatus.Success
       });
@@ -72,8 +72,8 @@ const actions = store => ({
       const returnValue = await state.httpClient.post('/api/v1/service/oauth2/client/authorization-uri', {
         clientId: state.clientId,
         secret: state.secret,
-        integrationName: state.integrationName,
-        serviceId
+        integration_name: state.integrationName,
+        service_id: serviceId
       });
 
       if (returnValue.authorizationUri) {

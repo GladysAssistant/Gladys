@@ -27,7 +27,7 @@ async function poll(device) {
       users,
       async (user) => {
         const withingsClientId = await this.gladys.variable.getValue(
-          `${OAUTH2.VARIABLE.CLIENT_ID}`,
+          OAUTH2.VARIABLE.CLIENT_ID,
           this.serviceId,
           user.id,
         );

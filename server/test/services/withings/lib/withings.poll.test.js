@@ -24,7 +24,7 @@ const gladys = {
           return 'http://localhost:9292';
         case `${OAUTH2.VARIABLE.TOKEN_PATH}`:
           return '/oauth2/token';
-        case `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`:
+        case OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX:
           return 'ashboard/integration/health/test/settings';
         case `${OAUTH2.VARIABLE.AUTHORIZE_HOST}`:
           return 'http://localhost:9292';
@@ -34,7 +34,7 @@ const gladys = {
           return 'authorization_code';
         case `${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`:
           return 'user.info,user.metrics,user.activity,user.sleepevents';
-        case `${OAUTH2.VARIABLE.ACCESS_TOKEN}`:
+        case OAUTH2.VARIABLE.ACCESS_TOKEN:
           return (
             '{' +
             '"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4",' +
@@ -46,7 +46,7 @@ const gladys = {
             '"expires_at":"2020-11-13T20:46:50.042Z"' +
             '}'
           );
-        case `${OAUTH2.VARIABLE.CLIENT_ID}`:
+        case OAUTH2.VARIABLE.CLIENT_ID:
           countGetValueCallClientId += 1;
           return 'fake_client_id';
         default:

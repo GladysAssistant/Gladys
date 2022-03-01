@@ -15,23 +15,23 @@ const { OAUTH2 } = require('../../utils/constants');
  *    {...}, '78v4f3df83g74v1fsd8375f63gvrf5c');
  */
 async function refreshTokenAccess(serviceId, gladys, userId) {
-  const clientId = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_ID}`, serviceId, userId);
-  const secret = await gladys.variable.getValue(`${OAUTH2.VARIABLE.CLIENT_SECRET}`, serviceId, userId);
-  const accessToken = JSON.parse(await gladys.variable.getValue(`${OAUTH2.VARIABLE.ACCESS_TOKEN}`, serviceId, userId));
+  const clientId = await gladys.variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
+  const secret = await gladys.variable.getValue(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, userId);
+  const accessToken = JSON.parse(await gladys.variable.getValue(OAUTH2.VARIABLE.ACCESS_TOKEN, serviceId, userId));
 
   logger.trace('accessToken: ', accessToken);
   // Find provider configuration
-  const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, serviceId);
-  const tokenPath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_PATH}`, serviceId);
-  const authorizeHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_HOST}`, serviceId);
-  const authorizePath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_PATH}`, serviceId);
+  const tokenHost = await gladys.variable.getValue(OAUTH2.VARIABLE.TOKEN_HOST, serviceId);
+  const tokenPath = await gladys.variable.getValue(OAUTH2.VARIABLE.TOKEN_PATH, serviceId);
+  const authorizeHost = await gladys.variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_HOST, serviceId);
+  const authorizePath = await gladys.variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_PATH, serviceId);
   const integrationScope = await gladys.variable.getValue(`${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`, serviceId);
 
   // Init credentials based on integration name
   const credentials = {
     client: {
-      id: `${clientId}`,
-      secret: `${secret}`,
+      id: clientId,
+      secret,
     },
     auth: {
       tokenHost,
@@ -62,7 +62,7 @@ async function refreshTokenAccess(serviceId, gladys, userId) {
 
         // Save new  accessToken
         await gladys.variable.setValue(
-          `${OAUTH2.VARIABLE.ACCESS_TOKEN}`,
+          OAUTH2.VARIABLE.ACCESS_TOKEN,
           JSON.stringify(authResult),
           serviceId,
           userId,

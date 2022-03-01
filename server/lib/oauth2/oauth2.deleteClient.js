@@ -16,9 +16,9 @@ const { Error500 } = require('../../utils/httpErrors');
  */
 async function deleteClient(serviceId, userId) {
   try {
-    await this.gladys.variable.destroy(`${OAUTH2.VARIABLE.CLIENT_ID}`, serviceId, userId);
-    await this.gladys.variable.destroy(`${OAUTH2.VARIABLE.CLIENT_SECRET}`, serviceId, userId);
-    await this.gladys.variable.destroy(`${OAUTH2.VARIABLE.ACCESS_TOKEN}`, serviceId, userId);
+    await this.gladys.variable.destroy(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
+    await this.gladys.variable.destroy(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, userId);
+    await this.gladys.variable.destroy(OAUTH2.VARIABLE.ACCESS_TOKEN, serviceId, userId);
   } catch (error) {
     logger.error(error.message);
     throw new Error500(error);

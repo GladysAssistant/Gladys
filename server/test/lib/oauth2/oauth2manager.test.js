@@ -30,9 +30,9 @@ const gladys = {
           return 'user.info,user.metrics,user.activity,user.sleepevents';
         case `${OAUTH2.VARIABLE.GRANT_TYPE}`:
           return 'authorization_code';
-        case `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`:
+        case OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX:
           return '/dashboard/integration/health/test/settings';
-        case `${OAUTH2.VARIABLE.ACCESS_TOKEN}`:
+        case OAUTH2.VARIABLE.ACCESS_TOKEN:
           return (
             '{"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4","expires_in":10800,' +
             '"token_type":"Bearer",' +

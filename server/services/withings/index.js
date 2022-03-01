@@ -16,7 +16,7 @@ module.exports = function WithingsService(gladys, serviceId) {
     logger.log('starting Withings service');
 
     // check if variable necessary to oauth2 connection is in variable table
-    const tokenHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, serviceId);
+    const tokenHost = await gladys.variable.getValue(OAUTH2.VARIABLE.TOKEN_HOST, serviceId);
     if (!tokenHost) {
       // Init variable in db
       await gladys.variable.setValue(`${OAUTH2.VARIABLE.TOKEN_HOST}`, 'https://wbsapi.withings.net', serviceId);
@@ -35,7 +35,7 @@ module.exports = function WithingsService(gladys, serviceId) {
       );
       await gladys.variable.setValue(`${OAUTH2.VARIABLE.GRANT_TYPE}`, 'authorization_code', serviceId);
       await gladys.variable.setValue(
-        `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`,
+        OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX,
         'dashboard/integration/health/withings/settings',
         serviceId,
       );

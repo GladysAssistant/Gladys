@@ -16,8 +16,8 @@ const actions = store => ({
           const serviceId = (await state.httpClient.get(`/api/v1/service/withings`)).id;
           await state.httpClient.post('/api/v1/service/oauth2/client/access-token-uri', {
             integrationName: 'withings',
-            authorizationCode: queryParams.code,
-            serviceId
+            authorization_code: queryParams.code,
+            service_id: serviceId
           });
 
           route('/dashboard/integration/health/withings/settings');
@@ -26,13 +26,13 @@ const actions = store => ({
         const returnServiceId = (await state.httpClient.get('/api/v1/service/withings')).id;
 
         const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
-          serviceId: returnServiceId
+          service_id: returnServiceId
         });
         // Case of config found
         let withingsDevices;
-        if (returnGetConfig.clientId) {
+        if (returnGetConfig.client_id) {
           const result = await state.httpClient.post('/api/v1/service/withings/init');
-          if (result) {
+          if (result) { 
             withingsDevices = result.withingsDevices;
           }
 
