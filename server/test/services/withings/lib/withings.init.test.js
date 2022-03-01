@@ -7,11 +7,24 @@ const { OAUTH2 } = require('../../../../utils/constants.js');
 
 const serverOauth2 = new OAuth2Server();
 const server = new ServerMock({ host: 'localhost', port: 9192 }, null);
+
 const gladys = {
   device: {
     create: fake.returns(null),
     destroyByServiceId: fake.returns(null),
-    get: fake.returns(null),
+    get: function getFakeDevice() {
+      return [
+        {
+          name: 'Withings - string',
+          params: [
+            {
+              name: 'WITHINGS_DEVICE_ID',
+              value: 'withingsDevideId4',
+            },
+          ],
+        },
+      ];
+    },
     saveHistoricalState: function shs(device, featureBattery, featureState) {
       device.featureBattery = featureBattery;
       device.featureBattery = featureState;

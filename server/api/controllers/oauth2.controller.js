@@ -64,6 +64,10 @@ module.exports = function OAuth2Controller(gladys) {
     const authorizeHost = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_HOST}`, req.body.serviceId);
     const authorizePath = await gladys.variable.getValue(`${OAUTH2.VARIABLE.AUTHORIZE_PATH}`, req.body.serviceId);
     const grantType = await gladys.variable.getValue(`${OAUTH2.VARIABLE.GRANT_TYPE}`, req.body.serviceId);
+    const additionalAccesTokenRequestAxtionParam = await gladys.variable.getValue(
+      `${OAUTH2.VARIABLE.ADDITIONAL_ACCESS_TOKEN_REQUEST_ACTION_PARAM}`,
+      req.body.serviceId,
+    );
     const redirectUriSuffix = await gladys.variable.getValue(
       `${OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX}`,
       req.body.serviceId,
@@ -93,10 +97,12 @@ module.exports = function OAuth2Controller(gladys) {
       code: authorizationCode,
       client_id: clientId,
       client_secret: secret,
-      action: 'requesttoken',
       grant_type: grantType,
       redirect_uri: `${req.headers.referer}${redirectUriSuffix}`,
     };
+    if (additionalAccesTokenRequestAxtionParam) {
+      tokenConfig.action = additionalAccesTokenRequestAxtionParam;
+    }
 
     try {
       const client = new AuthorizationCode(credentials);

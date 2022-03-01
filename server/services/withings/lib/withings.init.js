@@ -322,15 +322,17 @@ async function init(userId) {
         let matchDeviceInDB;
         if (devicesInDB) {
           const currentDeviceParam = value.params.filter((element) => element.name === withingsDeviceIdName);
-          if (currentDeviceParam) {
-            const currentWithingsDeviceId = currentDeviceParam.value;
+          if (currentDeviceParam && currentDeviceParam.length > 0) {
+            const currentWithingsDeviceId = currentDeviceParam[0].value;
 
-            matchDeviceInDB = devicesInDB.find(
-              (element) =>
-                element.params.find((param) => param.name === withingsDeviceIdName).VALUE === currentWithingsDeviceId,
+            matchDeviceInDB = devicesInDB.find((element) =>
+              element.params.find(
+                (param) => param.name === withingsDeviceIdName && param.value === currentWithingsDeviceId,
+              ),
             );
           }
         }
+
         if (matchDeviceInDB) {
           matchDeviceInDB.inDB = true;
           devicesResult.push(matchDeviceInDB);

@@ -50,7 +50,7 @@ describe('withingsService', () => {
   );
   it('should start service (without db var)', async () => {
     await withingsServiceWithoutDBVar.start();
-    assert.equal(countSetValueCount, 7);
+    assert.equal(countSetValueCount, 8);
   });
   it('should stop service (without db var)', async () => {
     await withingsServiceWithoutDBVar.stop();

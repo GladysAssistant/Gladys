@@ -1,26 +1,54 @@
 const EventEmitter = require('events');
+const sinon = require('sinon');
 
 const Device = require('../../../lib/device');
-
 const StateManager = require('../../../lib/state');
+const ServiceManager = require('../../../lib/service');
+const db = require('../../../models');
 
 const event = new EventEmitter();
+const serviceName = 'fake-service';
 
 describe('Device', () => {
-  it('save test param', async () => {
-    const stateManager = new StateManager(event);
-    stateManager.setState('device', 'test-device', {
-      id: 'cfsmb47f-4d25-4381-8923-2633b23192sm',
-      name: 'test',
-      service_id: 'test-delete',
+  let serviceImpl;
+  let stateManager;
+
+  beforeEach(async () => {
+    serviceImpl = {
+      id: 3030383,
+      selector: serviceName,
+      name: serviceName,
+      version: '0.1.0',
+    };
+
+    stateManager = new StateManager();
+    stateManager.setState('service', serviceName, serviceImpl);
+
+    await db.Service.create(serviceImpl);
+  });
+
+  afterEach(async () => {
+    const serviceInDb = await db.Service.findOne({
+      where: {
+        name: serviceName,
+      },
     });
 
-    const device = new Device(event, {}, stateManager);
-    device.devicesByPollFrequency[60000] = [
-      {
-        service_id: 'test-delete',
-      },
-    ];
-    await device.destroyByServiceId('test-delete');
+    await serviceInDb.destroy();
+
+    sinon.reset();
+  });
+
+  it('should destroy device', async () => {
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
+    await device.create({
+      name: 'test-device-destroyByServiceId',
+      external_id: 'test-device-new-destroyByServiceId',
+      service_id: serviceImpl.id,
+      selector: 'test-device-destroyByServiceId',
+    });
+
+    await device.destroyByServiceId(serviceImpl.id);
   });
 });
