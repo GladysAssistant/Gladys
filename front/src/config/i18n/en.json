@@ -1027,9 +1027,22 @@
         "houseIsEmptyDescription": "If the house is empty, the scene will continue. Otherwise, the scene will stop.",
         "houseIsNotEmptyDescription": "If the house is not empty, the scene will continue. Otherwise, the scene will stop.",
         "houseLabel": "House"
+      },
+      "calendarEventIsRunning": {
+        "description": "This action let you stop a scene if a calendar event is currently running, or if an event is not running. Only shared calendars are displayed here.",
+        "calendarLabel": "Look in the following shared calendars",
+        "nameLabel": "If the name",
+        "namePlaceholder": "Enter a name",
+        "whenFoundLabel": "If an event is found",
+        "whenNotFoundLabel": "If no event is found",
+        "stopScene": "Stop the scene",
+        "continueScene": "Continue the scene"
       }
     },
     "actions": {
+      "calendar": {
+        "is-event-running": "Condition on calendar events"
+      },
       "device": {
         "get-value": "Get device value",
         "set-value": "Set device value"
