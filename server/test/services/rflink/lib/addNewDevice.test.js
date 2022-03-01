@@ -12,7 +12,7 @@ const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
   serialport: SerialPortMock,
 });
 
-describe.only('RFLinkHandler.addDevice', () => {
+describe('RFLinkHandler.addDevice', () => {
   let rflinkHandler;
   let gladys;
   const event = { emit: fake.returns(null) };
