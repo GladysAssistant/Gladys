@@ -1,7 +1,6 @@
 [
   {
     "external_id": "zigbee2mqtt:0x00158d00033e88d5",
-    "params": [],
     "features": [
       {
         "category": "battery",
@@ -50,7 +49,6 @@
     "name": "0x00158d0004019127",
     "model": "WXKG11LM",
     "external_id": "zigbee2mqtt:0x00158d0004019127",
-    "params": [],
     "features": [
       {
         "name": "Battery",
@@ -84,7 +82,6 @@
     "name": "0x00158d00045b2740",
     "model": "WSDCGQ11LM",
     "external_id": "zigbee2mqtt:0x00158d00045b2740",
-    "params": [{ "name": "feature_map_alarm", "value": "{\"0\":false,\"1\":true,\"false\":0,\"true\":1}" }],
     "features": [
       {
         "name": "Battery",

@@ -15,7 +15,6 @@ describe('zigbee2mqtt convertDevice', () => {
       external_id: `zigbee2mqtt:${notManagedDevice.friendly_name}`,
       model: undefined,
       features: [],
-      params: [],
       should_poll: false,
       service_id: serviceId,
     };
@@ -43,7 +42,6 @@ describe('zigbee2mqtt convertDevice', () => {
       name: managedDevice.friendly_name,
       external_id: `zigbee2mqtt:${managedDevice.friendly_name}`,
       model: 'WXKG11LM',
-      params: [],
       features: [
         {
           category: 'button',

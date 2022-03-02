@@ -1,6 +1,5 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const { convertValue } = require('../utils/convertValue');
 const { convertFeature } = require('../utils/convertFeature');
 
 /**
@@ -91,7 +90,7 @@ function handleMqttMessage(topic, message) {
               try {
                 const newState = {
                   device_feature_external_id: `${feature.external_id}`,
-                  state: convertValue(device, feature.type, zigbeeFeatureField, incomingFeatures[zigbeeFeatureField]),
+                  state: this.readValue(deviceName, zigbeeFeatureField, incomingFeatures[zigbeeFeatureField]),
                 };
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
               } catch (e) {

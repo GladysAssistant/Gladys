@@ -6,6 +6,8 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const Zigbee2MqttService = proxyquire('../../../../services/zigbee2mqtt', {});
 
+const discoveredDevices = require('./payloads/mqtt_devices_get.json');
+
 const event = {
   emit: fake.resolves(null),
 };
@@ -21,7 +23,7 @@ const mqtt = {
 };
 
 const wrongFeature = {
-  external_id: 'NOTzigbee2mqtt:device-test:switch:binary:state',
+  external_id: 'NOTzigbee2mqtt:0x00158d00045b2740:switch:binary:state',
 };
 
 const wrongTopic = {
@@ -29,26 +31,16 @@ const wrongTopic = {
 };
 
 const wrongProperty = {
-  external_id: 'zigbee2mqtt:device-test:switch:binary',
+  external_id: 'zigbee2mqtt:0x00158d00045b2740:switch:binary',
 };
 
 const featureBinary = {
-  external_id: 'zigbee2mqtt:device-test:switch:binary:state',
+  external_id: 'zigbee2mqtt:0x00158d00045b2740:switch:binary:alarm',
   type: 'binary',
 };
 
-const featureBrightness = {
-  external_id: 'zigbee2mqtt:device-test:light:brightness:brightness',
-  type: 'brightness',
-};
-
-const featureTemperature = {
-  external_id: 'zigbee2mqtt:device-test:light:temperature:color_temp',
-  type: 'temperature',
-};
-
 const featureColor = {
-  external_id: 'zigbee2mqtt:device-test:light:color:color',
+  external_id: 'zigbee2mqtt:0x00158d00045b2740:light:color:color',
   type: 'color',
 };
 
@@ -59,6 +51,11 @@ describe('zigbee2mqtt setValue', () => {
   beforeEach(() => {
     zigbee2MqttService = Zigbee2MqttService(gladys, serviceId);
     zigbee2MqttService.device.mqttClient = mqtt;
+    discoveredDevices
+      .filter((d) => d.supported)
+      .forEach((device) => {
+        zigbee2MqttService.device.discoveredDevices[device.friendly_name] = device;
+      });
     sinon.reset();
   });
 
@@ -70,7 +67,7 @@ describe('zigbee2mqtt setValue', () => {
     } catch (e) {
       assertC.equal(
         e.message,
-        `Zigbee2mqtt device external_id is invalid : "${wrongFeature.external_id}" should starts with "zigbee2mqtt:"`,
+        `Zigbee2mqtt device external_id is invalid: "${wrongFeature.external_id}" should starts with "zigbee2mqtt:"`,
       );
     }
   });
@@ -82,7 +79,7 @@ describe('zigbee2mqtt setValue', () => {
     } catch (e) {
       assertC.equal(
         e.message,
-        `Zigbee2mqtt device external_id is invalid : "${wrongTopic.external_id}" have no MQTT topic`,
+        `Zigbee2mqtt device external_id is invalid: "${wrongTopic.external_id}" have no MQTT topic`,
       );
     }
   });
@@ -94,37 +91,30 @@ describe('zigbee2mqtt setValue', () => {
     } catch (e) {
       assertC.equal(
         e.message,
-        `Zigbee2mqtt device external_id is invalid : "${wrongProperty.external_id}" have no Zigbee property`,
+        `Zigbee2mqtt device external_id is invalid: "${wrongProperty.external_id}" have no Zigbee property`,
+      );
+    }
+  });
+  it('set value expose not found', async () => {
+    // EXECUTE
+    try {
+      await zigbee2MqttService.device.setValue(null, featureColor, 255);
+      assert.fail();
+    } catch (e) {
+      assertC.equal(
+        e.message,
+        `Zigbee2mqtt expose not found: "zigbee2mqtt:0x00158d00045b2740:light:color:color" with property "color"`,
       );
     }
   });
   it('set value good topic ON', async () => {
     // EXECUTE
-    await zigbee2MqttService.device.setValue(null, featureBinary, true);
-    assert.calledOnceWithExactly(mqtt.publish, `zigbee2mqtt/device-test/set`, JSON.stringify({ state: 'ON' }));
+    await zigbee2MqttService.device.setValue(null, featureBinary, 1);
+    assert.calledOnceWithExactly(mqtt.publish, `zigbee2mqtt/0x00158d00045b2740/set`, JSON.stringify({ alarm: true }));
   });
   it('set value good topic OFF', async () => {
     // EXECUTE
-    await zigbee2MqttService.device.setValue(null, featureBinary, false);
-    assert.calledOnceWithExactly(mqtt.publish, `zigbee2mqtt/device-test/set`, JSON.stringify({ state: 'OFF' }));
-  });
-  it('set value good topic brightness', async () => {
-    // EXECUTE
-    await zigbee2MqttService.device.setValue(null, featureBrightness, 150);
-    assert.calledOnceWithExactly(mqtt.publish, `zigbee2mqtt/device-test/set`, JSON.stringify({ brightness: 150 }));
-  });
-  it('set value good topic temperature', async () => {
-    // EXECUTE
-    await zigbee2MqttService.device.setValue(null, featureTemperature, 56);
-    assert.calledOnceWithExactly(mqtt.publish, `zigbee2mqtt/device-test/set`, JSON.stringify({ color_temp: 56 }));
-  });
-  it('set value good topic color', async () => {
-    // EXECUTE
-    await zigbee2MqttService.device.setValue(null, featureColor, 255);
-    assert.calledOnceWithExactly(
-      mqtt.publish,
-      `zigbee2mqtt/device-test/set`,
-      JSON.stringify({ color: { rgb: '0,0,255' } }),
-    );
+    await zigbee2MqttService.device.setValue(null, featureBinary, 0);
+    assert.calledOnceWithExactly(mqtt.publish, `zigbee2mqtt/0x00158d00045b2740/set`, JSON.stringify({ alarm: false }));
   });
 });

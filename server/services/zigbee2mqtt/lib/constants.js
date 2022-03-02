@@ -15,12 +15,7 @@ const DEFAULT = {
   ],
 };
 
-const DEVICE = {
-  PARAM_PREFIX: 'feature_map_',
-};
-
 module.exports = {
   CONFIGURATION,
   DEFAULT,
-  DEVICE,
 };
