@@ -6,6 +6,8 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import get from 'get-value';
 
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+
 import style from './CalendarIsEventRunning.css';
 
 const isNullOrUndefined = variable => variable === null || variable === undefined;
@@ -66,6 +68,14 @@ class CheckTime extends Component {
     );
   };
 
+  initVariables = action => {
+    if (action.stop_scene_if_event_found === false) {
+      this.setVariables();
+    } else {
+      this.removeVariables();
+    }
+  };
+
   refreshSelectedOptions = action => {
     const selectedCalendarsOptions = [];
     if (action.calendars && this.state.calendarsOptions) {
@@ -76,6 +86,10 @@ class CheckTime extends Component {
         }
       });
     }
+    if (get(this.props, 'action.stop_scene_if_event_found') !== action.stop_scene_if_event_found) {
+      this.initVariables(action);
+    }
+
     this.setState({ selectedCalendarsOptions });
   };
 
@@ -99,9 +113,53 @@ class CheckTime extends Component {
     }
   };
 
+  setVariables = () => {
+    const { columnIndex, index } = this.props;
+    const EVENT_NAME_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventName');
+    const EVENT_LOCATION_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventLocation');
+    const EVENT_START_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventStart');
+    const EVENT_END_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventEnd');
+    this.props.setVariables(columnIndex, index, [
+      {
+        name: 'calendarEvent.name',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_NAME_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvent.location',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_LOCATION_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvent.start',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_START_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvent.end',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_END_VARIABLE,
+        data: {}
+      }
+    ]);
+  };
+
+  removeVariables = () => {
+    const { columnIndex, index } = this.props;
+    this.props.setVariables(columnIndex, index, []);
+  };
+
   componentDidMount() {
     this.initActionIfNeeded();
     this.getCalendars();
+    this.initVariables(this.props.action);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -218,4 +276,4 @@ class CheckTime extends Component {
   }
 }
 
-export default connect('user,httpClient', {})(CheckTime);
+export default connect('user,httpClient', {})(withIntlAsProp(CheckTime));

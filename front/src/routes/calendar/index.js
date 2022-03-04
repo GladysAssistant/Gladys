@@ -64,7 +64,6 @@ class Map extends Component {
 
   render(props, {}) {
     const noCalendarConnected = props.calendars && props.calendars.length === 0;
-    console.log(noCalendarConnected, props.calendars);
     return (
       <div class="page">
         <div class="page-main">

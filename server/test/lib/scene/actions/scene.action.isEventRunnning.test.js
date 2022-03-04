@@ -1,7 +1,9 @@
 const { assert, fake, useFakeTimers } = require('sinon');
 const chaiAssert = require('chai').assert;
+const { expect } = require('chai');
 const dayjs = require('dayjs');
 const EventEmitter = require('events');
+
 const { ACTIONS } = require('../../../../utils/constants');
 const { AbortScene } = require('../../../../utils/coreErrors');
 const { executeActions } = require('../../../../lib/scene/scene.executeActions');
@@ -36,11 +38,12 @@ describe('scene.action.isEventRunning', () => {
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
       name: 'my test event',
+      location: 'school',
       start: startDate,
       end: endDate,
     });
     await executeActions(
-      { stateManager, event, message, calendar },
+      { stateManager, event, message, calendar, timezone: 'Europe/Paris' },
       [
         [
           {
@@ -62,6 +65,24 @@ describe('scene.action.isEventRunning', () => {
       scope,
     );
     assert.calledWith(message.sendToUser, 'pepper', 'hello');
+    expect(scope).to.deep.equal({
+      '0': {
+        '0': {
+          calendarEvent: {
+            name: 'my test event',
+            location: 'school',
+            start: dayjs(startDate)
+              .tz('Europe/Paris')
+              .locale('en')
+              .format('LLL'),
+            end: dayjs(endDate)
+              .tz('Europe/Paris')
+              .locale('en')
+              .format('LLL'),
+          },
+        },
+      },
+    });
   });
   it('should execute condition is-event-running, and not send message because scene should stop', async () => {
     const stateManager = new StateManager(event);
