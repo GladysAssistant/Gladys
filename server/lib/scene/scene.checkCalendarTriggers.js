@@ -114,7 +114,7 @@ async function checkCalendarTriggers() {
           .tz(this.timezone)
           .locale(eventRaw.calendar.creator.language)
           .format('LLL'),
-        end: dayjs(eventRaw.start)
+        end: dayjs(eventRaw.end)
           .tz(this.timezone)
           .locale(eventRaw.calendar.creator.language)
           .format('LLL'),

@@ -251,6 +251,8 @@ const ActionCard = ({ children, ...props }) => (
             columnIndex={props.columnIndex}
             index={props.index}
             updateActionProperty={props.updateActionProperty}
+            variables={props.variables}
+            setVariables={props.setVariables}
           />
         )}
       </div>
