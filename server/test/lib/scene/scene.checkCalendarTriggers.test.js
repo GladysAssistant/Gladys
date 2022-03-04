@@ -75,7 +75,7 @@ describe('scene.checkCalendarTriggers', () => {
             .tz('Europe/Paris')
             .locale('en')
             .format('LLL'),
-          end: dayjs(startDate)
+          end: dayjs(endDate)
             .tz('Europe/Paris')
             .locale('en')
             .format('LLL'),
