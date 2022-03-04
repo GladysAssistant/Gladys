@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import { DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';
@@ -123,13 +123,33 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
 
           <div class="form-group">
             <label class="form-label">
-              <Text id="integration.mqtt.feature.mqttTopicExampleLabel" />
+              <Text id="integration.mqtt.feature.mqttTopicToPublishExampleLabel" />
             </label>
-
+            <p>
+              <small>
+                <MarkupText id="integration.mqtt.feature.mqttTopicToPublishExampleDescription" />
+              </small>
+            </p>
             <pre>
-              <code>{props.mqttTopic}</code>
+              <code>{props.publishMqttTopic}</code>
             </pre>
           </div>
+
+          {feature.read_only === false && (
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.mqtt.feature.mqttTopicToListenExampleLabel" />
+              </label>
+              <p>
+                <small>
+                  <MarkupText id="integration.mqtt.feature.mqttTopicToListenExampleDescription" />
+                </small>
+              </p>
+              <pre>
+                <code>{props.listenMqttTopic}</code>
+              </pre>
+            </div>
+          )}
 
           <div class="form-group">
             <button onClick={props.deleteFeature} class="btn btn-outline-danger">
@@ -170,10 +190,12 @@ class MqttFeatureBoxComponent extends Component {
     this.props.deleteFeature(this.props.featureIndex);
   };
   getMqttTopic = () => {
-    if (this.props.feature.read_only) {
-      return `gladys/master/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
-    }
-    return `gladys/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
+    const publishMqttTopic = `gladys/master/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
+    const listenMqttTopic = `gladys/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
+    return {
+      publishMqttTopic,
+      listenMqttTopic
+    };
   };
   copyMqttTopic = async () => {
     try {
@@ -186,7 +208,7 @@ class MqttFeatureBoxComponent extends Component {
     }
   };
   render() {
-    const mqttTopic = this.getMqttTopic();
+    const { publishMqttTopic, listenMqttTopic } = this.getMqttTopic();
     return (
       <MqttFeatureBox
         {...this.props}
@@ -199,7 +221,8 @@ class MqttFeatureBoxComponent extends Component {
         updateReadOnly={this.updateReadOnly}
         deleteFeature={this.deleteFeature}
         copyMqttTopic={this.copyMqttTopic}
-        mqttTopic={mqttTopic}
+        publishMqttTopic={publishMqttTopic}
+        listenMqttTopic={listenMqttTopic}
       />
     );
   }
