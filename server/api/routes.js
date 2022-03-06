@@ -518,9 +518,9 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: oauth2Controller.buildAuthorizationUri,
     },
-    'post /api/v1/service/oauth2/client/access-token-uri': {
+    'post /api/v1/service/oauth2/client/access-token': {
       authenticated: true,
-      controller: oauth2Controller.buildAccesTokenUri,
+      controller: oauth2Controller.getAccesTokenUri,
     },
     'get /api/v1/service/oauth2/client': {
       authenticated: true,

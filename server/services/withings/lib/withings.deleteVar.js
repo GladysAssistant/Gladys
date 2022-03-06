@@ -1,8 +1,5 @@
-const OAuth2Manager = require('../../../lib/oauth2');
-
 /**
  * @description Delete client_id, secret_id, access_token of current oauth2 integration and all devices.
- * @param {string} integrationName - Name of oauth2 integration.
  * @param {string} userId - Gladys userId.
  * @returns {Promise} Resolve with current integration service id.
  * @example
@@ -12,9 +9,8 @@ const OAuth2Manager = require('../../../lib/oauth2');
  *  }
  * );
  */
-async function deleteVar(integrationName, userId) {
-  const oauth2Manager = new OAuth2Manager(this.gladys);
-  const oauth2Result = await oauth2Manager.deleteClient(this.serviceId, userId);
+async function deleteVar(userId) {
+  const oauth2Result = await this.gladys.oauth2Client.deleteClient(this.serviceId, userId);
   return oauth2Result;
 }
 

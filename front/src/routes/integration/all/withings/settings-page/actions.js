@@ -14,7 +14,7 @@ const actions = store => ({
         const queryParams = queryString.parse(state.currentUrl.substring(state.currentUrl.indexOf('?')));
         if (queryParams && queryParams.code) {
           const serviceId = (await state.httpClient.get(`/api/v1/service/withings`)).id;
-          await state.httpClient.post('/api/v1/service/oauth2/client/access-token-uri', {
+          await state.httpClient.post('/api/v1/service/oauth2/client/access-token', {
             integrationName: 'withings',
             authorization_code: queryParams.code,
             service_id: serviceId
@@ -32,7 +32,7 @@ const actions = store => ({
         let withingsDevices;
         if (returnGetConfig.client_id) {
           const result = await state.httpClient.post('/api/v1/service/withings/init');
-          if (result) { 
+          if (result) {
             withingsDevices = result.withingsDevices;
           }
 

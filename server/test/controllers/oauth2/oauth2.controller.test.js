@@ -42,7 +42,7 @@ describe('POST /api/v1/service/oauth2/client/authorization-uri', () => {
   });
 });
 
-describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
+describe('POST /api/v1/service/oauth2/client/access-token', () => {
   before(async function testBefore() {
     // Generate a new RSA key and add it to the keystore
     await server.issuer.keys.generate('RS256');
@@ -65,7 +65,7 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
     };
 
     await buildOauth2Request
-      .post('/api/v1/service/oauth2/client/access-token-uri')
+      .post('/api/v1/service/oauth2/client/access-token')
       .send(req)
       .expect('Content-Type', /json/)
       .expect(200)
@@ -77,7 +77,7 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
 });
 
 // failled call
-describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
+describe('POST /api/v1/service/oauth2/client/access-token', () => {
   it('should get 500 HTTP error on token access uri', async () => {
     const req = {
       integration_name: 'test',
@@ -86,7 +86,7 @@ describe('POST /api/v1/service/oauth2/client/access-token-uri', () => {
     };
 
     await buildOauth2Request
-      .post('/api/v1/service/oauth2/client/access-token-uri')
+      .post('/api/v1/service/oauth2/client/access-token')
       .send(req)
       .expect('Content-Type', /json/)
       .expect(500);

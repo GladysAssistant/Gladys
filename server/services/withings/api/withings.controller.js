@@ -8,10 +8,12 @@ module.exports = function WithingsController(withingsHandler) {
    * @apiGroup Withings
    */
   async function init(req, res) {
-    const resultInit = await withingsHandler.init(req.user.id);
-    res.json({
-      withingsDevices: resultInit,
-    });
+    if (req.user && req.user.id) {
+      const resultInit = await withingsHandler.init(req.user.id);
+      res.json({
+        withingsDevices: resultInit,
+      });
+    }
   }
 
   /**
@@ -31,11 +33,13 @@ module.exports = function WithingsController(withingsHandler) {
    * @apiGroup Withings
    */
   async function deleteConfig(req, res) {
-    await withingsHandler.deleteVar('withings', req.user.id);
-    await withingsHandler.deleteDevices();
-    res.json({
-      success: true,
-    });
+    if (req.user && req.user.id) {
+      await withingsHandler.deleteVar(req.user.id);
+      await withingsHandler.deleteDevices();
+      res.json({
+        success: true,
+      });
+    }
   }
 
   return {

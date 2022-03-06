@@ -1,7 +1,5 @@
 const Promise = require('bluebird');
-const uuid = require('uuid');
 const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
-const OAuth2Manager = require('../../../lib/oauth2');
 const logger = require('../../../utils/logger');
 const { OAUTH2 } = require('../../../utils/constants.js');
 
@@ -18,7 +16,6 @@ async function poll(device) {
   if (device.features) {
     logger.debug('Features : ', device.features);
 
-    const oauth2Manager = new OAuth2Manager(this.gladys);
     const withingsDeviceId = device.params.find((oneParam) => oneParam.name === 'WITHINGS_DEVICE_ID').value;
 
     // Get all users of gladys
@@ -104,7 +101,7 @@ async function poll(device) {
               if (feature.last_value_changed) {
                 dateToPoll = feature.last_value_changed.getTime();
               }
-              const measureResult = await oauth2Manager.executeOauth2HTTPQuery(
+              const measureResult = await this.gladys.oauth2Client.executeOauth2HTTPQuery(
                 this.serviceId,
                 user.id,
                 'get',
@@ -130,15 +127,9 @@ async function poll(device) {
                       logger.debug('currentGroup: ', currentGroup);
 
                       await Promise.each(currentGroup.measures, async (measure) => {
-                        // Build a feature state
-                        const featureState = {
-                          id: uuid.v4(),
-                          device_feature_id: feature.id,
-                          value: (measure.value * 10 ** measure.unit).toFixed(2),
-                          created_at: new Date(currentGroup.created * 1000),
-                          updated_at: new Date(),
-                        };
-                        await this.gladys.device.saveHistoricalState(device, feature, featureState);
+                        const historicalValueState = (measure.value * 10 ** measure.unit).toFixed(2);
+                        const createdAt = new Date(currentGroup.created * 1000);
+                        await this.gladys.device.saveHistoricalState(feature, historicalValueState, createdAt);
                       });
                     }
                   });
@@ -147,7 +138,7 @@ async function poll(device) {
             }
 
             if (withingsType === -1) {
-              const userResult = await oauth2Manager.executeOauth2HTTPQuery(
+              const userResult = await this.gladys.oauth2Client.executeOauth2HTTPQuery(
                 this.serviceId,
                 user.id,
                 'get',
@@ -187,14 +178,7 @@ async function poll(device) {
                     featureBattery.last_value = currentBatValue;
                     featureBattery.last_value_string = currentBatValueString;
 
-                    const featureState = {
-                      id: uuid.v4(),
-                      device_feature_id: feature.id,
-                      value: currentBatValue,
-                      created_at: currentDate,
-                      updated_at: currentDate,
-                    };
-                    await this.gladys.device.saveHistoricalState(device, featureBattery, featureState);
+                    await this.gladys.device.saveHistoricalState(featureBattery, currentBatValue, currentDate);
                   }
                 });
               }

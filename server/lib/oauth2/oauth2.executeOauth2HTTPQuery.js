@@ -6,26 +6,29 @@ const { OAUTH2 } = require('../../utils/constants');
 
 /**
  * @description Refresh Oauth2 token in case of it expired .
+ * @param {Object} variable - Gladys variable manager.
  * @param {string} serviceId - Gladys service id call method.
- * @param {Object} gladys - Current gladys instance.
  * @param {string} userId - Gladys userId of current session.
  * @returns {Object} Response of oauth2 refresh token query .
  * @example
  * oauth2.refreshTokenAccess('7fdsf4s68r4gfr68f4r63csd7f6f4c3r85',
  *    {...}, '78v4f3df83g74v1fsd8375f63gvrf5c');
  */
-async function refreshTokenAccess(serviceId, gladys, userId) {
-  const clientId = await gladys.variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
-  const secret = await gladys.variable.getValue(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, userId);
-  const accessToken = JSON.parse(await gladys.variable.getValue(OAUTH2.VARIABLE.ACCESS_TOKEN, serviceId, userId));
+async function refreshTokenAccess(variable, serviceId, userId) {
+  const clientId = await variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
+  const secret = await variable.getValue(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, userId);
+  const accessToken = JSON.parse(await variable.getValue(OAUTH2.VARIABLE.ACCESS_TOKEN, serviceId, userId));
 
   logger.trace('accessToken: ', accessToken);
   // Find provider configuration
-  const tokenHost = await gladys.variable.getValue(OAUTH2.VARIABLE.TOKEN_HOST, serviceId);
-  const tokenPath = await gladys.variable.getValue(OAUTH2.VARIABLE.TOKEN_PATH, serviceId);
-  const authorizeHost = await gladys.variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_HOST, serviceId);
-  const authorizePath = await gladys.variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_PATH, serviceId);
-  const integrationScope = await gladys.variable.getValue(`${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`, serviceId);
+  const tokenHost = await variable.getValue(OAUTH2.VARIABLE.TOKEN_HOST, serviceId);
+  const tokenPath = await variable.getValue(OAUTH2.VARIABLE.TOKEN_PATH, serviceId);
+  const authorizeHost = await variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_HOST, serviceId);
+  const authorizePath = await variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_PATH, serviceId);
+  const additionalAccessTokenRequestActionParam = await variable.getValue(
+    OAUTH2.VARIABLE.ADDITIONAL_ACCESS_TOKEN_REQUEST_ACTION_PARAM,
+    serviceId,
+  );
 
   // Init credentials based on integration name
   const credentials = {
@@ -55,18 +58,26 @@ async function refreshTokenAccess(serviceId, gladys, userId) {
         const refreshParams = {
           client_id: clientId,
           client_secret: secret,
-          scope: integrationScope,
+          grant_type: 'refresh_token',
+          refresh_token: authResult.token.refresh_token,
         };
+        if (additionalAccessTokenRequestActionParam) {
+          refreshParams.action = additionalAccessTokenRequestActionParam;
+        }
 
         authResult = await authResult.refresh(refreshParams);
 
         // Save new  accessToken
-        await gladys.variable.setValue(
-          OAUTH2.VARIABLE.ACCESS_TOKEN,
-          JSON.stringify(authResult),
-          serviceId,
-          userId,
-        );
+        if (!authResult.token.status || authResult.token.status === 0) {
+          let jsonResult;
+          if (authResult.token.body) {
+            jsonResult = authResult.token.body;
+            authResult = await client.createToken(jsonResult);
+          } else {
+            jsonResult = authResult.token;
+          }
+          await variable.setValue(OAUTH2.VARIABLE.ACCESS_TOKEN, JSON.stringify(jsonResult), serviceId, userId);
+        }
       } catch (error) {
         logger.error('Error refreshing access token: ', error);
       }
@@ -94,8 +105,7 @@ async function refreshTokenAccess(serviceId, gladys, userId) {
  */
 async function executeOauth2HTTPQuery(serviceId, userId, queryType, queryUrl, queryParams) {
   // Refresh token access if needed
-  const accesToken = await refreshTokenAccess(serviceId, this.gladys, userId);
-
+  const accesToken = await refreshTokenAccess(this.variable, serviceId, userId);
   const headerConfig = {
     headers: {
       Authorization: `${accesToken.token.token_type} ${accesToken.token.access_token}`,
@@ -118,7 +128,6 @@ async function executeOauth2HTTPQuery(serviceId, userId, queryType, queryUrl, qu
 
       result = await axios.post(queryUrl, data, headerConfig);
     }
-
     return result;
   } catch (error) {
     logger.error('Execute query error: ', error.message);

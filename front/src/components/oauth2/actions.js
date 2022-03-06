@@ -70,8 +70,6 @@ const actions = store => ({
       );
 
       const returnValue = await state.httpClient.post('/api/v1/service/oauth2/client/authorization-uri', {
-        clientId: state.clientId,
-        secret: state.secret,
         integration_name: state.integrationName,
         service_id: serviceId
       });

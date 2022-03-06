@@ -1,5 +1,4 @@
 const uuid = require('uuid');
-const OAuth2Manager = require('../../../lib/oauth2');
 const logger = require('../../../utils/logger');
 const {
   DEVICE_FEATURE_CATEGORIES,
@@ -257,9 +256,8 @@ function buildFeature(currentGroup, device, currentFeatures) {
  */
 async function init(userId) {
   const { serviceId } = this;
-  const oauth2Manager = new OAuth2Manager(this.gladys);
 
-  const userResult = await oauth2Manager.executeOauth2HTTPQuery(
+  const userResult = await this.gladys.oauth2Client.executeOauth2HTTPQuery(
     serviceId,
     userId,
     'get',
@@ -270,6 +268,7 @@ async function init(userId) {
   const devices = [];
   const devicesResult = [];
   const mapOfDeviceByWithingsDeviceId = new Map();
+
   if (userResult.data.body.devices) {
     await userResult.data.body.devices.forEach((element) => {
       if (element) {
@@ -280,7 +279,7 @@ async function init(userId) {
       }
     });
 
-    const measureResult = await oauth2Manager.executeOauth2HTTPQuery(
+    const measureResult = await this.gladys.oauth2Client.executeOauth2HTTPQuery(
       serviceId,
       userId,
       'get',
@@ -315,7 +314,6 @@ async function init(userId) {
     // get device in db to know device already connected
     const { gladys } = this;
     const devicesInDB = await gladys.device.get({ service: 'withings' });
-
     // Save device with feature
     await mapOfDeviceByWithingsDeviceId.forEach((value, key) => {
       if (key) {
@@ -345,7 +343,6 @@ async function init(userId) {
       }
     });
   }
-
   return devicesResult;
 }
 
