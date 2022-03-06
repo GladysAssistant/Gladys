@@ -19,7 +19,6 @@ class WithingsSettingsPage extends Component {
     this.props.updateIntegrationName('withings');
     this.props.getCurrentConfig();
     this.props.initWithingsDevices();
-    this.props.updateWithingsDeviceImg();
   }
 
   render(props, {}) {
@@ -42,7 +41,6 @@ class WithingsSettingsPage extends Component {
                   {props.withingsDevices.map((withingsDevice, index) => (
                     <Device
                       device={withingsDevice}
-                      withingsImgMap={props.withingsImgMap}
                       deviceIndex={index}
                       houses={props.houses}
                       updateDeviceProperty={props.updateDeviceProperty}

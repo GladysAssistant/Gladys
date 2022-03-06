@@ -4,6 +4,7 @@ import cx from 'classnames';
 import get from 'get-value';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { WithingsDeviceImgByModel } from './withingsConsts';
 
 dayjs.extend(relativeTime);
 
@@ -90,12 +91,12 @@ class WithingsDeviceBox extends Component {
             <div class="dimmer-content">
               <div class="card-body">
                 <div class="form-group">
-                  {props.withingsImgMap && (
+                  {WithingsDeviceImgByModel && (
                     <Localizer>
                       <img
                         class="card-img-top"
                         style="aspect-ratio: 1 / 1;"
-                        src={`/assets/images/withings/${props.withingsImgMap.get(props.device.model)}`}
+                        src={`/assets/images/withings/${WithingsDeviceImgByModel[props.device.model]}`}
                         alt={<Text id="global.logoAlt" />}
                       />
                     </Localizer>

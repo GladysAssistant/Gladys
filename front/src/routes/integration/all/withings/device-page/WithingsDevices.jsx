@@ -45,7 +45,6 @@ const WithingsDevices = ({ children, ...props }) => (
                                 props.withingsDevices.map((withingsDevice, index) => (
                                   <Device
                                     device={withingsDevice}
-                                    withingsImgMap={props.withingsImgMap}
                                     deviceIndex={index}
                                     houses={props.houses}
                                     updateDeviceProperty={props.updateDeviceProperty}
