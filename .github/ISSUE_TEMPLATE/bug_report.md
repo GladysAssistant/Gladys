@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve Gladys
+about: Report a bug to help us improve Gladys Assistant
 ---
 
 First, are you sure that you found a Gladys bug?
