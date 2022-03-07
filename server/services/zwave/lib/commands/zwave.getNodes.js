@@ -3,6 +3,7 @@ const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
 const { getDeviceFeatureExternalId, getDeviceExternalId, getDeviceName } = require('../utils/externalId');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Split Node into each endpoints.
@@ -48,7 +49,6 @@ function getNodes() {
   // foreach node in RAM, we format it with the gladys device format
   return nodes
     .map((node) => {
-      // logger.info(`{"id":"${node.nodeId}","classes":${JSON.stringify(node.classes)}}`);
 
       const newDevice = {
         name: getDeviceName(node),
@@ -102,7 +102,11 @@ function getNodes() {
                   max,
                 });
               } else {
-                // logger.info(`Unkown category/type for ${JSON.stringify(properties[property])}`);
+                logger.info(
+                  `Unkown category/type for property ${JSON.stringify(properties[property])} of node ${
+                    node.nodeId
+                  }, product ${node.product}`,
+                );
               }
             } else {
               newDevice.params.push({
@@ -113,8 +117,6 @@ function getNodes() {
           });
         });
       });
-
-      // logger.info(`{"id":"${node.nodeId}","features":${JSON.stringify(newDevice.features)}}`);
 
       return newDevice;
     })
