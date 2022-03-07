@@ -75,7 +75,7 @@ describe('scene.checkCalendarTriggers', () => {
             .tz('Europe/Paris')
             .locale('en')
             .format('LLL'),
-          end: dayjs(startDate)
+          end: dayjs(endDate)
             .tz('Europe/Paris')
             .locale('en')
             .format('LLL'),
@@ -223,7 +223,7 @@ describe('scene.checkCalendarTriggers', () => {
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal([]);
   });
-  it('should check if calendar events are matching the trigger - has-any-name false', async () => {
+  it('should check if calendar events are matching the trigger - has-any-name true', async () => {
     await sceneManager.create({
       name: 'check-events',
       icon: 'bell',
@@ -242,5 +242,29 @@ describe('scene.checkCalendarTriggers', () => {
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
+  it('should check that private calendars are not matched', async () => {
+    // calendar is now private
+    await calendar.update('test-calendar', {
+      shared: false,
+    });
+    await sceneManager.create({
+      name: 'check-events',
+      icon: 'bell',
+      triggers: [
+        {
+          type: EVENTS.CALENDAR.EVENT_IS_COMING,
+          calendar_event_attribute: 'start',
+          calendars: ['test-calendar'],
+          calendar_event_name_comparator: 'has-any-name',
+          calendar_event_name: 'thisisnotinthetitle',
+          duration: 10,
+          unit: 'minute',
+        },
+      ],
+      actions: [[]],
+    });
+    const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
+    expect(idsOfEventsMatching).to.deep.equal([]);
   });
 });

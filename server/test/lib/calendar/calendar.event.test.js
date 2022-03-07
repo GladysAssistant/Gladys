@@ -1,4 +1,6 @@
 const { expect, assert } = require('chai');
+const { useFakeTimers } = require('sinon');
+const dayjs = require('dayjs');
 
 const Calendar = require('../../../lib/calendar');
 
@@ -220,5 +222,102 @@ describe('calendar.getEvents', () => {
       to: '2020-03-12 07:49:07.556',
     });
     expect(events).to.deep.equal([]);
+  });
+});
+
+describe('calendar.findCurrentlyRunningEvent', () => {
+  const calendar = new Calendar();
+  let clock;
+  const now = new Date();
+  const startDate = dayjs(now)
+    .subtract(45, 'minute')
+    .toDate();
+  const endDate = dayjs(now)
+    .add(45, 'minute')
+    .toDate();
+  beforeEach(async () => {
+    clock = useFakeTimers(now);
+  });
+  afterEach(() => {
+    clock.restore();
+  });
+  it('should find event in calendar - has any name', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'has-any-name', '');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
+  it('should find event in calendar - is-exactly', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'is-exactly', 'my test event');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
+  it('should find event in calendar - contains', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'contains', 'test');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
+  it('should find event in calendar - starts-with', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'starts-with', 'my test');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
+  it('should find event in calendar - ends-with', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'ends-with', 'test event');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
+  });
+  it('should not find event in calendar - contains', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: endDate,
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'contains', 'nonnonon');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal([]);
+  });
+  it('should not find event in calendar - event in the past', async () => {
+    await calendar.createEvent('test-calendar', {
+      id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
+      name: 'my test event',
+      start: startDate,
+      end: dayjs(now)
+        .subtract(10, 'minute')
+        .toDate(),
+    });
+    const events = await calendar.findCurrentlyRunningEvent(['test-calendar'], 'contains', 'test');
+    const eventsId = events.map((e) => e.id);
+    expect(eventsId).deep.equal([]);
   });
 });

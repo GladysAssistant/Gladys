@@ -78,6 +78,18 @@ const JobList = ({ children, ...props }) => (
             ))}
         </tbody>
       </table>
+      <div class="card-body">
+        {!props.isFirstPage && (
+          <button class="btn btn-secondary" onClick={props.loadPreviousPage}>
+            <Text id="jobsSettings.previous" />
+          </button>
+        )}
+        {!props.isLastPage && (
+          <button class="btn btn-secondary" onClick={props.loadNextPage}>
+            <Text id="jobsSettings.next" />
+          </button>
+        )}
+      </div>
     </div>
   </div>
 );

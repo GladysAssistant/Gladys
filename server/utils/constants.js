@@ -232,6 +232,9 @@ const CONDITIONS = {
 };
 
 const ACTIONS = {
+  CALENDAR: {
+    IS_EVENT_RUNNING: 'calendar.is-event-running',
+  },
   DEVICE: {
     SET_VALUE: 'device.set-value',
     GET_VALUE: 'device.get-value',

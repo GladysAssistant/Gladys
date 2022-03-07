@@ -69,6 +69,7 @@ async function checkCalendarTriggers() {
         '$calendar.selector$': {
           [Op.in]: trigger.calendars,
         },
+        '$calendar.shared$': true,
       },
     };
     // eslint-disable-next-line default-case
@@ -113,7 +114,7 @@ async function checkCalendarTriggers() {
           .tz(this.timezone)
           .locale(eventRaw.calendar.creator.language)
           .format('LLL'),
-        end: dayjs(eventRaw.start)
+        end: dayjs(eventRaw.end)
           .tz(this.timezone)
           .locale(eventRaw.calendar.creator.language)
           .format('LLL'),
