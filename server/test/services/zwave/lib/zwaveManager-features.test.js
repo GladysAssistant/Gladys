@@ -73,7 +73,7 @@ describe('zwaveManager events', () => {
       endpoint: 0,
       property: 'currentValue',
     });
-    expect(zwaveManager.nodes[1].classes[37][0].currentValue).to.deep.equal({
+    expect(zwaveManager.nodes[1].classes[37][0].targetValue).to.deep.equal({
       commandClass: 37,
       endpoint: 0,
       genre: 'user',
@@ -82,25 +82,24 @@ describe('zwaveManager events', () => {
       max: 99,
       min: 0,
       nodeId: 1,
-      property: 'currentValue',
+      property: 'targetValue',
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
+    expect(nodes.length).equal(1);
+    expect(nodes[0].params.length).equal(0);
+    expect(nodes[0].features).to.deep.equal([
       {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['37'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [],
-        features: [],
+        category: 'switch',
+        external_id: 'zwave:node_id:1:comclass:37:endpoint:0:property:targetValue',
+        has_feedback: true,
+        name: 'Current value',
+        read_only: true,
+        selector: 'zwave-node-1-targetvalue-37-0-current-value',
+        type: 'binary',
+        unit: null,
+        max: 99,
+        min: 0,
       },
     ]);
   });
@@ -131,34 +130,20 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
+    expect(nodes.length).equal(1);
+    expect(nodes[0].params.length).equal(0);
+    expect(nodes[0].features).to.deep.equal([
       {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['49'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [],
-        features: [
-          {
-            category: 'light-sensor',
-            external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Illuminance',
-            has_feedback: true,
-            name: 'Illuminance',
-            read_only: true,
-            selector: 'zwave-illuminance-0-illuminance-product-node-1',
-            type: 'integer',
-            unit: 'lux',
-            min: null,
-            max: null,
-          },
-        ],
+        category: 'light-sensor',
+        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Illuminance',
+        has_feedback: true,
+        name: 'Illuminance',
+        read_only: true,
+        selector: 'zwave-node-1-illuminance-49-0-illuminance',
+        type: 'integer',
+        unit: 'lux',
+        max: 100,
+        min: 0,
       },
     ]);
   });
@@ -189,34 +174,20 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
+    expect(nodes.length).equal(1);
+    expect(nodes[0].params.length).equal(0);
+    expect(nodes[0].features).to.deep.equal([
       {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['49'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [],
-        features: [
-          {
-            category: 'humidity-sensor',
-            external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Humidity',
-            has_feedback: true,
-            name: 'Humidity',
-            read_only: true,
-            selector: 'zwave-humidity-0-humidity-product-node-1',
-            type: 'decimal',
-            unit: 'percent',
-            min: null,
-            max: null,
-          },
-        ],
+        category: 'humidity-sensor',
+        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Humidity',
+        has_feedback: true,
+        name: 'Humidity',
+        read_only: true,
+        selector: 'zwave-node-1-humidity-49-0-humidity',
+        type: 'decimal',
+        unit: 'percent',
+        min: 0,
+        max: 100,
       },
     ]);
   });
@@ -245,21 +216,20 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
+    expect(nodes.length).equal(1);
+    expect(nodes[0].params.length).equal(0);
+    expect(nodes[0].features).to.deep.equal([
       {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['49'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [],
-        features: [],
+        category: 'ultraviolet-sensor',
+        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Ultraviolet',
+        has_feedback: true,
+        name: 'Ultraviolet',
+        read_only: true,
+        selector: 'zwave-node-1-ultraviolet-49-0-ultraviolet',
+        type: 'decimal',
+        unit: null,
+        min: 0,
+        max: 100,
       },
     ]);
   });
@@ -290,92 +260,20 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
+    expect(nodes.length).equal(1);
+    expect(nodes[0].params.length).equal(0);
+    expect(nodes[0].features).to.deep.equal([
       {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['49'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [],
-        features: [
-          {
-            category: 'temperature-sensor',
-            external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Air temperature',
-            type: 'decimal',
-            has_feedback: true,
-            name: 'Air temperature',
-            read_only: true,
-            selector: 'zwave-air-temperature-0-air-temperature-product-node-1',
-            unit: 'celsius',
-            min: null,
-            max: null,
-          },
-        ],
-      },
-    ]);
-  });
-
-  it('should receive value added 49-0-Power', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Power',
-        unit: 'W',
-        writeable: false,
-      };
-    };
-    zwaveManager.valueAdded(zwaveNode, {
-      commandClass: 49,
-      endpoint: 0,
-      property: 'Power',
-    });
-    expect(zwaveManager.nodes[1].classes[49][0].Power).to.deep.equal({
-      commandClass: 49,
-      endpoint: 0,
-      genre: 'user',
-      label: 'Power',
-      type: 'number',
-      unit: 'W',
-      nodeId: 1,
-      property: 'Power',
-      writeable: false,
-    });
-    const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
-      {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['49'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [],
-        features: [
-          {
-            category: 'switch',
-            external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Power',
-            has_feedback: true,
-            max: null,
-            min: null,
-            name: 'Power',
-            read_only: true,
-            selector: 'zwave-power-0-power-product-node-1',
-            type: 'power',
-            unit: 'watt',
-          },
-        ],
+        category: 'temperature-sensor',
+        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Air temperature',
+        type: 'decimal',
+        has_feedback: true,
+        name: 'Air temperature',
+        read_only: true,
+        selector: 'zwave-node-1-air-temperature-49-0-air-temperature',
+        unit: 'celsius',
+        min: -20,
+        max: 50,
       },
     ]);
   });
@@ -404,34 +302,20 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
+    expect(nodes.length).equal(1);
+    expect(nodes[0].params.length).equal(0);
+    expect(nodes[0].features).to.deep.equal([
       {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['113'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [],
-        features: [
-          {
-            category: 'motion-sensor',
-            external_id: 'zwave:node_id:1:comclass:113:endpoint:0:property:Home Security-Motion sensor status',
-            has_feedback: true,
-            name: 'Motion sensor status',
-            read_only: true,
-            selector: 'zwave-home-security-motion-sensor-status-0-motion-sensor-status-product-node-1',
-            type: 'integer',
-            min: null,
-            max: null,
-            unit: null,
-          },
-        ],
+        category: 'motion-sensor',
+        external_id: 'zwave:node_id:1:comclass:113:endpoint:0:property:Home Security-Motion sensor status',
+        has_feedback: true,
+        name: 'Motion sensor status',
+        read_only: true,
+        selector: 'zwave-node-1-home-security-motion-sensor-status-113-0-motion-sensor-status',
+        type: 'integer',
+        unit: null,
+        max: undefined,
+        min: undefined,
       },
     ]);
   });
@@ -451,41 +335,11 @@ describe('zwaveManager events', () => {
       endpoint: 0,
       property: 'wakeUpInterval',
     });
-    expect(zwaveManager.nodes[1].classes[132][0].wakeUpInterval).to.deep.equal({
-      commandClass: 132,
-      endpoint: 0,
-      genre: 'system',
-      label: 'Wake Up interval',
-      type: 'number',
-      max: 16777200,
-      min: 300,
-      nodeId: 1,
-      property: 'wakeUpInterval',
-      writeable: true,
-    });
+    expect(zwaveManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
-      {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['132'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [
-          {
-            name: 'wake-up-interval-undefined',
-            value: '',
-          },
-        ],
-        features: [],
-      },
-    ]);
+    expect(nodes.length).equal(1);
+    expect(nodes[0].features.length).equal(0);
+    expect(nodes[0].params.length).equal(0);
   });
 
   it('should receive value added 132-0-controllerNodeId', () => {
@@ -501,39 +355,11 @@ describe('zwaveManager events', () => {
       endpoint: 0,
       property: 'controllerNodeId',
     });
-    expect(zwaveManager.nodes[1].classes[132][0].controllerNodeId).to.deep.equal({
-      commandClass: 132,
-      endpoint: 0,
-      genre: 'system',
-      label: 'Node ID of the controller',
-      nodeId: 1,
-      property: 'controllerNodeId',
-      type: 'any',
-      writeable: false,
-    });
+    expect(zwaveManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
-      {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['132'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [
-          {
-            name: 'node-id-of-the-controller-undefined',
-            value: '',
-          },
-        ],
-        features: [],
-      },
-    ]);
+    expect(nodes.length).equal(1);
+    expect(nodes[0].features.length).equal(0);
+    expect(nodes[0].params.length).equal(0);
   });
 
   it('should receive value added 132-0-level', () => {
@@ -552,42 +378,11 @@ describe('zwaveManager events', () => {
       endpoint: 0,
       property: 'level',
     });
-    expect(zwaveManager.nodes[1].classes[132][0].level).to.deep.equal({
-      commandClass: 132,
-      endpoint: 0,
-      genre: 'system',
-      label: 'Battery level',
-      type: 'number',
-      max: 100,
-      min: 0,
-      unit: '%',
-      nodeId: 1,
-      property: 'level',
-      writeable: false,
-    });
+    expect(zwaveManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
-      {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['132'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [
-          {
-            name: 'battery-level-undefined',
-            value: '',
-          },
-        ],
-        features: [],
-      },
-    ]);
+    expect(nodes.length).equal(1);
+    expect(nodes[0].features.length).equal(0);
+    expect(nodes[0].params.length).equal(0);
   });
 
   it('should receive value added 132-0-isLow', () => {
@@ -603,38 +398,10 @@ describe('zwaveManager events', () => {
       endpoint: 0,
       property: 'isLow',
     });
-    expect(zwaveManager.nodes[1].classes[132][0].isLow).to.deep.equal({
-      commandClass: 132,
-      endpoint: 0,
-      genre: 'system',
-      label: 'Low battery level',
-      type: 'boolean',
-      nodeId: 1,
-      property: 'isLow',
-      writeable: false,
-    });
+    expect(zwaveManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal([
-      {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['132'],
-          deviceDatabaseUrl: 'deviceDatabaseUrl',
-        },
-        params: [
-          {
-            name: 'low-battery-level-undefined',
-            value: '',
-          },
-        ],
-        features: [],
-      },
-    ]);
+    expect(nodes.length).equal(1);
+    expect(nodes[0].features.length).equal(0);
+    expect(nodes[0].params.length).equal(0);
   });
 });

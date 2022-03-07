@@ -297,13 +297,13 @@ const CATEGORIES = [
 ];
 
 const GENRE = {
-  112: 'config',
-  114: 'system',
-  115: 'system',
-  132: 'system',
-  134: 'system',
-  94: 'system',
-  44: 'config',
+  112: 'config', // COMMAND_CLASS_CONFIGURATION
+  114: 'system', // COMMAND_CLASS_MANUFACTURER_SPECIFIC
+  115: 'system', // COMMAND_CLASS_POWERLEVEL
+  132: 'system', // COMMAND_CLASS_WAKE_UP
+  134: 'system', // COMMAND_CLASS_VERSION
+  94: 'system', // COMMAND_CLASS_ZWAVEPLUS_INFO
+  44: 'config', // COMMAND_CLASS_SCENE_ACTUATOR_CONF
 };
 
 const SCENE_VALUES = {
