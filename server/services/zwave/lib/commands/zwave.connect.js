@@ -40,6 +40,7 @@ async function connect(driverPath, securityKeys) {
     },
     securityKeys,
   });
+  this.driver.enableErrorReporting();
   this.driver.on('error', (e) => {
     logger.debug(`ZWave Error: [${e.name}] ${e.message}`);
   });
