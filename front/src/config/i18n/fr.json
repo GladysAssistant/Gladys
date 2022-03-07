@@ -1759,6 +1759,16 @@
       "stop": "Stop",
       "record": "Enregistrer"
     },
+    "shutter": {
+      "shortCategoryName": "Volet",
+      "up-down-stop": "Actions",
+      "position": "Position"
+    },
+    "curtain": {
+      "shortCategoryName": "Rideau",
+      "up-down-stop": "Actions",
+      "position": "Position"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"

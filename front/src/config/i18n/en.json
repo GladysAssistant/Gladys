@@ -1759,6 +1759,16 @@
       "stop": "Stop",
       "record": "Record"
     },
+    "shutter": {
+      "shortCategoryName": "Shutter",
+      "up-down-stop": "Actions",
+      "position": "Position"
+    },
+    "curtain": {
+      "shortCategoryName": "Curtain",
+      "up-down-stop": "Actions",
+      "position": "Position"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"

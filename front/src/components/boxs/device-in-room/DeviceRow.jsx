@@ -7,6 +7,7 @@ import SensorDeviceFeature from './device-features/SensorDeviceFeature';
 import LightTemperatureDeviceFeature from './device-features/LightTemperatureDeviceFeature';
 import MultiLevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 import NumberDeviceFeature from './device-features/NumberDeviceFeature';
+import UpDownDeviceFeature from './device-features/UpDownDeviceFeature';
 
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
@@ -15,7 +16,11 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: LightTemperatureDeviceFeature,
   [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL]: NumberDeviceFeature,
-  [DEVICE_FEATURE_TYPES.TELEVISION.VOLUME]: MultiLevelDeviceFeature
+  [DEVICE_FEATURE_TYPES.TELEVISION.VOLUME]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SHUTTER.UP_DOWN_STOP]: UpDownDeviceFeature,
+  [DEVICE_FEATURE_TYPES.SHUTTER.POSITION]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.CURTAIN.UP_DOWN_STOP]: UpDownDeviceFeature,
+  [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: MultiLevelDeviceFeature
 };
 
 const DeviceRow = ({ children, ...props }) => {

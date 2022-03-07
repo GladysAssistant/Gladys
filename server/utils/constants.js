@@ -323,6 +323,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   SIGNAL: 'signal',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   TELEVISION: 'television',
+  SHUTTER: 'roller-shutter',
+  CURTAIN: 'curtain',
   UNKNOWN: 'unknown',
 };
 
@@ -412,6 +414,14 @@ const DEVICE_FEATURE_TYPES = {
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
+  },
+  SHUTTER: {
+    UP_DOWN_STOP: 'up-down-stop',
+    POSITION: 'position',
+  },
+  CURTAIN: {
+    UP_DOWN_STOP: 'up-down-stop',
+    POSITION: 'position',
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',
