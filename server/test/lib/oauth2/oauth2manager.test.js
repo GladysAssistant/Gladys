@@ -1,11 +1,10 @@
 const { OAuth2Server } = require('oauth2-mock-server');
-const { assert, expect } = require('chai');
+const { assert } = require('chai');
 const { fake } = require('sinon');
 
 const OAuth2Manager = require('../../../lib/oauth2');
 const logger = require('../../../utils/logger');
 const { OAUTH2 } = require('../../../utils/constants');
-const { Error500 } = require('../../../utils/httpErrors');
 
 const server = new OAuth2Server();
 
@@ -66,7 +65,7 @@ describe('oauth2manager test', () => {
     await server.stop();
   });
 
-  const manager = new OAuth2Manager(gladys);
+  const manager = new OAuth2Manager(gladys.variable);
 
   it('oauth manager get executeOauth2HTTPQuery test ', async () => {
     const queryType = 'get';
@@ -118,22 +117,7 @@ describe('oauth2manager test', () => {
 
 describe('oauth2manager failled test', () => {
   // check error
-  const manager = new OAuth2Manager(null);
-
-  it('oauth manager get error deleteClient failled test ', async () => {
-    try {
-      const result = await manager.deleteClient(testServiceId, testUserId);
-      logger.debug(result);
-      assert.fail('should have Error500 error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error500);
-    }
-  });
-});
-
-describe('oauth2manager failled test', () => {
-  // check error
-  const manager = new OAuth2Manager(gladys);
+  const manager = new OAuth2Manager(gladys.variable);
 
   it('oauth manager get error on refresh token test ', async () => {
     const queryType = 'get';

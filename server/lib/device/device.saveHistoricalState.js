@@ -57,7 +57,7 @@ async function saveHistoricalState(deviceFeature, historicalState, createdAt) {
     );
 
     deviceFeature.last_value = historicalState.value;
-    deviceFeature.last_value_changed = historicalState.updated_at;
+    deviceFeature.last_value_changed = historicalStateObject.created_at;
 
     // save local state in RAM
     this.stateManager.setState('deviceFeature', deviceFeature.selector, deviceFeature);

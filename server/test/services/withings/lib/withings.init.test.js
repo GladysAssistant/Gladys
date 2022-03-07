@@ -2,6 +2,7 @@ const { assert } = require('chai');
 const { OAuth2Server } = require('oauth2-mock-server');
 const { fake } = require('sinon');
 const ServerMock = require('mock-http-server');
+const OAuth2Manager = require('../../../../lib/oauth2/index');
 const WithingsHandler = require('../../../../services/withings/lib');
 const { OAUTH2 } = require('../../../../utils/constants.js');
 
@@ -300,6 +301,8 @@ describe('WithingsHandler init', () => {
     serverOauth2.issuer.keys.generate('RS256');
     // Start the server
     serverOauth2.start(9292, 'localhost');
+
+    gladys.oauth2Client = new OAuth2Manager(gladys.variable);
   });
 
   after(function testAfter(done) {

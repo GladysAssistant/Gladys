@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-const uuid = require('uuid');
 const { assert } = require('chai');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
@@ -40,15 +39,9 @@ describe('Device saveHistoricalState', () => {
 
     const deviceFeature = testDevice.features[0];
     const updateDate = new Date().toISOString();
-    const historicalState = {
-      id: uuid.v4(),
-      device_feature_id: deviceFeature.id,
-      value: 20,
-      created_at: updateDate,
-      updated_at: updateDate,
-    };
+    const historicalState = 20;
 
-    await device.saveHistoricalState(device, deviceFeature, historicalState);
+    await device.saveHistoricalState(deviceFeature, historicalState, updateDate);
 
     return assert.equal(deviceFeature.last_value_changed, updateDate);
   });

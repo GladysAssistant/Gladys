@@ -5,6 +5,7 @@ const sinon = require('sinon');
 const WithingsHandler = require('../../../../services/withings/lib');
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { OAUTH2 } = require('../../../../utils/constants.js');
+const OAuth2Manager = require('../../../../lib/oauth2/index');
 
 const { assert, fake } = sinon;
 
@@ -174,6 +175,8 @@ describe('WithingsHandler poll', () => {
     serverOauth2.issuer.keys.generate('RS256');
     // Start the server
     serverOauth2.start(9292, 'localhost');
+
+    gladys.oauth2Client = new OAuth2Manager(gladys.variable);
   });
 
   after((done) => {
@@ -311,7 +314,7 @@ describe('WithingsHandler poll', () => {
 
     // 18 feature - 1 feature unknown = 17 state to save
     assert.callCount(gladys.device.saveHistoricalState, 17);
-    assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
+    assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
 
     const deviceToPoll2 = {
       id: 'gdfgdfgd-7207-4e55-b893-gfdgdfgkjliu',
@@ -340,7 +343,7 @@ describe('WithingsHandler poll', () => {
 
     deviceDef.params = [{ name: 'WITHINGS_DEVICE_ID', value: 'withingsDevideId2' }];
     deviceDef.features = deviceToPoll2.features;
-    assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
+    assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
 
     const deviceToPoll3 = {
       id: 'gdfgdfgd-7207-4e55-b893-gfdgdfgkjliu',
@@ -369,7 +372,7 @@ describe('WithingsHandler poll', () => {
 
     deviceDef.params = [{ name: 'WITHINGS_DEVICE_ID', value: 'withingsDevideId3' }];
     deviceDef.features = deviceToPoll3.features;
-    assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
+    assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
 
     const deviceToPoll4 = {
       id: 'gdfgdfgd-7207-4e55-b893-gfdgdfgkjliu',
@@ -398,6 +401,6 @@ describe('WithingsHandler poll', () => {
 
     deviceDef.params = [{ name: 'WITHINGS_DEVICE_ID', value: 'withingsDevideId4' }];
     deviceDef.features = deviceToPoll4.features;
-    assert.calledWith(gladys.device.saveHistoricalState, deviceDef);
+    assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
   });
 });

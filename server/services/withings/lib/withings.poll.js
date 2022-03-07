@@ -94,8 +94,6 @@ async function poll(device) {
             }
 
             if (withingsType > 0) {
-              logger.debug('Current feature last value changed: ', feature.last_value_changed);
-
               // Fix date to start poll in tmestamp
               let dateToPoll = 0;
               if (feature.last_value_changed) {
@@ -124,8 +122,6 @@ async function poll(device) {
                   const valueList = value[1];
                   await Promise.each(valueList, async (currentGroup) => {
                     if (key) {
-                      logger.debug('currentGroup: ', currentGroup);
-
                       await Promise.each(currentGroup.measures, async (measure) => {
                         const historicalValueState = (measure.value * 10 ** measure.unit).toFixed(2);
                         const createdAt = new Date(currentGroup.created * 1000);
