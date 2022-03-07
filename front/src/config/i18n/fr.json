@@ -1395,6 +1395,8 @@
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Statut",
+    "previous": "Précédent",
+    "next": "Suivant",
     "jobTypes": {
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",

@@ -1395,6 +1395,8 @@
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Status",
+    "previous": "Previous",
+    "next": "Next",
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
