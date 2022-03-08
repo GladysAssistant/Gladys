@@ -51,6 +51,10 @@ const SYSTEM_VARIABLE_NAMES = {
 };
 
 const EVENTS = {
+  CALENDAR: {
+    EVENT_IS_COMING: 'calendar.event-is-coming',
+    CHECK_IF_EVENT_IS_COMING: 'calendar.check-if-event-is-coming',
+  },
   DEVICE: {
     NEW: 'device.new',
     CREATE: 'device.create',
@@ -228,6 +232,9 @@ const CONDITIONS = {
 };
 
 const ACTIONS = {
+  CALENDAR: {
+    IS_EVENT_RUNNING: 'calendar.is-event-running',
+  },
   DEVICE: {
     SET_VALUE: 'device.set-value',
     GET_VALUE: 'device.get-value',

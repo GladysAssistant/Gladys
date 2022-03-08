@@ -83,5 +83,13 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+  calendar.associate = (models) => {
+    calendar.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      targetKey: 'id',
+      as: 'creator',
+    });
+  };
+
   return calendar;
 };

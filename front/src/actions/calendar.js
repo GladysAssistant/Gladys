@@ -12,9 +12,7 @@ function createActions(store) {
           to,
           shared: true
         });
-        const calendars = await state.httpClient.get('/api/v1/calendar', {
-          shared: true
-        });
+        const calendars = await state.httpClient.get('/api/v1/calendar');
         const eventsFormated = events.map(event => {
           return {
             title: event.name,
@@ -26,6 +24,7 @@ function createActions(store) {
         });
         store.setState({
           eventsFormated,
+          calendars,
           DeviceGetStatus: CalendarGetEventsStatus.Success
         });
       } catch (e) {

@@ -5,24 +5,39 @@ const db = require('../../models');
  * @description Get calendars
  * @param {string} userId - The id of the user.
  * @param {Object} options - Options of the query.
+ * @returns {Promise} - Resolves with list of calendars.
  * @example
  * gladys.calendar.get('f6cc6e0c-1b48-4b59-8ac7-9a0ad2e0ed3c');
  */
 async function get(userId, options = {}) {
-  const where = {
-    [Op.or]: [
+  const where = {};
+
+  // if we ask specifically for shared calendar
+  // only returned shared calendars
+  if (options.shared === true) {
+    where.shared = true;
+  } else if (options.shared === false) {
+    // if we ask specifically for private calendars
+    // only return my private calendars
+    where[Op.and] = [
       {
         user_id: userId,
       },
-      ...(options.shared
-        ? [
-            {
-              shared: true,
-            },
-          ]
-        : []),
-    ],
-  };
+      {
+        shared: false,
+      },
+    ];
+  } else {
+    // else, return calendars that are shared OR my private calendars
+    where[Op.or] = [
+      {
+        user_id: userId,
+      },
+      {
+        shared: true,
+      },
+    ];
+  }
 
   if (options.serviceId) {
     where.service_id = options.serviceId;

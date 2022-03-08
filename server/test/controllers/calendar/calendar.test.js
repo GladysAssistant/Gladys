@@ -104,6 +104,38 @@ describe('GET /api/v1/calendar', () => {
         });
       });
   });
+  it('should GET only shared calendars', async () => {
+    await authenticatedRequest
+      .get('/api/v1/calendar?shared=true')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        res.body.forEach((calendar) => {
+          expect(calendar).to.have.property('name');
+          expect(calendar).to.have.property('description');
+          expect(calendar).to.have.property('user_id', '0cd30aef-9c4e-4a23-88e3-3547971296e5');
+          expect(calendar).to.have.property('sync');
+          expect(calendar).to.have.property('shared', true);
+          expect(calendar).to.have.property('notify');
+        });
+      });
+  });
+  it('should GET only private calendars', async () => {
+    await authenticatedRequest
+      .get('/api/v1/calendar?shared=false')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        res.body.forEach((calendar) => {
+          expect(calendar).to.have.property('name');
+          expect(calendar).to.have.property('description');
+          expect(calendar).to.have.property('user_id', '0cd30aef-9c4e-4a23-88e3-3547971296e5');
+          expect(calendar).to.have.property('sync');
+          expect(calendar).to.have.property('shared', false);
+          expect(calendar).to.have.property('notify');
+        });
+      });
+  });
 });
 
 describe('GET /api/v1/calendar/event', () => {

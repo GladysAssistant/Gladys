@@ -28,6 +28,17 @@ const actionSchema = Joi.array().items(
       ),
       before: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
       after: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
+      calendar_event_name_comparator: Joi.string().valid(
+        'is-exactly',
+        'contains',
+        'starts-with',
+        'ends-with',
+        'has-any-name',
+      ),
+      calendars: Joi.array().items(Joi.string()),
+      calendar_event_name: Joi.string(),
+      stop_scene_if_event_found: Joi.boolean(),
+      stop_scene_if_event_not_found: Joi.boolean(),
       request_response_keys: Joi.array().items(Joi.string()),
       headers: Joi.array().items(
         Joi.object().keys({
@@ -59,6 +70,19 @@ const triggersSchema = Joi.array().items(
     user: Joi.string(),
     area: Joi.string(),
     scheduler_type: Joi.string().valid('every-month', 'every-week', 'every-day', 'interval', 'custom-time'),
+    // Calendar event
+    calendar_event_attribute: Joi.string().valid('start', 'end'),
+    calendar_event_name_comparator: Joi.string().valid(
+      'is-exactly',
+      'contains',
+      'starts-with',
+      'ends-with',
+      'has-any-name',
+    ),
+    calendars: Joi.array().items(Joi.string()),
+    calendar_event_name: Joi.string(),
+    duration: Joi.number(),
+    // End of calendar checks
     date: Joi.date().format('YYYY-MM-DD'),
     time: Joi.string().regex(/^([0-9]{2}):([0-9]{2})$/),
     interval: Joi.number(),

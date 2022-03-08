@@ -271,6 +271,44 @@ const actionsFunc = {
       await self.house.userLeft(action.house, action.user);
     }
   },
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: async (self, action, scope, columnIndex, rowIndex) => {
+    // find if one event match the condition
+    const events = await self.calendar.findCurrentlyRunningEvent(
+      action.calendars,
+      action.calendar_event_name_comparator,
+      action.calendar_event_name,
+    );
+
+    const atLeastOneEventFound = events.length > 0;
+    // If one event was found, and the scene should be stopped in that case
+    if (atLeastOneEventFound && action.stop_scene_if_event_found === true) {
+      throw new AbortScene('EVENT_FOUND');
+    }
+    // If no event was found, and the scene should be stopped in that case
+    if (!atLeastOneEventFound && action.stop_scene_if_event_not_found === true) {
+      throw new AbortScene('EVENT_NOT_FOUND');
+    }
+
+    // set variable
+    if (atLeastOneEventFound) {
+      const eventRaw = events[0];
+      const eventFormatted = {
+        name: eventRaw.name,
+        location: eventRaw.location,
+        start: dayjs(eventRaw.start)
+          .tz(self.timezone)
+          .locale(eventRaw.calendar.creator.language)
+          .format('LLL'),
+        end: dayjs(eventRaw.end)
+          .tz(self.timezone)
+          .locale(eventRaw.calendar.creator.language)
+          .format('LLL'),
+      };
+      set(scope, `${columnIndex}.${rowIndex}`, {
+        calendarEvent: eventFormatted,
+      });
+    }
+  },
 };
 
 module.exports = {
