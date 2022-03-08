@@ -14,7 +14,6 @@ const helpTextStyle = {
 const OPENING_VARIABLE = '{{';
 const CLOSING_VARIABLE = '}}';
 
-@connect('httpClient', {})
 class SendMessageParams extends Component {
   getOptions = async () => {
     try {
@@ -58,6 +57,7 @@ class SendMessageParams extends Component {
     const variableWhileList = [];
     let variablesKey = '';
     let variableReady = null;
+    // Action variables
     nextProps.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {
       actionGroup.forEach((action, index) => {
         if (nextProps.variables[groupIndex][index]) {
@@ -79,6 +79,26 @@ class SendMessageParams extends Component {
             });
           });
         }
+      });
+    });
+    // Triggers variables
+    nextProps.triggersVariables.forEach((triggerVariables, index) => {
+      triggerVariables.forEach(triggerVariable => {
+        if (triggerVariable.ready && variableReady === null) {
+          variableReady = true;
+        }
+        if (!triggerVariable.ready) {
+          variableReady = false;
+        }
+        // we create a "variablesKey" string to quickly compare the variables displayed
+        // instead of having to loop through 2 arrays. It's quicker :)
+        variablesKey += `trigger.${index}.${triggerVariable.name}.${triggerVariable.label}.${triggerVariable.ready}`;
+        variableWhileList.push({
+          id: `triggerEvent.${triggerVariable.name}`,
+          text: `${index + 1}. ${triggerVariable.label}`,
+          title: `${index + 1}. ${triggerVariable.label}`,
+          value: `triggerEvent.${triggerVariable.name}`
+        });
       });
     });
     const previousVariablesKey = this.state.variablesKey;
@@ -186,4 +206,4 @@ class SendMessageParams extends Component {
   }
 }
 
-export default SendMessageParams;
+export default connect('httpClient', {})(SendMessageParams);

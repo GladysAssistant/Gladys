@@ -39,7 +39,8 @@
     "date": "Date",
     "time": "Time",
     "event": "Event",
-    "noEventsInRange": "There are no events in this range."
+    "noEventsInRange": "There are no events in this range.",
+    "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
     "noFeatures": "No features"
@@ -755,7 +756,10 @@
         "readOnlyLabel": "Is it a sensor?",
         "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
         "addButton": "Add feature",
-        "mqttTopicExampleLabel": "MQTT Topic",
+        "mqttTopicToPublishExampleLabel": "MQTT Topic to publish",
+        "mqttTopicToPublishExampleDescription": "Gladys is listening to this topic. If you publish a value in this topic, it'll be associated with this device. (see <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a>)",
+        "mqttTopicToListenExampleLabel": "MQTT Topic to listen",
+        "mqttTopicToListenExampleDescription": "Gladys will publish in this topic if the device is controlled in Gladys. You need to listen to this topic. (see <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a>)",
         "copyMqttTopic": "Copy MQTT Topic",
         "copied": "Copied!",
         "copyFailed": "Fail to copy",
@@ -1111,9 +1115,22 @@
         "houseIsEmptyDescription": "If the house is empty, the scene will continue. Otherwise, the scene will stop.",
         "houseIsNotEmptyDescription": "If the house is not empty, the scene will continue. Otherwise, the scene will stop.",
         "houseLabel": "House"
+      },
+      "calendarEventIsRunning": {
+        "description": "This action let you stop a scene if a calendar event is currently running, or if an event is not running. Only shared calendars are displayed here.",
+        "calendarLabel": "Look in the following shared calendars",
+        "nameLabel": "If the name",
+        "namePlaceholder": "Enter a name",
+        "whenFoundLabel": "If an event is found",
+        "whenNotFoundLabel": "If no event is found",
+        "stopScene": "Stop the scene",
+        "continueScene": "Continue the scene"
       }
     },
     "actions": {
+      "calendar": {
+        "is-event-running": "Condition on calendar events"
+      },
       "device": {
         "get-value": "Get device value",
         "set-value": "Set device value"
@@ -1159,6 +1176,12 @@
         "get-value": {
           "last_value": "Device last value"
         }
+      },
+      "calendar": {
+        "eventName": "Event name",
+        "eventLocation": "Event location",
+        "eventStart": "Start date",
+        "eventEnd": "End date"
       }
     },
     "triggers": {
@@ -1181,6 +1204,9 @@
       "area": {
         "user-entered": "User entered a zone",
         "user-left": "User left a zone"
+      },
+      "calendar": {
+        "event-is-coming": "Calendar event is coming"
       }
     },
     "triggersCard": {
@@ -1247,6 +1273,24 @@
         "userLeftDescription": "This scene will start when a user left this zone. Zones can be created in the maps tab.",
         "userLabel": "User",
         "areaLabel": "Zone"
+      },
+      "calendarEventIsComing": {
+        "description": "This will trigger the scene when a calendar event matches the conditions. Only shared calendars are displayed here.",
+        "calendarLabel": "Look in the following shared calendars",
+        "nameLabel": "If the name",
+        "isExactly": "is exactly",
+        "contains": "contains",
+        "startsWith": "starts with",
+        "endsWith": "ends with",
+        "hasAnyName": "has any name",
+        "namePlaceholder": "Text to match",
+        "durationName": "And the event is",
+        "startingIn": "Starting in",
+        "endingIn": "Ending in",
+        "durationPlaceholder": "Duration",
+        "minute": "minutes",
+        "hour": "hours",
+        "day": "days"
       }
     }
   },
@@ -1436,6 +1480,8 @@
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Status",
+    "previous": "Previous",
+    "next": "Next",
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",

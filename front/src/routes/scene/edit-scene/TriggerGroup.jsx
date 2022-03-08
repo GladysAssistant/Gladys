@@ -44,6 +44,8 @@ const TriggerGroup = ({ children, ...props }) => (
                       deleteTrigger={props.deleteTrigger}
                       index={index}
                       updateTriggerProperty={props.updateTriggerProperty}
+                      variables={props.variables}
+                      setVariablesTrigger={props.setVariablesTrigger}
                     />
                   </div>
                 ))}

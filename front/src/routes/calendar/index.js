@@ -1,21 +1,23 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { Text } from 'preact-i18n';
 import actions from '../../actions/calendar';
 import { isBright } from '../../utils/color';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import localeData from 'dayjs/plugin/localeData';
+import weekday from 'dayjs/plugin/weekday';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
+dayjs.extend(weekday);
 dayjs.extend(localeData);
 dayjs.extend(localizedFormat);
 
 const localizer = momentLocalizer(dayjs);
 
-@connect('eventsFormated,user', actions, dayjs)
 class Map extends Component {
   onRangeChange = range => {
     let from, to;
@@ -47,6 +49,8 @@ class Map extends Component {
     };
 
   componentWillMount() {
+    dayjs.locale(this.props.user.language);
+
     const from = dayjs()
       .startOf('week')
       .subtract(7, 'day')
@@ -59,11 +63,17 @@ class Map extends Component {
   }
 
   render(props, {}) {
+    const noCalendarConnected = props.calendars && props.calendars.length === 0;
     return (
       <div class="page">
         <div class="page-main">
           <div class="my-3 my-md-5">
             <div class="container">
+              {noCalendarConnected && (
+                <div class="alert alert-warning">
+                  <Text id="calendar.noCalendarsConnected" />
+                </div>
+              )}
               <div class="row">
                 <div class="col-md-12">
                   <div class="card">
@@ -95,4 +105,4 @@ class Map extends Component {
   }
 }
 
-export default withIntlAsProp(Map);
+export default connect('eventsFormated,calendars,user', actions, dayjs)(withIntlAsProp(Map));
