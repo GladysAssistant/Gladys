@@ -8,16 +8,14 @@ module.exports = function WithingsController(withingsHandler) {
    * @apiGroup Withings
    */
   async function init(req, res) {
-    if (req.user && req.user.id) {
-      const resultInit = await withingsHandler.init(req.user.id);
-      res.json({
-        withingsDevices: resultInit,
-      });
-    }
+    const resultInit = await withingsHandler.init(req.user.id);
+    res.json({
+      withingsDevices: resultInit,
+    });
   }
 
   /**
-   * @description Poll withings devices (used to initialize featuer state on gladys device creation).
+   * @description Poll withings devices (used to initialize feature state on gladys device creation).
    * @api {get} /api/v1/service/withings/poll Poll withings devices.
    * @apiName poll
    * @apiGroup Withings
@@ -33,13 +31,11 @@ module.exports = function WithingsController(withingsHandler) {
    * @apiGroup Withings
    */
   async function deleteConfig(req, res) {
-    if (req.user && req.user.id) {
-      await withingsHandler.deleteVar(req.user.id);
-      await withingsHandler.deleteDevices();
-      res.json({
-        success: true,
-      });
-    }
+    await withingsHandler.deleteVar(req.user.id);
+    await withingsHandler.deleteDevices();
+    res.json({
+      success: true,
+    });
   }
 
   return {

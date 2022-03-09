@@ -9,14 +9,7 @@ module.exports = function OAuth2Controller(gladys) {
    * @apiGroup OAuth2
    */
   async function buildAuthorizationUri(req, res) {
-    if (
-      req.body &&
-      req.body.service_id &&
-      req.user &&
-      req.user.id &&
-      req.body.integration_name &&
-      req.headers.referer
-    ) {
+    if (req.body && req.body.service_id && req.body.integration_name && req.headers.referer) {
       const authorizationUriResult = await gladys.oauth2Client.buildAuthorizationUri(
         req.body.service_id,
         req.user.id,
@@ -33,19 +26,12 @@ module.exports = function OAuth2Controller(gladys) {
   /**
    * @description Get access token and save it in database (for current service).
    * @api {post} /api/v1/service/oauth2/client/access-token Build an getToken uri (to get token access)
-   * @apiName buildAccesTokenUri
+   * @apiName buildAccessTokenUri
    * @apiGroup OAuth2
    */
-  async function getAccesTokenUri(req, res) {
-    if (
-      req.body &&
-      req.body.service_id &&
-      req.user &&
-      req.user.id &&
-      req.body.authorization_code &&
-      req.headers.referer
-    ) {
-      const authResult = await gladys.oauth2Client.getAccesToken(
+  async function getAccessTokenUri(req, res) {
+    if (req.body && req.body.service_id && req.body.authorization_code && req.headers.referer) {
+      const authResult = await gladys.oauth2Client.getAccessToken(
         req.body.service_id,
         req.user.id,
         req.body.authorization_code,
@@ -64,7 +50,7 @@ module.exports = function OAuth2Controller(gladys) {
    * @apiGroup oauth2
    */
   async function getCurrentConfig(req, res) {
-    if (req.query && req.query.service_id && req.user && req.user.id) {
+    if (req.query && req.query.service_id) {
       const serviceId = req.query.service_id;
 
       const resultClientId = await gladys.variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, req.user.id);
@@ -77,7 +63,7 @@ module.exports = function OAuth2Controller(gladys) {
 
   return Object.freeze({
     buildAuthorizationUri: asyncMiddleware(buildAuthorizationUri),
-    getAccesTokenUri: asyncMiddleware(getAccesTokenUri),
+    getAccessTokenUri: asyncMiddleware(getAccessTokenUri),
     getCurrentConfig: asyncMiddleware(getCurrentConfig),
   });
 };

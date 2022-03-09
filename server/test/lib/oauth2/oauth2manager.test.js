@@ -17,17 +17,17 @@ const gladys = {
   variable: {
     getValue: function getValue(key, serviceId, userId) {
       switch (key) {
-        case `${OAUTH2.VARIABLE.TOKEN_HOST}`:
+        case OAUTH2.VARIABLE.TOKEN_HOST:
           return testUrl;
-        case `${OAUTH2.VARIABLE.TOKEN_PATH}`:
+        case OAUTH2.VARIABLE.TOKEN_PATH:
           return '/token';
-        case `${OAUTH2.VARIABLE.AUTHORIZE_HOST}`:
+        case OAUTH2.VARIABLE.AUTHORIZE_HOST:
           return testUrl;
-        case `${OAUTH2.VARIABLE.AUTHORIZE_PATH}`:
+        case OAUTH2.VARIABLE.AUTHORIZE_PATH:
           return '/authorize2';
-        case `${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`:
+        case OAUTH2.VARIABLE.INTEGRATION_SCOPE:
           return 'user.info,user.metrics,user.activity,user.sleepevents';
-        case `${OAUTH2.VARIABLE.GRANT_TYPE}`:
+        case OAUTH2.VARIABLE.GRANT_TYPE:
           return 'authorization_code';
         case OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX:
           return '/dashboard/integration/health/test/settings';

@@ -21,19 +21,19 @@ const gladys = {
     getValue: function returnValue(key, serviceId, userId) {
       countGetValueCall += 1;
       switch (key) {
-        case `${OAUTH2.VARIABLE.TOKEN_HOST}`:
+        case OAUTH2.VARIABLE.TOKEN_HOST:
           return 'http://localhost:9292';
-        case `${OAUTH2.VARIABLE.TOKEN_PATH}`:
+        case OAUTH2.VARIABLE.TOKEN_PATH:
           return '/oauth2/token';
         case OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX:
           return 'ashboard/integration/health/test/settings';
-        case `${OAUTH2.VARIABLE.AUTHORIZE_HOST}`:
+        case OAUTH2.VARIABLE.AUTHORIZE_HOST:
           return 'http://localhost:9292';
-        case `${OAUTH2.VARIABLE.AUTHORIZE_PATH}`:
+        case OAUTH2.VARIABLE.AUTHORIZE_PATH:
           return '/oauth2_user/authorize2';
-        case `${OAUTH2.VARIABLE.GRANT_TYPE}`:
+        case OAUTH2.VARIABLE.GRANT_TYPE:
           return 'authorization_code';
-        case `${OAUTH2.VARIABLE.INTEGRATION_SCOPE}`:
+        case OAUTH2.VARIABLE.INTEGRATION_SCOPE:
           return 'user.info,user.metrics,user.activity,user.sleepevents';
         case OAUTH2.VARIABLE.ACCESS_TOKEN:
           return (

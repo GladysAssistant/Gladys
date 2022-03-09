@@ -5,15 +5,15 @@ const { BadParameters } = require('../../utils/coreErrors');
 /**
  * @description Save hstorical device feature state in DB.
  * @param {Object} deviceFeature - A DeviceFeature object.
- * @param {Object} historicalState - The historical feature state object of the deviceFeature to save.
+ * @param {Object} historicalState - The historical feature state value (numeric) of the deviceFeature to save.
  * @param {Object} createdAt - Date of state.
  * @example
  * saveHistoricalState({
  *      id: 'fc235c88-b10d-4706-8b59-fef92a7119b2',
  *      selector: 'my-light'
  *    },
- *    'newValue',
- *    '2022-02-03'
+ *    50,
+ *    '2022-03-09T11:30:19.000'
  * );
  */
 async function saveHistoricalState(deviceFeature, historicalState, createdAt) {
@@ -23,14 +23,10 @@ async function saveHistoricalState(deviceFeature, historicalState, createdAt) {
     throw new BadParameters(`device.saveHistoricalState of NaN value on ${deviceFeature.selector}`);
   }
   // get current feture to update last value if needed
-  const deviceFeatureInDB = await db.DeviceFeature.findOne({
-    where: {
-      id: deviceFeature.id,
-    },
-  });
+  const previousDeviceFeature = this.stateManager.get('deviceFeature', deviceFeature.selector);
 
   const historicalStateObject = {
-    device_feature_id: deviceFeatureInDB.id,
+    device_feature_id: previousDeviceFeature.id,
     value: historicalState,
     created_at: createdAt,
   };
@@ -38,10 +34,10 @@ async function saveHistoricalState(deviceFeature, historicalState, createdAt) {
   await db.DeviceFeatureState.create(historicalStateObject);
 
   const historicalStateAfterFeatureLastValue =
-    new Date(historicalStateObject.created_at) > new Date(deviceFeatureInDB.last_value_changed);
+    new Date(historicalStateObject.created_at) > new Date(previousDeviceFeature.last_value_changed);
   const featureLastValueChageIsValidDate =
-    deviceFeatureInDB.last_value_changed instanceof Date &&
-    !Number.isNaN(deviceFeatureInDB.last_value_changed.getTime());
+    previousDeviceFeature.last_value_changed instanceof Date &&
+    !Number.isNaN(previousDeviceFeature.last_value_changed.getTime());
 
   if (historicalStateAfterFeatureLastValue || !featureLastValueChageIsValidDate) {
     await db.DeviceFeature.update(
@@ -56,11 +52,14 @@ async function saveHistoricalState(deviceFeature, historicalState, createdAt) {
       },
     );
 
-    deviceFeature.last_value = historicalState.value;
+    deviceFeature.last_value = historicalStateObject.value;
     deviceFeature.last_value_changed = historicalStateObject.created_at;
 
     // save local state in RAM
-    this.stateManager.setState('deviceFeature', deviceFeature.selector, deviceFeature);
+    this.stateManager.setState('deviceFeature', deviceFeature.selector, {
+      last_value: historicalStateObject.value,
+      last_value_changed: historicalStateObject.created_at,
+    });
   }
 }
 

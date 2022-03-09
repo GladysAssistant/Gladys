@@ -105,10 +105,10 @@ async function refreshTokenAccess(variable, serviceId, userId) {
  */
 async function executeOauth2HTTPQuery(serviceId, userId, queryType, queryUrl, queryParams) {
   // Refresh token access if needed
-  const accesToken = await refreshTokenAccess(this.variable, serviceId, userId);
+  const accessToken = await refreshTokenAccess(this.variable, serviceId, userId);
   const headerConfig = {
     headers: {
-      Authorization: `${accesToken.token.token_type} ${accesToken.token.access_token}`,
+      Authorization: `${accessToken.token.token_type} ${accessToken.token.access_token}`,
     },
   };
 

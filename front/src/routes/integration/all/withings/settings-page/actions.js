@@ -1,4 +1,3 @@
-import queryString from 'query-string';
 import { route } from 'preact-router';
 import { RequestStatus } from '../../../../../utils/consts';
 
@@ -11,12 +10,11 @@ const actions = store => ({
     try {
       // check if this call is a return of oauth2 authorize code
       if (state.currentUrl) {
-        const queryParams = queryString.parse(state.currentUrl.substring(state.currentUrl.indexOf('?')));
-        if (queryParams && queryParams.code) {
+        if (this.code) {
           const serviceId = (await state.httpClient.get(`/api/v1/service/withings`)).id;
           await state.httpClient.post('/api/v1/service/oauth2/client/access-token', {
             integrationName: 'withings',
-            authorization_code: queryParams.code,
+            authorization_code: this.code,
             service_id: serviceId
           });
 
