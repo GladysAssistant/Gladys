@@ -8,13 +8,11 @@ const proxyquire = require('proxyquire').noCallThru();
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const DockerodeMock = require('./DockerodeMock.test');
 
-const getNetworkMode = proxyquire('../../../lib/system/system.getNetworkMode', {
-  '../../utils/childProcess': { exec: () => 'containerId' },
-});
-
 const System = proxyquire('../../../lib/system', {
   dockerode: DockerodeMock,
-  './system.getNetworkMode': getNetworkMode,
+  './system.getGladysContainerId': {
+    getGladysContainerId: fake.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c'),
+  },
 });
 
 const sequelize = {
