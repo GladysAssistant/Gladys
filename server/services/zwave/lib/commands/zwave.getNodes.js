@@ -49,7 +49,6 @@ function getNodes() {
   // foreach node in RAM, we format it with the gladys device format
   return nodes
     .map((node) => {
-
       const newDevice = {
         name: getDeviceName(node),
         model: `${node.product} ${node.firmwareVersion}`,
