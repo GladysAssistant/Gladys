@@ -4,8 +4,8 @@ const { DEVICE_FEATURE_UNITS } = require('../../../../../utils/constants');
 
 describe('zwave.getUnit', () => {
   it('should return temperature unit', () => {
-    const celsius = getUnit('C');
-    const fahrenheit = getUnit('F');
+    const celsius = getUnit('°C');
+    const fahrenheit = getUnit('°F');
     expect(celsius).to.equal(DEVICE_FEATURE_UNITS.CELSIUS);
     expect(fahrenheit).to.equal(DEVICE_FEATURE_UNITS.FAHRENHEIT);
   });
