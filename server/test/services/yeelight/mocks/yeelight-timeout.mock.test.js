@@ -34,6 +34,11 @@ class Discover extends EventEmitter {
     return new Promise((resolve, _) => setTimeout(() => resolve([]), 10500));
   }
 
+  scanByIp() {
+    this.test = 1; // useless, this is just for eslint
+    return new Promise((resolve, _) => setTimeout(() => resolve([]), 10500));
+  }
+
   destroy() {
     this.test = 1; // useless, this is just for eslint
     return Promise.resolve();

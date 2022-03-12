@@ -1,7 +1,7 @@
 {
-  "location": "yeelight://192.168.0.1:55443",
-  "id": "0x00000000035ac142",
-  "model": "color",
+  "location": "yeelight://192.168.0.2:55443",
+  "id": "0x0000000000000002",
+  "model": "mono",
   "version": "76",
   "capabilities": [
     "get_prop",
@@ -16,21 +16,15 @@
     "cron_get",
     "cron_del",
     "set_ct_abx",
-    "set_rgb",
-    "set_hsv",
     "set_adjust",
     "adjust_bright",
     "adjust_ct",
-    "adjust_color",
     "set_music",
     "set_name"
   ],
   "status": "off",
   "bright": 50,
-  "hue": 240,
-  "rgb": 1315890,
-  "sat": 60,
   "mode": 1,
   "port": 55443,
-  "host": "192.168.0.1"
+  "host": "192.168.0.2"
 }

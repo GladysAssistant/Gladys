@@ -1,7 +1,7 @@
 const sinon = require('sinon');
 const { DEVICE_FEATURE_TYPES } = require('../../../../../utils/constants');
 const { emitNewState } = require('../../../../../services/yeelight/lib/utils/emitNewState');
-const GladysColorDevice = require('../../mocks/Gladys-color.json');
+const GladysColorDevice = require('../../mocks/gladys/color.json');
 
 const { assert, fake } = sinon;
 

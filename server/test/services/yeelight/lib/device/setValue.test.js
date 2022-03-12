@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const GladysDevice = require('../../mocks/Gladys-color.json');
+const GladysDevice = require('../../mocks/gladys/color.json');
 const YeelightApi = require('../../mocks/yeelight.mock.test');
 
 const { assert } = sinon;
@@ -21,42 +21,42 @@ describe('YeelightHandler setValue', () => {
     sinon.reset();
   });
 
-  it('should set binary value', async () => {
+  it('set binary value', async () => {
     await yeelightService.device.setValue(GladysDevice, { category: 'light', type: 'binary' }, 1);
     assert.calledWithExactly(setPowerSpy, true);
     assert.notCalled(setBrightSpy);
     assert.notCalled(setCtAbxSpy);
     assert.notCalled(setRGBSpy);
   });
-  it('should set brightness value', async () => {
+  it('set brightness value', async () => {
     await yeelightService.device.setValue(GladysDevice, { category: 'light', type: 'brightness' }, 90);
     assert.notCalled(setPowerSpy);
     assert.calledWithExactly(setBrightSpy, 90);
     assert.notCalled(setCtAbxSpy);
     assert.notCalled(setRGBSpy);
   });
-  it('should set temperature value', async () => {
+  it('set temperature value', async () => {
     await yeelightService.device.setValue(GladysDevice, { category: 'light', type: 'temperature' }, 4000);
     assert.notCalled(setPowerSpy);
     assert.notCalled(setBrightSpy);
     assert.calledWithExactly(setCtAbxSpy, 4000);
     assert.notCalled(setRGBSpy);
   });
-  it('should set color value', async () => {
+  it('set color value', async () => {
     await yeelightService.device.setValue(GladysDevice, { category: 'light', type: 'color' }, 1315890);
     assert.notCalled(setPowerSpy);
     assert.notCalled(setBrightSpy);
     assert.notCalled(setCtAbxSpy);
     assert.calledWithExactly(setRGBSpy, new YeelightApi.Color(20, 20, 20), 'sudden');
   });
-  it('should do nothing because of the feature type is not handled yet', async () => {
+  it('does nothing because of the feature type is not handled yet', async () => {
     await yeelightService.device.setValue(GladysDevice, { category: 'light', type: 'not_handled' }, 90);
     assert.notCalled(setPowerSpy);
     assert.notCalled(setBrightSpy);
     assert.notCalled(setCtAbxSpy);
     assert.notCalled(setRGBSpy);
   });
-  it('should return Yeelight device not found error', async () => {
+  it('returns Yeelight device not found error', async () => {
     const notFoundDevice = {
       ...GladysDevice,
       params: [

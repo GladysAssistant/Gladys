@@ -1,8 +1,8 @@
 const Promise = require('bluebird');
 const { EventEmitter } = require('events');
-const yeelightColor = require('./yeelight-color.json');
-const yeelightWhite = require('./yeelight-white.json');
-const yeelightUnhandled = require('./yeelight-unhandled.json');
+const yeelightColor = require('./yeelight/color.json');
+const yeelightWhite = require('./yeelight/white.json');
+const yeelightUnhandled = require('./yeelight/unhandled.json');
 
 const DevicePropery = {
   POWER: 'power',
@@ -33,6 +33,12 @@ const devices = [yeelightColor, yeelightWhite, yeelightUnhandled];
 
 class Discover extends EventEmitter {
   start() {
+    this.test = 1; // useless, this is just for eslint
+    devices.forEach((device) => this.emit('deviceAdded', device));
+    return new Promise((resolve, _) => resolve(devices));
+  }
+
+  scanByIp() {
     this.test = 1; // useless, this is just for eslint
     devices.forEach((device) => this.emit('deviceAdded', device));
     return new Promise((resolve, _) => resolve(devices));

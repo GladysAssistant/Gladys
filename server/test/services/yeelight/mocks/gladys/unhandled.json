@@ -2,8 +2,8 @@
   "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
   "name": "Yeelight Unknown",
   "model": "unhandled",
-  "external_id": "yeelight:0x00000000035ac100",
-  "selector": "yeelight:0x00000000035ac100",
+  "external_id": "yeelight:0x0000000000000003",
+  "selector": "yeelight:0x0000000000000003",
   "should_poll": false,
   "features": [],
   "params": [
@@ -19,7 +19,7 @@
   "not_handled": true,
   "raw_yeelight_device": {
     "location": "yeelight://192.168.0.3:55443",
-    "id": "0x00000000035ac100",
+    "id": "0x0000000000000003",
     "model": "unhandled",
     "version": "76",
     "capabilities": [],

@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const GladysColorDevice = require('../../mocks/Gladys-color.json');
+const GladysColorDevice = require('../../mocks/gladys/color.json');
 const YeelightApi = require('../../mocks/yeelight.mock.test');
 
 const { assert, fake } = sinon;
@@ -23,23 +23,23 @@ describe('YeelightHandler poll', () => {
     sinon.reset();
   });
 
-  it('should poll device states', async () => {
+  it('polls device states', async () => {
     await yeelightService.device.poll(GladysColorDevice);
     assert.callCount(gladys.event.emit, 4);
     assert.calledWithExactly(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'yeelight:0x00000000035ac142:binary',
+      device_feature_external_id: 'yeelight:0x0000000000000001:binary',
       state: 0,
     });
     assert.calledWithExactly(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'yeelight:0x00000000035ac142:brightness',
+      device_feature_external_id: 'yeelight:0x0000000000000001:brightness',
       state: 50,
     });
     assert.calledWithExactly(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'yeelight:0x00000000035ac142:temperature',
+      device_feature_external_id: 'yeelight:0x0000000000000001:temperature',
       state: 4000,
     });
     assert.calledWithExactly(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'yeelight:0x00000000035ac142:color',
+      device_feature_external_id: 'yeelight:0x0000000000000001:color',
       state: 1315890,
     });
   });
