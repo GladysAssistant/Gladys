@@ -1,9 +1,9 @@
-import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
-import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import get from 'get-value';
+import { Component } from 'preact';
+import { Localizer, Text } from 'preact-i18n';
 import { Link } from 'preact-router';
+
+import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class YeelightDeviceBox extends Component {
   updateName = e => {
@@ -15,31 +15,21 @@ class YeelightDeviceBox extends Component {
   };
 
   saveDevice = async () => {
-    this.setState({
-      loading: true,
-      errorMessage: null
-    });
+    this.setState({ loading: true, errorMessage: null });
     try {
       await this.props.saveDevice(this.props.listName, this.props.deviceIndex);
     } catch (e) {
       let errorMessage = 'integration.yeelight.error.defaultError';
-      if (e.response.status === 409) {
+      if (e.response && e.response.status === 409) {
         errorMessage = 'integration.yeelight.error.conflictError';
       }
-      this.setState({
-        errorMessage
-      });
+      this.setState({ errorMessage });
     }
-    this.setState({
-      loading: false
-    });
+    this.setState({ loading: false });
   };
 
   deleteDevice = async () => {
-    this.setState({
-      loading: true,
-      errorMessage: null
-    });
+    this.setState({ loading: true, errorMessage: null });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
@@ -47,18 +37,16 @@ class YeelightDeviceBox extends Component {
         errorMessage: 'integration.yeelight.error.defaultDeletionError'
       });
     }
-    this.setState({
-      loading: false
-    });
+    this.setState({ loading: false });
   };
 
-  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
-    const validModel = device.features && device.features.length > 0;
+  render(props, { loading, errorMessage }) {
+    const validModel = props.device.features && props.device.features.length > 0;
 
     return (
       <div class="col-md-6">
         <div class="card">
-          <div class="card-header">{device.name}</div>
+          <div class="card-header">{props.device.name}</div>
           <div
             class={cx('dimmer', {
               active: loading
@@ -73,31 +61,31 @@ class YeelightDeviceBox extends Component {
                   </div>
                 )}
                 <div class="form-group">
-                  <label class="form-label" for={`name_${deviceIndex}`}>
+                  <label class="form-label" for={`name_${props.deviceIndex}`}>
                     <Text id="integration.yeelight.nameLabel" />
                   </label>
                   <Localizer>
                     <input
-                      id={`name_${deviceIndex}`}
+                      id={`name_${props.deviceIndex}`}
                       type="text"
-                      value={device.name}
+                      value={props.device.name}
                       onInput={this.updateName}
                       class="form-control"
                       placeholder={<Text id="integration.yeelight.namePlaceholder" />}
-                      disabled={!editable || !validModel}
+                      disabled={!props.editable || !validModel}
                     />
                   </Localizer>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for={`model_${deviceIndex}`}>
+                  <label class="form-label" for={`model_${props.deviceIndex}`}>
                     <Text id="integration.yeelight.modelLabel" />
                   </label>
                   <Localizer>
                     <input
-                      id={`model_${deviceIndex}`}
+                      id={`model_${props.deviceIndex}`}
                       type="text"
-                      value={device.model}
+                      value={props.device.model}
                       class="form-control"
                       disabled="true"
                     />
@@ -105,14 +93,14 @@ class YeelightDeviceBox extends Component {
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for={`ip_${deviceIndex}`}>
+                  <label class="form-label" for={`ip_${props.deviceIndex}`}>
                     <Text id="integration.yeelight.ipLabel" />
                   </label>
                   <Localizer>
                     <input
-                      id={`ip_${deviceIndex}`}
+                      id={`ip_${props.deviceIndex}`}
                       type="text"
-                      value={device.params.find(param => param.name === 'IP_ADDRESS').value}
+                      value={props.device.params.find(param => param.name === 'IP_ADDRESS').value}
                       class="form-control"
                       disabled="true"
                     />
@@ -120,23 +108,23 @@ class YeelightDeviceBox extends Component {
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for={`room_${deviceIndex}`}>
+                  <label class="form-label" for={`room_${props.deviceIndex}`}>
                     <Text id="integration.yeelight.roomLabel" />
                   </label>
                   <select
-                    id={`room_${deviceIndex}`}
+                    id={`room_${props.deviceIndex}`}
                     onChange={this.updateRoom}
                     class="form-control"
-                    disabled={!editable || !validModel}
+                    disabled={!props.editable || !validModel}
                   >
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {housesWithRooms &&
-                      housesWithRooms.map(house => (
+                    {props.housesWithRooms &&
+                      props.housesWithRooms.map(house => (
                         <optgroup label={house.name}>
                           {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
+                            <option selected={room.id === props.device.room_id} value={room.id}>
                               {room.name}
                             </option>
                           ))}
@@ -150,18 +138,7 @@ class YeelightDeviceBox extends Component {
                     <label class="form-label">
                       <Text id="integration.yeelight.device.featuresLabel" />
                     </label>
-                    <div class="tags">
-                      {device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    </div>
+                    <DeviceFeatures features={props.device.features} />
                   </div>
                 )}
 
@@ -197,7 +174,7 @@ class YeelightDeviceBox extends Component {
                   )}
 
                   {validModel && props.editButton && (
-                    <Link href={`/dashboard/integration/device/yeelight/edit/${device.selector}`}>
+                    <Link href={`/dashboard/integration/device/yeelight/edit/${props.device.selector}`}>
                       <button class="btn btn-secondary float-right">
                         <Text id="integration.yeelight.device.editButton" />
                       </button>

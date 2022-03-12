@@ -1,7 +1,7 @@
-import { Text, Localizer } from 'preact-i18n';
 import { Component } from 'preact';
-import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
-import get from 'get-value';
+import { Localizer, Text } from 'preact-i18n';
+
+import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class YeelightDeviceForm extends Component {
   updateName = e => {
@@ -80,21 +80,7 @@ class YeelightDeviceForm extends Component {
           <label class="form-label">
             <Text id="integration.yeelight.device.featuresLabel" />
           </label>
-          <div class="tags">
-            {props.device &&
-              props.device.features &&
-              props.device.features.map(feature => (
-                <span class="tag">
-                  <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                  <div class="tag-addon">
-                    <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
-                  </div>
-                </span>
-              ))}
-            {(!props.device.features || props.device.features.length === 0) && (
-              <Text id="integration.yeelight.device.noFeatures" />
-            )}
-          </div>
+          <DeviceFeatures features={props.device.features} />
         </div>
       </div>
     );

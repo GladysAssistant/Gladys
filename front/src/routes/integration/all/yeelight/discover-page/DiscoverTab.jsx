@@ -39,6 +39,7 @@ const DeviceTab = ({ children, ...props }) => (
           )}
           <div class="row">
             {props.discoveredDevices &&
+              props.discoveredDevices.length > 0 &&
               props.discoveredDevices.map((device, index) => (
                 <YeelightDeviceBox
                   {...props}
@@ -51,7 +52,7 @@ const DeviceTab = ({ children, ...props }) => (
                   listName="discoveredDevices"
                 />
               ))}
-            {!props.discoveredDevices || (props.discoveredDevices.length === 0 && <EmptyState />)}
+            {(!props.discoveredDevices || props.discoveredDevices.length === 0) && <EmptyState />}
           </div>
         </div>
       </div>

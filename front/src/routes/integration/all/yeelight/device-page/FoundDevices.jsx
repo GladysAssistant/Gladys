@@ -48,6 +48,7 @@ const FoundDevices = ({ children, ...props }) => (
               </div>
             )}
             {props.yeelightNewDevices &&
+              props.yeelightDevices.length > 0 &&
               props.yeelightNewDevices.map(device => (
                 <div class="col-md-4">
                   <div class="card">
@@ -69,7 +70,7 @@ const FoundDevices = ({ children, ...props }) => (
                   </div>
                 </div>
               ))}
-            {props.yeelightNewDevices && props.yeelightNewDevices.length === 0 && (
+            {(!props.yeelightNewDevices || props.yeelightNewDevices.length === 0) && (
               <Text id="integration.yeelight.device.noDevices" />
             )}
           </div>

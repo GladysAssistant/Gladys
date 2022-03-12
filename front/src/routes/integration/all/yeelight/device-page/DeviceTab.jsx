@@ -59,7 +59,7 @@ const DeviceTab = ({ children, ...props }) => (
                   listName="yeelightDevices"
                 />
               ))}
-            {!props.yeelightDevices || (props.yeelightDevices.length === 0 && <EmptyState />)}
+            {(!props.yeelightDevices || props.yeelightDevices.length === 0) && <EmptyState />}
           </div>
         </div>
       </div>
