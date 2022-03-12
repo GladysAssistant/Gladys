@@ -56,34 +56,28 @@ class TurnOnLight extends Component {
       </div>
     </div>
   );
-  getBinaryButtons = () => (
+  getBinaryButton = (category, value) => (
+    <div class="col-6">
+      <button
+        class={cx('btn', 'btn-block', 'p-1', {
+          'btn-primary': this.props.trigger.value === value,
+          'btn-outline-primary': this.props.trigger.value !== value,
+          active: this.props.trigger.value === value
+        })}
+        onClick={this.handleValueChangeBinary(value)}
+      >
+        <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
+          <Text id={`editScene.triggersCard.newState.${value ? 'on' : 'off'}`} />
+        </Text>
+      </button>
+    </div>
+  );
+  getBinaryButtons = category => (
     <div class="col-4">
       <div class="form-group">
         <div class="row">
-          <div class="col-6">
-            <button
-              class={cx('btn btn-block', {
-                'btn-primary': this.props.trigger.value === 1,
-                'btn-outline-primary': this.props.trigger.value !== 1,
-                active: this.props.trigger.value === 1
-              })}
-              onClick={this.handleValueChangeBinary(1)}
-            >
-              <Text id="editScene.triggersCard.newState.on" />
-            </button>
-          </div>
-          <div class="col-6">
-            <button
-              class={cx('btn btn-block', {
-                'btn-primary': this.props.trigger.value === 0,
-                'btn-outline-primary': this.props.trigger.value !== 0,
-                active: this.props.trigger.value === 0
-              })}
-              onClick={this.handleValueChangeBinary(0)}
-            >
-              <Text id="editScene.triggersCard.newState.off" />
-            </button>
-          </div>
+          {this.getBinaryButton(category, 1)}
+          {this.getBinaryButton(category, 0)}
         </div>
       </div>
     </div>
@@ -113,7 +107,7 @@ class TurnOnLight extends Component {
             this.getBinaryOperator()}
           {selectedDeviceFeature &&
             selectedDeviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
-            this.getBinaryButtons()}
+            this.getBinaryButtons(selectedDeviceFeature.category)}
           {selectedDeviceFeature &&
             selectedDeviceFeature.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR &&
             this.getPresenceSensor()}
