@@ -1837,6 +1837,13 @@
       }
     },
     "category": {
+      "opening-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Fermé",
+          "one": "Ouvert"
+        }
+      },
       "co-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
