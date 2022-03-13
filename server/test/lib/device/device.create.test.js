@@ -253,4 +253,71 @@ describe('Device', () => {
     expect(newDevice).to.have.property('features');
     expect(newDevice).to.have.property('params');
   });
+  it('should update device and remove polling', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceByExternalId', 'test-device-external', {
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'Test device',
+      selector: 'test-remove-poll',
+      params: [],
+    });
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
+    await device.create({
+      id: 'f3525782-f513-4068-9f64-f3429756f99d',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-remove-poll',
+      external_id: 'test-remove-poll',
+      should_poll: true,
+      poll_frequency: 60000,
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      features: [
+        {
+          name: 'On/Off',
+          external_id: 'philips-hue:1:binary',
+          category: 'light',
+          type: 'binary',
+          read_only: false,
+          keep_history: true,
+          has_feedback: false,
+          min: 0,
+          max: 1,
+        },
+      ],
+    });
+
+    expect(device.devicesByPollFrequency).to.have.key('60000');
+    expect(device.devicesByPollFrequency['60000']).to.have.lengthOf(1);
+
+    await device.create({
+      id: 'f3525782-f513-4068-9f64-f3429756f99d',
+      name: 'UPDATED_DEVICE',
+      selector: 'test-remove-poll',
+      external_id: 'test-remove-poll',
+      should_poll: false,
+      poll_frequency: 60000,
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      features: [
+        {
+          name: 'On/Off',
+          external_id: 'philips-hue:1:binary',
+          category: 'light',
+          type: 'binary',
+          read_only: false,
+          keep_history: true,
+          has_feedback: false,
+          min: 0,
+          max: 1,
+        },
+      ],
+    });
+
+    expect(device.devicesByPollFrequency['60000']).to.have.lengthOf(0);
+  });
 });
