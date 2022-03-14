@@ -1,7 +1,12 @@
+import pLimit from 'p-limit';
+
 export class GatewayHttpClient {
   constructor(session) {
     this.session = session;
     this.session.dispatcher.addListener('GLADYS_GATEWAY_CONNECTED', this.emptyQueue.bind(this));
+    // we only allow max 5 concurrent API call to Gladys Plus
+    // to avoid overloading the user instance
+    this.limiter = pLimit(5);
     this.queue = [];
   }
 
@@ -9,11 +14,12 @@ export class GatewayHttpClient {
     this.queue.forEach(func => {
       func();
     });
+    this.queue = [];
   }
 
   async callApi(func, url, data) {
     try {
-      const result = await this.session.gatewayClient[func](url, data);
+      const result = await this.limiter(() => this.session.gatewayClient[func](url, data));
       return result;
     } catch (e) {
       const error = {
