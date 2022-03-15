@@ -22,6 +22,7 @@ const gladys = {
     setValue: fake.resolves(true),
   },
   system: {
+    getGladysContainerId: fake.resolves('containerid'),
     getContainerMounts: fake.resolves([]),
   },
 };
