@@ -12,6 +12,7 @@
     "arm64"
   ],
   "dependencies": {
+    "lodash.clonedeep": "^4.5.0",
     "mqtt": "^4.0.0"
   }
 }
