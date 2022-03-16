@@ -5,8 +5,8 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 
 const DANGER_ON_VALUE_SENSORS = [DEVICE_FEATURE_CATEGORIES.CO_SENSOR];
 
-const BinaryDeviceValue = ({ feature }) => {
-  const { category, last_value: lastValue = null } = feature;
+const BinaryDeviceValue = ({ deviceFeature }) => {
+  const { category, last_value: lastValue = null } = deviceFeature;
   const reverseColors = DANGER_ON_VALUE_SENSORS.includes(category);
 
   const value = lastValue === null ? -1 : lastValue;
