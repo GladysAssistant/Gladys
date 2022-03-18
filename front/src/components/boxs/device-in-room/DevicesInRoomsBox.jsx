@@ -13,11 +13,16 @@ import {
 
 import DeviceRow from './DeviceRow';
 
-const enableSwithAll = feature => {
+const hasSwitchFeature = (device, featureSelectors) => {
+  return device.features.find(feature => isSwitchFeature(feature, featureSelectors));
+};
+
+const isSwitchFeature = (feature, featureSelectors) => {
   return (
     feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
     feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY &&
-    feature.read_only === false
+    feature.read_only === false &&
+    featureSelectors.includes(feature.selector)
   );
 };
 
@@ -30,11 +35,7 @@ const DeviceInRoomCard = ({ children, ...props }) => {
   const { roomName, boxData, loading, devices = [], box = {} } = props;
   const { device_features: featureSelectors = [] } = box;
 
-  const hasBinaryLightDeviceFeature =
-    devices
-      .flatMap(device => device.features)
-      .filter(feature => featureSelectors.indexOf(feature.selector) !== -1)
-      .filter(feature => enableSwithAll(feature)).length > 0;
+  const hasBinaryLightDeviceFeature = devices.find(device => hasSwitchFeature(device, featureSelectors)) !== undefined;
 
   return (
     <div class="card">
