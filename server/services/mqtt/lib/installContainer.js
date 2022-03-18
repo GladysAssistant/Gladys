@@ -1,3 +1,4 @@
+const cloneDeep = require('lodash.clonedeep');
 const logger = require('../../../utils/logger');
 const { exec } = require('../../../utils/childProcess');
 const { generate } = require('../../../utils/password');
@@ -34,7 +35,11 @@ async function installContainer(saveConfiguration = true) {
     logger.trace(brokerEnv);
 
     logger.info(`Creating container...`);
-    container = await this.gladys.system.createContainer(containerDescriptor);
+    const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+    // get the volume where Gladys container is mounted
+    const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
+    containerDescriptorToMutate.HostConfig.Binds = [`${basePathOnHost}/mosquitto:/mosquitto/config`];
+    container = await this.gladys.system.createContainer(containerDescriptorToMutate);
     logger.trace(container);
 
     logger.info('MQTT broker successfully installed as Docker container');
