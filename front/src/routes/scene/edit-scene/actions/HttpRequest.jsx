@@ -133,7 +133,17 @@ class HttpRequestAction extends Component {
     e.preventDefault();
     try {
       await this.setState({ error: false, pending: true });
-      const { data, headers } = await this.props.httpClient.post('/api/v1/http/request', this.props.action);
+      // format headers properly for the http request route
+      const newHeaders = {};
+      this.props.action.headers.forEach(header => {
+        newHeaders[header.key] = header.value;
+      });
+      const actionWithCorrectHeader = update(this.props.action, {
+        headers: {
+          $set: newHeaders
+        }
+      });
+      const { data, headers } = await this.props.httpClient.post('/api/v1/http/request', actionWithCorrectHeader);
       let responseData = data;
       const isJsonResponse = headers['content-type'].indexOf('application/json') !== -1;
       if (isJsonResponse) {
