@@ -686,6 +686,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_MQTT_DEVICE: 'tasmota.new-mqtt-device',
     NEW_HTTP_DEVICE: 'tasmota.new-http-device',
   },
+  TUYA: {
+    STATUS: 'tuya.status',
+  },
   BLUETOOTH: {
     STATE: 'bluetooth.status',
     DISCOVER: 'bluetooth.discover',

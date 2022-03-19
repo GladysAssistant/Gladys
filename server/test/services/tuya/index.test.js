@@ -1,9 +1,11 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
-const { assert } = sinon;
+const { assert, fake } = sinon;
 
-const TuyaHandlerMock = require('./mock/tuya.mock.test');
+const TuyaHandlerMock = sinon.stub();
+TuyaHandlerMock.prototype.init = fake.returns(null);
+TuyaHandlerMock.prototype.disconnect = fake.returns(null);
 
 const TuyaService = proxyquire('../../../services/tuya/index', { './lib': TuyaHandlerMock });
 
@@ -23,13 +25,13 @@ describe('TuyaService', () => {
 
   it('should start service', async () => {
     await tuyaService.start();
-    assert.calledOnce(tuyaService.device.connect);
+    assert.calledOnce(tuyaService.device.init);
     assert.notCalled(tuyaService.device.disconnect);
   });
 
   it('should stop service', async () => {
     tuyaService.stop();
-    assert.notCalled(tuyaService.device.connect);
+    assert.notCalled(tuyaService.device.init);
     assert.calledOnce(tuyaService.device.disconnect);
   });
 });

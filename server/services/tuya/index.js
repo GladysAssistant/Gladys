@@ -14,7 +14,7 @@ module.exports = function TuyaService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Tuya service');
-    await tuyaHandler.connect();
+    await tuyaHandler.init();
   }
 
   /**

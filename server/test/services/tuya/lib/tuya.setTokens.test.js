@@ -12,7 +12,7 @@ const gladys = {
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
-describe('TuyaHandler.saveTokens', () => {
+describe('TuyaHandler.setTokens', () => {
   const tuyaHandler = new TuyaHandler(gladys, serviceId);
 
   beforeEach(() => {
@@ -30,7 +30,7 @@ describe('TuyaHandler.saveTokens', () => {
       expire_time: 'expire',
     };
 
-    await tuyaHandler.saveTokens(tokens);
+    await tuyaHandler.setTokens(tokens);
 
     assert.callCount(gladys.variable.setValue, 2);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.ACCESS_TOKEN, 'access', serviceId);

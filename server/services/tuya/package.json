@@ -11,5 +11,8 @@
     "x64",
     "arm",
     "arm64"
-  ]
+  ],
+  "dependencies": {
+    "@tuya/tuya-connector-nodejs": "^2.1.2"
+  }
 }

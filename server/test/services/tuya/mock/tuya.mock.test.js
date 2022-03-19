@@ -1,11 +1,14 @@
-const { fake } = require('sinon');
+const sinon = require('sinon');
 
-const TuyaHandler = function TuyaHandler(gladys, serviceId) {
-  this.gladys = gladys;
-  this.serviceId = serviceId;
+const client = {
+  init: sinon.stub(),
 };
 
-TuyaHandler.prototype.connect = fake.returns(null);
-TuyaHandler.prototype.disconnect = fake.returns(null);
+const TuyaContext = function TuyaContext() {
+  this.client = client;
+};
 
-module.exports = TuyaHandler;
+module.exports = {
+  TuyaContext,
+  client,
+};
