@@ -33,6 +33,10 @@ describe('mqttHandler.installContainer', function Describe() {
       },
       system: {
         getNetworkMode: fake.rejects(error),
+        getGladysBasePath: fake.resolves({
+          basePathOnHost: '/var/lib/gladysassistant',
+          basePathOnContainer: '/var/lib/gladysassistant',
+        }),
       },
     };
 
@@ -67,6 +71,10 @@ describe('mqttHandler.installContainer', function Describe() {
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
         getNetworkMode: fake.resolves('host'),
+        getGladysBasePath: fake.resolves({
+          basePathOnHost: '/var/lib/gladysassistant',
+          basePathOnContainer: '/var/lib/gladysassistant',
+        }),
       },
       variable: {
         setValue: fake.resolves(true),
@@ -104,6 +112,10 @@ describe('mqttHandler.installContainer', function Describe() {
         exec: fake.resolves(true),
         restartContainer: fake.resolves(true),
         getNetworkMode: fake.resolves('host'),
+        getGladysBasePath: fake.resolves({
+          basePathOnHost: '/var/lib/gladysassistant',
+          basePathOnContainer: '/var/lib/gladysassistant',
+        }),
       },
       variable: {
         setValue: fake.resolves(true),
