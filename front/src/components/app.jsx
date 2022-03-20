@@ -80,6 +80,7 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import WithingsDevicePage from '../routes/integration/all/withings/device-page';
+import WithingsEditDevicePage from '../routes/integration/all/withings/edit-page';
 import WithingsSettingsPage from '../routes/integration/all/withings/settings-page';
 
 // MQTT integration
@@ -223,6 +224,7 @@ const AppRouter = connect(
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <WithingsDevicePage path="/dashboard/integration/health/withings/device" />
+        <WithingsEditDevicePage path="/dashboard/integration/health/withings/device/:deviceSelector" />
         <WithingsSettingsPage path="/dashboard/integration/health/withings/settings" />
         <Redirect path="/dashboard/integration/health/withings" to="/dashboard/integration/health/withings/device" />
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />

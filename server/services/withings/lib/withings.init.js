@@ -57,7 +57,7 @@ function buildNewDevice(withingsDevice, serviceId) {
   }
   newFeatures.push({
     id: uniqueBatFeatureId,
-    name: 'Battery',
+    name: 'deviceFeatureCategory.battery.shortCategoryName',
     selector: `withings-battery-${uniqueId}`,
     device_id: uniqueId,
     external_id: uniqueId,
@@ -122,95 +122,78 @@ function buildFeature(currentGroup, device, currentFeatures) {
       // Choose type of feature
       // (cf: https://developer.withings.com/api-reference#operation/measure-getmeas )
       let featureType;
-      let featureName;
       let featureUnit;
       switch (element.type) {
         case 1:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.WEIGHT;
-          featureName = 'Weight';
           featureUnit = DEVICE_FEATURE_UNITS.KILOGRAM;
           break;
         case 4:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.HEIGHT;
-          featureName = 'Height';
           featureUnit = DEVICE_FEATURE_UNITS.CENTIMETER;
           break;
         case 5:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.FAT_FREE_MASS;
-          featureName = 'Fat Free Mass';
           featureUnit = DEVICE_FEATURE_UNITS.KILOGRAM;
           break;
         case 6:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.FAT_RATIO;
-          featureName = 'Fat Ratio';
           featureUnit = DEVICE_FEATURE_UNITS.PERCENT;
           break;
         case 8:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.FAT_MASS_WEIGHT;
-          featureName = 'Fat Mass Weight';
           featureUnit = DEVICE_FEATURE_UNITS.KILOGRAM;
           break;
         case 9:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.DIASTOLIC_BLOOD_PRESSURE;
-          featureName = 'Diastolic Blood Pressure';
           featureUnit = DEVICE_FEATURE_UNITS.MERCURE_MILIMETER;
           break;
         case 10:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.SYSTOLIC_BLOOD_PRESSURE;
-          featureName = 'Systolic Blood Pressure';
           featureUnit = DEVICE_FEATURE_UNITS.MERCURE_MILIMETER;
           break;
         case 11:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.HEARTH_PULSE;
-          featureName = 'Heart Pulse';
           featureUnit = DEVICE_FEATURE_UNITS.BEATS_PER_MINUTE;
           break;
         case 12:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.TEMPERATURE;
-          featureName = 'Temperature';
           featureUnit = DEVICE_FEATURE_UNITS.CELSIUS;
           break;
         case 54:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.SPO2;
-          featureName = 'SpO2';
           featureUnit = DEVICE_FEATURE_UNITS.PERCENT;
           break;
         case 71:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.BODY_TEMPERATURE;
-          featureName = 'Body Temperature';
           featureUnit = DEVICE_FEATURE_UNITS.CELSIUS;
           break;
         case 73:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.SKIN_TEMPERATURE;
-          featureName = 'Skin Temperature';
           featureUnit = DEVICE_FEATURE_UNITS.CELSIUS;
           break;
         case 76:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.MUSCLE_MASS;
-          featureName = 'Muscle Mass';
           featureUnit = DEVICE_FEATURE_UNITS.KILOGRAM;
           break;
         case 77:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.HYDRATION;
-          featureName = 'Hydration';
           featureUnit = DEVICE_FEATURE_UNITS.KILOGRAM;
           break;
         case 88:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.BONE_MASS;
-          featureName = 'Bone Mass';
           featureUnit = DEVICE_FEATURE_UNITS.KILOGRAM;
           break;
         case 91:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.PULSE_WAVE_VELOCITY;
-          featureName = 'Pulse Wave Velocity';
           featureUnit = DEVICE_FEATURE_UNITS.METER_PER_SECOND;
           break;
         default:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.UNKNOWN;
-          featureName = 'Unknown';
           featureUnit = '';
           break;
       }
+      const featureName = `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.HEALTH}.${featureType}`;
 
       // Search existing feature
       let tmpFeature = features.find((feat) => feat.type === featureType);

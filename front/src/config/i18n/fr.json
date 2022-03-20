@@ -900,7 +900,8 @@
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "createDeviceInGladys": "Connecter dans Gladys",
-        "deleteDeviceInGladys": "Déconnecter de Gladys"
+        "deleteDeviceInGladys": "Déconnecter de Gladys",
+        "editButton": "Editer"
       },
       "title": "Withings",
       "description": "Synchronisez vos appareils Withings.",
@@ -1903,6 +1904,7 @@
     "notFound": "Appareil recherché introuvable.",
     "pollFrequency": {
       "label": "Fréquence de rafraîchissement",
+      "everyDays": "Tous les jours",
       "everyMinutes": "Toutes les minutes (recommandé)",
       "every30Seconds": "Toutes les 30 secondes",
       "every10Seconds": "Toutes les 10 secondes",

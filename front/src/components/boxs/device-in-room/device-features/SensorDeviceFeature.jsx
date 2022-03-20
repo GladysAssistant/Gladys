@@ -25,7 +25,7 @@ const SensorDeviceType = ({ children, ...props }) => (
         )}`}
       />
     </td>
-    <td>{props.deviceFeature.name}</td>
+    <td><Text id={props.deviceFeature.name} >{props.deviceFeature.name}</Text></td>
     {SPECIAL_SENSORS.indexOf(props.deviceFeature.category) === -1 && (
       <td class="text-right">
         {DEVICE_FEATURE_TYPES.SENSOR.BINARY === props.deviceFeature.type && (

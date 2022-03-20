@@ -3,13 +3,15 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
 import dayjs from 'dayjs';
+import { Link } from 'preact-router';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { WithingsDeviceImgByModel } from './withingsConsts';
 
 dayjs.extend(relativeTime);
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
-import { RequestStatus, DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
+import { RequestStatus } from '../../../../../utils/consts';
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 class WithingsDeviceBox extends Component {
   refreshDeviceProperty = () => {
@@ -128,23 +130,7 @@ class WithingsDeviceBox extends Component {
                   <label>
                     <Text id="integration.withings.device.featuresLabel" />
                   </label>
-                  <div class="tags">
-                    {props.device &&
-                      props.device.features &&
-                      props.device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    {(!props.device.features || props.device.features.length === 0) && (
-                      <Text id="integration.withings.device.noFeatures" />
-                    )}
-                  </div>
+                  <DeviceFeatures features={props.device.features} />
                   {!props.forConnect && (
                     <p class="mt-4">
                       {mostRecentValueAt ? (
@@ -181,6 +167,11 @@ class WithingsDeviceBox extends Component {
                       <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                         <Text id="integration.withings.device.deleteButton" />
                       </button>
+                      <Link href={`/dashboard/integration/health/withings/device/${props.device.selector}`}>
+                        <button class="btn btn-secondary float-right">
+                          <Text id="integration.withings.device.editButton" />
+                        </button>
+                      </Link>
                     </>
                   )}
                 </div>

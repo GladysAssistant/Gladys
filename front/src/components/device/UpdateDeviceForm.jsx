@@ -60,6 +60,9 @@ class UpdateDeviceForm extends Component {
               <Text id="editDeviceForm.pollFrequency.label" />
             </label>
             <select onChange={this.updatePollFrequency} value={props.device.poll_frequency} class="form-control">
+              <option value={DEVICE_POLL_FREQUENCIES.EVERY_DAY}>
+                <Text id="editDeviceForm.pollFrequency.everyDays" />
+              </option>
               <option value={DEVICE_POLL_FREQUENCIES.EVERY_MINUTES}>
                 <Text id="editDeviceForm.pollFrequency.everyMinutes" />
               </option>
