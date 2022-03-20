@@ -14,7 +14,12 @@ const STATUS = {
   DISCOVERING_DEVICES: 'discovering',
 };
 
+const API = {
+  VERSION: '/v1.2/iot-03',
+};
+
 module.exports = {
   GLADYS_VARIABLES,
   STATUS,
+  API,
 };

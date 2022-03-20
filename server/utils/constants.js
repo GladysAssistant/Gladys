@@ -688,6 +688,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   TUYA: {
     STATUS: 'tuya.status',
+    DISCOVER: 'tuya.discover',
   },
   BLUETOOTH: {
     STATE: 'bluetooth.status',
