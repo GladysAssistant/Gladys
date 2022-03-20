@@ -56,6 +56,6 @@ module.exports = function WithingsService(gladys, serviceId) {
     start,
     stop,
     device: withingsHandler,
-    controllers: WithingsController(withingsHandler),
+    controllers: WithingsController(gladys, withingsHandler),
   });
 };
