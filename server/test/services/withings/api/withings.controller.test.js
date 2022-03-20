@@ -11,7 +11,7 @@ const withingsHandler = {
 const gladys = {
   device: {
     getBySelector: fake.resolves(null),
-  }
+  },
 };
 
 describe('WithingsController POST /api/v1/service/withings/init', () => {

@@ -9,7 +9,7 @@ const WITHINGS_PAGE_PATH = '/dashboard/integration/health/withings/device';
 class WithingsEditDevicePage extends Component {
   render(props, {}) {
     return (
-      <WithingsPage user={props.user} {...props} >
+      <WithingsPage user={props.user} {...props}>
         <UpdateDevice
           {...props}
           integrationName="withings"

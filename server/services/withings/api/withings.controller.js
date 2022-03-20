@@ -21,7 +21,7 @@ module.exports = function WithingsController(gladys, withingsHandler) {
    * @apiGroup Withings
    */
   async function poll(req, res) {
-    if(req.params.device_selector){
+    if (req.params.device_selector) {
       const deviceToPoll = await gladys.device.getBySelector(req.params.device_selector);
       await withingsHandler.poll(deviceToPoll);
     }
