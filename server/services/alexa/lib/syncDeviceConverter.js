@@ -11,9 +11,11 @@ function syncDeviceConverter(device) {
   const endpoint = {
     endpointId: device.selector,
     friendlyName: device.name,
+    manufacturerName: 'Gladys Assistant',
+    description: device.name,
+    additionalAttributes: {},
     displayCategories: [],
     capabilities: [],
-    connections: [],
   };
 
   // We create a unique map of device features
@@ -42,6 +44,13 @@ function syncDeviceConverter(device) {
   if (endpoint.capabilities.length === 0) {
     return null;
   }
+
+  endpoint.capabilities.push({
+    type: 'AlexaInterface',
+    interface: 'Alexa',
+    version: '3',
+  });
+
   // otherwise, return the full endpoint
   return endpoint;
 }
