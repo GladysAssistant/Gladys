@@ -1,3 +1,4 @@
+const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 const { exec } = require('../../../utils/childProcess');
 const { CONFIGURATION } = require('./constants');
@@ -27,21 +28,22 @@ async function installZ2mContainer() {
 
       // Prepare Z2M env
       logger.info(`Preparing Zigbee2mqtt environment...`);
-      const { basePathOnContainer, basePathOnHost } = await this.basePath();
+      const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
       const mqttUser = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
       const mqttPass = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, this.serviceId);
       const brokerEnv = await exec(
         `sh ./services/zigbee2mqtt/docker/gladys-z2m-zigbee2mqtt-env.sh ${basePathOnContainer} ${mqttUser} "${mqttPass}"`,
       );
       logger.trace(brokerEnv);
-      containerDescriptor.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/z2m:/app/data`);
+      containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/z2m:/app/data`);
 
       const driverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);
       logger.info(`Configuration of Device ${driverPath}`);
-      containerDescriptor.HostConfig.Devices[0].PathOnHost = driverPath;
+      containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = driverPath;
 
       logger.info(`Creation of container...`);
-      const containerLog = await this.gladys.system.createContainer(containerDescriptor);
+      const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerLog);
       logger.info('Zigbee2mqtt successfully installed and configured as Docker container');
       this.zigbee2mqttExist = true;

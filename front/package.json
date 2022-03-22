@@ -59,6 +59,7 @@
     "immutability-helper": "^3.1.1",
     "leaflet": "^1.7.1",
     "linkstate": "^1.1.1",
+    "p-limit": "^4.0.0",
     "preact": "^10.5.14",
     "preact-cli-plugin-fast-async": "^1.0.1",
     "preact-i18n": "^2.4.0-preactx",
