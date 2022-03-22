@@ -1810,6 +1810,12 @@
     "speed-sensor": {
       "shortCategoryName": "Capteur de vitesse"
     },
+    "precipitation-sensor": {
+      "shortCategoryName": "Capteur de précipitations"
+    },
+    "uv-sensor": {
+      "shortCategoryName": "Capteur d'UV"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
