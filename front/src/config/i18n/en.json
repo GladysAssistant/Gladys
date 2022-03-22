@@ -1554,36 +1554,74 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
+    "kelvin": "Kelvin (K)",
     "percent": "Percent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "bar": "Bar",
+    "psi": "Pound-force per square inch (psi)",
     "lux": "Lux",
+    "ppm": "Parts per million (ppm)",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
     "kilowatt-hour": "Kilowatt hour (kWh)",
+    "megawatt-hour": "Megawatt hour (MWh)",
     "ampere": "Ampere (A)",
+    "milliampere": "Milliampere (mA)",
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
-    "ppm": "Parts per million (ppm)",
+    "volt-ampere": "Voltampere (VA)",
+    "volt-ampere-reactive": "Voltampere reactive (var)",
+    "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
-    "mm": "Millimeter (mm)"
+    "m": "Meter (m)",
+    "km": "Kilometer (km)",
+    "degree": "Angular degree (°)",
+    "liter": "Liter (l)",
+    "milliliter": "Milliliter (ml)",
+    "cubicmeter": "Cubic meter (m3)",
+    "euro": "Euro (€)",
+    "dollar": "Dollar ($)",
+    "meter-per-second": "Meter per second (m/s)",
+    "kilometer-per-hour": "Kilometer per hour (km/h)",
+    "millimeter-per-hour": "Millimeter per hour (mm/h)",
+    "uv-index": "UV Index"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
+    "kelvin": "K",
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "bar": "bar",
+    "psi": "psi",
     "lux": "lx",
+    "ppm": "ppm",
     "watt": "W",
     "kilowatt": "kW",
     "kilowatt-hour": "kWh",
+    "megawatt-hour": "MWh",
     "ampere": "A",
+    "milliampere": "mA",
     "millivolt": "mV",
     "volt": "V",
-    "ppm": "ppm",
+    "volt-ampere": "VA",
+    "volt-ampere-reactive": "var",
+    "mm": "mm",
     "cm": "cm",
-    "mm": "mm"
+    "m": "m",
+    "km": "km",
+    "degree": "°",
+    "liter": "l",
+    "milliliter": "ml",
+    "cubicmeter": "m3",
+    "euro": "€",
+    "dollar": "$",
+    "meter-per-second": "m/s",
+    "kilometer-per-hour": "km/h",
+    "millimeter-per-hour": "mm/h",
+    "uv-index": "UV Index"
   },
   "deviceFeatureValue": {
     "type": {
@@ -1756,6 +1794,18 @@
       "pause": "Pause",
       "stop": "Stop",
       "record": "Record"
+    },
+    "energy-sensor": {
+      "shortCategoryName": "Energy sensor"
+    },
+    "volume-sensor": {
+      "shortCategoryName": "Volume sensor"
+    },
+    "currency": {
+      "shortCategoryName": "Currency"
+    },
+    "speed-sensor": {
+      "shortCategoryName": "Speed sensor"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
