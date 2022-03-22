@@ -19,6 +19,7 @@ import HttpRequest from './actions/HttpRequest';
 import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
+import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -41,15 +42,19 @@ const ACTION_ICON = {
   [ACTIONS.SCENE.START]: 'fe fe-fast-forward',
   [ACTIONS.HOUSE.IS_EMPTY]: 'fe fe-home',
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
-  [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio'
+  [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar'
 };
 
 const ActionCard = ({ children, ...props }) => (
   <div
     class={cx({
       'col-lg-12': props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF,
-      'col-lg-6': props.action.type === ACTIONS.MESSAGE.SEND,
-      'col-lg-4': props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF && props.action.type !== ACTIONS.MESSAGE.SEND
+      'col-lg-6': props.action.type === ACTIONS.MESSAGE.SEND || props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+      'col-lg-4':
+        props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
+        props.action.type !== ACTIONS.MESSAGE.SEND &&
+        props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING
     })}
   >
     <div class="card">
@@ -139,6 +144,7 @@ const ActionCard = ({ children, ...props }) => (
             updateActionProperty={props.updateActionProperty}
             actionsGroupsBefore={props.actionsGroupsBefore}
             variables={props.variables}
+            triggersVariables={props.triggersVariables}
           />
         )}
         {props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF && (
@@ -237,6 +243,16 @@ const ActionCard = ({ children, ...props }) => (
             columnIndex={props.columnIndex}
             index={props.index}
             updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING && (
+          <CalendarIsEventRunning
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+            variables={props.variables}
+            setVariables={props.setVariables}
           />
         )}
       </div>

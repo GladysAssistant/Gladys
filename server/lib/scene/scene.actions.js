@@ -149,28 +149,55 @@ const actionsFunc = {
   },
   [ACTIONS.CONDITION.CHECK_TIME]: async (self, action, scope) => {
     const now = dayjs.tz(dayjs(), self.timezone);
+    let beforeDate;
+    let afterDate;
+    let isBeforeCondition = true;
+    let isAfterCondition = true;
+
     if (action.before) {
-      const beforeDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.before}`, self.timezone);
-      const isBeforeCondition = now.isBefore(beforeDate);
+      beforeDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.before}`, self.timezone);
+      isBeforeCondition = now.isBefore(beforeDate);
       if (!isBeforeCondition) {
         logger.debug(
-          `Check time before: ${now.format('HH:mm')} > ${beforeDate.format('HH:mm')} condition is not verified.`,
+          `Check time before: ${now.format('HH:mm')} < ${beforeDate.format('HH:mm')} condition is not verified.`,
         );
-        throw new AbortScene('CONDITION_IS_BEFORE_HOUR_NOT_VERIFIED');
       } else {
         logger.debug(`Check time before: ${now.format('HH:mm')} < ${beforeDate.format('HH:mm')} condition is valid.`);
       }
     }
     if (action.after) {
-      const afterDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.after}`, self.timezone);
-      const isAfterCondition = now.isAfter(afterDate);
+      afterDate = dayjs.tz(`${now.format('YYYY-MM-DD')} ${action.after}`, self.timezone);
+      isAfterCondition = now.isAfter(afterDate);
       if (!isAfterCondition) {
         logger.debug(
           `Check time after: ${now.format('HH:mm')} > ${afterDate.format('HH:mm')} condition is not verified.`,
         );
-        throw new AbortScene('CONDITION_IS_AFTER_HOUR_NOT_VERIFIED');
       } else {
         logger.debug(`Check time after: ${now.format('HH:mm')} > ${afterDate.format('HH:mm')} condition is valid.`);
+      }
+    }
+
+    // if the afterDate is not before the beforeDate
+    // It means the user is trying to do a cross-day time check
+    // Example: AFTER 23:00 and BEFORE 8:00.
+    // This means H > 23 OR h < 8
+    // Putting a AND has no sense because it'll simply not work
+    // Example: H > 23 AND H < 8 is always wrong.
+    if (action.before && action.after && !afterDate.isBefore(beforeDate)) {
+      // So the condition is a OR in this case
+      const conditionVerified = isBeforeCondition || isAfterCondition;
+      if (!conditionVerified) {
+        throw new AbortScene('CONDITION_BEFORE_OR_AFTER_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time: Condition OR verified.`);
+      }
+    } else {
+      // Otherwise, the condition is a AND
+      const conditionVerified = isBeforeCondition && isAfterCondition;
+      if (!conditionVerified) {
+        throw new AbortScene('CONDITION_BEFORE_AND_AFTER_NOT_VERIFIED');
+      } else {
+        logger.debug(`Check time: Condition AND verified.`);
       }
     }
     if (action.days_of_the_week) {
@@ -242,6 +269,44 @@ const actionsFunc = {
       );
       logger.info(`CheckUserPresence action: Set "${action.user}" to left home of house "${action.house}"`);
       await self.house.userLeft(action.house, action.user);
+    }
+  },
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: async (self, action, scope, columnIndex, rowIndex) => {
+    // find if one event match the condition
+    const events = await self.calendar.findCurrentlyRunningEvent(
+      action.calendars,
+      action.calendar_event_name_comparator,
+      action.calendar_event_name,
+    );
+
+    const atLeastOneEventFound = events.length > 0;
+    // If one event was found, and the scene should be stopped in that case
+    if (atLeastOneEventFound && action.stop_scene_if_event_found === true) {
+      throw new AbortScene('EVENT_FOUND');
+    }
+    // If no event was found, and the scene should be stopped in that case
+    if (!atLeastOneEventFound && action.stop_scene_if_event_not_found === true) {
+      throw new AbortScene('EVENT_NOT_FOUND');
+    }
+
+    // set variable
+    if (atLeastOneEventFound) {
+      const eventRaw = events[0];
+      const eventFormatted = {
+        name: eventRaw.name,
+        location: eventRaw.location,
+        start: dayjs(eventRaw.start)
+          .tz(self.timezone)
+          .locale(eventRaw.calendar.creator.language)
+          .format('LLL'),
+        end: dayjs(eventRaw.end)
+          .tz(self.timezone)
+          .locale(eventRaw.calendar.creator.language)
+          .format('LLL'),
+      };
+      set(scope, `${columnIndex}.${rowIndex}`, {
+        calendarEvent: eventFormatted,
+      });
     }
   },
 };

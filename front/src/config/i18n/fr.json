@@ -39,7 +39,8 @@
     "date": "date",
     "time": "heure",
     "event": "événement",
-    "noEventsInRange": "Aucuns évènements trouvés dans cette période."
+    "noEventsInRange": "Aucuns évènements trouvés dans cette période.",
+    "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
     "noFeatures": "Aucune fonctionnalité"
@@ -309,9 +310,11 @@
       "title": "CalDAV",
       "accountTab": "Compte",
       "syncTab": "Synchronisation",
+      "shareTab": "Partage",
       "description": "Synchonisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
+      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de Gladys.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
@@ -367,7 +370,7 @@
       "synchronizationRequestChangesError": "Impossible de récupérer les changements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationRequestEventsError": "Impossible de récupérer les détails des évènements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationNeeded": "Une première synchronisation est nécessaire pour lister les calendriers.",
-      "calendarChoiceSuccess": "Choix des calendriers enregistré avec succès.",
+      "calendarChoiceSuccess": "Choix enregistrés avec succès.",
       "calendarChoiceError": "Une erreur est survenue lors de la sauvegarde.",
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",
@@ -487,6 +490,7 @@
       "testConnectionButton": "Tester",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
+      "rotate180Label": "Rotation 180°",
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
       "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
     },
@@ -794,7 +798,10 @@
         "readOnlyLabel": "Est-ce un capteur ?",
         "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
         "addButton": "Ajouter une fonctionnalité",
-        "mqttTopicExampleLabel": "Topic MQTT",
+        "mqttTopicToPublishExampleLabel": "Topic MQTT pour publier",
+        "mqttTopicToPublishExampleDescription": "Gladys écoute ce topic. Si vous publiez une valeur dedans, Gladys l'associera à cette fonctionnalité. ( voir <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a> )",
+        "mqttTopicToListenExampleLabel": "Topic MQTT à écouter",
+        "mqttTopicToListenExampleDescription": "Gladys publiera un message dans ce topic si cet appareil est contrôlé depuis Gladys. Vous devez écouter ce topic. ( voir <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a> )",
         "copyMqttTopic": "Copier le topic MQTT",
         "copied": "Copié !",
         "copyFailed": "Erreur lors de la copie",
@@ -1023,9 +1030,22 @@
         "houseIsEmptyDescription": "Si la maison est vide, cette scène continuera. Sinon, la scène s'arrêtera.",
         "houseIsNotEmptyDescription": "Si la maison n'est pas vide, cette scène continuera. Sinon, la scène s'arrêtera.",
         "houseLabel": "Maison"
+      },
+      "calendarEventIsRunning": {
+        "description": "Cette action vous permet de stopper une scène si un évènement est actuellement en cours ou si au contraire aucun n'évènement n'est en cours. Cette condition ne cherche que dans les calendriers partagés.",
+        "calendarLabel": "Dans les calendriers partagés suivants",
+        "nameLabel": "Si le nom",
+        "namePlaceholder": "Entrez un nom",
+        "whenFoundLabel": "Si un évènement est trouvé",
+        "whenNotFoundLabel": "Si aucun évènement n'est trouvé",
+        "stopScene": "Arrêter la scène",
+        "continueScene": "Continuer la scène"
       }
     },
     "actions": {
+      "calendar": {
+        "is-event-running": "Condition sur un évènement d'un calendrier"
+      },
       "device": {
         "get-value": "Récupérer le dernier état",
         "set-value": "Contrôler un appareil"
@@ -1071,6 +1091,12 @@
         "get-value": {
           "last_value": "Dernière valeur de l'appareil"
         }
+      },
+      "calendar": {
+        "eventName": "Nom de l'évènement",
+        "eventLocation": "Lieu de l'évènement",
+        "eventStart": "Date de début",
+        "eventEnd": "Date de fin"
       }
     },
     "triggers": {
@@ -1093,6 +1119,9 @@
       "area": {
         "user-entered": "Utilisateur entre dans la zone",
         "user-left": "Utilisateur quitte la zone"
+      },
+      "calendar": {
+        "event-is-coming": "Un évènement dans le calendrier arrive"
       }
     },
     "triggersCard": {
@@ -1159,6 +1188,24 @@
         "userLeftDescription": "Ce déclencheur lancera la scène dès que l'utilisateur sélectionné quittera la zone sélectionnée. Vous pouvez créer des zones dans l'onglet plans.",
         "userLabel": "Utilisateur",
         "areaLabel": "Zone"
+      },
+      "calendarEventIsComing": {
+        "description": "Ce déclencheur lancera la scène lorsqu'un évènement dans l'un des calendriers sélectionnés répondra aux différentes contraintes. Seuls les calendriers partagés sont affichés.",
+        "calendarLabel": "Dans les calendriers partagés suivants",
+        "nameLabel": "Si le nom",
+        "isExactly": "est exactement",
+        "contains": "contient",
+        "startsWith": "commence par",
+        "endsWith": "finit par",
+        "hasAnyName": "a n'importe quel nom",
+        "namePlaceholder": "Texte",
+        "durationName": "Et l'évènement",
+        "startingIn": "commence dans",
+        "endingIn": "finit dans",
+        "durationPlaceholder": "Durée",
+        "minute": "minutes",
+        "hour": "heures",
+        "day": "jours"
       }
     }
   },
@@ -1348,6 +1395,8 @@
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Statut",
+    "previous": "Précédent",
+    "next": "Suivant",
     "jobTypes": {
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
@@ -1669,6 +1718,7 @@
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
+      "binary": "Vibration (Oui/Non)",
       "status": "Etat",
       "tilt-angle": "Angle d'inclinaison",
       "acceleration-x": "Accélération X",

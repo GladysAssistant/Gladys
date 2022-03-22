@@ -17,13 +17,15 @@ async function newMessage(msg) {
   const telegramUserId = msg.from.id;
   const telegramChatId = msg.chat.id;
 
+  const telegramUserIdString = telegramUserId.toString();
+
   if (msg.text.startsWith('/start')) {
     const splitted = msg.text.split(' ');
-    await this.linkUser(splitted[1], telegramUserId);
+    await this.linkUser(splitted[1], telegramUserIdString);
     return null;
   }
 
-  const user = await this.gladys.user.getByTelegramUserId(telegramUserId);
+  const user = await this.gladys.user.getByTelegramUserId(telegramUserIdString);
 
   const message = {
     source: 'telegram',

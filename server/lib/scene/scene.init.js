@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, EVENTS } = require('../../utils/constants');
 const logger = require('../../utils/logger');
 
 /**
@@ -32,6 +32,9 @@ async function init() {
 
   this.schedule.scheduleJob(rule, this.dailyUpdate.bind(this));
   await this.dailyUpdate();
+
+  //  At every minute, check if calendar event is coming
+  this.schedule.scheduleJob('* * * * *', () => this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING));
 
   return plainScenes;
 }

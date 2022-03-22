@@ -18,7 +18,15 @@ function add(device) {
     if (!this.devicesByPollFrequency[device.poll_frequency]) {
       this.devicesByPollFrequency[device.poll_frequency] = [];
     }
-    this.devicesByPollFrequency[device.poll_frequency].push(device);
+    // we only add the device to the poll frequency if the device was not in
+    const deviceAlreadyInFrequencyIndex = this.devicesByPollFrequency[device.poll_frequency].findIndex(
+      (d) => d.id === device.id,
+    );
+    if (deviceAlreadyInFrequencyIndex === -1) {
+      this.devicesByPollFrequency[device.poll_frequency].push(device);
+    } else {
+      this.devicesByPollFrequency[device.poll_frequency][deviceAlreadyInFrequencyIndex] = device;
+    }
 
     // foreach frequency
     Object.keys(DEVICE_POLL_FREQUENCIES).forEach((frequency) => {

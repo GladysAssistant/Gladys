@@ -63,6 +63,7 @@ async function create(device) {
   delete device.params;
 
   let actionEvent = EVENTS.DEVICE.CREATE;
+  let oldPollFrequency = null;
 
   // we execute the whole insert in a transaction to avoir inconsistent state
   await db.sequelize.transaction(async (transaction) => {
@@ -80,6 +81,7 @@ async function create(device) {
       deviceInDb = await db.Device.create(device, { transaction });
     } else {
       actionEvent = EVENTS.DEVICE.UPDATE;
+      oldPollFrequency = deviceInDb.poll_frequency;
 
       // or update it
       await deviceInDb.update(device, { transaction });
@@ -155,6 +157,16 @@ async function create(device) {
   // if the new device should be polled, poll
   if (newDevice.should_poll) {
     this.poll(newDevice);
+  }
+  const pollingWasDisabled = newDevice.should_poll === false && oldPollFrequency;
+  const pollingWasUpdated = oldPollFrequency !== newDevice.poll_frequency;
+  if (oldPollFrequency && (pollingWasDisabled || pollingWasUpdated)) {
+    // Remove from poll
+    const { [oldPollFrequency]: devices } = this.devicesByPollFrequency;
+    const deviceIndex = devices.findIndex((d) => d.external_id === device.external_id);
+    if (deviceIndex !== -1) {
+      devices.splice(deviceIndex, 1);
+    }
   }
 
   // notify device is succesfully created or updated
