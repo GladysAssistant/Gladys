@@ -3,7 +3,7 @@ import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import ColorDeviceFeature from './device-features/ColorDeviceFeature';
-import SensorDeviceFeature from './device-features/SensorDeviceFeature';
+import SensorDeviceFeature from './device-features/sensor-value/SensorDeviceFeature';
 import LightTemperatureDeviceFeature from './device-features/LightTemperatureDeviceFeature';
 import MultiLevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 import NumberDeviceFeature from './device-features/NumberDeviceFeature';

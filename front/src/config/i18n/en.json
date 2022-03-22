@@ -1803,6 +1803,7 @@
     },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
+      "binary": "Vibrate (yes/no)",
       "status": "Status",
       "tilt-angle": "Tilt Angle",
       "acceleration-x": "Acceleration X",

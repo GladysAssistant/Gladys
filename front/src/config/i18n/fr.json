@@ -1803,6 +1803,7 @@
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
+      "binary": "Vibration (Oui/Non)",
       "status": "Etat",
       "tilt-angle": "Angle d'inclinaison",
       "acceleration-x": "Accélération X",
