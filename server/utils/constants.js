@@ -323,6 +323,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SIGNAL: 'signal',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   TELEVISION: 'television',
+  ENERGY_SENSOR: 'energy-sensor',
   UNKNOWN: 'unknown',
 };
 
@@ -419,21 +420,46 @@ const DEVICE_FEATURE_TYPES = {
 };
 
 const DEVICE_FEATURE_UNITS = {
+  // Temperature units
   CELSIUS: 'celsius',
   FAHRENHEIT: 'fahrenheit',
+  KELVIN: 'kelvin',
+  // Percentage units
   PERCENT: 'percent',
-  HECTO_PASCAL: 'hPa',
+  // Pressure units
   PASCAL: 'pascal',
+  HECTO_PASCAL: 'hPa',
+  BAR: 'bar',
+  PSI: 'psi',
+  // Light units
   LUX: 'lux',
+  // Concentration units
+  PPM: 'ppm',
+  // Power units
   WATT: 'watt',
   KILOWATT: 'kilowatt',
   KILOWATT_HOUR: 'kilowatt-hour',
+  MEGAWATT_HOUR: 'megawatt-hour',
   AMPERE: 'ampere',
+  MILLI_AMPERE: 'milliampere',
   MILLI_VOLT: 'millivolt',
   VOLT: 'volt',
-  PPM: 'ppm',
+  VOLT_AMPERE: 'volt-ampere',
+  VOLT_AMPERE_REACTIVE: 'volt-ampere-reactive',
+  // Length units
   MM: 'mm',
   CM: 'cm',
+  M: 'm',
+  KM: 'km',
+  // Degree units
+  DEGREE: 'degree',
+  // Volume units
+  LITER: 'liter',
+  MILLILITER: 'milliliter',
+  CUBIC_METER: 'cubicmeter',
+  // Currency units
+  EURO: 'euro',
+  DOLLAR: 'dollar',
 };
 
 const WEATHER_UNITS = {
@@ -460,6 +486,18 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.DEVICE_TEMPERATURE_SENSOR]: [
     DEVICE_FEATURE_UNITS.CELSIUS,
     DEVICE_FEATURE_UNITS.FAHRENHEIT,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MILLI_AMPERE,
+    DEVICE_FEATURE_UNITS.AMPERE,
+    DEVICE_FEATURE_UNITS.MILLI_VOLT,
+    DEVICE_FEATURE_UNITS.VOLT,
+    DEVICE_FEATURE_UNITS.WATT,
+    DEVICE_FEATURE_UNITS.KILOWATT,
+    DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+    DEVICE_FEATURE_UNITS.MEGAWATT_HOUR,
+    DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+    DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
   ],
 };
 
