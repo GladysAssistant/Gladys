@@ -118,7 +118,7 @@ describe('Device.saveState', () => {
     }
     await Promise.all(promises);
   });
-  it.only('should not save NaN as state', async () => {
+  it('should not save NaN as state', async () => {
     const event = {
       on: stub().returns(null),
     };
