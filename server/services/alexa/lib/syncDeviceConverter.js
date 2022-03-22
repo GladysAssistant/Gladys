@@ -1,5 +1,5 @@
 const get = require('get-value');
-const mappings = require('./deviceMappings');
+const { mappings } = require('./deviceMappings');
 
 /**
  * @description Format a Gladys device the Alexa way

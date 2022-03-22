@@ -22,4 +22,12 @@ const mappings = {
   },
 };
 
-module.exports = mappings;
+const readValues = {
+  [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
+    [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (value) => {
+      return value === 1 ? 'ON' : 'OFF';
+    },
+  },
+};
+
+module.exports = { mappings, readValues };

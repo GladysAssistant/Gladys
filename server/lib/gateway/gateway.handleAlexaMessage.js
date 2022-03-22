@@ -32,9 +32,15 @@ async function handleAlexaMessage(data, rawMessage, cb) {
       this.alexaConnected = true;
     }
     const directiveNamespace = get(body, 'directive.header.namespace');
+    const directiveName = get(body, 'directive.header.name');
+    logger.debug(`gateway.handleAlexaMessage: New message : ${directiveNamespace}`);
     let response;
     if (directiveNamespace === 'Alexa.Discovery') {
       response = service.alexaHandler.onDiscovery();
+    } else if (directiveNamespace === 'Alexa.PowerController') {
+      response = service.alexaHandler.onExecute(body);
+    } else if (directiveNamespace === 'Alexa' && directiveName === 'ReportState') {
+      response = service.alexaHandler.onReportState(body);
     } else {
       response = {
         status: 400,

@@ -1,4 +1,6 @@
 const { onDiscovery } = require('./alexa.onDiscovery');
+const { onExecute } = require('./alexa.onExecute');
+const { onReportState } = require('./alexa.onReportState');
 
 /**
  * @description Add ability to connect to Alexa.
@@ -13,5 +15,7 @@ const AlexaHandler = function AlexaHandler(gladys, serviceId) {
 };
 
 AlexaHandler.prototype.onDiscovery = onDiscovery;
+AlexaHandler.prototype.onExecute = onExecute;
+AlexaHandler.prototype.onReportState = onReportState;
 
 module.exports = AlexaHandler;
