@@ -24,6 +24,9 @@ module.exports = (sequelize, DataTypes) => {
       value: {
         allowNull: false,
         type: DataTypes.DOUBLE,
+        validate: {
+          isFloat: true,
+        },
       },
     },
     {},
