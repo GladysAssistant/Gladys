@@ -441,6 +441,18 @@ const DEVICE_FEATURE_TYPES = {
     MODE: 'mode',
     ROTATION: 'rotation',
   },
+  BATTERY: {
+    INTEGER: 'integer',
+  },
+  VIBRATION_SENSOR: {
+    BINARY: 'binary',
+    STATUS: 'status',
+    TILT_ANGLE: 'tilt-angle',
+    ACCELERATION_X: 'acceleration-x',
+    ACCELERATION_Y: 'acceleration-y',
+    ACCELERATION_Z: 'acceleration-z',
+    BED_ACTIVITY: 'bed-activity',
+  },
   BUTTON: {
     CLICK: 'click',
   },
