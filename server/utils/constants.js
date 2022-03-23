@@ -396,14 +396,6 @@ const DEVICE_FEATURE_TYPES = {
   TEMPERATURE_SENSOR: {
     DECIMAL: 'decimal',
   },
-  VIBRATION_SENSOR: {
-    STATUS: 'status',
-    TILT_ANGLE: 'tilt-angle',
-    ACCELERATION_X: 'acceleration-x',
-    ACCELERATION_Y: 'acceleration-y',
-    ACCELERATION_Z: 'acceleration-z',
-    BED_ACTIVITY: 'bed-activity',
-  },
   CO2_SENSOR: {
     DECIMAL: 'decimal',
   },
@@ -440,9 +432,6 @@ const DEVICE_FEATURE_TYPES = {
   CUBE: {
     MODE: 'mode',
     ROTATION: 'rotation',
-  },
-  BATTERY: {
-    INTEGER: 'integer',
   },
   VIBRATION_SENSOR: {
     BINARY: 'binary',
