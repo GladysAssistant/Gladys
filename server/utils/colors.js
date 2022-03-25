@@ -122,10 +122,106 @@ function xyToInt(x, y) {
   return (red << 16) | (green << 8) | blue;
 }
 
+/**
+ * @description Converts HSV color to int.
+ * @param {Object} hsvColor - HSV color object.
+ * @returns {number} Int color.
+ * @example
+ * const int = hsvToInt({ h: 87, s: 24, v: 66 });
+ * console.log(int === 9873536);
+ */
+function hsvToInt(hsvColor) {
+  const { h: hue, s: saturation, v: value } = hsvColor;
+  const h = hue / 60;
+  const s = saturation / 100;
+  let v = value / 100;
+  const hi = Math.floor(h) % 6;
+
+  const f = h - Math.floor(h);
+  const p = 255 * v * (1 - s);
+  const q = 255 * v * (1 - s * f);
+  const t = 255 * v * (1 - s * (1 - f));
+  v *= 255;
+
+  let rgb;
+  switch (hi) {
+    case 0:
+      rgb = [v, t, p];
+      break;
+    case 1:
+      rgb = [q, v, p];
+      break;
+    case 2:
+      rgb = [p, v, t];
+      break;
+    case 3:
+      rgb = [p, q, v];
+      break;
+    case 4:
+      rgb = [t, p, v];
+      break;
+    case 5:
+      rgb = [v, p, q];
+      break;
+    default:
+      rgb = [0, 0, 0];
+  }
+
+  return rgbToInt(rgb);
+}
+
+/**
+ * @description Converts int color to HSV.
+ * @param {number} intColor - Int color.
+ * @returns {Object} HSV color.
+ * @example
+ * const hsv = intToHsv(9873536);
+ * console.log(hsv); // { h: 87, s: 24, v: 66 }
+ */
+function intToHsv(intColor) {
+  const [red, green, blue] = intToRgb(intColor);
+
+  const r = red / 255;
+  const g = green / 255;
+  const b = blue / 255;
+  const v = Math.max(r, g, b);
+  const diff = v - Math.min(r, g, b);
+  const diffc = (c) => {
+    return (v - c) / 6 / diff + 1 / 2;
+  };
+
+  let h = 0;
+  let s = 0;
+  if (diff !== 0) {
+    s = diff / v;
+    const rdif = diffc(r);
+    const gdif = diffc(g);
+    const bdif = diffc(b);
+
+    if (r === v) {
+      h = bdif - gdif;
+    } else if (g === v) {
+      h = 1 / 3 + rdif - bdif;
+    } else if (b === v) {
+      h = 2 / 3 + gdif - rdif;
+    }
+
+    if (h < 0) {
+      h += 1;
+    } else if (h > 1) {
+      h -= 1;
+    }
+  }
+
+  return { h: Math.round(h * 360), s: Math.round(s * 1000) / 10, v: Math.round(v * 1000) / 10 };
+}
+
 module.exports = {
   intToRgb,
   rgbToInt,
   intToHex,
   hexToInt,
   xyToInt,
+  hsvToInt,
+  intToHsv,
 };
