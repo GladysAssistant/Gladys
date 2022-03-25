@@ -79,6 +79,7 @@
     "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.5.3",
+    "bottleneck": "^2.19.5",
     "compression": "^1.7.4",
     "cross-env": "^5.2.0",
     "dayjs": "^1.10.4",
