@@ -865,30 +865,29 @@
     },
     "oauth2": {
       "buttonConnect": "Connect now",
-      "apiKeyLabel": "Then, enter your client id and client secret key here:",
+      "apiKeyLabel": "Then, enter your client id and client secret keys here:",
       "errorEmptyConfig": "Client id and client secret must not be empty!",
-      "errorServiceId": "Service Id of current integration must not be found!",
       "errorAuthorizationUri": "Error in authorization provider connection configuration!",
       "clientId": "Account client id",
       "secret": "Account client secret",
       "instructions": "In this stage please fill in the given client id and client secret key below and click on connect button.",
-      "delete": "To delete your account configuration clic on 'Unconnect' button (all data will be deleted).",
-      "unconnectButton": "Unconnect"
+      "delete": "To delete your account configuration clic on 'unlink' button (all data will be deleted).",
+      "unconnectButton": "Unlink"
     },
     "withings": {
       "settings": {
-        "title": "Withings Settings",
+        "outh2": {
+          "title": "Withings Settings",
+          "introduction": "To connect Withings account to Gladys, you first need to create a Withings user account in <a href=\"https://account.withings.com/connectionwou/account_login\" target=\"_blank\" >this link</a>.<br/><br/>To connect Withings measures to Gladys, you need to create a Withings partner account in <a href=\"https://account.withings.com/partner/add_oauth2\" target=\"_blank\" >this link</a></br>(in callback url field put http://gladys.local/dashboard/integration/health/withings/settings, in environmnet field choose Dev, you can use Prod with gladys plus url and https protocol, refer to Documentation link for more details). <br/>",
+          "instructionsToUse": "To use this integration, go to the dashboard and create a device box or chart.",
+          "clientId": "Client Id:",
+          "complete": "Your account is now linked to Gladys with those parameters:"
+        },
         "menu": "Discover",
-        "introduction": "To connect Withings account to Gladys, you first need to create a Withings user account in <a href=https://account.withings.com/connectionwou/account_login target=_blank >this link</a>.<br/><br/>To connect Withings measures to Gladys, you need to create a Withings partner account in <a href=https://account.withings.com/partner/add_oauth2 target=_blank >this link</a></br>(in callback url field put http://gladys.local/dashboard/integration/health/withings/settings, in environmnet field choose Dev, you can use Prod with gladys plus url and https protocol, reefer to Documentation link for more details). <br/>",
-        "instructionsToUse": "To use this integration, go to the dashboard and create a device box or chart.",
-        "configurationError": "We were not able to configure your account. Are you sure your client_id and secret_id are valid?",
-        "complete": "Your account is now linked to Gladys with those parameters:",
-        "clientId": "Client Id:",
         "chooseDevice": "Choose withings devices to connect in the list below:"
       },
       "device": {
         "title": "Withings Devices",
-        "empty": "No Withings devices available, go to the 'Settings' page to connect your account and create the devices.",
         "menu": "Devices",
         "noDevices": "No Withings devices available, go to the 'Settings' page to connect your account and create the devices.",
         "nameLabel": "Name",
@@ -1618,7 +1617,7 @@
     "mm": "Millimeter (mm)",
     "mmHg": "Millimeters of mercury (mmHg)",
     "bpm": "Beats per minute (bpm)",
-    "m/s": "Meters per second (m/s)"
+    "meter-per-second": "Meters per second (m/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1639,7 +1638,7 @@
     "kg": "kg",
     "mmHg": "mmHg",
     "bpm": "bpm",
-    "m/s": "m/s"
+    "meter-per-second": "m/s"
   },
   "deviceFeatureValue": {
     "type": {

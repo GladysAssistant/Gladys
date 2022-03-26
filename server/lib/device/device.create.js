@@ -121,7 +121,6 @@ async function create(device) {
       // if not, we create it
       feature.device_id = deviceToReturn.id;
       const featureCreated = await db.DeviceFeature.create(feature, { transaction });
-
       return featureCreated.get({ plain: true });
     });
     deviceToReturn.features = newFeatures;

@@ -3,7 +3,7 @@ const logger = require('../../utils/logger');
 const { BadParameters } = require('../../utils/coreErrors');
 
 /**
- * @description Save hstorical device feature state in DB.
+ * @description Save historical device feature state in DB.
  * @param {Object} deviceFeature - A DeviceFeature object.
  * @param {Object} historicalState - The historical feature state value (numeric) of the deviceFeature to save.
  * @param {Object} createdAt - Date of state.

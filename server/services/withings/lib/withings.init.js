@@ -287,7 +287,6 @@ async function init(userId) {
           const currentFeatures = mapOfFeatureByWithingsDeviceId.get(key);
           const features = buildFeature(currentGroup, mapOfDeviceByWithingsDeviceId.get(key), currentFeatures);
           if (features) {
-            mapOfFeatureByWithingsDeviceId.delete(key);
             mapOfFeatureByWithingsDeviceId.set(key, features);
           }
         }

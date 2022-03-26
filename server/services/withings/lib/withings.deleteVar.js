@@ -10,8 +10,7 @@
  * );
  */
 async function deleteVar(userId) {
-  const oauth2Result = await this.gladys.oauth2Client.deleteClient(this.serviceId, userId);
-  return oauth2Result;
+  return this.gladys.oauth2Client.deleteClient(this.serviceId, userId); 
 }
 
 module.exports = {

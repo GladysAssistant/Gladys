@@ -21,53 +21,46 @@ const actions = store => ({
     store.setState({
       oauth2GetStatus: RequestStatus.Getting
     });
+    try{
+      const returnServiceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
 
-    const returnServiceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
-
-    const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
-      service_id: returnServiceId
-    });
-    if (returnGetConfig) {
-      store.setState({
-        clientIdInDb: returnGetConfig.client_id,
-        oauth2ErrorMsg: null,
-        oauth2GetStatus: RequestStatus.Success
+      const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
+        service_id: returnServiceId
       });
-    } else {
+      
+      if (returnGetConfig) {
+        store.setState({
+          clientIdInDb: returnGetConfig.client_id,
+          oauth2ErrorMsg: null,
+          oauth2GetStatus: RequestStatus.Success
+        });
+      } else {
+        store.setState({
+          oauth2ErrorMsg: null,
+          oauth2GetStatus: RequestStatus.Success
+        });
+      }
+    } catch (e) {
       store.setState({
-        oauth2ErrorMsg: null,
-        oauth2GetStatus: RequestStatus.Success
+        oauth2GetStatus: RequestStatus.Error
       });
     }
   },
   async startConnect(state) {
-    store.setState({
-      oauth2GetStatus: RequestStatus.Getting
-    });
+    if (!state.secret || !state.clientId) {
+      store.setState({
+        oauth2GetStatus: RequestStatus.Error,
+        oauth2ErrorMsg: 'errorEmptyConfig'
+      });
+      return;
+    }
     try {
-      if (!state.secret || !state.clientId) {
-        store.setState({
-          oauth2GetStatus: RequestStatus.Error,
-          oauth2ErrorMsg: 'errorEmptyConfig'
-        });
-        return;
-      }
+      store.setState({
+        oauth2GetStatus: RequestStatus.Getting
+      });
 
       const serviceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
 
-      // Save Oauth2 variables
-      await state.httpClient.post(`/api/v1/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_ID}`, {
-        value: state.clientId,
-        userRelated: true
-      });
-
-      await state.httpClient.post(
-        `/api/v1/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_SECRET}`,
-        {
-          value: state.secret,
-          userRelated: true
-        }
-      );
 
       const returnValue = await state.httpClient.post('/api/v1/service/oauth2/client/authorization-uri', {
         integration_name: state.integrationName,
@@ -75,6 +68,19 @@ const actions = store => ({
       });
 
       if (returnValue.authorizationUri) {
+        // Save Oauth2 variables
+        await state.httpClient.post(`/api/v1/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_ID}`, {
+          value: state.clientId,
+          userRelated: true
+        });
+
+        await state.httpClient.post(
+          `/api/v1/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_SECRET}`,
+          {
+            value: state.secret,
+            userRelated: true
+          }
+        );
         window.location = returnValue.authorizationUri;
       } else {
         store.setState({
@@ -96,7 +102,7 @@ const actions = store => ({
       oauth2GetStatus: RequestStatus.Getting
     });
 
-    await state.httpClient.get(`/api/v1/service/${state.integrationName}/deleteConfig`);
+    await state.httpClient.get(`/api/v1/service/${state.integrationName}/reset`);
 
     store.setState({
       clientIdInDb: null,

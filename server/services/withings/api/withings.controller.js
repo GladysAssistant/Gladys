@@ -15,12 +15,13 @@ module.exports = function WithingsController(gladys, withingsHandler) {
   }
 
   /**
-   * @description Poll withings devices (used to initialize feature state on gladys device creation).
-   * @api {get} /api/v1/service/withings/poll/:device_selector Poll withings devices.
-   * @apiName poll
+   * @description Post create action to poll withings devices 
+   *  (used to initialize feature state on gladys device creation).
+   * @api {get} /api/v1/service/withings/post_create/:device_selector Poll withings devices.
+   * @apiName post_create
    * @apiGroup Withings
    */
-  async function poll(req, res) {
+  async function postCreate(req, res) {
     if (req.params.device_selector) {
       const deviceToPoll = await gladys.device.getBySelector(req.params.device_selector);
       await withingsHandler.poll(deviceToPoll);
@@ -28,12 +29,12 @@ module.exports = function WithingsController(gladys, withingsHandler) {
   }
 
   /**
-   * @description Delete clientId and secret of withings oauth2 api.
-   * @api {get} /api/v1/service/withings/deleteConfig Delete clientId and secret of withings oauth2 api.
-   * @apiName deleteConfig
+   * @description Delete client id, secret client of withings oauth2 api and al withings devices.
+   * @api {get} /api/v1/service/withings/reset Delete clientId and secret of withings oauth2 api.
+   * @apiName reset
    * @apiGroup Withings
    */
-  async function deleteConfig(req, res) {
+  async function reset(req, res) {
     await withingsHandler.deleteVar(req.user.id);
     await withingsHandler.deleteDevices();
     res.json({
@@ -46,13 +47,13 @@ module.exports = function WithingsController(gladys, withingsHandler) {
       authenticated: true,
       controller: asyncMiddleware(init),
     },
-    'get /api/v1/service/withings/deleteConfig': {
+    'get /api/v1/service/withings/reset': {
       authenticated: true,
-      controller: asyncMiddleware(deleteConfig),
+      controller: asyncMiddleware(reset),
     },
-    'get /api/v1/service/withings/poll/:device_selector': {
+    'get /api/v1/service/withings/post_create/:device_selector': {
       authenticated: true,
-      controller: asyncMiddleware(poll),
+      controller: asyncMiddleware(postCreate),
     },
   };
 };

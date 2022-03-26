@@ -12,7 +12,7 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
               <div class="card">
                 <div class="card-header">
                   <h3 class="card-title">
-                    <Text id={`integration.${integrationName}.settings.title`} />
+                    <Text id={`integration.${integrationName}.settings.oauth2.title`} />
                   </h3>
                 </div>
                 <div class="card-body">
@@ -30,7 +30,7 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                           </div>
                         )}
                         <p>
-                          <MarkupText id={`integration.${integrationName}.settings.introduction`} />
+                          <MarkupText id={`integration.${integrationName}.settings.oauth2.introduction`} />
                         </p>
                         <p>
                           <MarkupText id={`integration.oauth2.instructions`} />
@@ -77,16 +77,16 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                       <div class="dimmer-content">
                         <div class="alert alert-info">
                           <p>
-                            <Text id={`integration.${integrationName}.settings.complete`} />
+                            <Text id={`integration.${integrationName}.settings.oauth2.complete`} />
                           </p>
                           <p>
                             <b>
-                              <Text id={`integration.${integrationName}.settings.clientId`} />
+                              <Text id={`integration.${integrationName}.settings.oauth2.clientId`} />
                             </b>
                             {props.clientIdInDb}
                           </p>
                           <p>
-                            <Text id={`integration.${integrationName}.settings.instructionsToUse`} />
+                            <Text id={`integration.${integrationName}.settings.oauth2.instructionsToUse`} />
                           </p>
                         </div>
                         <p>

@@ -865,9 +865,8 @@
     },
     "oauth2": {
       "buttonConnect": "Connecter maintenant",
-      "apiKeyLabel": "Saisissez ensuite votre clé client id et client secret ici :",
+      "apiKeyLabel": "Saisissez ensuite vos clés client id et client secret ici :",
       "errorEmptyConfig": "Client id et client secret ne doivent pas être vide !",
-      "errorServiceId": "Service Id de l'intégration courante n'a pas été trouvé !",
       "errorAuthorizationUri": "Erreur dans la configuration du provider pour l'autorisation de connexion !",
       "clientId": "Client id du compte",
       "secret": "Client secret du compte",
@@ -877,18 +876,18 @@
     },
     "withings": {
       "settings": {
-        "title": "Withings Configuration",
+        "oauth2": {
+          "title": "Withings Configuration",
+          "introduction": "Pour connecter le compte Withings à Gladys, vous devez d'abord créer un compte d'utilisateur Withings à <a href=\"https://account.withings.com/connectionwou/account_login\" target=\"_blank\" >ce lien</a>.<br/><br/>Pour relier les mesures Withings à Gladys, vous devez créer un compte partenaire Withings à <a href=\"https://account.withings.com/partner/add_oauth2\" target=\"_blank\" >ce lien</a></br>(dans le champ url de callback mettre http://gladys.local/dashboard/integration/health/withings/settings, dans le champs environnement choisir Dev, vous pouvez utiliser Prod avec gladys plus url et le protocole https, voir le lien Documentation pour plus de détails). <br/>",
+          "instructionsToUse": "Pour utiliser cette intégration, rendez-vous sur le tableau de bord et créez une box d'appareil ou de graphique.",
+          "complete": "Votre compte est maintenant lié à Gladys avec ces paramètres :",
+          "clientId": "Client Id :"
+        },
         "menu": "Découverte",
-        "introduction": "Pour connecter le compte Withings à Gladys, vous devez d'abord créer un compte d'utilisateur Withings à <a href=https://account.withings.com/connectionwou/account_login target=_blank >ce lien</a>.<br/><br/>Pour relier les mesures Withings à Gladys, vous devez créer un compte partenaire Withings à <a href=https://account.withings.com/partner/add_oauth2 target=_blank >ce lien</a></br>(dans le champ url de callback mettre http://gladys.local/dashboard/integration/health/withings/settings, dans le champs environnement choisir Dev, vous pouvez utiliser Prod avec gladys plus url et le protocole https, voir le lien Documentation pour plus de détails). <br/>",
-        "instructionsToUse": "Pour utiliser cette intégration, rendez-vous sur le tableau de bord et créez une box d'appareil ou de graphique.",
-        "configurationError": "Nous n'avons pas pu configurer votre compte. Êtes-vous sûr que votre client_id et votre secret_id sont corrects ?",
-        "complete": "Votre compte est maintenant lié à Gladys avec ces paramètres:",
-        "clientId": "Client Id:",
-        "chooseDevice": "Choisissez les appareils withings à connecter dans la liste plus bas:"
+        "chooseDevice": "Choisissez les appareils withings à connecter dans la liste plus bas :"
       },
       "device": {
-        "title": "Appareils Withings",
-        "empty": "Aucun appareils Withings disponibles, allez sur la page 'Configuration' pour connecter votre compte et créer les appareils.",
+        "title": "Appareils Withings",  
         "menu": "Appareils",
         "noDevices": "Aucun appareils Withings disponibles, allez sur la page 'Configuration' pour connecter votre compte et créer les appareils.",
         "nameLabel": "Nom",
@@ -1618,7 +1617,7 @@
     "mm": "Millimètre (mm)",
     "mmHg": "Millimètres de mercure (mmHg)",
     "bpm": "Battements par minute (bpm)",
-    "m/s": "Mètres par seconde (m/s)"
+    "meter-per-second": "Mètres par seconde (m/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1639,7 +1638,7 @@
     "kg": "kg",
     "mmHg": "mmHg",
     "bpm": "bpm",
-    "m/s": "m/s"
+    "meter-per-second": "m/s"
   },
   "deviceFeatureValue": {
     "type": {

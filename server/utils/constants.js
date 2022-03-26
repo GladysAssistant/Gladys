@@ -457,7 +457,7 @@ const DEVICE_FEATURE_UNITS = {
   CENTIMETER: 'cm',
   MERCURE_MILIMETER: 'mmHg',
   BEATS_PER_MINUTE: 'bpm',
-  METER_PER_SECOND: 'm/s',
+  METER_PER_SECOND: 'meter-per-second',
   MM: 'mm',
   CM: 'cm',
 };
