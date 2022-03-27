@@ -2,7 +2,7 @@ const { OAuth2Server } = require('oauth2-mock-server');
 const { assert } = require('chai');
 const { fake } = require('sinon');
 
-const OAuth2Manager = require('../../../lib/oauth2');
+const OAuth2Manager = require('../../../lib/oauth2-client');
 const logger = require('../../../utils/logger');
 const { OAUTH2 } = require('../../../utils/constants');
 

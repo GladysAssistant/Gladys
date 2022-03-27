@@ -47,7 +47,7 @@ class WithingsSettingsPage extends Component {
                       saveDevice={props.saveDevice}
                       deleteDevice={props.deleteDevice}
                       user={props.user}
-                      forConnect
+                      settingsPage
                     />
                   ))}
                 </div>

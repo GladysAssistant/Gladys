@@ -887,7 +887,7 @@
         "chooseDevice": "Choisissez les appareils withings à connecter dans la liste plus bas :"
       },
       "device": {
-        "title": "Appareils Withings",  
+        "title": "Appareils Withings",
         "menu": "Appareils",
         "noDevices": "Aucun appareils Withings disponibles, allez sur la page 'Configuration' pour connecter votre compte et créer les appareils.",
         "nameLabel": "Nom",
@@ -895,7 +895,6 @@
         "noValueReceived": "Aucune valeur reçue.",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
-        "noFeatures": "Aucune fonctionnalité",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "createDeviceInGladys": "Connecter dans Gladys",

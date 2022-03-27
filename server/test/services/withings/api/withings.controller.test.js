@@ -27,14 +27,14 @@ describe('WithingsController POST /api/v1/service/withings/init', () => {
   });
 });
 
-describe('WithingsController GET /api/v1/service/withings/poll', () => {
+describe('WithingsController GET /api/v1/service/withings/post_create', () => {
   const controller = WithingsController(gladys, withingsHandler);
 
   it('should poll', async () => {
     const req = { params: { device_selector: 'fsdfdd452f4181fsdf2sdfhgyrjfdsfsd' } };
     const res = { json: fake.returns(null) };
 
-    await controller['get /api/v1/service/withings/poll/:device_selector'].controller(req, res);
+    await controller['get /api/v1/service/withings/post_create/:device_selector'].controller(req, res);
     assert.calledOnce(withingsHandler.poll);
   });
 });

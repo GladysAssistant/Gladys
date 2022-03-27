@@ -11,11 +11,15 @@ const WithingsService = proxyquire('../../../services/withings', {
 });
 
 describe('withingsService', () => {
+  let countSetValueCount = 0;
+  let countGetValueCount = 0;
   const withingsService = WithingsService(
     {
       variable: {
-        getValue: fake.returns(
-          '{' +
+        getValue: function returnValue(key, serviceId, userId) {
+          countGetValueCount += 1;
+          return (
+            '{' +
             '"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4",' +
             '"expires_in":10800,' +
             '"token_type":"Bearer",' +
@@ -23,20 +27,24 @@ describe('withingsService', () => {
             '"refresh_token":"11757dc7fd8d25889f5edfd373d1f525f53d4942",' +
             '"userid":"33669966",' +
             '"expires_at":"2020-11-13T20:46:50.042Z"' +
-            '}',
-        ),
+            '}'
+          );
+        },
       },
     },
     '3ac129d9-a610-42f8-924f-3fe708001b3d',
   );
   it('should start service', async () => {
     await withingsService.start();
+    assert.equal(countSetValueCount, 0);
+    assert.equal(countGetValueCount, 1);
   });
+
   it('should stop service', async () => {
     await withingsService.stop();
   });
 
-  let countSetValueCount = 0;
+  countSetValueCount = 0;
   const withingsServiceWithoutDBVar = WithingsService(
     {
       variable: {
@@ -51,8 +59,5 @@ describe('withingsService', () => {
   it('should start service (without db var)', async () => {
     await withingsServiceWithoutDBVar.start();
     assert.equal(countSetValueCount, 8);
-  });
-  it('should stop service (without db var)', async () => {
-    await withingsServiceWithoutDBVar.stop();
   });
 });

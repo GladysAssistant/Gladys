@@ -9,16 +9,6 @@ const db = require('../../models');
  */
 async function destroyByServiceId(serviceId) {
   const devices = await db.Device.findAll({
-    include: [
-      {
-        model: db.DeviceParam,
-        as: 'params',
-      },
-      {
-        model: db.DeviceFeature,
-        as: 'features',
-      },
-    ],
     where: {
       service_id: serviceId,
     },

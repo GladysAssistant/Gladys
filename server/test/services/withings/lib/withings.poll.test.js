@@ -5,7 +5,7 @@ const sinon = require('sinon');
 const WithingsHandler = require('../../../../services/withings/lib');
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { OAUTH2 } = require('../../../../utils/constants.js');
-const OAuth2Manager = require('../../../../lib/oauth2/index');
+const OAuth2Manager = require('../../../../lib/oauth2-client/index');
 
 const { assert, fake } = sinon;
 

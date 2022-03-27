@@ -1,5 +1,6 @@
 const EventEmitter = require('events');
 const sinon = require('sinon');
+const { assert } = require('chai');
 
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
@@ -49,6 +50,11 @@ describe('Device', () => {
       selector: 'test-device-destroyByServiceId',
     });
 
+    let testDevice = await device.get({ search: 'test-device-destroyByServiceId' });
+    assert.equal(testDevice[0].name, 'test-device-destroyByServiceId');
+
     await device.destroyByServiceId(serviceImpl.id);
+    testDevice = await device.get({ search: 'test-device-destroyByServiceId' });
+    assert.equal(testDevice.length, 0);
   });
 });

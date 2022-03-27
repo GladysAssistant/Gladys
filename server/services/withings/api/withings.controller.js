@@ -15,7 +15,7 @@ module.exports = function WithingsController(gladys, withingsHandler) {
   }
 
   /**
-   * @description Post create action to poll withings devices 
+   * @description Post create action to poll withings devices
    *  (used to initialize feature state on gladys device creation).
    * @api {get} /api/v1/service/withings/post_create/:device_selector Poll withings devices.
    * @apiName post_create

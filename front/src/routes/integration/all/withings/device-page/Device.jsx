@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { Link } from 'preact-router';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { WithingsDeviceImgByModel } from './withingsConsts';
+import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 
 dayjs.extend(relativeTime);
 
@@ -45,7 +46,7 @@ class WithingsDeviceBox extends Component {
   deleteDevice = async () => {
     this.setState({ loading: true });
     try {
-      if (this.props.forConnect) {
+      if (this.props.settingsPage) {
         await this.props.deleteDevice(this.props.device, null);
       } else {
         await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
@@ -75,12 +76,7 @@ class WithingsDeviceBox extends Component {
             {props.device.name}
             {batteryLevel && (
               <div class="page-options d-flex">
-                <div class="tag tag-green">
-                  <Text id="global.percentValue" fields={{ value: batteryLevel }} />
-                  <span class="tag-addon">
-                    <i class="fe fe-battery" />
-                  </span>
-                </div>
+                <BatteryLevelFeature batteryLevel={batteryLevel} />
               </div>
             )}
           </div>
@@ -104,7 +100,7 @@ class WithingsDeviceBox extends Component {
                     </Localizer>
                   )}
                 </div>
-                {!props.forConnect && (
+                {!props.settingsPage && (
                   <div class="form-group">
                     <label>
                       <Text id="integration.withings.device.roomLabel" />
@@ -131,7 +127,7 @@ class WithingsDeviceBox extends Component {
                     <Text id="integration.withings.device.featuresLabel" />
                   </label>
                   <DeviceFeatures features={props.device.features} />
-                  {!props.forConnect && (
+                  {!props.settingsPage && (
                     <p class="mt-4">
                       {mostRecentValueAt ? (
                         <Text
@@ -149,17 +145,17 @@ class WithingsDeviceBox extends Component {
                   )}
                 </div>
                 <div class="form-group">
-                  {props.forConnect && props.device.inDB && (
+                  {props.settingsPage && props.device.inDB && (
                     <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                       <Text id="integration.withings.device.deleteDeviceInGladys" />
                     </button>
                   )}
-                  {props.forConnect && !props.device.inDB && (
+                  {props.settingsPage && !props.device.inDB && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.withings.device.createDeviceInGladys" />
                     </button>
                   )}
-                  {!props.forConnect && (
+                  {!props.settingsPage && (
                     <>
                       <button onClick={this.saveDevice} class="btn btn-success mr-2">
                         <Text id="integration.withings.device.saveButton" />
