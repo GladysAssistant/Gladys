@@ -858,6 +858,116 @@
         "disconnected": "Déconnecté du broker MQTT."
       }
     },
+    "broadlink": {
+      "title": "Broadlink",
+      "description": "Contrôler avec les appareils Broadlink.",
+      "remoteTab": "Télécommandes",
+      "peripheralTab": "Appareils disponibles",
+      "peripheral": {
+        "title": "Appareils Broadlink disponibles",
+        "description": "Ici vous trouverez les appareils Broadlink disponible. Si celui que vous cherchez est manquant, merci de vérifier qu'il est bien connecté au réseau.",
+        "noPeripherals": "Aucun appareil découvert sur le réseau, merci de vérifier les branchements.",
+        "noNameLabel": "Type non reconnu",
+        "ipAddressLabel": "Adresse IP",
+        "macAddressLabel": "Adresse MAC",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "nameLabel": "Nom de l'appareil",
+        "saveButton": "Enregistrer",
+        "alreadyCreatedButton": "Déjà créé",
+        "createRemoteButton": "Créer une télécommande"
+      },
+      "remote": {
+        "title": "Appareils Broadlink dans Gladys",
+        "searchPlaceholder": "Rechercher des appareils",
+        "newButton": "Nouvelle télécommande",
+        "noRemoteFound": "Aucun appareil ou télécommande Broadlink trouvé.",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "roomLabel": "Pièce",
+        "saveButton": "Enregistrer",
+        "deleteButton": "Supprimer",
+        "editButton": "Editer",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "setup": {
+        "cancel": "Annuler",
+        "noNameLabel": "Pas de nom",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "notFound": "Appareil introuvable.",
+        "saveButton": "Enregistrer",
+        "peripheralLabel": "Périphérique lié",
+        "categoryLabel": "Type d'appareil à contrôller",
+        "featuresLabel": "Fonctionnalités",
+        "learnModeTitle": "Capturer le signal de la télécommande",
+        "learningModeInProgress": "Appuyez sur le bouton de la télécommande",
+        "cancelLearnModeButton": "Annuler le mode capture",
+        "skipLearningButton": "Ignorer cette étape et passer à la suivante",
+        "peripheralNotFound": "Appareil non trouvé.",
+        "peripheralNotLearn": "Cette appareil n'a pas de mode d'apprentissage.",
+        "cancelLearnFailed": "Impossible d'annuler le mode apprentissage.",
+        "learnFailed": "Impossible de passer en mode apprentissage.",
+        "selectFeatureLabel": "Choisissez une fonctionnalité de la liste ou cliquez sur le bouton suivant pour entrer dans le mode apprentissage. Le mode apprentissage vous permet d'enregistrer toutes les commandes une par une, de manière automatisée.",
+        "selectedFeatureLabel": "Fonctionnalité sélectionnée",
+        "selectActionLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée. Sélectionnez une action dans la liste ci-dessous pour activer la capture.",
+        "selectedFeatureInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée.",
+        "unselectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée, merci de sélectionner une action pour activer la capture.",
+        "selectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée, avec l'action <b>{{action}}</b>.",
+        "testError": "Une erreur est survenue lors du test de la fonctionnalité, vérifiez votre matériel.",
+        "peripheralSelectLabel": "{{name}} ({{address}})",
+        "testLabel": "Tester",
+        "unselect": "Annuler la sélection",
+        "deleteLabel": "Supprimer",
+        "learnAllLabel": "Mode apprentissage",
+        "learnAllModeLabel": "Prochain bouton dans {{timeLeft}} secondes...",
+        "quitLearnModeLabel": "Arrêter le mode apprentissage",
+        "saveSuccess": "L'appareil Broadlink a été créé avec succés.",
+        "successLabel": "Effectué",
+        "features": {
+          "light": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "brightness": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            },
+            "temperature": {
+              "none": "Froid",
+              "many": "Chaud"
+            }
+          },
+          "switch": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "dimmer": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            }
+          },
+          "siren": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            }
+          },
+          "television": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "volume": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            }
+          }
+        }
+      }
+    },
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Gérez les appareils Xiaomi via le pont Xiaomi.",
