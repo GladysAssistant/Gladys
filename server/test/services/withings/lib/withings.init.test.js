@@ -310,12 +310,9 @@ describe('WithingsHandler init', () => {
     serverOauth2.stop();
   });
   it('init devices in Gladys', async () => {
-    const withingsHandler = new WithingsHandler(
-      gladys,
-      '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
-      'http://localhost:9192',
-      'test',
-    );
+    const withingsHandler = new WithingsHandler(gladys, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
+    withingsHandler.withingsUrl = 'http://localhost:9192';
+    withingsHandler.integrationName = 'test';
 
     const result = await withingsHandler.init('0cd30aef-9c4e-4a23-88e3-3547971296e5');
 

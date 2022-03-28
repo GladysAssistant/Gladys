@@ -288,6 +288,17 @@
     "validationError": "Le tableau de bord n'est pas valide, êtes-vous sûr d'avoir rempli tous les champs ?",
     "createDashboardButton": "Créer"
   },
+  "oauth2": {
+    "buttonConnect": "Connecter maintenant",
+    "apiKeyLabel": "Saisissez ensuite vos clés client id et client secret ici :",
+    "errorEmptyConfig": "Client id et client secret ne doivent pas être vide !",
+    "errorAuthorizationUri": "Erreur dans la configuration du provider pour l'autorisation de connexion !",
+    "clientId": "Client id du compte",
+    "secret": "Client secret du compte",
+    "instructions": "À cette étape, veuillez remplir les champs client id et client secret ci-dessous et cliquez sur le bouton de connexion.",
+    "delete": "Pour supprimer vos configurations de compte cliquer sur le bouton 'Déconneter' (toutes les données associées seront supprimées).",
+    "unconnectButton": "Déconnecter"
+  },
   "integration": {
     "root": {
       "title": "Intégrations",
@@ -862,17 +873,6 @@
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
       }
-    },
-    "oauth2": {
-      "buttonConnect": "Connecter maintenant",
-      "apiKeyLabel": "Saisissez ensuite vos clés client id et client secret ici :",
-      "errorEmptyConfig": "Client id et client secret ne doivent pas être vide !",
-      "errorAuthorizationUri": "Erreur dans la configuration du provider pour l'autorisation de connexion !",
-      "clientId": "Client id du compte",
-      "secret": "Client secret du compte",
-      "instructions": "À cette étape, veuillez remplir les champs client id et client secret ci-dessous et cliquez sur le bouton de connexion.",
-      "delete": "Pour supprimer vos configurations de compte cliquer sur le bouton 'Déconneter' (toutes les données associées seront supprimées).",
-      "unconnectButton": "Déconnecter"
     },
     "withings": {
       "settings": {

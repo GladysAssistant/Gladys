@@ -26,25 +26,25 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                       <div class="dimmer-content">
                         {props.oauth2ErrorMsg && (
                           <div class="alert alert-danger">
-                            <Text id={`integration.oauth2.${props.oauth2ErrorMsg}`} />
+                            <Text id={`oauth2.${props.oauth2ErrorMsg}`} />
                           </div>
                         )}
                         <p>
                           <MarkupText id={`integration.${integrationName}.settings.oauth2.introduction`} />
                         </p>
                         <p>
-                          <MarkupText id={`integration.oauth2.instructions`} />
+                          <MarkupText id={`oauth2.instructions`} />
                         </p>
                         <div class="form-group">
                           <div class="form-label">
-                            <Text id={`integration.oauth2.apiKeyLabel`} />
+                            <Text id={`oauth2.apiKeyLabel`} />
                           </div>
                           <div class="input-group">
                             <Localizer>
                               <input
                                 type="text"
                                 class="form-control"
-                                placeholder={<Text id={`integration.oauth2.clientId`} />}
+                                placeholder={<Text id={`oauth2.clientId`} />}
                                 onInput={props.updateClientId}
                                 value={props.clientId}
                               />
@@ -57,7 +57,7 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                               <input
                                 type="text"
                                 class="form-control"
-                                placeholder={<Text id={`integration.oauth2.secret`} />}
+                                placeholder={<Text id={`oauth2.secret`} />}
                                 onInput={props.updateSecret}
                                 value={props.secret}
                               />
@@ -67,7 +67,7 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                         <div class="form-group">
                           <span class="input-group-append">
                             <button class="btn btn-primary" onClick={props.startConnect}>
-                              <Text id={`integration.oauth2.buttonConnect`} />
+                              <Text id={`oauth2.buttonConnect`} />
                             </button>
                           </span>
                         </div>
@@ -90,12 +90,12 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                           </p>
                         </div>
                         <p>
-                          <Text id="integration.oauth2.delete" />
+                          <Text id="oauth2.delete" />
                         </p>
                         <div class="form-group">
                           <span class="input-group-append">
                             <button class="btn btn-primary" onClick={props.unConnect}>
-                              <Text id={`integration.oauth2.unconnectButton`} />
+                              <Text id={`oauth2.unconnectButton`} />
                             </button>
                           </span>
                         </div>

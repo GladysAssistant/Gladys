@@ -3,7 +3,11 @@ const { fake } = require('sinon');
 const WithingsHandler = require('../../../../services/withings/lib');
 
 const gladysOk = {
-  variable: { destroy: fake.resolves(null) },
+  variable: {
+    getValue: fake.resolves(null),
+    setValue: fake.resolves(null),
+    destroy: fake.resolves(null),
+  },
   oauth2Client: {
     deleteClient: fake.resolves({ success: true }),
   },
@@ -11,7 +15,7 @@ const gladysOk = {
 
 describe('WithingsHandler deleteVar', () => {
   it('deletes oauth2 vars', async () => {
-    const withingsHandler = new WithingsHandler(gladysOk, null, null, null);
+    const withingsHandler = new WithingsHandler(gladysOk, null);
 
     const result = await withingsHandler.deleteVar('req');
     expect(result).to.eql({ success: true });

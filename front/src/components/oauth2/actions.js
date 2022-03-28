@@ -2,11 +2,6 @@ import { RequestStatus } from '../../utils/consts';
 import { OAUTH2 } from '../../../../server/utils/constants';
 
 const actions = store => ({
-  updateIntegrationName(state, e) {
-    store.setState({
-      integrationName: e
-    });
-  },
   updateClientId(state, e) {
     store.setState({
       clientId: e.target.value
@@ -22,10 +17,8 @@ const actions = store => ({
       oauth2GetStatus: RequestStatus.Getting
     });
     try {
-      const returnServiceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
-
       const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
-        service_id: returnServiceId
+        service_id: state.currentIntegration.id
       });
 
       if (returnGetConfig) {
@@ -59,16 +52,17 @@ const actions = store => ({
         oauth2GetStatus: RequestStatus.Getting
       });
 
-      const serviceId = (await state.httpClient.get(`/api/v1/service/${state.integrationName}`)).id;
-
       // Save Oauth2 variables
-      await state.httpClient.post(`/api/v1/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_ID}`, {
-        value: state.clientId,
-        userRelated: true
-      });
+      await state.httpClient.post(
+        `/api/v1/service/${state.currentIntegration.name}/variable/${OAUTH2.VARIABLE.CLIENT_ID}`,
+        {
+          value: state.clientId,
+          userRelated: true
+        }
+      );
 
       await state.httpClient.post(
-        `/api/v1/service/${state.integrationName}/variable/${OAUTH2.VARIABLE.CLIENT_SECRET}`,
+        `/api/v1/service/${state.currentIntegration.name}/variable/${OAUTH2.VARIABLE.CLIENT_SECRET}`,
         {
           value: state.secret,
           userRelated: true
@@ -77,8 +71,8 @@ const actions = store => ({
 
       // TODO : passer le client / secret en param et auver les param que apres ou dans ?
       const returnValue = await state.httpClient.post('/api/v1/service/oauth2/client/authorization-uri', {
-        integration_name: state.integrationName,
-        service_id: serviceId
+        integration_name: state.currentIntegration.name,
+        service_id: state.currentIntegration.id
       });
 
       if (returnValue.authorizationUri) {
@@ -103,7 +97,7 @@ const actions = store => ({
       oauth2GetStatus: RequestStatus.Getting
     });
 
-    await state.httpClient.get(`/api/v1/service/${state.integrationName}/reset`);
+    await state.httpClient.get(`/api/v1/service/${state.currentIntegration.name}/reset`);
 
     store.setState({
       clientIdInDb: null,

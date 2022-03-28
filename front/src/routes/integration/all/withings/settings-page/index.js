@@ -4,6 +4,7 @@ import { Text } from 'preact-i18n';
 import actions from './actions';
 import actionsWithingsDevice from '../device-page/actions';
 import actionsOAuth2 from '../../../../../components/oauth2/actions';
+import actionsCommon from '../../../../../actions/integration';
 import WithingsPage from '../WithingsPage';
 import OAuth2Config from '../../../../../components/oauth2/OAuth2Config';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -12,13 +13,13 @@ import Device from '../device-page/Device';
 
 @connect(
   'user,session,clientIdInDb,withingsSaveStatus,oauth2GetStatus,oauth2ErrorMsg,houses,withingsClientId,withingsGetStatus,withingsImgMap,withingsDevices',
-  combineActions(actions, actionsOAuth2, actionsWithingsDevice)
+  combineActions(actions, actionsOAuth2, actionsWithingsDevice, actionsCommon)
 )
 class WithingsSettingsPage extends Component {
-  componentWillMount() {
-    this.props.updateIntegrationName('withings');
-    this.props.getCurrentConfig();
-    this.props.initWithingsDevices();
+  async componentWillMount() {
+    await this.props.getIntegrationByName('withings');
+    await this.props.getCurrentConfig();
+    await this.props.initWithingsDevices();
   }
 
   render(props, {}) {

@@ -3,25 +3,20 @@ const { init } = require('./withings.init');
 const { deleteVar } = require('./withings.deleteVar');
 const { deleteDevices } = require('./withings.deleteDevices');
 const { poll } = require('./withings.poll');
+const { postCreate } = require('./withings.postCreate');
 
 /**
  * @param {Object} gladys - The gladys object.
  * @param {string} serviceId - Identification of the service.
- * @param {string} withingsServerUrl - Withings server url.
- * @param {string} integrationName - [Optional] By default interationName='withings', param used only for test.
  * @description Create all device if not exist by listening
  * @example
  * const withingsHandler = WithingsHandler(gladys, serviceId)
  */
-const WithingsHandler = function WithingsHandler(gladys, serviceId, withingsServerUrl, integrationName) {
+const WithingsHandler = function WithingsHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  this.withingsUrl = withingsServerUrl;
-  if (integrationName) {
-    this.integrationName = integrationName;
-  } else {
-    this.integrationName = 'withings';
-  }
+  this.withingsUrl = 'https://wbsapi.withings.net';
+  this.integrationName = 'withings';
 };
 
 // COMMANDS
@@ -29,5 +24,6 @@ WithingsHandler.prototype.init = init;
 WithingsHandler.prototype.deleteVar = deleteVar;
 WithingsHandler.prototype.deleteDevices = deleteDevices;
 WithingsHandler.prototype.poll = poll;
+WithingsHandler.prototype.postCreate = postCreate;
 
 module.exports = WithingsHandler;

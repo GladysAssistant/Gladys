@@ -69,12 +69,9 @@ const gladys = {
 };
 
 describe('WithingsHandler poll', () => {
-  const withingsHandler = new WithingsHandler(
-    gladys,
-    '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
-    'http://localhost:9192',
-    'test',
-  );
+  const withingsHandler = new WithingsHandler(gladys, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
+  withingsHandler.withingsUrl = 'http://localhost:9192';
+  withingsHandler.integrationName = 'test';
 
   before((done) => {
     server.on({

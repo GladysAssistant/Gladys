@@ -28,9 +28,9 @@ describe('Withings settings page', () => {
   });
 
   it('Check setting page and connect', () => {
-    cy.get('.markup').i18n('integration.oauth2.instructions');
+    cy.get('.markup').i18n('oauth2.instructions');
 
-    cy.get('.form-label').i18n('integration.oauth2.apiKeyLabel');
+    cy.get('.form-label').i18n('oauth2.apiKeyLabel');
 
     cy.get('input')
       .first()
@@ -42,7 +42,7 @@ describe('Withings settings page', () => {
       .clear()
       .type('FakeSecret');
 
-    cy.contains('button', 'integration.oauth2.buttonConnect').click();
+    cy.contains('button', 'oauth2.buttonConnect').click();
 
     // Check redirected to settings page
     cy.location('pathname').should('eq', '/dashboard/integration/health/withings/settings');
@@ -55,14 +55,14 @@ describe('Withings settings page', () => {
 
     cy.get('.alert-info').i18n('integration.withings.settings.instructionsToUse');
 
-    cy.contains('p', 'integration.oauth2.delete').should('exist');
+    cy.contains('p', 'oauth2.delete').should('exist');
   });
 
   it('Check unconnect', () => {
-    cy.contains('button', 'integration.oauth2.unconnectButton').click();
+    cy.contains('button', 'oauth2.unconnectButton').click();
 
-    cy.get('.markup').i18n('integration.oauth2.instructions');
+    cy.get('.markup').i18n('oauth2.instructions');
 
-    cy.get('.form-label').i18n('integration.oauth2.apiKeyLabel');
+    cy.get('.form-label').i18n('oauth2.apiKeyLabel');
   });
 });
