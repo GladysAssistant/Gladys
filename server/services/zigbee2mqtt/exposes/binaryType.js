@@ -85,5 +85,11 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
       },
     },
+    relais: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      },
+    },
   },
 };
