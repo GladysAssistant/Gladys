@@ -1,7 +1,7 @@
-const ServerMock = require('mock-http-server');
 const chai = require('chai');
 const { OAuth2Server } = require('oauth2-mock-server');
 const sinon = require('sinon');
+const serverHttpWithingsMock = require('./withings.serverMock.test');
 const WithingsHandler = require('../../../../services/withings/lib');
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { OAUTH2 } = require('../../../../utils/constants.js');
@@ -9,9 +9,12 @@ const OAuth2Manager = require('../../../../lib/oauth2-client/index');
 
 const { assert, fake } = sinon;
 
-const serverOauth2 = new OAuth2Server();
+const serverHost = 'localhost';
+const httpServerPort = 9192;
+const oauth2ServerPort = 9292;
 
-const server = new ServerMock({ host: 'localhost', port: 9192 }, null);
+const server = serverHttpWithingsMock.getHttpServer(serverHost, httpServerPort, false);
+const serverOauth2 = new OAuth2Server();
 
 let countGetValueCall = 0;
 let countGetValueCallClientId = 0;
@@ -20,39 +23,10 @@ const gladys = {
   variable: {
     getValue: function returnValue(key, serviceId, userId) {
       countGetValueCall += 1;
-      switch (key) {
-        case OAUTH2.VARIABLE.TOKEN_HOST:
-          return 'http://localhost:9292';
-        case OAUTH2.VARIABLE.TOKEN_PATH:
-          return '/oauth2/token';
-        case OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX:
-          return 'ashboard/integration/health/test/settings';
-        case OAUTH2.VARIABLE.AUTHORIZE_HOST:
-          return 'http://localhost:9292';
-        case OAUTH2.VARIABLE.AUTHORIZE_PATH:
-          return '/oauth2_user/authorize2';
-        case OAUTH2.VARIABLE.GRANT_TYPE:
-          return 'authorization_code';
-        case OAUTH2.VARIABLE.INTEGRATION_SCOPE:
-          return 'user.info,user.metrics,user.activity,user.sleepevents';
-        case OAUTH2.VARIABLE.ACCESS_TOKEN:
-          return (
-            '{' +
-            '"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4",' +
-            '"expires_in":10800,' +
-            '"token_type":"Bearer",' +
-            '"scope":"user.info,user.metrics,user.activity,user.sleepevents",' +
-            '"refresh_token":"11757dc7fd8d25889f5edfd373d1f525f53d4942",' +
-            '"userid":"33669966",' +
-            '"expires_at":"2020-11-13T20:46:50.042Z"' +
-            '}'
-          );
-        case OAUTH2.VARIABLE.CLIENT_ID:
-          countGetValueCallClientId += 1;
-          return 'fake_client_id';
-        default:
-          return '';
+      if (key === OAUTH2.VARIABLE.CLIENT_ID) {
+        countGetValueCallClientId += 1;
       }
+      return serverHttpWithingsMock.getVariable(key, serverHost, oauth2ServerPort);
     },
     setValue: fake.resolves(null),
     destroy: fake.returns(null),
@@ -70,108 +44,17 @@ const gladys = {
 
 describe('WithingsHandler poll', () => {
   const withingsHandler = new WithingsHandler(gladys, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
-  withingsHandler.withingsUrl = 'http://localhost:9192';
+  withingsHandler.withingsUrl = `http://${serverHost}:${httpServerPort}`;
   withingsHandler.integrationName = 'test';
 
   before((done) => {
-    server.on({
-      method: 'GET',
-      path: '/v2/user',
-      reply: {
-        status: 200,
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          status: 0,
-          body: {
-            devices: [
-              {
-                type: 'string',
-                model: 'string',
-                model_id: 0,
-                battery: 'low',
-                deviceid: 'withingsDevideId',
-                timezone: 'string',
-                last_session_date: 0,
-              },
-              {
-                type: 'string',
-                model: 'string',
-                model_id: 0,
-                battery: 'no',
-                deviceid: 'withingsDevideId2',
-                timezone: 'string',
-                last_session_date: 0,
-              },
-              {
-                type: 'string',
-                model: 'string',
-                model_id: 0,
-                battery: 'medium',
-                deviceid: 'withingsDevideId3',
-                timezone: 'string',
-                last_session_date: 0,
-              },
-              {
-                type: 'string',
-                model: 'string',
-                model_id: 0,
-                battery: 'high',
-                deviceid: 'withingsDevideId4',
-                timezone: 'string',
-                last_session_date: 0,
-              },
-            ],
-          },
-        }),
-      },
-    });
-
-    server.on({
-      method: 'GET',
-      path: '/measure',
-      reply: {
-        status: 200,
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          status: 0,
-          body: {
-            updatetime: 'string',
-            timezone: 'string',
-            measuregrps: [
-              {
-                grpid: 0,
-                attrib: 0,
-                date: 0,
-                created: 0,
-                category: 1,
-                deviceid: 'withingsDevideId',
-                measures: [
-                  {
-                    value: 0,
-                    type: 1,
-                    unit: 0,
-                    algo: 0,
-                    fm: 0,
-                    fw: 0,
-                  },
-                ],
-                comment: 'string',
-              },
-            ],
-            more: true,
-            offset: 0,
-          },
-        }),
-      },
-    });
-
     server.start(done);
 
     // Start fake oatuh2 server
     // Generate a new RSA key and add it to the keystore
     serverOauth2.issuer.keys.generate('RS256');
     // Start the server
-    serverOauth2.start(9292, 'localhost');
+    serverOauth2.start(oauth2ServerPort, serverHost);
 
     gladys.oauth2Client = new OAuth2Manager(gladys.variable);
   });

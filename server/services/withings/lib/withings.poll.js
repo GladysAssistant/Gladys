@@ -99,12 +99,10 @@ async function poll(device) {
               if (feature.last_value_changed) {
                 dateToPoll = feature.last_value_changed.getTime();
               }
-              const measureResult = await this.gladys.oauth2Client.executeOauth2HTTPQuery(
-                this.serviceId,
+
+              const measureResult = await this.getMeasures(
                 user.id,
-                'get',
-                `${this.withingsUrl}/measure`,
-                `action=getmeas&meastype=${withingsType}&category=1&lastupdate=${dateToPoll / 1000 + 1}`,
+                `&meastype=${withingsType}&category=1&lastupdate=${dateToPoll / 1000 + 1}`,
               );
 
               if (measureResult.data.body.measuregrps) {
@@ -134,14 +132,9 @@ async function poll(device) {
             }
 
             if (withingsType === -1) {
-              const userResult = await this.gladys.oauth2Client.executeOauth2HTTPQuery(
-                this.serviceId,
-                user.id,
-                'get',
-                `${this.withingsUrl}/v2/user`,
-                'action=getdevice',
-              );
+              const userResult = await this.getDevices(user.id);
 
+              // Update battery level
               if (userResult.data && userResult.data.body && userResult.data.body.devices) {
                 await Promise.each(userResult.data.body.devices, async (element) => {
                   logger.debug('withingsDeviceId: ', withingsDeviceId);

@@ -267,13 +267,7 @@ async function init(userId) {
     );
   }
 
-  const userResult = await this.gladys.oauth2Client.executeOauth2HTTPQuery(
-    serviceId,
-    userId,
-    'get',
-    `${this.withingsUrl}/v2/user`,
-    'action=getdevice',
-  );
+  const userResult = await this.getDevices(userId);
 
   const devices = [];
   const devicesResult = [];
@@ -289,13 +283,7 @@ async function init(userId) {
       }
     });
 
-    const measureResult = await this.gladys.oauth2Client.executeOauth2HTTPQuery(
-      serviceId,
-      userId,
-      'get',
-      `${this.withingsUrl}/measure`,
-      'action=getmeas',
-    );
+    const measureResult = await this.getMeasures(userId, null);
 
     const mapOfMeasuresGrpsByWithingsDeviceId = new Map();
     await measureResult.data.body.measuregrps.forEach((element) => {
