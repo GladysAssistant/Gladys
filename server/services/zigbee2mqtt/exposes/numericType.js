@@ -191,70 +191,80 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
-    current_tier1_summ_delivered: { // HCHC index
+    current_tier1_summ_delivered: {
+      // HCHC index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier2_summ_delivered: { // HCHP index
+    current_tier2_summ_delivered: {
+      // HCHP index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier3_summ_delivered: { // BBRHCJW index
+    current_tier3_summ_delivered: {
+      // BBRHCJW index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier4_summ_delivered: { // BBRHPJW index
+    current_tier4_summ_delivered: {
+      // BBRHPJW index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier5_summ_delivered: { // BBRHCJR index
+    current_tier5_summ_delivered: {
+      // BBRHCJR index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier6_summ_delivered: { // BBRHPJR index
+    current_tier6_summ_delivered: {
+      // BBRHPJR index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier7_summ_delivered: { // EASF07 index
+    current_tier7_summ_delivered: {
+      // EASF07 index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier8_summ_delivered: { // EASF08 index
+    current_tier8_summ_delivered: {
+      // EASF08 index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier9_summ_delivered: { // EASF09 index
+    current_tier9_summ_delivered: {
+      // EASF09 index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    current_tier10_summ_delivered: { // EASF10 index
+    current_tier10_summ_delivered: {
+      // EASF10 index
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
