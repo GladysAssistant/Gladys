@@ -94,83 +94,11 @@ async function poll(device) {
             }
 
             if (withingsType > 0) {
-              // Fix date to start poll in tmestamp
-              let dateToPoll = 0;
-              if (feature.last_value_changed) {
-                dateToPoll = feature.last_value_changed.getTime();
-              }
-
-              const measureResult = await this.getMeasures(
-                user.id,
-                `&meastype=${withingsType}&category=1&lastupdate=${dateToPoll / 1000 + 1}`,
-              );
-
-              if (measureResult.data.body.measuregrps) {
-                const mapOfMeasuresGrpsByWithingsDeviceId = new Map();
-                measureResult.data.body.measuregrps.forEach((element) => {
-                  if (element) {
-                    // Build map of measuregrps by withings device id
-                    const measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid) || [];
-                    measureList.push(element);
-                    mapOfMeasuresGrpsByWithingsDeviceId.set(element.deviceid, measureList);
-                  }
-                });
-                await Promise.each(mapOfMeasuresGrpsByWithingsDeviceId, async (value) => {
-                  const key = value[0];
-                  const valueList = value[1];
-                  await Promise.each(valueList, async (currentGroup) => {
-                    if (key) {
-                      await Promise.each(currentGroup.measures, async (measure) => {
-                        const historicalValueState = (measure.value * 10 ** measure.unit).toFixed(2);
-                        const createdAt = new Date(currentGroup.created * 1000);
-                        await this.gladys.device.saveHistoricalState(feature, historicalValueState, createdAt);
-                      });
-                    }
-                  });
-                });
-              }
+              await this.getAndSaveMeasures(feature, withingsType, user.id);
             }
 
             if (withingsType === -1) {
-              const userResult = await this.getDevices(user.id);
-
-              // Update battery level
-              if (userResult.data && userResult.data.body && userResult.data.body.devices) {
-                await Promise.each(userResult.data.body.devices, async (element) => {
-                  logger.debug('withingsDeviceId: ', withingsDeviceId);
-                  logger.debug('featureBattery: ', featureBattery);
-
-                  if (element.deviceid === withingsDeviceId) {
-                    const currentDate = new Date();
-                    let currentBatValueString;
-                    let currentBatValue = 100;
-                    switch (element.battery) {
-                      case 'low':
-                        currentBatValueString = `${element.battery} (< 30%)`;
-                        currentBatValue = 20;
-                        break;
-                      case 'medium':
-                        currentBatValueString = `${element.battery} (> 30%)`;
-                        currentBatValue = 30;
-                        break;
-                      case 'high':
-                        currentBatValueString = `${element.battery} (> 75%)`;
-                        currentBatValue = 75;
-                        break;
-                      default:
-                        currentBatValueString = `No value`;
-                        currentBatValue = 0;
-                        break;
-                    }
-
-                    featureBattery.last_value_changed = currentDate;
-                    featureBattery.last_value = currentBatValue;
-                    featureBattery.last_value_string = currentBatValueString;
-
-                    await this.gladys.device.saveHistoricalState(featureBattery, currentBatValue, currentDate);
-                  }
-                });
-              }
+              await this.getAndSaveBatteryLevel(featureBattery, withingsDeviceId, user.id);
             }
           });
         }

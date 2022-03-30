@@ -1,6 +1,8 @@
 const uuid = require('uuid');
+const Promise = require('bluebird');
 const { OAUTH2 } = require('../../../utils/constants.js');
 const logger = require('../../../utils/logger');
+const withingsBatUtils = require('./utils/withings.buildBatteryLevelValues');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_POLL_FREQUENCIES,
@@ -36,26 +38,11 @@ function buildNewDevice(withingsDevice, serviceId) {
   // Feature allow in each device = battery
   const uniqueBatFeatureId = uuid.v4();
   const currentDate = new Date();
-  let currentBatValueString = `${withingsDevice.battery}`;
-  let currentBatValue = 100;
-  switch (currentBatValueString) {
-    case 'low':
-      currentBatValueString = `${currentBatValueString} (< 30%)`;
-      currentBatValue = 20;
-      break;
-    case 'medium':
-      currentBatValueString = `${currentBatValueString} (> 30%)`;
-      currentBatValue = 30;
-      break;
-    case 'high':
-      currentBatValueString = `${currentBatValueString} (> 75%)`;
-      currentBatValue = 75;
-      break;
-    default:
-      currentBatValueString = `No value`;
-      currentBatValue = 0;
-      break;
-  }
+
+  const batteryValues = withingsBatUtils.buildBatteryLevelValues(withingsDevice.battery);
+  const currentBatValue = batteryValues[0];
+  const currentBatValueString = batteryValues[1];
+
   newFeatures.push({
     id: uniqueBatFeatureId,
     name: 'deviceFeatureCategory.battery.shortCategoryName',
@@ -285,61 +272,52 @@ async function init(userId) {
 
     const measureResult = await this.getMeasures(userId, null);
 
-    const mapOfMeasuresGrpsByWithingsDeviceId = new Map();
-    await measureResult.data.body.measuregrps.forEach((element) => {
-      if (element) {
-        // Build map of measuregrps by withings device id
-        const measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid) || [];
-        measureList.push(element);
-        mapOfMeasuresGrpsByWithingsDeviceId.set(element.deviceid, measureList);
-      }
-    });
+    const mapOfMeasuresGrpsByWithingsDeviceId = this.buildMapOfMeasures(measureResult.data.body.measuregrps);
 
+    // Build map of feature (based on withings measures)
     const mapOfFeatureByWithingsDeviceId = new Map();
-    await mapOfMeasuresGrpsByWithingsDeviceId.forEach((value, key) => {
-      value.forEach((currentGroup) => {
+    await Promise.map(
+      mapOfMeasuresGrpsByWithingsDeviceId.entries(),
+      async (entrie) => {
+        const key = entrie[0];
+        const value = entrie[1];
+        value.forEach((currentGroup) => {
+          if (key) {
+            const currentFeatures = mapOfFeatureByWithingsDeviceId.get(key);
+            const features = buildFeature(currentGroup, mapOfDeviceByWithingsDeviceId.get(key), currentFeatures);
+            if (features) {
+              mapOfFeatureByWithingsDeviceId.set(key, features);
+            }
+          }
+        });
+      },
+      { concurrency: 2 },
+    );
+
+    // Build list of device to display
+    await Promise.map(
+      mapOfDeviceByWithingsDeviceId.entries(),
+      async (entrie) => {
+        const key = entrie[0];
+        const value = entrie[1];
         if (key) {
-          const currentFeatures = mapOfFeatureByWithingsDeviceId.get(key);
-          const features = buildFeature(currentGroup, mapOfDeviceByWithingsDeviceId.get(key), currentFeatures);
-          if (features) {
-            mapOfFeatureByWithingsDeviceId.set(key, features);
+          const matchDeviceInDB = await this.matchDeviceInDB(value);
+
+          if (matchDeviceInDB) {
+            matchDeviceInDB.inDB = true;
+            devicesResult.push(matchDeviceInDB);
+          } else {
+            const arrayOfFeatures = mapOfFeatureByWithingsDeviceId.get(key);
+            // Assign features to device
+            value.features = value.features.concat(arrayOfFeatures);
+            devicesResult.push(value);
           }
         }
-      });
-    });
-
-    // get device in db to know device already connected
-    const { gladys } = this;
-    const devicesInDB = await gladys.device.get({ service: 'withings' });
-    // Save device with feature
-    await mapOfDeviceByWithingsDeviceId.forEach((value, key) => {
-      if (key) {
-        let matchDeviceInDB;
-        if (devicesInDB) {
-          const currentDeviceParam = value.params.filter((element) => element.name === withingsDeviceIdName);
-          if (currentDeviceParam && currentDeviceParam.length > 0) {
-            const currentWithingsDeviceId = currentDeviceParam[0].value;
-
-            matchDeviceInDB = devicesInDB.find((element) =>
-              element.params.find(
-                (param) => param.name === withingsDeviceIdName && param.value === currentWithingsDeviceId,
-              ),
-            );
-          }
-        }
-
-        if (matchDeviceInDB) {
-          matchDeviceInDB.inDB = true;
-          devicesResult.push(matchDeviceInDB);
-        } else {
-          const arrayOfFeatures = mapOfFeatureByWithingsDeviceId.get(key);
-          // Assign features to device
-          value.features = value.features.concat(arrayOfFeatures);
-          devicesResult.push(value);
-        }
-      }
-    });
+      },
+      { concurrency: 2 },
+    );
   }
+
   return devicesResult;
 }
 
