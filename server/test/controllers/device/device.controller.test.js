@@ -107,6 +107,58 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
   });
 });
 
+describe('GET /api/v1/device_feature/states', () => {
+  beforeEach(async function BeforeEach() {
+    this.timeout(10000);
+    await insertStates(25000);
+  });
+  it('should get device state by selector', async function Test() {
+    const now = new Date();
+    const dateState = `${now.getUTCFullYear()}-${`0${now.getUTCMonth() + 1}`.slice(-2)}-${`0${now.getUTCDate()}`.slice(
+      -2,
+    )}`;
+
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states')
+      .query({
+        start_interval: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
+        end_interval: new Date(`${dateState}T23:59:59.999Z`).toISOString(),
+        max_states: 100,
+        device_features: 'test-device-feature',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(1);
+        expect(res.body[0].values).to.have.lengthOf(100);
+      });
+  });
+  it('should get device state', async function Test() {
+    const now = new Date();
+    const dateState = `${now.getUTCFullYear()}-${`0${now.getUTCMonth() + 1}`.slice(-2)}-${`0${now.getUTCDate()}`.slice(
+      -2,
+    )}`;
+
+    await authenticatedRequest
+      .get('/api/v1/device_feature/states')
+      .query({
+        start_interval: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
+        end_interval: new Date(`${dateState}T23:59:59.999Z`).toISOString(),
+        max_states: 5,
+        device_features: 'test-device-feature',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.lengthOf(1);
+        res.body[0].values.forEach((state) => {
+          expect(state).to.have.property('created_at');
+          expect(state).to.have.property('value');
+        });
+      });
+  });
+});
+
 describe('DELETE /api/v1/device/:device_selector', () => {
   it('should delete device', async () => {
     await authenticatedRequest

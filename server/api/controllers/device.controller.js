@@ -105,6 +105,21 @@ module.exports = function DeviceController(gladys) {
     res.json(states);
   }
 
+  /**
+   * @api {get} /api/v1/device_feature/states getDeviceFeaturesStates
+   * @apiName getDeviceFeaturesStates
+   * @apiGroup Device
+   */
+  async function getDeviceFeaturesStates(req, res) {
+    const states = await gladys.device.getDeviceFeaturesStatesMulti(
+      req.query.device_features.split(','),
+      req.query.start_interval,
+      req.query.end_interval,
+      req.query.max_states,
+    );
+    res.json(states);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     get: asyncMiddleware(get),
@@ -114,5 +129,6 @@ module.exports = function DeviceController(gladys) {
     setValue: asyncMiddleware(setValue),
     setValueFeature: asyncMiddleware(setValueFeature),
     getDeviceFeaturesAggregated: asyncMiddleware(getDeviceFeaturesAggregated),
+    getDeviceFeaturesStates: asyncMiddleware(getDeviceFeaturesStates),
   });
 };
