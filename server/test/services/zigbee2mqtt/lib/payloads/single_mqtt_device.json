@@ -1,0 +1,47 @@
+{
+  "date_code": "20161129",
+  "definition": {
+    "description": "Switch",
+    "exposes": [
+      {
+        "access": 3,
+        "description": "Plug",
+        "type": "switch",
+        "features": [
+          {
+            "type": "binary",
+            "name": "state",
+            "property": "state",
+            "access": 3,
+            "value_on": "ON",
+            "value_off": "OFF"
+          }
+        ]
+      }
+    ],
+    "model": "WSDCGQ11LM",
+    "supports_ota": false,
+    "vendor": "Xiaomi"
+  },
+  "endpoints": {
+    "1": {
+      "bindings": [],
+      "clusters": {
+        "input": ["genBasic", "genIdentify", "msTemperatureMeasurement", "msPressureMeasurement", "msRelativeHumidity"],
+        "output": ["genBasic", "genGroups"]
+      },
+      "configured_reportings": []
+    }
+  },
+  "friendly_name": "0x00158d00045b2740",
+  "ieee_address": "0x00158d00045b2740",
+  "interview_completed": true,
+  "interviewing": false,
+  "manufacturer": "LUMI",
+  "model_id": "lumi.weather",
+  "network_address": 23007,
+  "power_source": "Battery",
+  "software_build_id": "3000-0001",
+  "supported": true,
+  "type": "EndDevice"
+}
