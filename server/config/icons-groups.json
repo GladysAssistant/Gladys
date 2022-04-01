@@ -51,6 +51,7 @@
   ],
   "peoples": ["user-check", "user-minus", "user-plus", "user-x", "user", "users"],
   "nonclassees": [
+    "activity",
     "airplay",
     "anchor",
     "aperture",
