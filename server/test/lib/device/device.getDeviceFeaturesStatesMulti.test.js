@@ -33,7 +33,7 @@ describe('Device.getDeviceFeaturesStatesMulti', function Describe() {
     await queryInterface.bulkDelete('t_device_feature_state');
   });
   it('should return last hour states', async () => {
-    await insertStates(120);
+    await insertStates(1);
     const variable = {
       getValue: fake.resolves(null),
     };
@@ -55,7 +55,7 @@ describe('Device.getDeviceFeaturesStatesMulti', function Describe() {
       100,
     );
     expect(response).to.be.instanceOf(Array);
-    const { values } = response[0];
-    expect(values).to.have.lengthOf(100);
+    const { dataRaw } = response[0];
+    expect(dataRaw).to.have.lengthOf(2000);
   });
 });
