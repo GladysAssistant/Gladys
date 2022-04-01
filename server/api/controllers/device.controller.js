@@ -115,7 +115,6 @@ module.exports = function DeviceController(gladys) {
       req.query.device_features.split(','),
       req.query.start_interval,
       req.query.end_interval,
-      req.query.max_states,
     );
     res.json(states);
   }

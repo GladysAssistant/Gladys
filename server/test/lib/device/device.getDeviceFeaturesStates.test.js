@@ -33,7 +33,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     const queryInterface = db.sequelize.getQueryInterface();
     await queryInterface.bulkDelete('t_device_feature_state');
   });
-  it('should return last 10 minutes states', async () => {
+  it.only('should return the current states', async () => {
     await insertStates(120);
     const variable = {
       getValue: fake.resolves(null),
@@ -50,17 +50,17 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       -2,
     )}`;
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable);
-    const { values, device, deviceFeature } = await deviceInstance.getDeviceFeaturesStates(
+    const { dataRaw, device, deviceFeature } = await deviceInstance.getDeviceFeaturesStates(
       'test-device-feature',
       new Date(`${dateState}T00:00:00.000Z`).toISOString(),
       new Date(`${dateState}T23:59:59.999Z`).toISOString(),
-      100,
     );
-    expect(values).to.have.lengthOf(100);
     expect(device).to.have.property('name');
     expect(deviceFeature).to.have.property('name');
+    expect(dataRaw[0]).to.have.lengthOf(2);
+    expect(dataRaw).to.have.lengthOf(2000);
   });
-  it('should return last hours states', async () => {
+  it.only('should return states between 00:01 and 00:30', async () => {
     await insertStates(48 * 60);
     const variable = {
       getValue: fake.resolves(null),
@@ -76,15 +76,18 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       -2,
     )}`;
     const device = new Device(event, {}, stateManager, {}, {}, variable);
-    const { values } = await device.getDeviceFeaturesStates(
+    const { dataRaw } = await device.getDeviceFeaturesStates(
       'test-device-feature',
-      new Date(`${dateState}T00:00:00.000Z`).toISOString(),
-      new Date(`${dateState}T23:59:59.999Z`).toISOString(),
-      100,
+      new Date(`${dateState}T00:01:00.000Z`).toISOString(),
+      new Date(`${dateState}T00:30:00.000Z`).toISOString(),
     );
-    expect(values).to.have.lengthOf(100);
+    expect(dataRaw).to.be.an('array');
+    expect(dataRaw[0]).to.be.an('array');
+    expect(dataRaw[0]).to.have.lengthOf(2);
+    expect(dataRaw[0][0]).to.be.an('date');
+    expect(dataRaw[0][1]).to.be.an('number');
   });
-  it('should return error, device feature doesnt exist', async () => {
+  it.only('should return error, device feature doesnt exist', async () => {
     const variable = {
       getValue: fake.resolves(null),
     };
@@ -100,7 +103,6 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       'this-device-does-not-exist',
       new Date(`${dateState}T00:00:00.000Z`).toISOString(),
       new Date(`${dateState}T23:59:59.999Z`).toISOString(),
-      100,
     );
     return assert.isRejected(promise, 'DeviceFeature not found');
   });

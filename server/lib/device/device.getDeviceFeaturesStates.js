@@ -1,5 +1,4 @@
 const { Op } = require('sequelize');
-const { LTTB } = require('downsample');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
@@ -8,12 +7,11 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * @param {string} selector - Device selector.
  * @param {string} startInterval - Date of start.
  * @param {string} endInterval - Date of end.
- * @param {number} maxStates - Number of elements to return max.
  * @returns {Promise<Object>} - Resolve with an array of data.
  * @example
- * device.getDeviceFeaturesStates('test-device', 2022-03-31T01:13:45.190Z);
+ * device.getDeviceFeaturesStates('test-device', 2022-03-31T00:00:00.000Z, 2022-03-31T23:59:59.999Z);
  */
-async function getDeviceFeaturesStates(selector, startInterval, endInterval, maxStates = 100) {
+async function getDeviceFeaturesStates(selector, startInterval, endInterval) {
   const deviceFeature = this.stateManager.get('deviceFeature', selector);
   if (deviceFeature === null) {
     throw new NotFoundError('DeviceFeature not found');
@@ -35,20 +33,9 @@ async function getDeviceFeaturesStates(selector, startInterval, endInterval, max
     },
   });
 
-  const dataForDownsampling = rows.map((deviceFeatureState) => {
+  const dataRaw = rows.map((deviceFeatureState) => {
     return [new Date(deviceFeatureState.created_at), deviceFeatureState.value];
   });
-
-  const downsampled = LTTB(dataForDownsampling, maxStates);
-
-  // @ts-ignore
-  const values = downsampled.map((e) => {
-    return {
-      created_at: e[0],
-      value: e[1],
-    };
-  });
-
   return {
     device: {
       name: device.name,
@@ -56,7 +43,7 @@ async function getDeviceFeaturesStates(selector, startInterval, endInterval, max
     deviceFeature: {
       name: deviceFeature.name,
     },
-    values,
+    dataRaw,
   };
 }
 
