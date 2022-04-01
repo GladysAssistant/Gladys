@@ -33,7 +33,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     const queryInterface = db.sequelize.getQueryInterface();
     await queryInterface.bulkDelete('t_device_feature_state');
   });
-  it.only('should return the current states', async () => {
+  it('should return the current states', async () => {
     await insertStates(120);
     const variable = {
       getValue: fake.resolves(null),
@@ -60,7 +60,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     expect(dataRaw[0]).to.have.lengthOf(2);
     expect(dataRaw).to.have.lengthOf(2000);
   });
-  it.only('should return states between 00:01 and 00:30', async () => {
+  it('should return states between 00:01 and 00:30', async () => {
     await insertStates(48 * 60);
     const variable = {
       getValue: fake.resolves(null),
@@ -87,7 +87,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     expect(dataRaw[0][0]).to.be.an('date');
     expect(dataRaw[0][1]).to.be.an('number');
   });
-  it.only('should return error, device feature doesnt exist', async () => {
+  it('should return error, device feature doesnt exist', async () => {
     const variable = {
       getValue: fake.resolves(null),
     };
