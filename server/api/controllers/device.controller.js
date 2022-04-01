@@ -109,6 +109,66 @@ module.exports = function DeviceController(gladys) {
    * @api {get} /api/v1/device_feature/states getDeviceFeaturesStates
    * @apiName getDeviceFeaturesStates
    * @apiGroup Device
+   *
+   * @apiParam {String} name Name of the dashboard.
+   * @apiParam {String} [device_features] Devices features selector (can contain 4 features from different devices).
+   * @apiParam {string} [start_interval] Start date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
+   * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time).
+   * @apiParam {string} [end_interval] End date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
+   * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time)..
+   * @apiParamExample {json} Request-Example:
+   * {
+   *   "device_features": "test-device-feature-1,test-device-feature-2",
+   *   "start_interval": "2022-04-01 00:00:00.000",
+   *   "end_interval": "2022-04-01 23:59:00.000"
+   * }
+   * @apiSuccessExample {json} Success-Response:
+   * [
+   * 	{
+   * 		"device": {
+   * 			"name": "Test device"
+   * 		},
+   * 		"deviceFeature": {
+   * 			"name": "Test device_feature 1"
+   * 		},
+   * 		"dataRaw": [
+   * 			[
+   * 				"2022-04-01T06:13:26.651Z",
+   * 				55
+   * 			],
+   * 			[
+   * 				"2022-04-01T06:14:26.655Z",
+   * 				52
+   * 			],
+   * 			[
+   * 				"2022-04-01T06:15:26.654Z",
+   * 				27
+   *      ]
+   *   	]
+   * 	},
+   * 	{
+   * 		"device": {
+   * 			"name": "Test device"
+   * 		},
+   * 		"deviceFeature": {
+   * 			"name": "Test device_feature 2"
+   * 		},
+   * 		"dataRaw": [
+   * 			[
+   * 				"2022-04-01T06:13:26.657Z",
+   * 				1104
+   *      ],
+   * 			[
+   * 				"2022-04-01T06:14:26.655Z",
+   * 				758
+   * 			],
+   * 			[
+   * 				"2022-04-01T06:15:26.654Z",
+   * 				2300
+   *      ]
+   *    ]
+   *  }
+   * ]
    */
   async function getDeviceFeaturesStates(req, res) {
     const states = await gladys.device.getDeviceFeaturesStatesMulti(
