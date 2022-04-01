@@ -3,8 +3,8 @@ import { Link } from 'preact-router/match';
 import { RequestStatus } from '../../../utils/consts';
 import cx from 'classnames';
 import get from 'get-value';
-import iconList from '../../../../../server/config/icons.json';
-import iconListGroups from '../../../../../server/config/icons-groups.json';
+// import iconList from '../../../../../server/config/icons.json';
+import iconListGroups from '../../../../../server/config/icons-groups';
 import style from './style.css';
 
 const NewScenePage = ({ children, ...props }) => (
@@ -43,7 +43,7 @@ const NewScenePage = ({ children, ...props }) => (
                 <Text id="newScene.invalidName" />
               </div>
             </div>
-            <div class="form-group">
+            <div class={cx('form-group', style.iconGlobalContainer)}>
               <label class="form-label">
                 <Text id="newScene.iconLabel" />
               </label>
@@ -52,51 +52,60 @@ const NewScenePage = ({ children, ...props }) => (
                   <Text id="newScene.invalidIcon" />
                 </div>
               )}
-              <div class={cx('row', style.iconContainer)}>
-                {iconList.map(icon => (
-                  <div class="col-auto">
-                    <div
-                      class={cx('text-center', style.iconDiv, {
-                        [style.iconDivChecked]: get(props, 'newScene.icon') === icon
-                      })}
-                    >
-                      <label class={style.iconLabel}>
-                        <input
-                          name="icon"
-                          type="radio"
-                          onChange={props.updateNewSceneIcon}
-                          checked={get(props, 'newScene.icon') === icon}
-                          value={icon}
-                          class={style.iconInput}
-                        />
-                        <i class={`fe fe-${icon}`} />
-                      </label>
-                    </div>
+              {/*<div class={cx('row', style.iconContainer)}>*/}
+              {Object.keys(iconListGroups).map(iconGroup => (
+                <div class={cx('form-group', style.iconContainerRow)}>
+                  <label class="form-label">{iconGroup}</label>
+                  <div class={cx('row', style.iconContainer)}>
+                    {iconListGroups[iconGroup].map(icon => (
+                      <div class="col-auto">
+                        <div
+                          class={cx('text-center', style.iconDiv, {
+                            [style.iconDivChecked]: get(props, 'newScene.icon') === icon
+                          })}
+                        >
+                          <label class={style.iconLabel}>
+                            <input
+                              name="icon"
+                              type="radio"
+                              onChange={props.updateNewSceneIcon}
+                              checked={get(props, 'newScene.icon') === icon}
+                              value={icon}
+                              class={style.iconInput}
+                            />
+                            <i class={`fe fe-${icon}`} />
+                          </label>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-                {/*{iconList.map(icon => (
-                  <div class="col-auto">
-                    <div
-                      class={cx('text-center', style.iconDiv, {
-                        [style.iconDivChecked]: get(props, 'newScene.icon') === icon
-                      })}
-                    >
-                      <label class={style.iconLabel}>
-                        <input
-                          name="icon"
-                          type="radio"
-                          onChange={props.updateNewSceneIcon}
-                          checked={get(props, 'newScene.icon') === icon}
-                          value={icon}
-                          class={style.iconInput}
-                        />
-                        <i class={`fe fe-${icon}`} />
-                      </label>
-                    </div>
+                </div>
+              ))}
+              {/*{iconList.map(icon => (
+                <div class="col-auto">
+                  <div
+                    class={cx('text-center', style.iconDiv, {
+                      [style.iconDivChecked]: get(props, 'newScene.icon') === icon
+                    })}
+                  >
+                    <label class={style.iconLabel}>
+                      <input
+                        name="icon"
+                        type="radio"
+                        onChange={props.updateNewSceneIcon}
+                        checked={get(props, 'newScene.icon') === icon}
+                        value={icon}
+                        class={style.iconInput}
+                      />
+                      <i class={`fe fe-${icon}`} />
+                    </label>
                   </div>
-                    ))}*/}
-              </div>
+                </div>
+                  ))}*/}
             </div>
+            {
+              // </div>
+            }
 
             <div class="form-footer">
               <button

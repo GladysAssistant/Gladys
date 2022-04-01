@@ -1,22 +1,38 @@
 .containerWithMargin {
   margin-top: 3rem;
+  overflow: auto;
+}
+
+.iconContainerRow {
+  margin-top: 1rem;
+  height: auto;
+  margin-bottom: 2px;
+}
+
+.iconGlobalContainer {
+  margin-top: 1rem;
+  height: 50rem;
+  overflow: auto;
+  font-size: 25px;
+  margin-bottom: 5px;
 }
 
 .iconContainer {
   margin-top: 1rem;
-  height: 40rem;
-  overflow: scroll;
+  height: auto;
+  width: auto;
+  margin-bottom: 1rem;
 }
 
 .iconDiv {
   padding: 5px;
-  width: 35px;
-  margin-bottom: 8px;
+  width: 10px;
+  margin-bottom: 2px;
 }
 
 .iconDivChecked {
   background-color: #f5f7fb;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 .iconLabel {
