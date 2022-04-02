@@ -132,17 +132,22 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     stateManagerGetStub.onFirstCall().returns({
       features: [
         {
-          external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
+          external_id: 'zigbee2mqtt:0x00158d00033e88d5:battery:integer:battery',
           type: 'battery',
         },
       ],
     });
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    zigbeeDevices
+      .filter((d) => d.supported)
+      .forEach((device) => {
+        zigbee2mqttManager.discoveredDevices[device.friendly_name] = device;
+      });
     // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86, "battery":59}`);
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/0x00158d00033e88d5', `{"humidity":86, "battery":59}`);
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
+      device_feature_external_id: 'zigbee2mqtt:0x00158d00033e88d5:battery:integer:battery',
       state: 59,
     });
   });

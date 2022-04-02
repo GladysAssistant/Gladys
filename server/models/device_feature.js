@@ -64,13 +64,22 @@ module.exports = (sequelize, DataTypes) => {
       min: {
         allowNull: false,
         type: DataTypes.DOUBLE,
+        validate: {
+          isFloat: true,
+        },
       },
       max: {
         allowNull: false,
         type: DataTypes.DOUBLE,
+        validate: {
+          isFloat: true,
+        },
       },
       last_value: {
         type: DataTypes.DOUBLE,
+        validate: {
+          isFloat: true,
+        },
       },
       last_value_string: {
         type: DataTypes.TEXT,
