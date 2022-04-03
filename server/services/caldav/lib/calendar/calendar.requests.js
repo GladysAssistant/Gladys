@@ -115,7 +115,7 @@ async function requestEventsData(xhr, calendarUrl, eventsToUpdate, calDavHost) {
                   if (!eventToUpdate.href.endsWith('.ics')) {
                     return '';
                   }
-                  return `<d:href>${eventToUpdate.href}</d:href>`;
+                  return `<d:href>${encodeURIComponent(eventToUpdate.href).replace(/%2F/g, '/')}</d:href>`;
                 })
                 .join('\n')}
               <c:filter>
