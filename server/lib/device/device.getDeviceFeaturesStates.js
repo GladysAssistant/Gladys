@@ -42,6 +42,8 @@ async function getDeviceFeaturesStates(selector, startInterval, endInterval) {
     },
     deviceFeature: {
       name: deviceFeature.name,
+      selector: deviceFeature.selector,
+      external_id: deviceFeature.external_id,
     },
     dataRaw,
   };

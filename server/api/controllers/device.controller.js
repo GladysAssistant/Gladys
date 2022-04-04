@@ -119,19 +119,30 @@ module.exports = function DeviceController(gladys) {
    * @apiParamExample {json} Request-Example:
    * {
    *   "device_features": "test-device-feature-1,test-device-feature-2",
+   *   "start_interval": "2022-03-31T22:00:00.000Z",
+   *   "end_interval": "2022-04-01T21:59:59.999Z"
+   * }
+   * OU
+   * {
+   *   "device_features": "test-device-feature-1,test-device-feature-2",
    *   "start_interval": "2022-04-01 00:00:00.000",
    *   "end_interval": "2022-04-01 23:59:00.000"
    * }
    * @apiSuccessExample {json} Success-Response:
    * [
    * 	{
-   * 		"device": {
+   * 		"device":
+   * 		{
    * 			"name": "Test device"
    * 		},
-   * 		"deviceFeature": {
+   * 		"deviceFeature":
+   * 		{
    * 			"name": "Test device_feature 1"
+   * 			"selector": "test-device-feature-1",
+   * 			"external_id": "mqtt:test_device_feature_1",
    * 		},
-   * 		"dataRaw": [
+   * 		"dataRaw":
+   * 		[
    * 			[
    * 				"2022-04-01T06:13:26.651Z",
    * 				55
@@ -143,21 +154,26 @@ module.exports = function DeviceController(gladys) {
    * 			[
    * 				"2022-04-01T06:15:26.654Z",
    * 				27
-   *      ]
-   *   	]
+   * 			]
+   * 		]
    * 	},
    * 	{
-   * 		"device": {
+   * 		"device":
+   * 		{
    * 			"name": "Test device"
    * 		},
-   * 		"deviceFeature": {
+   * 		"deviceFeature":
+   * 		{
    * 			"name": "Test device_feature 2"
+   * 			"selector": "test-device-feature-2",
+   * 			"external_id": "mqtt:test_device_feature_2",
    * 		},
-   * 		"dataRaw": [
+   * 		"dataRaw":
+   * 		[
    * 			[
    * 				"2022-04-01T06:13:26.657Z",
    * 				1104
-   *      ],
+   * 			],
    * 			[
    * 				"2022-04-01T06:14:26.655Z",
    * 				758
@@ -165,9 +181,9 @@ module.exports = function DeviceController(gladys) {
    * 			[
    * 				"2022-04-01T06:15:26.654Z",
    * 				2300
-   *      ]
-   *    ]
-   *  }
+   * 			]
+   * 		]
+   * 	}
    * ]
    */
   async function getDeviceFeaturesStates(req, res) {

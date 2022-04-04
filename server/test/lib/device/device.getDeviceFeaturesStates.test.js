@@ -57,6 +57,8 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     );
     expect(device).to.have.property('name');
     expect(deviceFeature).to.have.property('name');
+    expect(deviceFeature).to.have.property('selector');
+    expect(deviceFeature).to.have.property('external_id');
     expect(dataRaw[0]).to.have.lengthOf(2);
     expect(dataRaw).to.have.lengthOf(2000);
   });
