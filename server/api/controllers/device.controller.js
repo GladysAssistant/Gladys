@@ -111,8 +111,9 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    *
    * @apiParam {String} name Name of the dashboard.
-   * @apiParam {String} [device_features] Devices features selector (can contain 4 features from different devices).
-   * @apiParam {string} [start_interval] Start date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
+   * @apiParam {String} device_features Device(s) feature(s) selector(s)
+   * (can contain 4 features from different devices).
+   * @apiParam {string} start_interval Start date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
    * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time).
    * @apiParam {string} [end_interval] End date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
    * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time)..
