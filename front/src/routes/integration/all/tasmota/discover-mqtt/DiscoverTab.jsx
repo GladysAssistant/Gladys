@@ -57,12 +57,11 @@ class DiscoverTab extends Component {
                       listName="discoveredDevices"
                     />
                   ))}
-                {!props.discoveredDevices ||
-                  (props.discoveredDevices.length === 0 && (
-                    <EmptyDeviceList>
-                      <Text id="integration.tasmota.discover.noDeviceFound" />
-                    </EmptyDeviceList>
-                  ))}
+                {(!props.discoveredDevices || props.discoveredDevices.length === 0) && (
+                  <EmptyDeviceList>
+                    <Text id="integration.tasmota.discover.noDeviceFound" />
+                  </EmptyDeviceList>
+                )}
               </div>
             </div>
           </div>

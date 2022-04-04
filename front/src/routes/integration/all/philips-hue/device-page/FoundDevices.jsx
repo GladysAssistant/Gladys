@@ -37,9 +37,11 @@ const FoundDevices = ({ children, ...props }) => (
           {props.getPhilipsHueNewDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {(!props.philipsHueNewDevices || props.philipsHueNewDevices.length === 0) && (
-              <EmptyDeviceList>
-                <Text id="integration.philipsHue.device.noDevicesFound" />
-              </EmptyDeviceList>
+              <div class="col-md-12">
+                <div class="alert alert-info">
+                  <Text id="integration.philipsHue.device.noDevicesFound" />
+                </div>
+              </div>
             )}
             {props.philipsHueNewDevices &&
               props.philipsHueNewDevices.map((device, index) => (
@@ -75,7 +77,7 @@ const FoundDevices = ({ children, ...props }) => (
               ))}
             {(!props.philipsHueDevices || props.philipsHueDevices.length === 0) && (
               <EmptyDeviceList>
-                <Text id="integration.philipsHue.device.noDevices" />
+                <Text id="integration.philipsHue.device.noDevicesFound" />
               </EmptyDeviceList>
             )}
           </div>

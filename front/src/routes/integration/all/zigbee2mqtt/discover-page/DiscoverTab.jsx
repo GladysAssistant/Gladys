@@ -3,7 +3,6 @@ import cx from 'classnames';
 
 import EmptyDeviceList from '../../../../../components/device/view/EmptyDeviceList';
 import DiscoveredBox from './DiscoveredBox';
-import style from './style.css';
 import CheckStatus from '../commons/CheckStatus';
 
 const DiscoverTab = ({ children, ...props }) => (
@@ -45,7 +44,7 @@ const DiscoverTab = ({ children, ...props }) => (
         })}
       >
         <div class="loader" />
-        <div class={cx('dimmer-content', style.zigbee2mqttListBody)}>
+        <div class="dimmer-content">
           <div class="row">
             {props.zigbee2mqttDevices &&
               props.zigbee2mqttDevices.map((device, index) => (
