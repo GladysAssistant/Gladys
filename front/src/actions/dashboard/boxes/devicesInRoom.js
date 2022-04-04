@@ -10,7 +10,6 @@ const BOX_KEY = 'DevicesInRoom';
 
 const getLightStatus = room => {
   let roomLightStatus = 0;
-  let hasBinaryLightDeviceFeature = false;
   room.devices.forEach(device => {
     device.features.forEach(feature => {
       // if it's a light
@@ -23,14 +22,10 @@ const getLightStatus = room => {
       if (isLight && feature.last_value === 1) {
         roomLightStatus = 1;
       }
-      if (isLight) {
-        hasBinaryLightDeviceFeature = true;
-      }
     });
   });
   return {
-    roomLightStatus,
-    hasBinaryLightDeviceFeature
+    roomLightStatus
   };
 };
 
@@ -44,10 +39,9 @@ function createActions(store) {
       try {
         const room = await state.httpClient.get(`/api/v1/room/${box.room}?expand=devices`);
         // we test if there are lights ON/OFF device features to control in this room
-        const { hasBinaryLightDeviceFeature, roomLightStatus } = getLightStatus(room);
+        const { roomLightStatus } = getLightStatus(room);
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           room,
-          hasBinaryLightDeviceFeature,
           roomLightStatus
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
@@ -100,10 +94,9 @@ function createActions(store) {
           }
         }
       });
-      const { hasBinaryLightDeviceFeature, roomLightStatus } = getLightStatus(newData.room);
+      const { roomLightStatus } = getLightStatus(newData.room);
       boxActions.mergeBoxData(state, BOX_KEY, x, y, {
         room: newData.room,
-        hasBinaryLightDeviceFeature,
         roomLightStatus
       });
       await actions.setValueDeviceDebounce(state, deviceFeature.selector, action);
@@ -128,10 +121,9 @@ function createActions(store) {
           }
         }
       });
-      const { hasBinaryLightDeviceFeature, roomLightStatus } = getLightStatus(newData.room);
+      const { roomLightStatus } = getLightStatus(newData.room);
       boxActions.mergeBoxData(state, BOX_KEY, x, y, {
         room: newData.room,
-        hasBinaryLightDeviceFeature,
         roomLightStatus
       });
       await deviceActions.setValue(state, deviceFeature.selector, action);
@@ -167,10 +159,9 @@ function createActions(store) {
                   }
                 }
               });
-              const { hasBinaryLightDeviceFeature, roomLightStatus } = getLightStatus(newData.room);
+              const { roomLightStatus } = getLightStatus(newData.room);
               boxActions.mergeBoxData(state, BOX_KEY, x, y, {
                 room: newData.room,
-                hasBinaryLightDeviceFeature,
                 roomLightStatus
               });
             }

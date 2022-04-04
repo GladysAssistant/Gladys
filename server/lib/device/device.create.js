@@ -157,7 +157,10 @@ async function create(device) {
   // if the new device should be polled, poll
   if (newDevice.should_poll) {
     this.poll(newDevice);
-  } else if (oldPollFrequency) {
+  }
+  const pollingWasDisabled = newDevice.should_poll === false && oldPollFrequency;
+  const pollingWasUpdated = oldPollFrequency !== newDevice.poll_frequency;
+  if (oldPollFrequency && (pollingWasDisabled || pollingWasUpdated)) {
     // Remove from poll
     const { [oldPollFrequency]: devices } = this.devicesByPollFrequency;
     const deviceIndex = devices.findIndex((d) => d.external_id === device.external_id);

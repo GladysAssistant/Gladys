@@ -371,6 +371,7 @@ const DEVICE_FEATURE_TYPES = {
     INTEGER: 'integer',
   },
   VIBRATION_SENSOR: {
+    BINARY: 'binary',
     STATUS: 'status',
     TILT_ANGLE: 'tilt-angle',
     ACCELERATION_X: 'acceleration-x',

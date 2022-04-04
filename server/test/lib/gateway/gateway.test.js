@@ -5,6 +5,7 @@ const path = require('path');
 const { fake, assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
+const db = require('../../../models');
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 
 const event = new EventEmitter();
@@ -77,7 +78,8 @@ describe('gateway', () => {
     });
   });
 
-  describe('gateway.backup', () => {
+  describe('gateway.backup', async function Describe() {
+    this.timeout(20000);
     it('should backup gladys', async () => {
       const variable = {
         getValue: fake.resolves('key'),
@@ -88,6 +90,40 @@ describe('gateway', () => {
       await gateway.backup();
       assert.calledOnce(gateway.gladysGatewayClient.uploadBackup);
     });
+    it('should backup gladys with lots of insert at the same time', async function Test() {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const promisesDevices = [];
+      const promises = [];
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      // create 100 state
+      for (let i = 0; i < 100; i += 1) {
+        promisesDevices.push(
+          db.DeviceFeatureState.create({
+            device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+            value: 1,
+          }),
+        );
+      }
+      // start backup
+      promises.push(gateway.backup());
+      // create 100 states
+      for (let i = 0; i < 100; i += 1) {
+        promisesDevices.push(
+          db.DeviceFeatureState.create({
+            device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+            value: 1,
+          }),
+        );
+      }
+      await Promise.all(promisesDevices);
+      await Promise.all(promises);
+      assert.calledOnce(gateway.gladysGatewayClient.uploadBackup);
+    });
+
     it('should backup gladys and test progress bar', async () => {
       const variable = {
         getValue: fake.resolves('key'),

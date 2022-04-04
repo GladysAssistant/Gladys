@@ -6,12 +6,17 @@ dayjs.extend(relativeTime);
 
 class RelativeTime extends Component {
   refreshTimeDisplay = () => {
-    if (this.props.datetime && this.props.language) {
-      const relativeTime = dayjs(this.props.datetime)
-        .locale(this.props.language)
-        .fromNow();
+    const { datetime, language, futureDisabled } = this.props;
+    if (datetime && language) {
+      let relativeTime = dayjs(datetime);
+      const now = dayjs();
+
+      if (futureDisabled && relativeTime.isAfter(now)) {
+        relativeTime = now;
+      }
+
       this.setState({
-        relativeTime
+        relativeTime: relativeTime.locale(language).fromNow()
       });
     }
   };
