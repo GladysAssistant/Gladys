@@ -52,16 +52,15 @@ const NewScenePage = ({ children, ...props }) => (
                 </div>
 
                 <div>
-                <span class="btn-group">
-                  <button class="btn btn-secondary" name="listView" onClick={props.handleClick}>
-                    {`Vue liste`}
-                  </button>
-                  <button class="btn btn-secondary" name="groupView" onClick={props.handleClick2}>
-                    {`Vue groupe`}
-                  </button>
-                </span>
+                  <span class="btn-group">
+                    <button class="btn btn-secondary" name="listView" onClick={props.handleClick}>
+                      {`Vue liste`}
+                    </button>
+                    <button class="btn btn-secondary" name="groupView" onClick={props.handleClick}>
+                      {`Vue groupe`}
+                    </button>
+                  </span>
                 </div>
-                
               </div>
               {get(props, 'newSceneErrors.icon') && (
                 <div class="alert alert-danger">
@@ -70,9 +69,8 @@ const NewScenePage = ({ children, ...props }) => (
               )}
               {/*console.log(props)*/}
             </div>
-            {/*<div class={cx('row', style.iconContainer)}>*/}
             <div class={cx('form-group', style.iconGlobalContainer)}>
-              {props.selectIconView === "iconGroup" && (
+              {props.selectIconView === 'iconGroup' &&
                 Object.keys(iconListGroups).map(iconGroup => (
                   <div class={cx('form-group', style.iconContainerRow)}>
                     <label class="form-label">{iconGroup}</label>
@@ -100,34 +98,31 @@ const NewScenePage = ({ children, ...props }) => (
                       ))}
                     </div>
                   </div>
-                ))
-              )}
-              {props.selectIconView === "iconList" && (
-                iconList.map(icon => (
-                  <div class={cx('form-group', style.iconContainerRow)}>
-                    <div class={cx('row', style.iconContainer)}>
-                  <div class="col">
-                    <div
-                      class={cx('text-center', style.iconDiv, {
-                        [style.iconDivChecked]: get(props, 'newScene.icon') === icon
-                      })}
-                    >
-                      <label class={style.iconLabel}>
-                        <input
-                          name="icon"
-                          type="radio"
-                          onChange={props.updateNewSceneIcon}
-                          checked={get(props, 'newScene.icon') === icon}
-                          value={icon}
-                          class={style.iconInput}
-                        />
-                        <i class={`fe fe-${icon}`} />
-                      </label>
+                ))}
+              {props.selectIconView === 'iconList' && (
+                <div class={cx('row', style.iconContainer)}>
+                  {iconList.map(icon => (
+                    <div class="col-2">
+                      <div
+                        class={cx('text-center', style.iconDiv, {
+                          [style.iconDivChecked]: get(props, 'newScene.icon') === icon
+                        })}
+                      >
+                        <label class={style.iconLabel}>
+                          <input
+                            name="icon"
+                            type="radio"
+                            onChange={props.updateNewSceneIcon}
+                            checked={get(props, 'newScene.icon') === icon}
+                            value={icon}
+                            class={style.iconInput}
+                          />
+                          <i class={`fe fe-${icon}`} />
+                        </label>
+                      </div>
                     </div>
-                  </div>
-                  </div>
-                  </div>
-                ))
+                  ))}
+                </div>
               )}
             </div>
             <div class="form-footer">

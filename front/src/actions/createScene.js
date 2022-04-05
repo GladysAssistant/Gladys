@@ -5,8 +5,16 @@ import { route } from 'preact-router';
 
 function createActions(store) {
   const actions = {
-    checkErrors(state) {
+    async checkErrors(state, e) {
       let newSceneErrors = {};
+
+      if (state.selecticonViewLoading === true) {
+        store.setState({
+          newSceneErrors,
+          selecticonViewLoading: false
+        });
+        return;
+      }
       if (!state.newScene.name) {
         newSceneErrors.name = true;
       }
@@ -58,33 +66,23 @@ function createActions(store) {
         },
         newSceneErrors: null,
         createSceneStatus: null,
-        selectIconView: "iconList"
+        selectIconView: 'iconList',
+        selecticonViewLoading: false
       });
     },
     handleClick(state, e) {
-      //e.preventDefault();
-      
-      if (state.target.name === "listView") {
-          store.setState({
-          selectIconView: "iconList"
+      if (e.target.name === 'listView') {
+        store.setState({
+          selectIconView: 'iconList',
+          selecticonViewLoading: true
         });
       }
-      if (state.target.name === "groupView") {
-          store.setState({
-          selectIconView: "iconGroup"
+      if (e.target.name === 'groupView') {
+        store.setState({
+          selectIconView: 'iconGroup',
+          selecticonViewLoading: true
         });
       }
-      console.log(e)
-      console.log(state)
-      console.log(state.target)
-    },
-    handleClick2(state, e) {
-      console.log(e)
-      console.log(state)
-      console.log(state.target)
-      store.setState({
-        selectIconView: "iconGroup"
-      });
     },
     updateNewSceneName(state, e) {
       const newState = update(state, {
@@ -100,7 +98,6 @@ function createActions(store) {
       }
     },
     updateNewSceneIcon(state, e) {
-      console.log('Le lien 3 a été cliqué.');
       const newState = update(state, {
         newScene: {
           icon: {
