@@ -420,6 +420,30 @@ const DEVICE_FEATURE_TYPES = {
     FORWARD: 'forward',
     RECORD: 'record',
   },
+  ENERGY_SENSOR: {
+    BINARY: 'binary',
+    POWER: 'power',
+    ENERGY: 'energy',
+    VOLTAGE: 'voltage',
+    CURRENT: 'current',
+    INDEX: 'index',
+  },
+  SPEED_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  UV_SENSOR: {
+    INTEGER: 'integer',
+  },
+  CURRENCY: {
+    COST: 'cost',
+  },
+  PRECIPITATION_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  VOLUME_SENSOR: {
+    DECIMAL: 'decimal',
+    INTEGER: 'integer',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },

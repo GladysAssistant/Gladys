@@ -1801,22 +1801,34 @@
       "record": "Record"
     },
     "energy-sensor": {
-      "shortCategoryName": "Energy sensor"
+      "shortCategoryName": "Energy sensor",
+      "voltage": "Voltage",
+      "current": "Current",
+      "binary": "Switch",
+      "power": "Power",
+      "energy": "Energy",
+      "index": "Index"
     },
     "volume-sensor": {
-      "shortCategoryName": "Volume sensor"
+      "shortCategoryName": "Volume sensor",
+      "decimal": "Volume (decimal)",
+      "integer": "Volume (integer)"
     },
     "currency": {
-      "shortCategoryName": "Currency"
+      "shortCategoryName": "Currency",
+      "cost": "Cost"
     },
     "speed-sensor": {
-      "shortCategoryName": "Speed sensor"
+      "shortCategoryName": "Speed sensor",
+      "decimal": "Speed"
     },
     "precipitation-sensor": {
-      "shortCategoryName": "Precipitation sensor"
+      "shortCategoryName": "Precipitation sensor",
+      "decimal": "Precipitation"
     },
     "uv-sensor": {
-      "shortCategoryName": "UV Sensor"
+      "shortCategoryName": "UV Sensor",
+      "integer": "UV Index"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
