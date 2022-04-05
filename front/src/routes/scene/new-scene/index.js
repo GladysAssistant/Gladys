@@ -13,4 +13,4 @@ class NewScene extends Component {
   }
 }
 
-export default connect('newScene,newSceneErrors,createSceneStatus', actions)(NewScene);
+export default connect('newScene,newSceneErrors,createSceneStatus,selectIconView', actions)(NewScene);

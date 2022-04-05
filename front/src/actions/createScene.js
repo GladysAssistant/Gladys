@@ -57,7 +57,33 @@ function createActions(store) {
           actions: [[]]
         },
         newSceneErrors: null,
-        createSceneStatus: null
+        createSceneStatus: null,
+        selectIconView: "iconList"
+      });
+    },
+    handleClick(state, e) {
+      //e.preventDefault();
+      
+      if (state.target.name === "listView") {
+          store.setState({
+          selectIconView: "iconList"
+        });
+      }
+      if (state.target.name === "groupView") {
+          store.setState({
+          selectIconView: "iconGroup"
+        });
+      }
+      console.log(e)
+      console.log(state)
+      console.log(state.target)
+    },
+    handleClick2(state, e) {
+      console.log(e)
+      console.log(state)
+      console.log(state.target)
+      store.setState({
+        selectIconView: "iconGroup"
       });
     },
     updateNewSceneName(state, e) {
@@ -74,6 +100,7 @@ function createActions(store) {
       }
     },
     updateNewSceneIcon(state, e) {
+      console.log('Le lien 3 a été cliqué.');
       const newState = update(state, {
         newScene: {
           icon: {
