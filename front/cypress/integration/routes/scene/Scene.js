@@ -36,7 +36,7 @@ describe('Scene view', () => {
     // Delete all Bluetooth devices
     cy.deleteDevices('mqtt');
   });
-  it.only('Should create new scene', () => {
+  it('Should create new scene', () => {
     cy.visit('/dashboard/scene');
     cy.contains('scene.newButton')
       .should('have.class', 'btn-outline-primary')
