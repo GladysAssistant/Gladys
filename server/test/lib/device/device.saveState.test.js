@@ -142,4 +142,31 @@ describe('Device.saveState', () => {
       expect(e).instanceOf(BadParameters);
     }
   });
+  it('should not save string state', async () => {
+    const event = {
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const device = new Device(event, {}, stateManager);
+
+    const stringValue = 'LOCK';
+
+    try {
+      await device.saveState(
+        {
+          id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+          selector: 'test-device-feature',
+          has_feedback: false,
+          keep_history: false,
+        },
+        // @ts-ignore
+        stringValue,
+      );
+      assert.fail('String device state should fail');
+    } catch (e) {
+      expect(e.toString()).to.equal(
+        'SequelizeValidationError: Validation error: Validation isFloat on last_value failed',
+      );
+    }
+  });
 });

@@ -1,13 +1,22 @@
+const Sequelize = require('sequelize');
 const path = require('path');
 const fse = require('fs-extra');
 const fs = require('fs');
+const fsPromise = require('fs').promises;
 const FormData = require('form-data');
+const retry = require('async-retry');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { exec } = require('../../utils/childProcess');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 const BACKUP_NAME_BASE = 'gladys-db-backup';
+
+const RETRY_OPTIONS = {
+  retries: 3,
+  factor: 2,
+  minTimeout: 2000,
+};
 
 /**
  * @description Create a backup and upload it to the Gateway
@@ -28,17 +37,24 @@ async function backup() {
   const encryptedBackupFilePath = `${compressedBackupFilePath}.enc`;
   // we ensure the backup folder exists
   await fse.ensureDir(this.config.backupsFolder);
-  // we delete old backups
-  await fse.emptyDir(this.config.backupsFolder);
   // we lock the database
   logger.info(`Gateway backup: Locking Database`);
-  await db.sequelize.query('BEGIN IMMEDIATE;');
-  // backup database
-  logger.info(`Starting Gateway backup in folder ${backupFilePath}`);
-  await exec(`sqlite3 ${this.config.storage} ".backup '${backupFilePath}'"`);
-  // we remove the lock
-  logger.info(`Gateway backup: Unlocking Database`);
-  await db.sequelize.query('COMMIT;');
+  // It's possible to get "Cannot start a transaction within a transaction" errors
+  // So we might want to retry this part a few times
+  await retry(async (bail, attempt) => {
+    await db.sequelize.transaction({ type: Sequelize.Transaction.TYPES.IMMEDIATE }, async () => {
+      logger.info(`Backup attempt n°${attempt} : Cleaning backup folder`);
+      // we delete old backups
+      await fse.emptyDir(this.config.backupsFolder);
+      // We backup database
+      logger.info(`Starting Gateway backup in folder ${backupFilePath}`);
+      await exec(`sqlite3 ${this.config.storage} ".backup '${backupFilePath}'"`);
+      logger.info(`Gateway backup: Unlocking Database`);
+    });
+  }, RETRY_OPTIONS);
+  const fileInfos = await fsPromise.stat(backupFilePath);
+  const fileSizeMB = Math.round(fileInfos.size / 1024 / 1024);
+  logger.info(`Gateway backup : Success! File size is ${fileSizeMB}mb.`);
   // compress backup
   logger.info(`Gateway backup: Gzipping backup`);
   await exec(`gzip ${backupFilePath}`);
