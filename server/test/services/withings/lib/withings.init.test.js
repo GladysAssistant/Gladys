@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 const { OAuth2Server } = require('oauth2-mock-server');
-const { fake } = require('sinon');
+const sinon = require('sinon');
 const serverHttpWithingsMock = require('./withings.serverMock.test');
 const OAuth2Manager = require('../../../../lib/oauth2-client/index');
 const WithingsHandler = require('../../../../services/withings/lib');
@@ -14,8 +14,8 @@ const serverOauth2 = new OAuth2Server();
 
 const gladys = {
   device: {
-    create: fake.returns(null),
-    destroyByServiceId: fake.returns(null),
+    create: sinon.fake.returns(null),
+    destroyByServiceId: sinon.fake.returns(null),
     get: function getFakeDevice() {
       return [
         {
@@ -35,15 +35,15 @@ const gladys = {
     },
   },
   user: {
-    get: fake.returns([{ id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' }]),
+    get: sinon.fake.returns([{ id: '0cd30aef-9c4e-4a23-88e3-3547971296e5' }]),
   },
-  event: { emit: fake.returns(null) },
+  event: { emit: sinon.fake.returns(null) },
   variable: {
     getValue: function returnValue(key, serviceId) {
       return serverHttpWithingsMock.getVariable(key, serverHost, oauth2ServerPort);
     },
-    setValue: fake.returns(null),
-    destroy: fake.returns(null),
+    setValue: sinon.fake.returns(null),
+    destroy: sinon.fake.returns(null),
   },
 };
 
@@ -107,5 +107,21 @@ describe('WithingsHandler init', () => {
     await assert.equal(paramCreated.length, 1);
     await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
     await assert.equal(paramCreated[0].value, 'withingsDevideId4');
+  });
+
+  it('init devices without variable in db', async () => {
+    gladys.variable.getValue = function returnValue(key, serviceId) {
+      return null;
+    };
+    const withingsHandler = new WithingsHandler(gladys, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
+    withingsHandler.withingsUrl = `http://${serverHost}:${httpServerPort}`;
+    withingsHandler.integrationName = 'test';
+
+    try {
+      await withingsHandler.init('0cd30aef-9c4e-4a23-88e3-3547971296e5');
+      sinon.assert.fail();
+    } catch (e) {
+      sinon.assert.callCount(gladys.variable.setValue, 8);
+    }
   });
 });

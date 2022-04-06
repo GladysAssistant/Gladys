@@ -291,7 +291,7 @@ async function init(userId) {
           }
         });
       },
-      { concurrency: 2 },
+      { concurrency: 0 },
     );
 
     // Build list of device to display
@@ -314,7 +314,7 @@ async function init(userId) {
           }
         }
       },
-      { concurrency: 2 },
+      { concurrency: 0 },
     );
   }
 

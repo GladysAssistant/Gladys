@@ -177,6 +177,8 @@ function getVariable(key, host, port) {
         '"expires_at":"2020-11-13T20:46:50.042Z"' +
         '}'
       );
+    case OAUTH2.VARIABLE.ADDITIONAL_ACCESS_TOKEN_REQUEST_ACTION_PARAM:
+      return 'requesttoken';
     case OAUTH2.VARIABLE.CLIENT_ID:
       return 'fake_client_id';
     default:

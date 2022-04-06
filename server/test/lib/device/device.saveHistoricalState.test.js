@@ -1,7 +1,8 @@
 const EventEmitter = require('events');
-const { assert } = require('chai');
+const { assert, expect } = require('chai');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const { BadParameters } = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
 
@@ -45,5 +46,27 @@ describe('Device saveHistoricalState', () => {
     await device.saveHistoricalState(deviceFeature, historicalState, updateDate);
 
     return assert.equal(deviceFeature.last_value_changed, updateDate);
+  });
+
+  it('should not save NaN as state', async () => {
+    const stateManager = new StateManager(event);
+    const device = new Device(event, {}, stateManager);
+
+    const nanValue = parseInt('NaN value', 10);
+
+    try {
+      await device.saveHistoricalState(
+        {
+          id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+          selector: 'test-device-feature',
+          has_feedback: false,
+          keep_history: false,
+        },
+        nanValue,
+      );
+      assert.fail('NaN device state should fail');
+    } catch (e) {
+      expect(e).instanceOf(BadParameters);
+    }
   });
 });
