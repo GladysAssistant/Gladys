@@ -5,7 +5,7 @@ import { route } from 'preact-router';
 
 function createActions(store) {
   const actions = {
-    async checkErrors(state, e) {
+    checkErrors(state, e) {
       let newSceneErrors = {};
 
       if (state.selecticonViewLoading === true) {
@@ -33,6 +33,9 @@ function createActions(store) {
       e.preventDefault();
       // if errored, we don't continue
       if (actions.checkErrors(state)) {
+        return;
+      }
+      if (state.selecticonViewLoading === true) {
         return;
       }
       store.setState({

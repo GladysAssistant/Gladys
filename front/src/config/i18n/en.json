@@ -1956,20 +1956,20 @@
     "groupIconLabel": {
       "alerts": "Alerts",
       "arrows": "Arrows",
-      "writingFormatCode": "Writing Formats and Code",
-      "sunWeather": "Sun and Weather Conditions",
-      "devicesIcon": "Devices",
-      "otherObject": "Other Objects",
-      "computerandmultimediaphone": "Computing, Multimedia and Telephony",
-      "network": "Networks",
-      "express": "Expressions and conversations",
-      "socialNetworkInternet": "Social networks and websites",
-      "toggle": "Switches and Toggles",
-      "remoteControl": "Remotes",
       "cartography": "Cartography",
+      "computerandmultimediaphone": "Computing, Multimedia and Telephony",
+      "devicesIcon": "Devices",
+      "express": "Expressions and conversations",
       "livingEntityGestures": "People and gestures",
+      "network": "Networks",
+      "otherObject": "Other Objects",
+      "others": "Others",
+      "remoteControl": "Remotes",
+      "socialNetworkInternet": "Social networks and websites",
       "stockExchange": "Stock exchange and currencies",
-      "others": "Others"
+      "toggle": "Switches and Toggles",
+      "sunWeather": "Sun and Weather Conditions",
+      "writingFormatCode": "Writing Formats and Code"
     }
   }
 }

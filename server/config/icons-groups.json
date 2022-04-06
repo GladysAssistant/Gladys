@@ -3,8 +3,8 @@
     "power",
     "toggle-left",
     "toggle-right",
-    "camera-off", 
-    "camera", 
+    "camera-off",
+    "camera",
     "zap-off",
     "zap",
     "video-off",
@@ -54,14 +54,14 @@
     "maximize-2",
     "minimize-2"
   ],
-  "writingFormatCode": [ 
+  "writingFormatCode": [
     "bold",
     "italic",
     "underline",
     "type",
-    "align-center", 
-    "align-justify", 
-    "align-left", 
+    "align-center",
+    "align-justify",
+    "align-left",
     "align-right",
     "save",
     "scissors",
@@ -81,16 +81,7 @@
     "wind",
     "moon"
   ],
-  "devicesIcon": [
-    "calendar",
-    "clock",
-    "tv",
-    "watch",
-    "battery-charging", 
-    "battery",
-    "droplet",
-    "thermometer"
-  ],
+  "devicesIcon": ["calendar", "clock", "tv", "watch", "battery-charging", "battery", "droplet", "thermometer"],
   "otherObject": [
     "home",
     "credit-card",
@@ -138,16 +129,7 @@
     "speaker",
     "film"
   ],
-  "network": [
-    "bar-chart-2",
-    "bar-chart",
-    "bluetooth",
-    "cast",
-    "wifi-off",
-    "wifi",
-    "radio",
-    "rss"
-  ],
+  "network": ["bar-chart-2", "bar-chart", "bluetooth", "cast", "wifi-off", "wifi", "radio", "rss"],
   "express": [
     "mail",
     "message-circle",
@@ -188,19 +170,8 @@
     "link-2",
     "link"
   ],
-  "cartography": [
-    "map-pin",
-    "map",
-    "move",
-    "navigation-2",
-    "navigation",
-    "compass"
-  ],
-  "stockExchange": [
-    "dollar-sign",
-    "trending-down",
-    "trending-up"
-  ],
+  "cartography": ["map-pin", "map", "move", "navigation-2", "navigation", "compass"],
+  "stockExchange": ["dollar-sign", "trending-down", "trending-up"],
   "remoteControl": [
     "refresh-ccw",
     "refresh-cw",
@@ -222,11 +193,11 @@
     "volume"
   ],
   "livingEntityGestures": [
-    "user-check", 
-    "user-minus", 
+    "user-check",
+    "user-minus",
     "user-plus",
-    "user-x", 
-    "user", 
+    "user-x",
+    "user",
     "users",
     "thumbs-down",
     "thumbs-up"
