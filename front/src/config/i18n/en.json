@@ -1949,5 +1949,27 @@
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
     "stripeButton": "Edit subscription in Stripe"
+  },
+  "iconLabel": {
+    "listView": "List View",
+    "groupView": "Group View",
+    "groupIconLabel": {
+      "alerts": "Alerts",
+      "arrows": "Arrows",
+      "writingFormatCode": "Writing Formats and Code",
+      "sunWeather": "Sun and Weather Conditions",
+      "devicesIcon": "Devices",
+      "otherObject": "Other Objects",
+      "computerandmultimediaphone": "Computing, Multimedia and Telephony",
+      "network": "Networks",
+      "express": "Expressions and conversations",
+      "socialNetworkInternet": "Social networks and websites",
+      "toggle": "Switches and Toggles",
+      "remoteControl": "Remotes",
+      "cartography": "Cartography",
+      "livingEntityGestures": "People and gestures",
+      "stockExchange": "Stock exchange and currencies",
+      "others": "Others"
+    }
   }
 }

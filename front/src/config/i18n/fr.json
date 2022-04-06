@@ -1949,5 +1949,27 @@
     "informationTitle": "Vos informations de paiement",
     "stripeDescription": "Le paiement est géré par Stripe. Nous ne voyons jamais votre carte de crédit.",
     "stripeButton": "Gérer la facturation dans Stripe"
+  },
+  "iconLabel": {
+    "listView": "Vue liste",
+    "groupView": "Vue groupe",
+    "groupIconLabel": {
+      "alerts": "Alertes",
+      "arrows": "Flèches",
+      "writingFormatCode": "Formats d'écriture et Code",
+      "sunWeather": "Soleil et Conditions météorologiques",
+      "devicesIcon": "Appareillages",
+      "otherObject": "Autres objets",
+      "computerandmultimediaphone": "Informatique, multimédia et Téléphonie",
+      "network": "Réseaux",
+      "express": "Expressions et conversations",
+      "socialNetworkInternet": "Réseaux sociaux et sites internet",
+      "toggle": "Interrupteurs et bascules",
+      "remoteControl": "Télécommandes",
+      "cartography": "Cartograpie",
+      "livingEntityGestures": "Être vivant et gestes",
+      "stockExchange": "Bourse et monnaies",
+      "others": "Autres"
+    }
   }
 }

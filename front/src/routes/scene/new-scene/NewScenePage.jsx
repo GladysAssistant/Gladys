@@ -54,10 +54,10 @@ const NewScenePage = ({ children, ...props }) => (
                 <div>
                   <span class="btn-group">
                     <button class="btn btn-secondary" name="listView" onClick={props.handleClick}>
-                      {`Vue liste`}
+                      <Text id="iconLabel.listView" />
                     </button>
                     <button class="btn btn-secondary" name="groupView" onClick={props.handleClick}>
-                      {`Vue groupe`}
+                      <Text id="iconLabel.groupView" />
                     </button>
                   </span>
                 </div>
@@ -73,7 +73,10 @@ const NewScenePage = ({ children, ...props }) => (
               {props.selectIconView === 'iconGroup' &&
                 Object.keys(iconListGroups).map(iconGroup => (
                   <div class={cx('form-group', style.iconContainerRow)}>
-                    <label class="form-label">{iconGroup}</label>
+                    <label class="form-label">
+                      <Text id={`iconLabel.groupIconLabel.${iconGroup}`} />
+                    </label>
+
                     <div class={cx('row', style.iconContainer)}>
                       {iconListGroups[iconGroup].map(icon => (
                         <div class="col-auto">
@@ -102,7 +105,7 @@ const NewScenePage = ({ children, ...props }) => (
               {props.selectIconView === 'iconList' && (
                 <div class={cx('row', style.iconContainer)}>
                   {iconList.map(icon => (
-                    <div class="col-2">
+                    <div class="col-auto">
                       <div
                         class={cx('text-center', style.iconDiv, {
                           [style.iconDivChecked]: get(props, 'newScene.icon') === icon
