@@ -4,6 +4,8 @@ const { getConfiguration } = require('./getConfiguration');
 const { disconnect } = require('./disconnect');
 const { handleMqttMessage } = require('./handleMqttMessage');
 const { getDiscoveredDevices } = require('./getDiscoveredDevices');
+const { findMatchingExpose } = require('./findMatchingExpose');
+const { readValue } = require('./readValue');
 const { setValue } = require('./setValue');
 const { status } = require('./status');
 const { subscribe } = require('./subscribe');
@@ -11,7 +13,6 @@ const { installMqttContainer } = require('./installMqttContainer');
 const { installZ2mContainer } = require('./installZ2mContainer');
 const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
-const { basePath } = require('./basePath');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -27,7 +28,7 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.serviceId = serviceId;
   this.mqttClient = null;
 
-  this.discoveredDevices = [];
+  this.discoveredDevices = {};
   this.topicBinds = {};
   this.usbConfigured = false;
   this.mqttExist = false;
@@ -46,10 +47,11 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
 Zigbee2mqttManager.prototype.init = init;
 Zigbee2mqttManager.prototype.connect = connect;
 Zigbee2mqttManager.prototype.getConfiguration = getConfiguration;
-Zigbee2mqttManager.prototype.basePath = basePath;
 Zigbee2mqttManager.prototype.disconnect = disconnect;
 Zigbee2mqttManager.prototype.handleMqttMessage = handleMqttMessage;
 Zigbee2mqttManager.prototype.getDiscoveredDevices = getDiscoveredDevices;
+Zigbee2mqttManager.prototype.findMatchingExpose = findMatchingExpose;
+Zigbee2mqttManager.prototype.readValue = readValue;
 Zigbee2mqttManager.prototype.setValue = setValue;
 Zigbee2mqttManager.prototype.status = status;
 Zigbee2mqttManager.prototype.subscribe = subscribe;
