@@ -24,11 +24,12 @@ class RemoteFeatureEditionPanel extends Component {
   testFeature = () => {
     try {
       const { editedFeatures, selectedFeature, selectedValue, peripheral } = this.props;
-      const feature = get(editedFeatures, `${selectedFeature}.codes.${selectedFeature}-${selectedValue}`);
+      const codes = get(editedFeatures, `${selectedFeature}.codes`, { default: {} });
+      const code = get(codes, `${selectedFeature}-${selectedValue}`, { default: codes[selectedFeature] });
 
       this.props.httpClient.post(`/api/v1/service/broadlink/send`, {
         peripheral,
-        code: feature
+        code
       });
 
       this.setState({
