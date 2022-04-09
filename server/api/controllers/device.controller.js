@@ -106,93 +106,80 @@ module.exports = function DeviceController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/device_feature/states getDeviceFeaturesStates
-   * @apiName getDeviceFeaturesStates
+   * @api {get} /api/v1/device_feature/:device_feature_selector/states getDeviceFeaturesStates
+   * @apiName getDeviceFeatureStates
    * @apiGroup Device
    *
-   * @apiParam {String} name Name of the dashboard.
-   * @apiParam {String} device_features Device(s) feature(s) selector(s)
-   * (can contain 4 features from different devices).
-   * @apiParam {string} start_interval Start date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
+   * @apiParam {string} from - Start date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
    * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time).
-   * @apiParam {string} [end_interval] End date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
-   * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time)..
-   * @apiParamExample {json} Request-Example:
+   * @apiParam {string} [to="now"] - End date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
+   * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time).
+   * @apiParam {number} [take] - Number of elements to return.
+   * @apiParam {number} [skip=0] - Number of elements to skip.
+   * @apiParam {number} [attributes] - Possible values (separated by a comma ',' if several): 'id',
+   * 'device_feature_id', 'value', 'created_at' and 'updated_at'. Leave empty to have all the columns.
+   * @apiParamExample {json} Request-Example with take and skip:
    * {
-   *   "device_features": "test-device-feature-1,test-device-feature-2",
-   *   "start_interval": "2022-03-31T22:00:00.000Z",
-   *   "end_interval": "2022-04-01T21:59:59.999Z"
+   *   "from": "2022-04-06T07:00:00.000Z",
+   *   "to": "2022-04-06T21:59:59.999Z",
+   *   "take": 3,
+   *   "skip": 5
    * }
-   * OU
-   * {
-   *   "device_features": "test-device-feature-1,test-device-feature-2",
-   *   "start_interval": "2022-04-01 00:00:00.000",
-   *   "end_interval": "2022-04-01 23:59:00.000"
-   * }
-   * @apiSuccessExample {json} Success-Response:
+   * @apiSuccessExample {json} Success-Response with take and skip:
    * [
    * 	{
-   * 		"device":
-   * 		{
-   * 			"name": "Test device"
-   * 		},
-   * 		"deviceFeature":
-   * 		{
-   * 			"name": "Test device_feature 1"
-   * 			"selector": "test-device-feature-1",
-   * 			"external_id": "mqtt:test_device_feature_1",
-   * 		},
-   * 		"dataRaw":
-   * 		[
-   * 			[
-   * 				"2022-04-01T06:13:26.651Z",
-   * 				55
-   * 			],
-   * 			[
-   * 				"2022-04-01T06:14:26.655Z",
-   * 				52
-   * 			],
-   * 			[
-   * 				"2022-04-01T06:15:26.654Z",
-   * 				27
-   * 			]
-   * 		]
+   * 		id: 'e1f30d6e-7891-4484-9aa7-2e094b53ed6c',
+   * 		device_feature_id: '83c31637-8cb3-4085-b518-dbe2f89b7d0c',
+   * 		value: 13,
+   * 		created_at: '2022-04-06 09:05:09.127 +00:00',
+   * 		updated_at: '2022-04-06 09:05:09.127 +00:00'
    * 	},
    * 	{
-   * 		"device":
-   * 		{
-   * 			"name": "Test device"
-   * 		},
-   * 		"deviceFeature":
-   * 		{
-   * 			"name": "Test device_feature 2"
-   * 			"selector": "test-device-feature-2",
-   * 			"external_id": "mqtt:test_device_feature_2",
-   * 		},
-   * 		"dataRaw":
-   * 		[
-   * 			[
-   * 				"2022-04-01T06:13:26.657Z",
-   * 				1104
-   * 			],
-   * 			[
-   * 				"2022-04-01T06:14:26.655Z",
-   * 				758
-   * 			],
-   * 			[
-   * 				"2022-04-01T06:15:26.654Z",
-   * 				2300
-   * 			]
-   * 		]
+   * 		id: '77bb6449-cdd0-4163-9f38-95102e1cbafa',
+   * 		device_feature_id: '83c31637-8cb3-4085-b518-dbe2f89b7d0c',
+   * 		value: 16,
+   * 		created_at: '2022-04-06 09:06:09.146 +00:00',
+   * 		updated_at: '2022-04-06 09:06:09.146 +00:00'
+   * 	},
+   * 	{
+   * 		id: '61a87d2a-93e7-4c6c-bd0e-a337803c236c',
+   * 		device_feature_id: '83c31637-8cb3-4085-b518-dbe2f89b7d0c',
+   * 		value: 108,
+   * 		created_at: '2022-04-06 09:07:09.137 +00:00',
+   * 		updated_at: '2022-04-06 09:07:09.137 +00:00'
    * 	}
+   * ]
+   * @apiParamExample {json} Request-Example with attributes:
+   * {
+   *   'from': "2022-04-06 10:00:00.000",
+   *   'to': "2022-04-09 23:59:00.000",
+   *   'attributes': "created_at,value,id"
+   * }
+   * @apiSuccessExample {json} Success-Response with attributes definitions:
+   * [
+   * 	{
+   * 		created_at: '2022-04-06 10:00:09.225 +00:00',
+   * 		value: 139,
+   * 		id: '30c43c01-0718-40cd-84e0-b975894bd5af'
+   * 	},
+   * 	{
+   * 		created_at: '2022-04-06 10:01:09.219 +00:00',
+   * 		value: 140,
+   * 		id: 'd1674409-6baf-4658-abf0-070cbc5cbeef',
+   * 	},
+   * 	{
+   * 		created_at: '2022-04-06 10:02:09.166 +00:00',
+   * 		value: 141,
+   * 		id: '53129293-0b7c-4ced-be7d-7809fa558c96'
+   * 	},
+   * 	{
+   * 		...
+   * 	},
+   * 	... 3878 more items
    * ]
    */
   async function getDeviceFeaturesStates(req, res) {
-    const states = await gladys.device.getDeviceFeaturesStatesMulti(
-      req.query.device_features.split(','),
-      req.query.start_interval,
-      req.query.end_interval,
-    );
+    const states = await gladys.device.getDeviceFeaturesStates(req.params.device_feature_selector, req.query);
     res.json(states);
   }
 
