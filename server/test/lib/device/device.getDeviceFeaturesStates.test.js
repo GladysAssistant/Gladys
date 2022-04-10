@@ -13,8 +13,8 @@ const insertStates = async () => {
   const deviceFeatureStateToInsert = [];
   const statesToInsert = 23 * 60 + 59;
   for (let i = 0; i < statesToInsert; i += 1) {
-    const startAt = new Date(now.getTime() - (24 * 60) * 60 * 1000);
-    const date = new Date(startAt.getTime() + (((24 * 60) * 60 * 1000) / statesToInsert) * i);
+    const startAt = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const date = new Date(startAt.getTime() + ((24 * 60 * 60 * 1000) / statesToInsert) * i);
     deviceFeatureStateToInsert.push({
       id: uuid.v4(),
       device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
@@ -48,14 +48,11 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       -2,
     )}`;
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable);
-    const states = await deviceInstance.getDeviceFeaturesStates(
-      'test-device-feature',
-      {
-        from: new Date(`${dateState} 00:00:00.000`).toISOString(),
-        to: new Date(`${dateState} 23:59:59.999`).toISOString()
-      }
-    );
-    expect(states).to.have.lengthOf((23 * 60 + 59)-1);
+    const states = await deviceInstance.getDeviceFeaturesStates('test-device-feature', {
+      from: new Date(`${dateState} 00:00:00.000`).toISOString(),
+      to: new Date(`${dateState} 23:59:59.999`).toISOString(),
+    });
+    expect(states).to.have.lengthOf(23 * 60 + 59 - 1);
     expect(states[0]).to.be.an('object');
     expect(Object.keys(states[0])).to.have.lengthOf(5);
     expect(states[0]).to.have.property('id');
@@ -86,15 +83,12 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       -2,
     )}`;
     const device = new Device(event, {}, stateManager, {}, {}, variable);
-    const states = await device.getDeviceFeaturesStates(
-      'test-device-feature',
-      {
-        from: new Date(`${dateState}T00:01:00.000Z`).toISOString(),
-        to: new Date(`${dateState}T01:30:00.000Z`).toISOString(),
-        attributes : 'value,created_at,device_feature_id'
-      }
-    );
-    
+    const states = await device.getDeviceFeaturesStates('test-device-feature', {
+      from: new Date(`${dateState}T00:01:00.000Z`).toISOString(),
+      to: new Date(`${dateState}T01:30:00.000Z`).toISOString(),
+      attributes: 'value,created_at,device_feature_id',
+    });
+
     expect(states).to.have.lengthOf(90 - 1);
     expect(states[0]).to.be.an('object');
     expect(Object.keys(states[0])).to.have.lengthOf(3);
@@ -102,7 +96,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     expect(states[0]).to.have.property('created_at');
     expect(states[0]).to.have.property('device_feature_id');
     const firstDateState = new Date(states[0].created_at);
-    const lastDateState = new Date(states[states.length-1].created_at);
+    const lastDateState = new Date(states[states.length - 1].created_at);
     expect(firstDateState.getUTCHours()).to.equal(0);
     expect(firstDateState.getUTCMinutes()).to.equal(1);
     expect(lastDateState.getUTCHours()).to.equal(1);
@@ -123,22 +117,19 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       -2,
     )}`;
     const device = new Device(event, {}, stateManager, {}, {}, variable);
-    const states = await device.getDeviceFeaturesStates(
-      'test-device-feature',
-      {
-        from: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
-        attributes : 'value',
-        take : 60,
-        skip : 10,
-      }
-    );
-    
+    const states = await device.getDeviceFeaturesStates('test-device-feature', {
+      from: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
+      attributes: 'value',
+      take: 60,
+      skip: 10,
+    });
+
     expect(states).to.have.lengthOf(60);
     expect(states[0]).to.be.an('object');
     expect(Object.keys(states[0])).to.have.lengthOf(1);
     expect(states[0]).to.have.property('value');
-    expect(states[0].value).to.equal(120+10+1);
-    expect(states[states.length-1].value).to.equal(120+10+60);
+    expect(states[0].value).to.equal(120 + 10 + 1);
+    expect(states[states.length - 1].value).to.equal(120 + 10 + 60);
   });
   it('should return error, device feature doesnt exist', async () => {
     const variable = {
@@ -151,13 +142,10 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       -2,
     )}`;
     const device = new Device(event, {}, stateManager, {}, {}, variable);
-    const promise = device.getDeviceFeaturesStates(
-      'test-device-feature',
-      {
-        from: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
-        to: new Date(`${dateState}T10:00:00.000Z`).toISOString(),
-      }
-    );
+    const promise = device.getDeviceFeaturesStates('test-device-feature', {
+      from: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
+      to: new Date(`${dateState}T10:00:00.000Z`).toISOString(),
+    });
     return assert.isRejected(promise, 'DeviceFeature not found');
   });
   it('should return error, start date missing', async () => {
@@ -174,12 +162,9 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       -2,
     )}`;
     const device = new Device(event, {}, stateManager, {}, {}, variable);
-    const promise = device.getDeviceFeaturesStates(
-      'this-device-does-not-exist',
-      {
-        to: new Date(`${dateState}T10:00:00.000Z`).toISOString(),
-      }
-    );
+    const promise = device.getDeviceFeaturesStates('this-device-does-not-exist', {
+      to: new Date(`${dateState}T10:00:00.000Z`).toISOString(),
+    });
     return assert.isRejected(promise, 'Start date missing');
   });
 });
