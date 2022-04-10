@@ -16,7 +16,7 @@ const WEATHER_ICONS = {
   wind: 'ti-wind',
   night: 'ti-moon',
   thunderstorm: 'ti-cloud-storm',
-  mist: 'ti-cloud-fog',
+  mist: 'ti-cloud-fog'
 };
 
 const translateWeatherToIcon = weather => get(WEATHER_ICONS, weather, { default: 'ti-question' });
