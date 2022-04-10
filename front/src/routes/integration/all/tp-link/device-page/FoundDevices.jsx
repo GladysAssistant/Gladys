@@ -28,7 +28,7 @@ const FoundDevices = ({ children, ...props }) => (
           onClick={props.getTpLinkNewDevices}
           disabled={props.getTpLinkNewDevicesStatus === RequestStatus.Getting}
         >
-          <i class="fe fe-radio" /> <Text id="integration.tpLink.device.scanButton" />
+          <i class="ti ti-radio" /> <Text id="integration.tpLink.device.scanButton" />
         </button>
       </div>
     </div>

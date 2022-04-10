@@ -106,9 +106,9 @@ class SetupTab extends Component {
                       <td className={style.tdCenter}>
                         <hr className={style.line} />
                         <i
-                          className={cx('fe', {
-                            'fe-check': props.gladysConnected,
-                            'fe-x': !props.gladysConnected,
+                          className={cx('ti', {
+                            'ti-check': props.gladysConnected,
+                            'ti-x': !props.gladysConnected,
                             greenIcon: props.gladysConnected,
                             redIcon: !props.gladysConnected
                           })}
@@ -131,9 +131,9 @@ class SetupTab extends Component {
                       <td className={('text-center', style.tdCenter)}>
                         <hr className={style.line} />
                         <i
-                          className={cx('fe', {
-                            'fe-check': props.zigbee2mqttConnected,
-                            'fe-x': !props.zigbee2mqttConnected,
+                          className={cx('ti', {
+                            'ti-check': props.zigbee2mqttConnected,
+                            'ti-x': !props.zigbee2mqttConnected,
                             greenIcon: props.zigbee2mqttConnected,
                             redIcon: !props.zigbee2mqttConnected
                           })}
@@ -263,9 +263,9 @@ class SetupTab extends Component {
                     <td>
                       {props.mqttRunning && (
                         <i
-                          className={cx('fe', {
-                            'fe-check': props.gladysConnected,
-                            'fe-x': !props.gladysConnected,
+                          className={cx('ti', {
+                            'ti-check': props.gladysConnected,
+                            'ti-x': !props.gladysConnected,
                             greenIcon: props.gladysConnected,
                             redIcon: !props.gladysConnected
                           })}
@@ -280,9 +280,9 @@ class SetupTab extends Component {
                     <td>
                       {props.zigbee2mqttRunning && (
                         <i
-                          className={cx('fe', {
-                            'fe-check': props.zigbee2mqttConnected,
-                            'fe-x': !props.zigbee2mqttConnected,
+                          className={cx('ti', {
+                            'ti-check': props.zigbee2mqttConnected,
+                            'ti-x': !props.zigbee2mqttConnected,
                             greenIcon: props.zigbee2mqttConnected,
                             redIcon: !props.zigbee2mqttConnected
                           })}

@@ -22,7 +22,7 @@ const pushAllWithType = (items, type, icon) => {
 };
 
 pushAllWithType(devices, 'device', 'toggle-right');
-pushAllWithType(communications, 'communication', 'message-square');
+pushAllWithType(communications, 'communication', 'message');
 pushAllWithType(calendars, 'calendar', 'calendar');
 pushAllWithType(weathers, 'weather', 'cloud');
 

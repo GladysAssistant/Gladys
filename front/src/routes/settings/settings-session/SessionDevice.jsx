@@ -31,7 +31,7 @@ const SessionDevice = ({ children, ...props }) => {
             cursor: 'pointer'
           }}
           onClick={revokeSession}
-          class="fe fe-trash-2"
+          class="ti ti-trash"
         />
       </td>
     </tr>

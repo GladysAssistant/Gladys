@@ -26,24 +26,24 @@ const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
 };
 
 const ACTION_ICON = {
-  [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
-  [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
-  [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
-  [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
-  [ACTIONS.TIME.DELAY]: 'fe fe-clock',
-  [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
-  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
-  [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
-  [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
-  [ACTIONS.USER.SET_OUT_OF_HOME]: 'fe fe-home',
-  [ACTIONS.HTTP.REQUEST]: 'fe fe-link',
-  [ACTIONS.USER.CHECK_PRESENCE]: 'fe fe-home',
-  [ACTIONS.CONDITION.CHECK_TIME]: 'fe fe-watch',
-  [ACTIONS.SCENE.START]: 'fe fe-fast-forward',
-  [ACTIONS.HOUSE.IS_EMPTY]: 'fe fe-home',
-  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
-  [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
-  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar'
+  [ACTIONS.LIGHT.TURN_ON]: 'ti ti-toggle-right',
+  [ACTIONS.LIGHT.TURN_OFF]: 'ti ti-toggle-left',
+  [ACTIONS.SWITCH.TURN_ON]: 'ti ti-toggle-right',
+  [ACTIONS.SWITCH.TURN_OFF]: 'ti ti-toggle-left',
+  [ACTIONS.TIME.DELAY]: 'ti ti-clock',
+  [ACTIONS.MESSAGE.SEND]: 'ti ti-message',
+  [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'ti ti-shuffle',
+  [ACTIONS.DEVICE.GET_VALUE]: 'ti ti-refresh-cw',
+  [ACTIONS.USER.SET_SEEN_AT_HOME]: 'ti ti-home',
+  [ACTIONS.USER.SET_OUT_OF_HOME]: 'ti ti-home',
+  [ACTIONS.HTTP.REQUEST]: 'ti ti-link',
+  [ACTIONS.USER.CHECK_PRESENCE]: 'ti ti-home',
+  [ACTIONS.CONDITION.CHECK_TIME]: 'ti ti-watch',
+  [ACTIONS.SCENE.START]: 'ti ti-fast-forward',
+  [ACTIONS.HOUSE.IS_EMPTY]: 'ti ti-home',
+  [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'ti ti-home',
+  [ACTIONS.DEVICE.SET_VALUE]: 'ti ti-radio',
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'ti ti-calendar'
 };
 
 const ActionCard = ({ children, ...props }) => (
@@ -60,7 +60,7 @@ const ActionCard = ({ children, ...props }) => (
     <div class="card">
       <div class="card-header">
         {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
-        {props.action.type === null && <i class="fe fe-plus-circle" />}
+        {props.action.type === null && <i class="ti ti-plus-circle" />}
         <div class="card-title">
           <i
             class={props.action.icon}
@@ -77,14 +77,14 @@ const ActionCard = ({ children, ...props }) => (
         <div class="card-options">
           {false && (
             <a class="card-options-collapse">
-              <i class="fe fe-chevron-down" />
+              <i class="ti ti-chevron-down" />
             </a>
           )}
           <a
             onClick={deleteActionFromColumn(props.columnIndex, props.index, props.deleteAction)}
             class="card-options-remove"
           >
-            <i class="fe fe-x" />
+            <i class="ti ti-x" />
           </a>
         </div>
       </div>

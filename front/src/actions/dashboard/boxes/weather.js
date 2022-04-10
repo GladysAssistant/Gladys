@@ -7,17 +7,19 @@ import get from 'get-value';
 const BOX_KEY = 'Weather';
 
 const WEATHER_ICONS = {
-  snow: 'fe-cloud-snow',
-  rain: 'fe-cloud-rain',
-  clear: 'fe-sun',
-  cloud: 'fe-cloud',
-  fog: 'fe-cloud',
-  sleet: 'fe-cloud-drizzle',
-  wind: 'fe-wind',
-  night: 'fe-moon'
+  snow: 'ti-cloud-snow',
+  rain: 'ti-cloud-rain',
+  clear: 'ti-sun',
+  cloud: 'ti-cloud',
+  fog: 'ti-cloud-fog',
+  sleet: 'ti-cloud',
+  wind: 'ti-wind',
+  night: 'ti-moon',
+  thunderstorm: 'ti-cloud-storm',
+  mist: 'ti-cloud-fog',
 };
 
-const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
+const translateWeatherToIcon = weather => get(WEATHER_ICONS, weather, { default: 'ti-question' });
 
 function createActions(store) {
   const boxActions = createBoxActions(store);
@@ -30,15 +32,15 @@ function createActions(store) {
         weather.datetime_beautiful = dayjs(weather.datetime)
           .locale(state.user.language)
           .format('D MMM');
-        weather.weatherIcon = translateWeatherToFeIcon(weather.weather);
+        weather.weatherIcon = translateWeatherToIcon(weather.weather);
 
         weather.hours.map(hour => {
-          hour.weatherIcon = translateWeatherToFeIcon(hour.weather);
+          hour.weatherIcon = translateWeatherToIcon(hour.weather);
           hour.datetime_beautiful = dayjs(hour.datetime).format('HH');
         });
         weather.days.shift();
         weather.days.map(day => {
-          day.weather_icon = translateWeatherToFeIcon(day.weather);
+          day.weather_icon = translateWeatherToIcon(day.weather);
           day.datetime_beautiful = dayjs(day.datetime).format('dddd');
         });
 

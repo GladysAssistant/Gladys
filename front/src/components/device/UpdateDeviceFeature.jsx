@@ -29,7 +29,7 @@ class UpdateDeviceFeature extends Component {
       <div class="col-md-4">
         <div class="card">
           <div class="card-header">
-            <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
+            <i class={`mr-2 ti ti-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`} />
             <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
           </div>
           <div class="card-body">

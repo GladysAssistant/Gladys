@@ -84,7 +84,7 @@ class ColorDeviceType extends Component {
       <Fragment>
         <tr>
           <td>
-            <i class="fe fe-circle" />
+            <i class="ti ti-circle" />
           </td>
           <td>{getDeviceName(device, deviceFeature)}</td>
           <td class="text-right">

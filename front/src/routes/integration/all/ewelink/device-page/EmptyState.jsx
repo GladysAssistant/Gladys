@@ -12,7 +12,7 @@ const EmptyState = () => (
         <Text id="integration.eWeLink.discoverDeviceDescr" />
         <Link href="/dashboard/integration/device/ewelink/discover">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.eWeLink.discoverTab" /> <i class="fe fe-radio" />
+            <Text id="integration.eWeLink.discoverTab" /> <i class="ti ti-radio" />
           </button>
         </Link>
       </div>

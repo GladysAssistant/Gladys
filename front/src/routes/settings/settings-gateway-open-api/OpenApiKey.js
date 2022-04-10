@@ -38,7 +38,7 @@ const OpenApiKey = ({ children, ...props }) => {
         <div>{lastUsed}</div>
       </td>
       <td>
-        <i style={{ cursor: 'pointer' }} onClick={revokeOpenApiKey} class="fe fe-trash-2" />
+        <i style={{ cursor: 'pointer' }} onClick={revokeOpenApiKey} class="ti ti-trash" />
       </td>
     </tr>
   );

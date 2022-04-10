@@ -18,7 +18,7 @@ const UserPresence = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
-        <i class="fe fe-home" />
+        <i class="ti ti-home" />
         <span class="m-1">
           <Text id="dashboard.boxTitle.user-presence" />
         </span>
@@ -54,7 +54,7 @@ const UserPresence = ({ children, ...props }) => (
           {props.usersWithPresence && props.usersWithPresence.length === 0 && (
             <div>
               <div class="alert alert-icon alert-primary" role="alert">
-                <i class="fe fe-bell mr-2" /> <Text id="dashboard.boxes.userPresence.emptyText" />
+                <i class="ti ti-bell mr-2" /> <Text id="dashboard.boxes.userPresence.emptyText" />
               </div>
             </div>
           )}

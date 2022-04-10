@@ -13,11 +13,11 @@ const SessionDeviceLabel = ({ session }) => {
     label = `${useragent.browser} - ${useragent.platform} - ${useragent.os}`;
 
     if (useragent.isTablet) {
-      icon = 'tablet';
+      icon = 'device-tablet';
     } else if (useragent.isMobile) {
-      icon = 'smartphone';
+      icon = 'device-mobile';
     } else if (useragent.isDesktop) {
-      icon = 'airplay';
+      icon = 'device-desktop';
     } else {
       icon = 'help-circle';
     }
@@ -25,7 +25,7 @@ const SessionDeviceLabel = ({ session }) => {
 
   return (
     <div>
-      <i class={`fe fe-${icon} mr-2`} />
+      <i class={`ti ti-${icon} mr-2`} />
       {label}
     </div>
   );

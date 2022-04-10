@@ -21,21 +21,21 @@ const NodeTab = ({ children, ...props }) => {
         </h3>
         <div class="page-options d-flex">
           <button class="btn btn-outline-primary" onClick={props.healNetwork} disabled={zwaveActionsDisabled}>
-            <Text id="integration.zwave.setup.healNetworkButton" /> <i class="fe fe-radio" />
+            <Text id="integration.zwave.setup.healNetworkButton" /> <i class="ti ti-radio" />
           </button>
           <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=add' : '#'}>
             <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-              <Text id="integration.zwave.setup.addNodeButton" /> <i class="fe fe-plus" />
+              <Text id="integration.zwave.setup.addNodeButton" /> <i class="ti ti-plus" />
             </button>
           </a>
           <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=add-secure' : '#'}>
             <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-              <Text id="integration.zwave.setup.addNodeSecureButton" /> <i class="fe fe-plus" />
+              <Text id="integration.zwave.setup.addNodeSecureButton" /> <i class="ti ti-plus" />
             </button>
           </a>
           <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=remove' : '#'}>
             <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
-              <Text id="integration.zwave.setup.removeNode" /> <i class="fe fe-trash" />
+              <Text id="integration.zwave.setup.removeNode" /> <i class="ti ti-trash" />
             </button>
           </a>
         </div>
