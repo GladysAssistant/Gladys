@@ -7,7 +7,7 @@
  * getDevices('rzede-jlkunv-rze23f-csdcs-fsdfsd')
  */
 function getDevices(userId) {
-  return this.gladys.oauth2Client.executeOauth2HTTPQuery(
+  return this.gladys.oauth2Client.executeQuery(
     this.serviceId,
     userId,
     'get',

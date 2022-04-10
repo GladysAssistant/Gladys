@@ -226,6 +226,7 @@ const AppRouter = connect(
         <WithingsDevicePage path="/dashboard/integration/health/withings/device" />
         <WithingsEditDevicePage path="/dashboard/integration/health/withings/device/:deviceSelector" />
         <WithingsSettingsPage path="/dashboard/integration/health/withings/settings" />
+        <Redirect path="/dashboard/integration/device/withings" to="/dashboard/integration/health/withings/device" />
         <Redirect path="/dashboard/integration/health/withings" to="/dashboard/integration/health/withings/device" />
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
         <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />

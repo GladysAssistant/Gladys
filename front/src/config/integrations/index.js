@@ -6,6 +6,7 @@ import healths from './healths.json';
 
 const integrations = [];
 const integrationsByType = {};
+const integrationsByKey = {};
 const categories = [];
 
 const pushAllWithType = (items, type, icon) => {
@@ -17,7 +18,10 @@ const pushAllWithType = (items, type, icon) => {
 
   items.forEach(item => {
     const newItem = { ...item, type };
-    integrations.push(newItem);
+    if (!integrationsByKey[item.key]) {
+      integrations.push(newItem);
+      integrationsByKey[item.key] = newItem;
+    }
     integrationsByType[type].push(newItem);
   });
 };

@@ -18,8 +18,8 @@ import Device from '../device-page/Device';
 class WithingsSettingsPage extends Component {
   async componentWillMount() {
     await this.props.getIntegrationByName('withings');
-    await this.props.getCurrentConfig();
     await this.props.initWithingsDevices();
+    await this.props.getCurrentConfig();
   }
 
   render(props, {}) {

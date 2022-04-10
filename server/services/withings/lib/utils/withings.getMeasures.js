@@ -12,7 +12,7 @@ function getMeasures(userId, params) {
   if (params) {
     actionRequest += params;
   }
-  return this.gladys.oauth2Client.executeOauth2HTTPQuery(
+  return this.gladys.oauth2Client.executeQuery(
     this.serviceId,
     userId,
     'get',

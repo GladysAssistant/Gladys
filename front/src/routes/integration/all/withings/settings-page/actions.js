@@ -23,6 +23,7 @@ const actions = store => ({
         const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
           service_id: state.currentIntegration.id
         });
+
         // Case of config found
         let withingsDevices;
         if (returnGetConfig.client_id) {
@@ -30,13 +31,13 @@ const actions = store => ({
           if (result) {
             withingsDevices = result.withingsDevices;
           }
-
-          store.setState({
-            oauth2GetStatus: RequestStatus.Success,
-            withingsGetStatus: RequestStatus.Success,
-            withingsDevices
-          });
         }
+
+        store.setState({
+          oauth2GetStatus: RequestStatus.Success,
+          withingsGetStatus: RequestStatus.Success,
+          withingsDevices
+        });
       }
     } catch (e) {
       store.setState({

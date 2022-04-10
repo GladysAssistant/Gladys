@@ -21,7 +21,7 @@ const actions = store => ({
         service_id: state.currentIntegration.id
       });
 
-      if (returnGetConfig) {
+      if (returnGetConfig.client_id) {
         store.setState({
           clientIdInDb: returnGetConfig.client_id,
           oauth2ErrorMsg: null,
@@ -69,7 +69,6 @@ const actions = store => ({
         }
       );
 
-      // TODO : passer le client / secret en param et auver les param que apres ou dans ?
       const returnValue = await state.httpClient.post('/api/v1/service/oauth2/client/authorization-uri', {
         integration_name: state.currentIntegration.name,
         service_id: state.currentIntegration.id

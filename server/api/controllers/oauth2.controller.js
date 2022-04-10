@@ -55,6 +55,16 @@ module.exports = function OAuth2Controller(gladys) {
 
       const resultClientId = await gladys.variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, req.user.id);
 
+      const resultAccessToken = await gladys.variable.getValue(OAUTH2.VARIABLE.ACCESS_TOKEN, serviceId, req.user.id);
+
+      // If access_token does not exist and client_id exist
+      // => connect process is not complete: remove variable already saved
+      // => force restart connect process from beginning
+      if (resultClientId && !resultAccessToken) {
+        gladys.variable.destroy(OAUTH2.VARIABLE.CLIENT_ID, serviceId, req.user.id);
+        gladys.variable.destroy(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, req.user.id);
+      }
+
       res.json({
         client_id: resultClientId,
       });

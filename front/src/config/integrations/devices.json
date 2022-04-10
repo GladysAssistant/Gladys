@@ -41,5 +41,9 @@
   {
     "key": "eWeLink",
     "img": "/assets/integrations/cover/ewelink.jpg"
+  },
+  {
+    "key": "withings",
+    "img": "/assets/integrations/cover/withings.jpg"
   }
 ]

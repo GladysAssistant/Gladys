@@ -50,7 +50,7 @@ const gladys = {
 };
 
 /**
- * Verify componant to implement oauth2manager executeOauth2HTTPQuery
+ * Verify componant to implement oauth2manager executeQuery
  */
 describe('oauth2manager test', () => {
   before(async function testBefore() {
@@ -67,43 +67,43 @@ describe('oauth2manager test', () => {
 
   const manager = new OAuth2Manager(gladys.variable);
 
-  it('oauth manager get executeOauth2HTTPQuery test ', async () => {
+  it('oauth manager get executeQuery test ', async () => {
     const queryType = 'get';
     const queryUrl = `${testUrl}/userinfo`;
     const queryParams = 'param1=testParam';
 
-    const result = await manager.executeOauth2HTTPQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
+    const result = await manager.executeQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
 
     return assert.equal(result.status, '200');
   });
 
-  it('oauth manager post executeOauth2HTTPQuery test ', async () => {
+  it('oauth manager post executeQuery test ', async () => {
     const queryType = 'post';
     const queryUrl = `${testUrl}/revoke`;
     const queryParams = 'param1=testParam';
 
     logger.debug(manager);
-    const result = await manager.executeOauth2HTTPQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
+    const result = await manager.executeQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
 
     return assert.equal(result.status, '200');
   });
 
-  it('oauth manager get error executeOauth2HTTPQuery test ', async () => {
+  it('oauth manager get error executeQuery test ', async () => {
     const queryType = 'get';
     const queryUrl = `${testUrl}/revoke`;
     const queryParams = 'param1=testParam';
 
-    const result = await manager.executeOauth2HTTPQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
+    const result = await manager.executeQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
 
     return assert.equal(result, null);
   });
 
-  it('oauth manager get error executeOauth2HTTPQuery test (bad integration name) ', async () => {
+  it('oauth manager get error executeQuery test (bad integration name) ', async () => {
     const queryType = 'get';
     const queryUrl = `${testUrl}/revoke`;
     const queryParams = 'param1=testParam';
 
-    const result = await manager.executeOauth2HTTPQuery(testServiceId, 'fakeUserId', queryType, queryUrl, queryParams);
+    const result = await manager.executeQuery(testServiceId, 'fakeUserId', queryType, queryUrl, queryParams);
 
     return assert.equal(result, null);
   });
@@ -124,7 +124,7 @@ describe('oauth2manager failled test', () => {
     const queryUrl = `${testUrl}/userinfo`;
     const queryParams = 'param1=testParam';
 
-    const result = await manager.executeOauth2HTTPQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
+    const result = await manager.executeQuery(testServiceId, testUserId, queryType, queryUrl, queryParams);
 
     return assert.equal(result, null);
   });

@@ -1,7 +1,7 @@
 const { AuthorizationCode } = require('simple-oauth2');
 const logger = require('../../utils/logger');
 const { OAUTH2 } = require('../../utils/constants');
-const { Error500 } = require('../../utils/httpErrors');
+const { BadOauth2ClientResponse } = require('../../utils/coreErrors');
 
 /**
  * @description Get new  AccessToken with client_id and secrei_id of current oauth2 integration.
@@ -67,7 +67,7 @@ async function getAccessToken(serviceId, userId, authorizationCode, referer) {
 
     if (authResult.token) {
       if (authResult.token.status && authResult.token.status !== 0) {
-        throw new Error500('Oauth2 get token response is not with status 0');
+        throw new BadOauth2ClientResponse('Oauth2 get token response is not with status 0');
       }
 
       let jsonResult;
@@ -91,7 +91,7 @@ async function getAccessToken(serviceId, userId, authorizationCode, referer) {
     await this.variable.destroy(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
     await this.variable.destroy(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, userId);
     logger.error(error);
-    throw new Error500(error);
+    throw error;
   }
 }
 

@@ -22,7 +22,6 @@ const WithingsHandler = function WithingsHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.withingsUrl = 'https://wbsapi.withings.net';
-  this.integrationName = 'withings';
 };
 
 // COMMANDS

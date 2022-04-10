@@ -47,6 +47,13 @@ class AbortScene extends Error {
   }
 }
 
+class BadOauth2ClientResponse extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
 module.exports = {
   PasswordNotMatchingError,
   NotFoundError,
@@ -55,4 +62,5 @@ module.exports = {
   NoValuesFoundError,
   PlatformNotCompatible,
   AbortScene,
+  BadOauth2ClientResponse,
 };

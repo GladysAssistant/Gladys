@@ -52,7 +52,7 @@ async function refreshTokenAccess(variable, serviceId, userId) {
     let authResult = await client.createToken(accessToken);
 
     if (authResult.expired()) {
-      logger.trace('Refresh token is requiered');
+      logger.trace('Refresh token is required');
       // Refresh token
       try {
         const refreshParams = {
@@ -100,10 +100,10 @@ async function refreshTokenAccess(variable, serviceId, userId) {
  * @param {string} queryParams - Array of query params.
  * @returns {Promise} Result of query .
  * @example
- * oauth2.executeOauth2HTTPQuery('7fdsf4s68r4gfr68f4r63csd7f6f4c3r85', '78v4f3df83g74v1fsd8375f63gvrf5c', 'withings'
+ * oauth2.executeQuery('7fdsf4s68r4gfr68f4r63csd7f6f4c3r85', '78v4f3df83g74v1fsd8375f63gvrf5c', 'withings'
  *  'Bearer', 'get', 'http://localhost/apiname',[...]);
  */
-async function executeOauth2HTTPQuery(serviceId, userId, queryType, queryUrl, queryParams) {
+async function executeQuery(serviceId, userId, queryType, queryUrl, queryParams) {
   // Refresh token access if needed
   const accessToken = await refreshTokenAccess(this.variable, serviceId, userId);
   const headerConfig = {
@@ -136,5 +136,5 @@ async function executeOauth2HTTPQuery(serviceId, userId, queryType, queryUrl, qu
 }
 
 module.exports = {
-  executeOauth2HTTPQuery,
+  executeQuery,
 };
