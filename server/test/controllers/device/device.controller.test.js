@@ -107,33 +107,34 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
   });
 });
 
-describe('GET /api/v1/device_feature/states', () => {
+describe('GET /api/v1/device_feature/:device_feature_selector/states', () => {
   beforeEach(async function BeforeEach() {
     this.timeout(10000);
     await insertStates(1);
   });
-  it('should get device state by selector', async function Test() {
+  it('should get device feature states by selector', async function Test() {
     const now = new Date();
     const dateState = `${now.getUTCFullYear()}-${`0${now.getUTCMonth() + 1}`.slice(-2)}-${`0${now.getUTCDate()}`.slice(
       -2,
     )}`;
 
     await authenticatedRequest
-      .get('/api/v1/device_feature/states')
+      .get('/api/v1/device_feature/test-device-feature/states')
       .query({
-        start_interval: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
-        end_interval: new Date(`${dateState}T23:59:59.999Z`).toISOString(),
-        device_features: 'test-device-feature',
+        from: new Date(`${dateState}T00:00:00.000Z`),
+        to: new Date(`${dateState}T23:59:59.999Z`),
       })
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
-        expect(res.body).to.have.lengthOf(1);
-        expect(res.body[0].dataRaw).to.be.an('array');
-        expect(res.body[0].dataRaw).to.have.lengthOf(2000);
-        expect(res.body[0].dataRaw[0]).to.be.an('array');
-        expect(res.body[0].dataRaw[0]).to.have.lengthOf(2);
-        expect(res.body[0].dataRaw[0][1]).to.be.an('number');
+        expect(res.body).to.have.lengthOf(2000);
+        expect(res.body[0]).to.be.an('object');
+        expect(Object.keys(res.body[0])).to.have.lengthOf(5);
+        expect(res.body[0]).to.have.property('id');
+        expect(res.body[0]).to.have.property('device_feature_id');
+        expect(res.body[0]).to.have.property('value');
+        expect(res.body[0]).to.have.property('created_at');
+        expect(res.body[0]).to.have.property('updated_at');
       });
   });
 });

@@ -1,7 +1,6 @@
 const { Op } = require('sequelize');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
-const logger = require('../../utils/logger');
 
 const DEFAULT_OPTIONS = {
   skip: 0,
@@ -29,8 +28,11 @@ const DEFAULT_OPTIONS = {
  */
 async function getDeviceFeaturesStates(selector, options) {
   const deviceFeature = this.stateManager.get('deviceFeature', selector);
-  if (deviceFeature === null || options.from === undefined) {
+  if (deviceFeature === null) {
     throw new NotFoundError('DeviceFeature not found');
+  }
+  if (options.from === undefined) {
+    throw new NotFoundError('Start date missing');
   }
 
   // Default from date is one week ago
@@ -60,14 +62,10 @@ async function getDeviceFeaturesStates(selector, options) {
   }
 
   if (optionsWithDefault.attributes !== undefined) {
-    logger.info(optionsWithDefault.attributes);
     queryParams.attributes = optionsWithDefault.attributes.split(',');
   }
 
-  logger.info(queryParams);
-
   const states = await db.DeviceFeatureState.findAll(queryParams);
-  logger.info(states);
 
   return states;
 }
