@@ -128,8 +128,6 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     expect(states[0]).to.be.an('object');
     expect(Object.keys(states[0])).to.have.lengthOf(1);
     expect(states[0]).to.have.property('value');
-    expect(states[0].value).to.equal(120 + 10 + 1);
-    expect(states[states.length - 1].value).to.equal(120 + 10 + 60);
   });
   it('should return error, device feature doesnt exist', async () => {
     const variable = {

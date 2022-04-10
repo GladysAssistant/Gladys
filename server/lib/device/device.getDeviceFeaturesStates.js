@@ -6,7 +6,6 @@ const DEFAULT_OPTIONS = {
   skip: 0,
   order_dir: 'ASC',
   order_by: 'created_at',
-  // attributes: ['id', 'created_at', 'value'],
 };
 
 /**
@@ -44,7 +43,6 @@ async function getDeviceFeaturesStates(selector, options) {
 
   const queryParams = {
     raw: true,
-    // attributes: options.attributes ? [optionsWithDefault.attributes] : optionsWithDefault.attributes,
     where: {
       device_feature_id: deviceFeature.id,
       created_at: {
