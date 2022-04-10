@@ -1,0 +1,92 @@
+name: Docker Image CI
+
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Docker Tag to build'
+        required: true
+        default: 'dev'
+      platforms:
+        description: 'Docker platform to build'
+        required: true
+        default: 'linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8'
+
+jobs:
+  build-front:
+    name: Front build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: 📇 Use npm cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+      - name: 🏗️ Build front
+        working-directory: ./front
+        run: |
+          npm run build
+      - name: ↗️ Upload build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: static
+          path: front/build
+  docker:
+    needs: build-front
+    name: Docker magic !
+    runs-on: ubuntu-20.04
+    env:
+      DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
+      DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
+      DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v2
+      - name: 🐳 Docker meta
+        id: docker_meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ secrets.DOCKERHUB_REPO }}
+          labels: |
+            org.opencontainers.image.title=Gladys Assistant Preprod Image
+      - name: 💽 Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: 🐳 Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          version: latest
+      - name: ↙️ Download build artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: static
+          path: static
+      - name: 🔑 Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: 🐳 Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./docker/Dockerfile.buildx
+          platforms: ${{ github.event.inputs.platforms }}
+          push: true
+          pull: true
+          tags: ${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_REPO }}:${{ github.event.inputs.tag }}
+          cache-to: type=inline
