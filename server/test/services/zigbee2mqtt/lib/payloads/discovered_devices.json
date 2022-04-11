@@ -119,6 +119,18 @@
         "selector": "zigbee2mqtt-0x00158d00045b2740-humidity-sensor-decimal-humidity"
       },
       {
+        "name": "Alarm",
+        "read_only": false,
+        "has_feedback": true,
+        "min": 0,
+        "max": 1,
+        "category": "siren",
+        "type": "binary",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:siren:binary:alarm",
+        "selector": "zigbee2mqtt-0x00158d00045b2740-siren-binary-alarm"
+      },
+      {
         "name": "Pressure",
         "read_only": true,
         "has_feedback": false,

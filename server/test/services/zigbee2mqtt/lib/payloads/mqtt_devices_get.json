@@ -185,6 +185,15 @@
           "unit": "%"
         },
         {
+          "access": 7,
+          "description": "Any binary feature",
+          "name": "alarm",
+          "property": "alarm",
+          "type": "binary",
+          "value_off": false,
+          "value_on": true
+        },
+        {
           "access": 1,
           "description": "The measured atmospheric pressure",
           "name": "pressure",
