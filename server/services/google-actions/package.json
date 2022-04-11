@@ -12,7 +12,7 @@
     "arm64"
   ],
   "dependencies": {
-    "set-value": "^4.0.0",
+    "set-value": "^4.0.1",
     "uuid": "^3.3.3"
   }
 }
