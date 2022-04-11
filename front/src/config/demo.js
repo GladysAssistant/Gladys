@@ -146,7 +146,7 @@ const data = {
         {
           type: 'devices-in-room',
           room: 'living-room',
-          device_features: ['main-tv-binary', 'main-tv-volume', 'main-tv-channel']
+          device_features: ['main-tv-binary', 'main-tv-volume', 'main-tv-channel', 'main-presence-sensor']
         }
       ],
       [
@@ -305,6 +305,18 @@ const data = {
             read_only: false,
             last_value: 22,
             last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Presence',
+            selector: 'main-presence-sensor',
+            category: 'presence-sensor',
+            type: 'push',
+            unit: null,
+            min: 0,
+            max: 1,
+            read_only: true,
+            last_value: 0,
+            last_value_changed: dayjs().add(60, 'second')
           }
         ]
       },
@@ -449,7 +461,7 @@ const data = {
           },
           {
             name: 'Humidity',
-            selector: 'temperature-living-room-celsius',
+            selector: 'temperature-living-room-humidity',
             category: 'humidity-sensor',
             type: 'decimal',
             unit: 'percent',
@@ -481,7 +493,7 @@ const data = {
             max: 1,
             read_only: true,
             last_value: 0,
-            last_value_changed: '2021-07-13 13:49:07.556 +01:00'
+            last_value_changed: dayjs().add(60, 'second')
           },
           {
             name: 'Kitchen door',
