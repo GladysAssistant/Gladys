@@ -7,14 +7,14 @@ const Device = require('../../../lib/device');
 
 const event = new EventEmitter();
 
-const now = new Date('2000-06-15 23:59:00.000');
+const now = new Date('2000-06-15 03:59:00.000');
 const insertStates = async () => {
   const queryInterface = db.sequelize.getQueryInterface();
   const deviceFeatureStateToInsert = [];
-  const statesToInsert = 23 * 60 + 59;
+  const statesToInsert = 3 * 60;
   for (let i = 0; i < statesToInsert; i += 1) {
-    const startAt = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const date = new Date(startAt.getTime() + ((24 * 60 * 60 * 1000) / statesToInsert) * i);
+    const startAt = new Date(now.getTime() - 3 * 60 * 60 * 1000);
+    const date = new Date(startAt.getTime() + ((3 * 60 * 60 * 1000) / statesToInsert) * i);
     deviceFeatureStateToInsert.push({
       id: uuid.v4(),
       device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
@@ -26,14 +26,14 @@ const insertStates = async () => {
   await queryInterface.bulkInsert('t_device_feature_state', deviceFeatureStateToInsert);
 };
 
-describe('Device.getDeviceFeaturesStates', function Describe() {
+describe.only('Device.getDeviceFeaturesStates', function Describe() {
   this.timeout(15000);
 
   beforeEach(async () => {
     const queryInterface = db.sequelize.getQueryInterface();
     await queryInterface.bulkDelete('t_device_feature_state');
   });
-  it('should return the current states', async () => {
+  it.only('Should return the full 24h existing state of the device feature - with queries "from" and "to" in GMT', async () => {
     await insertStates();
     const variable = {
       getValue: fake.resolves(null),
@@ -44,15 +44,17 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
         name: 'my-feature',
       }),
     };
-    const dateState = `${now.getUTCFullYear()}-${`0${now.getUTCMonth() + 1}`.slice(-2)}-${`0${now.getUTCDate()}`.slice(
+    const dateStateFrom = `${now.getUTCFullYear()}-${`0${now.getUTCMonth() + 1}`.slice(-2)}-${`0${now.getUTCDate() -
+      1}`.slice(-2)}`;
+    const dateStateTo = `${now.getUTCFullYear()}-${`0${now.getUTCMonth() + 1}`.slice(
       -2,
-    )}`;
+    )}-${`0${now.getUTCDate()}`.slice(-2)}`;
     const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable);
     const states = await deviceInstance.getDeviceFeaturesStates('test-device-feature', {
-      from: new Date(`${dateState} 00:00:00.000`).toISOString(),
-      to: new Date(`${dateState} 23:59:59.999`).toISOString(),
+      from: new Date(`${dateStateFrom} 00:00:00.000`).toISOString(),
+      to: new Date(`${dateStateTo} 23:59:59.999`).toISOString(),
     });
-    expect(states).to.have.lengthOf(23 * 60 + 59 - 1);
+    expect(states).to.have.lengthOf(3 * 60);
     expect(states[0]).to.be.an('object');
     expect(Object.keys(states[0])).to.have.lengthOf(5);
     expect(states[0]).to.have.property('id');
@@ -68,7 +70,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     expect(new Date(states[0].created_at)).to.be.an('date');
     expect(new Date(states[0].updated_at)).to.be.an('date');
   });
-  it('should return states between 00:01 and 01:30 only values, created_at and device_feature_id', async () => {
+  it.only('should return states between 00:01 and 01:30 only values, created_at and device_feature_id - with queries "from" and "to" in UTC', async () => {
     await insertStates();
     const variable = {
       getValue: fake.resolves(null),
@@ -84,12 +86,12 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     )}`;
     const device = new Device(event, {}, stateManager, {}, {}, variable);
     const states = await device.getDeviceFeaturesStates('test-device-feature', {
-      from: new Date(`${dateState}T00:01:00.000Z`).toISOString(),
-      to: new Date(`${dateState}T01:30:00.000Z`).toISOString(),
+      from: new Date(`${dateState}T00:10:00.000Z`).toISOString(),
+      to: new Date(`${dateState}T00:30:00.000Z`).toISOString(),
       attributes: 'value,created_at,device_feature_id',
     });
 
-    expect(states).to.have.lengthOf(90 - 1);
+    expect(states).to.have.lengthOf(21);
     expect(states[0]).to.be.an('object');
     expect(Object.keys(states[0])).to.have.lengthOf(3);
     expect(states[0]).to.have.property('value');
@@ -98,11 +100,11 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     const firstDateState = new Date(states[0].created_at);
     const lastDateState = new Date(states[states.length - 1].created_at);
     expect(firstDateState.getUTCHours()).to.equal(0);
-    expect(firstDateState.getUTCMinutes()).to.equal(1);
-    expect(lastDateState.getUTCHours()).to.equal(1);
-    expect(lastDateState.getUTCMinutes()).to.equal(29);
+    expect(firstDateState.getUTCMinutes()).to.equal(10);
+    expect(lastDateState.getUTCHours()).to.equal(0);
+    expect(lastDateState.getUTCMinutes()).to.equal(30);
   });
-  it('should return states between 00:10 and 01:10 with a target between 2000-06-15 00:10 and now using take and skip , only values', async () => {
+  it.only('should return states between 00:10 and 01:10 with a target between 2000-06-15 00:10 and now using take and skip , only values', async () => {
     await insertStates();
     const variable = {
       getValue: fake.resolves(null),
@@ -129,7 +131,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     expect(Object.keys(states[0])).to.have.lengthOf(1);
     expect(states[0]).to.have.property('value');
   });
-  it('should return error, device feature doesnt exist', async () => {
+  it.only('should return error, device feature doesnt exist', async () => {
     const variable = {
       getValue: fake.resolves(null),
     };
@@ -146,7 +148,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     });
     return assert.isRejected(promise, 'DeviceFeature not found');
   });
-  it('should return error, start date missing', async () => {
+  it.only('should return error, start date missing', async () => {
     const variable = {
       getValue: fake.resolves(null),
     };
