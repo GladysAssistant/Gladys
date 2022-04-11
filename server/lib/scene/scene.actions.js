@@ -127,7 +127,14 @@ const actionsFunc = {
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
-    set(scope, `${columnIndex}.${rowIndex}`, deviceFeature);
+    set(
+      scope,
+      `${columnIndex}`,
+      {
+        [rowIndex]: deviceFeature,
+      },
+      { merge: true },
+    );
   },
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
@@ -247,7 +254,14 @@ const actionsFunc = {
       parseJsonIfJson(bodyWithVariables),
       headersObject,
     );
-    set(scope, `${columnIndex}.${rowIndex}`, response);
+    set(
+      scope,
+      `${columnIndex}`,
+      {
+        [rowIndex]: response,
+      },
+      { merge: true },
+    );
   },
   [ACTIONS.USER.CHECK_PRESENCE]: async (self, action, scope, columnIndex, rowIndex) => {
     let deviceSeenRecently = false;
@@ -304,9 +318,16 @@ const actionsFunc = {
           .locale(eventRaw.calendar.creator.language)
           .format('LLL'),
       };
-      set(scope, `${columnIndex}.${rowIndex}`, {
-        calendarEvent: eventFormatted,
-      });
+      set(
+        scope,
+        `${columnIndex}`,
+        {
+          [rowIndex]: {
+            calendarEvent: eventFormatted,
+          },
+        },
+        { merge: true },
+      );
     }
   },
 };
