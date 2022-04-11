@@ -26,14 +26,14 @@ const insertStates = async () => {
   await queryInterface.bulkInsert('t_device_feature_state', deviceFeatureStateToInsert);
 };
 
-describe.only('Device.getDeviceFeaturesStates', function Describe() {
+describe('Device.getDeviceFeaturesStates', function Describe() {
   this.timeout(15000);
 
   beforeEach(async () => {
     const queryInterface = db.sequelize.getQueryInterface();
     await queryInterface.bulkDelete('t_device_feature_state');
   });
-  it.only('Should return the full 24h existing state of the device feature - with queries "from" and "to" in GMT', async () => {
+  it('Should return the full 24h existing state of the device feature - with queries "from" and "to" in GMT', async () => {
     await insertStates();
     const variable = {
       getValue: fake.resolves(null),
@@ -70,7 +70,7 @@ describe.only('Device.getDeviceFeaturesStates', function Describe() {
     expect(new Date(states[0].created_at)).to.be.an('date');
     expect(new Date(states[0].updated_at)).to.be.an('date');
   });
-  it.only('should return states between 00:01 and 01:30 only values, created_at and device_feature_id - with queries "from" and "to" in UTC', async () => {
+  it('should return states between 00:01 and 01:30 only values, created_at and device_feature_id - with queries "from" and "to" in UTC', async () => {
     await insertStates();
     const variable = {
       getValue: fake.resolves(null),
@@ -104,7 +104,7 @@ describe.only('Device.getDeviceFeaturesStates', function Describe() {
     expect(lastDateState.getUTCHours()).to.equal(0);
     expect(lastDateState.getUTCMinutes()).to.equal(30);
   });
-  it.only('should return states between 00:10 and 01:10 with a target between 2000-06-15 00:10 and now using take and skip , only values', async () => {
+  it('should return states between 00:10 and 01:10 with a target between 2000-06-15 00:10 and now using take and skip , only values', async () => {
     await insertStates();
     const variable = {
       getValue: fake.resolves(null),
@@ -131,7 +131,7 @@ describe.only('Device.getDeviceFeaturesStates', function Describe() {
     expect(Object.keys(states[0])).to.have.lengthOf(1);
     expect(states[0]).to.have.property('value');
   });
-  it.only('should return error, device feature doesnt exist', async () => {
+  it('should return error, device feature doesnt exist', async () => {
     const variable = {
       getValue: fake.resolves(null),
     };
@@ -148,7 +148,7 @@ describe.only('Device.getDeviceFeaturesStates', function Describe() {
     });
     return assert.isRejected(promise, 'DeviceFeature not found');
   });
-  it.only('should return error, start date missing', async () => {
+  it('should return error, start date missing', async () => {
     const variable = {
       getValue: fake.resolves(null),
     };
