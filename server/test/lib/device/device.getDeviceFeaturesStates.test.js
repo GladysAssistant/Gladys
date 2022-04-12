@@ -33,7 +33,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     const queryInterface = db.sequelize.getQueryInterface();
     await queryInterface.bulkDelete('t_device_feature_state');
   });
-  it.only('Should return the full 24h existing state of the device feature - with queries "from" and "to" in GMT', async () => {
+  it('Should return the full 24h existing state of the device feature - with queries "from" and "to" in GMT', async () => {
     await insertStates();
     const variable = {
       getValue: fake.resolves(null),
@@ -70,7 +70,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
     expect(new Date(states[0].created_at)).to.be.an('date');
     expect(new Date(states[0].updated_at)).to.be.an('date');
   });
-  it.only('should return states between 00:10 and 01:10 with a target between 2000-06-15 00:10 and now using take and skip , only values', async () => {
+  it('should return states between 00:10 and 01:10 with a target between 2000-06-15 00:10 and now using take and skip , only values', async () => {
     await insertStates();
     const variable = {
       getValue: fake.resolves(null),
