@@ -67,7 +67,6 @@ const NewScenePage = ({ children, ...props }) => (
                   <Text id="newScene.invalidIcon" />
                 </div>
               )}
-              {/*console.log(props)*/}
             </div>
             <div class={cx('form-group', style.iconGlobalContainer)}>
               {props.selectIconView === 'iconGroup' &&

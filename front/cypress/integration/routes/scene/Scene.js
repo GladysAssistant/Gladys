@@ -57,6 +57,32 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene`);
   });
+  it('Should create new scene with icon selected by groups', () => {
+    cy.visit('/dashboard/scene');
+    cy.contains('scene.newButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
+
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/new`);
+
+    cy.get('input:visible').then(inputs => {
+      // Zone name
+      cy.wrap(inputs[0]).type('My scene');
+    });
+
+    cy.contains('iconLabel.groupView')
+      .should('have.class', 'btn-secondary')
+      .should('have.name', 'groupView')
+      .click();
+
+    cy.get('.fe-activity').click();
+
+    cy.contains('newScene.createSceneButton')
+      .should('have.class', 'btn-primary')
+      .click();
+
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene`);
+  });
   it('Should add new condition house empty', () => {
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addActionButton')
