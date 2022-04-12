@@ -72,7 +72,7 @@ describe('Scene view', () => {
 
     cy.contains('iconLabel.groupView')
       .should('have.class', 'btn-secondary')
-      .should('have.name', 'groupView')
+      .should('have.prop', 'name', 'groupView')
       .click();
 
     cy.get('.fe-activity').click();
