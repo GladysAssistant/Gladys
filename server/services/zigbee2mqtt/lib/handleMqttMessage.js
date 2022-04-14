@@ -1,5 +1,7 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+const { convertDevice } = require('../utils/convertDevice');
+const { convertValue } = require('../utils/convertValue');
 const { convertFeature } = require('../utils/convertFeature');
 
 /**
@@ -20,15 +22,13 @@ function handleMqttMessage(topic, message) {
     case 'zigbee2mqtt/bridge/devices': {
       logger.log('Getting config devices from Zigbee2mqtt');
       const devices = JSON.parse(message);
-
-      this.discoveredDevices = {};
-
-      devices
+      const convertedDevices = devices
         // Remove Coordinator
         .filter((d) => d.supported)
-        .forEach((device) => {
-          this.discoveredDevices[device.friendly_name] = device;
-        });
+        // Add features
+        .map((d) => convertDevice(d, this.serviceId));
+
+      this.discoveredDevices = convertedDevices;
 
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.DISCOVER,
@@ -90,7 +90,7 @@ function handleMqttMessage(topic, message) {
               try {
                 const newState = {
                   device_feature_external_id: `${feature.external_id}`,
-                  state: this.readValue(deviceName, zigbeeFeatureField, incomingFeatures[zigbeeFeatureField]),
+                  state: convertValue(feature.type, incomingFeatures[zigbeeFeatureField]),
                 };
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
               } catch (e) {

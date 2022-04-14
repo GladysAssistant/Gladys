@@ -1,5 +1,6 @@
+const { intToRgb } = require('../../../utils/colors');
 const { BadParameters } = require('../../../utils/coreErrors');
-const exposesMap = require('../exposes');
+const logger = require('../../../utils/logger');
 
 /**
  * @description Set the new device value from Gladys to MQTT.
@@ -10,32 +11,46 @@ const exposesMap = require('../exposes');
  * setValue(device, deviceFeature, 0);
  */
 function setValue(device, deviceFeature, value) {
-  const externalId = deviceFeature.external_id;
+  const externalId = device.external_id;
 
   if (!externalId.startsWith('zigbee2mqtt:')) {
     throw new BadParameters(
-      `Zigbee2mqtt device external_id is invalid: "${externalId}" should starts with "zigbee2mqtt:"`,
+      `Zigbee2mqtt device external_id is invalid : "${externalId}" should starts with "zigbee2mqtt:"`,
     );
   }
-
-  const [, topic = '', , , property = ''] = externalId.split(':');
+  // Remove first 'zigbee2mqtt:' substring
+  const topic = externalId.substring(12);
   if (topic.length === 0) {
-    throw new BadParameters(`Zigbee2mqtt device external_id is invalid: "${externalId}" have no MQTT topic`);
-  } else if (property.length === 0) {
-    throw new BadParameters(`Zigbee2mqtt device external_id is invalid: "${externalId}" have no Zigbee property`);
+    throw new BadParameters(`Zigbee2mqtt device external_id is invalid : "${externalId}" have no MQTT topic`);
   }
 
+  // Convert Gladys value to Zigbee value
   let zigbeeValue;
-
-  // Looks mapping from exposes
-  const expose = this.findMatchingExpose(topic, property);
-  if (expose) {
-    zigbeeValue = exposesMap[expose.type].writeValue(expose, value);
+  switch (deviceFeature.type) {
+    case 'binary':
+      zigbeeValue = value ? `{"state": "ON"}` : `{"state": "OFF"}`;
+      break;
+    case 'brightness':
+      zigbeeValue = `{"brightness": ${value}}`;
+      break;
+    case 'temperature':
+      zigbeeValue = `{"color_temp": ${value}}`;
+      break;
+    case 'color': {
+      const [r, g, b] = intToRgb(parseInt(value, 10));
+      zigbeeValue = `{"color": {"rgb": "${r},${g},${b}"}}`;
+      break;
+    }
+    default:
+      zigbeeValue = null;
+  }
+  if (zigbeeValue) {
     // Send message to Zigbee2mqtt topics
-    const mqttPaylad = JSON.stringify({ [property]: zigbeeValue });
-    this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, mqttPaylad);
+    this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, zigbeeValue);
   } else {
-    throw new BadParameters(`Zigbee2mqtt expose not found: "${externalId}" with property "${property}"`);
+    logger.warn(
+      `Zigbee value ${value} for device ${device.external_id}, feature ${deviceFeature.type} is not managed by`,
+    );
   }
 }
 
