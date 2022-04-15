@@ -15,6 +15,7 @@ const { getBySelector } = require('./scene.getBySelector');
 const { executeSingleAction } = require('./scene.executeSingleAction');
 const { update } = require('./scene.update');
 const { dailyUpdate } = require('./scene.dailyUpdate');
+const { duplicate } = require('./scene.duplicate');
 
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
@@ -74,5 +75,6 @@ SceneManager.prototype.getBySelector = getBySelector;
 SceneManager.prototype.execute = execute;
 SceneManager.prototype.executeSingleAction = executeSingleAction;
 SceneManager.prototype.update = update;
+SceneManager.prototype.duplicate = duplicate;
 
 module.exports = SceneManager;
