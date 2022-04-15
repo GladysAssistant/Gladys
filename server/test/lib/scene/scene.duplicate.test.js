@@ -17,7 +17,7 @@ describe('SceneManager', () => {
 
   it('should return not found', async () => {
     const sceneManager = new SceneManager({}, event);
-    const promise = sceneManager.destroy('not-found-scene');
+    const promise = sceneManager.duplicate('not-found-scene', 'new-name');
     return assert.isRejected(promise);
   });
 });
