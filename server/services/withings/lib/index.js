@@ -1,5 +1,6 @@
 // COMMANDS
 const { init } = require('./withings.init');
+const { initDevices } = require('./withings.initDevices');
 const { deleteVar } = require('./withings.deleteVar');
 const { deleteDevices } = require('./withings.deleteDevices');
 const { poll } = require('./withings.poll');
@@ -26,6 +27,7 @@ const WithingsHandler = function WithingsHandler(gladys, serviceId) {
 
 // COMMANDS
 WithingsHandler.prototype.init = init;
+WithingsHandler.prototype.initDevices = initDevices;
 WithingsHandler.prototype.deleteVar = deleteVar;
 WithingsHandler.prototype.deleteDevices = deleteDevices;
 WithingsHandler.prototype.poll = poll;

@@ -3,12 +3,12 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 module.exports = function WithingsController(gladys, withingsHandler) {
   /**
    * @description Init gladys devices with withings devices.
-   * @api {post} /api/v1/service/withings/init Init gladys devices with withings devices.
+   * @api {post} /api/v1/service/withings/init_devices Init gladys devices with withings devices.
    * @apiName init
    * @apiGroup Withings
    */
   async function init(req, res) {
-    const resultInit = await withingsHandler.init(req.user.id);
+    const resultInit = await withingsHandler.initDevices(req.user.id);
     res.json({
       withingsDevices: resultInit,
     });
@@ -29,7 +29,7 @@ module.exports = function WithingsController(gladys, withingsHandler) {
   }
 
   return {
-    'post /api/v1/service/withings/init': {
+    'post /api/v1/service/withings/init_devices': {
       authenticated: true,
       controller: asyncMiddleware(init),
     },

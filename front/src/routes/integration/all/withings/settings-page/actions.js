@@ -27,7 +27,7 @@ const actions = store => ({
         // Case of config found
         let withingsDevices;
         if (returnGetConfig.client_id) {
-          const result = await state.httpClient.post('/api/v1/service/withings/init');
+          const result = await state.httpClient.post('/api/v1/service/withings/init_devices');
           if (result) {
             withingsDevices = result.withingsDevices;
           }

@@ -13,6 +13,7 @@ module.exports = function WithingsService(gladys, serviceId) {
    */
   async function start() {
     logger.log('starting Withings service');
+    await withingsHandler.init();
   }
 
   /**

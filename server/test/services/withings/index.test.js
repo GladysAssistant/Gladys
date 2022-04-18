@@ -1,3 +1,4 @@
+const sinon = require('sinon');
 const { fake, assert } = require('sinon');
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
@@ -21,11 +22,12 @@ describe('withingsService', () => {
     expect(withingsService).to.have.property('controllers');
     expect(withingsService).to.have.property('device');
 
-    assert.notCalled(gladys.variable.getValue);
-    assert.notCalled(gladys.variable.setValue);
+    assert.callCount(gladys.variable.getValue, 1);
+    assert.callCount(gladys.variable.setValue, 8);
   });
 
   it('should stop service', async () => {
+    sinon.reset();
     await withingsService.stop();
 
     assert.notCalled(gladys.variable.getValue);

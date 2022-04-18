@@ -31,7 +31,7 @@ describe('Withings settings page', () => {
     cy.intercept(
       {
         method: 'POST',
-        url: `${serverUrl}/api/v1/service/withings/init`
+        url: `${serverUrl}/api/v1/service/withings/init_devices`
       },
       {
         body: []
