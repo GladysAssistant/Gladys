@@ -40,7 +40,11 @@ async function sendToUser(userSelector, text, file = null) {
   const nextcloudTalkService = this.service.getService('nextcloud-talk');
   // if the service exist
   if (nextcloudTalkService) {
-    const nextcloudTalkToken = this.variable.getValue('NEXTCLOUD_TALK_TOKEN', nextcloudTalkService.id, user.id);
+    const nextcloudTalkToken = await this.variable.getValue(
+      'NEXTCLOUD_TALK_TOKEN',
+      nextcloudTalkService.message.serviceId,
+      user.id,
+    );
     // if the user had nextcloud talk configured
     if (nextcloudTalkToken) {
       // we forward the message to Nextcloud Talk
