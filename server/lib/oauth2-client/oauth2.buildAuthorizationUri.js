@@ -43,8 +43,12 @@ async function buildAuthorizationUri(serviceId, userId, integrationName, referer
   };
 
   const client = new AuthorizationCode(credentials);
+  let redirectUri = referer;
+  if (referer && !referer.includes(redirectUriSuffix)) {
+    redirectUri = `${referer}${redirectUriSuffix}`;
+  }
   const authorizationUriResult = await client.authorizeURL({
-    redirect_uri: `${referer}${redirectUriSuffix}`,
+    redirect_uri: redirectUri,
     scope: integrationScope,
     state: `gladys_state_${integrationName}`,
   });
