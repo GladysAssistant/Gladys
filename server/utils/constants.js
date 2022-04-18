@@ -567,6 +567,7 @@ const DASHBOARD_BOX_TYPE = {
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
   CHART: 'chart',
+  SCENE: 'scene',
 };
 
 const ERROR_MESSAGES = {

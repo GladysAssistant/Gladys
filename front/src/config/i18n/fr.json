@@ -201,7 +201,8 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
-      "chart": "Graphique"
+      "chart": "Graphique",
+      "scene": "Scene"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -276,6 +277,10 @@
         "no": "Non",
         "preview": "Prévisualisation",
         "showPreviewButton": "Afficher une prévisualisation"
+      },
+      "scene": {
+        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici.",
+        "lastExecution": "Dernière execution : {{lastExecution}}"
       }
     }
   },

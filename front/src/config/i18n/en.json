@@ -201,7 +201,8 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
-      "chart": "Chart"
+      "chart": "Chart",
+      "scene": "Scene"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -276,6 +277,10 @@
         "no": "No",
         "preview": "Preview",
         "showPreviewButton": "Show preview"
+      },
+      "scene": {
+        "editSceneLabel": "Select the scene you want to display here.",
+        "lastExecution": "Last execution: {{dateLastExecution}}"
       }
     }
   },
