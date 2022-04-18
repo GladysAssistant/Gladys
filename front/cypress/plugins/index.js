@@ -20,7 +20,7 @@ module.exports = (on, config) => {
   // `config` is the resolved Cypress config
 
   // Load NODE env variables
-  const language = 'en';
+  const language = process.env.LANGUAGE || 'en';
   config.env.language = language;
 
   const serverUrl = process.env.LOCAL_API_URL || 'http://localhost:1443';
