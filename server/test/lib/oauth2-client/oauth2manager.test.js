@@ -129,3 +129,33 @@ describe('oauth2manager failled test', () => {
     return assert.equal(result, null);
   });
 });
+
+describe('oauth2manager buildRedirectUri result test without path', () => {
+  const manager = new OAuth2Manager(gladys.variable);
+
+  it('oauth manager buildRedirectUri without path test ', async () => {
+    const result = manager.buildRedirectUri('http://localhost:1444', '/path/test');
+
+    return assert.equal(result, 'http://localhost:1444/path/test');
+  });
+});
+
+describe('oauth2manager buildRedirectUri result test with path', () => {
+  const manager = new OAuth2Manager(gladys.variable);
+
+  it('oauth manager buildRedirectUri with path test ', async () => {
+    const result = manager.buildRedirectUri('http://localhost:1444/path/test', '/path/test');
+
+    return assert.equal(result, 'http://localhost:1444/path/test');
+  });
+});
+
+describe('oauth2manager buildRedirectUri result test with ?', () => {
+  const manager = new OAuth2Manager(gladys.variable);
+
+  it('oauth manager buildRedirectUri with path test ', async () => {
+    const result = manager.buildRedirectUri('http://localhost:1444/path/test?test', '/path/test');
+
+    return assert.equal(result, 'http://localhost:1444/path/test');
+  });
+});

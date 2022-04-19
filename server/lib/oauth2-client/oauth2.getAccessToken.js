@@ -55,7 +55,7 @@ async function getAccessToken(serviceId, userId, authorizationCode, referer) {
     client_id: clientId,
     client_secret: secret,
     grant_type: grantType,
-    redirect_uri: `${referer}${redirectUriSuffix}`,
+    redirect_uri: this.buildRedirectUri(referer, redirectUriSuffix),
   };
   if (additionalAccessTokenRequestAxtionParam) {
     tokenConfig.action = additionalAccessTokenRequestAxtionParam;
