@@ -203,7 +203,8 @@
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
       "chart": "Graphique",
-      "ecowatt": "Ecowatt ( France )"
+      "ecowatt": "Ecowatt ( France )",
+      "clock": "Horloge"
     },
     "boxes": {
       "column": "Colonne {{index}}",
