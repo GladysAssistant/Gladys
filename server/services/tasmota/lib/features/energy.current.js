@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -12,7 +13,7 @@ module.exports = {
     return {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
-      name: 'Energy',
+      name: `${i18n.__('integrations.global.device.feature.energy')}`,
       read_only: true,
       has_feedback: false,
       min: 0,

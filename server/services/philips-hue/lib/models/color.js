@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -16,7 +17,7 @@ const getPhilipsHueColorLight = (philipsHueLight, bridgeSerialNumber, serviceId)
   poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
   features: [
     {
-      name: `${philipsHueLight.name} On/Off`,
+      name: `${philipsHueLight.name} ${i18n.__('integrations.global.device.feature.onOff')}`,
       read_only: false,
       has_feedback: false,
       external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`,
@@ -27,7 +28,7 @@ const getPhilipsHueColorLight = (philipsHueLight, bridgeSerialNumber, serviceId)
       max: 1,
     },
     {
-      name: `${philipsHueLight.name} Color`,
+      name: `${philipsHueLight.name} ${i18n.__('integrations.global.device.feature.color')}`,
       read_only: false,
       has_feedback: false,
       external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`,
@@ -38,7 +39,7 @@ const getPhilipsHueColorLight = (philipsHueLight, bridgeSerialNumber, serviceId)
       max: 0,
     },
     {
-      name: `${philipsHueLight.name} Brightness`,
+      name: `${philipsHueLight.name} ${i18n.__('integrations.global.device.feature.brightness')}`,
       read_only: false,
       has_feedback: false,
       external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`,

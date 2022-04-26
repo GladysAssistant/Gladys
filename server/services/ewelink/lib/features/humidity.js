@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -10,7 +11,7 @@ module.exports = {
   // Gladys feature
   generateFeature: (name, channel = 0) => {
     return {
-      name: `${name} Humidity`,
+      name: `${name} ${i18n.__('integrations.global.device.feature.humidity')}`,
       category: DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR,
       type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
       read_only: true,

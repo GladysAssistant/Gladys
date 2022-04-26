@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { intToRgb, rgbToInt } = require('../../../../utils/colors');
 
@@ -11,7 +12,7 @@ module.exports = {
       return {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-        name: 'Color',
+        name: `${i18n.__('integrations.global.device.feature.color')}`,
         read_only: false,
         has_feedback: true,
         min: 0,

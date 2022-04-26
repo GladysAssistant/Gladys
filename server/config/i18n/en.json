@@ -1,0 +1,26 @@
+{
+  "integrations": {
+    "global": {
+      "device": {
+        "feature": {
+          "battery": "Battery",
+          "onOff": "On/Off",
+          "temperature": "Temperature",
+          "humidity": "Humidity",
+          "color": "Color",
+          "colorTemperature": "Color temperature",
+          "brightness": "Brightness",
+          "effectMode": "Effect mode",
+          "effectspeed": "Effect speed",
+          "counter": "Counter",
+          "dimmer": "Dimmer",
+          "distance": "Distance",
+          "energy": "Energy",
+          "power": "Power",
+          "voltage": "Voltage",
+          "switch": "Switch"
+        }
+      }
+    }
+  }
+}

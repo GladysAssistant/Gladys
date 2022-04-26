@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 module.exports = {
@@ -6,7 +7,7 @@ module.exports = {
   // Gladys feature
   generateFeature: (device, key) => {
     const position = key.replace(/C/i, '');
-    const name = `Counter ${position}`.trim();
+    const name = `${i18n.__('integrations.global.device.feature.counter')} ${position}`.trim();
 
     return {
       category: DEVICE_FEATURE_CATEGORIES.COUNTER_SENSOR,

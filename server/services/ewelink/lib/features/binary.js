@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, STATE } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 const { parseExternalId } = require('../utils/externalId');
@@ -6,7 +7,7 @@ module.exports = {
   // Gladys feature
   generateFeature: (name, channel = 0) => {
     return {
-      name: `${name}${channel > 0 ? ` Ch${channel}` : ''} On/Off`,
+      name: `${name}${channel > 0 ? ` Ch${channel}` : ''} ${i18n.__('integrations.global.device.feature.onOff')}`,
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
       read_only: false,

@@ -3,6 +3,8 @@ const http = require('http');
 const compression = require('compression');
 const WebSocket = require('ws');
 const path = require('path');
+const i18n = require('i18n');
+const constants = require('../utils/constants');
 const errorMiddleware = require('./middlewares/errorMiddleware');
 const notFoundMiddleware = require('./middlewares/notFoundMiddleware');
 const WebsocketManager = require('./websockets');
@@ -19,7 +21,7 @@ const STATIC_FOLDER = path.join(__dirname, '/../static');
  * @example
  * server.start(gladys, 1337);
  */
-function start(gladys, port, options) {
+async function start(gladys, port, options) {
   const app = express();
 
   // compress all response
@@ -35,6 +37,23 @@ function start(gladys, port, options) {
 
   // loading app
   app.use(setupRoutes(gladys));
+
+  i18n.configure({
+    locales: [constants.AVAILABLE_LANGUAGES.FR, constants.AVAILABLE_LANGUAGES.EN],
+    register: global,
+    directory: path.join(__dirname, '../config/i18n'),
+    defaultLocale: 'en',
+    objectNotation: true,
+    updateFiles: false,
+  });
+
+  const user = await gladys.user.get({ order_dir: 'ASC', order_by: 'created_at', take: 1 });
+  if (user) {
+    const userLanguage = user[0].language;
+    i18n.setLocale(userLanguage);
+  }
+
+  app.use(i18n.init);
 
   // if not API routes was found
   app.use('/api', notFoundMiddleware);

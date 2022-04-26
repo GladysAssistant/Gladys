@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const logger = require('../../../../utils/logger');
 
 const {
@@ -78,7 +79,7 @@ const INFORMATION_SERVICES = {
     '2a19': {
       discover: (serviceUuid, characteristic, device) => {
         const feature = {
-          name: 'Battery',
+          name: `${i18n.__('integrations.global.device.feature.battery')}`,
           category: DEVICE_FEATURE_CATEGORIES.BATTERY,
           type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
           unit: DEVICE_FEATURE_UNITS.PERCENT,
@@ -99,7 +100,7 @@ const INFORMATION_SERVICES = {
     '2a6e': {
       discover: (serviceUuid, characteristic, device) => {
         const feature = {
-          name: 'Temperature',
+          name: `${i18n.__('integrations.global.device.feature.temperature')}`,
           category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           read_only: true,
@@ -116,7 +117,7 @@ const INFORMATION_SERVICES = {
     '2a1f': {
       discover: (serviceUuid, characteristic, device) => {
         const feature = {
-          name: 'Temperature',
+          name: `${i18n.__('integrations.global.device.feature.temperature')}`,
           category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           unit: DEVICE_FEATURE_UNITS.CELSIUS,
@@ -134,7 +135,7 @@ const INFORMATION_SERVICES = {
     '2a20': {
       discover: (serviceUuid, characteristic, device) => {
         const feature = {
-          name: 'Temperature',
+          name: `${i18n.__('integrations.global.device.feature.temperature')}`,
           category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
           unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,

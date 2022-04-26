@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { LIGHT_MODULES } = require('./modules');
 
@@ -11,7 +12,7 @@ module.exports = {
     const type = lightDevice ? DEVICE_FEATURE_TYPES.LIGHT.BINARY : DEVICE_FEATURE_TYPES.SWITCH.BINARY;
 
     const position = key.replace(/POWER/i, '');
-    const name = `Switch ${position}`.trim();
+    const name = `${i18n.__('integrations.global.device.feature.switch')} ${position}`.trim();
 
     return {
       category,

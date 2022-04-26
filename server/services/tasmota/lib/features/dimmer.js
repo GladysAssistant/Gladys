@@ -1,3 +1,4 @@
+const i18n = require('i18n');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { LIGHT_MODULES } = require('./modules');
 
@@ -9,7 +10,9 @@ module.exports = {
     const lightDevice = LIGHT_MODULES.includes(device.model);
     const category = lightDevice ? DEVICE_FEATURE_CATEGORIES.LIGHT : DEVICE_FEATURE_CATEGORIES.SWITCH;
     const type = lightDevice ? DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS : DEVICE_FEATURE_TYPES.SWITCH.DIMMER;
-    const name = lightDevice ? 'Brightness' : 'Dimmer';
+    const name = lightDevice
+      ? `${i18n.__('integrations.global.device.feature.brightness')}`
+      : `${i18n.__('integrations.global.device.feature.dimmer')}`;
 
     return {
       category,
