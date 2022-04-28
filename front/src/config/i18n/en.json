@@ -1858,6 +1858,11 @@
       "shortCategoryName": "UV Sensor",
       "integer": "UV Index"
     },
+    "time-sensor": {
+      "shortCategoryName": "Time sensor",
+      "decimal": "Time (decimal)",
+      "integer": "Time (integer)"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
