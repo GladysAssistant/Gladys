@@ -1593,7 +1593,16 @@
     "meter-per-second": "Mètre par seconde (m/s)",
     "kilometer-per-hour": "Kilomètre par heure (km/h)",
     "millimeter-per-hour": "Millimètre par heure (mm/h)",
-    "uv-index": "Indice UV"
+    "uv-index": "Indice UV",
+    "microseconds": "Microsecondes (μs)",
+    "milliseconds": "Millisecondes (ms)",
+    "seconds": "Secondes (s)",
+    "minutes": "Minutes (min)",
+    "hours": "Heures (h)",
+    "days": "Jours (j)",
+    "weeks": "Semaines (sem)",
+    "months": "Mois (m)",
+    "years": "Années (an)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1635,7 +1644,16 @@
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
     "millimeter-per-hour": "mm/h",
-    "uv-index": "Indice UV"
+    "uv-index": "Indice UV",
+    "microseconds": "μs",
+    "milliseconds": "ms",
+    "seconds": "s",
+    "minutes": "min",
+    "hours": "h",
+    "days": "j",
+    "weeks": "sem",
+    "months": "m",
+    "years": "an."
   },
   "deviceFeatureValue": {
     "type": {

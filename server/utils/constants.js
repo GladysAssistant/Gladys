@@ -329,6 +329,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SPEED_SENSOR: 'speed-sensor',
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   UV_SENSOR: 'uv-sensor',
+  TIME_SENSOR: 'time-sensor',
   UNKNOWN: 'unknown',
 };
 
@@ -444,6 +445,10 @@ const DEVICE_FEATURE_TYPES = {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
   },
+  TIME_SENSOR: {
+    DECIMAL: 'decimal',
+    INTEGER: 'integer',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -503,6 +508,16 @@ const DEVICE_FEATURE_UNITS = {
   MILLIMETER_PER_HOUR: 'millimeter-per-hour',
   // UV Units
   UV_INDEX: 'uv-index',
+  // Time units
+  MICROSECONDS: 'microseconds',
+  MILLISECONDS: 'milliseconds',
+  SECONDS: 'seconds',
+  MINUTES: 'minutes',
+  HOURS: 'hours',
+  DAYS: 'days',
+  WEEKS: 'weeks',
+  MONTHS: 'months',
+  YEARS: 'years',
 };
 
 const WEATHER_UNITS = {
@@ -577,6 +592,17 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   ],
   [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: [DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR],
   [DEVICE_FEATURE_CATEGORIES.UV_SENSOR]: [DEVICE_FEATURE_UNITS.UV_INDEX],
+  [DEVICE_FEATURE_CATEGORIES.TIME_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MICROSECONDS,
+    DEVICE_FEATURE_UNITS.MILLISECONDS,
+    DEVICE_FEATURE_UNITS.SECONDS,
+    DEVICE_FEATURE_UNITS.MINUTES,
+    DEVICE_FEATURE_UNITS.HOURS,
+    DEVICE_FEATURE_UNITS.DAYS,
+    DEVICE_FEATURE_UNITS.WEEKS,
+    DEVICE_FEATURE_UNITS.MONTHS,
+    DEVICE_FEATURE_UNITS.YEARS,
+  ],
 };
 
 const ACTIONS_STATUS = {
