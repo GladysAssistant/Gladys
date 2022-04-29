@@ -1921,7 +1921,7 @@
     "complete": "Terminé ! Veuillez vérifier votre e-mail.",
     "done": "Terminé ! Vous pouvez maintenant vous connecter <a href=\"/login\" style=\"color: blue\">ici</a>.",
     "usernameLabel": "Nom",
-    "usernamePlaceholder": "Entez votre nom",
+    "usernamePlaceholder": "Entrez votre nom",
     "usernameInvalid": "Le nom doit comprendre entre 2 et 30 caractères",
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre adresse e-mail",
