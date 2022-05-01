@@ -291,6 +291,12 @@
         "ok": "Network ok",
         "warning": "Network warning",
         "critical": "Network critical"
+      },
+      "clock": {
+        "analog": "Analog",
+        "digital": "Digital",
+        "date": "{{day}}, {{month}} {{dayNumber}}, {{year}}",
+        "smallDate": "{{month}} {{dayNumber}}"
       }
     }
   },
