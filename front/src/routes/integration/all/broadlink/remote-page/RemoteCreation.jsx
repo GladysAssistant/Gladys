@@ -77,7 +77,7 @@ class RemoteCreation extends Component {
 
     Object.keys(editedFeatures).forEach(type => {
       const { feature, codes } = editedFeatures[type];
-      const { feature: defaultFeature } = remoteFeatures[type];
+      const { feature: defaultFeature = {} } = remoteFeatures[type];
       const featureExternalId = `${deviceExternalId}:${type}`;
 
       let nbCodes = 0;
@@ -102,7 +102,7 @@ class RemoteCreation extends Component {
           keep_history: false,
           has_feedback: true,
           min: defaultFeature.min || 0,
-          max: defaultFeature.max || 0,
+          max: defaultFeature.max || 1,
           ...feature
         });
       }
