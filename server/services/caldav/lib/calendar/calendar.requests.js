@@ -74,13 +74,18 @@ async function requestCalendars(xhr, homeUrl) {
  * requestChanges(xhr, calendarToUpdate)
  */
 async function requestChanges(xhr, calendarToUpdate) {
-  const req = this.dav.request.syncCollection({
-    syncLevel: 1,
-    syncToken: calendarToUpdate.sync_token || '',
-    props: [{ name: 'getetag', namespace: this.dav.ns.DAV }],
-  });
-
-  const { responses: eventsToUpdate } = await xhr.send(req, calendarToUpdate.external_id);
+  const eventsToUpdate = [];
+  let result;
+  do {
+    const req = this.dav.request.syncCollection({
+      syncLevel: 1,
+      syncToken: result ? result.syncToken : calendarToUpdate.sync_token || '',
+      props: [{ name: 'getetag', namespace: this.dav.ns.DAV }],
+    });
+    // eslint-disable-next-line no-await-in-loop
+    result = await xhr.send(req, calendarToUpdate.external_id);
+    eventsToUpdate.push(...result.responses.filter((event) => event.props.getetag));
+  } while (result.responses.length > 0 && !result.responses[result.responses.length - 1].props.getetag);
 
   return eventsToUpdate;
 }
@@ -110,7 +115,7 @@ async function requestEventsData(xhr, calendarUrl, eventsToUpdate, calDavHost) {
                   if (!eventToUpdate.href.endsWith('.ics')) {
                     return '';
                   }
-                  return `<d:href>${eventToUpdate.href}</d:href>`;
+                  return `<d:href>${encodeURIComponent(eventToUpdate.href).replace(/%2F/g, '/')}</d:href>`;
                 })
                 .join('\n')}
               <c:filter>

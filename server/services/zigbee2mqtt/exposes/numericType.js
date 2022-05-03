@@ -2,6 +2,12 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } 
 
 module.exports = {
   type: 'numeric',
+  writeValue: (expose, value) => {
+    return value;
+  },
+  readValue: (expose, value) => {
+    return value;
+  },
   feature: {
     min: 0,
     max: 10000,
