@@ -7,27 +7,29 @@ const { ACTIONS } = require('../utils/broadlink.constants');
  * @param {string} peripheralIdentifier - The peripheral address.
  * @param {string} code - IR code to send.
  * @example
- * gladys.broadlink.send('770f78b9401c', '0200ZO4440D2');
+ * await gladys.broadlink.send('770f78b9401c', '0200ZO4440D2');
  */
-function send(peripheralIdentifier, code) {
+async function send(peripheralIdentifier, code) {
   logger.debug(`Broalink sending on ${peripheralIdentifier}`);
-  const peripheral = this.broadlinkDevices[peripheralIdentifier];
 
-  if (!peripheral || !peripheral.sendData) {
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.SEND_MODE,
-      payload: {
-        action: ACTIONS.SEND.ERROR,
-      },
-    });
-  } else {
+  let peripheral;
+  try {
+    peripheral = await this.getDevice(peripheralIdentifier);
+
     const bufferCode = Buffer.from(code, 'hex');
-    peripheral.sendData(bufferCode);
+    await peripheral.sendData(bufferCode);
 
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.SEND_MODE,
       payload: {
         action: ACTIONS.SEND.SUCCESS,
+      },
+    });
+  } catch (e) {
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.SEND_MODE,
+      payload: {
+        action: ACTIONS.SEND.ERROR,
       },
     });
   }

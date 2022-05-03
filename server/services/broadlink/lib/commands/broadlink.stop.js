@@ -4,15 +4,12 @@
  * gladys.broadlink.stop();
  */
 function stop() {
-  this.handlers = [];
-
   // Stop discovering
-  const { sockets = [] } = this.broadlink;
-  sockets.forEach((socket) => socket.close());
-
-  this.broadlink.removeAllListeners();
   this.broadlinkDevices = {};
   this.peripherals = {};
+
+  Object.values(this.learnTimers).forEach((timer) => clearTimeout(timer));
+  this.learnTimers = {};
 
   return null;
 }

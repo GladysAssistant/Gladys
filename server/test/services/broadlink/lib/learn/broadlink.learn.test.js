@@ -5,27 +5,30 @@ const BroadlinkHandler = require('../../../../../services/broadlink/lib');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
 describe('broadlink.learn', () => {
-  const gladys = {
-    event: {
-      emit: fake.returns(null),
-    },
-  };
-  const broadlink = {};
   const serviceId = 'service-id';
 
-  const broadlinkHandler = new BroadlinkHandler(gladys, broadlink, serviceId);
+  let broadlink;
+  let gladys;
+  let broadlinkHandler;
 
-  let clock;
   beforeEach(() => {
-    clock = sinon.useFakeTimers();
+    gladys = {
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+    broadlink = {};
+    broadlinkHandler = new BroadlinkHandler(gladys, broadlink, serviceId);
   });
+
   afterEach(() => {
-    clock.restore();
     sinon.reset();
   });
 
-  it('learn unknown peripheral', () => {
-    broadlinkHandler.learn('');
+  it('learn unknown peripheral', async () => {
+    broadlinkHandler.getDevice = fake.rejects(null);
+
+    await broadlinkHandler.learn('');
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.LEARN_MODE,
@@ -35,13 +38,11 @@ describe('broadlink.learn', () => {
     });
   });
 
-  it('learn not learnable peripheral', () => {
+  it('learn not learnable peripheral', async () => {
     const device = {};
-    broadlinkHandler.broadlinkDevices = {
-      '12ac': device,
-    };
+    broadlinkHandler.getDevice = fake.resolves(device);
 
-    broadlinkHandler.learn('12ac');
+    await broadlinkHandler.learn('12ac');
 
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.LEARN_MODE,
@@ -51,24 +52,15 @@ describe('broadlink.learn', () => {
     });
   });
 
-  it('learn learnable peripheral', () => {
+  it('learn learnable peripheral', async () => {
     const device = {
-      learnCode: (cb) => {
-        cb(null, 'any');
-      },
+      enterLearning: fake.resolves(null),
     };
-    broadlinkHandler.broadlinkDevices = {
-      '12ac': device,
-    };
+    broadlinkHandler.getDevice = fake.resolves(device);
+    broadlinkHandler.checkData = fake.resolves(device);
 
-    broadlinkHandler.learn('12ac');
+    await broadlinkHandler.learn('12ac');
 
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.LEARN_MODE,
-      payload: {
-        action: 'success',
-        code: 'any',
-      },
-    });
+    assert.calledOnce(broadlinkHandler.checkData);
   });
 });

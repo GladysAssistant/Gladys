@@ -1,21 +1,34 @@
 const { expect } = require('chai');
+const sinon = require('sinon');
+
+const { assert, fake } = sinon;
 
 const BroadlinkHandler = require('../../../../../services/broadlink/lib');
 
-describe('broadlink.getPerpiherals', () => {
+describe('broadlink.getPeripherals', () => {
   const gladys = {};
   const broadlink = {};
   const serviceId = 'service-id';
 
-  const broadlinkHandler = new BroadlinkHandler(gladys, broadlink, serviceId);
+  let broadlinkHandler;
 
-  it('no peripherals', () => {
-    const peripherals = broadlinkHandler.getPeripherals();
-
-    expect(peripherals).to.deep.eq([]);
+  beforeEach(() => {
+    broadlinkHandler = new BroadlinkHandler(gladys, broadlink, serviceId);
+    broadlinkHandler.init = fake.resolves(null);
   });
 
-  it('with peripherals', () => {
+  afterEach(() => {
+    sinon.reset();
+  });
+
+  it('no peripherals', async () => {
+    const peripherals = await broadlinkHandler.getPeripherals();
+
+    expect(peripherals).to.deep.eq([]);
+    assert.calledOnceWithExactly(broadlinkHandler.init);
+  });
+
+  it('with peripherals', async () => {
     const device1 = {
       name: 'p1',
     };
@@ -28,8 +41,9 @@ describe('broadlink.getPerpiherals', () => {
       'device-2': device2,
     };
 
-    const peripherals = broadlinkHandler.getPeripherals();
+    const peripherals = await broadlinkHandler.getPeripherals();
 
     expect(peripherals).to.deep.eq([device1, device2]);
+    assert.calledOnceWithExactly(broadlinkHandler.init);
   });
 });

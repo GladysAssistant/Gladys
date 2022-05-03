@@ -1,16 +1,20 @@
 const sinon = require('sinon');
 
-const { assert } = sinon;
+const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
-const { MockedBroadlinkClient } = require('./mocks.test');
+
+const broadlinkMock = {};
 
 const BroadlinkService = proxyquire('../../../services/broadlink', {
-  'broadlink-js': MockedBroadlinkClient,
+  'node-broadlink': broadlinkMock,
 });
 
 const gladys = {};
 
 describe('BroadlinkService', () => {
+  beforeEach(() => {
+    broadlinkMock.discover = fake.resolves([]);
+  });
   afterEach(() => {
     sinon.reset();
   });
@@ -20,15 +24,11 @@ describe('BroadlinkService', () => {
 
   it('should start service', async () => {
     await broadlinkService.start();
-    assert.calledOnce(broadlink.discover);
-    assert.calledWith(broadlink.on, 'discover');
-    assert.notCalled(broadlink.removeAllListeners);
+    assert.calledOnceWithExactly(broadlink.discover);
   });
 
   it('should stop service', async () => {
     broadlinkService.stop();
     assert.notCalled(broadlink.discover);
-    assert.notCalled(broadlink.on);
-    assert.calledOnce(broadlink.removeAllListeners);
   });
 });

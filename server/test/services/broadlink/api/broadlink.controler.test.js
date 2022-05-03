@@ -22,7 +22,7 @@ describe('GET /api/v1/service/broadlink/peripheral', () => {
     };
 
     await controller['get /api/v1/service/broadlink/peripheral'].controller(req, res);
-    assert.calledOnce(broadlinkHandler.getPeripherals);
+    assert.calledOnceWithExactly(broadlinkHandler.getPeripherals);
     assert.calledOnce(res.json);
   });
 });

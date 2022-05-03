@@ -1,18 +1,12 @@
-const handlers = require('../modules');
-
 /**
  * @description Subscribe to Broadlink events.
+ * @returns {Promise} Null.
  * @example
- * gladys.broadlink.init();
+ * await gladys.broadlink.init();
  */
-function init() {
-  this.handlers = handlers.map((Handler) => new Handler(this.gladys, this.serviceId));
-
-  this.broadlinkDevices = {};
-  this.peripherals = {};
-  this.broadlink.on('discover', this.addPeripheral);
-  this.broadlink.discover();
-
+async function init() {
+  const devices = await this.broadlink.discover();
+  await Promise.all(devices.map((device) => this.addPeripheral(device)));
   return null;
 }
 

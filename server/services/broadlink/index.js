@@ -3,8 +3,8 @@ const BroadlinkHandler = require('./lib');
 const BroadlinkController = require('./api/broadlink.controller');
 
 module.exports = function BroadlinkService(gladys, serviceId) {
-  const { Broadlink } = require('broadlink-js');
-  const broadlinkHandler = new BroadlinkHandler(gladys, new Broadlink(), serviceId);
+  const broadlink = require('node-broadlink');
+  const broadlinkHandler = new BroadlinkHandler(gladys, broadlink, serviceId);
 
   /**
    * @public
@@ -14,7 +14,7 @@ module.exports = function BroadlinkService(gladys, serviceId) {
    */
   async function start() {
     logger.info('starting Broadlink service');
-    broadlinkHandler.init();
+    await broadlinkHandler.init();
   }
 
   /**

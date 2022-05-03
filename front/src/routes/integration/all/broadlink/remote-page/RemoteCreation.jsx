@@ -354,16 +354,16 @@ class RemoteCreation extends Component {
                   data-cy="remote-peripheral"
                   disabled={learning}
                 >
-                  <option value="" disabled selected={!peripheral}>
+                  <option value="" disabled selected>
                     <Text id="global.emptySelectOption" />
                   </option>
-                  {broadlinkPeripherals.map(peripheral => (
-                    <option selected={peripheral.mac === peripheral} value={peripheral.mac}>
+                  {broadlinkPeripherals.map(availablePeripheral => (
+                    <option selected={availablePeripheral.mac === peripheral} value={availablePeripheral.mac}>
                       <Text
                         id="integration.broadlink.setup.peripheralSelectLabel"
                         fields={{
-                          name: peripheral.name,
-                          address: peripheral.address
+                          name: availablePeripheral.name,
+                          address: availablePeripheral.address
                         }}
                       />
                     </option>

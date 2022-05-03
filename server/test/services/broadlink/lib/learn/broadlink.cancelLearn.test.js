@@ -6,23 +6,32 @@ const BroadlinkHandler = require('../../../../../services/broadlink/lib');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
 describe('broadlink.cancelLearn', () => {
-  const gladys = {
-    event: {
-      emit: fake.returns(null),
-    },
-  };
-  const broadlink = {};
   const serviceId = 'service-id';
-  const broadlinkHandler = new BroadlinkHandler(gladys, broadlink, serviceId);
+
+  let gladys;
+  let broadlink;
+  let broadlinkHandler;
+
+  beforeEach(() => {
+    gladys = {
+      event: {
+        emit: fake.returns(null),
+      },
+    };
+    broadlink = {};
+    broadlinkHandler = new BroadlinkHandler(gladys, broadlink, serviceId);
+  });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('cancelLearn unknown peripheral', () => {
-    broadlinkHandler.cancelLearn('');
+  it('cancelLearn unknown peripheral', async () => {
+    broadlinkHandler.getDevice = fake.rejects(null);
 
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    await broadlinkHandler.cancelLearn('');
+
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.LEARN_MODE,
       payload: {
         action: 'no_peripheral',
@@ -30,53 +39,37 @@ describe('broadlink.cancelLearn', () => {
     });
   });
 
-  it('cancelLearn not learnable peripheral', () => {
-    const device = {};
-    broadlinkHandler.broadlinkDevices = {
-      '12ac': device,
+  it('cancelLearn not learning peripheral', async () => {
+    const device = {
+      cancelLearning: fake.rejects(null),
     };
+    broadlinkHandler.getDevice = fake.resolves(device);
 
-    broadlinkHandler.cancelLearn('12ac');
+    await broadlinkHandler.cancelLearn('12ac');
 
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.LEARN_MODE,
       payload: {
         action: 'cancel_error',
       },
     });
+    assert.calledOnceWithExactly(device.cancelLearning);
   });
 
-  it('cancelLearn not learning peripheral', () => {
+  it('cancelLearn learning peripheral', async () => {
     const device = {
-      cancelLearnCode: fake.returns(null),
+      cancelLearning: fake.resolves(null),
     };
-    broadlinkHandler.broadlinkDevices = {
-      '12ac': device,
-    };
+    broadlinkHandler.getDevice = fake.resolves(device);
 
-    broadlinkHandler.cancelLearn('12ac');
+    await broadlinkHandler.cancelLearn('12ac');
 
-    assert.notCalled(gladys.event.emit);
-    assert.notCalled(device.cancelLearnCode);
-  });
-
-  it('cancelLearn learning peripheral', () => {
-    const device = {
-      cancelLearnCode: fake.returns(null),
-      learning: true,
-    };
-    broadlinkHandler.broadlinkDevices = {
-      '12ac': device,
-    };
-
-    broadlinkHandler.cancelLearn('12ac');
-
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.LEARN_MODE,
       payload: {
         action: 'cancel_success',
       },
     });
-    assert.calledOnce(device.cancelLearnCode);
+    assert.calledOnceWithExactly(device.cancelLearning);
   });
 });

@@ -15,6 +15,7 @@ const ACTIONS = {
 const PARAMS = {
   CODE: 'code_',
   PERIPHERAL: 'peripheral',
+  MANUFACTURER: 'manufacturer',
 };
 
 module.exports = {

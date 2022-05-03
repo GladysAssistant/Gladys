@@ -1,4 +1,5 @@
-const { BadParameters, ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { BadParameters } = require('../../../../utils/coreErrors');
+const { PARAMS } = require('../utils/broadlink.constants');
 
 /**
  * @description Send the new device value to Broadlink device.
@@ -6,24 +7,27 @@ const { BadParameters, ServiceNotConfiguredError } = require('../../../../utils/
  * @param {Object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
  * @example
- * setValue(device, deviceFeature, 0);
+ * await setValue(device, deviceFeature, 0);
  */
-function setValue(device, deviceFeature, value) {
-  const handler = this.handlers.find((h) => h.getPeripheralId(device));
+async function setValue(device, deviceFeature, value) {
+  const { params = [] } = device;
 
-  if (!handler) {
+  const peripheralParam = params.find((p) => p.name === PARAMS.PERIPHERAL);
+
+  if (!peripheralParam) {
+    throw new BadParameters(`${device.external_id} device is not well configured, please try to update it`);
+  }
+
+  const broadlinkDevice = await this.getDevice(peripheralParam.value);
+  const deviceMapper = this.loadMapper(broadlinkDevice);
+
+  if (!deviceMapper || typeof deviceMapper.setValue !== 'function') {
     throw new BadParameters(`${device.external_id} device is not managed by Broadlink`);
   }
 
-  const peripheralId = handler.getPeripheralId(device);
-  const peripheral = this.broadlinkDevices[peripheralId];
+  await deviceMapper.setValue(broadlinkDevice, device, deviceFeature, value);
 
-  if (!peripheral) {
-    throw new ServiceNotConfiguredError(`${peripheralId} Broadlink peripheral is not discovered`);
-  }
-
-  handler.setValue(peripheral, device, deviceFeature, value);
-  return null;
+  return value;
 }
 
 module.exports = {

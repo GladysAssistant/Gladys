@@ -1,9 +1,14 @@
 const { init } = require('./commands/broadlink.init');
 const { stop } = require('./commands/broadlink.stop');
+const { buildPeripheral } = require('./commands/broadlink.buildPeripheral');
 const { getPeripherals } = require('./commands/broadlink.getPeripherals');
+const { loadMapper } = require('./commands/broadlink.loadMapper');
+const { getDevice } = require('./commands/broadlink.getDevice');
 const { setValue } = require('./commands/broadlink.setValue');
-const { addPeripheral } = require('./events/broadlink.addPeripheral');
+const { poll } = require('./commands/broadlink.poll');
+const { addPeripheral } = require('./commands/broadlink.addPeripheral');
 const { learn } = require('./learn/broadlink.learn');
+const { checkData } = require('./learn/broadlink.checkData');
 const { cancelLearn } = require('./learn/broadlink.cancelLearn');
 const { send } = require('./learn/broadlink.send');
 
@@ -20,21 +25,23 @@ const BroadlinkHandler = function BroadlinkHandler(gladys, broadlink, serviceId)
   this.broadlink = broadlink;
   this.serviceId = serviceId;
 
-  this.handlers = [];
   this.learnTimers = {};
 
   this.broadlinkDevices = {};
   this.peripherals = {};
-
-  this.addPeripheral = this.addPeripheral.bind(this);
 };
 
 BroadlinkHandler.prototype.init = init;
 BroadlinkHandler.prototype.stop = stop;
+BroadlinkHandler.prototype.buildPeripheral = buildPeripheral;
 BroadlinkHandler.prototype.getPeripherals = getPeripherals;
+BroadlinkHandler.prototype.loadMapper = loadMapper;
+BroadlinkHandler.prototype.getDevice = getDevice;
 BroadlinkHandler.prototype.setValue = setValue;
+BroadlinkHandler.prototype.poll = poll;
 BroadlinkHandler.prototype.addPeripheral = addPeripheral;
 BroadlinkHandler.prototype.learn = learn;
+BroadlinkHandler.prototype.checkData = checkData;
 BroadlinkHandler.prototype.cancelLearn = cancelLearn;
 BroadlinkHandler.prototype.send = send;
 

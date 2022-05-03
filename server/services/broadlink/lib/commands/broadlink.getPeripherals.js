@@ -1,10 +1,11 @@
 /**
  * @description Returns stored peripherals.
- * @returns {Array} Discovered peripherals.
+ * @returns {Promise} Discovered peripherals.
  * @example
- * gladys.broadlink.getPeripherals();
+ * await gladys.broadlink.getPeripherals();
  */
-function getPeripherals() {
+async function getPeripherals() {
+  await this.init();
   return Object.values(this.peripherals);
 }
 
