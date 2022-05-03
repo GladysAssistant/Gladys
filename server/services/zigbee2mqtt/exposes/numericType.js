@@ -183,331 +183,373 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
-    BASE: {
+    current_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    ISOUSC: {
+    available_power: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
-    HCHC: {
+    current_tier1_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    HCHP: {
+    current_tier2_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    BBRHCJW: {
+    current_tier3_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    BBRHPJW: {
+    current_tier4_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    BBRHCJR: {
+    current_tier5_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    BBRHPJR: {
+    current_tier6_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    EASF07: {
+    current_tier7_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    EASF08: {
+    current_tier8_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    EASF09: {
+    current_tier9_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    EASF10: {
+    current_tier10_summ_delivered: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    IINST: {
+    rms_current: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
-    IINST2: {
+    rms_current_ph_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
-    IINST3: {
+    rms_current_ph_c: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
-    IMAX: {
+    rms_current_max: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
-    IMAX2: {
+    rms_current_max_ph_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
-    IMAX3: {
+    rms_current_max_ph_c: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
       },
     },
-    PMAX: {
+    active_power_max: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
-    SMAXN2: {
+    active_power_max_ph_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
-    SMAXN3: {
+    active_power_max_ph_c: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
-    PAPP: {
+    apparent_power: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
-    SINSTS2: {
+    apparent_power_ph_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
-    SINSTS3: {
+    apparent_power_ph_c: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
-    EASD01: {
+    active_enerfy_out_d01: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    EASD02: {
+    active_enerfy_out_d02: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    EASD03: {
+    active_enerfy_out_d03: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    EASD04: {
+    active_enerfy_out_d04: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    URMS1: {
+    rms_voltage: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
-    URMS2: {
+    rms_voltage_ph_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
-    URMS3: {
+    rms_voltage_ph_c: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
-    SINSTI: {
+    injected_v_a: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
-    SMAXIN: {
+    injected_v_a_max_n: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
-    'SMAXIN-1': {
+    injected_v_a_max_n1: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
-    CCAIN: {
+    injected_active_load_n: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
-    'CCAIN-1': {
+    injected_active_load_n1: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
-    CCASN: {
+    active_power: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
-    'CCASN-1': {
+    active_power_ph_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
-    UMOY1: {
+    average_rms_voltage_meas_period: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
-    UMOY2: {
+    average_rms_voltage_measure_period_ph_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
-    UMOY3: {
+    average_rms_voltage_measure_period_ph_c: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
-    ERQ2: {
+    reactive_power: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
       },
     },
-    ERQ3: {
+    reactive_power_ph_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
       },
     },
-    ERQ4: {
+    reactive_power_ph_c: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
       },
     },
-    ERQ1: {
+    total_reactive_power: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
       },
     },
-    EAIT: {
+    current_summ_received: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
       },
     },
-    NTARF: {
+    current_index_tarif: {
       feature: {
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+      },
+    },
+    start_notice_e_j_p: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.DURATION,
+        type: DEVICE_FEATURE_TYPES.DURATION.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.MINUTES,
+      },
+    },
+    warn_d_p_s: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      },
+    },
+    warn_d_i_r1: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      },
+    },
+    warn_d_i_r2: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      },
+    },
+    warn_d_i_r3: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.AMPERE,
+      },
+    },
+    power_threshold: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
   },
