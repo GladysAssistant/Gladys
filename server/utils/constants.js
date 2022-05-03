@@ -329,7 +329,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SPEED_SENSOR: 'speed-sensor',
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   UV_SENSOR: 'uv-sensor',
-  TIME_SENSOR: 'time-sensor',
+  DURATION: 'duration',
   UNKNOWN: 'unknown',
 };
 
@@ -436,7 +436,7 @@ const DEVICE_FEATURE_TYPES = {
     INTEGER: 'integer',
   },
   CURRENCY: {
-    COST: 'cost',
+    DECIMAL: 'decimal',
   },
   PRECIPITATION_SENSOR: {
     DECIMAL: 'decimal',
@@ -445,7 +445,7 @@ const DEVICE_FEATURE_TYPES = {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
   },
-  TIME_SENSOR: {
+  DURATION: {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
   },
@@ -508,7 +508,7 @@ const DEVICE_FEATURE_UNITS = {
   MILLIMETER_PER_HOUR: 'millimeter-per-hour',
   // UV Units
   UV_INDEX: 'uv-index',
-  // Time units
+  // Duration units
   MICROSECONDS: 'microseconds',
   MILLISECONDS: 'milliseconds',
   SECONDS: 'seconds',
@@ -592,7 +592,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   ],
   [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: [DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR],
   [DEVICE_FEATURE_CATEGORIES.UV_SENSOR]: [DEVICE_FEATURE_UNITS.UV_INDEX],
-  [DEVICE_FEATURE_CATEGORIES.TIME_SENSOR]: [
+  [DEVICE_FEATURE_CATEGORIES.DURATION]: [
     DEVICE_FEATURE_UNITS.MICROSECONDS,
     DEVICE_FEATURE_UNITS.MILLISECONDS,
     DEVICE_FEATURE_UNITS.SECONDS,

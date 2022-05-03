@@ -1843,8 +1843,8 @@
       "integer": "Volume (integer)"
     },
     "currency": {
-      "shortCategoryName": "Currency",
-      "cost": "Cost"
+      "shortCategoryName": "Money",
+      "decimal": "Currency"
     },
     "speed-sensor": {
       "shortCategoryName": "Speed sensor",
@@ -1858,10 +1858,10 @@
       "shortCategoryName": "UV Sensor",
       "integer": "UV Index"
     },
-    "time-sensor": {
-      "shortCategoryName": "Time sensor",
-      "decimal": "Time (decimal)",
-      "integer": "Time (integer)"
+    "duration": {
+      "shortCategoryName": "Duration",
+      "decimal": "Duration (decimal)",
+      "integer": "Duration (integer)"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

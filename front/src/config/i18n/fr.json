@@ -1653,7 +1653,7 @@
     "days": "j",
     "weeks": "sem",
     "months": "m",
-    "years": "an."
+    "years": "an"
   },
   "deviceFeatureValue": {
     "type": {
@@ -1832,7 +1832,7 @@
       "shortCategoryName": "Capteur d'énergie",
       "voltage": "Tension",
       "current": "Intensité",
-      "binary": "Commutateur",
+      "binary": "Relais",
       "power": "Puissance",
       "energy": "Energie",
       "index": "Index"
@@ -1843,11 +1843,11 @@
       "integer": "Volume (entier)"
     },
     "currency": {
-      "shortCategoryName": "Monnaie",
-      "cost": "Coût"
+      "shortCategoryName": "Devise",
+      "decimal": "Monnaie"
     },
     "speed-sensor": {
-      "shortCategoryName": "Capteur de vitesse",
+      "shortCategoryName": "Vitesse",
       "decimal": "Vitesse"
     },
     "precipitation-sensor": {
@@ -1858,8 +1858,8 @@
       "shortCategoryName": "Capteur d'UV",
       "integer": "Indice UV"
     },
-    "time-sensor": {
-      "shortCategoryName": "Capteur de durée",
+    "duration": {
+      "shortCategoryName": "Durée",
       "decimal": "Durée (décimale)",
       "integer": "Durée (entier)"
     },
