@@ -54,7 +54,7 @@ describe('broadlink.addPeripheral', () => {
     expect(broadlinkHandler.broadlinkDevices).to.deep.eq({ '0b16212c3742': broadlinkDevice });
   });
 
-  it('should not add peripheral on atuh error', async () => {
+  it('should add device on auth error', async () => {
     broadlinkHandler.buildPeripheral = fake.returns(undefined);
 
     const broadlinkDevice = {
@@ -67,8 +67,10 @@ describe('broadlink.addPeripheral', () => {
 
     assert.calledOnceWithExactly(broadlinkDevice.auth);
 
+    assert.calledOnceWithExactly(broadlinkDevice.auth);
+
     expect(broadlinkHandler.peripherals).to.deep.eq({});
-    expect(broadlinkHandler.broadlinkDevices).to.deep.eq({});
+    expect(broadlinkHandler.broadlinkDevices).to.deep.eq({ '0b16212c3742': broadlinkDevice });
   });
 
   it('should not add invalid device', async () => {
