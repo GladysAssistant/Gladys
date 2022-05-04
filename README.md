@@ -68,6 +68,7 @@ Thanks goes to these wonderful people 👏
     <td align="center"><a href="https://github.com/thebradleysanders"><img src="https://avatars2.githubusercontent.com/u/10698631?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brad Sanders</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=thebradleysanders" title="Documentation">📖</a></td>
     <td align="center"><a href="http://robmccann.co.uk"><img src="https://avatars.githubusercontent.com/u/412744?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Rob McCann</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=rob-mccann" title="Code">💻</a></td>
     <td align="center"><a href="https://bandism.net/"><img src="https://avatars.githubusercontent.com/u/22633385?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ikko Ashimine</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=eltociear" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://ehtesham.dev"><img src="https://avatars.githubusercontent.com/u/38346914?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ehtesham Siddiqui</b></sub></a><br /><a href="https://github.com/GladysAssistant/Gladys/commits?author=siddiquiehtesham" title="Documentation">📖</a></td>
   </tr>
 </table>
 

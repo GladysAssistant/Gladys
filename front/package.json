@@ -27,7 +27,7 @@
     "@relative-ci/agent": "^2.0.0",
     "compare-json": "^0.4.0",
     "cross-env": "^5.2.0",
-    "cypress": "^6.9.1",
+    "cypress": "^9.5.2",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^4.0.0",
     "eslint-config-synacor": "^2.0.2",
@@ -68,7 +68,6 @@
     "react-big-calendar": "^0.40.0",
     "react-datepicker": "^3.8.0",
     "react-select": "^4.3.1",
-    "set-value": "^3.0.2",
     "unistore": "^3.5.2",
     "useragent-parser-js": "^1.0.3",
     "uuid": "^3.4.0"

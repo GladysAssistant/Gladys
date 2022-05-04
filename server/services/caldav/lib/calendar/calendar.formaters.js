@@ -167,9 +167,21 @@ function formatEvents(caldavEvents, gladysCalendar) {
       if (
         caldavEvent.start &&
         caldavEvent.start.tz === undefined &&
-        Number.isInteger(this.dayjs(caldavEvent.end).diff(this.dayjs(caldavEvent.start), 'days', true))
+        (Number.isInteger(this.dayjs(caldavEvent.end).diff(this.dayjs(caldavEvent.start), 'days', true)) ||
+          !caldavEvent.end)
       ) {
         newEvent.full_day = true;
+      }
+
+      if (newEvent.full_day && !caldavEvent.end) {
+        newEvent.end = this.dayjs
+          .tz(
+            this.dayjs(caldavEvent.start)
+              .add(1, 'day')
+              .format('YYYY-MM-DDTHH:mm:ss'),
+            caldavEvent.start.tz,
+          )
+          .format();
       }
 
       events.push(newEvent);
