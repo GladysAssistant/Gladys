@@ -2,6 +2,23 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../ut
 
 module.exports = {
   type: 'binary',
+  writeValue: (expose, value) => {
+    if (value === 1) {
+      return expose.value_on;
+    }
+
+    return expose.value_off;
+  },
+  readValue: (expose, value) => {
+    switch (value) {
+      case expose.value_on:
+        return 1;
+      case expose.value_off:
+        return 0;
+      default:
+        return undefined;
+    }
+  },
   feature: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,

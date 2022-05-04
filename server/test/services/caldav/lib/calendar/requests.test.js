@@ -245,13 +245,13 @@ describe('CalDAV requests', () => {
         {
           href: 'https://caldav.host.com/home/personal/event-1.ics',
           props: {
-            etag: '91ca3c10-ce36-48dc-9da5-4e25ce575b7e',
+            getetag: '91ca3c10-ce36-48dc-9da5-4e25ce575b7e',
           },
         },
         {
           href: 'https://caldav.host.com/home/personal/',
           props: {
-            etag: '6e187cb6-3a01-4ae5-9387-8c9ee229fd27',
+            getetag: '6e187cb6-3a01-4ae5-9387-8c9ee229fd27',
           },
         },
       ],
@@ -262,13 +262,13 @@ describe('CalDAV requests', () => {
       {
         href: 'https://caldav.host.com/home/personal/event-1.ics',
         props: {
-          etag: '91ca3c10-ce36-48dc-9da5-4e25ce575b7e',
+          getetag: '91ca3c10-ce36-48dc-9da5-4e25ce575b7e',
         },
       },
       {
         href: 'https://caldav.host.com/home/personal/',
         props: {
-          etag: '6e187cb6-3a01-4ae5-9387-8c9ee229fd27',
+          getetag: '6e187cb6-3a01-4ae5-9387-8c9ee229fd27',
         },
       },
     ]);
