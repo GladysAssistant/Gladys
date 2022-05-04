@@ -1,18 +1,26 @@
 const logger = require('../../../../../utils/logger');
 const types = require('./type');
+const { CATEGORY_AND_TYPE_BY_CODE } = require('./tuya.categoryAndTypeMapping');
 
 /**
  * @description Trasnforms Tuya feature as Gadlsy feature.
  * @param {Object} tuyaFunctions - Functions from Tuya.
+ * @param {string} externalId - Gladys external ID.
  * @returns {Object} Gladys feature or undefined.
  * @example
- * convertFeature({ code: 'switch', type: 'Boolean', values: '{}' });
+ * convertFeature({ code: 'switch', type: 'Boolean', values: '{}' }, 'tuya:device_id');
  */
-function convertFeature(tuyaFunctions) {
-  const { code, type, valuesAsString } = tuyaFunctions;
-  const mappingType = types[type];
+function convertFeature(tuyaFunctions, externalId) {
+  const { code, type, valuesAsString, name, readOnly } = tuyaFunctions;
 
-  if (mappingType === undefined) {
+  const featuresCategoryAndType = CATEGORY_AND_TYPE_BY_CODE[code];
+  if (!featuresCategoryAndType) {
+    logger.warn(`Tuya function with "${code}" code is not managed`);
+    return undefined;
+  }
+
+  const mappingType = types[type];
+  if (!mappingType) {
     logger.warn(`Tuya function with "${type}" type is not managed on "${code}" code`);
     return undefined;
   }
@@ -25,7 +33,17 @@ function convertFeature(tuyaFunctions) {
   }
 
   // TODO feature has only min/max/unit
-  return mappingType.getFeatureAttributes(values);
+  const featureAttributes = mappingType.getFeatureAttributes(values);
+
+  return {
+    name,
+    external_id: `${externalId}:${code}`,
+    selector: `${externalId}:${code}`,
+    read_only: readOnly,
+    has_feedback: false,
+    ...featuresCategoryAndType,
+    ...featureAttributes,
+  };
 }
 
 module.exports = {
