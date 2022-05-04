@@ -1,19 +1,46 @@
 const { assert } = require('chai');
 
 const enumType = require('../../../../services/zigbee2mqtt/exposes/enumType');
+const { BUTTON_STATUS } = require('../../../../utils/constants');
 
 describe('zigbee2mqtt enumType', () => {
   const expose = {
-    values: ['SINGLE', 'LONG', 'SHORT', 'DOUBLE', 'TRIPLE'],
+    values: ['single', 'long', 'short', 'double', 'triple', 'hold'],
   };
 
-  it('should write enum value', () => {
-    const result = enumType.writeValue(expose, 2);
-    assert.equal(result, 'SHORT');
+  [
+    { enumValue: 'single', intValue: BUTTON_STATUS.CLICK },
+    { enumValue: 'double', intValue: BUTTON_STATUS.DOUBLE_CLICK },
+    { enumValue: 'hold', intValue: BUTTON_STATUS.LONG_CLICK },
+  ].forEach((mapping) => {
+    const { enumValue, intValue } = mapping;
+
+    it(`should write ${enumValue} value as ${intValue} value`, () => {
+      const result = enumType.writeValue(expose, intValue);
+      assert.equal(result, enumValue);
+    });
+
+    it(`should read ${intValue} value as ${enumValue}`, () => {
+      const result = enumType.readValue(expose, enumValue);
+      assert.equal(result, intValue);
+    });
+  });
+
+  it('should write undefined value on missing enum', () => {
+    const missingEnumExpose = {
+      values: ['single', 'long', 'short', 'double', 'triple'],
+    };
+    const result = enumType.writeValue(missingEnumExpose, BUTTON_STATUS.LONG_CLICK);
+    assert.equal(result, undefined);
+  });
+
+  it('should write undefined value', () => {
+    const result = enumType.writeValue(expose, 6);
+    assert.equal(result, undefined);
   });
 
   it('should read enum value', () => {
-    const result = enumType.readValue(expose, 'DOUBLE');
-    assert.equal(result, 3);
+    const result = enumType.readValue(expose, 'unknown');
+    assert.equal(result, undefined);
   });
 });

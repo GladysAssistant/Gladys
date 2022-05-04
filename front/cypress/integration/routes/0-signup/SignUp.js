@@ -121,9 +121,6 @@ describe('Sign-up', () => {
       req => {
         req.reply(res => {
           window.localStorage.setItem('user', JSON.stringify(res.body));
-          const accessToken = res.body.access_token;
-
-          Cypress.env('users', { ...users, tony: { ...tony, access_token: accessToken } });
         });
       }
     );
