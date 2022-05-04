@@ -860,8 +860,8 @@
     },
     "broadlink": {
       "title": "Broadlink",
-      "description": "Contrôler avec les appareils Broadlink.",
-      "remoteTab": "Télécommandes",
+      "description": "Contrôlez vos appareils Broadlink.",
+      "remoteTab": "Appareils",
       "peripheralTab": "Appareils disponibles",
       "peripheral": {
         "title": "Appareils Broadlink disponibles",
