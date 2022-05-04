@@ -30,6 +30,7 @@ async function learn(peripheralIdentifier) {
       logger.debug(`Broadlink entering ${peripheralIdentifier} in learn mode...`);
       this.checkData(peripheral, peripheralIdentifier);
     } catch (e) {
+      logger.error(`Broadlink fails to enter in learning mode on ${peripheralIdentifier} device`, e);
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.LEARN_MODE,
         payload: {

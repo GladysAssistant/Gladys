@@ -26,6 +26,7 @@ async function send(peripheralIdentifier, code) {
       },
     });
   } catch (e) {
+    logger.error(`Broadlink fails to send data on ${peripheralIdentifier} device`, e);
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BROADLINK.SEND_MODE,
       payload: {

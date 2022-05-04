@@ -15,7 +15,7 @@ async function addPeripheral(broadlinkDevice) {
   } catch (e) {
     const { model: name, mac: macArray } = broadlinkDevice;
     const mac = Buffer.from(macArray).toString('hex');
-    logger.error(`Broadlink fails to connect to ${name} (${mac}) device`);
+    logger.error(`Broadlink fails to connect to ${name} (${mac}) device`, e);
     return;
   }
 
