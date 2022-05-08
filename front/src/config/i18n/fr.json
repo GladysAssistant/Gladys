@@ -296,7 +296,11 @@
         "analog": "Analogique",
         "digital": "Digitale",
         "date": "{{day}} {{dayNumber}} {{month}} {{year}}",
-        "smallDate": "{{dayNumber}} {{month}}"
+        "smallDate": "{{dayNumber}} {{month}}",
+        "type": "Type de l'horloge ?",
+        "displaySecond": "Afficher les secondes ?",
+        "yes": "Oui",
+        "no": "Non"
       }
     }
   },

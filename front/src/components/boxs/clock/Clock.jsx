@@ -7,87 +7,29 @@ dayjs.extend(localizedFormat);
 
 import { CLOCK_TYPES } from '../../../../../server/utils/constants';
 import { Text } from 'preact-i18n';
-
-const padding = {
-  paddingLeft: '20px',
-  paddingRight: '20px',
-  paddingTop: '10px',
-  paddingBottom: '10px'
-};
+import style from './style.css';
+import get from 'get-value';
 
 const Clock = ({ children, ...props }) => (
   <div class="card">
     {props.clockType === CLOCK_TYPES.ANALOG && (
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          width: '100%',
-          padding: '16px'
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            flex: 'auto'
-          }}
-        >
-          <div
-            style={{
-              fontSize: '18px',
-              textAlign: 'left'
-            }}
-          >
-            {props.day}
-          </div>
-          <div
-            style={{
-              fontSize: '40px',
-              textAlign: 'left'
-            }}
-          >
+      <div class={style.analogRow}>
+        <div class={style.analogCol}>
+          <div class={style.analogSmallText}>{props.day}</div>
+          <div class={style.analogBigText}>
             <Text id="dashboard.boxes.clock.smallDate" fields={{ month: props.month, dayNumber: props.dayNumber }} />
           </div>
-          <div
-            style={{
-              fontSize: '18px',
-              textAlign: 'left'
-            }}
-          >
-            {props.year}
-          </div>
+          <div class={style.analogSmallText}>{props.year}</div>
         </div>
-
-        <div
-          style={{
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <ReactClock className={'react-clock'} value={props.time} />
+        <div class={style.analogClock}>
+          <ReactClock className={'react-clock'} value={props.time} renderSecondHand={props.displaySecond} />
         </div>
       </div>
     )}
     {props.clockType === CLOCK_TYPES.DIGITAL && (
-      <div style={padding}>
-        <div
-          style={{
-            fontSize: '40px',
-            lineHeight: '1.2',
-            textAlign: 'center'
-          }}
-          class="font-size-40 blue-grey-700"
-        >
-          {props.time}
-        </div>
-        <div
-          style={{
-            paddingTop: '10px',
-            fontSize: '16px',
-            textAlign: 'center'
-          }}
-        >
+      <div class={style.padding}>
+        <div class={style.digitalTime}>{props.time}</div>
+        <div class={style.digitalDate}>
           <Text
             id="dashboard.boxes.clock.date"
             fields={{ day: props.day, month: props.month, dayNumber: props.dayNumber, year: props.year }}
@@ -118,9 +60,12 @@ class ClockComponent extends Component {
       .locale(this.props.user.language)
       .format('YYYY');
 
+    const displaySecond = get(this.props, 'box.clock_display_second', false);
+
     const time = dayjs()
       .locale(this.props.user.language)
-      .format('LTS');
+      .format(displaySecond ? 'LTS' : 'LT');
+
     this.setState({ day, dayNumber, month, year, time });
   };
   componentDidMount() {
@@ -135,6 +80,8 @@ class ClockComponent extends Component {
   }
 
   render(props, { day, dayNumber, month, year, time }) {
+    const clockType = get(props, 'box.clock_type', CLOCK_TYPES.ANALOG);
+    const displaySecond = get(props, 'box.clock_display_second', false);
     return (
       <Clock
         day={day}
@@ -142,7 +89,8 @@ class ClockComponent extends Component {
         month={month}
         year={year}
         time={time}
-        clockType={props.box.clock_type}
+        clockType={clockType}
+        displaySecond={displaySecond}
         language={props.user.language}
       />
     );
