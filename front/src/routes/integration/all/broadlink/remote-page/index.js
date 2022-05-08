@@ -31,6 +31,7 @@ class BroadlinkDeviceSetupPage extends Component {
     let { deviceSelector, peripheral } = this.props;
     let device;
     let loading = RequestStatus.Success;
+    let isRemote = false;
 
     if (deviceSelector) {
       try {
@@ -40,6 +41,7 @@ class BroadlinkDeviceSetupPage extends Component {
         const peripheralParam = device.params.find(param => param.name === PARAMS.PERIPHERAL);
         if (peripheralParam) {
           peripheral = peripheralParam.value;
+          isRemote = device.external_id !== `broadlink:${peripheral}`;
         }
       } catch (e) {
         // Device not found
@@ -60,13 +62,12 @@ class BroadlinkDeviceSetupPage extends Component {
     this.setState({
       loading,
       device,
-      peripheral
+      peripheral,
+      isRemote
     });
   }
 
-  render(props, { loading, device, peripheral }) {
-    const isRemote = !(props.deviceSelector && !peripheral);
-
+  render(props, { loading, device, peripheral, isRemote }) {
     return (
       <BroadlinkPage>
         <div
