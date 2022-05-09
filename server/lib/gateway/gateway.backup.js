@@ -1,25 +1,32 @@
 const Sequelize = require('sequelize');
 const path = require('path');
 const fse = require('fs-extra');
-const fs = require('fs');
+const Promise = require('bluebird');
 const fsPromise = require('fs').promises;
-const FormData = require('form-data');
 const retry = require('async-retry');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { exec } = require('../../utils/childProcess');
+const { readChunk } = require('../../utils/readChunk');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 const BACKUP_NAME_BASE = 'gladys-db-backup';
 
-const RETRY_OPTIONS = {
+const SQLITE_BACKUP_RETRY_OPTIONS = {
   retries: 3,
   factor: 2,
   minTimeout: 2000,
 };
 
+const UPLOAD_ONE_CHUNK_RETRY_OPTIONS = {
+  retries: 4,
+  factor: 2,
+  minTimeout: 50,
+};
+
 /**
  * @description Create a backup and upload it to the Gateway
+ * @returns {Promise} - Resolve when backup is finished.
  * @example
  * backup();
  */
@@ -28,6 +35,7 @@ async function backup() {
   if (encryptKey === null) {
     throw new NotFoundError('GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
   }
+  const systemInfos = await this.system.getInfos();
   const now = new Date();
   const date = `${now.getFullYear()}-${now.getMonth() +
     1}-${now.getDate()}-${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}`;
@@ -51,7 +59,7 @@ async function backup() {
       await exec(`sqlite3 ${this.config.storage} ".backup '${backupFilePath}'"`);
       logger.info(`Gateway backup: Unlocking Database`);
     });
-  }, RETRY_OPTIONS);
+  }, SQLITE_BACKUP_RETRY_OPTIONS);
   const fileInfos = await fsPromise.stat(backupFilePath);
   const fileSizeMB = Math.round(fileInfos.size / 1024 / 1024);
   logger.info(`Gateway backup : Success! File size is ${fileSizeMB}mb.`);
@@ -63,16 +71,58 @@ async function backup() {
   await exec(
     `openssl enc -aes-256-cbc -pass pass:${encryptKey} -in ${compressedBackupFilePath} -out ${encryptedBackupFilePath}`,
   );
-  // Read backup file in stream
-  const form = new FormData();
-  form.append('upload', fs.createReadStream(encryptedBackupFilePath));
-  // and upload it to the Gladys Gateway
-  logger.info(`Gateway backup: Uploading backup`);
-  await this.gladysGatewayClient.uploadBackup(form, (progressEvent) => {
-    logger.info(`Gladys Plus backup: Upload backup progress, ${progressEvent.loaded} / ${progressEvent.total}`);
+  // Upload file to the Gladys Gateway
+  const encryptedFileInfos = await fsPromise.stat(encryptedBackupFilePath);
+  logger.info(
+    `Gateway backup: Uploading backup, size of encrypted backup = ${Math.round(
+      encryptedFileInfos.size / 1024 / 1024,
+    )}mb.`,
+  );
+  const initializeBackupResponse = await this.gladysGatewayClient.initializeMultiPartBackup({
+    file_size: encryptedFileInfos.size,
   });
-  // done!
-  logger.info(`Gladys backup uploaded with success to Gladys Gateway. ${backupFileName}`);
+  try {
+    const partsUploaded = await Promise.map(
+      initializeBackupResponse.parts,
+      async (part, index) => {
+        const startPosition = index * initializeBackupResponse.chunk_size;
+        const chunk = await readChunk(encryptedBackupFilePath, {
+          length: initializeBackupResponse.chunk_size,
+          startPosition,
+        });
+
+        // each chunk is retried
+        return retry(async () => {
+          const { headers } = await this.gladysGatewayClient.uploadOneBackupChunk(
+            part.signed_url,
+            chunk,
+            systemInfos.gladys_version,
+          );
+
+          return {
+            PartNumber: part.part_number,
+            ETag: headers.etag.replace(/"/g, ''),
+          };
+        }, UPLOAD_ONE_CHUNK_RETRY_OPTIONS);
+      },
+      { concurrency: 2 },
+    );
+    await this.gladysGatewayClient.finalizeMultiPartBackup({
+      file_key: initializeBackupResponse.file_key,
+      file_id: initializeBackupResponse.file_id,
+      parts: partsUploaded,
+      backup_id: initializeBackupResponse.backup_id,
+    });
+    // done!
+    logger.info(`Gladys backup uploaded with success to Gladys Gateway.`);
+  } catch (e) {
+    await this.gladysGatewayClient.abortMultiPartBackup({
+      file_key: initializeBackupResponse.file_key,
+      file_id: initializeBackupResponse.file_id,
+      backup_id: initializeBackupResponse.backup_id,
+    });
+    throw e;
+  }
   return {
     encryptedBackupFilePath,
   };

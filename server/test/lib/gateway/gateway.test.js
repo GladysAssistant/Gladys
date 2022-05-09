@@ -88,7 +88,22 @@ describe('gateway', () => {
       const gateway = new Gateway(variable, event, system, sequelize, config);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.backup();
-      assert.calledOnce(gateway.gladysGatewayClient.uploadBackup);
+      assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
+      assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
+      assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
+    });
+    it('should start and abort backup', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects('error');
+      const promise = gateway.backup();
+      await assertChai.isRejected(promise);
+      assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
+      assert.calledOnce(gateway.gladysGatewayClient.abortMultiPartBackup);
     });
     it('should backup gladys with lots of insert at the same time', async function Test() {
       const variable = {
@@ -121,21 +136,9 @@ describe('gateway', () => {
       }
       await Promise.all(promisesDevices);
       await Promise.all(promises);
-      assert.calledOnce(gateway.gladysGatewayClient.uploadBackup);
-    });
-
-    it('should backup gladys and test progress bar', async () => {
-      const variable = {
-        getValue: fake.resolves('key'),
-        setValue: fake.resolves(null),
-      };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
-      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
-      gateway.gladysGatewayClient.uploadBackup = async (form, func) => {
-        func({ loaded: 1, total: 100 });
-        await Promise.delay(100);
-      };
-      await gateway.backup();
+      assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
+      assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
+      assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
     });
     it('should not backup, no backup key found', async () => {
       const variable = {
