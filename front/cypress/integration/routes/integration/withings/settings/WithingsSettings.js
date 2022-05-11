@@ -60,7 +60,6 @@ describe('Withings settings page', () => {
 
     cy.contains('button', 'oauth2.buttonConnect').click();
 
-    // Check redirected to settings page
     cy.location('pathname').should('eq', '/dashboard/integration/health/withings/settings');
 
     cy.get('.alert-info').i18n('integration.withings.settings.oauth2.complete');
