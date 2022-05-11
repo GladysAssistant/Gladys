@@ -3,13 +3,13 @@ import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import update from 'immutability-helper';
 import get from 'get-value';
+import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 import { PARAMS } from '../../../../../../../server/services/broadlink/lib/utils/broadlink.constants';
 import RemoteFeatureEditionPanel from './RemoteFeatureEditionPanel';
-import RemoteCreationSuccess from './RemoteCreationSuccess';
 import { MANAGED_CATEGORIES, MANAGED_FEATURES } from './features';
 import RemoteFeatureTag from './edition/RemoteFeatureTag';
 
@@ -297,167 +297,178 @@ class RemoteCreation extends Component {
     const category = device.model;
 
     return (
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">{device.name || <Text id="integration.broadlink.setup.noNameLabel" />}</h3>
-        </div>
-        <div class="card-body">
-          {saveStatus === RequestStatus.Error && (
-            <div class="alert alert-danger">
-              <Text id="integration.broadlink.setup.saveError" />
+      <div
+        class={cx('dimmer', {
+          active: saveStatus === RequestStatus.Getting
+        })}
+      >
+        <div class="loader" />
+        <div class="dimmer-content">
+          <div class="card">
+            <div class="card-header">
+              <Link
+                href={`/dashboard/integration/device/broadlink${
+                  props.deviceSelector || !props.peripheral ? '' : '/peripheral'
+                }`}
+              >
+                <button class="btn btn-secondary mr-2">
+                  <Text id="global.backButton" />
+                </button>
+              </Link>
+              <h3 class="card-title">{device.name || <Text id="integration.broadlink.setup.noNameLabel" />}</h3>
             </div>
-          )}
-
-          {saveStatus === RequestStatus.Success && <RemoteCreationSuccess />}
-
-          {saveStatus !== RequestStatus.Success && (
-            <div>
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="integration.broadlink.remote.nameLabel" />
-                </label>
-                <Localizer>
-                  <input
-                    type="text"
-                    value={device.name}
-                    onInput={this.updateDeviceName}
-                    class="form-control"
-                    data-cy="remote-name"
-                    placeholder={<Text id="integration.broadlink.remote.namePlaceholder" />}
-                  />
-                </Localizer>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="integration.broadlink.remote.roomLabel" />
-                </label>
-                <select onChange={this.updateDeviceRoom} class="form-control" data-cy="remote-room">
-                  <option value="">
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  {houses.map(house => (
-                    <optgroup label={house.name}>
-                      {house.rooms.map(room => (
-                        <option selected={room.id === device.room_id} value={room.id}>
-                          {room.name}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="integration.broadlink.setup.peripheralLabel" />
-                </label>
-                <select
-                  onChange={this.updatePeripheralModel}
-                  class="form-control"
-                  data-cy="remote-peripheral"
-                  disabled={learning}
-                >
-                  <option value="" disabled selected>
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  {broadlinkPeripherals.map(availablePeripheral => (
-                    <option selected={availablePeripheral.mac === peripheral} value={availablePeripheral.mac}>
-                      <Text
-                        id="integration.broadlink.setup.peripheralSelectLabel"
-                        fields={{
-                          name: availablePeripheral.name,
-                          address: availablePeripheral.address
-                        }}
-                      />
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label class="form-label">
-                  <Text id="integration.broadlink.setup.categoryLabel" />
-                </label>
-                <select
-                  class="form-control"
-                  onChange={this.updateDeviceModel}
-                  disabled={!peripheral || learning}
-                  data-cy="remote-category"
-                >
-                  <option value="" disabled selected={!category}>
-                    <Text id="global.emptySelectOption" />
-                  </option>
-                  {MANAGED_CATEGORIES.map(cat => (
-                    <option value={cat} selected={cat === category}>
-                      <Text id={`deviceFeatureCategory.${cat}.shortCategoryName`} />
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {category && (
-                <Fragment>
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.broadlink.setup.featuresLabel" />
-                    </label>
-                    <div class="tags">
-                      {Object.keys(MANAGED_FEATURES[category]).map(type => (
-                        <RemoteFeatureTag
-                          disabled={learning}
-                          category={category}
-                          type={type}
-                          editedFeature={editedFeatures[type]}
-                          selected={selectedFeature === type}
-                          selectFeature={this.selectFeature}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  <RemoteFeatureEditionPanel
-                    {...props}
-                    device={device}
-                    peripheral={peripheral}
-                    selectedFeature={selectedFeature}
-                    selectedValue={selectedValue}
-                    editedFeatures={editedFeatures}
-                    learnAllMode={learnAllMode}
-                    learning={learning}
-                    learnAll={this.learnAll}
-                    storeFeatureCode={this.storeFeatureCode}
-                    quitLearnMode={this.quitLearnMode}
-                    deleteFeature={this.deleteFeature}
-                    updateFeature={this.updateFeature}
-                    selectFeature={this.selectFeature}
-                    selectValue={this.selectValue}
-                    setLearning={this.setLearning}
-                  />
-                </Fragment>
+            <div class="card-body">
+              {saveStatus === RequestStatus.Error && (
+                <div class="alert alert-danger">
+                  <Text id="integration.broadlink.setup.saveError" />
+                </div>
               )}
 
-              <div class="row mt-5">
-                <div class="col">
-                  <button onClick={this.saveDevice} disabled={canSave || learning} class="btn btn-success mr-2">
-                    <Text id="integration.broadlink.setup.saveButton" />
-                  </button>
-                </div>
-                <div class="col text-right">
-                  <Link
-                    href={`/dashboard/integration/device/broadlink${
-                      props.deviceSelector || !props.peripheral ? '' : '/peripheral'
-                    }`}
-                    class="mr-2"
-                  >
-                    <button class="btn btn-danger" disabled={learning}>
-                      <Text id="integration.broadlink.setup.cancel" />
+              {saveStatus !== RequestStatus.Success && (
+                <div>
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.broadlink.remote.nameLabel" />
+                    </label>
+                    <Localizer>
+                      <input
+                        type="text"
+                        value={device.name}
+                        onInput={this.updateDeviceName}
+                        class="form-control"
+                        data-cy="remote-name"
+                        placeholder={<Text id="integration.broadlink.remote.namePlaceholder" />}
+                      />
+                    </Localizer>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.broadlink.remote.roomLabel" />
+                    </label>
+                    <select onChange={this.updateDeviceRoom} class="form-control" data-cy="remote-room">
+                      <option value="">
+                        <Text id="global.emptySelectOption" />
+                      </option>
+                      {houses.map(house => (
+                        <optgroup label={house.name}>
+                          {house.rooms.map(room => (
+                            <option selected={room.id === device.room_id} value={room.id}>
+                              {room.name}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.broadlink.setup.peripheralLabel" />
+                    </label>
+                    <select
+                      onChange={this.updatePeripheralModel}
+                      class="form-control"
+                      data-cy="remote-peripheral"
+                      disabled={learning}
+                    >
+                      <option value="" disabled selected>
+                        <Text id="global.emptySelectOption" />
+                      </option>
+                      {broadlinkPeripherals.map(availablePeripheral => (
+                        <option selected={availablePeripheral.mac === peripheral} value={availablePeripheral.mac}>
+                          <Text
+                            id="integration.broadlink.setup.peripheralSelectLabel"
+                            fields={{
+                              name: availablePeripheral.name,
+                              address: availablePeripheral.address
+                            }}
+                          />
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">
+                      <Text id="integration.broadlink.setup.categoryLabel" />
+                    </label>
+                    <select
+                      class="form-control"
+                      onChange={this.updateDeviceModel}
+                      disabled={!peripheral || learning}
+                      data-cy="remote-category"
+                    >
+                      <option value="" disabled selected={!category}>
+                        <Text id="global.emptySelectOption" />
+                      </option>
+                      {MANAGED_CATEGORIES.map(cat => (
+                        <option value={cat} selected={cat === category}>
+                          <Text id={`deviceFeatureCategory.${cat}.shortCategoryName`} />
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {category && (
+                    <Fragment>
+                      <div class="form-group">
+                        <label class="form-label">
+                          <Text id="integration.broadlink.setup.featuresLabel" />
+                        </label>
+                        <div class="tags">
+                          {Object.keys(MANAGED_FEATURES[category]).map(type => (
+                            <RemoteFeatureTag
+                              disabled={learning}
+                              category={category}
+                              type={type}
+                              editedFeature={editedFeatures[type]}
+                              selected={selectedFeature === type}
+                              selectFeature={this.selectFeature}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      <RemoteFeatureEditionPanel
+                        {...props}
+                        device={device}
+                        peripheral={peripheral}
+                        selectedFeature={selectedFeature}
+                        selectedValue={selectedValue}
+                        editedFeatures={editedFeatures}
+                        learnAllMode={learnAllMode}
+                        learning={learning}
+                        learnAll={this.learnAll}
+                        storeFeatureCode={this.storeFeatureCode}
+                        quitLearnMode={this.quitLearnMode}
+                        deleteFeature={this.deleteFeature}
+                        updateFeature={this.updateFeature}
+                        selectFeature={this.selectFeature}
+                        selectValue={this.selectValue}
+                        setLearning={this.setLearning}
+                      />
+                    </Fragment>
+                  )}
+
+                  <div class="form-group">
+                    <Link
+                      href={`/dashboard/integration/device/broadlink${
+                        props.deviceSelector || !props.peripheral ? '' : '/peripheral'
+                      }`}
+                    >
+                      <button class="btn btn-secondary mr-2">
+                        <Text id="global.backButton" />
+                      </button>
+                    </Link>
+                    <button onClick={this.saveDevice} disabled={canSave || learning} class="btn btn-success mr-2">
+                      <Text id="integration.broadlink.setup.saveButton" />
                     </button>
-                  </Link>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     );

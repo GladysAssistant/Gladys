@@ -244,7 +244,7 @@ describe('Broadlink device list', () => {
 
     cy.location('pathname').should('eq', '/dashboard/integration/device/broadlink/edit/broadlink-8008bda3ae44');
 
-    cy.contains('button', 'integration.broadlink.setup.cancel').click();
+    cy.contains('button', 'global.backButton').click();
     cy.location('pathname').should('eq', '/dashboard/integration/device/broadlink');
   });
 });

@@ -892,7 +892,6 @@
         "featuresLabel": "Fonctionnalités"
       },
       "setup": {
-        "cancel": "Annuler",
         "noNameLabel": "Pas de nom",
         "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
         "notFound": "Appareil introuvable.",
@@ -922,8 +921,6 @@
         "learnAllLabel": "Mode apprentissage",
         "learnAllModeLabel": "Prochain bouton dans {{timeLeft}} secondes...",
         "quitLearnModeLabel": "Arrêter le mode apprentissage",
-        "saveSuccess": "L'appareil Broadlink a été créé avec succés.",
-        "successLabel": "Effectué",
         "features": {
           "light": {
             "binary": {

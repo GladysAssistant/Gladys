@@ -173,7 +173,7 @@ describe('Broadlink peripheral list', () => {
     cy.get('[data-cy=remote-peripheral]').should('have.value', '8008bda3ae44');
     cy.get('[data-cy=remote-category]').should('not.have.value');
 
-    cy.contains('button', 'integration.broadlink.setup.cancel').click();
+    cy.contains('button', 'global.backButton').click();
     cy.location('pathname').should('eq', '/dashboard/integration/device/broadlink/peripheral');
   });
 });

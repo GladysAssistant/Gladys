@@ -765,7 +765,6 @@
         "featuresLabel": "Features"
       },
       "setup": {
-        "cancel": "Cancel",
         "noNameLabel": "No name",
         "saveError": "Error saving or deleting device",
         "notFound": "Requested device not found.",
@@ -795,8 +794,6 @@
         "learnAllLabel": "Learn all features",
         "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
         "quitLearnModeLabel": "Stop learning features",
-        "saveSuccess": "Broadlink device successfully created.",
-        "successLabel": "Done",
         "features": {
           "light": {
             "binary": {

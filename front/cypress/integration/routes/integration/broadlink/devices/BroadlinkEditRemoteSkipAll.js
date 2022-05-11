@@ -92,10 +92,10 @@ describe('Broadlink edit remote - skip all', () => {
         .i18n('integration.broadlink.setup.learnAllLabel');
       cy.get('button')
         .eq(1)
-        .i18n('integration.broadlink.setup.saveButton');
+        .i18n('global.backButton');
       cy.get('button')
         .last()
-        .i18n('integration.broadlink.setup.cancel');
+        .i18n('integration.broadlink.setup.saveButton');
     });
   });
 
@@ -195,7 +195,7 @@ describe('Broadlink edit remote - skip all', () => {
   });
 
   it('Cancel go back', () => {
-    cy.contains('button', 'integration.broadlink.setup.cancel').click();
+    cy.contains('button', 'global.backButton').click();
     cy.location('pathname').should('eq', '/dashboard/integration/device/broadlink');
   });
 });

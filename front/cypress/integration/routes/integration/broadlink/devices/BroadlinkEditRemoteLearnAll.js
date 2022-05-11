@@ -95,10 +95,10 @@ describe('Broadlink edit remote - learn all', () => {
         .i18n('integration.broadlink.setup.learnAllLabel');
       cy.get('button')
         .eq(1)
-        .i18n('integration.broadlink.setup.saveButton');
+        .i18n('global.backButton');
       cy.get('button')
         .last()
-        .i18n('integration.broadlink.setup.cancel');
+        .i18n('integration.broadlink.setup.saveButton');
     });
   });
 
@@ -192,38 +192,5 @@ describe('Broadlink edit remote - learn all', () => {
 
   it('Check all learned', () => {
     cy.get('.tag-primary').should('be.length', 3);
-  });
-
-  it('Save device', () => {
-    const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({
-      method: 'POST',
-      url: `${serverUrl}/api/v1/device`
-    }).as('saveDevice');
-
-    cy.contains('button', 'integration.broadlink.setup.saveButton').click();
-
-    cy.wait('@saveDevice');
-
-    cy.contains('button', 'integration.broadlink.setup.successLabel').click();
-    cy.location('pathname').should('eq', '/dashboard/integration/device/broadlink');
-  });
-
-  it('Check switch device', () => {
-    cy.contains('.card-header', 'Light Remote')
-      .should('exist')
-      .parent('.card')
-      .within(() => {
-        // Check device name
-        cy.get('input')
-          .should('have.value', 'Light Remote')
-          .should('not.be.disabled');
-        // Check device room
-        cy.get('select')
-          .should('have.value', '')
-          .should('not.be.disabled');
-        // Check device features
-        cy.get('.tag').should('be.length', 3);
-      });
   });
 });
