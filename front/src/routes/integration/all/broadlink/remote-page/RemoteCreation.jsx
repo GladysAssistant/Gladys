@@ -68,6 +68,10 @@ class RemoteCreation extends Component {
       {
         name: PARAMS.PERIPHERAL,
         value: peripheral
+      },
+      {
+        name: PARAMS.REMOTE_TYPE,
+        value: category
       }
     ];
 

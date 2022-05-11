@@ -8,8 +8,8 @@ describe('Broadlink edit remote', () => {
     const remote = {
       name: 'Light Remote',
       model: 'light',
-      selector: 'broadlink-8008bda3ae44',
-      external_id: 'broadlink:8008bda3ae44',
+      selector: 'broadlink-any-remote',
+      external_id: 'broadlink:any-remote',
       should_poll: false,
       poll_frequency: null,
       created_at: '2019-02-12T07:49:07.556Z',
@@ -33,6 +33,10 @@ describe('Broadlink edit remote', () => {
           value: '8008bda3ae44'
         },
         {
+          name: PARAMS.REMOTE_TYPE,
+          value: 'light'
+        },
+        {
           name: 'code_binary-0',
           value: 'POWER'
         }
@@ -51,7 +55,7 @@ describe('Broadlink edit remote', () => {
       }
     );
 
-    cy.visit('/dashboard/integration/device/broadlink/edit/broadlink-8008bda3ae44');
+    cy.visit('/dashboard/integration/device/broadlink/edit/broadlink-any-remote');
   });
 
   after(() => {

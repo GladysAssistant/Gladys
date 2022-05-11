@@ -16,6 +16,7 @@ const PARAMS = {
   CODE: 'code_',
   PERIPHERAL: 'peripheral',
   MANUFACTURER: 'manufacturer',
+  REMOTE_TYPE: 'remote_type',
 };
 
 module.exports = {
