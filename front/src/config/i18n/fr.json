@@ -878,9 +878,9 @@
         "createRemoteButton": "Créer une télécommande"
       },
       "remote": {
-        "title": "Appareils Broadlink dans Gladys",
+        "title": "Appareils Broadlink",
         "searchPlaceholder": "Rechercher des appareils",
-        "newButton": "Nouvelle télécommande",
+        "newButton": "Créer",
         "noRemoteFound": "Aucun appareil ou télécommande Broadlink trouvé.",
         "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
         "nameLabel": "Nom de l'appareil",

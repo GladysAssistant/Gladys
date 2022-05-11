@@ -751,9 +751,9 @@
         "createRemoteButton": "Create remote control"
       },
       "remote": {
-        "title": "Broadlink devices in Gladys",
+        "title": "Broadlink devices",
         "searchPlaceholder": "Search for devices",
-        "newButton": "New remote control",
+        "newButton": "Create",
         "noRemoteFound": "No Broadlink device or remote found.",
         "saveError": "There was an error saving the device.",
         "nameLabel": "Device name",
