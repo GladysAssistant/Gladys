@@ -500,12 +500,10 @@ const DEVICE_FEATURE_UNITS = {
   MILLI_AMPERE: 'milliampere',
   MILLI_VOLT: 'millivolt',
   VOLT: 'volt',
-  PPM: 'ppm',
   KILOGRAM: 'kg',
   CENTIMETER: 'cm',
   MERCURE_MILIMETER: 'mmHg',
   BEATS_PER_MINUTE: 'bpm',
-  METER_PER_SECOND: 'meter-per-second',
   VOLT_AMPERE: 'volt-ampere',
   VOLT_AMPERE_REACTIVE: 'volt-ampere-reactive',
   // Length units
