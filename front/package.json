@@ -27,7 +27,7 @@
     "@relative-ci/agent": "^2.0.0",
     "compare-json": "^0.4.0",
     "cross-env": "^5.2.0",
-    "cypress": "^6.9.1",
+    "cypress": "^9.5.2",
     "eslint": "^4.19.1",
     "eslint-config-prettier": "^4.0.0",
     "eslint-config-synacor": "^2.0.2",
