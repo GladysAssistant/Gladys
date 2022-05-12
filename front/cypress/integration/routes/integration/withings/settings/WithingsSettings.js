@@ -27,7 +27,7 @@ describe('Withings settings page', () => {
       {
         authorizationUri: '/dashboard/integration/health/withings/settings'
       }
-    );
+    ).as('authorizationUriAction');
     cy.intercept(
       {
         method: 'POST',
@@ -37,6 +37,17 @@ describe('Withings settings page', () => {
         body: []
       }
     );
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/withings/reset`
+      },
+      {
+        body: {
+          success: true
+        }
+      }
+    ).as('resetAction');
 
     cy.login();
 
@@ -60,15 +71,17 @@ describe('Withings settings page', () => {
 
     cy.contains('button', 'oauth2.buttonConnect').click();
 
+    cy.wait('@authorizationUriAction');
+
     cy.location('pathname').should('eq', '/dashboard/integration/health/withings/settings');
 
-    cy.get('.alert-info').i18n('integration.withings.settings.oauth2.complete');
+    cy.get('.alert').i18n('integration.withings.settings.oauth2.complete');
 
-    cy.get('.alert-info').i18n('integration.withings.settings.oauth2.clientId');
+    cy.get('.alert').i18n('integration.withings.settings.oauth2.clientId');
 
-    cy.get('.alert-info').contains('FakeClientId');
+    cy.get('.alert').contains('FakeClientId');
 
-    cy.get('.alert-info').i18n('integration.withings.settings.oauth2.instructionsToUse');
+    cy.get('.alert').i18n('integration.withings.settings.oauth2.instructionsToUse');
 
     cy.contains('p', 'oauth2.delete').should('exist');
   });
@@ -76,8 +89,10 @@ describe('Withings settings page', () => {
   it('Check unconnect', () => {
     cy.contains('button', 'oauth2.unconnectButton').click();
 
+    cy.wait('@resetAction');
+
     cy.get('.markup').i18n('oauth2.instructions');
 
-    cy.get('.form-label').i18n('oauth2.apiKeyLabel');
+    cy.get('.form-label').i18n('oauth2.');
   });
 });
