@@ -47,14 +47,14 @@ describe('Withings settings page', () => {
           success: true
         }
       }
-    ).as('resetAction');
+    );
 
     cy.login();
 
     cy.visit('/dashboard/integration/health/withings/settings');
   });
 
-  it('Check setting page and connect', () => {
+  it('Check setting page and connect and unconnect', () => {
     cy.get('.markup').i18n('oauth2.instructions');
 
     cy.get('.form-label').i18n('oauth2.apiKeyLabel');
@@ -75,24 +75,20 @@ describe('Withings settings page', () => {
 
     cy.location('pathname').should('eq', '/dashboard/integration/health/withings/settings');
 
-    cy.get('.alert').i18n('integration.withings.settings.oauth2.complete');
+    cy.get('.alert.alert-info').i18n('integration.withings.settings.oauth2.complete');
 
-    cy.get('.alert').i18n('integration.withings.settings.oauth2.clientId');
+    cy.get('.alert.alert-info').i18n('integration.withings.settings.oauth2.clientId');
 
-    cy.get('.alert').contains('FakeClientId');
+    cy.get('.alert.alert-info').contains('FakeClientId');
 
-    cy.get('.alert').i18n('integration.withings.settings.oauth2.instructionsToUse');
+    cy.get('.alert.alert-info').i18n('integration.withings.settings.oauth2.instructionsToUse');
 
     cy.contains('p', 'oauth2.delete').should('exist');
-  });
 
-  it('Check unconnect', () => {
     cy.contains('button', 'oauth2.unconnectButton').click();
-
-    cy.wait('@resetAction');
 
     cy.get('.markup').i18n('oauth2.instructions');
 
-    cy.get('.form-label').i18n('oauth2.');
+    cy.get('.form-label').i18n('oauth2.apiKeyLabel');
   });
 });

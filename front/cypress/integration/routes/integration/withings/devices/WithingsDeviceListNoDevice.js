@@ -6,7 +6,7 @@ describe('Withings Empty device list', () => {
   });
 
   it('Check Empty device page', () => {
-    cy.get('.alert').i18n('integration.withings.device.noDevices');
+    cy.get('.alert.alert-info').i18n('integration.withings.device.noDevices');
   });
 
   it('Check right menu  page', () => {
