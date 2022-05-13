@@ -1,5 +1,7 @@
 const GladysGatewayClient = require('@gladysassistant/gladys-gateway-js');
 const WebCrypto = require('node-webcrypto-ossl');
+const schedule = require('node-schedule');
+
 const getConfig = require('../../utils/getConfig');
 const logger = require('../../utils/logger');
 const { EVENTS, JOB_TYPES } = require('../../utils/constants');
@@ -34,6 +36,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.event = event;
   this.system = system;
   this.sequelize = sequelize;
+  this.schedule = schedule;
   this.config = config;
   this.user = user;
   this.stateManager = stateManager;
@@ -45,6 +48,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.googleHomeConnected = false;
   this.forwardStateToGoogleHomeTimeouts = new Map();
   this.googleHomeForwardStateTimeout = 5 * 1000;
+  this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
   this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));

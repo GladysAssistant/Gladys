@@ -15,7 +15,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
 });
 
 const getConfig = require('../../../utils/getConfig');
-const { EVENTS } = require('../../../utils/constants');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -76,7 +76,12 @@ describe('gateway', () => {
       },
     ];
     const variable = {
-      getValue: fake.resolves(JSON.stringify(userKeys)),
+      getValue: (name) => {
+        if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
+          return 'Europe/Paris';
+        }
+        return JSON.stringify(userKeys);
+      },
       setValue: fake.resolves(null),
     };
     const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
@@ -84,6 +89,7 @@ describe('gateway', () => {
       await gateway.init();
       expect(gateway.connected).to.equal(true);
       expect(gateway.usersKeys).to.deep.equal(userKeys);
+      expect(gateway.backupSchedule).to.not.equal(undefined);
     });
   });
 
@@ -178,6 +184,33 @@ describe('gateway', () => {
           is_deleted: false,
         },
       ]);
+    });
+  });
+
+  describe('gateway.checkIfBackupNeeded', async function Describe() {
+    this.timeout(20000);
+    it('should check if backup is needed and execute backup', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const eventFake = {
+        emit: fake.returns(null),
+        on: fake.returns(null),
+      };
+      const gateway = new Gateway(variable, eventFake, system, sequelize, config, {}, {}, {}, job);
+      gateway.backupRandomInterval = 10;
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.connected = true;
+      await gateway.checkIfBackupNeeded();
+      assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+      // wait 50ms and see if backup was called
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          assert.calledOnce(eventFake.emit);
+          resolve();
+        }, 50);
+      });
     });
   });
 

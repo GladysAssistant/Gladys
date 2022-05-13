@@ -40,6 +40,20 @@ async function init() {
     this.connected = false;
   }
 
+  if (this.backupSchedule && this.backupSchedule.cancel) {
+    this.backupSchedule.cancel();
+  }
+  // schedule backup at midnight
+  const timezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+
+  const rule = new this.schedule.RecurrenceRule();
+  rule.tz = timezone;
+  rule.hour = 0;
+  rule.minute = 0;
+  rule.second = 0;
+
+  this.backupSchedule = this.schedule.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
+
   if (process.env.NODE_ENV === 'production') {
     try {
       await this.getLatestGladysVersion();
