@@ -10,12 +10,14 @@ const logger = require('../../../../utils/logger');
  * });
  */
 async function addPeripheral(broadlinkDevice) {
+  let connectable = true;
   try {
     await broadlinkDevice.auth();
   } catch (e) {
     const { model: name, mac: macArray } = broadlinkDevice;
     const mac = Buffer.from(macArray).toString('hex');
     logger.warn(`Broadlink fails to connect to ${name} (${mac}) device`, e);
+    connectable = false;
   }
 
   const { model: name, mac: macArray, host = {} } = broadlinkDevice;
@@ -27,7 +29,7 @@ async function addPeripheral(broadlinkDevice) {
     logger.info(`Broadlink discovers new peripheral: ${mac}`);
 
     const { address } = host;
-    this.peripherals[mac] = { name, mac, address, ...peripheral };
+    this.peripherals[mac] = { name, mac, address, connectable, ...peripheral };
   } else {
     logger.info(`Broadlink doesn't manager ${broadlinkDevice.module} peripheral`);
   }

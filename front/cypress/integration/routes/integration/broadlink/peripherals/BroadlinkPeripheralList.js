@@ -40,7 +40,7 @@ describe('Broadlink peripheral list', () => {
   });
 
   it('Check list', () => {
-    cy.get('[data-cy=peripheral-card]').should('be.length', 3);
+    cy.get('[data-cy=peripheral-card]').should('be.length', 4);
   });
 
   it('Check already created device', () => {
@@ -85,6 +85,28 @@ describe('Broadlink peripheral list', () => {
         cy.get('[data-cy=peripheral-submit]')
           .should('not.be.disabled')
           .i18n('integration.broadlink.peripheral.saveButton');
+      });
+  });
+
+  it('Check locked device', () => {
+    cy.contains('.card-header', 'SP3')
+      .should('exist')
+      .parent('.card')
+      .within(() => {
+        // Check peripheral name
+        cy.get('[data-cy=peripheral-name]')
+          .should('have.value', 'SP3')
+          .should('be.disabled');
+        // Check peripheral address
+        cy.get('[data-cy=peripheral-address]')
+          .should('have.value', '7396e6541fb9')
+          .should('be.disabled');
+        // Check peripheral features
+        cy.get('.tag').should('be.length', 1);
+        // Check peripheral action
+        cy.get('[data-cy=peripheral-submit]')
+          .should('be.disabled')
+          .i18n('integration.broadlink.peripheral.notConnectable');
       });
   });
 

@@ -13,7 +13,7 @@ const DevicePeripheralForm = ({ peripheral, updateName, saveDevice }) => (
         type="text"
         class="form-control"
         data-cy="peripheral-name"
-        disabled={peripheral.device.created_at}
+        disabled={!peripheral.connectable || peripheral.device.created_at}
         value={peripheral.device.name}
         onInput={updateName}
       />
@@ -31,14 +31,19 @@ const DevicePeripheralForm = ({ peripheral, updateName, saveDevice }) => (
       <DeviceFeatures features={peripheral.device.features} />
     </div>
     <div class="form-group">
-      {peripheral.device.created_at && (
+      {peripheral.connectable && peripheral.device.created_at && (
         <button class="btn btn-primary mr-2" disabled data-cy="peripheral-submit">
           <Text id="integration.broadlink.peripheral.alreadyCreatedButton" />
         </button>
       )}
-      {!peripheral.device.created_at && (
+      {peripheral.connectable && !peripheral.device.created_at && (
         <button onClick={saveDevice} class="btn btn-success mr-2" data-cy="peripheral-submit">
           <Text id="integration.broadlink.peripheral.saveButton" />
+        </button>
+      )}
+      {!peripheral.connectable && (
+        <button class="btn btn-danger mr-2" data-cy="peripheral-submit" disabled>
+          <Text id="integration.broadlink.peripheral.notConnectable" />
         </button>
       )}
     </div>

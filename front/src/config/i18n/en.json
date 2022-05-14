@@ -747,6 +747,7 @@
         "noFeatures": "No features",
         "nameLabel": "Name",
         "saveButton": "Save",
+        "notConnectable": "Locked",
         "alreadyCreatedButton": "Already created",
         "createRemoteButton": "Create remote control"
       },

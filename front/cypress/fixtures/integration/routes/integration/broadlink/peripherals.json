@@ -3,6 +3,7 @@
     "address": "210.248.100.245",
     "mac": "4bf75cf0fdbb",
     "name": "MP1",
+    "connectable": true,
     "device": {
       "name": "MP1",
       "external_id": "broadlink:4bf75cf0fdbb",
@@ -64,6 +65,7 @@
     "name": "SP2",
     "mac": "7396e6541fb0",
     "canLearn": false,
+    "connectable": true,
     "device": {
       "external_id": "broadlink:7396e6541fb0",
       "selector": "broadlink:7396e6541fb0",
@@ -87,9 +89,38 @@
     }
   },
   {
+    "address": "227.154.146.115",
+    "name": "SP3",
+    "mac": "7396e6541fb9",
+    "canLearn": false,
+    "connectable": false,
+    "device": {
+      "external_id": "broadlink:7396e6541fb9",
+      "selector": "broadlink:7396e6541fb9",
+      "model": "SP3",
+      "name": "SP3",
+      "should_poll": false,
+      "poll_frequency": 60000,
+      "features": [
+        {
+          "name": "SP3",
+          "category": "switch",
+          "type": "binary",
+          "external_id": "broadlink:7396e6541fb0:0",
+          "selector": "broadlink:7396e6541fb0:0",
+          "min": 0,
+          "max": 1,
+          "read_only": false,
+          "has_feedback": true
+        }
+      ]
+    }
+  },
+  {
     "address": "220.156.58.18",
     "name": "RM3 Pro Plus",
     "mac": "8008bda3ae44",
-    "canLearn": true
+    "canLearn": true,
+    "connectable": true
   }
 ]

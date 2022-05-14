@@ -17,11 +17,18 @@ const HubPeripheralForm = ({ peripheral }) => (
       <input type="text" class="form-control" data-cy="peripheral-address" disabled value={peripheral.mac} />
     </div>
     <div class="form-group">
-      <Link href={`/dashboard/integration/device/broadlink/edit?peripheral=${peripheral.mac}`}>
-        <button class="btn btn-success mr-2" data-cy="peripheral-submit">
-          <Text id="integration.broadlink.peripheral.createRemoteButton" />
+      {!peripheral.connectable && (
+        <button class="btn btn-danger mr-2" data-cy="peripheral-submit" disabled>
+          <Text id="integration.broadlink.peripheral.notConnectable" />
         </button>
-      </Link>
+      )}
+      {peripheral.connectable && (
+        <Link href={`/dashboard/integration/device/broadlink/edit?peripheral=${peripheral.mac}`}>
+          <button class="btn btn-success mr-2" data-cy="peripheral-submit">
+            <Text id="integration.broadlink.peripheral.createRemoteButton" />
+          </button>
+        </Link>
+      )}
     </div>
   </Fragment>
 );

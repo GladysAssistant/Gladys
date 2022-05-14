@@ -874,6 +874,7 @@
         "noFeatures": "Aucune fonctionnalité",
         "nameLabel": "Nom de l'appareil",
         "saveButton": "Enregistrer",
+        "notConnectable": "Verouillé",
         "alreadyCreatedButton": "Déjà créé",
         "createRemoteButton": "Créer une télécommande"
       },
