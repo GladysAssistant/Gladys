@@ -108,6 +108,9 @@ class RemoteFeatureEditionPanel extends Component {
       if (!this.state.timeLeft) {
         this.setState({ timeLeft: 3 });
         this.timer = setInterval(this.decrementTimeRemaining, 1000);
+      } else {
+        this.props.quitLearnMode();
+        this.setState({ timeLeft: 0 });
       }
     } else {
       clearInterval(this.timer);
@@ -140,12 +143,13 @@ class RemoteFeatureEditionPanel extends Component {
             errorKey: null
           });
 
-          this.props.storeFeatureCode(payload.code);
+          const learnAllMode = this.props.storeFeatureCode(payload.code);
 
-          if (this.props.learnAllMode) {
+          if (learnAllMode) {
             await this.enterLearnAllMode(this.props.learnAllMode);
           } else {
             this.props.setLearning(false);
+            this.setState({ timeLeft: undefined });
           }
         }
         break;

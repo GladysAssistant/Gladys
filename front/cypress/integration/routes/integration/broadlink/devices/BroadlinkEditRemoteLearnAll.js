@@ -193,4 +193,91 @@ describe('Broadlink edit remote - learn all', () => {
   it('Check all learned', () => {
     cy.get('.tag-primary').should('be.length', 3);
   });
+
+  describe('Learn one more', () => {
+    it('Select feature', () => {
+      cy.get('.tag-dark').should('not.exist');
+      cy.get('.input-icon').should('not.exist');
+
+      cy.get('.tag')
+        .first()
+        .click();
+
+      cy.get('.tag-dark').should('have.length', 1);
+      cy.get('.input-icon > input')
+        .should('have.length', 1)
+        .should('have.value', 'Power');
+
+      cy.contains('button', 'integration.broadlink.setup.learnAllLabel').should('not.exist');
+      cy.contains('button', 'integration.broadlink.setup.quitLearnModeLabel').should('not.exist');
+      cy.contains('div', 'integration.broadlink.setup.learningModeInProgress').should('not.exist');
+
+      cy.contains('button', 'integration.broadlink.setup.testLabel')
+        .should('exist')
+        .should('be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.deleteLabel')
+        .should('exist')
+        .should('be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.learnModeTitle')
+        .should('exist')
+        .should('be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.features.light.binary.none')
+        .should('exist')
+        .should('not.be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.features.light.binary.one')
+        .should('exist')
+        .should('not.be.disabled');
+    });
+
+    it('Select sub-feature', () => {
+      cy.contains('button', 'integration.broadlink.setup.features.light.binary.none').click();
+
+      cy.contains('button', 'integration.broadlink.setup.testLabel')
+        .should('exist')
+        .should('not.be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.deleteLabel')
+        .should('exist')
+        .should('not.be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.learnModeTitle')
+        .should('exist')
+        .should('not.be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.features.light.binary.none')
+        .should('exist')
+        .should('not.be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.features.light.binary.one')
+        .should('exist')
+        .should('not.be.disabled');
+    });
+
+    it('Enable capture mode', () => {
+      const serverUrl = Cypress.env('serverUrl');
+      cy.intercept(
+        {
+          method: 'POST',
+          url: `${serverUrl}/api/v1/service/broadlink/learn`
+        },
+        { learn: true }
+      ).as('learnMode');
+
+      cy.contains('button', 'integration.broadlink.setup.learnModeTitle').click();
+
+      cy.wait('@learnMode');
+
+      cy.contains('button', 'integration.broadlink.setup.testLabel').should('be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.deleteLabel').should('be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.learnModeTitle').should('not.exist');
+      cy.contains('button', 'integration.broadlink.setup.cancelLearnModeButton').should('exist');
+      cy.contains('div', 'integration.broadlink.setup.learningModeInProgress').should('exist');
+    });
+
+    it('Cancel capture mode', () => {
+      cy.contains('button', 'integration.broadlink.setup.cancelLearnModeButton').click();
+
+      cy.contains('button', 'integration.broadlink.setup.testLabel').should('not.be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.deleteLabel').should('not.be.disabled');
+      cy.contains('button', 'integration.broadlink.setup.learnModeTitle').should('exist');
+      cy.contains('button', 'integration.broadlink.setup.cancelLearnModeButton').should('not.exist');
+      cy.contains('div', 'integration.broadlink.setup.learningModeInProgress').should('not.exist');
+    });
+  });
 });

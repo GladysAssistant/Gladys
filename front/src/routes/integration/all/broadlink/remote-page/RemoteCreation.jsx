@@ -198,6 +198,8 @@ class RemoteCreation extends Component {
       selectedFeature,
       selectedValue
     });
+
+    return learnAllMode;
   };
 
   setLearning = learning => {
