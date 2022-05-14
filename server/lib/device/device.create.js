@@ -116,6 +116,9 @@ async function create(device) {
           },
         });
         await deviceFeature.update(feature, { transaction });
+        if (deviceFeature.keep_history === false) {
+          this.purgeStatesAggregates(deviceFeature);
+        }
         return deviceFeature.get({ plain: true });
       }
       // if not, we create it

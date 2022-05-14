@@ -101,7 +101,27 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
               />
             </Localizer>
           </div>
-
+          <div class="page-options d-flex">
+            <div class="form-group">
+              <div class="form-label">
+                <Text id="integration.mqtt.feature.keepHistoryLabel" />
+              </div>
+              <label class="custom-switch">
+                <input
+                  type="checkbox"
+                  checked={feature.keep_history}
+                  onClick={props.updateKeepHistory}
+                  class="custom-switch-input"
+                />
+                <span class="custom-switch-indicator" />
+              </label>
+              <p>
+                <small>
+                  <MarkupText id="integration.mqtt.feature.keepHistoryDescription" />
+                </small>
+              </p>
+            </div>
+          </div>
           <div class="form-group">
             <div class="form-label">
               <Text id="integration.mqtt.feature.readOnlyLabel" />
@@ -186,6 +206,14 @@ class MqttFeatureBoxComponent extends Component {
     };
     this.props.updateFeatureProperty(e, 'read_only', this.props.featureIndex);
   };
+  updateKeepHistory = () => {
+    const e = {
+      target: {
+        value: !this.props.feature.keep_history
+      }
+    };
+    this.props.updateFeatureProperty(e, 'keep_history', this.props.featureIndex);
+  };
   deleteFeature = () => {
     this.props.deleteFeature(this.props.featureIndex);
   };
@@ -219,6 +247,7 @@ class MqttFeatureBoxComponent extends Component {
         updateMax={this.updateMax}
         updateUnit={this.updateUnit}
         updateReadOnly={this.updateReadOnly}
+        updateKeepHistory={this.updateKeepHistory}
         deleteFeature={this.deleteFeature}
         copyMqttTopic={this.copyMqttTopic}
         publishMqttTopic={publishMqttTopic}
