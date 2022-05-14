@@ -9,6 +9,7 @@ describe('Broadlink device list', () => {
       external_id: 'broadlink:7396e6541fb0',
       selector: 'broadlink:7396e6541fb0',
       name: 'SP2',
+      model: 'SP2',
       should_poll: false,
       poll_frequency: 60000,
       features: [
@@ -135,9 +136,13 @@ describe('Broadlink device list', () => {
       .parent('.card')
       .within(() => {
         // Check device name
-        cy.get('input')
+        cy.get('[data-cy=device-name]')
           .should('have.value', 'SP2')
           .should('not.be.disabled');
+        // Check device model
+        cy.get('[data-cy=device-model]')
+          .should('have.value', 'SP2')
+          .should('be.disabled');
         // Check device room
         cy.get('select')
           .should('have.value', '')
@@ -165,11 +170,11 @@ describe('Broadlink device list', () => {
       .parent('.card')
       .within(() => {
         // Check device name
-        cy.get('input').type(' new name');
+        cy.get('[data-cy=device-name]').type(' new name');
         // Check device room
         cy.get('select').select(rooms[0].name);
 
-        cy.contains('button', 'integration.broadlink.remote.saveButton').click();
+        cy.contains('button', 'integration.broadlink.device.saveButton').click();
       });
 
     // Check device well created
@@ -197,7 +202,7 @@ describe('Broadlink device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.contains('button', 'integration.broadlink.remote.deleteButton').click();
+        cy.contains('button', 'integration.broadlink.device.deleteButton').click();
       });
 
     // Check device well created
@@ -213,14 +218,20 @@ describe('Broadlink device list', () => {
   });
 
   it('Check remote device', () => {
+    const i18n = Cypress.env('i18n');
+
     cy.contains('.card-header', 'TV Remote')
       .should('exist')
       .parent('.card')
       .within(() => {
         // Check device name
-        cy.get('input')
+        cy.get('[data-cy=device-name]')
           .should('have.value', 'TV Remote')
           .should('not.be.disabled');
+        // Check device model
+        cy.get('[data-cy=device-model]')
+          .should('have.value', i18n.deviceFeatureCategory.television.shortCategoryName)
+          .should('be.disabled');
         // Check device room
         cy.get('select')
           .should('have.value', '')
@@ -239,7 +250,7 @@ describe('Broadlink device list', () => {
       .should('exist')
       .parent('.card')
       .within(() => {
-        cy.contains('button', 'integration.broadlink.remote.editButton').click();
+        cy.contains('button', 'integration.broadlink.device.editButton').click();
       });
 
     cy.location('pathname').should('eq', '/dashboard/integration/device/broadlink/edit/broadlink-8008bda3ae44');

@@ -330,7 +330,7 @@ class RemoteCreation extends Component {
                 <div>
                   <div class="form-group">
                     <label class="form-label">
-                      <Text id="integration.broadlink.remote.nameLabel" />
+                      <Text id="integration.broadlink.device.nameLabel" />
                     </label>
                     <Localizer>
                       <input
@@ -339,14 +339,14 @@ class RemoteCreation extends Component {
                         onInput={this.updateDeviceName}
                         class="form-control"
                         data-cy="remote-name"
-                        placeholder={<Text id="integration.broadlink.remote.namePlaceholder" />}
+                        placeholder={<Text id="integration.broadlink.device.namePlaceholder" />}
                       />
                     </Localizer>
                   </div>
 
                   <div class="form-group">
                     <label class="form-label">
-                      <Text id="integration.broadlink.remote.roomLabel" />
+                      <Text id="integration.broadlink.device.roomLabel" />
                     </label>
                     <select onChange={this.updateDeviceRoom} class="form-control" data-cy="remote-room">
                       <option value="">

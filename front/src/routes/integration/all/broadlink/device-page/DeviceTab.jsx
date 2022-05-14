@@ -17,7 +17,7 @@ const DeviceTab = ({
   <div class="card">
     <div class="card-header">
       <h1 class="card-title">
-        <Text id="integration.broadlink.remote.title" />
+        <Text id="integration.broadlink.device.title" />
       </h1>
       <div class="page-options d-flex">
         <select onChange={changeOrderDir} class="form-control custom-select w-auto">
@@ -36,14 +36,14 @@ const DeviceTab = ({
             <input
               type="text"
               class="form-control w-10"
-              placeholder={<Text id="integration.broadlink.remote.searchPlaceholder" />}
+              placeholder={<Text id="integration.broadlink.device.searchPlaceholder" />}
               onInput={debouncedSearch}
             />
           </Localizer>
         </div>
         <Link href="/dashboard/integration/device/broadlink/edit">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.broadlink.remote.newButton" /> <i class="fe fe-plus" />
+            <Text id="integration.broadlink.device.newButton" /> <i class="fe fe-plus" />
           </button>
         </Link>
       </div>
@@ -59,7 +59,7 @@ const DeviceTab = ({
           {broadlinkDevices.map((device, index) => (
             <DeviceBox {...props} device={device} deviceIndex={index} houses={houses} />
           ))}
-          {broadlinkDevices.length === 0 && <EmptyState id="integration.broadlink.remote.noRemoteFound" />}
+          {broadlinkDevices.length === 0 && <EmptyState id="integration.broadlink.device.noRemoteFound" />}
         </div>
       </div>
     </div>

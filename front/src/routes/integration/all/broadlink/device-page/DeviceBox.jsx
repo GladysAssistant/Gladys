@@ -32,6 +32,10 @@ class DeviceBox extends Component {
     });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
+      this.setState({
+        error: undefined,
+        saveError: undefined
+      });
     } catch (e) {
       this.setState({
         error: RequestStatus.Error
@@ -65,12 +69,12 @@ class DeviceBox extends Component {
               <div class="card-body">
                 {saveError && (
                   <div class="alert alert-danger">
-                    <Text id="integration.broadlink.remote.saveError" />
+                    <Text id="integration.broadlink.device.saveError" />
                   </div>
                 )}
                 <div class="form-group">
                   <label class="form-label" for={`name_${deviceIndex}`}>
-                    <Text id="integration.broadlink.remote.nameLabel" />
+                    <Text id="integration.broadlink.device.nameLabel" />
                   </label>
                   <Localizer>
                     <input
@@ -78,13 +82,28 @@ class DeviceBox extends Component {
                       value={device.name}
                       onInput={this.updateDeviceName}
                       class="form-control"
-                      placeholder={<Text id="integration.broadlink.remote.namePlaceholder" />}
+                      data-cy="device-name"
+                      placeholder={<Text id="integration.broadlink.device.namePlaceholder" />}
+                    />
+                  </Localizer>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.broadlink.device.modelLabel" />
+                  </label>
+                  <Localizer>
+                    <input
+                      type="text"
+                      value={<Text id={`deviceFeatureCategory.${device.model}.shortCategoryName`}>{device.model}</Text>}
+                      class="form-control"
+                      disabled
+                      data-cy="device-model"
                     />
                   </Localizer>
                 </div>
                 <div class="form-group">
                   <label class="form-label" for={`room_${deviceIndex}`}>
-                    <Text id="integration.broadlink.remote.roomLabel" />
+                    <Text id="integration.broadlink.device.roomLabel" />
                   </label>
                   <select onChange={this.updateDeviceRoom} class="form-control" id={`room_${deviceIndex}`}>
                     <option value="">
@@ -104,22 +123,22 @@ class DeviceBox extends Component {
 
                 <div class="form-group">
                   <label class="form-label">
-                    <Text id="integration.broadlink.remote.featuresLabel" />
+                    <Text id="integration.broadlink.device.featuresLabel" />
                   </label>
                   <DeviceFeatures features={device.features} />
                 </div>
 
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.broadlink.remote.saveButton" />
+                    <Text id="integration.broadlink.device.saveButton" />
                   </button>
                   <button onClick={this.deleteDevice} class="btn btn-danger">
-                    <Text id="integration.broadlink.remote.deleteButton" />
+                    <Text id="integration.broadlink.device.deleteButton" />
                   </button>
 
                   <Link href={`/dashboard/integration/device/broadlink/edit/${device.selector}`}>
                     <button class="btn btn-secondary float-right">
-                      <Text id="integration.broadlink.remote.editButton" />
+                      <Text id="integration.broadlink.device.editButton" />
                     </button>
                   </Link>
                 </div>

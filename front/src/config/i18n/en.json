@@ -752,7 +752,7 @@
         "alreadyCreatedButton": "Already created",
         "createRemoteButton": "Create remote control"
       },
-      "remote": {
+      "device": {
         "title": "Broadlink devices",
         "searchPlaceholder": "Search for devices",
         "newButton": "Create",
@@ -760,6 +760,7 @@
         "saveError": "There was an error saving the device.",
         "nameLabel": "Device name",
         "namePlaceholder": "Enter the name of your device",
+        "modelLabel": "Model",
         "roomLabel": "Room",
         "saveButton": "Save",
         "deleteButton": "Delete",

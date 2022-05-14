@@ -879,7 +879,7 @@
         "alreadyCreatedButton": "Déjà créé",
         "createRemoteButton": "Créer une télécommande"
       },
-      "remote": {
+      "device": {
         "title": "Appareils Broadlink",
         "searchPlaceholder": "Rechercher des appareils",
         "newButton": "Créer",
@@ -887,6 +887,7 @@
         "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
         "nameLabel": "Nom de l'appareil",
         "namePlaceholder": "Entrez le nom de votre appareil",
+        "modelLabel": "Modèle",
         "roomLabel": "Pièce",
         "saveButton": "Enregistrer",
         "deleteButton": "Supprimer",
