@@ -109,7 +109,7 @@ const actions = store => {
         });
       }
     },
-    driverFailed(state) {
+    driverFailed() {
       store.setState({
         zwaveDriverFailed: true,
         zwaveConnectionInProgress: false
