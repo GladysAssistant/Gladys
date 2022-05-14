@@ -35,13 +35,12 @@
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-preact-i18n": "^1.1.0",
+    "eslint-plugin-react": "^7.29.4",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
     "per-env": "^1.0.2",
-    "preact-cli": "^3.2.2",
-    "preact-render-spy": "^1.2.1",
-    "prettier": "^1.17.1",
-    "sirv-cli": "^1.0.12"
+    "preact-cli": "^3.3.5",
+    "prettier": "^1.17.1"
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^3.9.0",
@@ -61,8 +60,7 @@
     "leaflet": "^1.7.1",
     "linkstate": "^1.1.1",
     "p-limit": "^4.0.0",
-    "preact": "^10.5.14",
-    "preact-cli-plugin-fast-async": "^1.0.1",
+    "preact": "^10.7.2",
     "preact-i18n": "^2.4.0-preactx",
     "preact-router": "^3.2.1",
     "qrcode": "^1.4.2",
