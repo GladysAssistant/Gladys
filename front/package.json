@@ -76,6 +76,9 @@
   },
   "browserslist": [
     "defaults",
+    "not ie 11",
+    "not ie_mob 11",
+    "not ios_saf 12.2-12.5",
     "not dead"
   ]
 }

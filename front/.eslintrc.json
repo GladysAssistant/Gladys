@@ -10,7 +10,9 @@
     "no-useless-concat": "error",
     "prefer-template": "error",
     "jest/expect-expect": "off",
-    "no-async-promise-executor": "off"
+    "jest/valid-expect": "off",
+    "no-async-promise-executor": "off",
+    "react/jsx-key": "off"
   },
   "env": {
     "browser": true
