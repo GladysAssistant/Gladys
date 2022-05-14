@@ -36,7 +36,7 @@ describe('Broadlink edit remote - learn all', () => {
           value: '8008bda3ae44'
         },
         {
-          name: 'code_binary-1',
+          name: 'ir_code_binary-1',
           value: 'POWER'
         }
       ]

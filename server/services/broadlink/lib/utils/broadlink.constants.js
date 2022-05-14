@@ -13,7 +13,7 @@ const ACTIONS = {
 };
 
 const PARAMS = {
-  CODE: 'code_',
+  IR_CODE: 'ir_code_',
   PERIPHERAL: 'peripheral',
   MANUFACTURER: 'manufacturer',
   REMOTE_TYPE: 'remote_type',

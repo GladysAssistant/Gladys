@@ -87,7 +87,7 @@ class RemoteCreation extends Component {
       let nbCodes = 0;
       Object.keys(codes).forEach(codeKey => {
         params.push({
-          name: `${PARAMS.CODE}${codeKey}`,
+          name: `${PARAMS.IR_CODE}${codeKey}`,
           value: codes[codeKey]
         });
 
@@ -272,11 +272,11 @@ class RemoteCreation extends Component {
       const codes = {};
 
       // Get feature codes
-      const paramPrefix = `${PARAMS.CODE}${type}`;
+      const paramPrefix = `${PARAMS.IR_CODE}${type}`;
       params
         .filter(param => param.name.startsWith(paramPrefix))
         .forEach(param => {
-          codes[param.name.replace(PARAMS.CODE, '')] = param.value;
+          codes[param.name.replace(PARAMS.IR_CODE, '')] = param.value;
         });
 
       editedFeatures[type] = { feature, codes };

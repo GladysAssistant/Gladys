@@ -34,7 +34,7 @@ async function setValue(broadlinkDevice, gladysDevice, deviceFeature, value) {
   // Get all related params with code first
   for (let i = 0; i < nbExpectedCodes; i += 1) {
     const subValue = valueStr[i];
-    const paramNames = [`${PARAMS.CODE}${type}`, `${PARAMS.CODE}${type}-${subValue}`];
+    const paramNames = [`${PARAMS.IR_CODE}${type}`, `${PARAMS.IR_CODE}${type}-${subValue}`];
     const param = gladysDevice.params.find((p) => paramNames.includes(p.name));
 
     if (param) {

@@ -37,7 +37,7 @@ describe('Broadlink edit remote', () => {
           value: 'light'
         },
         {
-          name: 'code_binary-0',
+          name: 'ir_code_binary-0',
           value: 'POWER'
         }
       ]

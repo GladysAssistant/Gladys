@@ -28,7 +28,7 @@ describe('broadlink.remote', () => {
       const device = {
         params: [
           {
-            name: 'code_binary',
+            name: 'ir_code_binary',
             value: '0d',
           },
         ],
@@ -47,7 +47,7 @@ describe('broadlink.remote', () => {
       const device = {
         params: [
           {
-            name: 'code_binary-0',
+            name: 'ir_code_binary-0',
             value: '0d',
           },
         ],
@@ -66,11 +66,11 @@ describe('broadlink.remote', () => {
       const device = {
         params: [
           {
-            name: 'code_channel-1',
+            name: 'ir_code_channel-1',
             value: '0b',
           },
           {
-            name: 'code_channel-2',
+            name: 'ir_code_channel-2',
             value: '0c',
           },
         ],
@@ -91,7 +91,7 @@ describe('broadlink.remote', () => {
       const device = {
         params: [
           {
-            name: 'code_channel-1',
+            name: 'ir_code_channel-1',
             value: '0b',
           },
         ],

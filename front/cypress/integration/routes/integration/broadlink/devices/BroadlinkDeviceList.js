@@ -78,39 +78,39 @@ describe('Broadlink device list', () => {
           value: '8008bda3ae44'
         },
         {
-          name: 'code_binary-1',
+          name: 'ir_code_binary-1',
           value: 'POWER'
         },
         {
-          name: 'code_source',
+          name: 'ir_code_source',
           value: 'SOURCE'
         },
         {
-          name: 'code_channel-0',
+          name: 'ir_code_channel-0',
           value: 'CHANNEL_0'
         },
         {
-          name: 'code_channel-1',
+          name: 'ir_code_channel-1',
           value: 'CHANNEL_1'
         },
         {
-          name: 'code_channel-2',
+          name: 'ir_code_channel-2',
           value: 'CHANNEL_2'
         },
         {
-          name: 'code_channel-3',
+          name: 'ir_code_channel-3',
           value: 'CHANNEL_3'
         },
         {
-          name: 'code_channel-4',
+          name: 'ir_code_channel-4',
           value: 'CHANNEL_4'
         },
         {
-          name: 'code_channel-5',
+          name: 'ir_code_channel-5',
           value: 'CHANNEL_5'
         },
         {
-          name: 'code_channel-6',
+          name: 'ir_code_channel-6',
           value: 'CHANNEL_6'
         }
       ]
