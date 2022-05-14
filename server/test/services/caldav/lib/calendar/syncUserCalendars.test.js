@@ -2,8 +2,11 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const sinon = require('sinon');
 const dayjs = require('dayjs');
+const timezone = require('dayjs/plugin/timezone');
 const { syncUserCalendars } = require('../../../../../services/caldav/lib/calendar/calendar.syncUserCalendars');
 const { formatCalendars, formatEvents } = require('../../../../../services/caldav/lib/calendar/calendar.formaters');
+
+dayjs.extend(timezone);
 
 chai.use(chaiAsPromised);
 const { expect } = chai;
@@ -72,7 +75,7 @@ describe('CalDAV sync', () => {
         ctag: 'ctag1',
         displayName: 'Calendrier 1',
         components: ['VEVENT'],
-        resourcetype: 'calendar',
+        type: 'CALDAV',
         syncToken: 'sync-token-1',
       },
       {
@@ -83,7 +86,7 @@ describe('CalDAV sync', () => {
         ctag: 'ctag22',
         displayName: 'Calendrier 2',
         components: ['VEVENT'],
-        resourcetype: 'calendar',
+        type: 'CALDAV',
         syncToken: 'sync-token-22',
       },
       {
@@ -94,7 +97,7 @@ describe('CalDAV sync', () => {
         ctag: 'ctag3',
         displayName: 'Calendrier 3',
         components: ['VEVENT'],
-        resourcetype: 'calendar',
+        type: 'CALDAV',
         syncToken: 'sync-token-3',
       },
     ]);
@@ -109,6 +112,7 @@ describe('CalDAV sync', () => {
           ctag: 'ctag21',
           sync_token: 'syncToken21',
           external_id: 'https://caldav.host.com/home/professional',
+          type: 'CALDAV',
         },
       ])
       .withArgs(userId, { externalId: 'https://caldav.host.com/home/avengers' })
@@ -126,6 +130,7 @@ describe('CalDAV sync', () => {
       sync_token: 'sync-token-1',
       sync: '1',
       notify: '0',
+      type: 'CALDAV',
       created_at: '2020-02-11 21:04:51.318 +00:00',
       updated_at: '2020-02-11 21:04:51.318 +00:00',
     });
@@ -307,7 +312,7 @@ describe('CalDAV sync', () => {
         ctag: 'ctag1',
         displayName: 'Calendrier 1',
         components: ['VEVENT'],
-        resourcetype: 'calendar',
+        type: 'CALDAV',
         syncToken: 'sync-token-1',
       },
     ]);
@@ -326,6 +331,7 @@ describe('CalDAV sync', () => {
       sync_token: 'sync-token-1',
       sync: '1',
       notify: '0',
+      type: 'CALDAV',
       created_at: '2020-02-11 21:04:51.318 +00:00',
       updated_at: '2020-02-11 21:04:51.318 +00:00',
     });
@@ -358,7 +364,7 @@ describe('CalDAV sync', () => {
         ctag: 'ctag1',
         displayName: 'Calendrier 1',
         components: ['VEVENT'],
-        resourcetype: 'calendar',
+        type: 'CALDAV',
         syncToken: 'sync-token-1',
       },
     ]);
@@ -377,6 +383,7 @@ describe('CalDAV sync', () => {
       sync_token: 'sync-token-1',
       sync: '1',
       notify: '0',
+      type: 'CALDAV',
       created_at: '2020-02-11 21:04:51.318 +00:00',
       updated_at: '2020-02-11 21:04:51.318 +00:00',
     });

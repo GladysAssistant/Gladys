@@ -99,6 +99,7 @@ function formatRecurringEvents(event, gladysCalendar) {
         selector: `${event.uid}${startDate.format('YYYY-MM-DD-HH-mm')}`,
         name: recurrenceTitle,
         location: event.location,
+        description: event.description,
         url: event.href,
         calendar_id: gladysCalendar.id,
       };
@@ -148,6 +149,7 @@ function formatEvents(caldavEvents, gladysCalendar) {
         selector: caldavEvent.uid,
         name: caldavEvent.summary,
         location: caldavEvent.location,
+        description: caldavEvent.description,
         url: caldavEvent.href,
         calendar_id: gladysCalendar.id,
       };
@@ -213,6 +215,8 @@ function formatCalendars(caldavCalendars, userId) {
       user_id: userId,
       ctag: caldavCalendar.ctag,
       sync_token: caldavCalendar.syncToken,
+      type: caldavCalendar.type,
+      sync: caldavCalendar.type === 'CALDAV',
     };
 
     calendars.push(newCalendar);

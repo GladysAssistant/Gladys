@@ -1095,6 +1095,7 @@
       "calendar": {
         "eventName": "Nom de l'évènement",
         "eventLocation": "Lieu de l'évènement",
+        "eventDescription": "Description de l'évènement",
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
       }

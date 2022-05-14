@@ -41,7 +41,7 @@ async function requestCalendars(xhr, homeUrl) {
   const listCalendars = await xhr.send(req, homeUrl);
   // Filter to get only calendar from dav objects
   return listCalendars
-    .filter((res) => res.props.resourcetype.includes('calendar'))
+    .filter((res) => res.props.resourcetype.includes('calendar') || res.props.resourcetype.includes('subscribed'))
     .filter((res) => {
       const components = res.props.supportedCalendarComponentSet || [];
       return components.reduce((hasObjs, component) => {
@@ -59,7 +59,7 @@ async function requestCalendars(xhr, homeUrl) {
         ctag: res.props.getctag,
         displayName: res.props.displayname,
         components: res.props.supportedCalendarComponentSet,
-        resourcetype: res.props.resourcetype,
+        type: res.props.resourcetype.includes('calendar') ? 'CALDAV' : 'WEBCAL',
         syncToken: res.props.syncToken,
       };
     });
