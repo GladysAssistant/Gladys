@@ -24,8 +24,6 @@ async function init() {
         this.handleNewMessage.bind(this),
       );
       this.connected = true;
-      // try to backup, if needed
-      this.event.emit(EVENTS.GATEWAY.CHECK_IF_BACKUP_NEEDED);
 
       // check if google home is connected
       const value = await this.variable.getValue(
