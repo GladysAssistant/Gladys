@@ -13,7 +13,11 @@ class BroadlinkPeripheralBox extends Component {
     this.props.updateDeviceProperty(this.props.peripheralIndex, 'name', e.target.value);
   };
 
-  render({ peripheral }) {
+  updateRoom = e => {
+    this.props.updateDeviceProperty(this.props.peripheralIndex, 'room_id', e.target.value);
+  };
+
+  render({ peripheral, houses = [] }) {
     const { device, connectable, name, mac, address, model } = peripheral;
     const editable = connectable && !!device && !device.created_at;
     const alreadyCreated = connectable && !!device && !!device.created_at;
@@ -48,6 +52,29 @@ class BroadlinkPeripheralBox extends Component {
               </label>
               <input type="text" class="form-control" data-cy="peripheral-model" disabled value={model} />
             </div>
+
+            {!!device && (
+              <div class="form-group">
+                <label class="form-label" for="room">
+                  <Text id="editDeviceForm.roomLabel" />
+                </label>
+                <select onChange={this.updateRoom} class="form-control" id="room" disabled={!editable}>
+                  <option value="">
+                    <Text id="global.emptySelectOption" />
+                  </option>
+                  {houses.map(house => (
+                    <optgroup label={house.name}>
+                      {house.rooms.map(room => (
+                        <option selected={room.id === device.room_id} value={room.id}>
+                          {room.name}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+            )}
+
             <div class="form-group">
               <label class="form-label" for="ipAddress">
                 <Text id="integration.broadlink.peripheral.ipAddressLabel" />

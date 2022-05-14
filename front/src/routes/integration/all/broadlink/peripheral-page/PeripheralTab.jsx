@@ -7,7 +7,7 @@ import Peripheral from './Peripheral';
 import EmptyState from '../EmptyState';
 import style from '../style.css';
 
-const PeripheralTab = ({ broadlinkPeripherals = [], ...props }) => (
+const PeripheralTab = ({ broadlinkPeripherals = [], houses = [], ...props }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
@@ -30,6 +30,7 @@ const PeripheralTab = ({ broadlinkPeripherals = [], ...props }) => (
           <div class="row">
             {broadlinkPeripherals.map((peripheral, index) => (
               <Peripheral
+                houses={houses}
                 peripheral={peripheral}
                 peripheralIndex={index}
                 updateDeviceProperty={props.updateDeviceProperty}

@@ -56,6 +56,8 @@ describe('Broadlink peripheral list', () => {
         cy.get('[data-cy=peripheral-model]')
           .should('have.value', 'MP1 model')
           .should('be.disabled');
+        // Check room
+        cy.get('select').should('be.disabled');
         // Check peripheral ip
         cy.get('[data-cy=peripheral-ip]')
           .should('have.value', '210.248.100.245')
@@ -86,6 +88,8 @@ describe('Broadlink peripheral list', () => {
         cy.get('[data-cy=peripheral-model]')
           .should('have.value', 'SP2 model')
           .should('be.disabled');
+        // Check room
+        cy.get('select').should('not.be.disabled');
         // Check peripheral ip
         cy.get('[data-cy=peripheral-ip]')
           .should('have.value', '227.154.146.114')
@@ -116,6 +120,8 @@ describe('Broadlink peripheral list', () => {
         cy.get('[data-cy=peripheral-model]')
           .should('have.value', 'SP3 model')
           .should('be.disabled');
+        // Check room
+        cy.get('select').should('be.disabled');
         // Check peripheral ip
         cy.get('[data-cy=peripheral-ip]')
           .should('have.value', '227.154.146.115')
@@ -146,6 +152,8 @@ describe('Broadlink peripheral list', () => {
         cy.get('[data-cy=peripheral-model]')
           .should('have.value', 'RM3 model')
           .should('be.disabled');
+        // Check room
+        cy.get('select').should('not.exist');
         // Check peripheral ip
         cy.get('[data-cy=peripheral-ip]')
           .should('have.value', '220.156.58.18')
@@ -165,6 +173,8 @@ describe('Broadlink peripheral list', () => {
 
   it('Create new device', () => {
     const serverUrl = Cypress.env('serverUrl');
+    const { rooms } = Cypress.env('house');
+
     cy.intercept({
       method: 'POST',
       url: `${serverUrl}/api/v1/device`
@@ -179,6 +189,8 @@ describe('Broadlink peripheral list', () => {
           // Update name value
           .type(' Renamed');
 
+        cy.get('select').select(rooms[0].name);
+
         cy.get('[data-cy=peripheral-submit]').click();
       });
 
@@ -191,10 +203,9 @@ describe('Broadlink peripheral list', () => {
       .then(resp => {
         expect(resp.body).to.have.length(1);
         expect(resp.body[0].name).to.eq('SP2 Renamed');
+        expect(resp.body[0].room_id).to.not.eq(undefined);
       });
-  });
 
-  it('Check newly creted device', () => {
     cy.contains('.card-header', 'SP2')
       .should('exist')
       .parent('.card')
@@ -202,6 +213,10 @@ describe('Broadlink peripheral list', () => {
         // Check peripheral name
         cy.get('[data-cy=peripheral-name]')
           .should('have.value', 'SP2 Renamed')
+          .should('be.disabled');
+        // Check room
+        cy.get('select')
+          .should('not.have.value', '')
           .should('be.disabled');
         // Check peripheral address
         cy.get('[data-cy=peripheral-address]')

@@ -1,7 +1,10 @@
-import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
 
+import { RequestStatus } from '../../../../../utils/consts';
+import createActionsHouse from '../../../../../actions/house';
+
 function createActions(store) {
+  const houseActions = createActionsHouse(store);
   const actions = {
     async getBroadlinkPeripherals(state) {
       store.setState({
@@ -50,7 +53,7 @@ function createActions(store) {
       store.setState(newState);
     }
   };
-  return Object.assign({}, actions);
+  return Object.assign({}, houseActions, actions);
 }
 
 export default createActions;
