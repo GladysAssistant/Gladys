@@ -1,8 +1,8 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router';
 
-import DevicePeripheralForm from './DevicePeripheralForm';
-import HubPeripheralForm from './HubPeripheralForm';
+import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
 class BroadlinkPeripheralBox extends Component {
   saveDevice = () => {
@@ -14,6 +14,12 @@ class BroadlinkPeripheralBox extends Component {
   };
 
   render({ peripheral }) {
+    const { device, connectable, name, mac, address, model } = peripheral;
+    const editable = connectable && !!device && !device.created_at;
+    const alreadyCreated = connectable && !!device && !!device.created_at;
+    const remotePeripheral = connectable && !device;
+    const deviceName = (device && device.name) || name;
+
     return (
       <div class="col-md-6">
         <div class="card" data-cy="peripheral-card">
@@ -23,10 +29,69 @@ class BroadlinkPeripheralBox extends Component {
             </div>
           </div>
           <div class="card-body">
-            {!peripheral.device && <HubPeripheralForm peripheral={peripheral} />}
-            {peripheral.device && (
-              <DevicePeripheralForm peripheral={peripheral} updateName={this.updateName} saveDevice={this.saveDevice} />
+            <div class="form-group">
+              <label class="form-label" for="name">
+                <Text id="integration.broadlink.peripheral.nameLabel" />
+              </label>
+              <input
+                type="text"
+                class="form-control"
+                data-cy="peripheral-name"
+                disabled={!editable}
+                value={deviceName}
+                onInput={this.updateName}
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">
+                <Text id="integration.broadlink.peripheral.modelLabel" />
+              </label>
+              <input type="text" class="form-control" data-cy="peripheral-model" disabled value={model} />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ipAddress">
+                <Text id="integration.broadlink.peripheral.ipAddressLabel" />
+              </label>
+              <input type="text" class="form-control" data-cy="peripheral-ip" disabled value={address} />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="macAddress">
+                <Text id="integration.broadlink.peripheral.macAddressLabel" />
+              </label>
+              <input type="text" class="form-control" data-cy="peripheral-address" disabled value={mac} />
+            </div>
+            {device && (
+              <div class="form-group">
+                <label class="form-label">
+                  <Text id="integration.broadlink.peripheral.featuresLabel" />
+                </label>
+                <DeviceFeatures features={device.features} />
+              </div>
             )}
+            <div class="form-group">
+              {!connectable && (
+                <button class="btn btn-danger mr-2" data-cy="peripheral-submit" disabled>
+                  <Text id="integration.broadlink.peripheral.notConnectable" />
+                </button>
+              )}
+              {editable && (
+                <button onClick={this.saveDevice} class="btn btn-success mr-2" data-cy="peripheral-submit">
+                  <Text id="integration.broadlink.peripheral.saveButton" />
+                </button>
+              )}
+              {alreadyCreated && (
+                <button class="btn btn-primary mr-2" disabled data-cy="peripheral-submit">
+                  <Text id="integration.broadlink.peripheral.alreadyCreatedButton" />
+                </button>
+              )}
+              {remotePeripheral && (
+                <Link href={`/dashboard/integration/device/broadlink/edit?peripheral=${mac}`}>
+                  <button class="btn btn-success mr-2" data-cy="peripheral-submit">
+                    <Text id="integration.broadlink.peripheral.createRemoteButton" />
+                  </button>
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>

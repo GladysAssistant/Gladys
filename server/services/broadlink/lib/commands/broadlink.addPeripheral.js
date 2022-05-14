@@ -20,7 +20,7 @@ async function addPeripheral(broadlinkDevice) {
     connectable = false;
   }
 
-  const { model: name, mac: macArray, host = {} } = broadlinkDevice;
+  const { model, mac: macArray, host = {} } = broadlinkDevice;
   const mac = Buffer.from(macArray).toString('hex');
   this.broadlinkDevices[mac] = broadlinkDevice;
 
@@ -29,7 +29,7 @@ async function addPeripheral(broadlinkDevice) {
     logger.info(`Broadlink discovers new peripheral: ${mac}`);
 
     const { address } = host;
-    this.peripherals[mac] = { name, mac, address, connectable, ...peripheral };
+    this.peripherals[mac] = { name: model, model, mac, address, connectable, ...peripheral };
   } else {
     logger.info(`Broadlink doesn't manager ${broadlinkDevice.module} peripheral`);
   }

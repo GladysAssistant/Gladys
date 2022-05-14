@@ -39,7 +39,7 @@ function buildPeripheral(broadlinkDevice) {
       },
     ];
 
-    peripheral.device = {
+    const device = {
       name,
       features,
       external_id: externalId,
@@ -50,6 +50,10 @@ function buildPeripheral(broadlinkDevice) {
       poll_frequency: shouldPoll ? DEVICE_POLL_FREQUENCIES.EVERY_MINUTES : null,
       params,
     };
+
+    // Check for existing device in Gladys
+    const existing = this.gladys.stateManager.get('deviceByExternalId', externalId) || {};
+    peripheral.device = { ...existing, ...device };
   }
 
   return peripheral;

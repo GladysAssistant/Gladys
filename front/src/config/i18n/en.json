@@ -743,6 +743,7 @@
         "noNameLabel": "Type not recognized",
         "ipAddressLabel": "IP address",
         "macAddressLabel": "MAC address",
+        "modelLabel": "Model",
         "featuresLabel": "Features",
         "noFeatures": "No features",
         "nameLabel": "Name",

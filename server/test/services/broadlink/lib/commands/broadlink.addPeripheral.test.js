@@ -68,7 +68,14 @@ describe('broadlink.addPeripheral', () => {
     assert.calledOnceWithExactly(broadlinkDevice.auth);
 
     expect(broadlinkHandler.peripherals).to.deep.eq({
-      '0b16212c3742': { mac: '0b16212c3742', name: 'model', address: '127.0.0.1', canLearn: true, connectable: false },
+      '0b16212c3742': {
+        mac: '0b16212c3742',
+        name: 'model',
+        model: 'model',
+        address: '127.0.0.1',
+        canLearn: true,
+        connectable: false,
+      },
     });
     expect(broadlinkHandler.broadlinkDevices).to.deep.eq({ '0b16212c3742': broadlinkDevice });
   });
@@ -104,7 +111,14 @@ describe('broadlink.addPeripheral', () => {
     assert.calledOnceWithExactly(broadlinkDevice.auth);
 
     expect(broadlinkHandler.peripherals).to.deep.eq({
-      '0b16212c3742': { mac: '0b16212c3742', name: 'model', address: '127.0.0.1', canLearn: true, connectable: true },
+      '0b16212c3742': {
+        mac: '0b16212c3742',
+        name: 'model',
+        model: 'model',
+        address: '127.0.0.1',
+        canLearn: true,
+        connectable: true,
+      },
     });
     expect(broadlinkHandler.broadlinkDevices).to.deep.eq({ '0b16212c3742': broadlinkDevice });
   });
@@ -126,6 +140,7 @@ describe('broadlink.addPeripheral', () => {
       '0b16212c3742': {
         mac: '0b16212c3742',
         name: 'model',
+        model: 'model',
         address: '127.0.0.1',
         connectable: true,
         device: { features: [] },

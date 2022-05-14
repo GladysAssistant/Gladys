@@ -13,6 +13,9 @@ describe('broadlink.device.createDevice', () => {
   let broadlinkHandler;
 
   beforeEach(() => {
+    gladys.stateManager = {
+      get: fake.returns(null),
+    };
     broadlinkHandler = new BroadlinkHandler(gladys, broadlink, serviceId);
   });
 
@@ -26,6 +29,8 @@ describe('broadlink.device.createDevice', () => {
     const broadlinkDevice = 'not-managed';
     const peripheral = broadlinkHandler.buildPeripheral(broadlinkDevice);
     expect(peripheral).to.eq(null);
+
+    assert.notCalled(gladys.stateManager.get);
   });
 
   it('can learn device without features', () => {
@@ -40,6 +45,7 @@ describe('broadlink.device.createDevice', () => {
     expect(peripheral).to.deep.eq({ canLearn: true });
 
     assert.calledOnceWithExactly(deviceMapper.buildFeatures, 'model', 'broadlink:0b16', broadlinkDevice);
+    assert.notCalled(gladys.stateManager.get);
   });
 
   it('cannot learn device with features', () => {
@@ -70,6 +76,7 @@ describe('broadlink.device.createDevice', () => {
     expect(peripheral).to.deep.eq({ canLearn: false, device });
 
     assert.calledOnceWithExactly(deviceMapper.buildFeatures, 'model', 'broadlink:0b16', broadlinkDevice);
+    assert.calledOnce(gladys.stateManager.get);
   });
 
   it('can learn device with poll features', () => {
@@ -100,5 +107,6 @@ describe('broadlink.device.createDevice', () => {
     expect(peripheral).to.deep.eq({ canLearn: false, device });
 
     assert.calledOnceWithExactly(deviceMapper.buildFeatures, 'model', 'broadlink:0b16', broadlinkDevice);
+    assert.calledOnce(gladys.stateManager.get);
   });
 });

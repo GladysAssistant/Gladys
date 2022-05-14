@@ -870,6 +870,7 @@
         "noNameLabel": "Type non reconnu",
         "ipAddressLabel": "Adresse IP",
         "macAddressLabel": "Adresse MAC",
+        "modelLabel": "Modèle",
         "featuresLabel": "Fonctionnalités",
         "noFeatures": "Aucune fonctionnalité",
         "nameLabel": "Nom de l'appareil",

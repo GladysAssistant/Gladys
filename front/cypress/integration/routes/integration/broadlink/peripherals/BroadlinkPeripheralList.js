@@ -52,6 +52,14 @@ describe('Broadlink peripheral list', () => {
         cy.get('[data-cy=peripheral-name]')
           .should('have.value', 'MP1')
           .should('be.disabled');
+        // Check peripheral model
+        cy.get('[data-cy=peripheral-model]')
+          .should('have.value', 'MP1 model')
+          .should('be.disabled');
+        // Check peripheral ip
+        cy.get('[data-cy=peripheral-ip]')
+          .should('have.value', '210.248.100.245')
+          .should('be.disabled');
         // Check peripheral address
         cy.get('[data-cy=peripheral-address]')
           .should('have.value', '4bf75cf0fdbb')
@@ -73,8 +81,15 @@ describe('Broadlink peripheral list', () => {
         // Check peripheral name
         cy.get('[data-cy=peripheral-name]')
           .should('have.value', 'SP2')
-          .should('not.be.disabled')
-          .type(' Renamed');
+          .should('not.be.disabled');
+        // Check peripheral model
+        cy.get('[data-cy=peripheral-model]')
+          .should('have.value', 'SP2 model')
+          .should('be.disabled');
+        // Check peripheral ip
+        cy.get('[data-cy=peripheral-ip]')
+          .should('have.value', '227.154.146.114')
+          .should('be.disabled');
         // Check peripheral address
         cy.get('[data-cy=peripheral-address]')
           .should('have.value', '7396e6541fb0')
@@ -97,6 +112,14 @@ describe('Broadlink peripheral list', () => {
         cy.get('[data-cy=peripheral-name]')
           .should('have.value', 'SP3')
           .should('be.disabled');
+        // Check peripheral model
+        cy.get('[data-cy=peripheral-model]')
+          .should('have.value', 'SP3 model')
+          .should('be.disabled');
+        // Check peripheral ip
+        cy.get('[data-cy=peripheral-ip]')
+          .should('have.value', '227.154.146.115')
+          .should('be.disabled');
         // Check peripheral address
         cy.get('[data-cy=peripheral-address]')
           .should('have.value', '7396e6541fb9')
@@ -116,6 +139,14 @@ describe('Broadlink peripheral list', () => {
       .parent('.card')
       .within(() => {
         // Check peripheral name
+        cy.get('[data-cy=peripheral-name]')
+          .should('have.value', 'RM3 Pro Plus')
+          .should('be.disabled');
+        // Check peripheral model
+        cy.get('[data-cy=peripheral-model]')
+          .should('have.value', 'RM3 model')
+          .should('be.disabled');
+        // Check peripheral ip
         cy.get('[data-cy=peripheral-ip]')
           .should('have.value', '220.156.58.18')
           .should('be.disabled');
@@ -139,7 +170,17 @@ describe('Broadlink peripheral list', () => {
       url: `${serverUrl}/api/v1/device`
     }).as('saveDevice');
 
-    cy.contains('button', 'integration.broadlink.peripheral.saveButton').click();
+    cy.contains('.card-header', 'SP2')
+      .should('exist')
+      .parent('.card')
+      .within(() => {
+        // Check peripheral name
+        cy.get('[data-cy=peripheral-name]')
+          // Update name value
+          .type(' Renamed');
+
+        cy.get('[data-cy=peripheral-submit]').click();
+      });
 
     // Check device well created
     cy.wait('@saveDevice')

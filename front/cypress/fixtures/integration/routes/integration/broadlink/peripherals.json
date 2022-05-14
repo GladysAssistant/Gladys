@@ -3,6 +3,7 @@
     "address": "210.248.100.245",
     "mac": "4bf75cf0fdbb",
     "name": "MP1",
+    "model": "MP1 model",
     "connectable": true,
     "device": {
       "name": "MP1",
@@ -63,6 +64,7 @@
   {
     "address": "227.154.146.114",
     "name": "SP2",
+    "model": "SP2 model",
     "mac": "7396e6541fb0",
     "canLearn": false,
     "connectable": true,
@@ -91,6 +93,7 @@
   {
     "address": "227.154.146.115",
     "name": "SP3",
+    "model": "SP3 model",
     "mac": "7396e6541fb9",
     "canLearn": false,
     "connectable": false,
@@ -119,6 +122,7 @@
   {
     "address": "220.156.58.18",
     "name": "RM3 Pro Plus",
+    "model": "RM3 model",
     "mac": "8008bda3ae44",
     "canLearn": true,
     "connectable": true
