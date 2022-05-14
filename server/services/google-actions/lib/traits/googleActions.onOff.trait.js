@@ -14,6 +14,10 @@ const onOffTrait = {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
     },
+    {
+      category: DEVICE_FEATURE_CATEGORIES.TELEVISION,
+      type: DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
+    },
   ],
   states: [
     {
