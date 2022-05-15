@@ -108,6 +108,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
               </div>
               <label class="custom-switch">
                 <input
+                  id={`keep_history_${featureIndex}`}
                   type="checkbox"
                   checked={feature.keep_history}
                   onClick={props.updateKeepHistory}

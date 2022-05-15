@@ -165,6 +165,7 @@ class UpdateDeviceFeature extends Component {
                 </div>
                 <label class="custom-switch">
                   <input
+                    id={`keep_history_${featureIndex}`}
                     type="checkbox"
                     checked={feature.keep_history}
                     onClick={this.updateKeepHistory}
