@@ -70,7 +70,7 @@ function Gladys(params = {}) {
   const scene = new Scene(stateManager, event, device, message, variable, house, calendar, http);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
-  const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager, service);
+  const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager, service, job);
   const oauth2Client = new Oauth2Client(variable);
 
   const gladys = {
