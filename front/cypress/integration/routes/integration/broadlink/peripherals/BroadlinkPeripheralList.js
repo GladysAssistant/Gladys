@@ -194,16 +194,14 @@ describe('Broadlink peripheral list', () => {
         cy.get('[data-cy=peripheral-submit]').click();
       });
 
+    cy.wait('@saveDevice');
+
     // Check device well created
-    cy.wait('@saveDevice')
-      .request({
-        method: 'GET',
-        url: `${serverUrl}/api/v1/service/broadlink/device`
-      })
-      .then(resp => {
-        expect(resp.body).to.have.length(1);
-        expect(resp.body[0].name).to.eq('SP2 Renamed');
-        expect(resp.body[0].room_id).to.not.eq(undefined);
+    cy.get('@saveDevice')
+      .its('response.body')
+      .should(body => {
+        expect(body.name).to.eq('SP2 Renamed');
+        expect(body.room.name).to.eq(rooms[0].name);
       });
 
     cy.contains('.card-header', 'SP2')

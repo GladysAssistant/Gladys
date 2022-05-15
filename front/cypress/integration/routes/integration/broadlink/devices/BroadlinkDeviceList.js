@@ -11,7 +11,7 @@ describe('Broadlink device list', () => {
       name: 'SP2',
       model: 'SP2',
       should_poll: false,
-      poll_frequency: 60000,
+      poll_frequency: null,
       features: [
         {
           name: 'SP2',
@@ -177,16 +177,14 @@ describe('Broadlink device list', () => {
         cy.contains('button', 'integration.broadlink.device.saveButton').click();
       });
 
+    cy.wait('@saveDevice');
+
     // Check device well created
-    cy.wait('@saveDevice')
-      .request({
-        method: 'GET',
-        url: `${serverUrl}/api/v1/service/broadlink/device`
-      })
-      .then(resp => {
-        expect(resp.body).to.have.length(2);
-        expect(resp.body[0].name).to.eq('SP2 new name');
-        expect(resp.body[0].room.name).to.eq(rooms[0].name);
+    cy.get('@saveDevice')
+      .its('response.body')
+      .should(body => {
+        expect(body.name).to.eq('SP2 new name');
+        expect(body.room.name).to.eq(rooms[0].name);
       });
   });
 
@@ -205,16 +203,12 @@ describe('Broadlink device list', () => {
         cy.contains('button', 'integration.broadlink.device.deleteButton').click();
       });
 
+    cy.wait('@deleteDevice');
+
     // Check device well created
-    cy.wait('@deleteDevice')
-      .request({
-        method: 'GET',
-        url: `${serverUrl}/api/v1/service/broadlink/device`
-      })
-      .then(resp => {
-        expect(resp.body).to.have.length(1);
-        expect(resp.body[0].name).to.eq('TV Remote');
-      });
+    cy.get('@deleteDevice')
+      .its('response.body')
+      .should('deep.eq', { success: true });
   });
 
   it('Check remote device', () => {
