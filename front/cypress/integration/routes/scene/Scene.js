@@ -67,7 +67,7 @@ describe('Scene view', () => {
 
     cy.get('input:visible').then(inputs => {
       // Zone name
-      cy.wrap(inputs[0]).type('My scene');
+      cy.wrap(inputs[0]).type('My scene2');
     });
 
     cy.contains('iconLabel.groupView')
