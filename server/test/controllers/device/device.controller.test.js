@@ -109,7 +109,7 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
 
 describe('GET /api/v1/device_feature/:device_feature_selector/states', () => {
   beforeEach(async function BeforeEach() {
-    this.timeout(10000);
+    this.timeout(1000);
     await insertStates(1);
   });
   it('should get device feature states by selector', async function Test() {
@@ -128,13 +128,9 @@ describe('GET /api/v1/device_feature/:device_feature_selector/states', () => {
       .expect(200)
       .then((res) => {
         expect(res.body).to.have.lengthOf(2000);
+        expect(res.body).to.be.an('array');
         expect(res.body[0]).to.be.an('object');
         expect(Object.keys(res.body[0])).to.have.lengthOf(5);
-        expect(res.body[0]).to.have.property('id');
-        expect(res.body[0]).to.have.property('device_feature_id');
-        expect(res.body[0]).to.have.property('value');
-        expect(res.body[0]).to.have.property('created_at');
-        expect(res.body[0]).to.have.property('updated_at');
       });
   });
 });
