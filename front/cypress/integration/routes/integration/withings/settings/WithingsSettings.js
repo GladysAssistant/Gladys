@@ -2,6 +2,7 @@ describe('Withings settings page', () => {
   const serverUrl = Cypress.env('serverUrl');
 
   before(() => {
+    /*
     let interceptCount = 0;
     cy.intercept(
       {
@@ -12,13 +13,18 @@ describe('Withings settings page', () => {
         req.reply(res => {
           if (interceptCount === 0) {
             interceptCount += 1;
+            console.log('yop 0');
             res.send({});
           } else {
-            res.send({ client_id: 'FakeClientId' });
+            console.log('yop A');
+            console.log(res);
+            res = { client_id: 'FakeClientId' };
+            return res;
+            //res.send({ client_id: 'FakeClientId' });
           }
         });
       }
-    );
+    );*/
     cy.intercept(
       {
         method: 'POST',
@@ -91,6 +97,14 @@ describe('Withings settings page', () => {
       .clear()
       .type('FakeSecret');
 
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/oauth2/client`
+      },
+      { client_id: 'FakeClientId' }
+    );
+
     cy.contains('button', 'oauth2.buttonConnect').click();
 
     cy.wait('@authorizationUriAction');
@@ -106,7 +120,9 @@ describe('Withings settings page', () => {
     cy.get('.alert.alert-info').i18n('integration.withings.settings.oauth2.instructionsToUse');
 
     cy.contains('p', 'oauth2.delete').should('exist');
+  });
 
+  it('Check setting page unconnect', () => {
     cy.contains('button', 'oauth2.unconnectButton').click();
 
     cy.get('.markup').i18n('oauth2.instructions');
