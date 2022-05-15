@@ -48,6 +48,28 @@ describe('Withings settings page', () => {
         }
       }
     );
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/withings/variable/OAUTH2_CLIENT_ID`
+      },
+      {
+        body: {
+          success: true
+        }
+      }
+    );
+    cy.intercept(
+      {
+        method: 'POST',
+        url: `${serverUrl}/api/v1/service/withings/variable/OAUTH2_CLIENT_SECRET`
+      },
+      {
+        body: {
+          success: true
+        }
+      }
+    );
 
     cy.login();
 
