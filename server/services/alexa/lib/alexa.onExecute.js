@@ -27,7 +27,7 @@ function onExecute(body) {
       value = directiveName === 'TurnOn' ? 1 : 0;
       break;
     default:
-      throw new BadParameters(`Unkown directive ${directiveName}`);
+      throw new BadParameters(`Unkown directive ${directiveNamespace}`);
   }
   const action = {
     type: ACTIONS.DEVICE.SET_VALUE,
