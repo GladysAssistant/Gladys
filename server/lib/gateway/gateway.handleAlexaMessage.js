@@ -14,8 +14,8 @@ const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
  * });
  */
 async function handleAlexaMessage(data, rawMessage, cb) {
-  const service = this.serviceManager.getService('alexa');
   try {
+    const service = this.serviceManager.getService('alexa');
     const body = {
       ...data.data,
       user: {
