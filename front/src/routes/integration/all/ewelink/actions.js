@@ -61,7 +61,7 @@ function createActions(store) {
         });
       }
     },
-    displayConnectedMessage(state) {
+    displayConnectedMessage() {
       // display 3 seconds a message "EweLink connected"
       store.setState({
         eweLinkConnected: true,

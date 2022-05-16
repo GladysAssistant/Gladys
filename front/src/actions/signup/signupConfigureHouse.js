@@ -16,7 +16,7 @@ const icon = leaflet.icon({
 
 function createActions(store) {
   const actions = {
-    initRoomList(state) {
+    initRoomList() {
       store.setState({
         signupRooms: []
       });

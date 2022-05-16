@@ -19,7 +19,7 @@ class UpdateDeviceFeature extends Component {
   updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
   updateCategory = e => this.props.updateFeatureProperty(this.props.featureIndex, 'category', e.target.value);
-  deleteFeature = e => this.props.deleteFeature(this.props.featureIndex);
+  deleteFeature = () => this.props.deleteFeature(this.props.featureIndex);
 
   render({ feature, featureIndex, canEditCategory, device, ...props }) {
     const allowModifyCategory =

@@ -1,14 +1,21 @@
 {
-  "extends": ["eslint-config-synacor", "prettier", "plugin:cypress/recommended"],
+  "extends": ["preact", "prettier", "plugin:cypress/recommended", "plugin:compat/recommended"],
   "rules": {
-    "react/jsx-indent-props": ["enabled", 2],
+    "react/jsx-indent-props": ["error", 2],
     "brace-style": ["error", "1tbs"],
     "preact-i18n/no-missing-template-field": "error",
     "preact-i18n/no-text-as-attribute": "error",
     "preact-i18n/no-text-as-children": "error",
     "preact-i18n/no-unknown-key": "error",
     "no-useless-concat": "error",
-    "prefer-template": "error"
+    "prefer-template": "error",
+    "jest/expect-expect": "off",
+    "jest/valid-expect": "off",
+    "no-async-promise-executor": "off",
+    "react/jsx-key": "off"
+  },
+  "env": {
+    "browser": true
   },
   "plugins": ["json", "preact-i18n", "cypress"],
   "parserOptions": {
@@ -17,6 +24,7 @@
     }
   },
   "settings": {
+    "targets": null,
     "preact-i18n": {
       "languageFiles": [
         {

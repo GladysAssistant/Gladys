@@ -2,7 +2,7 @@ import { RequestStatus } from '../utils/consts';
 import update, { extend } from 'immutability-helper';
 import debounce from 'debounce';
 
-extend('$auto', function(value, object) {
+extend('$auto', (value, object) => {
   return object ? update(object, value) : update({}, value);
 });
 

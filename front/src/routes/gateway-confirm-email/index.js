@@ -18,7 +18,7 @@ class ConfirmEmailPage extends Component {
           emailConfirmed: true
         });
       })
-      .catch(err => {
+      .catch(() => {
         this.setState({
           error: true
         });
