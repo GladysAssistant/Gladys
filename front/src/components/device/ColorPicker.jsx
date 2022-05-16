@@ -41,7 +41,7 @@ class ColorDeviceType extends Component {
     }
   }
 
-  render(props, {}) {
+  render({}, {}) {
     return (
       <div
         class={cx('fade', 'w-100', 'mw-100', {

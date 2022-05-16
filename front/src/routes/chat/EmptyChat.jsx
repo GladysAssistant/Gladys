@@ -1,6 +1,6 @@
 import { Text } from 'preact-i18n';
 
-const Messages = ({ children, ...props }) => (
+const Messages = ({}) => (
   <div
     style={{
       width: '40%',

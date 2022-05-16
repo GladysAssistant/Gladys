@@ -5,7 +5,7 @@ import { route } from 'preact-router';
 
 function createActions(store) {
   const actions = {
-    resetPreferences(state) {
+    resetPreferences() {
       store.setState({
         signupUserPreferences: {
           temperature_unit_preference: 'celsius',

@@ -414,7 +414,7 @@ function createActions(store) {
         store.setState({ reSubscribeMonthlyPlanError: true, billingRequestStatus: RequestStatus.Error });
       }
     },
-    updateBillingRequestPending(state) {
+    updateBillingRequestPending() {
       store.setState({
         billingRequestStatus: RequestStatus.Getting
       });

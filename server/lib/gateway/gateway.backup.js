@@ -86,40 +86,33 @@ async function backup(jobId) {
     file_size: encryptedFileInfos.size,
   });
   try {
-    let numberOfchunksUploaded = 0;
     const totalOfChunksToUpload = initializeBackupResponse.parts.length;
 
-    const partsUploaded = await Promise.map(
-      initializeBackupResponse.parts,
-      async (part, index) => {
-        const startPosition = index * initializeBackupResponse.chunk_size;
-        const chunk = await readChunk(encryptedBackupFilePath, {
-          length: initializeBackupResponse.chunk_size,
-          startPosition,
-        });
+    const partsUploaded = await Promise.mapSeries(initializeBackupResponse.parts, async (part, index) => {
+      const startPosition = index * initializeBackupResponse.chunk_size;
+      const chunk = await readChunk(encryptedBackupFilePath, {
+        length: initializeBackupResponse.chunk_size,
+        startPosition,
+      });
 
-        // each chunk is retried
-        return retry(async () => {
-          const { headers } = await this.gladysGatewayClient.uploadOneBackupChunk(
-            part.signed_url,
-            chunk,
-            systemInfos.gladys_version,
-          );
+      // each chunk is retried
+      const partUploaded = await retry(async () => {
+        const { headers } = await this.gladysGatewayClient.uploadOneBackupChunk(
+          part.signed_url,
+          chunk,
+          systemInfos.gladys_version,
+        );
+        return {
+          PartNumber: part.part_number,
+          ETag: headers.etag.replace(/"/g, ''),
+        };
+      }, UPLOAD_ONE_CHUNK_RETRY_OPTIONS);
 
-          numberOfchunksUploaded += 1;
+      const percent = Math.round(30 + (((index + 1) * 100) / totalOfChunksToUpload) * 0.7);
+      await this.job.updateProgress(jobId, percent);
 
-          const percent = 30 + ((numberOfchunksUploaded * 100) / totalOfChunksToUpload) * 0.7;
-
-          await this.job.updateProgress(jobId, percent);
-
-          return {
-            PartNumber: part.part_number,
-            ETag: headers.etag.replace(/"/g, ''),
-          };
-        }, UPLOAD_ONE_CHUNK_RETRY_OPTIONS);
-      },
-      { concurrency: 2 },
-    );
+      return partUploaded;
+    });
     await this.gladysGatewayClient.finalizeMultiPartBackup({
       file_key: initializeBackupResponse.file_key,
       file_id: initializeBackupResponse.file_id,

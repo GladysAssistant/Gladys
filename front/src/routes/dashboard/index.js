@@ -7,7 +7,7 @@ import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpire
 import actions from '../../actions/dashboard';
 import get from 'get-value';
 
-extend('$auto', function(value, object) {
+extend('$auto', (value, object) => {
   return object ? update(object, value) : update({}, value);
 });
 
@@ -81,7 +81,7 @@ class Dashboard extends Component {
     }
   };
 
-  redirectToDashboard = e => {
+  redirectToDashboard = () => {
     this.setState({
       dashboardDropdownOpened: false
     });
