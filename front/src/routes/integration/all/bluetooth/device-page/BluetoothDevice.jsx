@@ -54,7 +54,7 @@ class BluetoothDevice extends Component {
     this.refreshDeviceProperty();
   }
 
-  render({ device, houses, ...props }, { batteryLevel, loading }) {
+  render({ device, houses }, { batteryLevel, loading }) {
     return (
       <div class="col-md-6">
         <div class="card">

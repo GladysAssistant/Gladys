@@ -52,7 +52,7 @@ const FoundDevices = ({ children, ...props }) => (
               </div>
             )}
             {props.tpLinkNewDevices &&
-              props.tpLinkNewDevices.map((device, index) => (
+              props.tpLinkNewDevices.map(device => (
                 <div class="col-md-4">
                   <div class="card">
                     <div class="card-header">

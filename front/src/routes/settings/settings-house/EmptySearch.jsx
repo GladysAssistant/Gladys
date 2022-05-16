@@ -4,7 +4,7 @@ const margin = {
   marginTop: '5rem'
 };
 
-const EmptySearch = ({ children, ...props }) => (
+const EmptySearch = ({}) => (
   <div style={margin} class="text-center">
     <Text id="housesSettings.noHouseFound" />
   </div>

@@ -65,7 +65,7 @@ class ZWaveDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, mostRecentValueAt, loading, error }) {
+  render(props, { batteryLevel, mostRecentValueAt, loading }) {
     return (
       <div class="col-md-6">
         <div class="card">

@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
-const ResetPasswordSuccess = ({ children, ...props }) => (
+const ResetPasswordSuccess = ({}) => (
   <div class="card">
     <div class="card-body p-6">
       <div class="alert alert-success" role="alert">
