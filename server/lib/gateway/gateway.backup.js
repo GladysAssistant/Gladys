@@ -86,7 +86,6 @@ async function backup(jobId) {
     file_size: encryptedFileInfos.size,
   });
   try {
-    let numberOfchunksUploaded = 0;
     const totalOfChunksToUpload = initializeBackupResponse.parts.length;
 
     const partsUploaded = await Promise.map(
@@ -99,24 +98,22 @@ async function backup(jobId) {
         });
 
         // each chunk is retried
-        return retry(async () => {
+        const partUploaded = await retry(async () => {
           const { headers } = await this.gladysGatewayClient.uploadOneBackupChunk(
             part.signed_url,
             chunk,
             systemInfos.gladys_version,
           );
-
-          numberOfchunksUploaded += 1;
-
-          const percent = 30 + ((numberOfchunksUploaded * 100) / totalOfChunksToUpload) * 0.7;
-
-          await this.job.updateProgress(jobId, percent);
-
           return {
             PartNumber: part.part_number,
             ETag: headers.etag.replace(/"/g, ''),
           };
         }, UPLOAD_ONE_CHUNK_RETRY_OPTIONS);
+
+        const percent = Math.round(30 + (((index + 1) * 100) / totalOfChunksToUpload) * 0.7);
+        await this.job.updateProgress(jobId, percent);
+
+        return partUploaded;
       },
       { concurrency: 2 },
     );
