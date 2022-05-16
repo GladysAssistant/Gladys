@@ -17,7 +17,7 @@ async function fileToBase64(file) {
 }
 
 async function getCropperBase64Image(cropper) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     if (!cropper) {
       return resolve(null);
     }

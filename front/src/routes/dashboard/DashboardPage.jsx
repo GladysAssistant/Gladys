@@ -33,7 +33,7 @@ const DashboardPage = ({ children, ...props }) => (
                             show: props.dashboardDropdownOpened
                           })}
                         >
-                          {props.dashboards.map((dashboard, index) => (
+                          {props.dashboards.map(dashboard => (
                             <Link
                               class="dropdown-item"
                               href={`/dashboard/${dashboard.selector}`}

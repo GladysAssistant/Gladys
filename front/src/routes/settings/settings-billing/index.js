@@ -23,7 +23,7 @@ class SettingsBilling extends Component {
     this.getSetupState();
   }
 
-  render(props, { setupState, loading }) {
+  render(props, { loading }) {
     return (
       <SettingsLayout>
         <GatewayBilling openStripeBilling={this.openStripeBilling} loading={loading} />

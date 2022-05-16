@@ -32,9 +32,14 @@ describe('Dashboard', () => {
         cy.wrap(inputs[0]).click();
       });
     });
-    cy.get('.choose-dashboard-user-presence-users')
-      .click()
-      .type(`Tony{enter}`);
+    cy.get('[class*="-control"]')
+      .find('div')
+      .first()
+      .click(0, 0, { force: true })
+      .get('[class*="-menu"]')
+      .find('[class*="-option"]')
+      .filter(`:contains("Tony")`)
+      .click(0, 0, { force: true });
     cy.contains('dashboard.editDashboardSaveButton')
       .should('have.class', 'btn-outline-primary')
       .click();
