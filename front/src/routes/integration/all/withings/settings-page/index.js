@@ -25,7 +25,7 @@ class WithingsSettingsPage extends Component {
   render(props, {}) {
     const loading = props.oauth2GetStatus === RequestStatus.Getting;
     return (
-      <WithingsPage user={props.user} {...props} loading={loading}>
+      <WithingsPage user={props.user} loading={loading}>
         <OAuth2Config integrationName="withings" user={props.user} {...props}>
           {props.withingsDevices && (
             <div class="card">
