@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 const Zigbee2MqttService = require('../../../../services/zigbee2mqtt');
 
-const discoveredDevices = require('./payloads/discovered_devices.json');
+const discoveredDevices = require('./payloads/mqtt_devices_get.json');
 const expectedDevicesPayload = require('./payloads/event_device_result.json');
 
 const gladys = {
@@ -38,8 +38,13 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
       .onThirdCall()
       .returns(false);
 
+    discoveredDevices
+      .filter((d) => d.supported)
+      .forEach((device) => {
+        zigbee2MqttService.device.discoveredDevices[device.friendly_name] = device;
+      });
+
     // EXECUTE
-    zigbee2MqttService.device.discoveredDevices = discoveredDevices;
     const devices = zigbee2MqttService.device.getDiscoveredDevices();
     // ASSERT
     expect(devices).deep.eq(expectedDevicesPayload);

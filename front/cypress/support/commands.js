@@ -74,23 +74,24 @@ Cypress.Commands.add('i18n', { prevSubject: 'element' }, (element, labelKey) => 
 // login
 Cypress.Commands.add('login', () => {
   const serverUrl = Cypress.env('serverUrl');
-  const { tony } = Cypress.env('users');
+  cy.task('loadVariable', 'tony').then(tony => {
+    if (tony && tony.access_token) {
+      cy.log(`Uses stored Tony's token`);
+      window.localStorage.setItem('user', JSON.stringify(tony));
+    } else {
+      // Check instance is configured
+      cy.request({
+        method: 'GET',
+        url: `${serverUrl}/api/v1/setup`
+      }).then(resp => {
+        if (resp.body.account_configured) {
+          return cy.onlyLogin();
+        }
 
-  if (tony.access_token) {
-    window.localStorage.setItem('user', JSON.stringify(tony));
-  } else {
-    // Check instance is configured
-    cy.request({
-      method: 'GET',
-      url: `${serverUrl}/api/v1/setup`
-    }).then(resp => {
-      if (resp.body.account_configured) {
-        return cy.onlyLogin();
-      }
-
-      return cy.setupAccount();
-    });
-  }
+        return cy.setupAccount();
+      });
+    }
+  });
 });
 
 // login
@@ -98,6 +99,8 @@ Cypress.Commands.add('onlyLogin', () => {
   const serverUrl = Cypress.env('serverUrl');
   const users = Cypress.env('users');
   const { tony } = users;
+
+  cy.log('Login with Tony');
 
   cy.request({
     method: 'POST',
@@ -107,8 +110,10 @@ Cypress.Commands.add('onlyLogin', () => {
       password: tony.password
     }
   }).then(resp => {
-    window.localStorage.setItem('user', JSON.stringify(resp.body));
-    Cypress.env('users', { ...users, tony: { ...tony, access_token: resp.body.access_token } });
+    const { body } = resp;
+    const newUser = { ...tony, ...body };
+    window.localStorage.setItem('user', JSON.stringify(newUser));
+    return cy.task('storeVariable', { key: 'tony', value: newUser });
   });
 });
 
@@ -118,6 +123,8 @@ Cypress.Commands.add('setupAccount', () => {
   const users = Cypress.env('users');
   const language = Cypress.env('language');
   const { tony } = users;
+
+  cy.log('Setup Gladys');
 
   const userToCreate = {
     ...tony,
@@ -130,12 +137,14 @@ Cypress.Commands.add('setupAccount', () => {
     url: `${serverUrl}/api/v1/signup`,
     body: userToCreate
   }).then(resp => {
-    window.localStorage.setItem('user', JSON.stringify(resp.body));
-    const accessToken = resp.body.access_token;
+    const { body } = resp;
+    const newUser = { ...tony, ...body };
 
-    Cypress.env('users', { ...users, tony: { ...tony, access_token: accessToken } });
+    window.localStorage.setItem('user', JSON.stringify(newUser));
+    users.tony = newUser;
 
     // Create house
+    const accessToken = body.access_token;
     cy.request({
       method: 'POST',
       url: `${serverUrl}/api/v1/house`,
@@ -162,12 +171,13 @@ Cypress.Commands.add('setupAccount', () => {
 
 // Add bearer to request
 Cypress.Commands.overwrite('request', (originalFn, options) => {
-  const { tony } = Cypress.env('users');
-  if (tony.access_token) {
-    options.headers = { Authorization: `Bearer ${tony.access_token}` };
-  }
+  cy.task('loadVariable', 'tony').then(tony => {
+    if (tony && tony.access_token) {
+      options.headers = { Authorization: `Bearer ${tony.access_token}` };
+    }
 
-  return originalFn(options);
+    return originalFn(options);
+  });
 });
 
 Cypress.Commands.add('sendWebSocket', payload => {

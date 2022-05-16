@@ -1,6 +1,15 @@
+const Bottleneck = require('bottleneck');
 const logger = require('../../utils/logger');
 const { EVENTS } = require('../../utils/constants');
 const { queryDeviceConverter } = require('../../services/google-actions/lib/utils/googleActions.queryDeviceConverter');
+
+// We want to avoid spamming the Gladys Gateway
+// So we limit to 2 concurrent calls + max 5 calls/seconds to Gladys Gateway
+// @ts-ignore
+const limiter = new Bottleneck({
+  maxConcurrent: 2,
+  minTime: 200,
+});
 
 /**
  * @description send a current state to google
@@ -43,6 +52,8 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
   }
 }
 
+const sendCurrentStateWithRateLimit = limiter.wrap(sendCurrentState);
+
 /**
  * @description Forward websocket message to Gateway.
  * @param {Object} event - Websocket event.
@@ -67,7 +78,7 @@ async function forwardDeviceStateToGoogleHome(event) {
       clearTimeout(this.forwardStateToGoogleHomeTimeouts.get(event.device_feature));
     }
     const newTimeout = setTimeout(() => {
-      sendCurrentState(this.stateManager, this.gladysGatewayClient, event.device_feature);
+      sendCurrentStateWithRateLimit(this.stateManager, this.gladysGatewayClient, event.device_feature);
     }, this.googleHomeForwardStateTimeout);
     this.forwardStateToGoogleHomeTimeouts.set(event.device_feature, newTimeout);
   }
