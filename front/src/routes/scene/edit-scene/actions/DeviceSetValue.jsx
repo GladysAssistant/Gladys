@@ -36,7 +36,7 @@ class DeviceSetValue extends Component {
     this.props.updateActionProperty(columnIndex, index, 'value', color);
   };
 
-  toggleBinaryValue = e => {
+  toggleBinaryValue = () => {
     const { columnIndex, index, action } = this.props;
     const previousValue = action.value !== undefined ? action.value : 0;
     const newValue = previousValue === 1 ? 0 : 1;

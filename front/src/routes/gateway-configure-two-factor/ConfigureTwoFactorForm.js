@@ -70,6 +70,20 @@ const ConfigureTwoFactorForm = ({ children, ...props }) => (
 
                     <div class="form-group">
                       <label class="form-label">
+                        <Text id="gatewayTwoFactorAuth.secretLabel" />
+                      </label>
+                      <div class="input-group">
+                        <input type="text" class="form-control" disabled value={props.secret} />
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-secondary" type="button" onClick={props.copySecret}>
+                            <Text id="gatewayTwoFactorAuth.copy" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-group">
+                      <label class="form-label">
                         <Text id="gatewayTwoFactorAuth.confirmCode" />
                       </label>
                       <Localizer>
