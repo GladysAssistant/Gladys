@@ -76,17 +76,17 @@ describe('alexa.onExecute', () => {
         },
         endpoint: { endpointId: 'device-1', cookie: {} },
         payload: {},
-        context: {
-          properties: [
-            {
-              namespace: 'Alexa.PowerController',
-              name: 'powerState',
-              value: 'ON',
-              timeOfSample: get(result, 'event.context.properties.0.timeOfSample'),
-              uncertaintyInMilliseconds: 500,
-            },
-          ],
-        },
+      },
+      context: {
+        properties: [
+          {
+            namespace: 'Alexa.PowerController',
+            name: 'powerState',
+            value: 'ON',
+            timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+            uncertaintyInMilliseconds: 500,
+          },
+        ],
       },
     });
   });
@@ -157,17 +157,17 @@ describe('alexa.onExecute', () => {
         },
         endpoint: { endpointId: 'device-1', cookie: {} },
         payload: {},
-        context: {
-          properties: [
-            {
-              namespace: 'Alexa.PowerController',
-              name: 'powerState',
-              value: 'OFF',
-              timeOfSample: get(result, 'event.context.properties.0.timeOfSample'),
-              uncertaintyInMilliseconds: 500,
-            },
-          ],
-        },
+      },
+      context: {
+        properties: [
+          {
+            namespace: 'Alexa.PowerController',
+            name: 'powerState',
+            value: 'OFF',
+            timeOfSample: get(result, 'context.properties.0.timeOfSample'),
+            uncertaintyInMilliseconds: 500,
+          },
+        ],
       },
     });
   });

@@ -49,17 +49,17 @@ function onExecute(body) {
       },
       endpoint: body.directive.endpoint,
       payload: {},
-      context: {
-        properties: [
-          {
-            namespace: 'Alexa.PowerController',
-            name: 'powerState',
-            value: value === 1 ? 'ON' : 'OFF',
-            timeOfSample: new Date().toISOString(),
-            uncertaintyInMilliseconds: 500,
-          },
-        ],
-      },
+    },
+    context: {
+      properties: [
+        {
+          namespace: 'Alexa.PowerController',
+          name: 'powerState',
+          value: value === 1 ? 'ON' : 'OFF',
+          timeOfSample: new Date().toISOString(),
+          uncertaintyInMilliseconds: 500,
+        },
+      ],
     },
   };
   return response;

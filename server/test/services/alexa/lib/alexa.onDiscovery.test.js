@@ -43,7 +43,7 @@ describe('alexa.onDiscovery', () => {
 
     const alexaHandler = new AlexaHandler(gladys, serviceId);
     const result = alexaHandler.onDiscovery();
-    const exptectedResult = {
+    const expectedResult = {
       event: {
         header: {
           namespace: 'Alexa.Discovery',
@@ -56,6 +56,9 @@ describe('alexa.onDiscovery', () => {
             {
               endpointId: 'device-1',
               friendlyName: 'Device 1',
+              manufacturerName: 'Gladys Assistant',
+              description: 'Device 1',
+              additionalAttributes: {},
               displayCategories: ['LIGHT'],
               capabilities: [
                 {
@@ -64,14 +67,14 @@ describe('alexa.onDiscovery', () => {
                   version: '3',
                   properties: { supported: [{ name: 'powerState' }], proactivelyReported: true, retrievable: true },
                 },
+                { type: 'AlexaInterface', interface: 'Alexa', version: '3' },
               ],
-              connections: [],
             },
           ],
         },
       },
     };
-    expect(result).to.deep.eq(exptectedResult);
+    expect(result).to.deep.eq(expectedResult);
     assert.calledOnce(gladys.stateManager.state.device.device_1.get);
   });
 });
