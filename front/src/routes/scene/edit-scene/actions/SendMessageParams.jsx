@@ -131,7 +131,7 @@ class SendMessageParams extends Component {
     });
     const text = this.props.action.text || '';
     this.tagify.loadOriginalValues(text);
-    this.tagify.on('input add remove change', e => {
+    this.tagify.on('input add remove change', () => {
       const text = get(this.tagify, 'DOM.input.innerText', '');
       this.parseText(text);
     });
@@ -167,7 +167,7 @@ class SendMessageParams extends Component {
       this.tagify.destroy();
     }
   }
-  render(props, { selectedOption, userOptions, variableWhileList, variableReady }) {
+  render(props, { selectedOption, userOptions }) {
     return (
       <div>
         <div class="form-group">

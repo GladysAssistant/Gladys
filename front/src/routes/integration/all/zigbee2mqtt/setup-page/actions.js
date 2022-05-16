@@ -95,7 +95,7 @@ const createActions = store => {
       await this.checkStatus();
     },
 
-    displayConnectedMessage(state) {
+    displayConnectedMessage() {
       // display 3 seconds a message "MQTT connected"
       store.setState({
         zigbee2mqttConnected: true

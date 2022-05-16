@@ -95,10 +95,6 @@ function createActions(store) {
           actions.newDownloadProgress(state, {
             event: upgradeDownloadStatus.last_event
           });
-        } else if (upgradeDownloadStatus.last_event !== null) {
-          store.setState({
-            downloadUpgradeStatus: RequestStatus.Error
-          });
         }
         store.setState({
           getUpgradeDownloadStatusStatus: RequestStatus.Success
@@ -149,13 +145,13 @@ function createActions(store) {
         });
       }
     },
-    downloadFinished(state, event) {
+    downloadFinished() {
       store.setState({
         downloadUpgradeProgress: 100,
         downloadUpgradeStatus: RequestStatus.Success
       });
     },
-    downloadFailed(state, event) {
+    downloadFailed() {
       store.setState({
         downloadUpgradeStatus: RequestStatus.Error,
         downloadUpgradeProgress: null

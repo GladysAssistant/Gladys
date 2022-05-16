@@ -1,4 +1,4 @@
-const Layout = ({ children, ...props }) => (
+const Layout = ({ children }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">

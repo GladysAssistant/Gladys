@@ -47,7 +47,7 @@ class ConfigureTwoFactorPage extends Component {
 
     this.props.session.gatewayClient
       .enableTwoFactor(accessToken, twoFactorCode)
-      .then(data => {
+      .then(() => {
         window.location = '/login';
       })
       .catch(err => {
