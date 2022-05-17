@@ -522,14 +522,14 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
-        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        unit: DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
       },
     },
     PCOUP: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
-        unit: DEVICE_FEATURE_UNITS.AMPERE,
+        unit: DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
       },
     },
   },
