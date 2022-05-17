@@ -10,7 +10,7 @@ class WelcomePage extends Component {
     this.props.checkIfInstanceIsConfigured();
   }
 
-  render({}, { currentUrl }) {
+  render({}, {}) {
     return (
       <SignupLayout currentUrl="/signup">
         <WelcomeTab />

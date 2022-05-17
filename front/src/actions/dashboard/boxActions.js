@@ -1,6 +1,6 @@
 import update, { extend } from 'immutability-helper';
 
-extend('$auto', function(value, object) {
+extend('$auto', (value, object) => {
   return object ? update(object, value) : update({}, value);
 });
 

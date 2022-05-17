@@ -59,7 +59,7 @@ class ResetPassword extends Component {
       passwordRepeat: ''
     };
   }
-  render(props, { loading, password, passwordRepeat, valid, errors }) {
+  render(props, { loading, password, passwordRepeat, errors }) {
     return (
       <div class={loading ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
