@@ -1485,7 +1485,8 @@
     "jobTypes": {
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
-      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire",
+      "gladys-gateway-backup": "Sauvegarde Gladys Plus"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -2089,9 +2090,11 @@
     "neverUsed": "Jamais"
   },
   "gatewayTwoFactorAuth": {
-    "title": "Gladys Gateway",
-    "configureTitle": "Configurer l'authentification Two-Factor (\"2FA\")",
+    "title": "Gladys Plus",
+    "configureTitle": "Configurer l'authentification à deux facteurs (\"2FA\")",
     "configureButton": "Configurer la 2FA",
+    "secretLabel": "Secret",
+    "copy": "Copier",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
     "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",
@@ -2101,7 +2104,7 @@
     "app": {
       "open": "Ouvrez votre application 2FA",
       "addAccount": "Cliquez sur \"Ajouter un compte\"",
-      "scanQRCode": "Scannez le QR Code ci-dessous"
+      "scanQRCode": "Scannez le QR Code ci-dessous, ou copiez manuellement le secret pour l'ajouter manuellement à votre application."
     }
   },
   "gatewaySignUp": {

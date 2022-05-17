@@ -15,7 +15,7 @@ function createActions(store) {
   const welcomeActions = createActionsWelcome(store);
 
   const actions = {
-    resetNewUser(state) {
+    resetNewUser() {
       store.setState({
         newUser: {
           firstname: '',

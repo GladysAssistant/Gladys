@@ -1485,7 +1485,8 @@
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
-      "hourly-device-state-aggregate": "Hourly sensors aggregation"
+      "hourly-device-state-aggregate": "Hourly sensors aggregation",
+      "gladys-gateway-backup": "Gladys Plus backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -2089,9 +2090,11 @@
     "neverUsed": "Never"
   },
   "gatewayTwoFactorAuth": {
-    "title": "Gladys Gateway",
+    "title": "Gladys Plus",
     "configureTitle": "Configure Two-Factor Authentication",
     "configureButton": "Configure 2FA",
+    "secretLabel": "Secret",
+    "copy": "Copy",
     "securityIsImportant": "The security of your Gladys Gateway account is really important to us.",
     "securityApps": "To ensure that your account remains secure, please enable two-factor authentication using a two-factor app like Authy on <a href=\"https://itunes.apple.com/us/app/authy/id494168017?mt=8\">iOS</a> or <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "The 2FA code you provided is not valid.",
@@ -2101,7 +2104,7 @@
     "app": {
       "open": "Open your 2FA app",
       "addAccount": "Click on \"Add Account\"",
-      "scanQRCode": "Scan the QR Code below"
+      "scanQRCode": "Scan the QR Code below or copy the secret to your 2FA application."
     }
   },
   "gatewaySignUp": {

@@ -13,9 +13,9 @@ export class DemoHttpClient {
     this.responses = await (await import('../config/demo')).default;
     return this.responses;
   };
-  setToken(refreshToken, accessToken) {}
+  setToken() {}
 
-  async get(url, query) {
+  async get(url) {
     await this.getDemoFile();
     const key = `get ${url}`;
     if (!this.responses[key]) {
@@ -25,7 +25,7 @@ export class DemoHttpClient {
     return Promise.resolve(this.responses[key]);
   }
 
-  async post(url, query) {
+  async post(url) {
     await this.getDemoFile();
     const key = `post ${url}`;
     if (!this.responses[key]) {
@@ -35,7 +35,7 @@ export class DemoHttpClient {
     return Promise.resolve(this.responses[key]);
   }
 
-  async patch(url, query) {
+  async patch(url) {
     await this.getDemoFile();
     const key = `patch ${url}`;
     if (!this.responses[key]) {

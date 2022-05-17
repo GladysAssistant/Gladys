@@ -803,6 +803,7 @@ const JOB_TYPES = {
   HOURLY_DEVICE_STATE_AGGREGATE: 'hourly-device-state-aggregate',
   DAILY_DEVICE_STATE_AGGREGATE: 'daily-device-state-aggregate',
   MONTHLY_DEVICE_STATE_AGGREGATE: 'monthly-device-state-aggregate',
+  GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
 };
 
 const JOB_STATUS = {
