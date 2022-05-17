@@ -81,6 +81,12 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 Read [Contributing.md](https://github.com/gladysassistant/Gladys/blob/master/.github/CONTRIBUTING.md) if you want to help us on Gladys Assistant.
 
+## Articles
+
+- [EN: Interview in Console #107](https://console.substack.com/p/console-104)
+- [EN: Hackster.io - Gladys Assistant Is a Privacy-First Smart Home Platform — and Now Installable in Raspberry Pi Imager](https://www.hackster.io/news/gladys-assistant-is-a-privacy-first-smart-home-platform-and-now-installable-in-raspberry-pi-imager-4a84d5559c63)
+- [FR: Framboise 314 - Plus de 500 installations pour l’assistant domotique Gladys !](https://www.framboise314.fr/plus-de-500-installation-pour-lassistant-domotique-gladys/)
+
 ## Copyright & License
 
 Copyright (c) 2013-2022 Gladys Assistant - Released under the [Apache 2.0 License](https://github.com/gladysassistant/Gladys/blob/master/LICENSE).

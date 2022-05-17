@@ -83,7 +83,7 @@ module.exports = function GatewayController(gladys) {
    * @apiGroup Gateway
    */
   async function createBackup(req, res) {
-    gladys.event.emit(EVENTS.GATEWAY.CREATE_BACKUP, null);
+    gladys.event.emit(EVENTS.GATEWAY.CREATE_BACKUP);
     res.json({
       success: true,
     });

@@ -90,21 +90,21 @@ class Chartbox extends Component {
     });
     this.getData();
   };
-  switchTo30DaysView = async e => {
+  switchTo30DaysView = async () => {
     await this.setState({
       interval: THIRTY_DAYS_IN_MINUTES,
       dropdown: false
     });
     this.getData();
   };
-  switchTo3monthsView = async e => {
+  switchTo3monthsView = async () => {
     await this.setState({
       interval: THREE_MONTHS_IN_MINUTES,
       dropdown: false
     });
     this.getData();
   };
-  switchToYearlyView = async e => {
+  switchToYearlyView = async () => {
     await this.setState({
       interval: ONE_YEAR_IN_MINUTES,
       dropdown: false
@@ -216,7 +216,7 @@ class Chartbox extends Component {
       this.getData();
     }
   };
-  updateInterval = async interval => {
+  updateInterval = async () => {
     await this.setState({
       interval: intervalByName[this.props.box.interval]
     });
@@ -256,7 +256,7 @@ class Chartbox extends Component {
       this.updateDeviceStateWebsocket
     );
   }
-  render(props, { loading, series, labels, dropdown, variation, lastValueRounded, interval, emptySeries, unit }) {
+  render(props, { loading, series, dropdown, variation, lastValueRounded, interval, emptySeries, unit }) {
     const displayVariation = props.box.display_variation;
     return (
       <div class="card">

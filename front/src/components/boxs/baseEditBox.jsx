@@ -1,10 +1,10 @@
 import { Text } from 'preact-i18n';
 
-const moveBoxUp = (moveBoxUpFunction, x, y) => e => {
+const moveBoxUp = (moveBoxUpFunction, x, y) => () => {
   moveBoxUpFunction(x, y);
 };
 
-const moveBoxDown = (moveBoxDownFunction, x, y) => e => {
+const moveBoxDown = (moveBoxDownFunction, x, y) => () => {
   moveBoxDownFunction(x, y);
 };
 

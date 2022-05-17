@@ -28,19 +28,19 @@
     "compare-json": "^0.4.0",
     "cross-env": "^5.2.0",
     "cypress": "^9.5.2",
-    "eslint": "^4.19.1",
-    "eslint-config-prettier": "^4.0.0",
-    "eslint-config-synacor": "^2.0.2",
-    "eslint-plugin-cypress": "^2.11.3",
-    "eslint-plugin-json": "^1.4.0",
+    "eslint": "^8.15.0",
+    "eslint-config-preact": "^1.3.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-compat": "^4.0.2",
+    "eslint-plugin-cypress": "^2.12.1",
+    "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-preact-i18n": "^1.1.0",
+    "eslint-plugin-react": "^7.29.4",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
     "per-env": "^1.0.2",
-    "preact-cli": "^3.2.2",
-    "preact-render-spy": "^1.2.1",
-    "prettier": "^1.17.1",
-    "sirv-cli": "^1.0.12"
+    "preact-cli": "^3.3.5",
+    "prettier": "^1.17.1"
   },
   "dependencies": {
     "@gladysassistant/gladys-gateway-js": "^3.9.0",
@@ -60,8 +60,7 @@
     "leaflet": "^1.7.1",
     "linkstate": "^1.1.1",
     "p-limit": "^4.0.0",
-    "preact": "^10.5.14",
-    "preact-cli-plugin-fast-async": "^1.0.1",
+    "preact": "^10.7.2",
     "preact-i18n": "^2.4.0-preactx",
     "preact-router": "^3.2.1",
     "qrcode": "^1.4.2",
@@ -72,35 +71,12 @@
     "useragent-parser-js": "^1.0.3",
     "uuid": "^3.4.0"
   },
-  "jest": {
-    "coverageDirectory": "./coverage/",
-    "collectCoverage": true,
-    "verbose": true,
-    "setupFiles": [
-      "<rootDir>/tests/__mocks__/browserMocks.js"
-    ],
-    "testRegex": "(/(__tests__|tests)/.*|(\\.|/)(test|spec))\\.jsx?$",
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "<rootDir>/tests/__mocks__/*"
-    ],
-    "testURL": "http://localhost:8080",
-    "moduleFileExtensions": [
-      "js",
-      "jsx"
-    ],
-    "moduleDirectories": [
-      "node_modules"
-    ],
-    "moduleNameMapper": {
-      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/tests/__mocks__/fileMock.js",
-      "\\.(css|less|scss)$": "identity-obj-proxy",
-      "^./style$": "identity-obj-proxy",
-      "^preact$": "<rootDir>/node_modules/preact/dist/preact.js",
-      "^react$": "preact/compat",
-      "^react-dom/test-utils$": "preact/test-utils",
-      "^react-dom$": "preact/compat",
-      "^react-addons-css-transition-group$": "preact-css-transition-group"
-    }
-  }
+  "browserslist": [
+    "defaults",
+    "not ie 11",
+    "not ie_mob 11",
+    "not ios_saf 12.2-12.5",
+    "not op_mini all",
+    "not dead"
+  ]
 }
