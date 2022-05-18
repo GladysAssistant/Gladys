@@ -34,6 +34,7 @@ async function requestCalendars(xhr, homeUrl) {
       { name: 'resourcetype', namespace: this.dav.ns.DAV },
       { name: 'supported-calendar-component-set', namespace: this.dav.ns.CALDAV },
       { name: 'sync-token', namespace: this.dav.ns.DAV },
+      { name: 'source', namespace: this.dav.ns.CALENDAR_SERVER },
     ],
     depth: 1,
   });
@@ -50,12 +51,13 @@ async function requestCalendars(xhr, homeUrl) {
     })
     .map((res) => {
       logger.info(`CalDAV : Found calendar ${res.props.displayname}`);
+
       return {
         data: res,
         description: res.props.calendarDescription,
         timezone: res.props.calendarTimezone,
         color: res.props.calendarColor,
-        url: url.resolve(homeUrl, res.href),
+        url: res.props.resourcetype.includes('calendar') ? url.resolve(homeUrl, res.href) : res.props.source,
         ctag: res.props.getctag,
         displayName: res.props.displayname,
         components: res.props.supportedCalendarComponentSet,
@@ -110,14 +112,14 @@ async function requestEventsData(xhr, calendarUrl, eventsToUpdate, calDavHost) {
                   <c:calendar-data />
               </d:prop>
               ${eventsToUpdate
-                .filter((eventToUpdate) => JSON.stringify(eventToUpdate.props) !== JSON.stringify({}))
-                .map((eventToUpdate) => {
-                  if (!eventToUpdate.href.endsWith('.ics')) {
-                    return '';
-                  }
-                  return `<d:href>${encodeURIComponent(eventToUpdate.href).replace(/%2F/g, '/')}</d:href>`;
-                })
-                .join('\n')}
+        .filter((eventToUpdate) => JSON.stringify(eventToUpdate.props) !== JSON.stringify({}))
+        .map((eventToUpdate) => {
+          if (!eventToUpdate.href.endsWith('.ics')) {
+            return '';
+          }
+          return `<d:href>${encodeURIComponent(eventToUpdate.href).replace(/%2F/g, '/')}</d:href>`;
+        })
+        .join('\n')}
               <c:filter>
                   <c:comp-filter name="VCALENDAR">
                       <c:comp-filter name="VEVENT" />

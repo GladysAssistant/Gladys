@@ -164,6 +164,10 @@ function formatEvents(caldavEvents, gladysCalendar) {
         newEvent.end = this.dayjs
           .tz(this.dayjs(caldavEvent.end).format('YYYY-MM-DDTHH:mm:ss'), caldavEvent.end.tz)
           .format();
+      } else if (caldavEvent.start && caldavEvent.duration) {
+        newEvent.end = this.dayjs
+          .tz(this.dayjs(caldavEvent.start).format('YYYY-MM-DDTHH:mm:ss'), caldavEvent.start.tz)
+          .add(this.dayjs.duration(caldavEvent.duration));
       }
 
       if (
