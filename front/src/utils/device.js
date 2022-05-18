@@ -14,7 +14,8 @@ import get from 'get-value';
  * but it's irrelevant to do it for all.
  */
 const DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES = {
-  mqtt: true
+  mqtt: true,
+  tasmota: true
 };
 
 const getDeviceFeatureName = (dictionnary, device, deviceFeature) => {

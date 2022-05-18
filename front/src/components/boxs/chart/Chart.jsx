@@ -5,6 +5,7 @@ import cx from 'classnames';
 import { Text } from 'preact-i18n';
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { getDeviceName } from '../device-in-room/device-features/utils';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
@@ -142,7 +143,9 @@ class Chartbox extends Component {
       const series = data.map((oneFeature, index) => {
         const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
         const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-        const name = oneUnitTranslated ? `${oneFeature.device.name} (${oneUnitTranslated})` : oneFeature.device.name;
+        const name = oneUnitTranslated
+          ? `${getDeviceName(oneFeature.device, oneFeature.deviceFeature)} (${oneUnitTranslated})`
+          : getDeviceName(oneFeature.device, oneFeature.deviceFeature);
         return {
           name,
           data: oneFeature.values.map(value => {

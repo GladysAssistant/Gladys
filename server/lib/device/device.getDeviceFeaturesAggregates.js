@@ -92,6 +92,7 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   return {
     device: {
       name: device.name,
+      service: device.service,
     },
     deviceFeature: {
       name: deviceFeature.name,
