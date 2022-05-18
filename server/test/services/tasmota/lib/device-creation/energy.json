@@ -28,10 +28,10 @@
         "Yesterday": 0.0,
         "Today": 0.001,
         "Power": 57,
-        "ApparentPower": 0,
-        "ReactivePower": 0,
-        "Factor": 0.0,
-        "Voltage": 12000,
+        "ApparentPower": 60,
+        "ReactivePower": 10,
+        "Factor": 0.95,
+        "Voltage": 12,
         "Current": 20.0
       }
     }
