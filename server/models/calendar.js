@@ -73,6 +73,9 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         type: DataTypes.STRING,
       },
+      last_sync: {
+        type: DataTypes.DATE,
+      },
     },
     {},
   );

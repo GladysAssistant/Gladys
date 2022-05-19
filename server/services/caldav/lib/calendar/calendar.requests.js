@@ -112,14 +112,14 @@ async function requestEventsData(xhr, calendarUrl, eventsToUpdate, calDavHost) {
                   <c:calendar-data />
               </d:prop>
               ${eventsToUpdate
-        .filter((eventToUpdate) => JSON.stringify(eventToUpdate.props) !== JSON.stringify({}))
-        .map((eventToUpdate) => {
-          if (!eventToUpdate.href.endsWith('.ics')) {
-            return '';
-          }
-          return `<d:href>${encodeURIComponent(eventToUpdate.href).replace(/%2F/g, '/')}</d:href>`;
-        })
-        .join('\n')}
+                .filter((eventToUpdate) => JSON.stringify(eventToUpdate.props) !== JSON.stringify({}))
+                .map((eventToUpdate) => {
+                  if (!eventToUpdate.href.endsWith('.ics')) {
+                    return '';
+                  }
+                  return `<d:href>${encodeURIComponent(eventToUpdate.href).replace(/%2F/g, '/')}</d:href>`;
+                })
+                .join('\n')}
               <c:filter>
                   <c:comp-filter name="VCALENDAR">
                       <c:comp-filter name="VEVENT" />
