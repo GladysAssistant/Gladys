@@ -8,7 +8,7 @@ import style from './style.css';
 let cx = classNames.bind(style);
 
 class SetupTab extends Component {
-  toggle = e => {
+  toggle = () => {
     let checked = this.props.z2mEnabled;
     checked = !checked;
 

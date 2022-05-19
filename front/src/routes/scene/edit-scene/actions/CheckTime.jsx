@@ -28,7 +28,7 @@ class CheckTime extends Component {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'days_of_the_week', values);
   };
 
-  render(props, state) {
+  render() {
     const language = get(this.props, 'user.language');
     const localeSet = language === 'fr' ? fr : 'en';
     const before = this.props.action.before

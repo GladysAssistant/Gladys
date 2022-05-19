@@ -60,7 +60,7 @@ function createActions(store) {
         }
       }
     },
-    initScene(state) {
+    initScene() {
       store.setState({
         newScene: {
           name: '',

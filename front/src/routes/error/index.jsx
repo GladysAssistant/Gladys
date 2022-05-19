@@ -1,6 +1,6 @@
 import { Text } from 'preact-i18n';
 
-const Error = ({ type, url }) => (
+const Error = ({ type }) => (
   <div class="page">
     <div class="page-content">
       <div class="container text-center">

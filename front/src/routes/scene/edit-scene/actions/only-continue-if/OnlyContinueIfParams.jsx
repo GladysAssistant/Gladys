@@ -42,7 +42,7 @@ class OnlyContinueIf extends Component {
     }
   }
 
-  render(props, { selectedOptions, deviceOptions }) {
+  render(props, {}) {
     const variableOptions = [];
 
     props.actionsGroupsBefore.forEach((actionGroup, groupIndex) => {

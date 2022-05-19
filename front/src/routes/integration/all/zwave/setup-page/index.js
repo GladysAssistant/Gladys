@@ -7,7 +7,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 
 @connect('user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus,zwaveHealNetworkStatus', actions)
 class ZwaveNodePage extends Component {
-  nodeReadyListener = payload => this.props.getNodes();
+  nodeReadyListener = () => this.props.getNodes();
   scanCompleteListener = () => {
     this.props.getStatus();
     this.props.getNodes();
