@@ -33,10 +33,9 @@ const FoundDevices = ({ children, ...props }) => (
                   <Text id="integration.rflink.device.noDevicesFound" />
                 </div>
               </div>
-
             )}
             {props.rflinkNewDevices &&
-              props.rflinkNewDevices.map((device) => (
+              props.rflinkNewDevices.map(device => (
                 <div class="col-md-4">
                   <div class="card">
                     <div class="card-header">
