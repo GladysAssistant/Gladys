@@ -51,7 +51,7 @@ class RflinkDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, loading, error }) {
+  render(props, { batteryLevel, loading }) {
     return (
       <div class="col-md-6">
         <div class="card">

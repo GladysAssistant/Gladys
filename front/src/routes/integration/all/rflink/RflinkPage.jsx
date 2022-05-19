@@ -31,7 +31,7 @@ const RflinkPage = ({ children, ...props }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-sliders" />
                     </span>
-                    <Text id="integration.rflink.settingsTab" />
+                    <Text id="integration.rflink.settingsTab" {...props} />
                   </Link>
                 </div>
               </div>

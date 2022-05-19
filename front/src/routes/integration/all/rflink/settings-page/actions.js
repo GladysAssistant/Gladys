@@ -140,7 +140,7 @@ const actions = store => {
         });
       }
     },
-    driverFailed(state) {
+    driverFailed() {
       store.setState({
         rflinkFailed: true,
         rflinkConnectionInProgress: false
