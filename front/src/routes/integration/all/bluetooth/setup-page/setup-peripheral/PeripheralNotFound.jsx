@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
-const PeripheralNotFound = ({ uuid }) => (
+const PeripheralNotFound = ({}) => (
   <div>
     <div class="alert alert-danger">
       <Text id={'integration.bluetooth.discover.peripheral.notAvailable'} />

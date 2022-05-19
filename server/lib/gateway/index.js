@@ -1,8 +1,10 @@
 const GladysGatewayClient = require('@gladysassistant/gladys-gateway-js');
 const WebCrypto = require('node-webcrypto-ossl');
+const schedule = require('node-schedule');
+
 const getConfig = require('../../utils/getConfig');
 const logger = require('../../utils/logger');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, JOB_TYPES } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 const serverUrl = getConfig().gladysGatewayServerUrl;
@@ -29,23 +31,28 @@ const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 
-const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager, serviceManager) {
+const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager, serviceManager, job) {
   this.variable = variable;
   this.event = event;
   this.system = system;
   this.sequelize = sequelize;
+  this.schedule = schedule;
   this.config = config;
   this.user = user;
   this.stateManager = stateManager;
   this.serviceManager = serviceManager;
+  this.job = job;
   this.connected = false;
   this.restoreInProgress = false;
   this.usersKeys = [];
   this.googleHomeConnected = false;
   this.forwardStateToGoogleHomeTimeouts = new Map();
   this.googleHomeForwardStateTimeout = 5 * 1000;
+  this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
+  this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));
+
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
   this.event.on(EVENTS.GATEWAY.CHECK_IF_BACKUP_NEEDED, eventFunctionWrapper(this.checkIfBackupNeeded.bind(this)));
   this.event.on(EVENTS.GATEWAY.RESTORE_BACKUP, eventFunctionWrapper(this.restoreBackupEvent.bind(this)));

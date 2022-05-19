@@ -30,7 +30,7 @@ class DemoSession {
     return null;
   }
 
-  setAccessToken(accessToken) {}
+  setAccessToken() {}
 
   getProfilePicture() {
     if (this.profilePicture) {

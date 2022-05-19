@@ -1,6 +1,6 @@
 import { Text } from 'preact-i18n';
 
-const GatewayNotConfigured = ({ children, ...props }) => (
+const GatewayNotConfigured = ({}) => (
   <div class="card">
     <div class="card-header">
       <h2 class="page-title">

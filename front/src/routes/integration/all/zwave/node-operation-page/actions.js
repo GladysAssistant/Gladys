@@ -40,7 +40,7 @@ const actions = store => {
         });
       }
     },
-    async removeNode(state, secure = false) {
+    async removeNode(state) {
       store.setState({
         zwaveRemoveNodeStatus: RequestStatus.Getting
       });
