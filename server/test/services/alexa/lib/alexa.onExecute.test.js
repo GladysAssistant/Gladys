@@ -15,6 +15,10 @@ const DEVICE_1_LIGHT = {
   features: [
     {
       category: 'light',
+      type: 'brightness',
+    },
+    {
+      category: 'light',
       type: 'binary',
     },
   ],
