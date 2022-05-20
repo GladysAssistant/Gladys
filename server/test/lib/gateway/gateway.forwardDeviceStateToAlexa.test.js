@@ -143,6 +143,61 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
       },
     });
   });
+  it('should forward only once', async () => {
+    const serviceManager = {
+      getService: fake.returns(alexaService),
+    };
+    const stateManager = {
+      get: (key) => {
+        const feature = {
+          name: 'New device feature',
+          selector: 'my-device',
+          external_id: 'hue:binary:1',
+          category: 'light',
+          type: 'binary',
+          read_only: false,
+          has_feedback: false,
+          last_value: 0,
+          last_value_changed: null,
+          last_value_string: null,
+          last_daily_aggregate: null,
+          last_hourly_aggregate: null,
+          last_monthly_aggregate: null,
+          min: 0,
+          max: 1,
+        };
+        if (key === 'deviceFeature') {
+          return feature;
+        }
+
+        // deviceById
+        return {
+          id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+          name: 'Light',
+          selector: 'my-device',
+          external_id: 'test-device-external',
+          service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+          room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+          features: [feature],
+        };
+      },
+    };
+    const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager, serviceManager, job);
+    gateway.alexaForwardStateTimeout = 30;
+    gateway.connected = true;
+    gateway.alexaConnected = true;
+    gateway.gladysGatewayClient.alexaReportState = fake.resolves(null);
+    const newEvent = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'my-device',
+    };
+    await gateway.forwardDeviceStateToAlexa(newEvent);
+    await gateway.forwardDeviceStateToAlexa(newEvent);
+    await Promise.delay(100);
+    assert.calledOnce(gateway.gladysGatewayClient.alexaReportState);
+  });
   it('should not forward, unknown type of device', async () => {
     const serviceManager = {
       getService: fake.returns(alexaService),
@@ -188,6 +243,60 @@ describe('gateway.forwardDeviceStateToAlexa', () => {
     gateway.alexaForwardStateTimeout = 1;
     gateway.connected = true;
     gateway.alexaConnected = true;
+    gateway.gladysGatewayClient.alexaReportState = fake.resolves(null);
+    const newEvent = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      device_feature: 'my-device',
+    };
+    await gateway.forwardDeviceStateToAlexa(newEvent);
+    await Promise.delay(100);
+    assert.notCalled(gateway.gladysGatewayClient.alexaReportState);
+  });
+  it('should not forward, alexa not connected', async () => {
+    const serviceManager = {
+      getService: fake.returns(alexaService),
+    };
+    const stateManager = {
+      get: (key) => {
+        const feature = {
+          name: 'New device feature',
+          selector: 'my-device',
+          external_id: 'hue:binary:1',
+          category: 'light',
+          type: 'binary',
+          read_only: true,
+          has_feedback: false,
+          last_value: 0,
+          last_value_changed: null,
+          last_value_string: null,
+          last_daily_aggregate: null,
+          last_hourly_aggregate: null,
+          last_monthly_aggregate: null,
+          min: 0,
+          max: 1,
+        };
+
+        if (key === 'deviceFeature') {
+          return feature;
+        }
+        // deviceById
+        return {
+          id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+          name: 'Light',
+          selector: 'my-device',
+          external_id: 'test-device-external',
+          service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+          room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+          features: [feature],
+        };
+      },
+    };
+    const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager, serviceManager, job);
+    gateway.alexaForwardStateTimeout = 1;
+    gateway.connected = true;
+    gateway.alexaConnected = false;
     gateway.gladysGatewayClient.alexaReportState = fake.resolves(null);
     const newEvent = {
       type: EVENTS.DEVICE.NEW_STATE,
