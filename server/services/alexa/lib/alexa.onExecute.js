@@ -1,13 +1,8 @@
 const uuid = require('uuid');
 const get = require('get-value');
-const {
-  EVENTS,
-  ACTIONS,
-  ACTIONS_STATUS,
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-} = require('../../../utils/constants');
-const { BadParameters } = require('../../../utils/coreErrors');
+const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../../utils/constants');
+const { BadParameters, NotFoundError } = require('../../../utils/coreErrors');
+const { writeValues, readValues } = require('./deviceMappings');
 
 /**
  * @public
@@ -24,18 +19,22 @@ function onExecute(body) {
   let value;
   switch (directiveNamespace) {
     case 'Alexa.PowerController':
-      value = directiveName === 'TurnOn' ? 1 : 0;
+      value = writeValues['Alexa.PowerController'](directiveName);
       break;
     default:
       throw new BadParameters(`Unkown directive ${directiveNamespace}`);
+  }
+  const deviceFeatureInMemory = this.gladys.stateManager.get('deviceFeature', endpointId);
+  if (!deviceFeatureInMemory) {
+    throw new NotFoundError(`Device "${endpointId}" not found`);
   }
   const action = {
     type: ACTIONS.DEVICE.SET_VALUE,
     status: ACTIONS_STATUS.PENDING,
     value,
     device: endpointId,
-    feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-    feature_type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+    feature_category: deviceFeatureInMemory.category,
+    feature_type: deviceFeatureInMemory.type,
   };
   this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
   const response = {
@@ -55,7 +54,7 @@ function onExecute(body) {
         {
           namespace: 'Alexa.PowerController',
           name: 'powerState',
-          value: value === 1 ? 'ON' : 'OFF',
+          value: readValues[deviceFeatureInMemory.category][deviceFeatureInMemory.type](value),
           timeOfSample: new Date().toISOString(),
           uncertaintyInMilliseconds: 500,
         },

@@ -20,6 +20,25 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
+    category: 'SMARTPLUG',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: {
+        type: 'AlexaInterface',
+        interface: 'Alexa.PowerController',
+        version: '3',
+        properties: {
+          supported: [
+            {
+              name: 'powerState',
+            },
+          ],
+          proactivelyReported: true,
+          retrievable: true,
+        },
+      },
+    },
+  },
 };
 
 const readValues = {
@@ -28,6 +47,17 @@ const readValues = {
       return value === 1 ? 'ON' : 'OFF';
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
+    [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (value) => {
+      return value === 1 ? 'ON' : 'OFF';
+    },
+  },
 };
 
-module.exports = { mappings, readValues };
+const writeValues = {
+  'Alexa.PowerController': (directiveName) => {
+    return directiveName === 'TurnOn' ? 1 : 0;
+  },
+};
+
+module.exports = { mappings, readValues, writeValues };
