@@ -819,6 +819,78 @@ describe('gateway', () => {
       expect(resultUnkown).to.deep.equal({ status: 400 });
       expect(resultDisconnect).to.deep.equal({});
     });
+    it('should handle a new gateway open api message: alexa-request', async function Test() {
+      this.timeout(10000);
+      const variable = {
+        setValue: fake.resolves(null),
+        destroy: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const serviceManager = {
+        getService: fake.returns({
+          alexaHandler: {
+            onDiscovery: fake.resolves({ onDiscovery: true }),
+            onReportState: fake.resolves({ onReportState: true }),
+            onExecute: fake.resolves({ onExecute: true }),
+          },
+        }),
+      };
+      const eventGateway = {
+        emit: fake.returns(null),
+        on: fake.returns(null),
+      };
+      const gateway = new Gateway(
+        variable,
+        eventGateway,
+        system,
+        sequelize,
+        config,
+        {},
+        stateManager,
+        serviceManager,
+        job,
+      );
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
+
+      const promiseDiscovery = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'alexa-request',
+            data: {
+              directive: {
+                header: {
+                  namespace: 'Alexa.Discovery',
+                  name: 'Discover',
+                  messageId: 'd89e30ed-bbcb-4ec5-9684-8e5c14e3bffd',
+                  payloadVersion: '3',
+                },
+                payload: {},
+              },
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const resultDiscovery = await promiseDiscovery;
+      expect(resultDiscovery).to.deep.equal({ onDiscovery: true });
+    });
   });
   describe('gateway.forwardDeviceStateToGoogleHome', () => {
     it('should forward an event to google home', async () => {
