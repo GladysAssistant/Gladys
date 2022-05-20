@@ -8,34 +8,49 @@ const { EVENTS } = require('../../../../utils/constants');
 
 const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
 
+const DEVICE_1_LIGHT = {
+  name: 'Device 1',
+  selector: 'device-1',
+  external_id: 'device-1-external-id',
+  features: [
+    {
+      category: 'light',
+      type: 'binary',
+    },
+  ],
+  model: 'device-model',
+  room: {
+    name: 'living-room',
+  },
+};
+
+const DEVICE_1_SWITCH = {
+  name: 'Device 1',
+  selector: 'device-1',
+  external_id: 'device-1-external-id',
+  features: [
+    {
+      category: 'switch',
+      type: 'binary',
+    },
+  ],
+  model: 'device-model',
+  room: {
+    name: 'living-room',
+  },
+};
+
 describe('alexa.onExecute', () => {
   it('Should turn on the light', async () => {
     const gladys = {
       stateManager: {
         get: () => {
-          return {
-            category: 'light',
-            type: 'binary',
-          };
+          return DEVICE_1_LIGHT;
         },
         state: {
           device: {
             device_1: {
-              get: fake.returns({
-                name: 'Device 1',
-                selector: 'device-1',
-                external_id: 'device-1-external-id',
-                features: [
-                  {
-                    category: 'light',
-                    type: 'binary',
-                  },
-                ],
-                model: 'device-model',
-                room: {
-                  name: 'living-room',
-                },
-              }),
+              get: fake.returns(DEVICE_1_LIGHT),
             },
           },
         },
@@ -100,29 +115,12 @@ describe('alexa.onExecute', () => {
     const gladys = {
       stateManager: {
         get: () => {
-          return {
-            category: 'light',
-            type: 'binary',
-          };
+          return DEVICE_1_LIGHT;
         },
         state: {
           device: {
             device_1: {
-              get: fake.returns({
-                name: 'Device 1',
-                selector: 'device-1',
-                external_id: 'device-1-external-id',
-                features: [
-                  {
-                    category: 'light',
-                    type: 'binary',
-                  },
-                ],
-                model: 'device-model',
-                room: {
-                  name: 'living-room',
-                },
-              }),
+              get: fake.returns(DEVICE_1_LIGHT),
             },
           },
         },
@@ -187,29 +185,12 @@ describe('alexa.onExecute', () => {
     const gladys = {
       stateManager: {
         get: () => {
-          return {
-            category: 'switch',
-            type: 'binary',
-          };
+          return DEVICE_1_SWITCH;
         },
         state: {
           device: {
             device_1: {
-              get: fake.returns({
-                name: 'Device 1',
-                selector: 'device-1',
-                external_id: 'device-1-external-id',
-                features: [
-                  {
-                    category: 'switch',
-                    type: 'binary',
-                  },
-                ],
-                model: 'device-model',
-                room: {
-                  name: 'living-room',
-                },
-              }),
+              get: fake.returns(DEVICE_1_SWITCH),
             },
           },
         },
@@ -274,29 +255,12 @@ describe('alexa.onExecute', () => {
     const gladys = {
       stateManager: {
         get: () => {
-          return {
-            category: 'switch',
-            type: 'binary',
-          };
+          return DEVICE_1_SWITCH;
         },
         state: {
           device: {
             device_1: {
-              get: fake.returns({
-                name: 'Device 1',
-                selector: 'device-1',
-                external_id: 'device-1-external-id',
-                features: [
-                  {
-                    category: 'switch',
-                    type: 'binary',
-                  },
-                ],
-                model: 'device-model',
-                room: {
-                  name: 'living-room',
-                },
-              }),
+              get: fake.returns(DEVICE_1_SWITCH),
             },
           },
         },

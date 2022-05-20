@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 const get = require('get-value');
-const { EVENTS, ACTIONS, ACTIONS_STATUS } = require('../../../utils/constants');
+const { EVENTS, ACTIONS, ACTIONS_STATUS, DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
 const { BadParameters, NotFoundError } = require('../../../utils/coreErrors');
 const { writeValues, readValues } = require('./deviceMappings');
 
@@ -17,24 +17,29 @@ function onExecute(body) {
   const endpointId = get(body, 'directive.endpoint.endpointId');
   const correlationToken = get(body, 'directive.header.correlationToken');
   let value;
+  const deviceInMemory = this.gladys.stateManager.get('device', endpointId);
+  if (!deviceInMemory) {
+    throw new NotFoundError(`Device "${endpointId}" not found`);
+  }
+  let deviceFeature;
   switch (directiveNamespace) {
     case 'Alexa.PowerController':
+      deviceFeature = deviceInMemory.features.find(
+        (f) => f.category === DEVICE_FEATURE_CATEGORIES.SWITCH || f.category === DEVICE_FEATURE_CATEGORIES.LIGHT,
+      );
       value = writeValues['Alexa.PowerController'](directiveName);
       break;
     default:
       throw new BadParameters(`Unkown directive ${directiveNamespace}`);
   }
-  const deviceFeatureInMemory = this.gladys.stateManager.get('deviceFeature', endpointId);
-  if (!deviceFeatureInMemory) {
-    throw new NotFoundError(`Device "${endpointId}" not found`);
-  }
+
   const action = {
     type: ACTIONS.DEVICE.SET_VALUE,
     status: ACTIONS_STATUS.PENDING,
     value,
     device: endpointId,
-    feature_category: deviceFeatureInMemory.category,
-    feature_type: deviceFeatureInMemory.type,
+    feature_category: deviceFeature.category,
+    feature_type: deviceFeature.type,
   };
   this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
   const response = {
@@ -54,7 +59,7 @@ function onExecute(body) {
         {
           namespace: 'Alexa.PowerController',
           name: 'powerState',
-          value: readValues[deviceFeatureInMemory.category][deviceFeatureInMemory.type](value),
+          value: readValues[deviceFeature.category][deviceFeature.type](value),
           timeOfSample: new Date().toISOString(),
           uncertaintyInMilliseconds: 500,
         },
