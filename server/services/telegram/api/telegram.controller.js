@@ -4,7 +4,7 @@ module.exports = function TelegramController(messageHandler) {
   /**
    * @api {get} /api/v1/service/telegram/link Get custom link
    * @apiName getCustomLink
-   * @apiGroup RtspCamera
+   * @apiGroup Telegram
    */
   async function getCustomLink(req, res) {
     const customLink = await messageHandler.getCustomLink(req.user.id);

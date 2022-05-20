@@ -15,7 +15,7 @@ const IncomingMessage = ({ children, ...props }) => (
     </div>
     <div class={style.received_msg}>
       <div class={style.received_withd_msg}>
-        <p>
+        <p class={style.msg_txt_wrap}>
           {props.message.text}
           {props.message.file && (
             <span>
@@ -37,7 +37,7 @@ const IncomingMessage = ({ children, ...props }) => (
 const OutGoingMessage = ({ children, ...props }) => (
   <div class={style.outgoing_msg}>
     <div class={style.sent_msg}>
-      <p>{props.message.text}</p>
+      <p class={style.msg_txt_wrap}>{props.message.text}</p>
       <span class={style.time_date}>
         {' '}
         {props.message.tempId ? (
