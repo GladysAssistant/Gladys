@@ -19,7 +19,8 @@ const PAGES_WITHOUT_HEADER = [
   '/subscribe-gateway',
   '/gateway-configure-two-factor',
   '/confirm-email',
-  '/dashboard/integration/device/google-home/authorize'
+  '/dashboard/integration/device/google-home/authorize',
+  '/dashboard/integration/device/alexa/authorize'
 ];
 
 const Header = ({ ...props }) => {
