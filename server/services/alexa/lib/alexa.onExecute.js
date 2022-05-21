@@ -1,6 +1,12 @@
 const uuid = require('uuid');
 const get = require('get-value');
-const { EVENTS, ACTIONS, ACTIONS_STATUS, DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
+const {
+  EVENTS,
+  ACTIONS,
+  ACTIONS_STATUS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+} = require('../../../utils/constants');
 const { BadParameters, NotFoundError } = require('../../../utils/coreErrors');
 const { writeValues, readValues } = require('./deviceMappings');
 
@@ -25,7 +31,9 @@ function onExecute(body) {
   switch (directiveNamespace) {
     case 'Alexa.PowerController':
       deviceFeature = deviceInMemory.features.find(
-        (f) => f.category === DEVICE_FEATURE_CATEGORIES.SWITCH || f.category === DEVICE_FEATURE_CATEGORIES.LIGHT,
+        (f) =>
+          (f.category === DEVICE_FEATURE_CATEGORIES.SWITCH || f.category === DEVICE_FEATURE_CATEGORIES.LIGHT) &&
+          f.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       );
       value = writeValues['Alexa.PowerController'](directiveName);
       break;
