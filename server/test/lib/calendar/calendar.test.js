@@ -150,7 +150,7 @@ describe('calendar.get', () => {
     const calendars = await calendar.get('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
       serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       sync: true,
-      type: 'CALDAV'
+      type: 'CALDAV',
     });
 
     calendars.forEach((oneCalendar) => {
