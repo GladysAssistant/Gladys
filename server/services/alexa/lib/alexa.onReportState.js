@@ -2,6 +2,7 @@ const uuid = require('uuid');
 const get = require('get-value');
 
 const { mappings, readValues } = require('./deviceMappings');
+const { NotFoundError } = require('../../../utils/coreErrors');
 
 /**
  * @public
@@ -13,6 +14,9 @@ const { mappings, readValues } = require('./deviceMappings');
 function onReportState(body) {
   const deviceSelector = get(body, 'directive.endpoint.endpointId');
   const device = this.gladys.stateManager.get('device', deviceSelector);
+  if (!device) {
+    throw new NotFoundError(`Device "${deviceSelector}" not found`);
+  }
   const properties = [];
   const now = new Date().toISOString();
   device.features.forEach((feature) => {
