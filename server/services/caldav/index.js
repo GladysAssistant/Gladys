@@ -107,6 +107,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
     start,
     stop,
     syncAllUsers,
+    syncAllUsersWebcals,
     calendar: {
       syncUserCalendars: calDavHandler.syncUserCalendars,
     },
