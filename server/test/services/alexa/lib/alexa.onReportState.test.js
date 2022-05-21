@@ -73,4 +73,31 @@ describe('alexa.onReportState', () => {
       },
     });
   });
+  it('Should return device not found', async () => {
+    const gladys = {
+      stateManager: {
+        get: fake.returns(null),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa',
+          name: 'ReportState',
+          payloadVersion: '3',
+          messageId: 'a05c8249-1cdd-41dd-bc1d-5a14ab4b98eb',
+          correlationToken:
+            'AAAAAAAAAQBe8ATzt+PzWVqbUXXQAv6JAAIAAAAAAADgCDHXLLn3nx8SmjtElD2w8CfsniSH6KxFhbRSgD/sELuMpZTr4Jl/E3Nip62gpI2QqFNm/TrQ/Pi+XSFtf/4AVCDxe4bV2FAXSVu61AsuUlhbdqdvjUoaHOuqSLW8F3Qj9z3HWhfvTCMEbbhw4XVDWOsyXb9nknvswimA+R4ftNdBx5POWZGxWtbvU+yeBStTV+QwSSZaHWjzQdi/LAo1KW35MkmLikny7Y7J097LTTL1Tof6IkLsi9/gxOtUUFvnD4yIkWeHTT110Ch6R4kDuonNtOiHsTmMMRtsY5kRWoIL9VMfX6QHWjamhvd+XJp4sXkLMBdtJ3aTzfsUNrQIdrcPTox9qTNjShunTlbAYkq1TSUXaylEGHvcwHrbo7ZoUlBvidqnJGUNRJPxOHHyfCm5VqFzuFI8AG1W/dj1W4Di0AAND/mwzjZKUTRsiX4uEaRw8/Na4Qj/GBMuT18hUoGpe7t/UYw5JFw+MXm0kn/5jKe9r62xil3TN8BK9ODQDP9zq08+iiT0CBtEX5F4Drrowb57IwcW7nt/hkCeeyR59B/Z6nPsSq0NQ+rd1w4a1iHIyaTU6acQsKwmaX1OeTvtT2p7U/HhqfhVMSqA7ybGhQDF4FPPzIbh+o+D1S+AX9m9nVSSJNwoevikdZimCbk1l1HmUrhz78GO+j0yFg==',
+        },
+        endpoint: { endpointId: 'device-1' },
+        payload: {},
+      },
+      user: { id: 'cbd42dc1-1b15-4c59-bea6-7e01968a9603', local_user_id: '275faa00-8a9c-4747-8fbe-417ddb966b16' },
+    };
+    expect(() => {
+      alexaHandler.onReportState(body);
+    }).to.throw('Device "device-1" not found');
+  });
 });
