@@ -199,6 +199,9 @@ const ActionCard = ({ children, ...props }) => (
             index={props.index}
             updateActionProperty={props.updateActionProperty}
             setVariables={props.setVariables}
+            actionsGroupsBefore={props.actionsGroupsBefore}
+            variables={props.variables}
+            triggersVariables={props.triggersVariables}
           />
         )}
         {props.action.type === ACTIONS.CONDITION.CHECK_TIME && (

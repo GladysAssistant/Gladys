@@ -4,7 +4,14 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import update from 'immutability-helper';
 
+import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
+
 const METHOD_WITH_BODY = ['post', 'patch', 'put'];
+
+const helpTextStyle = {
+  fontSize: 12,
+  marginBottom: '.375rem'
+};
 
 const getAllPropertiesObject = (obj, path = '', results = []) => {
   Object.keys(obj).forEach(key => {
@@ -70,7 +77,6 @@ class Header extends Component {
   }
 }
 
-@connect('httpClient', {})
 class HttpRequestAction extends Component {
   handleChangeMethod = e => {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'method', e.target.value);
@@ -81,8 +87,8 @@ class HttpRequestAction extends Component {
   handleChangeUrl = e => {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'url', e.target.value);
   };
-  handleChangeBody = e => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', e.target.value);
+  handleChangeBody = text => {
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', text);
   };
   addNewHeader = e => {
     e.preventDefault();
@@ -260,12 +266,16 @@ class HttpRequestAction extends Component {
                       <Text id="global.requiredField" />
                     </span>
                   </label>
+                  <div style={helpTextStyle}>
+                    <Text id="editScene.actionsCard.httpRequest.variablesExplanation" />
+                  </div>
                   <Localizer>
-                    <textarea
-                      type="text"
-                      class="form-control"
-                      value={props.action.body}
-                      onChange={this.handleChangeBody}
+                    <TextWithVariablesInjected
+                      text={props.action.body}
+                      updateText={this.handleChangeBody}
+                      triggersVariables={props.triggersVariables}
+                      actionsGroupsBefore={props.actionsGroupsBefore}
+                      variables={props.variables}
                       placeholder={<Text id="editScene.actionsCard.httpRequest.bodyPlaceholder" />}
                     />
                   </Localizer>
@@ -297,4 +307,4 @@ class HttpRequestAction extends Component {
   }
 }
 
-export default HttpRequestAction;
+export default connect('httpClient', {})(HttpRequestAction);

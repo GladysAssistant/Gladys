@@ -1034,6 +1034,7 @@
         "headersValuePlaceholder": "Valeur",
         "responseData": "Réponse",
         "tryButton": "Essayer",
+        "variablesExplanation": "Pour injecter une variable défini dans un bloc \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injecté que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       },
       "scene": {
