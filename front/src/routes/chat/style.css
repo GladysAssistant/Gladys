@@ -175,3 +175,7 @@
   margin-bottom: 6px;
   border-radius: 5px;
 }
+
+.msg_txt_wrap {
+  white-space: pre-line;
+}

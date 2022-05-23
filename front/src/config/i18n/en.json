@@ -627,6 +627,20 @@
       "cancelButton": "Cancel",
       "connectButton": "Link"
     },
+    "alexa": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Do you want to connect Gladys Assistant to Amazon Alexa?",
+      "description": "By signin in, you are authorizing Alexa to access your devices.",
+      "error": "An error occured. Please retry !",
+      "connectedAs": "Connected as",
+      "googleWillBeAble": "Alexa will be able:",
+      "seeDevices": "List all your devices",
+      "controlDevices": "Control all your devices",
+      "getNewDeviceValues": "Periodically refresh your device states",
+      "privacyPolicy": "Read Alexa's <a href=\"https://www.alexa.com/help/privacy\">privacy policy</a>.",
+      "cancelButton": "Cancel",
+      "connectButton": "Link"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Control your Z-Wave devices.",
