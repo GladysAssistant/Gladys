@@ -242,7 +242,7 @@ const AppRouter = connect(
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
         <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
-        
+
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
         <MapNewAreaPage path="/dashboard/maps/area/new" />
