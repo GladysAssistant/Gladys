@@ -13,7 +13,7 @@ module.exports = function BluetoothService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Bluetooth service');
-    bluetoothManager.start();
+    await bluetoothManager.start();
   }
 
   /**

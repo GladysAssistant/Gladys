@@ -9,7 +9,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 async function setPermitJoin() {
   this.z2mPermitJoin = !this.z2mPermitJoin;
   // Send message to Zigbee2mqtt topics
-  this.mqttClient.publish(`zigbee2mqtt/bridge/config/permit_join`, this.z2mPermitJoin.toString());
+  this.mqttClient.publish(`zigbee2mqtt/bridge/request/permit_join`, this.z2mPermitJoin.toString());
   logger.log('Set Permit_join to', this.z2mPermitJoin);
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
