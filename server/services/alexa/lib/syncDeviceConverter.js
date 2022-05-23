@@ -33,10 +33,13 @@ function syncDeviceConverter(device) {
     if (displayCategory && endpoint.displayCategories.indexOf(displayCategory) === -1) {
       endpoint.displayCategories.push(displayCategory);
     }
-    // we get the capability if handled
-    const capability = get(mappings, `${value.category}.capabilities.${value.type}`);
-    if (capability) {
-      endpoint.capabilities.push(capability);
+    // read only devices are not returned
+    if (value.read_only === false) {
+      // we get the capability if handled
+      const capability = get(mappings, `${value.category}.capabilities.${value.type}`);
+      if (capability) {
+        endpoint.capabilities.push(capability);
+      }
     }
   });
 
