@@ -39,10 +39,10 @@ function createActions(store) {
         if (state.rtspCameraSearch && state.rtspCameraSearch.length) {
           options.search = state.rtspCameraSearch;
         }
-        let rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
+        const rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
         // find camera params
-        rtspCameras = rtspCameras.map(camera => {
-          return actions.complete(camera);
+        rtspCameras.forEach(camera => {
+          actions.complete(camera);
         });
         store.setState({
           rtspCameras,
