@@ -29,6 +29,7 @@ describe('alexa.onDiscovery', () => {
           external_id: 'device-1-external-id',
           features: [
             {
+              read_only: false,
               category: 'light',
               type: 'binary',
             },
@@ -76,5 +77,44 @@ describe('alexa.onDiscovery', () => {
     };
     expect(result).to.deep.eq(expectedResult);
     assert.calledOnce(gladys.stateManager.state.device.device_1.get);
+  });
+  it('return not return read_only devices', async () => {
+    gladys.stateManager.state.device = {
+      device_1: {
+        get: fake.returns({
+          name: 'Device 1',
+          selector: 'device-1',
+          external_id: 'device-1-external-id',
+          features: [
+            {
+              read_only: true,
+              category: 'light',
+              type: 'binary',
+            },
+          ],
+          model: 'device-model',
+          room: {
+            name: 'living-room',
+          },
+        }),
+      },
+    };
+
+    const alexaHandler = new AlexaHandler(gladys, serviceId);
+    const result = alexaHandler.onDiscovery();
+    const expectedResult = {
+      event: {
+        header: {
+          namespace: 'Alexa.Discovery',
+          name: 'Discover.Response',
+          payloadVersion: '3',
+          messageId: get(result, 'event.header.messageId'),
+        },
+        payload: {
+          endpoints: [],
+        },
+      },
+    };
+    expect(result).to.deep.eq(expectedResult);
   });
 });

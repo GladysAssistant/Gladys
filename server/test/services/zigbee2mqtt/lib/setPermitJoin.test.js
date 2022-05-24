@@ -31,7 +31,7 @@ describe('zigbee2mqtt setPermitJoin', () => {
     // EXECUTE
     await zigbee2MqttService.device.setPermitJoin();
     // ASSERT
-    assert.calledWith(mqtt.publish, 'zigbee2mqtt/bridge/config/permit_join', 'true');
+    assert.calledWith(mqtt.publish, 'zigbee2mqtt/bridge/request/permit_join', 'true');
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,

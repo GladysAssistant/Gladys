@@ -17,6 +17,7 @@ describe('alexa.onReportState', () => {
           external_id: 'device-1-external-id',
           features: [
             {
+              read_only: false,
               category: 'light',
               type: 'binary',
               last_value: 1,
