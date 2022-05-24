@@ -183,6 +183,7 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
+    // Lixee TIC Device
     BASE: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
@@ -316,6 +317,13 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.WATT,
       },
     },
+    SMAXN: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+      },
+    },
     SMAXN2: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
@@ -330,7 +338,35 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
       },
     },
+    'SMAXN-1': {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+      },
+    },
+    'SMAXN2-1': {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+      },
+    },
+    'SMAXN3-1': {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+      },
+    },
     PAPP: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+        unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+      },
+    },
+    SINSTS: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
@@ -532,5 +568,6 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
       },
     },
+    // End of Lixee TIC device
   },
 };
