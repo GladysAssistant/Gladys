@@ -14,10 +14,12 @@ const DEVICE_1_LIGHT = {
   external_id: 'device-1-external-id',
   features: [
     {
+      read_only: false,
       category: 'light',
       type: 'brightness',
     },
     {
+      read_only: false,
       category: 'light',
       type: 'binary',
     },
@@ -34,6 +36,7 @@ const DEVICE_1_SWITCH = {
   external_id: 'device-1-external-id',
   features: [
     {
+      read_only: false,
       category: 'switch',
       type: 'binary',
     },
@@ -340,6 +343,7 @@ describe('alexa.onExecute', () => {
                 external_id: 'device-1-external-id',
                 features: [
                   {
+                    read_only: false,
                     category: 'switch',
                     type: 'binary',
                   },
@@ -384,6 +388,7 @@ describe('alexa.onExecute', () => {
       stateManager: {
         get: () => {
           return {
+            read_only: false,
             category: 'light',
             type: 'binary',
           };
@@ -397,6 +402,7 @@ describe('alexa.onExecute', () => {
                 external_id: 'device-1-external-id',
                 features: [
                   {
+                    read_only: false,
                     category: 'light',
                     type: 'binary',
                   },
