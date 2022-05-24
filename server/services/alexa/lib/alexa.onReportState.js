@@ -22,7 +22,7 @@ function onReportState(body) {
   device.features.forEach((feature) => {
     const func = get(readValues, `${feature.category}.${feature.type}`);
     const mapping = get(mappings, `${feature.category}.capabilities.${feature.type}`);
-    if (func && mapping) {
+    if (func && mapping && feature.read_only === false) {
       properties.push({
         namespace: mapping.interface,
         name: get(mapping, 'properties.supported.0.name'),
