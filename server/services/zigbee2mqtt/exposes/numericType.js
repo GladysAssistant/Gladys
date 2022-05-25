@@ -189,6 +189,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     ISOUSC: {
@@ -196,6 +198,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
         unit: DEVICE_FEATURE_UNITS.AMPERE,
+        min: 0,
+        max: 1000000,
       },
     },
     HCHC: {
@@ -203,6 +207,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     HCHP: {
@@ -210,6 +216,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     BBRHCJW: {
@@ -217,6 +225,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     BBRHPJW: {
@@ -224,6 +234,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     BBRHCJR: {
@@ -231,6 +243,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     BBRHPJR: {
@@ -238,6 +252,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     EASF07: {
@@ -245,6 +261,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     EASF08: {
@@ -252,6 +270,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     EASF09: {
@@ -259,6 +279,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     EASF10: {
@@ -266,6 +288,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     IINST: {
@@ -392,6 +416,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     EASD02: {
@@ -399,6 +425,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     EASD03: {
@@ -406,6 +434,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     EASD04: {
@@ -413,6 +443,8 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
         unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        min: 0,
+        max: 1000000,
       },
     },
     URMS1: {
@@ -572,6 +604,30 @@ module.exports = {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
         type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.BINARY,
+      },
+    },
+    EAST: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        min: 0,
+        max: 1000000,
+      },
+    },
+    EASF01: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        min: 0,
+        max: 1000000,
+      },
+    },
+    EASF02: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.INDEX,
+        min: 0,
+        max: 1000000,
       },
     },
     // End of Lixee TIC device
