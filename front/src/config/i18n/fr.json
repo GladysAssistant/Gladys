@@ -1685,6 +1685,24 @@
     "months": "m",
     "years": "an"
   },
+  "deviceFeatureAction": {
+    "category": {
+      "shutter": {
+        "state": {
+          "zero": "Arrêter",
+          "one": "Ouvrir",
+          "other": "Fermer"
+        }
+      },
+      "curtain": {
+        "state": {
+          "zero": "Arrêter",
+          "one": "Ouvrir",
+          "other": "Fermer"
+        }
+      }
+    }
+  },
   "deviceFeatureValue": {
     "type": {
       "binary": {
@@ -1896,6 +1914,16 @@
     "voc-sensor": {
       "shortCategoryName": "Capteur de pollution COV",
       "decimal": "COV (Décimale)"
+    },
+    "shutter": {
+      "shortCategoryName": "Volet",
+      "state": "Etat",
+      "position": "Position"
+    },
+    "curtain": {
+      "shortCategoryName": "Rideau",
+      "state": "Etat",
+      "position": "Position"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
