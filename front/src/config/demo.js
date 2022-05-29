@@ -146,7 +146,13 @@ const data = {
         {
           type: 'devices-in-room',
           room: 'living-room',
-          device_features: ['main-tv-binary', 'main-tv-volume', 'main-tv-channel', 'main-presence-sensor']
+          device_features: [
+            'main-tv-binary',
+            'main-tv-volume',
+            'main-tv-channel',
+            'main-presence-sensor',
+            'main-signal-sensor'
+          ]
         }
       ],
       [
@@ -316,6 +322,18 @@ const data = {
             max: 1,
             read_only: true,
             last_value: 0,
+            last_value_changed: dayjs().add(60, 'second')
+          },
+          {
+            name: 'Signal quality',
+            selector: 'main-signal-sensor',
+            category: 'signal',
+            type: 'integer',
+            unit: null,
+            min: 0,
+            max: 5,
+            read_only: true,
+            last_value: 4,
             last_value_changed: dayjs().add(60, 'second')
           }
         ]
@@ -493,6 +511,18 @@ const data = {
             max: 1,
             read_only: true,
             last_value: 0,
+            last_value_changed: dayjs().add(60, 'second')
+          },
+          {
+            name: 'Signal quality',
+            selector: 'main-signal-sensor',
+            category: 'signal',
+            type: 'integer',
+            unit: null,
+            min: 0,
+            max: 100,
+            read_only: true,
+            last_value: 82,
             last_value_changed: dayjs().add(60, 'second')
           },
           {
