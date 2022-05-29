@@ -30,6 +30,10 @@ const YeelightHandler = function YeelightHandler(gladys, yeelightApi, serviceId)
 
   this.discoveryInProgress = false;
   this.discovery = undefined;
+
+  this.getIntValue = (value) => {
+    return parseInt(value.toString(), 10);
+  };
 };
 
 YeelightHandler.prototype.discover = discover;

@@ -29,19 +29,30 @@ const DevicePropery = {
   NL_BR: 'nl_br',
   ACTIVE_MODE: 'active_mode',
 };
-const devices = [yeelightColor, yeelightWhite, yeelightUnhandled];
 
-class Discover extends EventEmitter {
+class DiscoverMock extends EventEmitter {
+  constructor(returnDevices, isTimeout = false) {
+    super();
+    this.returnDevices = returnDevices;
+    this.isTimeout = isTimeout;
+  }
+
   start() {
     this.test = 1; // useless, this is just for eslint
-    devices.forEach((device) => this.emit('deviceAdded', device));
-    return new Promise((resolve, _) => resolve(devices));
+    if (this.isTimeout) {
+      return new Promise((resolve, _) => setTimeout(() => resolve([]), 10500));
+    }
+    this.returnDevices.forEach((device) => this.emit('deviceAdded', device));
+    return new Promise((resolve, _) => resolve(this.returnDevices));
   }
 
   scanByIp() {
     this.test = 1; // useless, this is just for eslint
-    devices.forEach((device) => this.emit('deviceAdded', device));
-    return new Promise((resolve, _) => resolve(devices));
+    if (this.isTimeout) {
+      return new Promise((resolve, _) => setTimeout(() => resolve([]), 10500));
+    }
+    this.returnDevices.forEach((device) => this.emit('deviceAdded', device));
+    return new Promise((resolve, _) => resolve(this.returnDevices));
   }
 
   destroy() {
@@ -50,27 +61,49 @@ class Discover extends EventEmitter {
   }
 }
 
-const connected = {
-  options: { lightIp: '192.168.0.0', lightPort: 55443, timeout: 5000 },
-  connected: true,
-};
+class DiscoverEmpty extends DiscoverMock {
+  constructor() {
+    super([]);
+  }
+}
 
-class Yeelight {
-  constructor({ lightIp, lightPort }) {
-    this.lightIp = lightIp;
-    this.lightPort = lightPort;
+class DiscoverFull extends DiscoverMock {
+  constructor() {
+    super([yeelightColor, yeelightWhite, yeelightUnhandled]);
+  }
+}
+
+class DiscoverTimeout extends DiscoverMock {
+  constructor() {
+    super([], true);
+  }
+}
+
+class YeelightMock extends EventEmitter {
+  constructor({ lightIp, lightPort, isEmpty, isTimeout }) {
+    super();
+    this.connected = false;
+    this.options = { lightIp, lightPort, timeout: 5000 };
+    this.isEmpty = isEmpty;
+    this.isTimeout = isTimeout;
   }
 
   connect() {
-    if (this.lightIp !== 'not_found') {
-      connected.options.lightIp = this.lightIp;
-      return Promise.resolve(connected);
+    if (!this.isEmpty) {
+      if (this.options.lightIp === 'not_exist') {
+        return Promise.resolve(null);
+      }
+      this.connected = this.options.lightIp !== 'not_connected';
+      return Promise.resolve(this);
     }
     return Promise.reject(new Error('Connection timeout'));
   }
 
   setPower(turnOn, effect = 'sudden', duration = 500) {
     this.test = 1; // useless, this is just for eslint
+    if (this.isEmpty || this.isTimeout) {
+      return Promise.resolve(null);
+    }
     return Promise.resolve({
       action: 'set_power',
       command: { id: 1, method: 'set_power', params: [turnOn ? 'on' : 'off', effect, duration] },
@@ -81,6 +114,9 @@ class Yeelight {
 
   setBright(brightness, effect = 'sudden', duration = 500) {
     this.test = 1; // useless, this is just for eslint
+    if (this.isEmpty || this.isTimeout) {
+      return Promise.resolve(null);
+    }
     return Promise.resolve({
       action: 'set_bright',
       command: { id: 1, method: 'set_bright', params: [brightness, effect, duration] },
@@ -91,6 +127,9 @@ class Yeelight {
 
   setCtAbx(ct, effect = 'sudden', duration = 500) {
     this.test = 1; // useless, this is just for eslint
+    if (this.isEmpty || this.isTimeout) {
+      return Promise.resolve(null);
+    }
     return Promise.resolve({
       action: 'set_ct_abx',
       command: { id: 1, method: 'set_ct_abx', params: [ct, effect, duration] },
@@ -101,6 +140,9 @@ class Yeelight {
 
   setRGB(color, effect = 'sudden', duration = 500) {
     this.test = 1; // useless, this is just for eslint
+    if (this.isEmpty || this.isTimeout) {
+      return Promise.resolve(null);
+    }
     const mergedColor = color.red * 65536 + color.green * 256 + color.blue;
     return Promise.resolve({
       action: 'set_rgb',
@@ -112,6 +154,9 @@ class Yeelight {
 
   getProperty(params) {
     this.test = 1; // useless, this is just for eslint
+    if (this.isEmpty || this.isTimeout) {
+      return Promise.resolve(null);
+    }
     return Promise.resolve({
       action: 'get_prop',
       command: { id: 1, method: 'get_prop', params },
@@ -121,33 +166,53 @@ class Yeelight {
   }
 
   disconnect() {
-    this.test = 1; // useless, this is just for eslint
+    this.connected = false;
     return Promise.resolve(null);
   }
 
   getPropsByParams(props) {
     this.test = 1; // useless, this is just for eslint
     const results = [];
-    props.forEach((prop) => {
-      switch (prop) {
-        case 'power':
-          results.push('off');
-          break;
-        case 'bright':
-          results.push(50);
-          break;
-        case 'ct':
-          results.push(4000);
-          break;
-        case 'rgb':
-          results.push(1315890);
-          break;
+    if (!this.isEmpty && !this.isTimeout) {
+      props.forEach((prop) => {
+        switch (prop) {
+          case 'power':
+            results.push('off');
+            break;
+          case 'bright':
+            results.push(50);
+            break;
+          case 'ct':
+            results.push(4000);
+            break;
+          case 'rgb':
+            results.push(1315890);
+            break;
 
-        default:
-          break;
-      }
-    });
+          default:
+            break;
+        }
+      });
+    }
     return results;
+  }
+}
+
+class YeelightEmpty extends YeelightMock {
+  constructor({ lightIp, lightPort }) {
+    super({ lightIp, lightPort, isEmpty: true, isTimeout: false });
+  }
+}
+
+class YeelightFull extends YeelightMock {
+  constructor({ lightIp, lightPort }) {
+    super({ lightIp, lightPort, isEmpty: false, isTimeout: false });
+  }
+}
+
+class YeelightTimeout extends YeelightMock {
+  constructor({ lightIp, lightPort }) {
+    super({ lightIp, lightPort, isEmpty: false, isTimeout: true });
   }
 }
 
@@ -177,11 +242,29 @@ class Color {
   }
 }
 
-const MockedYeelightApi = {
-  Discover,
-  Yeelight,
+const MockedEmptyYeelightApi = {
+  Discover: DiscoverEmpty,
+  Yeelight: YeelightEmpty,
   Color,
   DevicePropery,
 };
 
-module.exports = MockedYeelightApi;
+const MockedYeelightApi = {
+  Discover: DiscoverFull,
+  Yeelight: YeelightFull,
+  Color,
+  DevicePropery,
+};
+
+const MockedTimeoutYeelightApi = {
+  Discover: DiscoverTimeout,
+  Yeelight: YeelightTimeout,
+  Color,
+  DevicePropery,
+};
+
+module.exports = {
+  MockedYeelightApi,
+  MockedEmptyYeelightApi,
+  MockedTimeoutYeelightApi,
+};

@@ -1,23 +1,23 @@
 const { expect } = require('chai');
-const sinon = require('sinon');
+const { assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const GladysColorDevice = require('../../mocks/gladys/color.json');
 const GladysWhiteDevice = require('../../mocks/gladys/white.json');
 const GladysUnhandledDevice = require('../../mocks/gladys/unhandled.json');
-const YeelightApi = require('../../mocks/yeelight.mock.test');
-const YeelightEmptyApi = require('../../mocks/yeelight-empty.mock.test');
-const YeelightTimeoutApi = require('../../mocks/yeelight-timeout.mock.test');
-
-const { assert } = sinon;
+const {
+  MockedYeelightApi,
+  MockedEmptyYeelightApi,
+  MockedTimeoutYeelightApi,
+} = require('../../mocks/yeelight.mock.test');
 
 const YeelightService = proxyquire('../../../../../services/yeelight/index', {
-  'yeelight-awesome': YeelightApi,
+  'yeelight-awesome': MockedYeelightApi,
 });
 const YeelightEmptyService = proxyquire('../../../../../services/yeelight/index', {
-  'yeelight-awesome': YeelightEmptyApi,
+  'yeelight-awesome': MockedEmptyYeelightApi,
 });
 const YeelightTimeoutService = proxyquire('../../../../../services/yeelight/index', {
-  'yeelight-awesome': YeelightTimeoutApi,
+  'yeelight-awesome': MockedTimeoutYeelightApi,
 });
 
 const gladysWithoutDevices = {
@@ -30,42 +30,44 @@ const gladysWithoutDevices = {
 const gladysWithColorAndUnhandledDevice = {
   stateManager: {
     get: (key, externalId) => {
-      if (externalId === 'yeelight:0x0000000000000001') {
-        return GladysColorDevice;
+      switch (externalId) {
+        case 'yeelight:0x0000000000000001':
+          return GladysColorDevice;
+        case 'yeelight:0x0000000000000003':
+          return GladysUnhandledDevice;
+        default:
+          return undefined;
       }
-      if (externalId === 'yeelight:0x0000000000000003') {
-        return GladysUnhandledDevice;
-      }
-      return undefined;
     },
   },
 };
 const gladysWithColorAndWhiteDevice = {
   stateManager: {
     get: (key, externalId) => {
-      if (externalId === 'yeelight:0x0000000000000001') {
-        return GladysColorDevice;
+      switch (externalId) {
+        case 'yeelight:0x0000000000000001':
+          return GladysColorDevice;
+        case 'yeelight:0x0000000000000002':
+          return GladysWhiteDevice;
+        default:
+          return undefined;
       }
-      if (externalId === 'yeelight:0x0000000000000002') {
-        return GladysWhiteDevice;
-      }
-      return undefined;
     },
   },
 };
 const gladysWithThreeDevices = {
   stateManager: {
     get: (key, externalId) => {
-      if (externalId === 'yeelight:0x0000000000000001') {
-        return GladysColorDevice;
+      switch (externalId) {
+        case 'yeelight:0x0000000000000001':
+          return GladysColorDevice;
+        case 'yeelight:0x0000000000000002':
+          return GladysWhiteDevice;
+        case 'yeelight:0x0000000000000003':
+          return GladysUnhandledDevice;
+        default:
+          return undefined;
       }
-      if (externalId === 'yeelight:0x0000000000000002') {
-        return GladysWhiteDevice;
-      }
-      if (externalId === 'yeelight:0x0000000000000003') {
-        return GladysUnhandledDevice;
-      }
-      return undefined;
     },
   },
 };
