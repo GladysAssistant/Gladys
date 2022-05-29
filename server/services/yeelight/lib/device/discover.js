@@ -1,4 +1,5 @@
 const Promise = require('bluebird');
+bluebird
 const logger = require('../../../../utils/logger');
 const features = require('../features');
 const { DEVICE_EXTERNAL_ID_BASE } = require('../utils/constants');
