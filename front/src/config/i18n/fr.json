@@ -669,6 +669,20 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "alexa": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Voulez-vous connecter Gladys Assistant à Amazon Alexa ?",
+      "description": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
+      "error": "Une erreur est survenue. Merci de réessayer.",
+      "connectedAs": "Connecté en tant que",
+      "googleWillBeAble": "Amazon Alexa pourra :",
+      "seeDevices": "Lister les appareils présents chez vous",
+      "controlDevices": "Contrôler vos appareils",
+      "getNewDeviceValues": "Récupérer périodiquement les états de vos appareils",
+      "privacyPolicy": "Lire la <a href=\"https://www.alexa.com/help/privacy\">politique de confidentialité d'Alexa</a>.",
+      "cancelButton": "Annuler",
+      "connectButton": "Lier"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Contrôlez vos appareils Z-Wave.",
@@ -814,7 +828,7 @@
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "installBrokerContainer": "Utiliser un broker dans un conteneur Docker.",
-        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer and configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
+        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer et configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
         "installBrokerButton": "Installez le broker sur Docker",
         "installingBrokerButton": "Installation en cours...",
         "installBrokerError": "Une erreur est survenue lors de l'installation du conteneur Docker, veuillez consulter les logs Gladys.",
@@ -954,10 +968,10 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "turnOnLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez allumer"
+        "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
       "turnOffLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez éteindre"
+        "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
@@ -1055,7 +1069,7 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer la lumière",
+        "turn-on": "Allumer les lumières",
         "turn-off": "Eteindre les lumières"
       },
       "switch": {
@@ -2007,9 +2021,11 @@
     "neverUsed": "Jamais"
   },
   "gatewayTwoFactorAuth": {
-    "title": "Gladys Gateway",
-    "configureTitle": "Configurer l'authentification Two-Factor (\"2FA\")",
+    "title": "Gladys Plus",
+    "configureTitle": "Configurer l'authentification à deux facteurs (\"2FA\")",
     "configureButton": "Configurer la 2FA",
+    "secretLabel": "Secret",
+    "copy": "Copier",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
     "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",
@@ -2019,7 +2035,7 @@
     "app": {
       "open": "Ouvrez votre application 2FA",
       "addAccount": "Cliquez sur \"Ajouter un compte\"",
-      "scanQRCode": "Scannez le QR Code ci-dessous"
+      "scanQRCode": "Scannez le QR Code ci-dessous, ou copiez manuellement le secret pour l'ajouter manuellement à votre application."
     }
   },
   "gatewaySignUp": {
