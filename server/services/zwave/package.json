@@ -15,6 +15,6 @@
   "dependencies": {
     "dayjs": "^1.10.7",
     "node-schedule": "^2.0.0",
-    "zwave-js": ">=9.0.0-beta.3"
+    "zwave-js": "^9.2.2"
   }
 }
