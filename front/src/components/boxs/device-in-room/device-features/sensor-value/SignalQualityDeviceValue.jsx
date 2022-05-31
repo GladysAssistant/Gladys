@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import TablerIcon from '../../../../icons/TablerIcon';
 
 const SignalQualityDeviceValue = ({ deviceFeature }) => {
   const { last_value: lastValue, min, max } = deviceFeature;
@@ -10,7 +11,7 @@ const SignalQualityDeviceValue = ({ deviceFeature }) => {
   const ratio = Math.round(((lastValue - min) * 5) / (max - min));
   return (
     <div class="d-flex flex-row-reverse">
-      <div class={`gi gi-antenna-bars-${ratio}`} />
+      <TablerIcon icon={`antenna-bars-${ratio || 'off'}`} />
     </div>
   );
 };
