@@ -84,8 +84,8 @@ async function requestChanges(xhr, calendarToUpdate) {
     });
     // eslint-disable-next-line no-await-in-loop
     result = await xhr.send(req, calendarToUpdate.external_id);
-    eventsToUpdate.push(...result.responses.filter((event) => event.props.getetag));
-  } while (result.responses.length > 0 && !result.responses[result.responses.length - 1].props.getetag);
+    eventsToUpdate.push(...result.responses.filter((event) => event.href));
+  } while (result.responses.length > 0);
 
   return eventsToUpdate;
 }
