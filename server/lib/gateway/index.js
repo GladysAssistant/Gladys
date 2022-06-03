@@ -11,9 +11,11 @@ const serverUrl = getConfig().gladysGatewayServerUrl;
 const cryptoLib = new WebCrypto();
 
 const { backup } = require('./gateway.backup');
+const { forwardDeviceStateToAlexa } = require('./gateway.forwardDeviceStateToAlexa');
 const { forwardDeviceStateToGoogleHome } = require('./gateway.forwardDeviceStateToGoogleHome');
 const { checkIfBackupNeeded } = require('./gateway.checkIfBackupNeeded');
 const { handleGoogleHomeMessage } = require('./gateway.handleGoogleHomeMessage');
+const { handleAlexaMessage } = require('./gateway.handleAlexaMessage');
 const { handleNewMessage } = require('./gateway.handleNewMessage');
 const { login } = require('./gateway.login');
 const { loginTwoFactor } = require('./gateway.loginTwoFactor');
@@ -46,8 +48,11 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.restoreInProgress = false;
   this.usersKeys = [];
   this.googleHomeConnected = false;
+  this.alexaConnected = false;
   this.forwardStateToGoogleHomeTimeouts = new Map();
+  this.forwardStateToAlexaTimeouts = new Map();
   this.googleHomeForwardStateTimeout = 5 * 1000;
+  this.alexaForwardStateTimeout = 5 * 1000;
   this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
@@ -61,11 +66,14 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.event.on(EVENTS.WEBSOCKET.SEND, eventFunctionWrapper(this.forwardWebsockets.bind(this)));
   this.event.on(EVENTS.GATEWAY.USER_KEYS_CHANGED, eventFunctionWrapper(this.refreshUserKeys.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToGoogleHome.bind(this)));
+  this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToAlexa.bind(this)));
 };
 
 Gateway.prototype.backup = backup;
 Gateway.prototype.checkIfBackupNeeded = checkIfBackupNeeded;
 Gateway.prototype.handleGoogleHomeMessage = handleGoogleHomeMessage;
+Gateway.prototype.handleAlexaMessage = handleAlexaMessage;
+Gateway.prototype.forwardDeviceStateToAlexa = forwardDeviceStateToAlexa;
 Gateway.prototype.forwardDeviceStateToGoogleHome = forwardDeviceStateToGoogleHome;
 Gateway.prototype.handleNewMessage = handleNewMessage;
 Gateway.prototype.login = login;

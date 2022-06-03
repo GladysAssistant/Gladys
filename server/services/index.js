@@ -1,3 +1,4 @@
+module.exports.alexa = require('./alexa');
 module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
 module.exports.openweather = require('./openweather');

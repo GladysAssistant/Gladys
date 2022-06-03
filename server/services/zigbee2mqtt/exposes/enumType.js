@@ -13,8 +13,11 @@ module.exports = {
       case BUTTON_STATUS.DOUBLE_CLICK:
         relatedValue = 'double';
         break;
-      case BUTTON_STATUS.LONG_CLICK:
+      case BUTTON_STATUS.HOLD_CLICK:
         relatedValue = 'hold';
+        break;
+      case BUTTON_STATUS.LONG_CLICK:
+        relatedValue = 'long';
         break;
       default:
         relatedValue = undefined;
@@ -34,6 +37,8 @@ module.exports = {
       case 'double':
         return BUTTON_STATUS.DOUBLE_CLICK;
       case 'hold':
+        return BUTTON_STATUS.HOLD_CLICK;
+      case 'long':
         return BUTTON_STATUS.LONG_CLICK;
       default:
         return undefined;

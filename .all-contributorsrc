@@ -200,6 +200,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "rpochet",
+      "name": "Pochet Romuald",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5940493?v=4",
+      "profile": "https://github.com/rpochet",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
