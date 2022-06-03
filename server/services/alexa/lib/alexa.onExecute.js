@@ -23,6 +23,7 @@ function onExecute(body) {
   const endpointId = get(body, 'directive.endpoint.endpointId');
   const correlationToken = get(body, 'directive.header.correlationToken');
   let value;
+  let nameOfAlexaFeature;
   const deviceInMemory = this.gladys.stateManager.get('device', endpointId);
   if (!deviceInMemory) {
     throw new NotFoundError(`Device "${endpointId}" not found`);
@@ -36,6 +37,21 @@ function onExecute(body) {
           f.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       );
       value = writeValues['Alexa.PowerController'](directiveName);
+      nameOfAlexaFeature = 'powerState';
+      break;
+    case 'Alexa.BrightnessController':
+      deviceFeature = deviceInMemory.features.find(
+        (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+      );
+      value = get(body, 'directive.payload.brightness');
+      nameOfAlexaFeature = 'brightness';
+      break;
+    case 'Alexa.ColorController':
+      deviceFeature = deviceInMemory.features.find(
+        (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+      );
+      value = writeValues['Alexa.ColorController'](get(body, 'directive.payload.color'));
+      nameOfAlexaFeature = 'color';
       break;
     default:
       throw new BadParameters(`Unkown directive ${directiveNamespace}`);
@@ -65,8 +81,8 @@ function onExecute(body) {
     context: {
       properties: [
         {
-          namespace: 'Alexa.PowerController',
-          name: 'powerState',
+          namespace: directiveNamespace,
+          name: nameOfAlexaFeature,
           value: readValues[deviceFeature.category][deviceFeature.type](value),
           timeOfSample: new Date().toISOString(),
           uncertaintyInMilliseconds: 500,
