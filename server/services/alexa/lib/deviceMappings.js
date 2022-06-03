@@ -83,8 +83,8 @@ const readValues = {
       const hsb = rgbToHsb(rgb);
       return {
         hue: hsb[0],
-        saturation: hsb[1],
-        brightness: hsb[2],
+        saturation: hsb[1] / 100,
+        brightness: hsb[2] / 100,
       };
     },
   },
@@ -100,7 +100,7 @@ const writeValues = {
     return directiveName === 'TurnOn' ? 1 : 0;
   },
   'Alexa.ColorController': (hsbColor) => {
-    const rgb = hsbToRgb([hsbColor.hue, hsbColor.saturation, hsbColor.brightness]);
+    const rgb = hsbToRgb([hsbColor.hue, hsbColor.saturation * 100, hsbColor.brightness * 100]);
     const int = rgbToInt(rgb);
     return int;
   },

@@ -297,8 +297,8 @@ describe('alexa.onExecute', () => {
         payload: {
           color: {
             hue: 300,
-            saturation: 100,
-            brightness: 100,
+            saturation: 1,
+            brightness: 1,
           },
         },
       },
@@ -333,8 +333,8 @@ describe('alexa.onExecute', () => {
             name: 'color',
             value: {
               hue: 300,
-              saturation: 100,
-              brightness: 100,
+              saturation: 1,
+              brightness: 1,
             },
             timeOfSample: get(result, 'context.properties.0.timeOfSample'),
             uncertaintyInMilliseconds: 500,
