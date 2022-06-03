@@ -1,4 +1,4 @@
-const spritePath = '/assets/icons/icon-sprite.svg';
+import IconSprite from '/assets/icons/icon-sprite.svg';
 
 const TablerIcon = ({ icon }) => (
   <svg
@@ -10,7 +10,7 @@ const TablerIcon = ({ icon }) => (
     stroke-linecap="round"
     stroke-linejoin="round"
   >
-    <use href={`${spritePath}#${icon}`} />
+    <use href={`${IconSprite}#${icon}`} />
   </svg>
 );
 
