@@ -166,6 +166,14 @@ describe('alexa.onExecute', () => {
       value: 0,
       device: 'device-1',
       feature_category: 'light',
+      feature_type: 'brightness',
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      type: 'device.set-value',
+      status: 'pending',
+      value: 0,
+      device: 'device-1',
+      feature_category: 'light',
       feature_type: 'binary',
     });
     expect(result).to.deep.equal({

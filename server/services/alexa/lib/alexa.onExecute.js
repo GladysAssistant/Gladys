@@ -30,7 +30,7 @@ function onExecute(body) {
   }
   let deviceFeature;
 
-  const controlPowerIfNeeded = (category, binaryValue) => {
+  const controlPower = (category, binaryValue) => {
     const action = {
       type: ACTIONS.DEVICE.SET_VALUE,
       status: ACTIONS_STATUS.PENDING,
@@ -38,6 +38,18 @@ function onExecute(body) {
       device: endpointId,
       feature_category: category,
       feature_type: 'binary',
+    };
+    this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+  };
+
+  const resetBrightness = () => {
+    const action = {
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: 0,
+      device: endpointId,
+      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      feature_type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
     };
     this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
   };
@@ -50,6 +62,9 @@ function onExecute(body) {
           f.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       );
       value = writeValues['Alexa.PowerController'](directiveName);
+      if (value === 0) {
+        resetBrightness();
+      }
       nameOfAlexaFeature = 'powerState';
       break;
     case 'Alexa.BrightnessController':
@@ -64,11 +79,11 @@ function onExecute(body) {
       nameOfAlexaFeature = 'brightness';
       // if the brightness is set to 0, turn off the light
       if (value === 0) {
-        controlPowerIfNeeded(deviceFeature.category, 0);
+        controlPower(deviceFeature.category, 0);
       } else {
         // if the brightness is set to something positive, make
         // sure the light is on
-        controlPowerIfNeeded(deviceFeature.category, 1);
+        controlPower(deviceFeature.category, 1);
       }
       break;
     case 'Alexa.ColorController':
@@ -78,7 +93,7 @@ function onExecute(body) {
       value = writeValues['Alexa.ColorController'](get(body, 'directive.payload.color'));
       nameOfAlexaFeature = 'color';
       // Make sure the light is on if we change the light color
-      controlPowerIfNeeded(deviceFeature.category, 1);
+      controlPower(deviceFeature.category, 1);
       break;
     default:
       throw new BadParameters(`Unkown directive ${directiveNamespace}`);
