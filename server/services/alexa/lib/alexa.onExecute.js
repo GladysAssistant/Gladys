@@ -29,6 +29,19 @@ function onExecute(body) {
     throw new NotFoundError(`Device "${endpointId}" not found`);
   }
   let deviceFeature;
+
+  const controlPowerIfNeeded = (category, binaryValue) => {
+    const action = {
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: binaryValue,
+      device: endpointId,
+      feature_category: category,
+      feature_type: 'binary',
+    };
+    this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+  };
+
   switch (directiveNamespace) {
     case 'Alexa.PowerController':
       deviceFeature = deviceInMemory.features.find(
@@ -49,6 +62,14 @@ function onExecute(body) {
         deviceFeature.last_value,
       );
       nameOfAlexaFeature = 'brightness';
+      // if the brightness is set to 0, turn off the light
+      if (value === 0) {
+        controlPowerIfNeeded(deviceFeature.category, 0);
+      } else {
+        // if the brightness is set to something positive, make
+        // sure the light is on
+        controlPowerIfNeeded(deviceFeature.category, 1);
+      }
       break;
     case 'Alexa.ColorController':
       deviceFeature = deviceInMemory.features.find(
@@ -56,6 +77,8 @@ function onExecute(body) {
       );
       value = writeValues['Alexa.ColorController'](get(body, 'directive.payload.color'));
       nameOfAlexaFeature = 'color';
+      // Make sure the light is on if we change the light color
+      controlPowerIfNeeded(deviceFeature.category, 1);
       break;
     default:
       throw new BadParameters(`Unkown directive ${directiveNamespace}`);

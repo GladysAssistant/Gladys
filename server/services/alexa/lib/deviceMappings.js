@@ -101,7 +101,14 @@ const writeValues = {
   },
   'Alexa.BrightnessController': (directiveName, payload, currentValue) => {
     if (directiveName === 'AdjustBrightness') {
-      return currentValue + payload.brightnessDelta;
+      const newValue = currentValue + payload.brightnessDelta;
+      if (newValue > 100) {
+        return 100;
+      }
+      if (newValue < 0) {
+        return 0;
+      }
+      return newValue;
     }
     return payload.brightness;
   },
