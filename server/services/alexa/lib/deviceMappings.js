@@ -99,6 +99,12 @@ const writeValues = {
   'Alexa.PowerController': (directiveName) => {
     return directiveName === 'TurnOn' ? 1 : 0;
   },
+  'Alexa.BrightnessController': (directiveName, payload, currentValue) => {
+    if (directiveName === 'AdjustBrightness') {
+      return currentValue + payload.brightnessDelta;
+    }
+    return payload.brightness;
+  },
   'Alexa.ColorController': (hsbColor) => {
     const rgb = hsbToRgb([hsbColor.hue, hsbColor.saturation * 100, hsbColor.brightness * 100]);
     const int = rgbToInt(rgb);

@@ -43,7 +43,11 @@ function onExecute(body) {
       deviceFeature = deviceInMemory.features.find(
         (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
       );
-      value = get(body, 'directive.payload.brightness');
+      value = writeValues['Alexa.BrightnessController'](
+        directiveName,
+        get(body, 'directive.payload'),
+        deviceFeature.last_value,
+      );
       nameOfAlexaFeature = 'brightness';
       break;
     case 'Alexa.ColorController':
