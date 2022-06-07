@@ -7,6 +7,7 @@ const {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
 } = require('../../../utils/constants');
+const { DIRECTIVE_NAMESPACES } = require('./alexa.constants');
 const { BadParameters, NotFoundError } = require('../../../utils/coreErrors');
 const { writeValues, readValues } = require('./deviceMappings');
 
@@ -57,13 +58,13 @@ function onExecute(body) {
   };
 
   switch (directiveNamespace) {
-    case 'Alexa.PowerController':
+    case DIRECTIVE_NAMESPACES.PowerController:
       deviceFeature = deviceInMemory.features.find(
         (f) =>
           (f.category === DEVICE_FEATURE_CATEGORIES.SWITCH || f.category === DEVICE_FEATURE_CATEGORIES.LIGHT) &&
           f.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       );
-      value = writeValues['Alexa.PowerController'](directiveName);
+      value = writeValues[DIRECTIVE_NAMESPACES.PowerController](directiveName);
 
       if (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT) {
         brightnessDeviceFeature = deviceInMemory.features.find(
@@ -77,7 +78,7 @@ function onExecute(body) {
       }
       nameOfAlexaFeature = 'powerState';
       break;
-    case 'Alexa.BrightnessController':
+    case DIRECTIVE_NAMESPACES.BrightnessController:
       binaryDeviceFeature = deviceInMemory.features.find(
         (f) =>
           (f.category === DEVICE_FEATURE_CATEGORIES.SWITCH || f.category === DEVICE_FEATURE_CATEGORIES.LIGHT) &&
@@ -86,7 +87,7 @@ function onExecute(body) {
       deviceFeature = deviceInMemory.features.find(
         (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
       );
-      value = writeValues['Alexa.BrightnessController'](
+      value = writeValues[DIRECTIVE_NAMESPACES.BrightnessController](
         directiveName,
         get(body, 'directive.payload'),
         deviceFeature.last_value,
@@ -102,11 +103,11 @@ function onExecute(body) {
         controlPower(deviceFeature.category, 1);
       }
       break;
-    case 'Alexa.ColorController':
+    case DIRECTIVE_NAMESPACES.ColorController:
       deviceFeature = deviceInMemory.features.find(
         (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR,
       );
-      value = writeValues['Alexa.ColorController'](get(body, 'directive.payload.color'));
+      value = writeValues[DIRECTIVE_NAMESPACES.ColorController](get(body, 'directive.payload.color'));
       nameOfAlexaFeature = 'color';
       // Make sure the light is on if we change the light color
       controlPower(deviceFeature.category, 1);

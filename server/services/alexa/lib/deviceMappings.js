@@ -1,4 +1,5 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const { DIRECTIVE_NAMESPACES } = require('./alexa.constants');
 const { hsbToRgb, rgbToInt, intToRgb, rgbToHsb } = require('../../../utils/colors');
 
 const mappings = {
@@ -7,7 +8,7 @@ const mappings = {
     capabilities: {
       [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: {
         type: 'AlexaInterface',
-        interface: 'Alexa.PowerController',
+        interface: DIRECTIVE_NAMESPACES.PowerController,
         version: '3',
         properties: {
           supported: [
@@ -21,7 +22,7 @@ const mappings = {
       },
       [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: {
         type: 'AlexaInterface',
-        interface: 'Alexa.BrightnessController',
+        interface: DIRECTIVE_NAMESPACES.BrightnessController,
         version: '3',
         properties: {
           supported: [
@@ -35,7 +36,7 @@ const mappings = {
       },
       [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: {
         type: 'AlexaInterface',
-        interface: 'Alexa.ColorController',
+        interface: DIRECTIVE_NAMESPACES.ColorController,
         version: '3',
         properties: {
           supported: [
@@ -54,7 +55,7 @@ const mappings = {
     capabilities: {
       [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: {
         type: 'AlexaInterface',
-        interface: 'Alexa.PowerController',
+        interface: DIRECTIVE_NAMESPACES.PowerController,
         version: '3',
         properties: {
           supported: [
@@ -96,10 +97,10 @@ const readValues = {
 };
 
 const writeValues = {
-  'Alexa.PowerController': (directiveName) => {
+  [DIRECTIVE_NAMESPACES.PowerController]: (directiveName) => {
     return directiveName === 'TurnOn' ? 1 : 0;
   },
-  'Alexa.BrightnessController': (directiveName, payload, currentValue, binaryCurrentValue) => {
+  [DIRECTIVE_NAMESPACES.BrightnessController]: (directiveName, payload, currentValue, binaryCurrentValue) => {
     if (directiveName === 'AdjustBrightness') {
       // if the light is currently off
       if (binaryCurrentValue === 0) {
@@ -123,7 +124,7 @@ const writeValues = {
     }
     return payload.brightness;
   },
-  'Alexa.ColorController': (hsbColor) => {
+  [DIRECTIVE_NAMESPACES.ColorController]: (hsbColor) => {
     const rgb = hsbToRgb([hsbColor.hue, hsbColor.saturation * 100, hsbColor.brightness * 100]);
     const int = rgbToInt(rgb);
     return int;
