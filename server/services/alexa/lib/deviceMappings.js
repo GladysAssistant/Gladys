@@ -99,8 +99,11 @@ const writeValues = {
   'Alexa.PowerController': (directiveName) => {
     return directiveName === 'TurnOn' ? 1 : 0;
   },
-  'Alexa.BrightnessController': (directiveName, payload, currentValue) => {
+  'Alexa.BrightnessController': (directiveName, payload, currentValue, binaryCurrentValue) => {
     if (directiveName === 'AdjustBrightness') {
+      if (binaryCurrentValue === 0) {
+        return payload.brightnessDelta;
+      }
       const newValue = currentValue + payload.brightnessDelta;
       if (newValue > 100) {
         return 100;

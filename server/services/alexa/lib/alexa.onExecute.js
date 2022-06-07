@@ -29,6 +29,8 @@ function onExecute(body) {
     throw new NotFoundError(`Device "${endpointId}" not found`);
   }
   let deviceFeature;
+  let brightnessDeviceFeature;
+  let binaryDeviceFeature;
 
   const controlPower = (category, binaryValue) => {
     const action = {
@@ -42,6 +44,18 @@ function onExecute(body) {
     this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
   };
 
+  const setBrightness = (brightness) => {
+    const action = {
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      value: brightness,
+      device: endpointId,
+      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      feature_type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+    };
+    this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+  };
+
   switch (directiveNamespace) {
     case 'Alexa.PowerController':
       deviceFeature = deviceInMemory.features.find(
@@ -50,9 +64,25 @@ function onExecute(body) {
           f.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       );
       value = writeValues['Alexa.PowerController'](directiveName);
+
+      if (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.LIGHT) {
+        brightnessDeviceFeature = deviceInMemory.features.find(
+          (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+        );
+
+        // if light is turned on, but brightness is 0, put to 100
+        if (brightnessDeviceFeature && brightnessDeviceFeature.last_value === 0 && value === 1) {
+          setBrightness(100);
+        }
+      }
       nameOfAlexaFeature = 'powerState';
       break;
     case 'Alexa.BrightnessController':
+      binaryDeviceFeature = deviceInMemory.features.find(
+        (f) =>
+          (f.category === DEVICE_FEATURE_CATEGORIES.SWITCH || f.category === DEVICE_FEATURE_CATEGORIES.LIGHT) &&
+          f.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      );
       deviceFeature = deviceInMemory.features.find(
         (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
       );
@@ -60,6 +90,7 @@ function onExecute(body) {
         directiveName,
         get(body, 'directive.payload'),
         deviceFeature.last_value,
+        binaryDeviceFeature.last_value,
       );
       nameOfAlexaFeature = 'brightness';
       // if the brightness is set to 0, turn off the light
