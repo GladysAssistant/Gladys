@@ -42,18 +42,6 @@ function onExecute(body) {
     this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
   };
 
-  const resetBrightness = () => {
-    const action = {
-      type: ACTIONS.DEVICE.SET_VALUE,
-      status: ACTIONS_STATUS.PENDING,
-      value: 0,
-      device: endpointId,
-      feature_category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-      feature_type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-    };
-    this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-  };
-
   switch (directiveNamespace) {
     case 'Alexa.PowerController':
       deviceFeature = deviceInMemory.features.find(
@@ -62,9 +50,6 @@ function onExecute(body) {
           f.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY,
       );
       value = writeValues['Alexa.PowerController'](directiveName);
-      if (value === 0) {
-        resetBrightness();
-      }
       nameOfAlexaFeature = 'powerState';
       break;
     case 'Alexa.BrightnessController':
