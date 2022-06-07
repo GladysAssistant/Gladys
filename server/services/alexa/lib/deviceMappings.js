@@ -101,9 +101,17 @@ const writeValues = {
   },
   'Alexa.BrightnessController': (directiveName, payload, currentValue, binaryCurrentValue) => {
     if (directiveName === 'AdjustBrightness') {
+      // if the light is currently off
       if (binaryCurrentValue === 0) {
+        // decreasing the brightness should keep the brightness at 0
+        if (payload.brightnessDelta < 0) {
+          return 0;
+        }
+        // putting more brightness should start from 0 (not previous value)
         return payload.brightnessDelta;
       }
+      // otherwise, if light is already on
+      // we compare with previous value
       const newValue = currentValue + payload.brightnessDelta;
       if (newValue > 100) {
         return 100;
