@@ -2,7 +2,6 @@ const { assert } = require('chai');
 const { OAuth2Server } = require('oauth2-mock-server');
 const sinon = require('sinon');
 const serverHttpWithingsMock = require('./withings.serverMock.test');
-const OAuth2Manager = require('../../../../lib/oauth2-client/index');
 const WithingsHandler = require('../../../../services/withings/lib');
 
 const serverHost = 'localhost';
@@ -56,8 +55,6 @@ describe('WithingsHandler initDevices', () => {
     serverOauth2.issuer.keys.generate('RS256');
     // Start the server
     serverOauth2.start(oauth2ServerPort, serverHost);
-
-    gladys.oauth2Client = new OAuth2Manager(gladys.variable);
   });
 
   after(function testAfter(done) {

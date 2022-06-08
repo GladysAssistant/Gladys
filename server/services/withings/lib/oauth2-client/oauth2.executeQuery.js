@@ -1,8 +1,8 @@
 const queryString = require('query-string');
-const { ClientCredentials } = require('simple-oauth2');
 const { default: axios } = require('axios');
-const logger = require('../../utils/logger');
-const { OAUTH2 } = require('../../utils/constants');
+const { ClientCredentials } = require('simple-oauth2');
+const logger = require('../../../../utils/logger');
+const { OAUTH2 } = require('../../../../utils/constants');
 
 /**
  * @description Refresh Oauth2 token in case of it expired .

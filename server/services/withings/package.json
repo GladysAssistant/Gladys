@@ -13,7 +13,10 @@
   ],
   "scripts": {},
   "dependencies": {
+    "axios": "^0.21.4",
     "bluebird": "^3.7.2",
+    "query-string": "^7.1.1",
+    "simple-oauth2": "^4.3.0",
     "uuid": "^3.3.2"
   }
 }

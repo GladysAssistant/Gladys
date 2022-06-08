@@ -1,7 +1,7 @@
 const { AuthorizationCode } = require('simple-oauth2');
-const logger = require('../../utils/logger');
-const { OAUTH2 } = require('../../utils/constants');
-const { BadOauth2ClientResponse } = require('../../utils/coreErrors');
+const logger = require('../../../../utils/logger');
+const { OAUTH2 } = require('../../../../utils/constants');
+const { BadOauth2ClientResponse } = require('../../../../utils/coreErrors');
 
 /**
  * @description Get new  AccessToken with client_id and secrei_id of current oauth2 integration.

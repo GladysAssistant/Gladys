@@ -1,5 +1,5 @@
-import { RequestStatus } from '../../utils/consts';
-import { OAUTH2 } from '../../../../server/utils/constants';
+import { RequestStatus } from '../../../../../../utils/consts';
+import { OAUTH2 } from '../../../../../../../../server/utils/constants';
 
 const actions = store => ({
   updateClientId(state, e) {
@@ -17,7 +17,7 @@ const actions = store => ({
       oauth2GetStatus: RequestStatus.Getting
     });
     try {
-      const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
+      const returnGetConfig = await state.httpClient.get('/api/v1/service/withings/oauth2/client', {
         service_id: state.currentIntegration.id
       });
 
@@ -69,7 +69,7 @@ const actions = store => ({
         }
       );
 
-      const returnValue = await state.httpClient.post('/api/v1/service/oauth2/client/authorization-uri', {
+      const returnValue = await state.httpClient.post('/api/v1/service/withings/oauth2/client/authorization-uri', {
         integration_name: state.currentIntegration.name,
         service_id: state.currentIntegration.id
       });

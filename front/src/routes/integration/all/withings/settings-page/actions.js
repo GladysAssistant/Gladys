@@ -11,7 +11,7 @@ const actions = store => ({
       // check if this call is a return of oauth2 authorize code
       if (state.currentUrl) {
         if (this.code) {
-          await state.httpClient.post('/api/v1/service/oauth2/client/access-token', {
+          await state.httpClient.post('/api/v1/service/withings/oauth2/client/access-token', {
             integrationName: 'withings',
             authorization_code: this.code,
             service_id: state.currentIntegration.id
@@ -20,7 +20,7 @@ const actions = store => ({
           route('/dashboard/integration/health/withings/settings');
         }
 
-        const returnGetConfig = await state.httpClient.get('/api/v1/service/oauth2/client', {
+        const returnGetConfig = await state.httpClient.get('/api/v1/service/withings/oauth2/client', {
           service_id: state.currentIntegration.id
         });
 

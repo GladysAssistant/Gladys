@@ -1,4 +1,4 @@
-const { OAUTH2 } = require('../../utils/constants');
+const { OAUTH2 } = require('../../../../utils/constants');
 
 /**
  * @description Delete client_id and secrei_id of current oauth2 integration.

@@ -5,7 +5,6 @@ const serverHttpWithingsMock = require('./withings.serverMock.test');
 const WithingsHandler = require('../../../../services/withings/lib');
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const { OAUTH2 } = require('../../../../utils/constants.js');
-const OAuth2Manager = require('../../../../lib/oauth2-client/index');
 
 const { assert, fake } = sinon;
 
@@ -55,8 +54,6 @@ describe('WithingsHandler poll', () => {
     serverOauth2.issuer.keys.generate('RS256');
     // Start the server
     serverOauth2.start(oauth2ServerPort, serverHost);
-
-    gladys.oauth2Client = new OAuth2Manager(gladys.variable);
   });
 
   after((done) => {

@@ -12,13 +12,7 @@ function getMeasures(userId, params) {
   if (params) {
     actionRequest += params;
   }
-  return this.gladys.oauth2Client.executeQuery(
-    this.serviceId,
-    userId,
-    'get',
-    `${this.withingsUrl}/measure`,
-    actionRequest,
-  );
+  return this.oauth2Client.executeQuery(this.serviceId, userId, 'get', `${this.withingsUrl}/measure`, actionRequest);
 }
 
 module.exports = {

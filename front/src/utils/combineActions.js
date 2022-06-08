@@ -9,7 +9,9 @@ function combineActions(...allActions) {
       actions = actions(store);
       for (let i in actions) {
         if (Object.prototype.hasOwnProperty.call(actions, i)) {
-          if (combined[i]) throw new Error(`Have a repeat action name: ${i}`);
+          if (combined[i]) {
+            throw new Error(`Duplicate action in files meged: ${i}`);
+          }
           let action = actions[i];
           combined[i] = action;
         }

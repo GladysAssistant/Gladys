@@ -1,3 +1,4 @@
+const Oauth2Client = require('./oauth2-client');
 // COMMANDS
 const { init } = require('./withings.init');
 const { initDevices } = require('./withings.initDevices');
@@ -23,6 +24,7 @@ const WithingsHandler = function WithingsHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.withingsUrl = 'https://wbsapi.withings.net';
+  this.oauth2Client = new Oauth2Client(gladys.variable);
 };
 
 // COMMANDS

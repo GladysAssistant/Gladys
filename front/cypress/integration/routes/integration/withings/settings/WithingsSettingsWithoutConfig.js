@@ -5,7 +5,7 @@ describe('Withings settings page', () => {
     cy.intercept(
       {
         method: 'POST',
-        url: `${serverUrl}/api/v1/service/oauth2/client/authorization-uri`
+        url: `${serverUrl}/api/v1/service/withings/oauth2/client/authorization-uri`
       },
       {
         authorizationUri: '/dashboard/integration/health/withings/settings'
@@ -62,7 +62,7 @@ describe('Withings settings page', () => {
   it('Check setting page and connect', () => {
     cy.get('.markup').i18n('oauth2.instructions');
 
-    cy.get('.form-label').i18n('oauth2.apiKeyLabel');
+    cy.get('.form-label').i18n('withings.settings.oauth2.apiKeyLabel');
 
     cy.get('input')
       .first()
@@ -74,7 +74,7 @@ describe('Withings settings page', () => {
       .clear()
       .type('FakeSecret');
 
-    cy.contains('button', 'oauth2.buttonConnect').click();
+    cy.contains('button', 'withings.settings.oauth2.buttonConnect').click();
 
     cy.wait('@authorizationUriAction');
   });
