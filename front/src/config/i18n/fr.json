@@ -1580,6 +1580,7 @@
     "psi": "Livre-force par pouce carré (psi)",
     "lux": "Lux",
     "ppm": "Partie par million (ppm)",
+    "ppb": "Partie par millard (ppb)",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
     "watt-hour": "Watt heure (Wh)",
@@ -1631,6 +1632,7 @@
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
+    "ppb": "ppb",
     "watt": "W",
     "kilowatt": "kW",
     "watt-hour": "Wh",
@@ -1878,6 +1880,10 @@
       "shortCategoryName": "Durée",
       "decimal": "Durée (décimale)",
       "integer": "Durée (entier)"
+    },
+    "voc-sensor": {
+      "shortCategoryName": "Capteur de pollution COV",
+      "decimal": "COV (Décimale)"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

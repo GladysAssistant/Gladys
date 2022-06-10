@@ -183,5 +183,14 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.VOLT,
       },
     },
+    voc: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.COV_SENSOR,
+        type: DEVICE_FEATURE_TYPES.COV_SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.PPB,
+        min: 0,
+        max: 5500,
+      },
+    },
   },
 };
