@@ -266,6 +266,7 @@ const AppRouter = connect(
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
+    this.props.getIntegrations();
   }
 
   render({ user }, {}) {
