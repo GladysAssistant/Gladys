@@ -2,23 +2,22 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import IntegrationPage from './IntegrationPage';
 import actions from '../../actions/integration';
-import withIntlAsProp from '../../utils/withIntlAsProp';
 
-@connect('user,integrations,integrationCategories,currentUrl,totalSize,searchKeyword,orderDir,user', actions)
+@connect('user', actions)
 class Integration extends Component {
   componentDidMount() {
-    this.props.getIntegrations(this.props.intl, this.props.category, null);
+    this.props.getIntegrations(this.props.category);
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps.user !== this.props.user) {
-      this.props.getIntegrations(this.props.intl, this.props.category, null);
+      this.props.getIntegrations(this.props.category);
     }
   }
 
-  render(props, {}) {
-    return <IntegrationPage {...props} />;
+  render({ category }, {}) {
+    return <IntegrationPage category={category} />;
   }
 }
 
-export default withIntlAsProp(Integration);
+export default Integration;
