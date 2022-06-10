@@ -27,6 +27,7 @@ import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
+import AlexaGateway from '../routes/integration/all/alexa-gateway';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -237,6 +238,7 @@ const AppRouter = connect(
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
 
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
+        <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
