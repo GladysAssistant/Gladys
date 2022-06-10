@@ -303,6 +303,7 @@
         "music": "Musique",
         "health": "Santé",
         "weather": "Météo",
+        "storage": "Stockage",
         "navigation": "Navigation"
       }
     },
@@ -747,13 +748,28 @@
     },
     "openWeather": {
       "title": "API OpenWeather",
-      "description": "Récupérer la météo dans Gladys.",
+      "description": "Stocker votre historique.",
       "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
       "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
       "apiKeyPlaceholder": "Entrer la clé API OpenWeather",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
+    },
+    "influxdb": {
+      "title": "InfluxDB",
+      "description": "Stocker vos données long terme.",
+      "introduction": "Cette intégration permet le stockage des états de vos appareils Gladys dans une base de données InfluxDB.",
+      "urlLabel": "Entrez l'url de votre serveur InfluxDB:",
+      "urlPlaceholder": "http://127.0.0.1:8086",
+      "tokenLabel": "Entrez votre jeton d'accès:",
+      "tokenPlaceholder": "Entrer le jeton d'accès",
+      "orgLabel": "Entrez votre organisation:",
+      "orgPlaceholder": "Entrer l'organisation",
+      "bucketLabel": "Entrez le nom de votre bucket:",
+      "bucketPlaceholder": "Entrer le nom du bucket",
+      "saveButton": "Sauvegarder",
+      "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
     "mqtt": {
       "title": "MQTT",

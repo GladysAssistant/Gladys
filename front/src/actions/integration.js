@@ -4,7 +4,7 @@ import update from 'immutability-helper';
 import { USER_ROLE } from '../../../server/utils/constants';
 import { integrations, integrationsByType, categories } from '../config/integrations';
 
-const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
+const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather', 'storage'];
 
 const actions = store => ({
   getIntegrations(state, category = null) {

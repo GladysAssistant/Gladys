@@ -1,0 +1,18 @@
+{
+  "name": "gladys-influxdb",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "@influxdata/influxdb-client": "^1.26.0",
+    "@influxdata/influxdb-client-apis": "^1.26.0"
+  }
+}
