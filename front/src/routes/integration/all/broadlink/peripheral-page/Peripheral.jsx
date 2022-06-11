@@ -17,7 +17,7 @@ class BroadlinkPeripheralBox extends Component {
     this.props.updateDeviceProperty(this.props.peripheralIndex, 'room_id', e.target.value);
   };
 
-  render({ peripheral, houses = [] }) {
+  render({ peripheral, housesWithRooms = [] }) {
     const { device, connectable, name, mac, address, model } = peripheral;
     const editable = connectable && !!device && !device.created_at;
     const alreadyCreated = connectable && !!device && !!device.created_at;
@@ -62,7 +62,7 @@ class BroadlinkPeripheralBox extends Component {
                   <option value="">
                     <Text id="global.emptySelectOption" />
                   </option>
-                  {houses.map(house => (
+                  {housesWithRooms.map(house => (
                     <optgroup label={house.name}>
                       {house.rooms.map(room => (
                         <option selected={room.id === device.room_id} value={room.id}>

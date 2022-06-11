@@ -54,7 +54,7 @@ class DeviceBox extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  render({ deviceIndex, device, houses = [] }, { loading, saveError }) {
+  render({ deviceIndex, device, housesWithRooms = [] }, { loading, saveError }) {
     return (
       <div class="col-md-6">
         <div class="card" data-cy="device-card">
@@ -109,7 +109,7 @@ class DeviceBox extends Component {
                     <option value="">
                       <Text id="global.emptySelectOption" />
                     </option>
-                    {houses.map(house => (
+                    {housesWithRooms.map(house => (
                       <optgroup label={house.name}>
                         {house.rooms.map(room => (
                           <option selected={room.id === device.room_id} value={room.id}>

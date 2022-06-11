@@ -7,7 +7,7 @@ import EmptyState from '../EmptyState';
 import { RequestStatus } from '../../../../../utils/consts';
 
 const DeviceTab = ({
-  houses,
+  housesWithRooms,
   changeOrderDir,
   debouncedSearch,
   getBroadlinkDevicesStatus,
@@ -57,7 +57,7 @@ const DeviceTab = ({
         <div class="loader" />
         <div class="dimmer-content row">
           {broadlinkDevices.map((device, index) => (
-            <DeviceBox {...props} device={device} deviceIndex={index} houses={houses} />
+            <DeviceBox {...props} device={device} deviceIndex={index} housesWithRooms={housesWithRooms} />
           ))}
           {broadlinkDevices.length === 0 && <EmptyState id="integration.broadlink.device.noRemoteFound" />}
         </div>

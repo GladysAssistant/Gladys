@@ -17,7 +17,7 @@ import UpdateDevice from '../../../../../components/device/UpdateDevice';
 
 const BROADLINK_PAGE_PATH = '/dashboard/integration/device/broadlink';
 
-@connect('session,user,httpClient,currentIntegration,houses,broadlinkPeripherals', actions)
+@connect('session,user,httpClient,currentIntegration,housesWithRooms,broadlinkPeripherals', actions)
 class BroadlinkDeviceSetupPage extends Component {
   constructor(props) {
     super(props);

@@ -1,13 +1,30 @@
 import { RequestStatus } from '../../../../../utils/consts';
 import update from 'immutability-helper';
-import createActionsHouse from '../../../../../actions/house';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
 
 function createActions(store) {
-  const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
+    async getHouses(state) {
+      store.setState({
+        housesGetStatus: RequestStatus.Getting
+      });
+      try {
+        const params = {
+          expand: 'rooms'
+        };
+        const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
+        store.setState({
+          housesWithRooms,
+          housesGetStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          housesGetStatus: RequestStatus.Error
+        });
+      }
+    },
     async getBroadlinkRemotes(state) {
       store.setState({
         getBroadlinkDevicesStatus: RequestStatus.Getting
@@ -88,7 +105,7 @@ function createActions(store) {
     }
   };
   actions.debouncedSearch = debounce(actions.search, 200);
-  return Object.assign({}, houseActions, integrationActions, actions);
+  return Object.assign({}, integrationActions, actions);
 }
 
 export default createActions;

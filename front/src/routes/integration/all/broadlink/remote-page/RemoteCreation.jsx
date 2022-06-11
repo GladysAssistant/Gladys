@@ -292,7 +292,7 @@ class RemoteCreation extends Component {
   }
 
   render(
-    { houses = [], broadlinkPeripherals = [], ...props },
+    { housesWithRooms = [], broadlinkPeripherals = [], ...props },
     { device, selectedFeature, selectedValue, editedFeatures = {}, learning, learnAllMode, peripheral, saveStatus }
   ) {
     const canSave = Object.keys(editedFeatures).length === 0 || !device.name;
@@ -352,7 +352,7 @@ class RemoteCreation extends Component {
                       <option value="">
                         <Text id="global.emptySelectOption" />
                       </option>
-                      {houses.map(house => (
+                      {housesWithRooms.map(house => (
                         <optgroup label={house.name}>
                           {house.rooms.map(room => (
                             <option selected={room.id === device.room_id} value={room.id}>

@@ -1,11 +1,28 @@
 import update from 'immutability-helper';
 
 import { RequestStatus } from '../../../../../utils/consts';
-import createActionsHouse from '../../../../../actions/house';
 
 function createActions(store) {
-  const houseActions = createActionsHouse(store);
   const actions = {
+    async getHouses(state) {
+      store.setState({
+        housesGetStatus: RequestStatus.Getting
+      });
+      try {
+        const params = {
+          expand: 'rooms'
+        };
+        const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
+        store.setState({
+          housesWithRooms,
+          housesGetStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          housesGetStatus: RequestStatus.Error
+        });
+      }
+    },
     async getBroadlinkPeripherals(state) {
       store.setState({
         getBroadlinkPeripheralsStatus: RequestStatus.Getting
@@ -53,7 +70,7 @@ function createActions(store) {
       store.setState(newState);
     }
   };
-  return Object.assign({}, houseActions, actions);
+  return Object.assign({}, actions);
 }
 
 export default createActions;
