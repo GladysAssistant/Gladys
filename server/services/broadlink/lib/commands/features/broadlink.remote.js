@@ -1,4 +1,5 @@
 const deviceClasses = require('node-broadlink/dist/remote');
+const Promise = require('bluebird');
 
 const { NoValuesFoundError } = require('../../../../../utils/coreErrors');
 const logger = require('../../../../../utils/logger');
@@ -47,15 +48,13 @@ async function setValue(broadlinkDevice, gladysDevice, deviceFeature, value) {
   }
 
   // Only if all exist, send them
-  await Promise.all(
-    relatedParams.map(async (param) => {
-      const { name, value: code } = param;
-      logger.info(`Broadlink sending IR code for ${name} on ${broadlinkDevice.mac.join(':')}`);
+  await Promise.each(relatedParams, async (param) => {
+    const { name, value: code } = param;
+    logger.info(`Broadlink sending IR code for ${name} on ${broadlinkDevice.mac.join(':')}`);
 
-      const bufferCode = Buffer.from(code, 'hex');
-      return broadlinkDevice.sendData(bufferCode);
-    }),
-  );
+    const bufferCode = Buffer.from(code, 'hex');
+    return broadlinkDevice.sendData(bufferCode);
+  });
 
   return null;
 }

@@ -1,3 +1,5 @@
+const Promise = require('bluebird');
+
 /**
  * @description Subscribe to Broadlink events.
  * @returns {Promise} Null.
@@ -6,7 +8,7 @@
  */
 async function init() {
   const devices = await this.broadlink.discover();
-  await Promise.all(devices.map((device) => this.addPeripheral(device)));
+  await Promise.each(devices, (device) => this.addPeripheral(device));
   return null;
 }
 
