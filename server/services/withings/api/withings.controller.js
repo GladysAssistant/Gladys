@@ -1,5 +1,4 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const { OAUTH2 } = require('../../../utils/constants');
 
 module.exports = function WithingsController(gladys, withingsHandler) {
   /**
@@ -77,19 +76,7 @@ module.exports = function WithingsController(gladys, withingsHandler) {
    */
   async function getCurrentConfig(req, res) {
     if (req.query && req.query.service_id) {
-      const serviceId = req.query.service_id;
-
-      const resultClientId = await gladys.variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, req.user.id);
-
-      const resultAccessToken = await gladys.variable.getValue(OAUTH2.VARIABLE.ACCESS_TOKEN, serviceId, req.user.id);
-
-      // If access_token does not exist and client_id exist
-      // => connect process is not complete: remove variable already saved
-      // => force restart connect process from beginning
-      if (resultClientId && !resultAccessToken) {
-        await gladys.variable.destroy(OAUTH2.VARIABLE.CLIENT_ID, serviceId, req.user.id);
-        await gladys.variable.destroy(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, req.user.id);
-      }
+      const resultClientId = await withingsHandler.oauth2Client.getCurrentConfig(req.query.service_id, req.user.id);
 
       res.json({
         client_id: resultClientId,

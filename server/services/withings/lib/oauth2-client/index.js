@@ -1,4 +1,5 @@
 const { executeQuery } = require('./oauth2.executeQuery');
+const { getCurrentConfig } = require('./oauth2.getCurrentConfig');
 const { deleteClient } = require('./oauth2.deleteClient');
 const { getAccessToken } = require('./oauth2.getAccessToken');
 const { buildAuthorizationUri } = require('./oauth2.buildAuthorizationUri');
@@ -9,6 +10,7 @@ const OAuth2Manager = function OAuth2Manager(variable) {
 };
 
 OAuth2Manager.prototype.executeQuery = executeQuery;
+OAuth2Manager.prototype.getCurrentConfig = getCurrentConfig;
 OAuth2Manager.prototype.deleteClient = deleteClient;
 OAuth2Manager.prototype.getAccessToken = getAccessToken;
 OAuth2Manager.prototype.buildAuthorizationUri = buildAuthorizationUri;

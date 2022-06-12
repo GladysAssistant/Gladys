@@ -34,7 +34,6 @@ const actions = store => ({
         }
 
         store.setState({
-          oauth2GetStatus: RequestStatus.Success,
           withingsGetStatus: RequestStatus.Success,
           withingsDevices
         });

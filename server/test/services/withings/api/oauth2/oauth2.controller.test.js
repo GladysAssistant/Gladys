@@ -22,6 +22,7 @@ const withingsHandler = {
   oauth2Client: {
     buildAuthorizationUri: fake.returns(null),
     getAccessToken: fake.returns(null),
+    getCurrentConfig: fake.returns(null),
   },
 };
 
@@ -113,6 +114,8 @@ describe('GET /api/v1/service/withings/oauth2/client', () => {
 
     await controller['get /api/v1/service/withings/oauth2/client'].controller(req, res);
 
-    assert.calledTwice(gladys.variable.getValue);
+    assert.calledOnce(withingsHandler.oauth2Client.getCurrentConfig);
+    assert.calledOnce(res.json);
+    assert.calledWith(res.json, { client_id: null });
   });
 });

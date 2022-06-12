@@ -1,10 +1,11 @@
 const { OAuth2Server } = require('oauth2-mock-server');
-const { assert } = require('chai');
+const { assert, expect } = require('chai');
 const { fake } = require('sinon');
 
 const OAuth2Manager = require('../../../../../services/withings/lib/oauth2-client');
 const logger = require('../../../../../utils/logger');
 const { OAUTH2 } = require('../../../../../utils/constants');
+const { BadOauth2ClientResponse } = require('../../../../../utils/coreErrors');
 
 const server = new OAuth2Server();
 
@@ -17,6 +18,8 @@ const gladys = {
   variable: {
     getValue: function getValue(key, serviceId, userId) {
       switch (key) {
+        case OAUTH2.VARIABLE.CLIENT_ID:
+          return 'fake_client_id';
         case OAUTH2.VARIABLE.TOKEN_HOST:
           return testUrl;
         case OAUTH2.VARIABLE.TOKEN_PATH:
@@ -67,6 +70,38 @@ describe('oauth2manager test', () => {
 
   const manager = new OAuth2Manager(gladys.variable);
 
+  it('oauth manager get buildAuthorizationUri test', async () => {
+    const result = await manager.buildAuthorizationUri(testServiceId, 'fakeUserId', 'fake-code', 'fake-referer');
+
+    assert.isNotNull(result);
+    assert.equal(
+      result,
+      'http://localhost:9292/authorize2?response_type=code&client_id=fake_client_id&redirect_uri=fake-referer%2Fdashboard%2Fintegration%2Fhealth%2Ftest%2Fsettings&scope=user.info%2Cuser.metrics%2Cuser.activity%2Cuser.sleepevents&state=gladys_state_fake-code',
+    );
+  });
+
+  it('oauth manager get getAccessToken test', async () => {
+    const result = await manager.getAccessToken(testServiceId, 'fakeUserId', 'fake-code', 'fake-referer');
+
+    assert.isNotNull(result.token);
+    assert.isNotNull(result.token.access_token);
+    assert.isNotNull(result.token.refresh_token);
+    assert.equal(result.token.token_type, 'Bearer');
+    assert.equal(result.token.expires_in, 3600);
+  });
+
+  it('oauth manager get error  getAccessToken test (BadOauth2ClientResponse)', async () => {
+    server.service.once('beforeResponse', (tokenEndpointResponse, req) => {
+      tokenEndpointResponse.body.status = 2;
+    });
+    try {
+      await manager.getAccessToken(testServiceId, 'fakeUserId', 'fake-code', 'fake-referer');
+      assert.fail('No error BadOauth2ClientResponse happen');
+    } catch (e) {
+      expect(e).be.instanceOf(BadOauth2ClientResponse);
+    }
+  });
+
   it('oauth manager get executeQuery test ', async () => {
     const queryType = 'get';
     const queryUrl = `${testUrl}/userinfo`;
@@ -106,6 +141,30 @@ describe('oauth2manager test', () => {
     const result = await manager.executeQuery(testServiceId, 'fakeUserId', queryType, queryUrl, queryParams);
 
     return assert.equal(result, null);
+  });
+
+  it('oauth manager getCurrentConfig (without AcessToken) test ', async () => {
+    const tmpManager = new OAuth2Manager({
+      getValue: function getValue(key, serviceId, userId) {
+        switch (key) {
+          case OAUTH2.VARIABLE.CLIENT_ID:
+            return 'fake_client_id';
+          default:
+            return null;
+        }
+      },
+      destroy: fake.returns(null),
+    });
+
+    const result = await tmpManager.getCurrentConfig(testServiceId, testUserId);
+    logger.debug(result);
+    return assert.equal(result, null);
+  });
+
+  it('oauth manager getCurrentConfig (with AcessToken) test ', async () => {
+    const result = await manager.getCurrentConfig(testServiceId, testUserId);
+    logger.debug(result);
+    return assert.equal(result, 'fake_client_id');
   });
 
   it('oauth manager  deleteClient test ', async () => {
