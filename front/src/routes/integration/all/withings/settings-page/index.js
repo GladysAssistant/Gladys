@@ -7,7 +7,6 @@ import actionsOAuth2 from './oauth2/actions';
 import actionsCommon from '../../../../../actions/integration';
 import WithingsPage from '../WithingsPage';
 import OAuth2Config from './oauth2/OAuth2Config';
-import { RequestStatus } from '../../../../../utils/consts';
 import { combineActions } from '../../../../../utils/combineActions';
 import Device from '../device-page/Device';
 
