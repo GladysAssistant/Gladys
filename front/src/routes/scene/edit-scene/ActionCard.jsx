@@ -28,8 +28,10 @@ const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
+  [ACTIONS.LIGHT.TOGGLE]: 'fe fe-shuffle',
   [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
+  [ACTIONS.SWITCH.TOGGLE]: 'fe fe-shuffle',
   [ACTIONS.TIME.DELAY]: 'fe fe-clock',
   [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',

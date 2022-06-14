@@ -959,11 +959,17 @@
       "turnOffLights": {
         "label": "Sélectionnez les lumière que vous souhaitez éteindre"
       },
+      "toggleLights": {
+        "label": "Sélectionnez les lumière que vous souhaitez inverser"
+      },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
       },
       "turnOffSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez éteindre"
+      },
+      "toggleSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez inverser"
       },
       "deviceGetValue": {
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
@@ -1057,10 +1063,12 @@
       "light": {
         "turn-on": "Allumer la lumière",
         "turn-off": "Eteindre les lumières"
+        "toggle": "Inverser les lumières"
       },
       "switch": {
         "turn-on": "Allumer les prises",
-        "turn-off": "Eteindre les prises"
+        "turn-off": "Eteindre les prises",
+        "toggle": "Inverser les prises"
       },
       "scene": {
         "start": "Démarrer la scène"
