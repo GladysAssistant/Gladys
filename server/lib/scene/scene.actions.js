@@ -68,7 +68,7 @@ const actionsFunc = {
           DEVICE_FEATURE_CATEGORIES.LIGHT,                                           
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,                                                 
         );                                                             
-        await self.device.setValue(device, deviceFeature, deviceFeature.last_value_changed == 0 ? 1 : 0);
+        await self.device.setValue(device, deviceFeature, deviceFeature.last_value_changed === 0 ? 1 : 0);
       } catch (e) {                                                                 
         logger.warn(e);                                                     
       }                                                                
@@ -113,7 +113,7 @@ const actionsFunc = {
           DEVICE_FEATURE_CATEGORIES.SWITCH,                                 
           DEVICE_FEATURE_TYPES.SWITCH.BINARY,                                        
         );                                                                           
-        await self.device.setValue(device, deviceFeature, deviceFeature.last_value == 0 ? 1 : 0);
+        await self.device.setValue(device, deviceFeature, deviceFeature.last_value === 0 ? 1 : 0);
       } catch (e) {                                                    
         logger.warn(e);                                                                                  
       }                                                                             
