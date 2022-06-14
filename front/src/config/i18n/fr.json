@@ -1062,7 +1062,7 @@
       "delay": "Attendre",
       "light": {
         "turn-on": "Allumer la lumière",
-        "turn-off": "Eteindre les lumières"
+        "turn-off": "Eteindre les lumières",
         "toggle": "Inverser les lumières"
       },
       "switch": {
