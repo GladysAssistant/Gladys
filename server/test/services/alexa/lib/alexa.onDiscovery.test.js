@@ -20,7 +20,7 @@ describe('alexa.onDiscovery', () => {
     gladys.stateManager.state.device = {};
   });
 
-  it('return one light with on/off capability', async () => {
+  it('return one light with on/off, brightness & color capability', async () => {
     gladys.stateManager.state.device = {
       device_1: {
         get: fake.returns({
@@ -32,6 +32,16 @@ describe('alexa.onDiscovery', () => {
               read_only: false,
               category: 'light',
               type: 'binary',
+            },
+            {
+              read_only: false,
+              category: 'light',
+              type: 'brightness',
+            },
+            {
+              read_only: false,
+              category: 'light',
+              type: 'color',
             },
           ],
           model: 'device-model',
@@ -67,6 +77,34 @@ describe('alexa.onDiscovery', () => {
                   interface: 'Alexa.PowerController',
                   version: '3',
                   properties: { supported: [{ name: 'powerState' }], proactivelyReported: true, retrievable: true },
+                },
+                {
+                  type: 'AlexaInterface',
+                  interface: 'Alexa.BrightnessController',
+                  version: '3',
+                  properties: {
+                    supported: [
+                      {
+                        name: 'brightness',
+                      },
+                    ],
+                    proactivelyReported: true,
+                    retrievable: true,
+                  },
+                },
+                {
+                  type: 'AlexaInterface',
+                  interface: 'Alexa.ColorController',
+                  version: '3',
+                  properties: {
+                    supported: [
+                      {
+                        name: 'color',
+                      },
+                    ],
+                    proactivelyReported: true,
+                    retrievable: true,
+                  },
                 },
                 { type: 'AlexaInterface', interface: 'Alexa', version: '3' },
               ],
