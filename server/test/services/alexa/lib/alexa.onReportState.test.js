@@ -86,6 +86,8 @@ describe('alexa.onReportState', () => {
               read_only: false,
               category: 'light',
               type: 'brightness',
+              min: 0,
+              max: 100,
               last_value: 50,
             },
           ],
