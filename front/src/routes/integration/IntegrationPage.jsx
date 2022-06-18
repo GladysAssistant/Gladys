@@ -53,10 +53,9 @@ class IntegrationPage extends Component {
                   </div>
                   <div class="col-lg-9">
                     <div class="row row-cards">
-                      {integrations &&
-                        integrations.map(integration => (
-                          <IntegrationCategory currentUrl={currentUrl} integration={integration} category={category} />
-                        ))}
+                      {integrations.map(integration => (
+                        <IntegrationCategory currentUrl={currentUrl} integration={integration} category={category} />
+                      ))}
                     </div>
                   </div>
                 </div>

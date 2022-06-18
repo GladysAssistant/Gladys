@@ -1,13 +1,14 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+
 import IntegrationPage from './IntegrationPage';
 import actions from '../../actions/integration';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 
-@connect('user,integrations,integrationCategories,currentUrl,totalSize,searchKeyword,orderDir,user', actions)
+@connect('user,integrations,integrationCategories,currentUrl,totalSize,searchKeyword,orderDir', actions)
 class Integration extends Component {
-  componentDidMount() {
-    this.props.getIntegrations(this.props.intl, this.props.category, null);
+  componentWillMount() {
+    this.props.getIntegrations(this.props.intl);
   }
 
   componentDidUpdate(prevProps) {
