@@ -7,7 +7,7 @@ import { integrations, integrationsByType, categories } from '../config/integrat
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
 
 const actions = store => ({
-  getIntegrations(state, intl, category, searchKeyword = '', orderDir = 'asc') {
+  async getIntegrations(state, intl, category, searchKeyword = '', orderDir = 'asc') {
     const { user = {} } = state;
 
     // Load all or category related integrations
