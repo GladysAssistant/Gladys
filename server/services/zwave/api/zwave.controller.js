@@ -136,7 +136,7 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
   async function refreshInfo(req, res) {
     zwaveManager.refreshInfo(req.body.nodeId);
     res.json({
-      success: true,
+      success: result,
     });
   }
 

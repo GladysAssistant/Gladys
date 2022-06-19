@@ -36,6 +36,8 @@ async function disconnectZwave2mqtt() {
   this.connected = false;
   this.ready = false;
   this.scanInProgress = false;
+
+  this.updateConfigJob.cancel();
 }
 
 module.exports = {
