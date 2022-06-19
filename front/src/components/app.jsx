@@ -74,7 +74,7 @@ import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
 import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
-import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
+import ZwaveDiscoverPage from '../routes/integration/all/zwave/discover-page';
 import ZwaveNodeOperationPage from '../routes/integration/all/zwave/node-operation-page';
 import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
@@ -204,7 +204,7 @@ const AppRouter = connect(
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
         <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
         <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
-        <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
+        <ZwaveDiscoverPage path="/dashboard/integration/device/zwave/discover" />
         <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
         <ZwaveEditPage path="/dashboard/integration/device/zwave/edit/:deviceSelector" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />

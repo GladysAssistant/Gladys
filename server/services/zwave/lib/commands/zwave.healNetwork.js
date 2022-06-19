@@ -1,5 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { DEFAULT } = require('../constants');
 
 /**
  * @description Heal Zwave network
@@ -11,7 +12,12 @@ function healNetwork() {
     throw new ServiceNotConfiguredError('ZWAVE_DRIVER_NOT_RUNNING');
   }
   logger.debug(`Zwave : Heal network.`);
-  this.driver.controller.beginHealingNetwork();
+
+  if (this.zwaveMode === DEFAULT.MODE_ZWAVEJS) {
+    this.driver.controller.beginHealingNetwork();
+  } else {
+    this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVE2MQTT_CLIENT_ID}/api/beginHealingNetwork/set`);
+  }
 }
 
 module.exports = {

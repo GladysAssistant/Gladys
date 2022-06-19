@@ -310,7 +310,6 @@ const DEVICE_FEATURE_CATEGORIES = {
   OPENING_SENSOR: 'opening-sensor',
   HUMIDITY_SENSOR: 'humidity-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
-  ULTRAVIOLET_SENSOR: 'ultraviolet-sensor',
   CO_SENSOR: 'co-sensor',
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
@@ -692,6 +691,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     SCAN_COMPLETE: 'zwave.scan-complete',
     NODE_ADDED: 'zwave.node-added',
     NODE_REMOVED: 'zwave.node-removed',
+    DISCOVER: 'zwave.discover',
+    STATUS_CHANGE: 'zwave.status-change',
+    MQTT_ERROR: 'zwave.mqtt-error',
+    PERMIT_JOIN: 'zwave.permit-join',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',

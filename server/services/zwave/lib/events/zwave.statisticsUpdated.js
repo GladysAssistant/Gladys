@@ -11,9 +11,11 @@ function statisticsUpdated(zwaveNode, statistics) {
   const { commandsTX, commandsRX, commandsDroppedRX, commandsDroppedTX, timeoutResponse } = statistics;
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
-  logger.debug(
-    `Statistics: nodeId = ${nodeId}, commandsTX = ${commandsTX}, commandsRX = ${commandsRX}, commandsDroppedRX = ${commandsDroppedRX}, commandsDroppedTX = ${commandsDroppedTX}, timeoutResponse = ${timeoutResponse}`,
-  );
+  if (!node) {
+    logger.info(`Node ${nodeId} not available. By-pass message`);
+    return;
+  }
+
   node.statistics = {
     lastUpdate: new Date().getTime(),
     commandsTX,

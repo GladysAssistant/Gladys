@@ -28,12 +28,48 @@ function nodeAdded(zwaveNode) {
     .on('sleep', this.nodeSleep.bind(this))
     .on('alive', this.nodeAlive.bind(this))
     .on('dead', this.nodeDead.bind(this))
-    .on('value added', this.valueAdded.bind(this))
-    .on('value updated', this.valueUpdated.bind(this))
-    .on('value notification', this.valueNotification.bind(this))
+    .on(
+      'value added',
+      function(...args) {
+        try {
+          this.valueAdded(...args);
+        } catch (err) {
+          logger.error(err);
+        }
+      }.bind(this),
+    )
+    .on(
+      'value updated',
+      function(...args) {
+        try {
+          this.valueUpdated(...args);
+        } catch (err) {
+          logger.error(err);
+        }
+      }.bind(this),
+    )
+    .on(
+      'value notification',
+      function(...args) {
+        try {
+          this.valueNotification(...args);
+        } catch (err) {
+          logger.error(err);
+        }
+      }.bind(this),
+    )
     .on('value removed', this.valueRemoved.bind(this))
     .on('metadata update', this.metadataUpdate.bind(this))
-    .on('notification', this.notification.bind(this))
+    .on(
+      'notification',
+      function(...args) {
+        try {
+          this.notification(...args);
+        } catch (err) {
+          logger.error(err);
+        }
+      }.bind(this),
+    )
     .on('statistics updated', this.statisticsUpdated.bind(this));
 
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {

@@ -6,7 +6,7 @@
  * getDeviceName(node);
  */
 function getDeviceName(node) {
-  return `${node.name}${node.endpoint > 0 ? ` [${node.endpoint}]` : ''}`;
+  return `${node.name} - ${node.nodeId} ${node.endpoint > 0 ? ` [${node.endpoint}]` : ''}`;
 }
 
 /**

@@ -7,28 +7,30 @@ const { nodeAdded } = require('../events/zwave.nodeAdded');
 const { nodeRemoved } = require('../events/zwave.nodeRemoved');
 const { nodeReady } = require('../events/zwave.nodeReady');
 const { scanComplete } = require('../events/zwave.scanComplete');
+const { DEFAULT } = require('../constants');
+const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../../utils/constants');
 
 const DRIVER_READY_TIMEOUT = 60 * 1000;
 
 /**
  * @description Connect to Zwave USB driver.
- * @param {string} driverPath - Path to the USB driver.
+ * @param {string} zwaveDriverPath - Path to the USB driver.
  * @param {Object} securityKeys - Zwave security keys.
  * @returns {Promise} Void.
  * @example
- * zwave.connect(driverPath, {});
+ * zwave.connectZwaveJS(zwaveDriverPath, {});
  */
-async function connect(driverPath, securityKeys) {
-  logger.debug(`Zwave : Connecting to USB = ${driverPath}`);
+async function connectZwaveJS(zwaveDriverPath, securityKeys) {
+  logger.debug(`Zwave : Connecting to USB = ${zwaveDriverPath}`);
   // special case for macOS
   if (os.platform() === 'darwin') {
-    this.driverPath = driverPath.replace('/dev/tty.', '/dev/cu.');
+    this.zwaveDriverPath = zwaveDriverPath.replace('/dev/tty.', '/dev/cu.');
   } else {
-    this.driverPath = driverPath;
+    this.zwaveDriverPath = zwaveDriverPath;
   }
   this.ready = false;
 
-  this.driver = new this.ZWaveJS.Driver(driverPath, {
+  this.driver = new this.ZWaveJS.Driver(zwaveDriverPath, {
     logConfig: {
       level: 'debug',
       logToFile: true,
@@ -40,7 +42,6 @@ async function connect(driverPath, securityKeys) {
     },
     securityKeys,
   });
-  this.driver.enableErrorReporting();
   this.driver.on('error', (e) => {
     logger.debug(`ZWave Error: [${e.name}] ${e.message}`);
   });
@@ -75,21 +76,92 @@ async function connect(driverPath, securityKeys) {
   });
 
   this.driver.on('all nodes ready', () => {
+    this.ready = true;
     scanComplete.bind(this)();
   });
 
   await this.driver
     .start()
-    .then((res) =>
+    .then((res) => {
+      this.connected = true;
+      this.restartRequired = false;
       setTimeout(() => {
         scanComplete.bind(this)();
-      }, DRIVER_READY_TIMEOUT),
-    )
+      }, DRIVER_READY_TIMEOUT);
+    })
     .catch((e) => logger.fatal(`Unable to start Z-Wave service ${e}`));
+}
 
-  this.connected = true;
+/**
+ * @description Initialize service with dependencies and connect to devices.
+ * @example
+ * connectZwave2mqtt();
+ */
+async function connectZwave2mqtt() {
+  if (this.mqttRunning) {
+    this.mqttClient.on('connect', () => {
+      logger.info('Connected to MQTT container');
+      DEFAULT.TOPICS.forEach((topic) => {
+        this.mqttClient.subscribe(topic);
+      });
+      this.mqttConnected = true;
+      this.connected = true;
+      this.restartRequired = false;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.STATUS_CHANGE,
+      });
+    });
+
+    this.mqttClient.on('error', (err) => {
+      logger.warn(`Error while connecting to MQTT - ${err}`);
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.MQTT_ERROR,
+        payload: err,
+      });
+      this.mqttConnected = false;
+    });
+
+    this.mqttClient.on('offline', () => {
+      logger.warn(`Disconnected from MQTT server`);
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
+        payload: 'DISCONNECTED',
+      });
+      this.mqttConnected = false;
+    });
+
+    this.mqttClient.on('message', (topic, message) => {
+      try {
+        this.handleMqttMessage(topic, message.toString());
+      } catch (e) {
+        logger.error(`Unable to process message on topic ${topic}: ${e}`);
+      }
+    });
+
+    this.ready = true;
+    this.scanInProgress = true;
+
+    // For testing
+    const nodes = require('../../../../../nodes_6.json');
+    this.handleMqttMessage(
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVE2MQTT_CLIENT_ID}/driver/driver_ready`,
+      '{"data": [{"controllerId":"controllerId","homeId":"homeId"}]}',
+    );
+    this.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVE2MQTT_CLIENT_ID}/api/getNodes`, nodes);
+
+    // this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVE2MQTT_CLIENT_ID}/api/getNodes/set`, 'true');
+
+    this.driver = {
+      controller: {
+        ownNodeId: 'N.A.',
+      },
+    };
+  } else {
+    logger.warn("Can't connect Gladys cause MQTT not running !");
+  }
 }
 
 module.exports = {
-  connect,
+  connectZwaveJS,
+  connectZwave2mqtt,
 };

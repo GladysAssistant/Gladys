@@ -4,33 +4,8 @@ const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
 const { getDeviceFeatureExternalId, getDeviceExternalId, getDeviceName } = require('../utils/externalId');
 const logger = require('../../../../utils/logger');
-
-/**
- * @description Split Node into each endpoints.
- * @param {Object} node - Z-Wave node .
- * @returns {Array} Splitted nodes.
- * @example
- * const nodes = zwaveManager.splitNode({});
- */
-function splitNode(node) {
-  if (node.endpoints.length < 2) {
-    node.endpoint = 0;
-    return node;
-  }
-  return node.endpoints.map((endpoint) => {
-    const eNode = Object.assign({}, node);
-    eNode.endpoint = endpoint.index;
-    eNode.classes = {};
-    Object.keys(node.classes).forEach((comclass) => {
-      const valuesClass = node.classes[comclass];
-      if (valuesClass[endpoint.index]) {
-        eNode.classes[comclass] = {};
-        eNode.classes[comclass][endpoint.index] = valuesClass[endpoint.index];
-      }
-    });
-    return eNode;
-  });
-}
+const { unbindValue } = require('../utils/bindValue');
+const { splitNode, splitNodeWithScene } = require('../utils/splitNode');
 
 /**
  * @description Return array of Nodes.
@@ -45,13 +20,18 @@ function getNodes() {
   const nodeIds = Object.keys(this.nodes);
 
   // transform object in array
-  const nodes = nodeIds.map((nodeId) => this.nodes[nodeId]).flatMap((node) => splitNode(node));
+  const nodes = nodeIds
+    .map((nodeId) => this.nodes[nodeId])
+    .flatMap((node) => splitNode(node))
+    .flatMap((node) => splitNodeWithScene(node));
+
   // foreach node in RAM, we format it with the gladys device format
   return nodes
     .map((node) => {
 
       const newDevice = {
         name: getDeviceName(node),
+        selector: slugify(`zwave-node-${node.nodeId}-${getDeviceName(node)}`),
         model: `${node.product} ${node.firmwareVersion}`,
         service_id: this.serviceId,
         external_id: getDeviceExternalId(node),
@@ -76,6 +56,7 @@ function getNodes() {
               propertyKey
             ];
             let { min, max } = properties[propertyKey];
+            const { value } = properties[propertyKey];
             if (genre === 'user') {
               const { category, type, min: categoryMin, max: categoryMax, hasFeedback } = getCategory(node, {
                 commandClass,
@@ -89,8 +70,16 @@ function getNodes() {
                 if (max === undefined) {
                   max = propertyType === 'boolean' ? 1 : categoryMax;
                 }
+                const valueUnbind = unbindValue(
+                  {
+                    commandClass,
+                    endpoint,
+                    property,
+                  },
+                  value,
+                );
                 newDevice.features.push({
-                  name: label,
+                  name: `${label} ${endpoint > 0 ? ` [${endpoint}]` : ''}`,
                   selector: slugify(`zwave-node-${node.nodeId}-${property}-${commandClass}-${endpoint}-${label}`),
                   category,
                   type,
@@ -100,6 +89,7 @@ function getNodes() {
                   has_feedback: hasFeedback,
                   min,
                   max,
+                  last_value: valueUnbind,
                 });
               } else {
                 logger.info(

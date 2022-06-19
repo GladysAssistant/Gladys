@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const { fake, stub } = require('sinon');
+const { fake, stub, assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
 const ZwaveService = proxyquire('../../../services/zwave/index', {
@@ -10,6 +10,7 @@ const ZwaveService = proxyquire('../../../services/zwave/index', {
         on: stub().returns(null),
         start: stub().resolves(null),
         destroy: stub().resolves(null),
+        enableErrorReporting: fake.returns(null),
       };
     }),
   },
@@ -34,7 +35,7 @@ describe('zwaveService', () => {
       .to.have.property('controllers')
       .and.be.instanceOf(Object);
   });
-  /* it('should start service', async () => {
+  it('should start service', async () => {
     await zwaveService.start();
     assert.calledThrice(zwaveService.device.driver.on);
     expect(zwaveService.device.connected).to.equal(true);
@@ -42,5 +43,5 @@ describe('zwaveService', () => {
   it('should stop service', async () => {
     await zwaveService.stop();
     expect(zwaveService.device.connected).to.equal(false);
-  }); */
+  });
 });

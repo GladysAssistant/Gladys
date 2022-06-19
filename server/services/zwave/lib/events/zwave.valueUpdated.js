@@ -15,15 +15,26 @@ function valueUpdated(zwaveNode, args) {
   const { commandClass, endpoint, property, propertyKey, /* prevValue, */ newValue } = args;
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
-  let fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
-
-  // Current value is the final state of target value
-  if (fullProperty === PROPERTIES.CURRENT_VALUE) {
-    fullProperty = PROPERTIES.TARGET_VALUE;
+  if (!node) {
+    logger.info(`Node ${nodeId} not available. By-pass message`);
+    return;
   }
 
+  // Current value is the final state of target value
+  if (property === PROPERTIES.CURRENT_VALUE) {
+    args.property = PROPERTIES.TARGET_VALUE;
+    args.propertyName = PROPERTIES.TARGET_VALUE;
+    args.writeable = true;
+    valueUpdated.bind(this)(zwaveNode, args);
+    return;
+  }
+
+  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
   const newValueUnbind = unbindValue(args, newValue);
   if (node.ready) {
+    /* logger.debug(
+      `${JSON.stringify(args)} for node ${JSON.stringify(node)}`,
+    ); */
     logger.debug(
       `Value Updated: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${node.classes[commandClass][endpoint][fullProperty].value} > ${newValueUnbind}`,
     );

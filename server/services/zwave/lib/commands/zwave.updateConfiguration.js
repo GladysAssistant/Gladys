@@ -1,24 +1,24 @@
 const logger = require('../../../../utils/logger');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { CONFIGURATION } = require('../constants');
 
 /**
- * @description Update ZWave configuration.
- * @returns {Promise<boolean>} True if success, false otherwise.
+ * @description Update Z-Wave configuration.
  * @example
  * zwave.updateConfiguration();
  */
-async function updateConfiguration() {
-  logger.info(`Zwave : Updating Configuration...`);
-  if (this.ready) {
-    const updated = await this.driver.installConfigUpdate();
-    if (updated) {
-      logger.info(`Zwave : Update Configuration successfull: New version is installed`);
-    } else {
-      logger.info(`Zwave : Update Configuration failed: version is up-to-date`);
-    }
-    return updated;
-  }
-  logger.debug(`Zwave : Update Configuration failed: Driver not ready`);
-  return false;
+async function updateConfiguration(configuration) {
+  logger.debug(`Zwave : Updating configuration...`);
+
+  const { zwaveMode, zwaveDriverPath } = configuration;
+
+  await this.gladys.variable.setValue(CONFIGURATION.ZWAVEMODE, zwaveMode, this.serviceId);
+  this.zwaveMode = zwaveMode;
+
+  await this.gladys.variable.setValue(CONFIGURATION.ZWAVE_DRIVER_PATH, zwaveDriverPath, this.serviceId);
+  this.zwaveDriverPath = zwaveDriverPath;
+
+  this.restartRequired = true;
 }
 
 module.exports = {

@@ -111,9 +111,9 @@ describe('zwaveManager commands', () => {
     zwaveManager.refreshNodeParams(1);
     assert.calledOnce(refreshValues);
   });
-  it('should return Z-Wave informations', () => {
-    const infos = zwaveManager.getInfos();
-    expect(infos).to.deep.equal({
+  it('should return Z-Wave status', () => {
+    const status = zwaveManager.getStatus();
+    expect(status).to.deep.equal({
       controller_node_id: undefined,
       suc_node_id: undefined,
       is_primary_controller: undefined,

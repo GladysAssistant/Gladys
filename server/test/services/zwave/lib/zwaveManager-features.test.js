@@ -58,7 +58,7 @@ describe('zwaveManager events', () => {
     };
   });
 
-  it('should receive value added 37-0-currentValue', () => {
+  it('should handle value added 37-0-currentValue', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'boolean',
@@ -86,8 +86,8 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'switch',
@@ -104,7 +104,7 @@ describe('zwaveManager events', () => {
     ]);
   });
 
-  it('should receive value added 49-0-Illuminance', () => {
+  it('should handle value added 49-0-Illuminance', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'number',
@@ -130,8 +130,8 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'light-sensor',
@@ -148,7 +148,7 @@ describe('zwaveManager events', () => {
     ]);
   });
 
-  it('should receive value added 49-0-Humidity', () => {
+  it('should handle value added 49-0-Humidity', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'number',
@@ -174,8 +174,8 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'humidity-sensor',
@@ -192,7 +192,7 @@ describe('zwaveManager events', () => {
     ]);
   });
 
-  it('should receive value added 49-0-Ultraviolet', () => {
+  it('should handle value added 49-0-Ultraviolet', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'number',
@@ -216,11 +216,11 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
     expect(nodes[0].features).to.deep.equal([
       {
-        category: 'ultraviolet-sensor',
+        category: 'uv-sensor',
         external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Ultraviolet',
         has_feedback: true,
         name: 'Ultraviolet',
@@ -234,7 +234,7 @@ describe('zwaveManager events', () => {
     ]);
   });
 
-  it('should receive value added 49-0-Air temperature', () => {
+  it('should handle value added 49-0-Air temperature', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'number',
@@ -260,8 +260,8 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'temperature-sensor',
@@ -278,7 +278,51 @@ describe('zwaveManager events', () => {
     ]);
   });
 
-  it('should receive value added 113-0-Home Security-Motion sensor status', () => {
+  it('should handle value added 49-0-Power', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Power',
+        unit: 'W',
+        writeable: false,
+      };
+    };
+    zwaveManager.valueAdded(zwaveNode, {
+      commandClass: 49,
+      endpoint: 0,
+      property: 'Power',
+    });
+    expect(zwaveManager.nodes[1].classes[49][0].Power).to.deep.equal({
+      commandClass: 49,
+      endpoint: 0,
+      genre: 'user',
+      type: 'number',
+      label: 'Power',
+      unit: 'W',
+      nodeId: 1,
+      property: 'Power',
+      writeable: false,
+    });
+    const nodes = zwaveManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'power-sensor',
+        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Power',
+        type: 'decimal',
+        has_feedback: true,
+        name: 'Power',
+        read_only: true,
+        selector: 'zwave-node-1-power-49-0-power',
+        unit: 'celsius',
+        min: -20,
+        max: 50,
+      },
+    ]);
+  });
+
+  it('should handle value added 113-0-Home Security-Motion sensor status', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'number',
@@ -302,8 +346,8 @@ describe('zwaveManager events', () => {
       writeable: false,
     });
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'motion-sensor',
@@ -320,7 +364,7 @@ describe('zwaveManager events', () => {
     ]);
   });
 
-  it('should receive value added 132-0-wakeUpInterval', () => {
+  it('should not handle value added 132-0-wakeUpInterval', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'number',
@@ -337,12 +381,12 @@ describe('zwaveManager events', () => {
     });
     expect(zwaveManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].features.length).equal(0);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(0);
   });
 
-  it('should receive value added 132-0-controllerNodeId', () => {
+  it('should not handle value added 132-0-controllerNodeId', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'any',
@@ -357,12 +401,12 @@ describe('zwaveManager events', () => {
     });
     expect(zwaveManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].features.length).equal(0);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(0);
   });
 
-  it('should receive value added 132-0-level', () => {
+  it('should not handle value added 132-0-level', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'number',
@@ -380,12 +424,12 @@ describe('zwaveManager events', () => {
     });
     expect(zwaveManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].features.length).equal(0);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(0);
   });
 
-  it('should receive value added 132-0-isLow', () => {
+  it('should not handle value added 132-0-isLow', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
         type: 'boolean',
@@ -400,8 +444,8 @@ describe('zwaveManager events', () => {
     });
     expect(zwaveManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveManager.getNodes();
-    expect(nodes.length).equal(1);
-    expect(nodes[0].features.length).equal(0);
-    expect(nodes[0].params.length).equal(0);
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(0);
   });
 });

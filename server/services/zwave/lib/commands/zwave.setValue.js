@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { DEFAULT } = require('../constants');
 const { bindValue } = require('../utils/bindValue');
 const { getNodeInfoByExternalId } = require('../utils/externalId');
 
@@ -12,13 +13,19 @@ const { getNodeInfoByExternalId } = require('../utils/externalId');
  */
 function setValue(device, deviceFeature, value) {
   const { nodeId, commandClass, endpoint, property, propertyKey } = getNodeInfoByExternalId(deviceFeature.external_id);
-  logger.debug(`Zwave : Setting value for feature ${deviceFeature.name}: ${value}`);
-  this.driver.controller.nodes
-    .get(nodeId)
-    .setValue(
-      { nodeId, commandClass, endpoint, property, propertyKey },
-      bindValue({ nodeId, commandClass, endpoint, property, propertyKey }, value),
+  logger.debug(`Zwave : Setting value for feature ${deviceFeature.name} of device ${nodeId}: ${value}`);
+  const zwaveValue = bindValue({ nodeId, commandClass, endpoint, property, propertyKey }, value);
+
+  if (this.zwaveMode === DEFAULT.MODE_ZWAVEJS) {
+    this.driver.controller.nodes
+      .get(nodeId)
+      .setValue({ nodeId, commandClass, endpoint, property, propertyKey }, zwaveValue);
+  } else {
+    this.mqttClient.publish(
+      `${DEFAULT.ROOT}/nodeID_${nodeId}/${commandClass}/${endpoint}/${property}/set`,
+      zwaveValue.toString(),
     );
+  }
 }
 
 module.exports = {

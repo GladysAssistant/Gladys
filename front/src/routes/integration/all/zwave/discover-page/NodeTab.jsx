@@ -17,25 +17,25 @@ const NodeTab = ({ children, ...props }) => {
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">
-          <Text id="integration.zwave.setup.title" />
+          <Text id="integration.zwave.discover.title" />
         </h3>
         <div class="page-options d-flex">
           <button class="btn btn-outline-primary" onClick={props.healNetwork} disabled={zwaveActionsDisabled}>
-            <Text id="integration.zwave.setup.healNetworkButton" /> <i class="fe fe-radio" />
+            <Text id="integration.zwave.discover.healNetworkButton" /> <i class="fe fe-radio" />
           </button>
           <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=add' : '#'}>
             <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-              <Text id="integration.zwave.setup.addNodeButton" /> <i class="fe fe-plus" />
+              <Text id="integration.zwave.discover.addNodeButton" /> <i class="fe fe-plus" />
             </button>
           </a>
           <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=add-secure' : '#'}>
             <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-              <Text id="integration.zwave.setup.addNodeSecureButton" /> <i class="fe fe-plus" />
+              <Text id="integration.zwave.discover.addNodeSecureButton" /> <i class="fe fe-plus" />
             </button>
           </a>
           <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave/node-operation?action=remove' : '#'}>
             <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
-              <Text id="integration.zwave.setup.removeNode" /> <i class="fe fe-trash" />
+              <Text id="integration.zwave.discover.removeNode" /> <i class="fe fe-trash" />
             </button>
           </a>
         </div>
@@ -50,7 +50,7 @@ const NodeTab = ({ children, ...props }) => {
           <div class="dimmer-content">
             {zwaveNotConfigured && (
               <div class="alert alert-warning">
-                <Text id="integration.zwave.setup.zwaveNotConfiguredError" />
+                <Text id="integration.zwave.discover.zwaveNotConfiguredError" />
               </div>
             )}
             <div
@@ -66,6 +66,8 @@ const NodeTab = ({ children, ...props }) => {
                     nodeIndex={index}
                     createDevice={props.createDevice}
                     editNodeName={props.editNodeName}
+                    refreshValues={props.refreshValues}
+                    refreshInfo={props.refreshInfo}
                   />
                 ))}
             </div>

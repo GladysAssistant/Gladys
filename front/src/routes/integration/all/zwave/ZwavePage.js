@@ -25,14 +25,14 @@ const DashboardSettings = ({ children }) => (
                   </Link>
 
                   <Link
-                    href="/dashboard/integration/device/zwave/setup"
+                    href="/dashboard/integration/device/zwave/discover"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
                       <i class="fe fe-sliders" />
                     </span>
-                    <Text id="integration.zwave.setupTab" />
+                    <Text id="integration.zwave.discoverTab" />
                   </Link>
 
                   <Link

@@ -15,12 +15,12 @@ class ZwaveNodeOperationPage extends Component {
   };
   nodeReadyListener = () => {
     if (this.props.action === 'add' || this.props.action === 'add-secure') {
-      route('/dashboard/integration/device/zwave/setup');
+      route('/dashboard/integration/device/zwave/discover');
     }
   };
   nodeRemovedListener = () => {
     if (this.props.action === 'remove') {
-      route('/dashboard/integration/device/zwave/setup');
+      route('/dashboard/integration/device/zwave/discover');
     }
   };
   decrementTimer = () => {
@@ -30,7 +30,7 @@ class ZwaveNodeOperationPage extends Component {
     if (this.state.remainingTimeInSeconds > 1) {
       setTimeout(this.decrementTimer, 1000);
     } else {
-      route('/dashboard/integration/device/zwave/setup');
+      route('/dashboard/integration/device/zwave/discover');
     }
   };
   addNode = () => {
@@ -47,7 +47,7 @@ class ZwaveNodeOperationPage extends Component {
   };
   cancel = () => {
     this.props.cancelZwaveCommand();
-    route('/dashboard/integration/device/zwave/setup');
+    route('/dashboard/integration/device/zwave/discover');
   };
   constructor(props) {
     super(props);

@@ -1,13 +1,14 @@
 const schedule = require('node-schedule');
 
 const { addNode } = require('./commands/zwave.addNode');
-const { connect } = require('./commands/zwave.connect');
-const { disconnect } = require('./commands/zwave.disconnect');
-const { getInfos } = require('./commands/zwave.getInfos');
+const { connectZwaveJS, connectZwave2mqtt } = require('./commands/zwave.connect');
+const { disconnectZwaveJS, disconnectZwave2mqtt } = require('./commands/zwave.disconnect');
+const { getStatus } = require('./commands/zwave.getStatus');
 const { getNodeNeighbors } = require('./commands/zwave.getNodeNeighbors');
 const { getNodes } = require('./commands/zwave.getNodes');
 const { healNetwork } = require('./commands/zwave.healNetwork');
-const { refreshNodeParams } = require('./commands/zwave.refreshNodeParams');
+const { refreshValues } = require('./commands/zwave.refreshValues');
+const { refreshInfo } = require('./commands/zwave.refreshInfo');
 const { removeNode } = require('./commands/zwave.removeNode');
 const { setValue } = require('./commands/zwave.setValue');
 const { driverFailed } = require('./events/zwave.driverFailed');
@@ -30,30 +31,41 @@ const {
 } = require('./events/zwave.nodeInterview');
 const { metadataUpdate } = require('./events/zwave.metadataUpdate');
 const { statisticsUpdated } = require('./events/zwave.statisticsUpdated');
+const { updateDeviceConfiguration } = require('./commands/zwave.updateDeviceConfiguration');
+const { installMqttContainer } = require('./commands/zwave.installMqttContainer');
+const { installZ2mContainer } = require('./commands/zwave.installZ2mContainer');
+const { getConfiguration } = require('./commands/zwave.getConfiguration');
+const { handleMqttMessage } = require('./events/zwave.handleMqttMessage');
+const { connect } = require('./connect');
+const { disconnect } = require('./disconnect');
 const { updateConfiguration } = require('./commands/zwave.updateConfiguration');
 
-const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, serviceId) {
+const ZwaveManager = function ZwaveManager(gladys, ZWaveJS, mqtt, serviceId) {
   this.gladys = gladys;
   this.eventManager = gladys.event;
   this.serviceId = serviceId;
   this.ZWaveJS = ZWaveJS;
   this.nodes = {};
-  this.connected = false;
-  this.scanInProgress = false;
   this.schedule = schedule;
 
-  /* this.mqttService = this.gladys.service.getService('mqtt');
-  this.mqttService.device.subscribe('zwavejsmqtt/#', (topic, message) => {
-    logger.info(`Message recevied from topic ${topic}`);
-    const { type, node, args } = JSON.parse(message);
-    if (type === 'value added') {
-      valueAdded(node, args);
-    } else if (type === 'value notification') {
-      notification(node, args);
-    } else if (type === 'notification') {
-      valueNotification(node, args);
-    }
-  }); */
+  this.zwaveConnected = false;
+  this.usbConfigured = false;
+
+  this.mqttExist = false;
+  this.mqttRunning = false;
+  this.mqttConnected = false;
+  this.mqttContainerRunning = false;
+  this.mqtt = mqtt;
+  this.mqttClient = null;
+
+  this.zwave2mqttExist = false;
+  this.zwave2mqttRunning = false;
+
+  this.zwaveMode = null;
+  this.restartRequired = false;
+
+  this.dockerBased = true;
+  this.scanInProgress = false;
 };
 
 // EVENTS
@@ -78,18 +90,28 @@ ZwaveManager.prototype.nodeInterviewFailed = nodeInterviewFailed;
 ZwaveManager.prototype.nodeInterviewCompleted = nodeInterviewCompleted;
 ZwaveManager.prototype.nodeInterviewStageCompleted = nodeInterviewStageCompleted;
 ZwaveManager.prototype.statisticsUpdated = statisticsUpdated;
+ZwaveManager.prototype.handleMqttMessage = handleMqttMessage;
 
 // COMMANDS
-ZwaveManager.prototype.addNode = addNode;
 ZwaveManager.prototype.connect = connect;
 ZwaveManager.prototype.disconnect = disconnect;
+ZwaveManager.prototype.connectZwaveJS = connectZwaveJS;
+ZwaveManager.prototype.connectZwave2mqtt = connectZwave2mqtt;
+ZwaveManager.prototype.disconnectZwaveJS = disconnectZwaveJS;
+ZwaveManager.prototype.disconnectZwave2mqtt = disconnectZwave2mqtt;
 ZwaveManager.prototype.healNetwork = healNetwork;
-ZwaveManager.prototype.refreshNodeParams = refreshNodeParams;
-ZwaveManager.prototype.getInfos = getInfos;
+ZwaveManager.prototype.refreshInfo = refreshInfo;
+ZwaveManager.prototype.refreshValues = refreshValues;
+ZwaveManager.prototype.getStatus = getStatus;
+ZwaveManager.prototype.getConfiguration = getConfiguration;
 ZwaveManager.prototype.getNodes = getNodes;
 ZwaveManager.prototype.getNodeNeighbors = getNodeNeighbors;
+ZwaveManager.prototype.addNode = addNode;
 ZwaveManager.prototype.removeNode = removeNode;
 ZwaveManager.prototype.setValue = setValue;
+ZwaveManager.prototype.getConfiguration = getConfiguration;
 ZwaveManager.prototype.updateConfiguration = updateConfiguration;
+ZwaveManager.prototype.installMqttContainer = installMqttContainer;
+ZwaveManager.prototype.installZ2mContainer = installZ2mContainer;
 
 module.exports = ZwaveManager;

@@ -4,7 +4,7 @@ const timezone = require('dayjs/plugin/timezone');
 
 const logger = require('../../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { updateConfiguration } = require('../commands/zwave.updateConfiguration');
+const { updateDeviceConfiguration } = require('../commands/zwave.updateDeviceConfiguration');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -24,7 +24,7 @@ function driverReady(homeId) {
     .minute(0)
     .tz(this.timezone)
     .toDate();
-  this.updateConfigJob = this.schedule.scheduleJob(todayAtMidnightInMyTimeZone, updateConfiguration.bind(this));
+  this.updateConfigJob = this.schedule.scheduleJob(todayAtMidnightInMyTimeZone, updateDeviceConfiguration.bind(this));
 
   this.scanInProgress = true;
   this.ready = true;
