@@ -316,7 +316,7 @@ class EditScene extends Component {
       return newState;
     });
   };
-  duplicateScene = async e => {
+  duplicateScene = () => {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
 

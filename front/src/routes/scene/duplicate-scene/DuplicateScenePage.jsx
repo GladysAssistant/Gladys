@@ -15,7 +15,7 @@ const DuplicateScenePage = ({ children, ...props }) => (
         <form onSubmit={props.duplicateScene} class="card">
           <div class="card-body p-6">
             <div class="card-title">
-              <Text id="duplicateScene.cardTitle" />
+              <Text id="duplicateScene.cardTitle" fields={{ name: props.sourceScene.name }} />
             </div>
             {props.duplicateSceneStatus === RequestStatus.ConflictError && (
               <div class="alert alert-danger">
@@ -32,7 +32,7 @@ const DuplicateScenePage = ({ children, ...props }) => (
                   class={cx('form-control', {
                     'is-invalid': get(props, 'duplicateSceneErrors.name')
                   })}
-                  placeholder={<Text id="duplicateScene.nameLabel" />}
+                  placeholder={<Text id="duplicateScene.namePlaceholder" />}
                   value={get(props, 'scene.name')}
                   onInput={props.updateDuplicateSceneName}
                 />

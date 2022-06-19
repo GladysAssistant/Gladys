@@ -1490,10 +1490,10 @@
     "sceneAlreadyExist": "A scene with that name already exist."
   },
   "duplicateScene": {
-    "cardTitle": "Duplicate a scene",
+    "cardTitle": "Duplicate scene \"{{name}}\"",
     "nameLabel": "Name",
-    "namePlaceholder": "Enter the name of your scene",
-    "duplicateSceneButton": "Duplicate scene",
+    "namePlaceholder": "Enter a new name for the duplicate scene, this must be different from the previous scene name.",
+    "duplicateSceneButton": "Duplicate",
     "invalidName": "Name is required",
     "sceneAlreadyExist": "A scene with that name already exist."
   },

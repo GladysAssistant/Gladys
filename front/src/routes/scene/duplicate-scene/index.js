@@ -11,6 +11,14 @@ class DuplicateScene extends Component {
     route(`/dashboard/scene/${this.props.scene_selector}`);
   };
 
+  getSourceScene = () => {
+    this.props.httpClient.get(`/api/v1/scene/${this.props.scene_selector}`).then(scene => {
+      this.setState({
+        sourceScene: scene
+      });
+    });
+  };
+
   duplicateScene = async e => {
     e.preventDefault();
     // if errored, we don't continue
@@ -67,8 +75,12 @@ class DuplicateScene extends Component {
 
   constructor(props) {
     super(props);
+    this.getSourceScene();
     this.state = {
       scene: {
+        name: ''
+      },
+      sourceScene: {
         name: ''
       },
       duplicateSceneErrors: null,
@@ -76,12 +88,13 @@ class DuplicateScene extends Component {
     };
   }
 
-  render(props, { duplicateSceneErrors, scene, duplicateSceneStatus }) {
+  render(props, { duplicateSceneErrors, scene, duplicateSceneStatus, sourceScene }) {
     return (
       <DuplicateScenePage
         {...props}
         goBack={this.goBack}
         scene={scene}
+        sourceScene={sourceScene}
         updateDuplicateSceneName={this.updateDuplicateSceneName}
         duplicateScene={this.duplicateScene}
         duplicateSceneErrors={duplicateSceneErrors}

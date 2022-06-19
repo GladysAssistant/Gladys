@@ -939,7 +939,7 @@
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
-    "duplicateButton": "Copier",
+    "duplicateButton": "Dupliquer",
     "triggersTitle": "Déclencheurs",
     "newTrigger": "Nouveau déclencheur",
     "addTriggerButton": "Ajouter déclencheur",
@@ -1490,10 +1490,10 @@
     "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
   },
   "duplicateScene": {
-    "cardTitle": "Copier une scène",
+    "cardTitle": "Dupliquer la scène \"{{name}}\"",
     "nameLabel": "Nom",
-    "namePlaceholder": "Entrez le nom de votre scène",
-    "duplicateSceneButton": "Copier une scène",
+    "namePlaceholder": "Entrez un nouveau nom pour la scène dupliquée, celui-ci doit être différent du nom de scène précédent.",
+    "duplicateSceneButton": "Dupliquer",
     "invalidName": "Le nom est requis",
     "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
   },
