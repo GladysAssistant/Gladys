@@ -57,12 +57,6 @@ cat <<EOF >>$zwave2mqtt_config_file
     "commandsTimeout": 30000,
     "logLevel": "info",
     "logEnabled": true,
-    "securityKeys": {
-      "S0_Legacy": "0102030405060708090A0B0C0D0E0F10",
-      "S2_AccessControl": "9EF050D84EB662D3C084148B8413D780",
-      "S2_Unauthenticated": "F80C363D6CF0EE8C77D5CC2DFFDB8837",
-      "S2_Authenticated": "ED76271CACBF13AEEA60F95C8B8A586B"
-    },
     "deviceConfigPriorityDir": "/usr/src/app/store/config",
     "logToFile": true,
     "serverEnabled": false,
