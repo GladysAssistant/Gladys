@@ -17,7 +17,7 @@ function splitNode(node) {
   }
 
   // Temporary remove endpoints for clone
-  const endpoints = node.endpoints;
+  const [endpoints] = node;
   node.endpoints = undefined;
 
   const commonNode = cloneDeep(node);

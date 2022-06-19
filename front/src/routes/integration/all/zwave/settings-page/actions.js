@@ -130,15 +130,12 @@ const createActions = store => {
           saveConfigurationStatus: RequestStatus.Error
         });
       }
-<<<<<<< HEAD
     },
     driverFailed() {
       store.setState({
         zwaveDriverFailed: true,
         zwaveConnectionInProgress: false
       });
-=======
->>>>>>> Support Zwavejs2mqtt
     }
   };
   return Object.assign({}, actions, integrationActions);

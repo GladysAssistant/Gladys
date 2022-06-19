@@ -630,29 +630,6 @@ const DEVICE_FEATURE_MINMAX_BY_TYPE = {
   },
 };
 
-const DEVICE_FEATURE_MINMAX_BY_TYPE = {
-  [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
-    MIN: 0,
-    MAX: 1,
-  },
-  [DEVICE_FEATURE_TYPES.SWITCH.POWER]: {
-    MIN: 0,
-    MAX: 10000, // 10 kW
-  },
-  [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: {
-    MIN: 0,
-    MAX: 100000, // 10 kW during 10000 hour (more than one year)
-  },
-  [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: {
-    MIN: 0,
-    MAX: 40,
-  },
-  [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: {
-    MIN: 0,
-    MAX: 400,
-  },
-};
-
 const ACTIONS_STATUS = {
   PENDING: 'pending',
   SUCCESS: 'success',

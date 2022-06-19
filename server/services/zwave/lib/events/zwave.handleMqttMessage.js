@@ -208,9 +208,9 @@ function handleMqttMessage(topic, message) {
         logger.debug(`Topic ${topic}: messsage "${message}"`);
 
         let newValue = message;
-        if(message === '') {
+        if (message === '') {
           // Notification stateless
-          break; 
+          break;
         } else if (message === 'false') {
           newValue = false;
         } else if (message === 'true') {
@@ -218,7 +218,7 @@ function handleMqttMessage(topic, message) {
         } else if (!Number.isNaN(message)) {
           newValue = Number(message);
         } else {
-          break; 
+          break;
         }
 
         valueUpdated.bind(this)(

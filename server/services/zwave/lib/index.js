@@ -109,6 +109,7 @@ ZwaveManager.prototype.getNodeNeighbors = getNodeNeighbors;
 ZwaveManager.prototype.addNode = addNode;
 ZwaveManager.prototype.removeNode = removeNode;
 ZwaveManager.prototype.setValue = setValue;
+ZwaveManager.prototype.updateDeviceConfiguration = updateDeviceConfiguration;
 ZwaveManager.prototype.getConfiguration = getConfiguration;
 ZwaveManager.prototype.updateConfiguration = updateConfiguration;
 ZwaveManager.prototype.installMqttContainer = installMqttContainer;
