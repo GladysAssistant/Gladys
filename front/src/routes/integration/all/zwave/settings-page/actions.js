@@ -1,6 +1,5 @@
 import createActionsIntegration from '../../../../../actions/integration';
 import { RequestStatus } from '../../../../../utils/consts';
-import get from 'get-value';
 
 const createActions = store => {
   const integrationActions = createActionsIntegration(store);
@@ -90,7 +89,7 @@ const createActions = store => {
         });
       }
     },
-    displayConnectedMessage(state) {
+    displayConnectedMessage() {
       // display 3 seconds a message "MQTT connected"
       store.setState({
         zwaveConnected: true

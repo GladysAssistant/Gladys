@@ -1,7 +1,6 @@
 const logger = require('../../utils/logger');
 const ZwaveManager = require('./lib');
 const ZwaveController = require('./api/zwave.controller');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 
 module.exports = function ZwaveService(gladys, serviceId) {
   const mqtt = require('mqtt');

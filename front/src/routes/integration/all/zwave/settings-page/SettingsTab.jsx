@@ -1,8 +1,6 @@
 import { Component } from 'preact';
-import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import { RequestStatus } from '../../../../../utils/consts';
-import CheckStatus from './CheckStatus.js';
-import get from 'get-value';
 import classNames from 'classnames/bind';
 import style from './style.css';
 import { DEFAULT } from '../../../../../../../server/services/zwave/lib/constants';
@@ -10,7 +8,7 @@ import { DEFAULT } from '../../../../../../../server/services/zwave/lib/constant
 let cx = classNames.bind(style);
 
 class SettingsTab extends Component {
-  toggleMode = e => {
+  toggleMode = () => {
     this.props.zwaveMode =
       this.props.zwaveMode === DEFAULT.MODE_ZWAVE2MQTT ? DEFAULT.MODE_ZWAVEJS : DEFAULT.MODE_ZWAVE2MQTT;
     this.props.updateConfiguration({ zwaveMode: this.props.zwaveMode });
@@ -20,7 +18,7 @@ class SettingsTab extends Component {
     this.props.updateConfiguration({ zwaveDriverPath: e.target.value });
   };
 
-  render(props, { showPassword }) {
+  render(props) {
     return (
       <>
         <div class="card">
@@ -60,19 +58,19 @@ class SettingsTab extends Component {
 
                 {props.restartRequired && (
                   <div class="alert alert-danger">
-                    <Text id="integration.zwave.settings.zwavejs.restartRequired" />
+                    <Text id="integration.zwave.status.restartRequired" />
                   </div>
                 )}
 
                 {props.zwaveContainerStatus === RequestStatus.Error && (
                   <p class="alert alert-danger">
-                    <Text id="integration.zwave.settings.error" />
+                    <Text id="integration.zwave.status.error" />
                   </p>
                 )}
 
                 {props.zwaveConnected && (
                   <p class="alert alert-success">
-                    <Text id="integration.zwave.settings.connected" />
+                    <Text id="integration.zwave.status.connected" />
                   </p>
                 )}
 
@@ -148,7 +146,7 @@ class SettingsTab extends Component {
               <Text id="integration.zwave.settings.zwave2mqtt.serviceStatus" />
             </h2>
           </div>
-          <div class="card-body"></div>
+          <div class="card-body" />
         </div>
       </>
     );

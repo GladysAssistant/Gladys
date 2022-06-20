@@ -1,5 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 /**
  * @description Getting Z-Wave status.
@@ -13,8 +12,12 @@ function getStatus() {
   return {
     ready: this.ready,
 
-    inclusionState: this.driver?.ready ? this.driver.controller?.inclusionState : 'Not ready',
-    isHealNetworkActive: this.driver?.ready ? this.driver.controller?.isHealNetworkActive : 'Not ready',
+    inclusionState:
+      this.driver && this.driver.ready && this.driver.controller ? this.driver.controller.inclusionState : 'Not ready',
+    isHealNetworkActive:
+      this.driver && this.driver.ready && this.driver.controller
+        ? this.driver.controller.isHealNetworkActive
+        : 'Not ready',
     scanInProgress: this.scanInProgress,
 
     zwaveConnected: this.zwaveConnected,

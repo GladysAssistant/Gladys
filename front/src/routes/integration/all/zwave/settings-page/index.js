@@ -18,13 +18,13 @@ class ZwaveSettingsPage extends Component {
     this.props.getStatus();
     this.props.getUsbPorts();
     this.props.getConfiguration();
-    // this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.STATUS_CHANGE, this.props.getStatus);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.STATUS_CHANGE, this.props.getStatus);
     // this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.DRIVER_READY, this.driverReadyListener);
     // this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.DRIVER_FAILED, this.driverFailedListener);
   }
 
   componentWillUnmount() {
-    // this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.STATUS_CHANGE, this.props.checkStatus);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.STATUS_CHANGE, this.props.checkStatus);
     /* this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVE.DRIVER_READY, this.driverReadyListener);
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZWAVE.DRIVER_FAILED,

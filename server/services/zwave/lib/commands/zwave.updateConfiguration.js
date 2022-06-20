@@ -1,11 +1,11 @@
 const logger = require('../../../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { CONFIGURATION } = require('../constants');
 
 /**
  * @description Update Z-Wave configuration.
+ * @param {Object} configuration - The configuration data.
  * @example
- * zwave.updateConfiguration();
+ * zwave.updateConfiguration({ zwaveMode: '', zwaveDriverPath: '' });
  */
 async function updateConfiguration(configuration) {
   logger.debug(`Zwave : Updating configuration...`);
