@@ -1,5 +1,4 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
   /**
@@ -136,7 +135,7 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
   async function refreshInfo(req, res) {
     zwaveManager.refreshInfo(req.body.nodeId);
     res.json({
-      success: result,
+      success: true,
     });
   }
 

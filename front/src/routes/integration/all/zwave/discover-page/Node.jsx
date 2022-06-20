@@ -136,11 +136,6 @@ class ZwaveNode extends Component {
                       <Text id="integration.zwave.discover.deviceDatabaseUrl" />
                     </a>
                   </div>
-                  <div>
-                    <a href={props.node.deviceDatabaseUrl} target="_blank" rel="noopener noreferrer">
-                      <Text id="integration.zwave.setup.deviceDatabaseUrl" />
-                    </a>
-                  </div>
                 </div>
               ) : (
                 <div class="card-body">

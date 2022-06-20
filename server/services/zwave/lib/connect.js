@@ -1,8 +1,13 @@
 const logger = require('../../../utils/logger');
 const { CONFIGURATION, DEFAULT } = require('./constants');
 const { generate } = require('../../../utils/password');
-const { PlatformNotCompatible, ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
+/**
+ * @description Start ZwaveJS driver.
+ * @example
+ * zwave.startZwaveJS();
+ */
 async function startZwaveJS() {
   const zwaveDriverPath = await this.gladys.variable.getValue(CONFIGURATION.ZWAVE_DRIVER_PATH, this.serviceId);
   if (!zwaveDriverPath) {
@@ -28,7 +33,12 @@ async function startZwaveJS() {
   await this.connectZwaveJS(zwaveDriverPath, securityKeys);
 }
 
-async function startMqtt() {
+/**
+ * @description Start ZwaveJS2mqtt driver.
+ * @example
+ * zwave.startZwaveJS2Mqtt();
+ */
+async function startZwaveJS2Mqtt() {
   let mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVE2MQTT_MQTT_PASSWORD_KEY, this.serviceId);
   if (!mqttPassword) {
     mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
@@ -42,8 +52,8 @@ async function startMqtt() {
   this.mqttClient = this.mqtt.connect(DEFAULT.ZWAVE2MQTT_MQTT_URL_VALUE, {
     username: DEFAULT.ZWAVE2MQTT_MQTT_USERNAME_VALUE,
     password: mqttPassword,
-    //reconnectPeriod: 5000,
-    //clientId: DEFAULT.MQTT_CLIENT_ID,
+    // reconnectPeriod: 5000,
+    // clientId: DEFAULT.MQTT_CLIENT_ID,
   });
   this.mqttRunning = this.mqttClient !== null;
   await this.connectZwave2mqtt();
@@ -92,7 +102,7 @@ async function connect() {
   }
 
   if (this.zwaveMode === DEFAULT.MODE_ZWAVE2MQTT) {
-    startMqtt.call(this);
+    startZwaveJS2Mqtt.call(this);
   } else {
     startZwaveJS.call(this);
   }

@@ -564,6 +564,8 @@
       "settingsTab": "Settings",
       "discoverTab": "Discover",
       "status": {
+        "error": "Failed to connect to Zwave network",
+        "connected": "Zwave network connected",
         "notConfigured": "Zwave2mqtt USB dongle is not configured, please go to ",
         "notEnabled": "Zwave2mqtt is not activated, please go to ",
         "mqttNotInstalled": "MQTT broker failed to install",
@@ -573,7 +575,8 @@
         "zwave2mqttNotRunning": "Zwave2mqtt failed to start",
         "zwave2mqttNotConnected": "Zwave2mqtt failed to connect to MQTT",
         "settingsPageLink": "USB dongle configuration page",
-        "setupPageLink": "Zwave2mqtt configuration page"
+        "setupPageLink": "Zwave2mqtt configuration page",
+        "restartRequired": "Please do a connect to take new parameters into account"
       },
       "device": {
         "title": "Z-Wave Devices",

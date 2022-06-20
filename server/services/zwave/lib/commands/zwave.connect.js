@@ -142,7 +142,7 @@ async function connectZwave2mqtt() {
     this.scanInProgress = true;
 
     // For testing
-    const nodes = require('../../../../../nodes_6.json');
+    const nodes = require('../../../../../../nodes_6.json');
     this.handleMqttMessage(
       `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVE2MQTT_CLIENT_ID}/driver/driver_ready`,
       '{"data": [{"controllerId":"controllerId","homeId":"homeId"}]}',

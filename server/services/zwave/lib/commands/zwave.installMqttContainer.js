@@ -1,10 +1,10 @@
 const { promisify } = require('util');
+const cloneDeep = require('lodash.clonedeep');
 const { exec } = require('../../../../utils/childProcess');
 const { CONFIGURATION } = require('../constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const containerDescriptor = require('../../docker/gladys-zwave-mqtt-container.json');
 const logger = require('../../../../utils/logger');
-const cloneDeep = require('lodash.clonedeep');
 
 const sleep = promisify(setTimeout);
 

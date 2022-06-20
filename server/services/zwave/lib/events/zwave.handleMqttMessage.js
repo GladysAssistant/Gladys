@@ -8,7 +8,6 @@ const { nodeDead, nodeAlive, nodeWakeUp, nodeSleep } = require('./zwave.nodeStat
 const { nodeReady } = require('./zwave.nodeReady');
 const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
 const { scanComplete } = require('./zwave.scanComplete');
-const { BRIDGE_EXTERNAL_ID_BASE } = require('../../../philips-hue/lib/utils/consts');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -122,17 +121,17 @@ function handleMqttMessage(topic, message) {
     case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVE2MQTT_CLIENT_ID}/api/getNodes`: {
       if (this.scanInProgress) {
         if (!(message instanceof Object)) {
-          /*const fs = require('fs');
+          /* const fs = require('fs');
           try {
             fs.writeFileSync('nodes.json', message);
           } catch (err) {
             console.error(err);
-          }*/
+          } */
         }
         const { success, result } = message instanceof Object ? message : JSON.parse(message);
         if (success) {
           this.nodes = {};
-          result.map((data) => {
+          result.forEach((data) => {
             const node = Object.assign(
               {
                 nodeId: data.id,
@@ -162,7 +161,7 @@ function handleMqttMessage(topic, message) {
                   value.property = value.propertyName.replace(/_/g, ' ');
                 }
                 delete value.propertyName;
-                value.propertyKey = value.propertyKey ? ('' + value.propertyKey).replace(/_/g, ' ') : undefined;
+                value.propertyKey = value.propertyKey ? `${value.propertyKey}`.replace(/_/g, ' ') : undefined;
 
                 valueAdded.bind(this)(
                   {
@@ -229,7 +228,7 @@ function handleMqttMessage(topic, message) {
             commandClass: commandClass * 1,
             endpoint: endpoint * 1 || 0,
             property: propertyName.replace(/_/g, ' '),
-            propertyKey: propertyKey ? ('' + propertyKey).replace(/_/g, ' ') : undefined,
+            propertyKey: propertyKey ? `${propertyKey}`.replace(/_/g, ' ') : undefined,
             newValue,
           },
         );
