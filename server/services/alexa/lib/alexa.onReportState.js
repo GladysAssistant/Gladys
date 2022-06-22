@@ -26,7 +26,7 @@ function onReportState(body) {
       properties.push({
         namespace: mapping.interface,
         name: get(mapping, 'properties.supported.0.name'),
-        value: func(feature.last_value),
+        value: func(feature.last_value, feature),
         timeOfSample: now,
         uncertaintyInMilliseconds: 0,
       });

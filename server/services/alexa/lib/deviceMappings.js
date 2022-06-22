@@ -76,8 +76,8 @@ const readValues = {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: (value) => {
       return value === 1 ? 'ON' : 'OFF';
     },
-    [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: (value) => {
-      return value;
+    [DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS]: (value, { min, max }) => {
+      return Math.round((value * 100) / max);
     },
     [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: (intColor) => {
       const rgb = intToRgb(intColor);
@@ -100,29 +100,35 @@ const writeValues = {
   [DIRECTIVE_NAMESPACES.PowerController]: (directiveName) => {
     return directiveName === 'TurnOn' ? 1 : 0;
   },
-  [DIRECTIVE_NAMESPACES.BrightnessController]: (directiveName, payload, currentValue, binaryCurrentValue) => {
+  [DIRECTIVE_NAMESPACES.BrightnessController]: (
+    directiveName,
+    payload,
+    currentValue,
+    binaryCurrentValue,
+    { min, max },
+  ) => {
     if (directiveName === 'AdjustBrightness') {
       // if the light is currently off
       if (binaryCurrentValue === 0) {
-        // decreasing the brightness should keep the brightness at 0
-        if (payload.brightnessDelta < 0) {
-          return 0;
+        // decreasing the brightness should keep the brightness at minimum value
+        if (payload.brightnessDelta < min) {
+          return min;
         }
         // putting more brightness should start from 0 (not previous value)
-        return payload.brightnessDelta;
+        return Math.round((payload.brightnessDelta * max) / 100);
       }
       // otherwise, if light is already on
       // we compare with previous value
-      const newValue = currentValue + payload.brightnessDelta;
-      if (newValue > 100) {
-        return 100;
+      const newValue = currentValue + (payload.brightnessDelta * max) / 100;
+      if (newValue > max) {
+        return max;
       }
-      if (newValue < 0) {
-        return 0;
+      if (newValue < min) {
+        return min;
       }
       return newValue;
     }
-    return payload.brightness;
+    return Math.round((payload.brightness * max) / 100);
   },
   [DIRECTIVE_NAMESPACES.ColorController]: (hsbColor) => {
     const rgb = hsbToRgb([hsbColor.hue, hsbColor.saturation * 100, hsbColor.brightness * 100]);

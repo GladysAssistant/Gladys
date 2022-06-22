@@ -71,9 +71,13 @@ function onExecute(body) {
           (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
         );
 
-        // if light is turned on, but brightness is 0, put to 100
-        if (brightnessDeviceFeature && brightnessDeviceFeature.last_value === 0 && value === 1) {
-          setBrightness(100);
+        // if light is turned on, but brightness is min, put to max
+        if (
+          brightnessDeviceFeature &&
+          brightnessDeviceFeature.last_value === brightnessDeviceFeature.min &&
+          value === 1
+        ) {
+          setBrightness(brightnessDeviceFeature.max);
         }
       }
       nameOfAlexaFeature = 'powerState';
@@ -92,10 +96,11 @@ function onExecute(body) {
         get(body, 'directive.payload'),
         deviceFeature.last_value,
         binaryDeviceFeature.last_value,
+        deviceFeature,
       );
       nameOfAlexaFeature = 'brightness';
-      // if the brightness is set to 0, turn off the light
-      if (value === 0) {
+      // if the brightness is set to minimum value, turn off the light
+      if (value === deviceFeature.min) {
         controlPower(deviceFeature.category, 0);
       } else {
         // if the brightness is set to something positive, make
@@ -142,7 +147,7 @@ function onExecute(body) {
         {
           namespace: directiveNamespace,
           name: nameOfAlexaFeature,
-          value: readValues[deviceFeature.category][deviceFeature.type](value),
+          value: readValues[deviceFeature.category][deviceFeature.type](value, deviceFeature),
           timeOfSample: new Date().toISOString(),
           uncertaintyInMilliseconds: 500,
         },
