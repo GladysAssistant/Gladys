@@ -1,6 +1,7 @@
 const get = require('get-value');
 const logger = require('../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { DIRECTIVE_NAMESPACES_LIST } = require('../../services/alexa/lib/alexa.constants');
 
 /**
  * @description Handle a new Gladys Alexa Gateway message.
@@ -37,7 +38,7 @@ async function handleAlexaMessage(data, rawMessage, cb) {
     let response;
     if (directiveNamespace === 'Alexa.Discovery') {
       response = service.alexaHandler.onDiscovery();
-    } else if (directiveNamespace === 'Alexa.PowerController') {
+    } else if (DIRECTIVE_NAMESPACES_LIST.indexOf(directiveNamespace) !== -1) {
       response = service.alexaHandler.onExecute(body);
     } else if (directiveNamespace === 'Alexa' && directiveName === 'ReportState') {
       response = service.alexaHandler.onReportState(body);

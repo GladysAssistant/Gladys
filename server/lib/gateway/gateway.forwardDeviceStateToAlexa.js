@@ -43,7 +43,7 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
       {
         namespace: mapping.interface,
         name: get(mapping, 'properties.supported.0.name'),
-        value: func(gladysFeature.last_value),
+        value: func(gladysFeature.last_value, gladysFeature),
         timeOfSample: now,
         uncertaintyInMilliseconds: 0,
       },
