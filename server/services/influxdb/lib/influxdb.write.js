@@ -12,12 +12,11 @@ const logger = require('../../../utils/logger');
  */
 function write(event) {
   logger.trace('EVENT - Write point to influxdb');
-  logger.trace(event);
 
   const gladysFeature = this.gladys.stateManager.get('deviceFeature', event.device_feature);
-  logger.trace(gladysFeature);
+
   const gladysDevice = this.gladys.stateManager.get('deviceById', gladysFeature.device_id);
-  logger.trace(gladysDevice);
+
   this.influxdbApi.useDefaultTags({ host: 'gladys' });
 
   let point;
@@ -25,7 +24,7 @@ function write(event) {
   switch (gladysFeature.type) {
     case 'binary':
       logger.trace('EVENT - Write point to influxdb - binary');
-      binaryValue = (event.last_value === 1 ? true : false);
+      binaryValue = event.last_value === 1 ? true : false;
       point = new Point(event.device_feature)
         .tag('type', gladysFeature.type)
         .tag('name', gladysFeature.name)

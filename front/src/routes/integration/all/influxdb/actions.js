@@ -1,49 +1,54 @@
+import createActionsIntegration from '../../../../actions/integration';
 import { RequestStatus } from '../../../../utils/consts';
-import { InfluxdbStatus } from '../../../../utils/consts';
 
-const actions = store => ({
-  async getInfluxdbSettings(state) {
-    store.setState({
-      influxdbGetSettingsStatus: InfluxdbStatus.Getting
-    });
-
-    let influxdbUrl = '';
-    let influxdbBucket = '';
-    let influxdbToken = '';
-    let influxdbOrg = '';
-
-    store.setState({
-      influxdbUrl,
-      influxdbBucket,
-      influxdbToken,
-      influxdbOrg
-    });
-
-    try {
-      const { value: url } = await state.httpClient.get('/api/v1/service/influxdb/variable/INFLUXDB_URL');
-      influxdbUrl = url;
-      const { value: bucket } = await state.httpClient.get('/api/v1/service/influxdb/variable/INFLUXDB_BUCKET');
-      influxdbBucket = bucket;
-      const { value: token } = await state.httpClient.get('/api/v1/service/influxdb/variable/INFLUXDB_TOKEN');
-      influxdbToken = token;
-      const { value: org } = await state.httpClient.get('/api/v1/service/influxdb/variable/INFLUXDB_ORG');
-      influxdbOrg = org;
-
+function createActions(store) {
+  const integrationActions = createActionsIntegration(store);
+  const actions = {
+    async loadProps(state) {
       store.setState({
-        influxdbGetSettingsStatus: InfluxdbStatus.Success
+        influxdbGetSettingsStatus: RequestStatus.Getting
       });
-    } catch (e) {
+      let configuration = {};
+      try {
+        configuration = await state.httpClient.get('/api/v1/service/influxdb/config');
+      } finally {
+        store.setState({
+          influxdbUrl: configuration.influxdbUrl,
+          influxdbBucket: configuration.influxdbBucket,
+          influxdbToken: configuration.influxdbToken,
+          influxdbOrg: configuration.influxdbOrg,
+          influxdbGetSettingsStatus: RequestStatus.Success
+        });
+      }
+    },
+    updateConfiguration(state, config) {
+      store.setState(config);
+    },
+    async saveConfiguration(state) {
+      event.preventDefault();
       store.setState({
-        influxdbGetSettingsStatus: InfluxdbStatus.Error
+        connectMqttStatus: RequestStatus.Getting,
+        mqttConnected: false,
+        mqttConnectionError: undefined
       });
+      try {
+        const { influxdbUrl, influxdbBucket, influxdbToken, influxdbOrg } = state;
+        await state.httpClient.post(`/api/v1/service/influxdb/saveConfig`, {
+          influxdbUrl,
+          influxdbBucket,
+          influxdbToken,
+          influxdbOrg
+        });
+      } catch (e) {
+        store.setState({
+          connectMqttStatus: RequestStatus.Error,
+          passwordChanges: false
+        });
+      }
     }
-    store.setState({
-      influxdbUrl,
-      influxdbBucket,
-      influxdbToken,
-      influxdbOrg
-    });
-  }
-});
+  };
 
-export default actions;
+  return Object.assign({}, actions, integrationActions);
+}
+
+export default createActions;

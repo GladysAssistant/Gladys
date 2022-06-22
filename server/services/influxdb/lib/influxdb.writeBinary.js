@@ -1,8 +1,6 @@
 const { Point } = require('@influxdata/influxdb-client');
 const logger = require('../../../utils/logger');
 
-
-
 /**
  * @description Write binary point to influxdb.
  * @param {Object} event - Gladys event.
