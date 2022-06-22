@@ -689,7 +689,21 @@
       "deviceTab": "Appareils",
       "networkTab": "Réseau",
       "settingsTab": "Paramètres",
-      "setupTab": "Configuration",
+      "discoverTab": "Découverte Z-Wave",
+      "status": {
+        "error": "Impossible de se connecter au réseau Zwave",
+        "connected": "Réseau Zwave connecté",
+        "notConfigured": "Aucun dongle USB Zwave2mqtt configuré, veuillez vous rendre sur ",
+        "notEnabled": "Le service Zwave2mqtt n'est pas activé, veuillez vous rendre sur ",
+        "mqttNotInstalled": "Le broker MQTT n'a pas pu être installé.",
+        "mqttNotRunning": "Le broker MQTT n'a pas démarré.",
+        "zwave2mqttNotInstalled": "Zwave2mqtt n'a pas pu être installé.",
+        "zwave2mqttNotRunning": "Zwave2mqtt n'a pas démarré.",
+        "zwave2mqttNotConnected": "Zwave2mqtt n'a pas réussi à se connecter au broker MQTT",
+        "settingsPageLink": "la page de paramétrage du dongle USB",
+        "setupPageLink": "la page de configuration de Zwave2mqtt",
+        "restartRequired": "reconnecter le service pour tenir compte des nouveaux paramêtres"
+      },
       "device": {
         "title": "Appareils Z-Wave",
         "search": "Chercher un appareil",
@@ -704,7 +718,7 @@
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
       },
-      "setup": {
+      "discover": {
         "title": "Appareils Z-Wave",
         "addNodeButton": "Ajouter",
         "addNodeSecureButton": "Ajout sécurisé",
@@ -714,9 +728,10 @@
         "noZwaveDevices": "Aucun appareil Z-Wave trouvé. Avez-vous sélectionné le port USB de votre dongle dans les paramètres ?",
         "manufacturer": "Fabricant",
         "name": "Nom",
-        "type": "Type",
         "scanInProgressText": "Recherche en cours...",
         "createDeviceInGladys": "Connecter dans Gladys",
+        "refreshValues": "Mettre à jour toutes les valeurs",
+        "refreshInfo": "Mettre à jour les informations",
         "features": "Fonctionnalités",
         "params": "Paramètre",
         "nodeId": "Noeud",
@@ -726,7 +741,8 @@
         "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
         "unknowNode": "Noeud inconnu",
         "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page.",
-        "createGithubIssue": "Signaler un bug avec cet appareil"
+        "createGithubIssue": "Signaler un bug avec cet appareil",
+        "deviceDatabaseUrl": "Lien vers Z-Wave JS DB de l'appareil"
       },
       "network": {
         "title": "Réseau Z-Wave",
@@ -738,15 +754,46 @@
       },
       "settings": {
         "title": "Paramètres Z-Wave",
-        "description": "Pour utiliser le Z-Wave dans Gladys, vous devez avoir une clé USB Z-Wave connectée à votre instance Gladys.",
-        "zwaveUsbDriverPathLabel": "Sélectionnez le port USB auquel votre clé Z-Wave est connectée",
+        "description": "Utilisation de Zwave2mqtt au lieu du driver Z-Wave JS",
+        "urlLabel": "URL du broker",
+        "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur du broker MQTT",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe du broker MQTT",
+        "saveLabel": "Sauvegarder la configuration",
         "connectButton": "Connecter",
         "disconnectButton": "Déconnecter",
-        "refreshButton": "Rafraîchir la liste USB",
-        "notConnected": "Gladys n'est connectée à aucune clé USB Z-Wave.",
-        "connectedWithSuccess": "Clé USB Z-Wave connectée avec succès.",
-        "connecting": "Tentative de connexion à la clé USB Z-Wave...",
-        "driverFailedError": "Une erreur s'est produite lors de la tentative de connexion à la clé USB Z-Wave."
+        "connected": "Zwave2mqtt démarré avec succès.",
+        "error": "Une erreur s'est produite au démarrage du service Zwave2mqtt.",
+        "zwavejs": {
+          "title": "Paramètres Z-Wave JS",
+          "description": "Pour utiliser le Z-Wave dans Gladys, vous devez avoir une clé USB Z-Wave connectée à votre instance Gladys.",
+          "zwaveUsbDriverPathLabel": "Sélectionnez le port USB auquel votre clé Z-Wave est connectée",
+          "refreshButton": "Rafraîchir la liste USB",
+          "notConnected": "Gladys n'est connectée à aucune clé USB Z-Wave.",
+          "connectedWithSuccess": "Clé USB Z-Wave connectée avec succès.",
+          "connecting": "Tentative de connexion à la clé USB Z-Wave...",
+          "driverFailedError": "Une erreur s'est produite lors de la tentative de connexion à la clé USB Z-Wave."
+        },
+        "zwave2mqtt": {
+          "title": "Configuration du service Zwave2mqtt",
+          "description": "Ce service utilise deux containers Docker (MQTT broker and Zwave2mqtt). Activer Zwave2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zwave2mqtt",
+          "enableLabel": "Activation du service Zwave2mqtt",
+          "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zwave2mqtt depuis Gladys.",
+          "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zwave2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
+          "enableZwave2mqtt": "Activer Zwave2mqtt",
+          "externalZwave2mqtt": "Zwave2mqtt externe",
+          "containersStatus": "Conteneurs liés à Zwave2mqtt",
+          "serviceStatus": "Etat du service Zwave2mqtt",
+          "link": "Lien",
+          "mqttZwaveLink": "MQTT - Zwave",
+          "gladysMqttLink": "Gladys - MQTT",
+          "zwave2Mqtt": "Zwave2mqtt",
+          "gladys": "Gladys",
+          "mqtt": "MQTT",
+          "status": "Status"
+        }
       },
       "nodeOperation": {
         "addNodeInstructions": "Vous pouvez maintenant inclure votre appareil en suivant les instructions du manuel de celui-ci.",
@@ -1717,7 +1764,8 @@
     "motion-sensor": {
       "shortCategoryName": "Détecteur de mouvement",
       "push": "Détecteur de mouvement",
-      "binary": "Détection mouvement Oui/Non"
+      "binary": "Détection mouvement Oui/Non",
+      "integer": "Détection mouvement"
     },
     "presence-sensor": {
       "shortCategoryName": "Détecteur de présence",
@@ -1799,6 +1847,11 @@
     "humidity-sensor": {
       "shortCategoryName": "Capteur d'humidité",
       "decimal": "Humidité (pourcentage)"
+    },
+    "ultraviolet-sensor": {
+      "shortCategoryName": "Capteur UV",
+      "integer": "UV entière",
+      "decimal": "UV décimale"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",

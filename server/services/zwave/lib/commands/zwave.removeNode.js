@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+const { DEFAULT } = require('../constants');
 
 const REMOVE_NODE_TIMEOUT = 60 * 1000;
 
@@ -9,8 +10,20 @@ const REMOVE_NODE_TIMEOUT = 60 * 1000;
  */
 function removeNode() {
   logger.debug(`Zwave : Entering exclusion mode`);
-  this.zwave.removeNode();
-  setTimeout(this.cancelControllerCommand.bind(this), REMOVE_NODE_TIMEOUT);
+
+  if (this.zwaveMode === DEFAULT.MODE_ZWAVEJS) {
+    this.driver.controller.beginExclusion();
+    setTimeout(() => {
+      this.driver.controller.stopExclusion();
+      this.scanInProgress = false;
+    }, REMOVE_NODE_TIMEOUT);
+  } else {
+    this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVE2MQTT_CLIENT_ID}/api/startExclusion/set`, {});
+    setTimeout(() => {
+      this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVE2MQTT_CLIENT_ID}/api/stopExclusion/set`);
+      this.scanInProgress = false;
+    }, REMOVE_NODE_TIMEOUT);
+  }
 }
 
 module.exports = {

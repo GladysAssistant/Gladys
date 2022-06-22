@@ -1,5 +1,4 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
   /**
@@ -13,16 +12,47 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
   }
 
   /**
+   * @api {get} /api/v1/service/zwave/status Get Zwave Status
+   * @apiName getStatus
+   * @apiGroup Zwave
+   */
+  async function getStatus(req, res) {
+    const status = await zwaveManager.getStatus();
+    res.json(status);
+  }
+
+  /**
+   * @api {get} /api/v1/service/zwave/configuration Get Zwave configuration
+   * @apiName getConfiguration
+   * @apiGroup Zwave
+   */
+  async function getConfiguration(req, res) {
+    const configuration = await zwaveManager.getConfiguration();
+    res.json(configuration);
+  }
+
+  /**
+   * @api {post} /api/v1/service/zwave/configuration Update configuration
+   * @apiName updateConfiguration
+   * @apiGroup Zwave
+   */
+  async function updateConfiguration(req, res) {
+    const result = await zwaveManager.updateConfiguration(req.body);
+    res.json({
+      success: result,
+    });
+  }
+
+  /**
    * @api {post} /api/v1/service/zwave/connect Connect
    * @apiName connect
    * @apiGroup Zwave
    */
   async function connect(req, res) {
-    const zwaveDriverPath = await gladys.variable.getValue('ZWAVE_DRIVER_PATH', serviceId);
-    if (!zwaveDriverPath) {
-      throw new ServiceNotConfiguredError('ZWAVE_DRIVER_PATH_NOT_FOUND');
+    if (zwaveManager.restartRequired) {
+      zwaveManager.disconnect();
     }
-    zwaveManager.connect(zwaveDriverPath);
+    zwaveManager.connect();
     res.json({
       success: true,
     });
@@ -46,31 +76,8 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
    * @apiGroup Zwave
    */
   async function getNodeNeighbors(req, res) {
-    const nodes = zwaveManager.getNodeNeighbors();
+    const nodes = await zwaveManager.getNodeNeighbors();
     res.json(nodes);
-  }
-
-  /**
-   * @api {get} /api/v1/service/zwave/info Get Zwave Informations
-   * @apiName getInfos
-   * @apiGroup Zwave
-   */
-  async function getInfos(req, res) {
-    const infos = zwaveManager.getInfos();
-    res.json(infos);
-  }
-
-  /**
-   * @api {get} /api/v1/service/zwave/status Get Zwave Status
-   * @apiName getStatus
-   * @apiGroup Zwave
-   */
-  async function getStatus(req, res) {
-    res.json({
-      connected: zwaveManager.connected,
-      scanInProgress: zwaveManager.scanInProgress,
-      ready: zwaveManager.ready,
-    });
   }
 
   /**
@@ -109,24 +116,24 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
   }
 
   /**
-   * @api {post} /api/v1/service/zwave/cancel Cancel ZWave command
-   * @apiName cancelCommand
+   * @api {post} /api/v1/service/zwave/values/refresh Refresh values
+   * @apiName refreshValues
    * @apiGroup Zwave
    */
-  async function cancelControllerCommand(req, res) {
-    zwaveManager.cancelControllerCommand();
+  async function refreshValues(req, res) {
+    zwaveManager.refreshValues(req.body.nodeId);
     res.json({
       success: true,
     });
   }
 
   /**
-   * @api {post} /api/v1/service/zwave/params/refresh Refresh params
-   * @apiName refreshParams
+   * @api {post} /api/v1/service/zwave/info/refresh Refresh info
+   * @apiName refreshValues
    * @apiGroup Zwave
    */
-  async function refreshNodeParams(req, res) {
-    zwaveManager.refreshNodeParams();
+  async function refreshInfo(req, res) {
+    zwaveManager.refreshInfo(req.body.nodeId);
     res.json({
       success: true,
     });
@@ -141,13 +148,17 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
       authenticated: true,
       controller: asyncMiddleware(getNodeNeighbors),
     },
-    'get /api/v1/service/zwave/info': {
-      authenticated: true,
-      controller: asyncMiddleware(getInfos),
-    },
     'get /api/v1/service/zwave/status': {
-      authenticated: true,
+      authenticated: false,
       controller: asyncMiddleware(getStatus),
+    },
+    'get /api/v1/service/zwave/configuration': {
+      authenticated: true,
+      controller: asyncMiddleware(getConfiguration),
+    },
+    'post /api/v1/service/zwave/configuration': {
+      authenticated: true,
+      controller: asyncMiddleware(updateConfiguration),
     },
     'post /api/v1/service/zwave/connect': {
       authenticated: true,
@@ -164,10 +175,15 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
       admin: true,
       controller: asyncMiddleware(healNetwork),
     },
-    'post /api/v1/service/zwave/params/refresh': {
+    'post /api/v1/service/zwave/values/refresh': {
       authenticated: true,
       admin: true,
-      controller: asyncMiddleware(refreshNodeParams),
+      controller: asyncMiddleware(refreshValues),
+    },
+    'post /api/v1/service/zwave/info/refresh': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(refreshInfo),
     },
     'post /api/v1/service/zwave/node/add': {
       authenticated: true,
@@ -178,11 +194,6 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(removeNode),
-    },
-    'post /api/v1/service/zwave/cancel': {
-      authenticated: true,
-      admin: true,
-      controller: asyncMiddleware(cancelControllerCommand),
     },
   };
 };

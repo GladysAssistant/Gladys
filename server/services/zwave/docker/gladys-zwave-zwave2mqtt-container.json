@@ -1,0 +1,35 @@
+{
+  "name": "gladys-zwave-zwave2mqtt",
+  "Image": "zwavejs/zwavejs2mqtt:latest",
+  "ExposedPorts": {},
+  "HostConfig": {
+    "Binds": [],
+    "PortBindings": {
+      "3000/tcp": [
+        {
+          "HostPort": "3000"
+        }
+      ]
+    },
+    "RestartPolicy": {
+      "Name": "always"
+    },
+    "NetworkMode": "host",
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": [
+      {
+        "PathOnHost": "/dev/ttyUSB0",
+        "PathInContainer": "/dev/ttyUSB0",
+        "CgroupPermissions": "rwm"
+      }
+    ]
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}

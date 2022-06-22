@@ -14,7 +14,7 @@ const NetworkTab = ({ children, ...props }) => {
       </div>
       {zwaveNotConfigured && (
         <div class="alert alert-warning">
-          <Text id="integration.zwave.setup.zwaveNotConfiguredError" />
+          <Text id="integration.zwave.status.notEnabled" />
         </div>
       )}
       <table class="table card-table table-vcenter">

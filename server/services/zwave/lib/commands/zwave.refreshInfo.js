@@ -2,19 +2,19 @@ const logger = require('../../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 /**
- * @description Request all params of a node.
+ * @description Resets (almost) all information about this node and forces a fresh interview.
  * @param {number} nodeId - The NodeId.
  * @example
- * zwave.refreshNodeParams(1);
+ * zwave.refreshInfo(1);
  */
-function refreshNodeParams(nodeId) {
+function refreshInfo(nodeId) {
   if (!this.connected) {
     throw new ServiceNotConfiguredError('ZWAVE_DRIVER_NOT_RUNNING');
   }
-  logger.debug(`Zwave : Request all params of nodeId = ${nodeId}`);
-  this.zwave.requestAllConfigParams(nodeId);
+  logger.info(`Zwave : Refresh information of node ${nodeId}`);
+  this.driver.controller.nodes.get(nodeId).refreshInfo();
 }
 
 module.exports = {
-  refreshNodeParams,
+  refreshInfo,
 };

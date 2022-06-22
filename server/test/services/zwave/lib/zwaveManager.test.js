@@ -1,151 +1,677 @@
 const { expect } = require('chai');
-const { assert } = require('sinon');
+const { assert, stub, fake, useFakeTimers } = require('sinon');
 const EventEmitter = require('events');
 
 const event = new EventEmitter();
 const ZwaveManager = require('../../../../services/zwave/lib');
-const ZwaveMock = require('../ZwaveMock.test');
-const nodesData = require('./nodesData.json');
-const nodesExpectedResult = require('./nodesExpectedResult.json');
+
+const ZWAVE_SERVICE_ID = 'ZWAVE_SERVICE_ID';
 
 describe('zwaveManager commands', () => {
-  const zwaveManager = new ZwaveManager(ZwaveMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
-  zwaveManager.connected = true;
-  it('should connect to zwave driver', () => {
-    zwaveManager.connect('/dev/tty1');
-    assert.calledWith(zwaveManager.zwave.connect, '/dev/tty1');
+  let gladys;
+  let zwaveManager;
+
+  before(() => {
+    gladys = {
+      user: {
+        get: stub().resolves([{ id: ZWAVE_SERVICE_ID }]),
+      },
+      service: {
+        getLocalServiceByName: stub().resolves({
+          id: ZWAVE_SERVICE_ID,
+        }),
+      },
+      variable: {
+        getValue: stub().resolves(null),
+        setValue: stub().resolves(null),
+      },
+      config: {
+        servicesFolder: fake.returns('/tmp'),
+      },
+    };
+    zwaveManager = new ZwaveManager(gladys, event, ZWAVE_SERVICE_ID);
+    zwaveManager.connected = false;
+    zwaveManager.eventManager = {
+      emit: stub().resolves(null),
+    };
+    zwaveManager.ZWaveJS = {
+      Driver: stub().returns({
+        on: fake.returns(null),
+        start: stub().resolves('the value you want to return'),
+        destroy: stub().resolves(null),
+        controller: {
+          beginInclusion: fake.returns(null),
+          stopInclusion: fake.returns(null),
+          beginExclusion: fake.returns(null),
+          stopExclusion: fake.returns(null),
+          beginHealingNetwork: fake.returns(null),
+        },
+      }),
+    };
+    zwaveManager.driver = {
+      destroy: stub().resolves(null),
+    };
+    zwaveManager.updateConfigJob = {
+      cancel: stub().resolves(null),
+    };
+  });
+
+  afterEach(() => {
+    zwaveManager.driver.destroy.reset();
+    zwaveManager.updateConfigJob.cancel.reset();
+    zwaveManager.eventManager.emit.reset();
+  });
+
+  it('should connect to zwave driver', async () => {
+    const DRIVER_READY_TIMEOUT = 60 * 1000;
+    const clock = useFakeTimers();
+    await zwaveManager.connect('/dev/tty1');
+    clock.tick(DRIVER_READY_TIMEOUT);
+    assert.calledThrice(zwaveManager.driver.on);
+    assert.calledOnce(zwaveManager.eventManager.emit);
+    expect(zwaveManager.connected).to.equal(true);
+    clock.restore();
   });
   it('should addNode', () => {
+    const ADD_NODE_TIMEOUT = 60 * 1000;
+    const clock = useFakeTimers();
     zwaveManager.addNode();
-    assert.calledOnce(zwaveManager.zwave.addNode);
+    clock.tick(ADD_NODE_TIMEOUT);
+    expect(zwaveManager.scanInProgress).to.equal(false);
+    assert.calledOnce(zwaveManager.driver.controller.beginInclusion);
+    assert.calledOnce(zwaveManager.driver.controller.stopInclusion);
+    clock.restore();
   });
   it('should removeNode', () => {
+    const REMOVE_NODE_TIMEOUT = 60 * 1000;
+    const clock = useFakeTimers();
     zwaveManager.removeNode();
-    assert.calledOnce(zwaveManager.zwave.removeNode);
-  });
-  it('should cancelControllerCommand', () => {
-    zwaveManager.cancelControllerCommand();
-    assert.calledOnce(zwaveManager.zwave.cancelControllerCommand);
+    clock.tick(REMOVE_NODE_TIMEOUT);
+    assert.calledOnce(zwaveManager.driver.controller.beginExclusion);
+    assert.calledOnce(zwaveManager.driver.controller.stopExclusion);
+    clock.restore();
   });
   it('should heal network', () => {
     zwaveManager.healNetwork();
-    assert.calledOnce(zwaveManager.zwave.healNetwork);
+    assert.calledOnce(zwaveManager.driver.controller.beginHealingNetwork);
   });
-  it('should return node neighbors', () => {
-    const nodes = zwaveManager.getNodeNeighbors();
+  it('should return node neighbors', async () => {
+    const nodes = await zwaveManager.getNodeNeighbors();
     expect(nodes).to.be.instanceOf(Array);
   });
   it('should refresh node params', () => {
+    const refreshValues = fake.returns(null);
+    zwaveManager.driver.controller.nodes = {
+      get: (id) => {
+        return {
+          refreshValues,
+        };
+      },
+    };
     zwaveManager.refreshNodeParams(1);
-    assert.calledWith(zwaveManager.zwave.requestAllConfigParams, 1);
+    assert.calledOnce(refreshValues);
   });
-  it('should return Z-Wave informations', () => {
-    const infos = zwaveManager.getInfos();
-    expect(infos).to.deep.equal({
-      controller_node_id: 1,
-      suc_node_id: 1,
-      is_primary_controller: true,
-      is_static_update_controller: true,
-      is_bridge_controller: false,
-      zwave_library_version: 'Z-Wave 3.99',
-      library_type_name: 'Static Controller',
-      send_queue_count: 3,
+  it('should return Z-Wave status', () => {
+    const status = zwaveManager.getStatus();
+    expect(status).to.deep.equal({
+      controller_node_id: undefined,
+      suc_node_id: undefined,
+      is_primary_controller: undefined,
+      is_static_update_controller: undefined,
+      is_bridge_controller: undefined,
+      zwave_library_version: undefined,
+      library_type_name: undefined,
     });
   });
-  it('should return array of nodes', () => {
-    zwaveManager.nodes = nodesData;
+  it('should return no-feature node', () => {
+    zwaveManager.nodes = {
+      '1': {
+        nodeId: 1,
+        endpoints: [], // No split
+        manufacturerId: 'manufacturerId',
+        product: 'product',
+        productType: 'productType',
+        productId: 'productId',
+        type: 'type',
+        firmwareVersion: 'firmwareVersion',
+        deviceDatabaseUrl: 'deviceDatabaseUrl',
+        name: 'name',
+        location: 'location',
+        status: 'status',
+        ready: true,
+        nodeType: 'nodeType',
+        classes: {},
+      },
+    };
     const nodes = zwaveManager.getNodes();
-    expect(nodes).to.deep.equal(nodesExpectedResult);
+    expect(nodes).to.deep.equal([
+      {
+        name: 'name',
+        service_id: 'ZWAVE_SERVICE_ID',
+        external_id: 'zwave:node_id:1',
+        ready: true,
+        rawZwaveNode: {
+          id: 1,
+          type: 'type',
+          product: 'product',
+          keysClasses: [],
+          deviceDatabaseUrl: 'deviceDatabaseUrl',
+        },
+        features: [],
+        params: [],
+      },
+    ]);
   });
-  it('should disconnect', () => {
-    zwaveManager.disconnect();
-    assert.calledOnce(zwaveManager.zwave.disconnect);
+  it('should disconnect', async () => {
+    zwaveManager.connected = true;
+    await zwaveManager.disconnect();
+    assert.calledOnce(zwaveManager.driver.destroy);
+    assert.calledOnce(zwaveManager.updateConfigJob.cancel);
+    expect(zwaveManager.connected).to.equal(false);
   });
-  it('should disconnect again', () => {
-    zwaveManager.disconnect();
-    assert.calledOnce(zwaveManager.zwave.disconnect);
+  it('should disconnect again', async () => {
+    zwaveManager.connected = false;
+    await zwaveManager.disconnect();
+    assert.notCalled(zwaveManager.driver.destroy);
+    assert.calledOnce(zwaveManager.updateConfigJob.cancel);
+    expect(zwaveManager.connected).to.equal(false);
   });
 });
 
 describe('zwaveManager events', () => {
-  const zwaveManager = new ZwaveManager(ZwaveMock, event, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
-  it('should receive controllerCommand', () => {
-    zwaveManager.controllerCommand(1, 1, 1, 'message');
+  let gladys;
+  let zwaveManager;
+
+  before(() => {
+    gladys = {
+      user: {
+        get: stub().resolves([{ id: ZWAVE_SERVICE_ID }]),
+      },
+      service: {
+        getLocalServiceByName: stub().resolves({
+          id: ZWAVE_SERVICE_ID,
+        }),
+      },
+      variable: {
+        getValue: stub().resolves(null),
+        setValue: stub().resolves(null),
+      },
+    };
+    zwaveManager = new ZwaveManager(gladys, event, ZWAVE_SERVICE_ID);
+    zwaveManager.connected = false;
+    zwaveManager.eventManager = {
+      emit: stub().resolves(null),
+    };
+    zwaveManager.ZWaveJS = {
+      Driver: fake.returns(null),
+    };
   });
+
+  beforeEach(() => {
+    zwaveManager.eventManager.emit.reset();
+  });
+
   it('should receive driverReady', () => {
     zwaveManager.driverReady('home-id');
   });
   it('should receive driverFailed', () => {
     zwaveManager.driverFailed();
   });
-  it('should receive node event', () => {
-    zwaveManager.nodeEvent(1, {});
-  });
   it('should receive notification', () => {
-    zwaveManager.notification(1, 1);
+    const zwaveNode = {
+      id: 1,
+    };
+    zwaveManager.notification(zwaveNode, {}, []);
   });
   it('should receive scanComplete', () => {
     zwaveManager.scanComplete();
   });
   it('should receive node added', () => {
-    zwaveManager.nodeAdded(1);
+    const zwaveNode = {
+      id: 1,
+      getAllEndpoints: fake.returns([2]),
+      on: stub().returnsThis(),
+    };
+
+    zwaveManager.nodes = {};
+    zwaveManager.nodeAdded(zwaveNode);
+    assert.calledOnce(zwaveNode.getAllEndpoints);
+    assert.calledOnce(zwaveManager.eventManager.emit);
+    expect(zwaveManager.nodes).to.deep.equal({
+      '1': {
+        nodeId: 1,
+        classes: {},
+        ready: false,
+        endpoints: [2],
+      },
+    });
   });
   it('should receive node removed', () => {
-    zwaveManager.nodeRemoved(2);
+    const zwaveNode = {
+      id: 1,
+    };
+    zwaveManager.nodes = {
+      '1': {
+        id: 1,
+      },
+    };
+    zwaveManager.nodeRemoved(zwaveNode);
+    assert.calledOnce(zwaveManager.eventManager.emit);
+    expect(zwaveManager.nodes).to.deep.equal({});
   });
   it('should receive node ready info', () => {
-    zwaveManager.nodeReady(1, {
-      manufacturer: 'Aeotec',
-      manufacturerid: '0x0086',
-      product: 'Z-Stick S2',
-      producttype: '0x0002',
-      productid: '0x0001',
-      type: 'Static PC Controller',
-      name: '',
-      loc: '',
+    const zwaveNode = {
+      id: 1,
+      manufacturerId: 'manufacturerId',
+      product: 'product',
+      productType: 'productType',
+      productId: 'productId',
+      type: 'type',
+      firmwareVersion: 'firmwareVersion',
+      deviceDatabaseUrl: 'deviceDatabaseUrl',
+      name: 'name',
+      location: 'location',
+      status: 'status',
+      ready: true,
+      nodeType: 'nodeType',
+      getDefinedValueIDs: fake.returns([]),
+    };
+    zwaveManager.nodes = {
+      '1': {
+        nodeId: 1,
+        classes: {},
+        ready: false,
+        endpoints: [2],
+      },
+    };
+    zwaveManager.nodeReady(zwaveNode);
+    assert.calledOnce(zwaveNode.getDefinedValueIDs);
+    assert.calledOnce(zwaveManager.eventManager.emit);
+    expect(zwaveManager.nodes).to.deep.equal({
+      '1': {
+        nodeId: 1,
+        classes: {},
+        endpoints: [2],
+        type: 'nodeType',
+        firmwareVersion: 'firmwareVersion',
+        deviceDatabaseUrl: 'deviceDatabaseUrl',
+        product: 'manufacturerId-productType-productId',
+        name: 'name (1)',
+        location: 'location',
+        status: 'status',
+        ready: true,
+      },
     });
   });
   it('should receive value added', () => {
-    zwaveManager.valueAdded(1, 10, {
-      value_id: '5-32-1-0',
-      node_id: 5,
-      class_id: 32,
-      type: 'byte',
-      genre: 'basic',
-      instance: 1,
-      index: 0,
-      label: 'Basic',
-      units: '',
-      help: '',
-      read_only: false,
-      write_only: false,
-      min: 0,
-      max: 255,
-      is_polled: false,
-      value: 0,
+    const zwaveNode = {
+      id: 1,
+      getValueMetadata: (args) => {
+        return {
+          type: 'number',
+          label: 'label',
+          min: 1,
+          max: 2,
+        };
+      },
+    };
+    zwaveManager.nodes = {
+      '1': {
+        id: 1,
+        classes: {},
+      },
+    };
+    zwaveManager.valueAdded(zwaveNode, {
+      commandClass: 11,
+      endpoint: 10,
+      property: 'property',
     });
-  });
-  it('should receive value changed', () => {
-    zwaveManager.valueChanged(1, 10, {
-      value_id: '5-32-1-0',
-      node_id: 5,
-      class_id: 32,
-      type: 'byte',
-      genre: 'basic',
-      instance: 1,
-      index: 0,
-      label: 'Basic',
-      units: '',
-      help: '',
-      read_only: false,
-      write_only: false,
-      min: 0,
-      max: 255,
-      is_polled: false,
-      value: 0,
+    expect(zwaveManager.nodes).to.deep.equal({
+      1: {
+        id: 1,
+        classes: {
+          11: {
+            // commandClass
+            10: {
+              // endpoint
+              property: {
+                commandClass: 11,
+                endpoint: 10,
+                genre: 'user',
+                label: 'label',
+                max: 2,
+                min: 1,
+                nodeId: 1,
+                property: 'property',
+                readOnly: true,
+              },
+            },
+          },
+        },
+      },
     });
   });
   it('should receive value removed', () => {
-    zwaveManager.valueRemoved(1, 10, 0, 0);
+    const zwaveNode = {
+      id: 1,
+    };
+    zwaveManager.nodes = {
+      '1': {
+        id: 1,
+        classes: {
+          '11': {
+            // commandClass
+            '10': {
+              // endpoint
+              property: {
+                commandClass: 11,
+                endpoint: 10,
+                genre: 'user',
+                label: 'label',
+                max: 2,
+                min: 1,
+                nodeId: 1,
+                property: 'property',
+                read_only: true,
+              },
+            },
+          },
+        },
+      },
+    };
+    zwaveManager.valueRemoved(zwaveNode, {
+      commandClass: 11,
+      endpoint: 10,
+      property: 'property',
+      propertyKey: '',
+    });
+    expect(zwaveManager.nodes).to.deep.equal({
+      '1': {
+        id: 1,
+        classes: {
+          '11': {
+            '10': {},
+          },
+        },
+      },
+    });
+  });
+});
+
+describe('zwaveManager devices', () => {
+  let gladys;
+  let zwaveManager;
+
+  before(() => {
+    gladys = {};
+    zwaveManager = new ZwaveManager(gladys, event, ZWAVE_SERVICE_ID);
+    zwaveManager.connected = true;
+  });
+
+  it('should receive node without feature/params', () => {
+    zwaveManager.nodes = {
+      '1': {
+        nodeId: 1,
+        endpoints: [],
+        manufacturerId: 'manufacturerId',
+        product: 'product',
+        productType: 'productType',
+        productId: 'productId',
+        type: 'type',
+        firmwareVersion: 'firmwareVersion',
+        deviceDatabaseUrl: 'deviceDatabaseUrl',
+        name: 'name',
+        location: 'location',
+        status: 'status',
+        ready: true,
+        nodeType: 'nodeType',
+        classes: {},
+      },
+    };
+    const devices = zwaveManager.getNodes();
+    expect(devices).to.deep.equal([
+      {
+        service_id: ZWAVE_SERVICE_ID,
+        external_id: 'zwave:node_id:1',
+        name: 'name',
+        ready: true,
+        features: [],
+        params: [],
+        rawZwaveNode: {
+          id: 1,
+          type: 'type',
+          product: 'product',
+          keysClasses: [],
+          deviceDatabaseUrl: 'deviceDatabaseUrl',
+        },
+      },
+    ]);
+  });
+
+  it('should receive node feature Temperature', () => {
+    zwaveManager.nodes = {
+      1: {
+        nodeId: 1,
+        endpoints: [],
+        manufacturerId: 'manufacturerId',
+        product: 'product',
+        productType: 'productType',
+        productId: 'productId',
+        type: 'type',
+        firmwareVersion: 'firmwareVersion',
+        deviceDatabaseUrl: 'deviceDatabaseUrl',
+        name: 'name',
+        location: 'location',
+        status: 'status',
+        ready: true,
+        nodeType: 'nodeType',
+        classes: {
+          49: {
+            0: {
+              'Air temperature': {
+                genre: 'user',
+                label: 'label',
+                min: -20,
+                max: 40,
+                units: 'C',
+                readOnly: true,
+                commandClass: 49,
+                endpoint: 0,
+                property: 'Air temperature',
+              },
+            },
+          },
+        },
+      },
+    };
+    const devices = zwaveManager.getNodes();
+    expect(devices).to.deep.equal([
+      {
+        service_id: ZWAVE_SERVICE_ID,
+        external_id: 'zwave:node_id:1',
+        name: 'name',
+        ready: true,
+        features: [
+          {
+            name: 'label',
+            selector: 'zwave-air-temperature-0-label-product-node-1',
+            category: 'temperature-sensor',
+            type: 'decimal',
+            external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Air temperature',
+            read_only: true,
+            unit: 'celsius',
+            has_feedback: true,
+            min: -20,
+            max: 40,
+          },
+        ],
+        params: [],
+        rawZwaveNode: {
+          id: 1,
+          type: 'type',
+          product: 'product',
+          keysClasses: ['49'],
+          deviceDatabaseUrl: 'deviceDatabaseUrl',
+        },
+      },
+    ]);
+  });
+
+  it('should receive 3 nodes feature Switch', () => {
+    zwaveManager.nodes = {
+      1: {
+        nodeId: 1,
+        endpoints: [
+          {
+            index: 0,
+          },
+          {
+            index: 1,
+          },
+          {
+            index: 2,
+          },
+        ],
+        manufacturerId: 'manufacturerId',
+        product: 'product',
+        productType: 'productType',
+        productId: 'productId',
+        type: 'type',
+        firmwareVersion: 'firmwareVersion',
+        deviceDatabaseUrl: 'deviceDatabaseUrl',
+        name: 'name',
+        location: 'location',
+        status: 'status',
+        ready: true,
+        nodeType: 'nodeType',
+        classes: {
+          37: {
+            0: {
+              targetValue: {
+                genre: 'user',
+                label: 'label',
+                min: 0,
+                max: 1,
+                readOnly: false,
+                commandClass: 37,
+                endpoint: 0,
+                property: 'targetValue',
+              },
+            },
+            1: {
+              targetValue: {
+                genre: 'user',
+                label: 'label',
+                min: 0,
+                max: 1,
+                readOnly: false,
+                commandClass: 37,
+                endpoint: 1,
+                property: 'targetValue',
+              },
+            },
+            2: {
+              targetValue: {
+                genre: 'user',
+                label: 'label',
+                min: 0,
+                max: 1,
+                readOnly: false,
+                commandClass: 37,
+                endpoint: 2,
+                property: 'targetValue',
+              },
+            },
+          },
+        },
+      },
+    };
+    const devices = zwaveManager.getNodes();
+    expect(devices).to.deep.equal([
+      {
+        service_id: ZWAVE_SERVICE_ID,
+        external_id: 'zwave:node_id:1',
+        name: 'name',
+        ready: true,
+        features: [
+          {
+            name: 'label',
+            selector: 'zwave-targetvalue-0-label-product-node-1',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'zwave:node_id:1:comclass:37:endpoint:0:property:targetValue',
+            read_only: false,
+            has_feedback: true,
+            min: 0,
+            max: 1,
+            unit: null,
+          },
+        ],
+        params: [],
+        rawZwaveNode: {
+          id: 1,
+          type: 'type',
+          product: 'product',
+          keysClasses: ['37'],
+          deviceDatabaseUrl: 'deviceDatabaseUrl',
+        },
+      },
+      {
+        service_id: ZWAVE_SERVICE_ID,
+        external_id: 'zwave:node_id:1_1',
+        name: 'name [1]',
+        ready: true,
+        features: [
+          {
+            name: 'label',
+            selector: 'zwave-targetvalue-1-label-product-node-1',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'zwave:node_id:1:comclass:37:endpoint:1:property:targetValue',
+            read_only: false,
+            has_feedback: true,
+            min: 0,
+            max: 1,
+            unit: null,
+          },
+        ],
+        params: [],
+        rawZwaveNode: {
+          id: 1,
+          type: 'type',
+          product: 'product',
+          keysClasses: ['37'],
+          deviceDatabaseUrl: 'deviceDatabaseUrl',
+        },
+      },
+      {
+        service_id: ZWAVE_SERVICE_ID,
+        external_id: 'zwave:node_id:1_2',
+        name: 'name [2]',
+        ready: true,
+        features: [
+          {
+            name: 'label',
+            selector: 'zwave-targetvalue-2-label-product-node-1',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'zwave:node_id:1:comclass:37:endpoint:2:property:targetValue',
+            read_only: false,
+            has_feedback: true,
+            min: 0,
+            max: 1,
+            unit: null,
+          },
+        ],
+        params: [],
+        rawZwaveNode: {
+          id: 1,
+          type: 'type',
+          product: 'product',
+          keysClasses: ['37'],
+          deviceDatabaseUrl: 'deviceDatabaseUrl',
+        },
+      },
+    ]);
   });
 });

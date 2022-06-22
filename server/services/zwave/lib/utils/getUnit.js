@@ -9,9 +9,9 @@ const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
  */
 function getUnit(zwaveUnit) {
   switch (zwaveUnit) {
-    case 'C':
+    case '°C':
       return DEVICE_FEATURE_UNITS.CELSIUS;
-    case 'F':
+    case '°F':
       return DEVICE_FEATURE_UNITS.FAHRENHEIT;
     case '%':
       return DEVICE_FEATURE_UNITS.PERCENT;

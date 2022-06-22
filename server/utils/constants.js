@@ -607,6 +607,29 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   ],
 };
 
+const DEVICE_FEATURE_MINMAX_BY_TYPE = {
+  [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+    MIN: 0,
+    MAX: 1,
+  },
+  [DEVICE_FEATURE_TYPES.SWITCH.POWER]: {
+    MIN: 0,
+    MAX: 10000, // 10 kW
+  },
+  [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: {
+    MIN: 0,
+    MAX: 100000, // 10 kW during 10000 hour (more than one year)
+  },
+  [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: {
+    MIN: 0,
+    MAX: 40,
+  },
+  [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: {
+    MIN: 0,
+    MAX: 400,
+  },
+};
+
 const ACTIONS_STATUS = {
   PENDING: 'pending',
   SUCCESS: 'success',
@@ -668,6 +691,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     SCAN_COMPLETE: 'zwave.scan-complete',
     NODE_ADDED: 'zwave.node-added',
     NODE_REMOVED: 'zwave.node-removed',
+    DISCOVER: 'zwave.discover',
+    STATUS_CHANGE: 'zwave.status-change',
+    MQTT_ERROR: 'zwave.mqtt-error',
+    PERMIT_JOIN: 'zwave.permit-join',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',
@@ -816,6 +843,7 @@ module.exports.DEVICE_FEATURE_UNITS = DEVICE_FEATURE_UNITS;
 module.exports.DEVICE_FEATURE_UNITS_LIST = DEVICE_FEATURE_UNITS_LIST;
 
 module.exports.DEVICE_FEATURE_UNITS_BY_CATEGORY = DEVICE_FEATURE_UNITS_BY_CATEGORY;
+module.exports.DEVICE_FEATURE_MINMAX_BY_TYPE = DEVICE_FEATURE_MINMAX_BY_TYPE;
 
 module.exports.SERVICE_STATUS = SERVICE_STATUS;
 module.exports.SERVICE_STATUS_LIST = createList(SERVICE_STATUS);

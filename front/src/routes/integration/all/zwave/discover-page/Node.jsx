@@ -11,14 +11,11 @@ const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const createGithubUrl = node => {
   const { rawZwaveNode } = node;
   const deviceToSend = {
-    manufacturer: rawZwaveNode.manufacturer,
-    manufacturerid: rawZwaveNode.manufacturerid,
     product: rawZwaveNode.product,
-    producttype: rawZwaveNode.producttype,
-    productid: rawZwaveNode.productid,
-    classes: Object.keys(rawZwaveNode.classes)
+    deviceDatabaseUrl: rawZwaveNode.deviceDatabaseUrl,
+    classes: rawZwaveNode.keysClasses
   };
-  const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.manufacturer} ${rawZwaveNode.product}"`);
+  const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.product}"`);
   const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(deviceToSend, null, 2)}\n\`\`\``);
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
@@ -49,6 +46,14 @@ class ZwaveNode extends Component {
     this.props.editNodeName(this.props.nodeIndex, e.target.value);
   };
 
+  refreshValues = async () => {
+    this.props.refreshValues(this.props.node);
+  };
+
+  refreshInfo = async () => {
+    this.props.refreshInfo(this.props.node);
+  };
+
   render(props, { loading, error, deviceCreated }) {
     return (
       <div index={props.node.id} class="col-md-6">
@@ -58,12 +63,12 @@ class ZwaveNode extends Component {
               <h3 class="card-title">{props.node.name}</h3>
             ) : (
               <h3 class="card-title">
-                <Text id="integration.zwave.setup.unknowNode" />
+                <Text id="integration.zwave.discover.unknowNode" />
               </h3>
             )}
             <div class="card-options">
               <span class="tag">
-                <Text id="integration.zwave.setup.nodeId" /> {props.node.rawZwaveNode.id}
+                <Text id="integration.zwave.discover.nodeId" /> {props.node.rawZwaveNode.id}
               </span>
             </div>
           </div>
@@ -76,45 +81,44 @@ class ZwaveNode extends Component {
             <div class="dimmer-content">
               {error === RequestStatus.Error && (
                 <div class="alert alert-danger">
-                  <Text id="integration.zwave.setup.createDeviceError" />
+                  <Text id="integration.zwave.discover.createDeviceError" />
                 </div>
               )}
               {error === RequestStatus.ConflictError && (
                 <div class="alert alert-danger">
-                  <Text id="integration.zwave.setup.conflictError" />
+                  <Text id="integration.zwave.discover.conflictError" />
                 </div>
               )}
               {deviceCreated && (
                 <div class="alert alert-success">
-                  <Text id="integration.zwave.setup.deviceCreatedSuccess" />
+                  <Text id="integration.zwave.discover.deviceCreatedSuccess" />
                 </div>
               )}
               {props.node.ready ? (
                 <div class="card-body">
                   <div class="form-group">
                     <label>
-                      <Text id="integration.zwave.setup.name" />
+                      <Text id="integration.zwave.discover.name" />
                     </label>
                     <input type="text" class="form-control" value={props.node.name} onChange={this.editNodeName} />
-                  </div>
-                  <div class="form-group">
-                    <label>
-                      <Text id="integration.zwave.setup.type" />
-                    </label>
-                    <input type="text" class="form-control" disabled value={props.node.rawZwaveNode.type} />
                   </div>
                   {props.node.features.length > 0 && (
                     <div class="form-group">
                       <label>
-                        <Text id="integration.zwave.setup.features" />
+                        <Text id="integration.zwave.discover.features" />
                       </label>
-
                       <DeviceFeatures features={props.node.features} />
                     </div>
                   )}
                   <div class="form-group">
                     <button class="btn btn-success" onClick={this.createDevice}>
-                      <Text id="integration.zwave.setup.createDeviceInGladys" />
+                      <Text id="integration.zwave.discover.createDeviceInGladys" />
+                    </button>
+                    <button class="btn btn-warning" onClick={this.refreshValues}>
+                      <Text id="integration.zwave.discover.refreshValues" />
+                    </button>
+                    <button class="btn btn-warning" onClick={this.refreshInfo}>
+                      <Text id="integration.zwave.discover.refreshInfo" />
                     </button>
                   </div>
                   <div>
@@ -124,14 +128,45 @@ class ZwaveNode extends Component {
                       rel="noopener noreferrer"
                       onClick={displayRawNode(props.node)}
                     >
-                      <Text id="integration.zwave.setup.createGithubIssue" />
+                      <Text id="integration.zwave.discover.createGithubIssue" />
+                    </a>
+                  </div>
+                  <div>
+                    <a href={props.node.deviceDatabaseUrl} target="_blank" rel="noopener noreferrer">
+                      <Text id="integration.zwave.discover.deviceDatabaseUrl" />
                     </a>
                   </div>
                 </div>
               ) : (
                 <div class="card-body">
                   <div class="alert alert-warning" role="alert">
-                    <Text id="integration.zwave.setup.sleepingNodeMsg" />
+                    <Text id="integration.zwave.discover.sleepingNodeMsg" />
+                  </div>
+                  <div class="form-group">
+                    <button class="btn btn-success" onClick={this.createDevice}>
+                      <Text id="integration.zwave.discover.createDeviceInGladys" />
+                    </button>
+                    <button class="btn btn-warning" onClick={this.refreshValues}>
+                      <Text id="integration.zwave.discover.refreshValues" />
+                    </button>
+                    <button class="btn btn-warning" onClick={this.refreshInfo}>
+                      <Text id="integration.zwave.discover.refreshInfo" />
+                    </button>
+                  </div>
+                  <div>
+                    <a
+                      href={createGithubUrl(props.node)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={displayRawNode(props.node)}
+                    >
+                      <Text id="integration.zwave.discover.createGithubIssue" />
+                    </a>
+                  </div>
+                  <div>
+                    <a href={props.node.deviceDatabaseUrl} target="_blank" rel="noopener noreferrer">
+                      <Text id="integration.zwave.discover.deviceDatabaseUrl" />
+                    </a>
                   </div>
                 </div>
               )}

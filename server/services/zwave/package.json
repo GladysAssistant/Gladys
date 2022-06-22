@@ -13,6 +13,10 @@
   ],
   "scripts": {},
   "dependencies": {
-    "openzwave-shared": "^1.6.2"
+    "dayjs": "^1.10.7",
+    "lodash.clonedeep": "^4.5.0",
+    "mqtt": "^4.2.6",
+    "node-schedule": "^2.0.0",
+    "zwave-js": "^9.4.0"
   }
 }

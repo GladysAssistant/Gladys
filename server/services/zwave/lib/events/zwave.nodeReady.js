@@ -1,31 +1,43 @@
 const logger = require('../../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { valueAdded } = require('./zwave.valueAdded');
 
 /**
  * @description When a node is ready.
- * @param {number} nodeId - The ID of the node.
- * @param {Object} nodeInfo - Informations about the node.
+ * @param {Object} zwaveNode - Informations about the node.
  * @example
  * zwave.on('node ready', this.nodeReady);
  */
-function nodeReady(nodeId, nodeInfo) {
+function nodeReady(zwaveNode) {
+  const nodeId = zwaveNode.id;
   logger.debug(`Zwave : Node Ready, nodeId = ${nodeId}`);
-  this.nodes[nodeId].manufacturer = nodeInfo.manufacturer;
-  this.nodes[nodeId].manufacturerid = nodeInfo.manufacturerid;
-  this.nodes[nodeId].product = nodeInfo.product;
-  this.nodes[nodeId].producttype = nodeInfo.producttype;
-  this.nodes[nodeId].productid = nodeInfo.productid;
-  this.nodes[nodeId].type = nodeInfo.type;
-  this.nodes[nodeId].name = nodeInfo.name;
-  this.nodes[nodeId].loc = nodeInfo.loc;
-  this.nodes[nodeId].ready = true;
+
+  const node = this.nodes[nodeId];
+  node.nodeId = nodeId;
+  node.product = `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`;
+  node.type = zwaveNode.nodeType;
+  node.deviceDatabaseUrl = zwaveNode.deviceDatabaseUrl;
+  node.firmwareVersion = zwaveNode.firmwareVersion;
+  node.name = `${zwaveNode.name ||
+    zwaveNode.label ||
+    `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`}`;
+  node.location = zwaveNode.location;
+  node.status = zwaveNode.status;
+  node.ready = zwaveNode.ready;
+  node.classes = {};
+
+  if (zwaveNode.getDefinedValueIDs) {
+    zwaveNode.getDefinedValueIDs().forEach((data) => {
+      valueAdded.bind(this)(zwaveNode, data);
+    });
+  }
 
   // enable poll if needed
-  const comclasses = Object.keys(this.nodes[nodeId].classes);
+  /* const comclasses = Object.keys(this.nodes[nodeId].classes);
   comclasses.forEach((comclass) => {
     const values = this.nodes[nodeId].classes[comclass];
     // enable poll
-    switch (values.class_id) {
+    switch (values.commandClass) {
       case 0x25: // COMMAND_CLASS_SWITCH_BINARY
       case 0x26: // COMMAND_CLASS_SWITCH_MULTILEVEL
         this.zwave.enablePoll(nodeId, comclass);
@@ -33,10 +45,14 @@ function nodeReady(nodeId, nodeInfo) {
       default:
         break;
     }
-  });
+  }); */
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZWAVE.NODE_READY,
-    payload: this.nodes[nodeId],
+    payload: {
+      nodeId,
+      name: node.name,
+      status: node.status,
+    },
   });
 }
 

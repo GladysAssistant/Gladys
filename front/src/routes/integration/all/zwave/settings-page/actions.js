@@ -1,6 +1,8 @@
+import createActionsIntegration from '../../../../../actions/integration';
 import { RequestStatus } from '../../../../../utils/consts';
 
-const actions = store => {
+const createActions = store => {
+  const integrationActions = createActionsIntegration(store);
   const actions = {
     async getUsbPorts(state) {
       store.setState({
@@ -18,60 +20,56 @@ const actions = store => {
         });
       }
     },
-    async getCurrentZwaveDriverPath(state) {
+    async getConfiguration(state) {
       store.setState({
-        getCurrentZwaveDriverPathStatus: RequestStatus.Getting
+        getConfigurationStatus: RequestStatus.Getting
       });
       try {
-        const zwaveDriverPath = await state.httpClient.get('/api/v1/service/zwave/variable/ZWAVE_DRIVER_PATH');
+        const configuration = await state.httpClient.get('/api/v1/service/zwave/configuration');
         store.setState({
-          zwaveDriverPath: zwaveDriverPath.value,
-          getCurrentZwaveDriverPathStatus: RequestStatus.Success
+          getConfigurationStatus: RequestStatus.Success,
+          ...configuration
         });
       } catch (e) {
         store.setState({
-          getCurrentZwaveDriverPathStatus: RequestStatus.Error
+          getConfigurationStatus: RequestStatus.Error
         });
       }
     },
-    updateZwaveDriverPath(state, e) {
+    async getStatus(state) {
       store.setState({
-        zwaveDriverPath: e.target.value
-      });
-    },
-    async saveDriverPathAndConnect(state) {
-      store.setState({
-        connectZwaveStatus: RequestStatus.Getting,
-        zwaveDriverFailed: false
+        getStatusStatus: RequestStatus.Getting
       });
       try {
-        await state.httpClient.post('/api/v1/service/zwave/variable/ZWAVE_DRIVER_PATH', {
-          value: state.zwaveDriverPath
-        });
-        await state.httpClient.post('/api/v1/service/zwave/connect');
+        const zwaveStatus = await state.httpClient.get('/api/v1/service/zwave/status');
         store.setState({
-          connectZwaveStatus: RequestStatus.Success,
+          getStatusStatus: RequestStatus.Success,
+          ...zwaveStatus
+        });
+      } catch (e) {
+        store.setState({
+          getStatusStatus: RequestStatus.Error,
+          zwaveConnectionInProgress: false
+        });
+      }
+    },
+    updateConfiguration(state, configuration) {
+      store.setState(configuration);
+    },
+    async connect(state) {
+      store.setState({
+        zwaveConnectStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/zwave/connect');
+        await actions.getStatus(store.getState());
+        store.setState({
+          zwaveConnectStatus: RequestStatus.Success,
           zwaveConnectionInProgress: true
         });
       } catch (e) {
         store.setState({
-          connectZwaveStatus: RequestStatus.Error
-        });
-      }
-    },
-    async getInfos(state) {
-      store.setState({
-        getZwaveInfos: RequestStatus.Getting
-      });
-      try {
-        const zwaveInfos = await state.httpClient.get('/api/v1/service/zwave/info');
-        store.setState({
-          zwaveInfos,
-          getZwaveInfos: RequestStatus.Success
-        });
-      } catch (e) {
-        store.setState({
-          getZwaveInfos: RequestStatus.Error
+          zwaveConnectStatus: RequestStatus.Error
         });
       }
     },
@@ -91,21 +89,44 @@ const actions = store => {
         });
       }
     },
-    async getStatus(state) {
+    displayConnectedMessage() {
+      // display 3 seconds a message "MQTT connected"
       store.setState({
-        zwaveGetStatusStatus: RequestStatus.Getting
+        zwaveConnected: true
+      });
+      setTimeout(
+        () =>
+          store.setState({
+            zwaveConnected: false,
+            connectMqttStatus: undefined
+          }),
+        3000
+      );
+    },
+    displayMqttError(state, error) {
+      store.setState({
+        zwaveConnected: false,
+        mqttConnectionError: error
+      });
+    },
+    async saveConfiguration(state) {
+      event.preventDefault();
+      store.setState({
+        saveConfigurationStatus: RequestStatus.Getting
       });
       try {
-        const zwaveStatus = await state.httpClient.get('/api/v1/service/zwave/status');
+        const { zwaveMode, zwaveDriverPath } = state;
+        await state.httpClient.post(`/api/v1/service/zwave/configuration`, {
+          zwaveMode,
+          zwaveDriverPath
+        });
+
         store.setState({
-          zwaveStatus,
-          zwaveConnectionInProgress: false,
-          zwaveGetStatusStatus: RequestStatus.Success
+          saveConfigurationStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          zwaveGetStatusStatus: RequestStatus.Error,
-          zwaveConnectionInProgress: false
+          saveConfigurationStatus: RequestStatus.Error
         });
       }
     },
@@ -116,8 +137,7 @@ const actions = store => {
       });
     }
   };
-
-  return actions;
+  return Object.assign({}, actions, integrationActions);
 };
 
-export default actions;
+export default createActions;
