@@ -28,9 +28,21 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
     zigbee2mqttManager.disconnect();
   }
 
+  /**
+   * @public
+   * @description Test if Zigbee2mqtt is running
+   * @returns {Promise<boolean>} Returns true if Z2M is used.
+   * @example
+   *  const used = await gladys.services.zigbee2mqtt.isUsed();
+   */
+  async function isUsed() {
+    return zigbee2mqttManager.gladysConnected && zigbee2mqttManager.z2mEnabled;
+  }
+
   return Object.freeze({
     start,
     stop,
+    isUsed,
     device: zigbee2mqttManager,
     controllers: Zigbee2mqttController(gladys, zigbee2mqttManager),
   });
