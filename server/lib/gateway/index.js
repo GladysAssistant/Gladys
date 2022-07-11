@@ -54,6 +54,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.googleHomeForwardStateTimeout = 5 * 1000;
   this.alexaForwardStateTimeout = 5 * 1000;
   this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
+  this.getLatestGladysVersionInitTimeout = 5 * 60 * 1000; // 5 minutes
   this.GladysGatewayClient = GladysGatewayClient;
   this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
   this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));

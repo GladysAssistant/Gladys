@@ -52,17 +52,17 @@ async function init() {
 
   this.backupSchedule = this.schedule.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
 
-  if (process.env.NODE_ENV === 'production') {
-    // Get latest Gladys version in 5 minutes
-    // To let the system initialize
-    setTimeout(async () => {
-      try {
+  // Get latest Gladys version in 5 minutes
+  // To let the system initialize
+  setTimeout(async () => {
+    try {
+      if (process.env.NODE_ENV === 'production') {
         await this.getLatestGladysVersion();
-      } catch (e) {
-        logger.debug(e);
       }
-    }, 5 * 60 * 1000);
-  }
+    } catch (e) {
+      logger.debug(e);
+    }
+  }, this.getLatestGladysVersionInitTimeout);
 }
 
 module.exports = {

@@ -86,7 +86,9 @@ describe('gateway', () => {
     };
     const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
     it('should login two factor to gladys gateway', async () => {
+      gateway.getLatestGladysVersionInitTimeout = 0;
       await gateway.init();
+      await Promise.delay(100);
       expect(gateway.connected).to.equal(true);
       expect(gateway.usersKeys).to.deep.equal(userKeys);
       expect(gateway.backupSchedule).to.not.equal(undefined);
