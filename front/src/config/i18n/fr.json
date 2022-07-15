@@ -897,6 +897,7 @@
       "setup": {
         "noNameLabel": "Pas de nom",
         "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "saveSuccess": "L'appareil Broadlink a été créé avec succés.",
         "notFound": "Appareil introuvable.",
         "saveButton": "Enregistrer",
         "peripheralLabel": "Périphérique lié",

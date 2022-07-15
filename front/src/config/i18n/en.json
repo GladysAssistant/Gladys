@@ -770,6 +770,7 @@
       "setup": {
         "noNameLabel": "No name",
         "saveError": "Error saving or deleting device",
+        "saveSuccess": "Broadlink device successfully created.",
         "notFound": "Requested device not found.",
         "saveButton": "Save",
         "peripheralLabel": "Linked peripheral",
