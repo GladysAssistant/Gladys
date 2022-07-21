@@ -932,6 +932,30 @@
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
+    },
+    "enedisLinky": {
+      "title": "Enedis Linky",
+      "description": "Récupérer les données de votre Linky.",
+      "meterTab": "Compteurs",
+      "nameLabel": "Nom du compteur",
+      "namePlaceholder": "Entrez le nom de votre compteur",
+      "roomLabel": "Pièce",
+      "usagePointLabel": "Point de Livraison (PDL)",
+      "usagePointPlaceholder": "PDL de votre compteur",
+      "testConnectionButton": "Tester",
+      "saveButton": "Sauvegarder",
+      "deleteButton": "Supprimer",
+      "testConnectionError": "Impossible de récupérer des infos sur votre compteur, vérifiez que les token ont des perssions suffisante",
+      "noLinkyFound": "Aucun compteur Linky trouvé",
+      "accountTab": "Compte Enedis",
+      "accountIntroduction": "Un compte Enedis est nécessaire pour récupérer les données via l'API...",
+      "accessToken": "Access Token Enedis",
+      "accessTokenInfo": "L'access token généré précédement",
+      "refreshToken": "Refresh token Enedis",
+      "refreshTokenInfo": "Le refresh token généré précédement",
+      "buttonSave": "Sauvegarder",
+      "saveError": "Impossible de sauvegarder cette configuration",
+      "saveSuccess": "Les identifiants de votre compte a été sauvegardé avec succès"
     }
   },
   "editScene": {

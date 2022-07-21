@@ -80,6 +80,8 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import EnedisLinkyMeterPage from '../routes/integration/all/enedis-linky/meter-page';
+import EnedisLinkyAccountPage from '../routes/integration/all/enedis-linky/account-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -227,6 +229,8 @@ const AppRouter = connect(
         <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+        <EnedisLinkyMeterPage path="/dashboard/integration/device/enedis-linky" />
+        <EnedisLinkyAccountPage path="/dashboard/integration/device/enedis-linky/account" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

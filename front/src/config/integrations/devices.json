@@ -41,5 +41,10 @@
   {
     "key": "eWeLink",
     "img": "/assets/integrations/cover/ewelink.jpg"
+  },
+  {
+    "key": "enedisLinky",
+    "link": "enedis-linky",
+    "img": "/assets/integrations/cover/enedis-linky.jpg"
   }
 ]
