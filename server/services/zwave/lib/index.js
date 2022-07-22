@@ -45,6 +45,7 @@ const ZwaveManager = function ZwaveManager(Zwave, eventManager, serviceId) {
   this.serviceId = serviceId;
   this.nodes = {};
   this.connected = false;
+  this.ready = false;
   this.scanInProgress = false;
   // setup all events listener
   this.zwave.on('driver ready', this.driverReady.bind(this));
