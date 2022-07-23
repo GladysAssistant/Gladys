@@ -86,7 +86,9 @@ describe('gateway', () => {
     };
     const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
     it('should login two factor to gladys gateway', async () => {
+      gateway.getLatestGladysVersionInitTimeout = 0;
       await gateway.init();
+      await Promise.delay(100);
       expect(gateway.connected).to.equal(true);
       expect(gateway.usersKeys).to.deep.equal(userKeys);
       expect(gateway.backupSchedule).to.not.equal(undefined);
@@ -277,7 +279,10 @@ describe('gateway', () => {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
+      const service = {
+        getUsage: fake.resolves({ zigbee: true }),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, service, job);
       const version = await gateway.getLatestGladysVersion();
       expect(version).to.have.property('name');
       expect(version).to.have.property('created_at');

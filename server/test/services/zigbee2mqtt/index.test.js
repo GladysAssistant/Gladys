@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const { assert, fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
@@ -21,5 +22,9 @@ describe('zigbee2mqtt service', () => {
     await zigbee2MqttService.stop();
     // ASSERT
     assert.calledOnce(zigbee2MqttService.device.disconnect);
+  });
+  it('should return if service is used', async () => {
+    const used = await zigbee2MqttService.isUsed();
+    expect(used).to.equal(false);
   });
 });

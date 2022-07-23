@@ -291,7 +291,7 @@
   "integration": {
     "root": {
       "title": "Integrations",
-      "subtitle": "1 - {{length}} of {{total}} integrations",
+      "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
       "restartButton": "Restart",
       "stopButton": "Stop",
@@ -1034,6 +1034,7 @@
         "headersValuePlaceholder": "Value",
         "responseData": "Response",
         "tryButton": "Try request",
+        "variablesExplanation": "To inject a variable defined in a \"Get device value\" action, type \"{{\". This variable will be injected only during scene execution, not when clicking on \"Try request\" below.",
         "requestError": "An error happened while making the request. Are you sure parameters are right?"
       },
       "scene": {

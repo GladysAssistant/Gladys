@@ -291,7 +291,7 @@
   "integration": {
     "root": {
       "title": "Intégrations",
-      "subtitle": "1 - {{length}} de {{total}} intégrations",
+      "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
@@ -828,7 +828,7 @@
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "installBrokerContainer": "Utiliser un broker dans un conteneur Docker.",
-        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer and configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
+        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer et configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
         "installBrokerButton": "Installez le broker sur Docker",
         "installingBrokerButton": "Installation en cours...",
         "installBrokerError": "Une erreur est survenue lors de l'installation du conteneur Docker, veuillez consulter les logs Gladys.",
@@ -968,10 +968,10 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "turnOnLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez allumer"
+        "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
       "turnOffLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez éteindre"
+        "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
@@ -1034,6 +1034,7 @@
         "headersValuePlaceholder": "Valeur",
         "responseData": "Réponse",
         "tryButton": "Essayer",
+        "variablesExplanation": "Pour injecter une variable défini dans un bloc \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injecté que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       },
       "scene": {
@@ -1069,7 +1070,7 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer la lumière",
+        "turn-on": "Allumer les lumières",
         "turn-off": "Eteindre les lumières"
       },
       "switch": {

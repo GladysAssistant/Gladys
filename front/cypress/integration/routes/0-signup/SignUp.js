@@ -112,7 +112,7 @@ describe('Sign-up', () => {
     });
 
     // Store access token
-    const serverUrl = Cypress.env('users');
+    const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       {
         method: 'POST',
@@ -161,7 +161,7 @@ describe('Sign-up', () => {
     // Add room
     cy.contains('button', 'signup.configureHouse.addRoomButton').click();
 
-    const serverUrl = Cypress.env('users');
+    const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       {
         method: 'POST',
