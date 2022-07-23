@@ -1,5 +1,4 @@
 import createActionsProfilePicture from './profilePicture';
-import createActionsIntegration from './integration';
 import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
@@ -19,7 +18,6 @@ const OPEN_PAGES = [
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
-  const integrations = createActionsIntegration(store);
 
   const actions = {
     handleRoute(state, e) {
@@ -97,7 +95,7 @@ function createActions(store) {
     }
   };
 
-  return Object.assign(actions, actionsProfilePicture, integrations);
+  return Object.assign(actions, actionsProfilePicture);
 }
 
 export default createActions;

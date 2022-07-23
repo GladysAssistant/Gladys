@@ -22,7 +22,7 @@ function getElementsByTagRegex(container, regex) {
  * requestCalendars(xhr, homeUrl)
  */
 async function requestCalendars(xhr, homeUrl) {
-  const ICAL_OBJS = new Set(['VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY', 'VTIMEZONE', 'VALARM']);
+  const ICAL_OBJS = new Set(['VEVENT', 'VFREEBUSY', 'VALARM']);
 
   const req = this.dav.request.propfind({
     props: [
