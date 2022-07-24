@@ -57,7 +57,7 @@ class TurnOnLight extends Component {
     </div>
   );
   getBinaryButton = (category, value) => (
-    <div class="col-6">
+    <div>
       <button
         class={cx('btn', 'btn-block', 'p-1', {
           'btn-primary': this.props.trigger.value === value,
@@ -75,7 +75,7 @@ class TurnOnLight extends Component {
   getBinaryButtons = category => (
     <div class="col-4">
       <div class="form-group">
-        <div class="row">
+        <div class="row d-flex justify-content-around">
           {this.getBinaryButton(category, 1)}
           {this.getBinaryButton(category, 0)}
         </div>
