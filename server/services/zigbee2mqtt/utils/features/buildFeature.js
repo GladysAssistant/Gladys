@@ -46,7 +46,7 @@ function buildByName(names = {}, name, parentType) {
  */
 function buildFeature(deviceName, expose = {}, parentType) {
   const { type, name, property, access, value_min: minValue, value_max: maxValue, unit: deviceUnit, values } = expose;
-  const { names = {}, feature } = exposesMap[type] || {};
+  const { names = {}, feature } = exposesMap[parentType] || exposesMap[type] || {};
   const byName = buildByName(names, name, parentType);
 
   if (!byName) {
@@ -61,7 +61,13 @@ function buildFeature(deviceName, expose = {}, parentType) {
   // eslint-disable-next-line no-bitwise
   const hasFeedback = !readOnly && (access & 1) === 1;
 
-  const createdFeature = { read_only: readOnly, has_feedback: hasFeedback, ...(feature || {}), ...(byName || {}) };
+  const createdFeature = {
+    min: 0,
+    read_only: readOnly,
+    has_feedback: hasFeedback,
+    ...(feature || {}),
+    ...(byName || {}),
+  };
 
   // Min value
   const min = minValue !== undefined ? minValue : createdFeature.min;
@@ -70,7 +76,7 @@ function buildFeature(deviceName, expose = {}, parentType) {
   let { max } = createdFeature;
   if (maxValue !== undefined) {
     max = maxValue;
-  } else if (values !== undefined) {
+  } else if (max === undefined && values !== undefined) {
     max = values.length;
   }
 

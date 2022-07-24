@@ -44,10 +44,6 @@ module.exports = {
         return undefined;
     }
   },
-  feature: {
-    min: 0,
-    max: 1,
-  },
   names: {
     action: {
       feature: {
