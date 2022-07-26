@@ -1,8 +1,4 @@
-const { promisify } = require('util');
-const { CONFIGURATION, DEFAULT } = require('./constants');
-const { NotFoundError } = require('../../../utils/coreErrors');
-
-const sleep = promisify(setTimeout);
+const { CONFIGURATION } = require('./constants');
 
 const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
   if (value !== undefined && value !== null && (typeof value !== 'string' || value.length > 0)) {
@@ -13,12 +9,12 @@ const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
 };
 
 /**
- * @description Save MQTT configuration.
- * @param {Object} configuration - MQTT configuration.
- * @param {string} [configuration.influxdbUrl] - MQTT URL.
- * @param {string} [configuration.influxdbToken] - MQTT username.
- * @param {string} [configuration.influxdbOrg] - MQTT password.
- * @param {string} [configuration.influxdbBucket] - MQTT password.
+ * @description Save InfluxDB configuration.
+ * @param {Object} configuration - InfluxDB configuration.
+ * @param {string} [configuration.influxdbUrl] - InfluxDB URL.
+ * @param {string} [configuration.influxdbToken] - InfluxDB token.
+ * @param {string} [configuration.influxdbOrg] - InfluxDB organization.
+ * @param {string} [configuration.influxdbBucket] - InfluxDB bucket.
  * @example
  * saveConfiguration(configuration);
  */
