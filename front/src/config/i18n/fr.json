@@ -762,7 +762,7 @@
     },
     "openWeather": {
       "title": "API OpenWeather",
-      "description": "Stocker votre historique.",
+      "description": "Récupérer la météo dans Gladys.",
       "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
       "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
