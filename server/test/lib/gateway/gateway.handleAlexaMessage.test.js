@@ -73,6 +73,60 @@ describe('gateway.handleAlexaMessage', () => {
     await gateway.handleAlexaMessage({ data: body }, '', callback);
     assert.calledWith(callback, { onExecute: true });
   });
+  it('should handle BrightnessController message', async () => {
+    const serviceManager = {
+      getService: fake.returns(alexaService),
+    };
+    const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, serviceManager, job);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa.BrightnessController',
+          name: 'SetBrightness',
+          payloadVersion: '3',
+          messageId: 'c43c5ef1-b456-4736-ba6b-4643a98a7e27',
+          correlationToken:
+            'AAAAAAAAAQBe8ATzt+PzWVqbUXXQAv6JFAIAAAAAAADNYsvnxph02bkNS9vIkVRS1S/HQ30Nab1ai4U8WdBDVhSBKEkvJkzXTZFidmkW/eI78kPC8zSg4HTO0I1BfpLZ3qKVHkvLija4pKuhadAHKg96ccMDKR7krNc3AZ5RaDrg1QTPGbEfKXbUoPMNNo9HyRJzoEaqphBRI2/aFLmHaHnENYM8Ou3y7CzFj41xQ3VBjKQdyb4cxD2MJrAln2X5t0vuMcxkgMJ0ZTt9L9N3aQKFx9Xi3RI91cR4cDajUxGGx1RzYa2t6oroos5tjN3IutEntO7V0iKO/9CMnerWuFbihll7EeiDxY33h2KcY4MCIg2zQKaBRnyHwin+R/e9A7Ozv3CR/Qvxj5CxmL9nHHFjZMRXsauNNfG5vzzo03H5WutpXjC/UwfPviGk0dG+FBH7AqQ4TH1RojoLS/a1mcpsxSORo/dezT3d9zxlD/8lcsMcWZao5mxEkQybkrOBxXVhgAJyyH+5X/RJjUWVjVBxR4ODIRie1RKuTcmla7VwqM8JocAUy9lWsCMXjW5KhNBnVca/xU8I/XfhaVD+LV+pqDDvgDmq/KVYyp8bbFKVdSQ9mFrVMpgt97lnMDd2oNASDET10grmQdwbn/FivkK2tnveVlaU7/BpnC+JpGBqHT0DSJucu0es0SLlEd875QAdGPJ4Eg+OD4t8z4NqXyyH2iqVhq+AwQDFjY6UpPaWkykN',
+        },
+        endpoint: { endpointId: 'device-1', cookie: {} },
+        payload: { brightness: 50 },
+      },
+      user: { id: 'cbd42dc1-1b15-4c59-bea6-7e01968a9603', local_user_id: '275faa00-8a9c-4747-8fbe-417ddb966b16' },
+    };
+    const callback = fake.returns(null);
+    await gateway.handleAlexaMessage({ data: body }, '', callback);
+    assert.calledWith(callback, { onExecute: true });
+  });
+  it('should handle ColorController message', async () => {
+    const serviceManager = {
+      getService: fake.returns(alexaService),
+    };
+    const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, serviceManager, job);
+    const body = {
+      directive: {
+        header: {
+          namespace: 'Alexa.ColorController',
+          name: 'SetColor',
+          payloadVersion: '3',
+          messageId: 'c43c5ef1-b456-4736-ba6b-4643a98a7e27',
+          correlationToken:
+            'AAAAAAAAAQBe8ATzt+PzWVqbUXXQAv6JFAIAAAAAAADNYsvnxph02bkNS9vIkVRS1S/HQ30Nab1ai4U8WdBDVhSBKEkvJkzXTZFidmkW/eI78kPC8zSg4HTO0I1BfpLZ3qKVHkvLija4pKuhadAHKg96ccMDKR7krNc3AZ5RaDrg1QTPGbEfKXbUoPMNNo9HyRJzoEaqphBRI2/aFLmHaHnENYM8Ou3y7CzFj41xQ3VBjKQdyb4cxD2MJrAln2X5t0vuMcxkgMJ0ZTt9L9N3aQKFx9Xi3RI91cR4cDajUxGGx1RzYa2t6oroos5tjN3IutEntO7V0iKO/9CMnerWuFbihll7EeiDxY33h2KcY4MCIg2zQKaBRnyHwin+R/e9A7Ozv3CR/Qvxj5CxmL9nHHFjZMRXsauNNfG5vzzo03H5WutpXjC/UwfPviGk0dG+FBH7AqQ4TH1RojoLS/a1mcpsxSORo/dezT3d9zxlD/8lcsMcWZao5mxEkQybkrOBxXVhgAJyyH+5X/RJjUWVjVBxR4ODIRie1RKuTcmla7VwqM8JocAUy9lWsCMXjW5KhNBnVca/xU8I/XfhaVD+LV+pqDDvgDmq/KVYyp8bbFKVdSQ9mFrVMpgt97lnMDd2oNASDET10grmQdwbn/FivkK2tnveVlaU7/BpnC+JpGBqHT0DSJucu0es0SLlEd875QAdGPJ4Eg+OD4t8z4NqXyyH2iqVhq+AwQDFjY6UpPaWkykN',
+        },
+        endpoint: { endpointId: 'device-1', cookie: {} },
+        payload: {
+          color: {
+            hue: 300,
+            saturation: 1,
+            brightness: 1,
+          },
+        },
+      },
+      user: { id: 'cbd42dc1-1b15-4c59-bea6-7e01968a9603', local_user_id: '275faa00-8a9c-4747-8fbe-417ddb966b16' },
+    };
+    const callback = fake.returns(null);
+    await gateway.handleAlexaMessage({ data: body }, '', callback);
+    assert.calledWith(callback, { onExecute: true });
+  });
   it('should handle Discovery message', async () => {
     const serviceManager = {
       getService: fake.returns(alexaService),
