@@ -7,7 +7,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 @connect('caldavCalendars,caldavSaveSyncStatus,caldavGetSettingsStatus,calendarsToSync', actions)
-class AccountPage extends Component {
+class SyncPage extends Component {
   componentWillMount() {
     this.props.getCaldavSetting();
   }
@@ -23,4 +23,4 @@ class AccountPage extends Component {
   }
 }
 
-export default withIntlAsProp(AccountPage);
+export default withIntlAsProp(SyncPage);

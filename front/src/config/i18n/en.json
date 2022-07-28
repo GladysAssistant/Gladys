@@ -39,7 +39,8 @@
     "date": "Date",
     "time": "Time",
     "event": "Event",
-    "noEventsInRange": "There are no events in this range."
+    "noEventsInRange": "There are no events in this range.",
+    "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
     "noFeatures": "No features"
@@ -290,7 +291,7 @@
   "integration": {
     "root": {
       "title": "Integrations",
-      "subtitle": "1 - {{length}} of {{total}} integrations",
+      "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
       "restartButton": "Restart",
       "stopButton": "Stop",
@@ -362,6 +363,7 @@
       "testConnectionButton": "Test connection",
       "saveButton": "Save",
       "deleteButton": "Delete",
+      "rotate180Label": "180° Rotation",
       "saveError": "There was an error saving the camera.",
       "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
     },
@@ -540,6 +542,20 @@
       "cancelButton": "Cancel",
       "connectButton": "Link"
     },
+    "alexa": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Do you want to connect Gladys Assistant to Amazon Alexa?",
+      "description": "By signin in, you are authorizing Alexa to access your devices.",
+      "error": "An error occured. Please retry !",
+      "connectedAs": "Connected as",
+      "googleWillBeAble": "Alexa will be able:",
+      "seeDevices": "List all your devices",
+      "controlDevices": "Control all your devices",
+      "getNewDeviceValues": "Periodically refresh your device states",
+      "privacyPolicy": "Read Alexa's <a href=\"https://www.alexa.com/help/privacy\">privacy policy</a>.",
+      "cancelButton": "Cancel",
+      "connectButton": "Link"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Control your Z-Wave devices.",
@@ -669,7 +685,10 @@
         "readOnlyLabel": "Is it a sensor?",
         "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
         "addButton": "Add feature",
-        "mqttTopicExampleLabel": "MQTT Topic",
+        "mqttTopicToPublishExampleLabel": "MQTT Topic to publish",
+        "mqttTopicToPublishExampleDescription": "Gladys is listening to this topic. If you publish a value in this topic, it'll be associated with this device. (see <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a>)",
+        "mqttTopicToListenExampleLabel": "MQTT Topic to listen",
+        "mqttTopicToListenExampleDescription": "Gladys will publish in this topic if the device is controlled in Gladys. You need to listen to this topic. (see <a href=\"https://gladysassistant.com/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a>)",
         "copyMqttTopic": "Copy MQTT Topic",
         "copied": "Copied!",
         "copyFailed": "Fail to copy",
@@ -735,9 +754,11 @@
       "title": "CalDAV",
       "accountTab": "Account",
       "syncTab": "Synchronization",
+      "shareTab": "Sharing",
       "description": "Sync your CalDAV calendars.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
-      "syncIntroduction": "Choose the calendars to synchronize.",
+      "syncIntroduction": "Choose calendars to synchronize.",
+      "shareIntroduction": "Choose calendars you want to share with other Gladys users.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
@@ -1013,6 +1034,7 @@
         "headersValuePlaceholder": "Value",
         "responseData": "Response",
         "tryButton": "Try request",
+        "variablesExplanation": "To inject a variable defined in a \"Get device value\" action, type \"{{\". This variable will be injected only during scene execution, not when clicking on \"Try request\" below.",
         "requestError": "An error happened while making the request. Are you sure parameters are right?"
       },
       "scene": {
@@ -1023,9 +1045,22 @@
         "houseIsEmptyDescription": "If the house is empty, the scene will continue. Otherwise, the scene will stop.",
         "houseIsNotEmptyDescription": "If the house is not empty, the scene will continue. Otherwise, the scene will stop.",
         "houseLabel": "House"
+      },
+      "calendarEventIsRunning": {
+        "description": "This action let you stop a scene if a calendar event is currently running, or if an event is not running. Only shared calendars are displayed here.",
+        "calendarLabel": "Look in the following shared calendars",
+        "nameLabel": "If the name",
+        "namePlaceholder": "Enter a name",
+        "whenFoundLabel": "If an event is found",
+        "whenNotFoundLabel": "If no event is found",
+        "stopScene": "Stop the scene",
+        "continueScene": "Continue the scene"
       }
     },
     "actions": {
+      "calendar": {
+        "is-event-running": "Condition on calendar events"
+      },
       "device": {
         "get-value": "Get device value",
         "set-value": "Set device value"
@@ -1071,6 +1106,12 @@
         "get-value": {
           "last_value": "Device last value"
         }
+      },
+      "calendar": {
+        "eventName": "Event name",
+        "eventLocation": "Event location",
+        "eventStart": "Start date",
+        "eventEnd": "End date"
       }
     },
     "triggers": {
@@ -1093,6 +1134,9 @@
       "area": {
         "user-entered": "User entered a zone",
         "user-left": "User left a zone"
+      },
+      "calendar": {
+        "event-is-coming": "Calendar event is coming"
       }
     },
     "triggersCard": {
@@ -1159,6 +1203,24 @@
         "userLeftDescription": "This scene will start when a user left this zone. Zones can be created in the maps tab.",
         "userLabel": "User",
         "areaLabel": "Zone"
+      },
+      "calendarEventIsComing": {
+        "description": "This will trigger the scene when a calendar event matches the conditions. Only shared calendars are displayed here.",
+        "calendarLabel": "Look in the following shared calendars",
+        "nameLabel": "If the name",
+        "isExactly": "is exactly",
+        "contains": "contains",
+        "startsWith": "starts with",
+        "endsWith": "ends with",
+        "hasAnyName": "has any name",
+        "namePlaceholder": "Text to match",
+        "durationName": "And the event is",
+        "startingIn": "Starting in",
+        "endingIn": "Ending in",
+        "durationPlaceholder": "Duration",
+        "minute": "minutes",
+        "hour": "hours",
+        "day": "days"
       }
     }
   },
@@ -1348,10 +1410,13 @@
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Status",
+    "previous": "Previous",
+    "next": "Next",
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
-      "hourly-device-state-aggregate": "Hourly sensors aggregation"
+      "hourly-device-state-aggregate": "Hourly sensors aggregation",
+      "gladys-gateway-backup": "Gladys Plus backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -1507,36 +1572,104 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
+    "kelvin": "Kelvin (K)",
     "percent": "Percent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "bar": "Bar",
+    "psi": "Pound-force per square inch (psi)",
     "lux": "Lux",
+    "ppm": "Parts per million (ppm)",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
+    "watt-hour": "Watt heure (Wh)",
     "kilowatt-hour": "Kilowatt hour (kWh)",
+    "megawatt-hour": "Megawatt hour (MWh)",
     "ampere": "Ampere (A)",
+    "milliampere": "Milliampere (mA)",
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
-    "ppm": "Parts per million (ppm)",
+    "volt-ampere": "Voltampere (VA)",
+    "volt-ampere-reactive": "Voltampere reactive (var)",
+    "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
-    "mm": "Millimeter (mm)"
+    "m": "Meter (m)",
+    "km": "Kilometer (km)",
+    "degree": "Angular degree (°)",
+    "liter": "Liter (l)",
+    "milliliter": "Milliliter (ml)",
+    "cubicmeter": "Cubic meter (m3)",
+    "euro": "Euro (€)",
+    "dollar": "Dollar ($)",
+    "bitcoin": "Bitcoin (₿)",
+    "litecoin": "Litecoin (Ł)",
+    "dogecoin": "Dogecoin (Ð)",
+    "ethereum": "Ethereum (⟠)",
+    "pound-sterling": "Pound sterling (£)",
+    "meter-per-second": "Meter per second (m/s)",
+    "kilometer-per-hour": "Kilometer per hour (km/h)",
+    "millimeter-per-hour": "Millimeter per hour (mm/h)",
+    "uv-index": "UV Index",
+    "microseconds": "Microseconds (μs)",
+    "milliseconds": "Milliseconds (ms)",
+    "seconds": "Seconds (s)",
+    "minutes": "Minutes (min)",
+    "hours": "Hours (h)",
+    "days": "Days (d)",
+    "weeks": "Weeks (w)",
+    "months": "Months (m)",
+    "years": "Years (y)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
+    "kelvin": "K",
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "bar": "bar",
+    "psi": "psi",
     "lux": "lx",
+    "ppm": "ppm",
     "watt": "W",
     "kilowatt": "kW",
+    "watt-hour": "Wh",
     "kilowatt-hour": "kWh",
+    "megawatt-hour": "MWh",
     "ampere": "A",
+    "milliampere": "mA",
     "millivolt": "mV",
     "volt": "V",
-    "ppm": "ppm",
+    "volt-ampere": "VA",
+    "volt-ampere-reactive": "var",
+    "mm": "mm",
     "cm": "cm",
-    "mm": "mm"
+    "m": "m",
+    "km": "km",
+    "degree": "°",
+    "liter": "l",
+    "milliliter": "ml",
+    "cubicmeter": "m3",
+    "euro": "€",
+    "dollar": "$",
+    "bitcoin": "₿",
+    "litecoin": "Ł",
+    "dogecoin": "Ð",
+    "ethereum": "⟠",
+    "pound-sterling": "£",
+    "meter-per-second": "m/s",
+    "kilometer-per-hour": "km/h",
+    "millimeter-per-hour": "mm/h",
+    "uv-index": "UV Index",
+    "microseconds": "μs",
+    "milliseconds": "ms",
+    "seconds": "s",
+    "minutes": "min",
+    "hours": "h",
+    "days": "d",
+    "weeks": "w",
+    "months": "m",
+    "years": "y"
   },
   "deviceFeatureValue": {
     "type": {
@@ -1669,6 +1802,7 @@
     },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
+      "binary": "Vibrate (yes/no)",
       "status": "Status",
       "tilt-angle": "Tilt Angle",
       "acceleration-x": "Acceleration X",
@@ -1709,6 +1843,41 @@
       "pause": "Pause",
       "stop": "Stop",
       "record": "Record"
+    },
+    "energy-sensor": {
+      "shortCategoryName": "Energy sensor",
+      "voltage": "Voltage",
+      "current": "Current",
+      "binary": "Switch",
+      "power": "Power",
+      "energy": "Energy",
+      "index": "Index"
+    },
+    "volume-sensor": {
+      "shortCategoryName": "Volume sensor",
+      "decimal": "Volume (decimal)",
+      "integer": "Volume (integer)"
+    },
+    "currency": {
+      "shortCategoryName": "Money",
+      "decimal": "Currency"
+    },
+    "speed-sensor": {
+      "shortCategoryName": "Speed sensor",
+      "decimal": "Speed"
+    },
+    "precipitation-sensor": {
+      "shortCategoryName": "Precipitation sensor",
+      "decimal": "Precipitation"
+    },
+    "uv-sensor": {
+      "shortCategoryName": "UV Sensor",
+      "integer": "UV Index"
+    },
+    "duration": {
+      "shortCategoryName": "Duration",
+      "decimal": "Duration (decimal)",
+      "integer": "Duration (integer)"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
@@ -1851,9 +2020,11 @@
     "neverUsed": "Never"
   },
   "gatewayTwoFactorAuth": {
-    "title": "Gladys Gateway",
+    "title": "Gladys Plus",
     "configureTitle": "Configure Two-Factor Authentication",
     "configureButton": "Configure 2FA",
+    "secretLabel": "Secret",
+    "copy": "Copy",
     "securityIsImportant": "The security of your Gladys Gateway account is really important to us.",
     "securityApps": "To ensure that your account remains secure, please enable two-factor authentication using a two-factor app like Authy on <a href=\"https://itunes.apple.com/us/app/authy/id494168017?mt=8\">iOS</a> or <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "The 2FA code you provided is not valid.",
@@ -1863,7 +2034,7 @@
     "app": {
       "open": "Open your 2FA app",
       "addAccount": "Click on \"Add Account\"",
-      "scanQRCode": "Scan the QR Code below"
+      "scanQRCode": "Scan the QR Code below or copy the secret to your 2FA application."
     }
   },
   "gatewaySignUp": {

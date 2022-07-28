@@ -65,9 +65,12 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('.choose-scene-action-type')
-      .click()
-      .type(`${i18n.editScene.actions.house['is-empty']}{enter}`);
+    cy.get('[class*="-control"]')
+      .click(0, 0, { force: true })
+      .get('[class*="-menu"]')
+      .find('[class*="-option"]')
+      .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
+      .click(0, 0, { force: true });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -75,9 +78,12 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.get('.scene-house-empty-or-not-choose-house')
-      .click()
-      .type('My House{enter}');
+    cy.get('[class*="-control"]')
+      .click(0, 0, { force: true })
+      .get('[class*="-menu"]')
+      .find('[class*="-option"]')
+      .filter(`:contains("My House")`)
+      .click(0, 0, { force: true });
   });
   it('Should add new condition device set value', () => {
     cy.visit('/dashboard/scene/my-scene');
@@ -87,9 +93,12 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('.choose-scene-action-type')
-      .click()
-      .type(`${i18n.editScene.actions.device['set-value']}{enter}`);
+    cy.get('[class*="-control"]')
+      .click(0, 0, { force: true })
+      .get('[class*="-menu"]')
+      .find('[class*="-option"]')
+      .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
+      .click(0, 0, { force: true });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -97,9 +106,39 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.get('.select-device-feature')
-      .click()
-      .type('One device{enter}');
+    cy.get('[class*="-control"]')
+      .click(0, 0, { force: true })
+      .get('[class*="-menu"]')
+      .find('[class*="-option"]')
+      .filter(`:contains("Multilevel")`)
+      .click(0, 0, { force: true });
+  });
+  it('Should add new calendar event trigger', () => {
+    cy.visit('/dashboard/scene/my-scene');
+    cy.contains('editScene.addNewTriggerButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
+
+    const i18n = Cypress.env('i18n');
+
+    cy.get('[class*="-control"]')
+      .click(0, 0, { force: true })
+      .get('[class*="-menu"]')
+      .find('[class*="-option"]')
+      .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
+      .click(0, 0, { force: true });
+
+    // I don't know why, but I'm unable to get this button with
+    // the text. Using the class but it's not recommended otherwise!!
+    cy.get('.btn-success').then(buttons => {
+      cy.wrap(buttons[1]).click();
+    });
+
+    cy.get('select').then(selects => {
+      cy.wrap(selects[0]).select('contains');
+      cy.wrap(selects[1]).select('start');
+      cy.wrap(selects[2]).select('minute');
+    });
   });
   it('Should disable scene', () => {
     cy.visit('/dashboard/scene');

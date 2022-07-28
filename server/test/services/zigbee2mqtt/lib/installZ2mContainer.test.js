@@ -39,6 +39,10 @@ const gladys = {
     pull: fake.resolves(true),
     restartContainer: fake.resolves(true),
     createContainer: fake.resolves(true),
+    getGladysBasePath: fake.resolves({
+      basePathOnHost: '/var/lib/gladysassistant',
+      basePathOnContainer: '/var/lib/gladysassistant',
+    }),
   },
 };
 
@@ -52,7 +56,6 @@ describe('zigbee2mqtt installz2mContainer', () => {
     sinon.reset();
     zigbee2mqttManager.zigbee2mqttRunning = false;
     zigbee2mqttManager.zigbee2mqttExist = false;
-    zigbee2mqttManager.basePath = fake.resolves('/var/lib/gladysassistant');
   });
 
   it('it should restart z2m container', async function Test() {

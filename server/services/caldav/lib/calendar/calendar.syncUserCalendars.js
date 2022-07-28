@@ -76,7 +76,7 @@ async function syncUserCalendars(userId) {
       await Promise.map(
         eventsToUpdate,
         async (eventToUpdate) => {
-          // Delete existing event if pops is empty
+          // Delete existing event if props is empty
           if (JSON.stringify(eventToUpdate.props) === JSON.stringify({})) {
             const eventToDelete = await this.gladys.calendar.getEvents(userId, { url: eventToUpdate.href });
             if (eventToDelete.length === 1) {

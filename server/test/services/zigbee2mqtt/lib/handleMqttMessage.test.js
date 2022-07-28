@@ -99,6 +99,26 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     assert.calledOnce(gladys.event.emit);
   });
 
+  it('it should log error when bad message but not crash service', async () => {
+    // PREPARE
+    stateManagerGetStub = sinon.stub();
+    stateManagerGetStub.onFirstCall().returns({
+      features: [
+        {
+          external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
+          type: 'battery',
+        },
+      ],
+    });
+    zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"battery":"LOCK"}`);
+    // ASSERT
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+    });
+  });
+
   it('it should get bad topic', async () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/anytopic/wrongtopic', `anymessage`);
@@ -112,17 +132,22 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     stateManagerGetStub.onFirstCall().returns({
       features: [
         {
-          external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
+          external_id: 'zigbee2mqtt:0x00158d00033e88d5:battery:integer:battery',
           type: 'battery',
         },
       ],
     });
     zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    zigbeeDevices
+      .filter((d) => d.supported)
+      .forEach((device) => {
+        zigbee2mqttManager.discoveredDevices[device.friendly_name] = device;
+      });
     // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86, "battery":59}`);
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/0x00158d00033e88d5', `{"humidity":86, "battery":59}`);
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'zigbee2mqtt:0x00158d0005828ece:battery:integer:battery',
+      device_feature_external_id: 'zigbee2mqtt:0x00158d00033e88d5:battery:integer:battery',
       state: 59,
     });
   });

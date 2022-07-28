@@ -1,0 +1,11 @@
+@media (min-width: 576px) {
+  .calendarEventIsComingMarginInputMargin {
+    margin-top: 27px;
+  }
+}
+
+@media (max-width: 576px) {
+  .calendarEventIsComingGroupMargin {
+    margin-top: 12px;
+  }
+}

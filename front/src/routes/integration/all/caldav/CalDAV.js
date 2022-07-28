@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
-const CalDAV = ({ children, ...props }) => (
+const CalDAV = ({ children }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -33,6 +33,17 @@ const CalDAV = ({ children, ...props }) => (
                       <i class="fe fe-sliders" />
                     </span>
                     <Text id="integration.caldav.syncTab" />
+                  </Link>
+
+                  <Link
+                    href="/dashboard/integration/calendar/caldav/share"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-sliders" />
+                    </span>
+                    <Text id="integration.caldav.shareTab" />
                   </Link>
                 </div>
               </div>

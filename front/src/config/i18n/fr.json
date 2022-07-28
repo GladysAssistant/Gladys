@@ -39,7 +39,8 @@
     "date": "date",
     "time": "heure",
     "event": "événement",
-    "noEventsInRange": "Aucuns évènements trouvés dans cette période."
+    "noEventsInRange": "Aucuns évènements trouvés dans cette période.",
+    "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
     "noFeatures": "Aucune fonctionnalité"
@@ -290,7 +291,7 @@
   "integration": {
     "root": {
       "title": "Intégrations",
-      "subtitle": "1 - {{length}} de {{total}} intégrations",
+      "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
@@ -309,9 +310,11 @@
       "title": "CalDAV",
       "accountTab": "Compte",
       "syncTab": "Synchronisation",
+      "shareTab": "Partage",
       "description": "Synchonisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
+      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de Gladys.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
@@ -367,7 +370,7 @@
       "synchronizationRequestChangesError": "Impossible de récupérer les changements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationRequestEventsError": "Impossible de récupérer les détails des évènements, vérifiez la configuration et l'état du serveur CalDAV.",
       "synchronizationNeeded": "Une première synchronisation est nécessaire pour lister les calendriers.",
-      "calendarChoiceSuccess": "Choix des calendriers enregistré avec succès.",
+      "calendarChoiceSuccess": "Choix enregistrés avec succès.",
       "calendarChoiceError": "Une erreur est survenue lors de la sauvegarde.",
       "buttonSave": "Sauvegarder",
       "buttonCleanUp": "Remettre à zéro",
@@ -487,6 +490,7 @@
       "testConnectionButton": "Tester",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
+      "rotate180Label": "Rotation 180°",
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
       "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
     },
@@ -665,6 +669,20 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "alexa": {
+      "title": "Gladys Assistant",
+      "cardTitle": "Voulez-vous connecter Gladys Assistant à Amazon Alexa ?",
+      "description": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
+      "error": "Une erreur est survenue. Merci de réessayer.",
+      "connectedAs": "Connecté en tant que",
+      "googleWillBeAble": "Amazon Alexa pourra :",
+      "seeDevices": "Lister les appareils présents chez vous",
+      "controlDevices": "Contrôler vos appareils",
+      "getNewDeviceValues": "Récupérer périodiquement les états de vos appareils",
+      "privacyPolicy": "Lire la <a href=\"https://www.alexa.com/help/privacy\">politique de confidentialité d'Alexa</a>.",
+      "cancelButton": "Annuler",
+      "connectButton": "Lier"
+    },
     "zwave": {
       "title": "Z-Wave",
       "description": "Contrôlez vos appareils Z-Wave.",
@@ -794,7 +812,10 @@
         "readOnlyLabel": "Est-ce un capteur ?",
         "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
         "addButton": "Ajouter une fonctionnalité",
-        "mqttTopicExampleLabel": "Topic MQTT",
+        "mqttTopicToPublishExampleLabel": "Topic MQTT pour publier",
+        "mqttTopicToPublishExampleDescription": "Gladys écoute ce topic. Si vous publiez une valeur dedans, Gladys l'associera à cette fonctionnalité. ( voir <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a> )",
+        "mqttTopicToListenExampleLabel": "Topic MQTT à écouter",
+        "mqttTopicToListenExampleDescription": "Gladys publiera un message dans ce topic si cet appareil est contrôlé depuis Gladys. Vous devez écouter ce topic. ( voir <a href=\"https://gladysassistant.com/fr/docs/api/mqtt-api/\" target=\"_blank\" rel=\"noopener noreferrer\">doc</a> )",
         "copyMqttTopic": "Copier le topic MQTT",
         "copied": "Copié !",
         "copyFailed": "Erreur lors de la copie",
@@ -807,7 +828,7 @@
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "installBrokerContainer": "Utiliser un broker dans un conteneur Docker.",
-        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer and configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
+        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer et configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
         "installBrokerButton": "Installez le broker sur Docker",
         "installingBrokerButton": "Installation en cours...",
         "installBrokerError": "Une erreur est survenue lors de l'installation du conteneur Docker, veuillez consulter les logs Gladys.",
@@ -947,10 +968,10 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "turnOnLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez allumer"
+        "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
       "turnOffLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez éteindre"
+        "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
@@ -1013,6 +1034,7 @@
         "headersValuePlaceholder": "Valeur",
         "responseData": "Réponse",
         "tryButton": "Essayer",
+        "variablesExplanation": "Pour injecter une variable défini dans un bloc \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injecté que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       },
       "scene": {
@@ -1023,9 +1045,22 @@
         "houseIsEmptyDescription": "Si la maison est vide, cette scène continuera. Sinon, la scène s'arrêtera.",
         "houseIsNotEmptyDescription": "Si la maison n'est pas vide, cette scène continuera. Sinon, la scène s'arrêtera.",
         "houseLabel": "Maison"
+      },
+      "calendarEventIsRunning": {
+        "description": "Cette action vous permet de stopper une scène si un évènement est actuellement en cours ou si au contraire aucun n'évènement n'est en cours. Cette condition ne cherche que dans les calendriers partagés.",
+        "calendarLabel": "Dans les calendriers partagés suivants",
+        "nameLabel": "Si le nom",
+        "namePlaceholder": "Entrez un nom",
+        "whenFoundLabel": "Si un évènement est trouvé",
+        "whenNotFoundLabel": "Si aucun évènement n'est trouvé",
+        "stopScene": "Arrêter la scène",
+        "continueScene": "Continuer la scène"
       }
     },
     "actions": {
+      "calendar": {
+        "is-event-running": "Condition sur un évènement d'un calendrier"
+      },
       "device": {
         "get-value": "Récupérer le dernier état",
         "set-value": "Contrôler un appareil"
@@ -1035,7 +1070,7 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer la lumière",
+        "turn-on": "Allumer les lumières",
         "turn-off": "Eteindre les lumières"
       },
       "switch": {
@@ -1071,6 +1106,12 @@
         "get-value": {
           "last_value": "Dernière valeur de l'appareil"
         }
+      },
+      "calendar": {
+        "eventName": "Nom de l'évènement",
+        "eventLocation": "Lieu de l'évènement",
+        "eventStart": "Date de début",
+        "eventEnd": "Date de fin"
       }
     },
     "triggers": {
@@ -1093,6 +1134,9 @@
       "area": {
         "user-entered": "Utilisateur entre dans la zone",
         "user-left": "Utilisateur quitte la zone"
+      },
+      "calendar": {
+        "event-is-coming": "Un évènement dans le calendrier arrive"
       }
     },
     "triggersCard": {
@@ -1159,6 +1203,24 @@
         "userLeftDescription": "Ce déclencheur lancera la scène dès que l'utilisateur sélectionné quittera la zone sélectionnée. Vous pouvez créer des zones dans l'onglet plans.",
         "userLabel": "Utilisateur",
         "areaLabel": "Zone"
+      },
+      "calendarEventIsComing": {
+        "description": "Ce déclencheur lancera la scène lorsqu'un évènement dans l'un des calendriers sélectionnés répondra aux différentes contraintes. Seuls les calendriers partagés sont affichés.",
+        "calendarLabel": "Dans les calendriers partagés suivants",
+        "nameLabel": "Si le nom",
+        "isExactly": "est exactement",
+        "contains": "contient",
+        "startsWith": "commence par",
+        "endsWith": "finit par",
+        "hasAnyName": "a n'importe quel nom",
+        "namePlaceholder": "Texte",
+        "durationName": "Et l'évènement",
+        "startingIn": "commence dans",
+        "endingIn": "finit dans",
+        "durationPlaceholder": "Durée",
+        "minute": "minutes",
+        "hour": "heures",
+        "day": "jours"
       }
     }
   },
@@ -1348,10 +1410,13 @@
     "jobType": "Type",
     "jobProgress": "%",
     "jobStatus": "Statut",
+    "previous": "Précédent",
+    "next": "Suivant",
     "jobTypes": {
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
-      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire",
+      "gladys-gateway-backup": "Sauvegarde Gladys Plus"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -1507,36 +1572,104 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
+    "kelvin": "Kelvin (K)",
     "percent": "Pourcent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "bar": "Bar",
+    "psi": "Livre-force par pouce carré (psi)",
     "lux": "Lux",
+    "ppm": "Partie par million (ppm)",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
+    "watt-hour": "Watt heure (Wh)",
     "kilowatt-hour": "Kilowatt heure (kWh)",
+    "megawatt-hour": "Mégawatt heure (MWh)",
     "ampere": "Ampère (A)",
+    "milliampere": "Milliampère (mA)",
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
-    "ppm": "Partie par million (ppm)",
+    "volt-ampere": "Voltampère (VA)",
+    "volt-ampere-reactive": "Voltampère réactif (var)",
+    "mm": "Millimètre (mm)",
     "cm": "Centimètre (cm)",
-    "mm": "Millimètre (mm)"
+    "m": "Mètre (m)",
+    "km": "Kilomètre (km)",
+    "degree": "Degré d'angle (°)",
+    "liter": "Litre (l)",
+    "milliliter": "Millilitre (ml)",
+    "cubicmeter": "Mètre cube (m3)",
+    "euro": "Euro (€)",
+    "dollar": "Dollar ($)",
+    "bitcoin": "Bitcoin (₿)",
+    "litecoin": "Litecoin (Ł)",
+    "dogecoin": "Dogecoin (Ð)",
+    "ethereum": "Ethereum (⟠)",
+    "pound-sterling": "livre sterling (£)",
+    "meter-per-second": "Mètre par seconde (m/s)",
+    "kilometer-per-hour": "Kilomètre par heure (km/h)",
+    "millimeter-per-hour": "Millimètre par heure (mm/h)",
+    "uv-index": "Indice UV",
+    "microseconds": "Microsecondes (μs)",
+    "milliseconds": "Millisecondes (ms)",
+    "seconds": "Secondes (s)",
+    "minutes": "Minutes (min)",
+    "hours": "Heures (h)",
+    "days": "Jours (j)",
+    "weeks": "Semaines (sem)",
+    "months": "Mois (m)",
+    "years": "Années (an)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
+    "kelvin": "K",
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "bar": "bar",
+    "psi": "psi",
     "lux": "lx",
+    "ppm": "ppm",
     "watt": "W",
     "kilowatt": "kW",
+    "watt-hour": "Wh",
     "kilowatt-hour": "kWh",
+    "megawatt-hour": "MWh",
     "ampere": "A",
+    "milliampere": "mA",
     "millivolt": "mV",
     "volt": "V",
-    "ppm": "ppm",
+    "volt-ampere": "VA",
+    "volt-ampere-reactive": "var",
+    "mm": "mm",
     "cm": "cm",
-    "mm": "mm"
+    "m": "m",
+    "km": "km",
+    "degree": "°",
+    "liter": "l",
+    "milliliter": "ml",
+    "cubicmeter": "m3",
+    "euro": "€",
+    "dollar": "$",
+    "bitcoin": "₿",
+    "litecoin": "Ł",
+    "dogecoin": "Ð",
+    "ethereum": "⟠",
+    "pound-sterling": "£",
+    "meter-per-second": "m/s",
+    "kilometer-per-hour": "km/h",
+    "millimeter-per-hour": "mm/h",
+    "uv-index": "Indice UV",
+    "microseconds": "μs",
+    "milliseconds": "ms",
+    "seconds": "s",
+    "minutes": "min",
+    "hours": "h",
+    "days": "j",
+    "weeks": "sem",
+    "months": "m",
+    "years": "an"
   },
   "deviceFeatureValue": {
     "type": {
@@ -1669,6 +1802,7 @@
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
+      "binary": "Vibration (Oui/Non)",
       "status": "Etat",
       "tilt-angle": "Angle d'inclinaison",
       "acceleration-x": "Accélération X",
@@ -1709,6 +1843,41 @@
       "pause": "Pause",
       "stop": "Stop",
       "record": "Enregistrer"
+    },
+    "energy-sensor": {
+      "shortCategoryName": "Capteur d'énergie",
+      "voltage": "Tension",
+      "current": "Intensité",
+      "binary": "Relais",
+      "power": "Puissance",
+      "energy": "Energie",
+      "index": "Index"
+    },
+    "volume-sensor": {
+      "shortCategoryName": "Capteur de volume",
+      "decimal": "Volume (décimale)",
+      "integer": "Volume (entier)"
+    },
+    "currency": {
+      "shortCategoryName": "Devise",
+      "decimal": "Monnaie"
+    },
+    "speed-sensor": {
+      "shortCategoryName": "Vitesse",
+      "decimal": "Vitesse"
+    },
+    "precipitation-sensor": {
+      "shortCategoryName": "Capteur de précipitations",
+      "decimal": "Précipitation"
+    },
+    "uv-sensor": {
+      "shortCategoryName": "Capteur d'UV",
+      "integer": "Indice UV"
+    },
+    "duration": {
+      "shortCategoryName": "Durée",
+      "decimal": "Durée (décimale)",
+      "integer": "Durée (entier)"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
@@ -1851,9 +2020,11 @@
     "neverUsed": "Jamais"
   },
   "gatewayTwoFactorAuth": {
-    "title": "Gladys Gateway",
-    "configureTitle": "Configurer l'authentification Two-Factor (\"2FA\")",
+    "title": "Gladys Plus",
+    "configureTitle": "Configurer l'authentification à deux facteurs (\"2FA\")",
     "configureButton": "Configurer la 2FA",
+    "secretLabel": "Secret",
+    "copy": "Copier",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
     "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",
@@ -1863,7 +2034,7 @@
     "app": {
       "open": "Ouvrez votre application 2FA",
       "addAccount": "Cliquez sur \"Ajouter un compte\"",
-      "scanQRCode": "Scannez le QR Code ci-dessous"
+      "scanQRCode": "Scannez le QR Code ci-dessous, ou copiez manuellement le secret pour l'ajouter manuellement à votre application."
     }
   },
   "gatewaySignUp": {
@@ -1871,7 +2042,7 @@
     "complete": "Terminé ! Veuillez vérifier votre e-mail.",
     "done": "Terminé ! Vous pouvez maintenant vous connecter <a href=\"/login\" style=\"color: blue\">ici</a>.",
     "usernameLabel": "Nom",
-    "usernamePlaceholder": "Entez votre nom",
+    "usernamePlaceholder": "Entrez votre nom",
     "usernameInvalid": "Le nom doit comprendre entre 2 et 30 caractères",
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre adresse e-mail",

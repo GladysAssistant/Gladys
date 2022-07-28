@@ -4,7 +4,7 @@ import cx from 'classnames';
 
 const IP_PATTERN = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 const atoi = addr => {
-  const parts = addr.split('.').map(function(str) {
+  const parts = addr.split('.').map(str => {
     return parseInt(str, 10);
   });
 

@@ -25,6 +25,25 @@ const device = {
       name: 'CAMERA_URL',
       value: 'test',
     },
+    {
+      name: 'CAMERA_ROTATION',
+      value: '0',
+    },
+  ],
+};
+
+const deviceFlipped = {
+  id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6c',
+  selector: 'my-camera',
+  params: [
+    {
+      name: 'CAMERA_URL',
+      value: 'test',
+    },
+    {
+      name: 'CAMERA_ROTATION',
+      value: '1',
+    },
   ],
 };
 
@@ -50,6 +69,10 @@ describe('RtspCameraManager commands', () => {
   });
   it('should getImage', async () => {
     const image = await rtspCameraManager.getImage(device);
+    expect(image).to.equal('image/png;base64,aW1hZ2U=');
+  });
+  it('should getImage 180°', async () => {
+    const image = await rtspCameraManager.getImage(deviceFlipped);
     expect(image).to.equal('image/png;base64,aW1hZ2U=');
   });
   it('should return error', async () => {

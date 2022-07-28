@@ -67,7 +67,7 @@ export class HttpClient {
     return this.executeQuery('patch', url, {}, body);
   }
 
-  async delete(url, body) {
+  async delete(url) {
     return this.executeQuery('delete', url);
   }
 }

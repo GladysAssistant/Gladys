@@ -7,20 +7,60 @@ import { integrations, integrationsByType, categories } from '../config/integrat
 const HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS = ['device', 'weather'];
 
 const actions = store => ({
-  getIntegrations(state, category = null) {
-    let selectedIntegrations = integrationsByType[category] || integrations;
-    let categoriesFiltered = categories;
-    if (state.user && state.user.role !== USER_ROLE.ADMIN) {
+  async getIntegrations(state, intl, category, searchKeyword = '', orderDir = 'asc') {
+    const { user = {} } = state;
+
+    // Load all or category related integrations
+    let selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
+    // Load all categories
+    let integrationCategories = categories;
+    // Total size
+    let totalSize = integrations.length;
+
+    // Filter integrations and categories according to user role
+    if (user.role !== USER_ROLE.ADMIN) {
       selectedIntegrations = selectedIntegrations.filter(
         i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1
       );
-      categoriesFiltered = categoriesFiltered.filter(i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1);
+
+      integrationCategories = integrationCategories.filter(
+        i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1
+      );
+
+      totalSize = integrations.filter(i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1).length;
     }
+
+    // Translate with i18n
+    selectedIntegrations = selectedIntegrations.map(integration => {
+      const name = get(intl.dictionary, `integration.${integration.key}.title`, { default: integration.key });
+      const description = get(intl.dictionary, `integration.${integration.key}.description`, {
+        default: ''
+      });
+      return { ...integration, name, description };
+    });
+
+    // Filter
+    if (searchKeyword && searchKeyword.length > 0) {
+      selectedIntegrations = selectedIntegrations.filter(integration => {
+        const { name, description } = integration;
+        return name.toLowerCase().includes(searchKeyword) || description.toLowerCase().includes(searchKeyword);
+      });
+    }
+
+    // Sort
+    if (orderDir === 'asc') {
+      selectedIntegrations.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (orderDir === 'desc') {
+      selectedIntegrations.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
     store.setState({
       integrations: selectedIntegrations,
-      totalSize: selectedIntegrations.length,
-      integrationCategories: categoriesFiltered,
-      searchKeyword: ''
+      totalSize,
+      integrationCategories,
+      searchKeyword,
+      orderDir,
+      selectedCategory: category
     });
   },
   async getServices(state, podId = null) {
@@ -71,32 +111,11 @@ const actions = store => ({
       console.error(e);
     }
   },
-  getIntegrationByCategory(state, category) {
-    let selectedIntegrations = category ? integrationsByType[category] || [] : integrations;
-    if (state.user && state.user.role !== USER_ROLE.ADMIN) {
-      selectedIntegrations = selectedIntegrations.filter(
-        i => HIDDEN_CATEGORIES_FOR_NON_ADMIN_USERS.indexOf(i.type) === -1
-      );
-    }
-    store.setState({
-      integrations: selectedIntegrations,
-      searchKeyword: ''
-    });
-  },
   search(state, e, intl) {
-    if (!e.target.value || e.target.value === '') {
-      this.getIntegrationByCategory(state.category);
-    } else {
-      const keyword = e.target.value.toLowerCase();
-      store.setState({
-        integrations: state.integrations.filter(integration => {
-          const name = get(intl.dictionary, `integration.${integration.key}.title`, { default: '' });
-          const description = get(intl.dictionary, `integration.${integration.key}.description`, { default: '' });
-          return name.toLowerCase().includes(keyword) || description.toLowerCase().includes(keyword);
-        }),
-        searchKeyword: keyword
-      });
-    }
+    this.getIntegrations(intl, state.selectedCategory, e.target.value, state.orderDir);
+  },
+  changeOrderDir(state, e, intl) {
+    this.getIntegrations(intl, state.selectedCategory, state.searchKeyword, e.target.value);
   }
 });
 

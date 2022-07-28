@@ -12,7 +12,7 @@ class XiaomiPage extends Component {
     this.props.getHouses();
     this.props.getXiaomiSensors();
     this.props.getXiaomiDevices();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.XIAOMI.NEW_DEVICE, payload => {
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.XIAOMI.NEW_DEVICE, () => {
       this.props.getXiaomiSensors();
     });
   }

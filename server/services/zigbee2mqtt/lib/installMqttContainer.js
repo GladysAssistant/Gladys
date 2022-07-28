@@ -1,3 +1,4 @@
+const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 const { exec } = require('../../../utils/childProcess');
 const { CONFIGURATION } = require('./constants');
@@ -28,13 +29,14 @@ async function installMqttContainer() {
 
       // Prepare broker env
       logger.info(`Preparing broker environment...`);
-      const { basePathOnContainer, basePathOnHost } = await this.basePath();
+      const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
       const brokerEnv = await exec(`sh ./services/zigbee2mqtt/docker/gladys-z2m-mqtt-env.sh ${basePathOnContainer}`);
       logger.trace(brokerEnv);
-      containerDescriptor.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/mqtt:/mosquitto/config`);
+      containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/mqtt:/mosquitto/config`);
 
-      logger.info(`Creating container...`);
-      containerMqtt = await this.gladys.system.createContainer(containerDescriptor);
+      logger.info(`Creating container with data in "${basePathOnHost}" on host...`);
+      containerMqtt = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerMqtt);
       this.mqttExist = true;
     } catch (e) {

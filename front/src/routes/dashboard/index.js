@@ -7,7 +7,7 @@ import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpire
 import actions from '../../actions/dashboard';
 import get from 'get-value';
 
-extend('$auto', function(value, object) {
+extend('$auto', (value, object) => {
   return object ? update(object, value) : update({}, value);
 });
 
@@ -81,7 +81,7 @@ class Dashboard extends Component {
     }
   };
 
-  redirectToDashboard = e => {
+  redirectToDashboard = () => {
     this.setState({
       dashboardDropdownOpened: false
     });
@@ -211,14 +211,26 @@ class Dashboard extends Component {
       unknownError: false
     });
     try {
+      const { currentDashboard: selectedDashboard, dashboards } = this.state;
+      const { selector } = selectedDashboard;
+
       const currentDashboard = await this.props.httpClient.patch(
-        `/api/v1/dashboard/${this.state.currentDashboard.selector}`,
+        `/api/v1/dashboard/${selector}`,
         this.state.currentDashboard
       );
+
+      const currentDashboardIndex = dashboards.findIndex(d => d.selector === selector);
+      const updatedDashboards = update(dashboards, {
+        [currentDashboardIndex]: {
+          $set: currentDashboard
+        }
+      });
+
       this.setState({
         currentDashboard,
         dashboardEditMode: false,
-        loading: false
+        loading: false,
+        dashboards: updatedDashboards
       });
     } catch (e) {
       if (e.response && e.response.status === 422) {
