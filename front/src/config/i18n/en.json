@@ -291,7 +291,7 @@
   "integration": {
     "root": {
       "title": "Integrations",
-      "subtitle": "1 - {{length}} of {{total}} integrations",
+      "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
       "restartButton": "Restart",
       "stopButton": "Stop",
