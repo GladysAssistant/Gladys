@@ -1,0 +1,19 @@
+{
+  "name": "gladys-enedis-linky",
+  "version": "1.0.0",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "dayjs": "^1.11.4",
+    "linky": "^1.5.0"
+  }
+}
