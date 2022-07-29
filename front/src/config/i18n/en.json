@@ -529,9 +529,12 @@
       "documentation": "Zigbee2mqtt documentation"
     },
     "googleHome": {
-      "title": "Gladys Assistant",
+      "title": "Google Home",
+      "description": "Control your Gladys device with your voice in Google Home",
+      "longDescription": "It's possible to use Google Home to control your Gladys devices by voice. To configure Google Home with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Do you want to connect Gladys Assistant to Google?",
-      "description": "By signin in, you are authorizing Google to access your devices.",
+      "pageDescription": "By signin in, you are authorizing Google to access your devices.",
       "error": "An error occured. Please retry !",
       "connectedAs": "Connected as",
       "googleWillBeAble": "Google will be able:",
@@ -543,9 +546,12 @@
       "connectButton": "Link"
     },
     "alexa": {
-      "title": "Gladys Assistant",
+      "title": "Amazon Alexa",
+      "description": "Control your Gladys device with your voice in Alexa",
+      "longDescription": "It's possible to use Amazon Alexa to control your Gladys devices by voice. To configure Alexa with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Do you want to connect Gladys Assistant to Amazon Alexa?",
-      "description": "By signin in, you are authorizing Alexa to access your devices.",
+      "pageDescription": "By signin in, you are authorizing Alexa to access your devices.",
       "error": "An error occured. Please retry !",
       "connectedAs": "Connected as",
       "googleWillBeAble": "Alexa will be able:",
@@ -555,6 +561,11 @@
       "privacyPolicy": "Read Alexa's <a href=\"https://www.alexa.com/help/privacy\">privacy policy</a>.",
       "cancelButton": "Cancel",
       "connectButton": "Link"
+    },
+    "owntracks": {
+      "title": "Owntracks",
+      "description": "Send your GPS location to Gladys with a mobile app",
+      "longDescription": "Owntracks is an open-source app running on iOS and Android that let you send your geolocation to a server. You can use Owntracks to trigger scenes based on your geolocation. To configure Owntracks with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>."
     },
     "zwave": {
       "title": "Z-Wave",

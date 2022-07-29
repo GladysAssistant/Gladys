@@ -51,7 +51,7 @@ class AlexaGateway extends Component {
                       alt={<Text id="global.logoAlt" />}
                     />
                   </Localizer>
-                  <Text id="integration.alexa.title" />
+                  <Text id="integration.alexa.pageTitle" />
                 </h2>
               </div>
               <form class="card">
@@ -75,7 +75,7 @@ class AlexaGateway extends Component {
                         </p>
                       )}
                       <p>
-                        <Text id="integration.alexa.description" />
+                        <Text id="integration.alexa.pageDescription" />
                       </p>
 
                       <p>

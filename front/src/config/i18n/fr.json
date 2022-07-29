@@ -656,9 +656,12 @@
       "documentation": "Documentation Zigbee2mqtt"
     },
     "googleHome": {
-      "title": "Gladys Assistant",
+      "title": "Google Home",
+      "description": "Contrôlez vos appareils Gladys à la voix dans Google Home",
+      "longDescription": "Il est possible d'utiliser Google Home pour contrôler vos appareils Gladys à la voix. Pour configurer Google Home, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Voulez-vous connecter Gladys Assistant à Google ?",
-      "description": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
+      "pageDescription": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
       "error": "Une erreur est survenue. Merci de réessayer.",
       "connectedAs": "Connecté en tant que",
       "googleWillBeAble": "Google pourra :",
@@ -670,9 +673,12 @@
       "connectButton": "Lier"
     },
     "alexa": {
-      "title": "Gladys Assistant",
+      "title": "Amazon Alexa",
+      "description": "Contrôlez vos appareils Gladys à la voix dans Alexa",
+      "longDescription": "Il est possible d'utiliser Amazon Alexa pour contrôler vos appareils Gladys à la voix. Pour configurer Alexa, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Voulez-vous connecter Gladys Assistant à Amazon Alexa ?",
-      "description": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
+      "pageDescription": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
       "error": "Une erreur est survenue. Merci de réessayer.",
       "connectedAs": "Connecté en tant que",
       "googleWillBeAble": "Amazon Alexa pourra :",
@@ -682,6 +688,11 @@
       "privacyPolicy": "Lire la <a href=\"https://www.alexa.com/help/privacy\">politique de confidentialité d'Alexa</a>.",
       "cancelButton": "Annuler",
       "connectButton": "Lier"
+    },
+    "owntracks": {
+      "title": "Owntracks",
+      "description": "Envoyez votre position GPS à Gladys via une application",
+      "longDescription": "Owntracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser Owntracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer Owntracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
     },
     "zwave": {
       "title": "Z-Wave",
