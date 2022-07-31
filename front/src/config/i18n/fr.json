@@ -1917,13 +1917,13 @@
     },
     "shutter": {
       "shortCategoryName": "Volet",
-      "state": "Etat",
-      "position": "Position"
+      "state": "Etat du volet",
+      "position": "Position du volet"
     },
     "curtain": {
       "shortCategoryName": "Rideau",
-      "state": "Etat",
-      "position": "Position"
+      "state": "Etat du rideau",
+      "position": "Position du rideau"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

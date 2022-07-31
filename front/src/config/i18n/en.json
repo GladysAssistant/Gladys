@@ -1917,13 +1917,13 @@
     },
     "shutter": {
       "shortCategoryName": "Shutter",
-      "state": "State",
-      "position": "Position"
+      "state": "Shutter state",
+      "position": "Shutter position"
     },
     "curtain": {
       "shortCategoryName": "Curtain",
-      "state": "State",
-      "position": "Position"
+      "state": "Curtain state",
+      "position": "curtain position"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
