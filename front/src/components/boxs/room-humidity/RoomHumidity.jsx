@@ -1,9 +1,11 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import get from 'get-value';
+
 import actions from '../../../actions/dashboard/boxes/humidityInRoom';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
-import get from 'get-value';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 const isNotNullOrUndefined = value => value !== undefined && value !== null;
 
@@ -47,8 +49,13 @@ class RoomHumidityBoxComponent extends Component {
     this.props.getHumidityInRoom(this.props.box, this.props.x, this.props.y);
   };
 
+  updateRoomHumidity = payload => {
+    this.props.deviceFeatureWebsocketEvent(this.props.box, this.props.x, this.props.y, payload);
+  };
+
   componentDidMount() {
     this.refreshData();
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.updateRoomHumidity);
   }
 
   componentDidUpdate(previousProps) {
@@ -56,6 +63,10 @@ class RoomHumidityBoxComponent extends Component {
     if (roomChanged) {
       this.refreshData();
     }
+  }
+
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE, this.updateRoomHumidity);
   }
 
   render(props, {}) {
@@ -69,6 +80,6 @@ class RoomHumidityBoxComponent extends Component {
 }
 
 export default connect(
-  'DashboardBoxDataHumidityInRoom,DashboardBoxStatusHumidityInRoom',
+  'session,DashboardBoxDataHumidityInRoom,DashboardBoxStatusHumidityInRoom',
   actions
 )(RoomHumidityBoxComponent);

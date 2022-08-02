@@ -2,6 +2,17 @@ describe('Bluetooth scanner - state change', () => {
   before(() => {
     cy.login();
 
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/bluetooth/status`
+      },
+      {
+        fixture: 'integration/routes/integration/bluetooth/status_not_ready.json'
+      }
+    );
+
     cy.visit('/dashboard/integration/device/bluetooth/config');
   });
 

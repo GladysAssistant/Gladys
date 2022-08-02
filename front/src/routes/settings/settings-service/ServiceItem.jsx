@@ -30,7 +30,7 @@ class ServiceItem extends Component {
     }
   };
 
-  render({ service, integrations }, { changeStatus }) {
+  render({ service, integrations = [] }, { changeStatus }) {
     const started = STARTED_STATUS.includes(service.status);
     const displayAction = !HIDDEN_ACTION_STATUS.includes(service.status);
     const integrationPage = integrations.find(
