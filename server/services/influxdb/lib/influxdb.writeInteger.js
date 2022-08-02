@@ -16,7 +16,7 @@ async function writeInteger(event, deviceFeature, gladysDevice) {
     .tag('type', deviceFeature.type)
     .tag('name', deviceFeature.name)
     .tag('room', gladysDevice.room.name)
-    .intField('value', parseInt(event.last_value,event.last_value.length));
+    .intField('value', parseInt(event.last_value, event.last_value.length));
 
   this.influxdbApi.writePoint(point);
   this.influxdbApi
