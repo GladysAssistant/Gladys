@@ -10,7 +10,7 @@ const logger = require('../../../utils/logger');
  * influxdb.writeFloat(event, deviceFeature, gladysDevice);
  */
 async function writeFloat(event, deviceFeature, gladysDevice) {
-  logger.debug('writeBinary function');
+  logger.debug('writeFloat function');
 
   const point = new Point(event.device_feature)
     .tag('type', deviceFeature.type)
@@ -20,7 +20,7 @@ async function writeFloat(event, deviceFeature, gladysDevice) {
 
   this.influxdbApi.writePoint(point);
   this.influxdbApi
-    .close()
+    .flush()
     .then(() => {
       logger.trace('FINISHED');
     })

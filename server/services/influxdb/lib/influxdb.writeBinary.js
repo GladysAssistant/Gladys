@@ -21,7 +21,7 @@ async function writeBinary(event, deviceFeature, gladysDevice) {
 
   this.influxdbApi.writePoint(point);
   this.influxdbApi
-    .close()
+    .flush()
     .then(() => {
       logger.trace('FINISHED');
     })

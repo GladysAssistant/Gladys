@@ -32,7 +32,7 @@ function write(event) {
       writeFloat.call(this, event, gladysFeature, gladysDevice);
       break;
     default:
-      logger.trace('unmanaged case');
+      logger.trace(`unmanaged case: ${gladysFeature.type}`);
   }
 }
 

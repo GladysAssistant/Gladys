@@ -10,17 +10,17 @@ const logger = require('../../../utils/logger');
  * influxdb.writeInteger(event, deviceFeature, gladysDevice);
  */
 async function writeInteger(event, deviceFeature, gladysDevice) {
-  logger.debug('writeBinary function');
+  logger.debug('writeInteger function');
 
   const point = new Point(event.device_feature)
     .tag('type', deviceFeature.type)
     .tag('name', deviceFeature.name)
     .tag('room', gladysDevice.room.name)
-    .intField('value', event.last_value);
+    .intField('value', parseInt(event.last_value,event.last_value.length));
 
   this.influxdbApi.writePoint(point);
   this.influxdbApi
-    .close()
+    .flush()
     .then(() => {
       logger.trace('FINISHED');
     })
