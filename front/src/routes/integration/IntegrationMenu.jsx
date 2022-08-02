@@ -1,13 +1,8 @@
-import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import actions from '../../actions/integration';
 
-const IntegrationMenu = connect(
-  'integrationCategories',
-  actions
-)(({ integrationCategories, getIntegrationByCategory }) => {
-  const refreshIntegrations = category => () => getIntegrationByCategory(category);
+const IntegrationMenu = ({ integrationCategories, getIntegrations, intl }) => {
+  const refreshIntegrations = category => () => getIntegrations(intl, category);
 
   return (
     <div class="list-group list-group-transparent mb-0">
@@ -37,6 +32,6 @@ const IntegrationMenu = connect(
       ))}
     </div>
   );
-});
+};
 
 export default IntegrationMenu;
