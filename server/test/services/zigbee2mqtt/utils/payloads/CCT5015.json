@@ -81,5 +81,22 @@
     "name": "CCT5015 device",
     "model": "CCT5015",
     "should_poll": false
-  }
+  },
+  "values": [
+    {
+      "internal": -1,
+      "external": "CLOSE",
+      "property": "state"
+    },
+    {
+      "internal": 1,
+      "external": "OPEN",
+      "property": "state"
+    },
+    {
+      "internal": 0,
+      "external": "STOP",
+      "property": "state"
+    }
+  ]
 }

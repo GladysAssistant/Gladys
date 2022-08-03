@@ -15,26 +15,42 @@ describe('zigbee2mqtt findMatchingExpose', () => {
     zigbee2MqttService.device.discoveredDevices[discoveredDevice.friendly_name] = discoveredDevice;
   });
 
-  it('no device discovered', () => {
+  it('no device discovered on unknown device', () => {
     const result = zigbee2MqttService.device.findMatchingExpose('unknown', 'property');
     assert.equal(result, undefined);
   });
 
-  it('no expose discovered', () => {
+  it('no expose discovered on unknown property', () => {
     const result = zigbee2MqttService.device.findMatchingExpose('0x00158d00045b2740', 'property');
     assert.equal(result, undefined);
   });
 
-  it('no expose discovered', () => {
+  it('expose discovered', () => {
     const expected = {
       type: 'binary',
       name: 'state',
       property: 'state',
+      parent_type: 'switch',
       access: 3,
       value_on: 'ON',
       value_off: 'OFF',
     };
     const result = zigbee2MqttService.device.findMatchingExpose('0x00158d00045b2740', 'state');
+    assert.deepEqual(result, expected);
+  });
+
+  it('expose dicovered on child features', () => {
+    const expected = {
+      access: 7,
+      description: 'Position of this cover',
+      name: 'position',
+      property: 'position',
+      type: 'numeric',
+      parent_type: 'cover',
+      value_max: 100,
+      value_min: 0,
+    };
+    const result = zigbee2MqttService.device.findMatchingExpose('0x00158d00045b2740', 'position');
     assert.deepEqual(result, expected);
   });
 });

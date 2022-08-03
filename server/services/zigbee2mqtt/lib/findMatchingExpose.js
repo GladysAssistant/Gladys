@@ -3,7 +3,7 @@ const logger = require('../../../utils/logger');
 const recursiveSearch = (expose, type, search) => {
   const { property, features = [] } = expose;
   if (property === search) {
-    return expose;
+    return { ...expose, parent_type: type };
   }
 
   for (let i = 0; i < features.length; i += 1) {

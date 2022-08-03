@@ -16,7 +16,9 @@ function readValue(deviceName, property, value) {
     throw new Error(`Zigbee2mqqt expose not found on device "${deviceName}" with property "${property}".`);
   }
 
-  const matchingValue = exposesMap[expose.type].readValue(expose, value);
+  const { parent_type: parentType, type: exposeType } = expose;
+  const mapper = exposesMap[parentType] || exposesMap[exposeType];
+  const matchingValue = mapper.readValue(expose, value);
 
   if (matchingValue === undefined) {
     throw new Error(`Zigbee2mqqt don't handle value "${value}" for property "${property}".`);
