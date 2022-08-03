@@ -162,6 +162,15 @@ module.exports = {
         max: 150,
       },
     },
+    water_consumed: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VOLUME_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VOLUME_SENSOR.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.LITER,
+        min: 0,
+        max: 1000000,
+      },
+    },
     voltage: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
