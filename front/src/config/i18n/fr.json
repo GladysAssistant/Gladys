@@ -782,8 +782,7 @@
       "orgPlaceholder": "Entrer l'organisation",
       "bucketLabel": "Entrez le nom de votre bucket:",
       "bucketPlaceholder": "Entrer le nom du bucket",
-      "saveButton": "Sauvegarder",
-      "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+      "saveButton": "Sauvegarder"
     },
     "mqtt": {
       "title": "MQTT",

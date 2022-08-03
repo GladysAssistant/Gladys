@@ -4,7 +4,7 @@ module.exports = function InfluxdbController(influxdbManager) {
   /**
    * @api {post} /api/v1/service/influxdb/saveConfig Save MQTT connection
    * @apiName save
-   * @apiGroup Mqtt
+   * @apiGroup InfluxDB
    */
   async function saveConfig(req, res) {
     await influxdbManager.saveConfiguration(req.body);
@@ -16,7 +16,7 @@ module.exports = function InfluxdbController(influxdbManager) {
   /**
    * @api {get} /api/v1/service/influxdb/config Get MQTT configuration.
    * @apiName getConfiguration
-   * @apiGroup Mqtt
+   * @apiGroup InfluxDB
    */
   async function getConfiguration(req, res) {
     const configuration = await influxdbManager.getConfiguration();

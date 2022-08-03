@@ -11,13 +11,14 @@ const logger = require('../../../utils/logger');
  */
 async function writeBinary(event, deviceFeature, gladysDevice) {
   logger.debug('writeBinary function');
-  // eslint-disable-next-line no-unneeded-ternary
-  const binaryValue = event.last_value === 1 ? true : false;
   const point = new Point(event.device_feature)
+    .measurement(deviceFeature.category)
     .tag('type', deviceFeature.type)
     .tag('name', deviceFeature.name)
     .tag('room', gladysDevice.room.name)
-    .booleanField('value', binaryValue);
+    .tag('device', gladysDevice.name)
+    .tag('service', gladysDevice.service.name)
+    .booleanField('value', !!event.last_value);
 
   this.influxdbApi.writePoint(point);
   this.influxdbApi

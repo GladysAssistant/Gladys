@@ -10,12 +10,13 @@ const logger = require('../../../utils/logger');
  * influxdb.writeFloat(event, deviceFeature, gladysDevice);
  */
 async function writeFloat(event, deviceFeature, gladysDevice) {
-  logger.debug('writeFloat function');
-
   const point = new Point(event.device_feature)
+    .measurement(deviceFeature.category)
     .tag('type', deviceFeature.type)
     .tag('name', deviceFeature.name)
     .tag('room', gladysDevice.room.name)
+    .tag('device', gladysDevice.name)
+    .tag('service', gladysDevice.service.name)
     .floatField('value', event.last_value);
 
   this.influxdbApi.writePoint(point);

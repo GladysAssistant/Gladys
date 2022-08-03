@@ -1,5 +1,4 @@
 const { writeBinary } = require('./influxdb.writeBinary');
-const { writeInteger } = require('./influxdb.writeInteger');
 const { writeFloat } = require('./influxdb.writeFloat');
 
 const logger = require('../../../utils/logger');
@@ -23,10 +22,11 @@ function write(event) {
       logger.trace('EVENT - Write point to influxdb - binary');
       writeBinary.call(this, event, gladysFeature, gladysDevice);
       break;
+    case 'index':
+    case 'power':
     case 'integer':
-      logger.trace('EVENT - Write point to influxdb - integer');
-      writeInteger.call(this, event, gladysFeature, gladysDevice);
-      break;
+    case 'voltage':
+    case 'current':
     case 'decimal':
       logger.trace('EVENT - Write point to influxdb - decimal');
       writeFloat.call(this, event, gladysFeature, gladysDevice);

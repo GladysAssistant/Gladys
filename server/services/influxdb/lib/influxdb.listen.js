@@ -5,7 +5,7 @@ const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
- * @description Listen.
+ * @description Instenciate influxdb lient and listen on state events.
  * @param {Object} configuration - InfluxDB configuration.
  * @example
  * influxdb.listen();

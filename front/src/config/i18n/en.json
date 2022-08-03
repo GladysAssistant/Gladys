@@ -650,13 +650,12 @@
       "urlLabel": "InfluxDB URL:",
       "urlPlaceholder": "http://127.0.0.1:8086",
       "tokenLabel": "Access Token:",
-      "tokenPlaceholder": "Entrer le jeton d'accès",
+      "tokenPlaceholder": "Fill your influxdb access token",
       "orgLabel": "Organization name:",
       "orgPlaceholder": "My org",
       "bucketLabel": "Bucket name:",
       "bucketPlaceholder": "gladys",
-      "saveButton": "Save",
-      "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+      "saveButton": "Save"
     },
     "mqtt": {
       "title": "MQTT",

@@ -12,7 +12,7 @@
     "arm64"
   ],
   "dependencies": {
-    "@influxdata/influxdb-client": "^1.26.0",
-    "@influxdata/influxdb-client-apis": "^1.26.0"
+    "@influxdata/influxdb-client": "^1.28.0",
+    "@influxdata/influxdb-client-apis": "^1.28.0"
   }
 }
