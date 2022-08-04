@@ -308,7 +308,7 @@
     },
     "telegram": {
       "title": "Telegram",
-      "description": "Talk to Gladys through Telegram.",
+      "description": "Chat with Gladys remotely through Telegram.",
       "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
       "link": "<b>ACTION REQUIRED:</b> To talk to Gladys in Telegram, click on <a href=\"{{link}}\">this link</a>. Don't speak in Telegram directly to your bot before having click on this link, otherwise your bot won't be able to know that it's you who are sending a message.",
       "note": "This link is unique to your account, do not send it to other users.",
@@ -318,7 +318,7 @@
     },
     "philipsHue": {
       "title": "Philips Hue",
-      "description": "Control Philips Hue Lights.",
+      "description": "Control Philips Hue Lights and plugs with the official hub",
       "deviceTab": "Devices",
       "setupTab": "Setup Bridges",
       "setup": {
@@ -345,7 +345,7 @@
     },
     "rtspCamera": {
       "title": "Cameras",
-      "description": "HTTP/RTSP cameras in Gladys.",
+      "description": "Display your cameras video flux in Gladys.",
       "search": "Search cameras",
       "new": "New",
       "nameLabel": "Camera Name",
@@ -369,7 +369,7 @@
     },
     "tasmota": {
       "title": "Tasmota",
-      "description": "Control your Tasmota devices.",
+      "description": "Control your Tasmota devices in HTTP or MQTT.",
       "deviceTab": "Devices",
       "mqttDiscoverTab": "MQTT discover",
       "httpDiscoverTab": "HTTP discover",
@@ -430,7 +430,7 @@
     },
     "tpLink": {
       "title": "TP-Link",
-      "description": "Control TP-Link Bulbs and Plugs.",
+      "description": "Control TP-Link Bulbs and Plugs in Gladys",
       "deviceTab": "Devices",
       "device": {
         "title": "Devices in Gladys",
@@ -454,7 +454,7 @@
     },
     "zigbee2mqtt": {
       "title": "Zigbee2mqtt",
-      "description": "Control your Zigbee devices.",
+      "description": "Control your Zigbee devices with Zigbee2mqtt",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "settingsTab": "Settings",
@@ -569,7 +569,7 @@
     },
     "zwave": {
       "title": "Z-Wave",
-      "description": "Control your Z-Wave devices.",
+      "description": "Control your Z-Wave devices with Open-Zwave.",
       "deviceTab": "Devices",
       "networkTab": "Network",
       "settingsTab": "Settings",
@@ -646,7 +646,7 @@
     },
     "openWeather": {
       "title": "OpenWeather API",
-      "description": "Get the weather in Gladys.",
+      "description": "Display the weather in your town on your dasboard.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
       "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
@@ -656,7 +656,7 @@
     },
     "mqtt": {
       "title": "MQTT",
-      "description": "Connect to MQTT server.",
+      "description": "Connect to a local or remote MQTT server",
       "deviceTab": "Devices",
       "setupTab": "Setup",
       "status": {
@@ -733,7 +733,7 @@
     },
     "xiaomi": {
       "title": "Xiaomi Home",
-      "description": "Display Xiaomi home devices.",
+      "description": "Control Xiaomi home devices with the official hub",
       "device": {
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
@@ -767,7 +767,7 @@
       "accountTab": "Account",
       "syncTab": "Synchronization",
       "shareTab": "Sharing",
-      "description": "Sync your CalDAV calendars.",
+      "description": "Sync your CalDAV calendars and use them in scenes.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "syncIntroduction": "Choose calendars to synchronize.",
       "shareIntroduction": "Choose calendars you want to share with other Gladys users.",
@@ -834,7 +834,7 @@
     },
     "bluetooth": {
       "title": "Bluetooth",
-      "description": "Control your Bluetooth devices.",
+      "description": "Control your Bluetooth devices and detect your presence.",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "setupTab": "Presence scanner",
@@ -891,7 +891,7 @@
     },
     "eWeLink": {
       "title": "eWeLink",
-      "description": "Control your eWeLink devices.",
+      "description": "Control your eWeLink devices (works with the cloud)",
       "deviceTab": "Devices",
       "discoverTab": "eWeLink discover",
       "setupTab": "Setup",
