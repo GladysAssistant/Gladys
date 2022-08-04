@@ -7,13 +7,14 @@ const { BadParameters } = require('../../utils/coreErrors');
  * @description Save new device feature state in DB.
  * @param {Object} deviceFeature - A DeviceFeature object.
  * @param {number} newValue - The new value of the deviceFeature to save.
+ * @param {Date} createdAt - Override created_at.
  * @example
  * saveState({
  *   id: 'fc235c88-b10d-4706-8b59-fef92a7119b2',
  *   selector: 'my-light'
  * }, 12);
  */
-async function saveState(deviceFeature, newValue) {
+async function saveState(deviceFeature, newValue, createdAt) {
   if (Number.isNaN(newValue)) {
     throw new BadParameters(`device.saveState of NaN value on ${deviceFeature.selector}`);
   }
@@ -44,6 +45,7 @@ async function saveState(deviceFeature, newValue) {
     await db.DeviceFeatureState.create({
       device_feature_id: deviceFeature.id,
       value: newValue,
+      ...(createdAt && { created_at: createdAt }),
     });
   }
 

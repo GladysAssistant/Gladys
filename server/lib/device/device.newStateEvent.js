@@ -6,6 +6,7 @@ const logger = require('../../utils/logger');
  * @param {Object} event - The event object.
  * @param {Object} event.device_feature_external_id - The deviceFeature concerned.
  * @param {number} event.state - The new state to save.
+ * @param {Date} event.created_at - The new state datetime.
  * @example
  * newStateEvent({ device_feature_external_id: 'xx', state: 12 });
  */
@@ -15,7 +16,7 @@ async function newStateEvent(event) {
     if (deviceFeature === null) {
       throw new NotFoundError('DeviceFeature not found');
     }
-    await this.saveState(deviceFeature, event.state);
+    await this.saveState(deviceFeature, event.state, event.created_at);
   } catch (e) {
     logger.debug(e);
   }

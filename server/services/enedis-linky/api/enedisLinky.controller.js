@@ -7,17 +7,18 @@ module.exports = function EnedisLinkyController(enedisLinkyHandler) {
    * @apiGroup EnedisLinky
    */
   async function testConnection(req, res) {
-    const threeDayAgo = enedisLinkyHandler.dayjs().subtract(3, 'day').format('YYYY-MM-DD');
-    const twoDayAgo = enedisLinkyHandler.dayjs().subtract(2, 'day').format('YYYY-MM-DD');
-    const oneDayAgo = enedisLinkyHandler.dayjs().subtract(1, 'day').format('YYYY-MM-DD');
-    const today = enedisLinkyHandler.dayjs().format('YYYY-MM-DD');
-    const tomorrow = enedisLinkyHandler.dayjs().add(1, 'day').format('YYYY-MM-DD');
-    console.log('threeDayAgo', threeDayAgo)
-    const linkyJson = await enedisLinkyHandler.getDailyConsumption(req.body, oneDayAgo, today);
-    console.log('linkyJson', linkyJson)
-    const linkyHourJson = await enedisLinkyHandler.getLoadCurve(req.body, oneDayAgo, today);
-    console.log('linkyHourJson', linkyHourJson)
-    res.send(linkyJson);
+    const threeDayAgo = enedisLinkyHandler
+      .dayjs()
+      .subtract(3, 'day')
+      .format('YYYY-MM-DD');
+    const twoDayAgo = enedisLinkyHandler
+      .dayjs()
+      .subtract(2, 'day')
+      .format('YYYY-MM-DD');
+    const linkyJson = await enedisLinkyHandler.getDailyConsumption(req.body, threeDayAgo, twoDayAgo);
+    const linkyHourJson = await enedisLinkyHandler.getLoadCurve(req.body, threeDayAgo, twoDayAgo);
+
+    res.send([linkyJson, linkyHourJson]);
   }
 
   return {

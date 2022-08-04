@@ -1,4 +1,3 @@
-const logger = require('../../../../utils/logger');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 
 const DEVICE_PARAM_LINKY_USAGE_POINT = 'LINKY_USAGE_POINT';
@@ -23,14 +22,12 @@ async function createSession(device) {
 
   const ENEDIS_ACCESS_TOKEN = await this.gladys.variable.getValue('ENEDIS_ACCESS_TOKEN', this.serviceId);
   const ENEDIS_REFRESH_TOKEN = await this.gladys.variable.getValue('ENEDIS_REFRESH_TOKEN', this.serviceId);
-  console.log(linkyUsagePointParam, ENEDIS_ACCESS_TOKEN, ENEDIS_REFRESH_TOKEN);
 
   const session = new this.linky.Session({
     accessToken: ENEDIS_ACCESS_TOKEN,
     refreshToken: ENEDIS_REFRESH_TOKEN,
     usagePointId: linkyUsagePointParam.value,
     onTokenRefresh: async (accessToken, refreshToken) => {
-      console.log('new tokens', accessToken, refreshToken);
       await this.gladys.variable.setValue('ENEDIS_ACCESS_TOKEN', accessToken, this.serviceId);
       await this.gladys.variable.getValue('ENEDIS_ACCESS_TOKEN', refreshToken, this.serviceId);
     },
