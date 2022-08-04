@@ -3,7 +3,7 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import { TIMER_STATUS } from '../../../../../server/utils/constants';
+import { TIMER_STATUS } from '../../../../../../server/utils/constants';
 import SvgIcon from '../../../icons/SvgIcon';
 
 const colorStatus = value => {
