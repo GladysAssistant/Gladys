@@ -57,6 +57,9 @@ const TimerStatusDeviceFeature = ({ children, ...props }) => {
       <td>{props.deviceFeature.name}</td>
       <td class="py-0">
         <div class="d-flex justify-content-end">
+          <div class={cx('badge badge-d-flex flex-row-reverse', colorClass)}>
+            <SvgIcon icon="tabler-drop-circle" />
+          </div>
           <div class="btn-group" role="group">
             <button class="btn btn-sm btn-secondary" onClick={enable}>
               <Text id={`deviceFeatureAction.category.timer.status.enabled`} />
@@ -64,9 +67,6 @@ const TimerStatusDeviceFeature = ({ children, ...props }) => {
             <button class="btn btn-sm btn-secondary" onClick={disable}>
               <Text id={`deviceFeatureAction.category.timer.status.disabled`} />
             </button>
-          </div>
-          <div class={cx('badge badge-d-flex flex-row-reverse', colorClass)}>
-            <SvgIcon icon="tabler-drop-circle" />
           </div>
         </div>
       </td>

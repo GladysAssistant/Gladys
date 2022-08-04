@@ -479,7 +479,7 @@ const data = {
             min: 0,
             max: 2,
             read_only: false,
-            last_value: 1,
+            last_value: 2,
             last_value_changed: '2022-08-04 07:49:07.556 +00:00'
           },
           {
