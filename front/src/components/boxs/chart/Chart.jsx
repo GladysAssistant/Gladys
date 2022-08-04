@@ -261,7 +261,7 @@ class Chartbox extends Component {
   render(props, { initialized, loading, series, dropdown, variation, lastValueRounded, interval, emptySeries, unit }) {
     const displayVariation = props.box.display_variation;
     return (
-      <div class="card">
+      <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class={cx(style.subheader)}>{props.box.title}</div>
@@ -457,7 +457,6 @@ class Chartbox extends Component {
                 display_axes={props.box.display_axes}
               />
             )}
-            <div class="progress-bar">{initialized && loading && <div class="progress-bar-value" />}</div>
           </div>
         </div>
       </div>
