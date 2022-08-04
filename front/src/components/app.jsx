@@ -237,9 +237,9 @@ const AppRouter = connect(
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
 
-        <GoogleHomeWelcomePage path="/dashboard/integration/device/googlehome" />
+        <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
-        <AlexaWelcomePage path="/dashboard/integration/device/alexa" />
+        <AlexaWelcomePage path="/dashboard/integration/communication/alexa" />
         <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
 
