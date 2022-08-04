@@ -1592,6 +1592,7 @@
     "psi": "Pound-force per square inch (psi)",
     "lux": "Lux",
     "ppm": "Parts per million (ppm)",
+    "ppb": "Parts per billion (ppb)",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
     "watt-hour": "Watt heure (Wh)",
@@ -1643,6 +1644,7 @@
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
+    "ppb": "ppb",
     "watt": "W",
     "kilowatt": "kW",
     "watt-hour": "Wh",
@@ -1890,6 +1892,10 @@
       "shortCategoryName": "Duration",
       "decimal": "Duration (decimal)",
       "integer": "Duration (integer)"
+    },
+    "voc-sensor": {
+      "shortCategoryName": "VOC Sensor",
+      "decimal": "VOC (decimal)"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
