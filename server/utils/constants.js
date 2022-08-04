@@ -339,6 +339,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   UV_SENSOR: 'uv-sensor',
   DURATION: 'duration',
   TIMER: 'timer',
+  VOC_SENSOR: 'voc-sensor',
   UNKNOWN: 'unknown',
 };
 
@@ -461,6 +462,9 @@ const DEVICE_FEATURE_TYPES = {
   TIMER: {
     STATUS: 'status',
   },
+  VOC_SENSOR: {
+    DECIMAL: 'decimal',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -482,6 +486,7 @@ const DEVICE_FEATURE_UNITS = {
   LUX: 'lux',
   // Concentration units
   PPM: 'ppm',
+  PPB: 'ppb',
   // Power units
   WATT: 'watt',
   KILOWATT: 'kilowatt',
@@ -615,6 +620,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.MONTHS,
     DEVICE_FEATURE_UNITS.YEARS,
   ],
+  [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: [DEVICE_FEATURE_UNITS.PPB],
 };
 
 const ACTIONS_STATUS = {
