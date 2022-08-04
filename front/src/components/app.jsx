@@ -64,6 +64,9 @@ import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs'
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
+import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
+import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
+import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
 import CalDAVSharePage from '../routes/integration/all/caldav/share-page';
@@ -234,7 +237,10 @@ const AppRouter = connect(
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
 
+        <GoogleHomeWelcomePage path="/dashboard/integration/device/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
+        <AlexaWelcomePage path="/dashboard/integration/device/alexa" />
+        <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
 
         <ChatPage path="/dashboard/chat" />
