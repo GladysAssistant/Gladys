@@ -171,6 +171,15 @@ module.exports = {
         max: 1000000,
       },
     },
+    timer_time_left: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.DURATION,
+        type: DEVICE_FEATURE_TYPES.DURATION.INTEGER,
+        unit: DEVICE_FEATURE_UNITS.MINUTES,
+        min: 0,
+        max: 240,
+      },
+    },
     voltage: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,

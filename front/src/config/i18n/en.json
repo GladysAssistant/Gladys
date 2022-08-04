@@ -1671,6 +1671,17 @@
     "months": "m",
     "years": "y"
   },
+  "deviceFeatureAction": {
+    "category": {
+      "timer": {
+        "status": {
+          "disabled": "Disable",
+          "active": "Active",
+          "enabled": "Enable"
+        }
+      }
+    }
+  },
   "deviceFeatureValue": {
     "type": {
       "binary": {
@@ -1878,6 +1889,10 @@
       "shortCategoryName": "Duration",
       "decimal": "Duration (decimal)",
       "integer": "Duration (integer)"
+    },
+    "timer": {
+      "shortCategoryName": "Timer",
+      "status": "Timer status"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

@@ -1671,6 +1671,17 @@
     "months": "m",
     "years": "an"
   },
+  "deviceFeatureAction": {
+    "category": {
+      "timer": {
+        "status": {
+          "disabled": "Désactiver",
+          "active": "Actif",
+          "enabled": "Activer"
+        }
+      }
+    }
+  },
   "deviceFeatureValue": {
     "type": {
       "binary": {
@@ -1878,6 +1889,10 @@
       "shortCategoryName": "Durée",
       "decimal": "Durée (décimale)",
       "integer": "Durée (entier)"
+    },
+    "timer": {
+      "shortCategoryName": "Minuteur",
+      "status": "Status du minuteur"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

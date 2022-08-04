@@ -12,6 +12,12 @@ const BUTTON_STATUS = {
   LONG_CLICK: 6,
 };
 
+const TIMER_STATUS = {
+  DISABLED: 0,
+  ENABLED: 1,
+  ACTIVE: 2,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -332,6 +338,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   UV_SENSOR: 'uv-sensor',
   DURATION: 'duration',
+  TIMER: 'timer',
   UNKNOWN: 'unknown',
 };
 
@@ -450,6 +457,9 @@ const DEVICE_FEATURE_TYPES = {
   DURATION: {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
+  },
+  TIMER: {
+    STATUS: 'status',
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',
@@ -784,6 +794,7 @@ const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
+module.exports.TIMER_STATUS = TIMER_STATUS;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

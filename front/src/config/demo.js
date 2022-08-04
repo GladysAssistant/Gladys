@@ -166,6 +166,11 @@ const data = {
         },
         {
           type: 'user-presence'
+        },
+        {
+          type: 'devices-in-room',
+          room: 'garden',
+          device_features: ['timer-status', 'time-left', 'consumed-water']
         }
       ]
     ],
@@ -451,6 +456,55 @@ const data = {
             read_only: true,
             last_value: 27,
             last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      }
+    ]
+  },
+  'get /api/v1/room/garden?expand=devices': {
+    id: 'dee8c95b-a240-4c02-8365-a96f5df9ecc5',
+    name: 'Garden',
+    selector: 'garden',
+    devices: [
+      {
+        id: '5ba40c2a-3a8b-43a1-a0f6-2cac04d323e6',
+        name: 'Smart Valve',
+        selector: 'smart-valve',
+        features: [
+          {
+            name: 'Valve timer',
+            selector: 'timer-status',
+            category: 'timer',
+            type: 'status',
+            min: 0,
+            max: 2,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2022-08-04 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Consumed water',
+            selector: 'consumed-water',
+            category: 'volume-sensor',
+            type: 'integer',
+            unit: 'liter',
+            min: 0,
+            max: 1000000,
+            read_only: true,
+            last_value: 56,
+            last_value_changed: '2022-08-04 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Time left',
+            selector: 'time-left',
+            category: 'duration',
+            type: 'integer',
+            unit: 'minutes',
+            min: 0,
+            max: 240,
+            read_only: true,
+            last_value: 13,
+            last_value_changed: '2022-08-04 07:49:07.556 +00:00'
           }
         ]
       }
