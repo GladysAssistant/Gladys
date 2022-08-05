@@ -43,6 +43,10 @@
     "img": "/assets/integrations/cover/ewelink.jpg"
   },
   {
+    "key": "owntracks",
+    "img": "/assets/integrations/cover/owntracks.jpg"
+  },
+  {
     "key": "withings",
     "img": "/assets/integrations/cover/withings.jpg"
   }
