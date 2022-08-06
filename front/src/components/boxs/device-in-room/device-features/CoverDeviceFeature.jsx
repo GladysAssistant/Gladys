@@ -45,14 +45,26 @@ const CoverDeviceFeature = ({ children, ...props }) => {
       <td class="py-0">
         <div class="d-flex justify-content-end">
           <div class="btn-group" role="group">
-            <button class={cx('btn btn-sm btn-secondary', { active: lastValue === COVER_STATE.OPEN })} onClick={open}>
+            <button
+              class={cx('btn btn-sm btn-secondary', {
+                active: lastValue === COVER_STATE.OPEN
+              })}
+              onClick={open}
+            >
               <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.OPEN} />
             </button>
             <button
-              class={cx('btn btn-sm btn-secondary', 'fe fe-pause', { active: lastValue === COVER_STATE.STOP })}
+              class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
+                active: lastValue === COVER_STATE.STOP
+              })}
               onClick={stop}
             />
-            <button class={cx('btn btn-sm btn-secondary', { active: lastValue === COVER_STATE.CLOSE })} onClick={close}>
+            <button
+              class={cx('btn btn-sm', 'btn-secondary', {
+                active: lastValue === COVER_STATE.CLOSE
+              })}
+              onClick={close}
+            >
               <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.CLOSE} />
             </button>
           </div>
