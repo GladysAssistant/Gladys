@@ -1,11 +1,12 @@
 import get from 'get-value';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 
 import { getDeviceName } from './utils';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { COVER_STATE } from '../../../../../../server/utils/constants';
 
-const UpDownDeviceFeature = ({ children, ...props }) => {
+const CoverDeviceFeature = ({ children, ...props }) => {
   const { device, deviceFeature } = props;
   const { category, type, last_value: lastValue } = deviceFeature;
 
@@ -44,11 +45,14 @@ const UpDownDeviceFeature = ({ children, ...props }) => {
       <td class="py-0">
         <div class="d-flex justify-content-end">
           <div class="btn-group" role="group">
-            <button class="btn btn-sm btn-secondary" onClick={open}>
+            <button class={cx('btn btn-sm btn-secondary', { active: lastValue === COVER_STATE.OPEN })} onClick={open}>
               <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.OPEN} />
             </button>
-            <button class="btn btn-sm btn-secondary fe fe-pause" onClick={stop} />
-            <button class="btn btn-sm btn-secondary" onClick={close}>
+            <button
+              class={cx('btn btn-sm btn-secondary', 'fe fe-pause', { active: lastValue === COVER_STATE.STOP })}
+              onClick={stop}
+            />
+            <button class={cx('btn btn-sm btn-secondary', { active: lastValue === COVER_STATE.CLOSE })} onClick={close}>
               <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.CLOSE} />
             </button>
           </div>
@@ -58,4 +62,4 @@ const UpDownDeviceFeature = ({ children, ...props }) => {
   );
 };
 
-export default UpDownDeviceFeature;
+export default CoverDeviceFeature;
