@@ -6,6 +6,8 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../utils/constants');
  * setupPoll();
  */
 function setupPoll() {
+  // poll devices who need to be polled every 30 minutes
+  setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_30_MINUTES), DEVICE_POLL_FREQUENCIES.EVERY_30_MINUTES);
   // poll devices who need to be polled every minutes
   setInterval(this.pollAll(DEVICE_POLL_FREQUENCIES.EVERY_MINUTES), DEVICE_POLL_FREQUENCIES.EVERY_MINUTES);
   // poll devices who need to be polled every 30 seconds

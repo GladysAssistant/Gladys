@@ -15,10 +15,11 @@ module.exports = function EnedisLinkyController(enedisLinkyHandler) {
       .dayjs()
       .subtract(2, 'day')
       .format('YYYY-MM-DD');
-    const linkyJson = await enedisLinkyHandler.getDailyConsumption(req.body, threeDayAgo, twoDayAgo);
-    const linkyHourJson = await enedisLinkyHandler.getLoadCurve(req.body, threeDayAgo, twoDayAgo);
+    await enedisLinkyHandler.getDailyConsumption(req.body, threeDayAgo, twoDayAgo);
 
-    res.send([linkyJson, linkyHourJson]);
+    res.send({
+      success: true,
+    });
   }
 
   return {

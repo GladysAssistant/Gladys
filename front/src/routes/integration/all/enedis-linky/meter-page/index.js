@@ -33,7 +33,7 @@ class MeterPage extends Component {
     this.props.getHouses();
   }
 
-  render(props, { }) {
+  render(props, {}) {
     const loading = props.getEnedisLinkyStatus === RequestStatus.Getting;
     return (
       <EnedisLinkyPage>

@@ -29,7 +29,7 @@ async function createSession(device) {
     usagePointId: linkyUsagePointParam.value,
     onTokenRefresh: async (accessToken, refreshToken) => {
       await this.gladys.variable.setValue('ENEDIS_ACCESS_TOKEN', accessToken, this.serviceId);
-      await this.gladys.variable.getValue('ENEDIS_ACCESS_TOKEN', refreshToken, this.serviceId);
+      await this.gladys.variable.setValue('ENEDIS_REFRESH_TOKEN', refreshToken, this.serviceId);
     },
   });
 

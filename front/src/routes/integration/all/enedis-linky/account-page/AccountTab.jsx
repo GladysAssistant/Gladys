@@ -22,7 +22,7 @@ const AccountTab = ({ children, ...props }) => (
                         <Text id="integration.enedisLinky.accountTab" />
                       </h2>
                       <p>
-                        <Text id="integration.enedisLinky.accountIntroduction" />
+                        <MarkupText id="integration.enedisLinky.accountIntroduction" />
                       </p>
                       <div class="form-group">
                         <div class="form-label">
@@ -43,7 +43,7 @@ const AccountTab = ({ children, ...props }) => (
                         <div class="form-label">
                           <Text id={`integration.enedisLinky.refreshToken`} />
                         </div>
-                        <MarkupText id={'integration.enedisLinky.refreshTokenInfo'} />
+                        <Text id={'integration.enedisLinky.refreshTokenInfo'} />
                         <Localizer>
                           <input
                             type="text"

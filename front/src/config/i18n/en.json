@@ -932,6 +932,31 @@
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
       }
+    },
+    "enedisLinky": {
+      "title": "Enedis Linky",
+      "description": "Fetch Linky consumption data from Enedis API.",
+      "meterTab": "Meters",
+      "nameLabel": "Meter name",
+      "namePlaceholder": "Enter the name of your meter",
+      "roomLabel": "Room",
+      "usagePointLabel": "Delivery Point (PDL)",
+      "usagePointPlaceholder": "Meter PDL",
+      "testConnectionButton": "Test",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "testConnectionSuccess": "Connection with Enedis API succeed.",
+      "testConnectionError": "Can't fetch meter data, check tokens in \"Enedis account\" tab, if problem persist, it's possible that Enedis API is not available, retry later",
+      "noLinkyFound": "No Linky meter found",
+      "accountTab": "Enedis account",
+      "accountIntroduction": "You need Enedis account and a Linky meter to use this integration. Next <a href=\"https://conso.vercel.app/\" target=\"_blank\" rel=\"noopener noreferrer\">generate your credentials</a>",
+      "accessToken": "Enedis Access Token",
+      "accessTokenInfo": "Previously generated access token",
+      "refreshToken": "Enedis Refresh token",
+      "refreshTokenInfo": "Previously generated refresh token",
+      "buttonSave": "Save",
+      "saveError": "Can't save configuration",
+      "saveSuccess": "Tokens have been successfully saved"
     }
   },
   "editScene": {

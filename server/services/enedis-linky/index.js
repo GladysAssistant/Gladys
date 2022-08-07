@@ -1,10 +1,16 @@
 const linky = require('linky');
-const dayjs = require('dayjs');
 const logger = require('../../utils/logger');
 const EnedisLinkyHandler = require('./lib');
 const EnedisLinkyController = require('./api/enedisLinky.controller');
 
 module.exports = function EnedisLinkyService(gladys, serviceId) {
+  const dayjs = require('dayjs');
+  const utc = require('dayjs/plugin/utc');
+  const timezone = require('dayjs/plugin/timezone');
+
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+
   const device = new EnedisLinkyHandler(gladys, linky, dayjs, serviceId);
   /**
    * @public

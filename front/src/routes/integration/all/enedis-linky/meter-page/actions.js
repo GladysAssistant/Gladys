@@ -199,17 +199,7 @@ function createActions(store) {
     },
     async testConnection(state, index) {
       const linky = state.enedisLinkys[index];
-      const linkyJson = await state.httpClient.post(`/api/v1/service/enedis-linky/linky/test`, linky);
-      const enedisLinkys = update(state.enedisLinkys, {
-        [index]: {
-          linkyJson: {
-            $set: linkyJson
-          }
-        }
-      });
-      store.setState({
-        enedisLinkys
-      });
+      await state.httpClient.post(`/api/v1/service/enedis-linky/linky/test`, linky);
     },
     async search(state, e) {
       store.setState({

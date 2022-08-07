@@ -45,13 +45,11 @@ class EnedisLinkyBox extends Component {
     try {
       await this.props.testConnection(this.props.linkyIndex);
       this.setState({
-        testConnectionError: null,
-        testConnectionErrorMessage: null
+        testConnectionResult: RequestStatus.Success
       });
     } catch (e) {
       this.setState({
-        testConnectionError: RequestStatus.Error,
-        testConnectionErrorMessage: get(e, 'response.data.error')
+        testConnectionResult: RequestStatus.Error
       });
     }
     this.setState({
@@ -69,7 +67,7 @@ class EnedisLinkyBox extends Component {
     this.props.updateLinkyField(this.props.linkyIndex, 'room_id', newRoom);
   };
 
-  render(props, { loading, saveError, testConnectionError, testConnectionErrorMessage }) {
+  render(props, { loading, saveError, testConnectionResult }) {
     return (
       <div class="col-md-4">
         <div class="card">
@@ -80,21 +78,22 @@ class EnedisLinkyBox extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {props.linky.linkyJson &&
-                // <img class="card-img-top" src={`data:${props.camera.cameraImage}`} alt={props.camera.name} />
-                console.log(props.linky.linkyJson)}
               <div class="card-body">
                 {saveError && (
                   <div class="alert alert-danger">
                     <Text id="integration.enedisLinky.saveError" />
                   </div>
                 )}
-                {testConnectionError && (
+                {testConnectionResult === RequestStatus.Success && (
+                  <div class="alert alert-success">
+                    <Text id="integration.enedisLinky.testConnectionSuccess" />
+                  </div>
+                )}
+                {testConnectionResult === RequestStatus.Error && (
                   <div class="alert alert-danger">
                     <Text id="integration.enedisLinky.testConnectionError" />
                   </div>
                 )}
-                {testConnectionErrorMessage && <div class="alert alert-danger">{testConnectionErrorMessage}</div>}
                 <div class="form-group">
                   <label>
                     <Text id="integration.enedisLinky.nameLabel" />
