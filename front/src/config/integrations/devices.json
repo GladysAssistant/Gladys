@@ -46,5 +46,9 @@
     "key": "enedisLinky",
     "link": "enedis-linky",
     "img": "/assets/integrations/cover/enedis-linky.jpg"
+  },
+  {
+    "key": "owntracks",
+    "img": "/assets/integrations/cover/owntracks.jpg"
   }
 ]
