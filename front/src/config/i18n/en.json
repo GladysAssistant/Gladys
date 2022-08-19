@@ -636,7 +636,7 @@
         "passwordLabel": "Password",
         "passwordPlaceholder": "Enter MQTT broker password",
         "saveLabel": "Save configuration",
-        "connectButton": "Connect",
+        "connectButton": "Connect/Reconnect",
         "disconnectButton": "Disconnect",
         "error": "An error occured while saving configuration.",
         "zwavejs": {

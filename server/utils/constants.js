@@ -684,7 +684,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
-  ZWAVE: {
+  ZWAVEJS2MQTT: {
     DRIVER_READY: 'zwave.driver-ready',
     DRIVER_FAILED: 'zwave.driver-failed',
     NODE_READY: 'zwave.node-ready',

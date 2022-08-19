@@ -71,12 +71,6 @@ import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
-import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
-import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
-import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
-import ZwaveDiscoverPage from '../routes/integration/all/zwave/discover-page';
-import ZwaveNodeOperationPage from '../routes/integration/all/zwave/node-operation-page';
-import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
@@ -92,6 +86,14 @@ import Zigbee2mqttDiscoverPage from '../routes/integration/all/zigbee2mqtt/disco
 import Zigbee2mqttSettingsPage from '../routes/integration/all/zigbee2mqtt/settings-page';
 import Zigbee2mqttSetupPage from '../routes/integration/all/zigbee2mqtt/setup-page';
 import Zigbee2mqttEditPage from '../routes/integration/all/zigbee2mqtt/edit-page';
+
+// Zigbee2mqtt
+import Zwavejs2mqttNodePage from '../routes/integration/all/zwavejs2mqtt/node-page';
+import Zwavejs2mqttNetworkPage from '../routes/integration/all/zwavejs2mqtt/network-page';
+import Zwavejs2mqttSettingsPage from '../routes/integration/all/zwavejs2mqtt/settings-page';
+import Zwavejs2mqttDiscoverPage from '../routes/integration/all/zwavejs2mqtt/discover-page';
+import Zwavejs2mqttNodeOperationPage from '../routes/integration/all/zwavejs2mqtt/node-operation-page';
+import Zwavejs2mqttEditPage from '../routes/integration/all/zwavejs2mqtt/edit-page';
 
 // Tasmota
 import TasmotaPage from '../routes/integration/all/tasmota/device-page';
@@ -201,12 +203,12 @@ const AppRouter = connect(
         <Redirect path="/dashboard/integration/device/tp-link" to="/dashboard/integration/device/tp-link/device" />
         <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
-        <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
-        <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
-        <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
-        <ZwaveDiscoverPage path="/dashboard/integration/device/zwave/discover" />
-        <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
-        <ZwaveEditPage path="/dashboard/integration/device/zwave/edit/:deviceSelector" />
+        <Zwavejs2mqttNodePage path="/dashboard/integration/device/zwavejs2mqtt/node" />
+        <Zwavejs2mqttNetworkPage path="/dashboard/integration/device/zwavejs2mqtt/network" />
+        <Zwavejs2mqttSettingsPage path="/dashboard/integration/device/zwavejs2mqtt/settings" />
+        <Zwavejs2mqttDiscoverPage path="/dashboard/integration/device/zwavejs2mqtt/discover" />
+        <Zwavejs2mqttNodeOperationPage path="/dashboard/integration/device/zwavejs2mqtt/node-operation" />
+        <Zwavejs2mqttEditPage path="/dashboard/integration/device/zwavejs2mqtt/edit/:deviceSelector" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />

@@ -50,7 +50,12 @@ function start(gladys, port, options) {
   app.use(errorMiddleware);
 
   // initialize a simple http server
-  const server = http.createServer(app);
+  let server;
+  if(options.ssl) {
+    server = http.createServer(app);
+  } else {
+    server = http.createServer(app);
+  }
 
   // initialize the WebSocket server instance
   const wss = new WebSocket.Server({ server });

@@ -762,7 +762,7 @@
         "passwordLabel": "Mot de passe",
         "passwordPlaceholder": "Entrez le mot de passe du broker MQTT",
         "saveLabel": "Sauvegarder la configuration",
-        "connectButton": "Connecter",
+        "connectButton": "Connecter/Reconnecter",
         "disconnectButton": "Déconnecter",
         "connected": "Zwave2mqtt démarré avec succès.",
         "error": "Une erreur s'est produite au démarrage du service Zwave2mqtt.",
