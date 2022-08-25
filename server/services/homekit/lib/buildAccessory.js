@@ -20,7 +20,7 @@ function buildAccessory(device) {
   }, {});
 
   Object.keys(categories).forEach((category) => {
-    const service = this.buildService(this.gladys, device, categories[category], mappings[category]);
+    const service = this.buildService(device, categories[category], mappings[category]);
     accessory.addService(service);
   });
 

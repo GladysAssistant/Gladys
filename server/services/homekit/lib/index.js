@@ -1,4 +1,4 @@
-const { createBridge } = require('./createbridge');
+const { createBridge } = require('./createBridge');
 const { buildAccessory } = require('./buildAccessory');
 const { buildService } = require('./buildService');
 const { newPinCode } = require('./newPinCode');
