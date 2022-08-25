@@ -1,5 +1,6 @@
 const { createBridge } = require('./createbridge');
 const { buildAccessory } = require('./buildAccessory');
+const { buildService } = require('./buildService');
 const { newPinCode } = require('./newPinCode');
 
 /**
@@ -19,5 +20,6 @@ const HomeKitHandler = function HomeKitHandler(gladys, serviceId, hap) {
 HomeKitHandler.prototype.newPinCode = newPinCode;
 HomeKitHandler.prototype.createBridge = createBridge;
 HomeKitHandler.prototype.buildAccessory = buildAccessory;
+HomeKitHandler.prototype.buildService = buildService;
 
 module.exports = HomeKitHandler;

@@ -1,4 +1,3 @@
-const { Bridge } = require('hap-nodejs');
 const uuid = require('uuid');
 
 /**
@@ -16,7 +15,7 @@ async function createBridge(accessories) {
     await this.gladys.variable.setValue('HOMEKIT_GLADYS_UUID', bridgeUuid, this.serviceId);
   }
 
-  const gladysBridge = new Bridge('Gladys', bridgeUuid);
+  const gladysBridge = new this.hap.Bridge('Gladys', bridgeUuid);
 
   gladysBridge.addBridgedAccessories(accessories);
 

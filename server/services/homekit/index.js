@@ -7,10 +7,11 @@ module.exports = function HomeKitService(gladys, serviceId) {
 
   const homeKitHandler = new HomeKitHandler(gladys, serviceId, hap);
 
-  let bridge
+  let bridge;
   /**
    * @public
    * @description This function starts the HomeKit service and expose devices
+   * @returns {Promise} Empty promise once service is started.
    * @example
    * gladys.services.homekit.start();
    */
@@ -23,7 +24,7 @@ module.exports = function HomeKitService(gladys, serviceId) {
         return Object.keys(mappings).includes(feature.category);
       });
     });
-    const accessories = compatibleDevices.map(device => homeKitHandler.buildAccessory(device));
+    const accessories = compatibleDevices.map((device) => homeKitHandler.buildAccessory(device));
 
     let pincode = await gladys.variable.getValue('HOMEKIT_PIN_CODE', serviceId);
 
@@ -40,7 +41,7 @@ module.exports = function HomeKitService(gladys, serviceId) {
       username: '71:51:07:F4:BC:A8',
       pincode,
       port: '47129',
-      category: hap.Categories.BRIDGE
+      category: hap.Categories.BRIDGE,
     });
     await gladys.variable.setValue('HOMEKIT_SETUP_URI', bridge.setupURI(), serviceId);
   }

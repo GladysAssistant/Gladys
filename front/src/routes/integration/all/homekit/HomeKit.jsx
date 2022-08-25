@@ -36,13 +36,16 @@ const HomKitPage = ({ children, ...props }) => (
                         <div class="form-group">
                           <Text id={`integration.homekit.qrCode`} />
                           {props.homekitSetupDataUrl && (
-                            <img class="mx-auto d-block" src={props.homekitSetupDataUrl} style={{ marginBottom: '10px' }} />
+                            <img
+                              class="mx-auto d-block"
+                              src={props.homekitSetupDataUrl}
+                              style={{ marginBottom: '10px' }}
+                            />
                           )}
-                          <p><Text id={`integration.homekit.reload`} /></p>
-                          <button
-                            class="btn btn-primary"
-                            onClick={props.refreshBridge}
-                          >
+                          <p>
+                            <Text id={`integration.homekit.reload`} />
+                          </p>
+                          <button class="btn btn-primary" onClick={props.refreshBridge}>
                             <Text id={`integration.homekit.reloadButton`} />
                           </button>
                         </div>
@@ -55,8 +58,8 @@ const HomKitPage = ({ children, ...props }) => (
           </div>
         </div>
       </div>
-    </div >
-  </div >
+    </div>
+  </div>
 );
 
 export default HomKitPage;

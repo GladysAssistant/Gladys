@@ -1,7 +1,12 @@
 const { promisify } = require('util');
-const { Characteristic, CharacteristicEventTypes, Service } = require('hap-nodejs');
 const { intToRgb, rgbToHsb, hsbToRgb, rgbToInt } = require('../../../utils/colors');
-const { DEVICE_FEATURE_TYPES, ACTIONS, ACTIONS_STATUS, EVENTS, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_TYPES,
+  ACTIONS,
+  ACTIONS_STATUS,
+  EVENTS,
+  DEVICE_FEATURE_UNITS,
+} = require('../../../utils/constants');
 const { normalize } = require('./utils');
 const { fahrenheitToCelsius } = require('../../../utils/units');
 
@@ -13,14 +18,16 @@ const sleep = promisify(setTimeout);
  * @param {Object} device - Gladys device to format as HomeKit accessory.
  * @param {Object} features - Device features to associate to service.
  * @param {Object} categoryMapping - Homekit mapping for the current device category.
- * @returns {Service} HomeKit service to expose.
+ * @returns {Object} HomeKit service to expose.
  * @example
  * buildService(gladys, device, features)
  */
 function buildService(gladys, device, features, categoryMapping) {
+  const { Characteristic, CharacteristicEventTypes, Service } = this.hap;
+
   const service = new Service[categoryMapping.service](device.name);
 
-  features.forEach(feature => {
+  features.forEach((feature) => {
     switch (feature.type) {
       case DEVICE_FEATURE_TYPES.LIGHT.BINARY:
       case DEVICE_FEATURE_TYPES.SWITCH.BINARY: {
@@ -28,7 +35,7 @@ function buildService(gladys, device, features, categoryMapping) {
 
         onCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await gladys.device.getBySelector(device.selector);
-          callback(undefined, updatedFeatures.find(feat => feat.id === feature.id).last_value);
+          callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
         });
         onCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
           const action = {
@@ -49,7 +56,7 @@ function buildService(gladys, device, features, categoryMapping) {
 
         brightnessCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await gladys.device.getBySelector(device.selector);
-          callback(undefined, updatedFeatures.find(feat => feat.id === feature.id).last_value);
+          callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
         });
         brightnessCharacteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
           const action = {
@@ -70,14 +77,14 @@ function buildService(gladys, device, features, categoryMapping) {
 
         hueCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await gladys.device.getBySelector(device.selector);
-          const rgb = intToRgb(updatedFeatures.find(feat => feat.id === feature.id).last_value);
+          const rgb = intToRgb(updatedFeatures.find((feat) => feat.id === feature.id).last_value);
           const [h] = rgbToHsb(rgb);
           callback(undefined, h);
         });
         hueCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
           await sleep(50);
           const { features: updatedFeatures } = await gladys.device.getBySelector(device.selector);
-          let rgb = intToRgb(updatedFeatures.find(feat => feat.id === feature.id).last_value);
+          let rgb = intToRgb(updatedFeatures.find((feat) => feat.id === feature.id).last_value);
           const [, s, b] = rgbToHsb(rgb);
           rgb = hsbToRgb([value, s, b]);
           const action = {
@@ -96,13 +103,13 @@ function buildService(gladys, device, features, categoryMapping) {
 
         saturationCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await gladys.device.getBySelector(device.selector);
-          const rgb = intToRgb(updatedFeatures.find(feat => feat.id === feature.id).last_value);
+          const rgb = intToRgb(updatedFeatures.find((feat) => feat.id === feature.id).last_value);
           const [, s] = rgbToHsb(rgb);
           callback(undefined, s);
         });
         saturationCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
           const { features: updatedFeatures } = await gladys.device.getBySelector(device.selector);
-          let rgb = intToRgb(updatedFeatures.find(feat => feat.id === feature.id).last_value);
+          let rgb = intToRgb(updatedFeatures.find((feat) => feat.id === feature.id).last_value);
           const [h, , b] = rgbToHsb(rgb);
           rgb = hsbToRgb([h, value, b]);
           const action = {
@@ -122,25 +129,22 @@ function buildService(gladys, device, features, categoryMapping) {
         const temperatureCharacteristic = service.getCharacteristic(Characteristic.ColorTemperature);
         temperatureCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await gladys.device.getBySelector(device.selector);
-          callback(undefined, normalize(
-            updatedFeatures.find(feat => feat.id === feature.id).last_value,
-            feature.min,
-            feature.max,
-            140,
-            500
-          ));
+          callback(
+            undefined,
+            normalize(
+              updatedFeatures.find((feat) => feat.id === feature.id).last_value,
+              feature.min,
+              feature.max,
+              140,
+              500,
+            ),
+          );
         });
         temperatureCharacteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
           const action = {
             type: ACTIONS.DEVICE.SET_VALUE,
             status: ACTIONS_STATUS.PENDING,
-            value: normalize(
-              value,
-              140,
-              500,
-              feature.min,
-              feature.max,
-            ),
+            value: normalize(value, 140, 500, feature.min, feature.max),
             device: device.selector,
             feature_category: feature.category,
             feature_type: feature.type,
@@ -155,7 +159,7 @@ function buildService(gladys, device, features, categoryMapping) {
 
         currentTemperatureCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await gladys.device.getBySelector(device.selector);
-          let currentTemp = updatedFeatures.find(feat => feat.id === feature.id).last_value;
+          let currentTemp = updatedFeatures.find((feat) => feat.id === feature.id).last_value;
 
           if (feature.unit === DEVICE_FEATURE_UNITS.KELVIN) {
             currentTemp -= 273.15;
