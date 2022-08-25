@@ -16,7 +16,6 @@ async function createBridge(accessories) {
   }
 
   const gladysBridge = new this.hap.Bridge('Gladys', bridgeUuid);
-
   gladysBridge.addBridgedAccessories(accessories);
 
   return gladysBridge;
