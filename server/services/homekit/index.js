@@ -35,7 +35,7 @@ module.exports = function HomeKitService(gladys, serviceId) {
       await bridge.unpublish();
     }
 
-    bridge = homeKitHandler.createBridge(accessories);
+    bridge = await homeKitHandler.createBridge(accessories);
     await bridge.publish({
       username: '71:51:07:F4:BC:A8',
       pincode,

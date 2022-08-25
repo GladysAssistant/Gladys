@@ -1,14 +1,23 @@
 const { Bridge } = require('hap-nodejs');
+const uuid = require('uuid');
 
 /**
  * @description Create HomeKit bridge.
  * @param {Object} accessories - All accessories linked to the bridge.
- * @returns {Object} HomeKit bridge to expose.
+ * @returns {Promise} HomeKit bridge to expose.
  * @example
  * createBridge(accessories)
  */
-function createBridge(accessories) {
-  const gladysBridge = new Bridge('Gladys', this.hap.uuid.generate('hap.examples.gladysBridge'));
+async function createBridge(accessories) {
+  let bridgeUuid = await this.gladys.variable.getValue('HOMEKIT_GLADYS_UUID', this.serviceId);
+
+  if (!bridgeUuid) {
+    bridgeUuid = uuid.v4();
+    await this.gladys.variable.setValue('HOMEKIT_GLADYS_UUID', bridgeUuid, this.serviceId);
+  }
+
+  const gladysBridge = new Bridge('Gladys', bridgeUuid);
+
   gladysBridge.addBridgedAccessories(accessories);
 
   return gladysBridge;
