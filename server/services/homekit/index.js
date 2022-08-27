@@ -1,3 +1,4 @@
+const { getGladysBasePath } = require('../../lib/system/system.getGladysBasePath');
 const logger = require('../../utils/logger');
 const HomeKitHandler = require('./lib');
 const { mappings } = require('./lib/deviceMappings');
@@ -17,6 +18,11 @@ module.exports = function HomeKitService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting HomeKit service');
+    const dockerBased = await gladys.system.isDocker();
+    if (dockerBased) {
+      const { basePathOnContainer } = await getGladysBasePath();
+      hap.HAPStorage.setCustomStoragePath(`${basePathOnContainer}/homekit`);
+    }
 
     const devices = await gladys.device.get();
     const compatibleDevices = devices.filter((device) => {
