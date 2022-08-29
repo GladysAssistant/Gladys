@@ -2,6 +2,7 @@ const { createBridge } = require('./createBridge');
 const { buildAccessory } = require('./buildAccessory');
 const { buildService } = require('./buildService');
 const { newPinCode } = require('./newPinCode');
+const { newUsername } = require('./newUsername');
 
 /**
  * @description Add ability to connect to HomeKit.
@@ -18,6 +19,7 @@ const HomeKitHandler = function HomeKitHandler(gladys, serviceId, hap) {
 };
 
 HomeKitHandler.prototype.newPinCode = newPinCode;
+HomeKitHandler.prototype.newUsername = newUsername;
 HomeKitHandler.prototype.createBridge = createBridge;
 HomeKitHandler.prototype.buildAccessory = buildAccessory;
 HomeKitHandler.prototype.buildService = buildService;

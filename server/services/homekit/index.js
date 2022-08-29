@@ -1,4 +1,3 @@
-const { getGladysBasePath } = require('../../lib/system/system.getGladysBasePath');
 const logger = require('../../utils/logger');
 const HomeKitHandler = require('./lib');
 const { mappings } = require('./lib/deviceMappings');
@@ -20,7 +19,7 @@ module.exports = function HomeKitService(gladys, serviceId) {
     logger.info('Starting HomeKit service');
     const dockerBased = await gladys.system.isDocker();
     if (dockerBased) {
-      const { basePathOnContainer } = await getGladysBasePath();
+      const { basePathOnContainer } = await gladys.system.getGladysBasePath();
       hap.HAPStorage.setCustomStoragePath(`${basePathOnContainer}/homekit`);
     }
 
@@ -32,7 +31,12 @@ module.exports = function HomeKitService(gladys, serviceId) {
     });
     const accessories = compatibleDevices.map((device) => homeKitHandler.buildAccessory(device));
 
+    let username = await gladys.variable.getValue('HOMEKIT_USERNAME', serviceId);
     let pincode = await gladys.variable.getValue('HOMEKIT_PIN_CODE', serviceId);
+
+    if (!username) {
+      username = await homeKitHandler.newUsername();
+    }
 
     if (!pincode) {
       pincode = await homeKitHandler.newPinCode();
@@ -44,7 +48,7 @@ module.exports = function HomeKitService(gladys, serviceId) {
 
     bridge = await homeKitHandler.createBridge(accessories);
     await bridge.publish({
-      username: '71:51:07:F4:BC:A8',
+      username,
       pincode,
       port: '47129',
       category: hap.Categories.BRIDGE,
