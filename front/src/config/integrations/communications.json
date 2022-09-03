@@ -6,5 +6,13 @@
   {
     "key": "nextcloudTalk",
     "img": "/assets/integrations/cover/nextcloud-talk.jpg"
+  },
+  {
+    "key": "alexa",
+    "img": "/assets/integrations/cover/alexa.jpg"
+  },
+  {
+    "key": "googleHome",
+    "img": "/assets/integrations/cover/google-home.jpg"
   }
 ]

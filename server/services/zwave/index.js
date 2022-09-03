@@ -32,9 +32,21 @@ module.exports = function ZwaveService(gladys, serviceId) {
     zwaveManager.disconnect();
   }
 
+  /**
+   * @public
+   * @description Get info if the service is used.
+   * @returns {Promise<boolean>} Returns true if the service is used.
+   * @example
+   * gladys.services.zwave.isUsed();
+   */
+  async function isUsed() {
+    return zwaveManager.ready === true && Object.keys(zwaveManager.nodes).length > 0;
+  }
+
   return Object.freeze({
     start,
     stop,
+    isUsed,
     device: zwaveManager,
     controllers: ZwaveController(gladys, zwaveManager, serviceId),
   });

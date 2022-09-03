@@ -108,7 +108,7 @@ class MapComponent extends Component {
     }
   }
 
-  render(props) {
+  render() {
     return <div ref={this.setMapRef} style="width: 100%; height: 300px; z-index: 1" />;
   }
 }

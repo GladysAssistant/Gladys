@@ -112,7 +112,7 @@ describe('Sign-up', () => {
     });
 
     // Store access token
-    const serverUrl = Cypress.env('users');
+    const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       {
         method: 'POST',
@@ -121,9 +121,6 @@ describe('Sign-up', () => {
       req => {
         req.reply(res => {
           window.localStorage.setItem('user', JSON.stringify(res.body));
-          const accessToken = res.body.access_token;
-
-          Cypress.env('users', { ...users, tony: { ...tony, access_token: accessToken } });
         });
       }
     );
@@ -164,7 +161,7 @@ describe('Sign-up', () => {
     // Add room
     cy.contains('button', 'signup.configureHouse.addRoomButton').click();
 
-    const serverUrl = Cypress.env('users');
+    const serverUrl = Cypress.env('serverUrl');
     cy.intercept(
       {
         method: 'POST',

@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 
-const BluetoothPage = ({ children, ...props }) => (
+const BluetoothPage = ({ children }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">

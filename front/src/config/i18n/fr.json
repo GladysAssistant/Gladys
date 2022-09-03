@@ -291,7 +291,7 @@
   "integration": {
     "root": {
       "title": "Intégrations",
-      "subtitle": "1 - {{length}} de {{total}} intégrations",
+      "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
@@ -488,7 +488,7 @@
     },
     "rtspCamera": {
       "title": "Caméras",
-      "description": "Affichez vos caméras.",
+      "description": "Récupérez le flux vidéos de vos caméras dans Gladys",
       "search": "Chercher une caméra",
       "new": "Nouveau",
       "nameLabel": "Nom de la caméra",
@@ -512,7 +512,7 @@
     },
     "tasmota": {
       "title": "Tasmota",
-      "description": "Contrôler vos appareils Tasmota.",
+      "description": "Contrôler vos appareils Tasmota en MQTT ou HTTP",
       "deviceTab": "Appareils",
       "mqttDiscoverTab": "Découverte MQTT",
       "httpDiscoverTab": "Découverte HTTP",
@@ -597,7 +597,7 @@
     },
     "zigbee2mqtt": {
       "title": "Zigbee2mqtt",
-      "description": "Contrôlez vos appareils Zigbee.",
+      "description": "Contrôlez vos appareils Zigbee via Zigbee2mqtt.",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Zigbee",
       "settingsTab": "Paramètres",
@@ -672,9 +672,12 @@
       "documentation": "Documentation Zigbee2mqtt"
     },
     "googleHome": {
-      "title": "Gladys Assistant",
+      "title": "Google Home",
+      "description": "Contrôlez vos appareils Gladys à la voix dans Google Home",
+      "longDescription": "Il est possible d'utiliser Google Home pour contrôler vos appareils Gladys à la voix. Pour configurer Google Home, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Voulez-vous connecter Gladys Assistant à Google ?",
-      "description": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
+      "pageDescription": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
       "error": "Une erreur est survenue. Merci de réessayer.",
       "connectedAs": "Connecté en tant que",
       "googleWillBeAble": "Google pourra :",
@@ -685,9 +688,31 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "alexa": {
+      "title": "Amazon Alexa",
+      "description": "Contrôlez vos appareils Gladys à la voix dans Alexa",
+      "longDescription": "Il est possible d'utiliser Amazon Alexa pour contrôler vos appareils Gladys à la voix. Pour configurer Alexa, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
+      "pageTitle": "Gladys Assistant",
+      "cardTitle": "Voulez-vous connecter Gladys Assistant à Amazon Alexa ?",
+      "pageDescription": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
+      "error": "Une erreur est survenue. Merci de réessayer.",
+      "connectedAs": "Connecté en tant que",
+      "googleWillBeAble": "Amazon Alexa pourra :",
+      "seeDevices": "Lister les appareils présents chez vous",
+      "controlDevices": "Contrôler vos appareils",
+      "getNewDeviceValues": "Récupérer périodiquement les états de vos appareils",
+      "privacyPolicy": "Lire la <a href=\"https://www.alexa.com/help/privacy\">politique de confidentialité d'Alexa</a>.",
+      "cancelButton": "Annuler",
+      "connectButton": "Lier"
+    },
+    "owntracks": {
+      "title": "Owntracks",
+      "description": "Envoyez votre position GPS à Gladys via une application",
+      "longDescription": "Owntracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser Owntracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer Owntracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
+    },
     "zwave": {
       "title": "Z-Wave",
-      "description": "Contrôlez vos appareils Z-Wave.",
+      "description": "Contrôlez vos appareils Z-Wave avec Open-Zwave.",
       "deviceTab": "Appareils",
       "networkTab": "Réseau",
       "settingsTab": "Paramètres",
@@ -695,6 +720,7 @@
       "device": {
         "title": "Appareils Z-Wave",
         "search": "Chercher un appareil",
+        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
@@ -763,7 +789,7 @@
     },
     "openWeather": {
       "title": "API OpenWeather",
-      "description": "Récupérer la météo dans Gladys.",
+      "description": "Affichez les données de météo de votre ville dans Gladys.",
       "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
       "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
@@ -773,7 +799,7 @@
     },
     "mqtt": {
       "title": "MQTT",
-      "description": "Connexion à un serveur MQTT.",
+      "description": "Connexion à un serveur MQTT, en local ou en distant.",
       "deviceTab": "Appareils",
       "setupTab": "Configuration",
       "status": {
@@ -830,7 +856,7 @@
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "installBrokerContainer": "Utiliser un broker dans un conteneur Docker.",
-        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer and configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
+        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer et configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
         "installBrokerButton": "Installez le broker sur Docker",
         "installingBrokerButton": "Installation en cours...",
         "installBrokerError": "Une erreur est survenue lors de l'installation du conteneur Docker, veuillez consulter les logs Gladys.",
@@ -850,7 +876,7 @@
     },
     "xiaomi": {
       "title": "Xiaomi Home",
-      "description": "Gérez les appareils Xiaomi.",
+      "description": "Gérez les appareils Xiaomi via le pont Xiaomi.",
       "device": {
         "title": "Appareils Xiaomi dans Gladys",
         "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",
@@ -881,7 +907,7 @@
     },
     "eWeLink": {
       "title": "eWeLink",
-      "description": "Contrôlez vos appareils eWeLink.",
+      "description": "Contrôlez vos appareils eWeLink (via le cloud).",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte eWeLink",
       "setupTab": "Configuration",
@@ -970,10 +996,10 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "turnOnLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez allumer"
+        "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
       "turnOffLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez éteindre"
+        "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
@@ -1036,6 +1062,7 @@
         "headersValuePlaceholder": "Valeur",
         "responseData": "Réponse",
         "tryButton": "Essayer",
+        "variablesExplanation": "Pour injecter une variable défini dans un bloc \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injecté que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       },
       "scene": {
@@ -1071,7 +1098,7 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer la lumière",
+        "turn-on": "Allumer les lumières",
         "turn-off": "Eteindre les lumières"
       },
       "switch": {
@@ -1416,7 +1443,8 @@
     "jobTypes": {
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
-      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire",
+      "gladys-gateway-backup": "Sauvegarde Gladys Plus"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -1572,36 +1600,106 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
+    "kelvin": "Kelvin (K)",
     "percent": "Pourcent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "bar": "Bar",
+    "psi": "Livre-force par pouce carré (psi)",
     "lux": "Lux",
+    "ppm": "Partie par million (ppm)",
+    "ppb": "Partie par millard (ppb)",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
+    "watt-hour": "Watt heure (Wh)",
     "kilowatt-hour": "Kilowatt heure (kWh)",
+    "megawatt-hour": "Mégawatt heure (MWh)",
     "ampere": "Ampère (A)",
+    "milliampere": "Milliampère (mA)",
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
-    "ppm": "Partie par million (ppm)",
+    "volt-ampere": "Voltampère (VA)",
+    "volt-ampere-reactive": "Voltampère réactif (var)",
+    "mm": "Millimètre (mm)",
     "cm": "Centimètre (cm)",
-    "mm": "Millimètre (mm)"
+    "m": "Mètre (m)",
+    "km": "Kilomètre (km)",
+    "degree": "Degré d'angle (°)",
+    "liter": "Litre (l)",
+    "milliliter": "Millilitre (ml)",
+    "cubicmeter": "Mètre cube (m3)",
+    "euro": "Euro (€)",
+    "dollar": "Dollar ($)",
+    "bitcoin": "Bitcoin (₿)",
+    "litecoin": "Litecoin (Ł)",
+    "dogecoin": "Dogecoin (Ð)",
+    "ethereum": "Ethereum (⟠)",
+    "pound-sterling": "livre sterling (£)",
+    "meter-per-second": "Mètre par seconde (m/s)",
+    "kilometer-per-hour": "Kilomètre par heure (km/h)",
+    "millimeter-per-hour": "Millimètre par heure (mm/h)",
+    "uv-index": "Indice UV",
+    "microseconds": "Microsecondes (μs)",
+    "milliseconds": "Millisecondes (ms)",
+    "seconds": "Secondes (s)",
+    "minutes": "Minutes (min)",
+    "hours": "Heures (h)",
+    "days": "Jours (j)",
+    "weeks": "Semaines (sem)",
+    "months": "Mois (m)",
+    "years": "Années (an)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
+    "kelvin": "K",
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "bar": "bar",
+    "psi": "psi",
     "lux": "lx",
+    "ppm": "ppm",
+    "ppb": "ppb",
     "watt": "W",
     "kilowatt": "kW",
+    "watt-hour": "Wh",
     "kilowatt-hour": "kWh",
+    "megawatt-hour": "MWh",
     "ampere": "A",
+    "milliampere": "mA",
     "millivolt": "mV",
     "volt": "V",
-    "ppm": "ppm",
+    "volt-ampere": "VA",
+    "volt-ampere-reactive": "var",
+    "mm": "mm",
     "cm": "cm",
-    "mm": "mm"
+    "m": "m",
+    "km": "km",
+    "degree": "°",
+    "liter": "l",
+    "milliliter": "ml",
+    "cubicmeter": "m3",
+    "euro": "€",
+    "dollar": "$",
+    "bitcoin": "₿",
+    "litecoin": "Ł",
+    "dogecoin": "Ð",
+    "ethereum": "⟠",
+    "pound-sterling": "£",
+    "meter-per-second": "m/s",
+    "kilometer-per-hour": "km/h",
+    "millimeter-per-hour": "mm/h",
+    "uv-index": "Indice UV",
+    "microseconds": "μs",
+    "milliseconds": "ms",
+    "seconds": "s",
+    "minutes": "min",
+    "hours": "h",
+    "days": "j",
+    "weeks": "sem",
+    "months": "m",
+    "years": "an"
   },
   "deviceFeatureValue": {
     "type": {
@@ -1776,6 +1874,45 @@
       "stop": "Stop",
       "record": "Enregistrer"
     },
+    "energy-sensor": {
+      "shortCategoryName": "Capteur d'énergie",
+      "voltage": "Tension",
+      "current": "Intensité",
+      "binary": "Relais",
+      "power": "Puissance",
+      "energy": "Energie",
+      "index": "Index"
+    },
+    "volume-sensor": {
+      "shortCategoryName": "Capteur de volume",
+      "decimal": "Volume (décimale)",
+      "integer": "Volume (entier)"
+    },
+    "currency": {
+      "shortCategoryName": "Devise",
+      "decimal": "Monnaie"
+    },
+    "speed-sensor": {
+      "shortCategoryName": "Vitesse",
+      "decimal": "Vitesse"
+    },
+    "precipitation-sensor": {
+      "shortCategoryName": "Capteur de précipitations",
+      "decimal": "Précipitation"
+    },
+    "uv-sensor": {
+      "shortCategoryName": "Capteur d'UV",
+      "integer": "Indice UV"
+    },
+    "duration": {
+      "shortCategoryName": "Durée",
+      "decimal": "Durée (décimale)",
+      "integer": "Durée (entier)"
+    },
+    "voc-sensor": {
+      "shortCategoryName": "Capteur de pollution COV",
+      "decimal": "COV (Décimale)"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
@@ -1917,9 +2054,11 @@
     "neverUsed": "Jamais"
   },
   "gatewayTwoFactorAuth": {
-    "title": "Gladys Gateway",
-    "configureTitle": "Configurer l'authentification Two-Factor (\"2FA\")",
+    "title": "Gladys Plus",
+    "configureTitle": "Configurer l'authentification à deux facteurs (\"2FA\")",
     "configureButton": "Configurer la 2FA",
+    "secretLabel": "Secret",
+    "copy": "Copier",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
     "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",
@@ -1929,7 +2068,7 @@
     "app": {
       "open": "Ouvrez votre application 2FA",
       "addAccount": "Cliquez sur \"Ajouter un compte\"",
-      "scanQRCode": "Scannez le QR Code ci-dessous"
+      "scanQRCode": "Scannez le QR Code ci-dessous, ou copiez manuellement le secret pour l'ajouter manuellement à votre application."
     }
   },
   "gatewaySignUp": {
@@ -1937,7 +2076,7 @@
     "complete": "Terminé ! Veuillez vérifier votre e-mail.",
     "done": "Terminé ! Vous pouvez maintenant vous connecter <a href=\"/login\" style=\"color: blue\">ici</a>.",
     "usernameLabel": "Nom",
-    "usernamePlaceholder": "Entez votre nom",
+    "usernamePlaceholder": "Entrez votre nom",
     "usernameInvalid": "Le nom doit comprendre entre 2 et 30 caractères",
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre adresse e-mail",

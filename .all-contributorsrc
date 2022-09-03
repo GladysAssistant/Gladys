@@ -191,6 +191,24 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "siddiquiehtesham",
+      "name": "Ehtesham Siddiqui",
+      "avatar_url": "https://avatars.githubusercontent.com/u/38346914?v=4",
+      "profile": "https://ehtesham.dev",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "rpochet",
+      "name": "Pochet Romuald",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5940493?v=4",
+      "profile": "https://github.com/rpochet",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

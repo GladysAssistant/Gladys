@@ -43,7 +43,7 @@ const FoundDevices = ({ children, ...props }) => (
               </div>
             )}
             {props.philipsHueNewDevices &&
-              props.philipsHueNewDevices.map((device, index) => (
+              props.philipsHueNewDevices.map(device => (
                 <div class="col-md-4">
                   <div class="card">
                     <div class="card-header">

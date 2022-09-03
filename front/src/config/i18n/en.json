@@ -291,7 +291,7 @@
   "integration": {
     "root": {
       "title": "Integrations",
-      "subtitle": "1 - {{length}} of {{total}} integrations",
+      "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
       "restartButton": "Restart",
       "stopButton": "Stop",
@@ -308,7 +308,7 @@
     },
     "telegram": {
       "title": "Telegram",
-      "description": "Talk to Gladys through Telegram.",
+      "description": "Chat with Gladys remotely through Telegram.",
       "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
       "link": "<b>ACTION REQUIRED:</b> To talk to Gladys in Telegram, click on <a href=\"{{link}}\">this link</a>. Don't speak in Telegram directly to your bot before having click on this link, otherwise your bot won't be able to know that it's you who are sending a message.",
       "note": "This link is unique to your account, do not send it to other users.",
@@ -334,7 +334,7 @@
     },
     "philipsHue": {
       "title": "Philips Hue",
-      "description": "Control Philips Hue Lights.",
+      "description": "Control Philips Hue Lights and plugs with the official hub",
       "deviceTab": "Devices",
       "setupTab": "Setup Bridges",
       "setup": {
@@ -361,7 +361,7 @@
     },
     "rtspCamera": {
       "title": "Cameras",
-      "description": "HTTP/RTSP cameras in Gladys.",
+      "description": "Display your cameras video flux in Gladys.",
       "search": "Search cameras",
       "new": "New",
       "nameLabel": "Camera Name",
@@ -385,7 +385,7 @@
     },
     "tasmota": {
       "title": "Tasmota",
-      "description": "Control your Tasmota devices.",
+      "description": "Control your Tasmota devices in HTTP or MQTT.",
       "deviceTab": "Devices",
       "mqttDiscoverTab": "MQTT discover",
       "httpDiscoverTab": "HTTP discover",
@@ -446,7 +446,7 @@
     },
     "tpLink": {
       "title": "TP-Link",
-      "description": "Control TP-Link Bulbs and Plugs.",
+      "description": "Control TP-Link Bulbs and Plugs in Gladys",
       "deviceTab": "Devices",
       "device": {
         "title": "Devices in Gladys",
@@ -470,7 +470,7 @@
     },
     "zigbee2mqtt": {
       "title": "Zigbee2mqtt",
-      "description": "Control your Zigbee devices.",
+      "description": "Control your Zigbee devices with Zigbee2mqtt",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "settingsTab": "Settings",
@@ -545,9 +545,12 @@
       "documentation": "Zigbee2mqtt documentation"
     },
     "googleHome": {
-      "title": "Gladys Assistant",
+      "title": "Google Home",
+      "description": "Control your Gladys device with your voice in Google Home",
+      "longDescription": "It's possible to use Google Home to control your Gladys devices by voice. To configure Google Home with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Do you want to connect Gladys Assistant to Google?",
-      "description": "By signin in, you are authorizing Google to access your devices.",
+      "pageDescription": "By signin in, you are authorizing Google to access your devices.",
       "error": "An error occured. Please retry !",
       "connectedAs": "Connected as",
       "googleWillBeAble": "Google will be able:",
@@ -558,9 +561,31 @@
       "cancelButton": "Cancel",
       "connectButton": "Link"
     },
+    "alexa": {
+      "title": "Amazon Alexa",
+      "description": "Control your Gladys device with your voice in Alexa",
+      "longDescription": "It's possible to use Amazon Alexa to control your Gladys devices by voice. To configure Alexa with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>.",
+      "pageTitle": "Gladys Assistant",
+      "cardTitle": "Do you want to connect Gladys Assistant to Amazon Alexa?",
+      "pageDescription": "By signin in, you are authorizing Alexa to access your devices.",
+      "error": "An error occured. Please retry !",
+      "connectedAs": "Connected as",
+      "googleWillBeAble": "Alexa will be able:",
+      "seeDevices": "List all your devices",
+      "controlDevices": "Control all your devices",
+      "getNewDeviceValues": "Periodically refresh your device states",
+      "privacyPolicy": "Read Alexa's <a href=\"https://www.alexa.com/help/privacy\">privacy policy</a>.",
+      "cancelButton": "Cancel",
+      "connectButton": "Link"
+    },
+    "owntracks": {
+      "title": "Owntracks",
+      "description": "Send your GPS location to Gladys with a mobile app",
+      "longDescription": "Owntracks is an open-source app running on iOS and Android that let you send your geolocation to a server. You can use Owntracks to trigger scenes based on your geolocation. To configure Owntracks with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>."
+    },
     "zwave": {
       "title": "Z-Wave",
-      "description": "Control your Z-Wave devices.",
+      "description": "Control your Z-Wave devices with Open-Zwave.",
       "deviceTab": "Devices",
       "networkTab": "Network",
       "settingsTab": "Settings",
@@ -568,6 +593,7 @@
       "device": {
         "title": "Z-Wave Devices",
         "search": "Search devices",
+        "oldIntegrationWarning": "This integration is based on Open-Zwave, a library which is no longer supported. We are migrating to ZwaveJS2mqtt, but in the meantime we recommend that you use Node-RED + ZwaveJS2mqtt. <br /> <br /> If you want to help us develop this integration, join-us on the forum!",
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
@@ -636,7 +662,7 @@
     },
     "openWeather": {
       "title": "OpenWeather API",
-      "description": "Get the weather in Gladys.",
+      "description": "Display the weather in your town on your dasboard.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
       "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
@@ -646,7 +672,7 @@
     },
     "mqtt": {
       "title": "MQTT",
-      "description": "Connect to MQTT server.",
+      "description": "Connect to a local or remote MQTT server",
       "deviceTab": "Devices",
       "setupTab": "Setup",
       "status": {
@@ -723,7 +749,7 @@
     },
     "xiaomi": {
       "title": "Xiaomi Home",
-      "description": "Display Xiaomi home devices.",
+      "description": "Control Xiaomi home devices with the official hub",
       "device": {
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
@@ -757,7 +783,7 @@
       "accountTab": "Account",
       "syncTab": "Synchronization",
       "shareTab": "Sharing",
-      "description": "Sync your CalDAV calendars.",
+      "description": "Sync your CalDAV calendars and use them in scenes.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "syncIntroduction": "Choose calendars to synchronize.",
       "shareIntroduction": "Choose calendars you want to share with other Gladys users.",
@@ -824,7 +850,7 @@
     },
     "bluetooth": {
       "title": "Bluetooth",
-      "description": "Control your Bluetooth devices.",
+      "description": "Control your Bluetooth devices and detect your presence.",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "setupTab": "Presence scanner",
@@ -881,7 +907,7 @@
     },
     "eWeLink": {
       "title": "eWeLink",
-      "description": "Control your eWeLink devices.",
+      "description": "Control your eWeLink devices (works with the cloud)",
       "deviceTab": "Devices",
       "discoverTab": "eWeLink discover",
       "setupTab": "Setup",
@@ -1036,6 +1062,7 @@
         "headersValuePlaceholder": "Value",
         "responseData": "Response",
         "tryButton": "Try request",
+        "variablesExplanation": "To inject a variable defined in a \"Get device value\" action, type \"{{\". This variable will be injected only during scene execution, not when clicking on \"Try request\" below.",
         "requestError": "An error happened while making the request. Are you sure parameters are right?"
       },
       "scene": {
@@ -1416,7 +1443,8 @@
     "jobTypes": {
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
-      "hourly-device-state-aggregate": "Hourly sensors aggregation"
+      "hourly-device-state-aggregate": "Hourly sensors aggregation",
+      "gladys-gateway-backup": "Gladys Plus backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -1572,36 +1600,106 @@
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",
     "fahrenheit": "Fahrenheit (°F)",
+    "kelvin": "Kelvin (K)",
     "percent": "Percent (%)",
     "pascal": "Pascal (Pa)",
     "hPa": "Hectopascal (hPa)",
+    "bar": "Bar",
+    "psi": "Pound-force per square inch (psi)",
     "lux": "Lux",
+    "ppm": "Parts per million (ppm)",
+    "ppb": "Parts per billion (ppb)",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
+    "watt-hour": "Watt heure (Wh)",
     "kilowatt-hour": "Kilowatt hour (kWh)",
+    "megawatt-hour": "Megawatt hour (MWh)",
     "ampere": "Ampere (A)",
+    "milliampere": "Milliampere (mA)",
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
-    "ppm": "Parts per million (ppm)",
+    "volt-ampere": "Voltampere (VA)",
+    "volt-ampere-reactive": "Voltampere reactive (var)",
+    "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
-    "mm": "Millimeter (mm)"
+    "m": "Meter (m)",
+    "km": "Kilometer (km)",
+    "degree": "Angular degree (°)",
+    "liter": "Liter (l)",
+    "milliliter": "Milliliter (ml)",
+    "cubicmeter": "Cubic meter (m3)",
+    "euro": "Euro (€)",
+    "dollar": "Dollar ($)",
+    "bitcoin": "Bitcoin (₿)",
+    "litecoin": "Litecoin (Ł)",
+    "dogecoin": "Dogecoin (Ð)",
+    "ethereum": "Ethereum (⟠)",
+    "pound-sterling": "Pound sterling (£)",
+    "meter-per-second": "Meter per second (m/s)",
+    "kilometer-per-hour": "Kilometer per hour (km/h)",
+    "millimeter-per-hour": "Millimeter per hour (mm/h)",
+    "uv-index": "UV Index",
+    "microseconds": "Microseconds (μs)",
+    "milliseconds": "Milliseconds (ms)",
+    "seconds": "Seconds (s)",
+    "minutes": "Minutes (min)",
+    "hours": "Hours (h)",
+    "days": "Days (d)",
+    "weeks": "Weeks (w)",
+    "months": "Months (m)",
+    "years": "Years (y)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
     "fahrenheit": "°F",
+    "kelvin": "K",
     "percent": "%",
     "pascal": "Pa",
     "hPa": "hPa",
+    "bar": "bar",
+    "psi": "psi",
     "lux": "lx",
+    "ppm": "ppm",
+    "ppb": "ppb",
     "watt": "W",
     "kilowatt": "kW",
+    "watt-hour": "Wh",
     "kilowatt-hour": "kWh",
+    "megawatt-hour": "MWh",
     "ampere": "A",
+    "milliampere": "mA",
     "millivolt": "mV",
     "volt": "V",
-    "ppm": "ppm",
+    "volt-ampere": "VA",
+    "volt-ampere-reactive": "var",
+    "mm": "mm",
     "cm": "cm",
-    "mm": "mm"
+    "m": "m",
+    "km": "km",
+    "degree": "°",
+    "liter": "l",
+    "milliliter": "ml",
+    "cubicmeter": "m3",
+    "euro": "€",
+    "dollar": "$",
+    "bitcoin": "₿",
+    "litecoin": "Ł",
+    "dogecoin": "Ð",
+    "ethereum": "⟠",
+    "pound-sterling": "£",
+    "meter-per-second": "m/s",
+    "kilometer-per-hour": "km/h",
+    "millimeter-per-hour": "mm/h",
+    "uv-index": "UV Index",
+    "microseconds": "μs",
+    "milliseconds": "ms",
+    "seconds": "s",
+    "minutes": "min",
+    "hours": "h",
+    "days": "d",
+    "weeks": "w",
+    "months": "m",
+    "years": "y"
   },
   "deviceFeatureValue": {
     "type": {
@@ -1776,6 +1874,45 @@
       "stop": "Stop",
       "record": "Record"
     },
+    "energy-sensor": {
+      "shortCategoryName": "Energy sensor",
+      "voltage": "Voltage",
+      "current": "Current",
+      "binary": "Switch",
+      "power": "Power",
+      "energy": "Energy",
+      "index": "Index"
+    },
+    "volume-sensor": {
+      "shortCategoryName": "Volume sensor",
+      "decimal": "Volume (decimal)",
+      "integer": "Volume (integer)"
+    },
+    "currency": {
+      "shortCategoryName": "Money",
+      "decimal": "Currency"
+    },
+    "speed-sensor": {
+      "shortCategoryName": "Speed sensor",
+      "decimal": "Speed"
+    },
+    "precipitation-sensor": {
+      "shortCategoryName": "Precipitation sensor",
+      "decimal": "Precipitation"
+    },
+    "uv-sensor": {
+      "shortCategoryName": "UV Sensor",
+      "integer": "UV Index"
+    },
+    "duration": {
+      "shortCategoryName": "Duration",
+      "decimal": "Duration (decimal)",
+      "integer": "Duration (integer)"
+    },
+    "voc-sensor": {
+      "shortCategoryName": "VOC Sensor",
+      "decimal": "VOC (decimal)"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
@@ -1917,9 +2054,11 @@
     "neverUsed": "Never"
   },
   "gatewayTwoFactorAuth": {
-    "title": "Gladys Gateway",
+    "title": "Gladys Plus",
     "configureTitle": "Configure Two-Factor Authentication",
     "configureButton": "Configure 2FA",
+    "secretLabel": "Secret",
+    "copy": "Copy",
     "securityIsImportant": "The security of your Gladys Gateway account is really important to us.",
     "securityApps": "To ensure that your account remains secure, please enable two-factor authentication using a two-factor app like Authy on <a href=\"https://itunes.apple.com/us/app/authy/id494168017?mt=8\">iOS</a> or <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "The 2FA code you provided is not valid.",
@@ -1929,7 +2068,7 @@
     "app": {
       "open": "Open your 2FA app",
       "addAccount": "Click on \"Add Account\"",
-      "scanQRCode": "Scan the QR Code below"
+      "scanQRCode": "Scan the QR Code below or copy the secret to your 2FA application."
     }
   },
   "gatewaySignUp": {
