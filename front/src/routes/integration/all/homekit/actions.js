@@ -27,7 +27,7 @@ const actions = store => ({
       homekitReloadStatus: RequestStatus.Getting
     });
     try {
-      await state.httpClient.post('/api/v1/service/homekit/start');
+      await state.httpClient.get('/api/v1/service/homekit/reload');
       store.setState({
         homekitReloadStatus: RequestStatus.Success
       });

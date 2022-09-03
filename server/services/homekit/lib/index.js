@@ -16,6 +16,7 @@ const HomeKitHandler = function HomeKitHandler(gladys, serviceId, hap) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.hap = hap;
+  this.bridge = null;
 };
 
 HomeKitHandler.prototype.newPinCode = newPinCode;
