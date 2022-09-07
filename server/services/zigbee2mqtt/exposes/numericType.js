@@ -6,7 +6,7 @@ module.exports = {
     return value;
   },
   readValue: (expose, value) => {
-    if (expose.name === 'lqi') {
+    if (expose.name === 'linkquality') {
       return Math.round((value * 5) / 255);
     }
 
@@ -143,7 +143,7 @@ module.exports = {
         max: 150,
       },
     },
-    lqi: {
+    linkquality: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SIGNAL,
         type: DEVICE_FEATURE_TYPES.SIGNAL.QUALITY,

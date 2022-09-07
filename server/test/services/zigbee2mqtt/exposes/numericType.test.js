@@ -15,8 +15,8 @@ describe('zigbee2mqtt numericType', () => {
     assert.equal(result, 17);
   });
 
-  it('should read lqi value', () => {
-    const expose = { name: 'lqi' };
+  it('should read linkquality value', () => {
+    const expose = { name: 'linkquality' };
     const result = numericType.readValue(expose, 102);
     assert.equal(result, 2);
   });
