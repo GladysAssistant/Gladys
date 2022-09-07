@@ -131,7 +131,7 @@ describe('Dashboard Temperature Box', () => {
 
     cy.wait('@reloadBox');
 
-    cy.contains('h4', '24,7°C').should('exist');
+    cy.contains('h4', '24.7°C').should('exist');
   });
 
   it('Should not update temperature on update device value', () => {
