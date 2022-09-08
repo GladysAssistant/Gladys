@@ -4,8 +4,8 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 
 const ICON_MAP = {
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: {
-    0: 'shield-off',
-    1: 'shield'
+    0: 'unlock',
+    1: 'lock'
   }
 };
 
