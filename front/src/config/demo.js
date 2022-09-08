@@ -166,6 +166,11 @@ const data = {
         },
         {
           type: 'user-presence'
+        },
+        {
+          type: 'devices-in-room',
+          room: 'parental-room',
+          device_features: ['curtain-actions', 'shutter-actions', 'shutter-position']
         }
       ]
     ],
@@ -451,6 +456,72 @@ const data = {
             read_only: true,
             last_value: 27,
             last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      }
+    ]
+  },
+  'get /api/v1/room/parental-room?expand=devices': {
+    id: '1c634ff4-0476-4733-a084-b4a43d649c84',
+    name: 'Parental Room',
+    selector: 'parental-room',
+    devices: [
+      {
+        id: 'cb3b1a30-d1b6-4624-ac18-e581e3e3b00f',
+        name: 'Main curtain',
+        selector: 'main-curtain',
+        features: [
+          {
+            name: 'Curtain',
+            selector: 'curtain-actions',
+            category: 'curtain',
+            type: 'state',
+            min: -1,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Curtain',
+            selector: 'curtain-position',
+            category: 'curtain',
+            type: 'position',
+            min: 0,
+            max: 100,
+            read_only: true,
+            last_value: 30,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      },
+      {
+        id: '919be7a4-df47-4726-b1c0-7412aed99769',
+        name: 'Main shutter',
+        selector: 'main-shutter',
+        features: [
+          {
+            name: 'Shutter',
+            selector: 'shutter-actions',
+            category: 'shutter',
+            type: 'state',
+            min: -1,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Shutter position',
+            selector: 'shutter-position',
+            category: 'shutter',
+            type: 'position',
+            min: 0,
+            max: 100,
+            read_only: true,
+            last_value: 30,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00',
+            unit: 'percent'
           }
         ]
       }
