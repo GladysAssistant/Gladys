@@ -1,10 +1,11 @@
 const { assert } = require('chai');
 
-const coverType = require('../../../../services/zigbee2mqtt/exposes/coverType');
+const enumType = require('../../../../services/zigbee2mqtt/exposes/enumType');
 const { COVER_STATE } = require('../../../../utils/constants');
 
-describe('zigbee2mqtt coverType', () => {
+describe('zigbee2mqtt cover enumType', () => {
   const expose = {
+    name: 'state',
     values: ['OPEN', 'CLOSE', 'STOP'],
   };
 
@@ -16,12 +17,12 @@ describe('zigbee2mqtt coverType', () => {
     const { enumValue, intValue } = mapping;
 
     it(`should write ${enumValue} value as ${intValue} value`, () => {
-      const result = coverType.writeValue(expose, intValue);
+      const result = enumType.writeValue(expose, intValue);
       assert.equal(result, enumValue);
     });
 
     it(`should read ${intValue} value as ${enumValue}`, () => {
-      const result = coverType.readValue(expose, enumValue);
+      const result = enumType.readValue(expose, enumValue);
       assert.equal(result, intValue);
     });
   });
@@ -30,17 +31,17 @@ describe('zigbee2mqtt coverType', () => {
     const missingEnumExpose = {
       values: ['OPEN', 'CLOSE'],
     };
-    const result = coverType.writeValue(missingEnumExpose, COVER_STATE.STOP);
+    const result = enumType.writeValue(missingEnumExpose, COVER_STATE.STOP);
     assert.equal(result, undefined);
   });
 
   it('should write undefined value', () => {
-    const result = coverType.writeValue(expose, 7);
+    const result = enumType.writeValue(expose, 7);
     assert.equal(result, undefined);
   });
 
   it('should read enum value', () => {
-    const result = coverType.readValue(expose, 'unknown');
+    const result = enumType.readValue(expose, 'unknown');
     assert.equal(result, undefined);
   });
 });

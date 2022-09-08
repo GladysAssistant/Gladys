@@ -30,27 +30,11 @@ describe('zigbee2mqtt findMatchingExpose', () => {
       type: 'binary',
       name: 'state',
       property: 'state',
-      parent_type: 'switch',
       access: 3,
       value_on: 'ON',
       value_off: 'OFF',
     };
     const result = zigbee2MqttService.device.findMatchingExpose('0x00158d00045b2740', 'state');
-    assert.deepEqual(result, expected);
-  });
-
-  it('expose dicovered on child features', () => {
-    const expected = {
-      access: 7,
-      description: 'Position of this cover',
-      name: 'position',
-      property: 'position',
-      type: 'numeric',
-      parent_type: 'cover',
-      value_max: 100,
-      value_min: 0,
-    };
-    const result = zigbee2MqttService.device.findMatchingExpose('0x00158d00045b2740', 'position');
     assert.deepEqual(result, expected);
   });
 });

@@ -76,6 +76,18 @@
         "unit": "percent",
         "read_only": false,
         "has_feedback": true
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:CCT5015 device:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-cct5015-device-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
       }
     ],
     "name": "CCT5015 device",
