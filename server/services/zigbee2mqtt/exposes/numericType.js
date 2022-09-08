@@ -149,6 +149,7 @@ module.exports = {
         type: DEVICE_FEATURE_TYPES.SIGNAL.QUALITY,
         min: 0,
         max: 5,
+        forceOverride: true,
       },
     },
     power: {
