@@ -52,7 +52,7 @@ class GoogleHomeGateway extends Component {
                       alt={<Text id="global.logoAlt" />}
                     />
                   </Localizer>
-                  <Text id="integration.googleHome.title" />
+                  <Text id="integration.googleHome.pageTitle" />
                 </h2>
               </div>
               <form class="card">
@@ -76,7 +76,7 @@ class GoogleHomeGateway extends Component {
                         </p>
                       )}
                       <p>
-                        <Text id="integration.googleHome.description" />
+                        <Text id="integration.googleHome.pageDescription" />
                       </p>
 
                       <p>
