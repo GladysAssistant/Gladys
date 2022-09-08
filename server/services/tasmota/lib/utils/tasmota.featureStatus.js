@@ -4,9 +4,20 @@ const { recursiveSearch, generateExternalId, generateValue } = require('../featu
 const sendEvent = (gladysEvent, deviceExternalId, featureTemplate, fullKey, command, value) => {
   const featureExternalId = generateExternalId(featureTemplate, command, fullKey);
 
-  gladysEvent.emit(EVENTS.DEVICE.NEW_STATE, {
-    device_feature_external_id: `tasmota:${deviceExternalId}:${featureExternalId}`,
-    state: generateValue(featureTemplate, value),
+  // Check if value is an array
+  const arrayValue = typeof value === 'object';
+
+  // If value is array, and feature should be splited
+  const multipleFeatures = arrayValue && !featureTemplate.valueAsArray;
+
+  const valueAsArray = multipleFeatures ? value : [value];
+
+  valueAsArray.forEach((val, index) => {
+    const externalId = `tasmota:${deviceExternalId}:${featureExternalId}${multipleFeatures ? index + 1 : ''}`;
+    gladysEvent.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: externalId,
+      state: generateValue(featureTemplate, val),
+    });
   });
 };
 

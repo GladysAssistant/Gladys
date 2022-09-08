@@ -124,14 +124,14 @@ describe('Dashboard Temperature Box', () => {
     cy.request({
       method: 'POST',
       url: `${serverUrl}/api/v1/device/first-device/temperature-sensor/decimal/value`,
-      body: { value: 24 }
+      body: { value: 24.68 }
     });
 
     cy.sendWebSocket({ type: 'device.new-state', payload: { device_feature_selector: 'first-temperature' } });
 
     cy.wait('@reloadBox');
 
-    cy.contains('h4', '24°C').should('exist');
+    cy.contains('h4', '24.7°C').should('exist');
   });
 
   it('Should not update temperature on update device value', () => {
