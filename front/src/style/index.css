@@ -233,3 +233,11 @@ body {
 .device-features {
   min-height: 70px;
 }
+.loading-border {
+  animation: borderBlink 2s infinite;
+}
+@keyframes borderBlink { 
+  50% {
+    border-color: #45aaf2 ; 
+  }
+}
