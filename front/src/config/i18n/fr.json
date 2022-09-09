@@ -672,6 +672,12 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "enedis": {
+      "title": "Enedis",
+      "longDescription": "Enedis gère le réseau d'électricité jusqu'au compteur d'électricité. Pour récupérez vos données de consommation et de production d'électricité dans Gladys, autorisez Enedis à nous transmettre vos données Linky.",
+      "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données.",
+      "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer."
+    },
     "alexa": {
       "title": "Amazon Alexa",
       "description": "Contrôlez vos appareils Gladys à la voix dans Alexa",
