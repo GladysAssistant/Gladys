@@ -76,6 +76,11 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
         connected: false,
       },
     ]),
+    enedisGetConsumptionLoadCurve: fake.resolves({ enedisFunction: 'enedisGetConsumptionLoadCurve' }),
+    enedisGetDailyConsumption: fake.resolves({ enedisFunction: 'enedisGetDailyConsumption' }),
+    enedisGetDailyConsumptionMaxPower: fake.resolves({
+      enedisFunction: 'enedisGetDailyConsumptionMaxPower',
+    }),
   };
 };
 
