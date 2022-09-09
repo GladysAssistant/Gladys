@@ -33,6 +33,11 @@ const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 
+// Enedis API
+const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
+const { enedisGetDailyConsumption } = require('./enedis/gateway.enedisGetDailyConsumption');
+const { enedisGetDailyConsumptionMaxPower } = require('./enedis/gateway.enedisGetDailyConsumptionMaxPower');
+
 const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager, serviceManager, job) {
   this.variable = variable;
   this.event = event;
@@ -92,5 +97,10 @@ Gateway.prototype.restoreBackup = restoreBackup;
 Gateway.prototype.restoreBackupEvent = restoreBackupEvent;
 Gateway.prototype.saveUsersKeys = saveUsersKeys;
 Gateway.prototype.refreshUserKeys = refreshUserKeys;
+
+// Enedis API
+Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;
+Gateway.prototype.enedisGetDailyConsumption = enedisGetDailyConsumption;
+Gateway.prototype.enedisGetDailyConsumptionMaxPower = enedisGetDailyConsumptionMaxPower;
 
 module.exports = Gateway;
