@@ -1,7 +1,7 @@
 const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 
 const event = new EventEmitter();
 
@@ -12,6 +12,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
 });
 
 const getConfig = require('../../../utils/getConfig');
+const { Error403 } = require('../../../utils/httpErrors');
 
 const system = {
   getInfos: fake.resolves({
@@ -35,6 +36,15 @@ const job = {
   updateProgress: fake.resolves({}),
 };
 
+class AxiosForbiddenError extends Error {
+  constructor(message) {
+    super();
+    this.response = {
+      status: 403,
+    };
+  }
+}
+
 describe('gateway.enedisApi', () => {
   const variable = {
     getValue: fake.resolves(null),
@@ -52,5 +62,29 @@ describe('gateway.enedisApi', () => {
   it('should get enedisGetDailyConsumptionMaxPower', async () => {
     const response = await gateway.enedisGetDailyConsumptionMaxPower();
     expect(response).to.deep.equal({ enedisFunction: 'enedisGetDailyConsumptionMaxPower' });
+  });
+  it('should receive error on enedisGetConsumptionLoadCurve', async () => {
+    gateway.gladysGatewayClient.enedisGetConsumptionLoadCurve = fake.rejects(new AxiosForbiddenError());
+    const promise = gateway.enedisGetConsumptionLoadCurve();
+    await assert.isRejected(promise, Error403);
+    gateway.gladysGatewayClient.enedisGetConsumptionLoadCurve = fake.rejects(new Error());
+    const promise2 = gateway.enedisGetConsumptionLoadCurve();
+    await assert.isRejected(promise2, Error);
+  });
+  it('should receive error on enedisGetDailyConsumption', async () => {
+    gateway.gladysGatewayClient.enedisGetDailyConsumption = fake.rejects(new AxiosForbiddenError());
+    const promise = gateway.enedisGetDailyConsumption();
+    await assert.isRejected(promise, Error403);
+    gateway.gladysGatewayClient.enedisGetDailyConsumption = fake.rejects(new Error());
+    const promise2 = gateway.enedisGetDailyConsumption();
+    await assert.isRejected(promise2, Error);
+  });
+  it('should receive error on enedisGetDailyConsumptionMaxPower', async () => {
+    gateway.gladysGatewayClient.enedisGetDailyConsumptionMaxPower = fake.rejects(new AxiosForbiddenError());
+    const promise = gateway.enedisGetDailyConsumptionMaxPower();
+    await assert.isRejected(promise, Error403);
+    gateway.gladysGatewayClient.enedisGetDailyConsumptionMaxPower = fake.rejects(new Error());
+    const promise2 = gateway.enedisGetDailyConsumptionMaxPower();
+    await assert.isRejected(promise2, Error);
   });
 });
