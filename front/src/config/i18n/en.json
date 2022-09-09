@@ -562,6 +562,19 @@
       "cancelButton": "Cancel",
       "connectButton": "Link"
     },
+    "enedis": {
+      "title": "Enedis",
+      "description": "Connect your Enedis account to Gladys",
+      "longDescription": "Enedis is the main french electricity provider. To get your electricity data in Gladys, you can connect your Enedis account to sync it.",
+      "buttonDescription": "By clicking on this button, you are giving access to Gladys to your personal Enedis account.",
+      "error": "An error happened while linking your Enedis account, please try again.",
+      "notOnGladysGateway": "This integration is available on Gladys Plus. To connect/re-connect your Enedis account, go to Gladys Plus!",
+      "connectedToUsagePointds": {
+        "singular": "Connected to {{count}} delivery point (PRM).",
+        "plural": "Connected to {{count}} delivery points (PRM)."
+      },
+      "reconnectInfo": "If you want to refresh your Enedis access key, you can re-connect to Enedis at any time. You need to reconnect at least once every 3 years."
+    },
     "owntracks": {
       "title": "Owntracks",
       "description": "Send your GPS location to Gladys with a mobile app",

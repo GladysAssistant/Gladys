@@ -674,9 +674,16 @@
     },
     "enedis": {
       "title": "Enedis",
+      "description": "Connectez votre compte Enedis à Gladys",
       "longDescription": "Enedis gère le réseau d'électricité jusqu'au compteur d'électricité. Pour récupérez vos données de consommation et de production d'électricité dans Gladys, autorisez Enedis à nous transmettre vos données Linky.",
       "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données.",
-      "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer."
+      "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer.",
+      "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus !",
+      "connectedToUsagePointds": {
+        "singular": "Connecté à {{count}} point de livraison (PRM).",
+        "plural": "Connecté à {{count}} points de livraison (PRM)."
+      },
+      "reconnectInfo": "Si jamais vous voulez rafraichir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 3 ans."
     },
     "alexa": {
       "title": "Amazon Alexa",
