@@ -1732,6 +1732,24 @@
     "months": "m",
     "years": "y"
   },
+  "deviceFeatureAction": {
+    "category": {
+      "shutter": {
+        "state": {
+          "zero": "Stop",
+          "one": "Open",
+          "other": "Close"
+        }
+      },
+      "curtain": {
+        "state": {
+          "zero": "Stop",
+          "one": "Open",
+          "other": "Close"
+        }
+      }
+    }
+  },
   "deviceFeatureValue": {
     "type": {
       "binary": {
@@ -1963,6 +1981,16 @@
     "voc-sensor": {
       "shortCategoryName": "VOC Sensor",
       "decimal": "VOC (decimal)"
+    },
+    "shutter": {
+      "shortCategoryName": "Shutter",
+      "state": "Shutter state",
+      "position": "Shutter position"
+    },
+    "curtain": {
+      "shortCategoryName": "Curtain",
+      "state": "Curtain state",
+      "position": "curtain position"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
