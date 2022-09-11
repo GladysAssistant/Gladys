@@ -4,8 +4,8 @@ const { fake } = require('sinon');
 
 const OAuth2Manager = require('../../../../../services/withings/lib/oauth2-client');
 const logger = require('../../../../../utils/logger');
-const { OAUTH2 } = require('../../../../../utils/constants');
-const { BadOauth2ClientResponse } = require('../../../../../utils/coreErrors');
+const { OAUTH2 } = require('../../../../../services/withings/lib/oauth2-client/utils/constants.js');
+const { BadOauth2ClientResponse } = require('../../../../../services/withings/lib/oauth2-client/utils/coreErrors');
 
 const server = new OAuth2Server();
 

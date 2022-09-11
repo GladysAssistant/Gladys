@@ -1,4 +1,4 @@
-const { OAUTH2 } = require('../../../../utils/constants');
+const { OAUTH2 } = require('./utils/constants.js');
 
 /**
  * @description  Return the current integration config.

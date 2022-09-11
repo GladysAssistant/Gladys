@@ -1,5 +1,5 @@
 const { AuthorizationCode } = require('simple-oauth2');
-const { OAUTH2 } = require('../../../../utils/constants');
+const { OAUTH2 } = require('./utils/constants.js');
 
 /**
  * @description Build a authorization uri of current oauth2 integration.

@@ -1,4 +1,4 @@
-const { OAUTH2 } = require('../../../utils/constants.js');
+const { OAUTH2 } = require('./oauth2-client/utils/constants.js');
 
 /**
  * @description Check if withings oauth2 configuration is in catabase and save it if necessary.

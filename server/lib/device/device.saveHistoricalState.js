@@ -22,7 +22,7 @@ async function saveHistoricalState(deviceFeature, historicalState, createdAt) {
   if (Number.isNaN(historicalState)) {
     throw new BadParameters(`device.saveHistoricalState of NaN value on ${deviceFeature.selector}`);
   }
-  // get current feture to update last value if needed
+  // get current feature to update last value if needed
   const previousDeviceFeature = this.stateManager.get('deviceFeature', deviceFeature.selector);
 
   const historicalStateObject = {
@@ -35,11 +35,11 @@ async function saveHistoricalState(deviceFeature, historicalState, createdAt) {
 
   const historicalStateAfterFeatureLastValue =
     new Date(historicalStateObject.created_at) > new Date(previousDeviceFeature.last_value_changed);
-  const featureLastValueChageIsValidDate =
+  const featureLastValueChangeIsValidDate =
     previousDeviceFeature.last_value_changed instanceof Date &&
     !Number.isNaN(previousDeviceFeature.last_value_changed.getTime());
 
-  if (historicalStateAfterFeatureLastValue || !featureLastValueChageIsValidDate) {
+  if (historicalStateAfterFeatureLastValue || !featureLastValueChangeIsValidDate) {
     await db.DeviceFeature.update(
       {
         last_value: historicalStateObject.value,

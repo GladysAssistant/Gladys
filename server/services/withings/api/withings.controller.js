@@ -35,17 +35,18 @@ module.exports = function WithingsController(gladys, withingsHandler) {
    * @apiGroup OAuth2
    */
   async function buildAuthorizationUri(req, res) {
+    let authorizationUriResult;
     if (req.body && req.body.service_id && req.body.integration_name && req.headers.referer) {
-      const authorizationUriResult = await withingsHandler.oauth2Client.buildAuthorizationUri(
+      authorizationUriResult = await withingsHandler.oauth2Client.buildAuthorizationUri(
         req.body.service_id,
         req.user.id,
         req.body.integration_name,
         req.headers.referer,
       );
-      res.json({
-        authorizationUri: authorizationUriResult,
-      });
     }
+    res.json({
+      authorizationUri: authorizationUriResult,
+    });
   }
 
   /**
@@ -55,17 +56,18 @@ module.exports = function WithingsController(gladys, withingsHandler) {
    * @apiGroup OAuth2
    */
   async function getAccessTokenUri(req, res) {
+    let authResult;
     if (req.body && req.body.service_id && req.body.authorization_code && req.headers.referer) {
-      const authResult = await withingsHandler.oauth2Client.getAccessToken(
+      authResult = await withingsHandler.oauth2Client.getAccessToken(
         req.body.service_id,
         req.user.id,
         req.body.authorization_code,
         req.headers.referer,
       );
-      res.json({
-        result: authResult,
-      });
     }
+    res.json({
+      result: authResult,
+    });
   }
 
   /**
@@ -75,13 +77,13 @@ module.exports = function WithingsController(gladys, withingsHandler) {
    * @apiGroup oauth2
    */
   async function getCurrentConfig(req, res) {
+    let resultClientId;
     if (req.query && req.query.service_id) {
-      const resultClientId = await withingsHandler.oauth2Client.getCurrentConfig(req.query.service_id, req.user.id);
-
-      res.json({
-        client_id: resultClientId,
-      });
+      resultClientId = await withingsHandler.oauth2Client.getCurrentConfig(req.query.service_id, req.user.id);
     }
+    res.json({
+      client_id: resultClientId,
+    });
   }
 
   return {

@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
-const { OAUTH2 } = require('../../../utils/constants.js');
+const { OAUTH2 } = require('./oauth2-client/utils/constants.js');
 
 /**
  * @description Poll value of a withings device.

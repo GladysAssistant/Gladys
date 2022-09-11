@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const serverHttpWithingsMock = require('./withings.serverMock.test');
 const WithingsHandler = require('../../../../services/withings/lib');
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
-const { OAUTH2 } = require('../../../../utils/constants.js');
+const { OAUTH2 } = require('../../../../services/withings/lib/oauth2-client/utils/constants.js');
 
 const { assert, fake } = sinon;
 
