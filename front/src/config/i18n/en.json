@@ -1122,6 +1122,7 @@
       "calendar": {
         "eventName": "Event name",
         "eventLocation": "Event location",
+        "eventDescription": "Event description",
         "eventStart": "Start date",
         "eventEnd": "End date"
       }
