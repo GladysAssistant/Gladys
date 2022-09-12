@@ -171,8 +171,11 @@ class UpdateDeviceFeature extends Component {
                     class="custom-switch-input"
                   />
                   <span class="custom-switch-indicator" />
+                  <span class="custom-switch-description">
+                    <Text id="editDeviceForm.keepHistorySmallDescription" />
+                  </span>
                 </label>
-                <p>
+                <p class="mt-2">
                   <small>
                     <MarkupText id="editDeviceForm.keepHistoryDescription" />
                   </small>

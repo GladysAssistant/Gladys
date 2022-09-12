@@ -104,7 +104,7 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
           <div class="page-options d-flex">
             <div class="form-group">
               <div class="form-label">
-                <Text id="integration.mqtt.feature.keepHistoryLabel" />
+                <Text id="editDeviceForm.keepHistoryLabel" />
               </div>
               <label class="custom-switch">
                 <input
@@ -115,10 +115,13 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
                   class="custom-switch-input"
                 />
                 <span class="custom-switch-indicator" />
+                <span class="custom-switch-description">
+                  <Text id="editDeviceForm.keepHistorySmallDescription" />
+                </span>
               </label>
-              <p>
+              <p class="mt-2">
                 <small>
-                  <MarkupText id="integration.mqtt.feature.keepHistoryDescription" />
+                  <MarkupText id="editDeviceForm.keepHistoryDescription" />
                 </small>
               </p>
             </div>
