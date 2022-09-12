@@ -37,6 +37,18 @@
         "selector": "zigbee2mqtt-0x00158d00033e88d5-switch-voltage-voltage",
         "type": "voltage",
         "unit": "millivolt"
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:0x00158d00033e88d5:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-0x00158d00033e88d5-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
       }
     ],
     "model": "WXKG01LM",
@@ -73,6 +85,18 @@
         "unit": "millivolt",
         "external_id": "zigbee2mqtt:0x00158d0004019127:switch:voltage:voltage",
         "selector": "zigbee2mqtt-0x00158d0004019127-switch-voltage-voltage"
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:0x00158d0004019127:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-0x00158d0004019127-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
       }
     ],
     "should_poll": false,
@@ -154,6 +178,18 @@
         "unit": "millivolt",
         "external_id": "zigbee2mqtt:0x00158d00045b2740:switch:voltage:voltage",
         "selector": "zigbee2mqtt-0x00158d00045b2740-switch-voltage-voltage"
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-0x00158d00045b2740-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
       }
     ],
     "should_poll": false,

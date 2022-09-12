@@ -309,6 +309,7 @@ const actionsFunc = {
       const eventFormatted = {
         name: eventRaw.name,
         location: eventRaw.location,
+        description: eventRaw.description,
         start: dayjs(eventRaw.start)
           .tz(self.timezone)
           .locale(eventRaw.calendar.creator.language)

@@ -731,6 +731,117 @@
         "disconnected": "Disconnected from MQTT broker."
       }
     },
+    "broadlink": {
+      "title": "Broadlink",
+      "description": "Control your Broadlink devices.",
+      "remoteTab": "Devices",
+      "peripheralTab": "Discover devices",
+      "peripheral": {
+        "title": "Available Broadlink devices",
+        "description": "Here are discovered Broadlink devices, if one is missing, please check its network link.",
+        "noPeripherals": "No peripheral discovered on network, please check the connectivity.",
+        "noNameLabel": "Type not recognized",
+        "ipAddressLabel": "IP address",
+        "macAddressLabel": "MAC address",
+        "modelLabel": "Model",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "nameLabel": "Name",
+        "saveButton": "Save",
+        "notConnectable": "Locked",
+        "alreadyCreatedButton": "Already created",
+        "createRemoteButton": "Create remote control"
+      },
+      "device": {
+        "title": "Broadlink devices",
+        "searchPlaceholder": "Search for devices",
+        "newButton": "Create",
+        "noRemoteFound": "No Broadlink device or remote found.",
+        "saveError": "There was an error saving the device.",
+        "nameLabel": "Device name",
+        "namePlaceholder": "Enter the name of your device",
+        "modelLabel": "Model",
+        "roomLabel": "Room",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit",
+        "featuresLabel": "Features"
+      },
+      "setup": {
+        "noNameLabel": "No name",
+        "saveError": "Error saving or deleting device",
+        "saveSuccess": "Broadlink device successfully created.",
+        "notFound": "Requested device not found.",
+        "saveButton": "Save",
+        "peripheralLabel": "Linked peripheral",
+        "categoryLabel": "Device category to control",
+        "featuresLabel": "Features",
+        "learnModeTitle": "Capture remote command",
+        "learningModeInProgress": "Press button on your remote",
+        "cancelLearnModeButton": "Cancel capture mode",
+        "skipLearningButton": "Skip this step and go to next",
+        "peripheralNotFound": "Peripheral not available.",
+        "peripheralNotLearn": "Peripheral is not able to learn code.",
+        "cancelLearnFailed": "Failed to cancel learning mode.",
+        "learnFailed": "Failed to enter in learn mode.",
+        "selectFeatureLabel": "Select a feature in the list or click button bellow to entrer in learning mode. Learning mode allows you to save all commands, one by one, in an automatized way.",
+        "selectedFeatureLabel": "Selected feature",
+        "selectActionLabel": "Feature <b>{{feature}}</b> is selected, now select an action in the list bellow to enabled capture mode.",
+        "selectedFeatureInfoLabel": "Feature <b>{{feature}}</b> is selected.",
+        "unselectedActionInfoLabel": "Feature <b>{{feature}}</b> is selected, please select an action to enter capture mode.",
+        "selectedActionInfoLabel": "Feature <b>{{feature}}</b> is selected, with action <b>{{action}}</b>.",
+        "testError": "An error occured while testing feature, please check your device.",
+        "peripheralSelectLabel": "{{name}} ({{address}})",
+        "testLabel": "Test",
+        "unselect": "Unselect",
+        "deleteLabel": "Delete",
+        "learnAllLabel": "Learn all features",
+        "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
+        "quitLearnModeLabel": "Stop learning features",
+        "features": {
+          "light": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "brightness": {
+              "none": "Down",
+              "many": "Up"
+            },
+            "temperature": {
+              "none": "Cold",
+              "many": "Hot"
+            }
+          },
+          "switch": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "dimmer": {
+              "none": "Down",
+              "many": "Up"
+            }
+          },
+          "siren": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            }
+          },
+          "television": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "volume": {
+              "none": "Down",
+              "many": "Up"
+            }
+          }
+        }
+      }
+    },
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Control Xiaomi home devices with the official hub",
@@ -1163,6 +1274,7 @@
       "calendar": {
         "eventName": "Event name",
         "eventLocation": "Event location",
+        "eventDescription": "Event description",
         "eventStart": "Start date",
         "eventEnd": "End date"
       }
@@ -2055,6 +2167,9 @@
     "minPlaceholder": "Enter feature minimum value",
     "maxLabel": "Maximum value",
     "maxPlaceholder": "Enter feature maximum value",
+    "keepHistoryLabel": "Keep state history?",
+    "keepHistorySmallDescription": "Yes, keep history",
+    "keepHistoryDescription": "If yes, the state history of this feature will be kept according to the retention policy defined in the <a href=\"/dashboard/settings/system\">System</a> page. If not, only the last state will be kept.",
     "addButton": "Add feature",
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",

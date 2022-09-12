@@ -47,6 +47,10 @@
     "img": "/assets/integrations/cover/owntracks.jpg"
   },
   {
+    "key": "broadlink",
+    "img": "/assets/integrations/cover/broadlink.jpg"
+  },
+  {
     "key": "withings",
     "img": "/assets/integrations/cover/withings.jpg"
   }

@@ -744,6 +744,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
   },
+  BROADLINK: {
+    LEARN_MODE: 'broadlink.learn',
+    SEND_MODE: 'broadlink.send',
+  },
 };
 
 const DASHBOARD_TYPE = {
