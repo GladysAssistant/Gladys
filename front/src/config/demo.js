@@ -1245,6 +1245,20 @@ const data = {
       }
     ]
   },
+  'get /api/v1/device/zigbee2mqtt-0x00158d0005828ece': {
+    name: 'Aqara Sensor',
+    external_id: 'zigbee2mqtt-0x00158d0005828ece',
+    selector: 'zigbee2mqtt-0x00158d0005828ece',
+    room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+    model: 'zigbee2mqtt-0x00158d0005828ece',
+    features: [
+      {
+        category: 'switch',
+        type: 'binary',
+        name: 'Switch'
+      }
+    ]
+  },
   'get /api/v1/device/tasmota-192-168-1-1': {
     name: 'Switch',
     external_id: 'tasmota:sonoff-basic',
