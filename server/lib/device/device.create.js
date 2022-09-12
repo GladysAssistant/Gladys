@@ -2,6 +2,7 @@ const Promise = require('bluebird');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
 const { EVENTS } = require('../../utils/constants');
+const logger = require('../../utils/logger');
 
 const getByExternalId = async (externalId) => {
   return db.Device.findOne({
@@ -65,6 +66,8 @@ async function create(device) {
   let actionEvent = EVENTS.DEVICE.CREATE;
   let oldPollFrequency = null;
 
+  const deviceFeaturesIdsToPurge = [];
+
   // we execute the whole insert in a transaction to avoir inconsistent state
   await db.sequelize.transaction(async (transaction) => {
     // external_id is a required parameter
@@ -116,6 +119,9 @@ async function create(device) {
           },
         });
         await deviceFeature.update(feature, { transaction });
+        if (deviceFeature.keep_history === false) {
+          deviceFeaturesIdsToPurge.push(deviceFeature.id);
+        }
         return deviceFeature.get({ plain: true });
       }
       // if not, we create it
@@ -146,6 +152,18 @@ async function create(device) {
 
     return deviceToReturn;
   });
+
+  // We purge states of all device features that were marked as "keep_history = false"
+  await Promise.each(deviceFeaturesIdsToPurge, async (deviceFeaturesIdToPurge) => {
+    await this.purgeStatesByFeatureId(deviceFeaturesIdToPurge);
+  });
+
+  if (deviceFeaturesIdsToPurge.length > 0) {
+    // If we don't run a VACUUM, the database file size will stay the same
+    // Read: https://www.sqlite.org/lang_vacuum.html
+    logger.info('Running VACUUM command to free up space.');
+    await db.sequelize.query('VACUUM;');
+  }
 
   // we get the whole device from the DB to avoid
   // having a partial final object
