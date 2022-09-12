@@ -37,28 +37,6 @@ async function purgeStates() {
   return true;
 }
 
-/**
- * @description Purge device states
- * @param {Object} deviceFeature - A DeviceFeature object.
- * @returns {Promise} Resolve when finished.
- * @example
- * device.purgeStatesAggregates();
- */
-async function purgeStatesAggregates(deviceFeature) {
-  logger.debug('Purging device feature states and aggregates...');
-
-  // we bulk insert the data
-  const queryInterface = db.sequelize.getQueryInterface();
-  await queryInterface.bulkDelete('t_device_feature_state', { device_feature_id: deviceFeature.id });
-  logger.info(`Purging device feature states with option no keep history selected.`);
-  await queryInterface.bulkDelete('t_device_feature_state_aggregate', {
-    device_feature_id: deviceFeature.id,
-  });
-  logger.info(`Purging device feature aggregates with option no keep history selected.`);
-  return true;
-}
-
 module.exports = {
   purgeStates,
-  purgeStatesAggregates,
 };

@@ -20,7 +20,8 @@ const { getBySelector } = require('./device.getBySelector');
 const { getDeviceFeaturesAggregates } = require('./device.getDeviceFeaturesAggregates');
 const { getDeviceFeaturesAggregatesMulti } = require('./device.getDeviceFeaturesAggregatesMulti');
 const { onHourlyDeviceAggregateEvent } = require('./device.onHourlyDeviceAggregateEvent');
-const { purgeStates, purgeStatesAggregates } = require('./device.purgeStates');
+const { purgeStates } = require('./device.purgeStates');
+const { purgeStatesByFeatureId } = require('./device.purgeStatesByFeatureId');
 const { poll } = require('./device.poll');
 const { pollAll } = require('./device.pollAll');
 const { saveState } = require('./device.saveState');
@@ -62,10 +63,6 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(EVENTS.DEVICE.ADD_PARAM, eventFunctionWrapper(this.addParam.bind(this)));
   this.eventManager.on(EVENTS.DEVICE.PURGE_STATES, eventFunctionWrapper(this.purgeStates.bind(this)));
   this.eventManager.on(
-    EVENTS.DEVICE.PURGE_STATES_AGGREGATES_NO_KEEP_HISTORY,
-    eventFunctionWrapper(this.purgeStatesAggregates.bind(this)),
-  );
-  this.eventManager.on(
     EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
     eventFunctionWrapper(this.onHourlyDeviceAggregateEvent.bind(this)),
   );
@@ -84,7 +81,7 @@ DeviceManager.prototype.getDeviceFeaturesAggregates = getDeviceFeaturesAggregate
 DeviceManager.prototype.getDeviceFeaturesAggregatesMulti = getDeviceFeaturesAggregatesMulti;
 DeviceManager.prototype.onHourlyDeviceAggregateEvent = onHourlyDeviceAggregateEvent;
 DeviceManager.prototype.purgeStates = purgeStates;
-DeviceManager.prototype.purgeStatesAggregates = purgeStatesAggregates;
+DeviceManager.prototype.purgeStatesByFeatureId = purgeStatesByFeatureId;
 DeviceManager.prototype.poll = poll;
 DeviceManager.prototype.pollAll = pollAll;
 DeviceManager.prototype.newStateEvent = newStateEvent;
