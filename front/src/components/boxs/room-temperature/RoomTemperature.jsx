@@ -18,7 +18,7 @@ const RoomTemperatureBox = ({ children, ...props }) => (
       <div>
         {props.valued && (
           <h4 class="m-0">
-            <Text id="global.degreeValue" fields={{ value: Math.round(props.temperature) }} />
+            <Text id="global.degreeValue" fields={{ value: Number(props.temperature).toFixed(1) }} />
             <Text id={`global.${props.unit}`} />
           </h4>
         )}
