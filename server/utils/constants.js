@@ -72,6 +72,7 @@ const EVENTS = {
     ADD_PARAM: 'device.add-param',
     NEW_STATE: 'device.new-state',
     PURGE_STATES: 'device.purge-states',
+    PURGE_STATES_AGGREGATES_NO_KEEP_HISTORY: 'device.purge-device-states-aggregates-no-keep-history',
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
   },
   GATEWAY: {

@@ -146,6 +146,40 @@ describe('Device', () => {
       },
     ]);
   });
+  it('should update device which already exist, update a feature and a param', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
+    const newDevice = await device.create({
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      features: [
+        {
+          name: 'New device feature',
+          selector: 'new-device-feature',
+          external_id: 'hue:binary:1',
+          category: 'temperature',
+          type: 'decimal',
+          keep_history: false,
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+        },
+      ],
+    });
+    await device.newStateEvent({ device_feature_external_id: 'hue:binary:1', state: 12 });
+    await device.newStateEvent({ device_feature_external_id: 'hue:binary:1', state: 5 });
+    expect(newDevice).to.have.property('name', 'RENAMED_DEVICE');
+    expect(newDevice).to.have.property('selector', 'test-device');
+    expect(newDevice).to.have.property('features');
+  });
   it('should update device which already exist with a new poll frequency', async () => {
     const stateManager = new StateManager(event);
     stateManager.setState('deviceByExternalId', 'test-device-external', {

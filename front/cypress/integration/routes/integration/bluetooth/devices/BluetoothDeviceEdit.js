@@ -47,6 +47,16 @@ describe('Bluetooth device edit', () => {
 
   it('Update device', () => {
     const { rooms } = Cypress.env('house');
+    const { features } = device;
+    let keepHistoryValueBegin;
+    let keepHistoryValueAfter;
+    if (features[0].keep_history) {
+      keepHistoryValueBegin = 'be.checked';
+      keepHistoryValueAfter = 'be.not.checked';
+    } else {
+      keepHistoryValueBegin = 'be.not.checked';
+      keepHistoryValueAfter = 'be.checked';
+    }
     cy.contains('.card-header', device.name)
       .should('exist')
       .parent('.card')
@@ -56,10 +66,12 @@ describe('Bluetooth device edit', () => {
           .clear()
           .type('New name');
         cy.get('select').select(rooms[0].name);
-        cy.get('input')
-          .last()
+        cy.get('#featureName_0')
           .clear()
           .type('Sensor');
+        cy.get('#keep_history_0').should(keepHistoryValueBegin);
+        cy.get('[class="custom-switch-indicator"]').click();
+        cy.get('#keep_history_0').should(keepHistoryValueAfter);
 
         cy.contains('button', 'integration.bluetooth.device.saveButton').click();
       });
