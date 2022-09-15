@@ -266,7 +266,7 @@ export const DeviceFeatureCategoriesIcon = {
     [DEVICE_FEATURE_TYPES.DATA.SIZE]: 'hard-drive'
   },
   [DEVICE_FEATURE_CATEGORIES.DATARATE]: {
-    [DEVICE_FEATURE_TYPES.DATA.RATE]: 'activity'
+    [DEVICE_FEATURE_TYPES.DATARATE.RATE]: 'activity'
   },
   [DEVICE_FEATURE_CATEGORIES.UNKNOWN]: {
     [DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN]: 'help-circle'

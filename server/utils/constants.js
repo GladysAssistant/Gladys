@@ -475,6 +475,8 @@ const DEVICE_FEATURE_TYPES = {
   },
   DATA: {
     SIZE: 'size',
+  },
+  DATARATE: {
     RATE: 'rate',
   },
   UNKNOWN: {

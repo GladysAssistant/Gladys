@@ -2073,6 +2073,14 @@
       "state": "Curtain state",
       "position": "curtain position"
     },
+    "data": {
+      "shortCategoryName": "Datas",
+      "size": "Size"
+    },
+    "datarate": {
+      "shortCategoryName": "Datarate",
+      "rate": "Rate"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"

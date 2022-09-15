@@ -2073,6 +2073,14 @@
       "state": "Etat du rideau",
       "position": "Position du rideau"
     },
+    "data": {
+      "shortCategoryName": "Données",
+      "size": "Taille"
+    },
+    "datarate": {
+      "shortCategoryName": "Débit de données",
+      "rate": "Débit"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
