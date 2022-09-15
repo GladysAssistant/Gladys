@@ -16,3 +16,4 @@ module.exports['tp-link'] = require('./tp-link');
 module.exports.zigbee2mqtt = require('./zigbee2mqtt');
 module.exports['google-actions'] = require('./google-actions');
 module.exports.influxdb = require('./influxdb');
+module.exports.broadlink = require('./broadlink');

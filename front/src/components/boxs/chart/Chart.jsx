@@ -158,6 +158,7 @@ class Chartbox extends Component {
       const newState = {
         series,
         loading: false,
+        initialized: true,
         emptySeries
       };
 
@@ -227,6 +228,7 @@ class Chartbox extends Component {
     this.state = {
       interval: this.props.box.interval ? intervalByName[this.props.box.interval] : ONE_HOUR_IN_MINUTES,
       loading: true,
+      initialized: false,
       height: 'small'
     };
   }
@@ -256,10 +258,10 @@ class Chartbox extends Component {
       this.updateDeviceStateWebsocket
     );
   }
-  render(props, { loading, series, dropdown, variation, lastValueRounded, interval, emptySeries, unit }) {
+  render(props, { initialized, loading, series, dropdown, variation, lastValueRounded, interval, emptySeries, unit }) {
     const displayVariation = props.box.display_variation;
     return (
-      <div class="card">
+      <div class={cx('card', { 'loading-border': initialized && loading })}>
         <div class="card-body">
           <div class="d-flex align-items-center">
             <div class={cx(style.subheader)}>{props.box.title}</div>
@@ -424,13 +426,13 @@ class Chartbox extends Component {
 
         <div
           class={cx('dimmer', {
-            active: loading
+            active: loading && !initialized
           })}
         >
           <div class="loader" />
           <div
             class={cx('dimmer-content', {
-              [style.minSizeChartLoading]: loading
+              [style.minSizeChartLoading]: loading && !initialized
             })}
           >
             {emptySeries === true && (

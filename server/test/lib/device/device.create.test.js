@@ -5,6 +5,7 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../utils/constants');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
+const db = require('../../../models');
 
 const event = new EventEmitter();
 
@@ -455,5 +456,56 @@ describe('Device', () => {
 
     expect(device.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES.EVERY_MINUTES]).to.have.lengthOf(0);
     expect(device.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS]).to.have.lengthOf(1);
+  });
+  it('should update a feature with keep_history = false and check that states are deleted', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager);
+    await db.DeviceFeatureState.create({
+      device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      value: 10,
+    });
+    await db.DeviceFeatureStateAggregate.create({
+      type: 'daily',
+      device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      value: 10,
+    });
+    const createdDevice = await device.create({
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      features: [
+        {
+          name: 'New device feature',
+          selector: 'new-device-feature',
+          external_id: 'hue:binary:1',
+          category: 'temperature',
+          type: 'decimal',
+          keep_history: false,
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+        },
+      ],
+    });
+    expect(createdDevice.features[0]).to.have.property('id', 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4');
+    const states = await db.DeviceFeatureState.findAll({
+      where: {
+        device_feature_id: createdDevice.features[0].id,
+      },
+    });
+    expect(states).to.have.lengthOf(0);
+    const statesAggregates = await db.DeviceFeatureStateAggregate.findAll({
+      where: {
+        device_feature_id: createdDevice.features[0].id,
+      },
+    });
+    expect(statesAggregates).to.have.lengthOf(0);
   });
 });
