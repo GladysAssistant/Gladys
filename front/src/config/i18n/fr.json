@@ -1749,19 +1749,19 @@
     "kilobit": "Kilobit",
     "megabit": "Megabit",
     "gigabit": "Gigabit",
-    "byte": "Byte (B)",
-    "kilobyte": "Kilobyte (kB)",
-    "megabyte": "Megabyte (MB)",
-    "gigabyte": "Gigabyte (GB)",
-    "terabyte": "Terabyte (TB)",
+    "byte": "Octet (o)",
+    "kilobyte": "Kilooctet (Ko)",
+    "megabyte": "Megaoctet (Mo)",
+    "gigabyte": "Gigaoctet (Go)",
+    "terabyte": "Teraoctet (To)",
     "bits-per-second": "Bits par seconde (bit/s)",
     "kilobits-per-second": "Kilobits par seconde (kbit/s)",
     "megabits-per-second": "Megabits par seconde (Mbit/s)",
     "gigabits-per-second": "Gigabits par seconde (Gbit/s)",
-    "bytes-per-second": "Bytes par seconde (B/s)",
-    "kilobytes-per-second": "kilobytes par seconde (kB/s)",
-    "megabytes-per-second": "Megabytes par seconde (MB/s)",
-    "gigabytes-per-second": "Gigabytes par seconde (GB/s)"
+    "bytes-per-second": "Octets par seconde (o/s)",
+    "kilobytes-per-second": "Kilooctets par seconde (Ko/s)",
+    "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
+    "gigabytes-per-second": "Gigaoctets par seconde (Go/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1819,19 +1819,19 @@
     "kilobit": "kbit",
     "megabit": "Mbit",
     "gigabit": "Gbit",
-    "byte": "B",
-    "kilobyte": "kB",
-    "megabyte": "MB",
-    "gigabyte": "GB",
-    "terabyte": "TB",
+    "byte": "o",
+    "kilobyte": "Ko",
+    "megabyte": "Mo",
+    "gigabyte": "Go",
+    "terabyte": "To",
     "bits-per-second": "bit/s",
     "kilobits-per-second": "kbit/s",
     "megabits-per-second": "Mbit/s",
     "gigabits-per-second": "Gbit/s",
-    "bytes-per-second": "B/s",
-    "kilobytes-per-second": "kB/s",
-    "megabytes-per-second": "MB/s",
-    "gigabytes-per-second": "GB/s"
+    "bytes-per-second": "o/s",
+    "kilobytes-per-second": "Ko/s",
+    "megabytes-per-second": "Mo/s",
+    "gigabytes-per-second": "Go/s"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2074,7 +2074,7 @@
       "position": "Position du rideau"
     },
     "data": {
-      "shortCategoryName": "Données",
+      "shortCategoryName": "Donnée",
       "size": "Taille"
     },
     "datarate": {
