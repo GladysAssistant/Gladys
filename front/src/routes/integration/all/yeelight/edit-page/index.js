@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import YeelightPage from '../YeelightPage';
 import UpdateDevice from '../../../../../components/device';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
 class EditYeelightDevice extends Component {
   render(props, {}) {
     return (
@@ -19,4 +18,4 @@ class EditYeelightDevice extends Component {
   }
 }
 
-export default EditYeelightDevice;
+export default connect('user,session,httpClient,currentIntegration,houses', {})(EditYeelightDevice);

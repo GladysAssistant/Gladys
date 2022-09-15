@@ -115,8 +115,11 @@ describe('YeelightHandler discover', function Describe() {
   it('returns an error if discovery take more than 10s', async () => {
     const yeelightService = YeelightTimeoutService(gladysWithoutDevices, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     try {
+      const timeout = setTimeout(async () => {
+        assert.fail();
+      }, 10000);
       await yeelightService.device.discover();
-      assert.fail();
+      clearTimeout(timeout);
     } catch (error) {
       expect(yeelightService.device.discoveryInProgress).to.equal(false);
     }

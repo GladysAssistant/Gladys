@@ -94,9 +94,12 @@ class YeelightMock extends EventEmitter {
         return Promise.resolve(null);
       }
       this.connected = this.options.lightIp !== 'not_connected';
+      if (this.connected) {
+        this.emit('connected');
+      }
       return Promise.resolve(this);
     }
-    return Promise.reject(new Error('Connection timeout'));
+    throw new Error(`Unable to connect, no device with id '${this.options.lightId}' found`);
   }
 
   setPower(turnOn, effect = 'sudden', duration = 500) {
@@ -104,9 +107,11 @@ class YeelightMock extends EventEmitter {
     if (this.isEmpty || this.isTimeout) {
       return Promise.resolve(null);
     }
+    const command = { id: 1, method: 'set_power', params: [turnOn ? 'on' : 'off', effect, duration] };
+    this.emit(`${command.method}_sent`, command);
     return Promise.resolve({
       action: 'set_power',
-      command: { id: 1, method: 'set_power', params: [turnOn ? 'on' : 'off', effect, duration] },
+      command,
       result: { id: 1, result: ['ok'] },
       success: true,
     });
@@ -117,9 +122,11 @@ class YeelightMock extends EventEmitter {
     if (this.isEmpty || this.isTimeout) {
       return Promise.resolve(null);
     }
+    const command = { id: 1, method: 'set_bright', params: [brightness, effect, duration] };
+    this.emit(`${command.method}_sent`, command);
     return Promise.resolve({
       action: 'set_bright',
-      command: { id: 1, method: 'set_bright', params: [brightness, effect, duration] },
+      command,
       result: { id: 1, result: ['ok'] },
       success: true,
     });
@@ -130,9 +137,11 @@ class YeelightMock extends EventEmitter {
     if (this.isEmpty || this.isTimeout) {
       return Promise.resolve(null);
     }
+    const command = { id: 1, method: 'set_ct_abx', params: [ct, effect, duration] };
+    this.emit(`${command.method}_sent`, command);
     return Promise.resolve({
       action: 'set_ct_abx',
-      command: { id: 1, method: 'set_ct_abx', params: [ct, effect, duration] },
+      command,
       result: { id: 1, result: ['ok'] },
       success: true,
     });
@@ -144,9 +153,11 @@ class YeelightMock extends EventEmitter {
       return Promise.resolve(null);
     }
     const mergedColor = color.red * 65536 + color.green * 256 + color.blue;
+    const command = { id: 1, method: 'set_rgb', params: [mergedColor, effect, duration] };
+    this.emit(`${command.method}_sent`, command);
     return Promise.resolve({
       action: 'set_rgb',
-      command: { id: 1, method: 'set_rgb', params: [mergedColor, effect, duration] },
+      command,
       result: { id: 1, result: ['ok'] },
       success: true,
     });
@@ -157,9 +168,11 @@ class YeelightMock extends EventEmitter {
     if (this.isEmpty || this.isTimeout) {
       return Promise.resolve(null);
     }
+    const command = { id: 1, method: 'get_prop', params };
+    this.emit(`${command.method}_sent`, command);
     return Promise.resolve({
       action: 'get_prop',
-      command: { id: 1, method: 'get_prop', params },
+      command,
       result: { id: 1, result: this.getPropsByParams(params) },
       success: true,
     });

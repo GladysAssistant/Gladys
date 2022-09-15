@@ -16,9 +16,9 @@ const setValueLimiter = new Bottleneck({
 });
 
 /**
- * @description Add ability to control a Yeelight device
- * @param {Object} gladys - Gladys instance.
- * @param {Object} yeelightApi - Yeelight Client.
+ * @description Add ability to control a Yeelight device.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} yeelightApi - Yeelight Client.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const yeelightHandler = new YeelightHandler(gladys, client, serviceId);

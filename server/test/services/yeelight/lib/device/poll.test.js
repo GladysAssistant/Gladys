@@ -21,7 +21,10 @@ describe('YeelightHandler poll', () => {
   it('returns Yeelight devices not found error when connection fails', async () => {
     const notFoundDevice = {
       ...GladysColorDevice,
-      params: [{ name: 'IP_ADDRESS', value: 'fails' }, { name: 'PORT_ADDRESS', value: 55443 }],
+      params: [
+        { name: 'IP_ADDRESS', value: 'fails' },
+        { name: 'PORT_ADDRESS', value: 55443 },
+      ],
     };
     const yeelightService = YeelightEmptyService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await expect(yeelightService.device.poll(notFoundDevice)).to.be.rejectedWith('YEELIGHT_DEVICE_NOT_FOUND');
@@ -29,7 +32,10 @@ describe('YeelightHandler poll', () => {
   it('returns Yeelight devices not found error when not exist', async () => {
     const notFoundDevice = {
       ...GladysColorDevice,
-      params: [{ name: 'IP_ADDRESS', value: 'not_exist' }, { name: 'PORT_ADDRESS', value: 55443 }],
+      params: [
+        { name: 'IP_ADDRESS', value: 'not_exist' },
+        { name: 'PORT_ADDRESS', value: 55443 },
+      ],
     };
     const yeelightService = YeelightService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await expect(yeelightService.device.poll(notFoundDevice)).to.be.rejectedWith('YEELIGHT_DEVICE_NOT_FOUND');
@@ -37,7 +43,10 @@ describe('YeelightHandler poll', () => {
   it('returns Yeelight devices not found error when not connected', async () => {
     const notFoundDevice = {
       ...GladysColorDevice,
-      params: [{ name: 'IP_ADDRESS', value: 'not_connected' }, { name: 'PORT_ADDRESS', value: 55443 }],
+      params: [
+        { name: 'IP_ADDRESS', value: 'not_connected' },
+        { name: 'PORT_ADDRESS', value: 55443 },
+      ],
     };
     const yeelightService = YeelightService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
     await expect(yeelightService.device.poll(notFoundDevice)).to.be.rejectedWith('YEELIGHT_DEVICE_NOT_FOUND');

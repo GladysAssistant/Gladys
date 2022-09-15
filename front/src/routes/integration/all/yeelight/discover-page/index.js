@@ -4,7 +4,6 @@ import actions from '../actions';
 import YeelightPage from '../YeelightPage';
 import DiscoverTab from './DiscoverTab';
 
-@connect('user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading', actions)
 class YeelightIntegration extends Component {
   async componentWillMount() {
     this.props.getDiscoveredYeelightDevices();
@@ -21,4 +20,7 @@ class YeelightIntegration extends Component {
   }
 }
 
-export default YeelightIntegration;
+export default connect(
+  'user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading',
+  actions
+)(YeelightIntegration);

@@ -1,4 +1,3 @@
-const { flatten, intersection, isEmpty } = require('lodash');
 const { DEVICE_POLL_FREQUENCIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 const { DEVICE_EXTERNAL_ID_BASE, DEVICE_IP_ADDRESS, DEVICE_PORT_ADDRESS } = require('../utils/constants');
@@ -32,40 +31,20 @@ const AVAILABLE_FEATURE_MODELS = {
   },
 };
 
-const getDeviceModel = (device) => {
-  switch (device.model) {
-    case 'mono':
-      return 'White';
-    case 'color':
-    case 'color4':
-      return 'RGBW';
-    case 'stripe':
-      return 'Stripe';
-    case 'ceiling1':
-      return 'Ceiling';
-    case 'ceiling':
-      return 'Ceiling color';
-    case 'bslamp':
-    case 'bslamp1':
-    case 'bslamp3':
-      return 'Bedside';
-    case 'desklamp':
-      return 'Desklamp';
-    case 'ct_bulb':
-      return 'Color';
-    default:
-      return 'Unknown';
-  }
+const getDeviceName = (device) => {
+  return device.name || `Yeelight ${device.model}`;
 };
 
-const getDeviceName = (device) => {
-  const modelName = getDeviceModel(device);
-  return device.name || `Yeelight ${modelName}`;
+const hasFeature = (device, feature) => {
+  return (
+    device.capabilities.filter((capability) => AVAILABLE_FEATURE_MODELS[feature].capabilities.includes(capability))
+      .length > 0
+  );
 };
 
 /**
  * @description Get the external ID of the Yeelight device.
- * @param {Object} device - The Yeelight device.
+ * @param {object} device - The Yeelight device.
  * @returns {string} Return the external ID of the Gladys device.
  * @example
  * getExternalId(device, 1);
@@ -77,7 +56,7 @@ function getExternalId(device) {
 /**
  * @description Parse the external ID of the Gladys device.
  * @param {string} externalId - External ID of the Gladys device.
- * @returns {Object} Return the prefix, the device ID and the type.
+ * @returns {object} Return the prefix, the device ID and the type.
  * @example
  * parseExternalId('yeelight:0x00000000035ac142:power');
  */
@@ -89,26 +68,17 @@ function parseExternalId(externalId) {
 /**
  * @description Create an Yeelight device for Gladys.
  * @param {string} serviceId - The UUID of the service.
- * @param {Object} device - The Yeelight device.
- * @returns {Object} Return Gladys device.
+ * @param {object} device - The Yeelight device.
+ * @returns {object} Return Gladys device.
  * @example
  * getDevice(serviceId, device, channel);
  */
 function getDevice(serviceId, device) {
   const name = getDeviceName(device);
-  const modelName = getDeviceModel(device);
   const externalId = getExternalId(device);
-
-  const isUnhandled = isEmpty(
-    intersection(
-      flatten(Object.keys(AVAILABLE_FEATURE_MODELS).map((feature) => AVAILABLE_FEATURE_MODELS[feature].capabilities)),
-      device.capabilities,
-    ),
-  );
-
   const createdDevice = {
     name,
-    model: modelName,
+    model: device.model,
     external_id: externalId,
     selector: externalId,
     should_poll: false,
@@ -126,28 +96,29 @@ function getDevice(serviceId, device) {
     ],
   };
 
-  if (isUnhandled) {
+  const createdDeviceFeatures = Object.keys(AVAILABLE_FEATURE_MODELS).reduce((acc, feature) => {
+    if (hasFeature(device, feature)) {
+      const featureExternalId = [externalId, AVAILABLE_FEATURE_MODELS[feature].id].join(':');
+      const deviceFeature = {
+        ...AVAILABLE_FEATURE_MODELS[feature].feature.generateFeature(name),
+        external_id: featureExternalId,
+        selector: featureExternalId,
+      };
+
+      logger.debug(`Yeelight: Add feature "${feature}" to device "${device.id}"`);
+      acc.push(deviceFeature);
+    }
+    return acc;
+  }, []);
+
+  if (createdDeviceFeatures.length === 0) {
     createdDevice.model = 'unhandled';
     createdDevice.not_handled = true;
     createdDevice.raw_yeelight_device = device;
   } else {
     createdDevice.should_poll = true;
-    createdDevice.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS;
-
-    Object.keys(AVAILABLE_FEATURE_MODELS).forEach((feature) => {
-      const hasFeature = !isEmpty(intersection(AVAILABLE_FEATURE_MODELS[feature].capabilities, device.capabilities));
-      if (hasFeature) {
-        const featureExternalId = [externalId, AVAILABLE_FEATURE_MODELS[feature].id].join(':');
-        const deviceFeature = {
-          ...AVAILABLE_FEATURE_MODELS[feature].feature.generateFeature(name),
-          external_id: featureExternalId,
-          selector: featureExternalId,
-        };
-
-        logger.debug(`Yeelight: Add feature "${feature}" to device "${device.id}"`);
-        createdDevice.features.push(deviceFeature);
-      }
-    });
+    createdDevice.poll_frequency = DEVICE_POLL_FREQUENCIES.EVERY_10_SECONDS;
+    createdDevice.features = createdDeviceFeatures;
   }
 
   return createdDevice;

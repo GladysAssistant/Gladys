@@ -8,7 +8,7 @@ const { emitNewState } = require('../utils/emitNewState');
 
 /**
  * @description Poll value of a Yeelight device.
- * @param {Object} device - The device to control.
+ * @param {object} device - The device to control.
  * @returns {Promise<any>} Returns nothing.
  * @example
  * poll(device);
@@ -16,56 +16,48 @@ const { emitNewState } = require('../utils/emitNewState');
 async function poll(device) {
   const lightIp = getDeviceParam(device, DEVICE_IP_ADDRESS);
   const lightPort = getDeviceParam(device, DEVICE_PORT_ADDRESS);
-  const yeelight = new this.yeelightApi.Yeelight({ lightIp, lightPort });
+  const light = new this.yeelightApi.Yeelight({ lightIp, lightPort });
 
-  return yeelight
-    .connect()
-    .catch((error) => {
-      logger.warn(`Yeelight: ${error}`);
+  try {
+    await light.connect();
+    if (!light || !light.connected) {
       throw new NotFoundError(`YEELIGHT_DEVICE_NOT_FOUND`);
-    })
-    .then((light) => {
-      if (!light || !light.connected) {
-        throw new NotFoundError(`YEELIGHT_DEVICE_NOT_FOUND`);
-      }
+    }
 
-      return light
-        .getProperty([
-          this.yeelightApi.DevicePropery.POWER,
-          this.yeelightApi.DevicePropery.BRIGHT,
-          this.yeelightApi.DevicePropery.CT,
-          this.yeelightApi.DevicePropery.RGB,
-        ])
-        .then((state) => {
-          light.disconnect();
+    const state = await light.getProperty([
+      this.yeelightApi.DevicePropery.POWER,
+      this.yeelightApi.DevicePropery.BRIGHT,
+      this.yeelightApi.DevicePropery.CT,
+      this.yeelightApi.DevicePropery.RGB,
+    ]);
+    await light.disconnect();
 
-          const [binary, brightness, temperature, color] = state.result.result;
+    const [binary, brightness, temperature, color] = state.result.result;
 
-          // BINARY
-          const currentBinaryValue = binary === 'on' ? STATE.ON : STATE.OFF;
-          logger.debug(`Yeelight: Power is ${binary}`);
+    // BINARY
+    const currentBinaryValue = binary === 'on' ? STATE.ON : STATE.OFF;
+    logger.debug(`Yeelight: Power is ${binary}`);
+    emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.BINARY, currentBinaryValue);
 
-          // BRIGHTNESS
-          const currentBrightnessValue = this.getIntValue(brightness);
-          logger.debug(`Yeelight: Brightness at ${currentBrightnessValue}%`);
+    // BRIGHTNESS
+    const currentBrightnessValue = this.getIntValue(brightness);
+    logger.debug(`Yeelight: Brightness at ${currentBrightnessValue}%`);
+    emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentBrightnessValue);
 
-          // COLOR TEMPERATURE
-          const currentTemperatureValue = this.getIntValue(temperature);
-          logger.debug(`Yeelight: Temperature: ${currentTemperatureValue}K`);
+    // COLOR TEMPERATURE
+    const currentTemperatureValue = this.getIntValue(temperature);
+    logger.debug(`Yeelight: Temperature: ${currentTemperatureValue}K`);
+    emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE, currentTemperatureValue);
 
-          // COLOR
-          const currentColorValue = this.getIntValue(color);
-          const rgb = intToRgb(currentColorValue);
-          logger.debug(`Yeelight: RGB: ${rgb} (${currentColorValue})`);
-
-          return Promise.all([
-            emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.BINARY, currentBinaryValue),
-            emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS, currentBrightnessValue),
-            emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE, currentTemperatureValue),
-            emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.COLOR, currentColorValue),
-          ]);
-        });
-    });
+    // COLOR
+    const currentColorValue = this.getIntValue(color);
+    const rgb = intToRgb(currentColorValue);
+    logger.debug(`Yeelight: RGB: ${rgb} (${currentColorValue})`);
+    emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.COLOR, currentColorValue);
+  } catch (error) {
+    await light.disconnect();
+    throw new NotFoundError(`YEELIGHT_DEVICE_NOT_FOUND`);
+  }
 }
 
 module.exports = {

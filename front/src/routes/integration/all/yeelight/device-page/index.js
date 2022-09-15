@@ -4,7 +4,6 @@ import actions from '../actions';
 import YeelightPage from '../YeelightPage';
 import DeviceTab from './DeviceTab';
 
-@connect('user,yeelightDevices,housesWithRooms,getYeelightStatus', actions)
 class YeelightIntegration extends Component {
   componentWillMount() {
     this.props.getYeelightDevices();
@@ -21,4 +20,4 @@ class YeelightIntegration extends Component {
   }
 }
 
-export default YeelightIntegration;
+export default connect('user,yeelightDevices,housesWithRooms,getYeelightStatus', actions)(YeelightIntegration);
