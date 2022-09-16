@@ -2044,6 +2044,10 @@
       "state": "Etat du rideau",
       "position": "Position du rideau"
     },
+    "timer": {
+      "shortCategoryName": "Minuteur",
+      "status": "Status du minuteur"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"

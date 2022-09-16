@@ -2044,6 +2044,10 @@
       "state": "Curtain state",
       "position": "curtain position"
     },
+    "timer": {
+      "shortCategoryName": "Timer",
+      "status": "Timer status"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
