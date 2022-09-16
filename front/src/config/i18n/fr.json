@@ -1799,11 +1799,6 @@
   },
   "deviceFeatureAction": {
     "category": {
-      "timer": {
-        "status": {
-          "disabled": "Désactiver",
-          "active": "Actif",
-          "enabled": "Activer"
       "shutter": {
         "state": {
           "zero": "Arrêter",
@@ -1816,6 +1811,13 @@
           "zero": "Arrêter",
           "one": "Ouvrir",
           "other": "Fermer"
+        }
+      },
+      "timer": {
+        "status": {
+          "enabled": "Activé",
+          "disabled": "Désactivé",
+          "active": "Actif"
         }
       }
     }
@@ -2027,10 +2029,6 @@
       "shortCategoryName": "Durée",
       "decimal": "Durée (décimale)",
       "integer": "Durée (entier)"
-    },
-    "timer": {
-      "shortCategoryName": "Minuteur",
-      "status": "Status du minuteur"
     },
     "voc-sensor": {
       "shortCategoryName": "Capteur de pollution COV",

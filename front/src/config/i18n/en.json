@@ -1799,11 +1799,6 @@
   },
   "deviceFeatureAction": {
     "category": {
-      "timer": {
-        "status": {
-          "disabled": "Disable",
-          "active": "Active",
-          "enabled": "Enable"
       "shutter": {
         "state": {
           "zero": "Stop",
@@ -1816,6 +1811,13 @@
           "zero": "Stop",
           "one": "Open",
           "other": "Close"
+        }
+      },
+      "timer": {
+        "status": {
+          "enabled": "Enabled",
+          "disabled": "Disabled",
+          "active": "Active"
         }
       }
     }
@@ -2027,10 +2029,6 @@
       "shortCategoryName": "Duration",
       "decimal": "Duration (decimal)",
       "integer": "Duration (integer)"
-    },
-    "timer": {
-      "shortCategoryName": "Timer",
-      "status": "Timer status"
     },
     "voc-sensor": {
       "shortCategoryName": "VOC Sensor",
