@@ -77,8 +77,17 @@ function buildFeature(deviceName, expose = {}, parentType) {
   // Unit
   const unit = mapUnit(deviceUnit, createdFeature.unit);
 
+  // Force override values
+  const definedFeature = createdFeature.forceOverride
+    ? // We force to override with Gladys mapping
+      { ...createdFeature, min, max, unit, ...(byName || {}) }
+    : // Values from z2m are kept
+      { ...createdFeature, min, max, unit };
+  // Clean additional attribute
+  delete definedFeature.forceOverride;
+
   // Add missing properties
-  return completeFeature(deviceName, { ...createdFeature, min, max, unit }, property);
+  return completeFeature(deviceName, definedFeature, property);
 }
 
 module.exports = {

@@ -29,4 +29,5 @@ module.exports = {
     const [red, green, blue] = intToRgb(value);
     return `${red},${green},${blue}`;
   },
+  valueAsArray: true,
 };

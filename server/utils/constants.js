@@ -18,6 +18,12 @@ const TIMER_STATUS = {
   ACTIVE: 2,
 };
 
+const COVER_STATE = {
+  STOP: 0,
+  OPEN: 1,
+  CLOSE: -1,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -340,6 +346,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   DURATION: 'duration',
   TIMER: 'timer',
   VOC_SENSOR: 'voc-sensor',
+  SHUTTER: 'shutter',
+  CURTAIN: 'curtain',
   UNKNOWN: 'unknown',
 };
 
@@ -464,6 +472,14 @@ const DEVICE_FEATURE_TYPES = {
   },
   VOC_SENSOR: {
     DECIMAL: 'decimal',
+  },
+  SHUTTER: {
+    STATE: 'state',
+    POSITION: 'position',
+  },
+  CURTAIN: {
+    STATE: 'state',
+    POSITION: 'position',
   },
   UNKNOWN: {
     UNKNOWN: 'unknown',
@@ -712,6 +728,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
   },
+  BROADLINK: {
+    LEARN_MODE: 'broadlink.learn',
+    SEND_MODE: 'broadlink.send',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -801,6 +821,7 @@ const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.TIMER_STATUS = TIMER_STATUS;
+module.exports.COVER_STATE = COVER_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

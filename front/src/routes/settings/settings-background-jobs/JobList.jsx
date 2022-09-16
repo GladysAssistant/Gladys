@@ -1,11 +1,8 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { JOB_STATUS, JOB_ERROR_TYPES } from '../../../../../server/utils/constants';
+import RelativeTime from '../../../components/device/RelativeTime';
 import style from './style.css';
-
-dayjs.extend(relativeTime);
 
 const JobList = ({ children, ...props }) => (
   <div class="card">
@@ -40,9 +37,7 @@ const JobList = ({ children, ...props }) => (
                   </div>
                   <div>
                     <small>
-                      {dayjs(job.created_at)
-                        .locale(props.user.language)
-                        .fromNow()}
+                      <RelativeTime datetime={job.created_at} language={props.user.language} futureDisabled />
                     </small>
                   </div>
                   {job.data && job.data.error_type && job.data.error_type !== JOB_ERROR_TYPES.UNKNOWN_ERROR && (
