@@ -38,12 +38,10 @@ const shouldDisplayDeviceName = (device, deviceFeature) => {
 
 const getDeviceFeatureName = (dictionnary, device, feature) => {
   const displayDeviceName = shouldDisplayDeviceName(device, feature);
-  if (displayDeviceName) {
-    const featureDescription = get(dictionnary, `deviceFeatureCategory.${feature.category}.${feature.type}`);
-    return `${device.name} (${featureDescription})`;
-  }
+  const featureName = displayDeviceName ? '' : ` - ${feature.name}`;
 
-  return feature.name;
+  const featureDescription = get(dictionnary, `deviceFeatureCategory.${feature.category}.${feature.type}`);
+  return `${device.name} (${featureDescription}${featureName})`;
 };
 
 const getDeviceName = (device, feature) => {
