@@ -56,6 +56,14 @@ async function get(userId, options = {}) {
     where.external_id = options.externalId;
   }
 
+  if (options.sync) {
+    where.sync = options.sync;
+  }
+
+  if (options.type) {
+    where.type = options.type;
+  }
+
   const calendars = await db.Calendar.findAll({ where });
 
   const plainCalendars = calendars.map((calendar) => calendar.get({ plain: true }));

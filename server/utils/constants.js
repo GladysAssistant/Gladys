@@ -12,6 +12,12 @@ const BUTTON_STATUS = {
   LONG_CLICK: 6,
 };
 
+const COVER_STATE = {
+  STOP: 0,
+  OPEN: 1,
+  CLOSE: -1,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -333,6 +339,9 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   UV_SENSOR: 'uv-sensor',
   DURATION: 'duration',
+  VOC_SENSOR: 'voc-sensor',
+  SHUTTER: 'shutter',
+  CURTAIN: 'curtain',
   UNKNOWN: 'unknown',
 };
 
@@ -457,6 +466,17 @@ const DEVICE_FEATURE_TYPES = {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
   },
+  VOC_SENSOR: {
+    DECIMAL: 'decimal',
+  },
+  SHUTTER: {
+    STATE: 'state',
+    POSITION: 'position',
+  },
+  CURTAIN: {
+    STATE: 'state',
+    POSITION: 'position',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -478,6 +498,7 @@ const DEVICE_FEATURE_UNITS = {
   LUX: 'lux',
   // Concentration units
   PPM: 'ppm',
+  PPB: 'ppb',
   // Power units
   WATT: 'watt',
   KILOWATT: 'kilowatt',
@@ -611,6 +632,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.MONTHS,
     DEVICE_FEATURE_UNITS.YEARS,
   ],
+  [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: [DEVICE_FEATURE_UNITS.PPB],
 };
 
 const ACTIONS_STATUS = {
@@ -701,6 +723,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONNECTED: 'ewelink.connected',
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
+  },
+  BROADLINK: {
+    LEARN_MODE: 'broadlink.learn',
+    SEND_MODE: 'broadlink.send',
   },
   ECOVACS: {
     CONNECTED: 'ecovacs.connected',
@@ -795,6 +821,7 @@ const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
+module.exports.COVER_STATE = COVER_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;

@@ -38,6 +38,7 @@ describe('scene.action.isEventRunning', () => {
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
       name: 'my test event',
+      description: 'my event description',
       location: 'school',
       start: startDate,
       end: endDate,
@@ -70,6 +71,7 @@ describe('scene.action.isEventRunning', () => {
         '0': {
           calendarEvent: {
             name: 'my test event',
+            description: 'my event description',
             location: 'school',
             start: dayjs(startDate)
               .tz('Europe/Paris')
@@ -93,6 +95,7 @@ describe('scene.action.isEventRunning', () => {
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
       name: 'my test event',
+      description: 'my event description',
       location: 'school',
       start: startDate,
       end: endDate,
@@ -131,6 +134,7 @@ describe('scene.action.isEventRunning', () => {
     const calendarEvent = {
       name: 'my test event',
       location: 'school',
+      description: 'my event description',
       start: dayjs(startDate)
         .tz('Europe/Paris')
         .locale('en')
@@ -165,6 +169,7 @@ describe('scene.action.isEventRunning', () => {
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
       name: 'my test event',
+      description: 'my event description',
       start: startDate,
       end: endDate,
     });
@@ -202,6 +207,7 @@ describe('scene.action.isEventRunning', () => {
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
       name: 'my test event',
+      description: 'my event description',
       start: startDate,
       end: endDate,
     });

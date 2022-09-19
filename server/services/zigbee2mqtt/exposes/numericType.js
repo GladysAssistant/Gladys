@@ -6,6 +6,10 @@ module.exports = {
     return value;
   },
   readValue: (expose, value) => {
+    if (expose.name === 'linkquality') {
+      return Math.round((value * 5) / 255);
+    }
+
     return value;
   },
   feature: {
@@ -139,6 +143,15 @@ module.exports = {
         max: 150,
       },
     },
+    linkquality: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIGNAL,
+        type: DEVICE_FEATURE_TYPES.SIGNAL.QUALITY,
+        min: 0,
+        max: 5,
+        forceOverride: true,
+      },
+    },
     power: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -181,6 +194,15 @@ module.exports = {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
         unit: DEVICE_FEATURE_UNITS.VOLT,
+      },
+    },
+    voc: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VOC_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VOC_SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.PPB,
+        min: 0,
+        max: 5500,
       },
     },
   },
