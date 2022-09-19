@@ -64,6 +64,9 @@ import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs'
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
+import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
+import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
+import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
 import CalDAVSharePage from '../routes/integration/all/caldav/share-page';
@@ -83,6 +86,11 @@ import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import RflinkDevicePage from '../routes/integration/all/rflink/device-page';
 import RflinkSettingsPage from '../routes/integration/all/rflink/settings-page';
 import RflinkEditPage from '../routes/integration/all/rflink/device-page/setup';
+
+// Broadlink integration
+import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
+import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
+import BroadlinkPeripheralPage from '../routes/integration/all/broadlink/peripheral-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -240,7 +248,15 @@ const AppRouter = connect(
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+        <BroadlinkDevicePage path="/dashboard/integration/device/broadlink" />
+        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit" />
+        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
+        <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
+
+        <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
+        <AlexaWelcomePage path="/dashboard/integration/communication/alexa" />
+        <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
 
         <ChatPage path="/dashboard/chat" />
