@@ -31,6 +31,4 @@ describe('ecovacs.stop command', () => {
     // TODO : complete
     assert.notCalled(gladys.variable.setValue);
   });
-
-
 });

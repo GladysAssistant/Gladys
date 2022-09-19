@@ -1,42 +1,21 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { assert, fake } = sinon;
+const { assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
-
-function EcovacsHandler() {
-  this.start = fake.returns(null);
-  this.stop = fake.returns(null);
-}
+const { EcovacsHandlerMock } = require('./mocks/ecovacs.mock.test');
 
 const EcovacsService = proxyquire('../../../services/ecovacs', {
-  './lib': EcovacsHandler,
+  './lib': EcovacsHandlerMock,
 });
 
-const gladys = {
-  event: {
-    emit: fake.returns(null),
-  },
-  variable: {
-    getValue: () => 'value',
-  },
-};
-
 describe('EcovacsService', () => {
-  let ecovacsService;
-
-  beforeEach(() => {
-    ecovacsService = EcovacsService(gladys, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
-  });
-
-  afterEach(() => {
-    sinon.reset();
-  });
+  const ecovacsService = EcovacsService({}, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
 
   it('should have controllers', () => {
-      expect(ecovacsService)
-        .to.have.property('controllers')
-        .and.be.instanceOf(Object);
+    expect(ecovacsService)
+      .to.have.property('controllers')
+      .and.be.instanceOf(Object);
   });
 
   it('should start service', async () => {

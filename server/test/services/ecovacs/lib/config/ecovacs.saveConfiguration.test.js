@@ -1,11 +1,13 @@
-const { expect } = require('chai');
 const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
+const { serviceId } = require('../../consts.test');
 
 const { assert, fake } = sinon;
-const EventEmitter = require('events');
+const EcovacsApiMock = require('../../mocks/ecovacs-api.mock.test');
 
-const event = new EventEmitter();
-const EcovacsHandler = require('../../../../../services/ecovacs/lib');
+const EcovacsService = proxyquire('../../../../../services/ecovacs/index', {
+  'ecovacs-deebot': EcovacsApiMock,
+});
 
 const gladys = {
   variable: {
@@ -16,23 +18,15 @@ const gladys = {
     get: fake.resolves([]),
   },
 };
-const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
 describe('ecovacs.saveConfiguration config command', () => {
-  let ecovacsHandler;
-
   beforeEach(() => {
-    ecovacsHandler = new EcovacsHandler(gladys, serviceId);
-  });
-
-  afterEach(() => {
     sinon.reset();
   });
 
-  it('should save configuration of service', () => {
-    const result = ecovacsHandler.saveConfiguration();
-    assert.notCalled(gladys.variable.setValue);
-    expect(result).deep.eq(null);
+  it('should save configuration of service', async () => {
+    const ecovacsService = EcovacsService(gladys, serviceId);
+    await ecovacsService.device.saveConfiguration({ login: 'john@doe.com', password: '666', country: 'fr' });
+    assert.calledThrice(gladys.variable.setValue);
   });
-
 });

@@ -3,7 +3,8 @@ const EcovacsHandler = require('./lib');
 const EcovacsController = require('./api/ecovacs.controller');
 
 module.exports = function EcovacsService(gladys, serviceId) {
-  const ecovacsHandler = new EcovacsHandler(gladys, serviceId);
+  const ecovacsDeebot = require('ecovacs-deebot');
+  const ecovacsHandler = new EcovacsHandler(gladys, ecovacsDeebot, serviceId);
 
   /**
    * @public

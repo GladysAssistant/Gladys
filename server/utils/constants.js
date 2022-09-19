@@ -325,6 +325,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SIGNAL: 'signal',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   TELEVISION: 'television',
+  VACBOT: 'vacuum',
   ENERGY_SENSOR: 'energy-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   CURRENCY: 'currency',
@@ -422,6 +423,11 @@ const DEVICE_FEATURE_TYPES = {
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
+  },
+  VACBOT: {
+    PLAY: 'play',
+    PAUSE: 'pause',
+    STOP: 'stop',
   },
   ENERGY_SENSOR: {
     BINARY: 'binary',
@@ -695,6 +701,11 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONNECTED: 'ewelink.connected',
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
+  },
+  ECOVACS: {
+    CONNECTED: 'ecovacs.connected',
+    NEW_DEVICE: 'ecovacs.new-device',
+    ERROR: 'ecovacs.error',
   },
 };
 

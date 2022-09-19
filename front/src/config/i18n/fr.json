@@ -579,6 +579,64 @@
         "deleteError": "Erreur lors de la suppression, veuillez réessayer."
       }
     },
+    "ecovacs": {
+      "title": "Ecovacs Deebot",
+      "description": "Contrôlez vos aspirateurs robots.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Ecovacs",
+      "setupTab": "Configuration",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Ecovacs",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Ecovacs, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Ecovacs.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "device": {
+        "title": "Appareils Ecovacs dans Gladys",
+        "search": "Rechercher les appareils",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil Ecovacs trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud Ecovacs",
+        "description": "Les appareils Ecovacs sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Ecovacs. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil Ecovacs n'a été découvert.",
+        "scan": "Scanner"
+      },
+      "setup": {
+        "title": "Configuration Ecovacs",
+        "ecovacsDescription": "Vous pouvez connecter Gladys à votre compte cloud Ecovacs pour commander les appareils associés.",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur Ecovacs",
+        "countryCodeLabel": "Code pays",
+        "countryPlaceholder": "Entrez le code de votre pays (ex: fr)",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe utilisateur Ecovacs",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Ecovacs...",
+        "connected": "Connexion réussie au compte cloud Ecovacs !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "zigbee2mqtt": {
       "title": "Zigbee2mqtt",
       "description": "Contrôlez vos appareils Zigbee.",

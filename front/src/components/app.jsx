@@ -112,6 +112,11 @@ import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
+// Ecovacs
+import EcovacsPage from '../routes/integration/all/ecovacs/device-page';
+import EcovacsDiscoverPage from '../routes/integration/all/ecovacs/discover-page';
+import EcovacsSetupPage from '../routes/integration/all/ecovacs/setup-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -227,6 +232,9 @@ const AppRouter = connect(
         <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+        <EcovacsPage path="/dashboard/integration/device/ecovacs" />
+        <EcovacsDiscoverPage path="/dashboard/integration/device/ecovacs/discover" />
+        <EcovacsSetupPage path="/dashboard/integration/device/ecovacs/setup" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

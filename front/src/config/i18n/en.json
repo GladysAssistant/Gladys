@@ -428,6 +428,64 @@
         "conflictError": "Current topic is already in use."
       }
     },
+    "ecovacs": {
+      "title": "Ecovacs Deebot",
+      "description": "Control your vacuum bots.",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover Ecovacs",
+      "setupTab": "Setup",
+      "discoverDeviceDescr": "Automatically scan Ecovacs devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed or available",
+      "status": {
+        "notConnected": "Gladys failed to connect to Ecovacs cloud account, please go to ",
+        "setupPageLink": "Ecovacs configuration page.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "search": "Search devices",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No Ecovacs device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your Ecovacs cloud account",
+        "description": "Ecovacs devices are automatically discovered. Your Ecovacs devices need to be added to your Ecovacs cloud account before.",
+        "error": "Error discovering Ecovacs devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No Ecovacs device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "Ecovacs configuration",
+        "ecovacsDescription": "You can connect Gladys to your Ecovacs cloud account to command the associated devices.",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter Ecovacs username",
+        "countryCodeLabel": "Country code",
+        "countryPlaceholder": "Enter your country code (ie:fr)",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter Ecovacs password",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your Ecovacs cloud account...",
+        "connected": "Connected to the Ecovacs cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
+    },
     "tpLink": {
       "title": "TP-Link",
       "description": "Control TP-Link Bulbs and Plugs.",

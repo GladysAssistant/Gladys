@@ -1,38 +1,22 @@
-const { expect } = require('chai');
 const sinon = require('sinon');
+const { expect } = require('chai');
+const proxyquire = require('proxyquire').noCallThru();
+const { event, serviceId } = require('../../consts.test');
+const EcovacsApiMock = require('../../mocks/ecovacs-api.mock.test');
 
-const { assert, fake } = sinon;
-const EventEmitter = require('events');
-
-const event = new EventEmitter();
-const EcovacsHandler = require('../../../../../services/ecovacs/lib');
-
-const gladys = {
-  variable: {
-    getValue: fake.resolves(null),
-    setValue: fake.resolves(null),
-  },
-  device: {
-    get: fake.resolves([]),
-  },
-};
-const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
+const EcovacsService = proxyquire('../../../../../services/ecovacs/index', {
+  'ecovacs-deebot': EcovacsApiMock,
+});
 
 describe('ecovacs.getStatus command', () => {
-  let ecovacsHandler;
-
   beforeEach(() => {
-    ecovacsHandler = new EcovacsHandler(gladys, serviceId);
-  });
-
-  afterEach(() => {
     sinon.reset();
   });
 
-  it('should get status ready', () => {
-    const result = ecovacsHandler.getStatus();
-    assert.notCalled(gladys.variable.setValue);
-    expect(result).deep.eq(null);
+  it('should get service status', async () => {
+    const gladys = { event };
+    const ecovacsService = EcovacsService(gladys, serviceId);
+    const result = await ecovacsService.device.getStatus();
+    expect(result).deep.eq({ connected: false, configured: false });
   });
-
 });
