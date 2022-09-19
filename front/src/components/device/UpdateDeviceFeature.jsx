@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -19,6 +19,14 @@ class UpdateDeviceFeature extends Component {
   updateMax = e => this.props.updateFeatureProperty(this.props.featureIndex, 'max', e.target.value);
   updateUnit = e => this.props.updateFeatureProperty(this.props.featureIndex, 'unit', e.target.value);
   updateCategory = e => this.props.updateFeatureProperty(this.props.featureIndex, 'category', e.target.value);
+  updateKeepHistory = () => {
+    const e = {
+      target: {
+        value: !this.props.feature.keep_history
+      }
+    };
+    this.props.updateFeatureProperty(this.props.featureIndex, 'keep_history', e.target.value);
+  };
   deleteFeature = () => this.props.deleteFeature(this.props.featureIndex);
 
   render({ feature, featureIndex, canEditCategory, device, ...props }) {
@@ -149,6 +157,31 @@ class UpdateDeviceFeature extends Component {
                 </Localizer>
               </div>
             )}
+            <div class="page-options d-flex">
+              <div class="form-group">
+                <div class="form-label">
+                  <Text id="editDeviceForm.keepHistoryLabel" />
+                </div>
+                <label class="custom-switch">
+                  <input
+                    id={`keep_history_${featureIndex}`}
+                    type="checkbox"
+                    checked={feature.keep_history}
+                    onClick={this.updateKeepHistory}
+                    class="custom-switch-input"
+                  />
+                  <span class="custom-switch-indicator" />
+                  <span class="custom-switch-description">
+                    <Text id="editDeviceForm.keepHistorySmallDescription" />
+                  </span>
+                </label>
+                <p class="mt-2">
+                  <small>
+                    <MarkupText id="editDeviceForm.keepHistoryDescription" />
+                  </small>
+                </p>
+              </div>
+            </div>
             {props.allowModifyFeatures && (
               <div class="form-group">
                 <button onClick={props.deleteFeature} class="btn btn-outline-danger">

@@ -472,7 +472,7 @@
     },
     "rtspCamera": {
       "title": "Caméras",
-      "description": "Affichez vos caméras.",
+      "description": "Récupérez le flux vidéos de vos caméras dans Gladys",
       "search": "Chercher une caméra",
       "new": "Nouveau",
       "nameLabel": "Nom de la caméra",
@@ -496,7 +496,7 @@
     },
     "tasmota": {
       "title": "Tasmota",
-      "description": "Contrôler vos appareils Tasmota.",
+      "description": "Contrôler vos appareils Tasmota en MQTT ou HTTP",
       "deviceTab": "Appareils",
       "mqttDiscoverTab": "Découverte MQTT",
       "httpDiscoverTab": "Découverte HTTP",
@@ -581,7 +581,7 @@
     },
     "zigbee2mqtt": {
       "title": "Zigbee2mqtt",
-      "description": "Contrôlez vos appareils Zigbee.",
+      "description": "Contrôlez vos appareils Zigbee via Zigbee2mqtt.",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Zigbee",
       "settingsTab": "Paramètres",
@@ -656,9 +656,12 @@
       "documentation": "Documentation Zigbee2mqtt"
     },
     "googleHome": {
-      "title": "Gladys Assistant",
+      "title": "Google Home",
+      "description": "Contrôlez vos appareils Gladys à la voix dans Google Home",
+      "longDescription": "Il est possible d'utiliser Google Home pour contrôler vos appareils Gladys à la voix. Pour configurer Google Home, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Voulez-vous connecter Gladys Assistant à Google ?",
-      "description": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
+      "pageDescription": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
       "error": "Une erreur est survenue. Merci de réessayer.",
       "connectedAs": "Connecté en tant que",
       "googleWillBeAble": "Google pourra :",
@@ -670,9 +673,12 @@
       "connectButton": "Lier"
     },
     "alexa": {
-      "title": "Gladys Assistant",
+      "title": "Amazon Alexa",
+      "description": "Contrôlez vos appareils Gladys à la voix dans Alexa",
+      "longDescription": "Il est possible d'utiliser Amazon Alexa pour contrôler vos appareils Gladys à la voix. Pour configurer Alexa, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Voulez-vous connecter Gladys Assistant à Amazon Alexa ?",
-      "description": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
+      "pageDescription": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
       "error": "Une erreur est survenue. Merci de réessayer.",
       "connectedAs": "Connecté en tant que",
       "googleWillBeAble": "Amazon Alexa pourra :",
@@ -683,9 +689,14 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "owntracks": {
+      "title": "Owntracks",
+      "description": "Envoyez votre position GPS à Gladys via une application",
+      "longDescription": "Owntracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser Owntracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer Owntracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
+    },
     "zwave": {
       "title": "Z-Wave",
-      "description": "Contrôlez vos appareils Z-Wave.",
+      "description": "Contrôlez vos appareils Z-Wave avec Open-Zwave.",
       "deviceTab": "Appareils",
       "networkTab": "Réseau",
       "settingsTab": "Paramètres",
@@ -693,6 +704,7 @@
       "device": {
         "title": "Appareils Z-Wave",
         "search": "Chercher un appareil",
+        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
@@ -761,7 +773,7 @@
     },
     "openWeather": {
       "title": "API OpenWeather",
-      "description": "Récupérer la météo dans Gladys.",
+      "description": "Affichez les données de météo de votre ville dans Gladys.",
       "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
       "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
@@ -771,7 +783,7 @@
     },
     "mqtt": {
       "title": "MQTT",
-      "description": "Connexion à un serveur MQTT.",
+      "description": "Connexion à un serveur MQTT, en local ou en distant.",
       "deviceTab": "Appareils",
       "setupTab": "Configuration",
       "status": {
@@ -846,9 +858,120 @@
         "disconnected": "Déconnecté du broker MQTT."
       }
     },
+    "broadlink": {
+      "title": "Broadlink",
+      "description": "Contrôlez vos appareils Broadlink.",
+      "remoteTab": "Appareils",
+      "peripheralTab": "Appareils disponibles",
+      "peripheral": {
+        "title": "Appareils Broadlink disponibles",
+        "description": "Ici vous trouverez les appareils Broadlink disponible. Si celui que vous cherchez est manquant, merci de vérifier qu'il est bien connecté au réseau.",
+        "noPeripherals": "Aucun appareil découvert sur le réseau, merci de vérifier les branchements.",
+        "noNameLabel": "Type non reconnu",
+        "ipAddressLabel": "Adresse IP",
+        "macAddressLabel": "Adresse MAC",
+        "modelLabel": "Modèle",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "nameLabel": "Nom de l'appareil",
+        "saveButton": "Enregistrer",
+        "notConnectable": "Verouillé",
+        "alreadyCreatedButton": "Déjà créé",
+        "createRemoteButton": "Créer une télécommande"
+      },
+      "device": {
+        "title": "Appareils Broadlink",
+        "searchPlaceholder": "Rechercher des appareils",
+        "newButton": "Créer",
+        "noRemoteFound": "Aucun appareil ou télécommande Broadlink trouvé.",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "modelLabel": "Modèle",
+        "roomLabel": "Pièce",
+        "saveButton": "Enregistrer",
+        "deleteButton": "Supprimer",
+        "editButton": "Editer",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "setup": {
+        "noNameLabel": "Pas de nom",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "saveSuccess": "L'appareil Broadlink a été créé avec succés.",
+        "notFound": "Appareil introuvable.",
+        "saveButton": "Enregistrer",
+        "peripheralLabel": "Périphérique lié",
+        "categoryLabel": "Type d'appareil à contrôller",
+        "featuresLabel": "Fonctionnalités",
+        "learnModeTitle": "Capturer le signal de la télécommande",
+        "learningModeInProgress": "Appuyez sur le bouton de la télécommande",
+        "cancelLearnModeButton": "Annuler le mode capture",
+        "skipLearningButton": "Ignorer cette étape et passer à la suivante",
+        "peripheralNotFound": "Appareil non trouvé.",
+        "peripheralNotLearn": "Cette appareil n'a pas de mode d'apprentissage.",
+        "cancelLearnFailed": "Impossible d'annuler le mode apprentissage.",
+        "learnFailed": "Impossible de passer en mode apprentissage.",
+        "selectFeatureLabel": "Choisissez une fonctionnalité de la liste ou cliquez sur le bouton suivant pour entrer dans le mode apprentissage. Le mode apprentissage vous permet d'enregistrer toutes les commandes une par une, de manière automatisée.",
+        "selectedFeatureLabel": "Fonctionnalité sélectionnée",
+        "selectActionLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée. Sélectionnez une action dans la liste ci-dessous pour activer la capture.",
+        "selectedFeatureInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée.",
+        "unselectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée, merci de sélectionner une action pour activer la capture.",
+        "selectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée, avec l'action <b>{{action}}</b>.",
+        "testError": "Une erreur est survenue lors du test de la fonctionnalité, vérifiez votre matériel.",
+        "peripheralSelectLabel": "{{name}} ({{address}})",
+        "testLabel": "Tester",
+        "unselect": "Annuler la sélection",
+        "deleteLabel": "Supprimer",
+        "learnAllLabel": "Mode apprentissage",
+        "learnAllModeLabel": "Prochain bouton dans {{timeLeft}} secondes...",
+        "quitLearnModeLabel": "Arrêter le mode apprentissage",
+        "features": {
+          "light": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "brightness": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            },
+            "temperature": {
+              "none": "Froid",
+              "many": "Chaud"
+            }
+          },
+          "switch": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "dimmer": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            }
+          },
+          "siren": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            }
+          },
+          "television": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "volume": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            }
+          }
+        }
+      }
+    },
     "xiaomi": {
       "title": "Xiaomi Home",
-      "description": "Gérez les appareils Xiaomi.",
+      "description": "Gérez les appareils Xiaomi via le pont Xiaomi.",
       "device": {
         "title": "Appareils Xiaomi dans Gladys",
         "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",
@@ -879,7 +1002,7 @@
     },
     "eWeLink": {
       "title": "eWeLink",
-      "description": "Contrôlez vos appareils eWeLink.",
+      "description": "Contrôlez vos appareils eWeLink (via le cloud).",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte eWeLink",
       "setupTab": "Configuration",
@@ -1110,6 +1233,7 @@
       "calendar": {
         "eventName": "Nom de l'évènement",
         "eventLocation": "Lieu de l'évènement",
+        "eventDescription": "Description de l'évènement",
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
       }
@@ -1580,6 +1704,7 @@
     "psi": "Livre-force par pouce carré (psi)",
     "lux": "Lux",
     "ppm": "Partie par million (ppm)",
+    "ppb": "Partie par millard (ppb)",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
     "watt-hour": "Watt heure (Wh)",
@@ -1631,6 +1756,7 @@
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
+    "ppb": "ppb",
     "watt": "W",
     "kilowatt": "kW",
     "watt-hour": "Wh",
@@ -1670,6 +1796,24 @@
     "weeks": "sem",
     "months": "m",
     "years": "an"
+  },
+  "deviceFeatureAction": {
+    "category": {
+      "shutter": {
+        "state": {
+          "zero": "Arrêter",
+          "one": "Ouvrir",
+          "other": "Fermer"
+        }
+      },
+      "curtain": {
+        "state": {
+          "zero": "Arrêter",
+          "one": "Ouvrir",
+          "other": "Fermer"
+        }
+      }
+    }
   },
   "deviceFeatureValue": {
     "type": {
@@ -1879,6 +2023,20 @@
       "decimal": "Durée (décimale)",
       "integer": "Durée (entier)"
     },
+    "voc-sensor": {
+      "shortCategoryName": "Capteur de pollution COV",
+      "decimal": "COV (Décimale)"
+    },
+    "shutter": {
+      "shortCategoryName": "Volet",
+      "state": "Etat du volet",
+      "position": "Position du volet"
+    },
+    "curtain": {
+      "shortCategoryName": "Rideau",
+      "state": "Etat du rideau",
+      "position": "Position du rideau"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
@@ -1942,6 +2100,9 @@
     "minPlaceholder": "Entrez la valeur minimum",
     "maxLabel": "Valeur maximum",
     "maxPlaceholder": "Entrez la valeur maximum",
+    "keepHistoryLabel": "Conserver l'historique des états ?",
+    "keepHistorySmallDescription": "Oui, conserver l'historique",
+    "keepHistoryDescription": "Si oui, les états de cette fonctionnalité seront conservés selon la durée définie sur la page <a href=\"/dashboard/settings/system\">Système</a>. Si non, seul le dernier état sera conservé.",
     "addButton": "Ajouter fonctionnalité",
     "deleteLabel": "Supprimer fonctionnalité",
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",

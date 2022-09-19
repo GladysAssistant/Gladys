@@ -308,7 +308,7 @@
     },
     "telegram": {
       "title": "Telegram",
-      "description": "Talk to Gladys through Telegram.",
+      "description": "Chat with Gladys remotely through Telegram.",
       "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
       "link": "<b>ACTION REQUIRED:</b> To talk to Gladys in Telegram, click on <a href=\"{{link}}\">this link</a>. Don't speak in Telegram directly to your bot before having click on this link, otherwise your bot won't be able to know that it's you who are sending a message.",
       "note": "This link is unique to your account, do not send it to other users.",
@@ -318,7 +318,7 @@
     },
     "philipsHue": {
       "title": "Philips Hue",
-      "description": "Control Philips Hue Lights.",
+      "description": "Control Philips Hue Lights and plugs with the official hub",
       "deviceTab": "Devices",
       "setupTab": "Setup Bridges",
       "setup": {
@@ -345,7 +345,7 @@
     },
     "rtspCamera": {
       "title": "Cameras",
-      "description": "HTTP/RTSP cameras in Gladys.",
+      "description": "Display your cameras video flux in Gladys.",
       "search": "Search cameras",
       "new": "New",
       "nameLabel": "Camera Name",
@@ -369,7 +369,7 @@
     },
     "tasmota": {
       "title": "Tasmota",
-      "description": "Control your Tasmota devices.",
+      "description": "Control your Tasmota devices in HTTP or MQTT.",
       "deviceTab": "Devices",
       "mqttDiscoverTab": "MQTT discover",
       "httpDiscoverTab": "HTTP discover",
@@ -430,7 +430,7 @@
     },
     "tpLink": {
       "title": "TP-Link",
-      "description": "Control TP-Link Bulbs and Plugs.",
+      "description": "Control TP-Link Bulbs and Plugs in Gladys",
       "deviceTab": "Devices",
       "device": {
         "title": "Devices in Gladys",
@@ -454,7 +454,7 @@
     },
     "zigbee2mqtt": {
       "title": "Zigbee2mqtt",
-      "description": "Control your Zigbee devices.",
+      "description": "Control your Zigbee devices with Zigbee2mqtt",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "settingsTab": "Settings",
@@ -529,9 +529,12 @@
       "documentation": "Zigbee2mqtt documentation"
     },
     "googleHome": {
-      "title": "Gladys Assistant",
+      "title": "Google Home",
+      "description": "Control your Gladys device with your voice in Google Home",
+      "longDescription": "It's possible to use Google Home to control your Gladys devices by voice. To configure Google Home with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Do you want to connect Gladys Assistant to Google?",
-      "description": "By signin in, you are authorizing Google to access your devices.",
+      "pageDescription": "By signin in, you are authorizing Google to access your devices.",
       "error": "An error occured. Please retry !",
       "connectedAs": "Connected as",
       "googleWillBeAble": "Google will be able:",
@@ -543,9 +546,12 @@
       "connectButton": "Link"
     },
     "alexa": {
-      "title": "Gladys Assistant",
+      "title": "Amazon Alexa",
+      "description": "Control your Gladys device with your voice in Alexa",
+      "longDescription": "It's possible to use Amazon Alexa to control your Gladys devices by voice. To configure Alexa with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Do you want to connect Gladys Assistant to Amazon Alexa?",
-      "description": "By signin in, you are authorizing Alexa to access your devices.",
+      "pageDescription": "By signin in, you are authorizing Alexa to access your devices.",
       "error": "An error occured. Please retry !",
       "connectedAs": "Connected as",
       "googleWillBeAble": "Alexa will be able:",
@@ -556,9 +562,14 @@
       "cancelButton": "Cancel",
       "connectButton": "Link"
     },
+    "owntracks": {
+      "title": "Owntracks",
+      "description": "Send your GPS location to Gladys with a mobile app",
+      "longDescription": "Owntracks is an open-source app running on iOS and Android that let you send your geolocation to a server. You can use Owntracks to trigger scenes based on your geolocation. To configure Owntracks with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>."
+    },
     "zwave": {
       "title": "Z-Wave",
-      "description": "Control your Z-Wave devices.",
+      "description": "Control your Z-Wave devices with Open-Zwave.",
       "deviceTab": "Devices",
       "networkTab": "Network",
       "settingsTab": "Settings",
@@ -566,6 +577,7 @@
       "device": {
         "title": "Z-Wave Devices",
         "search": "Search devices",
+        "oldIntegrationWarning": "This integration is based on Open-Zwave, a library which is no longer supported. We are migrating to ZwaveJS2mqtt, but in the meantime we recommend that you use Node-RED + ZwaveJS2mqtt. <br /> <br /> If you want to help us develop this integration, join-us on the forum!",
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
@@ -634,7 +646,7 @@
     },
     "openWeather": {
       "title": "OpenWeather API",
-      "description": "Get the weather in Gladys.",
+      "description": "Display the weather in your town on your dasboard.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
       "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
@@ -644,7 +656,7 @@
     },
     "mqtt": {
       "title": "MQTT",
-      "description": "Connect to MQTT server.",
+      "description": "Connect to a local or remote MQTT server",
       "deviceTab": "Devices",
       "setupTab": "Setup",
       "status": {
@@ -719,9 +731,120 @@
         "disconnected": "Disconnected from MQTT broker."
       }
     },
+    "broadlink": {
+      "title": "Broadlink",
+      "description": "Control your Broadlink devices.",
+      "remoteTab": "Devices",
+      "peripheralTab": "Discover devices",
+      "peripheral": {
+        "title": "Available Broadlink devices",
+        "description": "Here are discovered Broadlink devices, if one is missing, please check its network link.",
+        "noPeripherals": "No peripheral discovered on network, please check the connectivity.",
+        "noNameLabel": "Type not recognized",
+        "ipAddressLabel": "IP address",
+        "macAddressLabel": "MAC address",
+        "modelLabel": "Model",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "nameLabel": "Name",
+        "saveButton": "Save",
+        "notConnectable": "Locked",
+        "alreadyCreatedButton": "Already created",
+        "createRemoteButton": "Create remote control"
+      },
+      "device": {
+        "title": "Broadlink devices",
+        "searchPlaceholder": "Search for devices",
+        "newButton": "Create",
+        "noRemoteFound": "No Broadlink device or remote found.",
+        "saveError": "There was an error saving the device.",
+        "nameLabel": "Device name",
+        "namePlaceholder": "Enter the name of your device",
+        "modelLabel": "Model",
+        "roomLabel": "Room",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit",
+        "featuresLabel": "Features"
+      },
+      "setup": {
+        "noNameLabel": "No name",
+        "saveError": "Error saving or deleting device",
+        "saveSuccess": "Broadlink device successfully created.",
+        "notFound": "Requested device not found.",
+        "saveButton": "Save",
+        "peripheralLabel": "Linked peripheral",
+        "categoryLabel": "Device category to control",
+        "featuresLabel": "Features",
+        "learnModeTitle": "Capture remote command",
+        "learningModeInProgress": "Press button on your remote",
+        "cancelLearnModeButton": "Cancel capture mode",
+        "skipLearningButton": "Skip this step and go to next",
+        "peripheralNotFound": "Peripheral not available.",
+        "peripheralNotLearn": "Peripheral is not able to learn code.",
+        "cancelLearnFailed": "Failed to cancel learning mode.",
+        "learnFailed": "Failed to enter in learn mode.",
+        "selectFeatureLabel": "Select a feature in the list or click button bellow to entrer in learning mode. Learning mode allows you to save all commands, one by one, in an automatized way.",
+        "selectedFeatureLabel": "Selected feature",
+        "selectActionLabel": "Feature <b>{{feature}}</b> is selected, now select an action in the list bellow to enabled capture mode.",
+        "selectedFeatureInfoLabel": "Feature <b>{{feature}}</b> is selected.",
+        "unselectedActionInfoLabel": "Feature <b>{{feature}}</b> is selected, please select an action to enter capture mode.",
+        "selectedActionInfoLabel": "Feature <b>{{feature}}</b> is selected, with action <b>{{action}}</b>.",
+        "testError": "An error occured while testing feature, please check your device.",
+        "peripheralSelectLabel": "{{name}} ({{address}})",
+        "testLabel": "Test",
+        "unselect": "Unselect",
+        "deleteLabel": "Delete",
+        "learnAllLabel": "Learn all features",
+        "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
+        "quitLearnModeLabel": "Stop learning features",
+        "features": {
+          "light": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "brightness": {
+              "none": "Down",
+              "many": "Up"
+            },
+            "temperature": {
+              "none": "Cold",
+              "many": "Hot"
+            }
+          },
+          "switch": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "dimmer": {
+              "none": "Down",
+              "many": "Up"
+            }
+          },
+          "siren": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            }
+          },
+          "television": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "volume": {
+              "none": "Down",
+              "many": "Up"
+            }
+          }
+        }
+      }
+    },
     "xiaomi": {
       "title": "Xiaomi Home",
-      "description": "Display Xiaomi home devices.",
+      "description": "Control Xiaomi home devices with the official hub",
       "device": {
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
@@ -755,7 +878,7 @@
       "accountTab": "Account",
       "syncTab": "Synchronization",
       "shareTab": "Sharing",
-      "description": "Sync your CalDAV calendars.",
+      "description": "Sync your CalDAV calendars and use them in scenes.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "syncIntroduction": "Choose calendars to synchronize.",
       "shareIntroduction": "Choose calendars you want to share with other Gladys users.",
@@ -822,7 +945,7 @@
     },
     "bluetooth": {
       "title": "Bluetooth",
-      "description": "Control your Bluetooth devices.",
+      "description": "Control your Bluetooth devices and detect your presence.",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
       "setupTab": "Presence scanner",
@@ -879,7 +1002,7 @@
     },
     "eWeLink": {
       "title": "eWeLink",
-      "description": "Control your eWeLink devices.",
+      "description": "Control your eWeLink devices (works with the cloud)",
       "deviceTab": "Devices",
       "discoverTab": "eWeLink discover",
       "setupTab": "Setup",
@@ -1110,6 +1233,7 @@
       "calendar": {
         "eventName": "Event name",
         "eventLocation": "Event location",
+        "eventDescription": "Event description",
         "eventStart": "Start date",
         "eventEnd": "End date"
       }
@@ -1580,6 +1704,7 @@
     "psi": "Pound-force per square inch (psi)",
     "lux": "Lux",
     "ppm": "Parts per million (ppm)",
+    "ppb": "Parts per billion (ppb)",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
     "watt-hour": "Watt heure (Wh)",
@@ -1631,6 +1756,7 @@
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
+    "ppb": "ppb",
     "watt": "W",
     "kilowatt": "kW",
     "watt-hour": "Wh",
@@ -1670,6 +1796,24 @@
     "weeks": "w",
     "months": "m",
     "years": "y"
+  },
+  "deviceFeatureAction": {
+    "category": {
+      "shutter": {
+        "state": {
+          "zero": "Stop",
+          "one": "Open",
+          "other": "Close"
+        }
+      },
+      "curtain": {
+        "state": {
+          "zero": "Stop",
+          "one": "Open",
+          "other": "Close"
+        }
+      }
+    }
   },
   "deviceFeatureValue": {
     "type": {
@@ -1879,6 +2023,20 @@
       "decimal": "Duration (decimal)",
       "integer": "Duration (integer)"
     },
+    "voc-sensor": {
+      "shortCategoryName": "VOC Sensor",
+      "decimal": "VOC (decimal)"
+    },
+    "shutter": {
+      "shortCategoryName": "Shutter",
+      "state": "Shutter state",
+      "position": "Shutter position"
+    },
+    "curtain": {
+      "shortCategoryName": "Curtain",
+      "state": "Curtain state",
+      "position": "curtain position"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
@@ -1942,6 +2100,9 @@
     "minPlaceholder": "Enter feature minimum value",
     "maxLabel": "Maximum value",
     "maxPlaceholder": "Enter feature maximum value",
+    "keepHistoryLabel": "Keep state history?",
+    "keepHistorySmallDescription": "Yes, keep history",
+    "keepHistoryDescription": "If yes, the state history of this feature will be kept according to the retention policy defined in the <a href=\"/dashboard/settings/system\">System</a> page. If not, only the last state will be kept.",
     "addButton": "Add feature",
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",

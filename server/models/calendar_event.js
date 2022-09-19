@@ -36,6 +36,10 @@ module.exports = (sequelize, DataTypes) => {
       location: {
         type: DataTypes.STRING,
       },
+      description: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
       start: {
         allowNull: false,
         type: DataTypes.DATE,

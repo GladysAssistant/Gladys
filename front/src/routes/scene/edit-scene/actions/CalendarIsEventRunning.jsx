@@ -117,6 +117,7 @@ class CheckTime extends Component {
     const { columnIndex, index } = this.props;
     const EVENT_NAME_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventName');
     const EVENT_LOCATION_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventLocation');
+    const EVENT_DESCRIPTION_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventDescription');
     const EVENT_START_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventStart');
     const EVENT_END_VARIABLE = get(this.props.intl.dictionary, 'editScene.variables.calendar.eventEnd');
     this.props.setVariables(columnIndex, index, [
@@ -132,6 +133,13 @@ class CheckTime extends Component {
         type: 'calendar',
         ready: true,
         label: EVENT_LOCATION_VARIABLE,
+        data: {}
+      },
+      {
+        name: 'calendarEvent.description',
+        type: 'calendar',
+        ready: true,
+        label: EVENT_DESCRIPTION_VARIABLE,
         data: {}
       },
       {
