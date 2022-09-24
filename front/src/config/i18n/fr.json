@@ -926,6 +926,13 @@
         "learnAllModeLabel": "Prochain bouton dans {{timeLeft}} secondes...",
         "quitLearnModeLabel": "Arrêter le mode apprentissage",
         "features": {
+          "curtain": {
+            "state": {
+              "none": "Arrêter",
+              "one": "Ouvrir",
+              "other": "Fermer"
+            }
+          },
           "light": {
             "binary": {
               "none": "Eteindre",
@@ -954,6 +961,13 @@
             "binary": {
               "none": "Eteindre",
               "one": "Allumer"
+            }
+          },
+          "shutter": {
+            "state": {
+              "none": "Arrêter",
+              "one": "Ouvrir",
+              "other": "Fermer"
             }
           },
           "television": {

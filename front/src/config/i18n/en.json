@@ -799,6 +799,13 @@
         "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
         "quitLearnModeLabel": "Stop learning features",
         "features": {
+          "curtain": {
+            "state": {
+              "none": "Stop",
+              "one": "Open",
+              "other": "Close"
+            }
+          },
           "light": {
             "binary": {
               "none": "Off",
@@ -827,6 +834,13 @@
             "binary": {
               "none": "Off",
               "one": "On"
+            }
+          },
+          "shutter": {
+            "state": {
+              "none": "Stop",
+              "one": "Open",
+              "other": "Close"
             }
           },
           "television": {
