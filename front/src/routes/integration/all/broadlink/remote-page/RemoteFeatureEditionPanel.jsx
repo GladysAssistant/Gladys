@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { MarkupText, Text } from 'preact-i18n';
+import { MarkupText, Text, translate } from 'preact-i18n';
 
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
@@ -7,6 +7,29 @@ import RemoteFeatureEdition from './edition/RemoteFeatureEdition';
 import { ACTIONS } from '../../../../../../../server/services/broadlink/lib/utils/broadlink.constants';
 import get from 'get-value';
 import { MANAGED_FEATURES } from './features';
+
+const renderSelectedAction = (intl, category, selectedFeature, selectedValue) => {
+  const action = translate(
+    `integration.broadlink.setup.features.${category}.${selectedFeature}`,
+    intl && intl.scope,
+    intl && intl.dictionary,
+    { selectedValue },
+    selectedValue,
+    `${selectedValue}`
+  );
+
+  return (
+    <div class="alert alert-info">
+      <MarkupText
+        id="integration.broadlink.setup.selectedActionInfoLabel"
+        fields={{
+          feature: <Text id={`deviceFeatureCategory.${category}.${selectedFeature}`} />,
+          action
+        }}
+      />
+    </div>
+  );
+};
 
 class RemoteFeatureEditionPanel extends Component {
   cancelSelection = () => {
@@ -216,25 +239,9 @@ class RemoteFeatureEditionPanel extends Component {
                 />
               </div>
             )}
-            {hasActions && hasSelectedValue && (
-              <div class="alert alert-info">
-                <MarkupText
-                  id="integration.broadlink.setup.selectedActionInfoLabel"
-                  fields={{
-                    feature: <Text id={`deviceFeatureCategory.${category}.${selectedFeature}`} />,
-                    action: (
-                      <Text
-                        id={`integration.broadlink.setup.features.${category}.${selectedFeature}`}
-                        plural={selectedValue}
-                        fields={{ selectedValue }}
-                      >
-                        {`${selectedValue}`}
-                      </Text>
-                    )
-                  }}
-                />
-              </div>
-            )}
+            {hasActions &&
+              hasSelectedValue &&
+              renderSelectedAction(props.intl, category, selectedFeature, selectedValue)}
             {hasActions && !hasSelectedValue && (
               <div class="alert alert-info">
                 <MarkupText
