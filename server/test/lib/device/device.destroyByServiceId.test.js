@@ -5,9 +5,11 @@ const { assert } = require('chai');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
+const Job = require('../../../lib/job');
 const db = require('../../../models');
 
 const event = new EventEmitter();
+const job = new Job(event);
 const serviceName = 'fake-service';
 
 describe('Device', () => {
@@ -42,7 +44,7 @@ describe('Device', () => {
 
   it('should destroy device', async () => {
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     await device.create({
       name: 'test-device-destroyByServiceId',
       external_id: 'test-device-new-destroyByServiceId',

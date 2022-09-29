@@ -2,9 +2,12 @@ const EventEmitter = require('events');
 const { assert, expect } = require('chai');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const ServiceManager = require('../../../lib/service');
+const Job = require('../../../lib/job');
 const { BadParameters } = require('../../../utils/coreErrors');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 describe('Device saveHistoricalState', () => {
   it('should save historical sate (new state)', async () => {
@@ -36,7 +39,8 @@ describe('Device saveHistoricalState', () => {
     });
     stateManager.setState('deviceFeature', 'test-feature', testFeature);
 
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     const testDevice = await device.getBySelector('test-device');
 
     const deviceFeature = testDevice.features[0];
@@ -74,7 +78,8 @@ describe('Device saveHistoricalState', () => {
     });
     stateManager.setState('deviceFeature', 'test-feature', testFeature);
 
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     const testDevice = await device.getBySelector('test-device');
 
     const deviceFeature = testDevice.features[0];
@@ -88,7 +93,8 @@ describe('Device saveHistoricalState', () => {
 
   it('should not save NaN as state', async () => {
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
 
     const nanValue = parseInt('NaN value', 10);
 
