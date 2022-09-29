@@ -26,3 +26,16 @@ describe('GET /api/v1/system/disk', () => {
       });
   });
 });
+
+describe('POST /api/v1/system/vacuum', () => {
+  it('should vacuum database', async () => {
+    await authenticatedRequest
+      .post('/api/v1/system/vacuum')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('success', true);
+        expect(res.body).to.have.property('message');
+      });
+  });
+});
