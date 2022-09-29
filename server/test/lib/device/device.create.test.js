@@ -1,7 +1,8 @@
 const { expect } = require('chai');
+const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 
-const { DEVICE_POLL_FREQUENCIES } = require('../../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../../utils/constants');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
@@ -459,10 +460,14 @@ describe('Device', () => {
     expect(device.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES.EVERY_MINUTES]).to.have.lengthOf(0);
     expect(device.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS]).to.have.lengthOf(1);
   });
-  it('should update a feature with keep_history = false and check that states are deleted', async () => {
+  it('should update a feature with keep_history = false and check that background job to delete states is called', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    const fakeEvent = {
+      emit: fake.returns(null),
+      on: fake.returns(null),
+    };
+    const device = new Device(fakeEvent, {}, stateManager, serviceManager, {}, {}, job);
     await db.DeviceFeatureState.create({
       device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
       value: 10,
@@ -497,17 +502,10 @@ describe('Device', () => {
       ],
     });
     expect(createdDevice.features[0]).to.have.property('id', 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4');
-    const states = await db.DeviceFeatureState.findAll({
-      where: {
-        device_feature_id: createdDevice.features[0].id,
-      },
-    });
-    expect(states).to.have.lengthOf(0);
-    const statesAggregates = await db.DeviceFeatureStateAggregate.findAll({
-      where: {
-        device_feature_id: createdDevice.features[0].id,
-      },
-    });
-    expect(statesAggregates).to.have.lengthOf(0);
+    assert.calledWith(
+      fakeEvent.emit,
+      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
+      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    );
   });
 });
