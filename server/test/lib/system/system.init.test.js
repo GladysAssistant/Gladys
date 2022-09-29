@@ -44,6 +44,6 @@ describe('system.init', () => {
     assert.called(system.dockerode.listContainers);
 
     assert.notCalled(sequelize.close);
-    assert.calledOnce(event.on);
+    assert.called(event.on);
   });
 });
