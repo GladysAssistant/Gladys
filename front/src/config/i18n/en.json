@@ -1540,7 +1540,8 @@
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
       "hourly-device-state-aggregate": "Hourly sensors aggregation",
-      "gladys-gateway-backup": "Gladys Plus backup"
+      "gladys-gateway-backup": "Gladys Plus backup",
+      "device-state-purge-single-feature": "Single device feature states clean"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."

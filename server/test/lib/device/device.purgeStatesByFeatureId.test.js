@@ -4,6 +4,7 @@ const EventEmitter = require('events');
 const Device = require('../../../lib/device');
 const db = require('../../../models');
 const StateManager = require('../../../lib/state');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
 
@@ -32,8 +33,13 @@ describe('device.purgeStatesByFeatureId', () => {
   it('should purge states of a specific feature id', async () => {
     const stateManager = new StateManager(event);
     const service = {};
-    const device = new Device(event, {}, stateManager, service, {}, {});
-    await device.purgeStatesByFeatureId('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4');
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
+    const res = await device.purgeStatesByFeatureId('ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4');
+    expect(res).to.deep.equal({
+      numberOfDeviceFeatureStateToDelete: 1,
+      numberOfDeviceFeatureStateAggregateToDelete: 3,
+    });
     const states = await db.DeviceFeatureState.findAll({
       where: {
         device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',

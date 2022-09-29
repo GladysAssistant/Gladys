@@ -14,8 +14,9 @@ function wrapper(type, func) {
     let job;
     try {
       job = await this.start(type);
-      await func(...args, job.id);
+      const res = await func(...args, job.id);
       await this.finish(job.id, JOB_STATUS.SUCCESS);
+      return res;
     } catch (error) {
       if (job) {
         const data = {

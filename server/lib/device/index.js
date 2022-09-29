@@ -1,4 +1,4 @@
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, JOB_TYPES } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 // Categories of DeviceFeatures
@@ -55,6 +55,11 @@ const DeviceManager = function DeviceManager(
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
   this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);
 
+  this.purgeStatesByFeatureId = this.job.wrapper(
+    JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE,
+    this.purgeStatesByFeatureId.bind(this),
+  );
+
   this.devicesByPollFrequency = {};
   // listen to events
   this.eventManager.on(EVENTS.DEVICE.NEW_STATE, this.newStateEvent.bind(this));
@@ -65,6 +70,10 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(
     EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
     eventFunctionWrapper(this.onHourlyDeviceAggregateEvent.bind(this)),
+  );
+  this.eventManager.on(
+    EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
+    eventFunctionWrapper(this.purgeStatesByFeatureId.bind(this)),
   );
 };
 
