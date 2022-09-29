@@ -73,6 +73,7 @@ const EVENTS = {
     NEW_STATE: 'device.new-state',
     PURGE_STATES: 'device.purge-states',
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
+    PURGE_STATES_SINGLE_FEATURE: 'device.purge-states-single-feature',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -763,6 +764,7 @@ const JOB_TYPES = {
   DAILY_DEVICE_STATE_AGGREGATE: 'daily-device-state-aggregate',
   MONTHLY_DEVICE_STATE_AGGREGATE: 'monthly-device-state-aggregate',
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
+  DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
 };
 
 const JOB_STATUS = {

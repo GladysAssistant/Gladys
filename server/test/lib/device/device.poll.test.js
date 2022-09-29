@@ -5,8 +5,10 @@ const { assert } = require('chai');
 const Device = require('../../../lib/device');
 
 const StateManager = require('../../../lib/state');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 const testService = {
   device: {
@@ -26,7 +28,7 @@ describe('Device', () => {
     const service = {
       getService: () => testService,
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     await device.poll({
       service: {
         name: 'test',
@@ -38,7 +40,7 @@ describe('Device', () => {
     const service = {
       getService: () => testServiceBroken,
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     await device.poll({
       service: {
         name: 'test',
@@ -50,7 +52,7 @@ describe('Device', () => {
     const service = {
       getService: () => null,
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const promise = device.poll({
       service: {
         name: 'doesnotexist',
@@ -63,7 +65,7 @@ describe('Device', () => {
     const service = {
       getService: () => ({}),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const promise = device.poll({
       service: {
         name: 'doesnotexist',

@@ -3,8 +3,10 @@ const { expect } = require('chai');
 const { assert, fake } = require('sinon');
 const Device = require('../../../../lib/device');
 const StateManager = require('../../../../lib/state');
+const Job = require('../../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 const messageManager = {
   replyByIntent: fake.resolves(true),
@@ -13,7 +15,7 @@ const messageManager = {
 describe('TemperatureSensor.getTemperatureInRoom', () => {
   it('should get average temperature in room in celsius', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, {});
+    const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);
     const result = await deviceManager.temperatureSensorManager.getTemperatureInRoom(
       '2398c689-8b47-43cc-ad32-e98d9be098b5',
       {
@@ -27,7 +29,7 @@ describe('TemperatureSensor.getTemperatureInRoom', () => {
   });
   it('should get average temperature in room in fahrenheit', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, {}, stateManager, {});
+    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
     const result = await deviceManager.temperatureSensorManager.getTemperatureInRoom(
       '2398c689-8b47-43cc-ad32-e98d9be098b5',
       {
@@ -41,7 +43,7 @@ describe('TemperatureSensor.getTemperatureInRoom', () => {
   });
   it('should return not found error', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, {}, stateManager, {});
+    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
     const temperatureResult = await deviceManager.temperatureSensorManager.getTemperatureInRoom(
       'f08337ff-206e-4bd7-86c4-6d63d793d58e',
       {
@@ -58,7 +60,7 @@ describe('TemperatureSensor.getTemperatureInRoom', () => {
 describe('TemperatureSensor.command', () => {
   it('should ask the temperature in a room', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, {});
+    const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);
     const message = {
       user: {
         temperature_unit_preference: 'celsius',
@@ -132,7 +134,7 @@ describe('TemperatureSensor.command', () => {
   });
   it('should return room not found', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, {});
+    const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);
     const message = {
       user: {
         temperature_unit_preference: 'celsius',
