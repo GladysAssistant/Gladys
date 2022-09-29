@@ -4,6 +4,7 @@ const EventEmitter = require('events');
 const { fake } = require('sinon');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
+const Job = require('../../../lib/job');
 
 const { authenticatedRequest } = require('../request.test');
 
@@ -67,7 +68,8 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
       getValue: fake.resolves(null),
     };
     const event = new EventEmitter();
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const job = new Job(event);
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
     await device.calculateAggregate('daily');
     await device.calculateAggregate('monthly');

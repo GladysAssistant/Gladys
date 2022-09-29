@@ -1,8 +1,10 @@
 const EventEmitter = require('events');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 describe('Device', () => {
   it('should save new sate', async () => {
@@ -24,7 +26,7 @@ describe('Device', () => {
       created_at: '2019-02-12 07:49:07.556 +00:00',
       updated_at: '2019-02-12 07:49:07.556 +00:00',
     });
-    const device = new Device(event, {}, stateManager);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
     await device.newStateEvent({ device_feature_external_id: 'hue:binary:1', state: 12 });
   });
 });
