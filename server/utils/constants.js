@@ -158,6 +158,7 @@ const EVENTS = {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
     CHECK_UPGRADE: 'system.check-upgrade',
     TIMEZONE_CHANGED: 'system.timezone-changed',
+    VACUUM: 'system.vacuum',
   },
   WEBSOCKET: {
     SEND: 'websocket.send',
@@ -765,6 +766,7 @@ const JOB_TYPES = {
   MONTHLY_DEVICE_STATE_AGGREGATE: 'monthly-device-state-aggregate',
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
+  VACUUM: 'vacuum',
 };
 
 const JOB_STATUS = {
