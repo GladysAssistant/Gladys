@@ -3,9 +3,6 @@ const Promise = require('bluebird');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 
-const STATES_TO_PURGE_PER_QUERY = 1000;
-const WAIT_TIME_BETWEEN_QUERY_IN_MS = 100;
-
 /**
  * @description Purge device states of a specific feature
  * @param {string} deviceFeatureId - Id of a device feature.
@@ -33,16 +30,30 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
     `Purging "${deviceFeatureId}": ${numberOfDeviceFeatureStateToDelete} states & ${numberOfDeviceFeatureStateAggregateToDelete} aggregates to delete.`,
   );
 
-  const numberOfIterationsStates = Math.ceil(numberOfDeviceFeatureStateToDelete / STATES_TO_PURGE_PER_QUERY);
+  const numberOfIterationsStates = Math.ceil(
+    numberOfDeviceFeatureStateToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
+  );
   const iterator = [...Array(numberOfIterationsStates)];
 
   const numberOfIterationsStatesAggregates = Math.ceil(
-    numberOfDeviceFeatureStateAggregateToDelete / STATES_TO_PURGE_PER_QUERY,
+    numberOfDeviceFeatureStateAggregateToDelete / this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
   );
   const iteratorAggregates = [...Array(numberOfIterationsStatesAggregates)];
 
   const total = numberOfIterationsStates + numberOfIterationsStatesAggregates;
-  let currentProgress = 0;
+  let currentBatch = 0;
+  let currentProgressPercent = 0;
+
+  // We only save progress to DB if it changed
+  // Because saving progress is expensive (DB write + Websocket call)
+  const updateProgressIfNeeded = async () => {
+    currentBatch += 1;
+    const newProgressPercent = Math.round((currentBatch * 100) / total);
+    if (currentProgressPercent !== newProgressPercent) {
+      currentProgressPercent = newProgressPercent;
+      await this.job.updateProgress(jobId, currentProgressPercent);
+    }
+  };
 
   await Promise.each(iterator, async () => {
     await db.sequelize.query(
@@ -56,14 +67,13 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
       {
         replacements: {
           id: deviceFeatureId,
-          limit: STATES_TO_PURGE_PER_QUERY,
+          limit: this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
         },
         type: QueryTypes.SELECT,
       },
     );
-    currentProgress += 1;
-    await this.job.updateProgress(jobId, Math.round((currentProgress * 100) / total));
-    await Promise.delay(WAIT_TIME_BETWEEN_QUERY_IN_MS);
+    await updateProgressIfNeeded();
+    await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
   });
 
   await Promise.each(iteratorAggregates, async () => {
@@ -78,14 +88,13 @@ async function purgeStatesByFeatureId(deviceFeatureId, jobId) {
       {
         replacements: {
           id: deviceFeatureId,
-          limit: STATES_TO_PURGE_PER_QUERY,
+          limit: this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH,
         },
         type: QueryTypes.SELECT,
       },
     );
-    currentProgress += 1;
-    await this.job.updateProgress(jobId, Math.round((currentProgress * 100) / total));
-    await Promise.delay(WAIT_TIME_BETWEEN_QUERY_IN_MS);
+    await updateProgressIfNeeded();
+    await Promise.delay(this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH);
   });
   return {
     numberOfDeviceFeatureStateToDelete,

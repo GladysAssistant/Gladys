@@ -49,6 +49,9 @@ const DeviceManager = function DeviceManager(
   this.variable = variable;
   this.job = job;
 
+  this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
+  this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
+
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, this);
   this.lightManager = new LightManager(eventManager, messageManager, this);
