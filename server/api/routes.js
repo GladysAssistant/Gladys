@@ -496,6 +496,11 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: systemController.getUpgradeDownloadStatus,
     },
+    'post /api/v1/system/vacuum': {
+      authenticated: true,
+      admin: true,
+      controller: systemController.vacuum,
+    },
     // user
     'post /api/v1/user': {
       authenticated: true,
