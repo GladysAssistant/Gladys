@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const EventEmitter = require('events');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
 
@@ -20,7 +21,8 @@ describe('Device.addParam', () => {
         },
       ],
     });
-    const device = new Device(event, {}, stateManager);
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
     const newDevice = await device.addParam('test-device', {
       name: 'NEW_VALUE',
       value: '10',
@@ -46,7 +48,8 @@ describe('Device.addParam', () => {
         },
       ],
     });
-    const device = new Device(event, {}, stateManager);
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
     const newDevice = await device.addParam('test-device', {
       name: 'TEST_PARAM',
       value: '1000',
