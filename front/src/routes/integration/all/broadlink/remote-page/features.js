@@ -1,6 +1,15 @@
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 
 export const MANAGED_FEATURES = {
+  [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
+    [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: {
+      feature: {
+        min: -1,
+        max: 1
+      },
+      values: [-1, 0, 1]
+    }
+  },
   [DEVICE_FEATURE_CATEGORIES.LIGHT]: {
     [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: {
       feature: {
@@ -47,6 +56,15 @@ export const MANAGED_FEATURES = {
         max: 1
       },
       values: [0, 1]
+    }
+  },
+  [DEVICE_FEATURE_CATEGORIES.SHUTTER]: {
+    [DEVICE_FEATURE_TYPES.SHUTTER.STATE]: {
+      feature: {
+        min: -1,
+        max: 1
+      },
+      values: [-1, 0, 1]
     }
   },
   [DEVICE_FEATURE_CATEGORIES.TELEVISION]: {

@@ -7,6 +7,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const DockerodeMock = require('./DockerodeMock.test');
+const Job = require('../../../lib/job');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -16,6 +17,8 @@ const event = {
   on: fake.resolves(null),
   emit: fake.resolves(null),
 };
+
+const job = new Job(event);
 
 const config = {
   tempFolder: '/tmp/gladys',
@@ -86,7 +89,7 @@ describe('system.getGladysContainerId', () => {
       './system.getGladysContainerId': getGladysContainerId,
     });
 
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event, config, job);
     await system.init();
     // Reset all fakes invoked within init call
     sinon.reset();
