@@ -1836,6 +1836,13 @@
           "zero": "Healthy",
           "one": "CO detected"
         }
+      },
+      "leak-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
+        }
       }
     }
   },

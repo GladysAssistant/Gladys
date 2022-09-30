@@ -1836,6 +1836,13 @@
           "zero": "Sain",
           "one": "CO détecté"
         }
+      },
+      "leak-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Non",
+          "one": "Oui"
+        }
       }
     }
   },
