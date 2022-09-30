@@ -1,4 +1,5 @@
-const { Point } = require('@influxdata/influxdb-client');
+const { Point, HttpError } = require('@influxdata/influxdb-client');
+const { Error422 } = require('../../../utils/httpErrors');
 const logger = require('../../../utils/logger');
 
 /**
@@ -27,8 +28,11 @@ async function writeBinary(event, deviceFeature, gladysDevice) {
       logger.trace('FINISHED');
     })
     .catch((e) => {
-      logger.error(e);
-      logger.error('Finished ERROR');
+      if (e instanceof HttpError && e.statusCode === 422) {
+        throw new Error422(`InfluxDB API - Unprocessable entity, maybe datatype problem`);
+      } else {
+        logger.error(e);
+      }
     });
 }
 
