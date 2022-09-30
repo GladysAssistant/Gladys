@@ -253,9 +253,6 @@ class HttpRequestAction extends Component {
               <div class="form-group">
                 <label class="form-label">
                   <Text id="editScene.actionsCard.httpRequest.headersLabel" />
-                  <span class="form-required">
-                    <Text id="global.requiredField" />
-                  </span>
                 </label>
                 {props.action.headers &&
                   props.action.headers.map((header, index) => (
