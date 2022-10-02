@@ -799,6 +799,13 @@
         "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
         "quitLearnModeLabel": "Stop learning features",
         "features": {
+          "curtain": {
+            "state": {
+              "none": "Stop",
+              "one": "Open",
+              "other": "Close"
+            }
+          },
           "light": {
             "binary": {
               "none": "Off",
@@ -827,6 +834,13 @@
             "binary": {
               "none": "Off",
               "one": "On"
+            }
+          },
+          "shutter": {
+            "state": {
+              "none": "Stop",
+              "one": "Open",
+              "other": "Close"
             }
           },
           "television": {
@@ -1540,7 +1554,9 @@
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
       "hourly-device-state-aggregate": "Hourly sensors aggregation",
-      "gladys-gateway-backup": "Gladys Plus backup"
+      "gladys-gateway-backup": "Gladys Plus backup",
+      "device-state-purge-single-feature": "Single device feature states clean",
+      "vacuum": "Database cleaning"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -1574,6 +1590,10 @@
     "timezoneText": "The timezone is used in scheduled scene.",
     "deviceStateRetentionTime": "Keep Device State History",
     "deviceStateRetentionTimeDescription": "How long Gladys will keep your device states in database.",
+    "vacuumDatabaseTitle": "Database cleaning",
+    "vacuumDatabaseDescription": "By clicking on this button, Gladys will start cleaning the database to free up space. This does not delete any data, it just physically remove old deleted data. Be careful, this task can take some time to run, and during that time Gladys will not be available.",
+    "vacuumDatabaseButton": "Start database cleaning",
+    "vacuumDatabaseStarted": "Database cleaning has started... Gladys will not be available until this job finishes.",
     "containerState": {
       "created": "Created",
       "restarting": "Restarting",
@@ -1829,6 +1849,13 @@
           "other": "No value received",
           "zero": "Healthy",
           "one": "CO detected"
+        }
+      },
+      "leak-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
         }
       }
     }

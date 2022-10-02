@@ -57,7 +57,8 @@ describe('Device.calculateAggregate', function Before() {
       // we modify the retention policy to take the last 1000 days (it'll cover this last year)
       getValue: fake.resolves('1000'),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const job = new Job(event);
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
     const deviceFeatureStates = await db.DeviceFeatureStateAggregate.findAll({
       raw: true,
@@ -78,7 +79,8 @@ describe('Device.calculateAggregate', function Before() {
       // we modify the retention policy to take the last 5 days only (for testing)
       getValue: fake.resolves('5'),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const job = new Job(event);
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
   });
   it('should calculate hourly aggregate with last aggregate from device', async () => {
@@ -91,7 +93,8 @@ describe('Device.calculateAggregate', function Before() {
       // we modify the retention policy to take the last 1000 days (for testing)
       getValue: fake.resolves('1000'),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const job = new Job(event);
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
   });
   it('should calculate daily aggregate', async () => {
@@ -99,7 +102,8 @@ describe('Device.calculateAggregate', function Before() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const job = new Job(event);
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.calculateAggregate('daily');
     const deviceFeatureStates = await db.DeviceFeatureStateAggregate.findAll({
       raw: true,
@@ -114,7 +118,8 @@ describe('Device.calculateAggregate', function Before() {
     const variable = {
       getValue: fake.resolves(null),
     };
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const job = new Job(event);
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.calculateAggregate('monthly');
     const deviceFeatureStates = await db.DeviceFeatureStateAggregate.findAll({
       raw: true,
