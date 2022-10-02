@@ -83,6 +83,8 @@ import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+
+// RFLink integration
 import RflinkDevicePage from '../routes/integration/all/rflink/device-page';
 import RflinkSettingsPage from '../routes/integration/all/rflink/settings-page';
 import RflinkEditPage from '../routes/integration/all/rflink/device-page/setup';
@@ -234,20 +236,23 @@ const AppRouter = connect(
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
         <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
+        <EweLinkPage path="/dashboard/integration/device/ewelink" />
+        <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
+        <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
+        <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+
         <Redirect path="/dashboard/integration/device/rflink" to="/dashboard/integration/device/rflink/device" />
         <RflinkDevicePage path="/dashboard/integration/device/rflink/device" />
         <RflinkSettingsPage path="/dashboard/integration/device/rflink/settings" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/:deviceSelector" />
-        <EweLinkPage path="/dashboard/integration/device/ewelink" />
-        <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
-        <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
-        <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+
         <BroadlinkDevicePage path="/dashboard/integration/device/broadlink" />
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit" />
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />

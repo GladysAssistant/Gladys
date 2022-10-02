@@ -31,7 +31,7 @@ describe('RFLinkHandler.connect', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_READY,
     });
-    expect(rflinkHandler.Path).to.be.equal('/tty1');
+    expect(rflinkHandler.path).to.be.equal('/tty1');
     expect(rflinkHandler.connected).to.be.equal(true);
     expect(rflinkHandler.ready).to.be.equal(true);
     expect(rflinkHandler.scanInProgress).to.be.equal(true);
@@ -42,7 +42,7 @@ describe('RFLinkHandler.connect', () => {
     const path = '/dev/tty.';
     await rflinkHandler.connect(path);
     assert.calledOnce(osStub);
-    expect(rflinkHandler.Path).to.be.equal('/dev/cu.');
+    expect(rflinkHandler.path).to.be.equal('/dev/cu.');
   });
 
   it('should fail connection with a non defined path', async () => {

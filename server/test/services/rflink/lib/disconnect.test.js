@@ -25,7 +25,7 @@ describe('RFLinkHandler.disconnect', () => {
   });
 
   it('should disconnect by closing opened port and set right state of handler', async () => {
-    rflinkHandler.Path = '/tty';
+    rflinkHandler.path = '/tty';
     rflinkHandler.connected = true;
     rflinkHandler.sendUsb = { close: stub().resolves(true) };
     await rflinkHandler.disconnect();
@@ -36,7 +36,7 @@ describe('RFLinkHandler.disconnect', () => {
   });
 
   it('should set right state of handler and do nothing else since port is not opened', async () => {
-    rflinkHandler.Path = '';
+    rflinkHandler.path = '';
     rflinkHandler.connected = false;
     rflinkHandler.sendUsb = { close: stub().resolves(true) };
     await rflinkHandler.disconnect();

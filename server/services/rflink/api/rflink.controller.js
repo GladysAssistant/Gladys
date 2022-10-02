@@ -9,8 +9,8 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
    * @apiGroup RFlink
    */
   async function getNewDevices(req, res) {
-    const NewDevices = RFlinkManager.getNewDevices();
-    res.json(NewDevices);
+    const newDevices = RFlinkManager.getNewDevices();
+    res.json(newDevices);
   }
 
   /**
@@ -126,7 +126,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
   async function remove(req, res) {
     // Deleting the device from the new device list
     const index = RFlinkManager.newDevices.findIndex((element) => {
-      logger.debug(element.external_id);
       if (element.external_id === req.body.external_id) {
         return true;
       }
@@ -135,7 +134,6 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
     if (index !== -1) {
       RFlinkManager.newDevices.splice(index, 1);
     }
-
     res.json({
       success: true,
     });

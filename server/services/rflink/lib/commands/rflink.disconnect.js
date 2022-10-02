@@ -6,7 +6,7 @@ const logger = require('../../../../utils/logger');
  * rflink.disconnect();
  */
 function disconnect() {
-  if (this.Path && this.connected) {
+  if (this.path && this.connected) {
     logger.debug(`Rflink : Disconnecting...`);
     this.sendUsb.close();
   } else {

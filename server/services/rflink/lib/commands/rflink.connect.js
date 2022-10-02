@@ -7,28 +7,28 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Connect to Rflink
- * @param {string} Path - Path to the Rflink gateway.
+ * @param {string} path - Path to the Rflink gateway.
  * @returns {string} Status.
  * @example
- * rflink.connect(Path);
+ * rflink.connect(path);
  */
-function connect(Path) {
+function connect(path) {
   this.connected = false;
   this.ready = false;
   this.scanInProgress = false;
 
-  if (!Path) {
+  if (!path) {
     throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
   }
   // special case for macOS
   if (os.platform() === 'darwin') {
-    this.Path = Path.replace('/dev/tty.', '/dev/cu.');
+    this.path = path.replace('/dev/tty.', '/dev/cu.');
   } else {
-    this.Path = Path;
+    this.path = path;
   }
 
   try {
-    const port = new Serialport(this.Path, {
+    const port = new Serialport(this.path, {
       baudRate: 57600,
       dataBits: 8,
       parity: 'none',
@@ -52,7 +52,7 @@ function connect(Path) {
     this.sendUsb.pipe(readline);
     this.usb = readline;
 
-    logger.debug(`Rflink : Connecting to USB = ${Path}`);
+    logger.debug(`Rflink : Connecting to USB = ${path}`);
     this.connected = true;
     this.ready = true;
     this.scanInProgress = true;
