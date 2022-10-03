@@ -1,0 +1,114 @@
+{
+  "name": "CCT5015",
+  "mqttDevice": {
+    "definition": {
+      "model": "CCT5015",
+      "exposes": [
+        {
+          "features": [
+            {
+              "access": 3,
+              "name": "state",
+              "property": "state",
+              "type": "enum",
+              "values": ["OPEN", "CLOSE", "STOP"]
+            },
+            {
+              "access": 7,
+              "description": "Position of this cover",
+              "name": "position",
+              "property": "position",
+              "type": "numeric",
+              "value_max": 100,
+              "value_min": 0
+            }
+          ],
+          "type": "cover"
+        },
+        {
+          "access": 3,
+          "description": "Duration of lift",
+          "name": "lift_duration",
+          "property": "lift_duration",
+          "type": "numeric",
+          "unit": "seconds",
+          "value_max": 300,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ]
+    },
+    "friendly_name": "CCT5015 device"
+  },
+  "gladysDevice": {
+    "service_id": "a4c859f0-32d2-46b7-8f5a-3285960f498a",
+    "external_id": "zigbee2mqtt:CCT5015 device",
+    "features": [
+      {
+        "external_id": "zigbee2mqtt:CCT5015 device:shutter:state:state",
+        "selector": "zigbee2mqtt-cct5015-device-shutter-state-state",
+        "name": "State",
+        "category": "shutter",
+        "type": "state",
+        "min": -1,
+        "max": 1,
+        "unit": null,
+        "read_only": false,
+        "has_feedback": true
+      },
+      {
+        "external_id": "zigbee2mqtt:CCT5015 device:shutter:position:position",
+        "selector": "zigbee2mqtt-cct5015-device-shutter-position-position",
+        "name": "Position",
+        "category": "shutter",
+        "type": "position",
+        "min": 0,
+        "max": 100,
+        "unit": "percent",
+        "read_only": false,
+        "has_feedback": true
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:CCT5015 device:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-cct5015-device-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
+      }
+    ],
+    "name": "CCT5015 device",
+    "model": "CCT5015",
+    "should_poll": false
+  },
+  "values": [
+    {
+      "internal": -1,
+      "external": "CLOSE",
+      "property": "state"
+    },
+    {
+      "internal": 1,
+      "external": "OPEN",
+      "property": "state"
+    },
+    {
+      "internal": 0,
+      "external": "STOP",
+      "property": "state"
+    }
+  ]
+}

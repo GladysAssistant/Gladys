@@ -152,6 +152,15 @@ module.exports = {
         forceOverride: true,
       },
     },
+    position: {
+      types: {
+        cover: {
+          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+          type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+        },
+      },
+    },
     power: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,

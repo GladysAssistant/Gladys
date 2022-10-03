@@ -17,6 +17,20 @@
             "value_off": "OFF"
           }
         ]
+      },
+      {
+        "features": [
+          {
+            "access": 7,
+            "description": "Position of this cover",
+            "name": "position",
+            "property": "position",
+            "type": "numeric",
+            "value_max": 100,
+            "value_min": 0
+          }
+        ],
+        "type": "cover"
       }
     ],
     "model": "WSDCGQ11LM",
