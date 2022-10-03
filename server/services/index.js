@@ -1,6 +1,7 @@
 module.exports.alexa = require('./alexa');
 module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
+module.exports.enedis = require('./enedis');
 module.exports.openweather = require('./openweather');
 module.exports.mqtt = require('./mqtt');
 module.exports['philips-hue'] = require('./philips-hue');

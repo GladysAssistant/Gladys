@@ -1,11 +1,14 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import uuid from 'uuid';
+import Promise from 'bluebird';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import EnedisButton from './enedis-button.png';
 import { route } from 'preact-router';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 
-const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway }) => (
+const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway, sync }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -49,6 +52,11 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
                       <p>
                         <Text id="integration.enedis.longDescription" />
                       </p>
+                      {usagePointsIds && (
+                        <button class="btn btn-primary" onClick={sync}>
+                          <Text id="integration.enedis.syncButton" /> Sync
+                        </button>
+                      )}
                       {!notOnGladysGateway && (
                         <div>
                           <p>
@@ -92,12 +100,39 @@ class EnedisWelcomePageComponent extends Component {
   };
   getCurrentEnedisUsagePoints = async () => {
     try {
-      const data = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/variable/ENEDIS_USAGE_POINTS_ID');
+      const data = await this.props.httpClient.get('/api/v1/service/enedis/variable/ENEDIS_USAGE_POINTS_ID');
       const usagePointsIds = JSON.parse(data.value);
       this.setState({ usagePointsIds });
     } catch (e) {
       console.error(e);
     }
+  };
+  createUsagePointDevice = async (usagePointId, serviceId) => {
+    const device = {
+      name: 'Enedis',
+      selector: `enedis-${usagePointId}`,
+      external_id: `enedis:${usagePointId}`,
+      service_id: serviceId,
+      features: [
+        {
+          id: uuid.v4(),
+          name: 'Enedis Power',
+          selector: `enedis-${usagePointId}-power`,
+          min: 0,
+          max: 1000000,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          external_id: `enedis:${usagePointId}:power`,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+          read_only: true,
+          has_feedback: false,
+          keep_history: true
+        }
+      ]
+    };
+    await this.props.httpClient.post('/api/v1/device', device);
+  };
+  sync = async () => {
+    await this.props.httpClient.post('/api/v1/service/enedis/sync');
   };
   detectCode = async () => {
     if (this.props.code) {
@@ -107,11 +142,18 @@ class EnedisWelcomePageComponent extends Component {
         this.setState({
           usagePointsIds: response.usage_points_id
         });
-        await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/variable/ENEDIS_USAGE_POINTS_ID', {
+        await this.props.httpClient.post('/api/v1/service/enedis/variable/ENEDIS_USAGE_POINTS_ID', {
           value: JSON.stringify(response.usage_points_id)
+        });
+        const enedisIntegration = await this.props.httpClient.get(`/api/v1/service/enedis`, {
+          pod_id: null
+        });
+        await Promise.each(response.usage_points_id, async usagePointId => {
+          await this.createUsagePointDevice(usagePointId, enedisIntegration.id);
         });
         route('/dashboard/integration/device/enedis');
       } catch (e) {
+        console.error(e);
         await this.setState({ errored: true });
       }
     }
@@ -132,6 +174,7 @@ class EnedisWelcomePageComponent extends Component {
         errored={errored}
         usagePointsIds={usagePointsIds}
         notOnGladysGateway={notOnGladysGateway}
+        sync={this.sync}
       />
     );
   }
