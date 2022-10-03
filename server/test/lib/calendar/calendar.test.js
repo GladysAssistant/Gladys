@@ -82,6 +82,8 @@ describe('calendar.get', () => {
         notify: false,
         ctag: null,
         sync_token: null,
+        last_sync: new Date('2019-02-12T07:49:07.556Z'),
+        type: 'CALDAV',
         created_at: new Date('2019-02-12T07:49:07.556Z'),
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
       },
@@ -118,6 +120,8 @@ describe('calendar.get', () => {
         notify: false,
         ctag: null,
         sync_token: null,
+        last_sync: new Date('2019-02-12T07:49:07.556Z'),
+        type: 'CALDAV',
         created_at: new Date('2019-02-12T07:49:07.556Z'),
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
       },
@@ -140,6 +144,45 @@ describe('calendar.get', () => {
     });
 
     expect(calendars).to.eql([]);
+  });
+
+  it('should get list of calendars with sync enable & type CALDAV', async () => {
+    const calendars = await calendar.get('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      serviceId: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      sync: true,
+      type: 'CALDAV',
+    });
+
+    calendars.forEach((oneCalendar) => {
+      expect(oneCalendar).to.have.property('id');
+      expect(oneCalendar).to.have.property('name');
+      expect(oneCalendar).to.have.property('selector');
+      expect(oneCalendar).to.have.property('external_id');
+      expect(oneCalendar).to.have.property('sync');
+      expect(oneCalendar).to.have.property('notify');
+    });
+
+    expect(calendars).to.eql([
+      {
+        id: '07ec2599-3221-4d6c-ac56-41443973201b',
+        user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        shared: true,
+        service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        name: 'Test Calendar',
+        selector: 'test-calendar',
+        external_id: '750db5b7-233b-41d1-89eb-d3aa4e959295',
+        description: 'Test calendar',
+        color: '#6c235f',
+        sync: true,
+        notify: false,
+        ctag: null,
+        sync_token: null,
+        last_sync: new Date('2019-02-12T07:49:07.556Z'),
+        type: 'CALDAV',
+        created_at: new Date('2019-02-12T07:49:07.556Z'),
+        updated_at: new Date('2019-02-12T07:49:07.556Z'),
+      },
+    ]);
   });
 
   it('should get a calendar from selector', async () => {
@@ -169,6 +212,8 @@ describe('calendar.get', () => {
         notify: false,
         ctag: null,
         sync_token: null,
+        last_sync: new Date('2019-02-12T07:49:07.556Z'),
+        type: 'CALDAV',
         created_at: new Date('2019-02-12T07:49:07.556Z'),
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
       },

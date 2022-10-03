@@ -6,6 +6,10 @@ module.exports = {
     return value;
   },
   readValue: (expose, value) => {
+    if (expose.name === 'linkquality') {
+      return Math.round((value * 5) / 255);
+    }
+
     return value;
   },
   feature: {
@@ -137,6 +141,24 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
         min: -100,
         max: 150,
+      },
+    },
+    linkquality: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SIGNAL,
+        type: DEVICE_FEATURE_TYPES.SIGNAL.QUALITY,
+        min: 0,
+        max: 5,
+        forceOverride: true,
+      },
+    },
+    position: {
+      types: {
+        cover: {
+          category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+          type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+          unit: DEVICE_FEATURE_UNITS.PERCENT,
+        },
       },
     },
     power: {

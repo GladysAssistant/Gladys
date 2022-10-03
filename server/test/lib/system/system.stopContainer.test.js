@@ -12,6 +12,8 @@ const System = proxyquire('../../../lib/system', {
   dockerode: DockerodeMock,
 });
 
+const Job = require('../../../lib/job');
+
 const sequelize = {
   close: fake.resolves(null),
 };
@@ -21,6 +23,8 @@ const event = {
   emit: fake.resolves(null),
 };
 
+const job = new Job(event);
+
 const config = {
   tempFolder: '/tmp/gladys',
 };
@@ -29,7 +33,7 @@ describe('system.stopContainer', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event, config, job);
     await system.init();
     // Reset all fakes invoked within init call
     sinon.reset();

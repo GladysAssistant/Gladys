@@ -1,4 +1,4 @@
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, JOB_TYPES } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 // Categories of DeviceFeatures
@@ -21,6 +21,7 @@ const { getDeviceFeaturesAggregates } = require('./device.getDeviceFeaturesAggre
 const { getDeviceFeaturesAggregatesMulti } = require('./device.getDeviceFeaturesAggregatesMulti');
 const { onHourlyDeviceAggregateEvent } = require('./device.onHourlyDeviceAggregateEvent');
 const { purgeStates } = require('./device.purgeStates');
+const { purgeStatesByFeatureId } = require('./device.purgeStatesByFeatureId');
 const { poll } = require('./device.poll');
 const { pollAll } = require('./device.pollAll');
 const { saveState } = require('./device.saveState');
@@ -48,11 +49,19 @@ const DeviceManager = function DeviceManager(
   this.variable = variable;
   this.job = job;
 
+  this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
+  this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
+
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, this);
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
   this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);
+
+  this.purgeStatesByFeatureId = this.job.wrapper(
+    JOB_TYPES.DEVICE_STATES_PURGE_SINGLE_FEATURE,
+    this.purgeStatesByFeatureId.bind(this),
+  );
 
   this.devicesByPollFrequency = {};
   // listen to events
@@ -64,6 +73,10 @@ const DeviceManager = function DeviceManager(
   this.eventManager.on(
     EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
     eventFunctionWrapper(this.onHourlyDeviceAggregateEvent.bind(this)),
+  );
+  this.eventManager.on(
+    EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
+    eventFunctionWrapper(this.purgeStatesByFeatureId.bind(this)),
   );
 };
 
@@ -80,6 +93,7 @@ DeviceManager.prototype.getDeviceFeaturesAggregates = getDeviceFeaturesAggregate
 DeviceManager.prototype.getDeviceFeaturesAggregatesMulti = getDeviceFeaturesAggregatesMulti;
 DeviceManager.prototype.onHourlyDeviceAggregateEvent = onHourlyDeviceAggregateEvent;
 DeviceManager.prototype.purgeStates = purgeStates;
+DeviceManager.prototype.purgeStatesByFeatureId = purgeStatesByFeatureId;
 DeviceManager.prototype.poll = poll;
 DeviceManager.prototype.pollAll = pollAll;
 DeviceManager.prototype.newStateEvent = newStateEvent;
