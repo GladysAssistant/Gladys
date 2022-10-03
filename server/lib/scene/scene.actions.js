@@ -139,12 +139,14 @@ const actionsFunc = {
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
     action.conditions.forEach((condition) => {
-      const conditionVerified = compare(condition.operator, get(scope, condition.variable), condition.value);
+      // removing brackets
+      const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
+      const conditionVerified = compare(condition.operator, get(scope, variableWithoutBrackets), condition.value);
       if (conditionVerified) {
         oneConditionVerified = true;
       } else {
         logger.debug(
-          `Condition not verified. Condition: "${get(scope, condition.variable)} ${condition.operator} ${
+          `Condition not verified. Condition: "${get(scope, variableWithoutBrackets)} ${condition.operator} ${
             condition.value
           }"`,
         );
