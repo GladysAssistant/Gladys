@@ -2,7 +2,6 @@ const Promise = require('bluebird');
 const { BadParameters } = require('../../utils/coreErrors');
 const db = require('../../models');
 const { EVENTS } = require('../../utils/constants');
-const logger = require('../../utils/logger');
 
 const getByExternalId = async (externalId) => {
   return db.Device.findOne({
@@ -154,16 +153,12 @@ async function create(device) {
   });
 
   // We purge states of all device features that were marked as "keep_history = false"
-  await Promise.each(deviceFeaturesIdsToPurge, async (deviceFeaturesIdToPurge) => {
-    await this.purgeStatesByFeatureId(deviceFeaturesIdToPurge);
+  // We do this asynchronously with an event, so it doesn't block the current request
+  // Also, the function called will delete as slowly as possible the event
+  // To make sure that Gladys is not locked during this time
+  deviceFeaturesIdsToPurge.forEach((deviceFeatureIdToPurge) => {
+    this.eventManager.emit(EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE, deviceFeatureIdToPurge);
   });
-
-  if (deviceFeaturesIdsToPurge.length > 0) {
-    // If we don't run a VACUUM, the database file size will stay the same
-    // Read: https://www.sqlite.org/lang_vacuum.html
-    logger.info('Running VACUUM command to free up space.');
-    await db.sequelize.query('VACUUM;');
-  }
 
   // we get the whole device from the DB to avoid
   // having a partial final object

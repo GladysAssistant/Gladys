@@ -2,8 +2,10 @@ const EventEmitter = require('events');
 const { assert, fake } = require('sinon');
 const Device = require('../../../../lib/device');
 const StateManager = require('../../../../lib/state');
+const Job = require('../../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 const testService = {
   device: {
@@ -31,7 +33,7 @@ const deviceFeature = {
 describe('Light', () => {
   it('should turnOff the light', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, {}, stateManager, service);
+    const deviceManager = new Device(event, {}, stateManager, service, {}, {}, job);
     await deviceManager.lightManager.turnOff(device, deviceFeature);
     assert.calledWith(testService.device.setValue, device, deviceFeature, 0);
   });

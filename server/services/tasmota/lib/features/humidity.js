@@ -6,7 +6,7 @@ const {
 
 module.exports = {
   // Tasmota matcher
-  keyMatcher: /^StatusSNS\.(DHT11|AM2301)\.Humidity$/,
+  keyMatcher: /^StatusSNS\.[^.]+\.Humidity$/,
   // Gladys feature
   generateFeature: () => {
     return {

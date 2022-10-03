@@ -913,10 +913,10 @@
         "learnFailed": "Impossible de passer en mode apprentissage.",
         "selectFeatureLabel": "Choisissez une fonctionnalité de la liste ou cliquez sur le bouton suivant pour entrer dans le mode apprentissage. Le mode apprentissage vous permet d'enregistrer toutes les commandes une par une, de manière automatisée.",
         "selectedFeatureLabel": "Fonctionnalité sélectionnée",
-        "selectActionLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée. Sélectionnez une action dans la liste ci-dessous pour activer la capture.",
-        "selectedFeatureInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée.",
-        "unselectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée, merci de sélectionner une action pour activer la capture.",
-        "selectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée, avec l'action <b>{{action}}</b>.",
+        "selectActionLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée. Sélectionnez une action dans la liste ci-dessous pour activer la capture.",
+        "selectedFeatureInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée.",
+        "unselectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée, merci de sélectionner une action pour activer la capture.",
+        "selectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée, avec l'action <b>{{action}}</b>.",
         "testError": "Une erreur est survenue lors du test de la fonctionnalité, vérifiez votre matériel.",
         "peripheralSelectLabel": "{{name}} ({{address}})",
         "testLabel": "Tester",
@@ -926,6 +926,13 @@
         "learnAllModeLabel": "Prochain bouton dans {{timeLeft}} secondes...",
         "quitLearnModeLabel": "Arrêter le mode apprentissage",
         "features": {
+          "curtain": {
+            "state": {
+              "none": "Arrêter",
+              "one": "Ouvrir",
+              "other": "Fermer"
+            }
+          },
           "light": {
             "binary": {
               "none": "Eteindre",
@@ -954,6 +961,13 @@
             "binary": {
               "none": "Eteindre",
               "one": "Allumer"
+            }
+          },
+          "shutter": {
+            "state": {
+              "none": "Arrêter",
+              "one": "Ouvrir",
+              "other": "Fermer"
             }
           },
           "television": {
@@ -1540,7 +1554,9 @@
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
       "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire",
-      "gladys-gateway-backup": "Sauvegarde Gladys Plus"
+      "gladys-gateway-backup": "Sauvegarde Gladys Plus",
+      "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
+      "vacuum": "Nettoyage de la base de donnée"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -1574,6 +1590,10 @@
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
     "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
+    "vacuumDatabaseTitle": "Nettoyer la base de donnée",
+    "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de donnée, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle re-arrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
+    "vacuumDatabaseButton": "Lancer le nettoyage",
+    "vacuumDatabaseStarted": "Le nettoyage a commencé... Gladys sera indisponible jusqu'à la fin du nettoyage.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -1836,6 +1856,13 @@
           "other": "Aucune valeur reçue",
           "zero": "Sain",
           "one": "CO détecté"
+        }
+      },
+      "leak-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Non",
+          "one": "Oui"
         }
       }
     }
