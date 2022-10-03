@@ -3,8 +3,9 @@ const { assert } = require('chai');
 const enumType = require('../../../../services/zigbee2mqtt/exposes/enumType');
 const { BUTTON_STATUS } = require('../../../../utils/constants');
 
-describe('zigbee2mqtt enumType', () => {
+describe('zigbee2mqtt action enumType', () => {
   const expose = {
+    name: 'action',
     values: ['single', 'long', 'short', 'double', 'triple', 'hold'],
   };
 
