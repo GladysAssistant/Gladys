@@ -13,13 +13,26 @@ const helpTextStyle = {
   marginBottom: '.375rem'
 };
 
+function isNumeric(str) {
+  if (typeof str != 'string') return false; // we only process strings!
+  return (
+    !isNaN(str) && !isNaN(parseFloat(str)) // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+  ); // ...and ensure strings of whitespace fail
+}
+
 const getAllPropertiesObject = (obj, path = '', results = []) => {
   Object.keys(obj).forEach(key => {
     const value = obj[key];
-    if (typeof value === 'object') {
+    const shouldContinueParsingTree = typeof value === 'object' && value !== null && value !== undefined;
+    const keyIsNumber = isNumeric(key);
+    if (shouldContinueParsingTree && !keyIsNumber) {
       getAllPropertiesObject(value, `${path}${key}.`, results);
-    } else {
-      results.push(path + key);
+    } else if (shouldContinueParsingTree && keyIsNumber) {
+      getAllPropertiesObject(value, `${path}[${key}].`, results);
+    } else if (!keyIsNumber) {
+      results.push(`${path}${key}`);
+    } else if (keyIsNumber) {
+      results.push(`${path}[${key}]`);
     }
   });
   return results;
@@ -240,9 +253,6 @@ class HttpRequestAction extends Component {
               <div class="form-group">
                 <label class="form-label">
                   <Text id="editScene.actionsCard.httpRequest.headersLabel" />
-                  <span class="form-required">
-                    <Text id="global.requiredField" />
-                  </span>
                 </label>
                 {props.action.headers &&
                   props.action.headers.map((header, index) => (
