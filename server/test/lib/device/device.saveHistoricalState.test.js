@@ -90,13 +90,17 @@ describe('Device.saveHistoricalState', () => {
       ],
       raw: true,
     });
-    expect(newDeviceFeatureInDB).to.deep.equal({
-      last_monthly_aggregate: '2022-08-31 17:00:00.000 +00:00',
-      last_daily_aggregate: '2022-09-03 17:00:00.000 +00:00',
-      last_hourly_aggregate: '2022-09-03 17:00:00.000 +00:00',
-      last_value: 5,
-      last_value_changed: '2022-10-04 03:52:36.174 +00:00',
-    });
+    expect(new Date(newDeviceFeatureInDB.last_monthly_aggregate)).to.deep.equal(
+      new Date('2022-08-31 17:00:00.000 +00:00'),
+    );
+    expect(new Date(newDeviceFeatureInDB.last_daily_aggregate)).to.deep.equal(
+      new Date('2022-09-03 17:00:00.000 +00:00'),
+    );
+    expect(new Date(newDeviceFeatureInDB.last_hourly_aggregate)).to.deep.equal(
+      new Date('2022-09-03 17:00:00.000 +00:00'),
+    );
+    expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
+    expect(new Date(newDeviceFeatureInDB.last_value_changed)).to.deep.equal(new Date('2022-10-04 03:52:36.174 +00:00'));
   });
   it('should return error, invalid number', async () => {
     const event = {
