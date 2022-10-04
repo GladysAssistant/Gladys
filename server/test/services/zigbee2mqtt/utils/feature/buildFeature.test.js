@@ -202,23 +202,23 @@ describe('zigbee2mqtt buildFeature', () => {
 
   it(`override max by values`, () => {
     const expose = {
-      type: 'binary',
-      name: 'state',
-      property: 'property',
+      type: 'enum',
+      name: 'action',
+      property: 'action',
       values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], // length 10
     };
     const result = buildFeature('deviceName', expose, 'switch');
 
     const expectedResult = {
-      category: 'switch',
-      type: 'binary',
+      category: 'button',
+      type: 'click',
       min: 0,
       max: 10,
       read_only: true,
       has_feedback: false,
-      name: 'Property',
-      external_id: 'zigbee2mqtt:deviceName:switch:binary:property',
-      selector: 'zigbee2mqtt-devicename-switch-binary-property',
+      name: 'Action',
+      external_id: 'zigbee2mqtt:deviceName:button:click:action',
+      selector: 'zigbee2mqtt-devicename-button-click-action',
       unit: null,
     };
 

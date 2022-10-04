@@ -71,6 +71,19 @@ module.exports = function SystemController(gladys) {
     gladys.system.shutdown();
   }
 
+  /**
+   * @api {post} /api/v1/system/vacuum
+   * @apiName vacuumSystem
+   * @apiGroup System
+   */
+  async function vacuum(req, res) {
+    gladys.event.emit(EVENTS.SYSTEM.VACUUM);
+    res.json({
+      success: true,
+      message: 'Vacuum started, system might be unresponsive for a while',
+    });
+  }
+
   return Object.freeze({
     downloadUpgrade: asyncMiddleware(downloadUpgrade),
     getSystemInfos: asyncMiddleware(getSystemInfos),
@@ -78,5 +91,6 @@ module.exports = function SystemController(gladys) {
     getContainers: asyncMiddleware(getContainers),
     shutdown: asyncMiddleware(shutdown),
     getUpgradeDownloadStatus: asyncMiddleware(getUpgradeDownloadStatus),
+    vacuum: asyncMiddleware(vacuum),
   });
 };

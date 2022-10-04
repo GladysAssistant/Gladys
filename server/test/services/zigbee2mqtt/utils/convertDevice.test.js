@@ -30,6 +30,7 @@ describe('zigbee2mqtt convertDevice', () => {
             type: 'enum',
             name: 'action',
             property: 'action',
+            values: ['value1'],
           },
         ],
         model: 'WXKG11LM',

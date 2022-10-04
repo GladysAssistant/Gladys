@@ -12,6 +12,12 @@ const BUTTON_STATUS = {
   LONG_CLICK: 6,
 };
 
+const COVER_STATE = {
+  STOP: 0,
+  OPEN: 1,
+  CLOSE: -1,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -67,6 +73,7 @@ const EVENTS = {
     NEW_STATE: 'device.new-state',
     PURGE_STATES: 'device.purge-states',
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
+    PURGE_STATES_SINGLE_FEATURE: 'device.purge-states-single-feature',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -151,6 +158,7 @@ const EVENTS = {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
     CHECK_UPGRADE: 'system.check-upgrade',
     TIMEZONE_CHANGED: 'system.timezone-changed',
+    VACUUM: 'system.vacuum',
   },
   WEBSOCKET: {
     SEND: 'websocket.send',
@@ -333,6 +341,10 @@ const DEVICE_FEATURE_CATEGORIES = {
   UV_SENSOR: 'uv-sensor',
   DURATION: 'duration',
   VOC_SENSOR: 'voc-sensor',
+  SHUTTER: 'shutter',
+  CURTAIN: 'curtain',
+  DATA: 'data',
+  DATARATE: 'datarate',
   UNKNOWN: 'unknown',
 };
 
@@ -455,6 +467,20 @@ const DEVICE_FEATURE_TYPES = {
   VOC_SENSOR: {
     DECIMAL: 'decimal',
   },
+  SHUTTER: {
+    STATE: 'state',
+    POSITION: 'position',
+  },
+  CURTAIN: {
+    STATE: 'state',
+    POSITION: 'position',
+  },
+  DATA: {
+    SIZE: 'size',
+  },
+  DATARATE: {
+    RATE: 'rate',
+  },
   UNKNOWN: {
     UNKNOWN: 'unknown',
   },
@@ -513,7 +539,8 @@ const DEVICE_FEATURE_UNITS = {
   KILOMETER_PER_HOUR: 'kilometer-per-hour',
   // Precipitation units
   MILLIMETER_PER_HOUR: 'millimeter-per-hour',
-  // UV Units
+  MILLIMETER_PER_DAY: 'millimeter-per-day',
+  // UV units
   UV_INDEX: 'uv-index',
   // Duration units
   MICROSECONDS: 'microseconds',
@@ -525,6 +552,25 @@ const DEVICE_FEATURE_UNITS = {
   WEEKS: 'weeks',
   MONTHS: 'months',
   YEARS: 'years',
+  // Data units
+  BIT: 'bit',
+  KILOBIT: 'kilobit',
+  MEGABIT: 'megabit',
+  GIGABIT: 'gigabit',
+  BYTE: 'byte',
+  KILOBYTE: 'kilobyte',
+  MEGABYTE: 'megabyte',
+  GIGABYTE: 'gigabyte',
+  TERABYTE: 'terabyte',
+  // Data rate units
+  BITS_PER_SECOND: 'bits-per-second',
+  KILOBITS_PER_SECOND: 'kilobits-per-second',
+  MEGABITS_PER_SECOND: 'megabits-per-second',
+  GIGABITS_PER_SECOND: 'gigabits-per-second',
+  BYTES_PER_SECOND: 'bytes-per-second',
+  KILOBYTES_PER_SECOND: 'kilobytes-per-second',
+  MEGABYTES_PER_SECOND: 'megabytes-per-second',
+  GIGABYTES_PER_SECOND: 'gigabytes-per-second',
 };
 
 const WEATHER_UNITS = {
@@ -597,7 +643,10 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.METER_PER_SECOND,
     DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR,
   ],
-  [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: [DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR],
+  [DEVICE_FEATURE_CATEGORIES.PRECIPITATION_SENSOR]: [
+    DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
+    DEVICE_FEATURE_UNITS.MILLIMETER_PER_DAY,
+  ],
   [DEVICE_FEATURE_CATEGORIES.UV_SENSOR]: [DEVICE_FEATURE_UNITS.UV_INDEX],
   [DEVICE_FEATURE_CATEGORIES.DURATION]: [
     DEVICE_FEATURE_UNITS.MICROSECONDS,
@@ -611,6 +660,27 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.YEARS,
   ],
   [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: [DEVICE_FEATURE_UNITS.PPB],
+  [DEVICE_FEATURE_CATEGORIES.DATA]: [
+    DEVICE_FEATURE_UNITS.BIT,
+    DEVICE_FEATURE_UNITS.KILOBIT,
+    DEVICE_FEATURE_UNITS.MEGABIT,
+    DEVICE_FEATURE_UNITS.GIGABIT,
+    DEVICE_FEATURE_UNITS.BYTE,
+    DEVICE_FEATURE_UNITS.KILOBYTE,
+    DEVICE_FEATURE_UNITS.MEGABYTE,
+    DEVICE_FEATURE_UNITS.GIGABYTE,
+    DEVICE_FEATURE_UNITS.TERABYTE,
+  ],
+  [DEVICE_FEATURE_CATEGORIES.DATARATE]: [
+    DEVICE_FEATURE_UNITS.BITS_PER_SECOND,
+    DEVICE_FEATURE_UNITS.KILOBITS_PER_SECOND,
+    DEVICE_FEATURE_UNITS.MEGABITS_PER_SECOND,
+    DEVICE_FEATURE_UNITS.GIGABITS_PER_SECOND,
+    DEVICE_FEATURE_UNITS.BYTES_PER_SECOND,
+    DEVICE_FEATURE_UNITS.KILOBYTES_PER_SECOND,
+    DEVICE_FEATURE_UNITS.MEGABYTES_PER_SECOND,
+    DEVICE_FEATURE_UNITS.GIGABYTES_PER_SECOND,
+  ],
 };
 
 const ACTIONS_STATUS = {
@@ -702,6 +772,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NEW_DEVICE: 'ewelink.new-device',
     ERROR: 'ewelink.error',
   },
+  BROADLINK: {
+    LEARN_MODE: 'broadlink.learn',
+    SEND_MODE: 'broadlink.send',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -743,6 +817,8 @@ const JOB_TYPES = {
   DAILY_DEVICE_STATE_AGGREGATE: 'daily-device-state-aggregate',
   MONTHLY_DEVICE_STATE_AGGREGATE: 'monthly-device-state-aggregate',
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
+  DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
+  VACUUM: 'vacuum',
 };
 
 const JOB_STATUS = {
@@ -790,6 +866,7 @@ const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
+module.exports.COVER_STATE = COVER_STATE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
