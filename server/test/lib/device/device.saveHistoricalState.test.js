@@ -55,6 +55,9 @@ describe('Device.saveHistoricalState', () => {
       {
         last_value: 5,
         last_value_changed: dateInTheFuture,
+        last_monthly_aggregate: dateInTheFuture,
+        last_daily_aggregate: dateInTheFuture,
+        last_hourly_aggregate: dateInTheFuture,
       },
       {
         where: {

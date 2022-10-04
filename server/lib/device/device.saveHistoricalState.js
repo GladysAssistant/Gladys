@@ -89,9 +89,12 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
       const dateAtMidnight = new Date(newValueCreatedAtDate);
       dateAtMidnight.setHours(0, 0, 0, 0);
 
-      const newMonthlyAggregateIsBeforeCurrent = firstOfTheMonth < new Date(deviceFeature.last_monthly_aggregate || 0);
-      const newDailyAggregateIsBeforeCurrent = dateAtMidnight < new Date(deviceFeature.last_daily_aggregate || 0);
-      const newHourlyAggregateIsBeforeCurrent = dateAtMidnight < new Date(deviceFeature.last_hourly_aggregate || 0);
+      const newMonthlyAggregateIsBeforeCurrent =
+        firstOfTheMonth < new Date(previousDeviceFeature.last_monthly_aggregate || 0);
+      const newDailyAggregateIsBeforeCurrent =
+        dateAtMidnight < new Date(previousDeviceFeature.last_daily_aggregate || 0);
+      const newHourlyAggregateIsBeforeCurrent =
+        dateAtMidnight < new Date(previousDeviceFeature.last_hourly_aggregate || 0);
       const toUpdate = {};
       if (newMonthlyAggregateIsBeforeCurrent) {
         toUpdate.last_monthly_aggregate = firstOfTheMonth;
@@ -104,7 +107,7 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
       }
       if (Object.keys(toUpdate).length > 0) {
         // Update data in RAM
-        this.stateManager.setState('deviceFeature', deviceFeature.selector, toUpdate);
+        this.stateManager.setState('deviceFeature', previousDeviceFeature.selector, toUpdate);
         // Update DB
         await db.DeviceFeature.update(toUpdate, {
           where: {
