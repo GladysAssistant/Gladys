@@ -34,7 +34,6 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
   logger.debug(`device.saveHistoricalState of deviceFeature ${deviceFeature.selector}`);
 
   const previousDeviceFeature = this.stateManager.get('deviceFeature', deviceFeature.selector);
-  const previousDeviceFeatureValue = previousDeviceFeature ? previousDeviceFeature.last_value : null;
   const previousDeviceFeatureLastValueChanged =
     previousDeviceFeature && previousDeviceFeature.last_value_changed
       ? new Date(previousDeviceFeature.last_value_changed) // if date exists
@@ -72,15 +71,6 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
         last_value: newValue,
         last_value_changed: newValueCreatedAtDate,
       },
-    });
-
-    // check if there is a trigger matching
-    this.eventManager.emit(EVENTS.TRIGGERS.CHECK, {
-      type: EVENTS.DEVICE.NEW_STATE,
-      device_feature: deviceFeature.selector,
-      previous_value: previousDeviceFeatureValue,
-      last_value: newValue,
-      last_value_changed: newValueCreatedAtDate,
     });
   }
   // if the deviceFeature should keep history, we save a new deviceFeatureState

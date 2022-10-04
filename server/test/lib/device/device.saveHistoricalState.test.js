@@ -33,13 +33,6 @@ describe('Device.saveHistoricalState', () => {
       },
       type: 'device.new-state',
     });
-    assert.calledWith(event.emit.secondCall, 'trigger.check', {
-      device_feature: 'test-device-feature',
-      last_value: 12,
-      last_value_changed: new Date(newDate),
-      previous_value: null,
-      type: 'device.new-state',
-    });
   });
   it('should save old state and keep history', async () => {
     const event = {
