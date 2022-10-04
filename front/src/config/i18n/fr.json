@@ -1754,6 +1754,7 @@
     "meter-per-second": "Mètre par seconde (m/s)",
     "kilometer-per-hour": "Kilomètre par heure (km/h)",
     "millimeter-per-hour": "Millimètre par heure (mm/h)",
+    "millimeter-per-day": "Millimètre par jour (mm/j)",
     "uv-index": "Indice UV",
     "microseconds": "Microsecondes (μs)",
     "milliseconds": "Millisecondes (ms)",
@@ -1763,7 +1764,24 @@
     "days": "Jours (j)",
     "weeks": "Semaines (sem)",
     "months": "Mois (m)",
-    "years": "Années (an)"
+    "years": "Années (an)",
+    "bit": "Bit",
+    "kilobit": "Kilobit",
+    "megabit": "Megabit",
+    "gigabit": "Gigabit",
+    "byte": "Octet (o)",
+    "kilobyte": "Kilooctet (Ko)",
+    "megabyte": "Megaoctet (Mo)",
+    "gigabyte": "Gigaoctet (Go)",
+    "terabyte": "Teraoctet (To)",
+    "bits-per-second": "Bits par seconde (bit/s)",
+    "kilobits-per-second": "Kilobits par seconde (kbit/s)",
+    "megabits-per-second": "Megabits par seconde (Mbit/s)",
+    "gigabits-per-second": "Gigabits par seconde (Gbit/s)",
+    "bytes-per-second": "Octets par seconde (o/s)",
+    "kilobytes-per-second": "Kilooctets par seconde (Ko/s)",
+    "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
+    "gigabytes-per-second": "Gigaoctets par seconde (Go/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1806,6 +1824,7 @@
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
     "millimeter-per-hour": "mm/h",
+    "millimeter-per-day": "mm/j",
     "uv-index": "Indice UV",
     "microseconds": "μs",
     "milliseconds": "ms",
@@ -1815,7 +1834,24 @@
     "days": "j",
     "weeks": "sem",
     "months": "m",
-    "years": "an"
+    "years": "an",
+    "bit": "bit",
+    "kilobit": "kbit",
+    "megabit": "Mbit",
+    "gigabit": "Gbit",
+    "byte": "o",
+    "kilobyte": "Ko",
+    "megabyte": "Mo",
+    "gigabyte": "Go",
+    "terabyte": "To",
+    "bits-per-second": "bit/s",
+    "kilobits-per-second": "kbit/s",
+    "megabits-per-second": "Mbit/s",
+    "gigabits-per-second": "Gbit/s",
+    "bytes-per-second": "o/s",
+    "kilobytes-per-second": "Ko/s",
+    "megabytes-per-second": "Mo/s",
+    "gigabytes-per-second": "Go/s"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2063,6 +2099,14 @@
       "shortCategoryName": "Rideau",
       "state": "Etat du rideau",
       "position": "Position du rideau"
+    },
+    "data": {
+      "shortCategoryName": "Donnée",
+      "size": "Taille"
+    },
+    "datarate": {
+      "shortCategoryName": "Débit de données",
+      "rate": "Débit"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
