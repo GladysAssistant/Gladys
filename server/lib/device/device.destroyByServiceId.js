@@ -14,11 +14,10 @@ async function destroyByServiceId(serviceId) {
     },
   });
 
-  if (devices && devices.length > 0) {
-    await Promise.each(devices, async (device) => {
-      await device.destroy(device.selector);
-    });
-  }
+  await Promise.each(devices, async (device) => {
+    await device.destroy();
+  });
+
   return null;
 }
 

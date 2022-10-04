@@ -31,7 +31,7 @@ async function getAndSaveBatteryLevel(featureBattery, withingsDeviceId, userId) 
         featureBattery.last_value = currentBatValue;
         featureBattery.last_value_string = currentBatValueString;
 
-        await this.gladys.device.saveHistoricalState(featureBattery, currentBatValue, currentDate);
+        await this.gladys.device.saveState(featureBattery, currentBatValue);
       }
     });
   }

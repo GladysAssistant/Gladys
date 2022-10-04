@@ -50,7 +50,7 @@ class UpdateDeviceFeature extends Component {
                 <input
                   id={`featureName_${featureIndex}`}
                   type="text"
-                  value={<Text id={feature.name}>{feature.name}</Text>}
+                  value={feature.name}
                   onInput={this.updateName}
                   class="form-control"
                   placeholder={<Text id="editDeviceForm.namePlaceholder" />}

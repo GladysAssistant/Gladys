@@ -1,4 +1,6 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
+const { ERROR_MESSAGES } = require('../../../utils/constants');
+const { Error400 } = require('../../../utils/httpErrors');
 
 module.exports = function WithingsController(gladys, withingsHandler) {
   /**
@@ -46,7 +48,7 @@ module.exports = function WithingsController(gladys, withingsHandler) {
         authorizationUri: authorizationUriResult,
       });
     } else {
-      res.status(400);
+      throw new Error400(ERROR_MESSAGES.MISSING_MANDATORY_PARAMETER);
     }
   }
 
@@ -68,7 +70,7 @@ module.exports = function WithingsController(gladys, withingsHandler) {
         result: authResult,
       });
     } else {
-      res.status(400);
+      throw new Error400(ERROR_MESSAGES.MISSING_MANDATORY_PARAMETER);
     }
   }
 
@@ -85,7 +87,7 @@ module.exports = function WithingsController(gladys, withingsHandler) {
         client_id: resultClientId,
       });
     } else {
-      res.status(400);
+      throw new Error400(ERROR_MESSAGES.MISSING_MANDATORY_PARAMETER);
     }
   }
 

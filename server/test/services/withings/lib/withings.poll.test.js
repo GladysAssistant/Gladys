@@ -33,6 +33,7 @@ const gladys = {
   device: {
     create: fake.resolves(null),
     destroyByServiceId: fake.resolves(null),
+    saveState: fake.resolves(null),
     saveHistoricalState: fake.resolves(null),
   },
   user: {
@@ -44,7 +45,6 @@ const gladys = {
 describe('WithingsHandler poll', () => {
   const withingsHandler = new WithingsHandler(gladys, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
   withingsHandler.withingsUrl = `http://${serverHost}:${httpServerPort}`;
-  withingsHandler.integrationName = 'test';
 
   before((done) => {
     server.start(done);
@@ -189,8 +189,9 @@ describe('WithingsHandler poll', () => {
       features: deviceToPoll.features,
     };
 
-    // 18 feature - 1 feature unknown = 17 state to save
-    assert.callCount(gladys.device.saveHistoricalState, 17);
+    assert.callCount(gladys.device.saveState, 1);
+    // 17 feature - 1 feature unknown = 16 state to save
+    assert.callCount(gladys.device.saveHistoricalState, 16);
     assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
 
     const deviceToPoll2 = {

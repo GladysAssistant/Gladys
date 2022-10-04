@@ -1,4 +1,3 @@
-import { Text } from 'preact-i18n';
 import { createElement } from 'preact';
 import get from 'get-value';
 
@@ -46,9 +45,7 @@ const SensorDeviceType = ({ children, ...props }) => {
           )}`}
         />
       </td>
-      <td>
-        <Text id={props.deviceFeature.name}>{props.deviceFeature.name}</Text>
-      </td>
+      <td>{props.deviceFeature.name}</td>
       <td class="text-right">{createElement(elementType, props)}</td>
     </tr>
   );

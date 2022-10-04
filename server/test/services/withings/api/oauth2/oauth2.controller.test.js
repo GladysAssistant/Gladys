@@ -54,6 +54,7 @@ describe('POST /api/v1/service/withings/oauth2/client/authorization-uri', () => 
   });
 });
 
+// failled call
 describe('POST /api/v1/service/withings/oauth2/client/authorization-uri', () => {
   it('should get error authorization uri', async () => {
     sinon.reset();
@@ -72,8 +73,7 @@ describe('POST /api/v1/service/withings/oauth2/client/authorization-uri', () => 
     await controller['post /api/v1/service/withings/oauth2/client/authorization-uri'].controller(req, res);
 
     assert.notCalled(withingsHandler.oauth2Client.getAccessToken);
-    assert.calledOnce(res.status);
-    assert.calledWith(res.status, 400);
+    assert.notCalled(res.json);
   });
 });
 
@@ -118,10 +118,8 @@ describe('POST /api/v1/service/withings/oauth2/client/access-token', () => {
       status: fake.returns(null),
     };
     await controller['post /api/v1/service/withings/oauth2/client/access-token'].controller(req, res);
-
     assert.notCalled(withingsHandler.oauth2Client.getAccessToken);
-    assert.calledOnce(res.status);
-    assert.calledWith(res.status, 400);
+    assert.notCalled(res.json);
   });
 });
 
@@ -140,18 +138,18 @@ describe('GET /api/v1/service/withings/oauth2/client', () => {
     };
 
     const res = { json: fake.returns(null) };
-
     await controller['get /api/v1/service/withings/oauth2/client'].controller(req, res);
-
     assert.calledOnce(withingsHandler.oauth2Client.getCurrentConfig);
     assert.calledOnce(res.json);
     assert.calledWith(res.json, { client_id: null });
   });
 });
 
+// failled call
 describe('GET /api/v1/service/withings/oauth2/client', () => {
   it('should get error client param', async () => {
     sinon.reset();
+
     const req = {
       headers: {
         referer: 'fake-referer',
@@ -164,9 +162,7 @@ describe('GET /api/v1/service/withings/oauth2/client', () => {
 
     const res = { json: fake.returns(null), status: fake.returns(null) };
     await controller['get /api/v1/service/withings/oauth2/client'].controller(req, res);
-
     assert.notCalled(withingsHandler.oauth2Client.getAccessToken);
-    assert.calledOnce(res.status);
-    assert.calledWith(res.status, 400);
+    assert.notCalled(res.json);
   });
 });
