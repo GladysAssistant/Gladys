@@ -1769,6 +1769,7 @@
     "meter-per-second": "Meter per second (m/s)",
     "kilometer-per-hour": "Kilometer per hour (km/h)",
     "millimeter-per-hour": "Millimeter per hour (mm/h)",
+    "millimeter-per-day": "Millimeter per day (mm/d)",
     "uv-index": "UV Index",
     "microseconds": "Microseconds (μs)",
     "milliseconds": "Milliseconds (ms)",
@@ -1778,7 +1779,24 @@
     "days": "Days (d)",
     "weeks": "Weeks (w)",
     "months": "Months (m)",
-    "years": "Years (y)"
+    "years": "Years (y)",
+    "bit": "Bit",
+    "kilobit": "Kilobit",
+    "megabit": "Megabit",
+    "gigabit": "Gigabit",
+    "byte": "Byte (B)",
+    "kilobyte": "Kilobyte (kB)",
+    "megabyte": "Megabyte (MB)",
+    "gigabyte": "Gigabyte (GB)",
+    "terabyte": "Terabyte (TB)",
+    "bits-per-second": "Bits per second (bit/s)",
+    "kilobits-per-second": "Kilobits per second (kbit/s)",
+    "megabits-per-second": "Megabits per second (Mbit/s)",
+    "gigabits-per-second": "Gigabits per second (Gbit/s)",
+    "bytes-per-second": "Bytes per second (B/s)",
+    "kilobytes-per-second": "kilobytes per second (kB/s)",
+    "megabytes-per-second": "Megabytes per second (MB/s)",
+    "gigabytes-per-second": "Gigabytes per second (GB/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1821,6 +1839,7 @@
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
     "millimeter-per-hour": "mm/h",
+    "millimeter-per-day": "mm/d",
     "uv-index": "UV Index",
     "microseconds": "μs",
     "milliseconds": "ms",
@@ -1830,7 +1849,24 @@
     "days": "d",
     "weeks": "w",
     "months": "m",
-    "years": "y"
+    "years": "y",
+    "bit": "bit",
+    "kilobit": "kbit",
+    "megabit": "Mbit",
+    "gigabit": "Gbit",
+    "byte": "B",
+    "kilobyte": "kB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB",
+    "bits-per-second": "bit/s",
+    "kilobits-per-second": "kbit/s",
+    "megabits-per-second": "Mbit/s",
+    "gigabits-per-second": "Gbit/s",
+    "bytes-per-second": "B/s",
+    "kilobytes-per-second": "kB/s",
+    "megabytes-per-second": "MB/s",
+    "gigabytes-per-second": "GB/s"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2078,6 +2114,14 @@
       "shortCategoryName": "Curtain",
       "state": "Curtain state",
       "position": "curtain position"
+    },
+    "data": {
+      "shortCategoryName": "Data",
+      "size": "Size"
+    },
+    "datarate": {
+      "shortCategoryName": "Datarate",
+      "rate": "Rate"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
