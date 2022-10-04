@@ -4,6 +4,10 @@
     "img": "/assets/integrations/cover/zwave.jpg"
   },
   {
+    "key": "zwavejs2mqtt",
+    "img": "/assets/integrations/cover/zwavejs2mqtt.jpg"
+  },
+  {
     "key": "rtspCamera",
     "link": "rtsp-camera",
     "img": "/assets/integrations/cover/rtsp-camera.jpg"
