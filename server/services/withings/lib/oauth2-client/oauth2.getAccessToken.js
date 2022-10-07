@@ -20,18 +20,6 @@ const { BadOauth2ClientResponse } = require('./utils/coreErrors');
  * );
  */
 async function getAccessToken(serviceId, userId, authorizationCode, referer) {
-  // Find provider configuration
-  const tokenHost = await this.variable.getValue(OAUTH2.VARIABLE.TOKEN_HOST, serviceId);
-  const tokenPath = await this.variable.getValue(OAUTH2.VARIABLE.TOKEN_PATH, serviceId);
-  const authorizeHost = await this.variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_HOST, serviceId);
-  const authorizePath = await this.variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_PATH, serviceId);
-  const grantType = await this.variable.getValue(OAUTH2.VARIABLE.GRANT_TYPE, serviceId);
-  const additionalAccessTokenRequestAxtionParam = await this.variable.getValue(
-    OAUTH2.VARIABLE.ADDITIONAL_ACCESS_TOKEN_REQUEST_ACTION_PARAM,
-    serviceId,
-  );
-  const redirectUriSuffix = await this.variable.getValue(OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX, serviceId);
-
   const clientId = await this.variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
   const secret = await this.variable.getValue(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, userId);
 
@@ -42,10 +30,10 @@ async function getAccessToken(serviceId, userId, authorizationCode, referer) {
       secret,
     },
     auth: {
-      tokenHost,
-      tokenPath,
-      authorizeHost,
-      authorizePath,
+      tokenHost: this.tokenHost,
+      tokenPath: this.tokenPath,
+      authorizeHost: this.authorizeHost,
+      authorizePath: this.authorizePath,
     },
   };
 
@@ -54,16 +42,16 @@ async function getAccessToken(serviceId, userId, authorizationCode, referer) {
     code: authorizationCode,
     client_id: clientId,
     client_secret: secret,
-    grant_type: grantType,
-    redirect_uri: this.buildRedirectUri(referer, redirectUriSuffix),
+    grant_type: this.grantType,
+    redirect_uri: this.buildRedirectUri(referer, this.redirectUriSuffix),
+    action: this.additionalAccessTokenRequestAxtionParam,
   };
-  if (additionalAccessTokenRequestAxtionParam) {
-    tokenConfig.action = additionalAccessTokenRequestAxtionParam;
-  }
 
   try {
+    console.log(tokenConfig);
     const client = new AuthorizationCode(credentials);
     const authResult = await client.getToken(tokenConfig, { json: true });
+    console.log(authResult);
 
     if (authResult.token) {
       if (authResult.token.status && authResult.token.status !== 0) {

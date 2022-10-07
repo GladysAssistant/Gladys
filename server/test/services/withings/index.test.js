@@ -21,9 +21,6 @@ describe('withingsService', () => {
 
     expect(withingsService).to.have.property('controllers');
     expect(withingsService).to.have.property('device');
-
-    assert.callCount(gladys.variable.getValue, 1);
-    assert.callCount(gladys.variable.setValue, 8);
   });
 
   it('should stop service', async () => {

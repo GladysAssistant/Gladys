@@ -18,13 +18,6 @@ const { OAUTH2 } = require('./utils/constants.js');
  * );
  */
 async function buildAuthorizationUri(serviceId, userId, integrationName, referer) {
-  // Find provider configuration
-  const tokenHost = await this.variable.getValue(OAUTH2.VARIABLE.TOKEN_HOST, serviceId);
-  const authorizeHost = await this.variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_HOST, serviceId);
-  const authorizePath = await this.variable.getValue(OAUTH2.VARIABLE.AUTHORIZE_PATH, serviceId);
-  const integrationScope = await this.variable.getValue(OAUTH2.VARIABLE.INTEGRATION_SCOPE, serviceId);
-  const redirectUriSuffix = await this.variable.getValue(OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX, serviceId);
-
   // Get variale client id and client secret
   const clientId = await this.variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
   const secret = await this.variable.getValue(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, userId);
@@ -36,16 +29,16 @@ async function buildAuthorizationUri(serviceId, userId, integrationName, referer
       secret,
     },
     auth: {
-      tokenHost,
-      authorizeHost,
-      authorizePath,
+      tokenHost: this.tokenHost,
+      authorizeHost: this.authorizeHost,
+      authorizePath: this.authorizePath,
     },
   };
 
   const client = new AuthorizationCode(credentials);
   const authorizationUriResult = await client.authorizeURL({
-    redirect_uri: this.buildRedirectUri(referer, redirectUriSuffix),
-    scope: integrationScope,
+    redirect_uri: this.buildRedirectUri(referer, this.redirectUriSuffix),
+    scope: this.integrationScope,
     state: `gladys_state_${integrationName}`,
   });
 

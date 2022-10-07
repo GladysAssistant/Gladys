@@ -144,27 +144,11 @@ function getHttpServer(host, port, withHistoricalData) {
  * @description Return a HttpServer corresponding to withings server
  *
  * @param {string} key - Key of fariable to return.
- * @param {string} host - Host of server (oauth2).
- * @param {number} port - Port of server (oauth2).
  * @returns {string} Value of variable.
  * @example serverHttpWithingsMock.getHttgetVariablepServer(OAUTH2.VARIABLE.TOKEN_HOST, 'localhost', 9192 );
  */
-function getVariable(key, host, port) {
+function getVariable(key) {
   switch (key) {
-    case OAUTH2.VARIABLE.TOKEN_HOST:
-      return `http://${host}:${port}`;
-    case OAUTH2.VARIABLE.TOKEN_PATH:
-      return '/oauth2/token';
-    case OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX:
-      return 'ashboard/integration/health/test/settings';
-    case OAUTH2.VARIABLE.AUTHORIZE_HOST:
-      return `http://${host}:${port}`;
-    case OAUTH2.VARIABLE.AUTHORIZE_PATH:
-      return '/oauth2_user/authorize2';
-    case OAUTH2.VARIABLE.GRANT_TYPE:
-      return 'authorization_code';
-    case OAUTH2.VARIABLE.INTEGRATION_SCOPE:
-      return 'user.info,user.metrics,user.activity,user.sleepevents';
     case OAUTH2.VARIABLE.ACCESS_TOKEN:
       return (
         '{' +
@@ -177,8 +161,6 @@ function getVariable(key, host, port) {
         '"expires_at":"2020-11-13T20:46:50.042Z"' +
         '}'
       );
-    case OAUTH2.VARIABLE.ADDITIONAL_ACCESS_TOKEN_REQUEST_ACTION_PARAM:
-      return 'requesttoken';
     case OAUTH2.VARIABLE.CLIENT_ID:
       return 'fake_client_id';
     default:

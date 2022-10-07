@@ -20,20 +20,6 @@ const gladys = {
       switch (key) {
         case OAUTH2.VARIABLE.CLIENT_ID:
           return 'fake_client_id';
-        case OAUTH2.VARIABLE.TOKEN_HOST:
-          return testUrl;
-        case OAUTH2.VARIABLE.TOKEN_PATH:
-          return '/token';
-        case OAUTH2.VARIABLE.AUTHORIZE_HOST:
-          return testUrl;
-        case OAUTH2.VARIABLE.AUTHORIZE_PATH:
-          return '/authorize2';
-        case OAUTH2.VARIABLE.INTEGRATION_SCOPE:
-          return 'user.info,user.metrics,user.activity,user.sleepevents';
-        case OAUTH2.VARIABLE.GRANT_TYPE:
-          return 'authorization_code';
-        case OAUTH2.VARIABLE.REDIRECT_URI_SUFFIX:
-          return '/dashboard/integration/health/test/settings';
         case OAUTH2.VARIABLE.ACCESS_TOKEN:
           return (
             '{"access_token":"b96a86b654acb01c2aeb4d5a39f10ff9c964f8e4","expires_in":10800,' +
@@ -69,6 +55,11 @@ describe('oauth2manager test', () => {
   });
 
   const manager = new OAuth2Manager(gladys.variable);
+  manager.tokenHost = testUrl;
+  manager.authorizeHost = testUrl;
+  manager.tokenPath = '/token';
+  manager.authorizePath = '/authorize2';
+  manager.redirectUriSuffix = '/dashboard/integration/health/test/settings';
 
   it('oauth manager get buildAuthorizationUri test', async () => {
     const result = await manager.buildAuthorizationUri(testServiceId, 'fakeUserId', 'fake-code', 'fake-referer');

@@ -39,7 +39,7 @@ const gladys = {
   event: { emit: sinon.fake.returns(null) },
   variable: {
     getValue: function returnValue(key, serviceId) {
-      return serverHttpWithingsMock.getVariable(key, serverHost, oauth2ServerPort);
+      return serverHttpWithingsMock.getVariable(key);
     },
     setValue: sinon.fake.returns(null),
     destroy: sinon.fake.returns(null),
@@ -65,6 +65,8 @@ describe('WithingsHandler initDevices', () => {
   it('init devices in Gladys', async () => {
     const withingsHandler = new WithingsHandler(gladys, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
     withingsHandler.withingsUrl = `http://${serverHost}:${httpServerPort}`;
+    withingsHandler.oauth2Client.tokenHost = `http://${serverHost}:${oauth2ServerPort}`;
+    withingsHandler.oauth2Client.authorizeHost = `http://${serverHost}:${oauth2ServerPort}`;
 
     const result = await withingsHandler.initDevices('0cd30aef-9c4e-4a23-88e3-3547971296e5');
 

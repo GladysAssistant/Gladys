@@ -25,7 +25,7 @@ const gladys = {
       if (key === OAUTH2.VARIABLE.CLIENT_ID) {
         countGetValueCallClientId += 1;
       }
-      return serverHttpWithingsMock.getVariable(key, serverHost, oauth2ServerPort);
+      return serverHttpWithingsMock.getVariable(key);
     },
     setValue: fake.resolves(null),
     destroy: fake.returns(null),
@@ -45,6 +45,8 @@ const gladys = {
 describe('WithingsHandler poll', () => {
   const withingsHandler = new WithingsHandler(gladys, '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4');
   withingsHandler.withingsUrl = `http://${serverHost}:${httpServerPort}`;
+  withingsHandler.oauth2Client.tokenHost = `http://${serverHost}:${oauth2ServerPort}`;
+  withingsHandler.oauth2Client.authorizeHost = `http://${serverHost}:${oauth2ServerPort}`;
 
   before((done) => {
     server.start(done);
@@ -173,7 +175,7 @@ describe('WithingsHandler poll', () => {
 
     await withingsHandler.poll(deviceToPoll);
 
-    chai.assert.equal(countGetValueCall, 137);
+    chai.assert.equal(countGetValueCall, 52);
     chai.assert.equal(countGetValueCallClientId, 18);
 
     const deviceDef = {

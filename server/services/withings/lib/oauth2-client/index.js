@@ -7,6 +7,15 @@ const { buildRedirectUri } = require('./oauth2.buildRedirectUri');
 
 const OAuth2Manager = function OAuth2Manager(variable) {
   this.variable = variable;
+  this.tokenHost = 'https://wbsapi.withings.net';
+  this.tokenPath = '/v2/oauth2';
+  this.authorizeHost = 'https://account.withings.com';
+  this.authorizePath = '/oauth2_user/authorize2';
+  this.additionalAccessTokenRequestActionParam = 'requesttoken';
+  this.integrationScope = 'user.info,user.metrics,user.activity,user.sleepevents';
+  this.grantType = 'authorization_code';
+  this.redirectUriSuffix = 'dashboard/integration/health/withings/settings';
+  this.additionalAccessTokenRequestAxtionParam = 'requesttoken';
 };
 
 OAuth2Manager.prototype.executeQuery = executeQuery;

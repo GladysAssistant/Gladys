@@ -1,6 +1,5 @@
 const Oauth2Client = require('./oauth2-client');
 // COMMANDS
-const { init } = require('./withings.init');
 const { initDevices } = require('./withings.initDevices');
 const { deleteVar } = require('./withings.deleteVar');
 const { deleteDevices } = require('./withings.deleteDevices');
@@ -28,7 +27,6 @@ const WithingsHandler = function WithingsHandler(gladys, serviceId) {
 };
 
 // COMMANDS
-WithingsHandler.prototype.init = init;
 WithingsHandler.prototype.initDevices = initDevices;
 WithingsHandler.prototype.deleteVar = deleteVar;
 WithingsHandler.prototype.deleteDevices = deleteDevices;
