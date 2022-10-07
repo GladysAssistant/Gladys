@@ -8,9 +8,12 @@ const { mappings } = require('./deviceMappings');
  * buildAccessory(device)
  */
 function buildAccessory(device) {
-  const accessory = new this.hap.Accessory(device.name, device.id);
-
   const categories = device.features.reduce((previousValue, currentValue) => {
+    if (!mappings[currentValue.category] || !mappings[currentValue.category].capabilities[currentValue.type]) {
+      return {
+        ...previousValue,
+      };
+    }
     return {
       ...previousValue,
       [currentValue.category]: previousValue[currentValue.category]
@@ -19,14 +22,13 @@ function buildAccessory(device) {
     };
   }, {});
 
+  const accessory = new this.hap.Accessory(device.name, device.id);
   Object.keys(categories).forEach((category) => {
-    if (categories[category] && mappings[category]) {
-      const service = this.buildService(device, categories[category], mappings[category]);
-      accessory.addService(service);
-    }
+    const service = this.buildService(device, categories[category], mappings[category]);
+    accessory.addService(service);
   });
 
-  return accessory;
+  return accessory.services.length <= 1 ? null : accessory;
 }
 
 module.exports = {

@@ -31,7 +31,9 @@ async function createBridge() {
       return Object.keys(mappings).includes(feature.category);
     });
   });
-  const accessories = compatibleDevices.map((device) => this.buildAccessory(device));
+  const accessories = compatibleDevices
+    .map((device) => this.buildAccessory(device))
+    .filter((accessory) => accessory !== null);
 
   if (this.bridge) {
     await this.bridge.unpublish();
