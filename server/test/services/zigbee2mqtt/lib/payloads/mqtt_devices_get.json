@@ -94,6 +94,74 @@
     "type": "EndDevice"
   },
   {
+    "definition": {
+      "description": "Wireless switch with 3 buttons",
+      "exposes": [
+        {
+          "access": 1,
+          "description": "Remaining battery in %",
+          "name": "battery",
+          "property": "battery",
+          "type": "numeric",
+          "unit": "%",
+          "value_max": 100,
+          "value_min": 0
+        },
+        {
+          "access": 1,
+          "description": "Triggered action (e.g. a button click)",
+          "name": "action",
+          "property": "action",
+          "type": "enum",
+          "values": [
+            "1_single",
+            "1_double",
+            "1_hold",
+            "2_single",
+            "2_double",
+            "2_hold",
+            "3_single",
+            "3_double",
+            "3_hold"
+          ]
+        },
+        {
+          "access": 1,
+          "description": "Link quality (signal strength)",
+          "name": "linkquality",
+          "property": "linkquality",
+          "type": "numeric",
+          "unit": "lqi",
+          "value_max": 255,
+          "value_min": 0
+        }
+      ],
+      "model": "TS0043",
+      "supports_ota": false,
+      "vendor": "TuYa"
+    },
+    "endpoints": {
+      "1": {
+        "bindings": [],
+        "clusters": {
+          "input": [],
+          "output": []
+        },
+        "configured_reportings": []
+      }
+    },
+    "friendly_name": "0x00158d00033e88d1",
+    "ieee_address": "0x00158d00033e88d1",
+    "interview_completed": true,
+    "interviewing": false,
+    "manufacturer": "TuYa",
+    "model_id": "TS0043",
+    "network_address": 44173,
+    "power_source": "Battery",
+    "supported": true,
+    "type": "EndDevice"
+  },
+  {
     "date_code": "20180525",
     "definition": {
       "description": "Aqara wireless switch",
