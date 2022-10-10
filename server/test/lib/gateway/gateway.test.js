@@ -389,7 +389,7 @@ describe('gateway', () => {
       gateway.connected = true;
 
       const websocketMessage = {
-        type: 'zwave.new-node',
+        type: 'device.new',
         payload: {},
       };
       gateway.forwardWebsockets(websocketMessage);
@@ -399,7 +399,7 @@ describe('gateway', () => {
       const gateway = new Gateway({}, event, system, sequelize, config, {}, {}, {}, job);
 
       const websocketMessage = {
-        type: 'zwave.new-node',
+        type: 'device.new',
         payload: {},
       };
       gateway.forwardWebsockets(websocketMessage);
