@@ -18,7 +18,7 @@ function setValue(device, deviceFeature, value) {
     );
   }
 
-  const [, topic = '', , , property = ''] = externalId.split(':');
+  const [, topic = '', , , property = '', featureIndex] = externalId.split(':');
   if (topic.length === 0) {
     throw new BadParameters(`Zigbee2mqtt device external_id is invalid: "${externalId}" have no MQTT topic`);
   } else if (property.length === 0) {
@@ -30,7 +30,7 @@ function setValue(device, deviceFeature, value) {
   // Looks mapping from exposes
   const expose = this.findMatchingExpose(topic, property);
   if (expose) {
-    zigbeeValue = exposesMap[expose.type].writeValue(expose, value);
+    zigbeeValue = exposesMap[expose.type].writeValue(expose, value, featureIndex);
     // Send message to Zigbee2mqtt topics
     const mqttPaylad = JSON.stringify({ [property]: zigbeeValue });
     this.mqttClient.publish(`zigbee2mqtt/${topic}/set`, mqttPaylad);
