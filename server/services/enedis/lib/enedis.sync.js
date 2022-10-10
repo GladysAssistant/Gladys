@@ -68,6 +68,7 @@ async function sync() {
             this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
               device_feature_external_id: usagePointFeature.external_id,
               state: value.value,
+              created_at: new Date(value.date),
             });
           }
         });
