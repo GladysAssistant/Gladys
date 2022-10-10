@@ -2108,6 +2108,10 @@
       "shortCategoryName": "Datarate",
       "rate": "Rate"
     },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "thermostat-temperature": "Thermostat Temperature"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"

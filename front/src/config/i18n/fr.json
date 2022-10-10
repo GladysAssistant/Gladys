@@ -2108,6 +2108,10 @@
       "shortCategoryName": "Débit de données",
       "rate": "Débit"
     },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "thermostat-temperature": "Température de consigne"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
