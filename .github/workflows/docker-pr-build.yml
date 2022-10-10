@@ -61,15 +61,6 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      - name: 🖥️ Setup OZW
-        run: |
-          docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
-          sudo docker cp dummy:/usr/local/include/openzwave /usr/local/include/openzwave
-          sudo docker cp dummy:/openzwave/libopenzwave.so /usr/local/lib
-          sudo docker cp dummy:/openzwave/libopenzwave.so.1.6 /usr/local/lib
-          sudo docker cp dummy:/openzwave/config /usr/local/etc/openzwave
-          sudo ldconfig
-          docker rm -f dummy
       - name: 💽 Install System Dependencies
         run: |
           sudo apt update
@@ -117,15 +108,6 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      - name: 🖥️ Setup OZW
-        run: |
-          docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
-          sudo docker cp dummy:/usr/local/include/openzwave /usr/local/include/openzwave
-          sudo docker cp dummy:/openzwave/libopenzwave.so /usr/local/lib
-          sudo docker cp dummy:/openzwave/libopenzwave.so.1.6 /usr/local/lib
-          sudo docker cp dummy:/openzwave/config /usr/local/etc/openzwave
-          sudo ldconfig
-          docker rm -f dummy
       - name: 💽 Install System Dependencies
         run: |
           sudo apt update
