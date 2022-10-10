@@ -8,7 +8,6 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
-import { getDeviceName } from '../../../utils/device';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
@@ -143,7 +142,7 @@ class Chartbox extends Component {
       const series = data.map((oneFeature, index) => {
         const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
         const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-        const deviceName = getDeviceName(oneFeature.device, oneFeature);
+        const deviceName = oneFeature.name;
         const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
         return {
           name,
