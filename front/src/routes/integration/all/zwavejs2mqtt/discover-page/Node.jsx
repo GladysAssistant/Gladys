@@ -12,7 +12,6 @@ const createGithubUrl = node => {
   const { rawZwaveNode } = node;
   const deviceToSend = {
     product: rawZwaveNode.product,
-    deviceDatabaseUrl: rawZwaveNode.deviceDatabaseUrl,
     classes: rawZwaveNode.keysClasses
   };
   const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.product}"`);
@@ -125,11 +124,6 @@ class ZwaveNode extends Component {
                       <Text id="integration.zwavejs2mqtt.discover.createGithubIssue" />
                     </a>
                   </div>
-                  <div>
-                    <a href={props.node.deviceDatabaseUrl} target="_blank" rel="noopener noreferrer">
-                      <Text id="integration.zwavejs2mqtt.discover.deviceDatabaseUrl" />
-                    </a>
-                  </div>
                 </div>
               ) : (
                 <div class="card-body">
@@ -155,11 +149,6 @@ class ZwaveNode extends Component {
                       onClick={displayRawNode(props.node)}
                     >
                       <Text id="integration.zwavejs2mqtt.discover.createGithubIssue" />
-                    </a>
-                  </div>
-                  <div>
-                    <a href={props.node.deviceDatabaseUrl} target="_blank" rel="noopener noreferrer">
-                      <Text id="integration.zwavejs2mqtt.discover.deviceDatabaseUrl" />
                     </a>
                   </div>
                 </div>

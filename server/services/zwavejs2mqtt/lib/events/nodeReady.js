@@ -16,7 +16,6 @@ function nodeReady(zwaveNode) {
   node.nodeId = nodeId;
   node.product = `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`;
   node.type = zwaveNode.nodeType;
-  node.deviceDatabaseUrl = zwaveNode.deviceDatabaseUrl;
   node.firmwareVersion = zwaveNode.firmwareVersion;
   node.name = `${zwaveNode.name ||
     zwaveNode.label ||

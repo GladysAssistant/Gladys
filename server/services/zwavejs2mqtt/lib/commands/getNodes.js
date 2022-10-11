@@ -40,8 +40,6 @@ function getNodes() {
           type: node.type,
           product: node.product,
           keysClasses: Object.keys(node.classes),
-          // classes: node.classes, If set, HTTP 413 - Request entity too loarge
-          deviceDatabaseUrl: node.deviceDatabaseUrl,
         },
         features: [],
         params: [],

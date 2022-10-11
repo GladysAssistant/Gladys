@@ -144,6 +144,7 @@ const PROPERTIES = {
   SCENE_003: 'scene-003',
   SCENE_004: 'scene-004',
   SCENE_005: 'scene-005',
+  SCENE_006: 'scene-006',
   BATTERY_LEVEL: 'level',
   CURRENT_COLOR: 'currentColor',
   TARGET_COLOR: 'targetColor',

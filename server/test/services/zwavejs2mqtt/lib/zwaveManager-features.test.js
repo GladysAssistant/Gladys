@@ -53,7 +53,6 @@ describe('zwaveManager events', () => {
         type: 'type',
         product: 'product',
         keysClasses: [],
-        deviceDatabaseUrl: 'deviceDatabaseUrl',
       },
     };
   });
