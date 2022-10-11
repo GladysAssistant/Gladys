@@ -658,7 +658,6 @@
         "notEnabled": "Zwavejs2mqtt is not activated, please go to ",
         "mqttNotInstalled": "MQTT broker failed to install",
         "mqttNotRunning": "MQTT broker failed to start",
-        "mqttNotConnected": "Gladys failed to connect to MQTT",
         "zwavejs2mqttNotInstalled": "Zwavejs2mqtt failed to install",
         "zwavejs2mqttNotRunning": "Zwavejs2mqtt failed to start",
         "zwavejs2mqttNotConnected": "Zwavejs2mqtt failed to connect to MQTT",

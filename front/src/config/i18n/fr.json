@@ -858,7 +858,6 @@
         "error": "Une erreur s'est produite au démarrage du service Zwavejs2Mqtt.",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zwavejs2mqtt depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zwavejs2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
-        "enableZwavejs2Mqtt": "Activer Zwavejs2Mqtt",
         "externalZwavejs2mqtt": "Zwavejs2Mqtt externe",
         "containersStatus": "Conteneurs liés à Zwavejs2Mqtt",
         "serviceStatus": "Etat du service Zwavejs2Mqtt",
