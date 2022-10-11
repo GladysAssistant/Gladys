@@ -106,16 +106,6 @@ const createActions = store => {
     async createDevice(state, newDevice) {
       await state.httpClient.post('/api/v1/device', newDevice);
     },
-    async refreshValues(state, device) {
-      await state.httpClient.post('/api/v1/service/zwavejs2mqtt/values/refresh', {
-        nodeId: device.rawZwaveNode.id
-      });
-    },
-    async refreshInfo(state, device) {
-      await state.httpClient.post('/api/v1/service/zwavejs2mqtt/info/refresh', {
-        nodeId: device.rawZwaveNode.id
-      });
-    },
     editNodeName(state, index, name) {
       const newState = update(state, {
         zwaveNodes: {

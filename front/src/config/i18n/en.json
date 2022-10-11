@@ -691,8 +691,6 @@
         "name": "Name",
         "scanInProgressText": "Scan in Progress...",
         "createDeviceInGladys": "Connect in Gladys",
-        "refreshValues": "Refresh all values",
-        "refreshInfo": "Refresh all information",
         "features": "Features",
         "params": "Params",
         "nodeId": "Node",

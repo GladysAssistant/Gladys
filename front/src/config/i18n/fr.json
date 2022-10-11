@@ -817,8 +817,6 @@
         "name": "Nom",
         "scanInProgressText": "Recherche en cours...",
         "createDeviceInGladys": "Connecter dans Gladys",
-        "refreshValues": "Mettre à jour toutes les valeurs",
-        "refreshInfo": "Mettre à jour les informations",
         "features": "Fonctionnalités",
         "params": "Paramètre",
         "nodeId": "Noeud",

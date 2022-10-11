@@ -72,8 +72,6 @@ const NodeTab = ({ children, ...props }) => {
                     nodeIndex={index}
                     createDevice={props.createDevice}
                     editNodeName={props.editNodeName}
-                    refreshValues={props.refreshValues}
-                    refreshInfo={props.refreshInfo}
                   />
                 ))}
             </div>

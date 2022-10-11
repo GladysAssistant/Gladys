@@ -120,18 +120,6 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
     });
   }
 
-  /**
-   * @api {post} /api/v1/service/zwave/params/refresh Refresh params
-   * @apiName refreshParams
-   * @apiGroup Zwave
-   */
-  async function refreshNodeParams(req, res) {
-    zwaveManager.refreshNodeParams();
-    res.json({
-      success: true,
-    });
-  }
-
   return {
     'get /api/v1/service/zwave/node': {
       authenticated: true,
@@ -163,11 +151,6 @@ module.exports = function ZwaveController(gladys, zwaveManager, serviceId) {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(healNetwork),
-    },
-    'post /api/v1/service/zwave/params/refresh': {
-      authenticated: true,
-      admin: true,
-      controller: asyncMiddleware(refreshNodeParams),
     },
     'post /api/v1/service/zwave/node/add': {
       authenticated: true,

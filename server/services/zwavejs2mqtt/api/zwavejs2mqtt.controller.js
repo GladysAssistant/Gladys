@@ -113,30 +113,6 @@ module.exports = function ZwaveController(gladys, zwavejs2mqttManager, serviceId
     });
   }
 
-  /**
-   * @api {post} /api/v1/service/zwavejs2mqtt/values/refresh Refresh values
-   * @apiName refreshValues
-   * @apiGroup Zwavejs2mqtt
-   */
-  async function refreshValues(req, res) {
-    zwavejs2mqttManager.refreshValues(req.body.nodeId);
-    res.json({
-      success: true,
-    });
-  }
-
-  /**
-   * @api {post} /api/v1/service/zwavejs2mqtt/info/refresh Refresh info
-   * @apiName refreshValues
-   * @apiGroup Zwavejs2mqtt
-   */
-  async function refreshInfo(req, res) {
-    zwavejs2mqttManager.refreshInfo(req.body.nodeId);
-    res.json({
-      success: true,
-    });
-  }
-
   return {
     'get /api/v1/service/zwavejs2mqtt/node': {
       authenticated: true,
@@ -172,16 +148,6 @@ module.exports = function ZwaveController(gladys, zwavejs2mqttManager, serviceId
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(healNetwork),
-    },
-    'post /api/v1/service/zwavejs2mqtt/values/refresh': {
-      authenticated: true,
-      admin: true,
-      controller: asyncMiddleware(refreshValues),
-    },
-    'post /api/v1/service/zwavejs2mqtt/info/refresh': {
-      authenticated: true,
-      admin: true,
-      controller: asyncMiddleware(refreshInfo),
     },
     'post /api/v1/service/zwavejs2mqtt/node/add': {
       authenticated: true,

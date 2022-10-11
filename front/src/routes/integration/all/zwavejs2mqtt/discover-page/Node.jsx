@@ -45,14 +45,6 @@ class ZwaveNode extends Component {
     this.props.editNodeName(this.props.nodeIndex, e.target.value);
   };
 
-  refreshValues = async () => {
-    this.props.refreshValues(this.props.node);
-  };
-
-  refreshInfo = async () => {
-    this.props.refreshInfo(this.props.node);
-  };
-
   render(props, { loading, error, deviceCreated }) {
     return (
       <div index={props.node.id} class="col-md-6">
@@ -133,12 +125,6 @@ class ZwaveNode extends Component {
                   <div class="form-group">
                     <button class="btn btn-success" onClick={this.createDevice}>
                       <Text id="integration.zwavejs2mqtt.discover.createDeviceInGladys" />
-                    </button>
-                    <button class="btn btn-warning" onClick={this.refreshValues}>
-                      <Text id="integration.zwavejs2mqtt.discover.refreshValues" />
-                    </button>
-                    <button class="btn btn-warning" onClick={this.refreshInfo}>
-                      <Text id="integration.zwavejs2mqtt.discover.refreshInfo" />
                     </button>
                   </div>
                   <div>
