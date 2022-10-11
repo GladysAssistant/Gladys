@@ -1,116 +1,294 @@
-const EventEmitter = require('events');
-const { assert, expect } = require('chai');
+const { expect, assert: chaiAssert } = require('chai');
+const { assert, stub } = require('sinon');
+const db = require('../../../models');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
-const ServiceManager = require('../../../lib/service');
 const Job = require('../../../lib/job');
-const { BadParameters } = require('../../../utils/coreErrors');
 
-const event = new EventEmitter();
-const job = new Job(event);
-
-describe('Device saveHistoricalState', () => {
-  it('should save historical sate (new state)', async () => {
-    const testFeature = {
-      id: '5smd05fc-1736-4b76-99ca-5812329sm036',
-      name: 'Test feature test',
-      selector: 'test-feature',
-      external_id: 'feature:test',
-      category: 'feature',
-      type: 'weight',
-      unit: null,
-      read_only: false,
-      has_feedback: false,
-      min: 0,
-      max: 0,
-      last_value: null,
-      last_value_string: '10',
-      last_value_changed: new Date(2019, 2, 11, 5, 23, 59),
-      device_id: 'fdfmb47f-4d25-4381-8923-2633b23192sm',
-      created_at: '2019-02-12 07:49:07.556 +00:00',
-      updated_at: '2019-02-12 07:49:07.556 +00:00',
+describe('Device.saveHistoricalState', () => {
+  it('should save new state and keep history', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
     };
-
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'test-device', {
-      id: 'fdfmb47f-4d25-4381-8923-2633b23192sm',
-      name: 'test',
-      features: [testFeature],
+    const job = new Job(event);
+    const newDate = new Date().toISOString();
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    await device.saveHistoricalState(
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        selector: 'test-device-feature',
+        has_feedback: false,
+        keep_history: true,
+      },
+      12,
+      newDate,
+    );
+    assert.calledWith(event.emit.firstCall, 'websocket.send-all', {
+      payload: {
+        device_feature_selector: 'test-device-feature',
+        last_value: 12,
+        last_value_changed: new Date(newDate),
+      },
+      type: 'device.new-state',
     });
-    stateManager.setState('deviceFeature', 'test-feature', testFeature);
-
-    const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
-    const testDevice = await device.getBySelector('test-device');
-
-    const deviceFeature = testDevice.features[0];
-    const updateDate = new Date().toISOString();
-    const historicalState = 20;
-
-    await device.saveHistoricalState(deviceFeature, historicalState, updateDate);
-
-    return assert.equal(deviceFeature.last_value_changed, updateDate);
   });
-
-  it('should save historical sate on feature without state', async () => {
-    const testFeature = {
-      id: '5smd05fc-1736-4b76-99ca-5812329sm036',
-      name: 'Test feature test',
-      selector: 'test-feature',
-      external_id: 'feature:test',
-      category: 'feature',
-      type: 'weight',
-      unit: null,
-      read_only: false,
-      has_feedback: false,
-      min: 0,
-      max: 0,
-      device_id: 'fdfmb47f-4d25-4381-8923-2633b23192sm',
-      created_at: '2019-02-12 07:49:07.556 +00:00',
-      updated_at: '2019-02-12 07:49:07.556 +00:00',
+  it('should save old state and keep history, and update aggregate', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
     };
-
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'test-device', {
-      id: 'fdfmb47f-4d25-4381-8923-2633b23192sm',
-      name: 'test',
-      features: [testFeature],
+    const job = new Job(event);
+    const dateInThePast = new Date(2022, 9, 4, 3).toISOString();
+    const dateInTheFuture = new Date(2022, 10, 4, 3);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('deviceFeature', 'test-device-feature', {
+      last_value: 5,
+      last_value_changed: dateInTheFuture,
+      last_monthly_aggregate: dateInTheFuture,
+      last_daily_aggregate: dateInTheFuture,
+      last_hourly_aggregate: dateInTheFuture,
     });
-    stateManager.setState('deviceFeature', 'test-feature', testFeature);
-
-    const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
-    const testDevice = await device.getBySelector('test-device');
-
-    const deviceFeature = testDevice.features[0];
-    const updateDate = new Date().toISOString();
-    const historicalState = 20;
-
-    await device.saveHistoricalState(deviceFeature, historicalState, updateDate);
-
-    return assert.equal(deviceFeature.last_value_changed, updateDate);
-  });
-
-  it('should not save NaN as state', async () => {
-    const stateManager = new StateManager(event);
-    const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
-
-    const nanValue = parseInt('NaN value', 10);
-
-    try {
-      await device.saveHistoricalState(
-        {
-          id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    await db.DeviceFeature.update(
+      {
+        last_value: 5,
+        last_value_changed: dateInTheFuture,
+        last_monthly_aggregate: dateInTheFuture,
+        last_daily_aggregate: dateInTheFuture,
+        last_hourly_aggregate: dateInTheFuture,
+      },
+      {
+        where: {
           selector: 'test-device-feature',
-          has_feedback: false,
-          keep_history: false,
         },
-        nanValue,
-      );
-      assert.fail('NaN device state should fail');
-    } catch (e) {
-      expect(e).instanceOf(BadParameters);
-    }
+      },
+    );
+    await device.saveHistoricalState(
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        selector: 'test-device-feature',
+        has_feedback: false,
+        keep_history: true,
+      },
+      12,
+      dateInThePast,
+    );
+    assert.notCalled(event.emit);
+    const newDeviceFeatureInDB = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+      attributes: [
+        'last_monthly_aggregate',
+        'last_daily_aggregate',
+        'last_hourly_aggregate',
+        'last_value',
+        'last_value_changed',
+      ],
+      raw: true,
+    });
+    const compareDate = (name, date1, date2) => {
+      expect(new Date(date1)).to.be.lessThan(new Date(date2), name);
+    };
+    compareDate('monthly_aggregate', newDeviceFeatureInDB.last_monthly_aggregate, dateInTheFuture);
+    compareDate('daily_aggregate', newDeviceFeatureInDB.last_daily_aggregate, dateInTheFuture);
+    compareDate('hourly_aggregate', newDeviceFeatureInDB.last_hourly_aggregate, dateInTheFuture);
+    expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
+  });
+  it('should save old state and keep history, and not update null aggregate', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const job = new Job(event);
+    const dateInThePast = new Date(2022, 9, 4, 3).toISOString();
+    const dateInTheFuture = new Date(2022, 10, 4, 3);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('deviceFeature', 'test-device-feature', {
+      last_value: 5,
+      last_value_changed: dateInTheFuture,
+      last_monthly_aggregate: null,
+      last_daily_aggregate: null,
+      last_hourly_aggregate: null,
+    });
+    await db.DeviceFeature.update(
+      {
+        last_value: 5,
+        last_value_changed: dateInTheFuture,
+      },
+      {
+        where: {
+          selector: 'test-device-feature',
+        },
+      },
+    );
+    await device.saveHistoricalState(
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        selector: 'test-device-feature',
+        has_feedback: false,
+        keep_history: true,
+      },
+      12,
+      dateInThePast,
+    );
+    assert.notCalled(event.emit);
+    const newDeviceFeatureInDB = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+      attributes: [
+        'last_monthly_aggregate',
+        'last_daily_aggregate',
+        'last_hourly_aggregate',
+        'last_value',
+        'last_value_changed',
+      ],
+      raw: true,
+    });
+    expect(newDeviceFeatureInDB.last_monthly_aggregate).to.equal(null);
+    expect(newDeviceFeatureInDB.last_daily_aggregate).to.equal(null);
+    expect(newDeviceFeatureInDB.last_hourly_aggregate).to.equal(null);
+    expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
+  });
+  it('should save old state and keep history, and not update less recent aggregate', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const job = new Job(event);
+    const dateInThePast = new Date(2022, 9, 4, 3).toISOString();
+    const dateEvenBeforeInThePast = new Date(2021, 9, 4, 3).toISOString();
+    const dateInTheFuture = new Date(2022, 10, 4, 3);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('deviceFeature', 'test-device-feature', {
+      last_value: 5,
+      last_value_changed: dateInTheFuture,
+      last_monthly_aggregate: dateEvenBeforeInThePast,
+      last_daily_aggregate: dateEvenBeforeInThePast,
+      last_hourly_aggregate: dateEvenBeforeInThePast,
+    });
+    const deviceFeature = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+    });
+    deviceFeature.set({
+      last_value: 5,
+      last_value_changed: dateInTheFuture,
+      last_monthly_aggregate: dateEvenBeforeInThePast,
+      last_daily_aggregate: dateEvenBeforeInThePast,
+      last_hourly_aggregate: dateEvenBeforeInThePast,
+    });
+    await deviceFeature.save();
+    const oldDeviceInDb = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+      attributes: [
+        'last_monthly_aggregate',
+        'last_daily_aggregate',
+        'last_hourly_aggregate',
+        'last_value',
+        'last_value_changed',
+      ],
+      raw: true,
+    });
+    await device.saveHistoricalState(
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        selector: 'test-device-feature',
+        has_feedback: false,
+        keep_history: true,
+      },
+      12,
+      dateInThePast,
+    );
+    assert.notCalled(event.emit);
+    const newDeviceFeatureInDB = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+      attributes: [
+        'last_monthly_aggregate',
+        'last_daily_aggregate',
+        'last_hourly_aggregate',
+        'last_value',
+        'last_value_changed',
+      ],
+      raw: true,
+    });
+    expect(newDeviceFeatureInDB.last_monthly_aggregate).to.deep.equal(oldDeviceInDb.last_monthly_aggregate);
+    expect(newDeviceFeatureInDB.last_daily_aggregate).to.deep.equal(oldDeviceInDb.last_daily_aggregate);
+    expect(newDeviceFeatureInDB.last_hourly_aggregate).to.deep.equal(oldDeviceInDb.last_hourly_aggregate);
+    expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
+  });
+  it('should return error, invalid number', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const job = new Job(event);
+    const newDate = new Date().toISOString();
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    const promise = device.saveHistoricalState(
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        selector: 'test-device-feature',
+        has_feedback: false,
+        keep_history: true,
+      },
+      // @ts-ignore
+      'toto',
+      newDate,
+    );
+    return chaiAssert.isRejected(promise, 'Validation error: Validation isFloat on last_value failed');
+  });
+  it('should return error, invalid number', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const job = new Job(event);
+    const newDate = new Date().toISOString();
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    const promise = device.saveHistoricalState(
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        selector: 'test-device-feature',
+        has_feedback: false,
+        keep_history: true,
+      },
+      parseInt('dskflj', 10),
+      newDate,
+    );
+    return chaiAssert.isRejected(promise, 'device.saveHistoricalState of NaN value on test-device-feature');
+  });
+  it('should return error, invalid date', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const job = new Job(event);
+    const invalideDate = 'error';
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    const promise = device.saveHistoricalState(
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        selector: 'test-device-feature',
+        has_feedback: false,
+        keep_history: true,
+      },
+      12,
+      invalideDate,
+    );
+    return chaiAssert.isRejected(promise, '"value" must be a valid ISO 8601 date');
   });
 });
