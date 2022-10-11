@@ -119,19 +119,6 @@ describe('GET /api/v1/service/zwavejs2mqtt', () => {
     assert.calledOnceWithExactly(res.json, nodes);
   });
 
-  it('should heal network', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-    zwavejs2mqttManager.healNetwork = fake.returns(null);
-    await zwavejs2mqttController['post /api/v1/service/zwavejs2mqtt/heal'].controller(req, res);
-    assert.calledOnce(zwavejs2mqttManager.healNetwork);
-    assert.calledOnceWithExactly(res.json, {
-      success: true,
-    });
-  });
-
   it('should add node', async () => {
     const req = {
       body: {

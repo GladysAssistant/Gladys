@@ -3,7 +3,6 @@ const { connect } = require('./commands/connect');
 const { disconnect } = require('./commands/disconnect');
 const { getStatus } = require('./commands/getStatus');
 const { getNodes } = require('./commands/getNodes');
-const { healNetwork } = require('./commands/healNetwork');
 const { removeNode } = require('./commands/removeNode');
 const { setValue } = require('./commands/setValue');
 const { nodeAdded } = require('./events/nodeAdded');
@@ -78,7 +77,6 @@ Zwavejs2mqttManager.prototype.handleMqttMessage = handleMqttMessage;
 // COMMANDS
 Zwavejs2mqttManager.prototype.connect = connect;
 Zwavejs2mqttManager.prototype.disconnect = disconnect;
-Zwavejs2mqttManager.prototype.healNetwork = healNetwork;
 Zwavejs2mqttManager.prototype.getStatus = getStatus;
 Zwavejs2mqttManager.prototype.getConfiguration = getConfiguration;
 Zwavejs2mqttManager.prototype.getNodes = getNodes;

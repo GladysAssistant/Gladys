@@ -104,7 +104,8 @@ const createActions = store => {
         s2UnauthenticatedKey,
         s2AuthenticatedKey,
         s2AccessControlKey,
-        s0LegacyKey} = state;
+        s0LegacyKey
+      } = state;
       try {
         await state.httpClient.post(`/api/v1/service/zwavejs2mqtt/configuration`, {
           externalZwavejs2mqtt,
@@ -115,7 +116,7 @@ const createActions = store => {
           s2UnauthenticatedKey,
           s2AuthenticatedKey,
           s2AccessControlKey,
-          s0LegacyKey,
+          s0LegacyKey
         });
 
         store.setState({

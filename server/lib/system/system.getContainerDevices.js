@@ -12,9 +12,7 @@ async function getContainerDevices(containerId) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
-  const container = await this.dockerode.getContainer(
-    containerId
-  );
+  const container = await this.dockerode.getContainer(containerId);
   if (!container) {
     return [];
   }

@@ -79,18 +79,6 @@ module.exports = function ZwaveController(gladys, zwavejs2mqttManager, serviceId
   }
 
   /**
-   * @api {post} /api/v1/service/zwavejs2mqtt/heal Heal Network
-   * @apiName healNetwork
-   * @apiGroup Zwavejs2mqtt
-   */
-  async function healNetwork(req, res) {
-    zwavejs2mqttManager.healNetwork();
-    res.json({
-      success: true,
-    });
-  }
-
-  /**
    * @api {post} /api/v1/service/zwavejs2mqtt/node/add Add Node
    * @apiName addNode
    * @apiGroup Zwavejs2mqtt
@@ -143,11 +131,6 @@ module.exports = function ZwaveController(gladys, zwavejs2mqttManager, serviceId
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(disconnect),
-    },
-    'post /api/v1/service/zwavejs2mqtt/heal': {
-      authenticated: true,
-      admin: true,
-      controller: asyncMiddleware(healNetwork),
     },
     'post /api/v1/service/zwavejs2mqtt/node/add': {
       authenticated: true,

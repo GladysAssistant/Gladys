@@ -66,26 +66,6 @@ describe('zwaveManager commands', () => {
     assert.calledOnce(zwaveManager.driver.controller.stopExclusion);
     clock.restore();
   });
-  it('should heal network', () => {
-    zwaveManager.healNetwork();
-    assert.calledOnce(zwaveManager.driver.controller.beginHealingNetwork);
-  });
-  it('should return node neighbors', async () => {
-    const nodes = await zwaveManager.getNodeNeighbors();
-    expect(nodes).to.be.instanceOf(Array);
-  });
-  it('should refresh node params', () => {
-    const refreshValues = fake.returns(null);
-    zwaveManager.driver.controller.nodes = {
-      get: (id) => {
-        return {
-          refreshValues,
-        };
-      },
-    };
-    zwaveManager.refreshNodeParams(1);
-    assert.calledOnce(refreshValues);
-  });
   it('should return Z-Wave status', () => {
     const status = zwaveManager.getStatus();
     expect(status).to.deep.equal({

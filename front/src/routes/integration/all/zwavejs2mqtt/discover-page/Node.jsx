@@ -1,5 +1,5 @@
 import { Text } from 'preact-i18n';
-import { Component } from 'preact';
+import { Component, Link } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
 
@@ -128,14 +128,17 @@ class ZwaveNode extends Component {
                     </button>
                   </div>
                   <div>
-                    <a
+                    <Link
                       href={createGithubUrl(props.node)}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={displayRawNode(props.node)}
                     >
+                      <span class="icon mr-3">
+                        <i class="fe fe-external-link" />
+                      </span>
                       <Text id="integration.zwavejs2mqtt.discover.createGithubIssue" />
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}

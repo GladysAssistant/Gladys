@@ -71,22 +71,6 @@ const createActions = store => {
         });
       }
     },
-    async healNetwork(state) {
-      store.setState({
-        zwaveHealNetworkStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/zwavejs2mqtt/heal');
-        store.setState({
-          zwaveHealNetworkStatus: RequestStatus.Success
-        });
-        actions.getStatus(store.getState());
-      } catch (e) {
-        store.setState({
-          zwaveHealNetworkStatus: RequestStatus.Error
-        });
-      }
-    },
     async getStatus(state) {
       store.setState({
         zwaveGetStatusStatus: RequestStatus.Getting

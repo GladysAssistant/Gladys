@@ -831,6 +831,7 @@
       "settings": {
         "title": "Paramètres Z-Wave",
         "description": "Ce service utilise deux containers Docker (MQTT broker and Zwavejs2Mqtt). L'interface Zwavejs2mqtt est disponible à l'URL ci-dessous, user = admin, mot de passe = zwave.\nPour en savoir plus, rendez-vous sur la page de documentation Zwavejs2mqtt",
+        "zwavejs2mqtt": "Zwavejs2Mqtt interface",
         "urlLabel": "URL du broker",
         "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
         "userLabel": "Nom d'utilisateur",
@@ -852,7 +853,7 @@
         "notConnected": "Zwavejs2Mqtt n'est pas connecté",
         "usbNotConfigured": "Gladys n'est connectée à aucune clé USB Z-Wave.",
         "connecting": "Tentative de connexion à la clé USB Z-Wave...",
-        "zwaveUsbDriverPath": "Sélectionnez le port USB auquel votre clé Z-Wave est connecté",
+        "zwaveUsbDriverPathLabel": "Sélectionnez le port USB auquel votre clé Z-Wave est connecté",
         "refreshButton": "Rafraîchir la liste des appareils USB",
         "error": "Une erreur s'est produite au démarrage du service Zwavejs2Mqtt.",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zwavejs2mqtt depuis Gladys.",

@@ -705,6 +705,7 @@
       "settings": {
         "title": "Z-Wave Settings",
         "description": "This service uses two independent docker containers (MQTT broker and Zwavejs2Mqtt). The administration of Zwavejs2mqtt is available at <a href='http://localhost:8091'>Zwavejs2mqtt</a>, user = admin, password = zwave.\nLearn more on the Zwavejs2mqtt documentation page",
+        "zwavejs2mqtt": "Zwavejs2Mqtt interface",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",
@@ -726,7 +727,7 @@
         "notConnected": "Zwavejs2Mqtt is not connected",
         "usbNotConfigured": "Gladys is not connected to any Z-Wave USB stick.",
         "connecting": "Trying to connect to Z-Wave USB stick...",
-        "usbDriverPath": "Select the USB port where your Z-Wave stick is connected",
+        "zwaveUsbDriverPathLabel": "Select the USB port where your Z-Wave stick is connected",
         "refreshButton": "Refresh USB list",
         "error": "An error occured while saving configuration.",
         "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",

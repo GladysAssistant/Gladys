@@ -11,7 +11,6 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
   actions
 )
 class Zwavejs2mqttSettingsPage extends Component {
-
   componentWillMount() {
     this.props.getStatus();
     this.props.getUsbPorts();

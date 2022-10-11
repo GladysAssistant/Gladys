@@ -53,70 +53,38 @@ async function connect() {
   }
 
   // MQTT configuration
-  const mqttPassword = await this.gladys.variable.getValue(
-    CONFIGURATION.ZWAVEJS2MQTT_MQTT_PASSWORD,
-    this.serviceId,
-  );
+  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_PASSWORD, this.serviceId);
   if (!mqttPassword) {
     // First start, use default value for MQTT
     this.mqttUrl = DEFAULT.ZWAVEJS2MQTT_MQTT_URL_VALUE;
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_URL, this.mqttUrl, this.serviceId);
     this.mqttUsername = DEFAULT.ZWAVEJS2MQTT_MQTT_USERNAME_VALUE;
-    await this.gladys.variable.setValue(
-      CONFIGURATION.ZWAVEJS2MQTT_MQTT_USERNAME,
-      this.mqttUsername,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_USERNAME, this.mqttUsername, this.serviceId);
     this.mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
-    await this.gladys.variable.setValue(
-      CONFIGURATION.ZWAVEJS2MQTT_MQTT_PASSWORD,
-      this.mqttPassword,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_PASSWORD, this.mqttPassword, this.serviceId);
   } else {
     const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_URL, this.serviceId);
     this.mqttUrl = mqttUrl;
-    const mqttUsername = await this.gladys.variable.getValue(
-      CONFIGURATION.ZWAVEJS2MQTT_MQTT_USERNAME,
-      this.serviceId,
-    );
+    const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_USERNAME, this.serviceId);
     this.mqttUsername = mqttUsername;
     this.mqttPassword = mqttPassword;
   }
 
   // Security keys configuration
-  this.s2UnauthenticatedKey = await this.gladys.variable.getValue(
-    CONFIGURATION.S2_UNAUTHENTICATED,
-    this.serviceId,
-  );
+  this.s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
   if (!this.s2UnauthenticatedKey) {
     this.s2UnauthenticatedKey = crypto.randomBytes(16).toString('hex');
-    await this.gladys.variable.setValue(
-      CONFIGURATION.S2_UNAUTHENTICATED,
-      this.s2UnauthenticatedKey,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.S2_UNAUTHENTICATED, this.s2UnauthenticatedKey, this.serviceId);
   }
   this.s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);
   if (!this.s2AuthenticatedKey) {
     this.s2AuthenticatedKey = crypto.randomBytes(16).toString('hex');
-    await this.gladys.variable.setValue(
-      CONFIGURATION.S2_AUTHENTICATED,
-      this.s2AuthenticatedKey,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.S2_AUTHENTICATED, this.s2AuthenticatedKey, this.serviceId);
   }
-  this.s2AccessControlKey = await this.gladys.variable.getValue(
-    CONFIGURATION.S2_ACCESS_CONTROL,
-    this.serviceId,
-  );
+  this.s2AccessControlKey = await this.gladys.variable.getValue(CONFIGURATION.S2_ACCESS_CONTROL, this.serviceId);
   if (!this.s2AccessControlKey) {
     this.s2AccessControlKey = crypto.randomBytes(16).toString('hex');
-    await this.gladys.variable.setValue(
-      CONFIGURATION.S2_ACCESS_CONTROL,
-      this.s2AccessControlKey,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.S2_ACCESS_CONTROL, this.s2AccessControlKey, this.serviceId);
   }
   this.s0LegacyKey = await this.gladys.variable.getValue(CONFIGURATION.S0_LEGACY, this.serviceId);
   if (!this.s0LegacyKey) {

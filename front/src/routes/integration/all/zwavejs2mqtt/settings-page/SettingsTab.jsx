@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, Link } from 'preact-i18n';
 import classNames from 'classnames/bind';
 import style from './style.css';
 
@@ -70,9 +70,12 @@ class SettingsTab extends Component {
                   {!props.externalZwavejs2mqtt && (
                     <>
                       <br />
-                      <a target="zwavejs2mqtt" href="http://localhost:8091">
-                        Zwavejs2mqtt
-                      </a>
+                      <Link href="http://localhost:8091" target="zwavejs2mqtt">
+                        <span class="icon mr-3">
+                          <i class="fe fe-external-link" />
+                        </span>
+                        <Text id="integration.zwavejs2mqtt.settings.zwavejs2mqtt" />
+                      </Link>
                     </>
                   )}
                 </p>
@@ -183,7 +186,7 @@ class SettingsTab extends Component {
                     <>
                       <div class="form-group">
                         <label class="form-label">
-                          <Text id="integration.zwavejs2mqtt.settings.zwaveUsbDriverPath" />
+                          <Text id="integration.zwavejs2mqtt.settings.zwaveUsbDriverPathLabel" />
                         </label>
                         <select class="form-control" onChange={this.updateUsbDriverPath}>
                           <option>
@@ -193,10 +196,7 @@ class SettingsTab extends Component {
                             props.usbPorts.map(
                               usbPort =>
                                 usbPort.comPath && (
-                                  <option
-                                    value={usbPort.comPath}
-                                    selected={props.driverPath === usbPort.comPath}
-                                  >
+                                  <option value={usbPort.comPath} selected={props.driverPath === usbPort.comPath}>
                                     {usbPort.comPath}
                                     {usbPort.comName ? ` - ${usbPort.comName}` : ''}
                                     {usbPort.comVID ? ` - ${usbPort.comVID}` : ''}

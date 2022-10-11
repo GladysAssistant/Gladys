@@ -37,29 +37,17 @@ async function updateConfiguration(configuration) {
   }
 
   if (s2UnauthenticatedKey) {
-    await this.gladys.variable.setValue(
-      CONFIGURATION.S2_UNAUTHENTICATED,
-      s2UnauthenticatedKey,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.S2_UNAUTHENTICATED, s2UnauthenticatedKey, this.serviceId);
     this.s2UnauthenticatedKey = s2UnauthenticatedKey;
   }
 
   if (s2AuthenticatedKey) {
-    await this.gladys.variable.setValue(
-      CONFIGURATION.S2_AUTHENTICATED,
-      s2AuthenticatedKey,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.S2_AUTHENTICATED, s2AuthenticatedKey, this.serviceId);
     this.s2AuthenticatedKey = s2AuthenticatedKey;
   }
 
   if (s2AccessControlKey) {
-    await this.gladys.variable.setValue(
-      CONFIGURATION.S2_ACCESS_CONTROL,
-      s2AccessControlKey,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.S2_ACCESS_CONTROL, s2AccessControlKey, this.serviceId);
     this.s2AccessControlKey = s2AccessControlKey;
   }
 
