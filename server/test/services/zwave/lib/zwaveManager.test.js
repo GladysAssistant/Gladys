@@ -34,6 +34,10 @@ describe('zwaveManager commands', () => {
   it('should return node neighbors', () => {
     const nodes = zwaveManager.getNodeNeighbors();
     expect(nodes).to.be.instanceOf(Array);
+  });  
+  it('should refresh node params', () => {
+    zwaveManager.refreshNodeParams(1);
+    assert.calledWith(zwaveManager.zwave.requestAllConfigParams, 1);
   });
   it('should return Z-Wave informations', () => {
     const infos = zwaveManager.getInfos();
