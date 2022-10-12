@@ -57,6 +57,16 @@ class ZWaveDeviceBox extends Component {
   updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
+  convertDeviceToMqtt = async () => {
+    this.setState({ loading: true });
+    try {
+      await this.props.convertToMqtt(this.props.deviceIndex);
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: RequestStatus.Error });
+    }
+    this.setState({ loading: false });
+  };
   componentWillMount() {
     this.refreshDeviceProperty();
   }
@@ -152,6 +162,11 @@ class ZWaveDeviceBox extends Component {
                       <Text id="integration.zwave.device.editButton" />
                     </button>
                   </Link>
+                </div>
+                <div class="form-group">
+                  <button onClick={this.convertDeviceToMqtt} class="btn btn-warning">
+                    <Text id="integration.zwave.device.convertToMqtt" />
+                  </button>
                 </div>
               </div>
             </div>

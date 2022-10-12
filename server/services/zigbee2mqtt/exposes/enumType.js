@@ -38,7 +38,8 @@ module.exports = {
     return undefined;
   },
   readValue: (expose, value) => {
-    return (READ_VALUE_MAPPING[expose.name] || {})[value];
+    const subValue = value.replace(/^(\d+_)?/, '');
+    return (READ_VALUE_MAPPING[expose.name] || {})[subValue];
   },
   feature: {
     min: 0,
@@ -62,5 +63,20 @@ module.exports = {
         },
       },
     },
+  },
+  getFeatureIndexes: (values = []) => {
+    const indexes = values
+      // Force String value
+      .map((value) => `${value}`)
+      // Split at first '_' char
+      .map((value) => value.split('_', 2))
+      // Check for multiple indexes
+      .filter((value) => value.length > 1)
+      // Map first match to int
+      .map((value) => parseInt(value[0], 10))
+      // Check if it is an index
+      .filter((value) => !Number.isNaN(value));
+
+    return Array.from(new Set(indexes));
   },
 };
