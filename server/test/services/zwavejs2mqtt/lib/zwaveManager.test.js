@@ -3,7 +3,7 @@ const { assert, stub, fake, useFakeTimers } = require('sinon');
 const EventEmitter = require('events');
 
 const event = new EventEmitter();
-const ZwaveManager = require('../../../../services/zwave/lib');
+const ZwaveManager = require('../../../../services/zwavejs2mqtt/lib');
 
 const ZWAVE_SERVICE_ID = 'ZWAVE_SERVICE_ID';
 
@@ -69,13 +69,17 @@ describe('zwaveManager commands', () => {
   it('should return Z-Wave status', () => {
     const status = zwaveManager.getStatus();
     expect(status).to.deep.equal({
-      controller_node_id: undefined,
-      suc_node_id: undefined,
-      is_primary_controller: undefined,
-      is_static_update_controller: undefined,
-      is_bridge_controller: undefined,
-      zwave_library_version: undefined,
-      library_type_name: undefined,
+      dockerBased: true,
+      inclusionState: [undefined],
+      isHealNetworkActive: [undefined],
+      mqttConnected: false,
+      mqttExist: false,
+      mqttRunning: false,
+      ready: [undefined],
+      scanInProgress: false,
+      usbConfigured: false,
+      zwavejs2mqttExist: false,
+      zwavejs2mqttRunning: false,
     });
   });
   it('should return no-feature node', () => {
@@ -102,7 +106,7 @@ describe('zwaveManager commands', () => {
       {
         name: 'name',
         service_id: 'ZWAVE_SERVICE_ID',
-        external_id: 'zwave:node_id:1',
+        external_id: 'zwavejs2mqtt:node_id:1',
         ready: true,
         rawZwaveNode: {
           id: 1,
@@ -292,7 +296,7 @@ describe('zwaveManager events', () => {
                 min: 1,
                 nodeId: 1,
                 property: 'property',
-                readOnly: true,
+                type: 'number',
               },
             },
           },
@@ -380,9 +384,11 @@ describe('zwaveManager devices', () => {
     expect(devices).to.deep.equal([
       {
         service_id: ZWAVE_SERVICE_ID,
-        external_id: 'zwave:node_id:1',
-        name: 'name',
+        external_id: 'zwavejs2mqtt:node_id:1',
+        model: 'product firmwareVersion',
+        name: 'name - 1 ',
         ready: true,
+        selector: 'zwavejs2mqtt-node-1-name-1',
         features: [],
         params: [],
         rawZwaveNode: {
@@ -434,16 +440,16 @@ describe('zwaveManager devices', () => {
     expect(devices).to.deep.equal([
       {
         service_id: ZWAVE_SERVICE_ID,
-        external_id: 'zwave:node_id:1',
+        external_id: 'zwavejs2mqtt:node_id:1',
         name: 'name',
         ready: true,
         features: [
           {
             name: 'label',
-            selector: 'zwave-air-temperature-0-label-product-node-1',
+            selector: 'zwavejs2mqtt-air-temperature-0-label-product-node-1',
             category: 'temperature-sensor',
             type: 'decimal',
-            external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Air temperature',
+            external_id: 'zwavejs2mqtt:node_id:1:comclass:49:endpoint:0:property:Air temperature',
             read_only: true,
             unit: 'celsius',
             has_feedback: true,
@@ -534,70 +540,73 @@ describe('zwaveManager devices', () => {
     expect(devices).to.deep.equal([
       {
         service_id: ZWAVE_SERVICE_ID,
-        external_id: 'zwave:node_id:1',
-        name: 'name',
-        ready: true,
-        features: [
-          {
-            name: 'label',
-            selector: 'zwave-targetvalue-0-label-product-node-1',
-            category: 'switch',
-            type: 'binary',
-            external_id: 'zwave:node_id:1:comclass:37:endpoint:0:property:targetValue',
-            read_only: false,
-            has_feedback: true,
-            min: 0,
-            max: 1,
-            unit: null,
-          },
-        ],
-        params: [],
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['37'],
-        },
-      },
-      {
-        service_id: ZWAVE_SERVICE_ID,
-        external_id: 'zwave:node_id:1_1',
-        name: 'name [1]',
-        ready: true,
-        features: [
-          {
-            name: 'label',
-            selector: 'zwave-targetvalue-1-label-product-node-1',
-            category: 'switch',
-            type: 'binary',
-            external_id: 'zwave:node_id:1:comclass:37:endpoint:1:property:targetValue',
-            read_only: false,
-            has_feedback: true,
-            min: 0,
-            max: 1,
-            unit: null,
-          },
-        ],
-        params: [],
-        rawZwaveNode: {
-          id: 1,
-          type: 'type',
-          product: 'product',
-          keysClasses: ['37'],
-        },
-      },
-      {
-        service_id: ZWAVE_SERVICE_ID,
-        external_id: 'zwave:node_id:1_2',
+        external_id: 'zwavejs2mqtt:node_id:1',
         name: 'name [2]',
         ready: true,
         features: [
           {
             name: 'label',
-            selector: 'zwave-targetvalue-2-label-product-node-1',
+            selector: 'zwavejs2mqtt-targetvalue-2-label-product-node-1',
             category: 'switch',
             type: 'binary',
-            external_id: 'zwave:node_id:1:comclass:37:endpoint:2:property:targetValue',
+            external_id: 'zwavejs2mqtt:node_id:1:comclass:37:endpoint:0:property:targetValue',
+            read_only: false,
+            has_feedback: true,
+            last_value: 0,
+            min: 0,
+            max: 1,
+            unit: null,
+          },
+        ],
+        params: [],
+        rawZwaveNode: {
+          id: 1,
+          type: 'type',
+          product: 'product',
+          keysClasses: ['37'],
+        },
+      },
+      {
+        service_id: ZWAVE_SERVICE_ID,
+        external_id: 'zwavejs2mqtt:node_id:1_1',
+        name: 'name - 1 [1]',
+        ready: true,
+        features: [
+          {
+            name: 'label',
+            selector: 'zwavejs2mqtt-targetvalue-1-label-product-node-1',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'zwavejs2mqtt:node_id:1:comclass:37:endpoint:1:property:targetValue',
+            read_only: false,
+            has_feedback: true,
+            min: 0,
+            max: 1,
+            unit: null,
+          },
+        ],
+        params: [],
+        rawZwaveNode: {
+          id: 1,
+          type: 'type',
+          product: 'product',
+          keysClasses: ['37'],
+        },
+      },
+      {
+        service_id: ZWAVE_SERVICE_ID,
+        external_id: 'zwavejs2mqtt:node_id:1_2',
+        name: 'name - 1 [2]',
+        model: 'product firmwareVersion',
+        selector: 'zwavejs2mqtt-node-1-name-1-2',
+        ready: true,
+        features: [
+          {
+            name: 'label',
+            selector: 'zwavejs2mqtt-targetvalue-2-label-product-node-1',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'zwavejs2mqtt:node_id:1:comclass:37:endpoint:2:property:targetValue',
             read_only: false,
             has_feedback: true,
             min: 0,

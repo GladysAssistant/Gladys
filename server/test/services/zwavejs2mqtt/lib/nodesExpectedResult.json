@@ -2,7 +2,7 @@
   {
     "name": "ZME_UZB1 USB Stick",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:1",
+    "external_id": "zwavejs2mqtt:node_id:1",
     "ready": true,
     "rawZwaveNode": {
       "id": "1",
@@ -155,7 +155,7 @@
   {
     "name": "FGMS001-ZW5 Motion Sensor",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:15",
+    "external_id": "zwavejs2mqtt:node_id:15",
     "ready": true,
     "rawZwaveNode": {
       "id": "15",
@@ -1750,10 +1750,10 @@
     "features": [
       {
         "name": "Sensor",
-        "selector": "zwave-1-0-sensor-fgms001-zw5-motion-sensor-node-15",
+        "selector": "zwavejs2mqtt-1-0-sensor-fgms001-zw5-motion-sensor-node-15",
         "category": "motion-sensor",
         "type": "binary",
-        "external_id": "zwave:node_id:15:comclass:48:index:0:instance:1",
+        "external_id": "zwavejs2mqtt:node_id:15:comclass:48:index:0:instance:1",
         "read_only": true,
         "unit": null,
         "has_feedback": true,
@@ -1762,10 +1762,10 @@
       },
       {
         "name": "Air Temperature",
-        "selector": "zwave-1-1-air-temperature-fgms001-zw5-motion-sensor-node-15",
+        "selector": "zwavejs2mqtt-1-1-air-temperature-fgms001-zw5-motion-sensor-node-15",
         "category": "temperature-sensor",
         "type": "decimal",
-        "external_id": "zwave:node_id:15:comclass:49:index:1:instance:1",
+        "external_id": "zwavejs2mqtt:node_id:15:comclass:49:index:1:instance:1",
         "read_only": true,
         "unit": "celsius",
         "has_feedback": true,
@@ -1774,10 +1774,10 @@
       },
       {
         "name": "Illuminance",
-        "selector": "zwave-1-3-illuminance-fgms001-zw5-motion-sensor-node-15",
+        "selector": "zwavejs2mqtt-1-3-illuminance-fgms001-zw5-motion-sensor-node-15",
         "category": "light-sensor",
         "type": "integer",
-        "external_id": "zwave:node_id:15:comclass:49:index:3:instance:1",
+        "external_id": "zwavejs2mqtt:node_id:15:comclass:49:index:3:instance:1",
         "read_only": true,
         "unit": "lux",
         "has_feedback": true,
@@ -1786,10 +1786,10 @@
       },
       {
         "name": "Seismic Intensity",
-        "selector": "zwave-1-25-seismic-intensity-fgms001-zw5-motion-sensor-node-15",
+        "selector": "zwavejs2mqtt-1-25-seismic-intensity-fgms001-zw5-motion-sensor-node-15",
         "category": "sismic-sensor",
         "type": "decimal",
-        "external_id": "zwave:node_id:15:comclass:49:index:25:instance:1",
+        "external_id": "zwavejs2mqtt:node_id:15:comclass:49:index:25:instance:1",
         "read_only": true,
         "unit": null,
         "has_feedback": true,
@@ -1798,10 +1798,10 @@
       },
       {
         "name": "Battery Level",
-        "selector": "zwave-1-0-battery-level-fgms001-zw5-motion-sensor-node-15",
+        "selector": "zwavejs2mqtt-1-0-battery-level-fgms001-zw5-motion-sensor-node-15",
         "category": "battery",
         "type": "integer",
-        "external_id": "zwave:node_id:15:comclass:128:index:0:instance:1",
+        "external_id": "zwavejs2mqtt:node_id:15:comclass:128:index:0:instance:1",
         "read_only": true,
         "unit": "percent",
         "has_feedback": true,
@@ -1819,7 +1819,7 @@
       { "name": "x-axis-acceleration-units-15-49-1-307", "value": "Meter per Second Squared" },
       { "name": "y-axis-acceleration-units-15-49-1-308", "value": "Meter per Second Squared" },
       { "name": "z-axis-acceleration-units-15-49-1-309", "value": "Meter per Second Squared" },
-      { "name": "zwave-version-15-94-1-0", "value": 1 },
+      { "name": "zwavejs2mqtt-version-15-94-1-0", "value": 1 },
       { "name": "installericon-15-94-1-1", "value": 3079 },
       { "name": "usericon-15-94-1-2", "value": 3079 },
       { "name": "motion-detection-sensitivity-15-112-1-1", "value": 15 },
@@ -1885,7 +1885,7 @@
   {
     "name": "",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:2",
+    "external_id": "zwavejs2mqtt:node_id:2",
     "ready": false,
     "rawZwaveNode": {
       "id": "2",
@@ -1906,7 +1906,7 @@
   {
     "name": "",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:3",
+    "external_id": "zwavejs2mqtt:node_id:3",
     "ready": false,
     "rawZwaveNode": {
       "id": "3",
@@ -1927,7 +1927,7 @@
   {
     "name": "",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:4",
+    "external_id": "zwavejs2mqtt:node_id:4",
     "ready": false,
     "rawZwaveNode": {
       "id": "4",
@@ -1948,7 +1948,7 @@
   {
     "name": "",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:5",
+    "external_id": "zwavejs2mqtt:node_id:5",
     "ready": false,
     "rawZwaveNode": {
       "id": "5",
@@ -1969,7 +1969,7 @@
   {
     "name": "",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:6",
+    "external_id": "zwavejs2mqtt:node_id:6",
     "ready": false,
     "rawZwaveNode": {
       "id": "6",
@@ -1990,7 +1990,7 @@
   {
     "name": "",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:7",
+    "external_id": "zwavejs2mqtt:node_id:7",
     "ready": false,
     "rawZwaveNode": {
       "id": "7",
@@ -2011,7 +2011,7 @@
   {
     "name": "",
     "service_id": "de051f90-f34a-4fd5-be2e-e502339ec9bc",
-    "external_id": "zwave:node_id:8",
+    "external_id": "zwavejs2mqtt:node_id:8",
     "ready": false,
     "rawZwaveNode": {
       "id": "8",

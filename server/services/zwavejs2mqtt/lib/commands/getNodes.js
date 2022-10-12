@@ -30,7 +30,7 @@ function getNodes() {
     .map((node) => {
       const newDevice = {
         name: getDeviceName(node),
-        selector: slugify(`zwave-node-${node.nodeId}-${getDeviceName(node)}`),
+        selector: slugify(`zwavejs2mqtt-node-${node.nodeId}-${getDeviceName(node)}`),
         model: `${node.product} ${node.firmwareVersion}`,
         service_id: this.serviceId,
         external_id: getDeviceExternalId(node),
@@ -76,8 +76,8 @@ function getNodes() {
                   value,
                 );
                 newDevice.features.push({
-                  name: `${label} ${endpoint > 0 ? ` [${endpoint}]` : ''}`,
-                  selector: slugify(`zwave-node-${node.nodeId}-${property}-${commandClass}-${endpoint}-${label}`),
+                  name: `${label} ${endpoint > 0 ? `[${endpoint}]` : ''}`,
+                  selector: slugify(`zwavejs2mqtt-node-${node.nodeId}-${property}-${commandClass}-${endpoint}-${label}`),
                   category,
                   type,
                   external_id: getDeviceFeatureExternalId({ nodeId: node.nodeId, commandClass, endpoint, property }),

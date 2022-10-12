@@ -90,11 +90,11 @@ describe('zwaveManager events', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'switch',
-        external_id: 'zwave:node_id:1:comclass:37:endpoint:0:property:targetValue',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:37:endpoint:0:property:targetValue',
         has_feedback: true,
         name: 'Current value',
         read_only: true,
-        selector: 'zwave-node-1-targetvalue-37-0-current-value',
+        selector: 'zwavejs2mqtt-node-1-targetvalue-37-0-current-value',
         type: 'binary',
         unit: null,
         max: 99,
@@ -134,11 +134,11 @@ describe('zwaveManager events', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'light-sensor',
-        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Illuminance',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:49:endpoint:0:property:Illuminance',
         has_feedback: true,
         name: 'Illuminance',
         read_only: true,
-        selector: 'zwave-node-1-illuminance-49-0-illuminance',
+        selector: 'zwavejs2mqtt-node-1-illuminance-49-0-illuminance',
         type: 'integer',
         unit: 'lux',
         max: 100,
@@ -178,11 +178,11 @@ describe('zwaveManager events', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'humidity-sensor',
-        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Humidity',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:49:endpoint:0:property:Humidity',
         has_feedback: true,
         name: 'Humidity',
         read_only: true,
-        selector: 'zwave-node-1-humidity-49-0-humidity',
+        selector: 'zwavejs2mqtt-node-1-humidity-49-0-humidity',
         type: 'decimal',
         unit: 'percent',
         min: 0,
@@ -220,11 +220,11 @@ describe('zwaveManager events', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'uv-sensor',
-        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Ultraviolet',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:49:endpoint:0:property:Ultraviolet',
         has_feedback: true,
         name: 'Ultraviolet',
         read_only: true,
-        selector: 'zwave-node-1-ultraviolet-49-0-ultraviolet',
+        selector: 'zwavejs2mqtt-node-1-ultraviolet-49-0-ultraviolet',
         type: 'decimal',
         unit: null,
         min: 0,
@@ -264,12 +264,12 @@ describe('zwaveManager events', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'temperature-sensor',
-        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Air temperature',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:49:endpoint:0:property:Air temperature',
         type: 'decimal',
         has_feedback: true,
         name: 'Air temperature',
         read_only: true,
-        selector: 'zwave-node-1-air-temperature-49-0-air-temperature',
+        selector: 'zwavejs2mqtt-node-1-air-temperature-49-0-air-temperature',
         unit: 'celsius',
         min: -20,
         max: 50,
@@ -308,12 +308,12 @@ describe('zwaveManager events', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'power-sensor',
-        external_id: 'zwave:node_id:1:comclass:49:endpoint:0:property:Power',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:49:endpoint:0:property:Power',
         type: 'decimal',
         has_feedback: true,
         name: 'Power',
         read_only: true,
-        selector: 'zwave-node-1-power-49-0-power',
+        selector: 'zwavejs2mqtt-node-1-power-49-0-power',
         unit: 'celsius',
         min: -20,
         max: 50,
@@ -350,11 +350,11 @@ describe('zwaveManager events', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'motion-sensor',
-        external_id: 'zwave:node_id:1:comclass:113:endpoint:0:property:Home Security-Motion sensor status',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:113:endpoint:0:property:Home Security-Motion sensor status',
         has_feedback: true,
         name: 'Motion sensor status',
         read_only: true,
-        selector: 'zwave-node-1-home-security-motion-sensor-status-113-0-motion-sensor-status',
+        selector: 'zwavejs2mqtt-node-1-home-security-motion-sensor-status-113-0-motion-sensor-status',
         type: 'integer',
         unit: null,
         max: undefined,
