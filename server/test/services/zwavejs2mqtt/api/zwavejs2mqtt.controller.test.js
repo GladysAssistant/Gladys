@@ -107,18 +107,6 @@ describe('GET /api/v1/service/zwavejs2mqtt', () => {
     });
   });
 
-  it('should get neighbors', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-    const nodes = [];
-    zwavejs2mqttManager.getNodeNeighbors = fake.returns(nodes);
-    await zwavejs2mqttController['get /api/v1/service/zwavejs2mqtt/neighbor'].controller(req, res);
-    assert.calledOnce(zwavejs2mqttManager.getNodeNeighbors);
-    assert.calledOnceWithExactly(res.json, nodes);
-  });
-
   it('should add node', async () => {
     const req = {
       body: {

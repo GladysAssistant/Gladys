@@ -2,7 +2,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
-const { getDeviceFeatureExternalId, getDeviceExternalId, getDeviceName } = require('../utils/externalId');
+const { getDeviceFeatureExternalId, getDeviceExternalId, getDeviceName, getDeviceFeatureName } = require('../utils/externalId');
 const logger = require('../../../../utils/logger');
 const { unbindValue } = require('../utils/bindValue');
 const { splitNode, splitNodeWithScene } = require('../utils/splitNode');
@@ -76,7 +76,7 @@ function getNodes() {
                   value,
                 );
                 newDevice.features.push({
-                  name: `${label} ${endpoint > 0 ? `[${endpoint}]` : ''}`,
+                  name: getDeviceFeatureName({label, endpoint}),
                   selector: slugify(`zwavejs2mqtt-node-${node.nodeId}-${property}-${commandClass}-${endpoint}-${label}`),
                   category,
                   type,

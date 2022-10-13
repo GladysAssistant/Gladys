@@ -1,17 +1,17 @@
 /**
  * @description Return name of device
- * @param {Object} node - The zwave value.
+ * @param {Object} node - The zwave node.
  * @returns {string} Return name.
  * @example
  * getDeviceName(node);
  */
 function getDeviceName(node) {
-  return `${node.name} - ${node.nodeId} ${node.endpoint > 0 ? `[${node.endpoint}]` : ''}`;
+  return `${node.name} - ${node.nodeId}${node.endpoint > 0 ? ` [${node.endpoint}]` : ''}`;
 }
 
 /**
  * @description Return external id of device
- * @param {Object} node - The zwave value.
+ * @param {Object} node - The zwave node.
  * @returns {string} Return external id.
  * @example
  * getDeviceExternalId(node);
@@ -21,14 +21,25 @@ function getDeviceExternalId(node) {
 }
 
 /**
+ * @description Return name of device feature
+ * @param {Object} property - The zwave property.
+ * @returns {string} Return name.
+ * @example
+ * getDeviceFeatureName(feature);
+ */
+ function getDeviceFeatureName(property) {
+  return `${property.label}${property.endpoint > 0 ? ` [${property.endpoint}]` : ''}`;
+}
+
+/**
  * @description Return external id of deviceFeature
- * @param {Object} value - The zwave value.
+ * @param {Object} property - The zwave property.
  * @returns {string} Return external id.
  * @example
- * getDeviceFeatureExternalId(value);
+ * getDeviceFeatureExternalId(property);
  */
-function getDeviceFeatureExternalId(value) {
-  return `zwavejs2mqtt:node_id:${value.nodeId}:comclass:${value.commandClass}:endpoint:${value.endpoint}:property:${value.property}`;
+function getDeviceFeatureExternalId(property) {
+  return `zwavejs2mqtt:node_id:${property.nodeId}:comclass:${property.commandClass}:endpoint:${property.endpoint}:property:${property.property}`;
 }
 
 /**
@@ -55,6 +66,7 @@ function getNodeInfoByExternalId(externalId) {
 module.exports = {
   getDeviceName,
   getDeviceExternalId,
+  getDeviceFeatureName,
   getDeviceFeatureExternalId,
   getNodeInfoByExternalId,
 };
