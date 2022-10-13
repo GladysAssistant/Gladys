@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { CONFIGURATION } = require('../constants');
+const { CONFIGURATION, DEFAULT } = require('../constants');
 
 /**
  * @description Update Z-Wave configuration.
@@ -29,6 +29,15 @@ async function updateConfiguration(configuration) {
       this.serviceId,
     );
     this.externalZwavejs2mqtt = externalZwavejs2mqtt;
+  }
+
+  if (!this.externalZwavejs2mqtt) {
+    this.mqttUrl = DEFAULT.ZWAVEJS2MQTT_MQTT_URL_VALUE;
+    this.mqttUsername = DEFAULT.ZWAVEJS2MQTT_MQTT_USERNAME_VALUE;
+    this.mqttPassword = await this.gladys.variable.getValue(
+      CONFIGURATION.ZWAVEJS2MQTT_MQTT_PASSWORD_BACKUP,
+      this.serviceId,
+    );
   }
 
   if (driverPath) {

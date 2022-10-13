@@ -62,6 +62,11 @@ async function connect() {
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_USERNAME, this.mqttUsername, this.serviceId);
     this.mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_PASSWORD, this.mqttPassword, this.serviceId);
+    await this.gladys.variable.setValue(
+      CONFIGURATION.ZWAVEJS2MQTT_MQTT_PASSWORD_BACKUP,
+      this.mqttPassword,
+      this.serviceId,
+    );
   } else {
     const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJS2MQTT_MQTT_URL, this.serviceId);
     this.mqttUrl = mqttUrl;

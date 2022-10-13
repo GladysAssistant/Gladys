@@ -467,4 +467,180 @@ describe('zwavejs2mqttManager events', () => {
     expect(nodes[0].features).to.have.lengthOf(0);
     expect(nodes[0].params).to.have.lengthOf(0);
   });
+
+  it('should not handle value added 50-0-value-66049', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric Consumption [W]',
+        writeable: false,
+        unit: 'W',
+      };
+    };
+
+    zwavejs2mqttManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-66049',
+    });
+    const nodes = zwavejs2mqttManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'switch',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:50:endpoint:0:property:value-66049',
+        has_feedback: true,
+        last_value: undefined,
+        name: 'Electric Consumption [W]',
+        read_only: true,
+        selector: 'zwavejs2mqtt-node-1-value-66049-50-0-electric-consumption-w',
+        type: 'energy',
+        unit: 'watt',
+        max: 100000,
+        min: 0,
+      },
+    ]);
+  });
+
+  it('should not handle value added 50-0-value-66048', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric [W]',
+        writeable: false,
+        unit: 'kWh',
+      };
+    };
+
+    zwavejs2mqttManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-66048',
+    });
+    const nodes = zwavejs2mqttManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'switch',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:50:endpoint:0:property:value-66048',
+        has_feedback: true,
+        last_value: undefined,
+        name: 'Electric [W]',
+        read_only: true,
+        selector: 'zwavejs2mqtt-node-1-value-66048-50-0-electric-w',
+        type: 'energy',
+        unit: 'kilowatt-hour',
+        max: 100000,
+        min: 0,
+      },
+    ]);
+  });
+
+  it('should not handle value added 50-0-value-65537', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric Consumption [kWh]',
+        writeable: false,
+        unit: 'kWh',
+      };
+    };
+
+    zwavejs2mqttManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-65537',
+    });
+    const nodes = zwavejs2mqttManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'switch',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:50:endpoint:0:property:value-65537',
+        has_feedback: true,
+        last_value: undefined,
+        name: 'Electric Consumption [kWh]',
+        read_only: true,
+        selector: 'zwavejs2mqtt-node-1-value-65537-50-0-electric-consumption-kwh',
+        type: 'power',
+        unit: 'kilowatt-hour',
+        max: 10000,
+        min: 0,
+      },
+    ]);
+  });
+
+  it('should not handle value added 50-0-value-66561', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric Consumption [V]',
+        writeable: false,
+        unit: 'V',
+      };
+    };
+
+    zwavejs2mqttManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-66561',
+    });
+    const nodes = zwavejs2mqttManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'switch',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:50:endpoint:0:property:value-66561',
+        has_feedback: true,
+        last_value: undefined,
+        name: 'Electric Consumption [V]',
+        read_only: true,
+        selector: 'zwavejs2mqtt-node-1-value-66561-50-0-electric-consumption-v',
+        type: 'voltage',
+        unit: 'volt',
+        max: 400,
+        min: 0,
+      },
+    ]);
+  });
+
+  it('should not handle value added 50-0-value-66817', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric Consumption [A]',
+        writeable: false,
+        unit: 'A',
+      };
+    };
+
+    zwavejs2mqttManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-66817',
+    });
+    const nodes = zwavejs2mqttManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'switch',
+        external_id: 'zwavejs2mqtt:node_id:1:comclass:50:endpoint:0:property:value-66817',
+        has_feedback: true,
+        last_value: undefined,
+        name: 'Electric Consumption [A]',
+        read_only: true,
+        selector: 'zwavejs2mqtt-node-1-value-66817-50-0-electric-consumption-a',
+        type: 'current',
+        unit: 'ampere',
+        max: 40,
+        min: 0,
+      },
+    ]);
+  });
+
 });
