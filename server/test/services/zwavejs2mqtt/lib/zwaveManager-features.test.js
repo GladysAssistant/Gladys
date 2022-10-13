@@ -642,5 +642,4 @@ describe('zwavejs2mqttManager events', () => {
       },
     ]);
   });
-
 });
