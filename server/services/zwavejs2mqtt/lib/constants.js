@@ -136,7 +136,6 @@ const PROPERTIES = {
   ILLUMINANCE: 'Illuminance',
   ULTRAVIOLET: 'Ultraviolet',
   MOTION: 'Motion',
-  MOTION_ALARM: 'Home Security-Motion sensor status',
   SMOKE_ALARM: 'Smoke Alarm-Sensor status',
   SLOW_REFRESH: 'slowRefresh',
   SCENE_001: 'scene-001',
@@ -148,6 +147,7 @@ const PROPERTIES = {
   BATTERY_LEVEL: 'level',
   CURRENT_COLOR: 'currentColor',
   TARGET_COLOR: 'targetColor',
+  POWER: 'Power',
 };
 
 const CATEGORIES = [
@@ -230,7 +230,7 @@ const CATEGORIES = [
   {
     CATEGORY: DEVICE_FEATURE_CATEGORIES.SWITCH,
     COMMAND_CLASSES: [COMMAND_CLASSES.COMMAND_CLASS_SENSOR_MULTILEVEL],
-    PROPERTIES: [PROPERTIES.TARGET_VALUE],
+    PROPERTIES: [PROPERTIES.POWER],
     TYPE: DEVICE_FEATURE_TYPES.SWITCH.POWER,
     MIN: 0,
     MAX: Number.MAX_VALUE,

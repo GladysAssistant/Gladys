@@ -11,10 +11,12 @@ const REMOVE_NODE_TIMEOUT = 60 * 1000;
 function removeNode() {
   logger.debug(`Zwave : Entering exclusion mode`);
 
-  this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/startExclusion/set`, {});
+  this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/startExclusion/set`);
+
   setTimeout(() => {
     this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/stopExclusion/set`);
-    this.scanInProgress = false;
+    this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/getNodes/set`, 'true');
+    this.scanInProgress = true;
   }, REMOVE_NODE_TIMEOUT);
 }
 

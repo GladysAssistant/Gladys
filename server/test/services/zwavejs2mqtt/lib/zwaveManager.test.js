@@ -1,89 +1,188 @@
+const sinon = require('sinon');
+
 const { expect } = require('chai');
-const { assert, stub, fake, useFakeTimers } = require('sinon');
+
+const { assert, stub, fake, useFakeTimers } = sinon;
 const EventEmitter = require('events');
 
-const event = new EventEmitter();
-const ZwaveManager = require('../../../../services/zwavejs2mqtt/lib');
+const Zwavejs2mqttManager = require('../../../../services/zwavejs2mqtt/lib');
+const { CONFIGURATION, DEFAULT } = require('../../../../services/zwavejs2mqtt/lib/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const ZWAVE_SERVICE_ID = 'ZWAVE_SERVICE_ID';
+const ZWAVEJS2MQTT_SERVICE_ID = 'ZWAVEJS2MQTT_SERVICE_ID';
+const DRIVER_PATH = 'DRIVER_PATH';
 
-describe('zwaveManager commands', () => {
+const event = {
+  emit: fake.resolves(null),
+};
+
+const eventMqtt = new EventEmitter();
+
+const mqttClient = Object.assign(eventMqtt, {
+  subscribe: fake.resolves(null),
+  publish: fake.returns(true),
+  end: fake.resolves(true),
+  removeAllListeners: fake.resolves(true),
+});
+
+const mqtt = {
+  connect: fake.returns(mqttClient),
+};
+
+describe('zwavejs2mqttManager commands', () => {
   let gladys;
-  let zwaveManager;
+  let zwavejs2mqttManager;
 
   before(() => {
     gladys = {
-      user: {
-        get: stub().resolves([{ id: ZWAVE_SERVICE_ID }]),
-      },
+      event,
       service: {
-        getLocalServiceByName: stub().resolves({
-          id: ZWAVE_SERVICE_ID,
-        }),
+        getService: () => {
+          return {
+            list: () => Promise.resolve([DRIVER_PATH]),
+          };
+        },
       },
       variable: {
-        getValue: stub().resolves(null),
-        setValue: stub().resolves(null),
+        getValue: fake.resolves(true),
+        setValue: fake.resolves(true),
       },
+      system: {
+        isDocker: fake.resolves(true),
+      },
+      installMqttContainer: fake.returns(true),
+      installZ2mContainer: fake.returns(true),
     };
-    zwaveManager = new ZwaveManager(gladys, event, ZWAVE_SERVICE_ID);
-    zwaveManager.mqttConnected = false;
-    zwaveManager.eventManager = {
-      emit: stub().resolves(null),
-    };
+    zwavejs2mqttManager = new Zwavejs2mqttManager(gladys, mqtt, ZWAVEJS2MQTT_SERVICE_ID);
   });
 
-  afterEach(() => {
-    zwaveManager.eventManager.emit.reset();
+  beforeEach(() => {
+    sinon.reset();
   });
 
-  it('should connect to zwave driver', async () => {
-    const DRIVER_READY_TIMEOUT = 60 * 1000;
-    const clock = useFakeTimers();
-    await zwaveManager.connect('/dev/tty1');
-    clock.tick(DRIVER_READY_TIMEOUT);
-    assert.calledThrice(zwaveManager.driver.on);
-    assert.calledOnce(zwaveManager.eventManager.emit);
-    expect(zwaveManager.mqttConnected).to.equal(true);
-    clock.restore();
+  it('should connect to zwavejs2mqtt external instance', async () => {
+    zwavejs2mqttManager.mqttConnected = false;
+    gladys.variable.getValue = sinon.stub();
+    gladys.variable.getValue
+      .onFirstCall() // EXTERNAL_ZWAVEJS2MQTT
+      .resolves('1')
+      .onSecondCall() // DRIVER_PATH
+      .resolves(DRIVER_PATH);
+
+    await zwavejs2mqttManager.connect();
+    zwavejs2mqttManager.mqttClient.emit('connect');
+
+    assert.calledOnceWithExactly(zwavejs2mqttManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJS2MQTT.STATUS_CHANGE,
+    });
+    assert.calledOnce(mqtt.connect);
+    assert.calledWith(mqttClient.subscribe, 'zwavejs2mqtt/#');
+    expect(zwavejs2mqttManager.mqttConnected).to.equal(true);
+    expect(zwavejs2mqttManager.mqttExist).to.equal(true);
+    expect(zwavejs2mqttManager.mqttRunning).to.equal(true);
+    expect(zwavejs2mqttManager.zwavejs2mqttExist).to.equal(true);
+    expect(zwavejs2mqttManager.zwavejs2mqttRunning).to.equal(true);
   });
+
+  it('should disconnect from zwavejs2mqtt external instance', async () => {
+    zwavejs2mqttManager.mqttConnected = true;
+    zwavejs2mqttManager.mqttClient = mqttClient;
+
+    await zwavejs2mqttManager.disconnect();
+
+    assert.calledOnceWithExactly(zwavejs2mqttManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJS2MQTT.STATUS_CHANGE,
+    });
+    assert.calledOnce(mqttClient.end);
+    assert.calledOnce(mqttClient.removeAllListeners);
+    expect(zwavejs2mqttManager.mqttConnected).to.equal(false);
+    expect(zwavejs2mqttManager.scanInProgress).to.equal(false);
+  });
+
+  it('should disconnect again from zwavejs2mqtt external instance', async () => {
+    zwavejs2mqttManager.mqttConnected = false;
+
+    await zwavejs2mqttManager.disconnect();
+
+    assert.notCalled(zwavejs2mqttManager.eventManager.emit);
+    assert.notCalled(mqttClient.end);
+    assert.notCalled(mqttClient.removeAllListeners);
+    expect(zwavejs2mqttManager.mqttConnected).to.equal(false);
+    expect(zwavejs2mqttManager.scanInProgress).to.equal(false);
+  });
+
   it('should addNode', () => {
     const ADD_NODE_TIMEOUT = 60 * 1000;
     const clock = useFakeTimers();
-    zwaveManager.addNode();
+    zwavejs2mqttManager.mqttConnected = true;
+    zwavejs2mqttManager.mqttClient = mqttClient;
+
+    zwavejs2mqttManager.addNode();
+    assert.calledWithExactly(
+      zwavejs2mqttManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/startInclusion/set`,
+    );
+
     clock.tick(ADD_NODE_TIMEOUT);
-    expect(zwaveManager.scanInProgress).to.equal(false);
-    assert.calledOnce(zwaveManager.driver.controller.beginInclusion);
-    assert.calledOnce(zwaveManager.driver.controller.stopInclusion);
+    expect(zwavejs2mqttManager.scanInProgress).to.equal(true);
+    assert.calledWithExactly(
+      zwavejs2mqttManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/stopInclusion/set`,
+    );
+    assert.calledWithExactly(
+      zwavejs2mqttManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/getNodes/set`,
+      'true',
+    );
     clock.restore();
   });
+
   it('should removeNode', () => {
     const REMOVE_NODE_TIMEOUT = 60 * 1000;
     const clock = useFakeTimers();
-    zwaveManager.removeNode();
+    zwavejs2mqttManager.mqttConnected = true;
+    zwavejs2mqttManager.mqttClient = mqttClient;
+
+    zwavejs2mqttManager.removeNode();
+    assert.calledWithExactly(
+      zwavejs2mqttManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/startExclusion/set`,
+    );
+
     clock.tick(REMOVE_NODE_TIMEOUT);
-    assert.calledOnce(zwaveManager.driver.controller.beginExclusion);
-    assert.calledOnce(zwaveManager.driver.controller.stopExclusion);
+    expect(zwavejs2mqttManager.scanInProgress).to.equal(true);
+    assert.calledWithExactly(
+      zwavejs2mqttManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/startExclusion/set`,
+    );
+    assert.calledWithExactly(
+      zwavejs2mqttManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJS2MQTT_CLIENT_ID}/api/getNodes/set`,
+      'true',
+    );
     clock.restore();
   });
+
   it('should return Z-Wave status', () => {
-    const status = zwaveManager.getStatus();
+    const status = zwavejs2mqttManager.getStatus();
     expect(status).to.deep.equal({
       dockerBased: true,
-      inclusionState: [undefined],
-      isHealNetworkActive: [undefined],
+      inclusionState: undefined,
+      isHealNetworkActive: undefined,
       mqttConnected: false,
       mqttExist: false,
       mqttRunning: false,
-      ready: [undefined],
+      ready: undefined,
       scanInProgress: false,
       usbConfigured: false,
       zwavejs2mqttExist: false,
       zwavejs2mqttRunning: false,
     });
   });
+
   it('should return no-feature node', () => {
-    zwaveManager.nodes = {
+    zwavejs2mqttManager.mqttConnected = true;
+    zwavejs2mqttManager.nodes = {
       '1': {
         nodeId: 1,
         endpoints: [], // No split
@@ -101,12 +200,14 @@ describe('zwaveManager commands', () => {
         classes: {},
       },
     };
-    const nodes = zwaveManager.getNodes();
+    const nodes = zwavejs2mqttManager.getNodes();
     expect(nodes).to.deep.equal([
       {
-        name: 'name',
-        service_id: 'ZWAVE_SERVICE_ID',
+        name: 'name - 1',
+        model: 'product firmwareVersion',
+        service_id: 'ZWAVEJS2MQTT_SERVICE_ID',
         external_id: 'zwavejs2mqtt:node_id:1',
+        selector: 'zwavejs2mqtt-node-1-name-1',
         ready: true,
         rawZwaveNode: {
           id: 1,
@@ -119,68 +220,51 @@ describe('zwaveManager commands', () => {
       },
     ]);
   });
-  it('should disconnect', async () => {
-    zwaveManager.mqttConnected = true;
-    await zwaveManager.disconnect();
-    assert.calledOnce(zwaveManager.driver.destroy);
-    expect(zwaveManager.mqttConnected).to.equal(false);
-  });
-  it('should disconnect again', async () => {
-    zwaveManager.mqttConnected = false;
-    await zwaveManager.disconnect();
-    assert.notCalled(zwaveManager.driver.destroy);
-    expect(zwaveManager.mqttConnected).to.equal(false);
-  });
 });
 
-describe('zwaveManager events', () => {
+describe('zwavejs2mqttManager events', () => {
   let gladys;
-  let zwaveManager;
+  let zwavejs2mqttManager;
 
   before(() => {
     gladys = {
-      user: {
-        get: stub().resolves([{ id: ZWAVE_SERVICE_ID }]),
-      },
       service: {
-        getLocalServiceByName: stub().resolves({
-          id: ZWAVE_SERVICE_ID,
+        getService: fake.resolves({
+          list: fake.resolves([DRIVER_PATH]),
         }),
       },
       variable: {
-        getValue: stub().resolves(null),
-        setValue: stub().resolves(null),
+        getValue: (name) => Promise.resolve(CONFIGURATION.EXTERNAL_ZWAVEJS2MQTT ? true : null),
+        setValue: (name) => Promise.resolve(null),
       },
     };
-    zwaveManager = new ZwaveManager(gladys, event, ZWAVE_SERVICE_ID);
-    zwaveManager.mqttConnected = false;
-    zwaveManager.eventManager = {
-      emit: stub().resolves(null),
-    };
-    zwaveManager.ZWaveJS = {
-      Driver: fake.returns(null),
-    };
+    zwavejs2mqttManager = new Zwavejs2mqttManager(gladys, mqtt, ZWAVEJS2MQTT_SERVICE_ID);
+    zwavejs2mqttManager.mqttConnected = true;
   });
 
   beforeEach(() => {
-    zwaveManager.eventManager.emit.reset();
+    sinon.reset();
   });
 
   it('should receive driverReady', () => {
-    zwaveManager.driverReady('home-id');
+    zwavejs2mqttManager.driverReady('home-id');
   });
+
   it('should receive driverFailed', () => {
-    zwaveManager.driverFailed();
+    zwavejs2mqttManager.driverFailed();
   });
+
   it('should receive notification', () => {
     const zwaveNode = {
       id: 1,
     };
-    zwaveManager.notification(zwaveNode, {}, []);
+    zwavejs2mqttManager.notification(zwaveNode, {}, []);
   });
+
   it('should receive scanComplete', () => {
-    zwaveManager.scanComplete();
+    zwavejs2mqttManager.scanComplete();
   });
+
   it('should receive node added', () => {
     const zwaveNode = {
       id: 1,
@@ -188,11 +272,11 @@ describe('zwaveManager events', () => {
       on: stub().returnsThis(),
     };
 
-    zwaveManager.nodes = {};
-    zwaveManager.nodeAdded(zwaveNode);
+    zwavejs2mqttManager.nodes = {};
+    zwavejs2mqttManager.nodeAdded(zwaveNode);
     assert.calledOnce(zwaveNode.getAllEndpoints);
-    assert.calledOnce(zwaveManager.eventManager.emit);
-    expect(zwaveManager.nodes).to.deep.equal({
+    assert.calledOnce(zwavejs2mqttManager.eventManager.emit);
+    expect(zwavejs2mqttManager.nodes).to.deep.equal({
       '1': {
         nodeId: 1,
         classes: {},
@@ -201,19 +285,21 @@ describe('zwaveManager events', () => {
       },
     });
   });
+
   it('should receive node removed', () => {
     const zwaveNode = {
       id: 1,
     };
-    zwaveManager.nodes = {
+    zwavejs2mqttManager.nodes = {
       '1': {
         id: 1,
       },
     };
-    zwaveManager.nodeRemoved(zwaveNode);
-    assert.calledOnce(zwaveManager.eventManager.emit);
-    expect(zwaveManager.nodes).to.deep.equal({});
+    zwavejs2mqttManager.nodeRemoved(zwaveNode);
+    assert.calledOnce(zwavejs2mqttManager.eventManager.emit);
+    expect(zwavejs2mqttManager.nodes).to.deep.equal({});
   });
+
   it('should receive node ready info', () => {
     const zwaveNode = {
       id: 1,
@@ -230,7 +316,7 @@ describe('zwaveManager events', () => {
       nodeType: 'nodeType',
       getDefinedValueIDs: fake.returns([]),
     };
-    zwaveManager.nodes = {
+    zwavejs2mqttManager.nodes = {
       '1': {
         nodeId: 1,
         classes: {},
@@ -238,10 +324,10 @@ describe('zwaveManager events', () => {
         endpoints: [2],
       },
     };
-    zwaveManager.nodeReady(zwaveNode);
+    zwavejs2mqttManager.nodeReady(zwaveNode);
     assert.calledOnce(zwaveNode.getDefinedValueIDs);
-    assert.calledOnce(zwaveManager.eventManager.emit);
-    expect(zwaveManager.nodes).to.deep.equal({
+    assert.calledOnce(zwavejs2mqttManager.eventManager.emit);
+    expect(zwavejs2mqttManager.nodes).to.deep.equal({
       '1': {
         nodeId: 1,
         classes: {},
@@ -256,6 +342,7 @@ describe('zwaveManager events', () => {
       },
     });
   });
+
   it('should receive value added', () => {
     const zwaveNode = {
       id: 1,
@@ -268,18 +355,18 @@ describe('zwaveManager events', () => {
         };
       },
     };
-    zwaveManager.nodes = {
+    zwavejs2mqttManager.nodes = {
       '1': {
         id: 1,
         classes: {},
       },
     };
-    zwaveManager.valueAdded(zwaveNode, {
+    zwavejs2mqttManager.valueAdded(zwaveNode, {
       commandClass: 11,
       endpoint: 10,
       property: 'property',
     });
-    expect(zwaveManager.nodes).to.deep.equal({
+    expect(zwavejs2mqttManager.nodes).to.deep.equal({
       1: {
         id: 1,
         classes: {
@@ -304,11 +391,12 @@ describe('zwaveManager events', () => {
       },
     });
   });
+
   it('should receive value removed', () => {
     const zwaveNode = {
       id: 1,
     };
-    zwaveManager.nodes = {
+    zwavejs2mqttManager.nodes = {
       '1': {
         id: 1,
         classes: {
@@ -332,13 +420,13 @@ describe('zwaveManager events', () => {
         },
       },
     };
-    zwaveManager.valueRemoved(zwaveNode, {
+    zwavejs2mqttManager.valueRemoved(zwaveNode, {
       commandClass: 11,
       endpoint: 10,
       property: 'property',
       propertyKey: '',
     });
-    expect(zwaveManager.nodes).to.deep.equal({
+    expect(zwavejs2mqttManager.nodes).to.deep.equal({
       '1': {
         id: 1,
         classes: {
@@ -351,18 +439,18 @@ describe('zwaveManager events', () => {
   });
 });
 
-describe('zwaveManager devices', () => {
+describe('zwavejs2mqttManager devices', () => {
   let gladys;
-  let zwaveManager;
+  let zwavejs2mqttManager;
 
   before(() => {
     gladys = {};
-    zwaveManager = new ZwaveManager(gladys, event, ZWAVE_SERVICE_ID);
-    zwaveManager.mqttConnected = true;
+    zwavejs2mqttManager = new Zwavejs2mqttManager(gladys, mqtt, ZWAVEJS2MQTT_SERVICE_ID);
+    zwavejs2mqttManager.mqttConnected = true;
   });
 
   it('should receive node without feature/params', () => {
-    zwaveManager.nodes = {
+    zwavejs2mqttManager.nodes = {
       '1': {
         nodeId: 1,
         endpoints: [],
@@ -380,13 +468,13 @@ describe('zwaveManager devices', () => {
         classes: {},
       },
     };
-    const devices = zwaveManager.getNodes();
+    const devices = zwavejs2mqttManager.getNodes();
     expect(devices).to.deep.equal([
       {
-        service_id: ZWAVE_SERVICE_ID,
+        service_id: ZWAVEJS2MQTT_SERVICE_ID,
         external_id: 'zwavejs2mqtt:node_id:1',
         model: 'product firmwareVersion',
-        name: 'name - 1 ',
+        name: 'name - 1',
         ready: true,
         selector: 'zwavejs2mqtt-node-1-name-1',
         features: [],
@@ -402,7 +490,7 @@ describe('zwaveManager devices', () => {
   });
 
   it('should receive node feature Temperature', () => {
-    zwaveManager.nodes = {
+    zwavejs2mqttManager.nodes = {
       1: {
         nodeId: 1,
         endpoints: [],
@@ -425,7 +513,7 @@ describe('zwaveManager devices', () => {
                 label: 'label',
                 min: -20,
                 max: 40,
-                units: 'C',
+                unit: '°C',
                 readOnly: true,
                 commandClass: 49,
                 endpoint: 0,
@@ -436,23 +524,26 @@ describe('zwaveManager devices', () => {
         },
       },
     };
-    const devices = zwaveManager.getNodes();
+    const devices = zwavejs2mqttManager.getNodes();
     expect(devices).to.deep.equal([
       {
-        service_id: ZWAVE_SERVICE_ID,
+        service_id: ZWAVEJS2MQTT_SERVICE_ID,
         external_id: 'zwavejs2mqtt:node_id:1',
-        name: 'name',
+        selector: 'zwavejs2mqtt-node-1-name-1',
+        model: 'product firmwareVersion',
+        name: 'name - 1',
         ready: true,
         features: [
           {
             name: 'label',
-            selector: 'zwavejs2mqtt-air-temperature-0-label-product-node-1',
+            selector: 'zwavejs2mqtt-node-1-air-temperature-49-0-label',
             category: 'temperature-sensor',
             type: 'decimal',
             external_id: 'zwavejs2mqtt:node_id:1:comclass:49:endpoint:0:property:Air temperature',
             read_only: true,
             unit: 'celsius',
             has_feedback: true,
+            last_value: undefined,
             min: -20,
             max: 40,
           },
@@ -468,14 +559,11 @@ describe('zwaveManager devices', () => {
     ]);
   });
 
-  it('should receive 3 nodes feature Switch', () => {
-    zwaveManager.nodes = {
+  it.only('should receive 3 nodes feature Switch', () => {
+    zwavejs2mqttManager.nodes = {
       1: {
         nodeId: 1,
         endpoints: [
-          {
-            index: 0,
-          },
           {
             index: 1,
           },
@@ -536,21 +624,23 @@ describe('zwaveManager devices', () => {
         },
       },
     };
-    const devices = zwaveManager.getNodes();
+    const devices = zwavejs2mqttManager.getNodes();
     expect(devices).to.deep.equal([
       {
-        service_id: ZWAVE_SERVICE_ID,
+        service_id: ZWAVEJS2MQTT_SERVICE_ID,
         external_id: 'zwavejs2mqtt:node_id:1',
-        name: 'name [2]',
+        model: 'product firmwareVersion',
+        name: 'name - 1',
+        selector: 'zwavejs2mqtt-node-1-name-1',
         ready: true,
         features: [
           {
             name: 'label',
-            selector: 'zwavejs2mqtt-targetvalue-2-label-product-node-1',
+            selector: 'zwavejs2mqtt-node-1-targetvalue-37-0-label',
             category: 'switch',
             type: 'binary',
             external_id: 'zwavejs2mqtt:node_id:1:comclass:37:endpoint:0:property:targetValue',
-            read_only: false,
+            read_only: true,
             has_feedback: true,
             last_value: 0,
             min: 0,
@@ -567,19 +657,22 @@ describe('zwaveManager devices', () => {
         },
       },
       {
-        service_id: ZWAVE_SERVICE_ID,
+        service_id: ZWAVEJS2MQTT_SERVICE_ID,
         external_id: 'zwavejs2mqtt:node_id:1_1',
+        model: 'product firmwareVersion',
         name: 'name - 1 [1]',
+        selector: 'zwavejs2mqtt-node-1-name-1-1',
         ready: true,
         features: [
           {
-            name: 'label',
-            selector: 'zwavejs2mqtt-targetvalue-1-label-product-node-1',
+            name: 'label [1]',
+            selector: 'zwavejs2mqtt-node-1-targetvalue-37-1-label',
             category: 'switch',
             type: 'binary',
             external_id: 'zwavejs2mqtt:node_id:1:comclass:37:endpoint:1:property:targetValue',
-            read_only: false,
+            read_only: true,
             has_feedback: true,
+            last_value: 0,
             min: 0,
             max: 1,
             unit: null,
@@ -594,7 +687,7 @@ describe('zwaveManager devices', () => {
         },
       },
       {
-        service_id: ZWAVE_SERVICE_ID,
+        service_id: ZWAVEJS2MQTT_SERVICE_ID,
         external_id: 'zwavejs2mqtt:node_id:1_2',
         name: 'name - 1 [2]',
         model: 'product firmwareVersion',
@@ -602,13 +695,14 @@ describe('zwaveManager devices', () => {
         ready: true,
         features: [
           {
-            name: 'label',
-            selector: 'zwavejs2mqtt-targetvalue-2-label-product-node-1',
+            name: 'label [2]',
+            selector: 'zwavejs2mqtt-node-1-targetvalue-37-2-label',
             category: 'switch',
             type: 'binary',
             external_id: 'zwavejs2mqtt:node_id:1:comclass:37:endpoint:2:property:targetValue',
-            read_only: false,
+            read_only: true,
             has_feedback: true,
+            last_value: 0,
             min: 0,
             max: 1,
             unit: null,

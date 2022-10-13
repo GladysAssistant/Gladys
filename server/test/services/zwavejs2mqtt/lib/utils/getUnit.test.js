@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { getUnit } = require('../../../../../services/zwave/lib/utils/getUnit');
+const { getUnit } = require('../../../../../services/zwavejs2mqtt/lib/utils/getUnit');
 const { DEVICE_FEATURE_UNITS } = require('../../../../../utils/constants');
 
 describe('zwave.getUnit', () => {
