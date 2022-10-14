@@ -43,7 +43,8 @@
     "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
-    "noFeatures": "No features"
+    "noFeatures": "No features",
+    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore."
   },
   "login": {
     "title": "Gladys Assistant",
