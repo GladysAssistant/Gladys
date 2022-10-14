@@ -23,7 +23,7 @@ async function sync() {
     const usagePointFeature = getDeviceFeature(
       usagePoint,
       DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+      DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
     );
 
     if (!usagePointFeature) {
@@ -37,8 +37,6 @@ async function sync() {
 
     let currendEndDate = dayjs();
     const syncTasksArray = [];
-
-    console.log({ lastSync });
 
     while (currendEndDate > lastSync) {
       let startDate = currendEndDate.subtract(7, 'days');
@@ -55,8 +53,10 @@ async function sync() {
     // Foreach interval
     await Promise.each(syncTasksArray, async (syncTask) => {
       try {
-        const data = await this.gladys.gateway.enedisGetConsumptionLoadCurve({
-          usage_point_id: getUsagePointIdFromExternalId(usagePoint.external_id),
+        const usagePointId = getUsagePointIdFromExternalId(usagePoint.external_id);
+        logger.debug(`Enedis: Syncing ${usagePointId} from ${syncTask.start_date} to ${syncTask.end_date}`);
+        const data = await this.gladys.gateway.enedisGetDailyConsumption({
+          usage_point_id: usagePointId,
           start: syncTask.start_date,
           end: syncTask.end_date,
         });

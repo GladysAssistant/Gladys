@@ -6,7 +6,11 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import EnedisButton from './enedis-button.png';
 import { route } from 'preact-router';
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS
+} from '../../../../../../server/utils/constants';
 
 const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway, sync }) => (
   <div class="page">
@@ -116,13 +120,14 @@ class EnedisWelcomePageComponent extends Component {
       features: [
         {
           id: uuid.v4(),
-          name: 'Enedis Power',
-          selector: `enedis-${usagePointId}-power`,
+          name: 'Enedis daily consumption',
+          selector: `enedis-${usagePointId}-daily-consumption`,
           min: 0,
           max: 1000000,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           external_id: `enedis:${usagePointId}:power`,
-          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
           read_only: true,
           has_feedback: false,
           keep_history: true

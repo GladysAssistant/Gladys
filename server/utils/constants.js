@@ -443,6 +443,7 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',
+    DAILY_CONSUMPTION: 'daily-consumption',
   },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',

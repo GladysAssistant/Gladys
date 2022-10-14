@@ -18,7 +18,6 @@ async function enedisGetDailyConsumption(query) {
     const consumption = await this.gladysGatewayClient.enedisGetDailyConsumption(query);
     return consumption;
   } catch (e) {
-    logger.debug(e);
     if (get(e, 'response.status') === 403) {
       throw new Error403();
     }
