@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { Link } from 'preact-router';
 import get from 'get-value';
@@ -186,7 +186,7 @@ class TasmotaDeviceBox extends Component {
                 )}
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
-                    <Text id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <div class="form-group">

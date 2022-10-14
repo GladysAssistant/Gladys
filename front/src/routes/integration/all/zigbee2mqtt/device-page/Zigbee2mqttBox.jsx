@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { Link } from 'preact-router/match';
@@ -98,7 +98,7 @@ class Zigbee2mqttBox extends Component {
                 )}
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
-                    <Text id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <div class="form-group">

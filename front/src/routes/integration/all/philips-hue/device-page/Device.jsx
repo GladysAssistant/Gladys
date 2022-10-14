@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -48,7 +48,7 @@ class PhilipsHueDeviceBox extends Component {
               <div class="card-body">
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
-                    <Text id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <DeviceForm {...props} />

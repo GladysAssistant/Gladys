@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
@@ -104,7 +104,7 @@ class ZWaveDeviceBox extends Component {
               <div class="card-body">
                 {tooMuchStatesError && (
                   <div class="alert alert-warning">
-                    <Text id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <div class="form-group">
