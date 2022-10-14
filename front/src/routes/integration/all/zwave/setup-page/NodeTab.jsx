@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
 
@@ -41,6 +41,9 @@ const NodeTab = ({ children, ...props }) => {
         </div>
       </div>
       <div class="card-body">
+        <div class="alert alert-danger">
+          <MarkupText id="integration.zwave.device.oldIntegrationWarning" />
+        </div>
         <div
           class={cx('dimmer', {
             active: zwaveActionsDisabled

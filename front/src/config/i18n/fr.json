@@ -704,7 +704,8 @@
       "device": {
         "title": "Appareils Z-Wave",
         "search": "Chercher un appareil",
-        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
+        "convertToMqtt": "Convertir en appareil MQTT",
+        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. Merci d'arrêter d'utiliser cette intégration avant Novembre 2022. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
