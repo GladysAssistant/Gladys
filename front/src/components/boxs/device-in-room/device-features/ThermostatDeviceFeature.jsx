@@ -7,6 +7,9 @@ import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
 import style from './style.css';
 
+const isNullOrUndefined = val => val === null || val === undefined;
+const DEFAULT_TEMPERATURE_IN_CASE_EMPTY = 18;
+
 const ThermostatDeviceFeature = ({ children, ...props }) => {
   function updateValue(value) {
     props.updateValueWithDebounce(
@@ -26,11 +29,17 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
   }
 
   function add() {
-    updateValue(props.deviceFeature.last_value + 0.5);
+    const prevValue = isNullOrUndefined(props.deviceFeature.last_value)
+      ? DEFAULT_TEMPERATURE_IN_CASE_EMPTY
+      : props.deviceFeature.last_value;
+    updateValue(prevValue + 0.5);
   }
 
   function substract() {
-    updateValue(props.deviceFeature.last_value - 0.5);
+    const prevValue = isNullOrUndefined(props.deviceFeature.last_value)
+      ? DEFAULT_TEMPERATURE_IN_CASE_EMPTY
+      : props.deviceFeature.last_value;
+    updateValue(prevValue - 0.5);
   }
 
   return (
