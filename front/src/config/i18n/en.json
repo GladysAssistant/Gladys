@@ -2113,7 +2113,7 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "thermostat-temperature": "Thermostat Temperature"
+      "target-temperature": "Thermostat Temperature"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

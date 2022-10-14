@@ -486,7 +486,7 @@ const DEVICE_FEATURE_TYPES = {
     UNKNOWN: 'unknown',
   },
   THERMOSTAT: {
-    TEMPERATURE: 'thermostat-temperature',
+    TARGET_TEMPERATURE: 'target-temperature',
   },
 };
 

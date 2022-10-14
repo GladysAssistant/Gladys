@@ -2113,7 +2113,7 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "thermostat-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

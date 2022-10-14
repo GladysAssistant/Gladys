@@ -534,7 +534,7 @@ const data = {
             name: 'Thermostat',
             selector: 'thermostat',
             category: 'thermostat',
-            type: 'thermostat-temperature',
+            type: 'target-temperature',
             min: 0,
             max: 30,
             read_only: false,

@@ -22,7 +22,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SHUTTER.POSITION]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: CoverDeviceFeature,
   [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: MultiLevelDeviceFeature,
-  [DEVICE_FEATURE_TYPES.THERMOSTAT.TEMPERATURE]: ThermostatDeviceFeature
+  [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: ThermostatDeviceFeature
 };
 
 const DeviceRow = ({ children, ...props }) => {
