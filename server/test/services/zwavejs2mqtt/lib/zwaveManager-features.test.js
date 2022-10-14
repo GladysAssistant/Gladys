@@ -295,51 +295,6 @@ describe('zwavejs2mqttManager events', () => {
     ]);
   });
 
-  /* it.only('should handle value added 49-0-Power', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Power',
-        unit: 'W',
-        writeable: false,
-      };
-    };
-    zwavejs2mqttManager.valueAdded(zwaveNode, {
-      commandClass: 49,
-      endpoint: 0,
-      property: 'Power',
-    });
-    expect(zwavejs2mqttManager.nodes[1].classes[49][0].Power).to.deep.equal({
-      commandClass: 49,
-      endpoint: 0,
-      genre: 'user',
-      type: 'number',
-      label: 'Power',
-      unit: 'W',
-      nodeId: 1,
-      property: 'Power',
-      writeable: false,
-    });
-    const nodes = zwavejs2mqttManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
-    expect(nodes[0].features).to.deep.equal([
-      {
-        category: 'power-sensor',
-        external_id: 'zwavejs2mqtt:node_id:1:comclass:49:endpoint:0:property:Power',
-        type: 'decimal',
-        has_feedback: true,
-        last_value: undefined,
-        name: 'Power',
-        read_only: true,
-        selector: 'zwavejs2mqtt-node-1-power-49-0-power',
-        unit: 'celsius',
-        min: -20,
-        max: 50,
-      },
-    ]);
-  }); */
-
   it('should handle value added 113-0-Smoke Alarm-Sensor status', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {

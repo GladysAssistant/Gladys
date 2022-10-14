@@ -169,14 +169,14 @@ describe('zwavejs2mqttManager commands', () => {
       dockerBased: true,
       inclusionState: undefined,
       isHealNetworkActive: undefined,
-      mqttConnected: false,
-      mqttExist: false,
-      mqttRunning: false,
+      mqttConnected: true,
+      mqttExist: true,
+      mqttRunning: true,
       ready: undefined,
-      scanInProgress: false,
-      usbConfigured: false,
-      zwavejs2mqttExist: false,
-      zwavejs2mqttRunning: false,
+      scanInProgress: true,
+      usbConfigured: true,
+      zwavejs2mqttExist: true,
+      zwavejs2mqttRunning: true,
     });
   });
 
@@ -228,6 +228,7 @@ describe('zwavejs2mqttManager events', () => {
 
   before(() => {
     gladys = {
+      event,
       service: {
         getService: fake.resolves({
           list: fake.resolves([DRIVER_PATH]),
@@ -244,14 +245,6 @@ describe('zwavejs2mqttManager events', () => {
 
   beforeEach(() => {
     sinon.reset();
-  });
-
-  it('should receive driverReady', () => {
-    zwavejs2mqttManager.driverReady('home-id');
-  });
-
-  it('should receive driverFailed', () => {
-    zwavejs2mqttManager.driverFailed();
   });
 
   it('should receive notification', () => {
@@ -335,7 +328,7 @@ describe('zwavejs2mqttManager events', () => {
         type: 'nodeType',
         firmwareVersion: 'firmwareVersion',
         product: 'manufacturerId-productType-productId',
-        name: 'name (1)',
+        name: 'name',
         location: 'location',
         status: 'status',
         ready: true,
@@ -559,7 +552,7 @@ describe('zwavejs2mqttManager devices', () => {
     ]);
   });
 
-  it.only('should receive 3 nodes feature Switch', () => {
+  it('should receive 3 nodes feature Switch', () => {
     zwavejs2mqttManager.nodes = {
       1: {
         nodeId: 1,
