@@ -1,11 +1,14 @@
 import get from 'get-value';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 
 import { getDeviceName } from './utils';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
-const NumberDeviceFeature = ({ children, ...props }) => {
-  function updateValue(e) {
+import style from './style.css';
+
+const ThermostatDeviceFeature = ({ children, ...props }) => {
+  function updateValue(value) {
     props.updateValueWithDebounce(
       props.x,
       props.y,
@@ -13,9 +16,21 @@ const NumberDeviceFeature = ({ children, ...props }) => {
       props.deviceFeature,
       props.deviceIndex,
       props.deviceFeatureIndex,
-      e.target.value,
+      value,
       props.deviceFeature.last_value
     );
+  }
+
+  function updateValueEvent(e) {
+    updateValue(e.target.value);
+  }
+
+  function add() {
+    updateValue(props.deviceFeature.last_value + 0.5);
+  }
+
+  function substract() {
+    updateValue(props.deviceFeature.last_value - 0.5);
   }
 
   return (
@@ -35,20 +50,25 @@ const NumberDeviceFeature = ({ children, ...props }) => {
         <div class="d-flex justify-content-end">
           <div class="d-flex">
             <div class="input-group">
+              <div class="input-group-prepend">
+                <button class="btn btn-outline-secondary" type="button" onClick={substract}>
+                  <Text id="dashboard.boxes.devicesInRoom.substractButton" />
+                </button>
+              </div>
               <input
                 type="number"
                 value={props.deviceFeature.last_value}
-                class="form-control text-center"
-                onChange={updateValue}
+                class={cx('form-control text-center', style.removeNumberArrow)}
+                onChange={updateValueEvent}
                 step={0.5}
                 min={props.deviceFeature.min}
                 max={props.deviceFeature.max}
               />
               {props.deviceFeature.unit && (
                 <div class="input-group-append">
-                  <span class="input-group-text">
-                    <Text id={`deviceFeatureUnitShort.${props.deviceFeature.unit}`} />
-                  </span>
+                  <button class="btn btn-outline-secondary" type="button" onClick={add}>
+                    <Text id="dashboard.boxes.devicesInRoom.addButton" />
+                  </button>
                 </div>
               )}
             </div>
@@ -59,4 +79,4 @@ const NumberDeviceFeature = ({ children, ...props }) => {
   );
 };
 
-export default NumberDeviceFeature;
+export default ThermostatDeviceFeature;
