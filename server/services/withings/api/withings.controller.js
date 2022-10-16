@@ -37,12 +37,19 @@ module.exports = function WithingsController(gladys, withingsHandler) {
    * @apiGroup OAuth2
    */
   async function buildAuthorizationUri(req, res) {
-    if (req.body && req.body.service_id && req.body.integration_name && req.headers.referer) {
+    if (
+      req.body &&
+      req.body.service_id &&
+      req.body.integration_name &&
+      req.headers.referer &&
+      req.body.redirect_uri_suffix
+    ) {
       const authorizationUriResult = await withingsHandler.oauth2Client.buildAuthorizationUri(
         req.body.service_id,
         req.user.id,
         req.body.integration_name,
         req.headers.referer,
+        req.body.redirect_uri_suffix,
       );
       res.json({
         authorizationUri: authorizationUriResult,
@@ -59,12 +66,19 @@ module.exports = function WithingsController(gladys, withingsHandler) {
    * @apiGroup OAuth2
    */
   async function getAccessTokenUri(req, res) {
-    if (req.body && req.body.service_id && req.body.authorization_code && req.headers.referer) {
+    if (
+      req.body &&
+      req.body.service_id &&
+      req.body.authorization_code &&
+      req.headers.referer &&
+      req.body.redirect_uri_suffix
+    ) {
       const authResult = await withingsHandler.oauth2Client.getAccessToken(
         req.body.service_id,
         req.user.id,
         req.body.authorization_code,
         req.headers.referer,
+        req.body.redirect_uri_suffix,
       );
       res.json({
         result: authResult,

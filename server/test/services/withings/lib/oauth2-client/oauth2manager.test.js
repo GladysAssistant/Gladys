@@ -59,10 +59,15 @@ describe('oauth2manager test', () => {
   manager.authorizeHost = testUrl;
   manager.tokenPath = '/token';
   manager.authorizePath = '/authorize2';
-  manager.redirectUriSuffix = '/dashboard/integration/health/test/settings';
 
   it('oauth manager get buildAuthorizationUri test', async () => {
-    const result = await manager.buildAuthorizationUri(testServiceId, 'fakeUserId', 'fake-code', 'fake-referer');
+    const result = await manager.buildAuthorizationUri(
+      testServiceId,
+      'fakeUserId',
+      'fake-code',
+      'fake-referer',
+      '/dashboard/integration/health/test/settings',
+    );
 
     assert.isNotNull(result);
     assert.equal(
@@ -72,7 +77,13 @@ describe('oauth2manager test', () => {
   });
 
   it('oauth manager get getAccessToken test', async () => {
-    const result = await manager.getAccessToken(testServiceId, 'fakeUserId', 'fake-code', 'fake-referer');
+    const result = await manager.getAccessToken(
+      testServiceId,
+      'fakeUserId',
+      'fake-code',
+      'fake-referer',
+      '/dashboard/integration/health/test/settings',
+    );
 
     assert.isNotNull(result.token);
     assert.isNotNull(result.token.access_token);
@@ -86,7 +97,13 @@ describe('oauth2manager test', () => {
       tokenEndpointResponse.body.status = 2;
     });
     try {
-      await manager.getAccessToken(testServiceId, 'fakeUserId', 'fake-code', 'fake-referer');
+      await manager.getAccessToken(
+        testServiceId,
+        'fakeUserId',
+        'fake-code',
+        'fake-referer',
+        '/dashboard/integration/health/test/settings',
+      );
       assert.fail('No error BadOauth2ClientResponse happen');
     } catch (e) {
       expect(e).be.instanceOf(BadOauth2ClientResponse);

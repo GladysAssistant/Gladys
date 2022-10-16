@@ -44,7 +44,6 @@ function buildNewDevice(withingsDevice, serviceId) {
 
   newFeatures.push({
     id: uniqueBatFeatureId,
-    name: 'deviceFeatureCategory.battery.shortCategoryName',
     selector: `withings-battery-${uniqueId}`,
     device_id: uniqueId,
     external_id: uniqueId,
@@ -192,7 +191,6 @@ function buildFeature(currentGroup, device, currentFeatures) {
         const uniqueId = uuid.v4();
         tmpFeature = {
           id: uniqueId,
-          name: featureName,
           selector: `withings-${featureName}-${gladysDeviceId}`,
           device_id: gladysDeviceId,
           external_id: `withings-${featureName}:${gladysDeviceId}:${uniqueId}`,

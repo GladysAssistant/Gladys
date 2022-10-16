@@ -26,7 +26,7 @@ const OAuth2Config = ({ integrationImg, integrationName, children, ...props }) =
                       <div class="dimmer-content">
                         {props.oauth2ErrorMsg && (
                           <div class="alert alert-danger">
-                            <Text id={`oauth2.${props.oauth2ErrorMsg}`} />
+                            <Text id={`integration.${integrationName}.settings.oauth2.${props.oauth2ErrorMsg}`} />
                           </div>
                         )}
                         <p>

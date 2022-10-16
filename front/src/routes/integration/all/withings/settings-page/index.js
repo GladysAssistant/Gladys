@@ -9,6 +9,7 @@ import WithingsPage from '../WithingsPage';
 import OAuth2Config from './oauth2/OAuth2Config';
 import { combineActions } from '../../../../../utils/combineActions';
 import Device from '../device-page/Device';
+import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 @connect(
   'user,session,clientIdInDb,withingsSaveStatus,oauth2GetStatus,oauth2ErrorMsg,houses,withingsClientId,withingsGetStatus,withingsImgMap,withingsDevices',
@@ -17,7 +18,7 @@ import Device from '../device-page/Device';
 class WithingsSettingsPage extends Component {
   async componentWillMount() {
     await this.props.getIntegrationByName('withings');
-    await this.props.initWithingsDevices();
+    await this.props.initWithingsDevices(this.props.intl.dictionary);
     await this.props.getCurrentConfig();
   }
 
@@ -59,4 +60,4 @@ class WithingsSettingsPage extends Component {
   }
 }
 
-export default WithingsSettingsPage;
+export default withIntlAsProp(WithingsSettingsPage);

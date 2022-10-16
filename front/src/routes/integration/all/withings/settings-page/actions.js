@@ -1,8 +1,10 @@
 import { route } from 'preact-router';
 import { RequestStatus } from '../../../../../utils/consts';
 
+export const REDIRECT_URI_SUFFIX = 'dashboard/integration/health/withings/settings';
+
 const actions = store => ({
-  async initWithingsDevices(state) {
+  async initWithingsDevices(state, dictionary) {
     store.setState({
       oauth2GetStatus: RequestStatus.Getting,
       withingsGetStatus: RequestStatus.Getting
@@ -14,10 +16,11 @@ const actions = store => ({
           await state.httpClient.post('/api/v1/service/withings/oauth2/client/access-token', {
             integrationName: 'withings',
             authorization_code: this.code,
-            service_id: state.currentIntegration.id
+            service_id: state.currentIntegration.id,
+            redirect_uri_suffix: REDIRECT_URI_SUFFIX
           });
 
-          route('/dashboard/integration/health/withings/settings');
+          route(REDIRECT_URI_SUFFIX);
         }
 
         const returnGetConfig = await state.httpClient.get('/api/v1/service/withings/oauth2/client', {
@@ -30,6 +33,14 @@ const actions = store => ({
           const result = await state.httpClient.post('/api/v1/service/withings/init_devices');
           if (result) {
             withingsDevices = result.withingsDevices;
+            withingsDevices.forEach(device => {
+              device.features.forEach(feature => {
+                const featureName = dictionary.deviceFeatureCategory[feature.category][feature.type];
+                if (featureName) {
+                  feature.name = featureName;
+                }
+              });
+            });
           }
         }
 

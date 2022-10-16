@@ -14,7 +14,6 @@ const OAuth2Manager = function OAuth2Manager(variable) {
   this.additionalAccessTokenRequestActionParam = 'requesttoken';
   this.integrationScope = 'user.info,user.metrics,user.activity,user.sleepevents';
   this.grantType = 'authorization_code';
-  this.redirectUriSuffix = 'dashboard/integration/health/withings/settings';
   this.additionalAccessTokenRequestAxtionParam = 'requesttoken';
 };
 

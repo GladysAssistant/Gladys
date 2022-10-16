@@ -1,5 +1,6 @@
 import { RequestStatus } from '../../../../../../utils/consts';
 import { OAUTH2 } from '../../../../../../../../server/services/withings/lib/oauth2-client/utils/constants';
+import { REDIRECT_URI_SUFFIX } from '../actions';
 
 const actions = store => ({
   updateClientId(state, e) {
@@ -71,7 +72,8 @@ const actions = store => ({
 
       const returnValue = await state.httpClient.post('/api/v1/service/withings/oauth2/client/authorization-uri', {
         integration_name: state.currentIntegration.name,
-        service_id: state.currentIntegration.id
+        service_id: state.currentIntegration.id,
+        redirect_uri_suffix: REDIRECT_URI_SUFFIX
       });
 
       if (returnValue.authorizationUri) {

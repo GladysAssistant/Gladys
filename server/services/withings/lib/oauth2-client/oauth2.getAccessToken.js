@@ -9,6 +9,7 @@ const { BadOauth2ClientResponse } = require('./utils/coreErrors');
  * @param {string} userId - This userId of current session.
  * @param {string} authorizationCode - Authorization code for nex token.
  * @param {string} referer - Gladys referer.
+ * @param {string} redirectUriSuffix - Integration redirect uri suffix.
  * @returns {Promise} Resolve with current integration service id.
  * @example
  * oauth2.getAccessToken(
@@ -16,10 +17,11 @@ const { BadOauth2ClientResponse } = require('./utils/coreErrors');
  *  serviceId: 'ffsdvs687f0bf3414e0fe3facfba7be945510fds09a'
  *  authorizationCode:  '25dbf26a066d947fca82a1f05ae5890f79a27687',
  *  referer: 'http://localhost:1444/'
+ *  redirectUriSuffix: 'dashboard/integration/health/withings/settings'
  *  }
  * );
  */
-async function getAccessToken(serviceId, userId, authorizationCode, referer) {
+async function getAccessToken(serviceId, userId, authorizationCode, referer, redirectUriSuffix) {
   const clientId = await this.variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
   const secret = await this.variable.getValue(OAUTH2.VARIABLE.CLIENT_SECRET, serviceId, userId);
 
@@ -43,15 +45,13 @@ async function getAccessToken(serviceId, userId, authorizationCode, referer) {
     client_id: clientId,
     client_secret: secret,
     grant_type: this.grantType,
-    redirect_uri: this.buildRedirectUri(referer, this.redirectUriSuffix),
+    redirect_uri: this.buildRedirectUri(referer, redirectUriSuffix),
     action: this.additionalAccessTokenRequestAxtionParam,
   };
 
   try {
-    console.log(tokenConfig);
     const client = new AuthorizationCode(credentials);
     const authResult = await client.getToken(tokenConfig, { json: true });
-    console.log(authResult);
 
     if (authResult.token) {
       if (authResult.token.status && authResult.token.status !== 0) {

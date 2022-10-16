@@ -41,6 +41,7 @@ describe('POST /api/v1/service/withings/oauth2/client/authorization-uri', () => 
       body: {
         integration_name: 'test',
         service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+        redirect_uri_suffix: 'dashboard/integration/health/withings/settings',
       },
     };
 
@@ -91,6 +92,7 @@ describe('POST /api/v1/service/withings/oauth2/client/access-token', () => {
         integration_name: 'test',
         service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
         authorization_code: 'fake-code',
+        redirect_uri_suffix: 'fake_redirect_uri',
       },
     };
 
