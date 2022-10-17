@@ -12,6 +12,8 @@ import {
   DEVICE_FEATURE_UNITS
 } from '../../../../../../server/utils/constants';
 
+import EnedisPage from './EnedisPage';
+
 const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway, sync }) => (
   <div class="page">
     <div class="page-main">
@@ -22,7 +24,7 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
               <div class="card">
                 <div class="card-header">
                   <h3 class="card-title">
-                    <Text id="integration.enedis.title" />
+                    <Text id="integration.enedis.welcome.title" />
                   </h3>
                 </div>
                 <div class="card-body">
@@ -35,40 +37,43 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
                     <div class="dimmer-content">
                       {errored && (
                         <p class="alert alert-danger">
-                          <Text id="integration.enedis.error" />
+                          <Text id="integration.enedis.welcome.error" />
                         </p>
                       )}
                       {notOnGladysGateway && (
                         <p class="alert alert-info">
-                          <Text id="integration.enedis.notOnGladysGateway" />
+                          <Text id="integration.enedis.welcome.notOnGladysGateway" />
                         </p>
                       )}
                       {usagePointsIds && (
                         <p class="alert alert-success">
                           <Text
-                            id="integration.enedis.connectedToUsagePointds"
+                            id="integration.enedis.welcome.connectedToUsagePointds"
                             plural={usagePointsIds.length}
                             fields={{ count: usagePointsIds.length }}
                           />{' '}
-                          <Text id="integration.enedis.reconnectInfo" />
+                          <Text id="integration.enedis.welcome.reconnectInfo" />
                         </p>
                       )}
                       <p>
-                        <Text id="integration.enedis.longDescription" />
+                        <Text id="integration.enedis.welcome.longDescription" />
                       </p>
                       {usagePointsIds && (
                         <button class="btn btn-primary" onClick={sync}>
-                          <Text id="integration.enedis.syncButton" /> Sync
+                          <Text id="integration.enedis.welcome.syncButton" /> Sync
                         </button>
                       )}
                       {!notOnGladysGateway && (
                         <div>
                           <p>
-                            <Text id="integration.enedis.buttonDescription" />
+                            <Text id="integration.enedis.welcome.buttonDescription" />
                           </p>
                           <a href={redirectUri} target="_blank" rel="noreferrer noopener">
                             <Localizer>
-                              <img src={EnedisButton} alt={<Text id="integration.enedis.buttonDescription" />} />
+                              <img
+                                src={EnedisButton}
+                                alt={<Text id="integration.enedis.welcome.buttonDescription" />}
+                              />
                             </Localizer>
                           </a>
                         </div>
@@ -173,14 +178,16 @@ class EnedisWelcomePageComponent extends Component {
   }
   render({}, { redirectUri, loading, errored, usagePointsIds, notOnGladysGateway }) {
     return (
-      <EnedisWelcomePage
-        redirectUri={redirectUri}
-        loading={loading}
-        errored={errored}
-        usagePointsIds={usagePointsIds}
-        notOnGladysGateway={notOnGladysGateway}
-        sync={this.sync}
-      />
+      <EnedisPage>
+        <EnedisWelcomePage
+          redirectUri={redirectUri}
+          loading={loading}
+          errored={errored}
+          usagePointsIds={usagePointsIds}
+          notOnGladysGateway={notOnGladysGateway}
+          sync={this.sync}
+        />
+      </EnedisPage>
     );
   }
 }

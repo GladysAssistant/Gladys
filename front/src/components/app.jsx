@@ -28,7 +28,8 @@ import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
 import AlexaGateway from '../routes/integration/all/alexa-gateway';
-import EnedisGateway from '../routes/integration/all/enedis-gateway';
+import EnedisGateway from '../routes/integration/all/enedis-gateway/Welcome';
+import EnedisGatewayUsagePoints from '../routes/integration/all/enedis-gateway/UsagePoints';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -254,6 +255,7 @@ const AppRouter = connect(
         <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
         <EnedisGateway path="/dashboard/integration/device/enedis" />
+        <EnedisGatewayUsagePoints path="/dashboard/integration/device/enedis/usage-points" />
         <EnedisGateway path="/dashboard/integration/device/enedis/redirect" />
 
         <ChatPage path="/dashboard/chat" />
