@@ -9,6 +9,7 @@ import MultiLevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 import NumberDeviceFeature from './device-features/NumberDeviceFeature';
 import TimerStatusDeviceFeature from './device-features/TimerStatusDeviceFeature';
 import CoverDeviceFeature from './device-features/CoverDeviceFeature';
+import ThermostatDeviceFeature from './device-features/ThermostatDeviceFeature';
 
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
@@ -22,7 +23,8 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SHUTTER.STATE]: CoverDeviceFeature,
   [DEVICE_FEATURE_TYPES.SHUTTER.POSITION]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: CoverDeviceFeature,
-  [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: MultiLevelDeviceFeature
+  [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: MultiLevelDeviceFeature,
+  [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: ThermostatDeviceFeature
 };
 
 const DeviceRow = ({ children, ...props }) => {

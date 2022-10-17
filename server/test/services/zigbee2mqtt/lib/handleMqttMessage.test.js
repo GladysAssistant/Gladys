@@ -152,6 +152,32 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     });
   });
 
+  it('it should get good topic with sub-feature', async () => {
+    // PREPARE
+    stateManagerGetStub = sinon.stub();
+    stateManagerGetStub.onFirstCall().returns({
+      features: [
+        {
+          external_id: 'zigbee2mqtt:0x00158d00033e88d1:button:click:action:2',
+          type: 'click',
+        },
+      ],
+    });
+    zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    zigbeeDevices
+      .filter((d) => d.supported)
+      .forEach((device) => {
+        zigbee2mqttManager.discoveredDevices[device.friendly_name] = device;
+      });
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/0x00158d00033e88d1', `{"action": "2_double"}`);
+    // ASSERT
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'zigbee2mqtt:0x00158d00033e88d1:button:click:action:2',
+      state: 2,
+    });
+  });
+
   it('it should get good topic but device not managed', async () => {
     // PREPARE
     stateManagerGetStub = sinon.stub();
