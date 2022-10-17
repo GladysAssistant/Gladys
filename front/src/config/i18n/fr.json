@@ -228,7 +228,9 @@
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
+        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration.",
+        "addButton": "+",
+        "substractButton": "-"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -2109,6 +2111,10 @@
     "datarate": {
       "shortCategoryName": "Débit de données",
       "rate": "Débit"
+    },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "target-temperature": "Température de consigne"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
