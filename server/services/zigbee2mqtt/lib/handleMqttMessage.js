@@ -85,12 +85,13 @@ function handleMqttMessage(topic, message) {
         if (device) {
           Object.keys(incomingFeatures).forEach((zigbeeFeatureField) => {
             // Find the feature regarding the field name
-            const feature = convertFeature(device.features, zigbeeFeatureField);
+            const value = incomingFeatures[zigbeeFeatureField];
+            const feature = convertFeature(device.features, zigbeeFeatureField, value);
             if (feature) {
               try {
                 const newState = {
                   device_feature_external_id: `${feature.external_id}`,
-                  state: this.readValue(deviceName, zigbeeFeatureField, incomingFeatures[zigbeeFeatureField]),
+                  state: this.readValue(deviceName, zigbeeFeatureField, value),
                 };
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
               } catch (e) {

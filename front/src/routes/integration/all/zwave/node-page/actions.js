@@ -52,6 +52,22 @@ function createActions(store) {
       });
       store.setState(newState);
     },
+    async convertToMqtt(state, deviceIndex) {
+      const mqttService = await state.httpClient.get('/api/v1/service/mqtt');
+      const newState = update(state, {
+        zwaveDevices: {
+          [deviceIndex]: {
+            service_id: {
+              $set: mqttService.id
+            }
+          }
+        }
+      });
+      await store.setState(newState);
+      const newDevice = store.getState().zwaveDevices[deviceIndex];
+      await this.saveDevice(newDevice);
+      await actions.getZWaveDevices(store.getState());
+    },
     async search(state, e) {
       store.setState({
         zwaveDeviceSearch: e.target.value

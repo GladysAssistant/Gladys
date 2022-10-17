@@ -43,7 +43,8 @@
     "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
-    "noFeatures": "Aucune fonctionnalité"
+    "noFeatures": "Aucune fonctionnalité",
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données. Afin d'éviter que Gladys soit bloquée pendant la suppression de cet appareil, nous avons lancé une suppression lente en arrière-plan de tous les états de cet appareil. D'ici quelques minutes/heures ( selon la rapidité de votre disque ), nous vous invitons à revenir sur cet onglet pour re-tenter une suppression de cet appareil. Pour suivre la suppression, <a href=\"/dashboard/settings/jobs\">c'est ici</a>."
   },
   "login": {
     "title": "Gladys Assistant",
@@ -227,7 +228,9 @@
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
+        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration.",
+        "addButton": "+",
+        "substractButton": "-"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -704,7 +707,8 @@
       "device": {
         "title": "Appareils Z-Wave",
         "search": "Chercher un appareil",
-        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
+        "convertToMqtt": "Convertir en appareil MQTT",
+        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. Merci d'arrêter d'utiliser cette intégration avant Novembre 2022. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
@@ -2109,6 +2113,10 @@
     "datarate": {
       "shortCategoryName": "Débit de données",
       "rate": "Débit"
+    },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "target-temperature": "Température de consigne"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

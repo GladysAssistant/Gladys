@@ -1,7 +1,8 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { Link } from 'preact-router';
+import get from 'get-value';
 
 import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/ewelink/lib/utils/constants';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
@@ -39,21 +40,33 @@ class EweLinkDeviceBox extends Component {
   deleteDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null
+      errorMessage: null,
+      tooMuchStatesError: false,
+      statesNumber: undefined
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
-      this.setState({
-        errorMessage: 'integration.eWeLink.error.defaultDeletionError'
-      });
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({
+          errorMessage: 'integration.eWeLink.error.defaultDeletionError'
+        });
+      }
     }
     this.setState({
       loading: false
     });
   };
 
-  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
+  render(
+    { deviceIndex, device, housesWithRooms, editable, ...props },
+    { loading, errorMessage, tooMuchStatesError, statesNumber }
+  ) {
     const validModel = device.features && device.features.length > 0;
     const online = device.params.find(param => param.name === DEVICE_ONLINE).value === '1';
     const firmware = device.params.find(param => param.name === DEVICE_FIRMWARE).value;
@@ -85,6 +98,11 @@ class EweLinkDeviceBox extends Component {
                 {errorMessage && (
                   <div class="alert alert-danger">
                     <Text id={errorMessage} />
+                  </div>
+                )}
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <div class="form-group">

@@ -25,6 +25,7 @@ const { purgeStatesByFeatureId } = require('./device.purgeStatesByFeatureId');
 const { poll } = require('./device.poll');
 const { pollAll } = require('./device.pollAll');
 const { saveState } = require('./device.saveState');
+const { saveHistoricalState } = require('./device.saveHistoricalState');
 const { saveStringState } = require('./device.saveStringState');
 const { setParam } = require('./device.setParam');
 const { setValue } = require('./device.setValue');
@@ -51,6 +52,7 @@ const DeviceManager = function DeviceManager(
 
   this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
+  this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
 
   // initialize all types of device feature categories
   this.camera = new CameraManager(this.stateManager, messageManager, eventManager, this);
@@ -98,6 +100,7 @@ DeviceManager.prototype.poll = poll;
 DeviceManager.prototype.pollAll = pollAll;
 DeviceManager.prototype.newStateEvent = newStateEvent;
 DeviceManager.prototype.saveState = saveState;
+DeviceManager.prototype.saveHistoricalState = saveHistoricalState;
 DeviceManager.prototype.saveStringState = saveStringState;
 DeviceManager.prototype.setParam = setParam;
 DeviceManager.prototype.setupPoll = setupPoll;
