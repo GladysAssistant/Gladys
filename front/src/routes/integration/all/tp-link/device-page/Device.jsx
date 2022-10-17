@@ -1,6 +1,8 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
+import get from 'get-value';
+
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceForm from './DeviceForm';
 
@@ -16,16 +18,29 @@ class TpLinkDeviceBox extends Component {
   };
 
   deleteDevice = async () => {
-    this.setState({ loading: true, saveError: null, deleteError: null });
+    this.setState({
+      loading: true,
+      saveError: null,
+      deleteError: null,
+      tooMuchStatesError: false,
+      statesNumber: undefined
+    });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
-      this.setState({ deleteError: RequestStatus.Error });
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({ deleteError: RequestStatus.Error });
+      }
     }
     this.setState({ loading: false });
   };
 
-  render(props, { loading, saveError, deleteError }) {
+  render(props, { loading, saveError, deleteError, tooMuchStatesError, statesNumber }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -38,6 +53,12 @@ class TpLinkDeviceBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                  </div>
+                )}
+
                 <DeviceForm {...props} />
 
                 <div class="form-group">
