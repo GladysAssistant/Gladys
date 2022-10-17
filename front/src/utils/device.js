@@ -18,7 +18,7 @@ const DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES = {
 };
 
 const matchFeature = (feature, selector, category, type) => {
-  return feature.selector !== selector && feature.category === category && feature.type === type;
+  return feature.selector !== selector && feature.type === type;
 };
 
 const shouldDisplayDeviceName = (device, deviceFeature) => {
