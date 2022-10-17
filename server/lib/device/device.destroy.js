@@ -1,6 +1,8 @@
-const { NotFoundError } = require('../../utils/coreErrors');
+const { QueryTypes } = require('sequelize');
+const { NotFoundError, BadParameters } = require('../../utils/coreErrors');
 const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../utils/constants');
 const db = require('../../models');
+const logger = require('../../utils/logger');
 
 /**
  * @description Destroy a device.
@@ -23,6 +25,46 @@ async function destroy(selector) {
 
   if (device === null) {
     throw new NotFoundError('Device not found');
+  }
+
+  // Deleting a device cascade delete its device features and device feature states
+  // This is a blocking operation that takes a lot of time
+  // So if the device has too much states, we don't allow the user to delete the device
+  // and ask him to come back later
+  const deviceStatesCount = await db.sequelize.query(
+    `
+      SELECT COUNT(s.id) as count
+      FROM t_device d
+      LEFT JOIN t_device_feature df ON d.id = df.device_id
+      LEFT JOIN t_device_feature_state s ON df.id = s.device_feature_id
+      WHERE d.id = :id
+      GROUP BY d.id
+
+      UNION ALL 
+
+      SELECT COUNT(s.id) as count
+      FROM t_device d
+      LEFT JOIN t_device_feature df ON d.id = df.device_id
+      LEFT JOIN t_device_feature_state_aggregate s ON df.id = s.device_feature_id
+      WHERE d.id = :id
+      GROUP BY d.id
+    `,
+    {
+      replacements: {
+        id: device.id,
+      },
+      type: QueryTypes.SELECT,
+    },
+  );
+
+  const totalNumberOfStates = deviceStatesCount[0].count + deviceStatesCount[1].count;
+  logger.info(`Deleting device ${selector}, device has ${totalNumberOfStates} states in DB`);
+  if (totalNumberOfStates > this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE) {
+    logger.info(`Deleting device ${selector}, device has too much states. Cleaning states first.`);
+    device.features.forEach((deviceFeature) => {
+      this.eventManager.emit(EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE, deviceFeature.id);
+    });
+    throw new BadParameters(`${totalNumberOfStates} states in DB. Too much states!`);
   }
 
   await device.destroy();

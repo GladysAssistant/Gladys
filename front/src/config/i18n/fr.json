@@ -43,7 +43,8 @@
     "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
-    "noFeatures": "Aucune fonctionnalité"
+    "noFeatures": "Aucune fonctionnalité",
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données. Afin d'éviter que Gladys soit bloquée pendant la suppression de cet appareil, nous avons lancé une suppression lente en arrière-plan de tous les états de cet appareil. D'ici quelques minutes/heures ( selon la rapidité de votre disque ), nous vous invitons à revenir sur cet onglet pour re-tenter une suppression de cet appareil. Pour suivre la suppression, <a href=\"/dashboard/settings/jobs\">c'est ici</a>."
   },
   "login": {
     "title": "Gladys Assistant",
