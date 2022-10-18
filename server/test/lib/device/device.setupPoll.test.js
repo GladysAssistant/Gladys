@@ -3,8 +3,10 @@ const { fake } = require('sinon');
 const Device = require('../../../lib/device');
 const { DEVICE_POLL_FREQUENCIES } = require('../../../utils/constants');
 const StateManager = require('../../../lib/state');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 const testService = {
   device: {
@@ -18,7 +20,7 @@ describe('Device', () => {
     const service = {
       getService: () => testService,
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     device.setupPoll();
   });
   it('should poll all', async () => {
@@ -26,7 +28,7 @@ describe('Device', () => {
     const service = {
       getService: () => testService,
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     device.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES.EVERY_MINUTES] = [
       {
         service: {
@@ -41,7 +43,7 @@ describe('Device', () => {
     const service = {
       getService: () => testService,
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     device.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES.EVERY_MINUTES] = [
       {
         service: {

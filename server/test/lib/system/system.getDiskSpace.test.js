@@ -22,13 +22,18 @@ const System = proxyquire('../../../lib/system', {
   './system.getDiskSpace': { getDiskSpace },
 });
 
+const Job = require('../../../lib/job');
+
 const sequelize = {
   close: fake.resolves(null),
 };
 
 const event = {
   on: fake.resolves(null),
+  emit: fake.resolves(null),
 };
+
+const job = new Job(event);
 
 const config = {
   tempFolder: '/tmp/gladys',
@@ -38,7 +43,7 @@ describe('system.getDiskSpace', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event, config, job);
     // Reset all fakes invoked within init call
     sinon.reset();
   });

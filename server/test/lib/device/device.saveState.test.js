@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const { assert, stub, useFakeTimers } = require('sinon');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const Job = require('../../../lib/job');
 const { BadParameters } = require('../../../utils/coreErrors');
 
 describe('Device.saveState', () => {
@@ -12,7 +13,8 @@ describe('Device.saveState', () => {
     };
     const clock = useFakeTimers(new Date('2019-05-01T00:00:00Z').getTime());
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
     await device.saveState(
       {
         id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
@@ -46,7 +48,8 @@ describe('Device.saveState', () => {
     };
     const clock = useFakeTimers(new Date('2019-05-01T00:00:00Z').getTime());
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
     stateManager.setState('deviceFeature', 'test-device-feature', {
       last_value: 5,
     });
@@ -82,7 +85,8 @@ describe('Device.saveState', () => {
       on: stub().returns(null),
     };
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
     await device.saveState(
       {
         id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
@@ -101,7 +105,8 @@ describe('Device.saveState', () => {
       on: stub().returns(null),
     };
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
     const promises = [];
     for (let i = 0; i < 200; i += 1) {
       promises.push(
@@ -123,7 +128,8 @@ describe('Device.saveState', () => {
       on: stub().returns(null),
     };
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
 
     const nanValue = parseInt('NaN value', 10);
 
@@ -147,7 +153,8 @@ describe('Device.saveState', () => {
       on: stub().returns(null),
     };
     const stateManager = new StateManager(event);
-    const device = new Device(event, {}, stateManager);
+    const job = new Job(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
 
     const stringValue = 'LOCK';
 

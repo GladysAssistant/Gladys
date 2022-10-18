@@ -2,8 +2,11 @@ const EventEmitter = require('events');
 const { assert, fake } = require('sinon');
 const Device = require('../../../../lib/device');
 const StateManager = require('../../../../lib/state');
+const Job = require('../../../../lib/job');
 
 const event = new EventEmitter();
+
+const job = new Job(event);
 
 const messageManager = {
   replyByIntent: fake.resolves(true),
@@ -19,7 +22,7 @@ const RANDOM_IMAGE =
 describe('Camera.command', () => {
   it('should respond with image from camera', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, {});
+    const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);
     const context = {};
     await deviceManager.camera.command(
       message,
@@ -46,7 +49,7 @@ describe('Camera.command', () => {
   });
   it('should respond camera not found', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, {});
+    const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);
     const context = {};
     await deviceManager.camera.command(
       message,
@@ -73,7 +76,7 @@ describe('Camera.command', () => {
   });
   it('should respond camera not found', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, {});
+    const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);
     const context = {};
     await deviceManager.camera.command(
       message,
