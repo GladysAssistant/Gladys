@@ -60,6 +60,7 @@ const NodeTab = ({ children, ...props }) => (
                   deviceIndex={index}
                   houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
+                  convertToMqtt={props.convertToMqtt}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
                   user={props.user}

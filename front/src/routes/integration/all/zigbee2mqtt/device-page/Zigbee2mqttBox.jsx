@@ -1,7 +1,8 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { Link } from 'preact-router/match';
+import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
@@ -55,21 +56,30 @@ class Zigbee2mqttBox extends Component {
 
   deleteDevice = async () => {
     this.setState({
-      loading: true
+      loading: true,
+      tooMuchStatesError: false,
+      statesNumber: undefined
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
-      this.setState({
-        deleteError: RequestStatus.Error
-      });
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({
+          deleteError: RequestStatus.Error
+        });
+      }
     }
     this.setState({
       loading: false
     });
   };
 
-  render(props, { loading, saveError }) {
+  render(props, { loading, saveError, tooMuchStatesError, statesNumber }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -84,6 +94,11 @@ class Zigbee2mqttBox extends Component {
                 {saveError && (
                   <div class="alert alert-danger">
                     <Text id="integration.zigbee2mqtt.saveError" />
+                  </div>
+                )}
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <div class="form-group">

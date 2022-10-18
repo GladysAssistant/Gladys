@@ -92,7 +92,8 @@ class TextWithVariablesInjected extends Component {
   };
   parseText = textContent => {
     let text = textContent ? textContent : '';
-    this.state.variableWhileList.forEach(variable => {
+    const variableWhileListSorted = this.state.variableWhileList.sort((a, b) => b.id.length - a.id.length);
+    variableWhileListSorted.forEach(variable => {
       text = text.replaceAll(variable.text, `${OPENING_VARIABLE}${variable.id}${CLOSING_VARIABLE}`);
     });
     text = text.replaceAll(`\n${OPENING_VARIABLE}`, OPENING_VARIABLE);

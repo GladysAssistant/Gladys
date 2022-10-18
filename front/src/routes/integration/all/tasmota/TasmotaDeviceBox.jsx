@@ -1,7 +1,8 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { Link } from 'preact-router';
+import get from 'get-value';
 
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
@@ -46,14 +47,23 @@ class TasmotaDeviceBox extends Component {
   deleteDevice = async () => {
     this.setState({
       loading: true,
-      errorMessage: null
+      errorMessage: null,
+      tooMuchStatesError: false,
+      statesNumber: undefined
     });
     try {
       await this.props.deleteDevice(this.props.deviceIndex);
     } catch (e) {
-      this.setState({
-        errorMessage: 'integration.tasmota.error.defaultDeletionError'
-      });
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({
+          errorMessage: 'integration.tasmota.error.defaultDeletionError'
+        });
+      }
     }
     this.setState({
       loading: false
@@ -97,7 +107,10 @@ class TasmotaDeviceBox extends Component {
     });
   };
 
-  render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage, authErrorMessage }) {
+  render(
+    { deviceIndex, device, housesWithRooms, editable, ...props },
+    { loading, errorMessage, authErrorMessage, tooMuchStatesError, statesNumber }
+  ) {
     const validModel = device.features.length > 0 || device.needAuthentication;
     // default value is 'mqtt'
     const deviceProtocol = ((device.params || []).find(p => p.name === 'protocol') || { value: 'mqtt' }).value;
@@ -169,6 +182,11 @@ class TasmotaDeviceBox extends Component {
                 {errorMessage && (
                   <div class="alert alert-danger">
                     <Text id={errorMessage} />
+                  </div>
+                )}
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <div class="form-group">

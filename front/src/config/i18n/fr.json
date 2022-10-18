@@ -43,7 +43,8 @@
     "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
-    "noFeatures": "Aucune fonctionnalité"
+    "noFeatures": "Aucune fonctionnalité",
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données. Afin d'éviter que Gladys soit bloquée pendant la suppression de cet appareil, nous avons lancé une suppression lente en arrière-plan de tous les états de cet appareil. D'ici quelques minutes/heures ( selon la rapidité de votre disque ), nous vous invitons à revenir sur cet onglet pour re-tenter une suppression de cet appareil. Pour suivre la suppression, <a href=\"/dashboard/settings/jobs\">c'est ici</a>."
   },
   "login": {
     "title": "Gladys Assistant",
@@ -227,7 +228,9 @@
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
+        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration.",
+        "addButton": "+",
+        "substractButton": "-"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -789,7 +792,8 @@
       "device": {
         "title": "Appareils Z-Wave",
         "search": "Chercher un appareil",
-        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
+        "convertToMqtt": "Convertir en appareil MQTT",
+        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. Merci d'arrêter d'utiliser cette intégration avant Novembre 2022. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
@@ -998,10 +1002,10 @@
         "learnFailed": "Impossible de passer en mode apprentissage.",
         "selectFeatureLabel": "Choisissez une fonctionnalité de la liste ou cliquez sur le bouton suivant pour entrer dans le mode apprentissage. Le mode apprentissage vous permet d'enregistrer toutes les commandes une par une, de manière automatisée.",
         "selectedFeatureLabel": "Fonctionnalité sélectionnée",
-        "selectActionLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée. Sélectionnez une action dans la liste ci-dessous pour activer la capture.",
-        "selectedFeatureInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée.",
-        "unselectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée, merci de sélectionner une action pour activer la capture.",
-        "selectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> is sélectionnée, avec l'action <b>{{action}}</b>.",
+        "selectActionLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée. Sélectionnez une action dans la liste ci-dessous pour activer la capture.",
+        "selectedFeatureInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée.",
+        "unselectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée, merci de sélectionner une action pour activer la capture.",
+        "selectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée, avec l'action <b>{{action}}</b>.",
         "testError": "Une erreur est survenue lors du test de la fonctionnalité, vérifiez votre matériel.",
         "peripheralSelectLabel": "{{name}} ({{address}})",
         "testLabel": "Tester",
@@ -1839,6 +1843,7 @@
     "meter-per-second": "Mètre par seconde (m/s)",
     "kilometer-per-hour": "Kilomètre par heure (km/h)",
     "millimeter-per-hour": "Millimètre par heure (mm/h)",
+    "millimeter-per-day": "Millimètre par jour (mm/j)",
     "uv-index": "Indice UV",
     "microseconds": "Microsecondes (μs)",
     "milliseconds": "Millisecondes (ms)",
@@ -1848,7 +1853,24 @@
     "days": "Jours (j)",
     "weeks": "Semaines (sem)",
     "months": "Mois (m)",
-    "years": "Années (an)"
+    "years": "Années (an)",
+    "bit": "Bit",
+    "kilobit": "Kilobit",
+    "megabit": "Megabit",
+    "gigabit": "Gigabit",
+    "byte": "Octet (o)",
+    "kilobyte": "Kilooctet (Ko)",
+    "megabyte": "Megaoctet (Mo)",
+    "gigabyte": "Gigaoctet (Go)",
+    "terabyte": "Teraoctet (To)",
+    "bits-per-second": "Bits par seconde (bit/s)",
+    "kilobits-per-second": "Kilobits par seconde (kbit/s)",
+    "megabits-per-second": "Megabits par seconde (Mbit/s)",
+    "gigabits-per-second": "Gigabits par seconde (Gbit/s)",
+    "bytes-per-second": "Octets par seconde (o/s)",
+    "kilobytes-per-second": "Kilooctets par seconde (Ko/s)",
+    "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
+    "gigabytes-per-second": "Gigaoctets par seconde (Go/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1891,6 +1913,7 @@
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
     "millimeter-per-hour": "mm/h",
+    "millimeter-per-day": "mm/j",
     "uv-index": "Indice UV",
     "microseconds": "μs",
     "milliseconds": "ms",
@@ -1900,7 +1923,24 @@
     "days": "j",
     "weeks": "sem",
     "months": "m",
-    "years": "an"
+    "years": "an",
+    "bit": "bit",
+    "kilobit": "kbit",
+    "megabit": "Mbit",
+    "gigabit": "Gbit",
+    "byte": "o",
+    "kilobyte": "Ko",
+    "megabyte": "Mo",
+    "gigabyte": "Go",
+    "terabyte": "To",
+    "bits-per-second": "bit/s",
+    "kilobits-per-second": "kbit/s",
+    "megabits-per-second": "Mbit/s",
+    "gigabits-per-second": "Gbit/s",
+    "bytes-per-second": "o/s",
+    "kilobytes-per-second": "Ko/s",
+    "megabytes-per-second": "Mo/s",
+    "gigabytes-per-second": "Go/s"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2148,6 +2188,18 @@
       "shortCategoryName": "Rideau",
       "state": "Etat du rideau",
       "position": "Position du rideau"
+    },
+    "data": {
+      "shortCategoryName": "Donnée",
+      "size": "Taille"
+    },
+    "datarate": {
+      "shortCategoryName": "Débit de données",
+      "rate": "Débit"
+    },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "target-temperature": "Température de consigne"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

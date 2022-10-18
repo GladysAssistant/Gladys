@@ -47,4 +47,9 @@ describe('zigbee2mqtt readValue', () => {
     const result = zigbee2MqttService.device.readValue('0x00158d00045b2740', 'alarm', false);
     assert.deepEqual(result, 0);
   });
+
+  it('should return binary OPEN on parent type', () => {
+    const result = zigbee2MqttService.device.readValue('0x00158d00045b2740', 'alarm', false);
+    assert.deepEqual(result, 0);
+  });
 });

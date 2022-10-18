@@ -43,7 +43,8 @@
     "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
-    "noFeatures": "No features"
+    "noFeatures": "No features",
+    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
   },
   "login": {
     "title": "Gladys Assistant",
@@ -227,7 +228,9 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."
+        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page.",
+        "addButton": "+",
+        "substractButton": "-"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -662,7 +665,8 @@
       "device": {
         "title": "Z-Wave Devices",
         "search": "Search devices",
-        "oldIntegrationWarning": "This integration is based on Open-Zwave, a library which is no longer supported. We are migrating to ZwaveJS2mqtt, but in the meantime we recommend that you use Node-RED + ZwaveJS2mqtt. <br /> <br /> If you want to help us develop this integration, join-us on the forum!",
+        "convertToMqtt": "Convert to MQTT device",
+        "oldIntegrationWarning": "This integration is based on Open-Zwave, a library which is no longer supported. We are migrating to ZwaveJS2mqtt, but in the meantime we recommend that you use Node-RED + ZwaveJS2mqtt. Please stop using this integration before end of November 2022. <br /> <br /> If you want to help us develop this integration, join-us on the forum!",
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
@@ -1839,6 +1843,7 @@
     "meter-per-second": "Meter per second (m/s)",
     "kilometer-per-hour": "Kilometer per hour (km/h)",
     "millimeter-per-hour": "Millimeter per hour (mm/h)",
+    "millimeter-per-day": "Millimeter per day (mm/d)",
     "uv-index": "UV Index",
     "microseconds": "Microseconds (μs)",
     "milliseconds": "Milliseconds (ms)",
@@ -1848,7 +1853,24 @@
     "days": "Days (d)",
     "weeks": "Weeks (w)",
     "months": "Months (m)",
-    "years": "Years (y)"
+    "years": "Years (y)",
+    "bit": "Bit",
+    "kilobit": "Kilobit",
+    "megabit": "Megabit",
+    "gigabit": "Gigabit",
+    "byte": "Byte (B)",
+    "kilobyte": "Kilobyte (kB)",
+    "megabyte": "Megabyte (MB)",
+    "gigabyte": "Gigabyte (GB)",
+    "terabyte": "Terabyte (TB)",
+    "bits-per-second": "Bits per second (bit/s)",
+    "kilobits-per-second": "Kilobits per second (kbit/s)",
+    "megabits-per-second": "Megabits per second (Mbit/s)",
+    "gigabits-per-second": "Gigabits per second (Gbit/s)",
+    "bytes-per-second": "Bytes per second (B/s)",
+    "kilobytes-per-second": "kilobytes per second (kB/s)",
+    "megabytes-per-second": "Megabytes per second (MB/s)",
+    "gigabytes-per-second": "Gigabytes per second (GB/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1891,6 +1913,7 @@
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
     "millimeter-per-hour": "mm/h",
+    "millimeter-per-day": "mm/d",
     "uv-index": "UV Index",
     "microseconds": "μs",
     "milliseconds": "ms",
@@ -1900,7 +1923,24 @@
     "days": "d",
     "weeks": "w",
     "months": "m",
-    "years": "y"
+    "years": "y",
+    "bit": "bit",
+    "kilobit": "kbit",
+    "megabit": "Mbit",
+    "gigabit": "Gbit",
+    "byte": "B",
+    "kilobyte": "kB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB",
+    "bits-per-second": "bit/s",
+    "kilobits-per-second": "kbit/s",
+    "megabits-per-second": "Mbit/s",
+    "gigabits-per-second": "Gbit/s",
+    "bytes-per-second": "B/s",
+    "kilobytes-per-second": "kB/s",
+    "megabytes-per-second": "MB/s",
+    "gigabytes-per-second": "GB/s"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2148,6 +2188,18 @@
       "shortCategoryName": "Curtain",
       "state": "Curtain state",
       "position": "curtain position"
+    },
+    "data": {
+      "shortCategoryName": "Data",
+      "size": "Size"
+    },
+    "datarate": {
+      "shortCategoryName": "Datarate",
+      "rate": "Rate"
+    },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "target-temperature": "Thermostat Temperature"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
