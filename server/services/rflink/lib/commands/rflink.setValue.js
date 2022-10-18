@@ -1,5 +1,5 @@
 const ObjToRF = require('../../api/rflink.parse.ObjToRF');
-const { intTo8bitsColorHex, to8bitsHex } = require('../utils/colors');
+const { rgbToMilightHue, intToRgb, rgbToHsb } = require('../../../../utils/colors');
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 
@@ -53,15 +53,22 @@ function setValue(device, deviceFeature, state) {
       const feature = deviceFeature.external_id.split(':')[2].toLowerCase();
 
       if (feature === 'color') {
-        const color = intTo8bitsColorHex(value);
-        msg = `10;MiLightv1;${id};${channel};${color}98;COLOR;\n`;
+        const rgb = intToRgb(value);
+        const hsv = rgbToHsb(rgb);
+        const color = rgbToMilightHue(rgb);
+        const hex = Number(color).toString(16);
+        const brightness = Number(hsv[2]).toString(16) || 22;
+        msg = `10;MiLightv1;${id};${channel};${hex}${brightness};COLOR;\n`;
       } else if (feature === 'brightness') {
         const featureIndex = device.features.findIndex((f) => f.type === 'color');
         let lastColorValue = '34';
         if (device.features[featureIndex].last_value) {
-          lastColorValue = intTo8bitsColorHex(device.features[featureIndex].last_value);
+          const rgb = intToRgb(device.features[featureIndex].last_value);
+          lastColorValue = Number( rgbToMilightHue(rgb) ).toString(16);
         }
-        const hex = to8bitsHex(Math.round((value * 232) / 100));
+        // The brightness is controlled in 32 steps.
+        const hex = Number(Math.round((value * 232) / 100)).toString(16);
+        // get the last color value and set brightness (a value from 0 to 100 converted in 8 bits hex)
         msg = `10;MiLightv1;${id};${channel};${lastColorValue}${hex};BRIGHT;\n`;
       } else if (feature === 'power') {
         switch (state) {

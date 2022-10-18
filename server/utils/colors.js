@@ -160,6 +160,23 @@ function xyToInt(x, y) {
   // eslint-disable-next-line no-bitwise
   return (red << 16) | (green << 8) | blue;
 }
+/**
+ * @description Converts RGB array color to int 0-255.
+ * @param {Array} rgb - [red, green, blue ] array.
+ * @returns {number} Int color255.
+ * @example
+ * rgbToMilightHue([255,255,255]);
+ * console.log(int === FF);
+ */
+ function rgbToMilightHue(rgb) {
+     // On the HSV color circle (0..360) the hue value start with red at 0 degrees. We need to convert this
+     // to the Milight color circle which has 256 values with red at position 176
+     // from https://github.com/mwittig/node-milight-promise/blob/master/src/helper.js
+     const hsb = rgbToHsb(rgb);
+     return (256 + 176 - Math.floor(Number(hsb[0]) / 360.0 * 255.0)) % 256;
+ }
+
+
 
 module.exports = {
   intToRgb,
@@ -169,4 +186,5 @@ module.exports = {
   xyToInt,
   hsbToRgb,
   rgbToHsb,
+  rgbToMilightHue,
 };

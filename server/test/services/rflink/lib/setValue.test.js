@@ -142,7 +142,7 @@ describe('RFLinkHandler.setValue', () => {
       external_id: `rflink:86aa70:color:12:milight`,
     };
     const state = 10;
-    const expectedMsg = '10;MiLightv1;86aa70;000;098;COLOR;\n'; // cmd;model;deviceId;external_id last item;cmd
+    const expectedMsg = '10;MiLightv1;86aa70;000;64;COLOR;\n'; // cmd;model;deviceId;external_id last item;cmd
     await rflinkHandler.setValue(device, deviceFeature, state);
     assert.calledOnce(rflinkHandler.sendUsb.write);
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
@@ -168,7 +168,7 @@ describe('RFLinkHandler.setValue', () => {
       external_id: `rflink:86aa70:brightness:12:milight`,
     };
     const state = 10;
-    const expectedMsg = '10;MiLightv1;86aa70;000;1717;BRIGHT;\n'; // cmd;model;deviceId;external_id last item;cmd
+    const expectedMsg = '10;MiLightv1;86aa70;000;3917;BRIGHT;\n'; // cmd;model;deviceId;external_id last item;cmd
     await rflinkHandler.setValue(device, deviceFeature, state);
     assert.calledOnce(rflinkHandler.sendUsb.write);
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
