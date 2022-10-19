@@ -129,18 +129,23 @@ const RflinkFeatureBox = ({ children, ...props }) => {
           </div>
 
           <div class="form-group">
-            <Text id="integration.rflink.feature.read_only_label" class="text-left" />
-            <label class="custom-switch text-right">
-              <input
-                type="radio"
-                name="bouton"
-                class="custom-switch-input"
-                value={props.feature.read_only}
-                checked={props.feature.read_only === true || props.feature.read_only === 'true'}
-                onClick={props.updateReadOnly}
-              />
+              <div class="form-label">
+                <Text id="integration.rflink.feature.readOnlyLabel" />
+              </div>
+              <label class="custom-switch">
+                <input
+                  type="radio"
+                  name="bouton"
+                  class="custom-switch-input"
+                  value={props.feature.read_only}
+                  checked={props.feature.read_only === true || props.feature.read_only === 'true'}
+                  onClick={props.updateReadOnly}
+                />
+              </label>
               <span class="custom-switch-indicator" />
-            </label>
+              <span class="custom-switch-description">
+                <Text id="integration.rflink.feature.readOnlyButton" />
+              </span>
           </div>
 
           <div class="form-group">

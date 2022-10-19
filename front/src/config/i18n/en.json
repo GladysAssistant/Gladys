@@ -319,7 +319,6 @@
       "settings": {
         "title": "RFLink Usb Settings",
         "description": "To use RFLink in Gladys, you need to have a RFLink gateway connected to your Gladys instance.",
-        "zwaveUsbDriverPathLabel": "Select the USB port where your RFLink is connected",
         "connectButton": "Connect",
         "disconnectButton": "Disconnect",
         "refreshButton": "Refresh USB list",
@@ -349,7 +348,8 @@
       },
       "feature": {
         "nameLabel": "Name",
-        "read_only_label": "Read only: ",
+        "readOnlyLabel": "Is it a sensor?",
+        "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
         "model": "Model",
         "message": "You can only create actuators, sensors are automatically detected and added in the device tab when they send messages",
         "namePlaceholder": "Enter feature name",
