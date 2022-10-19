@@ -348,8 +348,8 @@
       },
       "feature": {
         "nameLabel": "Name",
-        "readOnlyLabel": "Is it a sensor?",
-        "readOnlyButton": "Yes, it's a sensor sending data to Gladys only.",
+        "readOnlyLabel": "Is it read only feature?",
+        "readOnlyButton": "Yes, this feature is sending data to Gladys only.",
         "model": "Model",
         "message": "You can only create actuators, sensors are automatically detected and added in the device tab when they send messages",
         "namePlaceholder": "Enter feature name",

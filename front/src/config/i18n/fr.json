@@ -475,8 +475,8 @@
       },
       "feature": {
         "nameLabel": "Nom",
-        "readOnlyLabel": "Est-ce un capteur ?",
-        "readOnlyButton": "Oui, ce capteur ne fait qu'envoyer des données à Gladys.",
+        "readOnlyLabel": "Est-ce une fonctionnalité en lecture seule ?",
+        "readOnlyButton": "Oui, cette fonctionnalité ne fait qu'envoyer des données à Gladys.",
         "model": "Modèle",
         "message": "Vous ne pouvez uniquement créer que des actionneurs. Les capteurs sont automatiquement détectés et ajoutés dans l'onglet appareil lorsqu'ils envoient des messages",
         "namePlaceholder": "Entrez le nom de la fonction",

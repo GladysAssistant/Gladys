@@ -127,27 +127,26 @@ const RflinkFeatureBox = ({ children, ...props }) => {
               </Localizer>
             </div>
           </div>
-
           <div class="form-group">
-              <div class="form-label">
-                <Text id="integration.rflink.feature.readOnlyLabel" />
-              </div>
-              <label class="custom-switch">
-                <input
-                  type="radio"
-                  name="bouton"
-                  class="custom-switch-input"
-                  value={props.feature.read_only}
-                  checked={props.feature.read_only === true || props.feature.read_only === 'true'}
-                  onClick={props.updateReadOnly}
-                />
-              </label>
+            <div class="form-label">
+              <Text id="integration.rflink.feature.readOnlyLabel" />
+            </div>
+            <label class="custom-switch">
+              <input
+                type="checkbox"
+                name={`read_only_${props.featureIndex}`}
+                class="custom-switch-input"
+                value={props.feature.read_only}
+                checked={props.feature.read_only === true || props.feature.read_only === 'true'}
+                onClick={props.updateReadOnly}
+              />
               <span class="custom-switch-indicator" />
               <span class="custom-switch-description">
                 <Text id="integration.rflink.feature.readOnlyButton" />
               </span>
+            </label>
           </div>
-
+          
           <div class="form-group">
             <button onClick={props.deleteFeature} class="btn btn-outline-danger">
               <Text id="integration.rflink.feature.deleteLabel" />
@@ -172,16 +171,12 @@ class RflinkFeatureBoxComponent extends Component {
   updateMax = e => {
     this.props.updateFeatureProperty(e, 'max', this.props.featureIndex);
   };
-  updateReadOnly = e => {
-    if (e.target.value === 'false') {
-      e.target.value = true;
-    } else if (e.target.value === false) {
-      e.target.value = true;
-    } else if (e.target.value === 'true') {
-      e.target.value = false;
-    } else if (e.target.value === true) {
-      e.target.value = false;
-    }
+  updateReadOnly = () => {
+    const e = {
+      target: {
+        value: !this.props.feature.read_only
+      }
+    };
     this.props.updateFeatureProperty(e, 'read_only', this.props.featureIndex);
   };
   updateUnit = e => {
