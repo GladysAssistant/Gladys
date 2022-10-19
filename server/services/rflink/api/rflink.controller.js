@@ -2,14 +2,14 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
 
-module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
+module.exports = function RFlinkController(gladys, rflinkManager, serviceId) {
   /**
    * @api {get} /api/v1/service/rflink/newDevices get rflink devices
    * @apiName newDevices
    * @apiGroup RFlink
    */
   async function getNewDevices(req, res) {
-    const newDevices = RFlinkManager.getNewDevices();
+    const newDevices = rflinkManager.getNewDevices();
     res.json(newDevices);
   }
 
@@ -21,7 +21,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
   async function connect(req, res) {
     const rflinkPath = await gladys.variable.getValue('RFLINK_PATH', serviceId);
     try {
-      RFlinkManager.connect(rflinkPath);
+      rflinkManager.connect(rflinkPath);
     } catch (e) {
       logger.error('RFLink gateway cannot connect : no usb path configured');
       res.json({ success: false });
@@ -35,7 +35,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
    * @apiGroup RFlink
    */
   async function disconnect(req, res) {
-    RFlinkManager.disconnect();
+    rflinkManager.disconnect();
     res.json({
       success: true,
     });
@@ -48,11 +48,11 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
    */
   async function getStatus(req, res) {
     res.json({
-      currentMilightGateway: RFlinkManager.currentMilightGateway,
-      lastCommand: RFlinkManager.lastCommand,
-      connected: RFlinkManager.connected,
-      scanInProgress: RFlinkManager.scanInProgress,
-      ready: RFlinkManager.ready,
+      currentMilightGateway: rflinkManager.currentMilightGateway,
+      lastCommand: rflinkManager.lastCommand,
+      connected: rflinkManager.connected,
+      scanInProgress: rflinkManager.scanInProgress,
+      ready: rflinkManager.ready,
     });
   }
 
@@ -68,10 +68,10 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
     }
     let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceId);
     if (currentMilightGateway === null) {
-      currentMilightGateway = RFlinkManager.currentMilightGateway;
+      currentMilightGateway = rflinkManager.currentMilightGateway;
     }
-    RFlinkManager.currentMilightGateway = currentMilightGateway;
-    RFlinkManager.pair(currentMilightGateway, milightZone);
+    rflinkManager.currentMilightGateway = currentMilightGateway;
+    rflinkManager.pair(currentMilightGateway, milightZone);
 
     res.json({
       success: true,
@@ -92,11 +92,11 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
     }
     let currentMilightGateway = await gladys.variable.getValue('CURRENT_MILIGHT_GATEWAY', serviceId);
     if (currentMilightGateway === null) {
-      currentMilightGateway = RFlinkManager.currentMilightGateway;
+      currentMilightGateway = rflinkManager.currentMilightGateway;
     }
-    RFlinkManager.currentMilightGateway = currentMilightGateway;
+    rflinkManager.currentMilightGateway = currentMilightGateway;
 
-    RFlinkManager.unpair(currentMilightGateway, milightZone);
+    rflinkManager.unpair(currentMilightGateway, milightZone);
     res.json({
       success: true,
       currentMilightGateway,
@@ -112,7 +112,7 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
   async function sendDebug(req, res) {
     const command = `${req.body.value}\n`;
     logger.debug(`Command send to port : ${command}`);
-    RFlinkManager.sendUsb.write(command);
+    rflinkManager.sendUsb.write(command);
     res.json({
       success: true,
     });
@@ -125,14 +125,14 @@ module.exports = function RFlinkController(gladys, RFlinkManager, serviceId) {
    */
   async function remove(req, res) {
     // Deleting the device from the new device list
-    const index = RFlinkManager.newDevices.findIndex((element) => {
+    const index = rflinkManager.newDevices.findIndex((element) => {
       if (element.external_id === req.body.external_id) {
         return true;
       }
       return false;
     });
     if (index !== -1) {
-      RFlinkManager.newDevices.splice(index, 1);
+      rflinkManager.newDevices.splice(index, 1);
     }
     res.json({
       success: true,
