@@ -1,5 +1,6 @@
 import { Component } from 'preact';
-import { Text, Localizer, Link } from 'preact-i18n';
+import { Text, Localizer } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import classNames from 'classnames/bind';
 import style from './style.css';
 

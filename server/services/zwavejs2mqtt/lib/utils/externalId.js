@@ -1,3 +1,5 @@
+const { COMMAND_CLASSES } = require("../constants");
+
 /**
  * @description Return name of device
  * @param {Object} node - The zwave node.
@@ -39,6 +41,9 @@ function getDeviceFeatureName(property) {
  * getDeviceFeatureExternalId(property);
  */
 function getDeviceFeatureExternalId(property) {
+  if(property.commandClass === COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE) {
+    property.endpoint = Number(property.property.split('-')[1]);
+  }
   return `zwavejs2mqtt:node_id:${property.nodeId}:comclass:${property.commandClass}:endpoint:${property.endpoint}:property:${property.property}`;
 }
 

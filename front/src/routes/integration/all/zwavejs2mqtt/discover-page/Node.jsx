@@ -1,5 +1,6 @@
 import { Text } from 'preact-i18n';
-import { Component, Link } from 'preact';
+import { Component } from 'preact';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import get from 'get-value';
 
