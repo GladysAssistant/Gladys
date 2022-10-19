@@ -125,12 +125,8 @@ module.exports = function RFlinkController(gladys, rflinkManager, serviceId) {
    */
   async function remove(req, res) {
     // Deleting the device from the new device list
-    const index = rflinkManager.newDevices.findIndex((element) => {
-      if (element.external_id === req.body.external_id) {
-        return true;
-      }
-      return false;
-    });
+    const index = rflinkManager.newDevices.findIndex(
+      (element) => element.external_id === req.body.external_id);
     if (index !== -1) {
       rflinkManager.newDevices.splice(index, 1);
     }
