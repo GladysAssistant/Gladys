@@ -2,6 +2,8 @@ import { Text } from 'preact-i18n';
 import get from 'get-value';
 import cx from 'classnames';
 
+const ZONES = [1,2,3,4];
+
 const SettingsTab = ({ children, ...props }) => (
   <div class="page">
     <div class="card">
@@ -101,18 +103,11 @@ const SettingsTab = ({ children, ...props }) => (
               />
               <Text id="integration.rflink.settings.milight.zoneInfo" />
               <select class="form-control" onChange={props.updateZone}>
-                <option value="1">
-                  <Text id="integration.rflink.settings.zone1" />
-                </option>
-                <option value="2">
-                  <Text id="integration.rflink.settings.zone2" />
-                </option>
-                <option value="3">
-                  <Text id="integration.rflink.settings.zone3" />
-                </option>
-                <option value="4">
-                  <Text id="integration.rflink.settings.zone4" />
-                </option>
+                {ZONES.map(zone => (
+                  <option values={zone}>
+                    {zone}
+                  </option>
+                ))}
               </select>
             </div>
 

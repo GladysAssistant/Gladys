@@ -454,10 +454,6 @@
         "connecting": "Tentative de connexion à la passerelle RFLink...",
         "driverFailedError": "Une erreur s'est produite lors de la tentative de connexion à la passerelle RFLink.",
         "rflinkUsbDriverPathLabel": "Sélectionner le chemin usb de la gateway rflink :",
-        "zone1": "1",
-        "zone2": "2",
-        "zone3": "3",
-        "zone4": "4",
         "debug": {
           "title": "RFLink debug console",
           "info": "Ici vous pouvez voir la dernière commande envoyée par la passerelle RFLink à Gladys. Sous la forme : '20;02;MODEL;ID;LABEL=data;LABEL1=data1;' ...",
