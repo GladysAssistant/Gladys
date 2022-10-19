@@ -64,7 +64,7 @@ function setValue(device, deviceFeature, state) {
         let lastColorValue = '34';
         if (device.features[featureIndex].last_value) {
           const rgb = intToRgb(device.features[featureIndex].last_value);
-          lastColorValue = Number( rgbToMilightHue(rgb) ).toString(16);
+          lastColorValue = Number(rgbToMilightHue(rgb)).toString(16);
         }
         // The brightness is controlled in 32 steps.
         const hex = Number(Math.round((value * 232) / 100)).toString(16);
