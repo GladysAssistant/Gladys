@@ -146,7 +146,7 @@ const RflinkFeatureBox = ({ children, ...props }) => {
               </span>
             </label>
           </div>
-          
+
           <div class="form-group">
             <button onClick={props.deleteFeature} class="btn btn-outline-danger">
               <Text id="integration.rflink.feature.deleteLabel" />
