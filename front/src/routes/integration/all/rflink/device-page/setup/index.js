@@ -65,11 +65,11 @@ class RflinkDeviceSetupPage extends Component {
 
   updateDeviceProperty(deviceIndex, property, value) {
     let device;
-    if (property === 'external_id' && !value.startsWith('mqtt:')) {
+    if (property === 'external_id' && !value.startsWith('rflink:')) {
       if (value.length < 5) {
-        value = 'mqtt:';
+        value = 'rflink:';
       } else {
-        value = `mqtt:${value}`;
+        value = `rflink:${value}`;
       }
     }
 
@@ -95,11 +95,11 @@ class RflinkDeviceSetupPage extends Component {
   updateFeatureProperty(e, property, featureIndex) {
     let value = e.target.value;
     let device;
-    if (property === 'external_id' && !value.startsWith('mqtt:')) {
+    if (property === 'external_id' && !value.startsWith('rflink:')) {
       if (value.length < 5) {
-        value = 'mqtt:';
+        value = 'rflink:';
       } else {
-        value = `mqtt:${value}`;
+        value = `rflink:${value}`;
       }
     }
 
