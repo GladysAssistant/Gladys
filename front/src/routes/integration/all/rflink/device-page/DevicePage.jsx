@@ -52,11 +52,12 @@ const NodeTab = ({ children, ...props }) => (
         </div>
         <div class="loader" />
         <div class="dimmer-content">
-          {!props.rflinkDevices || props.rflinkDevices.length === 0 && (
-            <div class="alert alert-info">
-              <Text id="integration.rflink.device.noDevices" />
-            </div>
-          )}
+          {!props.rflinkDevices ||
+            (props.rflinkDevices.length === 0 && (
+              <div class="alert alert-info">
+                <Text id="integration.rflink.device.noDevices" />
+              </div>
+            ))}
           {props.getRflinkDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.rflinkDevices &&
