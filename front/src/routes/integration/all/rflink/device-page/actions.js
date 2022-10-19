@@ -61,22 +61,7 @@ function createActions(store) {
 
         if (state.rflinkDevices !== undefined && rflinkNewDevicesFiltered !== undefined) {
           rflinkNewDevicesFiltered = rflinkNewDevicesFiltered.filter(newDevice => {
-            let alreadyListed;
-            state.rflinkDevices.forEach(device => {
-              if (!(device.external_id === newDevice.external_id)) {
-                alreadyListed = true;
-                return true;
-              }
-              if (device.external_id === newDevice.external_id) {
-                alreadyListed = false;
-                return false;
-              }
-              return true;
-            });
-            if (alreadyListed !== undefined) {
-              return alreadyListed;
-            }
-            return true;
+            return state.rflinkDevices.indexOf(device => device.external_id === newDevice.external_id) < 0;
           });
         }
 
