@@ -467,8 +467,8 @@
         },
         "milight": {
           "title": "Paramètres Milight",
-          "gatewayBarinfo": "Numéro de passerelle : ",
-          "zoneInfo": "Zone de passerelle : ",
+          "gatewayBarinfo": "Numéro de passerelle :",
+          "zoneInfo": "Zone de passerelle :",
           "about": " Vous pouvez utiliser votre véritable identifiant de pont milight ou si vous n'avez pas de passerelle, utilisez-en un nouveau (F746 par défaut), l'identifiant est juste un code pour identifier la passerelle. Le nombre d'appareils MiLight est illimité mais chaque pont n'a que 4 zones",
           "pairButton": "Appairage",
           "unpairButton": "Dissocier"
@@ -481,10 +481,8 @@
         "message": "Vous ne pouvez uniquement créer que des actionneurs. Les capteurs sont automatiquement détectés et ajoutés dans l'onglet appareil lorsqu'ils envoient des messages",
         "namePlaceholder": "Entrez le nom de la fonction",
         "switchIdLabel": "ID",
-        "switchIdMessage": "L'ID externe de la fonctionnalité est un ID unique qui est utilisé pour contrôler l'appareil, il est toujours sous cette forme : 'rflink:id:type:channel'. Vous pouvez lire la documentation ici : non rédigée pour le moment",
         "switchIdPlaceholder": "ID appareil RFLink",
         "switchNumberLabel": "Canal",
-        "switchNumberMessage": "L'ID externe de la fonctionnalité est un ID unique qui est utilisé pour contrôler l'appareil, il est toujours sous cette forme: 'rflink:id:type:channel'. Vous pouvez lire la documentation ici : non rédigée pour le moment",
         "switchNumberPlaceholder": "Valeur de SWITCH dans la console de débogage (onglet Paramètres)",
         "unitLabel": "Unité",
         "minLabel": "Valeur minimum",
@@ -496,7 +494,7 @@
       },
       "device": {
         "title": "Appareils dans Gladys",
-        "devicesInfo": "Les appareils 433 Mhz bon marché sont détectés par défaut en tant que capteurs, vous pouvez le modifier en modifiant la propriété <lecture seule> d'un appareil",
+        "devicesInfo": "Certains actionneurs sont détectés comme étant des capteurs. Dans ce cas, vous pouvez le modifier en éditant la propriété <lecture seule> d'un appareil",
         "deviceOnNetworkTitle": "Appareils détectés par la passerelle",
         "connectButton": "Connecter / Reconnecter",
         "search": "Rechercher des appareils",
