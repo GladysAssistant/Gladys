@@ -49,5 +49,9 @@
   {
     "key": "broadlink",
     "img": "/assets/integrations/cover/broadlink.jpg"
+  },
+  {
+    "key": "overkiz",
+    "img": "/assets/integrations/cover/overkiz.jpg"
   }
 ]

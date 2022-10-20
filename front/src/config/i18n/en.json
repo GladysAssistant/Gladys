@@ -1073,6 +1073,52 @@
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
       }
+    },
+    "overkiz": {
+      "title": "",
+      "deviceTab": "",
+      "discoverTab": "",
+      "discoverDeviceDescr": "",
+      "setupTab": "",
+      "device": {
+        "title": "",
+        "search": "",
+        "noDeviceFound": "",
+        "nameLabel": "",
+        "namePlaceholder": "",
+        "modelLabel": "",
+        "roomLabel": "",
+        "featuresLabel": "",
+        "alreadyCreatedButton": "",
+        "updateButton": "",
+        "saveButton": "",
+        "deleteButton": "",
+        "unmanagedModelButton": "",
+        "editButton": ""
+      },
+      "status": {
+        "notConnected": "",
+        "setupPageLink": ""
+      },
+      "discover": {
+        "title": "",
+        "scan": "",
+        "description": "",
+        "noDeviceFound": ""
+      },
+      "setup": {
+        "title": "",
+        "overkizDescription": "",
+        "error": "",
+        "connecting": "",
+        "connected": "",
+        "connectionError": "",
+        "userLabel": "",
+        "userPlaceholder": "",
+        "passwordLabel": "",
+        "passwordPlaceholder": "",
+        "saveLabel": ""
+      }
     }
   },
   "editScene": {

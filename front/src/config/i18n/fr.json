@@ -1073,6 +1073,52 @@
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
+    },
+    "overkiz": {
+      "title": "",
+      "deviceTab": "",
+      "discoverTab": "",
+      "discoverDeviceDescr": "",
+      "setupTab": "",
+      "device": {
+        "title": "",
+        "search": "",
+        "noDeviceFound": "",
+        "nameLabel": "",
+        "namePlaceholder": "",
+        "modelLabel": "",
+        "roomLabel": "",
+        "featuresLabel": "",
+        "alreadyCreatedButton": "",
+        "updateButton": "",
+        "saveButton": "",
+        "deleteButton": "",
+        "unmanagedModelButton": "",
+        "editButton": ""
+      },
+      "status": {
+        "notConnected": "",
+        "setupPageLink": ""
+      },
+      "discover": {
+        "title": "",
+        "scan": "",
+        "description": "",
+        "noDeviceFound": ""
+      },
+      "setup": {
+        "title": "",
+        "overkizDescription": "",
+        "error": "",
+        "connecting": "",
+        "connected": "",
+        "connectionError": "",
+        "userLabel": "",
+        "userPlaceholder": "",
+        "passwordLabel": "",
+        "passwordPlaceholder": "",
+        "saveLabel": ""
+      }
     }
   },
   "editScene": {

@@ -1,0 +1,5000 @@
+{
+  "creationTime": 1586773014000,
+  "lastUpdateTime": 1586773014000,
+  "id": "SETUP-0814-0291-7832",
+  "location": {
+    "creationTime": 1586773014000,
+    "lastUpdateTime": 1635610555000,
+    "city": "xxx",
+    "country": "Belgium",
+    "postalCode": "xxx",
+    "addressLine1": "xxx",
+    "timezone": "Europe/Brussels",
+    "longitude": 2.343,
+    "latitude": 48.857,
+    "twilightMode": 2,
+    "twilightAngle": "CIVIL",
+    "twilightCity": "bruxelles",
+    "summerSolsticeDuskMinutes": 1290,
+    "winterSolsticeDuskMinutes": 990,
+    "twilightOffsetEnabled": false,
+    "dawnOffset": 0,
+    "duskOffset": 0,
+    "tariffSettings": {
+      "tariffMode": "offPeakHours",
+      "tariffs": [
+        {
+          "name": "tariff1",
+          "startTime": "00:00"
+        },
+        {
+          "name": "tariff2",
+          "startTime": "06:00"
+        },
+        {
+          "name": "tariff1",
+          "startTime": "22:00"
+        }
+      ]
+    },
+    "countryCode": "BE"
+  },
+  "gateways": [
+    {
+      "gatewayId": "0814-0291-7832",
+      "type": 32,
+      "subType": 0,
+      "placeOID": "ebd3b36a-dd8f-4012-90c3-6ab51607e889",
+      "alive": true,
+      "timeReliable": true,
+      "connectivity": {
+        "status": "OK",
+        "protocolVersion": "2021.5.4"
+      },
+      "upToDate": true,
+      "updateStatus": "UP_TO_DATE",
+      "syncInProgress": false,
+      "functions": "INTERNET_AUTHORIZATION,SCENARIO_DOWNLOAD,SCENARIO_AUTO_LAUNCHING,SCENARIO_TELECO_LAUNCHING,INTERNET_UPLOAD,INTERNET_UPDATE,TRIGGERS_SENSORS",
+      "mode": "ACTIVE"
+    }
+  ],
+  "devices": [
+    {
+      "creationTime": 1586773014000,
+      "lastUpdateTime": 1586773014000,
+      "label": "Box",
+      "deviceURL": "internal://0814-0291-7832/pod/0",
+      "shortcut": false,
+      "controllableName": "internal:PodMiniComponent",
+      "definition": {
+        "commands": [
+          {
+            "commandName": "getName",
+            "nparams": 0
+          },
+          {
+            "commandName": "update",
+            "nparams": 0
+          },
+          {
+            "commandName": "setCountryCode",
+            "nparams": 1
+          },
+          {
+            "commandName": "activateCalendar",
+            "nparams": 0
+          },
+          {
+            "commandName": "deactivateCalendar",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPodMode",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshUpdateStatus",
+            "nparams": 0
+          },
+          {
+            "commandName": "setCalendar",
+            "nparams": 1
+          },
+          {
+            "commandName": "setLightingLedPodMode",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPodLedOff",
+            "nparams": 0
+          },
+          {
+            "commandName": "setPodLedOn",
+            "nparams": 0
+          }
+        ],
+        "states": [
+          {
+            "type": "DiscreteState",
+            "values": ["offline", "online"],
+            "qualifiedName": "core:ConnectivityState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:CountryCodeState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:LocalIPv4AddressState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:NameState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["doublePress", "longPress", "simplePress", "triplePress", "veryLongPress"],
+            "qualifiedName": "internal:LastActionConfigButtonState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "internal:LightingLedPodModeState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "Pod",
+        "uiProfiles": ["UpdatableComponent"],
+        "uiClass": "Pod",
+        "qualifiedName": "internal:PodMiniComponent",
+        "type": "ACTUATOR"
+      },
+      "states": [
+        {
+          "name": "core:NameState",
+          "type": 3,
+          "value": "Box"
+        },
+        {
+          "name": "internal:LightingLedPodModeState",
+          "type": 2,
+          "value": 1
+        },
+        {
+          "name": "core:CountryCodeState",
+          "type": 3,
+          "value": "BE"
+        },
+        {
+          "name": "core:LocalIPv4AddressState",
+          "type": 3,
+          "value": "192.168.1.20"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "ebd3b36a-dd8f-4012-90c3-6ab51607e889",
+      "widget": "Pod",
+      "type": 1,
+      "oid": "50d30409-4949-4122-a674-aaacc0d28cc4",
+      "uiClass": "Pod"
+    },
+    {
+      "creationTime": 1601921868000,
+      "lastUpdateTime": 1601921868000,
+      "label": "Radiateur",
+      "deviceURL": "io://0814-0291-7832/11410052#1",
+      "shortcut": false,
+      "controllableName": "io:AtlanticElectricalHeaterWithAdjustableTemperatureSetpointIOComponent",
+      "definition": {
+        "commands": [
+          {
+            "commandName": "advancedRefresh",
+            "nparams": 1
+          },
+          {
+            "commandName": "cancelHeatingLevel",
+            "nparams": 1
+          },
+          {
+            "commandName": "delayedStopIdentify",
+            "nparams": 1
+          },
+          {
+            "commandName": "getName",
+            "nparams": 0
+          },
+          {
+            "commandName": "identify",
+            "nparams": 0
+          },
+          {
+            "commandName": "noPersonInside",
+            "nparams": 0
+          },
+          {
+            "commandName": "off",
+            "nparams": 0
+          },
+          {
+            "commandName": "personInside",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshComfortTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDateTime",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDerogatedTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshEcoTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshHeatingLevel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshIdentifier",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshManufacturerName",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshMaximumHeatingTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshMaximumTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshOperatingMode",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTimeProgram",
+            "nparams": 0
+          },
+          {
+            "commandName": "setComfortTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDateTime",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDerogatedTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setEcoTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevel",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevelWithTimer",
+            "nparams": 2
+          },
+          {
+            "commandName": "setHolidays",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHolidaysTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setName",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOccupancyActivation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOccupancy",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOpenWindowDetectionActivation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOperatingMode",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPreviousTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setSchedulingType",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTimeProgram",
+            "nparams": 1
+          },
+          {
+            "commandName": "startIdentify",
+            "nparams": 0
+          },
+          {
+            "commandName": "stopIdentify",
+            "nparams": 0
+          },
+          {
+            "commandName": "wink",
+            "nparams": 1
+          },
+          {
+            "commandName": "pairOneWayController",
+            "nparams": 2
+          },
+          {
+            "commandName": "refreshAutoProgram",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshControllerAddress",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshCumulatedLowering",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshCurrentWorkingRate",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDeletionCancelation",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshEffectiveTemperatureSetpoint",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshLocalLeadTime",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshModel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshNativeFunctionalLevel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPeakNotice",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPeakWarning",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPowerAndTension",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshRoomDeletionThreshold",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshSetpointLoweringTemperatureInProgMode",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshSynchronisationRequest",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTemperatureProbeCalibrationOffset",
+            "nparams": 0
+          },
+          {
+            "commandName": "setCommunicationTest",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDeletionCancelation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setExpectedPresence",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevelForTrigger",
+            "nparams": 1
+          },
+          {
+            "commandName": "setNativeLevelsList",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPeakNotice",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPeakWarning",
+            "nparams": 1
+          },
+          {
+            "commandName": "setRoomDeletionThreshold",
+            "nparams": 1
+          },
+          {
+            "commandName": "setSetpointLoweringTemperatureInProgMode",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTemperatureProbeCalibrationOffset",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTwinningExit",
+            "nparams": 1
+          },
+          {
+            "commandName": "unpairAllOneWayControllers",
+            "nparams": 0
+          },
+          {
+            "commandName": "unpairOneWayController",
+            "nparams": 2
+          }
+        ],
+        "states": [
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ComfortRoomTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:DateTimeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:DerogatedTargetTemperatureState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["good", "low", "normal", "verylow"],
+            "qualifiedName": "core:DiscreteRSSILevelState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:EcoRoomTemperatureState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["off", "on"],
+            "qualifiedName": "core:HolidaysModeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:HolidaysTargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:IdentifierState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:ManufacturerNameState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:MaximumHeatingTargetTemperatureState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:MaximumTargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:NameState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["active", "inactive"],
+            "qualifiedName": "core:OccupancyActivationState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["off", "on"],
+            "qualifiedName": "core:OnOffState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["active", "inactive"],
+            "qualifiedName": "core:OpenWindowDetectionActivationState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "antifreeze",
+              "auto",
+              "away",
+              "eco",
+              "frostprotection",
+              "manual",
+              "max",
+              "normal",
+              "off",
+              "on",
+              "prog",
+              "program",
+              "boost"
+            ],
+            "qualifiedName": "core:OperatingModeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:PreviousTargetTemperatureState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:PriorityLockTimerState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:RSSILevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["increase", "none", "standby"],
+            "qualifiedName": "core:RegulationModeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:TargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:TimeProgramState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:VersionState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:AutoProgramState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:ControllerAddressState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:CumulatedLoweringState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:CurrentWorkingRateState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["deletion cancelation", "no deletion cancelation"],
+            "qualifiedName": "io:DeletionCancelationState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:EffectiveTemperatureSetpointState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:ExpectedPresenceState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["external", "internal"],
+            "qualifiedName": "io:InternalExternalSchedulingTypeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:LocalLeadTimeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["boost", "comfort", "comfort-1", "comfort-2", "eco", "frostprotection", "off", "secured"],
+            "qualifiedName": "io:MaximumHeatingLevelState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:ModelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["base", "medium", "top"],
+            "qualifiedName": "io:NativeFunctionalLevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["long peak", "no peak", "short peak"],
+            "qualifiedName": "io:PeakNoticeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["long peak warning", "no warning", "short peak warning"],
+            "qualifiedName": "io:PeakWarningState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:PowerState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "comfortLevel1",
+              "comfortLevel2",
+              "comfortLevel3",
+              "comfortLevel4",
+              "environmentProtection",
+              "humanProtection",
+              "userLevel1",
+              "userLevel2"
+            ],
+            "qualifiedName": "io:PriorityLockLevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "LSC",
+              "SAAC",
+              "SFC",
+              "UPS",
+              "externalGateway",
+              "localUser",
+              "myself",
+              "rain",
+              "security",
+              "temperature",
+              "timer",
+              "user",
+              "wind"
+            ],
+            "qualifiedName": "io:PriorityLockOriginatorState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:RoomDeletionThresholdState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["kept", "lost"],
+            "qualifiedName": "io:RunningState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:SetpointLoweringTemperatureInProgModeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["boost", "comfort", "comfort-1", "comfort-2", "eco", "frostprotection", "off", "secured"],
+            "qualifiedName": "io:TargetHeatingLevelState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:TemperatureProbeCalibrationOffsetState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:TensionState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:TimerForTransitoryStateState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:UptimeState"
+          }
+        ],
+        "dataProperties": [
+          {
+            "value": "500",
+            "qualifiedName": "core:identifyInterval"
+          }
+        ],
+        "widgetName": "AtlanticElectricalHeaterWithAdjustableTemperatureSetpoint",
+        "uiProfiles": ["StatefulOperatingModeHeating", "OperatingModeHeating", "StatefulThermostat", "Thermostat"],
+        "uiClass": "HeatingSystem",
+        "uiClassifiers": ["emitter"],
+        "qualifiedName": "io:AtlanticElectricalHeaterWithAdjustableTemperatureSetpointIOComponent",
+        "type": "ACTUATOR"
+      },
+      "states": [
+        {
+          "name": "core:NameState",
+          "type": 3,
+          "value": "Radiateur"
+        },
+        {
+          "name": "core:VersionState",
+          "type": 3,
+          "value": "49373431303038202020"
+        },
+        {
+          "name": "core:PriorityLockTimerState",
+          "type": 1,
+          "value": 0
+        },
+        {
+          "name": "core:OnOffState",
+          "type": 3,
+          "value": "on"
+        },
+        {
+          "name": "io:TargetHeatingLevelState",
+          "type": 3,
+          "value": "comfort"
+        },
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:DiscreteRSSILevelState",
+          "type": 3,
+          "value": "low"
+        },
+        {
+          "name": "core:RSSILevelState",
+          "type": 2,
+          "value": 30
+        },
+        {
+          "name": "core:IdentifierState",
+          "type": 3,
+          "value": "00000000"
+        },
+        {
+          "name": "io:MaximumHeatingLevelState",
+          "type": 3,
+          "value": "unknown"
+        },
+        {
+          "name": "io:TimerForTransitoryStateState",
+          "type": 1,
+          "value": 0
+        },
+        {
+          "name": "core:ComfortRoomTemperatureState",
+          "type": 1,
+          "value": 24
+        },
+        {
+          "name": "core:EcoRoomTemperatureState",
+          "type": 1,
+          "value": 8
+        },
+        {
+          "name": "core:OperatingModeState",
+          "type": 3,
+          "value": "internal"
+        },
+        {
+          "name": "core:OccupancyActivationState",
+          "type": 3,
+          "value": "inactive"
+        },
+        {
+          "name": "core:MaximumHeatingTargetTemperatureState",
+          "type": 2,
+          "value": 28
+        },
+        {
+          "name": "core:MaximumTargetTemperatureState",
+          "type": 2,
+          "value": 28
+        },
+        {
+          "name": "core:TargetTemperatureState",
+          "type": 2,
+          "value": 24
+        },
+        {
+          "name": "io:SetpointLoweringTemperatureInProgModeState",
+          "type": 2,
+          "value": 8
+        },
+        {
+          "name": "core:OpenWindowDetectionActivationState",
+          "type": 3,
+          "value": "inactive"
+        },
+        {
+          "name": "io:InternalExternalSchedulingTypeState",
+          "type": 3,
+          "value": "internal"
+        },
+        {
+          "name": "core:DateTimeState",
+          "type": 11,
+          "value": {
+            "month": 1,
+            "hour": 11,
+            "year": 2022,
+            "weekday": 3,
+            "day": 6,
+            "minute": 44,
+            "second": 48
+          }
+        },
+        {
+          "name": "io:LocalLeadTimeState",
+          "type": 1,
+          "value": 4394
+        },
+        {
+          "name": "core:RegulationModeState",
+          "type": 3,
+          "value": "standby"
+        },
+        {
+          "name": "core:ManufacturerNameState",
+          "type": 3,
+          "value": "Atlantic"
+        },
+        {
+          "name": "io:ModelState",
+          "type": 3,
+          "value": "AGILIA H PI-io"
+        },
+        {
+          "name": "io:PowerState",
+          "type": 1,
+          "value": 750
+        },
+        {
+          "name": "io:TensionState",
+          "type": 1,
+          "value": 230
+        },
+        {
+          "name": "core:DerogatedTargetTemperatureState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:NativeFunctionalLevelState",
+          "type": 3,
+          "value": "Top"
+        },
+        {
+          "name": "io:TemperatureProbeCalibrationOffsetState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:CurrentWorkingRateState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:CumulatedLoweringState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:RoomDeletionThresholdState",
+          "type": 3,
+          "value": "-2°C"
+        },
+        {
+          "name": "io:EffectiveTemperatureSetpointState",
+          "type": 2,
+          "value": 16
+        },
+        {
+          "name": "io:ControllerAddressState",
+          "type": 1,
+          "value": 11410051
+        },
+        {
+          "name": "io:ExpectedPresenceState",
+          "type": 3,
+          "value": "17:30",
+          "lastUpdateTime": 1607184038000
+        },
+        {
+          "name": "io:AutoProgramState",
+          "type": 11,
+          "value": {
+            "sunday": [
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV2",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_NIV2",
+              "CONF_1",
+              "CONF_NIV1",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV2",
+              "CONF_NIV2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_1",
+              "CONF_1",
+              "CONF_1",
+              "CONF_NIV2",
+              "CONF_1",
+              "CONF_NIV3",
+              "CONF_1",
+              "CONF_NIV2",
+              "CONF_3_NIV2",
+              "CONF_2",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_3_NIV2"
+            ],
+            "saturday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_NIV2",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_3_NIV2",
+              "CONF_1",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_3_NIV2",
+              "CONF_NIV1",
+              "CONF_NIV2",
+              "CONF_NIV2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_3_NIV2",
+              "CONF_2",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV2",
+              "CONF_NIV3",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_1",
+              "CONF_2"
+            ],
+            "tuesday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV3",
+              "CONF_2",
+              "CONF_NIV1",
+              "CONF_3_NIV2",
+              "CONF_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_NIV2",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV2",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV2",
+              "CONF_NIV3",
+              "CONF_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2"
+            ],
+            "wednesday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_NIV3",
+              "CONF_1",
+              "CONF_NIV1",
+              "CONF_NIV3",
+              "CONF_2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_NIV1",
+              "CONF_NIV3",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_NIV2",
+              "CONF_1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_NIV3",
+              "CONF_3_NIV1",
+              "CONF_NIV3",
+              "CONF_NIV2",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_NIV2",
+              "CONF_2",
+              "CONF_NIV3",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_1",
+              "CONF_3_NIV2"
+            ],
+            "thursday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_1",
+              "CONF_NIV2",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_1",
+              "CONF_1",
+              "CONF_NIV2",
+              "CONF_NIV2",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_NIV3",
+              "CONF_3_NIV2",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV1",
+              "CONF_NIV2",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_2",
+              "CONF_2"
+            ],
+            "friday": [
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_3_NIV2",
+              "CONF_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_NIV2",
+              "CONF_NIV2",
+              "CONF_NIV3",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_NIV3",
+              "CONF_NIV2",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV1",
+              "CONF_NIV1",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1"
+            ],
+            "anticipTime": 4394,
+            "anticipNb": 20,
+            "monday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_1",
+              "CONF_NIV3",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV2",
+              "CONF_NIV2",
+              "CONF_2",
+              "CONF_NIV1",
+              "CONF_2",
+              "CONF_3_NIV2",
+              "CONF_NIV3",
+              "CONF_1",
+              "CONF_NIV2",
+              "CONF_NIV3",
+              "CONF_2",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_NIV3",
+              "CONF_NIV2",
+              "CONF_NIV1",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV2",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_1",
+              "CONF_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_1",
+              "CONF_NIV1",
+              "CONF_3_NIV1"
+            ]
+          }
+        },
+        {
+          "name": "core:TimeProgramState",
+          "type": 10,
+          "value": [
+            {
+              "monday": [
+                {
+                  "start": "05:30",
+                  "end": "08:30"
+                },
+                {
+                  "start": "18:30",
+                  "end": "21:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "tuesday": [
+                {
+                  "start": "05:30",
+                  "end": "08:30"
+                },
+                {
+                  "start": "18:30",
+                  "end": "21:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "wednesday": [
+                {
+                  "start": "06:30",
+                  "end": "08:30"
+                },
+                {
+                  "start": "18:30",
+                  "end": "21:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "thursday": [
+                {
+                  "start": "05:30",
+                  "end": "08:30"
+                },
+                {
+                  "start": "18:00",
+                  "end": "21:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "friday": [
+                {
+                  "start": "05:30",
+                  "end": "08:30"
+                },
+                {
+                  "start": "18:30",
+                  "end": "21:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "saturday": [
+                {
+                  "start": "05:30",
+                  "end": "08:30"
+                },
+                {
+                  "start": "17:00",
+                  "end": "21:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "sunday": [
+                {
+                  "start": "05:30",
+                  "end": "08:30"
+                },
+                {
+                  "start": "18:30",
+                  "end": "21:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "9abb0634-9b62-476f-8a60-0a63463e011b",
+      "widget": "AtlanticElectricalHeaterWithAdjustableTemperatureSetpoint",
+      "type": 1,
+      "oid": "fbb6f179-92b4-479a-9c53-41607e3c7a15",
+      "uiClass": "HeatingSystem"
+    },
+    {
+      "creationTime": 1601921868000,
+      "lastUpdateTime": 1601921868000,
+      "label": "IO (11410052#2)",
+      "deviceURL": "io://0814-0291-7832/11410052#2",
+      "shortcut": false,
+      "controllableName": "io:TemperatureInCelciusIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:TemperatureState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "TemperatureSensor",
+        "uiProfiles": ["Temperature"],
+        "uiClass": "TemperatureSensor",
+        "qualifiedName": "io:TemperatureInCelciusIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:TemperatureState",
+          "type": 2,
+          "value": 23.4
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:MeasuredValueType",
+          "type": 3,
+          "value": "core:TemperatureInCelcius"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "9abb0634-9b62-476f-8a60-0a63463e011b",
+      "widget": "TemperatureSensor",
+      "type": 2,
+      "oid": "45eca6ef-5a88-4858-a84c-f9614258f966",
+      "uiClass": "TemperatureSensor"
+    },
+    {
+      "creationTime": 1601921868000,
+      "lastUpdateTime": 1601921868000,
+      "label": "IO (11410052#3)",
+      "deviceURL": "io://0814-0291-7832/11410052#3",
+      "shortcut": false,
+      "controllableName": "io:ContactIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "DiscreteState",
+            "values": ["closed", "open"],
+            "qualifiedName": "core:ContactState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "ContactSensor",
+        "uiProfiles": ["DoorContactSensor", "ContactDetector"],
+        "uiClass": "ContactSensor",
+        "qualifiedName": "io:ContactIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:ContactState",
+          "type": 3,
+          "value": "closed"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "9abb0634-9b62-476f-8a60-0a63463e011b",
+      "widget": "ContactSensor",
+      "type": 2,
+      "oid": "a158c7c4-65d3-4e31-b67a-c91e358a7c17",
+      "uiClass": "ContactSensor"
+    },
+    {
+      "creationTime": 1601921868000,
+      "lastUpdateTime": 1601921868000,
+      "label": "IO (11410052#4)",
+      "deviceURL": "io://0814-0291-7832/11410052#4",
+      "shortcut": false,
+      "controllableName": "io:OccupancyIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "eventBased": true,
+            "type": "DiscreteState",
+            "values": ["noPersonInside", "personInside"],
+            "qualifiedName": "core:OccupancyState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "OccupancySensor",
+        "uiProfiles": ["OccupancyDetector"],
+        "uiClass": "OccupancySensor",
+        "qualifiedName": "io:OccupancyIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:OccupancyState",
+          "type": 3,
+          "value": "noPersonInside"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "9abb0634-9b62-476f-8a60-0a63463e011b",
+      "widget": "OccupancySensor",
+      "type": 2,
+      "oid": "2263edf8-95b5-41e8-8c59-a44c89aabe6f",
+      "uiClass": "OccupancySensor"
+    },
+    {
+      "creationTime": 1601921868000,
+      "lastUpdateTime": 1601921868000,
+      "label": "IO (11410052#5)",
+      "deviceURL": "io://0814-0291-7832/11410052#5",
+      "shortcut": false,
+      "controllableName": "io:CumulatedElectricalEnergyConsumptionIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff0State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff1State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff2State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff3State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff4State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff5State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff6State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff7State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff8State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff9State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ElectricEnergyConsumptionState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "CumulativeElectricPowerConsumptionSensor",
+        "uiProfiles": ["ElectricEnergyConsumption"],
+        "uiClass": "ElectricitySensor",
+        "qualifiedName": "io:CumulatedElectricalEnergyConsumptionIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:ElectricEnergyConsumptionState",
+          "type": 1,
+          "value": 525000
+        },
+        {
+          "name": "core:ConsumptionTariff1State",
+          "type": 1,
+          "value": 62000
+        },
+        {
+          "name": "core:ConsumptionTariff2State",
+          "type": 1,
+          "value": 291000
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        },
+        {
+          "name": "core:MeasuredValueType",
+          "type": 3,
+          "value": "core:ElectricalEnergyInWh"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "9abb0634-9b62-476f-8a60-0a63463e011b",
+      "widget": "CumulativeElectricPowerConsumptionSensor",
+      "type": 2,
+      "oid": "3d8317f1-5cfa-475d-9766-582909112fe0",
+      "uiClass": "ElectricitySensor"
+    },
+    {
+      "creationTime": 1601391514000,
+      "lastUpdateTime": 1601391514000,
+      "label": "IO (15909334)",
+      "deviceURL": "io://0814-0291-7832/15909334",
+      "shortcut": false,
+      "controllableName": "io:StackComponent",
+      "definition": {
+        "commands": [
+          {
+            "commandName": "advancedSomfyDiscover",
+            "nparams": 1
+          },
+          {
+            "commandName": "discover1WayController",
+            "nparams": 2
+          },
+          {
+            "commandName": "discoverActuators",
+            "nparams": 1
+          },
+          {
+            "commandName": "discoverSensors",
+            "nparams": 1
+          },
+          {
+            "commandName": "discoverSomfyUnsetActuators",
+            "nparams": 0
+          },
+          {
+            "commandName": "joinNetwork",
+            "nparams": 0
+          },
+          {
+            "commandName": "resetNetworkSecurity",
+            "nparams": 0
+          },
+          {
+            "commandName": "shareNetwork",
+            "nparams": 0
+          }
+        ],
+        "states": [],
+        "dataProperties": [],
+        "widgetName": "IOStack",
+        "uiProfiles": ["Specific"],
+        "uiClass": "ProtocolGateway",
+        "qualifiedName": "io:StackComponent",
+        "type": "PROTOCOL_GATEWAY"
+      },
+      "available": true,
+      "enabled": true,
+      "placeOID": "ebd3b36a-dd8f-4012-90c3-6ab51607e889",
+      "widget": "IOStack",
+      "type": 5,
+      "oid": "c40edcea-4d8c-4223-af1c-696abd4e94ff",
+      "uiClass": "ProtocolGateway"
+    },
+    {
+      "creationTime": 1588332894000,
+      "lastUpdateTime": 1588332894000,
+      "label": "Radiateur",
+      "deviceURL": "io://0814-0291-7832/5276217#1",
+      "shortcut": false,
+      "controllableName": "io:AtlanticElectricalHeaterWithAdjustableTemperatureSetpointIOComponent",
+      "definition": {
+        "commands": [
+          {
+            "commandName": "advancedRefresh",
+            "nparams": 1
+          },
+          {
+            "commandName": "cancelHeatingLevel",
+            "nparams": 1
+          },
+          {
+            "commandName": "delayedStopIdentify",
+            "nparams": 1
+          },
+          {
+            "commandName": "getName",
+            "nparams": 0
+          },
+          {
+            "commandName": "identify",
+            "nparams": 0
+          },
+          {
+            "commandName": "noPersonInside",
+            "nparams": 0
+          },
+          {
+            "commandName": "off",
+            "nparams": 0
+          },
+          {
+            "commandName": "personInside",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshComfortTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDateTime",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDerogatedTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshEcoTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshHeatingLevel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshIdentifier",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshManufacturerName",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshMaximumHeatingTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshMaximumTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshOperatingMode",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTimeProgram",
+            "nparams": 0
+          },
+          {
+            "commandName": "setComfortTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDateTime",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDerogatedTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setEcoTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevel",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevelWithTimer",
+            "nparams": 2
+          },
+          {
+            "commandName": "setHolidays",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHolidaysTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setName",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOccupancyActivation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOccupancy",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOpenWindowDetectionActivation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOperatingMode",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPreviousTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setSchedulingType",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTimeProgram",
+            "nparams": 1
+          },
+          {
+            "commandName": "startIdentify",
+            "nparams": 0
+          },
+          {
+            "commandName": "stopIdentify",
+            "nparams": 0
+          },
+          {
+            "commandName": "wink",
+            "nparams": 1
+          },
+          {
+            "commandName": "pairOneWayController",
+            "nparams": 2
+          },
+          {
+            "commandName": "refreshAutoProgram",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshControllerAddress",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshCumulatedLowering",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshCurrentWorkingRate",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDeletionCancelation",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshEffectiveTemperatureSetpoint",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshLocalLeadTime",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshModel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshNativeFunctionalLevel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPeakNotice",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPeakWarning",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPowerAndTension",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshRoomDeletionThreshold",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshSetpointLoweringTemperatureInProgMode",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshSynchronisationRequest",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTemperatureProbeCalibrationOffset",
+            "nparams": 0
+          },
+          {
+            "commandName": "setCommunicationTest",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDeletionCancelation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setExpectedPresence",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevelForTrigger",
+            "nparams": 1
+          },
+          {
+            "commandName": "setNativeLevelsList",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPeakNotice",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPeakWarning",
+            "nparams": 1
+          },
+          {
+            "commandName": "setRoomDeletionThreshold",
+            "nparams": 1
+          },
+          {
+            "commandName": "setSetpointLoweringTemperatureInProgMode",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTemperatureProbeCalibrationOffset",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTwinningExit",
+            "nparams": 1
+          },
+          {
+            "commandName": "unpairAllOneWayControllers",
+            "nparams": 0
+          },
+          {
+            "commandName": "unpairOneWayController",
+            "nparams": 2
+          }
+        ],
+        "states": [
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ComfortRoomTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:DateTimeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:DerogatedTargetTemperatureState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["good", "low", "normal", "verylow"],
+            "qualifiedName": "core:DiscreteRSSILevelState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:EcoRoomTemperatureState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["off", "on"],
+            "qualifiedName": "core:HolidaysModeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:HolidaysTargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:IdentifierState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:ManufacturerNameState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:MaximumHeatingTargetTemperatureState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:MaximumTargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:NameState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["active", "inactive"],
+            "qualifiedName": "core:OccupancyActivationState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["off", "on"],
+            "qualifiedName": "core:OnOffState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["active", "inactive"],
+            "qualifiedName": "core:OpenWindowDetectionActivationState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "antifreeze",
+              "auto",
+              "away",
+              "eco",
+              "frostprotection",
+              "manual",
+              "max",
+              "normal",
+              "off",
+              "on",
+              "prog",
+              "program",
+              "boost"
+            ],
+            "qualifiedName": "core:OperatingModeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:PreviousTargetTemperatureState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:PriorityLockTimerState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:RSSILevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["increase", "none", "standby"],
+            "qualifiedName": "core:RegulationModeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:TargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:TimeProgramState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:VersionState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:AutoProgramState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:ControllerAddressState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:CumulatedLoweringState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:CurrentWorkingRateState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["deletion cancelation", "no deletion cancelation"],
+            "qualifiedName": "io:DeletionCancelationState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:EffectiveTemperatureSetpointState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:ExpectedPresenceState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["external", "internal"],
+            "qualifiedName": "io:InternalExternalSchedulingTypeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:LocalLeadTimeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["boost", "comfort", "comfort-1", "comfort-2", "eco", "frostprotection", "off", "secured"],
+            "qualifiedName": "io:MaximumHeatingLevelState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:ModelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["base", "medium", "top"],
+            "qualifiedName": "io:NativeFunctionalLevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["long peak", "no peak", "short peak"],
+            "qualifiedName": "io:PeakNoticeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["long peak warning", "no warning", "short peak warning"],
+            "qualifiedName": "io:PeakWarningState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:PowerState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "comfortLevel1",
+              "comfortLevel2",
+              "comfortLevel3",
+              "comfortLevel4",
+              "environmentProtection",
+              "humanProtection",
+              "userLevel1",
+              "userLevel2"
+            ],
+            "qualifiedName": "io:PriorityLockLevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "LSC",
+              "SAAC",
+              "SFC",
+              "UPS",
+              "externalGateway",
+              "localUser",
+              "myself",
+              "rain",
+              "security",
+              "temperature",
+              "timer",
+              "user",
+              "wind"
+            ],
+            "qualifiedName": "io:PriorityLockOriginatorState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:RoomDeletionThresholdState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["kept", "lost"],
+            "qualifiedName": "io:RunningState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:SetpointLoweringTemperatureInProgModeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["boost", "comfort", "comfort-1", "comfort-2", "eco", "frostprotection", "off", "secured"],
+            "qualifiedName": "io:TargetHeatingLevelState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:TemperatureProbeCalibrationOffsetState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:TensionState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:TimerForTransitoryStateState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:UptimeState"
+          }
+        ],
+        "dataProperties": [
+          {
+            "value": "500",
+            "qualifiedName": "core:identifyInterval"
+          }
+        ],
+        "widgetName": "AtlanticElectricalHeaterWithAdjustableTemperatureSetpoint",
+        "uiProfiles": ["StatefulOperatingModeHeating", "OperatingModeHeating", "StatefulThermostat", "Thermostat"],
+        "uiClass": "HeatingSystem",
+        "uiClassifiers": ["emitter"],
+        "qualifiedName": "io:AtlanticElectricalHeaterWithAdjustableTemperatureSetpointIOComponent",
+        "type": "ACTUATOR"
+      },
+      "states": [
+        {
+          "name": "core:NameState",
+          "type": 3,
+          "value": "Radiateur"
+        },
+        {
+          "name": "core:VersionState",
+          "type": 3,
+          "value": "49373431303038202020"
+        },
+        {
+          "name": "core:PriorityLockTimerState",
+          "type": 1,
+          "value": 0
+        },
+        {
+          "name": "core:OnOffState",
+          "type": 3,
+          "value": "on"
+        },
+        {
+          "name": "io:TargetHeatingLevelState",
+          "type": 3,
+          "value": "eco"
+        },
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:DiscreteRSSILevelState",
+          "type": 3,
+          "value": "normal"
+        },
+        {
+          "name": "core:RSSILevelState",
+          "type": 2,
+          "value": 60
+        },
+        {
+          "name": "core:IdentifierState",
+          "type": 3,
+          "value": "00000000"
+        },
+        {
+          "name": "io:MaximumHeatingLevelState",
+          "type": 3,
+          "value": "unknown"
+        },
+        {
+          "name": "io:TimerForTransitoryStateState",
+          "type": 1,
+          "value": 0
+        },
+        {
+          "name": "core:ComfortRoomTemperatureState",
+          "type": 1,
+          "value": 18
+        },
+        {
+          "name": "core:EcoRoomTemperatureState",
+          "type": 1,
+          "value": 8
+        },
+        {
+          "name": "core:OperatingModeState",
+          "type": 3,
+          "value": "internal"
+        },
+        {
+          "name": "core:OccupancyActivationState",
+          "type": 3,
+          "value": "active"
+        },
+        {
+          "name": "core:MaximumHeatingTargetTemperatureState",
+          "type": 2,
+          "value": 28
+        },
+        {
+          "name": "core:MaximumTargetTemperatureState",
+          "type": 2,
+          "value": 28
+        },
+        {
+          "name": "core:TargetTemperatureState",
+          "type": 2,
+          "value": 18
+        },
+        {
+          "name": "io:SetpointLoweringTemperatureInProgModeState",
+          "type": 2,
+          "value": 8
+        },
+        {
+          "name": "core:OpenWindowDetectionActivationState",
+          "type": 3,
+          "value": "active"
+        },
+        {
+          "name": "io:InternalExternalSchedulingTypeState",
+          "type": 3,
+          "value": "internal"
+        },
+        {
+          "name": "core:DateTimeState",
+          "type": 11,
+          "value": {
+            "month": 1,
+            "hour": 11,
+            "year": 2022,
+            "weekday": 3,
+            "day": 6,
+            "minute": 44,
+            "second": 9
+          }
+        },
+        {
+          "name": "io:LocalLeadTimeState",
+          "type": 1,
+          "value": 1625
+        },
+        {
+          "name": "core:RegulationModeState",
+          "type": 3,
+          "value": "none"
+        },
+        {
+          "name": "core:ManufacturerNameState",
+          "type": 3,
+          "value": "Atlantic"
+        },
+        {
+          "name": "io:ModelState",
+          "type": 3,
+          "value": "AGILIA H PI-io"
+        },
+        {
+          "name": "io:PowerState",
+          "type": 1,
+          "value": 750
+        },
+        {
+          "name": "io:TensionState",
+          "type": 1,
+          "value": 230
+        },
+        {
+          "name": "core:DerogatedTargetTemperatureState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:NativeFunctionalLevelState",
+          "type": 3,
+          "value": "Top"
+        },
+        {
+          "name": "io:TemperatureProbeCalibrationOffsetState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:CurrentWorkingRateState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:CumulatedLoweringState",
+          "type": 2,
+          "value": 92
+        },
+        {
+          "name": "io:RoomDeletionThresholdState",
+          "type": 3,
+          "value": "-2°C"
+        },
+        {
+          "name": "io:EffectiveTemperatureSetpointState",
+          "type": 2,
+          "value": 10
+        },
+        {
+          "name": "io:ControllerAddressState",
+          "type": 1,
+          "value": 5276216
+        },
+        {
+          "name": "io:ExpectedPresenceState",
+          "type": 3,
+          "value": "19:30",
+          "lastUpdateTime": 1607019810000
+        },
+        {
+          "name": "io:AutoProgramState",
+          "type": 11,
+          "value": {
+            "sunday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_2",
+              "CONF_3_NIV2"
+            ],
+            "saturday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1"
+            ],
+            "tuesday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2"
+            ],
+            "wednesday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1"
+            ],
+            "thursday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1"
+            ],
+            "friday": [
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_2",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1"
+            ],
+            "anticipTime": 1625,
+            "anticipNb": 20,
+            "monday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1"
+            ]
+          }
+        },
+        {
+          "name": "core:PreviousTargetTemperatureState",
+          "type": 2,
+          "value": 18
+        },
+        {
+          "name": "core:TimeProgramState",
+          "type": 10,
+          "value": [
+            {
+              "monday": [
+                {
+                  "start": "07:00",
+                  "end": "08:00"
+                },
+                {
+                  "start": "18:30",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "tuesday": [
+                {
+                  "start": "07:00",
+                  "end": "08:00"
+                },
+                {
+                  "start": "18:30",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "wednesday": [
+                {
+                  "start": "07:00",
+                  "end": "08:00"
+                },
+                {
+                  "start": "18:30",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "thursday": [
+                {
+                  "start": "07:00",
+                  "end": "08:00"
+                },
+                {
+                  "start": "18:30",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "friday": [
+                {
+                  "start": "07:00",
+                  "end": "08:00"
+                },
+                {
+                  "start": "18:30",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "saturday": [
+                {
+                  "start": "07:00",
+                  "end": "08:00"
+                },
+                {
+                  "start": "18:30",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "sunday": [
+                {
+                  "start": "07:00",
+                  "end": "08:00"
+                },
+                {
+                  "start": "18:30",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "dab51ec0-5b0c-4694-8389-7498f02d6ee6",
+      "widget": "AtlanticElectricalHeaterWithAdjustableTemperatureSetpoint",
+      "type": 1,
+      "oid": "f2ca7610-248c-46a8-bf34-41edea559df5",
+      "uiClass": "HeatingSystem"
+    },
+    {
+      "creationTime": 1588332894000,
+      "lastUpdateTime": 1588332894000,
+      "label": "IO (5276217#2)",
+      "deviceURL": "io://0814-0291-7832/5276217#2",
+      "shortcut": false,
+      "controllableName": "io:TemperatureInCelciusIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:TemperatureState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "TemperatureSensor",
+        "uiProfiles": ["Temperature"],
+        "uiClass": "TemperatureSensor",
+        "qualifiedName": "io:TemperatureInCelciusIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:TemperatureState",
+          "type": 2,
+          "value": 16.13
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:MeasuredValueType",
+          "type": 3,
+          "value": "core:TemperatureInCelcius"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "dab51ec0-5b0c-4694-8389-7498f02d6ee6",
+      "widget": "TemperatureSensor",
+      "type": 2,
+      "oid": "b8ea4ea5-9eb2-4d79-989b-1c73eeb5e458",
+      "uiClass": "TemperatureSensor"
+    },
+    {
+      "creationTime": 1588332894000,
+      "lastUpdateTime": 1588332894000,
+      "label": "IO (5276217#3)",
+      "deviceURL": "io://0814-0291-7832/5276217#3",
+      "shortcut": false,
+      "controllableName": "io:ContactIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "DiscreteState",
+            "values": ["closed", "open"],
+            "qualifiedName": "core:ContactState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "ContactSensor",
+        "uiProfiles": ["DoorContactSensor", "ContactDetector"],
+        "uiClass": "ContactSensor",
+        "qualifiedName": "io:ContactIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:ContactState",
+          "type": 3,
+          "value": "closed"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "dab51ec0-5b0c-4694-8389-7498f02d6ee6",
+      "widget": "ContactSensor",
+      "type": 2,
+      "oid": "3105090e-b643-4962-91da-e783edf7c19f",
+      "uiClass": "ContactSensor"
+    },
+    {
+      "creationTime": 1588332894000,
+      "lastUpdateTime": 1588332894000,
+      "label": "IO (5276217#4)",
+      "deviceURL": "io://0814-0291-7832/5276217#4",
+      "shortcut": false,
+      "controllableName": "io:OccupancyIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "eventBased": true,
+            "type": "DiscreteState",
+            "values": ["noPersonInside", "personInside"],
+            "qualifiedName": "core:OccupancyState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "OccupancySensor",
+        "uiProfiles": ["OccupancyDetector"],
+        "uiClass": "OccupancySensor",
+        "qualifiedName": "io:OccupancyIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:OccupancyState",
+          "type": 3,
+          "value": "noPersonInside"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "dab51ec0-5b0c-4694-8389-7498f02d6ee6",
+      "widget": "OccupancySensor",
+      "type": 2,
+      "oid": "4a2301c2-3793-47eb-b7d9-ea73b7172f2e",
+      "uiClass": "OccupancySensor"
+    },
+    {
+      "creationTime": 1588332894000,
+      "lastUpdateTime": 1588332894000,
+      "label": "IO (5276217#5)",
+      "deviceURL": "io://0814-0291-7832/5276217#5",
+      "shortcut": false,
+      "controllableName": "io:CumulatedElectricalEnergyConsumptionIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff0State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff1State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff2State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff3State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff4State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff5State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff6State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff7State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff8State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff9State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ElectricEnergyConsumptionState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "CumulativeElectricPowerConsumptionSensor",
+        "uiProfiles": ["ElectricEnergyConsumption"],
+        "uiClass": "ElectricitySensor",
+        "qualifiedName": "io:CumulatedElectricalEnergyConsumptionIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "available"
+        },
+        {
+          "name": "core:ElectricEnergyConsumptionState",
+          "type": 1,
+          "value": 175000
+        },
+        {
+          "name": "core:ConsumptionTariff1State",
+          "type": 1,
+          "value": 37000
+        },
+        {
+          "name": "core:ConsumptionTariff2State",
+          "type": 1,
+          "value": 80000
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        },
+        {
+          "name": "core:MeasuredValueType",
+          "type": 3,
+          "value": "core:ElectricalEnergyInWh"
+        }
+      ],
+      "available": true,
+      "enabled": true,
+      "placeOID": "dab51ec0-5b0c-4694-8389-7498f02d6ee6",
+      "widget": "CumulativeElectricPowerConsumptionSensor",
+      "type": 2,
+      "oid": "cb623839-1213-41b3-a67e-b5e0c80e9141",
+      "uiClass": "ElectricitySensor"
+    },
+    {
+      "creationTime": 1586773220000,
+      "lastUpdateTime": 1586773220000,
+      "label": "Radiateur",
+      "deviceURL": "io://0814-0291-7832/6412161#1",
+      "shortcut": false,
+      "controllableName": "io:AtlanticElectricalHeaterWithAdjustableTemperatureSetpointIOComponent",
+      "definition": {
+        "commands": [
+          {
+            "commandName": "advancedRefresh",
+            "nparams": 1
+          },
+          {
+            "commandName": "cancelHeatingLevel",
+            "nparams": 1
+          },
+          {
+            "commandName": "delayedStopIdentify",
+            "nparams": 1
+          },
+          {
+            "commandName": "getName",
+            "nparams": 0
+          },
+          {
+            "commandName": "identify",
+            "nparams": 0
+          },
+          {
+            "commandName": "noPersonInside",
+            "nparams": 0
+          },
+          {
+            "commandName": "off",
+            "nparams": 0
+          },
+          {
+            "commandName": "personInside",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshComfortTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDateTime",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDerogatedTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshEcoTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshHeatingLevel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshIdentifier",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshManufacturerName",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshMaximumHeatingTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshMaximumTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshOperatingMode",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTargetTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTemperature",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTimeProgram",
+            "nparams": 0
+          },
+          {
+            "commandName": "setComfortTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDateTime",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDerogatedTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setEcoTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevel",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevelWithTimer",
+            "nparams": 2
+          },
+          {
+            "commandName": "setHolidays",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHolidaysTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setName",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOccupancyActivation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOccupancy",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOpenWindowDetectionActivation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setOperatingMode",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPreviousTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setSchedulingType",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTargetTemperature",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTimeProgram",
+            "nparams": 1
+          },
+          {
+            "commandName": "startIdentify",
+            "nparams": 0
+          },
+          {
+            "commandName": "stopIdentify",
+            "nparams": 0
+          },
+          {
+            "commandName": "wink",
+            "nparams": 1
+          },
+          {
+            "commandName": "pairOneWayController",
+            "nparams": 2
+          },
+          {
+            "commandName": "refreshAutoProgram",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshControllerAddress",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshCumulatedLowering",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshCurrentWorkingRate",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshDeletionCancelation",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshEffectiveTemperatureSetpoint",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshLocalLeadTime",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshModel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshNativeFunctionalLevel",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPeakNotice",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPeakWarning",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshPowerAndTension",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshRoomDeletionThreshold",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshSetpointLoweringTemperatureInProgMode",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshSynchronisationRequest",
+            "nparams": 0
+          },
+          {
+            "commandName": "refreshTemperatureProbeCalibrationOffset",
+            "nparams": 0
+          },
+          {
+            "commandName": "setCommunicationTest",
+            "nparams": 1
+          },
+          {
+            "commandName": "setDeletionCancelation",
+            "nparams": 1
+          },
+          {
+            "commandName": "setExpectedPresence",
+            "nparams": 1
+          },
+          {
+            "commandName": "setHeatingLevelForTrigger",
+            "nparams": 1
+          },
+          {
+            "commandName": "setNativeLevelsList",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPeakNotice",
+            "nparams": 1
+          },
+          {
+            "commandName": "setPeakWarning",
+            "nparams": 1
+          },
+          {
+            "commandName": "setRoomDeletionThreshold",
+            "nparams": 1
+          },
+          {
+            "commandName": "setSetpointLoweringTemperatureInProgMode",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTemperatureProbeCalibrationOffset",
+            "nparams": 1
+          },
+          {
+            "commandName": "setTwinningExit",
+            "nparams": 1
+          },
+          {
+            "commandName": "unpairAllOneWayControllers",
+            "nparams": 0
+          },
+          {
+            "commandName": "unpairOneWayController",
+            "nparams": 2
+          }
+        ],
+        "states": [
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ComfortRoomTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:DateTimeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:DerogatedTargetTemperatureState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["good", "low", "normal", "verylow"],
+            "qualifiedName": "core:DiscreteRSSILevelState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:EcoRoomTemperatureState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["off", "on"],
+            "qualifiedName": "core:HolidaysModeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:HolidaysTargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:IdentifierState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:ManufacturerNameState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:MaximumHeatingTargetTemperatureState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:MaximumTargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:NameState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["active", "inactive"],
+            "qualifiedName": "core:OccupancyActivationState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["off", "on"],
+            "qualifiedName": "core:OnOffState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["active", "inactive"],
+            "qualifiedName": "core:OpenWindowDetectionActivationState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "antifreeze",
+              "auto",
+              "away",
+              "eco",
+              "frostprotection",
+              "manual",
+              "max",
+              "normal",
+              "off",
+              "on",
+              "prog",
+              "program",
+              "boost"
+            ],
+            "qualifiedName": "core:OperatingModeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:PreviousTargetTemperatureState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:PriorityLockTimerState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:RSSILevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["increase", "none", "standby"],
+            "qualifiedName": "core:RegulationModeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:TargetTemperatureState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "core:TimeProgramState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:VersionState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:AutoProgramState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:ControllerAddressState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:CumulatedLoweringState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:CurrentWorkingRateState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["deletion cancelation", "no deletion cancelation"],
+            "qualifiedName": "io:DeletionCancelationState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:EffectiveTemperatureSetpointState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:ExpectedPresenceState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["external", "internal"],
+            "qualifiedName": "io:InternalExternalSchedulingTypeState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:LocalLeadTimeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["boost", "comfort", "comfort-1", "comfort-2", "eco", "frostprotection", "off", "secured"],
+            "qualifiedName": "io:MaximumHeatingLevelState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:ModelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["base", "medium", "top"],
+            "qualifiedName": "io:NativeFunctionalLevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["long peak", "no peak", "short peak"],
+            "qualifiedName": "io:PeakNoticeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["long peak warning", "no warning", "short peak warning"],
+            "qualifiedName": "io:PeakWarningState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:PowerState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "comfortLevel1",
+              "comfortLevel2",
+              "comfortLevel3",
+              "comfortLevel4",
+              "environmentProtection",
+              "humanProtection",
+              "userLevel1",
+              "userLevel2"
+            ],
+            "qualifiedName": "io:PriorityLockLevelState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": [
+              "LSC",
+              "SAAC",
+              "SFC",
+              "UPS",
+              "externalGateway",
+              "localUser",
+              "myself",
+              "rain",
+              "security",
+              "temperature",
+              "timer",
+              "user",
+              "wind"
+            ],
+            "qualifiedName": "io:PriorityLockOriginatorState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:RoomDeletionThresholdState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["kept", "lost"],
+            "qualifiedName": "io:RunningState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:SetpointLoweringTemperatureInProgModeState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["boost", "comfort", "comfort-1", "comfort-2", "eco", "frostprotection", "off", "secured"],
+            "qualifiedName": "io:TargetHeatingLevelState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:TemperatureProbeCalibrationOffsetState"
+          },
+          {
+            "type": "DataState",
+            "qualifiedName": "io:TensionState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:TimerForTransitoryStateState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "io:UptimeState"
+          }
+        ],
+        "dataProperties": [
+          {
+            "value": "500",
+            "qualifiedName": "core:identifyInterval"
+          }
+        ],
+        "widgetName": "AtlanticElectricalHeaterWithAdjustableTemperatureSetpoint",
+        "uiProfiles": ["StatefulOperatingModeHeating", "OperatingModeHeating", "StatefulThermostat", "Thermostat"],
+        "uiClass": "HeatingSystem",
+        "uiClassifiers": ["emitter"],
+        "qualifiedName": "io:AtlanticElectricalHeaterWithAdjustableTemperatureSetpointIOComponent",
+        "type": "ACTUATOR"
+      },
+      "states": [
+        {
+          "name": "core:NameState",
+          "type": 3,
+          "value": "Radiateur"
+        },
+        {
+          "name": "core:VersionState",
+          "type": 3,
+          "value": "49373431303038202020"
+        },
+        {
+          "name": "core:PriorityLockTimerState",
+          "type": 1,
+          "value": 0
+        },
+        {
+          "name": "core:OnOffState",
+          "type": 3,
+          "value": "on"
+        },
+        {
+          "name": "io:TargetHeatingLevelState",
+          "type": 3,
+          "value": "comfort"
+        },
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "unavailable"
+        },
+        {
+          "name": "core:DiscreteRSSILevelState",
+          "type": 3,
+          "value": "good"
+        },
+        {
+          "name": "core:RSSILevelState",
+          "type": 2,
+          "value": 82
+        },
+        {
+          "name": "core:IdentifierState",
+          "type": 3,
+          "value": "00000000"
+        },
+        {
+          "name": "io:MaximumHeatingLevelState",
+          "type": 3,
+          "value": "unknown"
+        },
+        {
+          "name": "io:TimerForTransitoryStateState",
+          "type": 1,
+          "value": 0
+        },
+        {
+          "name": "core:ComfortRoomTemperatureState",
+          "type": 1,
+          "value": 22
+        },
+        {
+          "name": "core:EcoRoomTemperatureState",
+          "type": 2,
+          "value": 4.5
+        },
+        {
+          "name": "core:OperatingModeState",
+          "type": 3,
+          "value": "standby"
+        },
+        {
+          "name": "core:OccupancyActivationState",
+          "type": 3,
+          "value": "inactive"
+        },
+        {
+          "name": "core:MaximumHeatingTargetTemperatureState",
+          "type": 2,
+          "value": 28
+        },
+        {
+          "name": "core:MaximumTargetTemperatureState",
+          "type": 2,
+          "value": 28
+        },
+        {
+          "name": "core:TargetTemperatureState",
+          "type": 2,
+          "value": 20.5
+        },
+        {
+          "name": "io:SetpointLoweringTemperatureInProgModeState",
+          "type": 2,
+          "value": 4.5
+        },
+        {
+          "name": "core:OpenWindowDetectionActivationState",
+          "type": 3,
+          "value": "inactive"
+        },
+        {
+          "name": "io:InternalExternalSchedulingTypeState",
+          "type": 3,
+          "value": "internal"
+        },
+        {
+          "name": "core:DateTimeState",
+          "type": 11,
+          "value": {
+            "month": 12,
+            "hour": 11,
+            "year": 2021,
+            "weekday": 3,
+            "day": 30,
+            "minute": 44,
+            "second": 46
+          }
+        },
+        {
+          "name": "io:LocalLeadTimeState",
+          "type": 1,
+          "value": 1744
+        },
+        {
+          "name": "core:RegulationModeState",
+          "type": 3,
+          "value": "increase"
+        },
+        {
+          "name": "core:ManufacturerNameState",
+          "type": 3,
+          "value": "Atlantic"
+        },
+        {
+          "name": "io:ModelState",
+          "type": 3,
+          "value": "AGILIA H PI-io"
+        },
+        {
+          "name": "io:PowerState",
+          "type": 1,
+          "value": 750
+        },
+        {
+          "name": "io:TensionState",
+          "type": 1,
+          "value": 230
+        },
+        {
+          "name": "core:DerogatedTargetTemperatureState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:NativeFunctionalLevelState",
+          "type": 3,
+          "value": "Top"
+        },
+        {
+          "name": "io:TemperatureProbeCalibrationOffsetState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:CurrentWorkingRateState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:CumulatedLoweringState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:RoomDeletionThresholdState",
+          "type": 3,
+          "value": "-2°C"
+        },
+        {
+          "name": "io:EffectiveTemperatureSetpointState",
+          "type": 2,
+          "value": 0
+        },
+        {
+          "name": "io:ControllerAddressState",
+          "type": 1,
+          "value": 6412160
+        },
+        {
+          "name": "io:ExpectedPresenceState",
+          "type": 3,
+          "value": "19:30",
+          "lastUpdateTime": 1638202928000
+        },
+        {
+          "name": "io:AutoProgramState",
+          "type": 11,
+          "value": {
+            "sunday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_NIV1",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2"
+            ],
+            "saturday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_NIV3",
+              "CONF_NIV3",
+              "CONF_NIV1",
+              "CONF_2",
+              "CONF_1",
+              "CONF_NIV2",
+              "CONF_2",
+              "CONF_NIV3",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1"
+            ],
+            "tuesday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1"
+            ],
+            "wednesday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_1",
+              "CONF_1",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_3_NIV2",
+              "CONF_1",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1"
+            ],
+            "thursday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_3_NIV2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1"
+            ],
+            "friday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1"
+            ],
+            "anticipTime": 1744,
+            "anticipNb": 20,
+            "monday": [
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_2",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_1",
+              "CONF_2",
+              "CONF_1",
+              "CONF_3_NIV2",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_2",
+              "CONF_1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_3_NIV1",
+              "CONF_2",
+              "CONF_3_NIV1"
+            ]
+          }
+        },
+        {
+          "name": "core:PreviousTargetTemperatureState",
+          "type": 2,
+          "value": 17
+        },
+        {
+          "name": "core:TimeProgramState",
+          "type": 10,
+          "value": [
+            {
+              "monday": [
+                {
+                  "start": "07:00",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "tuesday": [
+                {
+                  "start": "07:00",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "wednesday": [
+                {
+                  "start": "07:00",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "thursday": [
+                {
+                  "start": "07:00",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "friday": [
+                {
+                  "start": "07:00",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "saturday": [
+                {
+                  "start": "07:00",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            },
+            {
+              "sunday": [
+                {
+                  "start": "07:00",
+                  "end": "20:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                },
+                {
+                  "start": "00:00",
+                  "end": "00:00"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        }
+      ],
+      "available": false,
+      "enabled": true,
+      "placeOID": "2de0b602-9a42-48d3-9c9f-42bc192c8783",
+      "widget": "AtlanticElectricalHeaterWithAdjustableTemperatureSetpoint",
+      "type": 1,
+      "oid": "29bbe178-d3e3-4322-85dd-cafc8148cf41",
+      "uiClass": "HeatingSystem"
+    },
+    {
+      "creationTime": 1586773220000,
+      "lastUpdateTime": 1586773220000,
+      "label": "IO (6412161#2)",
+      "deviceURL": "io://0814-0291-7832/6412161#2",
+      "shortcut": false,
+      "controllableName": "io:TemperatureInCelciusIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:TemperatureState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "TemperatureSensor",
+        "uiProfiles": ["Temperature"],
+        "uiClass": "TemperatureSensor",
+        "qualifiedName": "io:TemperatureInCelciusIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "unavailable"
+        },
+        {
+          "name": "core:TemperatureState",
+          "type": 2,
+          "value": 18.6
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:MeasuredValueType",
+          "type": 3,
+          "value": "core:TemperatureInCelcius"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": false,
+      "enabled": true,
+      "placeOID": "2de0b602-9a42-48d3-9c9f-42bc192c8783",
+      "widget": "TemperatureSensor",
+      "type": 2,
+      "oid": "0a9055f2-6748-4f7b-b6f1-e396cc13203b",
+      "uiClass": "TemperatureSensor"
+    },
+    {
+      "creationTime": 1586773220000,
+      "lastUpdateTime": 1586773220000,
+      "label": "IO (6412161#3)",
+      "deviceURL": "io://0814-0291-7832/6412161#3",
+      "shortcut": false,
+      "controllableName": "io:ContactIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "DiscreteState",
+            "values": ["closed", "open"],
+            "qualifiedName": "core:ContactState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "ContactSensor",
+        "uiProfiles": ["DoorContactSensor", "ContactDetector"],
+        "uiClass": "ContactSensor",
+        "qualifiedName": "io:ContactIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "unavailable"
+        },
+        {
+          "name": "core:ContactState",
+          "type": 3,
+          "value": "closed"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": false,
+      "enabled": true,
+      "placeOID": "2de0b602-9a42-48d3-9c9f-42bc192c8783",
+      "widget": "ContactSensor",
+      "type": 2,
+      "oid": "73a92bd3-b831-4071-b1ff-a5f6b55cc838",
+      "uiClass": "ContactSensor"
+    },
+    {
+      "creationTime": 1586773220000,
+      "lastUpdateTime": 1586773220000,
+      "label": "IO (6412161#4)",
+      "deviceURL": "io://0814-0291-7832/6412161#4",
+      "shortcut": false,
+      "controllableName": "io:OccupancyIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "eventBased": true,
+            "type": "DiscreteState",
+            "values": ["noPersonInside", "personInside"],
+            "qualifiedName": "core:OccupancyState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "OccupancySensor",
+        "uiProfiles": ["OccupancyDetector"],
+        "uiClass": "OccupancySensor",
+        "qualifiedName": "io:OccupancyIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "unavailable"
+        },
+        {
+          "name": "core:OccupancyState",
+          "type": 3,
+          "value": "personInside"
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        }
+      ],
+      "available": false,
+      "enabled": true,
+      "placeOID": "2de0b602-9a42-48d3-9c9f-42bc192c8783",
+      "widget": "OccupancySensor",
+      "type": 2,
+      "oid": "357d8eb4-7bb5-45bf-a6ab-afa7460b673a",
+      "uiClass": "OccupancySensor"
+    },
+    {
+      "creationTime": 1586773220000,
+      "lastUpdateTime": 1586773220000,
+      "label": "IO (6412161#5)",
+      "deviceURL": "io://0814-0291-7832/6412161#5",
+      "shortcut": false,
+      "controllableName": "io:CumulatedElectricalEnergyConsumptionIOSystemDeviceSensor",
+      "definition": {
+        "commands": [],
+        "states": [
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff0State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff1State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff2State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff3State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff4State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff5State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff6State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff7State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff8State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ConsumptionTariff9State"
+          },
+          {
+            "type": "ContinuousState",
+            "qualifiedName": "core:ElectricEnergyConsumptionState"
+          },
+          {
+            "type": "DiscreteState",
+            "values": ["available", "unavailable"],
+            "qualifiedName": "core:StatusState"
+          }
+        ],
+        "dataProperties": [],
+        "widgetName": "CumulativeElectricPowerConsumptionSensor",
+        "uiProfiles": ["ElectricEnergyConsumption"],
+        "uiClass": "ElectricitySensor",
+        "qualifiedName": "io:CumulatedElectricalEnergyConsumptionIOSystemDeviceSensor",
+        "type": "SENSOR"
+      },
+      "states": [
+        {
+          "name": "core:StatusState",
+          "type": 3,
+          "value": "unavailable"
+        },
+        {
+          "name": "core:ElectricEnergyConsumptionState",
+          "type": 1,
+          "value": 232000
+        },
+        {
+          "name": "core:ConsumptionTariff1State",
+          "type": 1,
+          "value": 25000
+        },
+        {
+          "name": "core:ConsumptionTariff2State",
+          "type": 1,
+          "value": 123000
+        }
+      ],
+      "attributes": [
+        {
+          "name": "core:Manufacturer",
+          "type": 3,
+          "value": "Atlantic Group"
+        },
+        {
+          "name": "core:FirmwareRevision",
+          "type": 3,
+          "value": "I741008"
+        },
+        {
+          "name": "core:PowerSourceType",
+          "type": 3,
+          "value": "mainSupply"
+        },
+        {
+          "name": "core:MeasuredValueType",
+          "type": 3,
+          "value": "core:ElectricalEnergyInWh"
+        }
+      ],
+      "available": false,
+      "enabled": true,
+      "placeOID": "2de0b602-9a42-48d3-9c9f-42bc192c8783",
+      "widget": "CumulativeElectricPowerConsumptionSensor",
+      "type": 2,
+      "oid": "d4642883-14a9-4d05-ad6c-c50e3c1448e4",
+      "uiClass": "ElectricitySensor"
+    }
+  ],
+  "zones": [],
+  "resellerDelegationType": "NEVER",
+  "oid": "26bb7fd1-15c3-4f67-a39a-93ad60009c6c",
+  "rootPlace": {
+    "creationTime": 1586773014000,
+    "lastUpdateTime": 1586773014000,
+    "label": "All House",
+    "type": 0,
+    "oid": "ebd3b36a-dd8f-4012-90c3-6ab51607e889",
+    "subPlaces": [
+      {
+        "creationTime": 1586773400000,
+        "lastUpdateTime": 1586773400000,
+        "label": "Parents",
+        "type": 5,
+        "oid": "dab51ec0-5b0c-4694-8389-7498f02d6ee6",
+        "subPlaces": []
+      },
+      {
+        "creationTime": 1586773256000,
+        "lastUpdateTime": 1586773256000,
+        "label": "Maxime",
+        "type": 5,
+        "oid": "2de0b602-9a42-48d3-9c9f-42bc192c8783",
+        "subPlaces": []
+      },
+      {
+        "creationTime": 1601921676000,
+        "lastUpdateTime": 1612809479000,
+        "label": "Salle de bain",
+        "type": 8,
+        "oid": "9abb0634-9b62-476f-8a60-0a63463e011b",
+        "subPlaces": []
+      }
+    ]
+  },
+  "features": []
+}
