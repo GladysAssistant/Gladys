@@ -1075,7 +1075,8 @@
       }
     },
     "overkiz": {
-      "title": "",
+      "title": "Overkiz",
+      "description": "Control your Overkiz devices.",
       "deviceTab": "",
       "discoverTab": "",
       "discoverDeviceDescr": "",
@@ -1101,23 +1102,23 @@
         "setupPageLink": ""
       },
       "discover": {
-        "title": "",
-        "scan": "",
+        "title": "Overkiz devices in Gladys",
+        "scan": "Search devices",
         "description": "",
-        "noDeviceFound": ""
+        "noDeviceFound": "No Overkiz device found."
       },
       "setup": {
-        "title": "",
-        "overkizDescription": "",
-        "error": "",
-        "connecting": "",
-        "connected": "",
-        "connectionError": "",
-        "userLabel": "",
-        "userPlaceholder": "",
-        "passwordLabel": "",
-        "passwordPlaceholder": "",
-        "saveLabel": ""
+        "title": "Overkiz configuration",
+        "overkizDescription": "You can connect Gladys to your Overkiz cloud account to command the associated devices.",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter Overkiz username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter Overkiz password",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your Overkiz cloud account...",
+        "connected": "Connected to the Overkiz cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
       }
     }
   },
@@ -2160,7 +2161,8 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Thermostat Temperature"
+      "target-temperature": "Thermostat Temperature",
+      "mode": "Level"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

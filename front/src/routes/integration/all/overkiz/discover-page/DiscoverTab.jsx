@@ -32,7 +32,7 @@ const DeviceTab = ({ children, ...props }) => (
           {props.errorLoading && (
             <p class="alert alert-warning">
               <Text id="integration.overkiz.status.notConnected" />
-              <Link href="/dashboard/integration/device/overkiz/setup">
+              <Link href="/dashboard/integration/device/overkiz/setup-page">
                 <Text id="integration.overkiz.status.setupPageLink" />
               </Link>
             </p>

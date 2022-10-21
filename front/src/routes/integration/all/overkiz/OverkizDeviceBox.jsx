@@ -178,12 +178,6 @@ class OverkizDeviceBox extends Component {
                     </button>
                   )}
 
-                  {validModel && props.saveButton && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.overkiz.device.saveButton" />
-                    </button>
-                  )}
-
                   {validModel && props.deleteButton && (
                     <button onClick={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.overkiz.device.deleteButton" />
@@ -194,14 +188,6 @@ class OverkizDeviceBox extends Component {
                     <button class="btn btn-dark" disabled>
                       <Text id="integration.overkiz.device.unmanagedModelButton" />
                     </button>
-                  )}
-
-                  {validModel && props.editButton && (
-                    <Link href={`/dashboard/integration/device/overkiz/edit/${device.selector}`}>
-                      <button class="btn btn-secondary float-right">
-                        <Text id="integration.overkiz.device.editButton" />
-                      </button>
-                    </Link>
                   )}
                 </div>
               </div>

@@ -49,7 +49,7 @@ async function getOverkizDevices() {
         ready: node.available && node.enabled,
         rawOverkizDevice: node,
         should_poll: true,
-        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_10_MINUTES,
+        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_5_MINUTES,
         features: [],
         params: [
           {
@@ -86,7 +86,7 @@ async function getOverkizDevices() {
             selector: `overkiz-${node.deviceURL}-${node.uiClass}-${DEVICE_STATES.HEATING_LEVEL_STATE}`,
             external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.HEATING_LEVEL_STATE),
             category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-            type: DEVICE_FEATURE_TYPES.HEATER.LEVEL,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
             read_only: false,
             has_feedback: true,
             min: 0,

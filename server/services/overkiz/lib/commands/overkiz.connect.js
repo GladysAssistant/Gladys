@@ -83,6 +83,9 @@ async function connect() {
     type: WEBSOCKET_MESSAGE_TYPES.OVERKIZ.CONNECTED,
     payload: {},
   });
+
+  this.syncOverkizDevices();
+  // this.updateDevicesJob = this.cron.schedule('0 */5 * * * *', this.syncOverkizDevices.bind(this));
 }
 
 module.exports = {

@@ -25,7 +25,7 @@ const OverkizPage = ({ children }) => (
                   </Link>
 
                   <Link
-                    href="/dashboard/integration/device/overkiz/discover"
+                    href="/dashboard/integration/device/overkiz/discover-page"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
@@ -36,7 +36,7 @@ const OverkizPage = ({ children }) => (
                   </Link>
 
                   <Link
-                    href="/dashboard/integration/device/overkiz/setup"
+                    href="/dashboard/integration/device/overkiz/setup-page"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >

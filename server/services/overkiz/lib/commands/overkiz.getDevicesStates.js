@@ -39,9 +39,9 @@ async function getDevicesStates(device) {
       },
       {
         retries: 5,
-        onRetry: (err, num) => {
+        onRetry: async (err, num) => {
           if (err.response && err.response.status === 401) {
-            connect.bind(this)();
+            await connect.bind(this)();
             logger.info(`Overkiz : Connecting Overkiz server...`);
           } else {
             throw err;
@@ -50,10 +50,9 @@ async function getDevicesStates(device) {
       },
     );
 
-    device.states = response.data;
     logger.info(`Overkiz : Get new device states: ${deviceURL}`);
 
-    device.states.forEach((state) => {
+    response.data.forEach((state) => {
       const deviceFeatureExternalId = getDeviceFeatureExternalId({ deviceURL }, state.name);
       const newValueUnbind = unbindValue(device, state.name, state.value);
       const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);

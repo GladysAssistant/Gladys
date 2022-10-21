@@ -17,6 +17,7 @@
     "axios": "^0.21.1",
     "bluebird": "^3.7.0",
     "bottleneck": "^2.19.5",
+    "node-cron": "^3.0.2",
     "sleep-promise": "^9.1.0"
   }
 }

@@ -3,6 +3,7 @@ const retry = require('async-retry');
 const logger = require('../../../../utils/logger');
 
 const { updateGatewayState } = require('../overkiz.util');
+const { updateDevicesState } = require('../overkiz.util');
 const { connect } = require('./overkiz.connect');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
@@ -17,6 +18,7 @@ async function syncOverkizDevices() {
     throw new ServiceNotConfiguredError('OVERKIZ_NOT_CONNECTED');
   }
   logger.debug(`Overkiz : Starting discovery`);
+  this.scanInProgress = true;
 
   const response = await retry(
     async (bail) => {
@@ -35,9 +37,9 @@ async function syncOverkizDevices() {
     },
     {
       retries: 5,
-      onRetry: (err, num) => {
+      onRetry: async (err, num) => {
         if (err.response && err.response.status === 401) {
-          connect.bind(this)();
+          await connect.bind(this)();
           logger.info(`Overkiz : Connecting Overkiz server...`);
         } else {
           throw err;
@@ -46,18 +48,11 @@ async function syncOverkizDevices() {
     },
   );
 
-  this.devices = {};
-  response.data.devices.forEach((device) => {
-    const placeObj = response.data.rootPlace.subPlaces.find((place) => place.oid === device.placeOID);
-    if (placeObj) {
-      device.place = placeObj.label;
-    }
-    this.devices[device.oid] = device;
-  });
+  updateGatewayState.bind(this)(response.data.gateways);
 
-  updateGatewayState(response.data.gateways);
+  updateDevicesState.bind(this)(response.data.devices, response.data.rootPlace);
 
-  return this.devices;
+  this.scanInProgress = true;
 }
 
 module.exports = {

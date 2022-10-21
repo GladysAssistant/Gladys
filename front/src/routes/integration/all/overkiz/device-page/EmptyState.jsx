@@ -10,7 +10,7 @@ const EmptyState = () => (
 
       <div class="mt-5">
         <Text id="integration.overkiz.discoverDeviceDescr" />
-        <Link href="/dashboard/integration/device/overkiz/discover">
+        <Link href="/dashboard/integration/device/overkiz/discover-page">
           <button class="btn btn-outline-primary ml-2">
             <Text id="integration.overkiz.discoverTab" /> <i class="fe fe-radio" />
           </button>

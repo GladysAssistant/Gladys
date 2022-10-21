@@ -30,9 +30,9 @@ async function getExecutionState(execId) {
     },
     {
       retries: 5,
-      onRetry: (err, num) => {
+      onRetry: async (err, num) => {
         if (err.response && err.response.status === 401) {
-          connect.bind(this)();
+          await connect.bind(this)();
           logger.info(`Overkiz : Connecting Overkiz server...`);
         } else {
           throw err;
@@ -87,9 +87,9 @@ async function sendCommand(command, deviceURL, data) {
     },
     {
       retries: 5,
-      onRetry: (err, num) => {
+      onRetry: async (err, num) => {
         if (err.response && err.response.status === 401) {
-          connect.bind(this)();
+          await connect.bind(this)();
           logger.info(`Overkiz : Connecting Overkiz server...`);
         } else {
           throw err;
@@ -120,6 +120,7 @@ async function sendCommand(command, deviceURL, data) {
   execResponse = await getExecutionState.bind(this)(execId);
   const { state4 } = execResponse.data;
   await sleep(500); // Wait 2000 ms
+  
   logger.debug(state4);
 }
 

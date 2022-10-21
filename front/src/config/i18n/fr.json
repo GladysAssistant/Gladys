@@ -1075,49 +1075,50 @@
       }
     },
     "overkiz": {
-      "title": "",
-      "deviceTab": "",
-      "discoverTab": "",
+      "title": "Overkiz",
+      "description": "Contrôler vos appareils Overkiz.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
       "discoverDeviceDescr": "",
-      "setupTab": "",
+      "setupTab": "Configuration",
       "device": {
         "title": "",
         "search": "",
-        "noDeviceFound": "",
-        "nameLabel": "",
-        "namePlaceholder": "",
-        "modelLabel": "",
-        "roomLabel": "",
+        "noDeviceFound": "Aucun périphérique Overkiz détecté.",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "modelLabel": "Modèle",
+        "roomLabel": "Pièce",
+        "saveButton": "Sauvegarder",
+        "updateButton": "Mettre à jour",
+        "alreadyCreatedButton": "Déjà créé",
+        "deleteButton": "Supprimer",        
         "featuresLabel": "",
-        "alreadyCreatedButton": "",
-        "updateButton": "",
-        "saveButton": "",
-        "deleteButton": "",
         "unmanagedModelButton": "",
         "editButton": ""
       },
       "status": {
-        "notConnected": "",
-        "setupPageLink": ""
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Overkiz, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Overkiz."
       },
       "discover": {
-        "title": "",
-        "scan": "",
-        "description": "",
-        "noDeviceFound": ""
+        "title": "Découverte Overkiz",
+        "scan": "Rechercher",
+        "description": "Les appareils Overkiz sont automatiquement découverts. Vos appareils Overkiz doivent être ajoutés à votre compte cloud Overkiz avant.",
+        "noDeviceFound": "Aucun périphérique Overkiz détecté."
       },
       "setup": {
-        "title": "",
-        "overkizDescription": "",
-        "error": "",
-        "connecting": "",
-        "connected": "",
-        "connectionError": "",
-        "userLabel": "",
-        "userPlaceholder": "",
-        "passwordLabel": "",
-        "passwordPlaceholder": "",
-        "saveLabel": ""
+        "title": "Configuration Overkiz",
+        "overkizDescription": "Vous pouvez connecter Gladys à votre compte cloud Overkiz pour commander les appareils associés.",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Overkiz...",
+        "connected": "Connexion réussie au compte cloud Overkiz !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur Overkiz",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe utilisateur Overkiz",
+        "saveLabel": "Enregistrer"
       }
     }
   },
@@ -2160,7 +2161,8 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "mode": "Mode"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

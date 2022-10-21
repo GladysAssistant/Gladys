@@ -28,8 +28,6 @@ module.exports = function OverkizService(gladys, serviceId) {
     overkizHandler.overkizType = overkizType;
 
     await overkizHandler.connect();
-
-    overkizHandler.syncOverkizDevices();
   }
 
   /**
@@ -40,11 +38,25 @@ module.exports = function OverkizService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping Overkiz service');
+
+    await overkizHandler.disconnect();
+  }
+
+  /**
+   * @public
+   * @description Get info if the service is used.
+   * @returns {Promise<boolean>} Returns true if the service is used.
+   * @example
+   * gladys.services.overkiz.isUsed();
+   */
+  async function isUsed() {
+    return true;
   }
 
   return Object.freeze({
     start,
     stop,
+    isUsed,
     device: overkizHandler,
     controllers: OverkizController(overkizHandler),
   });

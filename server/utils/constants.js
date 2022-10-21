@@ -487,6 +487,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   THERMOSTAT: {
     TARGET_TEMPERATURE: 'target-temperature',
+    MODE: 'mode',
   },
 };
 
@@ -695,6 +696,8 @@ const ACTIONS_STATUS = {
 };
 
 const DEVICE_POLL_FREQUENCIES = {
+  EVERY_10_MINUTES: 10 * 60 * 1000,
+  EVERY_5_MINUTES: 5 * 60 * 1000,
   EVERY_MINUTES: 60 * 1000,
   EVERY_30_SECONDS: 30 * 1000,
   EVERY_10_SECONDS: 10 * 1000,
@@ -780,6 +783,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
   BROADLINK: {
     LEARN_MODE: 'broadlink.learn',
     SEND_MODE: 'broadlink.send',
+  },
+  OVERKIZ: {
+    CONNECTED: 'overkiz.connected',
+    NEW_DEVICE: 'overkiz.new-device',
+    UPDATE_DEVICE: 'overkiz.update-device',
+    ERROR: 'overkiz.error',
   },
 };
 

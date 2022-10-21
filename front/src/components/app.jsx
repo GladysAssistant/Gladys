@@ -242,10 +242,10 @@ const AppRouter = connect(
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
 
-        <OverkizPage path="/dashboard/integration/all/overkiz/device-page" />
-        <OverkizEditPage path="/dashboard/integration/all/overkiz/edit-page" />
-        <OverkizDiscoverPage path="/dashboard/integration/all/overkiz/discover-page" />
-        <OverkizSetupPage path="/dashboard/integration/all/overkiz/setup-page" />
+        <OverkizPage path="/dashboard/integration/device/overkiz" />
+        <OverkizEditPage path="/dashboard/integration/device/overkiz/edit-page" />
+        <OverkizDiscoverPage path="/dashboard/integration/device/overkiz/discover-page" />
+        <OverkizSetupPage path="/dashboard/integration/device/overkiz/setup-page" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
