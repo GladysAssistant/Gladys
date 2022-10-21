@@ -13,7 +13,7 @@ async function newMessage(msg) {
   logger.debug(`new message from Nextcloud Talk, ${msg.message}`);
 
   const nextcloudTalkToken = msg.token;
-  const userBot = this.bots.find((bot) => bot.token === nextcloudTalkToken);
+  const userBot = this.bots[nextcloudTalkToken];
   const user = await this.gladys.user.getById(userBot.userId);
 
   const message = {

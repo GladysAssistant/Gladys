@@ -5,10 +5,9 @@
  * disconnect();
  */
 async function disconnect() {
-  if (this.bots.length > 0) {
-    Promise.all(this.bots.map((bot) => bot.stopPolling()));
+  if (Object.keys(this.bots).length > 0) {
+    Promise.all(Object.keys(this.bots).map((token) => this.stopPolling(token)));
   }
-  this.bot = [];
 }
 
 module.exports = {

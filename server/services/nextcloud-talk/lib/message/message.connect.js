@@ -1,3 +1,5 @@
+const EventEmitter = require('events');
+
 /**
  * @description Connect Nextcloud Talk
  * @param {Array} tokens - Nextcloud Talk tokens.
@@ -9,16 +11,20 @@
  */
 async function connect(tokens) {
   // if a bots exist, we disconnect
-  if (this.bots.length > 0) {
+  if (Object.keys(this.bots).length > 0) {
     await this.disconnect();
   }
 
   tokens.forEach(async (token) => {
-    const bot = new this.NextcloudTalkBot(this.gladys, this.serviceId, token.user_id, token.value);
-    bot.startPolling();
-    bot.on('message', this.newMessage.bind(this));
-
-    this.bots.push(bot);
+    this.bots[token.value] = {
+      userId: token.user_id,
+      token: token.value,
+      isPolling: false,
+      eventEmitter: new EventEmitter(),
+      lastKnownMessageId: null,
+    };
+    this.startPolling(token.value);
+    this.bots[token.value].eventEmitter.on('message', this.newMessage.bind(this));
   });
 }
 
