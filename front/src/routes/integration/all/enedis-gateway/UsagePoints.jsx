@@ -6,21 +6,34 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
+import update from 'immutability-helper';
 
 dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
+import { getDeviceParam } from '../../../../utils/device';
+import { DEVICE_PARAMS } from './consts';
 import EnedisPage from './EnedisPage';
 
-const UsagePointDevice = ({ device, language = 'fr' }) => {
+const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDeviceParam, saveDevice }) => {
   const usagePointId = device.external_id.split(':')[1];
-  const contractType = 'base';
-  const pricePerKwh = 1.74;
-  const priceUnit = '€';
+
+  const contractType = getDeviceParam(device, DEVICE_PARAMS.CONTRACT_TYPE);
+  const pricePerKwh = getDeviceParam(device, DEVICE_PARAMS.PRICE_PER_KWH);
+  const priceCurrency = getDeviceParam(device, DEVICE_PARAMS.PRICE_CURRENCY);
+
   const lastRefresh = dayjs()
     .locale(language)
     .format('L LTS');
   const numberOfStates = 124;
+
+  const updateContractType = e => {
+    updateDeviceParam(deviceIndex, DEVICE_PARAMS.CONTRACT_TYPE, e.target.value);
+  };
+
+  const save = () => {
+    saveDevice(deviceIndex);
+  };
 
   return (
     <div class="col-md-6">
@@ -41,7 +54,7 @@ const UsagePointDevice = ({ device, language = 'fr' }) => {
             <label>
               <Text id="integration.enedis.usagePoints.contractType" />
             </label>
-            <select class="form-control" value={contractType}>
+            <select class="form-control" onChange={updateContractType} value={contractType}>
               <option value="base">
                 <Text id="integration.enedis.usagePoints.contracts.base" />
               </option>
@@ -58,7 +71,7 @@ const UsagePointDevice = ({ device, language = 'fr' }) => {
               <div class="input-group">
                 <input type="text" class="form-control" value={pricePerKwh} />
                 <div class="input-group-append">
-                  <span class="input-group-text">{priceUnit}</span>
+                  <span class="input-group-text">{priceCurrency}</span>
                 </div>
               </div>
             </div>
@@ -95,13 +108,16 @@ const UsagePointDevice = ({ device, language = 'fr' }) => {
           <button class="btn btn-primary">
             <Text id="integration.enedis.usagePoints.syncButton" />
           </button>
+          <button class="btn btn-success" onClick={save}>
+            <Text id="integration.enedis.usagePoints.saveButton" />
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-const EnedisUsagePoints = ({ errored, loading, usagePointsDevices }) => (
+const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceParam, saveDevice }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -130,7 +146,14 @@ const EnedisUsagePoints = ({ errored, loading, usagePointsDevices }) => (
 
                       <div class="row">
                         {usagePointsDevices &&
-                          usagePointsDevices.map(usagePointDevice => <UsagePointDevice device={usagePointDevice} />)}
+                          usagePointsDevices.map((usagePointDevice, index) => (
+                            <UsagePointDevice
+                              device={usagePointDevice}
+                              deviceIndex={index}
+                              updateDeviceParam={updateDeviceParam}
+                              saveDevice={saveDevice}
+                            />
+                          ))}
                       </div>
                     </div>
                   </div>
@@ -153,8 +176,44 @@ class EnedisWelcomePageComponent extends Component {
       console.error(e);
     }
   };
+  updateDeviceParam = (deviceIndex, deviceParam, value) => {
+    const device = this.state.usagePointsDevices[deviceIndex];
+    const deviceParamIndex = device.params.findIndex(p => p.name === deviceParam);
+    let newUsagePointsDevices;
+    if (deviceParamIndex !== -1) {
+      newUsagePointsDevices = update(this.state.usagePointsDevices, {
+        [deviceIndex]: {
+          params: {
+            [deviceParamIndex]: {
+              value: {
+                $set: value
+              }
+            }
+          }
+        }
+      });
+    } else {
+      newUsagePointsDevices = update(this.state.usagePointsDevices, {
+        [deviceIndex]: {
+          params: {
+            $push: [
+              {
+                name: deviceParam,
+                value
+              }
+            ]
+          }
+        }
+      });
+    }
+    this.setState({ usagePointsDevices: newUsagePointsDevices });
+  };
   sync = async () => {
     await this.props.httpClient.post('/api/v1/service/enedis/sync');
+  };
+  saveDevice = async deviceIndex => {
+    const device = this.state.usagePointsDevices[deviceIndex];
+    await this.props.httpClient.post('/api/v1/device', device);
   };
   init = async () => {
     await this.setState({ loading: true });
@@ -173,6 +232,8 @@ class EnedisWelcomePageComponent extends Component {
           usagePointsDevices={usagePointsDevices}
           sync={this.sync}
           language={user.language}
+          updateDeviceParam={this.updateDeviceParam}
+          saveDevice={this.saveDevice}
         />
       </EnedisPage>
     );

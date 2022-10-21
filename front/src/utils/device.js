@@ -26,4 +26,25 @@ const getDeviceFeatureName = (dictionnary, device, deviceFeature) => {
   return `${device.name} (${featureDescription})`;
 };
 
-export { getDeviceFeatureName, DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES };
+/**
+ * @description Get Device param by name.
+ * @param {Object} device - Device Object to parse.
+ * @param {string} paramName - The name of the param to get.
+ * @returns {string} Return param.
+ * @example
+ * const value = getDeviceParam({
+ *  params: [{ name: 'test', value: 1 }]
+ * }, 'test');
+ */
+function getDeviceParam(device, paramName) {
+  if (!get(device, 'params')) {
+    return null;
+  }
+  const param = device.params.find(oneParam => oneParam.name === paramName);
+  if (param) {
+    return param.value;
+  }
+  return null;
+}
+
+export { getDeviceFeatureName, DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES, getDeviceParam };
