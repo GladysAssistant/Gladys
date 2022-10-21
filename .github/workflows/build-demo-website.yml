@@ -1,8 +1,9 @@
 name: Build and publish demo website
 
 on:
-  pull_request:
-    branches: [master]
+  push:
+    tags:
+      - 'v*.*.*'
 
 jobs:
   deploy:
