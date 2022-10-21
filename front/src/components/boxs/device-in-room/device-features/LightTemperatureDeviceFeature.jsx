@@ -1,4 +1,5 @@
 import { getDeviceName } from './utils';
+import style from './style.css';
 
 const LightTemperatureDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
@@ -19,7 +20,7 @@ const LightTemperatureDeviceType = ({ children, ...props }) => {
       <td>
         <i class="fe fe-thermometer" />
       </td>
-      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
+      <td class={style.deviceName}>{getDeviceName(props.device, props.deviceFeature)}</td>
 
       <td class="text-right" style="padding-top: 0px; padding-bottom: 0px">
         <div class="col">
