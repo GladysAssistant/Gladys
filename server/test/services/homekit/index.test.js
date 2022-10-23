@@ -23,14 +23,32 @@ describe('HomeKitService', () => {
         getValue: stub().resolves(null),
       },
       system: {
-        isDocker: stub().resolves(false),
+        isDocker: stub().resolves(true),
       },
     };
     homekitService = HomeKitService(gladys);
   });
 
+  it('should start service in docker', async () => {
+    const setValue = stub().resolves({});
+    gladys.system.getGladysBasePath = stub().resolves({ basePathOnContainer: 'test/folder' });
+    gladys.variable.setValue = setValue;
+
+    await homekitService.start();
+
+    expect(homekitService)
+      .to.have.property('start')
+      .and.be.instanceOf(Function);
+    expect(setValue.callCount).to.equal(4);
+    expect(setValue.args[0][1]).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    expect(setValue.args[1][1]).to.match(/^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$/);
+    expect(setValue.args[2][1]).to.match(/^\d{3}-\d{2}-\d{3}$/);
+    expect(setValue.args[3][1]).to.match(/^X-HM:\/\/[0-9A-Z]+$/);
+  });
+
   it('should start service', async () => {
     const setValue = stub().resolves({});
+    gladys.system.isDocker = stub().resolves(false);
     gladys.variable.setValue = setValue;
 
     await homekitService.start();
