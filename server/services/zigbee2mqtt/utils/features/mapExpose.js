@@ -1,4 +1,4 @@
-const { buildFeature } = require('./buildFeature');
+const { buildFeatures } = require('./buildFeatures');
 
 /**
  * @description Build a Gladys feature according to Zigbee "expose" and "features" values.
@@ -15,10 +15,10 @@ function mapExpose(deviceName, expose, parentType = undefined) {
   const matchingFeatures = [];
 
   // Merge default with specific
-  const feature = buildFeature(deviceName, expose, parentType);
-  if (feature) {
+  const builtFeatures = buildFeatures(deviceName, expose, parentType);
+  builtFeatures.forEach((feature) => {
     matchingFeatures.push(feature);
-  }
+  });
 
   // Map exposed sub-features recursivly
   features.flatMap((f) => mapExpose(deviceName, f, parentType || type)).forEach((f) => matchingFeatures.push(f));
