@@ -4,7 +4,7 @@ const logger = require('../../../../utils/logger');
 const { getDeviceFeatureExternalId, getNodeStateInfoByExternalId } = require('../utils/overkiz.externalId');
 const { unbindValue } = require('../utils/overkiz.bindValue');
 const { connect } = require('./overkiz.connect');
-const { EVENTS } = require('../../../../utils/constants');
+const { EVENTS, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 
 /**
  * @description Update device states.
@@ -57,10 +57,13 @@ async function getDevicesStates(device) {
       const newValueUnbind = unbindValue(device, state.name, state.value);
       const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
       if (deviceFeature) {
-        this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: deviceFeatureExternalId,
-          state: newValueUnbind,
-        });
+        if(deviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR ||
+          newValueUnbind !== 0) {
+            this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+              device_feature_external_id: deviceFeatureExternalId,
+              state: newValueUnbind,
+            });
+        }
       }
     });
   });

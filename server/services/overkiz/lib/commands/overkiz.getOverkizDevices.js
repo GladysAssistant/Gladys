@@ -152,6 +152,7 @@ async function getOverkizDevices() {
           }),
         );
       }
+      
       return newDevice;
     });
 

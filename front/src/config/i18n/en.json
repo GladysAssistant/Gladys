@@ -230,7 +230,10 @@
         "deviceTitle": "{{name}} - {{type}}",
         "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page.",
         "addButton": "+",
-        "substractButton": "-"
+        "substractButton": "-",
+        "offMode": "Off",
+        "ecoMode": "Eco",
+        "comfortMode": "Comfort"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
