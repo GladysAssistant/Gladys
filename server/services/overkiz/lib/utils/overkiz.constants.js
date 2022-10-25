@@ -110,7 +110,7 @@ const DEVICE_STATES = {
   OCCUPANCY_STATE: 'core:OccupancyState',
   TEMPERATURE_STATE: 'core:TemperatureState',
   COMFORT_TEMPERATURE_STATE: 'core:ComfortRoomTemperatureState',
-  ECO_TEMPERATURE_STATE: 'core:EcoRoomTemperatureState',
+  ECO_TEMPERATURE_STATE: 'io:EffectiveTemperatureSetpointState', // 'core:EcoRoomTemperatureState',
   ON_OFF_STATE: 'core:OnOffState',
   ELECTRIC_ENERGY_CONSUMTION_STATE: 'core:ElectricEnergyConsumptionState',
 };

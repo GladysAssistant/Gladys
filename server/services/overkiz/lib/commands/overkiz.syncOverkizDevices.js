@@ -52,7 +52,7 @@ async function syncOverkizDevices() {
 
   updateDevicesState.bind(this)(response.data.devices, response.data.rootPlace);
 
-  this.scanInProgress = true;
+  this.scanInProgress = false;
 }
 
 module.exports = {
