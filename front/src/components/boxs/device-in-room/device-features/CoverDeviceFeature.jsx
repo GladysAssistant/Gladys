@@ -2,7 +2,7 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { getDeviceName } from './utils';
+import { getDeviceName } from '../../../../utils/device';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { COVER_STATE } from '../../../../../../server/utils/constants';
 
