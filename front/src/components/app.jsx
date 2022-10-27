@@ -66,6 +66,7 @@ import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs'
 import TelegramPage from '../routes/integration/all/telegram';
 import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
 import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
+import HomeKitPage from '../routes/integration/all/homekit';
 import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
@@ -235,6 +236,7 @@ const AppRouter = connect(
         <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+        <HomeKitPage path="/dashboard/integration/communication/homekit" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
