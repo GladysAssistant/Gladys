@@ -29,12 +29,9 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
   -moz-appearance: textfield;
 }
 
-.deviceName {
-  max-width: 9rem;
-}
-
 .thermostatHorizontalControls {
   display: flex;
+  min-width: 7rem;
 }
 
 .thermostatVerticalControls {

@@ -3,7 +3,6 @@ import get from 'get-value';
 
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon } from '../../../../../utils/consts';
-import style from '../style.css';
 
 import BinaryDeviceValue from './BinaryDeviceValue';
 import LastSeenDeviceValue from './LastSeenDeviceValue';
@@ -46,7 +45,7 @@ const SensorDeviceType = ({ children, ...props }) => {
           )}`}
         />
       </td>
-      <td class={style.deviceName}>{props.deviceFeature.name}</td>
+      <td>{props.deviceFeature.name}</td>
       <td class="text-right">{createElement(elementType, props)}</td>
     </tr>
   );

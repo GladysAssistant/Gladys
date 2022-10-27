@@ -53,7 +53,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
           )}`}
         />
       </td>
-      <td class={style.deviceName}>{getDeviceName(props.device, props.deviceFeature)}</td>
+      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
 
       <td class="py-0">
         <div class="d-flex justify-content-end">

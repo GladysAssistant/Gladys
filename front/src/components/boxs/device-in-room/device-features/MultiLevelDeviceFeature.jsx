@@ -2,7 +2,6 @@ import get from 'get-value';
 
 import { getDeviceName } from './utils';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import style from './style.css';
 
 const MultiLevelDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
@@ -29,7 +28,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
           )}`}
         />
       </td>
-      <td class={style.deviceName}>{getDeviceName(props.device, props.deviceFeature)}</td>
+      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
 
       <td class="text-right" style="padding-top: 0px; padding-bottom: 0px">
         <div class="col">

@@ -86,7 +86,7 @@ class ColorDeviceType extends Component {
           <td>
             <i class="fe fe-circle" />
           </td>
-          <td class={style.deviceName}>{getDeviceName(device, deviceFeature)}</td>
+          <td>{getDeviceName(device, deviceFeature)}</td>
           <td class="text-right">
             <div class="m-0 float-right d-flex">
               <button
