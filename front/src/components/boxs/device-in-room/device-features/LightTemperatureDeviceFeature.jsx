@@ -1,4 +1,4 @@
-import { getDeviceName } from './utils';
+import { getDeviceName } from '../../../../utils/device';
 
 const LightTemperatureDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
