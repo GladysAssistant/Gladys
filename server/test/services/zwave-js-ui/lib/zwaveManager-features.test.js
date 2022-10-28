@@ -117,6 +117,114 @@ describe('zwaveJSUIManager events', () => {
     ]);
   });
 
+  it('should handle value added 48-0-Any', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Any',
+        unit: 'W',
+        writeable: false,
+      };
+    };
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 48,
+      endpoint: 0,
+      property: 'Any',
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[48][0].Any).to.deep.equal({
+      commandClass: 48,
+      endpoint: 0,
+      genre: 'user',
+      label: 'Any',
+      type: 'number',
+      unit: 'W',
+      nodeId: 1,
+      property: 'Any',
+      writeable: false,
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.have.lengthOf(0);
+  });
+
+  it('should handle value added 48-0-Motion', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'binary',
+        label: 'Motion',
+        writeable: false,
+      };
+    };
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 48,
+      endpoint: 0,
+      property: 'Motion',
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[48][0].Motion).to.deep.equal({
+      commandClass: 48,
+      endpoint: 0,
+      genre: 'user',
+      label: 'Motion',
+      type: 'binary',
+      nodeId: 1,
+      property: 'Motion',
+      writeable: false,
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'motion-sensor',
+        external_id: 'zwave-js-ui:node_id:1:comclass:48:endpoint:0:property:Motion',
+        type: 'binary',
+        has_feedback: true,
+        last_value: 0,
+        name: 'Motion',
+        read_only: true,
+        unit: null,
+        min: undefined,
+        max:undefined,
+        selector: 'zwave-js-ui-node-1-motion-48-0-motion'
+      },
+    ]);
+  });
+
+  /** 
+   * Power should be handled by Meter command class
+   */
+  it('should handle value added 49-0-Power', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Power',
+        unit: 'W',
+        writeable: false,
+      };
+    };
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 49,
+      endpoint: 0,
+      property: 'Power',
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[49][0].Power).to.deep.equal({
+      commandClass: 49,
+      endpoint: 0,
+      genre: 'user',
+      label: 'Power',
+      type: 'number',
+      unit: 'W',
+      nodeId: 1,
+      property: 'Power',
+      writeable: false,
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.have.lengthOf(0);
+  });
+
   it('should handle value added 49-0-Illuminance', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
@@ -423,41 +531,6 @@ describe('zwaveJSUIManager events', () => {
     expect(nodes[0].params).to.have.lengthOf(0);
   });
 
-  it('should not handle value added 50-0-value-66049', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric Consumption [kWh]',
-        writeable: false,
-        unit: 'kWh',
-      };
-    };
-
-    zwaveJSUIManager.valueAdded(zwaveNode, {
-      commandClass: 50,
-      endpoint: 0,
-      property: 'value-66049',
-    });
-    const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
-    expect(nodes[0].features).to.deep.equal([
-      {
-        category: 'switch',
-        external_id: 'zwave-js-ui:node_id:1:comclass:50:endpoint:0:property:value-66049',
-        has_feedback: true,
-        last_value: undefined,
-        name: 'Electric Consumption [kWh]',
-        read_only: true,
-        selector: 'zwave-js-ui-node-1-value-66049-50-0-electric-consumption-kwh',
-        type: 'power',
-        unit: 'kilowatt-hour',
-        max: 10000,
-        min: 0,
-      },
-    ]);
-  });
-
   it('should not handle value added 50-0-value-66048', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
@@ -493,6 +566,83 @@ describe('zwaveJSUIManager events', () => {
     ]);
   });
 
+  it('should not handle value added 50-0-value-66049', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric Consumption [kWh]',
+        writeable: false,
+        unit: 'kWh',
+      };
+    };
+
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-66049',
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'switch',
+        external_id: 'zwave-js-ui:node_id:1:comclass:50:endpoint:0:property:value-66049',
+        has_feedback: true,
+        last_value: undefined,
+        name: 'Electric Consumption [kWh]',
+        read_only: true,
+        selector: 'zwave-js-ui-node-1-value-66049-50-0-electric-consumption-kwh',
+        type: 'power',
+        unit: 'kilowatt-hour',
+        max: 10000,
+        min: 0,
+      },
+    ]);
+  });
+
+  it('should not handle value added 50-0-value-66051', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric [W]',
+        writeable: false,
+        unit: 'W',
+      };
+    };
+
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-66051',
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.have.lengthOf(0);
+  });
+
+  it('should not handle value added 50-0-value-65536', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric [kWh]',
+        writeable: false,
+        unit: 'kWh',
+      };
+    };
+
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-65536',
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.have.lengthOf(0);
+  });
+
   it('should not handle value added 50-0-value-65537', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {
@@ -526,6 +676,27 @@ describe('zwaveJSUIManager events', () => {
         min: 0,
       },
     ]);
+  });
+
+  it('should not handle value added 50-0-value-65539', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'number',
+        label: 'Electric [kWh]',
+        writeable: false,
+        unit: 'kWh',
+      };
+    };
+
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 50,
+      endpoint: 0,
+      property: 'value-65539',
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.have.lengthOf(0);
   });
 
   it('should not handle value added 50-0-value-66561', () => {
