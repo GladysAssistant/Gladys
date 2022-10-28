@@ -773,12 +773,12 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NODE_ADDED: 'zwave.node-added',
     NODE_REMOVED: 'zwave.node-removed',
   },
-  ZWAVEJS2MQTT: {
-    DISCOVER: 'zwavejs2mqtt.discover',
-    STATUS_CHANGE: 'zwavejs2mqtt.status-change',
-    SCAN_COMPLETE: 'zwavejs2mqtt.scan-complete',
-    MQTT_ERROR: 'zwavejs2mqtt.mqtt-error',
-    PERMIT_JOIN: 'zwavejs2mqtt.permit-join',
+  ZWAVEJSUI: {
+    DISCOVER: 'zwave-js-ui.discover',
+    STATUS_CHANGE: 'zwave-js-ui.status-change',
+    SCAN_COMPLETE: 'zwave-js-ui.scan-complete',
+    MQTT_ERROR: 'zwave-js-ui.mqtt-error',
+    PERMIT_JOIN: 'zwave-js-ui.permit-join',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',

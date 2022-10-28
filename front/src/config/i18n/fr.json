@@ -775,7 +775,7 @@
         "nodeAddedDescription": "Attendez quelques secondes pendant que nous obtenons toutes les informations de ce nœud..."
       }
     },
-    "zwavejs2mqtt": {
+    "zwave-js-ui": {
       "title": "Z-Wave",
       "description": "Contrôlez vos appareils Z-Wave.",
       "deviceTab": "Appareils",
@@ -785,15 +785,15 @@
       "status": {
         "error": "Impossible de se connecter au réseau Zwave",
         "connected": "Réseau Zwave connecté",
-        "notConfigured": "Aucun dongle USB Zwavejs2mqtt configuré, veuillez vous rendre sur ",
-        "notEnabled": "Le service Zwavejs2mqtt n'est pas activé, veuillez vous rendre sur ",
+        "notConfigured": "Aucun dongle USB ZwaveJS UI configuré, veuillez vous rendre sur ",
+        "notEnabled": "Le service ZwaveJS UI n'est pas activé, veuillez vous rendre sur ",
         "mqttNotInstalled": "Le broker MQTT n'a pas pu être installé.",
         "mqttNotRunning": "Le broker MQTT n'a pas démarré.",
-        "zwavejs2mqttNotInstalled": "Zwavejs2mqtt n'a pas pu être installé.",
-        "zwavejs2mqttNotRunning": "Zwavejs2mqtt n'a pas démarré.",
-        "zwavejs2mqttNotConnected": "Zwavejs2mqtt n'a pas réussi à se connecter au broker MQTT",
+        "zwave-js-uiNotInstalled": "ZwaveJS UI n'a pas pu être installé.",
+        "zwave-js-uiNotRunning": "ZwaveJS UI n'a pas démarré.",
+        "zwave-js-uiNotConnected": "ZwaveJS UI n'a pas réussi à se connecter au broker MQTT",
         "settingsPageLink": "la page de paramétrage du dongle USB",
-        "setupPageLink": "la page de configuration de Zwavejs2mqtt"
+        "setupPageLink": "la page de configuration de ZwaveJSUI"
       },
       "device": {
         "title": "Appareils Z-Wave",
@@ -834,8 +834,8 @@
       },
       "settings": {
         "title": "Paramètres Z-Wave",
-        "description": "Ce service utilise deux containers Docker (MQTT broker and Zwavejs2Mqtt). L'interface Zwavejs2mqtt est disponible à l'URL ci-dessous, user = admin, mot de passe = zwave.\nPour en savoir plus, rendez-vous sur la page de documentation Zwavejs2mqtt",
-        "zwavejs2mqtt": "Zwavejs2Mqtt interface",
+        "description": "Ce service utilise deux containers Docker (MQTT broker and ZwaveJS UI). L'interface ZwaveJS UI est disponible à l'URL ci-dessous, user = admin, mot de passe = zwave.\nPour en savoir plus, rendez-vous sur la page de documentation ZwaveJS UI",
+        "zwave-js-ui": "Zwavejs UI interface",
         "urlLabel": "URL du broker",
         "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
         "userLabel": "Nom d'utilisateur",
@@ -853,22 +853,22 @@
         "connectButton": "Connecter/Reconnecter",
         "disconnectButton": "Déconnecter",
         "saveConfiguration": "Sauvegarder la configuration",
-        "connected": "Zwavejs2Mqtt démarré avec succès.",
-        "notConnected": "Zwavejs2Mqtt n'est pas connecté",
+        "connected": "Zwavejs UI démarré avec succès.",
+        "notConnected": "Zwavejs UI n'est pas connecté",
         "usbNotConfigured": "Gladys n'est connectée à aucune clé USB Z-Wave.",
         "connecting": "Tentative de connexion à la clé USB Z-Wave...",
         "zwaveUsbDriverPathLabel": "Sélectionnez le port USB auquel votre clé Z-Wave est connecté",
         "refreshButton": "Rafraîchir la liste des appareils USB",
-        "error": "Une erreur s'est produite au démarrage du service Zwavejs2Mqtt.",
-        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zwavejs2mqtt depuis Gladys.",
-        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zwavejs2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
-        "externalZwavejs2mqtt": "Zwavejs2Mqtt externe",
-        "containersStatus": "Conteneurs liés à Zwavejs2Mqtt",
-        "serviceStatus": "Etat du service Zwavejs2Mqtt",
+        "error": "Une erreur s'est produite au démarrage du service Zwavejs UI.",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer ZwaveJSUI depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer ZwaveJSUI depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
+        "externalZwaveJSUI": "ZwaveJS UI externe",
+        "containersStatus": "Conteneurs liés à Zwavejs UI",
+        "serviceStatus": "Etat du service Zwavejs UI",
         "link": "Lien",
         "mqttZwavejsLink": "MQTT - ZwaveJS",
         "gladysMqttLink": "Gladys - MQTT",
-        "zwave2Mqtt": "Zwavejs2Mqtt",
+        "zwave2Mqtt": "Zwavejs UI",
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Status"

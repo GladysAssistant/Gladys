@@ -1,0 +1,31 @@
+{
+  "name": "gladys-zwave-js-ui-mqtt",
+  "Image": "eclipse-mosquitto:2",
+  "ExposedPorts": {
+    "1885/tcp": {}
+  },
+  "HostConfig": {
+    "Binds": [],
+    "PortBindings": {
+      "1885/tcp": [
+        {
+          "HostPort": "1885"
+        }
+      ]
+    },
+    "RestartPolicy": {
+      "Name": "always"
+    },
+    "NetworkMode": "host",
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": []
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}

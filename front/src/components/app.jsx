@@ -120,12 +120,12 @@ import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
-// Zwavejs2mqtt
-import Zwavejs2mqttNodePage from '../routes/integration/all/zwavejs2mqtt/node-page';
-import Zwavejs2mqttNodeOperationPage from '../routes/integration/all/zwavejs2mqtt/node-operation-page';
-import Zwavejs2mqttDiscoverPage from '../routes/integration/all/zwavejs2mqtt/discover-page';
-import Zwavejs2mqttSettingsPage from '../routes/integration/all/zwavejs2mqtt/settings-page';
-import Zwavejs2mqttEditPage from '../routes/integration/all/zwavejs2mqtt/edit-page';
+// ZwaveJSUI
+import ZwaveJSUINodePage from '../routes/integration/all/zwave-js-ui/node-page';
+import ZwaveJSUINodeOperationPage from '../routes/integration/all/zwave-js-ui/node-operation-page';
+import ZwaveJSUIDiscoverPage from '../routes/integration/all/zwave-js-ui/discover-page';
+import ZwaveJSUISettingsPage from '../routes/integration/all/zwave-js-ui/settings-page';
+import ZwaveJSUIEditPage from '../routes/integration/all/zwave-js-ui/edit-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -254,12 +254,12 @@ const AppRouter = connect(
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
         <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
 
-        <Zwavejs2mqttNodePage path="/dashboard/integration/device/zwavejs2mqtt" />
-        <Zwavejs2mqttNodePage path="/dashboard/integration/device/zwavejs2mqtt/node" />
-        <Zwavejs2mqttDiscoverPage path="/dashboard/integration/device/zwavejs2mqtt/discover" />
-        <Zwavejs2mqttSettingsPage path="/dashboard/integration/device/zwavejs2mqtt/settings" />
-        <Zwavejs2mqttNodeOperationPage path="/dashboard/integration/device/zwavejs2mqtt/node-operation" />
-        <Zwavejs2mqttEditPage path="/dashboard/integration/device/zwavejs2mqtt/edit/:deviceSelector" />
+        <ZwaveJSUINodePage path="/dashboard/integration/device/zwave-js-ui" />
+        <ZwaveJSUINodePage path="/dashboard/integration/device/zwave-js-ui/node" />
+        <ZwaveJSUIDiscoverPage path="/dashboard/integration/device/zwave-js-ui/discover" />
+        <ZwaveJSUISettingsPage path="/dashboard/integration/device/zwave-js-ui/settings" />
+        <ZwaveJSUINodeOperationPage path="/dashboard/integration/device/zwave-js-ui/node-operation" />
+        <ZwaveJSUIEditPage path="/dashboard/integration/device/zwave-js-ui/edit/:deviceSelector" />
 
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />

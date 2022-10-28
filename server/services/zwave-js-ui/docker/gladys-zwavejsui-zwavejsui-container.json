@@ -1,0 +1,35 @@
+{
+  "name": "gladys-zwave-js-ui-zwave-js-ui",
+  "Image": "zwavejs/zwave-js-ui:latest",
+  "ExposedPorts": {},
+  "HostConfig": {
+    "Binds": ["/run/udev:/run/udev:ro"],
+    "PortBindings": {
+      "8091/tcp": [
+        {
+          "HostPort": "8091"
+        }
+      ]
+    },
+    "RestartPolicy": {
+      "Name": "always"
+    },
+    "NetworkMode": "host",
+    "Dns": [],
+    "DnsOptions": [],
+    "DnsSearch": [],
+    "BlkioWeightDevice": [],
+    "Devices": [
+      {
+        "PathOnHost": "/dev/ttyUSB0",
+        "PathInContainer": "/dev/ttyUSB0",
+        "CgroupPermissions": "rwm"
+      }
+    ]
+  },
+  "NetworkDisabled": false,
+  "AttachStdin": false,
+  "AttachStdout": false,
+  "AttachStderr": false,
+  "Tty": false
+}

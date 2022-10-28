@@ -1,0 +1,20 @@
+{
+  "name": "gladys-zwave-js-ui",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "dayjs": "^1.10.7",
+    "lodash.clonedeep": "^4.5.0",
+    "mqtt": "^4.2.6"
+  }
+}
