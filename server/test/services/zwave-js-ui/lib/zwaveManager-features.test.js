@@ -185,13 +185,13 @@ describe('zwaveJSUIManager events', () => {
         read_only: true,
         unit: null,
         min: undefined,
-        max:undefined,
-        selector: 'zwave-js-ui-node-1-motion-48-0-motion'
+        max: undefined,
+        selector: 'zwave-js-ui-node-1-motion-48-0-motion',
       },
     ]);
   });
 
-  /** 
+  /**
    * Power should be handled by Meter command class
    */
   it('should handle value added 49-0-Power', () => {
