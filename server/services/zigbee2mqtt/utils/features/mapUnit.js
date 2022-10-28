@@ -31,6 +31,10 @@ function mapUnit(deviceUnit, featureUnit) {
       return DEVICE_FEATURE_UNITS.CELSIUS;
     case '°F':
       return DEVICE_FEATURE_UNITS.FAHRENHEIT;
+    case 'VA':
+      return DEVICE_FEATURE_UNITS.VOLT_AMPERE;
+    case 'VArh':
+      return DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE;
     default:
       return featureUnit || null;
   }
