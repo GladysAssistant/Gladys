@@ -2,8 +2,10 @@ const EventEmitter = require('events');
 const { assert, fake } = require('sinon');
 const Device = require('../../../../lib/device');
 const StateManager = require('../../../../lib/state');
+const Job = require('../../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 const testService = {
   device: {
@@ -38,7 +40,7 @@ const context = {};
 describe('Light.command', () => {
   it('should send a turn on command', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, service);
+    const deviceManager = new Device(event, messageManager, stateManager, service, {}, {}, job);
     await deviceManager.lightManager.command(
       message,
       {
@@ -65,7 +67,7 @@ describe('Light.command', () => {
   });
   it('should fail to send a turn on command', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, serviceBroken);
+    const deviceManager = new Device(event, messageManager, stateManager, serviceBroken, {}, {}, job);
     await deviceManager.lightManager.command(
       message,
       {
@@ -92,7 +94,7 @@ describe('Light.command', () => {
   });
   it('should fail to send a turn on command', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, serviceBroken);
+    const deviceManager = new Device(event, messageManager, stateManager, serviceBroken, {}, {}, job);
     await deviceManager.lightManager.command(
       message,
       {
@@ -118,7 +120,7 @@ describe('Light.command', () => {
   });
   it('should send a turn off command', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, service);
+    const deviceManager = new Device(event, messageManager, stateManager, service, {}, {}, job);
     await deviceManager.lightManager.command(
       message,
       {
@@ -145,7 +147,7 @@ describe('Light.command', () => {
   });
   it('should fail to send a command because no device with binary feature in this room', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, service);
+    const deviceManager = new Device(event, messageManager, stateManager, service, {}, {}, job);
     // Mock getDeviceFeature to answer no binay feature
     deviceManager.lightManager.getLightsInRoom = () =>
       new Promise((resolve) => {
@@ -182,7 +184,7 @@ describe('Light.command', () => {
   });
   it('should fail to send a command because no device in this room', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, service);
+    const deviceManager = new Device(event, messageManager, stateManager, service, {}, {}, job);
     // Mock getLightsInRoom to answer no devices
     deviceManager.lightManager.getLightsInRoom = () =>
       new Promise((resolve) => {
@@ -213,7 +215,7 @@ describe('Light.command', () => {
   });
   it('should fail to send a command because no room found in command', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, messageManager, stateManager, service);
+    const deviceManager = new Device(event, messageManager, stateManager, service, {}, {}, job);
     // Mock getLightsInRoom to answer no devices
     deviceManager.lightManager.getLightsInRoom = () =>
       new Promise((resolve) => {

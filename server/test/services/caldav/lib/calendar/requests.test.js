@@ -122,7 +122,7 @@ describe('CalDAV requests', () => {
     xhr.send.resolves([
       {
         props: {
-          resourcetype: 'calendar',
+          resourcetype: ['collection', 'calendar'],
           supportedCalendarComponentSet: ['VEVENT'],
           displayname: 'Calendrier 1',
           calendarDescription: 'Description 1',
@@ -135,7 +135,7 @@ describe('CalDAV requests', () => {
       },
       {
         props: {
-          resourcetype: 'calendar',
+          resourcetype: ['collection', 'calendar'],
           supportedCalendarComponentSet: ['VEVENT'],
           displayname: 'Calendrier 2',
           calendarDescription: 'Description 2',
@@ -148,7 +148,7 @@ describe('CalDAV requests', () => {
       },
       {
         props: {
-          resourcetype: 'calendar',
+          resourcetype: ['collection', 'calendar'],
           supportedCalendarComponentSet: ['VEVENT'],
           displayname: 'Calendrier 3',
           calendarDescription: 'Description 3',
@@ -169,7 +169,7 @@ describe('CalDAV requests', () => {
             displayname: 'Calendrier 1',
             calendarColor: '#c4391d',
             getctag: 'ctag1',
-            resourcetype: 'calendar',
+            resourcetype: ['collection', 'calendar'],
             supportedCalendarComponentSet: ['VEVENT'],
             syncToken: 'sync-token-1',
             timezone: 'Europe/Paris',
@@ -183,7 +183,7 @@ describe('CalDAV requests', () => {
         displayName: 'Calendrier 1',
         color: '#c4391d',
         components: ['VEVENT'],
-        resourcetype: 'calendar',
+        type: 'CALDAV',
         syncToken: 'sync-token-1',
       },
       {
@@ -193,7 +193,7 @@ describe('CalDAV requests', () => {
             displayname: 'Calendrier 2',
             calendarColor: '#d5282c',
             getctag: 'ctag22',
-            resourcetype: 'calendar',
+            resourcetype: ['collection', 'calendar'],
             supportedCalendarComponentSet: ['VEVENT'],
             syncToken: 'sync-token-22',
             timezone: 'Europe/Paris',
@@ -207,7 +207,7 @@ describe('CalDAV requests', () => {
         displayName: 'Calendrier 2',
         color: '#d5282c',
         components: ['VEVENT'],
-        resourcetype: 'calendar',
+        type: 'CALDAV',
         syncToken: 'sync-token-22',
       },
       {
@@ -216,7 +216,7 @@ describe('CalDAV requests', () => {
             calendarDescription: 'Description 3',
             displayname: 'Calendrier 3',
             getctag: 'ctag3',
-            resourcetype: 'calendar',
+            resourcetype: ['collection', 'calendar'],
             supportedCalendarComponentSet: ['VEVENT'],
             syncToken: 'sync-token-3',
             timezone: 'Europe/Paris',
@@ -230,7 +230,7 @@ describe('CalDAV requests', () => {
         displayName: 'Calendrier 3',
         color: undefined,
         components: ['VEVENT'],
-        resourcetype: 'calendar',
+        type: 'CALDAV',
         syncToken: 'sync-token-3',
       },
     ]);

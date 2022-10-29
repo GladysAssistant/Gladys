@@ -62,7 +62,7 @@ async function syncUserCalendars(userId) {
   );
 
   await Promise.map(
-    calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null),
+    calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null && updatedCalendar.type === 'CALDAV'),
     async (calendarToUpdate) => {
       // Get events that have changed
       let eventsToUpdate;

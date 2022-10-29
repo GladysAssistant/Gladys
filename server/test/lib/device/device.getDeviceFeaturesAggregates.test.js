@@ -5,8 +5,10 @@ const uuid = require('uuid');
 const { fake } = require('sinon');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 const insertStates = async (intervalInMinutes) => {
   const queryInterface = db.sequelize.getQueryInterface();
@@ -62,7 +64,7 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
         name: 'my-feature',
       }),
     };
-    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable);
+    const deviceInstance = new Device(event, {}, stateManager, {}, {}, variable, job);
     await deviceInstance.calculateAggregate('hourly');
     const { values, device, deviceFeature } = await deviceInstance.getDeviceFeaturesAggregates(
       'test-device-feature',
@@ -84,7 +86,7 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
         name: 'my-feature',
       }),
     };
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 24 * 60, 100);
     expect(values).to.have.lengthOf(100);
@@ -100,7 +102,7 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
         name: 'my-feature',
       }),
     };
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 3 * 24 * 60, 100);
     expect(values).to.have.lengthOf(72);
@@ -116,7 +118,7 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
         name: 'my-feature',
       }),
     };
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
     await device.calculateAggregate('daily');
     const { values } = await device.getDeviceFeaturesAggregates('test-device-feature', 30 * 24 * 60, 100);
@@ -133,7 +135,7 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
         name: 'my-feature',
       }),
     };
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
     await device.calculateAggregate('daily');
     await device.calculateAggregate('monthly');
@@ -147,7 +149,7 @@ describe('Device.getDeviceFeaturesAggregates', function Describe() {
     const stateManager = {
       get: fake.returns(null),
     };
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     const promise = device.getDeviceFeaturesAggregates('this-device-does-not-exist', 365 * 24 * 60, 100);
     return assert.isRejected(promise, 'DeviceFeature not found');
   });

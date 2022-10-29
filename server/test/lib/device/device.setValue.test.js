@@ -5,14 +5,10 @@ const { assert } = require('chai');
 const Device = require('../../../lib/device');
 
 const StateManager = require('../../../lib/state');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
-
-/* const testService = {
-  light: {
-    turnOn: fake.resolves(true),
-  },
-}; */
+const job = new Job(event);
 
 describe('Device', () => {
   it('should throw an error, service does not exist', async () => {
@@ -20,7 +16,7 @@ describe('Device', () => {
     const service = {
       getService: () => null,
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const promise = device.setValue(
       {
         service: {
@@ -38,7 +34,7 @@ describe('Device', () => {
     const service = {
       getService: () => {},
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const promise = device.setValue(
       {
         service: {

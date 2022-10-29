@@ -200,6 +200,26 @@ const SystemPage = ({ children, ...props }) => (
                 </label>
               </div>
             </form>
+            <form class="mt-4">
+              <label>
+                <Text id="systemSettings.vacuumDatabaseTitle" />
+              </label>
+              <p>
+                <small>
+                  <Text id="systemSettings.vacuumDatabaseDescription" />
+                </small>
+              </p>
+              <p>
+                {props.vacuumStarted && (
+                  <div class="alert alert-info">
+                    <Text id="systemSettings.vacuumDatabaseStarted" />
+                  </div>
+                )}
+                <button onClick={props.vacuumDatabase} class="btn btn-primary">
+                  <Text id="systemSettings.vacuumDatabaseButton" />
+                </button>
+              </p>
+            </form>
           </div>
         </div>
       </div>

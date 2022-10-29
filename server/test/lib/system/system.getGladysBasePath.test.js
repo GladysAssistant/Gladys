@@ -10,6 +10,7 @@ const DockerodeMock = require('./DockerodeMock.test');
 const System = proxyquire('../../../lib/system', {
   dockerode: DockerodeMock,
 });
+const Job = require('../../../lib/job');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -20,6 +21,8 @@ const event = {
   emit: fake.resolves(null),
 };
 
+const job = new Job(event);
+
 const config = {
   tempFolder: '/tmp/gladys',
 };
@@ -28,7 +31,7 @@ describe('system.getGladysBasePath', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event, config, job);
     system.getGladysContainerId = fake.resolves('containerid');
     system.getContainerMounts = fake.resolves([]);
     await system.init();
