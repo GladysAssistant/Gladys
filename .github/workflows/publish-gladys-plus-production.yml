@@ -1,0 +1,10 @@
+name: Publish Gladys Plus front to production
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Cloudflare Pages deploy hook
+        run: curl -X POST "https://api.cloudflare.com/client/v4/pages/webhooks/deploy_hooks/${{ secrets.CLOUDFLARE_PAGES_GLADYS_PLUS_DEPLOY_HOOK }}"

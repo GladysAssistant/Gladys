@@ -4,8 +4,10 @@ const uuid = require('uuid');
 const { fake } = require('sinon');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 const insertStates = async (intervalInMinutes) => {
   const queryInterface = db.sequelize.getQueryInterface();
@@ -52,7 +54,7 @@ describe('Device.getDeviceFeaturesAggregatesMulti', function Describe() {
         name: 'my-feature',
       }),
     };
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
     const response = await device.getDeviceFeaturesAggregatesMulti(['test-device-feature'], 60, 100);
     expect(response).to.be.instanceOf(Array);

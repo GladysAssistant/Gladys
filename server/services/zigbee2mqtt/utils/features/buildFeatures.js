@@ -40,17 +40,17 @@ function buildByName(names = {}, name, parentType) {
  * @param {string} deviceName - Device friendly name.
  * @param {Object} expose - Zigbee "expose" values.
  * @param {string} parentType - Requested parent type.
- * @returns {Object} The related Gladys feature, or undefined.
+ * @returns {Array} The related Gladys features.
  *
  * @example buildFeature('MyDevice', {}, 'light');
  */
-function buildFeature(deviceName, expose = {}, parentType) {
+function buildFeatures(deviceName, expose = {}, parentType) {
   const { type, name, property, access, value_min: minValue, value_max: maxValue, unit: deviceUnit, values } = expose;
-  const { names = {}, feature } = exposesMap[type] || {};
+  const { names = {}, feature, getFeatureIndexes = () => [''] } = exposesMap[type] || {};
   const byName = buildByName(names, name, parentType);
 
   if (!byName) {
-    return undefined;
+    return [];
   }
 
   // Read only ?
@@ -77,12 +77,23 @@ function buildFeature(deviceName, expose = {}, parentType) {
   // Unit
   const unit = mapUnit(deviceUnit, createdFeature.unit);
 
+  // Force override values
+  const definedFeature = createdFeature.forceOverride
+    ? // We force to override with Gladys mapping
+      { ...createdFeature, min, max, unit, ...(byName || {}) }
+    : // Values from z2m are kept
+      { ...createdFeature, min, max, unit };
+  // Clean additional attribute
+  delete definedFeature.forceOverride;
+
   // Add missing properties
-  return completeFeature(deviceName, { ...createdFeature, min, max, unit }, property);
+  const typeFeaturesIndexes = getFeatureIndexes(values);
+  const featureIndexes = typeFeaturesIndexes.length === 0 ? [0] : typeFeaturesIndexes;
+  return featureIndexes.map((suffixIndex) => completeFeature(deviceName, definedFeature, property, suffixIndex));
 }
 
 module.exports = {
   buildByParentType,
   buildByName,
-  buildFeature,
+  buildFeatures,
 };

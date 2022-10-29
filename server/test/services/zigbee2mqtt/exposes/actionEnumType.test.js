@@ -3,8 +3,9 @@ const { assert } = require('chai');
 const enumType = require('../../../../services/zigbee2mqtt/exposes/enumType');
 const { BUTTON_STATUS } = require('../../../../utils/constants');
 
-describe('zigbee2mqtt enumType', () => {
+describe('zigbee2mqtt action enumType', () => {
   const expose = {
+    name: 'action',
     values: ['single', 'long', 'short', 'double', 'triple', 'hold'],
   };
 
@@ -43,5 +44,15 @@ describe('zigbee2mqtt enumType', () => {
   it('should read enum value', () => {
     const result = enumType.readValue(expose, 'unknown');
     assert.equal(result, undefined);
+  });
+
+  it('should have multiple indexes', () => {
+    const result = enumType.getFeatureIndexes(['1_single', '1_double', '2_single']);
+    assert.deepEqual(result, [1, 2]);
+  });
+
+  it('should have no indexes', () => {
+    const result = enumType.getFeatureIndexes(['single', 'double']);
+    assert.deepEqual(result, []);
   });
 });

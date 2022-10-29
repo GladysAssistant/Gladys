@@ -38,7 +38,8 @@
   "license": "Apache-2.0",
   "nodemonConfig": {
     "ignore": [
-      "test/*"
+      "test/*",
+      "persist/*"
     ]
   },
   "nyc": {
@@ -57,6 +58,7 @@
     "eslint-config-prettier": "^4.3.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsdoc": "^4.1.0",
+    "eslint-plugin-mocha": "^10.1.0",
     "eslint-plugin-no-call": "^1.2.5",
     "eslint-plugin-require-jsdoc": "^1.0.4",
     "jsdoc": "^3.6.10",
