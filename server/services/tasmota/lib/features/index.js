@@ -19,6 +19,7 @@ const counter = require('./counter');
 const humidity = require('./humidity');
 const temperature = require('./temperature');
 const deviceTemperature = require('./device_temperature');
+const thermostat = require('./thermostat');
 
 const FEATURE_TEMPLATES = [
   power,
@@ -35,6 +36,7 @@ const FEATURE_TEMPLATES = [
   humidity,
   temperature,
   deviceTemperature,
+  thermostat,
 ];
 
 const generateValue = (featureTemplate, value) => {

@@ -6,7 +6,7 @@ const {
 
 module.exports = {
   // Tasmota matcher
-  keyMatcher: /^StatusSNS\.(ENERGY\.)?((?!(ESP32))[^.]+)\.Temperature$$/,
+  keyMatcher: /^StatusSNS\.(ENERGY\.)?((?!(ESP32))[^.]+)\.Temperature$/,
   // Gladys feature
   generateFeature: () => {
     return {
