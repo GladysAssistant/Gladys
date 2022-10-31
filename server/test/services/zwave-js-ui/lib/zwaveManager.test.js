@@ -2,7 +2,7 @@ const sinon = require('sinon');
 
 const { expect } = require('chai');
 
-const { assert, stub, fake, useFakeTimers } = sinon;
+const { assert, fake, useFakeTimers } = sinon;
 const EventEmitter = require('events');
 
 const ZwaveJSUIManager = require('../../../../services/zwave-js-ui/lib');
