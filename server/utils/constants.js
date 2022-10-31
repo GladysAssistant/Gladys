@@ -333,7 +333,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SIGNAL: 'signal',
   DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
   TELEVISION: 'television',
-  VACBOT: 'vacuum',
+  VACBOT: 'vacbot',
   ENERGY_SENSOR: 'energy-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   CURRENCY: 'currency',
