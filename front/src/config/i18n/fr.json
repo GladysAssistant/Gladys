@@ -1031,7 +1031,7 @@
       "settings": {
         "oauth2": {
           "title": "Withings Configuration",
-          "introduction": "<div class=\"alert alert-info\">Pensez à faire cette configuration en local, pas via Gladys Plus.</div>Pour connecter le compte Withings à Gladys, vous devez d'abord créer un compte d'utilisateur Withings à <a href=\"https://account.withings.com/connectionwou/account_login\" target=\"_blank\" >ce lien</a>.<br/><br/>Pour relier les mesures Withings à Gladys, vous devez créer un compte partenaire Withings à <a href=\"https://developer.withings.com/dashboard/welcome\" target=\"_blank\" >ce lien</a><br/><br/>Dans le champ \"REGISTERED URLS\" vous pouvez mettre <code>http://gladys.local/dashboard/integration/health/withings/settings</code>, en pensant à remplacer <code>http://gladys.local</code> par l'URL locale que vous utilisez pour accéder à Gladys.<br/><br/>Dans le champs \"TARGET ENVIRONMENT\", choisir \"Development\".<br/>",
+          "introduction": "<div class=\"alert alert-info\">Pensez à faire cette configuration en local, pas via Gladys Plus.</div>Pour connecter le compte Withings à Gladys, vous devez d'abord créer un compte d'utilisateur Withings à <a href=\"https://account.withings.com/connectionwou/account_login\" target=\"_blank\" >ce lien</a>.<br/><br/>Pour relier les mesures Withings à Gladys, vous devez créer un compte partenaire Withings à <a href=\"https://developer.withings.com/dashboard/welcome\" target=\"_blank\" >ce lien</a><br/><br/>Dans le champ \"REGISTERED URLS\" vous pouvez mettre <code>http://gladys.local/dashboard/integration/health/withings/settings</code>, en pensant à remplacer <code>http://gladys.local</code> par l'URL locale que vous utilisez pour accéder à Gladys.<br/><br/>Dans le champ \"TARGET ENVIRONMENT\", choisir \"Production\".<br/>",
           "instructionsToUse": "Pour utiliser cette intégration, rendez-vous sur le tableau de bord et créez une box d'appareil ou de graphique.",
           "complete": "Votre compte est maintenant lié à Gladys avec ces paramètres :",
           "buttonConnect": "Connecter maintenant",
@@ -1041,7 +1041,7 @@
           "clientId": "Client id du compte",
           "secret": "Client secret du compte",
           "instructions": "À cette étape, veuillez remplir les champs client id et client secret ci-dessous et cliquez sur le bouton de connexion.",
-          "delete": "Pour supprimer vos configurations de compte cliquer sur le bouton 'Déconneter' (toutes les données associées seront supprimées).",
+          "delete": "Pour supprimer vos configurations de compte cliquer sur le bouton 'Déconnecter' (toutes les données associées seront supprimées).",
           "unconnectButton": "Déconnecter"
         },
         "menu": "Découverte",

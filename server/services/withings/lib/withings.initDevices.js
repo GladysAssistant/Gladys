@@ -9,8 +9,6 @@ const {
   DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
 
-const withingsDeviceIdName = 'WITHINGS_DEVICE_ID';
-
 /**
  * @description Build a new gladys device from withings device.
  *
@@ -24,14 +22,6 @@ function buildNewDevice(withingsDevice, serviceId) {
   // Build unique id for the device
   const uniqueId = uuid.v4();
 
-  // Build params for all device
-  const newParams = [
-    {
-      name: withingsDeviceIdName,
-      value: withingsDevice.deviceid,
-    },
-  ];
-
   // Build features
   const newFeatures = [];
   // Feature allow in each device = battery
@@ -44,9 +34,9 @@ function buildNewDevice(withingsDevice, serviceId) {
 
   newFeatures.push({
     id: uniqueBatFeatureId,
-    selector: `withings-battery-${uniqueId}`,
+    selector: `withings-${withingsDevice.model}-battery`,
     device_id: uniqueId,
-    external_id: uniqueId,
+    external_id: `withings:${withingsDevice.model}:${DEVICE_FEATURE_CATEGORIES.BATTERY}:${DEVICE_FEATURE_TYPES.SENSOR.INTEGER}`,
     category: DEVICE_FEATURE_CATEGORIES.BATTERY,
     type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
     read_only: true,
@@ -72,8 +62,8 @@ function buildNewDevice(withingsDevice, serviceId) {
 
   const newDevice = {
     id: uniqueId,
-    external_id: uniqueId,
-    selector: `withings-${withingsDevice.model}-${uniqueId}`,
+    external_id: withingsDevice.deviceid,
+    selector: `withings-${withingsDevice.model}`,
     name: `Withings - ${withingsDevice.model}`,
     model: withingsDevice.model,
     room_id: null,
@@ -81,7 +71,6 @@ function buildNewDevice(withingsDevice, serviceId) {
     should_poll: true,
     poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_DAY,
     features: newFeatures,
-    params: newParams,
   };
 
   return newDevice;
@@ -178,8 +167,7 @@ function buildFeature(currentGroup, device, currentFeatures) {
           featureType = DEVICE_FEATURE_TYPES.HEALTH.UNKNOWN;
           featureUnit = '';
           break;
-      }
-      const featureName = `deviceFeatureCategory.${DEVICE_FEATURE_CATEGORIES.HEALTH}.${featureType}`;
+      } 
 
       // Search existing feature
       let tmpFeature = features.find((feat) => feat.type === featureType);
@@ -191,9 +179,9 @@ function buildFeature(currentGroup, device, currentFeatures) {
         const uniqueId = uuid.v4();
         tmpFeature = {
           id: uniqueId,
-          selector: `withings-${featureName}-${gladysDeviceId}`,
-          device_id: gladysDeviceId,
-          external_id: `withings-${featureName}:${gladysDeviceId}:${uniqueId}`,
+          selector: `${device.selector}-${featureType}`,
+          device_id: gladysDeviceId, 
+          external_id: `withings:${device.model}:${DEVICE_FEATURE_CATEGORIES.HEALTH}:${featureType}`,
           category: DEVICE_FEATURE_CATEGORIES.HEALTH,
           type: featureType,
           read_only: true,

@@ -1,5 +1,3 @@
-const withingsDeviceIdName = 'WITHINGS_DEVICE_ID';
-
 /**
  * @description Returns the gladys device match with withings device.
  *
@@ -13,14 +11,8 @@ async function matchDeviceInDB(withingsDevice) {
   // get device in db to know device already connected
   const devicesInDB = await this.gladys.device.get({ service: 'withings' });
   if (devicesInDB) {
-    const currentDeviceParam = withingsDevice.params.filter((element) => element.name === withingsDeviceIdName);
-    if (currentDeviceParam && currentDeviceParam.length > 0) {
-      const currentWithingsDeviceId = currentDeviceParam[0].value;
-
       matchDevice = devicesInDB.find((element) =>
-        element.params.find((param) => param.name === withingsDeviceIdName && param.value === currentWithingsDeviceId),
-      );
-    }
+        element.external_id === withingsDevice.external_id);
   }
   return matchDevice;
 }

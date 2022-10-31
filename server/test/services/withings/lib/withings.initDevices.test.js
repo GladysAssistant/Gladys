@@ -82,28 +82,15 @@ describe('WithingsHandler initDevices', () => {
 
     const featureCreated = firstResult.features;
     await assert.equal(featureCreated.length, 18);
-
-    let paramCreated = firstResult.params;
-    await assert.equal(paramCreated.length, 1);
-    await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
-    await assert.equal(paramCreated[0].value, 'withingsDevideId');
+    await assert.equal(firstResult.external_id, 'withingsDevideId');
 
     await assert.equal(secondResult.name, 'Withings - string');
-    paramCreated = secondResult.params;
-    await assert.equal(paramCreated.length, 1);
-    await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
-    await assert.equal(paramCreated[0].value, 'withingsDevideId2');
+    await assert.equal(secondResult.external_id, 'withingsDevideId2');
 
     await assert.equal(thirdResult.name, 'Withings - string');
-    paramCreated = thirdResult.params;
-    await assert.equal(paramCreated.length, 1);
-    await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
-    await assert.equal(paramCreated[0].value, 'withingsDevideId3');
+    await assert.equal(thirdResult.external_id, 'withingsDevideId3'); 
 
     await assert.equal(fourResult.name, 'Withings - string');
-    paramCreated = fourResult.params;
-    await assert.equal(paramCreated.length, 1);
-    await assert.equal(paramCreated[0].name, 'WITHINGS_DEVICE_ID');
-    await assert.equal(paramCreated[0].value, 'withingsDevideId4');
+    await assert.equal(fourResult.external_id, 'withingsDevideId4'); 
   });
 });
