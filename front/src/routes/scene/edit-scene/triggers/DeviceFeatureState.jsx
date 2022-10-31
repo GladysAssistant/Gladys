@@ -57,7 +57,7 @@ class TurnOnLight extends Component {
     </div>
   );
   getBinaryButton = (category, value) => (
-    <div>
+    <div class="col-6">
       <button
         class={cx('btn', 'btn-block', 'p-1', {
           'btn-primary': this.props.trigger.value === value,
@@ -73,9 +73,9 @@ class TurnOnLight extends Component {
     </div>
   );
   getBinaryButtons = category => (
-    <div class="col-4">
+    <div class="col-10 col-md-4">
       <div class="form-group">
-        <div class="row d-flex justify-content-around">
+        <div class="row d-flex justify-content-center">
           {this.getBinaryButton(category, 1)}
           {this.getBinaryButton(category, 0)}
         </div>
@@ -94,7 +94,7 @@ class TurnOnLight extends Component {
     return (
       <div>
         <div class="row">
-          <div class="col-6">
+          <div class="col-12 col-md-6">
             <div class="form-group">
               <SelectDeviceFeature
                 value={this.props.trigger.device_feature}
@@ -114,7 +114,7 @@ class TurnOnLight extends Component {
           {selectedDeviceFeature &&
             selectedDeviceFeature.type !== DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
             selectedDeviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && (
-              <div class="col-3">
+              <div class="col-md-3">
                 <div class="form-group">
                   <select class="form-control" onChange={this.handleOperatorChange} value={props.trigger.operator}>
                     <option value="">
@@ -145,7 +145,7 @@ class TurnOnLight extends Component {
           {selectedDeviceFeature &&
             selectedDeviceFeature.type !== DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
             selectedDeviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && (
-              <div class="col-3">
+              <div class="col-md-3">
                 <div class="form-group">
                   <div class="input-group">
                     <Localizer>
@@ -168,7 +168,9 @@ class TurnOnLight extends Component {
                 </div>
               </div>
             )}
-          {selectedDeviceFeature && selectedDeviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && (
+        </div>
+        {selectedDeviceFeature && selectedDeviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && (
+          <div class="row">
             <div class="col-12">
               <label class="form-check form-switch">
                 <input
@@ -182,8 +184,8 @@ class TurnOnLight extends Component {
                 </span>
               </label>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
