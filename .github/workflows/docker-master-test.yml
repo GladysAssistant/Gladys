@@ -131,7 +131,7 @@ jobs:
           npm run coverage
       - name: 🔐 Dependencies security audit
         working-directory: ./server
-        run: npm audit --production --audit-level=critical
+        run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v2
         with:
