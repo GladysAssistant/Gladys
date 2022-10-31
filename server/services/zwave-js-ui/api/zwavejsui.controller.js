@@ -69,12 +69,12 @@ module.exports = function ZwaveController(gladys, zwaveJSUIManager, serviceId) {
   }
 
   /**
-   * @api {get} /api/v1/service/zwave-js-ui/neighbor Get Zwave node neighbors
-   * @apiName getNodeNeighbors
+   * @api {post} /api/v1/service/zwave-js-ui/heal Heal Zwave network
+   * @apiName healNetwork
    * @apiGroup ZwaveJSUI
    */
-  async function getNodeNeighbors(req, res) {
-    const nodes = await zwaveJSUIManager.getNodeNeighbors();
+  async function healNetwork(req, res) {
+    const nodes = await zwaveJSUIManager.healNetwork();
     res.json(nodes);
   }
 
@@ -107,9 +107,9 @@ module.exports = function ZwaveController(gladys, zwaveJSUIManager, serviceId) {
       authenticated: true,
       controller: asyncMiddleware(getNodes),
     },
-    'get /api/v1/service/zwave-js-ui/neighbor': {
+    'post /api/v1/service/zwave-js-ui/heal': {
       authenticated: true,
-      controller: asyncMiddleware(getNodeNeighbors),
+      controller: asyncMiddleware(healNetwork),
     },
     'get /api/v1/service/zwave-js-ui/status': {
       authenticated: false,

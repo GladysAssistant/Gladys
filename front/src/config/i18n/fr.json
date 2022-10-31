@@ -861,7 +861,6 @@
         "s0LegacyKeyPlaceholder": "Entrez la clé S0 Legacy",
         "connectButton": "Connecter/Reconnecter",
         "disconnectButton": "Déconnecter",
-        "saveConfiguration": "Sauvegarder la configuration",
         "connected": "Zwavejs UI démarré avec succès.",
         "notConnected": "Zwavejs UI n'est pas connecté",
         "usbNotConfigured": "Gladys n'est connectée à aucune clé USB Z-Wave.",

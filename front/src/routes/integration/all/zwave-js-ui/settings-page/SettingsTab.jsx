@@ -283,9 +283,6 @@ class SettingsTab extends Component {
                     <button class="btn btn-danger ml-2" onClick={props.disconnect}>
                       <Text id="integration.zwave-js-ui.settings.disconnectButton" />
                     </button>
-                    <button class="btn btn-warning ml-2" onClick={props.saveConfiguration}>
-                      <Text id="integration.zwave-js-ui.settings.saveConfiguration" />
-                    </button>
                   </div>
                 </form>
               </div>

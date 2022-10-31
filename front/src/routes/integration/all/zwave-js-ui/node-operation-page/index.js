@@ -8,6 +8,11 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 
 @connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
 class ZwaveJSUINodeOperationPage extends Component {
+  scanCompletedListener = () => {
+    this.setState({
+      scanComplete: true
+    });
+  };
   nodeAddedListener = () => {
     this.setState({
       nodeAdded: true
@@ -33,6 +38,9 @@ class ZwaveJSUINodeOperationPage extends Component {
       route('/dashboard/integration/device/zwave-js-ui/discover');
     }
   };
+  healNetwork = () => {
+    this.props.healNetwork();
+  };
   addNode = () => {
     this.props.addNode();
     setTimeout(this.decrementTimer, 1000);
@@ -57,6 +65,9 @@ class ZwaveJSUINodeOperationPage extends Component {
   }
   componentWillMount() {
     switch (this.props.action) {
+      case 'heal':
+        this.healNetwork();
+        break;
       case 'add':
         this.addNode();
         break;
@@ -67,12 +78,14 @@ class ZwaveJSUINodeOperationPage extends Component {
         this.removeNode();
         break;
     }
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE, this.scanCompletedListener);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_ADDED, this.nodeAddedListener);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_READY, this.nodeReadyListener);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_REMOVED, this.nodeRemovedListener);
   }
 
   componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE, this.scanCompletedListener);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_ADDED, this.nodeAddedListener);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_READY, this.nodeReadyListener);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_REMOVED, this.nodeRemovedListener);

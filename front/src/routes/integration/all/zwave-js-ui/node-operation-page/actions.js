@@ -54,6 +54,21 @@ const actions = store => {
           zwaveRemoveNodeStatus: RequestStatus.Error
         });
       }
+    },
+    async healNetwork(state) {
+      store.setState({
+        zwaveHealNetworkStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/zwave-js-ui/heal');
+        store.setState({
+          zwaveHealNetworkStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          zwaveHealNetworkStatus: RequestStatus.Error
+        });
+      }
     }
   };
 

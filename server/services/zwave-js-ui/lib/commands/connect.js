@@ -163,16 +163,6 @@ async function connect() {
     });
 
     this.scanInProgress = true;
-
-    // For testing
-    /* const nodes = require('../../../../../../nodes_wil.json');
-    this.handleMqttMessage(
-      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/driver/driver_ready`,
-      '{"data": [{"controllerId":"controllerId","homeId":"homeId"}]}',
-    );
-    this.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, nodes);
-    */
-
     this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
 
     this.driver = {

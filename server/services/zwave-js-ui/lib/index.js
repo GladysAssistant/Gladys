@@ -5,8 +5,6 @@ const { getStatus } = require('./commands/getStatus');
 const { getNodes } = require('./commands/getNodes');
 const { removeNode } = require('./commands/removeNode');
 const { setValue } = require('./commands/setValue');
-const { nodeAdded } = require('./events/nodeAdded');
-const { nodeRemoved } = require('./events/nodeRemoved');
 const { valueAdded } = require('./events/valueAdded');
 const { valueUpdated } = require('./events/valueUpdated');
 const { valueRemoved } = require('./events/valueRemoved');
@@ -28,6 +26,7 @@ const { installZ2mContainer } = require('./commands/installZ2mContainer');
 const { getConfiguration } = require('./commands/getConfiguration');
 const { handleMqttMessage } = require('./events/handleMqttMessage');
 const { updateConfiguration } = require('./commands/updateConfiguration');
+const { healNetwork } = require('./commands/healNetwork');
 
 const ZwaveJSUIManager = function ZwaveJSUIManager(gladys, mqtt, serviceId) {
   this.gladys = gladys;
@@ -53,8 +52,6 @@ const ZwaveJSUIManager = function ZwaveJSUIManager(gladys, mqtt, serviceId) {
 };
 
 // EVENTS
-ZwaveJSUIManager.prototype.nodeAdded = nodeAdded;
-ZwaveJSUIManager.prototype.nodeRemoved = nodeRemoved;
 ZwaveJSUIManager.prototype.valueAdded = valueAdded;
 ZwaveJSUIManager.prototype.valueUpdated = valueUpdated;
 ZwaveJSUIManager.prototype.valueRemoved = valueRemoved;
@@ -82,6 +79,7 @@ ZwaveJSUIManager.prototype.getConfiguration = getConfiguration;
 ZwaveJSUIManager.prototype.getNodes = getNodes;
 ZwaveJSUIManager.prototype.addNode = addNode;
 ZwaveJSUIManager.prototype.removeNode = removeNode;
+ZwaveJSUIManager.prototype.healNetwork = healNetwork;
 ZwaveJSUIManager.prototype.setValue = setValue;
 ZwaveJSUIManager.prototype.updateConfiguration = updateConfiguration;
 ZwaveJSUIManager.prototype.installMqttContainer = installMqttContainer;

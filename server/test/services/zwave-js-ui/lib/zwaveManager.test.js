@@ -6,7 +6,7 @@ const { assert, stub, fake, useFakeTimers } = sinon;
 const EventEmitter = require('events');
 
 const ZwaveJSUIManager = require('../../../../services/zwave-js-ui/lib');
-const { CONFIGURATION, DEFAULT } = require('../../../../services/zwave-js-ui/lib/constants');
+const { CONFIGURATION, DEFAULT, NODE_STATES } = require('../../../../services/zwave-js-ui/lib/constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
@@ -258,41 +258,6 @@ describe('zwaveJSUIManager events', () => {
     zwaveJSUIManager.scanComplete();
   });
 
-  it('should receive node added', () => {
-    const zwaveNode = {
-      id: 1,
-      getAllEndpoints: fake.returns([2]),
-      on: stub().returnsThis(),
-    };
-
-    zwaveJSUIManager.nodes = {};
-    zwaveJSUIManager.nodeAdded(zwaveNode);
-    assert.calledOnce(zwaveNode.getAllEndpoints);
-    assert.calledOnce(zwaveJSUIManager.eventManager.emit);
-    expect(zwaveJSUIManager.nodes).to.deep.equal({
-      '1': {
-        nodeId: 1,
-        classes: {},
-        ready: false,
-        endpoints: [2],
-      },
-    });
-  });
-
-  it('should receive node removed', () => {
-    const zwaveNode = {
-      id: 1,
-    };
-    zwaveJSUIManager.nodes = {
-      '1': {
-        id: 1,
-      },
-    };
-    zwaveJSUIManager.nodeRemoved(zwaveNode);
-    assert.calledOnce(zwaveJSUIManager.eventManager.emit);
-    expect(zwaveJSUIManager.nodes).to.deep.equal({});
-  });
-
   it('should receive node ready info', () => {
     const zwaveNode = {
       id: 1,
@@ -430,6 +395,95 @@ describe('zwaveJSUIManager events', () => {
       },
     });
   });
+  
+  it('should set node state to INTERVIEW_STARTED', () => {
+    const zwaveNode = {
+      id: 1,
+      getValueMetadata: (args) => {
+        return {
+          type: 'number',
+          label: 'label',
+          min: 1,
+          max: 2,
+        };
+      },
+    };
+    zwaveJSUIManager.nodes = {
+      '1': {
+        id: 1,
+        classes: {},
+      },
+    };
+      zwaveJSUIManager.nodeInterviewStarted(zwaveNode);
+      assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_STARTED);
+  });
+
+  it('should set node state to INTERVIEW_STAGE_COMPLETED', () => {
+    const zwaveNode = {
+      id: 1,
+      getValueMetadata: (args) => {
+        return {
+          type: 'number',
+          label: 'label',
+          min: 1,
+          max: 2,
+        };
+      },
+    };
+    zwaveJSUIManager.nodes = {
+      '1': {
+        id: 1,
+        classes: {},
+      },
+    };
+      zwaveJSUIManager.nodeInterviewStageCompleted(zwaveNode, 'stage');
+      assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_STAGE_COMPLETED);
+  });
+
+  it('should set node state to INTERVIEW_COMPLETED', () => {
+    const zwaveNode = {
+      id: 1,
+      getValueMetadata: (args) => {
+        return {
+          type: 'number',
+          label: 'label',
+          min: 1,
+          max: 2,
+        };
+      },
+    };
+    zwaveJSUIManager.nodes = {
+      '1': {
+        id: 1,
+        classes: {},
+      },
+    };
+      zwaveJSUIManager.nodeInterviewCompleted(zwaveNode);
+      assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_COMPLETED);
+  });
+
+  it('should set node state to INTERVIEW_FAILED', () => {
+    const zwaveNode = {
+      id: 1,
+      getValueMetadata: (args) => {
+        return {
+          type: 'number',
+          label: 'label',
+          min: 1,
+          max: 2,
+        };
+      },
+    };
+    zwaveJSUIManager.nodes = {
+      '1': {
+        id: 1,
+        classes: {},
+      },
+    };
+      zwaveJSUIManager.nodeInterviewFailed(zwaveNode);
+      assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_FAILED);
+  });
+
 });
 
 describe('zwaveJSUIManager devices', () => {
