@@ -57,8 +57,8 @@ const createActions = store => {
       store.setState(configuration);
     },
     async connect(state) {
-      await disconnect(state);
-      await saveConfiguration(state);
+      await this.disconnect(state);
+      await this.saveConfiguration(state);
       store.setState({
         zwaveConnectStatus: RequestStatus.Getting
       });
@@ -129,12 +129,6 @@ const createActions = store => {
           saveConfigurationStatus: RequestStatus.Error
         });
       }
-    },
-    driverFailed() {
-      store.setState({
-        zwaveDriverFailed: true,
-        zwaveConnectionInProgress: false
-      });
     }
   };
   return Object.assign({}, actions, integrationActions);
