@@ -1032,6 +1032,13 @@
               "other": "Fermer"
             }
           },
+          "vacbot": {
+            "state": {
+              "none": "Pause",
+              "one": "Nettoyer",
+              "other": "Arrêter"
+            }
+          },
           "television": {
             "binary": {
               "none": "Eteindre",
@@ -1930,6 +1937,13 @@
           "one": "Ouvrir",
           "other": "Fermer"
         }
+      },
+      "vacbot": {
+        "state": {
+          "zero": "Arrêter",
+          "one": "Ouvrir",
+          "other": "Fermer"
+        }
       }
     }
   },
@@ -2161,6 +2175,10 @@
       "shortCategoryName": "Rideau",
       "state": "Etat du rideau",
       "position": "Position du rideau"
+    },
+    "vacbot": {
+      "shortCategoryName": "Aspirateur Robot",
+      "state": "Etat de l'aspirateur robot"
     },
     "data": {
       "shortCategoryName": "Donnée",
