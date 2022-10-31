@@ -11,7 +11,6 @@ function healNetwork() {
 
   this.scanInProgress = true;
   this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
-
 }
 
 module.exports = {

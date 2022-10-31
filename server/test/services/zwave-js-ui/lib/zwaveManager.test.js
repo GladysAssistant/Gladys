@@ -395,7 +395,7 @@ describe('zwaveJSUIManager events', () => {
       },
     });
   });
-  
+
   it('should set node state to INTERVIEW_STARTED', () => {
     const zwaveNode = {
       id: 1,
@@ -414,8 +414,8 @@ describe('zwaveJSUIManager events', () => {
         classes: {},
       },
     };
-      zwaveJSUIManager.nodeInterviewStarted(zwaveNode);
-      assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_STARTED);
+    zwaveJSUIManager.nodeInterviewStarted(zwaveNode);
+    assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_STARTED);
   });
 
   it('should set node state to INTERVIEW_STAGE_COMPLETED', () => {
@@ -436,8 +436,8 @@ describe('zwaveJSUIManager events', () => {
         classes: {},
       },
     };
-      zwaveJSUIManager.nodeInterviewStageCompleted(zwaveNode, 'stage');
-      assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_STAGE_COMPLETED);
+    zwaveJSUIManager.nodeInterviewStageCompleted(zwaveNode, 'stage');
+    assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_STAGE_COMPLETED);
   });
 
   it('should set node state to INTERVIEW_COMPLETED', () => {
@@ -458,8 +458,8 @@ describe('zwaveJSUIManager events', () => {
         classes: {},
       },
     };
-      zwaveJSUIManager.nodeInterviewCompleted(zwaveNode);
-      assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_COMPLETED);
+    zwaveJSUIManager.nodeInterviewCompleted(zwaveNode);
+    assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_COMPLETED);
   });
 
   it('should set node state to INTERVIEW_FAILED', () => {
@@ -480,10 +480,9 @@ describe('zwaveJSUIManager events', () => {
         classes: {},
       },
     };
-      zwaveJSUIManager.nodeInterviewFailed(zwaveNode);
-      assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_FAILED);
+    zwaveJSUIManager.nodeInterviewFailed(zwaveNode);
+    assert.match(zwaveJSUIManager.nodes[1].state, NODE_STATES.INTERVIEW_FAILED);
   });
-
 });
 
 describe('zwaveJSUIManager devices', () => {

@@ -78,14 +78,20 @@ class ZwaveJSUINodeOperationPage extends Component {
         this.removeNode();
         break;
     }
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE, this.scanCompletedListener);
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE,
+      this.scanCompletedListener
+    );
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_ADDED, this.nodeAddedListener);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_READY, this.nodeReadyListener);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_REMOVED, this.nodeRemovedListener);
   }
 
   componentWillUnmount() {
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE, this.scanCompletedListener);
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE,
+      this.scanCompletedListener
+    );
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_ADDED, this.nodeAddedListener);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_READY, this.nodeReadyListener);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_REMOVED, this.nodeRemovedListener);
