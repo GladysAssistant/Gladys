@@ -88,9 +88,9 @@ describe('WithingsHandler initDevices', () => {
     await assert.equal(secondResult.external_id, 'withingsDevideId2');
 
     await assert.equal(thirdResult.name, 'Withings - string');
-    await assert.equal(thirdResult.external_id, 'withingsDevideId3'); 
+    await assert.equal(thirdResult.external_id, 'withingsDevideId3');
 
     await assert.equal(fourResult.name, 'Withings - string');
-    await assert.equal(fourResult.external_id, 'withingsDevideId4'); 
+    await assert.equal(fourResult.external_id, 'withingsDevideId4');
   });
 });

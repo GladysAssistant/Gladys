@@ -11,8 +11,7 @@ async function matchDeviceInDB(withingsDevice) {
   // get device in db to know device already connected
   const devicesInDB = await this.gladys.device.get({ service: 'withings' });
   if (devicesInDB) {
-      matchDevice = devicesInDB.find((element) =>
-        element.external_id === withingsDevice.external_id);
+    matchDevice = devicesInDB.find((element) => element.external_id === withingsDevice.external_id);
   }
   return matchDevice;
 }

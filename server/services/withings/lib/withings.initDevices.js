@@ -167,7 +167,7 @@ function buildFeature(currentGroup, device, currentFeatures) {
           featureType = DEVICE_FEATURE_TYPES.HEALTH.UNKNOWN;
           featureUnit = '';
           break;
-      } 
+      }
 
       // Search existing feature
       let tmpFeature = features.find((feat) => feat.type === featureType);
@@ -180,7 +180,7 @@ function buildFeature(currentGroup, device, currentFeatures) {
         tmpFeature = {
           id: uniqueId,
           selector: `${device.selector}-${featureType}`,
-          device_id: gladysDeviceId, 
+          device_id: gladysDeviceId,
           external_id: `withings:${device.model}:${DEVICE_FEATURE_CATEGORIES.HEALTH}:${featureType}`,
           category: DEVICE_FEATURE_CATEGORIES.HEALTH,
           type: featureType,
