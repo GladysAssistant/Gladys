@@ -10,7 +10,7 @@ const { convertFeature } = require('../utils/convertFeature');
  * @example
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */
-function handleMqttMessage(topic, message) {
+async function handleMqttMessage(topic, message) {
   this.zigbee2mqttConnected = true;
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -71,6 +71,18 @@ function handleMqttMessage(topic, message) {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
         payload: this.z2mPermitJoin,
       });
+      break;
+    }
+    case 'zigbee2mqtt/bridge/response/backup': {
+      const payload = JSON.parse(message);
+      const { status, zip } = payload;
+
+      if (status === 'ok') {
+        logger.info('Getting zigbee2mqtt backup');
+        await this.saveZ2mBackup(zip);
+      } else {
+        logger.error('zigbee2mqtt backup is not ok');
+      }
       break;
     }
     default: {
