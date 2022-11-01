@@ -15,6 +15,7 @@ describe('zigbee2mqtt init', () => {
   // PREPARE
   let zigbee2mqttManager;
   let gladys;
+  let clock;
 
   beforeEach(() => {
     gladys = {
@@ -49,9 +50,12 @@ describe('zigbee2mqtt init', () => {
     zigbee2mqttManager.dockerBased = undefined;
     zigbee2mqttManager.networkModeValid = undefined;
     zigbee2mqttManager.usbConfigured = undefined;
+
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
+    clock.restore();
     sinon.reset();
   });
 

@@ -22,6 +22,7 @@ describe('zigbee2mqtt disconnect', () => {
   // PREPARE
   let zigbee2MqttManager;
   let gladys;
+  let clock;
 
   beforeEach(() => {
     gladys = {
@@ -35,9 +36,11 @@ describe('zigbee2mqtt disconnect', () => {
     };
 
     zigbee2MqttManager = new Zigbee2mqttManager(gladys, mqtt, serviceId);
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
+    clock.restore();
     sinon.reset();
   });
 
@@ -77,5 +80,16 @@ describe('zigbee2mqtt disconnect', () => {
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
     assert.calledOnce(mqtt.end);
     assert.calledOnce(mqtt.removeAllListeners);
+  });
+
+  it('clear backup interval', async () => {
+    // PREPARE
+    const fakeInterval = fake.returns(null);
+    zigbee2MqttManager.backupInterval = setInterval(fakeInterval, 100);
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    clock.tick(150);
+    assert.notCalled(fakeInterval);
   });
 });

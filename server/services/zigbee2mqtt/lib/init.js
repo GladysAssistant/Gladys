@@ -68,6 +68,11 @@ async function init() {
 
     if (this.isEnabled()) {
       await this.connect(configuration);
+
+      // Interval for backup request (each 12 hours), only if not already defined
+      if (!this.backupInterval) {
+        this.backupInterval = setInterval(() => this.requestZ2mBackup(), 1000 * 60 * 60 * 12);
+      }
     }
   }
 
