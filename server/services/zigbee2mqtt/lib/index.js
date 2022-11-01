@@ -18,6 +18,7 @@ const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
 const { getZ2mBackup } = require('./getZ2mBackup');
 const { saveZ2mBackup } = require('./saveZ2mBackup');
+const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -68,5 +69,6 @@ Zigbee2mqttManager.prototype.setPermitJoin = setPermitJoin;
 Zigbee2mqttManager.prototype.getPermitJoin = getPermitJoin;
 Zigbee2mqttManager.prototype.getZ2mBackup = getZ2mBackup;
 Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
+Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 
 module.exports = Zigbee2mqttManager;

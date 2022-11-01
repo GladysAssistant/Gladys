@@ -225,11 +225,13 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // PREPARE
     const payload = {
       status: 'ok',
-      zip: 'content',
+      data: {
+        zip: 'content',
+      },
     };
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/backup', JSON.stringify(payload));
     // ASSERT
-    assert.calledOnceWithExactly(gladys.variable.setValue, 'Z2M_BACKUP', payload.zip, serviceId);
+    assert.calledOnceWithExactly(gladys.variable.setValue, 'Z2M_BACKUP', payload.data.zip, serviceId);
   });
 });

@@ -35,6 +35,9 @@ describe('zigbee2mqtt installz2mContainer', () => {
       event: {
         emit: fake.resolves(null),
       },
+      variable: {
+        getValue: fake.resolves(null),
+      },
       system: {
         getContainers: fake.resolves([containerStopped]),
         stopContainer: fake.resolves(true),
