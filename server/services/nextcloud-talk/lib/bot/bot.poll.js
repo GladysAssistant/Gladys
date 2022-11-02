@@ -8,7 +8,7 @@ const logger = require('../../../../utils/logger');
  * @example
  * poll('token1');
  */
- async function poll(token) {
+async function poll(token) {
   const { lastKnownMessageId } = this.bots[token];
   let result = {};
 
@@ -20,9 +20,9 @@ const logger = require('../../../../utils/logger');
       }`,
       '',
       {
-        Authorization: `Basic ${Buffer.from(`${this.bots[token].NEXTCLOUD_BOT_USERNAME}:${this.bots[token].NEXTCLOUD_BOT_PASSWORD}`).toString(
-          'base64',
-        )}`,
+        Authorization: `Basic ${Buffer.from(
+          `${this.bots[token].NEXTCLOUD_BOT_USERNAME}:${this.bots[token].NEXTCLOUD_BOT_PASSWORD}`,
+        ).toString('base64')}`,
         Accept: 'application/json',
         'OCS-APIRequest': true,
       },

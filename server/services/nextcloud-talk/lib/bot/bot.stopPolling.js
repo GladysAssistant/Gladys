@@ -6,7 +6,7 @@ const logger = require('../../../../utils/logger');
  * @example
  * stopPoll('token1');
  */
- function stopPolling(token) {
+function stopPolling(token) {
   logger.debug(`Stop polling Nextcloud Talk for token: ${token}`);
   this.bots[token].isPolling = false;
 }

@@ -22,7 +22,7 @@ const gladys = {
 
 describe('NextcloudTalk.message', () => {
   const messageHandler = new MessageHandler(gladys, 'a03a5e92-236a-4465-9bd5-530247d76959');
-  it('should connect', () => {
+  it('should connect', async () => {
     gladys.http.request = fake.resolves({
       headers: {
         'x-chat-last-given': 1,
@@ -33,23 +33,30 @@ describe('NextcloudTalk.message', () => {
         },
       },
     });
-    messageHandler.bots = [{ token: 'testToken1' }];
-    messageHandler.connect([{ value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }]);
+    messageHandler.bots = {};
+    await messageHandler.connect([{ value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }]);
+    expect(messageHandler.bots.testToken1.userId).eq('30385cbf-b9ff-4239-a6bb-35477ca3eea6');
   });
   it('should poll once', async () => {
-    const bot = new messageHandler.NextcloudTalkBot(gladys);
-    bot.NEXTCLOUD_BOT_USERNAME = 'user1';
     const emit = fake.resolves();
-    bot.emit = emit;
-    await bot.poll(2);
+    messageHandler.bots.testToken2 = {
+      lastKnownMessageId: 2,
+      isPolling: true,
+      eventEmitter: {
+        emit,
+      },
+    };
+    await messageHandler.poll('testToken2');
     expect(emit.args[0][0]).eq('message');
     expect(emit.args[0][1]).eql({ id: 2, actorId: 'userbot' });
   });
-  it('should stop polling', () => {
-    const bot = new messageHandler.NextcloudTalkBot();
-    bot.isPolling = true;
-    bot.stopPolling();
-    expect(bot.isPolling).equal(false);
+  it('should stop polling', async () => {
+    messageHandler.bots.testToken3 = {
+      lastKnownMessageId: 2,
+      isPolling: true,
+    };
+    await messageHandler.stopPolling('testToken3');
+    expect(messageHandler.bots.testToken3.isPolling).equal(false);
   });
   it('should handle new message', async () => {
     const msg = {
