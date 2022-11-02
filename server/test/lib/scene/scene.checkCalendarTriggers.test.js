@@ -71,6 +71,7 @@ describe('scene.checkCalendarTriggers', () => {
         calendarEvent: {
           name: 'my test event',
           location: null,
+          description: null,
           start: dayjs(startDate)
             .tz('Europe/Paris')
             .locale('en')

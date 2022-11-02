@@ -1,0 +1,130 @@
+[
+  {
+    "address": "210.248.100.245",
+    "mac": "4bf75cf0fdbb",
+    "name": "MP1",
+    "model": "MP1 model",
+    "connectable": true,
+    "device": {
+      "name": "MP1",
+      "external_id": "broadlink:4bf75cf0fdbb",
+      "selector": "broadlink:4bf75cf0fdbb",
+      "model": "MP1",
+      "created_at": "2019-02-12T07:49:07.556Z",
+      "should_poll": true,
+      "poll_frequency": 60000,
+      "features": [
+        {
+          "name": "MP1 1",
+          "category": "switch",
+          "type": "binary",
+          "external_id": "broadlink:4bf75cf0fdbb:0",
+          "selector": "broadlink:4bf75cf0fdbb:0",
+          "min": 0,
+          "max": 1,
+          "read_only": false,
+          "has_feedback": true
+        },
+        {
+          "name": "MP1 2",
+          "category": "switch",
+          "type": "binary",
+          "external_id": "broadlink:4bf75cf0fdbb:1",
+          "selector": "broadlink:4bf75cf0fdbb:1",
+          "min": 0,
+          "max": 1,
+          "read_only": false,
+          "has_feedback": true
+        },
+        {
+          "name": "MP1 3",
+          "category": "switch",
+          "type": "binary",
+          "external_id": "broadlink:4bf75cf0fdbb:2",
+          "selector": "broadlink:4bf75cf0fdbb:2",
+          "min": 0,
+          "max": 1,
+          "read_only": false,
+          "has_feedback": true
+        },
+        {
+          "name": "MP1 4",
+          "category": "switch",
+          "type": "binary",
+          "external_id": "broadlink:4bf75cf0fdbb:3",
+          "selector": "broadlink:4bf75cf0fdbb:3",
+          "min": 0,
+          "max": 1,
+          "read_only": false,
+          "has_feedback": true
+        }
+      ]
+    }
+  },
+  {
+    "address": "227.154.146.114",
+    "name": "SP2",
+    "model": "SP2 model",
+    "mac": "7396e6541fb0",
+    "canLearn": false,
+    "connectable": true,
+    "device": {
+      "external_id": "broadlink:7396e6541fb0",
+      "selector": "broadlink:7396e6541fb0",
+      "model": "SP2",
+      "name": "SP2",
+      "should_poll": false,
+      "poll_frequency": 60000,
+      "features": [
+        {
+          "name": "SP2",
+          "category": "switch",
+          "type": "binary",
+          "external_id": "broadlink:7396e6541fb0:0",
+          "selector": "broadlink:7396e6541fb0:0",
+          "min": 0,
+          "max": 1,
+          "read_only": false,
+          "has_feedback": true
+        }
+      ]
+    }
+  },
+  {
+    "address": "227.154.146.115",
+    "name": "SP3",
+    "model": "SP3 model",
+    "mac": "7396e6541fb9",
+    "canLearn": false,
+    "connectable": false,
+    "device": {
+      "external_id": "broadlink:7396e6541fb9",
+      "selector": "broadlink:7396e6541fb9",
+      "model": "SP3",
+      "name": "SP3",
+      "should_poll": false,
+      "poll_frequency": 60000,
+      "features": [
+        {
+          "name": "SP3",
+          "category": "switch",
+          "type": "binary",
+          "external_id": "broadlink:7396e6541fb0:0",
+          "selector": "broadlink:7396e6541fb0:0",
+          "min": 0,
+          "max": 1,
+          "read_only": false,
+          "has_feedback": true
+        }
+      ]
+    }
+  },
+  {
+    "address": "220.156.58.18",
+    "name": "RM3 Pro Plus",
+    "model": "RM3 model",
+    "mac": "8008bda3ae44",
+    "canLearn": true,
+    "connectable": true
+  }
+]

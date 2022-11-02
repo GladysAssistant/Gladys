@@ -16,3 +16,34 @@ input[type='range'][class~='light-temperature']::-moz-range-progress {
 input[type='range'][class~='light-temperature']::-ms-fill-lower {
   background: linear-gradient(to right, rgb(178, 212, 251), rgb(243, 166, 60));
 }
+
+/* Chrome, Safari, Edge, Opera */
+.removeNumberArrow::-webkit-outer-spin-button,
+.removeNumberArrow::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+.removeNumberArrow {
+  -moz-appearance: textfield;
+}
+
+.thermostatHorizontalControls {
+  display: flex;
+  min-width: 7rem;
+}
+
+.thermostatVerticalControls {
+  display: none;
+}
+
+@media ((min-width: 992px) and (max-width: 1300px)) or (max-width: 400px) {
+  .thermostatVerticalControls {
+    display: block;
+    min-width: 5rem;
+  }
+  .thermostatHorizontalControls {
+    display: none;
+  }
+}

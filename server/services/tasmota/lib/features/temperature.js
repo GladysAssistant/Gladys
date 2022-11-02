@@ -6,7 +6,7 @@ const {
 
 module.exports = {
   // Tasmota matcher
-  keyMatcher: /^StatusSNS\.(DHT11|AM2301)\.Temperature$/,
+  keyMatcher: /^StatusSNS\.(ENERGY\.)?((?!(ESP32))[^.]+)\.Temperature$$/,
   // Gladys feature
   generateFeature: () => {
     return {
@@ -21,7 +21,7 @@ module.exports = {
     };
   },
   generateExternalId: (key, fullKey) => {
-    const parts = fullKey.split('.');
-    return `${parts[1]}:Temperature`;
+    const parts = fullKey.split('.').slice(1, -1);
+    return `${parts.join(':')}:Temperature`;
   },
 };

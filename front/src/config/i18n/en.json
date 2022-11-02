@@ -43,7 +43,8 @@
     "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
-    "noFeatures": "No features"
+    "noFeatures": "No features",
+    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
   },
   "login": {
     "title": "Gladys Assistant",
@@ -227,7 +228,9 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."
+        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page.",
+        "addButton": "+",
+        "substractButton": "-"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -578,6 +581,15 @@
       "cancelButton": "Cancel",
       "connectButton": "Link"
     },
+    "homekit": {
+      "title": "Apple HomeKit",
+      "description": "Connect Gladys to HomeKit and use Siri to control your devices.",
+      "introduction": "To connect Gladys to HomeKit, you need an Apple device (iPhone, iPad, iPod touch).",
+      "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
+      "configurationError": "An error appears while getting settings.",
+      "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
+      "reloadButton": "Reload"
+    },
     "owntracks": {
       "title": "Owntracks",
       "description": "Send your GPS location to Gladys with a mobile app",
@@ -593,7 +605,8 @@
       "device": {
         "title": "Z-Wave Devices",
         "search": "Search devices",
-        "oldIntegrationWarning": "This integration is based on Open-Zwave, a library which is no longer supported. We are migrating to ZwaveJS2mqtt, but in the meantime we recommend that you use Node-RED + ZwaveJS2mqtt. <br /> <br /> If you want to help us develop this integration, join-us on the forum!",
+        "convertToMqtt": "Convert to MQTT device",
+        "oldIntegrationWarning": "This integration is based on Open-Zwave, a library which is no longer supported. We are migrating to ZwaveJS2mqtt, but in the meantime we recommend that you use Node-RED + ZwaveJS2mqtt. Please stop using this integration before end of November 2022. <br /> <br /> If you want to help us develop this integration, join-us on the forum!",
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
@@ -745,6 +758,131 @@
         "connected": "Connected to the MQTT broker with success !",
         "connectionError": "Error while connecting, please check your configuration.",
         "disconnected": "Disconnected from MQTT broker."
+      }
+    },
+    "broadlink": {
+      "title": "Broadlink",
+      "description": "Control your Broadlink devices.",
+      "remoteTab": "Devices",
+      "peripheralTab": "Discover devices",
+      "peripheral": {
+        "title": "Available Broadlink devices",
+        "description": "Here are discovered Broadlink devices, if one is missing, please check its network link.",
+        "noPeripherals": "No peripheral discovered on network, please check the connectivity.",
+        "noNameLabel": "Type not recognized",
+        "ipAddressLabel": "IP address",
+        "macAddressLabel": "MAC address",
+        "modelLabel": "Model",
+        "featuresLabel": "Features",
+        "noFeatures": "No features",
+        "nameLabel": "Name",
+        "saveButton": "Save",
+        "notConnectable": "Locked",
+        "alreadyCreatedButton": "Already created",
+        "createRemoteButton": "Create remote control"
+      },
+      "device": {
+        "title": "Broadlink devices",
+        "searchPlaceholder": "Search for devices",
+        "newButton": "Create",
+        "noRemoteFound": "No Broadlink device or remote found.",
+        "saveError": "There was an error saving the device.",
+        "nameLabel": "Device name",
+        "namePlaceholder": "Enter the name of your device",
+        "modelLabel": "Model",
+        "roomLabel": "Room",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "editButton": "Edit",
+        "featuresLabel": "Features"
+      },
+      "setup": {
+        "noNameLabel": "No name",
+        "saveError": "Error saving or deleting device",
+        "saveSuccess": "Broadlink device successfully created.",
+        "notFound": "Requested device not found.",
+        "saveButton": "Save",
+        "peripheralLabel": "Linked peripheral",
+        "categoryLabel": "Device category to control",
+        "featuresLabel": "Features",
+        "learnModeTitle": "Capture remote command",
+        "learningModeInProgress": "Press button on your remote",
+        "cancelLearnModeButton": "Cancel capture mode",
+        "skipLearningButton": "Skip this step and go to next",
+        "peripheralNotFound": "Peripheral not available.",
+        "peripheralNotLearn": "Peripheral is not able to learn code.",
+        "cancelLearnFailed": "Failed to cancel learning mode.",
+        "learnFailed": "Failed to enter in learn mode.",
+        "selectFeatureLabel": "Select a feature in the list or click button bellow to entrer in learning mode. Learning mode allows you to save all commands, one by one, in an automatized way.",
+        "selectedFeatureLabel": "Selected feature",
+        "selectActionLabel": "Feature <b>{{feature}}</b> is selected, now select an action in the list bellow to enabled capture mode.",
+        "selectedFeatureInfoLabel": "Feature <b>{{feature}}</b> is selected.",
+        "unselectedActionInfoLabel": "Feature <b>{{feature}}</b> is selected, please select an action to enter capture mode.",
+        "selectedActionInfoLabel": "Feature <b>{{feature}}</b> is selected, with action <b>{{action}}</b>.",
+        "testError": "An error occured while testing feature, please check your device.",
+        "peripheralSelectLabel": "{{name}} ({{address}})",
+        "testLabel": "Test",
+        "unselect": "Unselect",
+        "deleteLabel": "Delete",
+        "learnAllLabel": "Learn all features",
+        "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
+        "quitLearnModeLabel": "Stop learning features",
+        "features": {
+          "curtain": {
+            "state": {
+              "none": "Stop",
+              "one": "Open",
+              "other": "Close"
+            }
+          },
+          "light": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "brightness": {
+              "none": "Down",
+              "many": "Up"
+            },
+            "temperature": {
+              "none": "Cold",
+              "many": "Hot"
+            }
+          },
+          "switch": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "dimmer": {
+              "none": "Down",
+              "many": "Up"
+            }
+          },
+          "siren": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            }
+          },
+          "shutter": {
+            "state": {
+              "none": "Stop",
+              "one": "Open",
+              "other": "Close"
+            }
+          },
+          "television": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "volume": {
+              "none": "Down",
+              "many": "Up"
+            }
+          }
+        }
       }
     },
     "xiaomi": {
@@ -1138,6 +1276,7 @@
       "calendar": {
         "eventName": "Event name",
         "eventLocation": "Event location",
+        "eventDescription": "Event description",
         "eventStart": "Start date",
         "eventEnd": "End date"
       }
@@ -1444,7 +1583,9 @@
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
       "hourly-device-state-aggregate": "Hourly sensors aggregation",
-      "gladys-gateway-backup": "Gladys Plus backup"
+      "gladys-gateway-backup": "Gladys Plus backup",
+      "device-state-purge-single-feature": "Single device feature states clean",
+      "vacuum": "Database cleaning"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -1478,6 +1619,10 @@
     "timezoneText": "The timezone is used in scheduled scene.",
     "deviceStateRetentionTime": "Keep Device State History",
     "deviceStateRetentionTimeDescription": "How long Gladys will keep your device states in database.",
+    "vacuumDatabaseTitle": "Database cleaning",
+    "vacuumDatabaseDescription": "By clicking on this button, Gladys will start cleaning the database to free up space. This does not delete any data, it just physically remove old deleted data. Be careful, this task can take some time to run, and during that time Gladys will not be available.",
+    "vacuumDatabaseButton": "Start database cleaning",
+    "vacuumDatabaseStarted": "Database cleaning has started... Gladys will not be available until this job finishes.",
     "containerState": {
       "created": "Created",
       "restarting": "Restarting",
@@ -1619,6 +1764,7 @@
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "volt-ampere": "Voltampere (VA)",
+    "kilovolt-ampere": "Kilovoltampere (kVA)",
     "volt-ampere-reactive": "Voltampere reactive (var)",
     "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
@@ -1638,6 +1784,7 @@
     "meter-per-second": "Meter per second (m/s)",
     "kilometer-per-hour": "Kilometer per hour (km/h)",
     "millimeter-per-hour": "Millimeter per hour (mm/h)",
+    "millimeter-per-day": "Millimeter per day (mm/d)",
     "uv-index": "UV Index",
     "microseconds": "Microseconds (μs)",
     "milliseconds": "Milliseconds (ms)",
@@ -1647,7 +1794,24 @@
     "days": "Days (d)",
     "weeks": "Weeks (w)",
     "months": "Months (m)",
-    "years": "Years (y)"
+    "years": "Years (y)",
+    "bit": "Bit",
+    "kilobit": "Kilobit",
+    "megabit": "Megabit",
+    "gigabit": "Gigabit",
+    "byte": "Byte (B)",
+    "kilobyte": "Kilobyte (kB)",
+    "megabyte": "Megabyte (MB)",
+    "gigabyte": "Gigabyte (GB)",
+    "terabyte": "Terabyte (TB)",
+    "bits-per-second": "Bits per second (bit/s)",
+    "kilobits-per-second": "Kilobits per second (kbit/s)",
+    "megabits-per-second": "Megabits per second (Mbit/s)",
+    "gigabits-per-second": "Gigabits per second (Gbit/s)",
+    "bytes-per-second": "Bytes per second (B/s)",
+    "kilobytes-per-second": "kilobytes per second (kB/s)",
+    "megabytes-per-second": "Megabytes per second (MB/s)",
+    "gigabytes-per-second": "Gigabytes per second (GB/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1671,6 +1835,7 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "kilovolt-ampere": "kVA",
     "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",
@@ -1690,6 +1855,7 @@
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
     "millimeter-per-hour": "mm/h",
+    "millimeter-per-day": "mm/d",
     "uv-index": "UV Index",
     "microseconds": "μs",
     "milliseconds": "ms",
@@ -1699,7 +1865,42 @@
     "days": "d",
     "weeks": "w",
     "months": "m",
-    "years": "y"
+    "years": "y",
+    "bit": "bit",
+    "kilobit": "kbit",
+    "megabit": "Mbit",
+    "gigabit": "Gbit",
+    "byte": "B",
+    "kilobyte": "kB",
+    "megabyte": "MB",
+    "gigabyte": "GB",
+    "terabyte": "TB",
+    "bits-per-second": "bit/s",
+    "kilobits-per-second": "kbit/s",
+    "megabits-per-second": "Mbit/s",
+    "gigabits-per-second": "Gbit/s",
+    "bytes-per-second": "B/s",
+    "kilobytes-per-second": "kB/s",
+    "megabytes-per-second": "MB/s",
+    "gigabytes-per-second": "GB/s"
+  },
+  "deviceFeatureAction": {
+    "category": {
+      "shutter": {
+        "state": {
+          "zero": "Stop",
+          "one": "Open",
+          "other": "Close"
+        }
+      },
+      "curtain": {
+        "state": {
+          "zero": "Stop",
+          "one": "Open",
+          "other": "Close"
+        }
+      }
+    }
   },
   "deviceFeatureValue": {
     "type": {
@@ -1715,6 +1916,13 @@
           "other": "No value received",
           "zero": "Healthy",
           "one": "CO detected"
+        }
+      },
+      "leak-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
         }
       }
     }
@@ -1913,6 +2121,28 @@
       "shortCategoryName": "VOC Sensor",
       "decimal": "VOC (decimal)"
     },
+    "shutter": {
+      "shortCategoryName": "Shutter",
+      "state": "Shutter state",
+      "position": "Shutter position"
+    },
+    "curtain": {
+      "shortCategoryName": "Curtain",
+      "state": "Curtain state",
+      "position": "curtain position"
+    },
+    "data": {
+      "shortCategoryName": "Data",
+      "size": "Size"
+    },
+    "datarate": {
+      "shortCategoryName": "Datarate",
+      "rate": "Rate"
+    },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "target-temperature": "Thermostat Temperature"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
@@ -1976,6 +2206,9 @@
     "minPlaceholder": "Enter feature minimum value",
     "maxLabel": "Maximum value",
     "maxPlaceholder": "Enter feature maximum value",
+    "keepHistoryLabel": "Keep state history?",
+    "keepHistorySmallDescription": "Yes, keep history",
+    "keepHistoryDescription": "If yes, the state history of this feature will be kept according to the retention policy defined in the <a href=\"/dashboard/settings/system\">System</a> page. If not, only the last state will be kept.",
     "addButton": "Add feature",
     "deleteLabel": "Delete feature",
     "saveError": "Error saving or deleting device",

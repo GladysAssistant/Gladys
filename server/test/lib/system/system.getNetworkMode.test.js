@@ -14,6 +14,7 @@ const System = proxyquire('../../../lib/system', {
     getGladysContainerId: fake.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c'),
   },
 });
+const Job = require('../../../lib/job');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -24,6 +25,8 @@ const event = {
   emit: fake.resolves(null),
 };
 
+const job = new Job(event);
+
 const config = {
   tempFolder: '/tmp/gladys',
 };
@@ -32,7 +35,7 @@ describe('system.getNetworkMode', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event, config, job);
     await system.init();
     // Reset all fakes invoked within init call
     sinon.reset();

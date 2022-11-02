@@ -12,6 +12,7 @@ static
 gladys-backups
 qemu-*
 coverage
+persist
 stats.json
 size-plugin.json
 # VSCode

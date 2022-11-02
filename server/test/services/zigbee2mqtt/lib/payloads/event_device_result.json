@@ -37,6 +37,18 @@
         "selector": "zigbee2mqtt-0x00158d00033e88d5-switch-voltage-voltage",
         "type": "voltage",
         "unit": "millivolt"
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:0x00158d00033e88d5:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-0x00158d00033e88d5-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
       }
     ],
     "model": "WXKG01LM",
@@ -44,6 +56,75 @@
     "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
     "should_poll": false,
     "updatable": true
+  },
+  {
+    "name": "0x00158d00033e88d1",
+    "model": "TS0043",
+    "external_id": "zigbee2mqtt:0x00158d00033e88d1",
+    "features": [
+      {
+        "name": "Battery",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100,
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "external_id": "zigbee2mqtt:0x00158d00033e88d1:battery:integer:battery",
+        "selector": "zigbee2mqtt-0x00158d00033e88d1-battery-integer-battery"
+      },
+      {
+        "name": "Action 1",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 9,
+        "category": "button",
+        "type": "click",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00033e88d1:button:click:action:1",
+        "selector": "zigbee2mqtt-0x00158d00033e88d1-button-click-action-1"
+      },
+      {
+        "name": "Action 2",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 9,
+        "category": "button",
+        "type": "click",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00033e88d1:button:click:action:2",
+        "selector": "zigbee2mqtt-0x00158d00033e88d1-button-click-action-2"
+      },
+      {
+        "name": "Action 3",
+        "read_only": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 9,
+        "category": "button",
+        "type": "click",
+        "unit": null,
+        "external_id": "zigbee2mqtt:0x00158d00033e88d1:button:click:action:3",
+        "selector": "zigbee2mqtt-0x00158d00033e88d1-button-click-action-3"
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:0x00158d00033e88d1:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-0x00158d00033e88d1-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
+      }
+    ],
+    "should_poll": false,
+    "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee"
   },
   {
     "name": "0x00158d0004019127",
@@ -73,6 +154,18 @@
         "unit": "millivolt",
         "external_id": "zigbee2mqtt:0x00158d0004019127:switch:voltage:voltage",
         "selector": "zigbee2mqtt-0x00158d0004019127-switch-voltage-voltage"
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:0x00158d0004019127:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-0x00158d0004019127-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
       }
     ],
     "should_poll": false,
@@ -154,6 +247,18 @@
         "unit": "millivolt",
         "external_id": "zigbee2mqtt:0x00158d00045b2740:switch:voltage:voltage",
         "selector": "zigbee2mqtt-0x00158d00045b2740-switch-voltage-voltage"
+      },
+      {
+        "category": "signal",
+        "external_id": "zigbee2mqtt:0x00158d00045b2740:signal:integer:linkquality",
+        "has_feedback": false,
+        "max": 5,
+        "min": 0,
+        "name": "Linkquality",
+        "read_only": true,
+        "selector": "zigbee2mqtt-0x00158d00045b2740-signal-integer-linkquality",
+        "type": "integer",
+        "unit": null
       }
     ],
     "should_poll": false,

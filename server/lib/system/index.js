@@ -1,6 +1,6 @@
 const Docker = require('dockerode');
 
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, JOB_TYPES } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 const { downloadUpgrade } = require('./system.downloadUpgrade');
 const { init } = require('./system.init');
@@ -21,10 +21,11 @@ const { restartContainer } = require('./system.restartContainer');
 const { removeContainer } = require('./system.removeContainer');
 const { stopContainer } = require('./system.stopContainer');
 const { getNetworkMode } = require('./system.getNetworkMode');
+const { vacuum } = require('./system.vacuum');
 
 const { shutdown } = require('./system.shutdown');
 
-const System = function System(sequelize, event, config) {
+const System = function System(sequelize, event, config, job) {
   this.downloadUpgradeError = null;
   this.downloadUpgradeFinished = null;
   this.downloadUpgradeLastEvent = null;
@@ -32,8 +33,11 @@ const System = function System(sequelize, event, config) {
   this.sequelize = sequelize;
   this.event = event;
   this.config = config;
+  this.job = job;
   this.dockerode = null;
+  this.vacuum = this.job.wrapper(JOB_TYPES.VACUUM, this.vacuum.bind(this));
   this.event.on(EVENTS.SYSTEM.DOWNLOAD_UPGRADE, eventFunctionWrapper(this.downloadUpgrade.bind(this)));
+  this.event.on(EVENTS.SYSTEM.VACUUM, eventFunctionWrapper(this.vacuum.bind(this)));
   this.networkMode = null;
 };
 
@@ -56,6 +60,7 @@ System.prototype.restartContainer = restartContainer;
 System.prototype.removeContainer = removeContainer;
 System.prototype.stopContainer = stopContainer;
 System.prototype.getNetworkMode = getNetworkMode;
+System.prototype.vacuum = vacuum;
 
 System.prototype.shutdown = shutdown;
 

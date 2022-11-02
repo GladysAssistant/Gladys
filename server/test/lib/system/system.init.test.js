@@ -10,13 +10,18 @@ const System = proxyquire('../../../lib/system', {
   dockerode: DockerodeMock,
 });
 
+const Job = require('../../../lib/job');
+
 const sequelize = {
   close: fake.resolves(null),
 };
 
 const event = {
   on: fake.resolves(null),
+  emit: fake.returns(null),
 };
+
+const job = new Job(event);
 
 const config = {
   tempFolder: '/tmp/gladys',
@@ -26,7 +31,7 @@ describe('system.init', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event, config, job);
   });
 
   afterEach(() => {
@@ -36,9 +41,9 @@ describe('system.init', () => {
   it('should init system', async () => {
     await system.init();
 
-    assert.calledOnce(system.dockerode.listContainers);
+    assert.called(system.dockerode.listContainers);
 
     assert.notCalled(sequelize.close);
-    assert.calledOnce(event.on);
+    assert.called(event.on);
   });
 });

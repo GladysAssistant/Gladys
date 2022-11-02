@@ -66,6 +66,7 @@ import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs'
 import TelegramPage from '../routes/integration/all/telegram';
 import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
 import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
+import HomeKitPage from '../routes/integration/all/homekit';
 import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
@@ -84,6 +85,11 @@ import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
+
+// Broadlink integration
+import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
+import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
+import BroadlinkPeripheralPage from '../routes/integration/all/broadlink/peripheral-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -236,12 +242,18 @@ const AppRouter = connect(
         <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+        <HomeKitPage path="/dashboard/integration/communication/homekit" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
+
+        <BroadlinkDevicePage path="/dashboard/integration/device/broadlink" />
+        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit" />
+        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
+        <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
 
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
