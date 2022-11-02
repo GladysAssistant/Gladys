@@ -3,6 +3,7 @@ const JSZip = require('jszip');
 const path = require('path');
 
 const logger = require('../../../utils/logger');
+const { CONFIGURATION } = require('./constants');
 
 /**
  * @description Restore z2m backup from database.
@@ -22,7 +23,8 @@ async function restoreZ2mBackup(containerPath) {
   }
 
   // Check if backup is stored
-  const z2mBackup = await this.getZ2mBackup();
+  logger.info('Zigbee2mqtt: loading z2m backup...');
+  const z2mBackup = await this.gladys.variable.getValue(CONFIGURATION.Z2M_BACKUP, this.serviceId);
   if (z2mBackup) {
     logger.info('Restoring zigbee2mqtt configuration...');
     // Stored z2m backup is a base64 zip file

@@ -16,10 +16,10 @@ const { installMqttContainer } = require('./installMqttContainer');
 const { installZ2mContainer } = require('./installZ2mContainer');
 const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
-const { getZ2mBackup } = require('./getZ2mBackup');
 const { saveZ2mBackup } = require('./saveZ2mBackup');
 const { restoreZ2mBackup } = require('./restoreZ2mBackup');
-const { requestZ2mBackup } = require('./requestZ2mBackup');
+const { backup } = require('./backup');
+const { JOB_TYPES } = require('../../../utils/constants');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
@@ -49,7 +49,9 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.networkModeValid = true;
   this.dockerBased = true;
 
-  this.backupInterval = null;
+  this.backup = gladys.job.wrapper(JOB_TYPES.SERVICE_ZIGBEE2MQTT_BACKUP, this.backup.bind(this));
+  this.backupJob = {};
+  this.backupScheduledJob = null;
 };
 
 Zigbee2mqttManager.prototype.init = init;
@@ -70,9 +72,8 @@ Zigbee2mqttManager.prototype.installMqttContainer = installMqttContainer;
 Zigbee2mqttManager.prototype.installZ2mContainer = installZ2mContainer;
 Zigbee2mqttManager.prototype.setPermitJoin = setPermitJoin;
 Zigbee2mqttManager.prototype.getPermitJoin = getPermitJoin;
-Zigbee2mqttManager.prototype.getZ2mBackup = getZ2mBackup;
 Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
 Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
-Zigbee2mqttManager.prototype.requestZ2mBackup = requestZ2mBackup;
+Zigbee2mqttManager.prototype.backup = backup;
 
 module.exports = Zigbee2mqttManager;

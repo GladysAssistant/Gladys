@@ -75,14 +75,7 @@ async function handleMqttMessage(topic, message) {
     }
     case 'zigbee2mqtt/bridge/response/backup': {
       const payload = JSON.parse(message);
-      const { status, data } = payload;
-
-      if (status === 'ok') {
-        logger.info('Getting zigbee2mqtt backup');
-        await this.saveZ2mBackup(data.zip);
-      } else {
-        logger.error('zigbee2mqtt backup is not ok');
-      }
+      await this.saveZ2mBackup(payload);
       break;
     }
     default: {

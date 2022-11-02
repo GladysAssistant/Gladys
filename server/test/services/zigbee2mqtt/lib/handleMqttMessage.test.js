@@ -20,11 +20,15 @@ describe('zigbee2mqtt handleMqttMessage', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       event: {
         emit: fake.resolves(null),
-      },
-      variable: {
-        setValue: fake.resolves(true),
       },
       stateManager: {
         get: fake.resolves(true),
@@ -210,7 +214,9 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     assert.calledOnce(gladys.event.emit);
   });
 
-  it('it should not store backup', async () => {
+  it('it should store backup', async () => {
+    zigbee2mqttManager.saveZ2mBackup = fake.resolves(true);
+
     // PREPARE
     const payload = {
       status: 'ko',
@@ -218,20 +224,6 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     // EXECUTE
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/backup', JSON.stringify(payload));
     // ASSERT
-    assert.notCalled(gladys.variable.setValue);
-  });
-
-  it('it should store backup', async () => {
-    // PREPARE
-    const payload = {
-      status: 'ok',
-      data: {
-        zip: 'content',
-      },
-    };
-    // EXECUTE
-    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/backup', JSON.stringify(payload));
-    // ASSERT
-    assert.calledOnceWithExactly(gladys.variable.setValue, 'Z2M_BACKUP', payload.data.zip, serviceId);
+    assert.calledOnceWithExactly(zigbee2mqttManager.saveZ2mBackup, payload);
   });
 });

@@ -12,9 +12,9 @@ const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt
 async function disconnect() {
   let container;
 
-  // Stop backup request interval
-  if (this.backupInterval) {
-    clearInterval(this.backupInterval);
+  // Stop backup reccurent job
+  if (this.backupScheduledJob) {
+    this.backupScheduledJob.cancel();
   }
 
   // Disconnect from MQTT broker

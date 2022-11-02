@@ -10,6 +10,13 @@ const { fake } = sinon;
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const gladys = {
+  job: {
+    wrapper: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
+  },
   variable: {
     getValue: fake.resolves(null),
   },

@@ -69,9 +69,9 @@ async function init() {
     if (this.isEnabled()) {
       await this.connect(configuration);
 
-      // Interval for backup request (each 12 hours), only if not already defined
-      if (!this.backupInterval) {
-        this.backupInterval = setInterval(() => this.requestZ2mBackup(), 1000 * 60 * 60 * 12);
+      // Schedule reccurent job if not already scheduled
+      if (!this.backupScheduledJob) {
+        this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
       }
     }
   }
