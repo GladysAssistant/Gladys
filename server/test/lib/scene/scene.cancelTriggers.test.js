@@ -1,17 +1,39 @@
 const { expect } = require('chai');
 const EventEmitter = require('events');
-const { fake } = require('sinon');
+const sinon = require('sinon');
 const { EVENTS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 
+const { fake } = sinon;
 const event = new EventEmitter();
-const house = {
-  get: fake.resolves([]),
-};
 
 describe('SceneManager.cancelTriggers', () => {
+  let sceneManager;
+
+  beforeEach(() => {
+    const house = {
+      get: fake.resolves([]),
+    };
+
+    const scheduler = {
+      scheduleJob: (name, date, callback) => {
+        return {
+          name,
+          callback,
+          date,
+          cancel: () => {},
+        };
+      },
+    };
+
+    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler);
+  });
+
+  afterEach(() => {
+    sinon.reset();
+  });
+
   it('should cancel a node-schedule trigger', async () => {
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     const scene = await sceneManager.create({
       name: 'a-test-scene',
       icon: 'bell',
@@ -30,7 +52,6 @@ describe('SceneManager.cancelTriggers', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).not.to.have.property('nodeScheduleJob');
   });
   it('should cancel a js interval trigger', async () => {
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
     const scene = await sceneManager.create({
       name: 'a-test-scene',
       icon: 'bell',

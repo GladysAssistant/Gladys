@@ -57,7 +57,7 @@ async function dailyUpdate() {
         .toDate();
       logger.info(`Sunrise today is at ${sunriseHour}:${sunriseMinute} today, in your timezone = ${this.timezone}`);
       logger.info(`Sunset today is at ${sunsetHour}:${sunsetMinute} today, in your timezone = ${this.timezone}`);
-      const sunriseJob = this.schedule.scheduleJob(sunriseTime, () =>
+      const sunriseJob = this.scheduler.scheduleJob(EVENTS.TIME.SUNRISE, sunriseTime, () =>
         this.event.emit(EVENTS.TRIGGERS.CHECK, {
           type: EVENTS.TIME.SUNRISE,
           house,
@@ -70,7 +70,7 @@ async function dailyUpdate() {
         logger.info(`The sun rose this morning. Not scheduling for today.`);
       }
 
-      const sunsetJob = this.schedule.scheduleJob(sunsetTime, () =>
+      const sunsetJob = this.scheduler.scheduleJob(EVENTS.TIME.SUNSET, sunsetTime, () =>
         this.event.emit(EVENTS.TRIGGERS.CHECK, {
           type: EVENTS.TIME.SUNSET,
           house,
