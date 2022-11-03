@@ -4,8 +4,10 @@ const uuid = require('uuid');
 const { fake } = require('sinon');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 const now = new Date('2000-06-15T03:59:00.000Z');
 const insertStates = async () => {
