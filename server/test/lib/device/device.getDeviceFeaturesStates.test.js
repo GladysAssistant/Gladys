@@ -45,7 +45,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       }),
     };
     const dateState = '2000-06-15';
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     const states = await device.getDeviceFeaturesStates('test-device-feature', {
       from: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
       attributes: 'created_at,value',
@@ -65,7 +65,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
       get: fake.returns(null),
     };
     const dateState = '2000-06-15';
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     const promise = device.getDeviceFeaturesStates('test-device-feature', {
       from: new Date(`${dateState}T00:00:00.000Z`).toISOString(),
       to: new Date(`${dateState}T10:00:00.000Z`).toISOString(),
@@ -82,7 +82,7 @@ describe('Device.getDeviceFeaturesStates', function Describe() {
         name: 'my-feature',
       }),
     };
-    const device = new Device(event, {}, stateManager, {}, {}, variable);
+    const device = new Device(event, {}, stateManager, {}, {}, variable, job);
     const promise = device.getDeviceFeaturesStates('this-device-does-not-exist', {});
     return assert.isRejected(promise, 'Start date missing');
   });
