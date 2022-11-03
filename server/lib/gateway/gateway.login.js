@@ -1,11 +1,7 @@
 const get = require('get-value');
-const { webcrypto } = require('crypto');
-const getConfig = require('../../utils/getConfig');
 const logger = require('../../utils/logger');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 const { Error403, Error500 } = require('../../utils/httpErrors');
-
-const serverUrl = getConfig().gladysGatewayServerUrl;
 
 /**
  * @description Login to Gladys Gateway.
@@ -20,8 +16,6 @@ async function login(email, password) {
     if (this.gladysGatewayClient) {
       this.gladysGatewayClient.disconnect();
     }
-    // create a new instance of the client
-    this.gladysGatewayClient = new this.GladysGatewayClient({ cryptoLib: webcrypto, serverUrl, logger });
     // We login with email/password to get two factor token
     const loginResults = await this.gladysGatewayClient.login(email, password);
     return loginResults;

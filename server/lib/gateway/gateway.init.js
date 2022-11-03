@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, JOB_TYPES } = require('../../utils/constants');
 
 /**
  * @description Init Gladys Gateway.
@@ -44,13 +44,12 @@ async function init() {
   // schedule backup at midnight
   const timezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
-  const rule = new this.schedule.RecurrenceRule();
-  rule.tz = timezone;
-  rule.hour = 0;
-  rule.minute = 0;
-  rule.second = 0;
-
-  this.backupSchedule = this.schedule.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
+  const rule = { tz: timezone, hour: 0, minute: 0, second: 0 };
+  this.backupSchedule = this.scheduler.scheduleJob(
+    JOB_TYPES.GLADYS_GATEWAY_BACKUP,
+    rule,
+    this.checkIfBackupNeeded.bind(this),
+  );
 
   // Get latest Gladys version in 5 minutes
   // To let the system initialize
