@@ -156,7 +156,8 @@ const data = {
             'main-tv-volume',
             'main-tv-channel',
             'main-presence-sensor',
-            'main-signal-sensor'
+            'main-signal-sensor',
+            'button-click'
           ]
         }
       ],
@@ -345,6 +346,17 @@ const data = {
             read_only: true,
             last_value: 4,
             last_value_changed: dayjs().add(60, 'second')
+          },
+          {
+            name: 'Button',
+            selector: 'button-click',
+            category: 'button',
+            type: 'click',
+            min: 0,
+            max: 6,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
           }
         ]
       },
@@ -751,6 +763,17 @@ const data = {
               read_only: true,
               last_value: 0,
               unit: 'percent',
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            },
+            {
+              name: 'Button',
+              selector: 'button-click',
+              category: 'button',
+              type: 'click',
+              min: 0,
+              max: 6,
+              read_only: true,
+              last_value: 1,
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
