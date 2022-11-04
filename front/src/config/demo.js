@@ -805,6 +805,23 @@ const data = {
           ]
         },
         {
+          id: 'f10ae5bc-1da6-484e-b0d0-953ee94e5ccc',
+          name: 'Button click',
+          selector: 'button-click',
+          features: [
+            {
+              name: 'Remote',
+              selector: 'kitchen-button-click',
+              category: 'button',
+              type: 'click',
+              min: 0,
+              max: 6,
+              read_only: true,
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            }
+          ]
+        },
+        {
           id: '284d8f68-220c-45fd-a73a-eccb547aff24',
           name: 'Sensor',
           selector: 'humidity-sensor',
