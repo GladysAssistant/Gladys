@@ -1881,6 +1881,17 @@
       }
     },
     "category": {
+      "button": {
+        "click": {
+          "unknown": "{{value}} (unknown value)",
+          "1": "Simple click",
+          "2": "Double click",
+          "3": "Long click press",
+          "4": "Long click release",
+          "5": "Hold click",
+          "6": "Long click"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "No value received",
