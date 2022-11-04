@@ -1859,6 +1859,17 @@
       }
     },
     "category": {
+      "button": {
+        "click": {
+          "unknown": "{{value}} (valeur inconnue)",
+          "1": "Clic simple",
+          "2": "Clic double",
+          "3": "Pression clic long",
+          "4": "Relâche clic long",
+          "5": "Clic maintenu",
+          "6": "Clic long"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
