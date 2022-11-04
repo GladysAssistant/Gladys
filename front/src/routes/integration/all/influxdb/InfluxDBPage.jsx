@@ -15,6 +15,26 @@ class InfluxDBPage extends Component {
   updateInfluxdbBucket = e => {
     this.props.updateConfiguration({ influxdbBucket: e.target.value });
   };
+  testConnection = async () => {
+    this.setState({
+      loading: true
+    });
+    try {
+      await this.props.testConnection(this.props.cameraIndex);
+      this.setState({
+        testConnectionError: null,
+        testConnectionErrorMessage: null
+      });
+    } catch (e) {
+      this.setState({
+        testConnectionError: RequestStatus.Error,
+        testConnectionErrorMessage: get(e, 'response.data.error')
+      });
+    }
+    this.setState({
+      loading: false
+    });
+  };
   render(props) {
     return (
       <div class="page">
@@ -113,6 +133,9 @@ class InfluxDBPage extends Component {
                               >
                                 <Text id="integration.influxdb.saveButton" />
                               </button>
+                              <button onClick={this.testConnection} class="btn btn-info mr-2">
+                    <Text id="integration.influxdb.testConnectionButton" />
+                  </button>
                             </div>
                           </form>
                         </div>

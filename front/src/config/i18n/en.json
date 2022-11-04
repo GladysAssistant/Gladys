@@ -680,7 +680,8 @@
       "orgPlaceholder": "My org",
       "bucketLabel": "Bucket name:",
       "bucketPlaceholder": "gladys",
-      "saveButton": "Save"
+      "saveButton": "Save",
+      "testConnectionButton": "Test connection"
     },
     "mqtt": {
       "title": "MQTT",

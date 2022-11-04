@@ -45,7 +45,15 @@ function createActions(store) {
           passwordChanges: false
         });
       }
-    }
+    },
+    async testConnection(state) {
+      store.setState({
+        connectInfluxdbStatus: RequestStatus.Getting,
+      });
+      const { influxdbUrl, influxdbBucket, influxdbToken, influxdbOrg } = state;
+      const connectionStatus = await state.httpClient.post(`/api/v1/service/influxdb/test`, state);
+      
+    },
   };
 
   return Object.assign({}, actions, integrationActions);

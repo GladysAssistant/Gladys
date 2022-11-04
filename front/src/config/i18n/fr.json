@@ -807,7 +807,8 @@
       "orgPlaceholder": "Entrer l'organisation",
       "bucketLabel": "Entrez le nom de votre bucket:",
       "bucketPlaceholder": "Entrer le nom du bucket",
-      "saveButton": "Sauvegarder"
+      "saveButton": "Sauvegarder",
+      "testConnectionButton": "Tester"
     },
     "mqtt": {
       "title": "MQTT",
