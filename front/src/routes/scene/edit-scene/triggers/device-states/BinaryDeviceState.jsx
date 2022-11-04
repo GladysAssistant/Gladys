@@ -33,9 +33,13 @@ class BinaryDeviceState extends Component {
 
     return (
       <Fragment>
-        <div class="col-2 col-md-1">
-          <div class="text-center" style={{ marginTop: '10px' }}>
-            <i class="fe fe-arrow-right" style={{ fontSize: '20px' }} />
+        <div class="col-12 col-md-1">
+          <div class="text-center">
+            <i
+              class="fe fe-arrow-down d-block d-xs-none d-sm-none"
+              style={{ fontSize: '20px', marginBottom: '15px' }}
+            />
+            <i class="fe fe-arrow-right d-none d-xs-block d-sm-block" style={{ fontSize: '20px', marginTop: '10px' }} />
           </div>
         </div>
         <div class="col-12 col-md-5">
