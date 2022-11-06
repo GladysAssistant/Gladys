@@ -35,7 +35,7 @@ describe('Withings settings page', () => {
       {
         body: []
       }
-    );
+    ).as('initDevices');
     cy.intercept(
       {
         method: 'POST',
@@ -99,6 +99,8 @@ describe('Withings settings page', () => {
 
     // Check redirected to settings page
     cy.location('pathname').should('eq', '/dashboard/integration/health/withings/settings');
+
+    cy.wait('@initDevices');
 
     cy.get('.alert-info').i18n('integration.withings.settings.oauth2.complete');
 
