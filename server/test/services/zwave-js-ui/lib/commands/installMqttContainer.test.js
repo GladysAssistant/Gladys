@@ -6,9 +6,9 @@ const proxyquire = require('proxyquire').noCallThru();
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
 const { installMqttContainer } = proxyquire('../../../../../services/zwave-js-ui/lib/commands/installMqttContainer', {
-  '../../../utils/childProcess': { exec: fake.resolves(true) },
+  '../../../../utils/childProcess': { exec: fake.resolves(true) },
 });
-const ZwaveJSUIManager = proxyquire('../../../../../services/zwave-js-ui/lib/commands', {
+const ZwaveJSUIManager = proxyquire('../../../../../services/zwave-js-ui/lib', {
   './installMqttContainer': { installMqttContainer },
 });
 
