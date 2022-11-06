@@ -69,6 +69,7 @@ class WithingsDeviceBox extends Component {
   }
 
   render(props, { batteryLevel, mostRecentValueAt, loading }) {
+    console.log('Device: ', props.device.name, batteryLevel);
     return (
       <div class="col-md-6">
         <div class="card">
