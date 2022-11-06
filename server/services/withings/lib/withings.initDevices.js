@@ -277,6 +277,9 @@ async function initDevices(userId) {
     );
   }
 
+  logger.debug(devicesResult);
+  devicesResult.forEach((device) => logger.debug(device.features));
+
   return devicesResult;
 }
 
