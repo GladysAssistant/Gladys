@@ -166,7 +166,7 @@ async function connect() {
     this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
 
     this.driver = {
-      ownNodeId: 'N.A.',
+      controllerId: 'N.A.',
     };
   } else {
     logger.warn("Can't connect Gladys cause MQTT not connected !");

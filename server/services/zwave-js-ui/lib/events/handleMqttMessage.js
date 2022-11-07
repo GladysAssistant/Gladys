@@ -1,13 +1,6 @@
 const logger = require('../../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { statisticsUpdated } = require('./statisticsUpdated');
-const { valueUpdated } = require('./valueUpdated');
-const { valueAdded } = require('./valueAdded');
-const { nodeDead, nodeAlive, nodeWakeUp, nodeSleep } = require('./nodeState');
-const { nodeReady } = require('./nodeReady');
 const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
-const { scanComplete } = require('./scanComplete');
-const { driverReady } = require('../../../zwave/lib/events/zwave.driverReady');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -19,30 +12,32 @@ const { driverReady } = require('../../../zwave/lib/events/zwave.driverReady');
  */
 function handleMqttMessage(topic, message) {
   this.mqttConnected = true;
-  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
-  });
 
   switch (topic) {
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/driver/driver_ready`: {
       const msg = JSON.parse(message).data[0];
       this.driver.homeId = msg.homeId;
-      this.driver.ownNodeId = msg.controllerId;
-      driverReady.bind(this)(msg.homeId);
+      this.driver.controllerId = msg.controllerId;
+      this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+      });
       break;
     }
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/driver/all_nodes_ready`: {
-      scanComplete.bind(this)();
+      this.scanComplete();
       break;
     }
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/controller/statistics_updated`: {
       const msg = JSON.parse(message).data[0];
       this.driver.statistics = msg;
+      this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+      });
       break;
     }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_alive`: {
+    /* case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_alive`: {
       const msg = JSON.parse(message).data[0];
-      nodeAlive.bind(this)(
+      this.nodeAlive(
         {
           id: msg.id,
         },
@@ -52,7 +47,7 @@ function handleMqttMessage(topic, message) {
     }
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_ready`: {
       const msg = JSON.parse(message).data[0];
-      nodeReady.bind(this)(
+      this.nodeReady(
         {
           id: msg.id,
         },
@@ -62,14 +57,14 @@ function handleMqttMessage(topic, message) {
     }
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_sleep`: {
       const msg = JSON.parse(message).data[0];
-      nodeSleep.bind(this)({
+      this.nodeSleep({
         id: msg.id,
       });
       break;
     }
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_dead`: {
       const msg = JSON.parse(message).data[0];
-      nodeDead.bind(this)(
+      this.nodeDead(
         {
           id: msg.id,
         },
@@ -79,7 +74,7 @@ function handleMqttMessage(topic, message) {
     }
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_wakeup`: {
       const msg = JSON.parse(message).data[0];
-      nodeWakeUp.bind(this)({
+      this.nodeWakeUp({
         id: msg.id,
       });
       break;
@@ -93,19 +88,11 @@ function handleMqttMessage(topic, message) {
       break;
     }
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_metadata_updated`: {
-      // Use node topic
-      /* const msg = JSON.parse(message).data[0];
-      metadataUpdate.bind(this)(
-        {
-          id: msg.id,
-        },
-        msg.data,
-      ); */
       break;
     }
     case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/statistics_updated`: {
       const msg = JSON.parse(message);
-      statisticsUpdated.bind(this)(
+      this.statisticsUpdated(
         {
           id: msg.data[0],
         },
@@ -117,7 +104,7 @@ function handleMqttMessage(topic, message) {
     case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/status`:
     case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/version`: {
       break;
-    }
+    } */
     case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {
       if (this.scanInProgress) {
         if (!(message instanceof Object)) {
@@ -150,7 +137,7 @@ function handleMqttMessage(topic, message) {
             this.nodes[data.id] = node;
             node.label = node.productLabel;
 
-            nodeReady.bind(this)(node);
+            nodeReady(node);
             Object.keys(node.values)
               .filter((valueId) => !valueId.startsWith(COMMAND_CLASSES.COMMAND_CLASS_BASIC.toString()))
               .forEach((valueId) => {
@@ -163,7 +150,7 @@ function handleMqttMessage(topic, message) {
                 delete value.propertyName;
                 value.propertyKey = value.propertyKey ? `${value.propertyKey}`.replace(/_/g, ' ') : undefined;
 
-                valueAdded.bind(this)(
+                this.valueAdded(
                   {
                     id: data.id,
                   },
@@ -176,7 +163,7 @@ function handleMqttMessage(topic, message) {
             delete node.deviceConfig;
           });
 
-          scanComplete.bind(this)();
+          scanComplete();
         }
       }
       break;
@@ -220,7 +207,7 @@ function handleMqttMessage(topic, message) {
           break;
         }
 
-        valueUpdated.bind(this)(
+        this.valueUpdated(
           {
             id,
           },
@@ -237,6 +224,7 @@ function handleMqttMessage(topic, message) {
       }
     }
   }
+
   return null;
 }
 

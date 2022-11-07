@@ -330,10 +330,6 @@ const NODE_STATES = {
   DEAD: 'dead',
   SLEEP: 'sleep',
   WAKE_UP: 'wakeUp',
-  INTERVIEW_STARTED: 'interviewStarted',
-  INTERVIEW_STAGE_COMPLETED: 'interviewStageCompleted',
-  INTERVIEW_COMPLETED: 'interviewCompleted',
-  INTERVIEW_FAILED: 'interviewFailed',
 };
 
 const CONFIGURATION = {

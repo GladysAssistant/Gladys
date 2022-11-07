@@ -11,7 +11,7 @@ async function getConfiguration() {
 
   return {
     homeId: this.controller && this.controller.ready ? this.controller.homeId : 'Not ready',
-    ownNodeId: this.controller && this.controller.ready ? this.controller.ownNodeId : 'Not ready',
+    controllerId: this.controller && this.controller.ready ? this.controller.controllerId : 'Not ready',
     type: this.controller && this.controller.ready ? this.controller.type : 'Not ready',
     sdkVersion: this.controller && this.controller.ready ? this.controller.sdkVersion : 'Not ready',
 

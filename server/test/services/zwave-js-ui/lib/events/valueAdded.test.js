@@ -5,8 +5,8 @@ const { expect } = require('chai');
 const { stub, fake } = sinon;
 const EventEmitter = require('events');
 
-const ZwaveJSUIManager = require('../../../../services/zwave-js-ui/lib');
-const { CONFIGURATION } = require('../../../../services/zwave-js-ui/lib/constants');
+const ZwaveJSUIManager = require('../../../../../services/zwave-js-ui/lib');
+const { CONFIGURATION } = require('../../../../../services/zwave-js-ui/lib/constants');
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
 const DRIVER_PATH = 'DRIVER_PATH';
