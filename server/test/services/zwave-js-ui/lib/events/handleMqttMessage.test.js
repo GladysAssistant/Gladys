@@ -29,11 +29,10 @@ describe('zwave gladys node event', () => {
     node = {
       id: 1,
       ready: true,
-      classes: {
-      }
+      classes: {},
     };
     zwaveJSUIManager.nodes = {
-      '1': node
+      '1': node,
     };
     sinon.reset();
   });
@@ -45,25 +44,23 @@ describe('zwave gladys node event', () => {
     const message = '1';
     node.classes[commandClass] = {
       '0': {
-        'property': {
-
-        }
-      }
+        property: {},
+      },
     };
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/${nodeId}/${commandClass}/${endpoint}/${property}`,
-      message,
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/${nodeId}/${commandClass}/${endpoint}/${property}`, message);
+    assert.calledOnceWithExactly(
+      zwaveJSUIManager.valueUpdated,
+      {
+        id: 1,
+      },
+      {
+        commandClass: 37,
+        endpoint,
+        property,
+        propertyKey: undefined,
+        newValue: 1,
+      },
     );
-    assert.calledOnceWithExactly(zwaveJSUIManager.valueUpdated, {
-      id: 1,
-    },
-    {
-      commandClass: 37,
-      endpoint,
-      property,
-      propertyKey: undefined,
-      newValue: 1,
-    });
   });
 });
 

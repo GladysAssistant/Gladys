@@ -137,7 +137,7 @@ function handleMqttMessage(topic, message) {
             this.nodes[data.id] = node;
             node.label = node.productLabel;
 
-            nodeReady(node);
+            this.nodeReady(node);
             Object.keys(node.values)
               .filter((valueId) => !valueId.startsWith(COMMAND_CLASSES.COMMAND_CLASS_BASIC.toString()))
               .forEach((valueId) => {
@@ -163,7 +163,7 @@ function handleMqttMessage(topic, message) {
             delete node.deviceConfig;
           });
 
-          scanComplete();
+          this.scanComplete();
         }
       }
       break;
