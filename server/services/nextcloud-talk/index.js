@@ -3,7 +3,9 @@ const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 const MessageHandler = require('./lib');
 
 module.exports = function NextcloudTalkService(gladys, serviceId) {
-  const messageHandler = new MessageHandler(gladys, serviceId);
+  const axios = require('axios');
+
+  const messageHandler = new MessageHandler(gladys, serviceId, axios);
   /**
    * @public
    * @description This function starts the Nextcloud Talk Service

@@ -3,30 +3,35 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Poll for new message
- * @param {string} token - Token of conversation to poll.
+ * @param {string} userId - User to send message to.
  * @returns {Promise} - Resolve.
  * @example
- * poll('token1');
+ * poll('user1');
  */
-async function poll(token) {
-  const { lastKnownMessageId } = this.bots[token];
+async function poll(userId) {
+  const bot = this.bots[userId];
   let result = {};
 
   try {
-    result = await this.gladys.http.request(
-      'get',
-      `${this.bots[token].NEXTCLOUD_URL}/ocs/v2.php/apps/spreed/api/v1/chat/${token}?lookIntoFuture=1&timeout=15${
-        lastKnownMessageId ? `&lastKnownMessageId=${lastKnownMessageId}` : ''
+    const params = {
+      method: 'get',
+      url: `${bot.NEXTCLOUD_URL}/ocs/v2.php/apps/spreed/api/v1/chat/${bot.token}?timeout=15${
+        bot.lastKnownMessageId
+          ? `&lookIntoFuture=1&lastKnownMessageId=${bot.lastKnownMessageId}`
+          : '&lookIntoFuture=0&includeLastKnown=1'
       }`,
-      '',
-      {
-        Authorization: `Basic ${Buffer.from(
-          `${this.bots[token].NEXTCLOUD_BOT_USERNAME}:${this.bots[token].NEXTCLOUD_BOT_PASSWORD}`,
-        ).toString('base64')}`,
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${bot.NEXTCLOUD_BOT_USERNAME}:${bot.NEXTCLOUD_BOT_PASSWORD}`).toString(
+          'base64',
+        )}`,
         Accept: 'application/json',
         'OCS-APIRequest': true,
       },
-    );
+      timeout: 30 * 1000,
+      signal: this.abortController.signal,
+      validateStatus: null,
+    };
+    result = await this.axios.request(params);
   } catch (e) {
     logger.info('Fail to request new Nextcloud Talk messages, retry');
     logger.warn(e);
@@ -34,17 +39,17 @@ async function poll(token) {
 
   const newMessages = get(result, 'data.ocs.data');
   if (
-    lastKnownMessageId &&
-    this.bots[token].isPolling &&
+    bot.lastKnownMessageId &&
+    bot.isPolling &&
     newMessages &&
-    newMessages[newMessages.length - 1].actorId !== this.bots[token].NEXTCLOUD_BOT_USERNAME
+    newMessages[newMessages.length - 1].actorId !== bot.NEXTCLOUD_BOT_USERNAME
   ) {
-    this.bots[token].eventEmitter.emit('message', newMessages.pop());
+    bot.eventEmitter.emit('message', newMessages.pop());
   }
 
-  if (this.bots[token].isPolling) {
-    this.bots[token].lastKnownMessageId = get(result, 'headers.x-chat-last-given') || lastKnownMessageId;
-    setTimeout(() => this.poll(token), 50);
+  if (bot.isPolling) {
+    this.bots[userId].lastKnownMessageId = get(result, 'headers.x-chat-last-given') || bot.lastKnownMessageId;
+    setTimeout(() => this.poll(userId), 50);
   }
 }
 

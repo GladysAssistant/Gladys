@@ -2,13 +2,14 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Initiate bot poll message
- * @param {string} token - Token of conversation to stop.
+ * @param {string} userId - User to send message to.
  * @example
- * stopPoll('token1');
+ * stopPoll('user1');
  */
-function stopPolling(token) {
-  logger.debug(`Stop polling Nextcloud Talk for token: ${token}`);
-  this.bots[token].isPolling = false;
+function stopPolling(userId) {
+  logger.debug(`Stop polling Nextcloud Talk for user: ${userId}`);
+  this.bots[userId].isPolling = false;
+  this.bots[userId].lastKnownMessageId = null;
 }
 
 module.exports = {

@@ -14,7 +14,7 @@ const logger = require('../../../../utils/logger');
 async function send(token, message) {
   logger.debug(`Sending Nextcloud Talk message to user with token = ${token}.`);
 
-  const userBot = this.bots[token];
+  const userBot = Object.values(this.bots).find((bot) => bot.token === token);
 
   const NEXTCLOUD_URL = await this.gladys.variable.getValue('NEXTCLOUD_URL', this.serviceId, userBot.userId);
   const NEXTCLOUD_BOT_USERNAME = await this.gladys.variable.getValue(
@@ -36,7 +36,7 @@ async function send(token, message) {
 
   await this.gladys.http.request(
     'post',
-    `${NEXTCLOUD_URL}/ocs/v2.php/apps/spreed/api/v1/chat/${token}`,
+    `${NEXTCLOUD_URL}/ocs/v2.php/apps/spreed/api/v1/chat/${userBot.token}`,
     { message: message.text },
     headers,
   );
@@ -61,7 +61,7 @@ async function send(token, message) {
       {
         path,
         shareType: 10,
-        shareWith: token,
+        shareWith: userBot.token,
       },
       headers,
     );

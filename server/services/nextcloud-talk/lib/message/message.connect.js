@@ -1,4 +1,5 @@
 const EventEmitter = require('events');
+const { AbortController } = require('node-abort-controller');
 
 /**
  * @description Connect Nextcloud Talk
@@ -10,21 +11,23 @@ const EventEmitter = require('events');
  * ]);
  */
 async function connect(tokens) {
-  // if a bots exist, we disconnect
+  // if a bot exist, we disconnect
   if (Object.keys(this.bots).length > 0) {
     await this.disconnect();
   }
 
+  this.abortController = new AbortController();
+
   tokens.forEach(async (token) => {
-    this.bots[token.value] = {
+    this.bots[token.user_id] = {
       userId: token.user_id,
       token: token.value,
       isPolling: false,
       eventEmitter: new EventEmitter(),
       lastKnownMessageId: null,
     };
-    this.startPolling(token.value);
-    this.bots[token.value].eventEmitter.on('message', this.newMessage.bind(this));
+    this.startPolling(token.user_id);
+    this.bots[token.user_id].eventEmitter.on('message', this.newMessage.bind(this));
   });
 }
 

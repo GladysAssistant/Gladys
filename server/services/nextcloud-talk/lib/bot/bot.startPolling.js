@@ -2,36 +2,28 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Initiate bot poll
- * @param {string} token - Token of conversation to poll.
+ * @param {string} userId - User to send message to.
  * @returns {Promise} - Resolve.
  * @example
- * startPolling('token1');
+ * startPolling('user1');
  */
-async function startPolling(token) {
-  logger.debug(`Start polling Nextcloud Talk for token: ${token}`);
+async function startPolling(userId) {
+  logger.debug(`Start polling Nextcloud Talk for user: ${userId}`);
 
-  const user = await this.gladys.user.getById(this.bots[token].userId);
+  this.bots[userId].NEXTCLOUD_URL = await this.gladys.variable.getValue('NEXTCLOUD_URL', this.serviceId, userId);
+  this.bots[userId].NEXTCLOUD_BOT_USERNAME = await this.gladys.variable.getValue(
+    'NEXTCLOUD_BOT_USERNAME',
+    this.serviceId,
+    userId,
+  );
+  this.bots[userId].NEXTCLOUD_BOT_PASSWORD = await this.gladys.variable.getValue(
+    'NEXTCLOUD_BOT_PASSWORD',
+    this.serviceId,
+    userId,
+  );
 
-  if (!this.bots[token].NEXTCLOUD_URL) {
-    this.bots[token].NEXTCLOUD_URL = await this.gladys.variable.getValue('NEXTCLOUD_URL', this.serviceId, user.id);
-  }
-  if (!this.bots[token].NEXTCLOUD_BOT_USERNAME) {
-    this.bots[token].NEXTCLOUD_BOT_USERNAME = await this.gladys.variable.getValue(
-      'NEXTCLOUD_BOT_USERNAME',
-      this.serviceId,
-      user.id,
-    );
-  }
-  if (!this.bots[token].NEXTCLOUD_BOT_PASSWORD) {
-    this.bots[token].NEXTCLOUD_BOT_PASSWORD = await this.gladys.variable.getValue(
-      'NEXTCLOUD_BOT_PASSWORD',
-      this.serviceId,
-      user.id,
-    );
-  }
-
-  this.bots[token].isPolling = true;
-  this.poll(token);
+  this.bots[userId].isPolling = true;
+  this.poll(userId);
 }
 
 module.exports = {

@@ -35,7 +35,7 @@ describe('NextcloudTalk.message', () => {
     });
     messageHandler.bots = {};
     await messageHandler.connect([{ value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }]);
-    expect(messageHandler.bots.testToken1.userId).eq('30385cbf-b9ff-4239-a6bb-35477ca3eea6');
+    expect(messageHandler.bots['30385cbf-b9ff-4239-a6bb-35477ca3eea6'].token).eq('testToken1');
   });
   it('should poll once', async () => {
     const emit = fake.resolves();
