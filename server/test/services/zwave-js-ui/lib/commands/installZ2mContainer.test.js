@@ -9,7 +9,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/consta
 const { installZ2mContainer } = proxyquire('../../../../../services/zwave-js-ui/lib/commands/installZ2mContainer', {
   '../../../utils/childProcess': { exec: fake.resolves(true) },
 });
-const ZwaveJSUIManager = proxyquire('../../../../../services/zwave-js-ui/lib/commands', {
+const ZwaveJSUIManager = proxyquire('../../../../../services/zwave-js-ui/lib', {
   './installZ2mContainer': { installZ2mContainer },
 });
 
@@ -100,7 +100,7 @@ describe('zwave-js-ui installz2mContainer', () => {
     // ASSERT
     assert.calledWith(gladys.system.restartContainer, container.id);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
     assert.match(zwaveJSUIManager.zwavejsuiRunning, false);
     assert.match(zwaveJSUIManager.zwavejsuiExist, false);
@@ -119,7 +119,7 @@ describe('zwave-js-ui installz2mContainer', () => {
     }
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
     assert.match(zwaveJSUIManager.zwavejsuiRunning, false);
     assert.match(zwaveJSUIManager.zwavejsuiExist, false);
@@ -140,7 +140,7 @@ describe('zwave-js-ui installz2mContainer', () => {
     await zwaveJSUIManager.installZ2mContainer();
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
     assert.calledThrice(gladys.variable.getValue);
     assert.calledOnce(gladys.system.createContainer);
