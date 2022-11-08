@@ -2,16 +2,18 @@ const EventEmitter = require('events');
 const { expect, assert } = require('chai');
 const Device = require('../../../../lib/device');
 const StateManager = require('../../../../lib/state');
+const Job = require('../../../../lib/job');
 
 const RANDOM_IMAGE =
   'image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 describe('Camera.getImage', () => {
   it('should return camera image', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, {}, stateManager, {});
+    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
     stateManager.setState('device', 'test-camera', {
       features: [
         {
@@ -28,7 +30,7 @@ describe('Camera.getImage', () => {
   });
   it('should return camera not found', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, {}, stateManager, {});
+    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
     stateManager.setState('device', 'test-camera', {
       features: [
         {
@@ -45,7 +47,7 @@ describe('Camera.getImage', () => {
   });
   it('should return camera not found', async () => {
     const stateManager = new StateManager(event);
-    const deviceManager = new Device(event, {}, stateManager, {});
+    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
     stateManager.setState('device', 'test-camera-2', {
       features: [
         {

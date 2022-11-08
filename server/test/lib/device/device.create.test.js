@@ -1,18 +1,22 @@
 const { expect } = require('chai');
+const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 
-const { DEVICE_POLL_FREQUENCIES } = require('../../../utils/constants');
+const { DEVICE_POLL_FREQUENCIES, EVENTS } = require('../../../utils/constants');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
+const Job = require('../../../lib/job');
+const db = require('../../../models');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 describe('Device', () => {
   it('should create device alone', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     const newDevice = await device.create({
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       name: 'Philips Hue 1',
@@ -41,7 +45,7 @@ describe('Device', () => {
       ],
     });
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     const newDevice = await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
       name: 'RENAMED_DEVICE',
@@ -75,7 +79,7 @@ describe('Device', () => {
   it('should update device which already exist, update a feature and a param', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     const newDevice = await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
       name: 'RENAMED_DEVICE',
@@ -164,7 +168,7 @@ describe('Device', () => {
       ],
     });
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
       name: 'RENAMED_DEVICE',
@@ -208,7 +212,7 @@ describe('Device', () => {
       ],
     });
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     const newDevice = await device.create({
       id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
       name: 'RENAMED_DEVICE',
@@ -230,7 +234,7 @@ describe('Device', () => {
   it('should create device, one feature and one param', async () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     const newDevice = await device.create({
       service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       name: 'Philips Hue 1',
@@ -264,7 +268,7 @@ describe('Device', () => {
       params: [],
     });
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     await device.create({
       id: 'f3525782-f513-4068-9f64-f3429756f99d',
       name: 'RENAMED_DEVICE',
@@ -331,7 +335,7 @@ describe('Device', () => {
       params: [],
     });
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     await device.create({
       id: 'f3525782-f513-4068-9f64-f3429756f99d',
       name: 'RENAMED_DEVICE',
@@ -398,7 +402,7 @@ describe('Device', () => {
       params: [],
     });
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     await device.create({
       id: 'f3525782-f513-4068-9f64-f3429756f99d',
       name: 'RENAMED_DEVICE',
@@ -455,5 +459,53 @@ describe('Device', () => {
 
     expect(device.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES.EVERY_MINUTES]).to.have.lengthOf(0);
     expect(device.devicesByPollFrequency[DEVICE_POLL_FREQUENCIES.EVERY_30_SECONDS]).to.have.lengthOf(1);
+  });
+  it('should update a feature with keep_history = false and check that background job to delete states is called', async () => {
+    const stateManager = new StateManager(event);
+    const serviceManager = new ServiceManager({}, stateManager);
+    const fakeEvent = {
+      emit: fake.returns(null),
+      on: fake.returns(null),
+    };
+    const device = new Device(fakeEvent, {}, stateManager, serviceManager, {}, {}, job);
+    await db.DeviceFeatureState.create({
+      device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      value: 10,
+    });
+    await db.DeviceFeatureStateAggregate.create({
+      type: 'daily',
+      device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      value: 10,
+    });
+    const createdDevice = await device.create({
+      id: '7f85c2f8-86cc-4600-84db-6c074dadb4e8',
+      name: 'RENAMED_DEVICE',
+      selector: 'test-device',
+      external_id: 'test-device-external',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: '2398c689-8b47-43cc-ad32-e98d9be098b5',
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+      updated_at: '2019-02-12 07:49:07.556 +00:00',
+      features: [
+        {
+          name: 'New device feature',
+          selector: 'new-device-feature',
+          external_id: 'hue:binary:1',
+          category: 'temperature',
+          type: 'decimal',
+          keep_history: false,
+          read_only: false,
+          has_feedback: false,
+          min: 0,
+          max: 100,
+        },
+      ],
+    });
+    expect(createdDevice.features[0]).to.have.property('id', 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4');
+    assert.calledWith(
+      fakeEvent.emit,
+      EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
+      'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+    );
   });
 });

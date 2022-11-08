@@ -1,6 +1,7 @@
 const turnOn = require('./light.turnOn');
 const turnOff = require('./light.turnOff');
 const getState = require('./light.getState');
+const setValue = require('./light.setValue');
 
 /**
  * @description Add ability to control a light
@@ -17,5 +18,6 @@ const ExampleLightHandler = function ExampleLightHandler(gladys, client) {
 ExampleLightHandler.prototype.turnOn = turnOn;
 ExampleLightHandler.prototype.turnOff = turnOff;
 ExampleLightHandler.prototype.getState = getState;
+ExampleLightHandler.prototype.setValue = setValue;
 
 module.exports = ExampleLightHandler;

@@ -1,6 +1,6 @@
 import get from 'get-value';
 
-import { getDeviceName } from './utils';
+import { getDeviceName } from '../../../../utils/device';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
 const NumberDeviceFeature = ({ children, ...props }) => {

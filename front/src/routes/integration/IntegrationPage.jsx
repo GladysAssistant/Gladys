@@ -1,16 +1,14 @@
 import { Component } from 'preact';
-import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import IntegrationMenu from './IntegrationMenu';
 import IntegrationCategory from './IntegrationCategory';
-import actions from '../../actions/integration';
-import withIntlAsProp from '../../utils/withIntlAsProp';
 
-@connect('integrations,currentUrl,totalSize,searchKeyword,user', actions)
 class IntegrationPage extends Component {
+  changeOrderDirWithI18n = e => this.props.changeOrderDir(e, this.props.intl);
   searchWithI18n = e => this.props.search(e, this.props.intl);
 
-  render({ category, integrations, totalSize, currentUrl, searchKeyword, user }) {
+  render(props) {
+    const { category, integrations, totalSize, currentUrl, searchKeyword, user, orderDir } = props;
     return (
       <div class="page">
         <div class="page-main">
@@ -25,11 +23,11 @@ class IntegrationPage extends Component {
                     <Text id="integration.root.subtitle" fields={{ length: integrations.length, total: totalSize }} />
                   </div>
                   <div class="page-options d-flex">
-                    <select class="form-control custom-select w-auto">
-                      <option value="asc">
+                    <select class="form-control custom-select w-auto" onChange={this.changeOrderDirWithI18n}>
+                      <option value="asc" selected={orderDir === 'asc'}>
                         <Text id="global.orderDirAsc" />
                       </option>
-                      <option value="desc">
+                      <option value="desc" selected={orderDir === 'desc'}>
                         <Text id="global.orderDirDesc" />
                       </option>
                     </select>
@@ -51,14 +49,13 @@ class IntegrationPage extends Component {
                 </div>
                 <div class="row">
                   <div class="col-lg-3">
-                    <IntegrationMenu currentUrl={currentUrl} />
+                    <IntegrationMenu {...props} />
                   </div>
                   <div class="col-lg-9">
                     <div class="row row-cards">
-                      {integrations &&
-                        integrations.map(integration => (
-                          <IntegrationCategory currentUrl={currentUrl} integration={integration} category={category} />
-                        ))}
+                      {integrations.map(integration => (
+                        <IntegrationCategory currentUrl={currentUrl} integration={integration} category={category} />
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -71,4 +68,4 @@ class IntegrationPage extends Component {
   }
 }
 
-export default withIntlAsProp(IntegrationPage);
+export default IntegrationPage;

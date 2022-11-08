@@ -27,4 +27,8 @@ describe('zwaveService', () => {
   it('should stop service', async () => {
     await zwaveService.stop();
   });
+  it('should return isUsed true/false', async () => {
+    const isUsed = await zwaveService.isUsed();
+    expect(isUsed).to.equal(false);
+  });
 });

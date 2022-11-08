@@ -1,3 +1,4 @@
+module.exports.alexa = require('./alexa');
 module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
 module.exports.openweather = require('./openweather');
@@ -14,3 +15,5 @@ module.exports.ewelink = require('./ewelink');
 module.exports['tp-link'] = require('./tp-link');
 module.exports.zigbee2mqtt = require('./zigbee2mqtt');
 module.exports['google-actions'] = require('./google-actions');
+module.exports.homekit = require('./homekit');
+module.exports.broadlink = require('./broadlink');

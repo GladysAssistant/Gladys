@@ -2,5 +2,17 @@
   {
     "key": "telegram",
     "img": "/assets/integrations/cover/telegram.jpg"
+  },
+  {
+    "key": "alexa",
+    "img": "/assets/integrations/cover/alexa.jpg"
+  },
+  {
+    "key": "googleHome",
+    "img": "/assets/integrations/cover/google-home.jpg"
+  },
+  {
+    "key": "homekit",
+    "img": "/assets/integrations/cover/homekit.jpg"
   }
 ]

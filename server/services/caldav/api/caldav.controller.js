@@ -33,6 +33,7 @@ module.exports = function CalDAVController(caldavHandler) {
    */
   async function sync(req, res) {
     await caldavHandler.syncUserCalendars(req.user.id);
+    await caldavHandler.syncUserWebcals(req.user.id);
     res.json({
       success: true,
     });
