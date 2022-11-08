@@ -13,6 +13,9 @@ const sleep = promisify(setTimeout);
  * installZ2mContainer();
  */
 async function installZ2mContainer() {
+  this.zwaveJSUIExist = false;
+  this.zwaveJSUIRunning = false;
+  
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
     filters: { name: [containerDescriptor.name] },
