@@ -52,7 +52,7 @@ async function installMqttContainer() {
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
       });
-      return;
+      throw e;
     }
 
     try {
@@ -86,7 +86,7 @@ async function installMqttContainer() {
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
       });
-      // throw e;
+      throw e;
     }
   } else {
     this.mqttExist = true;
@@ -114,7 +114,7 @@ async function installMqttContainer() {
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
       });
-      // throw e;
+      throw e;
     }
   }
 }

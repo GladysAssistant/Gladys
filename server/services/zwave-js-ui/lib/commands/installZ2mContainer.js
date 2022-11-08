@@ -53,7 +53,7 @@ async function installZ2mContainer() {
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
       });
-      // throw e;
+      throw e;
     }
   }
 
@@ -97,7 +97,7 @@ async function installZ2mContainer() {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
-    // throw e;
+    throw e;
   }
 }
 

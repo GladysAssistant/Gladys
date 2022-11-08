@@ -9,7 +9,7 @@ const { installMqttContainer } = proxyquire('../../../../../services/zwave-js-ui
   '../../../../utils/childProcess': { exec: fake.resolves(true) },
 });
 const ZwaveJSUIManager = proxyquire('../../../../../services/zwave-js-ui/lib', {
-  './installMqttContainer': { installMqttContainer },
+  './commands/installMqttContainer': { installMqttContainer },
 });
 
 const event = {
@@ -144,7 +144,6 @@ describe('zwave-js-ui installMqttContainer', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
-    assert.called(gladys.variable.getValue);
     assert.calledOnce(gladys.system.createContainer);
     assert.calledTwice(gladys.system.restartContainer);
     assert.match(zwaveJSUIManager.mqttRunning, true);
