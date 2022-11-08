@@ -7,10 +7,10 @@ const { stub } = require('sinon');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
 const { installZ2mContainer } = proxyquire('../../../../../services/zwave-js-ui/lib/commands/installZ2mContainer', {
-  '../../../utils/childProcess': { exec: fake.resolves(true) },
+  '../../../../utils/childProcess': { exec: fake.resolves(true) },
 });
 const ZwaveJSUIManager = proxyquire('../../../../../services/zwave-js-ui/lib', {
-  './installZ2mContainer': { installZ2mContainer },
+  './commands/installZ2mContainer': { installZ2mContainer },
 });
 
 const event = {
