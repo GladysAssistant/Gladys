@@ -63,7 +63,7 @@ describe('scene.executeActions', () => {
       [
         [
           {
-            type: ACTIONS.LIGHT.TURN_ON,
+            type: ACTIONS.LIGHT.TURN_OFF,
             devices: ['light-1'],
           },
         ],
@@ -123,7 +123,7 @@ describe('scene.executeActions', () => {
       [
         [
           {
-            type: ACTIONS.LIGHT.TURN_ON,
+            type: ACTIONS.LIGHT.TOGGLE,
             devices: ['light-1'],
           },
         ],
@@ -211,7 +211,7 @@ describe('scene.executeActions', () => {
       [
         [
           {
-            type: ACTIONS.SWITCH.TURN_OFF,
+            type: ACTIONS.SWITCH.TOGGLE,
             devices: ['switch-1'],
           },
         ],
