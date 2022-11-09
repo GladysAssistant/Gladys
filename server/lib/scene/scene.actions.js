@@ -58,22 +58,22 @@ const actionsFunc = {
         logger.warn(e);
       }
     });
-  },                                                                               
-  [ACTIONS.LIGHT.TOGGLE]: async (self, action, scope) => {             
-    await Promise.map(action.devices, async (deviceSelector) => {                            
-      try {                                                            
-        const device = self.stateManager.get('device', deviceSelector);             
-        const deviceFeature = getDeviceFeature(                             
-          device,                                                                    
-          DEVICE_FEATURE_CATEGORIES.LIGHT,                                           
-          DEVICE_FEATURE_TYPES.LIGHT.BINARY,                                                 
-        );                                                             
+  },
+  [ACTIONS.LIGHT.TOGGLE]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+        );
         await self.device.setValue(device, deviceFeature, deviceFeature.last_value_changed === 0 ? 1 : 0);
-      } catch (e) {                                                                 
-        logger.warn(e);                                                     
-      }                                                                
-    });                                                                                      
-  },  
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
   [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
       try {
@@ -103,22 +103,22 @@ const actionsFunc = {
         logger.warn(e);
       }
     });
-  },                                                                                                   
-  [ACTIONS.SWITCH.TOGGLE]: async (self, action, scope) => {                 
-    await Promise.map(action.devices, async (deviceSelector) => {                    
-      try {                                                            
-        const device = self.stateManager.get('device', deviceSelector);                      
-        const deviceFeature = getDeviceFeature(                        
-          device,                                                                                        
-          DEVICE_FEATURE_CATEGORIES.SWITCH,                                 
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,                                        
-        );                                                                           
+  },
+  [ACTIONS.SWITCH.TOGGLE]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.SWITCH,
+          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        );
         await self.device.setValue(device, deviceFeature, deviceFeature.last_value === 0 ? 1 : 0);
-      } catch (e) {                                                    
-        logger.warn(e);                                                                                  
-      }                                                                             
-    });                                                                     
-  }, 
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
   [ACTIONS.TIME.DELAY]: async (self, action, scope) =>
     new Promise((resolve) => {
       let timeToWaitMilliseconds;
@@ -342,14 +342,8 @@ const actionsFunc = {
         name: eventRaw.name,
         location: eventRaw.location,
         description: eventRaw.description,
-        start: dayjs(eventRaw.start)
-          .tz(self.timezone)
-          .locale(eventRaw.calendar.creator.language)
-          .format('LLL'),
-        end: dayjs(eventRaw.end)
-          .tz(self.timezone)
-          .locale(eventRaw.calendar.creator.language)
-          .format('LLL'),
+        start: dayjs(eventRaw.start).tz(self.timezone).locale(eventRaw.calendar.creator.language).format('LLL'),
+        end: dayjs(eventRaw.end).tz(self.timezone).locale(eventRaw.calendar.creator.language).format('LLL'),
       };
       set(
         scope,
