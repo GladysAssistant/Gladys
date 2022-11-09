@@ -25,7 +25,7 @@ describe('scene.executeActions', () => {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         find: fake.returns(deviceFeature),
-      }
+      },
     };
     const stateManager = new StateManager(event);
     stateManager.setState('device', 'light-1', device);
@@ -42,8 +42,8 @@ describe('scene.executeActions', () => {
       {},
     );
     assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 1);
- });
- it('should execute light turn off', async () => {
+  });
+  it('should execute light turn off', async () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
@@ -54,7 +54,7 @@ describe('scene.executeActions', () => {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         find: fake.returns(deviceFeature),
-      }
+      },
     };
     const stateManager = new StateManager(event);
     stateManager.setState('device', 'light-1', device);
@@ -70,9 +70,9 @@ describe('scene.executeActions', () => {
       ],
       {},
     );
-   assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
- });
- it('should execute light toggle on', async () => {
+    assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
+  });
+  it('should execute light toggle on', async () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
@@ -84,7 +84,7 @@ describe('scene.executeActions', () => {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         find: fake.returns(deviceFeature),
-      }
+      },
     };
     const stateManager = new StateManager(event);
     stateManager.setState('device', 'light-1', device);
@@ -100,9 +100,9 @@ describe('scene.executeActions', () => {
       ],
       {},
     );
-   assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 1);
- });
- it('should execute light toggle off', async () => {
+    assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 1);
+  });
+  it('should execute light toggle off', async () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
@@ -114,7 +114,7 @@ describe('scene.executeActions', () => {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         find: fake.returns(deviceFeature),
-      }
+      },
     };
     const stateManager = new StateManager(event);
     stateManager.setState('device', 'light-1', device);
@@ -130,125 +130,125 @@ describe('scene.executeActions', () => {
       ],
       {},
     );
-   assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
- });
- it('should execute switch turn on', async () => {
-   const deviceFeature = {
-     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-   };
-   const device = {
-     setValue: fake.resolves(null),
-     features: {
-       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-       find: fake.returns(deviceFeature),
-     }
-   };
-   const stateManager = new StateManager(event);
-   stateManager.setState('device', 'switch-1', device);
-   await executeActions(
-     { stateManager, event, device },
-     [
-       [
-         {
-           type: ACTIONS.SWITCH.TURN_ON,
-           devices: ['switch-1'],
-         },
-       ],
-     ],
-     {},
-   );
-   assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 1);
- });
- it('should execute switch turn off', async () => {
-   const deviceFeature = {
-     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-   };
-   const device = {
-     setValue: fake.resolves(null),
-     features: {
-       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-       find: fake.returns(deviceFeature),
-     }
-   };
-   const stateManager = new StateManager(event);
-   stateManager.setState('device', 'switch-1', device);
-   await executeActions(
-     { stateManager, event, device },
-     [
-       [
-         {
-           type: ACTIONS.SWITCH.TURN_OFF,
-           devices: ['switch-1'],
-         },
-       ],
-     ],
-     {},
-   );
-   assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
- });
- it('should execute switch toggle on', async () => {
-   const deviceFeature = {
-     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-     last_value: 0,
-   };
-   const device = {
-     setValue: fake.resolves(null),
-     features: {
-       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-       find: fake.returns(deviceFeature),
-     }
-   };
-   const stateManager = new StateManager(event);
-   stateManager.setState('device', 'switch-1', device);
-   await executeActions(
-     { stateManager, event, device },
-     [
-       [
-         {
-           type: ACTIONS.SWITCH.TURN_OFF,
-           devices: ['switch-1'],
-         },
-       ],
-     ],
-     {},
-   );
-   assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 1);
- });
- it('should execute switch toggle off', async () => {
-   const deviceFeature = {
-     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-     last_value: 1,
-   };
-   const device = {
-     setValue: fake.resolves(null),
-     features: {
-       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-       find: fake.returns(deviceFeature),
-     }
-   };
-   const stateManager = new StateManager(event);
-   stateManager.setState('device', 'switch-1', device);
-   await executeActions(
-     { stateManager, event, device },
-     [
-       [
-         {
-           type: ACTIONS.SWITCH.TURN_OFF,
-           devices: ['switch-1'],
-         },
-       ],
-     ],
-     {},
-   );
-   assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
+    assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
+  });
+  it('should execute switch turn on', async () => {
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+    const device = {
+      setValue: fake.resolves(null),
+      features: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        find: fake.returns(deviceFeature),
+      },
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('device', 'switch-1', device);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_ON,
+            devices: ['switch-1'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 1);
+  });
+  it('should execute switch turn off', async () => {
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+    };
+    const device = {
+      setValue: fake.resolves(null),
+      features: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        find: fake.returns(deviceFeature),
+      },
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('device', 'switch-1', device);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_OFF,
+            devices: ['switch-1'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
+  });
+  it('should execute switch toggle on', async () => {
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      last_value: 0,
+    };
+    const device = {
+      setValue: fake.resolves(null),
+      features: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        find: fake.returns(deviceFeature),
+      },
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('device', 'switch-1', device);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_OFF,
+            devices: ['switch-1'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 1);
+  });
+  it('should execute switch toggle off', async () => {
+    const deviceFeature = {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      last_value: 1,
+    };
+    const device = {
+      setValue: fake.resolves(null),
+      features: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        find: fake.returns(deviceFeature),
+      },
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('device', 'switch-1', device);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_OFF,
+            devices: ['switch-1'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
   });
   it('should execute wait 5 ms', async () => {
     await executeActions(
