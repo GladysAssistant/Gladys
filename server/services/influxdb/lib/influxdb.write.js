@@ -1,5 +1,5 @@
-const { writeBinary } = require('./influxdb.writeBinary');
-const { writeFloat } = require('./influxdb.writeFloat');
+const { Point, HttpError } = require('@influxdata/influxdb-client');
+const { Error422, Error404 } = require('../../../utils/httpErrors');
 
 const logger = require('../../../utils/logger');
 
@@ -17,22 +17,47 @@ function write(event) {
 
   this.influxdbApi.useDefaultTags({ host: 'gladys' });
 
+  const point = new Point(event.device_feature)
+    .measurement(gladysFeature.category)
+    .tag('type', gladysFeature.type)
+    .tag('name', gladysFeature.name)
+    .tag('room', gladysDevice.room.name)
+    .tag('device', gladysDevice.name)
+    .tag('service', gladysDevice.service.name);
+
   switch (gladysFeature.type) {
-    case 'binary':
-      logger.trace('EVENT - Write point to influxdb - binary');
-      writeBinary.call(this, event, gladysFeature, gladysDevice);
+    case Number.isInteger(event.last_value): {
+      logger.debug(`${gladysFeature.name} Integer identified`);
+      point.intField('value', event.last_value);
       break;
-    case 'index':
-    case 'power':
-    case 'integer':
-    case 'voltage':
-    case 'current':
-    case 'decimal':
-      logger.trace('EVENT - Write point to influxdb - decimal');
-      writeFloat.call(this, event, gladysFeature, gladysDevice);
+    }
+    case !Number.isInteger(event.last_value): {
+      logger.debug(`${gladysFeature.name} Float identified`);
+      point.floatField('value', event.last_value);
       break;
+    }
     default:
-      logger.trace(`unmanaged case: ${gladysFeature.type}`);
+      logger.warn(`Datatype unidentified for device ${gladysDevice.name} and feature ${gladysFeature.name}`);
+  }
+
+  if (point.floatField || point.intField) {
+    this.influxdbApi.writePoint(point);
+    this.influxdbApi
+      .flush()
+      .then(() => {
+        logger.trace('FINISHED');
+      })
+      .catch((e) => {
+        if (e instanceof HttpError && e.statusCode === 422) {
+          throw new Error422(`InfluxDB API - Unprocessable entity, maybe datatype problem`);
+        } else if (e instanceof HttpError && e.statusCode === 404) {
+          throw new Error404(`InfluxDB API - Server unreachable`);
+        } else {
+          logger.error(e);
+        }
+      });
+  } else {
+    logger.warn(`Nothing to do for ${gladysDevice.name} and feature ${gladysFeature.name}`);
   }
 }
 

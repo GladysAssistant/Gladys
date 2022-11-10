@@ -15,17 +15,17 @@ function testConnection(configuration) {
   const healthAPI = new HealthAPI(this.influxdbClient);
 
   healthAPI
-  .getHealth()
-  .then((result /* : HealthCheck */) => {
-    console.log(JSON.stringify(result, null, 2));
-    console.log('\nFinished SUCCESS');
-    return true;
-  })
-  .catch(error => {
-    console.error(error);
-    console.log('\nFinished ERROR');
-    return false;
-  });
+    .getHealth()
+    .then((result /* : HealthCheck */) => {
+      logger.info(JSON.stringify(result, null, 2));
+      logger.info('\nFinished SUCCESS');
+      return true;
+    })
+    .catch((error) => {
+      logger.info(error);
+      logger.info('\nFinished ERROR');
+      return false;
+    });
 }
 
 module.exports = {

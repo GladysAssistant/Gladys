@@ -28,7 +28,7 @@ module.exports = function InfluxdbController(influxdbManager) {
    * @apiName TestConnection
    * @apiGroup InfluxDB
    */
-   async function testConnection(req, res) {
+  async function testConnection(req, res) {
     const connectionStatus = await influxdbManager.testConnection(req.body);
     res.send(connectionStatus);
   }
