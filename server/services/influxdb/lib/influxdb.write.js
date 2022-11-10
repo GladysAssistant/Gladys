@@ -25,19 +25,12 @@ function write(event) {
     .tag('device', gladysDevice.name)
     .tag('service', gladysDevice.service.name);
 
-  switch (gladysFeature.type) {
-    case Number.isInteger(event.last_value): {
-      logger.debug(`${gladysFeature.name} Integer identified`);
-      point.intField('value', event.last_value);
-      break;
-    }
-    case !Number.isInteger(event.last_value): {
-      logger.debug(`${gladysFeature.name} Float identified`);
-      point.floatField('value', event.last_value);
-      break;
-    }
-    default:
-      logger.warn(`Datatype unidentified for device ${gladysDevice.name} and feature ${gladysFeature.name}`);
+  if (Number.isInteger(event.last_value)) {
+    logger.warn(`${gladysDevice.name} ${gladysFeature.name} Integer identified`);
+    point.intField('value', event.last_value);
+  } else {
+    logger.warn(`${gladysDevice.name} ${gladysFeature.name} Float identified`);
+    point.floatField('value', event.last_value);
   }
 
   if (point.floatField || point.intField) {
