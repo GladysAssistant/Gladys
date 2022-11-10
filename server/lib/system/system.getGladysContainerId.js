@@ -42,7 +42,15 @@ async function getGladysContainerId() {
       // then, we remove .scope
       [containerId] = firstPart.split('.scope');
     } else {
-      throw new PlatformNotCompatible('DOCKER_CGROUP_CONTAINER_ID_NOT_AVAILABLE');
+      const mountinfo = await fs.promises.readFile('/proc/self/mountinfo', 'utf-8');
+
+      if (mountinfo.indexOf('/docker/containers/') !== -1) {
+        const allLines = mountinfo.split('\n');
+        const lineWithDocker = allLines.find((line) => line.indexOf('/docker/containers/') !== -1);
+        [, containerId] = /\/docker\/containers\/(\w+)/gm.exec(lineWithDocker);
+      } else {
+        throw new PlatformNotCompatible('DOCKER_CGROUP_CONTAINER_ID_NOT_AVAILABLE');
+      }
     }
 
     // we return the containerId trimed, just in case
