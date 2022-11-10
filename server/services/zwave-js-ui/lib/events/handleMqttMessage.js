@@ -201,10 +201,15 @@ function handleMqttMessage(topic, message) {
           newValue = false;
         } else if (message === 'true') {
           newValue = true;
-        } else if (!Number.isNaN(message)) {
-          newValue = Number(message);
         } else {
-          break;
+          try {
+            newValue = Number(message);
+          } catch (e) {
+            break;
+          }
+          if(Number.isNaN(newValue)) {
+            break;
+          }
         }
 
         this.valueUpdated(
