@@ -75,7 +75,7 @@ describe('zwave event', () => {
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
     zwaveJSUIManager.mqttConnected = true;
     zwaveJSUIManager.driver = {};
-    // zwaveJSUIManager.scanComplete = fake.returns(null);
+    zwaveJSUIManager.scanComplete = fake.returns(null);
   });
   beforeEach(() => {
     sinon.reset();
@@ -105,11 +105,7 @@ describe('zwave event', () => {
       `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/driver/all_nodes_ready`,
       JSON.stringify(message),
     );
-    assert.calledOnceWithExactly(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE,
-    });
-    // assert.calledOnce(zwaveJSUIManager.scanComplete);
-    expect(zwaveJSUIManager.scanInProgress).equals(false);
+    assert.calledOnce(zwaveJSUIManager.scanComplete);
   });
   it('should send statistics_updated event', () => {
     const message = {
