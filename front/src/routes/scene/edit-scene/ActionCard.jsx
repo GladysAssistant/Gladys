@@ -122,6 +122,14 @@ const ActionCard = ({ children, ...props }) => (
             updateActionProperty={props.updateActionProperty}
           />
         )}
+        {props.action.type === ACTIONS.LIGHT.TOGGLE && (
+          <TurnOnOffLightParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
         {props.action.type === ACTIONS.SWITCH.TURN_ON && (
           <TurnOnOffSwitchParams
             action={props.action}
@@ -131,6 +139,14 @@ const ActionCard = ({ children, ...props }) => (
           />
         )}
         {props.action.type === ACTIONS.SWITCH.TURN_OFF && (
+          <TurnOnOffSwitchParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.SWITCH.TOGGLE && (
           <TurnOnOffSwitchParams
             action={props.action}
             columnIndex={props.columnIndex}
