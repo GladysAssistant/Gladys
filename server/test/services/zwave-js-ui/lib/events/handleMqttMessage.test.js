@@ -38,61 +38,37 @@ describe('zwave gladys node event', () => {
     // sinon.reset();
   });
   it('should default _CLIENTS', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/_CLIENTS`,
-      null,
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
   it('should default status', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/???/status`,
-      null,
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/???/status`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
   it('should default nodeinfo', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/???/nodeinfo`,
-      null,
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/???/nodeinfo`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
   it('should default scanInProgress', () => {
     zwaveJSUIManager.scanInProgress = true;
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/???`,
-      null,
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/???`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
   it('should default set', () => {
     zwaveJSUIManager.scanInProgress = true;
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/nodeId/commandClass/endpoint/propertyName/set`,
-      null,
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeId/commandClass/endpoint/propertyName/set`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
   it('should default not supported commandClass', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/nodeId/112/endpoint/propertyName/set`,
-      null,
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeId/112/endpoint/propertyName/set`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
   it('should default node empty message', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/nodeID_1/commandClass/endpoint/propertyName/propertyKey`,
-      '',
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/commandClass/endpoint/propertyName/propertyKey`, '');
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
   it('should default node true message', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`,
-      'true',
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, 'true');
     assert.calledOnce(zwaveJSUIManager.valueUpdated);
     /* assert.calledOnceWithExactly(zwaveJSUIManager.valueUpdated, {
       id: 1,
@@ -106,10 +82,7 @@ describe('zwave gladys node event', () => {
     }); */
   });
   it('should default node false message', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`,
-      'false',
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, 'false');
     assert.calledOnce(zwaveJSUIManager.valueUpdated);
     /* assert.calledOnceWithExactly(zwaveJSUIManager.valueUpdated, {
       id: 1,
@@ -123,10 +96,7 @@ describe('zwave gladys node event', () => {
     }); */
   });
   it('should default node number message', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`,
-      '1',
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, '1');
     assert.calledOnce(zwaveJSUIManager.valueUpdated);
     /* assert.calledOnceWithExactly(zwaveJSUIManager.valueUpdated, {
       id: 1,
@@ -140,10 +110,7 @@ describe('zwave gladys node event', () => {
     }); */
   });
   it('should default node not a number message', () => {
-    zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`,
-      '???',
-    );
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, '???');
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 });

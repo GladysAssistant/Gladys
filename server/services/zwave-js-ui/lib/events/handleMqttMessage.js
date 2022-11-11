@@ -207,7 +207,7 @@ function handleMqttMessage(topic, message) {
           } catch (e) {
             break;
           }
-          if(Number.isNaN(newValue)) {
+          if (Number.isNaN(newValue)) {
             break;
           }
         }
