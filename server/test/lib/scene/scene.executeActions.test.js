@@ -132,6 +132,31 @@ describe('scene.executeActions', () => {
     );
     assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
   });
+  it('should execute light toggle error', async () => {
+    const device = {
+      setValue: fake.resolves(null),
+      features: {
+        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+        type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+        find: fake.throws('An error occured')
+      },
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('device', 'light-1', device);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.LIGHT.TOGGLE,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.notCalled(device.setValue);
+  });
   it('should execute switch turn on', async () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -249,6 +274,31 @@ describe('scene.executeActions', () => {
       {},
     );
     assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
+  });
+  it('should execute switch toggle error', async () => {
+    const device = {
+      setValue: fake.resolves(null),
+      features: {
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+        find: fake.throws('An error occured')
+      },
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('device', 'switch-1', device);
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.SWITCH.TURN_OFF,
+            devices: ['switch-1'],
+          },
+        ],
+      ],
+      {},
+    );
+    assert.notCalled(device.setValue);
   });
   it('should execute wait 5 ms', async () => {
     await executeActions(
