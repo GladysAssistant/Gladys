@@ -93,7 +93,7 @@ describe('scene.executeActions', () => {
       [
         [
           {
-            type: ACTIONS.LIGHT.TURN_ON,
+            type: ACTIONS.LIGHT.TOGGLE,
             devices: ['light-1'],
           },
         ],
