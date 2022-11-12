@@ -1,4 +1,4 @@
-const { Point, HttpError } = require('@influxdata/influxdb-client');
+const { Point, HttpError, DEFAULT_WriteOptions } = require('@influxdata/influxdb-client');
 const { Error422, Error404 } = require('../../../utils/httpErrors');
 
 const logger = require('../../../utils/logger');
@@ -28,8 +28,8 @@ function write(event) {
   this.influxdbApi.writePoint(point);
 
   // control the way of how data are flushed
-  if ((this.eventNumber + 1) % this.influxdbApi.influxdbWriteOptions.batchSize === 0) {
-    logger.info(`flush writeApi: chunk #${(this.eventNumber + 1) / this.influxdbApi.influxdbWriteOptions.batchSize}`);
+  if ((this.eventNumber + 1) % (DEFAULT_WriteOptions.batchSize + 1) === 0) {
+    logger.info(`flush writeApi: chunk #${(this.eventNumber + 1) / (DEFAULT_WriteOptions.batchSize + 1)}`);
     try {
       // write the data to InfluxDB server, wait for it
       this.writeApi.flush();
