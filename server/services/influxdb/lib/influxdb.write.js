@@ -22,6 +22,7 @@ function write(event) {
     .tag('room', gladysDevice.room.name)
     .tag('device', gladysDevice.name)
     .tag('service', gladysDevice.service.name)
+    .timestamp(gladysFeature.last_value_changed)
     .floatField('value', event.last_value);
 
   this.influxdbApi.writePoint(point);
