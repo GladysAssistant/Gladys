@@ -1,5 +1,4 @@
-const { Point, HttpError, DEFAULT_WriteOptions } = require('@influxdata/influxdb-client');
-const { Error422, Error404 } = require('../../../utils/httpErrors');
+const { Point } = require('@influxdata/influxdb-client');
 
 const logger = require('../../../utils/logger');
 
@@ -26,23 +25,6 @@ function write(event) {
     .floatField('value', event.last_value);
 
   this.influxdbApi.writePoint(point);
-
-  // control the way of how data are flushed
-  if ((this.eventNumber + 1) % (DEFAULT_WriteOptions.batchSize + 1) === 0) {
-    logger.info(`flush writeApi: chunk #${(this.eventNumber + 1) / (DEFAULT_WriteOptions.batchSize + 1)}`);
-    try {
-      // write the data to InfluxDB server, wait for it
-      this.writeApi.flush();
-    } catch (e) {
-      if (e instanceof HttpError && e.statusCode === 422) {
-        throw new Error422(`InfluxDB API - Unprocessable entity, maybe datatype problem`);
-      } else if (e instanceof HttpError && e.statusCode === 404) {
-        throw new Error404(`InfluxDB API - Server unreachable`);
-      } else {
-        logger.error(e);
-      }
-    }
-  }
 }
 
 module.exports = {

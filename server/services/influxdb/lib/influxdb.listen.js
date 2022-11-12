@@ -1,9 +1,16 @@
-const { InfluxDB, DEFAULT_WriteOptions } = require('@influxdata/influxdb-client');
+const { InfluxDB } = require('@influxdata/influxdb-client');
 const { Agent } = require('http');
+const Bottleneck = require('bottleneck/es5');
 const logger = require('../../../utils/logger');
 const { EVENTS } = require('../../../utils/constants');
 const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
+
+
+const limiter = new Bottleneck({
+  maxConcurrent: 1,
+  minTime: 100000,
+});
 
 /**
  * @description Instenciate influxdb client and listen on state events.
@@ -18,12 +25,8 @@ function listen(configuration) {
     throw new ServiceNotConfiguredError('InfluxDB service is not configured.');
   }
   this.configured = true;
-  const flushBatchSize = DEFAULT_WriteOptions.batchSize
+
   const influxdbWriteOptions = {
-    batchSize: flushBatchSize + 1,
-    flushInterval: 0,
-    maxBufferLines: 100,
-    maxRetries: 0,
     defaultTags: { host: 'gladys' },
   };
 
@@ -48,7 +51,9 @@ function listen(configuration) {
     'ns',
     influxdbWriteOptions,
   );
+  logger.info(this.influxdbApi);
   this.gladys.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.write.bind(this)));
+  limiter.wrap(this.influxdbApi.flush());
 }
 
 module.exports = {
