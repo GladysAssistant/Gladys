@@ -43,7 +43,7 @@ function listen(configuration) {
   this.influxdbApi = this.influxdbClient.getWriteApi(
     configuration.influxdbOrg,
     configuration.influxdbBucket,
-    'ns',
+    'ms',
     influxdbWriteOptions,
   );
   this.gladys.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.write.bind(this)));
