@@ -1,6 +1,7 @@
 const { createBridge } = require('./createBridge');
 const { buildAccessory } = require('./buildAccessory');
 const { buildService } = require('./buildService');
+const { notifyChange } = require('./notifyChange');
 const { newPinCode } = require('./newPinCode');
 const { newUsername } = require('./newUsername');
 
@@ -24,5 +25,6 @@ HomeKitHandler.prototype.newUsername = newUsername;
 HomeKitHandler.prototype.createBridge = createBridge;
 HomeKitHandler.prototype.buildAccessory = buildAccessory;
 HomeKitHandler.prototype.buildService = buildService;
+HomeKitHandler.prototype.notifyChange = notifyChange;
 
 module.exports = HomeKitHandler;

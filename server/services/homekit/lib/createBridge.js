@@ -1,4 +1,6 @@
 const uuid = require('uuid');
+const { EVENTS } = require('../../../utils/constants');
+const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 const { mappings } = require('./deviceMappings');
 
 /**
@@ -34,6 +36,8 @@ async function createBridge() {
   const accessories = compatibleDevices
     .map((device) => this.buildAccessory(device))
     .filter((accessory) => accessory !== null);
+
+  this.gladys.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.notifyChange.bind(this, accessories)));
 
   if (this.bridge) {
     await this.bridge.unpublish();

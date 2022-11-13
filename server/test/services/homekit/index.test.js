@@ -25,6 +25,9 @@ describe('HomeKitService', () => {
       system: {
         isDocker: stub().resolves(true),
       },
+      event: {
+        on: stub().returns(),
+      },
     };
     homekitService = HomeKitService(gladys);
   });
