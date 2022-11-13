@@ -168,7 +168,8 @@ describe('Notify change to HomeKit', () => {
 
     expect(updateCharacteristic.args[0]).eql(['COLORTEMPERATURE', 320]);
   });
-  it('should notify sensor temperature', async () => {
+
+  it('should notify sensor temperature Kelvin', async () => {
     const updateCharacteristic = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
@@ -194,5 +195,60 @@ describe('Notify change to HomeKit', () => {
     await homekitHandler.notifyChange([accessory], event);
 
     expect(updateCharacteristic.args[0]).eql(['CURRENTTEMPERATURE', 21]);
+  });
+
+  it('should notify sensor temperature Fahrenheit', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 68,
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Sensor temperature',
+        category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.FAHRENHEIT,
+      }),
+    };
+
+    await homekitHandler.notifyChange([accessory], event);
+
+    expect(updateCharacteristic.args[0]).eql(['CURRENTTEMPERATURE', 20]);
+  });
+
+  it('should do nothing wrong device category & type', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 68,
+    };
+
+    homekitHandler.gladys.stateManager = {
+      get: stub().returns({
+        id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+        device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+        name: 'Sensor temperature',
+        category: DEVICE_FEATURE_CATEGORIES.UNKNOWN,
+        type: DEVICE_FEATURE_TYPES.UNKNOWN.UNKNOWN,
+      }),
+    };
+
+    await homekitHandler.notifyChange([accessory], event);
+
+    expect(updateCharacteristic.callCount).eql(0);
   });
 });
