@@ -20,7 +20,7 @@ class InfluxDBPage extends Component {
       loading: true
     });
     try {
-      await this.props.testConnection(this.props.cameraIndex);
+      await this.props.testConnection();
       this.setState({
         testConnectionError: null,
         testConnectionErrorMessage: null
