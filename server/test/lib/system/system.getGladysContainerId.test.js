@@ -86,7 +86,7 @@ describe('system.getGladysContainerId', () => {
   beforeEach(async () => {
     FsMock = {
       promises: {
-        access: fake.resolves(null),
+        access: sinon.stub(),
         readFile: sinon.stub(),
       },
       constants: {
@@ -128,12 +128,19 @@ describe('system.getGladysContainerId', () => {
   });
 
   it('should return containerId through cidfile', async () => {
+    FsMock.promises.access.withArgs('/var/lib/gladysassistant/containerId').resolves(null);
     FsMock.promises.readFile.resolves('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
     const containerId = await system.getGladysContainerId();
     expect(containerId).to.eq('967ef3114fa2ceb8c4f6dbdbc78ee411a6f33fb1fe1d32455686ef6e89f41d1c');
   });
   it('should return containerId through exec in mountinfo (Debian 11)', async () => {
-    FsMock.promises.access = fake.rejects();
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .rejects()
+      .withArgs('/proc/self/cgroup')
+      .resolves(null)
+      .withArgs('/proc/self/mountinfo')
+      .resolves(null);
     FsMock.promises.readFile
       .withArgs('/proc/self/cgroup', 'utf-8')
       .resolves('0::/')
@@ -142,32 +149,66 @@ describe('system.getGladysContainerId', () => {
     const containerId2 = await system.getGladysContainerId();
     expect(containerId2).to.eq('83fa542c0b140e45e63ad7263c539ac08e2cbf7916894f1c51c3f016397b168e');
   });
+  it('should return containerId through exec in mountinfo (Debian 11) when cgroup does not exist', async () => {
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .rejects()
+      .withArgs('/proc/self/cgroup')
+      .rejects()
+      .withArgs('/proc/self/mountinfo')
+      .resolves(null);
+    FsMock.promises.readFile.withArgs('/proc/self/mountinfo', 'utf-8').resolves(procSelfMountInfo);
+    const containerId2 = await system.getGladysContainerId();
+    expect(containerId2).to.eq('83fa542c0b140e45e63ad7263c539ac08e2cbf7916894f1c51c3f016397b168e');
+  });
   it('should return containerId through exec in cgroup v2 (Debian 11)', async () => {
-    FsMock.promises.access = fake.rejects();
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .rejects()
+      .withArgs('/proc/self/cgroup')
+      .resolves(null);
     FsMock.promises.readFile = fake.resolves(procSelfCpuGroupDebia11);
     const containerId2 = await system.getGladysContainerId();
     expect(containerId2).to.eq('2bb2c94b0c395fc8fdff9fa4ce364a3be0dd05792145ffc93ce8d665d06521f1');
   });
   it('should return containerId through exec in cgroup v2 (Debian 11) with containerId not on first line', async () => {
-    FsMock.promises.access = fake.rejects();
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .rejects()
+      .withArgs('/proc/self/cgroup')
+      .resolves(null);
     FsMock.promises.readFile = fake.resolves(procSelfCpuGroupDebia11WithDataInSecondLine);
     const containerId2 = await system.getGladysContainerId();
     expect(containerId2).to.eq('2bb2c94b0c395fc8fdff9fa4ce364a3be0dd05792145ffc93ce8d665d06521f1');
   });
   it('should return containerId through exec in cgroup v1 (Debian 10)', async () => {
-    FsMock.promises.access = fake.rejects();
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .rejects()
+      .withArgs('/proc/self/cgroup')
+      .resolves(null);
     FsMock.promises.readFile = fake.resolves(procSelfCpuGroupDebian10);
     const containerId2 = await system.getGladysContainerId();
     expect(containerId2).to.eq('357e73ad015211a5acd76a8973b9287d4de75922e9802d94ba46b756f2bb5350');
   });
   it('should return containerId through exec in cgroup v1 (Debian 10) with containerId not on first line', async () => {
-    FsMock.promises.access = fake.rejects();
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .rejects()
+      .withArgs('/proc/self/cgroup')
+      .resolves(null);
     FsMock.promises.readFile = fake.resolves(procSelfCpuGroupDebian10WithDataInSecondLine);
     const containerId2 = await system.getGladysContainerId();
     expect(containerId2).to.eq('357e73ad015211a5acd76a8973b9287d4de75922e9802d94ba46b756f2bb5350');
   });
   it('should return error, system not compatible', async () => {
-    FsMock.promises.access = fake.rejects();
+    FsMock.promises.access
+      .withArgs('/var/lib/gladysassistant/containerId')
+      .rejects()
+      .withArgs('/proc/self/mountinfo')
+      .rejects()
+      .withArgs('/proc/self/cgroup')
+      .resolves(null);
     FsMock.promises.readFile = fake.resolves('3:rdma:/');
     try {
       await system.getGladysContainerId();
