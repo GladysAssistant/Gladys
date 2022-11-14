@@ -59,12 +59,13 @@ function getNodeInfoByExternalId(externalId) {
   const nodeId = parseInt(array[2], 10);
   const commandClass = parseInt(array[4], 10);
   const endpoint = parseInt(array[6], 10);
-  const property = array[8];
+  const property = array[8].split('-');
   return {
     nodeId,
     commandClass,
     endpoint,
-    property,
+    property: property[0],
+    propertyKey: property.length > 1 ? property[1] : undefined,
   };
 }
 

@@ -163,6 +163,61 @@ describe('zwaveJSUIManager commands', () => {
     clock.restore();
   });
 
+  it('should healNetwork', () => {
+    zwaveJSUIManager.mqttConnected = true;
+    zwaveJSUIManager.mqttClient = mqttClient;
+
+    zwaveJSUIManager.healNetwork();
+    assert.calledWithExactly(
+      zwaveJSUIManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`,
+      'true',
+    );
+  });
+
+  it('should setValue', () => {
+    zwaveJSUIManager.mqttConnected = true;
+    zwaveJSUIManager.mqttClient = mqttClient;
+
+    const commandClass = 2;
+    const endpoint = 3;
+    const property = 'property';
+    const device = {
+      nodeId: 1,
+    };
+    const deviceFeature = {
+      external_id: `zwave-js-ui:node_id:${device.nodeId}:comclass:${commandClass}:endpoint:${endpoint}:property:${property}`,
+    };
+    zwaveJSUIManager.setValue(device, deviceFeature, 0);
+    assert.calledWithExactly(
+      zwaveJSUIManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/nodeID_${device.nodeId}/${commandClass}/${endpoint}/${property}/set`,
+      '0',
+    );
+  });
+
+  it('should setValue with preperty key', () => {
+    zwaveJSUIManager.mqttConnected = true;
+    zwaveJSUIManager.mqttClient = mqttClient;
+
+    const commandClass = 2;
+    const endpoint = 3;
+    const property = 'property';
+    const propertyKey = 'propertyKey';
+    const device = {
+      nodeId: 1,
+    };
+    const deviceFeature = {
+      external_id: `zwave-js-ui:node_id:${device.nodeId}:comclass:${commandClass}:endpoint:${endpoint}:property:${property}-${propertyKey}`,
+    };
+    zwaveJSUIManager.setValue(device, deviceFeature, 0);
+    assert.calledWithExactly(
+      zwaveJSUIManager.mqttClient.publish,
+      `${DEFAULT.ROOT}/nodeID_${device.nodeId}/${commandClass}/${endpoint}/${property}/${propertyKey}/set`,
+      '0',
+    );
+  });
+
   it('should return Z-Wave status', () => {
     const status = zwaveJSUIManager.getStatus();
     expect(status).to.deep.equal({
