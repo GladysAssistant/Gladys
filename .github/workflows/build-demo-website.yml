@@ -40,3 +40,4 @@ jobs:
           projectName: gladysassistant-demo
           directory: ./front/build
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
