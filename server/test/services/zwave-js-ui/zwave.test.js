@@ -45,6 +45,7 @@ describe('zwaveJSUIService', () => {
       .to.have.property('controllers')
       .and.be.instanceOf(Object);
   });
+
   it('should start service', async () => {
     gladys.variable.getValue = sinon.stub();
     gladys.variable.getValue
@@ -55,8 +56,26 @@ describe('zwaveJSUIService', () => {
     await zwaveJSUIService.start();
     expect(zwaveJSUIService.device.mqttConnected).to.equal(true);
   });
+
   it('should stop service', async () => {
     await zwaveJSUIService.stop();
     expect(zwaveJSUIService.device.mqttConnected).to.equal(false);
+  });
+
+  it('should stop isUsed', async () => {
+    zwaveJSUIService.device.mqttConnected = true;
+    zwaveJSUIService.device.nodes = [{}];
+    await zwaveJSUIService.isUsed();
+  });
+
+  it('should stop isNotUsed not connected', async () => {
+    zwaveJSUIService.device.mqttConnected = false;
+    await zwaveJSUIService.isUsed();
+  });
+
+  it('should stop isNotUsed no node', async () => {
+    zwaveJSUIService.device.mqttConnected = true;
+    zwaveJSUIService.device.nodes = [];
+    await zwaveJSUIService.isUsed();
   });
 });

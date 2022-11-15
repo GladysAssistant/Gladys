@@ -74,8 +74,10 @@ module.exports = function ZwaveController(gladys, zwaveJSUIManager, serviceId) {
    * @apiGroup ZwaveJSUI
    */
   async function healNetwork(req, res) {
-    const nodes = await zwaveJSUIManager.healNetwork();
-    res.json(nodes);
+    await zwaveJSUIManager.healNetwork();
+    res.json({
+      success: true,
+    });
   }
 
   /**

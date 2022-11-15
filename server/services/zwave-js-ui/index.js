@@ -37,7 +37,7 @@ module.exports = function ZwaveJSUIService(gladys, serviceId) {
    * gladys.services.zwave-js-ui.isUsed();
    */
   async function isUsed() {
-    return true;
+    return zwaveJSUIManager.mqttConnected && zwaveJSUIManager.nodes && zwaveJSUIManager.nodes.length > 0;
   }
 
   return Object.freeze({

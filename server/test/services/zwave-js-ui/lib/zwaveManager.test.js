@@ -49,11 +49,12 @@ describe('zwaveJSUIManager commands', () => {
       },
       system: {
         isDocker: fake.resolves(true),
+        getContainers: fake.resolves([]),
       },
-      installMqttContainer: fake.returns(true),
-      installZ2mContainer: fake.returns(true),
     };
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
+    zwaveJSUIManager.installMqttContainer = fake.returns(true);
+    zwaveJSUIManager.installZ2mContainer = fake.returns(true);
   });
 
   beforeEach(() => {
@@ -110,6 +111,80 @@ describe('zwaveJSUIManager commands', () => {
     expect(zwaveJSUIManager.mqttConnected).to.equal(false);
     expect(zwaveJSUIManager.scanInProgress).to.equal(false);
   });
+
+  it('should connect to zwave-js-ui gladys instance no driver', async () => {
+    zwaveJSUIManager.mqttConnected = false;
+    gladys.variable.getValue = sinon.stub();
+    gladys.variable.getValue
+      .onFirstCall() // GLADYS ZWAVEJSUI
+      .resolves('0')
+      .onSecondCall() // DRIVER_PATH
+      .resolves(null);
+
+    await zwaveJSUIManager.connect();
+
+    expect(zwaveJSUIManager.mqttConnected).to.equal(false);
+    expect(zwaveJSUIManager.mqttExist).to.equal(false);
+    expect(zwaveJSUIManager.mqttRunning).to.equal(false);
+    expect(zwaveJSUIManager.zwaveJSUIExist).to.equal(false);
+    expect(zwaveJSUIManager.zwaveJSUIRunning).to.equal(false);
+  });
+
+  it('should connect to zwave-js-ui gladys instance driver set', async () => {
+    zwaveJSUIManager.mqttExist = true;
+    zwaveJSUIManager.mqttRunning = true;
+    zwaveJSUIManager.zwaveJSUIExist = true;
+    zwaveJSUIManager.zwaveJSUIRunning = true;
+    gladys.variable.getValue = sinon.stub();
+    gladys.variable.getValue
+      .onFirstCall() // GLADYS ZWAVEJSUI
+      .resolves('0')
+      .onSecondCall() // MQTT_PASSWORD
+      .resolves('MQTT_PASSWORD')
+      .onThirdCall() // MQTT_USERNAME
+      .resolves('MQTT_USERNAME')
+      .onCall(4) // DRIVER_PATH
+      .resolves(DRIVER_PATH);
+
+    await zwaveJSUIManager.connect();
+    zwaveJSUIManager.mqttClient.emit('connect');
+    assert.calledOnce(zwaveJSUIManager.installMqttContainer);
+    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+    });
+    assert.calledOnce(mqtt.connect);
+    assert.calledWith(mqttClient.subscribe, 'zwave-js-ui/#');
+    expect(zwaveJSUIManager.mqttConnected).to.equal(true);
+    expect(zwaveJSUIManager.mqttExist).to.equal(true);
+    expect(zwaveJSUIManager.mqttRunning).to.equal(true);
+    expect(zwaveJSUIManager.zwaveJSUIExist).to.equal(true);
+    expect(zwaveJSUIManager.zwaveJSUIRunning).to.equal(true);
+  });
+
+  /* it.only('should connect to zwave-js-ui gladys instance no driver', async () => {
+    zwaveJSUIManager.mqttConnected = false;
+    gladys.variable.getValue = sinon.stub();
+    gladys.variable.getValue
+      .onFirstCall() // GLADYS ZWAVEJSUI
+      .resolves('0')
+      .onSecondCall() // DRIVER_PATH
+      .resolves(null);
+
+    zwaveJSUIManager.mqttRunning = true;
+    await zwaveJSUIManager.connect();
+    zwaveJSUIManager.mqttClient.emit('connect');
+
+    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+    });
+    assert.calledOnce(mqtt.connect);
+    assert.calledWith(mqttClient.subscribe, 'zwave-js-ui/#');
+    expect(zwaveJSUIManager.mqttConnected).to.equal(true);
+    expect(zwaveJSUIManager.mqttExist).to.equal(true);
+    expect(zwaveJSUIManager.mqttRunning).to.equal(true);
+    expect(zwaveJSUIManager.zwaveJSUIExist).to.equal(true);
+    expect(zwaveJSUIManager.zwaveJSUIRunning).to.equal(true);
+  }); */
 
   it('should addNode', () => {
     const ADD_NODE_TIMEOUT = 60 * 1000;

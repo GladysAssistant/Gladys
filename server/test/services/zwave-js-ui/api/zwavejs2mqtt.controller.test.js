@@ -136,4 +136,17 @@ describe('GET /api/v1/service/zwave-js-ui', () => {
       success: true,
     });
   });
+
+  it('should healh network', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+    zwaveJSUIManager.healNetwork = fake.returns(null);
+    await zwaveJSUIController['post /api/v1/service/zwave-js-ui/heal'].controller(req, res);
+    assert.calledOnce(zwaveJSUIManager.healNetwork);
+    assert.calledOnceWithExactly(res.json, {
+      success: true,
+    });
+  });
 });

@@ -69,4 +69,18 @@ describe('system.getContainerDevices', () => {
     const devices = await system.getContainerDevices('fake_id');
     assert.match(devices, []);
   });
+
+  it('should return empty list because no devices found', async () => {
+    system.dockerode.getContainer = fake.returns({
+      inspect: fake.resolves({
+        HostConfig: {
+          Devices: [],
+        },
+      }),
+    });
+    const devices = await system.getContainerDevices(
+      'a8293feec54547a797aa2e52cc14b93f89a007d6c5608c587e30491feec8ee61',
+    );
+    assert.match(devices, []);
+  });
 });
