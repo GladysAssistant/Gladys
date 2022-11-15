@@ -196,7 +196,7 @@ describe('zwaveJSUIManager commands', () => {
     );
   });
 
-  it('should setValue with preperty key', () => {
+  it('should setValue with property key', () => {
     zwaveJSUIManager.mqttConnected = true;
     zwaveJSUIManager.mqttClient = mqttClient;
 
@@ -274,6 +274,44 @@ describe('zwaveJSUIManager commands', () => {
         params: [],
       },
     ]);
+  });
+
+  it('should updateConfiguration', () => {
+    const configuration = {
+      externalZwaveJSUI: true,
+      driverPath: 'driverPath',
+      mqttUrl: 'mqttUrl',
+      mqttUsername: 'mqttUsername',
+      mqttPassword: 'mqttPassword',
+      s2UnauthenticatedKe: 's2UnauthenticatedKey',
+      s2AuthenticatedKey: 's2AuthenticatedKey',
+      s2AccessControlKey: 's2AccessControlKey',
+      s0LegacyKey: 's0LegacyKey',
+    };
+
+    const setValueStub = sinon.stub();
+    setValueStub.returns(true);
+    zwaveJSUIManager.gladys.variable.setValue = setValueStub;
+
+    zwaveJSUIManager.updateConfiguration(configuration);
+
+    setValueStub.calledOnceWith(CONFIGURATION.EXTERNAL_ZWAVEJSUI, '1', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(setValueStub, CONFIGURATION.DRIVER_PATH, 'driverPath', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(setValueStub, CONFIGURATION.ZWAVEJSUI_MQTT_URL, 'mqttUrl', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, 'mqttUsername', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, 'mqttPassword', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(CONFIGURATION.S2_UNAUTHENTICATED, 's2UnauthenticatedKey', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(CONFIGURATION.S2_AUTHENTICATED, 's2AuthenticatedKey', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(CONFIGURATION.S2_ACCESS_CONTROL, 's2AccessControlKey', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(CONFIGURATION.S0_LEGACY, 's0LegacyKey', ZWAVEJSUI_SERVICE_ID);
   });
 });
 

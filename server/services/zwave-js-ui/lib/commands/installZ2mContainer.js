@@ -75,7 +75,7 @@ async function installZ2mContainer() {
 
     // Check if config is up-to-date
     const devices = await this.gladys.system.getContainerDevices(container.id);
-    if (!devices || devices.length === 0 || devices[0].PathOnHost !== this.driverPath) {
+    if (devices.length === 0 || devices[0].PathOnHost !== this.driverPath) {
       // Update Z2M env
       logger.info(`Updating ZwaveJSUI environment...`);
       const { basePathOnHost } = await this.gladys.system.getGladysBasePath();

@@ -18,7 +18,16 @@ Docker.prototype.listImages = fake.resolves(images);
 Docker.prototype.createContainer = fake.resolves({ id: containers[0].Id });
 
 Docker.prototype.getContainer = fake.returns({
-  inspect: fake.resolves({ HostConfig: { NetworkMode: 'host' } }),
+  inspect: fake.resolves({
+    HostConfig: {
+      NetworkMode: 'host',
+      Devices: [
+        {
+          PathOnHost: 'device_path',
+        },
+      ],
+    },
+  }),
   restart: fake.resolves(true),
   remove: fake.resolves(true),
   stop: fake.resolves(true),

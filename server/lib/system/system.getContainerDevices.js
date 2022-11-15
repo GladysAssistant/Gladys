@@ -20,7 +20,7 @@ async function getContainerDevices(containerId) {
   if (!inspect) {
     return [];
   }
-  return inspect.HostConfig.Devices;
+  return inspect.HostConfig.Devices || [];
 }
 
 module.exports = {
