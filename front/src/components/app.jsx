@@ -66,6 +66,7 @@ import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs'
 import TelegramPage from '../routes/integration/all/telegram';
 import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
 import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
+import HomeKitPage from '../routes/integration/all/homekit';
 import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
@@ -243,6 +244,8 @@ const AppRouter = connect(
         <EcovacsPage path="/dashboard/integration/device/ecovacs" />
         <EcovacsDiscoverPage path="/dashboard/integration/device/ecovacs/discover" />
         <EcovacsSetupPage path="/dashboard/integration/device/ecovacs/setup" />
+        <HomeKitPage path="/dashboard/integration/communication/homekit" />
+
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

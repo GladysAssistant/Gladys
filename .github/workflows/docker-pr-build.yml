@@ -95,7 +95,7 @@ jobs:
           npm run coverage
       - name: 🔐 Dependencies security audit
         working-directory: ./server
-        run: npm audit --production --audit-level=critical
+        run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
         uses: codecov/codecov-action@v2
         with:
@@ -132,7 +132,7 @@ jobs:
           sudo apt-get install -y libudev-dev sqlite3 openssl python-is-python3
       - name: 📦 Install NPM packages
         run: |
-          npm ci
+          npm ci && npm run install-server:dev
       - name: ✅ Cypress run
         uses: cypress-io/github-action@v2
         with:

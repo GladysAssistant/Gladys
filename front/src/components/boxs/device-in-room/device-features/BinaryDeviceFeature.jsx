@@ -1,4 +1,4 @@
-import { getDeviceName } from './utils';
+import { getDeviceName } from '../../../../utils/device';
 
 const BinaryDeviceType = ({ children, ...props }) => {
   function updateValue() {
