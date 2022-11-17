@@ -752,7 +752,7 @@
     },
     "homekit": {
       "title": "Apple HomeKit",
-      "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parlez.",
+      "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
       "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
       "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
