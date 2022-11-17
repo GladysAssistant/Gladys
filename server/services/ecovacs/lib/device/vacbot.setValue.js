@@ -9,7 +9,7 @@ const logger = require('../../../../utils/logger');
  * @param {Object} deviceFeature - The binary deviceFeature to control.
  * @param {number} value - The new value.
  * @example
- * turnOff(device, deviceFeature, value);
+ * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
   if (!this.connected) {
@@ -31,11 +31,14 @@ async function setValue(device, deviceFeature, value) {
     throw new NotFoundError(`ECOVACS_API_NOT_FOUND`);
   }
 
+  logger.debug(`DeviceFeature ${deviceFeature.type}`);
   switch (deviceFeature.type) {
-    case DEVICE_FEATURE_TYPES.SWITCH.BINARY:
+    case DEVICE_FEATURE_TYPES.VACBOT.STATE:
       if (value === 1) {
         vacbot.clean();
       } else if (value === 0) {
+        vacbot.pause();
+      } else if (value === -1) {
         vacbot.stop();
       }
       break;

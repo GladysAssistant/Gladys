@@ -151,7 +151,8 @@ const data = {
             'main-tv-volume',
             'main-tv-channel',
             'main-presence-sensor',
-            'main-signal-sensor'
+            'main-signal-sensor',
+            'main-vacbot-binary'
           ]
         }
       ],
@@ -467,6 +468,24 @@ const data = {
             read_only: true,
             last_value: 27,
             last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      },
+      {
+        id: '28e8ad03-70a8-431f-93cb-df916019c509',
+        name: 'DEEBOT OZMO 920 Series',
+        selector: 'main-vacbot',
+        features: [
+          {
+            name: 'power',
+            selector: 'main-vacbot-binary',
+            category: 'vacbot',
+            type: 'state',
+            read_only: false,
+            keep_history: false,
+            has_feedback: true,
+            min: 0,
+            max: 1
           }
         ]
       }
@@ -2736,6 +2755,72 @@ const data = {
           max: 1
         }
       ]
+    }
+  ],
+  'get /api/v1/service/ecovacs': {
+    id: 'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    name: 'ecovacs',
+    selector: 'ecovacs'
+  },
+  'get /api/v1/service/ecovacs/device': [
+    {
+      id: '28e8ad03-70a8-431f-93cb-df916019c509',
+      room_id: '568981d0-1a4d-40ea-af97-dd4037d2b344',
+      name: 'DEEBOT OZMO 920 Series',
+      model: 'DX5G',
+      external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:0',
+      selector: 'ecovacs:5c19a8f3a1e6ee0001782247:0',
+      should_poll: false,
+      features: [
+        {
+          name: 'power',
+          selector: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0',
+          external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0',
+          category: 'switch',
+          type: 'binary',
+          read_only: false,
+          keep_history: false,
+          has_feedback: true,
+          min: 0,
+          max: 1
+        }
+      ],
+      params: [],
+      room: {
+        id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+        name: 'Living Room',
+        selector: 'living-room'
+      },
+      service: {
+        id: 'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+        name: 'ecovacs',
+        selector: 'ecovacs'
+      }
+    }
+  ],
+  'get /api/v1/service/ecovacs/discover': [
+    {
+      service_id: 'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+      name: 'DEEBOT OZMO 990 Series',
+      model: 'DX6G',
+      external_id: 'ecovacs:5c19a8f3a1e6ee0001782247-bis:1',
+      selector: 'ecovacs:5c19a8f3a1e6ee0001782247-bis:1',
+      should_poll: false,
+      features: [
+        {
+          name: 'power',
+          selector: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0',
+          external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0',
+          category: 'switch',
+          type: 'binary',
+          read_only: false,
+          keep_history: false,
+          has_feedback: true,
+          min: 0,
+          max: 1
+        }
+      ],
+      params: []
     }
   ],
   'get /api/v1/device_feature/aggregated_states': [

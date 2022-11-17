@@ -1941,6 +1941,13 @@
           "one": "Open",
           "other": "Close"
         }
+      },
+      "vacbot": {
+        "state": {
+          "zero": "Pause",
+          "one": "Clean",
+          "other": "Stop"
+        }
       }
     }
   },
@@ -2172,6 +2179,10 @@
       "shortCategoryName": "Curtain",
       "state": "Curtain state",
       "position": "curtain position"
+    },
+    "vacbot": {
+      "shortCategoryName": "Vacbot",
+      "state": "Vacbot state"
     },
     "data": {
       "shortCategoryName": "Data",

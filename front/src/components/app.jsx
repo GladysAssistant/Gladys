@@ -246,7 +246,6 @@ const AppRouter = connect(
         <EcovacsSetupPage path="/dashboard/integration/device/ecovacs/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
 
-
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />

@@ -439,9 +439,7 @@ const DEVICE_FEATURE_TYPES = {
     RECORD: 'record',
   },
   VACBOT: {
-    PLAY: 'play',
-    PAUSE: 'pause',
-    STOP: 'stop',
+    STATE: 'state',
   },
   ENERGY_SENSOR: {
     BINARY: 'binary',

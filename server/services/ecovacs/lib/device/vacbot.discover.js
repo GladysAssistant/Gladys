@@ -1,11 +1,24 @@
 const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
 const { getExternalId } = require('../utils/ecovacs.externalId');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  DEVICE_POLL_FREQUENCIES,
-} = require('../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../../utils/constants');
+
+const WRITE_VALUE_MAPPING = {};
+const READ_VALUE_MAPPING = {};
+
+const addMapping = (exposeName, gladysValue, ecovacsValue) => {
+  const writeExposeMapping = WRITE_VALUE_MAPPING[exposeName] || {};
+  writeExposeMapping[gladysValue] = ecovacsValue;
+  WRITE_VALUE_MAPPING[exposeName] = writeExposeMapping;
+
+  const readExposeMapping = READ_VALUE_MAPPING[exposeName] || {};
+  readExposeMapping[ecovacsValue] = gladysValue;
+  READ_VALUE_MAPPING[exposeName] = readExposeMapping;
+};
+
+addMapping('state', COVER_STATE.OPEN, 'OPEN');
+addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
+addMapping('state', COVER_STATE.STOP, 'STOP');
 
 /**
  * @description Retrieve ecovacs devices from cloud.
@@ -54,34 +67,21 @@ async function discover() {
             selector: `${getExternalId(discoveredDevice)}`,
             external_id: `${getExternalId(discoveredDevice)}`,
             model: `${discoveredDevice.model}`,
-            should_poll: true,
-            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+            should_poll: false,
             features: [],
             params: [],
           };
           newDevice.features.push({
             name: 'power',
-            selector: `ecovacs:${discoveredDevice.pid}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}:${discoveredDevice.deviceNumber}`,
-            external_id: `ecovacs:${discoveredDevice.pid}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}:${discoveredDevice.deviceNumber}`,
-            category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-            type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+            selector: `ecovacs:${discoveredDevice.pid}:${DEVICE_FEATURE_TYPES.VACBOT.STATE}:${discoveredDevice.deviceNumber}`,
+            external_id: `ecovacs:${discoveredDevice.pid}:${DEVICE_FEATURE_TYPES.VACBOT.STATE}:${discoveredDevice.deviceNumber}`,
+            category: DEVICE_FEATURE_CATEGORIES.VACBOT,
+            type: DEVICE_FEATURE_TYPES.VACBOT.STATE,
             read_only: false,
             keep_history: false,
             has_feedback: true,
             min: 0,
             max: 1,
-          });
-          newDevice.features.push({
-            name: 'battery',
-            selector: `ecovacs:${discoveredDevice.pid}:${DEVICE_FEATURE_CATEGORIES.BATTERY}:${discoveredDevice.deviceNumber}`,
-            external_id: `ecovacs:${discoveredDevice.pid}:${DEVICE_FEATURE_CATEGORIES.BATTERY}:${discoveredDevice.deviceNumber}`,
-            category: DEVICE_FEATURE_CATEGORIES.BATTERY,
-            type: DEVICE_FEATURE_TYPES.BATTERY.INTEGER,
-            read_only: true,
-            keep_history: false,
-            has_feedback: false,
-            min: 0,
-            max: 100,
           });
           unknownDevices.push(newDevice);
         }

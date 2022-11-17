@@ -1951,9 +1951,9 @@
       },
       "vacbot": {
         "state": {
-          "zero": "Arrêter",
-          "one": "Ouvrir",
-          "other": "Fermer"
+          "zero": "Pause",
+          "one": "Nettoyer",
+          "other": "Stop"
         }
       }
     }
