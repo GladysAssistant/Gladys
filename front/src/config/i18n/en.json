@@ -644,6 +644,15 @@
       "cancelButton": "Cancel",
       "connectButton": "Link"
     },
+    "homekit": {
+      "title": "Apple HomeKit",
+      "description": "Connect Gladys to HomeKit and use Siri to control your devices.",
+      "introduction": "To connect Gladys to HomeKit, you need an Apple device (iPhone, iPad, iPod touch).",
+      "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
+      "configurationError": "An error appears while getting settings.",
+      "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
+      "reloadButton": "Reload"
+    },
     "owntracks": {
       "title": "Owntracks",
       "description": "Send your GPS location to Gladys with a mobile app",
@@ -1818,6 +1827,7 @@
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "volt-ampere": "Voltampere (VA)",
+    "kilovolt-ampere": "Kilovoltampere (kVA)",
     "volt-ampere-reactive": "Voltampere reactive (var)",
     "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
@@ -1888,6 +1898,7 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "kilovolt-ampere": "kVA",
     "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",

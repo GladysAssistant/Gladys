@@ -3,7 +3,7 @@ import cx from 'classnames';
 import iro from '@jaames/iro';
 
 import { intToHex, hexToInt } from '../../../../../../server/utils/colors';
-import { getDeviceName } from './utils';
+import { getDeviceName } from '../../../../utils/device';
 
 import style from './style.css';
 

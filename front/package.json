@@ -14,6 +14,7 @@
     "postbuild-with-stats": "cp ./old-sw.js ./build/sw.js",
     "serve": "sirv build --port 8080 --cors --single",
     "dev": "preact watch -p 1444 --template src/template.html",
+    "start-gateway": "cross-env GATEWAY_MODE=true preact watch -p 1445 --template src/template.html",
     "eslint": "eslint src cypress --ext .json --ext .js --ext .jsx",
     "compare-translations": "comparejson -e ./src/config/i18n/*.json && node ./cli/check_translations.js",
     "prettier-check": "prettier --check '**/*.js' '**/*.jsx' '**/*.json'",
@@ -43,7 +44,7 @@
     "prettier": "^1.17.1"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^4.2.0",
+    "@gladysassistant/gladys-gateway-js": "^4.4.1",
     "@gladysassistant/theme-optimized": "^1.0.3",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "^4.5.0",

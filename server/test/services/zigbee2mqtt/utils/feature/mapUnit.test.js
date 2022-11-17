@@ -18,6 +18,8 @@ describe('zigbee2mqtt mapUnit', () => {
     { input: 'kWh', expected: DEVICE_FEATURE_UNITS.KILOWATT_HOUR },
     { input: '°C', expected: DEVICE_FEATURE_UNITS.CELSIUS },
     { input: '°F', expected: DEVICE_FEATURE_UNITS.FAHRENHEIT },
+    { input: 'VA', expected: DEVICE_FEATURE_UNITS.VOLT_AMPERE },
+    { input: 'VArh', expected: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE },
   ];
 
   values.forEach((value) => {

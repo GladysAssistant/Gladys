@@ -44,7 +44,7 @@
   },
   "device": {
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données. Afin d'éviter que Gladys soit bloquée pendant la suppression de cet appareil, nous avons lancé une suppression lente en arrière-plan de tous les états de cet appareil. D'ici quelques minutes/heures ( selon la rapidité de votre disque ), nous vous invitons à revenir sur cet onglet pour re-tenter une suppression de cet appareil. Pour suivre la suppression, <a href=\"/dashboard/settings/jobs\">c'est ici</a>."
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
   },
   "login": {
     "title": "Gladys Assistant",
@@ -770,6 +770,15 @@
       "privacyPolicy": "Lire la <a href=\"https://www.alexa.com/help/privacy\">politique de confidentialité d'Alexa</a>.",
       "cancelButton": "Annuler",
       "connectButton": "Lier"
+    },
+    "homekit": {
+      "title": "Apple HomeKit",
+      "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
+      "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
+      "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
+      "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
+      "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparait pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
+      "reloadButton": "Relancer"
     },
     "owntracks": {
       "title": "Owntracks",
@@ -1818,6 +1827,7 @@
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "volt-ampere": "Voltampère (VA)",
+    "kilovolt-ampere": "Kilovoltampère (kVA)",
     "volt-ampere-reactive": "Voltampère réactif (var)",
     "mm": "Millimètre (mm)",
     "cm": "Centimètre (cm)",
@@ -1888,6 +1898,7 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "kilovolt-ampere": "kVA",
     "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",
@@ -2235,7 +2246,7 @@
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",
     "label": "Sélectionnez votre utilisateur Gladys",
-    "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté locallement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
+    "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté localement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "saveButton": "Sauvegarder",

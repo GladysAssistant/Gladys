@@ -367,8 +367,19 @@ const data = {
         selector: 'main-lamp',
         features: [
           {
-            name: 'Main Lamp',
+            name: 'First lamp',
             selector: 'main-lamp-binary',
+            category: 'light',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Second lamp ',
+            selector: 'secondary-lamp-binary',
             category: 'light',
             type: 'binary',
             min: 0,
@@ -2806,6 +2817,9 @@ const data = {
   'get /api/v1/device_feature/aggregated_states': [
     {
       device: {
+        name: 'Kitchen temperature'
+      },
+      deviceFeature: {
         name: 'Kitchen temperature'
       },
       values: [
