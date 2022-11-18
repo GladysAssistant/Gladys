@@ -106,12 +106,12 @@ jobs:
         run: |
           npm ci && npm run install-server:dev
       - name: ✅ Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v3.1.0
         with:
           install: false
           start: npm run start:cypress
           wait-on: 'http://localhost:1444'
-          config-file: ./front/cypress/cypress.json
+          config-file: ./front/cypress/cypress.config.js
           project: ./front
           command: npm run cypress:run
   build-front:
