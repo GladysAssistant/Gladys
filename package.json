@@ -8,7 +8,7 @@
     "npm": "6.x"
   },
   "scripts": {
-    "postinstall": "run-p install-front:dev",
+    "postinstall": "npm run install-front:dev",
     "start": "run-p start-server:dev start-front:dev",
     "test": "run-p test-server test-front",
     "install-server:dev": "cd server && npm install",
