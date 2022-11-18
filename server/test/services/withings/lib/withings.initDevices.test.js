@@ -81,7 +81,7 @@ describe('WithingsHandler initDevices', () => {
     await assert.equal(firstResult.poll_frequency, 86400000);
 
     const featureCreated = firstResult.features;
-    await assert.equal(featureCreated.length, 18);
+    await assert.equal(featureCreated.length, 23);
     await assert.equal(firstResult.external_id, 'withingsDevideId');
 
     await assert.equal(secondResult.name, 'Withings - string');
