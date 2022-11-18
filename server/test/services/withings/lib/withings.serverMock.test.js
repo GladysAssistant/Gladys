@@ -103,6 +103,12 @@ function getHttpServer(host, port, withHistoricalData) {
       getWithingsMeasure(77),
       getWithingsMeasure(88),
       getWithingsMeasure(91),
+      getWithingsMeasure(123),
+      getWithingsMeasure(135),
+      getWithingsMeasure(136),
+      getWithingsMeasure(137),
+      getWithingsMeasure(138),
+      getWithingsMeasure(139),
     ];
   } else {
     measures = [getWithingsMeasure(1)];

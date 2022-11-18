@@ -423,6 +423,12 @@ const DEVICE_FEATURE_TYPES = {
     HYDRATION: 'hydration',
     BONE_MASS: 'bone-mass',
     PULSE_WAVE_VELOCITY: 'pulse-wave-velocity',
+    VO2_MAX: 'vo2-max',
+    QRS_INERVAL: 'qrs-interval',
+    PR_INERVAL: 'pr-interval',
+    QT_INERVAL: 'qt-interval',
+    CORRECTED_QT_INERVAL: 'corrected-qt-interval',
+    ATRIAL_FIBRILLATION: 'atrial-fibrillation',
     UNKNOWN: 'unknown',
   },
   SIGNAL: {
@@ -544,6 +550,7 @@ const DEVICE_FEATURE_UNITS = {
   CENTIMETER: 'cm',
   MERCURE_MILIMETER: 'mmHg',
   BEATS_PER_MINUTE: 'bpm',
+  MILILITTER_PER_MINUTE_PER_KILOGRAM: 'milliliter-per-minute-per-kilogram',
   // Length units
   MM: 'mm',
   CM: 'cm',

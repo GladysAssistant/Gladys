@@ -1050,7 +1050,7 @@
       "device": {
         "title": "Withings Devices",
         "menu": "Devices",
-        "noDevices": "No Withings devices available, go to the 'Settings' page to connect your account and create the devices.",
+        "noDevices": "No Withings devices available, go to the 'Discover' page to connect your account and create the devices.",
         "nameLabel": "Name",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
         "noValueReceived": "No value received.",
@@ -2084,9 +2084,9 @@
       "unknown": "Unknown",
       "weight": "Weight",
       "height": "Height",
-      "fat-free-mass": "Fat Free Mass",
+      "fat-free-mass": "Lean Mass",
       "fat-ratio": "Fat Ratio",
-      "fat-mass-weight": "Fat Mass Weight",
+      "fat-mass-weight": "Fat Mass",
       "diastolic-blood-pressure": "Diastolic Blood Pressure",
       "systolic-blood-pressure": "Systolic Blood Pressure",
       "heart-pulse": "Heart Pulse",
@@ -2095,9 +2095,15 @@
       "body-temperature": "Body Temperature",
       "skin-temperature": "Skin Temperature",
       "muscle-mass": "Muscle Mass",
-      "hydration": "Hydration",
+      "hydration": "Body water",
       "bone-mass": "Bone Mass",
-      "pulse-wave-velocity": "Pulse Wave Velocity"
+      "pulse-wave-velocity": "Pulse Wave Velocity",
+      "vo2-max": "VO2 max",
+      "qrs-interval": "QRS interval",
+      "pr-interval": "PR interval",
+      "qt-interval": "QT interval",
+      "corrected-qt-interval": "Corrected QT interval",
+      "atrial-fibrillation": "Atrial fibrillation"
     },
     "signal": {
       "shortCategoryName": "Signal",

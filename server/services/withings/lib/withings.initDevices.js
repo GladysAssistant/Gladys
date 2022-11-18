@@ -97,7 +97,7 @@ function buildFeature(currentGroup, device, currentFeatures) {
       // Choose type of feature
       // (cf: https://developer.withings.com/api-reference#operation/measure-getmeas )
       let featureType;
-      let featureUnit;
+      let featureUnit = '';
       switch (element.type) {
         case 1:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.WEIGHT;
@@ -163,39 +163,59 @@ function buildFeature(currentGroup, device, currentFeatures) {
           featureType = DEVICE_FEATURE_TYPES.HEALTH.PULSE_WAVE_VELOCITY;
           featureUnit = DEVICE_FEATURE_UNITS.METER_PER_SECOND;
           break;
+        case 123:
+          featureType = DEVICE_FEATURE_TYPES.HEALTH.VO2_MAX;
+          featureUnit = DEVICE_FEATURE_UNITS.MILILITTER_PER_MINUTE_PER_KILOGRAM;
+          break;
+        case 135:
+          featureType = DEVICE_FEATURE_TYPES.HEALTH.QRS_INERVAL;
+          break;
+        case 136:
+          featureType = DEVICE_FEATURE_TYPES.HEALTH.PR_INERVAL;
+          break;
+        case 137:
+          featureType = DEVICE_FEATURE_TYPES.HEALTH.QT_INERVAL;
+          break;
+        case 138:
+          featureType = DEVICE_FEATURE_TYPES.HEALTH.CORRECTED_QT_INERVAL;
+          break;
+        case 139:
+          featureType = DEVICE_FEATURE_TYPES.HEALTH.ATRIAL_FIBRILLATION;
+          break;
         default:
           featureType = DEVICE_FEATURE_TYPES.HEALTH.UNKNOWN;
-          featureUnit = '';
           break;
       }
 
-      // Search existing feature
-      let tmpFeature = features.find((feat) => feat.type === featureType);
-      let isNewFeature = false;
+      if (featureType !== DEVICE_FEATURE_TYPES.HEALTH.UNKNOWN) {
+        // Search existing feature
+        let tmpFeature = features.find((feat) => feat.type === featureType);
+        let isNewFeature = false;
 
-      // if not exist build new
-      if (!tmpFeature) {
-        isNewFeature = true;
-        const uniqueId = uuid.v4();
-        tmpFeature = {
-          id: uniqueId,
-          selector: `${device.selector}-${featureType}`,
-          device_id: gladysDeviceId,
-          external_id: `withings:${device.model}:${DEVICE_FEATURE_CATEGORIES.HEALTH}:${featureType}`,
-          category: DEVICE_FEATURE_CATEGORIES.HEALTH,
-          type: featureType,
-          read_only: true,
-          keep_history: true,
-          has_feedback: false,
-          unit: featureUnit,
-          min: 0,
-          max: 100000,
-          feature_state: [],
-        };
-      }
+        // if not exist build new
+        if (!tmpFeature) {
+          isNewFeature = true;
+          const uniqueId = uuid.v4();
+          tmpFeature = {
+            id: uniqueId,
+            selector: `${device.selector}-${featureType}`,
+            device_id: gladysDeviceId,
+            external_id: `withings:${device.model}:${DEVICE_FEATURE_CATEGORIES.HEALTH}:${featureType}`,
+            category: DEVICE_FEATURE_CATEGORIES.HEALTH,
+            type: featureType,
+            read_only: true,
+            keep_history: true,
+            has_feedback: false,
+            unit: featureUnit,
+            min: 0,
+            max: 100000,
+            feature_state: [],
+          };
+        }
 
-      if (isNewFeature) {
-        features.push(tmpFeature);
+        if (isNewFeature) {
+          features.push(tmpFeature);
+        }
       }
     });
   }
