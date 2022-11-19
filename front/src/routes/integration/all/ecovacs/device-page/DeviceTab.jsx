@@ -48,7 +48,16 @@ const DeviceTab = ({ children, ...props }) => (
             {props.ecovacsDevices &&
               props.ecovacsDevices.length > 0 &&
               props.ecovacsDevices.map((device, index) => (
-                <EcovacsDeviceBox {...props} editable saveButton deleteButton device={device} deviceIndex={index} />
+                <EcovacsDeviceBox
+                  {...props}
+                  editable
+                  saveButton
+                  deleteButton
+                  device={device}
+                  deviceIndex={index}
+                  listName="ecovacsDevices"
+                  displayStatus="true"
+                />
               ))}
             {!props.ecovacsDevices || (props.ecovacsDevices.length === 0 && <EmptyState />)}
           </div>

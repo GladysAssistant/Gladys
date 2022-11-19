@@ -75,13 +75,13 @@ describe('GET /api/v1/service/ecovacs/status', () => {
     controller = EcovacsController(ecovacsHandler);
   });
 
-  it('should get ecovacs service status', () => {
+  it('should get ecovacs service status', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/ecovacs/status'].controller(req, res);
+    await controller['get /api/v1/service/ecovacs/status'].controller(req, res);
     assert.calledOnce(ecovacsHandler.getStatus);
     assert.calledOnce(res.json);
   });
@@ -95,13 +95,13 @@ describe('GET /api/v1/service/ecovacs/config', () => {
     controller = EcovacsController(ecovacsHandler);
   });
 
-  it('should ecovacs configuration', () => {
+  it('should get ecovacs configuration', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/ecovacs/config'].controller(req, res);
+    await controller['get /api/v1/service/ecovacs/config'].controller(req, res);
     assert.calledOnce(ecovacsHandler.getConfiguration);
     assert.calledOnce(res.json);
   });
@@ -115,7 +115,7 @@ describe('POST /api/v1/service/ecovacs/config', () => {
     controller = EcovacsController(ecovacsHandler);
   });
 
-  it('should save ecovacs configuration', () => {
+  it('should save ecovacs configuration', async () => {
     const req = {
       body: [],
     };
@@ -123,7 +123,7 @@ describe('POST /api/v1/service/ecovacs/config', () => {
       json: fake.returns({ success: true }),
     };
 
-    controller['post /api/v1/service/ecovacs/config'].controller(req, res);
+    await controller['post /api/v1/service/ecovacs/config'].controller(req, res);
     assert.calledWith(ecovacsHandler.saveConfiguration, req.body);
     assert.calledOnce(res.json);
   });

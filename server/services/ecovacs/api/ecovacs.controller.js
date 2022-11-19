@@ -34,17 +34,18 @@ module.exports = function EcovacsController(ecovacsHandler) {
 
   /**
    * @api {get} /api/v1/service/ecovacs/config Get Ecovacs configuration
-   * @apiName getConfiguration
+   * @apiName config
    * @apiGroup Ecovacs
    */
   async function getConfiguration(req, res) {
-    const config = ecovacsHandler.getConfiguration();
+    const config = await ecovacsHandler.getConfiguration();
+    logger.debug(config);
     res.json(config);
   }
 
   /**
    * @api {post} /api/v1/service/ecovacs/config Save Ecovacs configuration
-   * @apiName saveConfiguration
+   * @apiName config
    * @apiGroup Ecovacs
    */
   async function saveConfiguration(req, res) {
@@ -83,11 +84,11 @@ module.exports = function EcovacsController(ecovacsHandler) {
     },
     'get /api/v1/service/ecovacs/config': {
       authenticated: true,
-      controller: getConfiguration,
+      controller: asyncMiddleware(getConfiguration),
     },
     'post /api/v1/service/ecovacs/config': {
       authenticated: true,
-      controller: saveConfiguration,
+      controller: asyncMiddleware(saveConfiguration),
     },
     'get /api/v1/service/ecovacs/connect': {
       authenticated: true,

@@ -12,16 +12,17 @@ const { CONFIGURATION } = require('../utils/ecovacs.constants');
  * ecovacs.saveConfiguration();
  */
 async function saveConfiguration({ accountId, password, countryCode }) {
-  logger.debug(`Ecovacs: save config`);
   logger.debug(
     `Ecovacs: save config with ${CONFIGURATION.ECOVACS_LOGIN_KEY}=${accountId},${CONFIGURATION.ECOVACS_PASSWORD_KEY}=${password}, ${CONFIGURATION.ECOVACS_COUNTRY_KEY}=${countryCode}`,
   );
   await this.gladys.variable.setValue(CONFIGURATION.ECOVACS_LOGIN_KEY, accountId, this.serviceId);
-
-  // The passwordHash is an md5 hash of your Ecovacs password.
-  const passwordHash = this.ecovacsLibrary.EcoVacsAPI.md5(password);
-  await this.gladys.variable.setValue(CONFIGURATION.ECOVACS_PASSWORD_KEY, passwordHash, this.serviceId);
   await this.gladys.variable.setValue(CONFIGURATION.ECOVACS_COUNTRY_KEY, countryCode, this.serviceId);
+  // if password is undefined do not change it
+  if (password) {
+    // The passwordHash is an md5 hash of your Ecovacs password.
+    const passwordHash = this.ecovacsLibrary.EcoVacsAPI.md5(password);
+    await this.gladys.variable.setValue(CONFIGURATION.ECOVACS_PASSWORD_KEY, passwordHash, this.serviceId);
+  }
 }
 
 module.exports = {
