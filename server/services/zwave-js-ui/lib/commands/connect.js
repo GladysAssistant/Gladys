@@ -80,31 +80,37 @@ async function connect() {
       logger.info(`ZwaveJSUI USB dongle not attached`);
     }
 
-    // Security keys configuration
-    this.s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
-    if (!this.s2UnauthenticatedKey) {
-      this.s2UnauthenticatedKey = crypto.randomBytes(16).toString('hex');
-      await this.gladys.variable.setValue(CONFIGURATION.S2_UNAUTHENTICATED, this.s2UnauthenticatedKey, this.serviceId);
-    }
-    this.s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);
-    if (!this.s2AuthenticatedKey) {
-      this.s2AuthenticatedKey = crypto.randomBytes(16).toString('hex');
-      await this.gladys.variable.setValue(CONFIGURATION.S2_AUTHENTICATED, this.s2AuthenticatedKey, this.serviceId);
-    }
-    this.s2AccessControlKey = await this.gladys.variable.getValue(CONFIGURATION.S2_ACCESS_CONTROL, this.serviceId);
-    if (!this.s2AccessControlKey) {
-      this.s2AccessControlKey = crypto.randomBytes(16).toString('hex');
-      await this.gladys.variable.setValue(CONFIGURATION.S2_ACCESS_CONTROL, this.s2AccessControlKey, this.serviceId);
-    }
-    this.s0LegacyKey = await this.gladys.variable.getValue(CONFIGURATION.S0_LEGACY, this.serviceId);
-    if (!this.s0LegacyKey) {
-      this.s0LegacyKey = crypto.randomBytes(16).toString('hex');
-      await this.gladys.variable.setValue(CONFIGURATION.S0_LEGACY, this.s0LegacyKey, this.serviceId);
-    }
-
-    await this.installMqttContainer();
     if (this.usbConfigured) {
-      await this.installZ2mContainer();
+      // Security keys configuration
+      this.s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
+      if (!this.s2UnauthenticatedKey) {
+        this.s2UnauthenticatedKey = crypto.randomBytes(16).toString('hex');
+        await this.gladys.variable.setValue(
+          CONFIGURATION.S2_UNAUTHENTICATED,
+          this.s2UnauthenticatedKey,
+          this.serviceId,
+        );
+      }
+      this.s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);
+      if (!this.s2AuthenticatedKey) {
+        this.s2AuthenticatedKey = crypto.randomBytes(16).toString('hex');
+        await this.gladys.variable.setValue(CONFIGURATION.S2_AUTHENTICATED, this.s2AuthenticatedKey, this.serviceId);
+      }
+      this.s2AccessControlKey = await this.gladys.variable.getValue(CONFIGURATION.S2_ACCESS_CONTROL, this.serviceId);
+      if (!this.s2AccessControlKey) {
+        this.s2AccessControlKey = crypto.randomBytes(16).toString('hex');
+        await this.gladys.variable.setValue(CONFIGURATION.S2_ACCESS_CONTROL, this.s2AccessControlKey, this.serviceId);
+      }
+      this.s0LegacyKey = await this.gladys.variable.getValue(CONFIGURATION.S0_LEGACY, this.serviceId);
+      if (!this.s0LegacyKey) {
+        this.s0LegacyKey = crypto.randomBytes(16).toString('hex');
+        await this.gladys.variable.setValue(CONFIGURATION.S0_LEGACY, this.s0LegacyKey, this.serviceId);
+      }
+
+      await this.installMqttContainer();
+      if (this.usbConfigured) {
+        await this.installZ2mContainer();
+      }
     }
   }
 
