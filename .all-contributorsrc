@@ -209,6 +209,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "magarcia",
+      "name": "Martin Garcia",
+      "avatar_url": "https://avatars.githubusercontent.com/u/651610?v=4",
+      "profile": "http://magarcia.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
