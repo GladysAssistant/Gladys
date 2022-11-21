@@ -15,7 +15,8 @@ const colorLowAsGreen = (value, safeLimit, warnLimit) => {
 };
 
 const BADGE_CATEGORIES = {
-  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200)
+  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
+  [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000)
 };
 
 const BadgeNumberDeviceValue = props => {

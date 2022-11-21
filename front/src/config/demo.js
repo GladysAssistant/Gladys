@@ -2797,6 +2797,9 @@ const data = {
       device: {
         name: 'Kitchen temperature'
       },
+      deviceFeature: {
+        name: 'Kitchen temperature'
+      },
       values: [
         { created_at: dayjs().toDate(), value: 28 },
         {
