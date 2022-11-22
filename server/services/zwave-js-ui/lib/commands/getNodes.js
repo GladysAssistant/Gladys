@@ -25,12 +25,8 @@ function getNodes() {
   const nodeIds = Object.keys(this.nodes);
 
   // transform object in array
-  const nodes = nodeIds
-    .map((nodeId) => this.nodes[nodeId])
-    .flatMap((node) => splitNode(node))
-    // .flatMap((node) => splitNodeWithScene(node))
-    ;
-
+  const nodes = nodeIds.map((nodeId) => this.nodes[nodeId]).flatMap((node) => splitNode(node));
+  // .flatMap((node) => splitNodeWithScene(node))
   // foreach node in RAM, we format it with the gladys device format
   return nodes
     .map((node) => {
