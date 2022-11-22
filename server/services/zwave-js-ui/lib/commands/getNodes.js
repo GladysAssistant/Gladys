@@ -10,7 +10,7 @@ const {
 } = require('../utils/externalId');
 const logger = require('../../../../utils/logger');
 const { unbindValue } = require('../utils/bindValue');
-const { splitNode, splitNodeWithScene } = require('../utils/splitNode');
+const { splitNode } = require('../utils/splitNode');
 
 /**
  * @description Return array of Nodes.
@@ -28,7 +28,8 @@ function getNodes() {
   const nodes = nodeIds
     .map((nodeId) => this.nodes[nodeId])
     .flatMap((node) => splitNode(node))
-    .flatMap((node) => splitNodeWithScene(node));
+    // .flatMap((node) => splitNodeWithScene(node))
+    ;
 
   // foreach node in RAM, we format it with the gladys device format
   return nodes

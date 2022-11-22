@@ -61,14 +61,17 @@ function splitNodeWithScene(node) {
   ) {
     return node;
   }
-  const nodes = [node];
+
+  const commonNode = cloneDeep(node);
+  const nodes = [commonNode];
+
   let i = 1;
   Object.keys(node.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE][0])
     .filter((sceneProperty) => {
       return sceneProperty !== 'slowRefresh';
     })
     .forEach((sceneProperty) => {
-      const eNode = Object.assign({}, node);
+      const eNode = cloneDeep(node);
       eNode.endpoint = i;
       eNode.classes = {};
       eNode.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE] = {
@@ -87,6 +90,9 @@ function splitNodeWithScene(node) {
           },
         },
       };
+      if (commonNode.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE]) {
+        delete commonNode.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE][0];
+      }
       nodes.push(eNode);
       i += 1;
     });
