@@ -23,6 +23,7 @@ const mappings = {
     capabilities: {
       [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
         characteristics: ['ContactSensorState'],
+        notifDelay: 1000,
       },
     },
   },

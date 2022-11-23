@@ -1,16 +1,8 @@
-const { intToRgb, rgbToHsb } = require('../../../utils/colors');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  EVENTS,
-  DEVICE_FEATURE_UNITS,
-} = require('../../../utils/constants');
-const { normalize } = require('./utils');
-const { fahrenheitToCelsius } = require('../../../utils/units');
+const { EVENTS } = require('../../../utils/constants');
 const { mappings } = require('./deviceMappings');
 
 /**
- * @description Create HomeKit accessory service.
+ * @description Add delay before send new state to Homekit.
  * @param {Object} accessories - HomeKit accessories.
  * @param {Object} event - Gladys event to forward to HomeKit.
  * @returns {undefined}
@@ -28,68 +20,30 @@ function notifyChange(accessories, event) {
     return;
   }
 
-  const { Characteristic, Service } = this.hap;
-  switch (`${feature.category}:${feature.type}`) {
-    case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
-    case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
-    case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          event.last_value,
-        );
-      break;
-    }
-    case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          normalize(event.last_value, feature.min, feature.max, 0, 100),
-        );
-      break;
-    }
-    case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`: {
-      const rgb = intToRgb(event.last_value);
-      const [h, s] = rgbToHsb(rgb);
+  const delay = mappings[feature.category].capabilities[feature.type].notifDelay || 5000;
+  if (!this.notifyTimeouts[event.device_feature]) {
+    this.notifyTimeouts[event.device_feature] = {
+      timeout: setTimeout(() => {
+        this.sendState(hkAccessory, feature, event);
+      }, delay),
+      startDateTime: new Date().getTime(),
+    };
 
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          h,
-        )
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[1]],
-          s,
-        );
-      break;
-    }
-    case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          normalize(event.last_value, feature.min, feature.max, 140, 500),
-        );
-      break;
-    }
-    case `${DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
-      let currentTemp = event.last_value;
-      if (feature.unit === DEVICE_FEATURE_UNITS.KELVIN) {
-        currentTemp -= 273.15;
-      } else if (feature.unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
-        currentTemp = fahrenheitToCelsius(currentTemp);
-      }
-      hkAccessory
-        .getService(Service.TemperatureSensor)
-        .updateCharacteristic(Characteristic.CurrentTemperature, currentTemp);
-      break;
-    }
-    default:
-      break;
+    return;
   }
+
+  clearTimeout(this.notifyTimeouts[event.device_feature].timeout);
+
+  const now = new Date().getTime();
+  if (now - this.notifyTimeouts[event.device_feature].startDateTime < 2 * delay) {
+    this.notifyTimeouts[event.device_feature].timeout = setTimeout(() => {
+      this.sendState(hkAccessory, feature, event);
+    }, delay);
+
+    return;
+  }
+
+  this.sendState(hkAccessory, feature, event);
 }
 
 module.exports = {
