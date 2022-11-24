@@ -10,11 +10,6 @@ async function getConfiguration() {
   logger.debug(`Zwave : Getting informations...`);
 
   return {
-    homeId: this.controller && this.controller.ready ? this.controller.homeId : 'Not ready',
-    controllerId: this.controller && this.controller.ready ? this.controller.controllerId : 'Not ready',
-    type: this.controller && this.controller.ready ? this.controller.type : 'Not ready',
-    sdkVersion: this.controller && this.controller.ready ? this.controller.sdkVersion : 'Not ready',
-
     externalZwaveJSUI: this.externalZwaveJSUI,
     mqttUrl: this.mqttUrl,
     mqttUsername: this.mqttUsername,

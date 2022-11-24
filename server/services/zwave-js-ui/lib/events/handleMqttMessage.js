@@ -1,6 +1,5 @@
 const logger = require('../../../../utils/logger');
 const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -14,97 +13,6 @@ function handleMqttMessage(topic, message) {
   this.mqttConnected = true;
 
   switch (topic) {
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/driver/driver_ready`: {
-      const msg = JSON.parse(message).data[0];
-      this.driver.homeId = msg.homeId;
-      this.driver.controllerId = msg.controllerId;
-      this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
-      });
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/driver/all_nodes_ready`: {
-      this.scanComplete();
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/controller/statistics_updated`: {
-      const msg = JSON.parse(message).data[0];
-      this.driver.statistics = msg;
-      this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
-      });
-      break;
-    }
-    /* case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_alive`: {
-      const msg = JSON.parse(message).data[0];
-      this.nodeAlive(
-        {
-          id: msg.id,
-        },
-        msg.data,
-      );
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_ready`: {
-      const msg = JSON.parse(message).data[0];
-      this.nodeReady(
-        {
-          id: msg.id,
-        },
-        msg.data,
-      );
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_sleep`: {
-      const msg = JSON.parse(message).data[0];
-      this.nodeSleep({
-        id: msg.id,
-      });
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_dead`: {
-      const msg = JSON.parse(message).data[0];
-      this.nodeDead(
-        {
-          id: msg.id,
-        },
-        msg.data,
-      );
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_wakeup`: {
-      const msg = JSON.parse(message).data[0];
-      this.nodeWakeUp({
-        id: msg.id,
-      });
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_value_added`: {
-      // Use node topic
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_value_updated`: {
-      // Use node topic
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/node_metadata_updated`: {
-      break;
-    }
-    case `${DEFAULT.ROOT}/_EVENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/node/statistics_updated`: {
-      const msg = JSON.parse(message);
-      this.statisticsUpdated(
-        {
-          id: msg.data[0],
-        },
-        msg.data[1],
-      );
-      break;
-    }
-    case `${DEFAULT.ROOT}/driver/status`:
-    case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/status`:
-    case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/version`: {
-      break;
-    } */
     case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {
       if (this.scanInProgress) {
         const { success, result } = message instanceof Object ? message : JSON.parse(message);

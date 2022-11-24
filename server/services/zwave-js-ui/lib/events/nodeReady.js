@@ -1,6 +1,5 @@
 const logger = require('../../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { valueAdded } = require('./valueAdded');
 
 /**
  * @description When a node is ready.

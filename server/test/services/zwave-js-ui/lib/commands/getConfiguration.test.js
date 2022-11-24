@@ -29,11 +29,6 @@ describe('zwave-js-ui installMqttContainer', () => {
     const configuration = await zwaveJSUIManager.getConfiguration();
     // ASSERT
     assert.match(configuration, {
-      homeId: 'Not ready',
-      controllerId: 'Not ready',
-      type: 'Not ready',
-      sdkVersion: 'Not ready',
-
       externalZwaveJSUI: false,
       mqttUrl: 'mqttUrl',
       mqttUsername: 'mqttUsername',
@@ -50,10 +45,6 @@ describe('zwave-js-ui installMqttContainer', () => {
     // PREPARE
     zwaveJSUIManager.controller = {
       ready: true,
-      homeId: 'homeId',
-      controllerId: 'controllerId',
-      type: 'type',
-      sdkVersion: 'sdkVersion',
     };
     zwaveJSUIManager.externalZwaveJSUI = false;
     zwaveJSUIManager.mqttUrl = 'mqttUrl';
@@ -68,11 +59,6 @@ describe('zwave-js-ui installMqttContainer', () => {
     const configuration = await zwaveJSUIManager.getConfiguration();
     // ASSERT
     assert.match(configuration, {
-      homeId: 'homeId',
-      controllerId: 'controllerId',
-      type: 'type',
-      sdkVersion: 'sdkVersion',
-
       externalZwaveJSUI: false,
       mqttUrl: 'mqttUrl',
       mqttUsername: 'mqttUsername',
