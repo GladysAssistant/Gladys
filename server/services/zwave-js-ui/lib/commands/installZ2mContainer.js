@@ -94,7 +94,7 @@ async function installZ2mContainer() {
     logger.info('ZwaveJSUI container successfully started');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
-    });    
+    });
     this.zwaveJSUIRunning = true;
   } catch (e) {
     logger.error('ZwaveJSUI container failed to start:', e);

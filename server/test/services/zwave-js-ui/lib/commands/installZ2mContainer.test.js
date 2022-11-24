@@ -97,7 +97,7 @@ describe('zwave-js-ui installZ2mContainer', () => {
     this.timeout(6000);
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.restartContainer = fake.throws(new Error('docker fail'));
-    
+
     // EXECUTE
     try {
       await zwaveJSUIManager.installZ2mContainer();
