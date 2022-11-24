@@ -70,6 +70,14 @@ describe('system.getContainerDevices', () => {
     assert.match(devices, []);
   });
 
+  it('should return empty list because inspect return null', async () => {
+    system.dockerode.getContainer = fake.returns({
+      inspect: fake.resolves(null),
+    });
+    const devices = await system.getContainerDevices('fake_id');
+    assert.match(devices, []);
+  });
+
   it('should return empty list because no devices found', async () => {
     system.dockerode.getContainer = fake.returns({
       inspect: fake.resolves({

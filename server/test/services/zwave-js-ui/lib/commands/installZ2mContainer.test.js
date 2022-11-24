@@ -1,7 +1,9 @@
 const sinon = require('sinon');
 
-const { fake } = sinon;
+const { assert, fake } = sinon;
+
 const proxyquire = require('proxyquire').noCallThru();
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
 const { installZ2mContainer } = proxyquire('../../../../../services/zwave-js-ui/lib/commands/installZ2mContainer', {
   '../../../../utils/childProcess': { exec: fake.resolves(true) },
@@ -14,17 +16,15 @@ const event = {
   emit: fake.resolves(null),
 };
 
-/* const container = {
+const container = {
   id: 'docker-test',
   state: 'running',
-}; */
+};
 
 const containerStopped = {
   id: 'docker-test',
   state: 'stopped',
 };
-
-const containerDevices = [];
 
 const gladys = {
   event,
@@ -35,10 +35,10 @@ const gladys = {
   system: {
     getContainers: fake.resolves([containerStopped]),
     stopContainer: fake.resolves(true),
-    getContainerDevices: fake.resolves(containerDevices),
     pull: fake.resolves(true),
     restartContainer: fake.resolves(true),
     createContainer: fake.resolves(true),
+    exec: fake.resolves(true),
     getGladysBasePath: fake.resolves({
       basePathOnHost: '/var/lib/gladysassistant',
       basePathOnContainer: '/var/lib/gladysassistant',
@@ -48,7 +48,7 @@ const gladys = {
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
-describe('zwave-js-ui installz2mContainer', () => {
+describe('zwave-js-ui installZ2mContainer', () => {
   // PREPARE
   const zwaveJSUIManager = new ZwaveJSUIManager(gladys, null, serviceId);
 
@@ -58,7 +58,7 @@ describe('zwave-js-ui installz2mContainer', () => {
     zwaveJSUIManager.zwavejsuiExist = false;
   });
 
-  /* it('it should restart z2m container', async function Test() {
+  it('it should restart Z2m container', async function Test() {
     // PREPARE
     this.timeout(6000);
     // EXECUTE
@@ -68,11 +68,11 @@ describe('zwave-js-ui installz2mContainer', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
-    assert.match(zwaveJSUIManager.zwavejsuiRunning, true);
-    assert.match(zwaveJSUIManager.zwavejsuiExist, true);
-  }); */
+    assert.match(zwaveJSUIManager.mqttRunning, true);
+    assert.match(zwaveJSUIManager.mqttExist, true);
+  });
 
-  /* it('it should do nothing', async () => {
+  it('it should do nothing', async () => {
     // PREPARE
     gladys.system.getContainers = fake.resolves([container]);
     // EXECUTE
@@ -82,11 +82,11 @@ describe('zwave-js-ui installz2mContainer', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
-    assert.match(zwaveJSUIManager.zwavejsuiRunning, true);
-    assert.match(zwaveJSUIManager.zwavejsuiExist, true);
-  }); */
+    assert.match(zwaveJSUIManager.mqttRunning, true);
+    assert.match(zwaveJSUIManager.mqttExist, true);
+  });
 
-  /* it('it should fail to start z2m container', async () => {
+  it('it should fail to start Z2m container', async () => {
     // PREPARE
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.restartContainer = fake.throws(new Error('docker fail'));
@@ -102,11 +102,12 @@ describe('zwave-js-ui installz2mContainer', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
-    assert.match(zwaveJSUIManager.zwavejsuiRunning, false);
-    assert.match(zwaveJSUIManager.zwavejsuiExist, false);
-  }); */
+    assert.match(zwaveJSUIManager.mqttRunning, false);
+    assert.match(zwaveJSUIManager.mqttExist, true);
+    gladys.system.restartContainer = fake.resolves(true);
+  });
 
-  /* it('it should fail to install z2m container', async () => {
+  it('it should fail to install Z2m container', async () => {
     // PREPARE
     gladys.system.getContainers = fake.resolves([]);
     gladys.system.pull = fake.throws(new Error('docker fail pull'));
@@ -121,13 +122,14 @@ describe('zwave-js-ui installz2mContainer', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
-    assert.match(zwaveJSUIManager.zwavejsuiRunning, false);
-    assert.match(zwaveJSUIManager.zwavejsuiExist, false);
-  }); */
+    assert.match(zwaveJSUIManager.mqttRunning, false);
+    assert.match(zwaveJSUIManager.mqttExist, false);
+  });
 
-  /* it('it should install z2m container', async function Test() {
+  it('it should install Z2m container', async function Test() {
     // PREPARE
-    const getContainersStub = stub();
+    this.timeout(11000);
+    const getContainersStub = sinon.stub();
     getContainersStub
       .onFirstCall()
       .resolves([])
@@ -142,9 +144,37 @@ describe('zwave-js-ui installz2mContainer', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
-    assert.calledThrice(gladys.variable.getValue);
     assert.calledOnce(gladys.system.createContainer);
-    assert.match(zwaveJSUIManager.zwavejsuiRunning, true);
-    assert.match(zwaveJSUIManager.zwavejsuiExist, true);
-  }); */
+    assert.calledTwice(gladys.system.restartContainer);
+    assert.match(zwaveJSUIManager.mqttRunning, true);
+    assert.match(zwaveJSUIManager.mqttExist, true);
+  });
+  it('it should fail to configure Z2m container', async function Test() {
+    // PREPARE
+    this.timeout(11000);
+    const getContainersStub = sinon.stub();
+    getContainersStub
+      .onFirstCall()
+      .resolves([])
+      .onSecondCall()
+      .resolves([container]);
+    gladys.system.getContainers = getContainersStub;
+    gladys.system.restartContainer = fake.throws(new Error('docker fail restart'));
+
+    // EXECUTE
+    try {
+      await zwaveJSUIManager.installZ2mContainer();
+      assert.fail();
+    } catch (e) {
+      assert.match(e.message, 'docker fail restart');
+    }
+    // ASSERT
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+    });
+    assert.calledOnce(gladys.system.createContainer);
+    assert.calledOnce(gladys.system.restartContainer);
+    assert.match(zwaveJSUIManager.mqttRunning, false);
+    assert.match(zwaveJSUIManager.mqttExist, true);
+  });
 });
