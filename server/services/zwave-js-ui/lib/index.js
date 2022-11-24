@@ -12,15 +12,6 @@ const { nodeReady } = require('./events/nodeReady');
 const { notification } = require('./events/notification');
 const { scanComplete } = require('./events/scanComplete');
 const { valueNotification } = require('./events/valueNotification');
-const { nodeWakeUp, nodeSleep, nodeDead, nodeAlive } = require('./events/nodeState');
-const {
-  nodeInterviewCompleted,
-  nodeInterviewFailed,
-  nodeInterviewStageCompleted,
-  nodeInterviewStarted,
-} = require('./events/nodeInterview');
-const { metadataUpdate } = require('./events/metadataUpdate');
-const { statisticsUpdated } = require('./events/statisticsUpdated');
 const { installMqttContainer } = require('./commands/installMqttContainer');
 const { installZ2mContainer } = require('./commands/installZ2mContainer');
 const { getConfiguration } = require('./commands/getConfiguration');
@@ -56,19 +47,9 @@ ZwaveJSUIManager.prototype.valueAdded = valueAdded;
 ZwaveJSUIManager.prototype.valueUpdated = valueUpdated;
 ZwaveJSUIManager.prototype.valueRemoved = valueRemoved;
 ZwaveJSUIManager.prototype.valueNotification = valueNotification;
-ZwaveJSUIManager.prototype.metadataUpdate = metadataUpdate;
 ZwaveJSUIManager.prototype.nodeReady = nodeReady;
 ZwaveJSUIManager.prototype.notification = notification;
 ZwaveJSUIManager.prototype.scanComplete = scanComplete;
-ZwaveJSUIManager.prototype.nodeSleep = nodeSleep;
-ZwaveJSUIManager.prototype.nodeDead = nodeDead;
-ZwaveJSUIManager.prototype.nodeAlive = nodeAlive;
-ZwaveJSUIManager.prototype.nodeWakeUp = nodeWakeUp;
-ZwaveJSUIManager.prototype.nodeInterviewStarted = nodeInterviewStarted;
-ZwaveJSUIManager.prototype.nodeInterviewFailed = nodeInterviewFailed;
-ZwaveJSUIManager.prototype.nodeInterviewCompleted = nodeInterviewCompleted;
-ZwaveJSUIManager.prototype.nodeInterviewStageCompleted = nodeInterviewStageCompleted;
-ZwaveJSUIManager.prototype.statisticsUpdated = statisticsUpdated;
 ZwaveJSUIManager.prototype.handleMqttMessage = handleMqttMessage;
 
 // COMMANDS

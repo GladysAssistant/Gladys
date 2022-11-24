@@ -117,6 +117,18 @@ describe('zwaveJSUIManager events', () => {
     ]);
   });
 
+  it('should handle value added unsupported command class', () => {
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 112,
+      endpoint: 0,
+      property: 'Test',
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[112][0]).to.deep.equal({});
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].features).to.have.lengthOf(0);
+  });
+
   it('should handle value added 48-0-Any', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {

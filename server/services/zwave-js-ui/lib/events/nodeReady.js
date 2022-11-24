@@ -25,12 +25,6 @@ function nodeReady(zwaveNode) {
   node.ready = zwaveNode.ready;
   node.classes = {};
 
-  if (zwaveNode.getDefinedValueIDs) {
-    zwaveNode.getDefinedValueIDs().forEach((data) => {
-      valueAdded.bind(this)(zwaveNode, data);
-    });
-  }
-
   // enable poll if needed
   /* const comclasses = Object.keys(this.nodes[nodeId].classes);
   comclasses.forEach((comclass) => {

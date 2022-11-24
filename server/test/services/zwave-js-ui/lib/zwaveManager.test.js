@@ -312,7 +312,7 @@ describe('zwaveJSUIManager events', () => {
     zwaveJSUIManager.scanComplete();
   });
 
-  it('should receive node ready info', () => {
+  it.only('should receive node ready info', () => {
     const zwaveNode = {
       id: 1,
       manufacturerId: 'manufacturerId',
