@@ -46,11 +46,11 @@ const gladys = {
   },
 };
 
-const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
+const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
 
 describe('zwave-js-ui installMqttContainer', () => {
   // PREPARE
-  const zwaveJSUIManager = new ZwaveJSUIManager(gladys, null, serviceId);
+  const zwaveJSUIManager = new ZwaveJSUIManager(gladys, null, ZWAVEJSUI_SERVICE_ID);
 
   beforeEach(() => {
     sinon.reset();
