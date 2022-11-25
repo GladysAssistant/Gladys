@@ -170,7 +170,7 @@ const data = {
         {
           type: 'devices-in-room',
           room: 'parental-room',
-          device_features: ['curtain-actions', 'shutter-actions', 'shutter-position']
+          device_features: ['curtain-actions', 'shutter-actions', 'shutter-position', 'thermostat']
         }
       ]
     ],
@@ -367,8 +367,19 @@ const data = {
         selector: 'main-lamp',
         features: [
           {
-            name: 'Main Lamp',
+            name: 'First lamp',
             selector: 'main-lamp-binary',
+            category: 'light',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Second lamp ',
+            selector: 'secondary-lamp-binary',
             category: 'light',
             type: 'binary',
             min: 0,
@@ -522,6 +533,25 @@ const data = {
             last_value: 30,
             last_value_changed: '2019-02-12 07:49:07.556 +00:00',
             unit: 'percent'
+          }
+        ]
+      },
+      {
+        id: 'db3e81b4-00d4-4f9b-8aa6-0e50e719a729',
+        name: 'Thermostat',
+        selector: 'thermostat',
+        features: [
+          {
+            name: 'Thermostat',
+            selector: 'thermostat',
+            category: 'thermostat',
+            type: 'target-temperature',
+            min: 0,
+            max: 30,
+            read_only: false,
+            last_value: 19.5,
+            last_value_changed: '2022-10-10 07:49:07.556 +00:00',
+            unit: 'celsius'
           }
         ]
       }
@@ -2711,6 +2741,9 @@ const data = {
   'get /api/v1/device_feature/aggregated_states': [
     {
       device: {
+        name: 'Kitchen temperature'
+      },
+      deviceFeature: {
         name: 'Kitchen temperature'
       },
       values: [

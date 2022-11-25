@@ -43,7 +43,8 @@
     "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
-    "noFeatures": "No features"
+    "noFeatures": "No features",
+    "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
   },
   "login": {
     "title": "Gladys Assistant",
@@ -227,7 +228,9 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page."
+        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page.",
+        "addButton": "+",
+        "substractButton": "-"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -561,6 +564,15 @@
       "privacyPolicy": "Read Alexa's <a href=\"https://www.alexa.com/help/privacy\">privacy policy</a>.",
       "cancelButton": "Cancel",
       "connectButton": "Link"
+    },
+    "homekit": {
+      "title": "Apple HomeKit",
+      "description": "Connect Gladys to HomeKit and use Siri to control your devices.",
+      "introduction": "To connect Gladys to HomeKit, you need an Apple device (iPhone, iPad, iPod touch).",
+      "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
+      "configurationError": "An error appears while getting settings.",
+      "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
+      "reloadButton": "Reload"
     },
     "owntracks": {
       "title": "Owntracks",
@@ -1736,6 +1748,7 @@
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "volt-ampere": "Voltampere (VA)",
+    "kilovolt-ampere": "Kilovoltampere (kVA)",
     "volt-ampere-reactive": "Voltampere reactive (var)",
     "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
@@ -1806,6 +1819,7 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "kilovolt-ampere": "kVA",
     "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",
@@ -2108,6 +2122,10 @@
     "datarate": {
       "shortCategoryName": "Datarate",
       "rate": "Rate"
+    },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "target-temperature": "Thermostat Temperature"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

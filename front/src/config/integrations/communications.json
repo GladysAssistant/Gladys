@@ -10,5 +10,9 @@
   {
     "key": "googleHome",
     "img": "/assets/integrations/cover/google-home.jpg"
+  },
+  {
+    "key": "homekit",
+    "img": "/assets/integrations/cover/homekit.jpg"
   }
 ]
