@@ -10,7 +10,7 @@ async function setPermitJoin() {
   this.z2mPermitJoin = !this.z2mPermitJoin;
   // Send message to Zigbee2mqtt topics
   this.mqttClient.publish(`zigbee2mqtt/bridge/request/permit_join`, this.z2mPermitJoin.toString());
-  logger.log('Set Permit_join to', this.z2mPermitJoin);
+  logger.debug('Set Permit_join to', this.z2mPermitJoin);
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
