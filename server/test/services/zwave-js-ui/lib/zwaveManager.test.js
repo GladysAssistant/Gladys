@@ -5,7 +5,7 @@ const { expect } = require('chai');
 const { assert, fake, useFakeTimers } = sinon;
 const EventEmitter = require('events');
 
-const { CONFIGURATION, DEFAULT, NODE_STATES } = require('../../../../services/zwave-js-ui/lib/constants');
+const { CONFIGURATION, DEFAULT } = require('../../../../services/zwave-js-ui/lib/constants');
 const ZwaveJSUIManager = require('../../../../services/zwave-js-ui/lib');
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
