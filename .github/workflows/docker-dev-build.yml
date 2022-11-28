@@ -15,14 +15,14 @@ on:
 jobs:
   build-front:
     name: Front build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v2
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '18'
       - name: 📇 Use npm cache
         uses: actions/cache@v2
         with:
@@ -46,7 +46,7 @@ jobs:
   docker:
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     env:
       DOCKERHUB_USER: ${{secrets.DOCKERHUB_USER}}
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}

@@ -8,14 +8,14 @@ on:
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v2
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '18'
       - name: 📇 Use npm cache
         uses: actions/cache@v2
         with:
@@ -44,7 +44,7 @@ jobs:
           npm run compare-translations
   test-server:
     name: Server test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
         uses: actions/checkout@v2
@@ -53,7 +53,7 @@ jobs:
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '18'
       - name: 📇 Use npm cache
         uses: actions/cache@v2
         with:
@@ -93,14 +93,14 @@ jobs:
           fail_ci_if_error: true
   cypress-run:
     name: Cypress run
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v2
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '18'
       - name: 📇 Use npm cache
         uses: actions/cache@v2
         with:
@@ -129,14 +129,14 @@ jobs:
     name: Front build
     needs:
       - test-front
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v2
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: '18'
       - name: 📇 Use npm cache
         uses: actions/cache@v2
         with:
@@ -165,7 +165,7 @@ jobs:
     if: github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
         uses: actions/checkout@v2
