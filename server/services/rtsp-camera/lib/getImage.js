@@ -53,7 +53,14 @@ async function getImage(device) {
       .outputOptions(outputOptions)
       .output(writeStream)
       .on('end', async () => {
-        const image = await fse.readFile(filePath);
+        let image;
+        try {
+          image = await fse.readFile(filePath);
+        } catch (e) {
+          reject(e);
+          return;
+        }
+
         // convert binary data to base64 encoded string
         const cameraImageBase = Buffer.from(image).toString('base64');
         const cameraImage = `image/png;base64,${cameraImageBase}`;
