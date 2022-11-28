@@ -1,4 +1,5 @@
 name: Release Gladys Production Images
+run-name: Release Gladys ${{ github.ref_name }} Production Images
 
 on:
   push:
