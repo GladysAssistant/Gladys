@@ -311,6 +311,9 @@ describe('zwaveJSUIManager events', () => {
 
   it('should receive scanComplete', () => {
     zwaveJSUIManager.scanComplete();
+    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE,
+    });
   });
 
   it('should receive node ready info', () => {
