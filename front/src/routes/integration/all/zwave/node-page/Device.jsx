@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
@@ -42,11 +42,18 @@ class ZWaveDeviceBox extends Component {
     this.setState({ loading: false });
   };
   deleteDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
-      this.setState({ error: RequestStatus.Error });
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({ error: RequestStatus.Error });
+      }
     }
     this.setState({ loading: false });
   };
@@ -74,7 +81,7 @@ class ZWaveDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, mostRecentValueAt, loading }) {
+  render(props, { batteryLevel, mostRecentValueAt, loading, tooMuchStatesError, statesNumber }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -94,6 +101,11 @@ class ZWaveDeviceBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                  </div>
+                )}
                 <div class="form-group">
                   <label>
                     <Text id="integration.zwave.device.nameLabel" />

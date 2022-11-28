@@ -1,7 +1,8 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import { Link } from 'preact-router/match';
+import get from 'get-value';
 
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -28,7 +29,9 @@ class DeviceBox extends Component {
 
   deleteDevice = async () => {
     this.setState({
-      loading: true
+      loading: true,
+      tooMuchStatesError: false,
+      statesNumber: undefined
     });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
@@ -37,9 +40,14 @@ class DeviceBox extends Component {
         saveError: undefined
       });
     } catch (e) {
-      this.setState({
-        error: RequestStatus.Error
-      });
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({ error: RequestStatus.Error });
+      }
     }
     this.setState({
       loading: false
@@ -54,7 +62,7 @@ class DeviceBox extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
 
-  render({ deviceIndex, device, housesWithRooms = [] }, { loading, saveError }) {
+  render({ deviceIndex, device, housesWithRooms = [] }, { loading, saveError, tooMuchStatesError, statesNumber }) {
     return (
       <div class="col-md-6">
         <div class="card" data-cy="device-card">
@@ -70,6 +78,11 @@ class DeviceBox extends Component {
                 {saveError && (
                   <div class="alert alert-danger">
                     <Text id="integration.broadlink.device.saveError" />
+                  </div>
+                )}
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
                 <div class="form-group">

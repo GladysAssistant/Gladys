@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
@@ -21,11 +21,18 @@ class MqttDeviceBox extends Component {
   };
 
   deleteDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
-      this.setState({ error: RequestStatus.Error });
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({ error: RequestStatus.Error });
+      }
     }
     this.setState({ loading: false });
   };
@@ -50,7 +57,7 @@ class MqttDeviceBox extends Component {
     };
   };
 
-  render(props, { loading }) {
+  render(props, { loading, tooMuchStatesError, statesNumber }) {
     const { batteryLevel, mostRecentValueAt } = this.getDeviceProperty();
     return (
       <div class="col-md-6">
@@ -71,6 +78,12 @@ class MqttDeviceBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                  </div>
+                )}
+
                 <MqttDeviceForm {...props} mostRecentValueAt={mostRecentValueAt} />
 
                 <div class="form-group">
