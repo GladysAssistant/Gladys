@@ -1,7 +1,7 @@
 {
   "name": "gladys-front",
   "engines": {
-    "node": "18.x",
+    "node": "16.x",
     "npm": "8.x"
   },
   "scripts": {
