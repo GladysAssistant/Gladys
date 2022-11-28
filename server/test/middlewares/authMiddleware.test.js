@@ -12,9 +12,12 @@ const gladys = {
 
 describe('authMiddleware', () => {
   it('should allow api access', async () => {
-    const gladysWithSession = { ...gladys, session: {
+    const gladysWithSession = {
+      ...gladys,
+      session: {
         validateApiKey: () => Promise.resolve('id'),
-      },};
+      },
+    };
     const authMiddleware = AuthMiddleware('dashboard:read', gladysWithSession);
     const req = new MockExpressRequest({
       headers: {
@@ -30,11 +33,14 @@ describe('authMiddleware', () => {
     });
   });
   it('should refuse api key access and throw error', (done) => {
-    const gladysWithSession = { ...gladys, session: {
+    const gladysWithSession = {
+      ...gladys,
+      session: {
         validateApiKey: () => {
           throw new Error401('Api key not found');
         },
-      },};
+      },
+    };
     const authMiddleware = AuthMiddleware('dashboard:read', gladysWithSession);
     const req = new MockExpressRequest({
       headers: {
@@ -51,11 +57,14 @@ describe('authMiddleware', () => {
     });
   });
   it('should throw error, no header found', (done) => {
-    const gladysWithSession = { ...gladys, session: {
+    const gladysWithSession = {
+      ...gladys,
+      session: {
         validateApiKey: () => {
           throw new Error401('Api key not found');
         },
-      },};
+      },
+    };
     const authMiddleware = AuthMiddleware('dashboard:read', gladysWithSession);
     const req = new MockExpressRequest();
     authMiddleware(req, {}, (error) => {
