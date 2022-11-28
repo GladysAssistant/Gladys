@@ -7,6 +7,7 @@ const EventEmitter = require('events');
 
 const { CONFIGURATION, DEFAULT } = require('../../../../services/zwave-js-ui/lib/constants');
 const ZwaveJSUIManager = require('../../../../services/zwave-js-ui/lib');
+const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../../utils/constants');
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
 const DRIVER_PATH = 'DRIVER_PATH';
@@ -337,8 +338,14 @@ describe('zwaveJSUIManager events', () => {
       },
     };
     zwaveJSUIManager.nodeReady(zwaveNode);
-    assert.calledOnce(zwaveNode.getDefinedValueIDs);
-    assert.calledOnce(zwaveJSUIManager.eventManager.emit);
+    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_READY,
+      payload: {
+        nodeId: 1,
+        name: 'name',
+        status: 'status',
+      },
+    });
     expect(zwaveJSUIManager.nodes).to.deep.equal({
       '1': {
         nodeId: 1,
