@@ -129,7 +129,8 @@
     "arrow-body-style": "off",
     "max-classes-per-file": "off",
     "import/no-import-module-exports": "off",
-    "import/no-relative-packages": "off"
+    "import/no-relative-packages": "off",
+    "default-param-last": "warn"
   },
   "overrides": [
     {

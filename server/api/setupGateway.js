@@ -34,7 +34,7 @@ function setupGateway(gladys, routes) {
       user,
       method: method.toLowerCase(),
       url: urlParsed.pathname, // get only the path, without get params
-      query: Object.assign({}, query, urlParsed.query), // merge query/get params
+      query: { ...query, ...urlParsed.query }, // merge query/get params
       body,
       params: {},
     };

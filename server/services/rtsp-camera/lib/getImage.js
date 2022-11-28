@@ -14,14 +14,16 @@ const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
  * getImage(device);
  */
 async function getImage(device) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     // we find the camera url in the device
     const cameraUrlParam = device.params && device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_URL);
     if (!cameraUrlParam) {
-      return reject(new NotFoundError('CAMERA_URL_PARAM_NOT_FOUND'));
+      reject(new NotFoundError('CAMERA_URL_PARAM_NOT_FOUND'));
+      return;
     }
     if (!cameraUrlParam.value || cameraUrlParam.value.length === 0) {
-      return reject(new NotFoundError('CAMERA_URL_SHOULD_NOT_BE_EMPTY'));
+      reject(new NotFoundError('CAMERA_URL_SHOULD_NOT_BE_EMPTY'));
+      return;
     }
     // we find the camera rotation in the device
     let cameraRotationParam =
@@ -65,7 +67,6 @@ async function getImage(device) {
         await fse.remove(filePath);
       })
       .run();
-    return null;
   });
 }
 
