@@ -5,27 +5,25 @@ const logger = require('../../../utils/logger');
 /**
  * @description Instenciate influxdb client and get health.
  * @param {Object} configuration - InfluxDB configuration.
+ * @returns {boolean} Boolean result.
  * @example
  * influxdb.testConnection();
  */
 function testConnection(configuration) {
-  logger.info('test function');
+  logger.info('Test connection to influxdb');
   logger.info(configuration.influxdbUrl);
   this.influxdbClient = new InfluxDB({ url: configuration.influxdbUrl, token: configuration.influxdbToken });
   const healthAPI = new HealthAPI(this.influxdbClient);
-
+  let status;
   healthAPI
     .getHealth()
     .then((result /* : HealthCheck */) => {
-      logger.info(JSON.stringify(result, null, 2));
-      logger.info('\nFinished SUCCESS');
-      return true;
+      status = true;
     })
     .catch((error) => {
-      logger.info(error);
-      logger.info('\nFinished ERROR');
-      return false;
+      status = false;
     });
+  return status;
 }
 
 module.exports = {
