@@ -60,11 +60,11 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: 🐳 Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           version: latest
       - name: ↙️ Download build artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: static
           path: static
