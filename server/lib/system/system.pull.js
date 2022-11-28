@@ -19,10 +19,9 @@ async function pull(repoTag, onProgress = logger.trace) {
       stream,
       (finishErr, output) => {
         if (finishErr) {
-          reject(finishErr);
-          return;
+          return reject(finishErr);
         }
-        resolve(output);
+        return resolve(output);
       },
       onProgress,
     );
