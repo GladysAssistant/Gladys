@@ -13,7 +13,6 @@
   ],
   "dependencies": {
     "@influxdata/influxdb-client": "^1.32.0",
-    "@influxdata/influxdb-client-apis": "^1.32.0",
-    "bottleneck": "^2.19.5"
+    "@influxdata/influxdb-client-apis": "^1.32.0"
   }
 }
