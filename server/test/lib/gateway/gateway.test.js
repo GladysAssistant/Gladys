@@ -122,7 +122,7 @@ describe('gateway', () => {
       assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
       assert.calledOnce(gateway.gladysGatewayClient.abortMultiPartBackup);
     });
-    it('should backup gladys with lots of insert at the same time', async function Test() {
+    it('should backup gladys with lots of insert at the same time', async () => {
       const variable = {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
