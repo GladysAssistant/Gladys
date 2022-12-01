@@ -1,4 +1,5 @@
 name: Pull request tests
+run-name: Pull request tests ${{ github.head_ref }}
 
 on:
   pull_request:
