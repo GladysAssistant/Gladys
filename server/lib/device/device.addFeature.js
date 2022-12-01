@@ -38,7 +38,7 @@ async function addFeature(deviceSelector, feature) {
 
   // if the feature does not already exist, we create it.
   if (featureIndex === -1) {
-    const createdFeature = await db.DeviceFeature.create(Object.assign({}, feature, { device_id: device.id }));
+    const createdFeature = await db.DeviceFeature.create({ ...feature, device_id: device.id });
     featureInStore = createdFeature.get({ plain: true });
     device.features.push(featureInStore);
     // we save again the device in RAM
