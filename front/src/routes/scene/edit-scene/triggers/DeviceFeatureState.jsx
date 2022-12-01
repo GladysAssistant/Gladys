@@ -50,9 +50,10 @@ class TurnOnLight extends Component {
     this.props.updateTriggerProperty(this.props.index, 'threshold_only', e.target.checked);
   };
   getBinaryOperator = () => (
-    <div class="col-2 col-md-1">
-      <div class="text-center" style={{ marginTop: '10px' }}>
-        <i class="fe fe-arrow-right" style={{ fontSize: '20px' }} />
+    <div class="col-12 col-md-1">
+      <div class="text-center">
+        <i class="fe fe-arrow-down d-block d-xs-none d-sm-none" style={{ fontSize: '20px', marginBottom: '15px' }} />
+        <i class="fe fe-arrow-right d-none d-xs-block d-sm-block" style={{ fontSize: '20px', marginTop: '10px' }} />
       </div>
     </div>
   );
@@ -73,8 +74,8 @@ class TurnOnLight extends Component {
     </div>
   );
   getBinaryButtons = category => (
-    <div class="col-10 col-md-5">
-      <div class="form-group">
+    <div class="col-12 col-md-5">
+      <div class="form-group mt-1">
         <div class="row d-flex justify-content-center">
           {this.getBinaryButton(category, 1)}
           {this.getBinaryButton(category, 0)}
