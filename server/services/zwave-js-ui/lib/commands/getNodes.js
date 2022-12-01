@@ -11,6 +11,7 @@ const {
 const logger = require('../../../../utils/logger');
 const { unbindValue } = require('../utils/bindValue');
 const { splitNode } = require('../utils/splitNode');
+const { transformClasses } = require('../utils/transformClasses');
 
 /**
  * @description Return array of Nodes.
@@ -47,15 +48,21 @@ function getNodes() {
         params: [],
       };
 
-      Object.keys(node.classes).forEach((commandClassKey) => {
-        Object.keys(node.classes[commandClassKey]).forEach((endpointKey) => {
-          const properties = node.classes[commandClassKey][endpointKey];
-          Object.keys(properties).forEach((propertyKey) => {
-            const { property, genre, label, type: propertyType, unit, commandClass, endpoint, writeable } = properties[
-              propertyKey
-            ];
-            let { min, max } = properties[propertyKey];
-            const { value } = properties[propertyKey];
+      Object.entries(transformClasses(node)).forEach(([commandClassKey, commandClassValue]) => {
+        Object.entries(commandClassValue).forEach(([endpointKey, endpointValue]) => {
+          Object.entries(endpointValue).forEach(([propertyKey, propertyValue]) => {
+            const {
+              property,
+              genre,
+              label,
+              type: propertyType,
+              unit,
+              commandClass,
+              endpoint,
+              writeable,
+            } = propertyValue;
+            let { min, max } = propertyValue;
+            const { value } = propertyValue;
             if (genre === 'user') {
               const { category, type, min: categoryMin, max: categoryMax, hasFeedback } = getCategory(node, {
                 commandClass,

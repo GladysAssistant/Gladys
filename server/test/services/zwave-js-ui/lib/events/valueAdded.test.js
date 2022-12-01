@@ -157,7 +157,21 @@ describe('zwaveJSUIManager events', () => {
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
     expect(nodes[0].params).to.have.lengthOf(0);
-    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'motion-sensor',
+        external_id: 'zwave-js-ui:node_id:1:comclass:48:endpoint:0:property:Motion',
+        type: 'binary',
+        has_feedback: true,
+        last_value: 0,
+        name: 'Motion',
+        read_only: true,
+        unit: 'watt',
+        min: undefined,
+        max: undefined,
+        selector: 'zwave-js-ui-node-1-motion-48-0-motion',
+      },
+    ]);
   });
 
   it('should handle value added 48-0-Motion', () => {
@@ -172,6 +186,71 @@ describe('zwaveJSUIManager events', () => {
       commandClass: 48,
       endpoint: 0,
       property: 'Motion',
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[48][0].Motion).to.deep.equal({
+      commandClass: 48,
+      endpoint: 0,
+      genre: 'user',
+      label: 'Motion',
+      type: 'binary',
+      nodeId: 1,
+      property: 'Motion',
+      writeable: false,
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'motion-sensor',
+        external_id: 'zwave-js-ui:node_id:1:comclass:48:endpoint:0:property:Motion',
+        type: 'binary',
+        has_feedback: true,
+        last_value: 0,
+        name: 'Motion',
+        read_only: true,
+        unit: null,
+        min: undefined,
+        max: undefined,
+        selector: 'zwave-js-ui-node-1-motion-48-0-motion',
+      },
+    ]);
+  });
+
+  it('should handle value added 48-0-Any and 48-0-Motion', () => {
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'binary',
+        label: 'Any',
+        writeable: false,
+      };
+    };
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 48,
+      endpoint: 0,
+      property: 'Any',
+    });
+    zwaveNode.getValueMetadata = (args) => {
+      return {
+        type: 'binary',
+        label: 'Motion',
+        writeable: false,
+      };
+    };
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 48,
+      endpoint: 0,
+      property: 'Motion',
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[48][0].Any).to.deep.equal({
+      commandClass: 48,
+      endpoint: 0,
+      genre: 'user',
+      label: 'Any',
+      type: 'binary',
+      nodeId: 1,
+      property: 'Any',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[48][0].Motion).to.deep.equal({
       commandClass: 48,
