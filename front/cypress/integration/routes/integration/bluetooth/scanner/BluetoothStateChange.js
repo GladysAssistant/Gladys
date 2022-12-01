@@ -1,4 +1,4 @@
-describe('Bluetooth scanner - state change', () => {
+describe.skip('Bluetooth scanner - state change', () => {
   before(() => {
     cy.login();
 
