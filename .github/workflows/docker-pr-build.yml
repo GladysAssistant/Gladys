@@ -5,6 +5,10 @@ on:
     branches: [master]
     types: [opened, synchronize, reopened, ready_for_review]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   test-front:
     name: Front test
