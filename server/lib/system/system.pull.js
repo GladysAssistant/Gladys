@@ -14,7 +14,7 @@ async function pull(repoTag, onProgress = logger.trace) {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
   const stream = await this.dockerode.pull(repoTag);
-  return new Promise((resolve, reject) =>
+  return new Promise((resolve, reject) => {
     this.dockerode.modem.followProgress(
       stream,
       (finishErr, output) => {
@@ -24,8 +24,8 @@ async function pull(repoTag, onProgress = logger.trace) {
         return resolve(output);
       },
       onProgress,
-    ),
-  );
+    );
+  });
 }
 
 module.exports = {

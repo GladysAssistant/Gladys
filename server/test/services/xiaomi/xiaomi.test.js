@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
-const DgramMock = require('./DgramMock.test.js');
+const DgramMock = require('./DgramMock.test');
 
 const XiaomiManager = proxyquire('../../../services/xiaomi/lib', {
   dgram: DgramMock,

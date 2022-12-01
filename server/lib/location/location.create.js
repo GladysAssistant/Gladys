@@ -26,9 +26,7 @@ async function create(userSelector, location) {
     latitude: user.last_latitude,
     longitude: user.last_longitude,
   };
-  const locationWithUserId = Object.assign({}, location, {
-    user_id: user.id,
-  });
+  const locationWithUserId = { ...location, user_id: user.id };
   const createdLocation = await db.Location.create(locationWithUserId);
   const newLocation = {
     latitude: createdLocation.latitude,

@@ -1,4 +1,4 @@
-const { init } = require('./init.js');
+const { init } = require('./init');
 const { connect } = require('./connect');
 const { disconnect } = require('./disconnect');
 const { handleNewMessage } = require('./handleNewMessage');

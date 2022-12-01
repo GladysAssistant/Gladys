@@ -10,18 +10,13 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and publish demo website
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '16'
-      - name: 📇 Use npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
