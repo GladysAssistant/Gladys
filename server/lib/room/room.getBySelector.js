@@ -28,7 +28,7 @@ const SERVICE_ATTRIBUTES = ['name'];
  * gladys.room.getBySelector('living-room');
  */
 async function getBySelector(selector, options) {
-  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
+  const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
   const include = [];
   if (optionsWithDefault.expand.includes('devices')) {
     include.push({

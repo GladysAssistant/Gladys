@@ -125,7 +125,12 @@
     "no-call/no-call": [2, ["queryInterface.removeColumn", "queryInterface.changeColumn"]],
     "no-useless-concat": "error",
     "prefer-template": "error",
-    "mocha/no-exclusive-tests": "error"
+    "mocha/no-exclusive-tests": "error",
+    "arrow-body-style": "off",
+    "max-classes-per-file": "off",
+    "import/no-import-module-exports": "off",
+    "import/no-relative-packages": "off",
+    "default-param-last": "warn"
   },
   "overrides": [
     {

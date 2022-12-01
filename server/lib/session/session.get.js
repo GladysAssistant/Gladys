@@ -28,7 +28,7 @@ const FIELDS = [
  * session.get('70edd65d-2bde-4f54-885b-84e9330db346');
  */
 async function get(userId, options) {
-  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
+  const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
 
   const sessions = await db.Session.findAll({
     attributes: FIELDS,
