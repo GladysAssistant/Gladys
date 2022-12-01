@@ -1,4 +1,4 @@
-const pathToRegexp = require('path-to-regexp');
+const { pathToRegexp } = require('path-to-regexp');
 
 const nodeUrl = require('url');
 const errorMiddleware = require('./middlewares/errorMiddleware');
