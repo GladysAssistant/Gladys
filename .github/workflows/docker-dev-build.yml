@@ -22,7 +22,7 @@ jobs:
       - name: 💽 Setup nodejs
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version-file: 'front/package.json'
           cache: 'npm'
           cache-dependency-path: '**/package-lock.json'
       - name: 📦 Install NPM front packages
