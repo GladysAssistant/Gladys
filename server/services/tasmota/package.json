@@ -13,6 +13,6 @@
     "arm64"
   ],
   "dependencies": {
-    "uuid": "^3.3.2"
+    "uuid": "^9.0.0"
   }
 }

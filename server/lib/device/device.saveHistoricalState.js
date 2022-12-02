@@ -26,7 +26,7 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
     throw new BadParameters(`device.saveHistoricalState of NaN value on ${deviceFeature.selector}`);
   }
   // Validate that the date is correct
-  const result = Joi.validate(newValueCreatedAt, dateSchema);
+  const result = dateSchema.validate(newValueCreatedAt);
   if (result.error) {
     throw new BadParameters(result.error.details[0].message);
   }

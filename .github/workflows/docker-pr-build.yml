@@ -1,28 +1,28 @@
 name: Pull request tests
+run-name: Pull request tests ${{ github.head_ref }}
 
 on:
   pull_request:
     branches: [master]
     types: [opened, synchronize, reopened, ready_for_review]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - name: 📇 Use npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
@@ -44,32 +44,18 @@ jobs:
           npm run compare-translations
   test-server:
     name: Server test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - name: 📇 Use npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: 🖥️ Setup OZW
-        run: |
-          docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
-          sudo docker cp dummy:/usr/local/include/openzwave /usr/local/include/openzwave
-          sudo docker cp dummy:/openzwave/libopenzwave.so /usr/local/lib
-          sudo docker cp dummy:/openzwave/libopenzwave.so.1.6 /usr/local/lib
-          sudo docker cp dummy:/openzwave/config /usr/local/etc/openzwave
-          sudo ldconfig
-          docker rm -f dummy
+          node-version-file: 'server/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: 💽 Install System Dependencies
         run: |
           sudo apt update
@@ -97,35 +83,21 @@ jobs:
         working-directory: ./server
         run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true
   cypress-run:
     name: Cypress run
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - name: 📇 Use npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: 🖥️ Setup OZW
-        run: |
-          docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
-          sudo docker cp dummy:/usr/local/include/openzwave /usr/local/include/openzwave
-          sudo docker cp dummy:/openzwave/libopenzwave.so /usr/local/lib
-          sudo docker cp dummy:/openzwave/libopenzwave.so.1.6 /usr/local/lib
-          sudo docker cp dummy:/openzwave/config /usr/local/etc/openzwave
-          sudo ldconfig
-          docker rm -f dummy
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: 💽 Install System Dependencies
         run: |
           sudo apt update
@@ -134,34 +106,27 @@ jobs:
         run: |
           npm ci && npm run install-server:dev
       - name: ✅ Cypress run
-        uses: cypress-io/github-action@v2
+        uses: cypress-io/github-action@v3.1.0
         with:
           install: false
           start: npm run start:cypress
           wait-on: 'http://localhost:1444'
-          config-file: ./front/cypress/cypress.json
+          config-file: ./front/cypress/cypress.config.js
           project: ./front
           command: npm run cypress:run
   build-front:
     if: github.event.pull_request.draft == false
     name: Front build
-    needs:
-      - test-front
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - name: 📇 Use npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
@@ -170,12 +135,12 @@ jobs:
         working-directory: ./front
         run: |
           npm run build-with-stats
-      - name: Upload webpack stats artifact
+      - name: ↗️ Upload webpack stats artifact
         uses: relative-ci/agent-upload-artifact-action@v1
         with:
           webpackStatsFile: ./front/stats.json
       - name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: static
           path: front/build
@@ -183,24 +148,24 @@ jobs:
     if: github.event.pull_request.draft == false
     needs: build-front
     name: Docker magic !
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: 💽 Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v2
       - name: 🐳 Set up Docker Buildx
         id: buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
         with:
           version: latest
       - name: ↙️ Download build artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: static
           path: static
       - name: 🐳 Build AMD64 images
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: .
           file: ./docker/Dockerfile.buildx
