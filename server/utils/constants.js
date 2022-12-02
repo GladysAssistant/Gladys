@@ -781,6 +781,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     SCAN_COMPLETE: 'zwave-js-ui.scan-complete',
     MQTT_ERROR: 'zwave-js-ui.mqtt-error',
     PERMIT_JOIN: 'zwave-js-ui.permit-join',
+    NODE_READY: 'zwave-js-ui.node-ready',
+    NODE_ADDED: 'zwave-js-ui.node-added',
+    NODE_REMOVED: 'zwave-js-ui.node-removed',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',
