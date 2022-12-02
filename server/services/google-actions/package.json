@@ -13,6 +13,6 @@
   ],
   "dependencies": {
     "set-value": "^4.0.1",
-    "uuid": "^3.3.3"
+    "uuid": "^9.0.0"
   }
 }

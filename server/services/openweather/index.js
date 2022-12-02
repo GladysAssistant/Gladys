@@ -61,7 +61,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
       units: 'metric',
       offset: 0,
     };
-    const optionsMerged = Object.assign({}, DEFAULT, optionsModified);
+    const optionsMerged = { ...DEFAULT, ...optionsModified };
     const { latitude, longitude, language, units } = optionsMerged;
 
     if (!openWeatherApiKey) {
