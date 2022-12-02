@@ -99,15 +99,15 @@ function getNodes() {
                 });
               } else {
                 logger.info(
-                  `Unkown category/type for property ${JSON.stringify(properties[property])} of node ${
+                  `Unkown category/type for property ${JSON.stringify(propertyValue)} of node ${
                     node.nodeId
                   }, product ${node.product}`,
                 );
               }
             } else {
               newDevice.params.push({
-                name: slugify(`${endpointKey}-${label}-${properties[propertyKey].value_id}`),
-                value: properties[propertyKey].value || '',
+                name: slugify(`${endpointKey}-${label}-${propertyValue.value_id}`),
+                value: propertyValue.value || '',
               });
             }
           });
@@ -116,7 +116,7 @@ function getNodes() {
 
       return newDevice;
     })
-    .sort(function sortByNodeReady(a, b) {
+    .sort((a, b) => {
       return b.ready - a.ready || a.rawZwaveNode.id - b.rawZwaveNode.id;
     });
 }
