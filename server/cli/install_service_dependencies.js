@@ -5,7 +5,7 @@ if (process.env.NODE_ENV !== 'production') {
 const { lstatSync, readdirSync } = require('fs');
 const { join } = require('path');
 const { execSync } = require('child_process');
-const logger = require('../utils/logger.js');
+const logger = require('../utils/logger');
 
 const SERVICE_PATH = join(__dirname, '../services');
 

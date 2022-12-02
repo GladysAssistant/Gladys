@@ -73,7 +73,7 @@ See this module as an example!
 
 **All services should be tested.**
 
-You module is probably calling a third-party library to control a device. Like `node-openzwave-shared` for the Zwave service for example.
+You module is probably calling a third-party library to control a device.
 
 You need to mock your dependencies thanks to [proxyquire](https://github.com/thlorenz/proxyquire#readme).
 

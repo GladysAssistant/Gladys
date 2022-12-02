@@ -20,7 +20,7 @@ const DEFAULT_PARAMETERS = {
  */
 async function getTemperatureInRoom(roomId, options) {
   logger.debug(`Getting average temperature in room ${roomId}`);
-  const optionsWithDefault = Object.assign({}, DEFAULT_PARAMETERS, options);
+  const optionsWithDefault = { ...DEFAULT_PARAMETERS, ...options };
 
   const oneHourAgo = new Date(new Date().getTime() - 1 * 60 * 60 * 1000);
   const deviceFeatures = await db.DeviceFeature.findAll({
