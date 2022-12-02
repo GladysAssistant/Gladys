@@ -99,9 +99,9 @@ function getNodes() {
                 });
               } else {
                 logger.info(
-                  `Unkown category/type for property ${JSON.stringify(propertyValue)} of node ${
-                    node.nodeId
-                  }, product ${node.product}`,
+                  `Unkown category/type for property ${JSON.stringify(propertyValue)} of node ${node.nodeId}, product ${
+                    node.product
+                  }`,
                 );
               }
             } else {
