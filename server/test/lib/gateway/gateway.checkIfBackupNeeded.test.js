@@ -10,7 +10,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
 
-describe('gateway.checkIfBackupNeeded', function Describe() {
+describe('gateway.checkIfBackupNeeded', () => {
   const event = {};
 
   let gateway;

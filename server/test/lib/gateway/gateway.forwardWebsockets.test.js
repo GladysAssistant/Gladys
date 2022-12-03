@@ -8,7 +8,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
 
-describe('gateway.forwardWebsockets', function Describe() {
+describe('gateway.forwardWebsockets', () => {
   const variable = {};
 
   let gateway;
@@ -52,7 +52,7 @@ describe('gateway.forwardWebsockets', function Describe() {
     gateway.connected = true;
 
     const websocketMessage = {
-      type: 'zwave.new-node',
+      type: 'device.new',
       payload: {},
     };
     gateway.forwardWebsockets(websocketMessage);
@@ -60,7 +60,7 @@ describe('gateway.forwardWebsockets', function Describe() {
   });
   it('should prevent forwarding a websocket message when not connected', () => {
     const websocketMessage = {
-      type: 'zwave.new-node',
+      type: 'device.new',
       payload: {},
     };
     gateway.forwardWebsockets(websocketMessage);

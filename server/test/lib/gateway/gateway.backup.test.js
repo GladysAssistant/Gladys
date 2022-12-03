@@ -12,7 +12,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
 
-describe('gateway.backup', function Describe() {
+describe('gateway.backup', async function describe() {
   this.timeout(20000);
 
   const variable = {};
@@ -95,7 +95,7 @@ describe('gateway.backup', function Describe() {
     assert.calledOnce(gateway.gladysGatewayClient.abortMultiPartBackup);
   });
 
-  it('should backup gladys with lots of insert at the same time', async function Test() {
+  it('should backup gladys with lots of insert at the same time', async () => {
     const promisesDevices = [];
     const promises = [];
     // create 100 state

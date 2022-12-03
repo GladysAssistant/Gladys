@@ -37,11 +37,11 @@ async function handleAlexaMessage(data, rawMessage, cb) {
     logger.debug(`gateway.handleAlexaMessage: New message : ${directiveNamespace}`);
     let response;
     if (directiveNamespace === 'Alexa.Discovery') {
-      response = await service.alexaHandler.onDiscovery();
+      response = service.alexaHandler.onDiscovery();
     } else if (DIRECTIVE_NAMESPACES_LIST.indexOf(directiveNamespace) !== -1) {
-      response = await service.alexaHandler.onExecute(body);
+      response = service.alexaHandler.onExecute(body);
     } else if (directiveNamespace === 'Alexa' && directiveName === 'ReportState') {
-      response = await service.alexaHandler.onReportState(body);
+      response = service.alexaHandler.onReportState(body);
     } else {
       response = {
         status: 400,

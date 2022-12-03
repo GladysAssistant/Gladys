@@ -337,9 +337,9 @@ describe('gateway.handleNewMessage', () => {
   it('should handle a new gateway open api message: alexa-request', async () => {
     serviceManager.getService = fake.returns({
       alexaHandler: {
-        onDiscovery: fake.resolves({ onDiscovery: true }),
-        onReportState: fake.resolves({ onReportState: true }),
-        onExecute: fake.resolves({ onExecute: true }),
+        onDiscovery: fake.returns({ onDiscovery: true }),
+        onReportState: fake.returns({ onReportState: true }),
+        onExecute: fake.returns({ onExecute: true }),
       },
     });
 

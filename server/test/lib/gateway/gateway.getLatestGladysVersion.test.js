@@ -10,7 +10,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
 
-describe('gateway.getLatestGladysVersion', function Describe() {
+describe('gateway.getLatestGladysVersion', () => {
   const variable = {};
   const event = {};
   const system = {};

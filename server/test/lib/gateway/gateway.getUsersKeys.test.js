@@ -9,7 +9,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
 
-describe('gateway.getUsersKeys', function Describe() {
+describe('gateway.getUsersKeys', () => {
   const variable = {};
 
   let gateway;

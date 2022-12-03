@@ -27,7 +27,7 @@ describe('gateway.forwardDeviceStateToGoogleHome', () => {
   const stateManager = {};
   const event = {};
 
-  const newEvent = {
+  const oneEvent = {
     type: EVENTS.DEVICE.NEW_STATE,
     device_feature: 'my-device',
   };
@@ -77,7 +77,7 @@ describe('gateway.forwardDeviceStateToGoogleHome', () => {
   });
 
   it('should forward an event to google home', async () => {
-    stateManager.get = (key) => {
+    stateManager.get = (type) => {
       const feature = {
         id: 'f2e2d5ea-bcea-4092-b597-7b8fb723e070',
         device_id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
@@ -95,7 +95,7 @@ describe('gateway.forwardDeviceStateToGoogleHome', () => {
         last_value: 97,
         last_value_string: null,
       };
-      if (key === 'deviceById') {
+      if (type === 'deviceById') {
         return {
           id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
           service_id: '54a4c447-0caa-4ed5-aa6f-5019e4b27754',
@@ -110,11 +110,10 @@ describe('gateway.forwardDeviceStateToGoogleHome', () => {
           params: [],
         };
       }
-
       return feature;
     };
 
-    await gateway.forwardDeviceStateToGoogleHome(newEvent);
+    await gateway.forwardDeviceStateToGoogleHome(oneEvent);
 
     // Force wait
     clock.tick(200);
@@ -125,7 +124,7 @@ describe('gateway.forwardDeviceStateToGoogleHome', () => {
   });
 
   it('should not forward event to google home, event empty', async () => {
-    stateManager.get = (key) => {
+    stateManager.get = (type) => {
       const feature = {
         id: 'f2e2d5ea-bcea-4092-b597-7b8fb723e070',
         device_id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
@@ -143,7 +142,7 @@ describe('gateway.forwardDeviceStateToGoogleHome', () => {
         last_value: 97,
         last_value_string: null,
       };
-      if (key === 'deviceById') {
+      if (type === 'deviceById') {
         return {
           id: '31ad9f11-4ec7-495e-8238-2e576092ac0c',
           service_id: '54a4c447-0caa-4ed5-aa6f-5019e4b27754',
@@ -161,7 +160,7 @@ describe('gateway.forwardDeviceStateToGoogleHome', () => {
       return feature;
     };
 
-    await gateway.forwardDeviceStateToGoogleHome(newEvent);
+    await gateway.forwardDeviceStateToGoogleHome(oneEvent);
 
     // Force wait
     clock.tick(200);

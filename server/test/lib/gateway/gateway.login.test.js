@@ -56,18 +56,15 @@ describe('gateway.login', () => {
 
   it('should login to gladys gateway', async () => {
     const loginResults = await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
-    expect(loginResults).to.have.property('two_factor_token');
-    assert.calledWith(gateway.gladysGatewayClient.login, 'tony.stark@gladysassistant.com', 'warmachine123');
+    expect(loginResults).deep.eq({
+      two_factor_token: 'token',
+    });
   });
 
   it('should throw 403 error on error with gateway', async () => {
-    // force error on gateway client
-    const error = new Error();
-    error.response = { status: 403 };
-    gateway.gladysGatewayClient.login = fake.rejects(error);
-
     try {
-      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      // force error on gateway client
+      await gateway.login('tony.stark@gladysassistant.com', 'pass403');
       assert.fail();
     } catch (e) {
       expect(e).instanceOf(Error403);
@@ -75,11 +72,9 @@ describe('gateway.login', () => {
   });
 
   it('should throw 500 error on invalid gateway', async () => {
-    // force error on gateway client
-    gateway.gladysGatewayClient.login = fake.rejects(null);
-
     try {
-      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      // force error on gateway client
+      await gateway.login('tony.stark@gladysassistant.com', 'pass500');
       assert.fail();
     } catch (e) {
       expect(e).instanceOf(Error500);

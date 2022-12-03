@@ -12,7 +12,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
   '@gladysassistant/gladys-gateway-js': GladysGatewayClientMock,
 });
 
-describe('gateway.restoreBackup', function Describe() {
+describe('gateway.restoreBackup', () => {
   const variable = {};
   const event = {};
   const sequelize = {};
