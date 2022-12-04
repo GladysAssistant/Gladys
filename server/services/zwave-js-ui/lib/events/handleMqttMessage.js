@@ -19,20 +19,18 @@ function handleMqttMessage(topic, message) {
         if (success) {
           this.nodes = {};
           result.forEach((data) => {
-            const node = Object.assign(
-              {
-                nodeId: data.id,
-                classes: {},
-                values: {},
-                ready: false,
-                endpoints: data.endpointIndizes.map((idx) => {
-                  return {
-                    index: idx,
-                  };
-                }),
-              },
-              data,
-            );
+            const node = {
+              nodeId: data.id,
+              classes: {},
+              values: {},
+              ready: false,
+              endpoints: data.endpointIndizes.map((idx) => {
+                return {
+                  index: idx,
+                };
+              }),
+              ...data,
+            };
 
             this.nodes[data.id] = node;
             node.label = node.productLabel;

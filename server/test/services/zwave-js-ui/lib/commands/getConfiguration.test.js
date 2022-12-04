@@ -14,7 +14,7 @@ describe('zwave-js-ui installMqttContainer', () => {
     sinon.reset();
   });
 
-  it('it should getConfiguration not ready', async function Test() {
+  it('it should getConfiguration not ready', async () => {
     // PREPARE
     zwaveJSUIManager.externalZwaveJSUI = false;
     zwaveJSUIManager.mqttUrl = 'mqttUrl';
@@ -41,7 +41,7 @@ describe('zwave-js-ui installMqttContainer', () => {
     });
   });
 
-  it('it should getConfiguration ready', async function Test() {
+  it('it should getConfiguration ready', async () => {
     // PREPARE
     zwaveJSUIManager.controller = {
       ready: true,
