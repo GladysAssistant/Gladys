@@ -14,7 +14,7 @@ const gladys = {
 describe('EcowattController', () => {
   let clock;
   beforeEach(async () => {
-    clock = useFakeTimers(new Date('2022-12-09T05:23:57.931Z'));
+    clock = useFakeTimers(1670563437931);
   });
   afterEach(() => {
     clock.restore();
