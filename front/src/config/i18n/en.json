@@ -284,6 +284,7 @@
       "ecowatt": {
         "title": "Ecowatt France",
         "description": "This box let you check the status of the french electricity network.",
+        "error": "An error occured while fetching the RTE API. Please retry.",
         "dailyTitle": "Daily previsions",
         "nextDaysTitle": "Next days previsions",
         "ok": "Network ok",
