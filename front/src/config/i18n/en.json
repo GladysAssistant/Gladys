@@ -202,7 +202,8 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
-      "chart": "Chart"
+      "chart": "Chart",
+      "ecowatt": "Ecowatt (France)"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -279,6 +280,15 @@
         "no": "No",
         "preview": "Preview",
         "showPreviewButton": "Show preview"
+      },
+      "ecowatt": {
+        "title": "Ecowatt France",
+        "description": "This box let you check the status of the french electricity network.",
+        "dailyTitle": "Daily previsions",
+        "nextDaysTitle": "Next days previsions",
+        "ok": "Network ok",
+        "warning": "Network warning",
+        "critical": "Network critical"
       }
     }
   },
@@ -1163,6 +1173,14 @@
         "whenNotFoundLabel": "If no event is found",
         "stopScene": "Stop the scene",
         "continueScene": "Continue the scene"
+      },
+      "ecowattCondition": {
+        "description": "This conditions lets you check the status of the french electricity network",
+        "knowMore": "Read more",
+        "networkStatusLabel": "Continue scene if the network is",
+        "ok": "Network ok",
+        "warning": "Network warning",
+        "critical": "Network critical"
       }
     },
     "actions": {
@@ -1207,6 +1225,9 @@
       "house": {
         "is-empty": "If the house is empty",
         "is-not-empty": "If the house is not empty"
+      },
+      "ecowatt": {
+        "condition": "Condition on Ecowatt (France)"
       }
     },
     "variables": {
@@ -1853,6 +1874,13 @@
       }
     },
     "category": {
+      "opening-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Closed",
+          "one": "Opened"
+        }
+      },
       "co-sensor": {
         "binary": {
           "other": "No value received",
