@@ -5,7 +5,8 @@
  * const data = await getEcowattSignals();
  */
 async function getEcowattSignals() {
-  return this.gladysGatewayClient.getEcowattSignals();
+  const systemInfos = await this.system.getInfos();
+  return this.gladysGatewayClient.getEcowattSignals(systemInfos.gladys_version);
 }
 
 module.exports = {

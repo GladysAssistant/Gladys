@@ -24,7 +24,10 @@ describe('gateway.getEcowattSignals', () => {
     getValue: fake.resolves(null),
     setValue: fake.resolves(null),
   };
-  const gateway = new Gateway(variable, event, {}, {}, {}, {}, {}, {}, job);
+  const system = {
+    getInfos: fake.resolves({ gladys_version: 'v4.12.2' }),
+  };
+  const gateway = new Gateway(variable, event, system, {}, {}, {}, {}, {}, job);
   it('should login to gladys gateway', async () => {
     const data = await gateway.getEcowattSignals();
     expect(data).to.deep.equal({ signals: [] });
