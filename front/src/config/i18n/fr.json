@@ -284,8 +284,8 @@
       "ecowatt": {
         "title": "Ecowatt France",
         "description": "Cette box vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
-        "dailyTitle": "Prédiction du jour",
-        "nextDaysTitle": "Prévision des prochains jours",
+        "dailyTitle": "Prévisions du jour",
+        "nextDaysTitle": "Prévisions des prochains jours",
         "ok": "Réseau ok",
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
