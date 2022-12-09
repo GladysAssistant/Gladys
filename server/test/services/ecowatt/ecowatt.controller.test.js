@@ -9,6 +9,9 @@ const gladys = {
   gateway: {
     getEcowattSignals: fake.resolves(ecowattData),
   },
+  variable: {
+    getValue: fake.resolves('Europe/Paris'),
+  },
 };
 
 describe('EcowattController', () => {

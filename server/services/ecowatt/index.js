@@ -1,7 +1,14 @@
 const logger = require('../../utils/logger');
 const EcowattController = require('./controllers/ecowatt.controller');
 
+const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+
 module.exports = function EcowattService(gladys, serviceId) {
+  const dayjs = require('dayjs');
+  const utc = require('dayjs/plugin/utc');
+  const timezone = require('dayjs/plugin/timezone');
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
   /**
    * @public
    * @description This function starts the service
@@ -28,24 +35,28 @@ module.exports = function EcowattService(gladys, serviceId) {
    * @example const data = await getSignals();
    */
   async function getSignals() {
+    let systemTimezone = await gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+    if (!systemTimezone) {
+      // Default to France as ecowatt is a french integration
+      systemTimezone = 'Europe/Paris';
+    }
     const data = await gladys.gateway.getEcowattSignals();
     // Compose a slimed response
     const response = {
       today: null,
       days: [],
     };
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const todayDate = today.toDateString();
-    const tomorrowDate = tomorrow.toDateString();
+    const today = dayjs.tz(dayjs(), systemTimezone);
+    const todayDate = today.format('YYYY-MM-DD');
+    const tomorrow = today.add(1, 'day');
+    const tomorrowDate = tomorrow.format('YYYY-MM-DD');
 
     data.signals.forEach((day) => {
-      const dateInFile = new Date(day.jour).toDateString();
-      if (dateInFile === todayDate) {
+      const signalDate = dayjs(day.jour).format('YYYY-MM-DD');
+      if (signalDate === todayDate) {
         response.today = day;
       }
-      if (dateInFile === tomorrowDate) {
+      if (signalDate === tomorrowDate) {
         response.tomorrow = day;
       }
       response.days.push({

@@ -12,5 +12,7 @@
     "arm64"
   ],
   "scripts": {},
-  "dependencies": {}
+  "dependencies": {
+    "dayjs": "^1.11.7"
+  }
 }
