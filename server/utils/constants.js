@@ -282,6 +282,9 @@ const ACTIONS = {
   HTTP: {
     REQUEST: 'http.request',
   },
+  ECOWATT: {
+    CONDITION: 'ecowatt.condition',
+  },
 };
 
 const INTENTS = {
@@ -789,6 +792,7 @@ const DASHBOARD_BOX_TYPE = {
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
   CHART: 'chart',
+  ECOWATT: 'ecowatt',
 };
 
 const ERROR_MESSAGES = {

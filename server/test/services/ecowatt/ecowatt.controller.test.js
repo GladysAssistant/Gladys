@@ -1,0 +1,32 @@
+const { expect } = require('chai');
+const { fake, useFakeTimers } = require('sinon');
+const EcowattService = require('../../../services/ecowatt');
+const EcowattController = require('../../../services/ecowatt/controllers/ecowatt.controller');
+const ecowattData = require('./ecowatt.data');
+const ecowattExpectedData = require('./ecowatt.expected');
+
+const gladys = {
+  gateway: {
+    getEcowattSignals: fake.resolves(ecowattData),
+  },
+};
+
+describe('EcowattController', () => {
+  let clock;
+  beforeEach(async () => {
+    clock = useFakeTimers(new Date('2022-12-09T05:23:57.931Z'));
+  });
+  afterEach(() => {
+    clock.restore();
+  });
+  it('should getSignals', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+    const ecowattService = EcowattService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    const ecowattController = EcowattController(ecowattService.getSignals);
+    await ecowattController['get /api/v1/service/ecowatt/signals'].controller(req, res);
+    expect(res.json.firstCall.lastArg).to.deep.equal(ecowattExpectedData);
+  });
+});

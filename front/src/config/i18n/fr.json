@@ -202,7 +202,8 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
-      "chart": "Graphique"
+      "chart": "Graphique",
+      "ecowatt": "Ecowatt"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -279,6 +280,15 @@
         "no": "Non",
         "preview": "Prévisualisation",
         "showPreviewButton": "Afficher une prévisualisation"
+      },
+      "ecowatt": {
+        "title": "Ecowatt France",
+        "description": "Cette box vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
+        "dailyTitle": "Prédiction du jour",
+        "nextDaysTitle": "Prévision des prochains jours",
+        "ok": "Réseau ok",
+        "warning": "Réseau tendu",
+        "critical": "Réseau très tendu"
       }
     }
   },
@@ -1147,6 +1157,14 @@
         "whenNotFoundLabel": "Si aucun évènement n'est trouvé",
         "stopScene": "Arrêter la scène",
         "continueScene": "Continuer la scène"
+      },
+      "ecowattCondition": {
+        "description": "Cette condition vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
+        "knowMore": "En savoir plus",
+        "networkStatusLabel": "Continuer la scène si le réseau est",
+        "ok": "Réseau ok",
+        "warning": "Réseau tendu",
+        "critical": "Réseau très tendu"
       }
     },
     "actions": {
@@ -1191,6 +1209,9 @@
       "house": {
         "is-empty": "Si la maison est vide",
         "is-not-empty": "Si la maison n'est pas vide"
+      },
+      "ecowatt": {
+        "condition": "Condition sur Ecowatt (France)"
       }
     },
     "variables": {
