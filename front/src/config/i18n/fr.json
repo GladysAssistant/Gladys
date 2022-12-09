@@ -203,7 +203,7 @@
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
       "chart": "Graphique",
-      "ecowatt": "Ecowatt"
+      "ecowatt": "Ecowatt ( France )"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -1211,7 +1211,7 @@
         "is-not-empty": "Si la maison n'est pas vide"
       },
       "ecowatt": {
-        "condition": "Condition sur Ecowatt (France)"
+        "condition": "Condition sur Ecowatt ( France )"
       }
     },
     "variables": {
