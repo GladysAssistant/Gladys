@@ -1,7 +1,4 @@
 const logger = require('../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
-const { Error400 } = require('../../utils/httpErrors');
-const { ERROR_MESSAGES } = require('../../utils/constants');
 const EcowattController = require('./controllers/ecowatt.controller');
 
 module.exports = function EcowattService(gladys, serviceId) {
@@ -26,8 +23,9 @@ module.exports = function EcowattService(gladys, serviceId) {
   }
 
   /**
-   * @description Return ecowatt data formatted
-   * @returns {Promise<Object>} - Return ecowatt data
+   * @description Return ecowatt data formatted.
+   * @returns {Promise<Object>} - Return ecowatt data.
+   * @example const data = await getSignals();
    */
   async function getSignals() {
     const data = await gladys.gateway.getEcowattSignals();
