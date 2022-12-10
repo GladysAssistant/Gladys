@@ -2,7 +2,7 @@ const queryString = require('query-string');
 const { default: axios } = require('axios');
 const { ClientCredentials } = require('simple-oauth2');
 const logger = require('../../../../utils/logger');
-const { OAUTH2 } = require('./utils/constants.js');
+const { OAUTH2 } = require('./utils/constants');
 
 /**
  *

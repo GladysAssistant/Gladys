@@ -4,7 +4,7 @@ const { fake } = require('sinon');
 
 const OAuth2Manager = require('../../../../../services/withings/lib/oauth2-client');
 const logger = require('../../../../../utils/logger');
-const { OAUTH2 } = require('../../../../../services/withings/lib/oauth2-client/utils/constants.js');
+const { OAUTH2 } = require('../../../../../services/withings/lib/oauth2-client/utils/constants');
 const { BadOauth2ClientResponse } = require('../../../../../services/withings/lib/oauth2-client/utils/coreErrors');
 
 const server = new OAuth2Server();
@@ -42,7 +42,7 @@ const gladys = {
  * Verify componant to implement oauth2manager executeQuery
  */
 describe('oauth2manager test', () => {
-  before(async function testBefore() {
+  before(async () => {
     // Generate a new RSA key and add it to the keystore
     await server.issuer.keys.generate('RS256');
     // Start the server
@@ -50,7 +50,7 @@ describe('oauth2manager test', () => {
     logger.debug('Issuer URL:', server.issuer.url);
   });
 
-  after(async function testAfter() {
+  after(async () => {
     await server.stop();
   });
 

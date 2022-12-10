@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const serverHttpWithingsMock = require('./withings.serverMock.test');
 const WithingsHandler = require('../../../../services/withings/lib');
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
-const { OAUTH2 } = require('../../../../services/withings/lib/oauth2-client/utils/constants.js');
+const { OAUTH2 } = require('../../../../services/withings/lib/oauth2-client/utils/constants');
 
 const { assert, fake } = sinon;
 
@@ -171,18 +171,6 @@ describe('WithingsHandler poll', () => {
 
     chai.assert.equal(countGetValueCall, 52);
     chai.assert.equal(countGetValueCallClientId, 18);
-
-    const deviceDef = {
-      id: 'gdfgdfgd-7207-4e55-b893-gfdgdfgkjliu',
-      name: 'Withings - string',
-      model: 'string',
-      poll_frequency: 86400000,
-      selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
-      service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
-      should_poll: true,
-      external_id: 'withingsDevideId',
-      features: deviceToPoll.features,
-    };
 
     assert.callCount(gladys.device.saveState, 1);
     // 17 feature - 1 feature unknown = 16 state to save

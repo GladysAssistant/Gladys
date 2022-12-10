@@ -1,5 +1,5 @@
 const ServerMock = require('mock-http-server');
-const { OAUTH2 } = require('../../../../services/withings/lib/oauth2-client/utils/constants.js');
+const { OAUTH2 } = require('../../../../services/withings/lib/oauth2-client/utils/constants');
 
 /**
  *

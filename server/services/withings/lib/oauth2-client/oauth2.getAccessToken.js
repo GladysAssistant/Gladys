@@ -1,6 +1,6 @@
 const { AuthorizationCode } = require('simple-oauth2');
 const logger = require('../../../../utils/logger');
-const { OAUTH2 } = require('./utils/constants.js');
+const { OAUTH2 } = require('./utils/constants');
 const { BadOauth2ClientResponse } = require('./utils/coreErrors');
 
 /**

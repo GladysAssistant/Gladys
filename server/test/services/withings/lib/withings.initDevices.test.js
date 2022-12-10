@@ -42,7 +42,7 @@ const gladys = {
 };
 
 describe('WithingsHandler initDevices', () => {
-  before(function testBefore(done) {
+  before((done) => {
     server.start(done);
 
     // Start fake oatuh2 server
@@ -52,7 +52,7 @@ describe('WithingsHandler initDevices', () => {
     serverOauth2.start(oauth2ServerPort, serverHost);
   });
 
-  after(function testAfter(done) {
+  after((done) => {
     server.stop(done);
     serverOauth2.stop();
   });
