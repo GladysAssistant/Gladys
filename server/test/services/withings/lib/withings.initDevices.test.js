@@ -19,12 +19,7 @@ const gladys = {
       return [
         {
           name: 'Withings - string',
-          params: [
-            {
-              name: 'WITHINGS_DEVICE_ID',
-              value: 'withingsDevideId4',
-            },
-          ],
+          external_id: 'withingsDevideId4'
         },
       ];
     },

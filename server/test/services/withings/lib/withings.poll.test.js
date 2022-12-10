@@ -72,13 +72,7 @@ describe('WithingsHandler poll', () => {
       selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
       service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
       should_poll: true,
-      external_id: '9f66c962-7207-4e55-b893-712642f5e043',
-      params: [
-        {
-          name: 'WITHINGS_DEVICE_ID',
-          value: 'withingsDevideId',
-        },
-      ],
+      external_id: 'withingsDevideId',
     };
     deviceToPoll.features = [
       {
@@ -186,8 +180,7 @@ describe('WithingsHandler poll', () => {
       selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
       service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
       should_poll: true,
-      external_id: '9f66c962-7207-4e55-b893-712642f5e043',
-      params: [{ name: 'WITHINGS_DEVICE_ID', value: 'withingsDevideId' }],
+      external_id: 'withingsDevideId',
       features: deviceToPoll.features,
     };
 
@@ -204,13 +197,7 @@ describe('WithingsHandler poll', () => {
       selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
       service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
       should_poll: true,
-      external_id: '9f66c962-7207-4e55-b893-712642f5e043',
-      params: [
-        {
-          name: 'WITHINGS_DEVICE_ID',
-          value: 'withingsDevideId2',
-        },
-      ],
+      external_id: 'withingsDevideId2',
     };
     deviceToPoll2.features = [
       {
@@ -221,8 +208,6 @@ describe('WithingsHandler poll', () => {
     ];
     await withingsHandler.poll(deviceToPoll2);
 
-    deviceDef.params = [{ name: 'WITHINGS_DEVICE_ID', value: 'withingsDevideId2' }];
-    deviceDef.features = deviceToPoll2.features;
     assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
 
     const deviceToPoll3 = {
@@ -233,13 +218,7 @@ describe('WithingsHandler poll', () => {
       selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
       service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
       should_poll: true,
-      external_id: '9f66c962-7207-4e55-b893-712642f5e043',
-      params: [
-        {
-          name: 'WITHINGS_DEVICE_ID',
-          value: 'withingsDevideId3',
-        },
-      ],
+      external_id: 'withingsDevideId3',
     };
     deviceToPoll3.features = [
       {
@@ -250,8 +229,6 @@ describe('WithingsHandler poll', () => {
     ];
     await withingsHandler.poll(deviceToPoll3);
 
-    deviceDef.params = [{ name: 'WITHINGS_DEVICE_ID', value: 'withingsDevideId3' }];
-    deviceDef.features = deviceToPoll3.features;
     assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
 
     const deviceToPoll4 = {
@@ -262,13 +239,7 @@ describe('WithingsHandler poll', () => {
       selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
       service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
       should_poll: true,
-      external_id: '9f66c962-7207-4e55-b893-712642f5e043',
-      params: [
-        {
-          name: 'WITHINGS_DEVICE_ID',
-          value: 'withingsDevideId4',
-        },
-      ],
+      external_id: 'withingsDevideId4',
     };
     deviceToPoll4.features = [
       {
@@ -279,8 +250,6 @@ describe('WithingsHandler poll', () => {
     ];
     await withingsHandler.poll(deviceToPoll4);
 
-    deviceDef.params = [{ name: 'WITHINGS_DEVICE_ID', value: 'withingsDevideId4' }];
-    deviceDef.features = deviceToPoll4.features;
     assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
   });
 });

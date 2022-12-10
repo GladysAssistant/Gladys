@@ -17,11 +17,11 @@ function buildBatteryLevelValues(currentBatValueString) {
       break;
     case 'medium':
       batValueString = `${currentBatValueString} (> 30%)`;
-      batValue = 30;
-      break;
+      batValue = 50;
+      break; 
     case 'high':
       batValueString = `${currentBatValueString} (> 75%)`;
-      batValue = 75;
+      batValue = 100;
       break;
     default:
       batValueString = `No value`;

@@ -16,7 +16,7 @@ async function poll(device) {
   if (device.features) {
     logger.debug('Features : ', device.features);
 
-    const withingsDeviceId = device.params.find((oneParam) => oneParam.name === 'WITHINGS_DEVICE_ID').value;
+    const withingsDeviceId = device.external_id;
 
     // Get all users of gladys
     const users = await this.gladys.user.get();

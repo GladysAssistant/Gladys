@@ -32,13 +32,7 @@ describe('WithingsHandler poll', () => {
       selector: 'withings-string-9f66c962-7207-4e55-b893-712642f5e043',
       service_id: '55f177d7-bc35-4560-a1f0-4c58b9e9f2c4',
       should_poll: true,
-      external_id: '9f66c962-7207-4e55-b893-712642f5e043',
-      params: [
-        {
-          name: 'WITHINGS_DEVICE_ID',
-          value: 'withingsDevideId',
-        },
-      ],
+      external_id: 'withingsDevideId',
     };
 
     await withingsHandler.postCreate(deviceToPoll);

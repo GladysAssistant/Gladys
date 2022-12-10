@@ -29,5 +29,6 @@ export const WithingsDeviceImgByModel = {
   'Aura Dock': 'Aura_2.jpg',
   'Aura Sensor': 'Aura_2.jpg',
   'Aura Sensor V2': 'Aura_2.jpg',
-  Thermo: 'thermo-c.jpg'
+  Thermo: 'thermo-c.jpg',
+  Scanwatch: 'scanwatch.jpg'
 };

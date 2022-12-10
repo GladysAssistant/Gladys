@@ -96,7 +96,7 @@ class WithingsDeviceBox extends Component {
                         class="card-img-top"
                         style="aspect-ratio: 1 / 1;"
                         src={`/assets/images/withings/${WithingsDeviceImgByModel[props.device.model]}`}
-                        alt={<Text id="global.logoAlt" />}
+                        alt="/assets/icons/android-icon-192x192-round.png"
                       />
                     </Localizer>
                   )}
