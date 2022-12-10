@@ -34,8 +34,6 @@ async function getAccessToken(serviceId, userId, authorizationCode, referer, red
     auth: {
       tokenHost: this.tokenHost,
       tokenPath: this.tokenPath,
-      authorizeHost: this.authorizeHost,
-      authorizePath: this.authorizePath,
     },
   };
 

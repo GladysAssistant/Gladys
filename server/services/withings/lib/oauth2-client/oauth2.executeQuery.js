@@ -12,8 +12,6 @@ const { OAUTH2 } = require('./utils/constants.js');
  * @param {string} userId - Gladys userId of current session.
  * @param {string} tokenHost - Token host url.
  * @param {string} tokenPath - Token path.
- * @param {string} authorizeHost - Authorize host url.
- * @param {string} authorizePath - Authorize path.
  * @param {string} additionalAccessTokenRequestActionParam - Additional action parameter.
  * @returns {Object} Response of oauth2 refresh token query .
  * @example
@@ -27,8 +25,6 @@ async function refreshTokenAccess(
   userId,
   tokenHost,
   tokenPath,
-  authorizeHost,
-  authorizePath,
   additionalAccessTokenRequestActionParam,
 ) {
   const clientId = await variable.getValue(OAUTH2.VARIABLE.CLIENT_ID, serviceId, userId);
@@ -46,8 +42,6 @@ async function refreshTokenAccess(
     auth: {
       tokenHost,
       tokenPath,
-      authorizeHost,
-      authorizePath,
     },
     http: {
       json: true,
@@ -116,8 +110,6 @@ async function executeQuery(serviceId, userId, queryType, queryUrl, queryParams)
     userId,
     this.tokenHost,
     this.tokenPath,
-    this.authorizeHost,
-    this.authorizePath,
     this.additionalAccessTokenRequestActionParam,
   );
 
