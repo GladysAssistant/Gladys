@@ -3,7 +3,7 @@
 const { newValue } = require('./events/rflink.newValue');
 const { addNewDevice } = require('./commands/rflink.addNewDevice');
 const { addDevice } = require('./events/rflink.addDevice');
-const { message } = require('./events/rflink.message.js');
+const { message } = require('./events/rflink.message');
 
 // COMMANDS
 const { setValue } = require('./commands/rflink.setValue');
