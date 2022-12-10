@@ -57,8 +57,7 @@ module.exports = function WeatherController(gladys) {
       units: req.user.distance_unit_preference,
     };
     const weatherResult = await gladys.weather.get(options);
-    weatherResult.house = house;
-    const responseWithHouseAndOptions = Object.assign({}, weatherResult, { house }, { options });
+    const responseWithHouseAndOptions = { ...weatherResult, house, options };
     res.json(responseWithHouseAndOptions);
   }
 

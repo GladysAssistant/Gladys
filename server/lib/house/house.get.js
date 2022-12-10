@@ -18,7 +18,7 @@ const DEFAULT_OPTIONS = {
  * const houses = await gladys.house.get();
  */
 async function get(options) {
-  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
+  const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
   const queryParams = {
     include: [],
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],

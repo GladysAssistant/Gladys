@@ -2,15 +2,15 @@ const db = require('../../models');
 
 /**
  * @description Get all services.
- * @param {string} [pod_id] - Id of the pod.
+ * @param {string} [podId] - Id of the pod.
  * @returns {Promise} - Resolve with services.
  * @example
  * service.getAll(null);
  */
-async function getAll(pod_id = null) {
+async function getAll(podId = null) {
   return db.Service.findAll({
     where: {
-      pod_id,
+      pod_id: podId,
     },
   });
 }

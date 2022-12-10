@@ -1,5 +1,5 @@
 const GladysGatewayClient = require('@gladysassistant/gladys-gateway-js');
-const WebCrypto = require('node-webcrypto-ossl');
+const { webcrypto } = require('crypto');
 const schedule = require('node-schedule');
 
 const getConfig = require('../../utils/getConfig');
@@ -8,7 +8,6 @@ const { EVENTS, JOB_TYPES } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 const serverUrl = getConfig().gladysGatewayServerUrl;
-const cryptoLib = new WebCrypto();
 
 const { backup } = require('./gateway.backup');
 const { forwardDeviceStateToAlexa } = require('./gateway.forwardDeviceStateToAlexa');
@@ -32,6 +31,7 @@ const { restoreBackup } = require('./gateway.restoreBackup');
 const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
+const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 
 const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager, serviceManager, job) {
   this.variable = variable;
@@ -56,7 +56,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
   this.getLatestGladysVersionInitTimeout = 5 * 60 * 1000; // 5 minutes
   this.GladysGatewayClient = GladysGatewayClient;
-  this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib, serverUrl, logger });
+  this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib: webcrypto, serverUrl, logger });
   this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));
 
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
@@ -92,5 +92,6 @@ Gateway.prototype.restoreBackup = restoreBackup;
 Gateway.prototype.restoreBackupEvent = restoreBackupEvent;
 Gateway.prototype.saveUsersKeys = saveUsersKeys;
 Gateway.prototype.refreshUserKeys = refreshUserKeys;
+Gateway.prototype.getEcowattSignals = getEcowattSignals;
 
 module.exports = Gateway;
