@@ -1,0 +1,14 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node
+{
+  "name": "Gladys Assistant - Node.js",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  "forwardPorts": [1443, 1444],
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "netcorext.uuid-generator"
+  ],
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "cd server && npm install && cd ../front && npm install && cd .."
+}
