@@ -202,7 +202,8 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
-      "chart": "Graphique"
+      "chart": "Graphique",
+      "ecowatt": "Ecowatt ( France )"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -279,6 +280,16 @@
         "no": "Non",
         "preview": "Prévisualisation",
         "showPreviewButton": "Afficher une prévisualisation"
+      },
+      "ecowatt": {
+        "title": "Ecowatt France",
+        "description": "Cette box vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
+        "error": "Une erreur est survenue lors du rafraichissement via l'API RTE, merci de re-essayer.",
+        "dailyTitle": "Prévisions du jour",
+        "nextDaysTitle": "Prévisions des prochains jours",
+        "ok": "Réseau ok",
+        "warning": "Réseau tendu",
+        "critical": "Réseau très tendu"
       }
     }
   },
@@ -707,17 +718,13 @@
       "longDescription": "Owntracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser Owntracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer Owntracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
     },
     "zwave": {
-      "title": "Z-Wave",
-      "description": "Contrôlez vos appareils Z-Wave avec Open-Zwave.",
-      "deviceTab": "Appareils",
-      "networkTab": "Réseau",
-      "settingsTab": "Paramètres",
-      "setupTab": "Configuration",
+      "title": "Open-Zwave [OLD]",
+      "description": "En fin de vie, il n'est plus possible de l'utiliser.",
       "device": {
-        "title": "Appareils Z-Wave",
+        "title": "Anciens appareils Open-Zwave",
         "search": "Chercher un appareil",
         "convertToMqtt": "Convertir en appareil MQTT",
-        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. Merci d'arrêter d'utiliser cette intégration avant Novembre 2022. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
+        "oldIntegrationWarning": "Cette intégration était basée sur Open-Zwave, une librairie qui n'est plus maintenue. Cette intégration est en fin de vie. Nous travaillons sur une nouvelle intégration basée sur Zwave-js-ui, mais en attendant il faut s'armer de patience, et utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwave-js-ui-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">Zwave-js-ui + Node-RED + Gladys</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
@@ -728,60 +735,6 @@
         "editButton": "Editer",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
-      },
-      "setup": {
-        "title": "Appareils Z-Wave",
-        "addNodeButton": "Ajouter",
-        "addNodeSecureButton": "Ajout sécurisé",
-        "healNetworkButton": "Régler",
-        "removeNode": "Supprimer",
-        "scanButton": "Recherche",
-        "noZwaveDevices": "Aucun appareil Z-Wave trouvé. Avez-vous sélectionné le port USB de votre dongle dans les paramètres ?",
-        "manufacturer": "Fabricant",
-        "name": "Nom",
-        "type": "Type",
-        "scanInProgressText": "Recherche en cours...",
-        "createDeviceInGladys": "Connecter dans Gladys",
-        "features": "Fonctionnalités",
-        "params": "Paramètre",
-        "nodeId": "Noeud",
-        "zwaveNotConfiguredError": "Ce service Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
-        "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
-        "conflictError": "Un appareil avec ce nom existe déjà, merci de renommer cet appareil ou de supprimer l'existant.",
-        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
-        "unknowNode": "Noeud inconnu",
-        "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page.",
-        "createGithubIssue": "Signaler un bug avec cet appareil"
-      },
-      "network": {
-        "title": "Réseau Z-Wave",
-        "nodeId": "ID",
-        "nodeName": "Nom",
-        "nodeNeighbors": "Voisins",
-        "nodeAsleep": "Le noeud z-wave doit être en endormi ou mort.",
-        "node": "Noeud"
-      },
-      "settings": {
-        "title": "Paramètres Z-Wave",
-        "description": "Pour utiliser le Z-Wave dans Gladys, vous devez avoir une clé USB Z-Wave connectée à votre instance Gladys.",
-        "zwaveUsbDriverPathLabel": "Sélectionnez le port USB auquel votre clé Z-Wave est connectée",
-        "connectButton": "Connecter",
-        "disconnectButton": "Déconnecter",
-        "refreshButton": "Rafraîchir la liste USB",
-        "notConnected": "Gladys n'est connectée à aucune clé USB Z-Wave.",
-        "connectedWithSuccess": "Clé USB Z-Wave connectée avec succès.",
-        "connecting": "Tentative de connexion à la clé USB Z-Wave...",
-        "driverFailedError": "Une erreur s'est produite lors de la tentative de connexion à la clé USB Z-Wave."
-      },
-      "nodeOperation": {
-        "addNodeInstructions": "Vous pouvez maintenant inclure votre appareil en suivant les instructions du manuel de celui-ci.",
-        "removeNodeInstructions": "Vous pouvez désormais exclure votre appareil en suivant les instructions du manuel de celui-ci.",
-        "addNodeTitle": "Mode d'inclusion",
-        "removeNodeTitle": "Mode d'exclusion",
-        "seconds": "secondes restantes",
-        "cancelButton": "Annuler",
-        "nodeAddedTitle": "Un nouveau nœud a été trouvé",
-        "nodeAddedDescription": "Attendez quelques secondes pendant que nous obtenons toutes les informations de ce nœud..."
       }
     },
     "openWeather": {
@@ -1246,6 +1199,14 @@
         "whenNotFoundLabel": "Si aucun évènement n'est trouvé",
         "stopScene": "Arrêter la scène",
         "continueScene": "Continuer la scène"
+      },
+      "ecowattCondition": {
+        "description": "Cette condition vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
+        "knowMore": "En savoir plus",
+        "networkStatusLabel": "Continuer la scène si le réseau est",
+        "ok": "Réseau ok",
+        "warning": "Réseau tendu",
+        "critical": "Réseau très tendu"
       }
     },
     "actions": {
@@ -1290,6 +1251,9 @@
       "house": {
         "is-empty": "Si la maison est vide",
         "is-not-empty": "Si la maison n'est pas vide"
+      },
+      "ecowatt": {
+        "condition": "Condition sur Ecowatt ( France )"
       }
     },
     "variables": {
@@ -1944,6 +1908,13 @@
       }
     },
     "category": {
+      "opening-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Fermé",
+          "one": "Ouvert"
+        }
+      },
       "co-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",

@@ -6,7 +6,7 @@ const boxesSchema = Joi.array().items(
   Joi.array().items(
     Joi.object().keys({
       type: Joi.string()
-        .valid(DASHBOARD_BOX_TYPE_LIST)
+        .valid(...DASHBOARD_BOX_TYPE_LIST)
         .required(),
       house: Joi.string(),
       room: Joi.string(),
@@ -63,7 +63,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = Joi.validate(value, boxesSchema);
+            const result = boxesSchema.validate(value);
             if (result.error) {
               throw new Error(result.error.details[0].message);
             }

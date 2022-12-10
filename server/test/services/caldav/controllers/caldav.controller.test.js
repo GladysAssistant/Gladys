@@ -16,6 +16,7 @@ const res = {
   json: fake.returns(null),
   status: fake.returns({
     send: fake.returns(null),
+    json: fake.returns(null),
   }),
 };
 

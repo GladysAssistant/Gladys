@@ -3,7 +3,7 @@ const Promise = require('bluebird');
 const logger = require('../../../../../utils/logger');
 const { NotFoundError } = require('../../../../../utils/coreErrors');
 
-const { TIMERS } = require('./../bluetooth.constants');
+const { TIMERS } = require('../bluetooth.constants');
 
 /**
  * @description Try to discover Noble peripheral services.

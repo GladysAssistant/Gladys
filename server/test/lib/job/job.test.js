@@ -32,7 +32,7 @@ describe('Job', () => {
     });
     it('should not create a job, invalid data', async () => {
       const promise = job.start(JOB_TYPES.DAILY_DEVICE_STATE_AGGREGATE, []);
-      return chaiAssert.isRejected(promise, 'Validation error: "value" must be an object');
+      return chaiAssert.isRejected(promise, 'Validation error: "value" must be of type object');
     });
   });
   describe('job.finish', () => {
