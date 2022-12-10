@@ -1,4 +1,5 @@
 const sinon = require('sinon');
+const chai = require('chai');
 
 const { fake, assert } = sinon;
 
@@ -71,8 +72,13 @@ describe('POST /api/v1/service/withings/oauth2/client/authorization-uri', () => 
 
     const res = { json: fake.returns(null), status: fake.returns(null) };
 
-    await controller['post /api/v1/service/withings/oauth2/client/authorization-uri'].controller(req, res);
-
+    try {
+      await controller['post /api/v1/service/withings/oauth2/client/authorization-uri'].controller(req, res);
+      assert.fail();
+    } catch (e) {
+      chai.assert.equal(e.status, 400);
+      chai.assert.equal(e.code, 'BAD_REQUEST');
+    }
     assert.notCalled(withingsHandler.oauth2Client.getAccessToken);
     assert.notCalled(res.json);
   });
@@ -119,7 +125,13 @@ describe('POST /api/v1/service/withings/oauth2/client/access-token', () => {
       json: fake.returns(null),
       status: fake.returns(null),
     };
-    await controller['post /api/v1/service/withings/oauth2/client/access-token'].controller(req, res);
+    try {
+      await controller['post /api/v1/service/withings/oauth2/client/access-token'].controller(req, res);
+      assert.fail();
+    } catch (e) {
+      chai.assert.equal(e.status, 400);
+      chai.assert.equal(e.code, 'BAD_REQUEST');
+    }
     assert.notCalled(withingsHandler.oauth2Client.getAccessToken);
     assert.notCalled(res.json);
   });
@@ -163,7 +175,13 @@ describe('GET /api/v1/service/withings/oauth2/client', () => {
     };
 
     const res = { json: fake.returns(null), status: fake.returns(null) };
-    await controller['get /api/v1/service/withings/oauth2/client'].controller(req, res);
+    try {
+      await controller['get /api/v1/service/withings/oauth2/client'].controller(req, res);
+      assert.fail();
+    } catch (e) {
+      chai.assert.equal(e.status, 400);
+      chai.assert.equal(e.code, 'BAD_REQUEST');
+    }
     assert.notCalled(withingsHandler.oauth2Client.getAccessToken);
     assert.notCalled(res.json);
   });
