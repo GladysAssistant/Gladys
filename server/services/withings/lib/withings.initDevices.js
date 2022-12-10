@@ -272,7 +272,7 @@ async function initDevices(userId) {
       },
       { concurrency: 0 },
     );
-    
+
     logger.trace('measureResult: ', measureResult);
     logger.trace('mapOfDeviceByWithingsDeviceId: ', mapOfDeviceByWithingsDeviceId);
     logger.trace('mapOfFeatureByWithingsDeviceId: ', mapOfFeatureByWithingsDeviceId);
