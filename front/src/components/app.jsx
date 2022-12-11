@@ -84,6 +84,9 @@ import RflinkDevicePage from '../routes/integration/all/rflink/device-page';
 import RflinkSettingsPage from '../routes/integration/all/rflink/settings-page';
 import RflinkEditPage from '../routes/integration/all/rflink/device-page/setup';
 
+// Deprecated integration
+import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
+
 // Broadlink integration
 import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
 import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
