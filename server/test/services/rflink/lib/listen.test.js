@@ -1,5 +1,5 @@
 const sinon = require('sinon');
-const Readline = require('../../../../services/rflink/node_modules/@serialport/parser-readline/');
+const Readline = require('../../../../services/rflink/node_modules/@serialport/parser-readline');
 const RFLinkHandler = require('../../../../services/rflink/lib');
 
 const { assert, stub } = sinon;
