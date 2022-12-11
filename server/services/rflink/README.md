@@ -1,29 +1,31 @@
-==========
 How To
-==========
+======
 
 
 
-==========
 Todos
-==========
+=====
 
 1. Real life test
 
-2. Videos to show this working
+2. Videos to show this working (in progress)
 
 3. Documentation
 
 4. Front tests (Cypress)
 
+5.  Upgrading to "serialport": "10.x.x" & "@serialport/parser-readline": "10.x.x" (some code changes are required)
 
 
-============
+
+
 Known issues
 ============
 
 At gladys server startup
 ------------------------
+
+Should have no impact :
 
 2021-06-28T15:09:46+0200 <error> index.js:15 (process.on) unhandledRejection catched: Promise {
   <rejected> TypeError: Cannot read property 'event' of undefined
@@ -64,7 +66,7 @@ debug.js?c91e:365 Can't call "this.setState" on an unmounted component. This is 
   ...
   RflinkDeviceBox._this.deleteDevice	@	Device.jsx?46ce:31
 
-===========
+
 Improvments
 ===========
 
