@@ -5,6 +5,7 @@ import CameraBox from '../../components/boxs/camera/Camera';
 import AtHomeBox from '../../components/boxs/user-presence/UserPresence';
 import DevicesInRoomsBox from '../../components/boxs/device-in-room/DevicesInRoomsBox';
 import ChartBox from '../../components/boxs/chart/Chart';
+import EcowattBox from '../../components/boxs/ecowatt/Ecowatt';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -22,6 +23,8 @@ const Box = ({ children, ...props }) => {
       return <DevicesInRoomsBox {...props} />;
     case 'chart':
       return <ChartBox {...props} />;
+    case 'ecowatt':
+      return <EcowattBox {...props} />;
   }
 };
 

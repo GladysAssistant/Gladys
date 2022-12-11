@@ -122,7 +122,7 @@ describe('gateway', () => {
       assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
       assert.calledOnce(gateway.gladysGatewayClient.abortMultiPartBackup);
     });
-    it('should backup gladys with lots of insert at the same time', async function Test() {
+    it('should backup gladys with lots of insert at the same time', async () => {
       const variable = {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
@@ -389,7 +389,7 @@ describe('gateway', () => {
       gateway.connected = true;
 
       const websocketMessage = {
-        type: 'zwave.new-node',
+        type: 'device.new',
         payload: {},
       };
       gateway.forwardWebsockets(websocketMessage);
@@ -399,7 +399,7 @@ describe('gateway', () => {
       const gateway = new Gateway({}, event, system, sequelize, config, {}, {}, {}, job);
 
       const websocketMessage = {
-        type: 'zwave.new-node',
+        type: 'device.new',
         payload: {},
       };
       gateway.forwardWebsockets(websocketMessage);

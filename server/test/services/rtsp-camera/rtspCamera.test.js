@@ -58,6 +58,17 @@ const brokenDevice = {
   ],
 };
 
+const deviceThatResultInNoImage = {
+  id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+  selector: 'my-camera',
+  params: [
+    {
+      name: 'CAMERA_URL',
+      value: 'no-image-written',
+    },
+  ],
+};
+
 describe('RtspCameraManager commands', () => {
   const rtspCameraManager = new RtspCameraManager(gladys, FfmpegMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
   before(async () => {
@@ -77,7 +88,11 @@ describe('RtspCameraManager commands', () => {
   });
   it('should return error', async () => {
     const promise = rtspCameraManager.getImage(brokenDevice);
-    return assertChai.isRejected(promise);
+    return assertChai.isRejected(promise, 'broken');
+  });
+  it('should crash because no image was saved', async () => {
+    const promise = rtspCameraManager.getImage(deviceThatResultInNoImage);
+    return assertChai.isRejected(promise, 'ENOENT');
   });
   it('should return error, no camera url param', async () => {
     const promise = rtspCameraManager.getImage({});

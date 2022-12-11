@@ -202,7 +202,8 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
-      "chart": "Chart"
+      "chart": "Chart",
+      "ecowatt": "Ecowatt (France)"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -279,6 +280,16 @@
         "no": "No",
         "preview": "Preview",
         "showPreviewButton": "Show preview"
+      },
+      "ecowatt": {
+        "title": "Ecowatt France",
+        "description": "This box let you check the status of the french electricity network.",
+        "error": "An error occured while fetching the RTE API. Please retry.",
+        "dailyTitle": "Daily previsions",
+        "nextDaysTitle": "Next days previsions",
+        "ok": "Network ok",
+        "warning": "Network warning",
+        "critical": "Network critical"
       }
     }
   },
@@ -638,17 +649,13 @@
       "longDescription": "Owntracks is an open-source app running on iOS and Android that let you send your geolocation to a server. You can use Owntracks to trigger scenes based on your geolocation. To configure Owntracks with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>."
     },
     "zwave": {
-      "title": "Z-Wave",
-      "description": "Control your Z-Wave devices with Open-Zwave.",
-      "deviceTab": "Devices",
-      "networkTab": "Network",
-      "settingsTab": "Settings",
-      "setupTab": "Setup",
+      "title": "Open-Zwave [OLD]",
+      "description": "This integration is deprecated, we are migrating to zwave-js-ui.",
       "device": {
-        "title": "Z-Wave Devices",
+        "title": "Legacy Open-Zwave Devices",
         "search": "Search devices",
         "convertToMqtt": "Convert to MQTT device",
-        "oldIntegrationWarning": "This integration is based on Open-Zwave, a library which is no longer supported. We are migrating to ZwaveJS2mqtt, but in the meantime we recommend that you use Node-RED + ZwaveJS2mqtt. Please stop using this integration before end of November 2022. <br /> <br /> If you want to help us develop this integration, join-us on the forum!",
+        "oldIntegrationWarning": "This integration was based on Open-Zwave and is now DEPRECATED. We are migrating to Zwave-js-ui, but in the meantime we recommend that you use Node-RED + Zwave-js-ui + Gladys. <br /> <br /> If you want to help us develop this integration, join-us on the <a href=\"https://en-community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">forum</a>!",
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
@@ -659,60 +666,6 @@
         "editButton": "Edit",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
         "noValueReceived": "No value received."
-      },
-      "setup": {
-        "title": "Z-Wave Devices",
-        "addNodeButton": "Add",
-        "addNodeSecureButton": "Add Secure",
-        "healNetworkButton": "Heal",
-        "removeNode": "Remove",
-        "scanButton": "Scan",
-        "noZwaveDevices": "No Z-Wave devices found. Have you selected your USB dongle port in Settings?",
-        "manufacturer": "Manufacturer",
-        "name": "Name",
-        "type": "Type",
-        "scanInProgressText": "Scan in Progress...",
-        "createDeviceInGladys": "Connect in Gladys",
-        "features": "Features",
-        "params": "Params",
-        "nodeId": "Node",
-        "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
-        "createDeviceError": "There was an error while creating this device in Gladys.",
-        "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
-        "deviceCreatedSuccess": "The device was added with success.",
-        "unknowNode": "Unknow node",
-        "sleepingNodeMsg": "Node sleeping or dead. Wake it up then refresh this page.",
-        "createGithubIssue": "Report a bug with this device"
-      },
-      "network": {
-        "title": "Z-Wave Network",
-        "nodeId": "ID",
-        "nodeName": "Name",
-        "nodeNeighbors": "Neighbors",
-        "nodeAsleep": "Node might be asleep or dead",
-        "node": "Node"
-      },
-      "settings": {
-        "title": "Z-Wave Settings",
-        "description": "To use Z-Wave in Gladys, you need to have a Z-Wave USB Stick connected to your Gladys instance.",
-        "zwaveUsbDriverPathLabel": "Select the USB port where your Z-Wave stick is connected",
-        "connectButton": "Connect",
-        "disconnectButton": "Disconnect",
-        "refreshButton": "Refresh USB list",
-        "notConnected": "Gladys is not connected to any Z-Wave USB stick.",
-        "connectedWithSuccess": "Z-Wave USB stick connected with success.",
-        "connecting": "Trying to connect to Z-Wave USB stick...",
-        "driverFailedError": "An error occured while trying to connect to Z-Wave USB stick."
-      },
-      "nodeOperation": {
-        "addNodeInstructions": "You can now include your device following instructions in your device manual.",
-        "removeNodeInstructions": "You can now exclude your device following instructions in your device manual.",
-        "addNodeTitle": "Inclusion Mode",
-        "removeNodeTitle": "Exclusion Mode",
-        "seconds": "seconds remaining",
-        "cancelButton": "Cancel",
-        "nodeAddedTitle": "A new node was found",
-        "nodeAddedDescription": "Wait a few seconds while we get all of the information from this node..."
       }
     },
     "openWeather": {
@@ -1263,6 +1216,14 @@
         "whenNotFoundLabel": "If no event is found",
         "stopScene": "Stop the scene",
         "continueScene": "Continue the scene"
+      },
+      "ecowattCondition": {
+        "description": "This conditions lets you check the status of the french electricity network",
+        "knowMore": "Read more",
+        "networkStatusLabel": "Continue scene if the network is",
+        "ok": "Network ok",
+        "warning": "Network warning",
+        "critical": "Network critical"
       }
     },
     "actions": {
@@ -1307,6 +1268,9 @@
       "house": {
         "is-empty": "If the house is empty",
         "is-not-empty": "If the house is not empty"
+      },
+      "ecowatt": {
+        "condition": "Condition on Ecowatt (France)"
       }
     },
     "variables": {
@@ -1960,6 +1924,13 @@
       }
     },
     "category": {
+      "opening-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Closed",
+          "one": "Opened"
+        }
+      },
       "co-sensor": {
         "binary": {
           "other": "No value received",
