@@ -16,7 +16,7 @@
   "scripts": {},
   "dependencies": {
     "bluebird": "^3.7.2",
-    "ecovacs-deebot": "^0.8.3",
+    "ecovacs-deebot": "^0.9.0",
     "node-machine-id": "1.1.12"
   }
 }
