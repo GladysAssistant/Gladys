@@ -291,7 +291,7 @@ describe('scene.executeActions', () => {
       [
         [
           {
-            type: ACTIONS.SWITCH.TURN_OFF,
+            type: ACTIONS.SWITCH.TOGGLE,
             devices: ['switch-1'],
           },
         ],
