@@ -289,6 +289,6 @@ describe('Device.saveHistoricalState', () => {
       12,
       invalideDate,
     );
-    return chaiAssert.isRejected(promise, '"value" must be a valid ISO 8601 date');
+    return chaiAssert.isRejected(promise, '"value" must be in ISO 8601 date format');
   });
 });

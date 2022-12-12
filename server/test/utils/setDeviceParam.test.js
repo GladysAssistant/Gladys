@@ -24,7 +24,10 @@ describe('setDeviceParam', () => {
     setDeviceParam(device, paramName, paramValue);
 
     expect(device).deep.eq({
-      params: [{ name: 'no-match', value: 'value' }, { name: 'name', value: 'value' }],
+      params: [
+        { name: 'no-match', value: 'value' },
+        { name: 'name', value: 'value' },
+      ],
     });
   });
 
