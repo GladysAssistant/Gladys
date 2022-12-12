@@ -236,12 +236,11 @@ body {
 .loading-border {
   animation: borderBlink 2s infinite;
 }
-@keyframes borderBlink { 
+@keyframes borderBlink {
   50% {
-    border-color: #45aaf2 ; 
+    border-color: #45aaf2 ;
   }
 }
-
 
 .react-clock {
   display: block;
@@ -308,5 +307,3 @@ body {
 .react-clock__second-hand {
   transition: transform cubic-bezier(0.68, 0, 0.27, 1.55) 0.2s;
 }
-
-
