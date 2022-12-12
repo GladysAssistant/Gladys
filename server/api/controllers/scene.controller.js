@@ -94,7 +94,7 @@ module.exports = function SceneController(gladys) {
    *
    */
   async function duplicate(req, res) {
-    const scene = await gladys.scene.duplicate(req.params.scene_selector, req.body.name);
+    const scene = await gladys.scene.duplicate(req.params.scene_selector, req.body.name, req.body.icon);
     res.json(scene);
   }
 

@@ -1614,8 +1614,10 @@
     "cardTitle": "Dupliquer la scène \"{{name}}\"",
     "nameLabel": "Nom",
     "namePlaceholder": "Entrez un nouveau nom pour la scène dupliquée, celui-ci doit être différent du nom de scène précédent.",
+    "iconLabel": "Sélectionnez une icône pour votre scène",
     "duplicateSceneButton": "Dupliquer",
     "invalidName": "Le nom est requis",
+    "invalidIcon": "L'icône est requise",
     "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
   },
   "scene": {

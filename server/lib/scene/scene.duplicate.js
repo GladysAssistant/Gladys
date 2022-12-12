@@ -5,13 +5,14 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * @description Duplicate a scene.
  * @param {string} selector - The selector of the source scene.
  * @param {string} name - The name of the duplicated scene.
+ * @param {string} icon - The icon of the duplicated scene.
  * @returns {Promise} - Resolve with the scene.
  * @example
  * duplicateScene({
  *  selector: 'test'
  * });
  */
-async function duplicate(selector, name) {
+async function duplicate(selector, name, icon) {
   const existingScene = await db.Scene.findOne({
     where: {
       selector,
@@ -26,7 +27,7 @@ async function duplicate(selector, name) {
 
   const newScene = {
     name,
-    icon: plainExistingScene.icon,
+    icon,
     active: plainExistingScene.active,
     actions: plainExistingScene.actions,
     triggers: plainExistingScene.triggers,

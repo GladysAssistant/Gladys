@@ -14,7 +14,11 @@ class DuplicateScene extends Component {
   getSourceScene = () => {
     this.props.httpClient.get(`/api/v1/scene/${this.props.scene_selector}`).then(scene => {
       this.setState({
-        sourceScene: scene
+        sourceScene: scene,
+        scene: {
+          name: '',
+          icon: scene.icon
+        }
       });
     });
   };
@@ -56,6 +60,9 @@ class DuplicateScene extends Component {
     if (!this.state.scene.name) {
       duplicateSceneErrors.name = true;
     }
+    if (!this.state.scene.icon) {
+      duplicateSceneErrors.icon = true;
+    }
     this.setState({
       duplicateSceneErrors
     });
@@ -65,7 +72,20 @@ class DuplicateScene extends Component {
   updateDuplicateSceneName = e => {
     this.setState({
       scene: {
-        name: e.target.value
+        name: e.target.value,
+        icon: this.state.scene.icon
+      }
+    });
+    if (this.state.duplicateSceneErrors) {
+      this.checkErrors();
+    }
+  };
+
+  updateDuplicateSceneIcon = e => {
+    this.setState({
+      scene: {
+        name: this.state.scene.name,
+        icon: e.target.value
       }
     });
     if (this.state.duplicateSceneErrors) {
@@ -78,10 +98,12 @@ class DuplicateScene extends Component {
     this.getSourceScene();
     this.state = {
       scene: {
-        name: ''
+        name: '',
+        icon: ''
       },
       sourceScene: {
-        name: ''
+        name: '',
+        icon: ''
       },
       duplicateSceneErrors: null,
       duplicateSceneStatus: null
@@ -96,6 +118,7 @@ class DuplicateScene extends Component {
         scene={scene}
         sourceScene={sourceScene}
         updateDuplicateSceneName={this.updateDuplicateSceneName}
+        updateDuplicateSceneIcon={this.updateDuplicateSceneIcon}
         duplicateScene={this.duplicateScene}
         duplicateSceneErrors={duplicateSceneErrors}
         duplicateSceneStatus={duplicateSceneStatus}

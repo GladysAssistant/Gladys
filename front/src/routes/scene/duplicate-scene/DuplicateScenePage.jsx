@@ -3,6 +3,7 @@ import { RequestStatus } from '../../../utils/consts';
 import cx from 'classnames';
 import get from 'get-value';
 import style from './style.css';
+import iconList from '../../../../../server/config/icons.json';
 
 const DuplicateScenePage = ({ children, ...props }) => (
   <div class={cx('container', style.containerWithMargin)}>
@@ -39,6 +40,40 @@ const DuplicateScenePage = ({ children, ...props }) => (
               </Localizer>
               <div class="invalid-feedback">
                 <Text id="duplicateScene.invalidName" />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                <Text id="duplicateScene.iconLabel" />
+              </label>
+              {get(props, 'duplicateSceneErrors.icon') && (
+                <div className="alert alert-danger">
+                  <Text id="duplicateScene.invalidIcon" />
+                </div>
+              )}
+              <div className={cx('row', style.iconContainer)}>
+                {iconList.map(icon => (
+                  <div className="col-2">
+                    <div
+                      className={cx('text-center', style.iconDiv, {
+                        [style.iconDivChecked]: get(props, 'scene.icon') === icon
+                      })}
+                    >
+                      <label className={style.iconLabel}>
+                        <input
+                          name="icon"
+                          type="radio"
+                          onChange={props.updateDuplicateSceneIcon}
+                          checked={get(props, 'scene.icon') === icon}
+                          value={icon}
+                          className={style.iconInput}
+                        />
+                        <i className={`fe fe-${icon}`} />
+                      </label>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
