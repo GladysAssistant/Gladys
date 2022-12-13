@@ -177,7 +177,9 @@ describe('Scene view', () => {
       cy.wrap(inputs[0]).type('My Duplicated scene');
     });
 
-    cy.contains('duplicateScene.duplicateSceneButton')
+    cy.get('.fe-activity').click();
+
+    cy.get('.form-footer').contains('duplicateScene.duplicateSceneButton')
       .should('have.class', 'btn-primary')
       .click();
 
@@ -186,6 +188,14 @@ describe('Scene view', () => {
   it('Should delete existing scene', () => {
     cy.login();
     cy.visit('/dashboard/scene/my-scene');
+
+    cy.contains('editScene.deleteButton')
+      .should('have.class', 'btn-danger')
+      .click();
+
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+
+    cy.visit('/dashboard/scene/my-duplicated-scene');
 
     cy.contains('editScene.deleteButton')
       .should('have.class', 'btn-danger')
