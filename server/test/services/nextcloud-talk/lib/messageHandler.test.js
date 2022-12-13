@@ -20,18 +20,7 @@ const gladys = {
   http: {},
 };
 
-const axios = {
-  request: fake.resolves({
-    headers: {
-      'x-chat-last-given': 1,
-    },
-    data: {
-      ocs: {
-        data: [{ id: 2, actorId: 'userbot' }],
-      },
-    },
-  }),
-};
+const axios = {};
 
 describe('NextcloudTalk.message', () => {
   const messageHandler = new MessageHandler(gladys, 'a03a5e92-236a-4465-9bd5-530247d76959', axios);
@@ -41,6 +30,16 @@ describe('NextcloudTalk.message', () => {
     expect(messageHandler.bots['30385cbf-b9ff-4239-a6bb-35477ca3eea6'].token).eq('testToken1');
   });
   it('should poll once', async () => {
+    axios.request = fake.resolves({
+      headers: {
+        'x-chat-last-given': 1,
+      },
+      data: {
+        ocs: {
+          data: [{ id: 2, actorId: 'userbot' }],
+        },
+      },
+    });
     const emit = fake.resolves();
     messageHandler.bots.user2 = {
       token: 'testToken2',
