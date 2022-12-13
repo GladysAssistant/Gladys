@@ -36,4 +36,10 @@ describe('nextcloud-talk', () => {
     const nextcloudTalkService = NextcloudTalkService(gladys, 'a4a59a7d-0001-4958-a794-37e38790142f');
     await nextcloudTalkService.stop();
   });
+  it('should return if service is used', async () => {
+    const gladys = {};
+    const nextcloudTalkService = NextcloudTalkService(gladys, 'a4a59a7d-0001-4958-a794-37e38790142f');
+    const used = await nextcloudTalkService.isUsed();
+    expect(used).to.equal(false);
+  });
 });

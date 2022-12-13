@@ -33,9 +33,21 @@ module.exports = function NextcloudTalkService(gladys, serviceId) {
     await messageHandler.disconnect();
   }
 
+  /**
+   * @public
+   * @description Test if Nextcloud Talk is running
+   * @returns {Promise<boolean>} Returns true if Nextcloud Talk is used.
+   * @example
+   *  const used = await gladys.services.nextcloudTalk.isUsed();
+   */
+  async function isUsed() {
+    return Object.keys(messageHandler.bots).length > 0;
+  }
+
   return Object.freeze({
     start,
     stop,
+    isUsed,
     message: messageHandler,
   });
 };
