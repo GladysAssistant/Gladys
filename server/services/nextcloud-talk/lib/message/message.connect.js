@@ -1,5 +1,4 @@
 const EventEmitter = require('events');
-const { AbortController } = require('node-abort-controller');
 
 /**
  * @description Connect Nextcloud Talk
