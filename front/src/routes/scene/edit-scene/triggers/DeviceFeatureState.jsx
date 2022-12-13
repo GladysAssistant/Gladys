@@ -50,40 +50,35 @@ class TurnOnLight extends Component {
     this.props.updateTriggerProperty(this.props.index, 'threshold_only', e.target.checked);
   };
   getBinaryOperator = () => (
-    <div class="col-2">
-      <div class="text-center" style={{ marginTop: '10px' }}>
-        <i class="fe fe-arrow-right" style={{ fontSize: '20px' }} />
+    <div class="col-12 col-md-1">
+      <div class="text-center">
+        <i class="fe fe-arrow-down d-block d-xs-none d-sm-none" style={{ fontSize: '20px', marginBottom: '15px' }} />
+        <i class="fe fe-arrow-right d-none d-xs-block d-sm-block" style={{ fontSize: '20px', marginTop: '10px' }} />
       </div>
     </div>
   );
-  getBinaryButtons = () => (
-    <div class="col-4">
-      <div class="form-group">
-        <div class="row">
-          <div class="col-6">
-            <button
-              class={cx('btn btn-block', {
-                'btn-primary': this.props.trigger.value === 1,
-                'btn-outline-primary': this.props.trigger.value !== 1,
-                active: this.props.trigger.value === 1
-              })}
-              onClick={this.handleValueChangeBinary(1)}
-            >
-              <Text id="editScene.triggersCard.newState.on" />
-            </button>
-          </div>
-          <div class="col-6">
-            <button
-              class={cx('btn btn-block', {
-                'btn-primary': this.props.trigger.value === 0,
-                'btn-outline-primary': this.props.trigger.value !== 0,
-                active: this.props.trigger.value === 0
-              })}
-              onClick={this.handleValueChangeBinary(0)}
-            >
-              <Text id="editScene.triggersCard.newState.off" />
-            </button>
-          </div>
+  getBinaryButton = (category, value) => (
+    <div class="col-6">
+      <button
+        class={cx('btn', 'btn-block', 'p-1', {
+          'btn-primary': this.props.trigger.value === value,
+          'btn-outline-primary': this.props.trigger.value !== value,
+          active: this.props.trigger.value === value
+        })}
+        onClick={this.handleValueChangeBinary(value)}
+      >
+        <Text id={`deviceFeatureValue.category.${category}.binary`} plural={value}>
+          <Text id={`editScene.triggersCard.newState.${value ? 'on' : 'off'}`} />
+        </Text>
+      </button>
+    </div>
+  );
+  getBinaryButtons = category => (
+    <div class="col-12 col-md-5">
+      <div class="form-group mt-1">
+        <div class="row d-flex justify-content-center">
+          {this.getBinaryButton(category, 1)}
+          {this.getBinaryButton(category, 0)}
         </div>
       </div>
     </div>
@@ -100,7 +95,7 @@ class TurnOnLight extends Component {
     return (
       <div>
         <div class="row">
-          <div class="col-6">
+          <div class="col-12 col-md-6">
             <div class="form-group">
               <SelectDeviceFeature
                 value={this.props.trigger.device_feature}
@@ -113,14 +108,14 @@ class TurnOnLight extends Component {
             this.getBinaryOperator()}
           {selectedDeviceFeature &&
             selectedDeviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
-            this.getBinaryButtons()}
+            this.getBinaryButtons(selectedDeviceFeature.category)}
           {selectedDeviceFeature &&
             selectedDeviceFeature.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR &&
             this.getPresenceSensor()}
           {selectedDeviceFeature &&
             selectedDeviceFeature.type !== DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
             selectedDeviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && (
-              <div class="col-3">
+              <div class="col-md-3">
                 <div class="form-group">
                   <select class="form-control" onChange={this.handleOperatorChange} value={props.trigger.operator}>
                     <option value="">
@@ -151,7 +146,7 @@ class TurnOnLight extends Component {
           {selectedDeviceFeature &&
             selectedDeviceFeature.type !== DEVICE_FEATURE_TYPES.SWITCH.BINARY &&
             selectedDeviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && (
-              <div class="col-3">
+              <div class="col-md-3">
                 <div class="form-group">
                   <div class="input-group">
                     <Localizer>
@@ -174,7 +169,9 @@ class TurnOnLight extends Component {
                 </div>
               </div>
             )}
-          {selectedDeviceFeature && selectedDeviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && (
+        </div>
+        {selectedDeviceFeature && selectedDeviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR && (
+          <div class="row">
             <div class="col-12">
               <label class="form-check form-switch">
                 <input
@@ -188,8 +185,8 @@ class TurnOnLight extends Component {
                 </span>
               </label>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }

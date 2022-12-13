@@ -135,23 +135,19 @@ describe('scene.action.checkTime', () => {
       .hour(9)
       .minute(0);
     const clock = useFakeTimers(todayAt20.valueOf());
-    try {
-      await executeActions(
-        { stateManager, event },
+    await executeActions(
+      { stateManager, event },
+      [
         [
-          [
-            {
-              type: ACTIONS.CONDITION.CHECK_TIME,
-              after: sevenPm.format('HH:mm'),
-              before: nineAm.format('HH:mm'),
-            },
-          ],
+          {
+            type: ACTIONS.CONDITION.CHECK_TIME,
+            after: sevenPm.format('HH:mm'),
+            before: nineAm.format('HH:mm'),
+          },
         ],
-        scope,
-      );
-    } catch (e) {
-      throw e;
-    }
+      ],
+      scope,
+    );
     clock.restore();
   });
   it('should abort scene because condition is not verified', async () => {

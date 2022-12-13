@@ -282,6 +282,9 @@ const ACTIONS = {
   HTTP: {
     REQUEST: 'http.request',
   },
+  ECOWATT: {
+    CONDITION: 'ecowatt.condition',
+  },
 };
 
 const INTENTS = {
@@ -744,14 +747,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
-  ZWAVE: {
-    DRIVER_READY: 'zwave.driver-ready',
-    DRIVER_FAILED: 'zwave.driver-failed',
-    NODE_READY: 'zwave.node-ready',
-    SCAN_COMPLETE: 'zwave.scan-complete',
-    NODE_ADDED: 'zwave.node-added',
-    NODE_REMOVED: 'zwave.node-removed',
-  },
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
@@ -797,6 +792,7 @@ const DASHBOARD_BOX_TYPE = {
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
   CHART: 'chart',
+  ECOWATT: 'ecowatt',
 };
 
 const ERROR_MESSAGES = {
