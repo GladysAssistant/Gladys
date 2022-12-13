@@ -179,7 +179,8 @@ describe('Scene view', () => {
 
     cy.get('.fe-activity').click();
 
-    cy.get('.form-footer').contains('duplicateScene.duplicateSceneButton')
+    cy.get('.form-footer')
+      .contains('duplicateScene.duplicateSceneButton')
       .should('have.class', 'btn-primary')
       .click();
 
