@@ -76,7 +76,6 @@ const DuplicateScenePage = ({ children, ...props }) => (
                 ))}
               </div>
             </div>
-
             <div class="form-footer">
               <button
                 onClick={props.duplicateScene}
