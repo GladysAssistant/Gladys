@@ -31,6 +31,7 @@ const { restoreBackup } = require('./gateway.restoreBackup');
 const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
+const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 
 const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager, serviceManager, job) {
   this.variable = variable;
@@ -91,5 +92,6 @@ Gateway.prototype.restoreBackup = restoreBackup;
 Gateway.prototype.restoreBackupEvent = restoreBackupEvent;
 Gateway.prototype.saveUsersKeys = saveUsersKeys;
 Gateway.prototype.refreshUserKeys = refreshUserKeys;
+Gateway.prototype.getEcowattSignals = getEcowattSignals;
 
 module.exports = Gateway;

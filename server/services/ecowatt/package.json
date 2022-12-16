@@ -1,11 +1,9 @@
 {
-  "name": "gladys-bluetooth",
-  "version": "1.0.0",
+  "name": "gladys-ecowatt",
   "main": "index.js",
   "os": [
     "darwin",
     "linux",
-    "freebsd",
     "win32"
   ],
   "cpu": [
@@ -15,7 +13,6 @@
   ],
   "scripts": {},
   "dependencies": {
-    "@abandonware/noble": "^1.9.2-15",
-    "bluebird": "^3.7.2"
+    "dayjs": "^1.11.7"
   }
 }
