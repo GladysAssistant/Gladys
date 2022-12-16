@@ -350,43 +350,7 @@ describe('scene.executeActions', () => {
     );
     assert.calledWith(house.userLeft, 'my-house', 'john');
   });
-  it('should abort scene, condition is not verified', async () => {
-    const stateManager = new StateManager(event);
-    stateManager.setState('deviceFeature', 'my-device-feature', {
-      category: 'light',
-      type: 'binary',
-      last_value: 15,
-    });
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    const scope = {};
-    const promise = executeActions(
-      { stateManager, event, device },
-      [
-        [
-          {
-            type: ACTIONS.DEVICE.GET_VALUE,
-            device_feature: 'my-device-feature',
-          },
-        ],
-        [
-          {
-            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
-            conditions: [
-              {
-                variable: '0.0.last_value',
-                operator: '=',
-                value: 20,
-              },
-            ],
-          },
-        ],
-      ],
-      scope,
-    );
-    return chaiAssert.isRejected(promise, AbortScene);
-  });
+
   it('should abort scene, house empty is not verified', async () => {
     const stateManager = new StateManager(event);
     const house = {
@@ -464,74 +428,6 @@ describe('scene.executeActions', () => {
       ],
       scope,
     );
-  });
-  it('should finish scene, condition is verified', async () => {
-    const stateManager = new StateManager(event);
-    stateManager.setState('deviceFeature', 'my-device-feature', {
-      category: 'light',
-      type: 'binary',
-      last_value: 15,
-    });
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    const scope = {};
-    await executeActions(
-      { stateManager, event, device },
-      [
-        [
-          {
-            type: ACTIONS.DEVICE.GET_VALUE,
-            device_feature: 'my-device-feature',
-          },
-        ],
-        [
-          {
-            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
-            conditions: [
-              {
-                variable: '0.0.last_value',
-                operator: '=',
-                value: 15,
-              },
-            ],
-          },
-        ],
-      ],
-      scope,
-    );
-  });
-  it('should send message with value injected', async () => {
-    const stateManager = new StateManager(event);
-    stateManager.setState('deviceFeature', 'my-device-feature', {
-      category: 'light',
-      type: 'binary',
-      last_value: 15,
-    });
-    const message = {
-      sendToUser: fake.resolves(null),
-    };
-    const scope = {};
-    await executeActions(
-      { stateManager, event, message },
-      [
-        [
-          {
-            type: ACTIONS.DEVICE.GET_VALUE,
-            device_feature: 'my-device-feature',
-          },
-        ],
-        [
-          {
-            type: ACTIONS.MESSAGE.SEND,
-            user: 'pepper',
-            text: 'Temperature in the living room is {{0.0.last_value}} °C.',
-          },
-        ],
-      ],
-      scope,
-    );
-    assert.calledWith(message.sendToUser, 'pepper', 'Temperature in the living room is 15 °C.');
   });
 
   it('should execute action scene.start', async () => {

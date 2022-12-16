@@ -26,6 +26,18 @@ class SettingsSystem extends Component {
     }
   };
 
+  vacuumDatabase = async e => {
+    e.preventDefault();
+    this.setState({
+      vacuumStarted: true
+    });
+    try {
+      await this.props.httpClient.post('/api/v1/system/vacuum');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   getTimezone = async () => {
     try {
       const { value } = await this.props.httpClient.get(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.TIMEZONE}`);
@@ -86,7 +98,14 @@ class SettingsSystem extends Component {
     clearInterval(this.refreshPingIntervalId);
   }
 
-  render(props, { selectedTimezone, deviceStateHistoryInDays }) {
+  constructor(props) {
+    super(props);
+    this.state = {
+      vacuumStarted: false
+    };
+  }
+
+  render(props, { selectedTimezone, deviceStateHistoryInDays, vacuumStarted }) {
     const isDocker = get(props, 'systemInfos.is_docker');
     const upgradeDownloadInProgress = props.downloadUpgradeStatus === RequestStatus.Getting;
     const upgradeDownloadFinished = props.downloadUpgradeStatus === RequestStatus.Success;
@@ -104,6 +123,8 @@ class SettingsSystem extends Component {
         selectedTimezone={selectedTimezone}
         deviceStateHistoryInDays={deviceStateHistoryInDays}
         updateDeviceStateHistory={this.updateDeviceStateHistory}
+        vacuumDatabase={this.vacuumDatabase}
+        vacuumStarted={vacuumStarted}
       />
     );
   }

@@ -146,7 +146,13 @@ const data = {
         {
           type: 'devices-in-room',
           room: 'living-room',
-          device_features: ['main-tv-binary', 'main-tv-volume', 'main-tv-channel', 'main-presence-sensor']
+          device_features: [
+            'main-tv-binary',
+            'main-tv-volume',
+            'main-tv-channel',
+            'main-presence-sensor',
+            'main-signal-sensor'
+          ]
         }
       ],
       [
@@ -160,6 +166,11 @@ const data = {
         },
         {
           type: 'user-presence'
+        },
+        {
+          type: 'devices-in-room',
+          room: 'parental-room',
+          device_features: ['curtain-actions', 'shutter-actions', 'shutter-position', 'thermostat']
         }
       ]
     ],
@@ -317,6 +328,18 @@ const data = {
             read_only: true,
             last_value: 0,
             last_value_changed: dayjs().add(60, 'second')
+          },
+          {
+            name: 'Signal quality',
+            selector: 'main-signal-sensor',
+            category: 'signal',
+            type: 'integer',
+            unit: null,
+            min: 0,
+            max: 5,
+            read_only: true,
+            last_value: 4,
+            last_value_changed: dayjs().add(60, 'second')
           }
         ]
       },
@@ -344,8 +367,19 @@ const data = {
         selector: 'main-lamp',
         features: [
           {
-            name: 'Main Lamp',
+            name: 'First lamp',
             selector: 'main-lamp-binary',
+            category: 'light',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Second lamp ',
+            selector: 'secondary-lamp-binary',
             category: 'light',
             type: 'binary',
             min: 0,
@@ -438,6 +472,91 @@ const data = {
       }
     ]
   },
+  'get /api/v1/room/parental-room?expand=devices': {
+    id: '1c634ff4-0476-4733-a084-b4a43d649c84',
+    name: 'Parental Room',
+    selector: 'parental-room',
+    devices: [
+      {
+        id: 'cb3b1a30-d1b6-4624-ac18-e581e3e3b00f',
+        name: 'Main curtain',
+        selector: 'main-curtain',
+        features: [
+          {
+            name: 'Curtain',
+            selector: 'curtain-actions',
+            category: 'curtain',
+            type: 'state',
+            min: -1,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Curtain',
+            selector: 'curtain-position',
+            category: 'curtain',
+            type: 'position',
+            min: 0,
+            max: 100,
+            read_only: true,
+            last_value: 30,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      },
+      {
+        id: '919be7a4-df47-4726-b1c0-7412aed99769',
+        name: 'Main shutter',
+        selector: 'main-shutter',
+        features: [
+          {
+            name: 'Shutter',
+            selector: 'shutter-actions',
+            category: 'shutter',
+            type: 'state',
+            min: -1,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Shutter position',
+            selector: 'shutter-position',
+            category: 'shutter',
+            type: 'position',
+            min: 0,
+            max: 100,
+            read_only: true,
+            last_value: 30,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00',
+            unit: 'percent'
+          }
+        ]
+      },
+      {
+        id: 'db3e81b4-00d4-4f9b-8aa6-0e50e719a729',
+        name: 'Thermostat',
+        selector: 'thermostat',
+        features: [
+          {
+            name: 'Thermostat',
+            selector: 'thermostat',
+            category: 'thermostat',
+            type: 'target-temperature',
+            min: 0,
+            max: 30,
+            read_only: false,
+            last_value: 19.5,
+            last_value_changed: '2022-10-10 07:49:07.556 +00:00',
+            unit: 'celsius'
+          }
+        ]
+      }
+    ]
+  },
   'get /api/v1/room/kitchen?expand=devices': {
     id: 'be6ba391-ebb3-472d-81af-d75d710a8430',
     name: 'Kitchen',
@@ -493,6 +612,18 @@ const data = {
             max: 1,
             read_only: true,
             last_value: 0,
+            last_value_changed: dayjs().add(60, 'second')
+          },
+          {
+            name: 'Signal quality',
+            selector: 'main-signal-sensor',
+            category: 'signal',
+            type: 'integer',
+            unit: null,
+            min: 0,
+            max: 100,
+            read_only: true,
+            last_value: 82,
             last_value_changed: dayjs().add(60, 'second')
           },
           {
@@ -634,6 +765,24 @@ const data = {
               read_only: true,
               last_value: 74,
               unit: 'percent',
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            }
+          ]
+        },
+        {
+          id: '284d8f68-220c-45fd-a73a-eccb547aff24',
+          name: 'Window sensor',
+          selector: 'opening-sensor',
+          features: [
+            {
+              name: 'Window',
+              selector: 'kitchen-opening-sensor',
+              category: 'opening-sensor',
+              type: 'binary',
+              min: 0,
+              max: 1,
+              read_only: true,
+              last_value: 1,
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
@@ -959,6 +1108,296 @@ const data = {
       }
     }
   ],
+  'get /api/v1/service/broadlink': {
+    id: 'a810b8db-6d04-4697-bed3-c4b72c996279'
+  },
+  'get /api/v1/service/broadlink/peripheral': [
+    {
+      address: '210.248.100.245',
+      mac: '4bf75cf0fdbb',
+      name: 'MP1',
+      device: {
+        name: 'MP1',
+        external_id: 'broadlink:1cee8bf16731',
+        selector: 'broadlink:1cee8bf16731',
+        model: 'MP1',
+        service_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+        created_at: '2019-02-12T07:49:07.556Z',
+        should_poll: true,
+        poll_frequency: 60000,
+        features: [
+          {
+            name: 'MP1 1',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'broadlink:0',
+            selector: 'broadlink:0',
+            min: 0,
+            max: 1,
+            read_only: false,
+            has_feedback: true
+          },
+          {
+            name: 'MP1 2',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'broadlink:1',
+            selector: 'broadlink:1',
+            min: 0,
+            max: 1,
+            read_only: false,
+            has_feedback: true
+          },
+          {
+            name: 'MP1 3',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'broadlink:2',
+            selector: 'broadlink:2',
+            min: 0,
+            max: 1,
+            read_only: false,
+            has_feedback: true
+          },
+          {
+            name: 'MP1 4',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'broadlink:3',
+            selector: 'broadlink:3',
+            min: 0,
+            max: 1,
+            read_only: false,
+            has_feedback: true
+          }
+        ]
+      }
+    },
+    {
+      address: '227.154.146.114',
+      name: 'SP2',
+      mac: '7396e6541fb0',
+      canLearn: false,
+      device: {
+        external_id: 'broadlink:7396e6541fb0',
+        selector: 'broadlink:7396e6541fb0',
+        model: 'SP2',
+        name: 'SP2',
+        service_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+        should_poll: true,
+        poll_frequency: 60000,
+        features: [
+          {
+            name: 'SP2',
+            category: 'switch',
+            type: 'binary',
+            external_id: 'broadlink:0',
+            selector: 'broadlink:0',
+            min: 0,
+            max: 1,
+            read_only: false,
+            has_feedback: true
+          }
+        ]
+      }
+    },
+    {
+      address: '220.156.58.18',
+      name: 'RM3 Pro Plus',
+      mac: '1cee8bf16731',
+      canLearn: true
+    }
+  ],
+  'get /api/v1/service/broadlink/device': [
+    {
+      id: 'fbedb47f-4d25-4381-8923-2633b23192a0',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'TV Remote',
+      selector: 'broadlink-fbedb47f-4d25-4381-8923-2633b23192a0',
+      external_id: 'broadlink:fbedb47f-4d25-4381-8923-2633b23192a0',
+      should_poll: false,
+      poll_frequency: null,
+      model: 'television',
+      created_at: '2019-02-12T07:49:07.556Z',
+      updated_at: '2019-02-12T07:49:07.556Z',
+      room: {
+        id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+        name: 'Living Room',
+        selector: 'living-room'
+      }
+    },
+    {
+      id: '197018ef-5110-4e3d-9022-cecb85fce5cb',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'LED remote',
+      selector: 'broadlink-197018ef-5110-4e3d-9022-cecb85fce5cb',
+      external_id: 'broadlink:197018ef-5110-4e3d-9022-cecb85fce5cb',
+      should_poll: false,
+      poll_frequency: null,
+      model: 'light',
+      created_at: '2019-02-12T07:49:07.556Z',
+      updated_at: '2019-02-12T07:49:07.556Z',
+      room: {
+        id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+        name: 'Living Room',
+        selector: 'living-room'
+      }
+    },
+    {
+      id: '1e5412c3-a6b7-4c5f-aede-20c40adbd85d',
+      service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'SP2',
+      selector: 'broadlink-1e5412c3-a6b7-4c5f-aede-20c40adbd85d',
+      external_id: 'broadlink:1e5412c3-a6b7-4c5f-aede-20c40adbd85d',
+      should_poll: false,
+      poll_frequency: null,
+      model: 'sp2',
+      created_at: '2019-02-12T07:49:07.556Z',
+      updated_at: '2019-02-12T07:49:07.556Z',
+      room: {
+        id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+        name: 'Living Room',
+        selector: 'living-room'
+      },
+      features: [
+        {
+          name: 'sp2',
+          category: 'switch',
+          type: 'binary',
+          external_id: 'broadlink:0',
+          selector: 'broadlink-0',
+          min: 0,
+          max: 1,
+          read_only: false,
+          has_feedback: true
+        }
+      ]
+    }
+  ],
+  'get /api/v1/device/broadlink-197018ef-5110-4e3d-9022-cecb85fce5cb': {
+    id: '197018ef-5110-4e3d-9022-cecb85fce5cb',
+    service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+    room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+    name: 'LED remote',
+    model: 'light',
+    selector: 'broadlink-197018ef-5110-4e3d-9022-cecb85fce5cb',
+    external_id: 'broadlink:197018ef-5110-4e3d-9022-cecb85fce5cb',
+    should_poll: false,
+    poll_frequency: null,
+    created_at: '2019-02-12T07:49:07.556Z',
+    updated_at: '2019-02-12T07:49:07.556Z',
+    features: [
+      {
+        id: 'db05402f-8795-4942-903e-351716ee04f9',
+        name: 'Power ON',
+        external_id: 'broadlink:197018ef-5110-4e3d-9022-cecb85fce5cb:binary',
+        selector: 'broadlink-197018ef-5110-4e3d-9022-cecb85fce5cb-binary',
+        category: 'light',
+        type: 'binary'
+      }
+    ],
+    params: [
+      {
+        name: 'peripheral',
+        value: '1cee8bf16731'
+      },
+      {
+        name: 'code_binary-0',
+        value: 'POWER_OFF'
+      },
+      {
+        name: 'code_binary-1',
+        value: 'POWER_ON'
+      }
+    ]
+  },
+  'get /api/v1/device/broadlink-fbedb47f-4d25-4381-8923-2633b23192a0': {
+    id: 'fbedb47f-4d25-4381-8923-2633b23192a0',
+    service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
+    room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+    name: 'TV Remote',
+    model: 'television',
+    selector: 'broadlink-fbedb47f-4d25-4381-8923-2633b23192a0',
+    external_id: 'broadlink:fbedb47f-4d25-4381-8923-2633b23192a0',
+    should_poll: false,
+    poll_frequency: null,
+    created_at: '2019-02-12T07:49:07.556Z',
+    updated_at: '2019-02-12T07:49:07.556Z',
+    features: [
+      {
+        id: '22d37c48-6805-4118-ba1c-fa44052c2d3c',
+        name: 'Power',
+        external_id: 'broadlink:fbedb47f-4d25-4381-8923-2633b23192a0:binary',
+        selector: 'broadlink-fbedb47f-4d25-4381-8923-2633b23192a0-binary',
+        category: 'television',
+        type: 'binary'
+      },
+      {
+        id: '1667855b-a58d-4a8c-9ac6-c40c2a544db8',
+        name: 'Source',
+        external_id: 'broadlink:fbedb47f-4d25-4381-8923-2633b23192a0:source',
+        selector: 'broadlink-fbedb47f-4d25-4381-8923-2633b23192a0-source',
+        category: 'television',
+        type: 'source'
+      },
+      {
+        id: '8d8a9fb1-dbd0-4f31-bbc7-8ffebf1e9f93',
+        name: 'Channel',
+        external_id: 'broadlink:fbedb47f-4d25-4381-8923-2633b23192a0:channel',
+        selector: 'broadlink-fbedb47f-4d25-4381-8923-2633b23192a0-channel',
+        category: 'television',
+        type: 'channel'
+      }
+    ],
+    params: [
+      {
+        name: 'code_binary-1',
+        value: 'POWER'
+      },
+      {
+        name: 'code_source',
+        value: 'SOURCE'
+      },
+      {
+        name: 'code_channel-0',
+        value: 'CHANNEL_0'
+      },
+      {
+        name: 'code_channel-1',
+        value: 'CHANNEL_1'
+      },
+      {
+        name: 'code_channel-2',
+        value: 'CHANNEL_2'
+      },
+      {
+        name: 'code_channel-3',
+        value: 'CHANNEL_3'
+      },
+      {
+        name: 'code_channel-4',
+        value: 'CHANNEL_4'
+      },
+      {
+        name: 'code_channel-5',
+        value: 'CHANNEL_5'
+      },
+      {
+        name: 'code_channel-6',
+        value: 'CHANNEL_6'
+      }
+    ],
+    room: {
+      id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'Living Room',
+      selector: 'living-room'
+    }
+  },
+  'post /api/v1/service/broadlink/learn': {},
+  'post /api/v1/service/broadlink/learn/cancel': {},
   'get /api/v1/service/mqtt': {},
   'get /api/v1/service/mqtt/status': {
     configured: true,
@@ -1136,6 +1575,20 @@ const data = {
     selector: 'sonoff-basic',
     room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
     model: 'sonoff-basic',
+    features: [
+      {
+        category: 'switch',
+        type: 'binary',
+        name: 'Switch'
+      }
+    ]
+  },
+  'get /api/v1/device/zigbee2mqtt-0x00158d0005828ece': {
+    name: 'Aqara Sensor',
+    external_id: 'zigbee2mqtt-0x00158d0005828ece',
+    selector: 'zigbee2mqtt-0x00158d0005828ece',
+    room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+    model: 'zigbee2mqtt-0x00158d0005828ece',
     features: [
       {
         category: 'switch',
@@ -2306,6 +2759,9 @@ const data = {
   'get /api/v1/device_feature/aggregated_states': [
     {
       device: {
+        name: 'Kitchen temperature'
+      },
+      deviceFeature: {
         name: 'Kitchen temperature'
       },
       values: [

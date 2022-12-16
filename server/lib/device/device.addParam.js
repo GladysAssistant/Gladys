@@ -27,7 +27,7 @@ async function addParam(deviceSelector, param) {
 
   // if the param does not already exist, we create it.
   if (paramIndex === -1) {
-    const createdParam = await db.DeviceParam.create(Object.assign({}, param, { device_id: device.id }));
+    const createdParam = await db.DeviceParam.create({ ...param, device_id: device.id });
     paramInStore = createdParam.get({ plain: true });
     device.params.push(paramInStore);
     // we save again the device in RAM

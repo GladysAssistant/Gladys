@@ -20,6 +20,7 @@ import CheckUserPresence from './actions/CheckUserPresence';
 import CheckTime from './actions/CheckTime';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
+import EcowattCondition from './actions/EcowattCondition';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -43,7 +44,8 @@ const ACTION_ICON = {
   [ACTIONS.HOUSE.IS_EMPTY]: 'fe fe-home',
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
   [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
-  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar'
+  [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
+  [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap'
 };
 
 const ActionCard = ({ children, ...props }) => (
@@ -199,6 +201,9 @@ const ActionCard = ({ children, ...props }) => (
             index={props.index}
             updateActionProperty={props.updateActionProperty}
             setVariables={props.setVariables}
+            actionsGroupsBefore={props.actionsGroupsBefore}
+            variables={props.variables}
+            triggersVariables={props.triggersVariables}
           />
         )}
         {props.action.type === ACTIONS.CONDITION.CHECK_TIME && (
@@ -253,6 +258,14 @@ const ActionCard = ({ children, ...props }) => (
             updateActionProperty={props.updateActionProperty}
             variables={props.variables}
             setVariables={props.setVariables}
+          />
+        )}
+        {props.action.type === ACTIONS.ECOWATT.CONDITION && (
+          <EcowattCondition
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
           />
         )}
       </div>

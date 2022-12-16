@@ -18,8 +18,24 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
       ecdsaPublicKeyJwk: {},
     }),
     instanceConnect: fake.resolves({}),
-    uploadBackup: fake.resolves({
-      success: true,
+    initializeMultiPartBackup: fake.resolves({
+      file_id: 'c1075a77-0553-495f-8646-116c599f13bc',
+      file_key: 'b838be4b-c399-495b-ae0b-23247e71743c.enc',
+      backup_id: 'b5f5e38e-d0e6-469f-bee9-b2ae54f731c7',
+      chunk_size: 20 * 1024 * 1024,
+      parts: [
+        {
+          part_number: 1,
+          signed_url: 'https://test.test.com',
+        },
+      ],
+    }),
+    finalizeMultiPartBackup: fake.resolves({ backup: {}, signed_url: 'https://test.com' }),
+    abortMultiPartBackup: fake.resolves({ backup: {} }),
+    uploadOneBackupChunk: fake.resolves({
+      headers: {
+        etag: '"this-is-the-etag"',
+      },
     }),
     getBackups: fake.resolves([
       {
@@ -60,6 +76,7 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
         connected: false,
       },
     ]),
+    getEcowattSignals: fake.resolves({ signals: [] }),
   };
 };
 

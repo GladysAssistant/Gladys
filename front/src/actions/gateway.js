@@ -1,5 +1,6 @@
 import get from 'get-value';
 import update from 'immutability-helper';
+import { route } from 'preact-router';
 import { RequestStatus, LoginStatus } from '../utils/consts';
 import { validateEmail } from '../utils/validator';
 import { ERROR_MESSAGES, SYSTEM_VARIABLE_NAMES } from '../../../server/utils/constants';
@@ -148,15 +149,12 @@ function createActions(store) {
         store.setState({
           gatewayCreateBackupStatus: RequestStatus.Success
         });
-        // we refresh backups
-        setTimeout(() => actions.getBackups(store.getState()), 1000);
-        setTimeout(() => actions.getBackups(store.getState()), 3000);
-        setTimeout(() => actions.getBackups(store.getState()), 8000);
         // we remove the backup status after 1 second
         setTimeout(() => {
           store.setState({
             gatewayCreateBackupStatus: null
           });
+          route('/dashboard/settings/jobs');
         }, 1000);
       } catch (e) {
         store.setState({
@@ -416,7 +414,7 @@ function createActions(store) {
         store.setState({ reSubscribeMonthlyPlanError: true, billingRequestStatus: RequestStatus.Error });
       }
     },
-    updateBillingRequestPending(state) {
+    updateBillingRequestPending() {
       store.setState({
         billingRequestStatus: RequestStatus.Getting
       });

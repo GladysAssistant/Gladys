@@ -42,7 +42,7 @@ function createActions(store) {
         const rtspCameras = await state.httpClient.get('/api/v1/service/rtsp-camera/device', options);
         // find camera params
         rtspCameras.forEach(camera => {
-          camera = actions.complete(camera);
+          actions.complete(camera);
         });
         store.setState({
           rtspCameras,

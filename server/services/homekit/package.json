@@ -1,0 +1,19 @@
+{
+  "name": "gladys-homekit",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "hap-nodejs": "^0.10.2",
+    "uuid": "^9.0.0"
+  }
+}

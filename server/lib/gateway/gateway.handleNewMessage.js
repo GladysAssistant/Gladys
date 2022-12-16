@@ -84,6 +84,11 @@ async function handleNewMessage(data, rawMessage, cb) {
   if (data.type === 'gladys-open-api' && data.action === 'google-home-request') {
     this.handleGoogleHomeMessage(data, rawMessage, cb);
   }
+
+  // if the message is a Alexa request
+  if (data.type === 'gladys-open-api' && data.action === 'alexa-request') {
+    this.handleAlexaMessage(data, rawMessage, cb);
+  }
 }
 
 module.exports = {

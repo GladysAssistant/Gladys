@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
@@ -43,6 +43,9 @@ const NodeTab = ({ children, ...props }) => (
       >
         <div class="loader" />
         <div class="dimmer-content">
+          <div class="alert alert-danger">
+            <MarkupText id="integration.zwave.device.oldIntegrationWarning" />
+          </div>
           {props.zwaveDevices && props.zwaveDevices.length === 0 && (
             <div class="alert alert-info">
               <Text id="integration.zwave.device.noDevices" />
@@ -57,6 +60,7 @@ const NodeTab = ({ children, ...props }) => (
                   deviceIndex={index}
                   houses={props.houses}
                   updateDeviceProperty={props.updateDeviceProperty}
+                  convertToMqtt={props.convertToMqtt}
                   saveDevice={props.saveDevice}
                   deleteDevice={props.deleteDevice}
                   user={props.user}

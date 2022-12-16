@@ -22,7 +22,7 @@ class ForgotPasswordPage extends Component {
       });
   };
 
-  render({}, { email, password, success, forgotInProgress }) {
+  render({}, { email, success, forgotInProgress }) {
     return (
       <ForgotPassword
         email={email}

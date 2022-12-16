@@ -27,6 +27,7 @@ import GatewayForgotPassword from '../routes/gateway-forgot-password';
 import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
+import AlexaGateway from '../routes/integration/all/alexa-gateway';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -63,6 +64,10 @@ import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs'
 
 // Integrations
 import TelegramPage from '../routes/integration/all/telegram';
+import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
+import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
+import HomeKitPage from '../routes/integration/all/homekit';
+import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
 import CalDAVSharePage from '../routes/integration/all/caldav/share-page';
@@ -70,15 +75,17 @@ import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
-import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
-import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
-import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
-import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
-import ZwaveNodeOperationPage from '../routes/integration/all/zwave/node-operation-page';
-import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+
+// Deprecated integration
+import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
+
+// Broadlink integration
+import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
+import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
+import BroadlinkPeripheralPage from '../routes/integration/all/broadlink/peripheral-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -201,11 +208,6 @@ const AppRouter = connect(
         <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
-        <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
-        <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
-        <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
-        <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
-        <ZwaveEditPage path="/dashboard/integration/device/zwave/edit/:deviceSelector" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
@@ -226,6 +228,7 @@ const AppRouter = connect(
         <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+        <HomeKitPage path="/dashboard/integration/communication/homekit" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
@@ -233,7 +236,16 @@ const AppRouter = connect(
         <BluetoothSetupPeripheralPage path="/dashboard/integration/device/bluetooth/setup/:uuid" />
         <BluetoothSettingsPage path="/dashboard/integration/device/bluetooth/config" />
 
+        <BroadlinkDevicePage path="/dashboard/integration/device/broadlink" />
+        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit" />
+        <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
+        <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
+
+        <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
+        <AlexaWelcomePage path="/dashboard/integration/communication/alexa" />
+        <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
+        <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
@@ -264,7 +276,6 @@ const AppRouter = connect(
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
-    this.props.getIntegrations();
   }
 
   render({ user }, {}) {

@@ -1,7 +1,12 @@
 const { Op, fn, col, literal } = require('sequelize');
 const { LTTB } = require('downsample');
+const dayjs = require('dayjs');
+const utc = require('dayjs/plugin/utc');
+
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
+
+dayjs.extend(utc);
 
 /**
  * @description Get all features states aggregates.
@@ -63,7 +68,10 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   } else {
     rows = await db.DeviceFeatureStateAggregate.findAll({
       raw: true,
-      attributes: [[groupByFunction, 'created_at'], [fn('round', fn('avg', col('value')), 2), 'value']],
+      attributes: [
+        [groupByFunction, 'created_at'],
+        [fn('round', fn('avg', col('value')), 2), 'value'],
+      ],
       group: [groupByFunction],
       where: {
         device_feature_id: deviceFeature.id,
@@ -76,7 +84,7 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   }
 
   const dataForDownsampling = rows.map((deviceFeatureState) => {
-    return [new Date(deviceFeatureState.created_at), deviceFeatureState.value];
+    return [dayjs.utc(deviceFeatureState.created_at), deviceFeatureState.value];
   });
 
   const downsampled = LTTB(dataForDownsampling, maxStates);

@@ -22,7 +22,7 @@ function getElementsByTagRegex(container, regex) {
  * requestCalendars(xhr, homeUrl)
  */
 async function requestCalendars(xhr, homeUrl) {
-  const ICAL_OBJS = new Set(['VEVENT', 'VTODO', 'VJOURNAL', 'VFREEBUSY', 'VTIMEZONE', 'VALARM']);
+  const ICAL_OBJS = new Set(['VEVENT', 'VFREEBUSY', 'VALARM']);
 
   const req = this.dav.request.propfind({
     props: [
@@ -34,6 +34,7 @@ async function requestCalendars(xhr, homeUrl) {
       { name: 'resourcetype', namespace: this.dav.ns.DAV },
       { name: 'supported-calendar-component-set', namespace: this.dav.ns.CALDAV },
       { name: 'sync-token', namespace: this.dav.ns.DAV },
+      { name: 'source', namespace: this.dav.ns.CALENDAR_SERVER },
     ],
     depth: 1,
   });
@@ -41,7 +42,7 @@ async function requestCalendars(xhr, homeUrl) {
   const listCalendars = await xhr.send(req, homeUrl);
   // Filter to get only calendar from dav objects
   return listCalendars
-    .filter((res) => res.props.resourcetype.includes('calendar'))
+    .filter((res) => res.props.resourcetype.includes('calendar') || res.props.resourcetype.includes('subscribed'))
     .filter((res) => {
       const components = res.props.supportedCalendarComponentSet || [];
       return components.reduce((hasObjs, component) => {
@@ -50,16 +51,17 @@ async function requestCalendars(xhr, homeUrl) {
     })
     .map((res) => {
       logger.info(`CalDAV : Found calendar ${res.props.displayname}`);
+
       return {
         data: res,
         description: res.props.calendarDescription,
         timezone: res.props.calendarTimezone,
         color: res.props.calendarColor,
-        url: url.resolve(homeUrl, res.href),
+        url: res.props.resourcetype.includes('calendar') ? url.resolve(homeUrl, res.href) : res.props.source,
         ctag: res.props.getctag,
         displayName: res.props.displayname,
         components: res.props.supportedCalendarComponentSet,
-        resourcetype: res.props.resourcetype,
+        type: res.props.resourcetype.includes('calendar') ? 'CALDAV' : 'WEBCAL',
         syncToken: res.props.syncToken,
       };
     });
@@ -84,8 +86,8 @@ async function requestChanges(xhr, calendarToUpdate) {
     });
     // eslint-disable-next-line no-await-in-loop
     result = await xhr.send(req, calendarToUpdate.external_id);
-    eventsToUpdate.push(...result.responses.filter((event) => event.props.getetag));
-  } while (result.responses.length > 0 && !result.responses[result.responses.length - 1].props.getetag);
+    eventsToUpdate.push(...result.responses.filter((event) => event.href));
+  } while (result.responses.length > 0);
 
   return eventsToUpdate;
 }

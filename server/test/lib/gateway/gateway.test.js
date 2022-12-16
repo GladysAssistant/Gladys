@@ -15,7 +15,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
 });
 
 const getConfig = require('../../../utils/getConfig');
-const { EVENTS } = require('../../../utils/constants');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -34,13 +34,22 @@ const system = {
 
 const config = getConfig();
 
+const job = {
+  wrapper: (type, func) => {
+    return async () => {
+      return func();
+    };
+  },
+  updateProgress: fake.resolves({}),
+};
+
 describe('gateway', () => {
   describe('gateway.login', () => {
     const variable = {
       getValue: fake.resolves(null),
       setValue: fake.resolves(null),
     };
-    const gateway = new Gateway(variable, event, system, sequelize, config);
+    const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
     it('should login to gladys gateway', async () => {
       const loginResults = await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       expect(loginResults).to.have.property('two_factor_token');
@@ -67,14 +76,22 @@ describe('gateway', () => {
       },
     ];
     const variable = {
-      getValue: fake.resolves(JSON.stringify(userKeys)),
+      getValue: (name) => {
+        if (name === SYSTEM_VARIABLE_NAMES.TIMEZONE) {
+          return 'Europe/Paris';
+        }
+        return JSON.stringify(userKeys);
+      },
       setValue: fake.resolves(null),
     };
-    const gateway = new Gateway(variable, event, system, sequelize, config);
+    const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
     it('should login two factor to gladys gateway', async () => {
+      gateway.getLatestGladysVersionInitTimeout = 0;
       await gateway.init();
+      await Promise.delay(100);
       expect(gateway.connected).to.equal(true);
       expect(gateway.usersKeys).to.deep.equal(userKeys);
+      expect(gateway.backupSchedule).to.not.equal(undefined);
     });
   });
 
@@ -85,17 +102,32 @@ describe('gateway', () => {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.backup();
-      assert.calledOnce(gateway.gladysGatewayClient.uploadBackup);
+      assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
+      assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
+      assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
     });
-    it('should backup gladys with lots of insert at the same time', async function Test() {
+    it('should start and abort backup', async () => {
       const variable = {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.gladysGatewayClient.uploadOneBackupChunk = fake.rejects('error');
+      const promise = gateway.backup();
+      await assertChai.isRejected(promise);
+      assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
+      assert.calledOnce(gateway.gladysGatewayClient.abortMultiPartBackup);
+    });
+    it('should backup gladys with lots of insert at the same time', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       const promisesDevices = [];
       const promises = [];
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
@@ -121,28 +153,16 @@ describe('gateway', () => {
       }
       await Promise.all(promisesDevices);
       await Promise.all(promises);
-      assert.calledOnce(gateway.gladysGatewayClient.uploadBackup);
-    });
-
-    it('should backup gladys and test progress bar', async () => {
-      const variable = {
-        getValue: fake.resolves('key'),
-        setValue: fake.resolves(null),
-      };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
-      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
-      gateway.gladysGatewayClient.uploadBackup = async (form, func) => {
-        func({ loaded: 1, total: 100 });
-        await Promise.delay(100);
-      };
-      await gateway.backup();
+      assert.calledOnce(gateway.gladysGatewayClient.initializeMultiPartBackup);
+      assert.calledOnce(gateway.gladysGatewayClient.uploadOneBackupChunk);
+      assert.calledOnce(gateway.gladysGatewayClient.finalizeMultiPartBackup);
     });
     it('should not backup, no backup key found', async () => {
       const variable = {
         getValue: fake.resolves(null),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       const promise = gateway.backup();
       return assertChai.isRejected(promise, 'GLADYS_GATEWAY_BACKUP_KEY_NOT_FOUND');
@@ -152,7 +172,7 @@ describe('gateway', () => {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       const backups = await gateway.getBackups();
       expect(backups).to.deep.equal([
@@ -169,13 +189,40 @@ describe('gateway', () => {
     });
   });
 
+  describe('gateway.checkIfBackupNeeded', async function Describe() {
+    this.timeout(20000);
+    it('should check if backup is needed and execute backup', async () => {
+      const variable = {
+        getValue: fake.resolves('key'),
+        setValue: fake.resolves(null),
+      };
+      const eventFake = {
+        emit: fake.returns(null),
+        on: fake.returns(null),
+      };
+      const gateway = new Gateway(variable, eventFake, system, sequelize, config, {}, {}, {}, job);
+      gateway.backupRandomInterval = 10;
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.connected = true;
+      await gateway.checkIfBackupNeeded();
+      assert.calledOnce(gateway.gladysGatewayClient.getBackups);
+      // wait 50ms and see if backup was called
+      await new Promise((resolve) => {
+        setTimeout(() => {
+          assert.calledOnce(eventFake.emit);
+          resolve();
+        }, 50);
+      });
+    });
+  });
+
   describe('gateway.downloadBackup', () => {
     it('should restore a backup', async () => {
       const variable = {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       const { encryptedBackupFilePath } = await gateway.backup();
       const { backupFilePath } = await gateway.downloadBackup(encryptedBackupFilePath);
@@ -187,7 +234,7 @@ describe('gateway', () => {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.restoreBackupEvent('this-path-does-not-exist');
     });
@@ -196,7 +243,7 @@ describe('gateway', () => {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       const emptyFile = path.join(__dirname, 'this_file_is_not_a_valid_db.dbfile');
       const promise = gateway.restoreBackup(emptyFile);
@@ -207,7 +254,7 @@ describe('gateway', () => {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       const emptyFile = path.join(__dirname, 'this_file_has_no_user_table.dbfile');
       const promise = gateway.restoreBackup(emptyFile);
@@ -218,7 +265,7 @@ describe('gateway', () => {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       const emptyFile = path.join(__dirname, 'this_db_has_no_users.dbfile');
       const promise = gateway.restoreBackup(emptyFile);
@@ -232,7 +279,10 @@ describe('gateway', () => {
         getValue: fake.resolves('key'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const service = {
+        getUsage: fake.resolves({ zigbee: true }),
+      };
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, service, job);
       const version = await gateway.getLatestGladysVersion();
       expect(version).to.have.property('name');
       expect(version).to.have.property('created_at');
@@ -245,7 +295,7 @@ describe('gateway', () => {
         getValue: fake.resolves('[]'),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       const users = await gateway.getUsersKeys();
       expect(users).to.deep.equal([
         {
@@ -275,7 +325,7 @@ describe('gateway', () => {
         getValue: fake.resolves(JSON.stringify(oldUsers)),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       const users = await gateway.getUsersKeys();
       expect(users).to.deep.equal([
         {
@@ -305,7 +355,7 @@ describe('gateway', () => {
         getValue: fake.resolves(JSON.stringify(oldUsers)),
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       const users = await gateway.getUsersKeys();
       expect(users).to.deep.equal([
         {
@@ -328,28 +378,28 @@ describe('gateway', () => {
         setValue: fake.resolves(null),
         destroy: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       await gateway.disconnect();
     });
   });
   describe('gateway.forwardWebsockets', () => {
     it('should forward a websocket message when connected', () => {
-      const gateway = new Gateway({}, event, system, sequelize, config);
+      const gateway = new Gateway({}, event, system, sequelize, config, {}, {}, {}, job);
       gateway.connected = true;
 
       const websocketMessage = {
-        type: 'zwave.new-node',
+        type: 'device.new',
         payload: {},
       };
       gateway.forwardWebsockets(websocketMessage);
       assert.calledWith(gateway.gladysGatewayClient.newEventInstance, websocketMessage.type, websocketMessage.payload);
     });
     it('should prevent forwarding a websocket message when not connected', () => {
-      const gateway = new Gateway({}, event, system, sequelize, config);
+      const gateway = new Gateway({}, event, system, sequelize, config, {}, {}, {}, job);
 
       const websocketMessage = {
-        type: 'zwave.new-node',
+        type: 'device.new',
         payload: {},
       };
       gateway.forwardWebsockets(websocketMessage);
@@ -362,7 +412,7 @@ describe('gateway', () => {
       const variable = {
         setValue: fake.resolves(null),
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, {}, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
 
       return new Promise((resolve, reject) => {
@@ -391,7 +441,7 @@ describe('gateway', () => {
           id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
         }),
       };
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
 
       gateway.usersKeys = [
@@ -431,7 +481,7 @@ describe('gateway', () => {
         get: fake.returns(null),
       };
       const eventGateway = new EventEmitter();
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       gateway.usersKeys = [
         {
@@ -476,7 +526,7 @@ describe('gateway', () => {
         }),
       };
       const eventGateway = new EventEmitter();
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       gateway.usersKeys = [
         {
@@ -531,7 +581,7 @@ describe('gateway', () => {
         emit: fake.returns(),
         on: fake.returns(),
       };
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       gateway.usersKeys = [
         {
@@ -586,7 +636,7 @@ describe('gateway', () => {
         emit: fake.returns(),
         on: fake.returns(),
       };
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager);
+      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       gateway.usersKeys = [
         {
@@ -656,7 +706,17 @@ describe('gateway', () => {
         emit: fake.returns(),
         on: fake.returns(),
       };
-      const gateway = new Gateway(variable, eventGateway, system, sequelize, config, {}, stateManager, serviceManager);
+      const gateway = new Gateway(
+        variable,
+        eventGateway,
+        system,
+        sequelize,
+        config,
+        {},
+        stateManager,
+        serviceManager,
+        job,
+      );
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       gateway.usersKeys = [
         {
@@ -764,6 +824,78 @@ describe('gateway', () => {
       expect(resultUnkown).to.deep.equal({ status: 400 });
       expect(resultDisconnect).to.deep.equal({});
     });
+    it('should handle a new gateway open api message: alexa-request', async function Test() {
+      this.timeout(10000);
+      const variable = {
+        setValue: fake.resolves(null),
+        destroy: fake.resolves(null),
+      };
+      const stateManager = {
+        get: fake.returns({
+          id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+        }),
+      };
+      const serviceManager = {
+        getService: fake.returns({
+          alexaHandler: {
+            onDiscovery: fake.resolves({ onDiscovery: true }),
+            onReportState: fake.resolves({ onReportState: true }),
+            onExecute: fake.resolves({ onExecute: true }),
+          },
+        }),
+      };
+      const eventGateway = {
+        emit: fake.returns(null),
+        on: fake.returns(null),
+      };
+      const gateway = new Gateway(
+        variable,
+        eventGateway,
+        system,
+        sequelize,
+        config,
+        {},
+        stateManager,
+        serviceManager,
+        job,
+      );
+      await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
+      gateway.usersKeys = [
+        {
+          rsa_public_key: 'fingerprint',
+          ecdsa_public_key: 'fingerprint',
+          accepted: true,
+        },
+      ];
+
+      const promiseDiscovery = new Promise((resolve, reject) => {
+        gateway.handleNewMessage(
+          {
+            type: 'gladys-open-api',
+            action: 'alexa-request',
+            data: {
+              directive: {
+                header: {
+                  namespace: 'Alexa.Discovery',
+                  name: 'Discover',
+                  messageId: 'd89e30ed-bbcb-4ec5-9684-8e5c14e3bffd',
+                  payloadVersion: '3',
+                },
+                payload: {},
+              },
+            },
+          },
+          {
+            rsaPublicKeyRaw: 'key',
+            ecdsaPublicKeyRaw: 'key',
+            local_user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+          },
+          resolve,
+        );
+      });
+      const resultDiscovery = await promiseDiscovery;
+      expect(resultDiscovery).to.deep.equal({ onDiscovery: true });
+    });
   });
   describe('gateway.forwardDeviceStateToGoogleHome', () => {
     it('should forward an event to google home', async () => {
@@ -808,7 +940,7 @@ describe('gateway', () => {
           return feature;
         },
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       gateway.googleHomeForwardStateTimeout = 1;
       gateway.connected = true;
@@ -869,7 +1001,7 @@ describe('gateway', () => {
           return feature;
         },
       };
-      const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager);
+      const gateway = new Gateway(variable, event, system, sequelize, config, {}, stateManager, {}, job);
       await gateway.login('tony.stark@gladysassistant.com', 'warmachine123');
       gateway.googleHomeForwardStateTimeout = 1;
       gateway.connected = true;

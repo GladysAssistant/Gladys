@@ -15,13 +15,24 @@ class ConfigureTwoFactorPage extends Component {
   getOtpAuthUrl = async () => {
     const accessToken = this.props.session.getTwoFactorAccessToken();
     const data = await this.props.session.gatewayClient.configureTwoFactor(accessToken);
+    const url = new URL(data.otpauth_url);
+    const secret = url.searchParams.get('secret');
     QRCode.toDataURL(data.otpauth_url, (err, dataUrl) => {
-      this.setState({ dataUrl });
+      this.setState({ dataUrl, secret });
     });
   };
 
   nextStep = () => {
     this.setState({ step: this.state.step + 1 });
+  };
+
+  copySecret = () => {
+    try {
+      const { secret } = this.state;
+      navigator.clipboard.writeText(secret);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   updateTwoFactorCode = event => {
@@ -47,7 +58,7 @@ class ConfigureTwoFactorPage extends Component {
 
     this.props.session.gatewayClient
       .enableTwoFactor(accessToken, twoFactorCode)
-      .then(data => {
+      .then(() => {
         window.location = '/login';
       })
       .catch(err => {
@@ -63,15 +74,17 @@ class ConfigureTwoFactorPage extends Component {
     this.getOtpAuthUrl();
   };
 
-  render({}, { dataUrl, step, twoFactorCode, errored }) {
+  render({}, { dataUrl, step, twoFactorCode, errored, secret }) {
     return (
       <ConfigureTwoFactorForm
         dataUrl={dataUrl}
+        secret={secret}
         errored={errored}
         nextStep={this.nextStep}
         twoFactorCode={twoFactorCode}
         updateTwoFactorCode={this.updateTwoFactorCode}
         enableTwoFactor={this.enableTwoFactor}
+        copySecret={this.copySecret}
         step={step}
       />
     );

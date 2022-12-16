@@ -266,7 +266,6 @@ class WeatherBoxComponent extends Component {
     if (displayMode[GetWeatherModes.HourlyForecast]) {
       const hours = get(weatherObject, 'hours');
       if (typeof hours !== 'undefined') {
-        let i = 0;
         hoursDisplay = hours.map(hour => {
           return (
             <div style={Object.assign({ width: '10%', margin: '0.25em 1.25%' })}>
@@ -288,7 +287,6 @@ class WeatherBoxComponent extends Component {
     if (displayMode[GetWeatherModes.DailyForecast]) {
       const days = get(weatherObject, 'days');
       if (typeof days !== 'undefined') {
-        let i = 0;
         daysDisplay = days.map(day => {
           return (
             <div className="row" style={{ marginTop: '0.5em' }}>

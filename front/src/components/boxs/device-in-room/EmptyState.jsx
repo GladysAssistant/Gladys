@@ -4,7 +4,7 @@ const marginTop20px = {
   marginTop: '20px'
 };
 
-const EmptyState = ({ children, ...props }) => (
+const EmptyState = ({}) => (
   <div
     style={{
       width: '60%',

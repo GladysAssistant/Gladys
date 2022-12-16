@@ -1,8 +1,7 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
-import { Link } from 'preact-router/match';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -43,11 +42,18 @@ class ZWaveDeviceBox extends Component {
     this.setState({ loading: false });
   };
   deleteDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, tooMuchStatesError: false, statesNumber: undefined });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
-      this.setState({ error: RequestStatus.Error });
+      const status = get(e, 'response.status');
+      const dataMessage = get(e, 'response.data.message');
+      if (status === 400 && dataMessage && dataMessage.includes('Too much states')) {
+        const statesNumber = new Intl.NumberFormat().format(dataMessage.split(' ')[0]);
+        this.setState({ tooMuchStatesError: true, statesNumber });
+      } else {
+        this.setState({ error: RequestStatus.Error });
+      }
     }
     this.setState({ loading: false });
   };
@@ -57,6 +63,16 @@ class ZWaveDeviceBox extends Component {
   updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
+  convertDeviceToMqtt = async () => {
+    this.setState({ loading: true });
+    try {
+      await this.props.convertToMqtt(this.props.deviceIndex);
+    } catch (e) {
+      console.error(e);
+      this.setState({ error: RequestStatus.Error });
+    }
+    this.setState({ loading: false });
+  };
   componentWillMount() {
     this.refreshDeviceProperty();
   }
@@ -65,7 +81,7 @@ class ZWaveDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, mostRecentValueAt, loading, error }) {
+  render(props, { batteryLevel, mostRecentValueAt, loading, tooMuchStatesError, statesNumber }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -85,6 +101,11 @@ class ZWaveDeviceBox extends Component {
             <div class="loader" />
             <div class="dimmer-content">
               <div class="card-body">
+                {tooMuchStatesError && (
+                  <div class="alert alert-warning">
+                    <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
+                  </div>
+                )}
                 <div class="form-group">
                   <label>
                     <Text id="integration.zwave.device.nameLabel" />
@@ -125,7 +146,7 @@ class ZWaveDeviceBox extends Component {
                     <Text id="integration.zwave.device.featuresLabel" />
                   </label>
                   <DeviceFeatures features={props.device.features} />
-                  <p class="mt-4">
+                  <p class="mt-2">
                     {mostRecentValueAt ? (
                       <Text
                         id="integration.zwave.device.mostRecentValueAt"
@@ -141,17 +162,12 @@ class ZWaveDeviceBox extends Component {
                   </p>
                 </div>
                 <div class="form-group">
-                  <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.zwave.device.saveButton" />
-                  </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
+                  <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                     <Text id="integration.zwave.device.deleteButton" />
                   </button>
-                  <Link href={`/dashboard/integration/device/zwave/edit/${props.device.selector}`}>
-                    <button class="btn btn-secondary float-right">
-                      <Text id="integration.zwave.device.editButton" />
-                    </button>
-                  </Link>
+                  <button onClick={this.convertDeviceToMqtt} class="btn btn-warning">
+                    <Text id="integration.zwave.device.convertToMqtt" />
+                  </button>
                 </div>
               </div>
             </div>

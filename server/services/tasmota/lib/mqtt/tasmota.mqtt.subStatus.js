@@ -13,13 +13,14 @@ function subStatus(device, message) {
   const statusMsg = JSON.parse(message);
 
   recursiveSearch(statusMsg, (featureTemplate, fullKey, command, value) => {
-    const feature = addFeature(device, featureTemplate, fullKey, command, value);
-    if (feature) {
+    const features = addFeature(device, featureTemplate, fullKey, command, value);
+
+    features.forEach((feature) => {
       this.tasmotaHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: feature.external_id,
         state: feature.last_value,
       });
-    }
+    });
   });
   return null;
 }

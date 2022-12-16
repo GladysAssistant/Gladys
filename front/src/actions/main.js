@@ -1,5 +1,4 @@
 import createActionsProfilePicture from './profilePicture';
-import createActionsIntegration from './integration';
 import { getDefaultState } from '../utils/getDefaultState';
 import { route } from 'preact-router';
 import get from 'get-value';
@@ -19,7 +18,6 @@ const OPEN_PAGES = [
 
 function createActions(store) {
   const actionsProfilePicture = createActionsProfilePicture(store);
-  const integrations = createActionsIntegration(store);
 
   const actions = {
     handleRoute(state, e) {
@@ -39,7 +37,7 @@ function createActions(store) {
         showCollapsedMenu: !state.showCollapsedMenu
       });
     },
-    redirectToLogin(state) {
+    redirectToLogin() {
       const returnUrl = window.location.pathname + window.location.search;
       route(`/login?return_url=${encodeURIComponent(returnUrl)}`);
     },
@@ -70,14 +68,15 @@ function createActions(store) {
         const status = get(e, 'response.status');
         const error = get(e, 'response.data.error');
         const gatewayErrorMessage = get(e, 'response.data.error_message');
-        if (status === 401 || status === 403) {
+        const errorMessageOtherFormat = get(e, 'response.data.message');
+        if (status === 401) {
           state.session.reset();
           actions.redirectToLogin();
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
           route('/link-gateway-user');
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
           route('/link-gateway-user');
-        } else if (gatewayErrorMessage === 'NO_INSTANCE_FOUND') {
+        } else if (gatewayErrorMessage === 'NO_INSTANCE_FOUND' || errorMessageOtherFormat === 'NO_INSTANCE_DETECTED') {
           route('/link-gateway-user');
         } else {
           console.error(e);
@@ -97,7 +96,7 @@ function createActions(store) {
     }
   };
 
-  return Object.assign(actions, actionsProfilePicture, integrations);
+  return Object.assign(actions, actionsProfilePicture);
 }
 
 export default createActions;

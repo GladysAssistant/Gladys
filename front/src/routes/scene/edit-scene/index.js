@@ -22,10 +22,10 @@ class EditScene extends Component {
       }
       const variables = [];
       scene.actions.forEach(actionGroup => {
-        variables.push(actionGroup.map(action => []));
+        variables.push(actionGroup.map(() => []));
       });
       const triggersVariables = [];
-      scene.triggers.forEach(trigger => {
+      scene.triggers.forEach(() => {
         triggersVariables.push([]);
       });
       this.setState({

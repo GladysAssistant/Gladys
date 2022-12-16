@@ -18,7 +18,7 @@ function handleMqttMessage(topic, message) {
 
   switch (topic) {
     case 'zigbee2mqtt/bridge/devices': {
-      logger.log('Getting config devices from Zigbee2mqtt');
+      logger.debug('Getting config devices from Zigbee2mqtt');
       const devices = JSON.parse(message);
 
       this.discoveredDevices = {};
@@ -41,7 +41,7 @@ function handleMqttMessage(topic, message) {
       const config = JSON.parse(message);
       this.z2mPermitJoin = config.permit_join;
 
-      logger.log('Getting config from Zigbee2mqtt : permit_joint =', this.z2mPermitJoin);
+      logger.debug('Getting config from Zigbee2mqtt : permit_joint =', this.z2mPermitJoin);
 
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
@@ -53,7 +53,7 @@ function handleMqttMessage(topic, message) {
       const config = JSON.parse(message);
       this.z2mPermitJoin = config.data.value;
 
-      logger.log('Getting permit_joint :', this.z2mPermitJoin);
+      logger.debug('Getting permit_joint :', this.z2mPermitJoin);
 
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
@@ -65,7 +65,7 @@ function handleMqttMessage(topic, message) {
       const config = JSON.parse(message);
       this.z2mPermitJoin = config;
 
-      logger.log('Getting permit_joint :', this.z2mPermitJoin);
+      logger.debug('Getting permit_joint :', this.z2mPermitJoin);
 
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
@@ -85,12 +85,13 @@ function handleMqttMessage(topic, message) {
         if (device) {
           Object.keys(incomingFeatures).forEach((zigbeeFeatureField) => {
             // Find the feature regarding the field name
-            const feature = convertFeature(device.features, zigbeeFeatureField);
+            const value = incomingFeatures[zigbeeFeatureField];
+            const feature = convertFeature(device.features, zigbeeFeatureField, value);
             if (feature) {
               try {
                 const newState = {
                   device_feature_external_id: `${feature.external_id}`,
-                  state: this.readValue(deviceName, zigbeeFeatureField, incomingFeatures[zigbeeFeatureField]),
+                  state: this.readValue(deviceName, zigbeeFeatureField, value),
                 };
                 this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, newState);
               } catch (e) {
@@ -104,7 +105,7 @@ function handleMqttMessage(topic, message) {
           logger.warn(`Zigbee2mqtt device ${deviceName} not configured in Gladys.`);
         }
       } else {
-        logger.log(`Zigbee2mqtt topic ${topic} not handled.`);
+        logger.debug(`Zigbee2mqtt topic ${topic} not handled.`);
       }
     }
   }

@@ -1,19 +1,21 @@
 const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
+
 const { exec } = require('../../../utils/childProcess');
-const { CONFIGURATION } = require('./constants');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const logger = require('../../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+
+const containerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 
 const sleep = promisify(setTimeout);
 
 /**
  * @description Install and starts MQTT container.
+ * @param {Object} config - Service configuration properties.
  * @example
- * installMqttContainer();
+ * await z2m.installMqttContainer(config);
  */
-async function installMqttContainer() {
+async function installMqttContainer(config) {
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
     filters: { name: [containerDescriptor.name] },
@@ -55,16 +57,13 @@ async function installMqttContainer() {
       await sleep(5 * 1000);
 
       // Copy password in broker container
+      const { z2mMqttUsername, z2mMqttPassword, mqttUsername, mqttPassword } = config;
       logger.info(`Creating user/pass...`);
-      const z2mMqttUser = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
-      const z2mMqttPass = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, this.serviceId);
       await this.gladys.system.exec(containerMqtt.id, {
-        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', z2mMqttUser, z2mMqttPass],
+        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', z2mMqttUsername, z2mMqttPassword],
       });
-      const mqttUser = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
-      const mqttPass = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
       await this.gladys.system.exec(containerMqtt.id, {
-        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUser, mqttPass],
+        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUsername, mqttPassword],
       });
 
       // Container restart to inintialize users configuration

@@ -9,12 +9,14 @@ const caldavService = {
   enableCalendar: stub(),
   disableCalendar: stub(),
   syncUserCalendars: stub(),
+  syncUserWebcals: stub(),
 };
 
 const res = {
   json: fake.returns(null),
   status: fake.returns({
     send: fake.returns(null),
+    json: fake.returns(null),
   }),
 };
 
@@ -47,6 +49,7 @@ describe('get /api/v1/service/caldav/cleanup', () => {
 describe('get /api/v1/service/caldav/sync', () => {
   it('should sync', async () => {
     caldavService.syncUserCalendars.resolves({});
+    caldavService.syncUserWebcals.resolves({});
     const caldavController = CaldavController(caldavService);
     const req = {
       user: {
@@ -55,6 +58,7 @@ describe('get /api/v1/service/caldav/sync', () => {
     };
     await caldavController['get /api/v1/service/caldav/sync'].controller(req, res);
     assert.calledWith(caldavService.syncUserCalendars, userId);
+    assert.calledWith(caldavService.syncUserWebcals, userId);
   });
 });
 

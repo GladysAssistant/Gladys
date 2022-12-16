@@ -1,5 +1,5 @@
 const logger = require('../../utils/logger');
-const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @description Init Gladys Gateway.
@@ -24,8 +24,6 @@ async function init() {
         this.handleNewMessage.bind(this),
       );
       this.connected = true;
-      // try to backup, if needed
-      this.event.emit(EVENTS.GATEWAY.CHECK_IF_BACKUP_NEEDED);
 
       // check if google home is connected
       const value = await this.variable.getValue(
@@ -40,13 +38,31 @@ async function init() {
     this.connected = false;
   }
 
-  if (process.env.NODE_ENV === 'production') {
+  if (this.backupSchedule && this.backupSchedule.cancel) {
+    this.backupSchedule.cancel();
+  }
+  // schedule backup at midnight
+  const timezone = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+
+  const rule = new this.schedule.RecurrenceRule();
+  rule.tz = timezone;
+  rule.hour = 0;
+  rule.minute = 0;
+  rule.second = 0;
+
+  this.backupSchedule = this.schedule.scheduleJob(rule, this.checkIfBackupNeeded.bind(this));
+
+  // Get latest Gladys version in 5 minutes
+  // To let the system initialize
+  setTimeout(async () => {
     try {
-      await this.getLatestGladysVersion();
+      if (process.env.NODE_ENV === 'production') {
+        await this.getLatestGladysVersion();
+      }
     } catch (e) {
       logger.debug(e);
     }
-  }
+  }, this.getLatestGladysVersionInitTimeout);
 }
 
 module.exports = {

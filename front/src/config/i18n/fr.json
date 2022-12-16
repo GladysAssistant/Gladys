@@ -43,7 +43,8 @@
     "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
-    "noFeatures": "Aucune fonctionnalité"
+    "noFeatures": "Aucune fonctionnalité",
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
   },
   "login": {
     "title": "Gladys Assistant",
@@ -201,7 +202,8 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
-      "chart": "Graphique"
+      "chart": "Graphique",
+      "ecowatt": "Ecowatt ( France )"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -227,7 +229,9 @@
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration."
+        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration.",
+        "addButton": "+",
+        "substractButton": "-"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -276,6 +280,16 @@
         "no": "Non",
         "preview": "Prévisualisation",
         "showPreviewButton": "Afficher une prévisualisation"
+      },
+      "ecowatt": {
+        "title": "Ecowatt France",
+        "description": "Cette box vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
+        "error": "Une erreur est survenue lors du rafraichissement via l'API RTE, merci de re-essayer.",
+        "dailyTitle": "Prévisions du jour",
+        "nextDaysTitle": "Prévisions des prochains jours",
+        "ok": "Réseau ok",
+        "warning": "Réseau tendu",
+        "critical": "Réseau très tendu"
       }
     }
   },
@@ -291,7 +305,7 @@
   "integration": {
     "root": {
       "title": "Intégrations",
-      "subtitle": "1 - {{length}} de {{total}} intégrations",
+      "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
       "restartButton": "Redémarrer",
       "stopButton": "Arrêter",
@@ -472,7 +486,7 @@
     },
     "rtspCamera": {
       "title": "Caméras",
-      "description": "Affichez vos caméras.",
+      "description": "Récupérez le flux vidéos de vos caméras dans Gladys",
       "search": "Chercher une caméra",
       "new": "Nouveau",
       "nameLabel": "Nom de la caméra",
@@ -496,7 +510,7 @@
     },
     "tasmota": {
       "title": "Tasmota",
-      "description": "Contrôler vos appareils Tasmota.",
+      "description": "Contrôler vos appareils Tasmota en MQTT ou HTTP",
       "deviceTab": "Appareils",
       "mqttDiscoverTab": "Découverte MQTT",
       "httpDiscoverTab": "Découverte HTTP",
@@ -581,7 +595,7 @@
     },
     "zigbee2mqtt": {
       "title": "Zigbee2mqtt",
-      "description": "Contrôlez vos appareils Zigbee.",
+      "description": "Contrôlez vos appareils Zigbee via Zigbee2mqtt.",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Zigbee",
       "settingsTab": "Paramètres",
@@ -656,9 +670,12 @@
       "documentation": "Documentation Zigbee2mqtt"
     },
     "googleHome": {
-      "title": "Gladys Assistant",
+      "title": "Google Home",
+      "description": "Contrôlez vos appareils Gladys à la voix dans Google Home",
+      "longDescription": "Il est possible d'utiliser Google Home pour contrôler vos appareils Gladys à la voix. Pour configurer Google Home, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
+      "pageTitle": "Gladys Assistant",
       "cardTitle": "Voulez-vous connecter Gladys Assistant à Google ?",
-      "description": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
+      "pageDescription": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
       "error": "Une erreur est survenue. Merci de réessayer.",
       "connectedAs": "Connecté en tant que",
       "googleWillBeAble": "Google pourra :",
@@ -669,16 +686,45 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "alexa": {
+      "title": "Amazon Alexa",
+      "description": "Contrôlez vos appareils Gladys à la voix dans Alexa",
+      "longDescription": "Il est possible d'utiliser Amazon Alexa pour contrôler vos appareils Gladys à la voix. Pour configurer Alexa, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
+      "pageTitle": "Gladys Assistant",
+      "cardTitle": "Voulez-vous connecter Gladys Assistant à Amazon Alexa ?",
+      "pageDescription": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
+      "error": "Une erreur est survenue. Merci de réessayer.",
+      "connectedAs": "Connecté en tant que",
+      "googleWillBeAble": "Amazon Alexa pourra :",
+      "seeDevices": "Lister les appareils présents chez vous",
+      "controlDevices": "Contrôler vos appareils",
+      "getNewDeviceValues": "Récupérer périodiquement les états de vos appareils",
+      "privacyPolicy": "Lire la <a href=\"https://www.alexa.com/help/privacy\">politique de confidentialité d'Alexa</a>.",
+      "cancelButton": "Annuler",
+      "connectButton": "Lier"
+    },
+    "homekit": {
+      "title": "Apple HomeKit",
+      "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
+      "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
+      "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
+      "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
+      "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparait pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
+      "reloadButton": "Relancer"
+    },
+    "owntracks": {
+      "title": "Owntracks",
+      "description": "Envoyez votre position GPS à Gladys via une application",
+      "longDescription": "Owntracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser Owntracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer Owntracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
+    },
     "zwave": {
-      "title": "Z-Wave",
-      "description": "Contrôlez vos appareils Z-Wave.",
-      "deviceTab": "Appareils",
-      "networkTab": "Réseau",
-      "settingsTab": "Paramètres",
-      "setupTab": "Configuration",
+      "title": "Open-Zwave [OLD]",
+      "description": "En fin de vie, il n'est plus possible de l'utiliser.",
       "device": {
-        "title": "Appareils Z-Wave",
+        "title": "Anciens appareils Open-Zwave",
         "search": "Chercher un appareil",
+        "convertToMqtt": "Convertir en appareil MQTT",
+        "oldIntegrationWarning": "Cette intégration était basée sur Open-Zwave, une librairie qui n'est plus maintenue. Cette intégration est en fin de vie. Nous travaillons sur une nouvelle intégration basée sur Zwave-js-ui, mais en attendant il faut s'armer de patience, et utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwave-js-ui-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">Zwave-js-ui + Node-RED + Gladys</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
@@ -689,65 +735,11 @@
         "editButton": "Editer",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
-      },
-      "setup": {
-        "title": "Appareils Z-Wave",
-        "addNodeButton": "Ajouter",
-        "addNodeSecureButton": "Ajout sécurisé",
-        "healNetworkButton": "Régler",
-        "removeNode": "Supprimer",
-        "scanButton": "Recherche",
-        "noZwaveDevices": "Aucun appareil Z-Wave trouvé. Avez-vous sélectionné le port USB de votre dongle dans les paramètres ?",
-        "manufacturer": "Fabricant",
-        "name": "Nom",
-        "type": "Type",
-        "scanInProgressText": "Recherche en cours...",
-        "createDeviceInGladys": "Connecter dans Gladys",
-        "features": "Fonctionnalités",
-        "params": "Paramètre",
-        "nodeId": "Noeud",
-        "zwaveNotConfiguredError": "Ce service Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
-        "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
-        "conflictError": "Un appareil avec ce nom existe déjà, merci de renommer cet appareil ou de supprimer l'existant.",
-        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
-        "unknowNode": "Noeud inconnu",
-        "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page.",
-        "createGithubIssue": "Signaler un bug avec cet appareil"
-      },
-      "network": {
-        "title": "Réseau Z-Wave",
-        "nodeId": "ID",
-        "nodeName": "Nom",
-        "nodeNeighbors": "Voisins",
-        "nodeAsleep": "Le noeud z-wave doit être en endormi ou mort.",
-        "node": "Noeud"
-      },
-      "settings": {
-        "title": "Paramètres Z-Wave",
-        "description": "Pour utiliser le Z-Wave dans Gladys, vous devez avoir une clé USB Z-Wave connectée à votre instance Gladys.",
-        "zwaveUsbDriverPathLabel": "Sélectionnez le port USB auquel votre clé Z-Wave est connectée",
-        "connectButton": "Connecter",
-        "disconnectButton": "Déconnecter",
-        "refreshButton": "Rafraîchir la liste USB",
-        "notConnected": "Gladys n'est connectée à aucune clé USB Z-Wave.",
-        "connectedWithSuccess": "Clé USB Z-Wave connectée avec succès.",
-        "connecting": "Tentative de connexion à la clé USB Z-Wave...",
-        "driverFailedError": "Une erreur s'est produite lors de la tentative de connexion à la clé USB Z-Wave."
-      },
-      "nodeOperation": {
-        "addNodeInstructions": "Vous pouvez maintenant inclure votre appareil en suivant les instructions du manuel de celui-ci.",
-        "removeNodeInstructions": "Vous pouvez désormais exclure votre appareil en suivant les instructions du manuel de celui-ci.",
-        "addNodeTitle": "Mode d'inclusion",
-        "removeNodeTitle": "Mode d'exclusion",
-        "seconds": "secondes restantes",
-        "cancelButton": "Annuler",
-        "nodeAddedTitle": "Un nouveau nœud a été trouvé",
-        "nodeAddedDescription": "Attendez quelques secondes pendant que nous obtenons toutes les informations de ce nœud..."
       }
     },
     "openWeather": {
       "title": "API OpenWeather",
-      "description": "Récupérer la météo dans Gladys.",
+      "description": "Affichez les données de météo de votre ville dans Gladys.",
       "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
       "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
@@ -757,7 +749,7 @@
     },
     "mqtt": {
       "title": "MQTT",
-      "description": "Connexion à un serveur MQTT.",
+      "description": "Connexion à un serveur MQTT, en local ou en distant.",
       "deviceTab": "Appareils",
       "setupTab": "Configuration",
       "status": {
@@ -814,7 +806,7 @@
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas Docker, il est impossible d'installer le broker MQTT depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer le broker depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "installBrokerContainer": "Utiliser un broker dans un conteneur Docker.",
-        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer and configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
+        "brokerDockerNotInstalled": "Aucun broker n'est disponible actuellement sur votre environnement Docker, continuez pour installer et configurer le broker <a href=\"https://mosquitto.org/\">eclipse-mosquitto</a> dans un conteneur Docker.",
         "installBrokerButton": "Installez le broker sur Docker",
         "installingBrokerButton": "Installation en cours...",
         "installBrokerError": "Une erreur est survenue lors de l'installation du conteneur Docker, veuillez consulter les logs Gladys.",
@@ -832,9 +824,134 @@
         "disconnected": "Déconnecté du broker MQTT."
       }
     },
+    "broadlink": {
+      "title": "Broadlink",
+      "description": "Contrôlez vos appareils Broadlink.",
+      "remoteTab": "Appareils",
+      "peripheralTab": "Appareils disponibles",
+      "peripheral": {
+        "title": "Appareils Broadlink disponibles",
+        "description": "Ici vous trouverez les appareils Broadlink disponible. Si celui que vous cherchez est manquant, merci de vérifier qu'il est bien connecté au réseau.",
+        "noPeripherals": "Aucun appareil découvert sur le réseau, merci de vérifier les branchements.",
+        "noNameLabel": "Type non reconnu",
+        "ipAddressLabel": "Adresse IP",
+        "macAddressLabel": "Adresse MAC",
+        "modelLabel": "Modèle",
+        "featuresLabel": "Fonctionnalités",
+        "noFeatures": "Aucune fonctionnalité",
+        "nameLabel": "Nom de l'appareil",
+        "saveButton": "Enregistrer",
+        "notConnectable": "Verouillé",
+        "alreadyCreatedButton": "Déjà créé",
+        "createRemoteButton": "Créer une télécommande"
+      },
+      "device": {
+        "title": "Appareils Broadlink",
+        "searchPlaceholder": "Rechercher des appareils",
+        "newButton": "Créer",
+        "noRemoteFound": "Aucun appareil ou télécommande Broadlink trouvé.",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "modelLabel": "Modèle",
+        "roomLabel": "Pièce",
+        "saveButton": "Enregistrer",
+        "deleteButton": "Supprimer",
+        "editButton": "Editer",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "setup": {
+        "noNameLabel": "Pas de nom",
+        "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
+        "saveSuccess": "L'appareil Broadlink a été créé avec succés.",
+        "notFound": "Appareil introuvable.",
+        "saveButton": "Enregistrer",
+        "peripheralLabel": "Périphérique lié",
+        "categoryLabel": "Type d'appareil à contrôller",
+        "featuresLabel": "Fonctionnalités",
+        "learnModeTitle": "Capturer le signal de la télécommande",
+        "learningModeInProgress": "Appuyez sur le bouton de la télécommande",
+        "cancelLearnModeButton": "Annuler le mode capture",
+        "skipLearningButton": "Ignorer cette étape et passer à la suivante",
+        "peripheralNotFound": "Appareil non trouvé.",
+        "peripheralNotLearn": "Cette appareil n'a pas de mode d'apprentissage.",
+        "cancelLearnFailed": "Impossible d'annuler le mode apprentissage.",
+        "learnFailed": "Impossible de passer en mode apprentissage.",
+        "selectFeatureLabel": "Choisissez une fonctionnalité de la liste ou cliquez sur le bouton suivant pour entrer dans le mode apprentissage. Le mode apprentissage vous permet d'enregistrer toutes les commandes une par une, de manière automatisée.",
+        "selectedFeatureLabel": "Fonctionnalité sélectionnée",
+        "selectActionLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée. Sélectionnez une action dans la liste ci-dessous pour activer la capture.",
+        "selectedFeatureInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée.",
+        "unselectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée, merci de sélectionner une action pour activer la capture.",
+        "selectedActionInfoLabel": "La fonctionnalité <b>{{feature}}</b> est sélectionnée, avec l'action <b>{{action}}</b>.",
+        "testError": "Une erreur est survenue lors du test de la fonctionnalité, vérifiez votre matériel.",
+        "peripheralSelectLabel": "{{name}} ({{address}})",
+        "testLabel": "Tester",
+        "unselect": "Annuler la sélection",
+        "deleteLabel": "Supprimer",
+        "learnAllLabel": "Mode apprentissage",
+        "learnAllModeLabel": "Prochain bouton dans {{timeLeft}} secondes...",
+        "quitLearnModeLabel": "Arrêter le mode apprentissage",
+        "features": {
+          "curtain": {
+            "state": {
+              "none": "Arrêter",
+              "one": "Ouvrir",
+              "other": "Fermer"
+            }
+          },
+          "light": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "brightness": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            },
+            "temperature": {
+              "none": "Froid",
+              "many": "Chaud"
+            }
+          },
+          "switch": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "dimmer": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            }
+          },
+          "siren": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            }
+          },
+          "shutter": {
+            "state": {
+              "none": "Arrêter",
+              "one": "Ouvrir",
+              "other": "Fermer"
+            }
+          },
+          "television": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "volume": {
+              "none": "Diminuer",
+              "many": "Augmenter"
+            }
+          }
+        }
+      }
+    },
     "xiaomi": {
       "title": "Xiaomi Home",
-      "description": "Gérez les appareils Xiaomi.",
+      "description": "Gérez les appareils Xiaomi via le pont Xiaomi.",
       "device": {
         "title": "Appareils Xiaomi dans Gladys",
         "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",
@@ -865,7 +982,7 @@
     },
     "eWeLink": {
       "title": "eWeLink",
-      "description": "Contrôlez vos appareils eWeLink.",
+      "description": "Contrôlez vos appareils eWeLink (via le cloud).",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte eWeLink",
       "setupTab": "Configuration",
@@ -954,10 +1071,10 @@
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "turnOnLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez allumer"
+        "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
       "turnOffLights": {
-        "label": "Sélectionnez les lumière que vous souhaitez éteindre"
+        "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
@@ -1020,6 +1137,7 @@
         "headersValuePlaceholder": "Valeur",
         "responseData": "Réponse",
         "tryButton": "Essayer",
+        "variablesExplanation": "Pour injecter une variable défini dans un bloc \"Récupérer le dernier état\", tapez \"{{\". Cette variable ne sera injecté que lors de l'exécution de la scène, et non pas lors du clic sur le bouton \"Essayer\".",
         "requestError": "Une erreur est survenue lors de la requête. Êtes vous sûr d'avoir bien rempli le formulaire ?"
       },
       "scene": {
@@ -1040,6 +1158,14 @@
         "whenNotFoundLabel": "Si aucun évènement n'est trouvé",
         "stopScene": "Arrêter la scène",
         "continueScene": "Continuer la scène"
+      },
+      "ecowattCondition": {
+        "description": "Cette condition vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
+        "knowMore": "En savoir plus",
+        "networkStatusLabel": "Continuer la scène si le réseau est",
+        "ok": "Réseau ok",
+        "warning": "Réseau tendu",
+        "critical": "Réseau très tendu"
       }
     },
     "actions": {
@@ -1055,7 +1181,7 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer la lumière",
+        "turn-on": "Allumer les lumières",
         "turn-off": "Eteindre les lumières"
       },
       "switch": {
@@ -1084,6 +1210,9 @@
       "house": {
         "is-empty": "Si la maison est vide",
         "is-not-empty": "Si la maison n'est pas vide"
+      },
+      "ecowatt": {
+        "condition": "Condition sur Ecowatt ( France )"
       }
     },
     "variables": {
@@ -1095,6 +1224,7 @@
       "calendar": {
         "eventName": "Nom de l'évènement",
         "eventLocation": "Lieu de l'évènement",
+        "eventDescription": "Description de l'évènement",
         "eventStart": "Date de début",
         "eventEnd": "Date de fin"
       }
@@ -1400,7 +1530,10 @@
     "jobTypes": {
       "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
       "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
-      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire"
+      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire",
+      "gladys-gateway-backup": "Sauvegarde Gladys Plus",
+      "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
+      "vacuum": "Nettoyage de la base de donnée"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -1434,6 +1567,10 @@
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
     "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
+    "vacuumDatabaseTitle": "Nettoyer la base de donnée",
+    "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de donnée, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle re-arrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
+    "vacuumDatabaseButton": "Lancer le nettoyage",
+    "vacuumDatabaseStarted": "Le nettoyage a commencé... Gladys sera indisponible jusqu'à la fin du nettoyage.",
     "containerState": {
       "created": "Créé",
       "restarting": "Redémarrage",
@@ -1564,6 +1701,7 @@
     "psi": "Livre-force par pouce carré (psi)",
     "lux": "Lux",
     "ppm": "Partie par million (ppm)",
+    "ppb": "Partie par millard (ppb)",
     "watt": "Watt",
     "kilowatt": "Kilowatt",
     "watt-hour": "Watt heure (Wh)",
@@ -1574,6 +1712,7 @@
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "volt-ampere": "Voltampère (VA)",
+    "kilovolt-ampere": "Kilovoltampère (kVA)",
     "volt-ampere-reactive": "Voltampère réactif (var)",
     "mm": "Millimètre (mm)",
     "cm": "Centimètre (cm)",
@@ -1593,6 +1732,7 @@
     "meter-per-second": "Mètre par seconde (m/s)",
     "kilometer-per-hour": "Kilomètre par heure (km/h)",
     "millimeter-per-hour": "Millimètre par heure (mm/h)",
+    "millimeter-per-day": "Millimètre par jour (mm/j)",
     "uv-index": "Indice UV",
     "microseconds": "Microsecondes (μs)",
     "milliseconds": "Millisecondes (ms)",
@@ -1602,7 +1742,24 @@
     "days": "Jours (j)",
     "weeks": "Semaines (sem)",
     "months": "Mois (m)",
-    "years": "Années (an)"
+    "years": "Années (an)",
+    "bit": "Bit",
+    "kilobit": "Kilobit",
+    "megabit": "Megabit",
+    "gigabit": "Gigabit",
+    "byte": "Octet (o)",
+    "kilobyte": "Kilooctet (Ko)",
+    "megabyte": "Megaoctet (Mo)",
+    "gigabyte": "Gigaoctet (Go)",
+    "terabyte": "Teraoctet (To)",
+    "bits-per-second": "Bits par seconde (bit/s)",
+    "kilobits-per-second": "Kilobits par seconde (kbit/s)",
+    "megabits-per-second": "Megabits par seconde (Mbit/s)",
+    "gigabits-per-second": "Gigabits par seconde (Gbit/s)",
+    "bytes-per-second": "Octets par seconde (o/s)",
+    "kilobytes-per-second": "Kilooctets par seconde (Ko/s)",
+    "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
+    "gigabytes-per-second": "Gigaoctets par seconde (Go/s)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1615,6 +1772,7 @@
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
+    "ppb": "ppb",
     "watt": "W",
     "kilowatt": "kW",
     "watt-hour": "Wh",
@@ -1625,6 +1783,7 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "kilovolt-ampere": "kVA",
     "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",
@@ -1644,6 +1803,7 @@
     "meter-per-second": "m/s",
     "kilometer-per-hour": "km/h",
     "millimeter-per-hour": "mm/h",
+    "millimeter-per-day": "mm/j",
     "uv-index": "Indice UV",
     "microseconds": "μs",
     "milliseconds": "ms",
@@ -1653,7 +1813,42 @@
     "days": "j",
     "weeks": "sem",
     "months": "m",
-    "years": "an"
+    "years": "an",
+    "bit": "bit",
+    "kilobit": "kbit",
+    "megabit": "Mbit",
+    "gigabit": "Gbit",
+    "byte": "o",
+    "kilobyte": "Ko",
+    "megabyte": "Mo",
+    "gigabyte": "Go",
+    "terabyte": "To",
+    "bits-per-second": "bit/s",
+    "kilobits-per-second": "kbit/s",
+    "megabits-per-second": "Mbit/s",
+    "gigabits-per-second": "Gbit/s",
+    "bytes-per-second": "o/s",
+    "kilobytes-per-second": "Ko/s",
+    "megabytes-per-second": "Mo/s",
+    "gigabytes-per-second": "Go/s"
+  },
+  "deviceFeatureAction": {
+    "category": {
+      "shutter": {
+        "state": {
+          "zero": "Arrêter",
+          "one": "Ouvrir",
+          "other": "Fermer"
+        }
+      },
+      "curtain": {
+        "state": {
+          "zero": "Arrêter",
+          "one": "Ouvrir",
+          "other": "Fermer"
+        }
+      }
+    }
   },
   "deviceFeatureValue": {
     "type": {
@@ -1664,11 +1859,25 @@
       }
     },
     "category": {
+      "opening-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Fermé",
+          "one": "Ouvert"
+        }
+      },
       "co-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
           "zero": "Sain",
           "one": "CO détecté"
+        }
+      },
+      "leak-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Non",
+          "one": "Oui"
         }
       }
     }
@@ -1863,6 +2072,32 @@
       "decimal": "Durée (décimale)",
       "integer": "Durée (entier)"
     },
+    "voc-sensor": {
+      "shortCategoryName": "Capteur de pollution COV",
+      "decimal": "COV (Décimale)"
+    },
+    "shutter": {
+      "shortCategoryName": "Volet",
+      "state": "Etat du volet",
+      "position": "Position du volet"
+    },
+    "curtain": {
+      "shortCategoryName": "Rideau",
+      "state": "Etat du rideau",
+      "position": "Position du rideau"
+    },
+    "data": {
+      "shortCategoryName": "Donnée",
+      "size": "Taille"
+    },
+    "datarate": {
+      "shortCategoryName": "Débit de données",
+      "rate": "Débit"
+    },
+    "thermostat": {
+      "shortCategoryName": "Thermostat",
+      "target-temperature": "Température de consigne"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
@@ -1903,7 +2138,7 @@
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",
     "label": "Sélectionnez votre utilisateur Gladys",
-    "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté locallement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
+    "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté localement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "saveButton": "Sauvegarder",
@@ -1926,6 +2161,9 @@
     "minPlaceholder": "Entrez la valeur minimum",
     "maxLabel": "Valeur maximum",
     "maxPlaceholder": "Entrez la valeur maximum",
+    "keepHistoryLabel": "Conserver l'historique des états ?",
+    "keepHistorySmallDescription": "Oui, conserver l'historique",
+    "keepHistoryDescription": "Si oui, les états de cette fonctionnalité seront conservés selon la durée définie sur la page <a href=\"/dashboard/settings/system\">Système</a>. Si non, seul le dernier état sera conservé.",
     "addButton": "Ajouter fonctionnalité",
     "deleteLabel": "Supprimer fonctionnalité",
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
@@ -2004,9 +2242,11 @@
     "neverUsed": "Jamais"
   },
   "gatewayTwoFactorAuth": {
-    "title": "Gladys Gateway",
-    "configureTitle": "Configurer l'authentification Two-Factor (\"2FA\")",
+    "title": "Gladys Plus",
+    "configureTitle": "Configurer l'authentification à deux facteurs (\"2FA\")",
     "configureButton": "Configurer la 2FA",
+    "secretLabel": "Secret",
+    "copy": "Copier",
     "securityIsImportant": "La sécurité de votre compte Gladys Gateway est vraiment importante pour nous.",
     "securityApps": "Pour garantir la sécurité de votre compte, veuillez activer l'authentification à deux facteurs (\"2FA\") à l'aide d'une application à deux facteurs comme Authy sur <a href=\"https://itunes.apple.com/fr/app/authy/id494168017?mt=8\">iOS</a> ou <a href=\"https://play.google.com/store/apps/details?id=com.authy.authy\">Android</a>.",
     "invalidCode": "Le code 2FA que vous avez fourni n'est pas valide.",
@@ -2016,7 +2256,7 @@
     "app": {
       "open": "Ouvrez votre application 2FA",
       "addAccount": "Cliquez sur \"Ajouter un compte\"",
-      "scanQRCode": "Scannez le QR Code ci-dessous"
+      "scanQRCode": "Scannez le QR Code ci-dessous, ou copiez manuellement le secret pour l'ajouter manuellement à votre application."
     }
   },
   "gatewaySignUp": {

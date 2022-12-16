@@ -62,7 +62,7 @@ async function syncUserCalendars(userId) {
   );
 
   await Promise.map(
-    calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null),
+    calendarsToUpdate.filter((updatedCalendar) => updatedCalendar !== null && updatedCalendar.type === 'CALDAV'),
     async (calendarToUpdate) => {
       // Get events that have changed
       let eventsToUpdate;
@@ -78,7 +78,9 @@ async function syncUserCalendars(userId) {
         async (eventToUpdate) => {
           // Delete existing event if props is empty
           if (JSON.stringify(eventToUpdate.props) === JSON.stringify({})) {
-            const eventToDelete = await this.gladys.calendar.getEvents(userId, { url: eventToUpdate.href });
+            const eventToDelete = await this.gladys.calendar.getEvents(userId, {
+              url: encodeURIComponent(eventToUpdate.href).replace(/%2F/g, '/'),
+            });
             if (eventToDelete.length === 1) {
               await this.gladys.calendar.destroyEvent(eventToDelete[0].selector);
             }
