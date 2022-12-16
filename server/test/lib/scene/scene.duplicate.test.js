@@ -10,7 +10,7 @@ describe('SceneManager', () => {
     const sceneManager = new SceneManager({}, event);
 
     const duplicatedScene = await sceneManager.duplicate('to-duplicate-scene', 'new-name', 'new-icon');
-    expect(sceneManager.scenes['new-name']).not.to.equal(undefined)
+    expect(sceneManager.scenes['new-name']).not.to.equal(undefined);
 
     expect(duplicatedScene).to.have.property('selector', 'new-name');
     expect(duplicatedScene).to.have.property('name', 'new-name');
