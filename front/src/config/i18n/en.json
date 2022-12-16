@@ -1613,7 +1613,7 @@
   "duplicateScene": {
     "cardTitle": "Duplicate scene \"{{name}}\"",
     "nameLabel": "Name",
-    "namePlaceholder": "Enter a new name for the duplicate scene, this must be different from the previous scene name.",
+    "namePlaceholder": "Enter a new name",
     "iconLabel": "Select an icon for you scene",
     "duplicateSceneButton": "Duplicate",
     "invalidName": "Name is required",

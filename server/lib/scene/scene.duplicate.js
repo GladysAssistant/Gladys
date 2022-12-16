@@ -33,12 +33,7 @@ async function duplicate(selector, name, icon) {
     triggers: plainExistingScene.triggers,
   };
 
-  const createdScene = await db.Scene.create(newScene);
-  const plainScene = createdScene.get({ plain: true });
-  // add scene to live store
-  this.addScene(plainScene);
-  // return created scene
-  return plainScene;
+  return this.create(newScene);
 }
 
 module.exports = {
