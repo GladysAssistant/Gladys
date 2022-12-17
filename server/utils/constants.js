@@ -836,11 +836,6 @@ const JOB_ERROR_TYPES = {
   UNKNOWN_ERROR: 'unknown-error',
 };
 
-const CLOCK_TYPES = {
-  ANALOG: 'analog',
-  DIGITAL: 'digital',
-};
-
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -872,7 +867,6 @@ const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STAT
 const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
 const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
-const CLOCK_TYPES_LIST = createList(CLOCK_TYPES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -934,6 +928,3 @@ module.exports.JOB_STATUS = JOB_STATUS;
 module.exports.JOB_STATUS_LIST = JOB_STATUS_LIST;
 module.exports.JOB_ERROR_TYPES = JOB_ERROR_TYPES;
 module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;
-
-module.exports.CLOCK_TYPES = CLOCK_TYPES;
-module.exports.CLOCK_TYPES_LIST = CLOCK_TYPES_LIST;

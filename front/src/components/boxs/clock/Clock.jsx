@@ -5,7 +5,7 @@ import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { default as ReactClock } from 'react-clock';
 dayjs.extend(localizedFormat);
 
-import { CLOCK_TYPES } from '../../../../../server/utils/constants';
+import { CLOCK_TYPES } from './ClockTypes';
 import { Text } from 'preact-i18n';
 import style from './style.css';
 import get from 'get-value';

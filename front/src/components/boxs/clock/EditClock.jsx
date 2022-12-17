@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import BaseEditBox from '../baseEditBox';
 import { Text } from 'preact-i18n';
-import { CLOCK_TYPES_LIST } from '../../../../../server/utils/constants';
+import { CLOCK_TYPES_LIST } from './ClockTypes';
 
 @connect('', {})
 class EditClock extends Component {
