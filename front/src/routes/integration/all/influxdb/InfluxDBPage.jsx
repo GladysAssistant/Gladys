@@ -125,7 +125,7 @@ class InfluxDBPage extends Component {
                             </div>
                             <div class="form-group">
                               <button
-                                class={cx('btn', 'btn-success', {
+                                class={cx('btn', 'btn-success' , 'mr-2', {
                                   'btn-loading': props.loading
                                 })}
                                 type="submit"
