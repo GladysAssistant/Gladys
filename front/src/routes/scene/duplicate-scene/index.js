@@ -11,15 +11,14 @@ class DuplicateScene extends Component {
     route(`/dashboard/scene/${this.props.scene_selector}`);
   };
 
-  getSourceScene = () => {
-    this.props.httpClient.get(`/api/v1/scene/${this.props.scene_selector}`).then(scene => {
-      this.setState({
-        sourceScene: scene,
-        scene: {
-          name: '',
-          icon: scene.icon
-        }
-      });
+  getSourceScene = async () => {
+    const scene = await this.props.httpClient.get(`/api/v1/scene/${this.props.scene_selector}`);
+    this.setState({
+      sourceScene: scene,
+      scene: {
+        name: '',
+        icon: scene.icon
+      }
     });
   };
 
