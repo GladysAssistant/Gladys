@@ -22,5 +22,13 @@
   },
   "settings": {
     "targets": null
-  }
+  },
+  "overrides": [
+    {
+      "files": ["cypress/**/*.js"],
+      "rules": {
+        "promise/prefer-await-to-then": "off"
+      }
+    }
+  ]
 }
