@@ -8,14 +8,16 @@
  */
 function buildMapOfMeasures(measuregrps) {
   const mapOfMeasuresGrpsByWithingsDeviceId = new Map();
-  measuregrps.forEach((element) => {
-    if (element) {
-      // Build map of measuregrps by withings device id
-      const measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid) || [];
-      measureList.push(element);
-      mapOfMeasuresGrpsByWithingsDeviceId.set(element.deviceid, measureList);
-    }
-  });
+  if (measuregrps) {
+    measuregrps.forEach((element) => {
+      if (element) {
+        // Build map of measuregrps by withings device id
+        const measureList = mapOfMeasuresGrpsByWithingsDeviceId.get(element.deviceid) || [];
+        measureList.push(element);
+        mapOfMeasuresGrpsByWithingsDeviceId.set(element.deviceid, measureList);
+      }
+    });
+  }
   return mapOfMeasuresGrpsByWithingsDeviceId;
 }
 

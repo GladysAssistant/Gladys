@@ -27,15 +27,19 @@ async function getAndSaveMeasures(feature, withingsType, userId) {
     await Promise.each(mapOfMeasuresGrpsByWithingsDeviceId, async (value) => {
       const key = value[0];
       const valueList = value[1];
-      await Promise.each(valueList, async (currentGroup) => {
-        if (key) {
-          await Promise.each(currentGroup.measures, async (measure) => {
-            const historicalValueState = (measure.value * 10 ** measure.unit).toFixed(2);
-            const createdAt = new Date(currentGroup.created * 1000);
-            await this.gladys.device.saveHistoricalState(feature, historicalValueState, createdAt);
-          });
-        }
-      });
+      if (key) {
+        await Promise.each(valueList, async (currentGroup) => {
+          if (currentGroup) {
+            await Promise.each(currentGroup.measures, async (measure) => {
+              if (measure) {
+                const historicalValueState = (measure.value * 10 ** measure.unit).toFixed(2);
+                const createdAt = new Date(currentGroup.created * 1000);
+                await this.gladys.device.saveHistoricalState(feature, historicalValueState, createdAt);
+              }
+            });
+          }
+        });
+      }
     });
   }
 }

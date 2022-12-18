@@ -84,6 +84,24 @@ async function poll(device) {
               case DEVICE_FEATURE_TYPES.HEALTH.PULSE_WAVE_VELOCITY:
                 withingsType = 91;
                 break;
+              case DEVICE_FEATURE_TYPES.HEALTH.VO2_MAX:
+                withingsType = 123;
+                break;
+              case DEVICE_FEATURE_TYPES.HEALTH.QRS_INERVAL:
+                withingsType = 135;
+                break;
+              case DEVICE_FEATURE_TYPES.HEALTH.PR_INERVAL:
+                withingsType = 136;
+                break;
+              case DEVICE_FEATURE_TYPES.HEALTH.QT_INERVAL:
+                withingsType = 137;
+                break;
+              case DEVICE_FEATURE_TYPES.HEALTH.CORRECTED_QT_INERVAL:
+                withingsType = 138;
+                break;
+              case DEVICE_FEATURE_TYPES.HEALTH.ATRIAL_FIBRILLATION:
+                withingsType = 139;
+                break;
               case DEVICE_FEATURE_TYPES.SENSOR.INTEGER:
                 withingsType = -1;
                 featureBattery = { ...feature };
