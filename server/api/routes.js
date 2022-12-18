@@ -469,6 +469,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sceneController.start,
     },
+    'post /api/v1/scene/:scene_selector/duplicate': {
+      authenticated: true,
+      controller: sceneController.duplicate,
+    },
     // system
     'get /api/v1/system/info': {
       authenticated: true,
