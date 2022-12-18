@@ -15,7 +15,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "@abandonware/noble": "^1.9.2-10",
+    "@abandonware/noble": "^1.9.2-15",
     "bluebird": "^3.7.2"
   }
 }
