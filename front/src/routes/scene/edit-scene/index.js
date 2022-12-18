@@ -316,6 +316,9 @@ class EditScene extends Component {
       return newState;
     });
   };
+  duplicateScene = () => {
+    route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
+  };
 
   constructor(props) {
     super(props);
@@ -363,6 +366,7 @@ class EditScene extends Component {
           isNameEditable={isNameEditable}
           updateSceneName={this.updateSceneName}
           setNameInputRef={this.setNameInputRef}
+          duplicateScene={this.duplicateScene}
         />
       )
     );

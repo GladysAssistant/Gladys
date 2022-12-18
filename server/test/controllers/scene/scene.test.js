@@ -120,3 +120,21 @@ describe('POST /api/v1/scene/:scene_selector/start', () => {
       });
   });
 });
+
+describe('POST /api/v1/scene/:scene_selector/duplicate', () => {
+  it('should duplicate a scene', async () => {
+    await authenticatedRequest
+      .post('/api/v1/scene/to-duplicate-scene/duplicate')
+      .send({
+        name: 'Duplicated Scene',
+        icon: 'anchor',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('icon', 'anchor');
+        expect(res.body).to.have.property('name', 'Duplicated Scene');
+        expect(res.body).to.have.property('selector', 'duplicated-scene');
+      });
+  });
+});
