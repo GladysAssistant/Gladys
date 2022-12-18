@@ -199,12 +199,12 @@ describe('WithingsHandler poll', () => {
 
     await withingsHandler.poll(deviceToPoll);
 
-    chai.assert.equal(countGetValueCall, 52);
-    chai.assert.equal(countGetValueCallClientId, 18);
+    chai.assert.equal(countGetValueCall, 70);
+    chai.assert.equal(countGetValueCallClientId, 24);
 
     assert.callCount(gladys.device.saveState, 1);
-    // 17 feature - 1 feature unknown = 16 state to save
-    assert.callCount(gladys.device.saveHistoricalState, 16);
+    // 23 feature - 1 feature unknown = 22 state to save
+    assert.callCount(gladys.device.saveHistoricalState, 22);
     assert.calledWith(gladys.device.saveHistoricalState, deviceToPoll.features[0]);
 
     const deviceToPoll2 = {
