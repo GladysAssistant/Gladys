@@ -12,7 +12,7 @@ const gladys = {
     }),
   },
   event: {
-    emit: fake.resolves(),
+    emit: fake.resolves(null),
   },
   variable: {
     getValue: fake.resolves('test-value'),
@@ -25,7 +25,9 @@ const axios = {};
 describe('NextcloudTalk.message', () => {
   const messageHandler = new MessageHandler(gladys, 'a03a5e92-236a-4465-9bd5-530247d76959', axios);
   it('should connect', async () => {
-    messageHandler.bots = {};
+    messageHandler.bots = {
+      '30385cbf-b9ff-4239-a6bb-35477ca3eea6': {},
+    };
     await messageHandler.connect([{ value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }]);
     expect(messageHandler.bots['30385cbf-b9ff-4239-a6bb-35477ca3eea6'].token).eq('testToken1');
   });
@@ -40,7 +42,7 @@ describe('NextcloudTalk.message', () => {
         },
       },
     });
-    const emit = fake.resolves();
+    const emit = fake.resolves(null);
     messageHandler.bots.user2 = {
       token: 'testToken2',
       lastKnownMessageId: 2,

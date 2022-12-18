@@ -1,18 +1,12 @@
 const { expect } = require('chai');
+const { fake } = require('sinon');
 const NextcloudTalkService = require('../../../services/nextcloud-talk');
 
 describe('nextcloud-talk', () => {
   it('should start service', async () => {
     const gladys = {
       variable: {
-        getVariables: () => Promise.resolve([{ user_id: 'f0de00a8-8ba7-4a4e-8f5a-7a21e94f36a8', value: 'testToken' }]),
-        getValue: () => Promise.resolve('testvalue'),
-      },
-      user: {
-        getById: () =>
-          Promise.resolve({
-            id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6',
-          }),
+        getVariables: fake.resolves([{ user_id: 'f0de00a8-8ba7-4a4e-8f5a-7a21e94f36a8', value: 'testToken' }]),
       },
     };
     const nextcloudTalkService = NextcloudTalkService(gladys, 'a4a59a7d-0001-4958-a794-37e38790142f');
@@ -21,7 +15,7 @@ describe('nextcloud-talk', () => {
   it('should failed to start service', async () => {
     const gladys = {
       variable: {
-        getVariables: () => Promise.resolve([]),
+        getVariables: fake.resolves([]),
       },
     };
     const nextcloudTalkService = NextcloudTalkService(gladys, 'a4a59a7d-0001-4958-a794-37e38790142f');
@@ -30,7 +24,7 @@ describe('nextcloud-talk', () => {
   it('should stop service', async () => {
     const gladys = {
       variable: {
-        getVariables: () => Promise.resolve([{ user_id: 'f0de00a8-8ba7-4a4e-8f5a-7a21e94f36a8', value: 'testToken' }]),
+        getVariables: fake.resolves([{ user_id: 'f0de00a8-8ba7-4a4e-8f5a-7a21e94f36a8', value: 'testToken' }]),
       },
     };
     const nextcloudTalkService = NextcloudTalkService(gladys, 'a4a59a7d-0001-4958-a794-37e38790142f');
