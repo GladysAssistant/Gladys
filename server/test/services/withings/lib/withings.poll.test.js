@@ -161,6 +161,36 @@ describe('WithingsHandler poll', () => {
         last_value_changed: new Date(),
       },
       {
+        id: 'feb624ed-5d88-33ee-aaee-33f8069a78e5',
+        type: DEVICE_FEATURE_TYPES.HEALTH.VO2_MAX,
+        last_value_changed: new Date(),
+      },
+      {
+        id: 'feb624ed-5d88-47ae-emlp-33f8069a78e5',
+        type: DEVICE_FEATURE_TYPES.HEALTH.QRS_INERVAL,
+        last_value_changed: new Date(),
+      },
+      {
+        id: 'feb624ed-59df-47ae-aaee-33f8069a78e5',
+        type: DEVICE_FEATURE_TYPES.HEALTH.PR_INERVAL,
+        last_value_changed: new Date(),
+      },
+      {
+        id: 'feb624ed-5d88-47ae-mpcd-33f8069a78e5',
+        type: DEVICE_FEATURE_TYPES.HEALTH.QT_INERVAL,
+        last_value_changed: new Date(),
+      },
+      {
+        id: 'feb624ed-5d88-47ae-cdeq-33f8069a78e5',
+        type: DEVICE_FEATURE_TYPES.HEALTH.CORRECTED_QT_INERVAL,
+        last_value_changed: new Date(),
+      },
+      {
+        id: 'feb624ed-5d88-47ae-ddvv-33f8069a78e5',
+        type: DEVICE_FEATURE_TYPES.HEALTH.ATRIAL_FIBRILLATION,
+        last_value_changed: new Date(),
+      },
+      {
         id: '832fd6ce-9c2b-4806-bd0f-fbc9bb2432a4',
         type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
         last_value_changed: new Date(),
