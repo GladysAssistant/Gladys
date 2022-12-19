@@ -9,6 +9,7 @@ import { CLOCK_TYPES } from './ClockTypes';
 import { Text } from 'preact-i18n';
 import style from './style.css';
 import get from 'get-value';
+import cx from 'classnames';
 
 const Clock = ({ children, ...props }) => (
   <div class="card">
@@ -28,7 +29,7 @@ const Clock = ({ children, ...props }) => (
     )}
     {props.clockType === CLOCK_TYPES.DIGITAL && (
       <div class={style.padding}>
-        <div class={style.digitalTime}>{props.time}</div>
+        <div class={cx(style.digitalTime, 'text-monospace')}>{props.time}</div>
         <div class={style.digitalDate}>
           <Text
             id="dashboard.boxes.clock.date"
