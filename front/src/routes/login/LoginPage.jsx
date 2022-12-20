@@ -55,9 +55,6 @@ const LoginPage = connect(
             <div class="form-group">
               <label class="form-label">
                 <Text id="login.passwordLabel" />
-                <a href="/forgot-password" class="float-right small">
-                  <Text id="login.forgotPasswordLabel" />
-                </a>
               </label>
               <Localizer>
                 <input
@@ -79,6 +76,10 @@ const LoginPage = connect(
                 <Text id="login.loginButtonText" />
               </button>
             </div>
+
+            <a href="/forgot-password" className="float-right small mt-2">
+              <Text id="login.forgotPasswordLabel" />
+            </a>
           </div>
         </form>
         <div class="text-center text-muted">

@@ -40,6 +40,7 @@ const actionSchema = Joi.array().items(
       stop_scene_if_event_found: Joi.boolean(),
       stop_scene_if_event_not_found: Joi.boolean(),
       request_response_keys: Joi.array().items(Joi.string()),
+      ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
       headers: Joi.array().items(
         Joi.object().keys({
           key: Joi.string(),

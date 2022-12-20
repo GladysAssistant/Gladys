@@ -15,13 +15,24 @@ const { getBySelector } = require('./scene.getBySelector');
 const { executeSingleAction } = require('./scene.executeSingleAction');
 const { update } = require('./scene.update');
 const { dailyUpdate } = require('./scene.dailyUpdate');
+const { duplicate } = require('./scene.duplicate');
 
 const { EVENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 
-const SceneManager = function SceneManager(stateManager, event, device, message, variable, house, calendar, http) {
+const SceneManager = function SceneManager(
+  stateManager,
+  event,
+  device,
+  message,
+  variable,
+  house,
+  calendar,
+  http,
+  gateway,
+) {
   this.stateManager = stateManager;
   this.event = event;
   this.device = device;
@@ -30,6 +41,7 @@ const SceneManager = function SceneManager(stateManager, event, device, message,
   this.house = house;
   this.calendar = calendar;
   this.http = http;
+  this.gateway = gateway;
   this.scenes = {};
   this.timezone = DEFAULT_TIMEZONE;
   // @ts-ignore
@@ -63,5 +75,6 @@ SceneManager.prototype.getBySelector = getBySelector;
 SceneManager.prototype.execute = execute;
 SceneManager.prototype.executeSingleAction = executeSingleAction;
 SceneManager.prototype.update = update;
+SceneManager.prototype.duplicate = duplicate;
 
 module.exports = SceneManager;
