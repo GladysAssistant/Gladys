@@ -19,11 +19,7 @@ async function applyOnPeripheral(peripheralUuid, applyFunc, keepConnected = fals
     .then((peripheral) =>
       connect(peripheral).then((connectedPerpheral) =>
         new Promise((resolve) => {
-          try {
-            return resolve(applyFunc(connectedPerpheral));
-          } catch (e) {
-            throw e;
-          }
+          return resolve(applyFunc(connectedPerpheral));
         }).finally(() => {
           if (!keepConnected) {
             connectedPerpheral.disconnect();

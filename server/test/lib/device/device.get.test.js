@@ -3,8 +3,10 @@ const { expect, assert } = require('chai');
 const { fake } = require('sinon');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
+const Job = require('../../../lib/job');
 
 const event = new EventEmitter();
+const job = new Job(event);
 
 describe('Device.get', () => {
   it('should get devices', async () => {
@@ -14,7 +16,7 @@ describe('Device.get', () => {
         id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       }),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const devices = await device.get();
     expect(devices).to.be.instanceOf(Array);
   });
@@ -25,7 +27,7 @@ describe('Device.get', () => {
         id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       }),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const devices = await device.get({
       service: 'test-service',
     });
@@ -38,7 +40,7 @@ describe('Device.get', () => {
         id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       }),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const devices = await device.get({
       service: 'test-service',
       search: 'this name does not exist',
@@ -54,7 +56,7 @@ describe('Device.get', () => {
         id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       }),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const devices = await device.get({
       model: 'my-unknown-model',
     });
@@ -69,7 +71,7 @@ describe('Device.get', () => {
         id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       }),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const devices = await device.get({
       device_feature_category: 'my-unknown-category',
     });
@@ -84,7 +86,7 @@ describe('Device.get', () => {
         id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       }),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const devices = await device.get({
       device_feature_type: 'my-unknown-type',
     });
@@ -99,7 +101,7 @@ describe('Device.get', () => {
         id: 'a810b8db-6d04-4697-bed3-c4b72c996279',
       }),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const devices = await device.get({
       take: 0,
     });
@@ -112,7 +114,7 @@ describe('Device.get', () => {
     const service = {
       getLocalServiceByName: fake.resolves(null),
     };
-    const device = new Device(event, {}, stateManager, service);
+    const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const promise = device.get({
       service: 'not-found-service',
     });

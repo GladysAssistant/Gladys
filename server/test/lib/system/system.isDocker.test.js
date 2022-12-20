@@ -20,6 +20,7 @@ const { isDocker } = proxyquire('../../../lib/system/system.isDocker', {
 const System = proxyquire('../../../lib/system', {
   './system.isDocker': { isDocker },
 });
+const Job = require('../../../lib/job');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -27,7 +28,10 @@ const sequelize = {
 
 const event = {
   on: fake.resolves(null),
+  emit: fake.returns(null),
 };
+
+const job = new Job(event);
 
 const config = {
   tempFolder: '/tmp/gladys',
@@ -37,7 +41,7 @@ describe('system.isDocker', () => {
   let system;
 
   beforeEach(async () => {
-    system = new System(sequelize, event, config);
+    system = new System(sequelize, event, config, job);
     await system.init();
     // Reset all fakes invoked within init call
     sinon.reset();

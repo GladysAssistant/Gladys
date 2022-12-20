@@ -16,9 +16,8 @@ async function connect() {
   const { EcoVacsAPI } = this.ecovacsLibrary;
 
   // The accountId is your Ecovacs ID or email address.
-  const accountId = await this.gladys.variable.getValue(CONFIGURATION.ECOVACS_LOGIN_KEY, this.serviceId);
-  const password = await this.gladys.variable.getValue(CONFIGURATION.ECOVACS_PASSWORD_KEY, this.serviceId);
-  const countryCode = await this.gladys.variable.getValue(CONFIGURATION.ECOVACS_COUNTRY_KEY, this.serviceId);
+  const { login, password, countryCode } = await this.getConfiguration();
+  const accountId = login;
   const deviceID = 0; // The first vacuum from your account
   // Leave blank or use 'ecovacs.com' for Ecovacs login
   // or use 'yeedi.com' for yeedi login (available since version 0.8.3-alpha.2)

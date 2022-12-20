@@ -21,6 +21,7 @@ const fakes = {
   hasMoppingSystem: fake.returns(true),
   clean: fake.returns(true),
   stop: fake.returns(true),
+  pause: fake.returns(true),
 };
 
 class VacBotClass {}
@@ -33,6 +34,7 @@ VacBotClass.prototype.hasCustomAreaCleaningMode = fakes.hasCustomAreaCleaningMod
 VacBotClass.prototype.hasMoppingSystem = fakes.hasMoppingSystem;
 VacBotClass.prototype.clean = fakes.clean;
 VacBotClass.prototype.stop = fakes.stop;
+VacBotClass.prototype.pause = fakes.pause;
 
 class EcoVacsAPI {
   constructor(deviceId, country, continent = '') {

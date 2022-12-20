@@ -1,39 +1,42 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
-const proxyquire = require('proxyquire').noCallThru();
 
 const zigbeeDevices = require('./payloads/mqtt_devices_get.json');
 const expectedDevicesPayload = require('./payloads/event_device_result.json');
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {});
-
-const event = {
-  emit: fake.resolves(null),
-};
-
-const gladys = {
-  event,
-  variable: {
-    setValue: fake.resolves(true),
-  },
-  stateManager: {
-    get: fake.resolves(true),
-  },
-};
+const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 describe('zigbee2mqtt handleMqttMessage', () => {
   // PREPARE
-  const zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
+  let zigbee2mqttManager;
   let stateManagerGetStub;
+  let gladys;
 
   beforeEach(() => {
-    sinon.reset();
+    gladys = {
+      event: {
+        emit: fake.resolves(null),
+      },
+      variable: {
+        setValue: fake.resolves(true),
+      },
+      stateManager: {
+        get: fake.resolves(true),
+      },
+    };
+
+    zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
     zigbee2mqttManager.zigbee2mqttConnected = false;
+  });
+
+  afterEach(() => {
+    sinon.reset();
   });
 
   it('it should receive devices', async () => {
@@ -67,7 +70,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,
     });
-    assert.match(zigbee2mqttManager.z2mPermitJoin, true);
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
   });
 
   it('it should get permit join from response/permit_join', async () => {
@@ -78,7 +81,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,
     });
-    assert.match(zigbee2mqttManager.z2mPermitJoin, true);
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
   });
 
   it('it should get permit join from config/permit_join', async () => {
@@ -89,7 +92,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
       payload: true,
     });
-    assert.match(zigbee2mqttManager.z2mPermitJoin, true);
+    expect(zigbee2mqttManager.z2mPermitJoin).to.equal(true);
   });
 
   it('it should get empty message', async () => {
@@ -149,6 +152,32 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'zigbee2mqtt:0x00158d00033e88d5:battery:integer:battery',
       state: 59,
+    });
+  });
+
+  it('it should get good topic with sub-feature', async () => {
+    // PREPARE
+    stateManagerGetStub = sinon.stub();
+    stateManagerGetStub.onFirstCall().returns({
+      features: [
+        {
+          external_id: 'zigbee2mqtt:0x00158d00033e88d1:button:click:action:2',
+          type: 'click',
+        },
+      ],
+    });
+    zigbee2mqttManager.gladys.stateManager.get = stateManagerGetStub;
+    zigbeeDevices
+      .filter((d) => d.supported)
+      .forEach((device) => {
+        zigbee2mqttManager.discoveredDevices[device.friendly_name] = device;
+      });
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/0x00158d00033e88d1', `{"action": "2_double"}`);
+    // ASSERT
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'zigbee2mqtt:0x00158d00033e88d1:button:click:action:2',
+      state: 2,
     });
   });
 

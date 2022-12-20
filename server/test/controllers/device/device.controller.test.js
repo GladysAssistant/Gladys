@@ -4,6 +4,7 @@ const EventEmitter = require('events');
 const { fake } = require('sinon');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
+const Job = require('../../../lib/job');
 
 const { authenticatedRequest } = require('../request.test');
 
@@ -67,12 +68,13 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
       getValue: fake.resolves(null),
     };
     const event = new EventEmitter();
-    const device = new Device(event, {}, {}, {}, {}, variable);
+    const job = new Job(event);
+    const device = new Device(event, {}, {}, {}, {}, variable, job);
     await device.calculateAggregate('hourly');
     await device.calculateAggregate('daily');
     await device.calculateAggregate('monthly');
   });
-  it('should get device aggregated state by selector', async function Test() {
+  it('should get device aggregated state by selector', async () => {
     await authenticatedRequest
       .get('/api/v1/device_feature/aggregated_states')
       .query({
@@ -87,7 +89,7 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
         expect(res.body[0].values).to.have.lengthOf(100);
       });
   });
-  it('should get device aggregated state', async function Test() {
+  it('should get device aggregated state', async () => {
     await authenticatedRequest
       .get('/api/v1/device_feature/aggregated_states')
       .query({

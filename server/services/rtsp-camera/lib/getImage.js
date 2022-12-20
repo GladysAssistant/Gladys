@@ -14,14 +14,16 @@ const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
  * getImage(device);
  */
 async function getImage(device) {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     // we find the camera url in the device
     const cameraUrlParam = device.params && device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_URL);
     if (!cameraUrlParam) {
-      return reject(new NotFoundError('CAMERA_URL_PARAM_NOT_FOUND'));
+      reject(new NotFoundError('CAMERA_URL_PARAM_NOT_FOUND'));
+      return;
     }
     if (!cameraUrlParam.value || cameraUrlParam.value.length === 0) {
-      return reject(new NotFoundError('CAMERA_URL_SHOULD_NOT_BE_EMPTY'));
+      reject(new NotFoundError('CAMERA_URL_SHOULD_NOT_BE_EMPTY'));
+      return;
     }
     // we find the camera rotation in the device
     let cameraRotationParam =
@@ -51,7 +53,14 @@ async function getImage(device) {
       .outputOptions(outputOptions)
       .output(writeStream)
       .on('end', async () => {
-        const image = await fse.readFile(filePath);
+        let image;
+        try {
+          image = await fse.readFile(filePath);
+        } catch (e) {
+          reject(e);
+          return;
+        }
+
         // convert binary data to base64 encoded string
         const cameraImageBase = Buffer.from(image).toString('base64');
         const cameraImage = `image/png;base64,${cameraImageBase}`;
@@ -65,7 +74,6 @@ async function getImage(device) {
         await fse.remove(filePath);
       })
       .run();
-    return null;
   });
 }
 

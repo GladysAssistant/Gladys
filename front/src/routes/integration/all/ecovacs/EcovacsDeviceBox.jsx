@@ -6,7 +6,9 @@ import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class EcovacsDeviceBox extends Component {
   componentWillMount() {
-    this.props.getEcovacsDeviceStatus(this.props.device);
+    if (this.props.displayStatus) {
+      this.props.getEcovacsDeviceStatus(this.props.device);
+    }
   }
 
   updateName = e => {
@@ -23,7 +25,7 @@ class EcovacsDeviceBox extends Component {
       errorMessage: null
     });
     try {
-      await this.props.saveDevice(this.props.device, this.props.deviceIndex);
+      await this.props.saveDevice(this.props.listName, this.props.deviceIndex);
     } catch (e) {
       let errorMessage = 'integration.ecovacs.error.defaultError';
       if (e.response.status === 409) {

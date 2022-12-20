@@ -6,12 +6,15 @@ const { EVENTS } = require('../../../utils/constants');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
 const ServiceManager = require('../../../lib/service');
+const Job = require('../../../lib/job');
 
 const event = {
   emit: fake.returns(null),
   on: fake.returns(null),
 };
 const messageManager = {};
+
+const job = new Job(event);
 
 describe('Device.notify', () => {
   afterEach(() => {
@@ -32,7 +35,7 @@ describe('Device.notify', () => {
     const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
     stateManager.setState('serviceById', serviceId, service);
 
-    const device = new Device(event, messageManager, stateManager, serviceManager);
+    const device = new Device(event, messageManager, stateManager, serviceManager, {}, {}, job);
     const newDevice = {
       service_id: serviceId,
       name: 'Philips Hue 1',
@@ -61,7 +64,7 @@ describe('Device.notify', () => {
     const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
     stateManager.setState('serviceById', serviceId, service);
 
-    const device = new Device(event, messageManager, stateManager, serviceManager);
+    const device = new Device(event, messageManager, stateManager, serviceManager, {}, {}, job);
     const newDevice = {
       service_id: serviceId,
       name: 'Philips Hue 1',
@@ -90,7 +93,7 @@ describe('Device.notify', () => {
     const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
     stateManager.setState('serviceById', serviceId, service);
 
-    const device = new Device(event, messageManager, stateManager, serviceManager);
+    const device = new Device(event, messageManager, stateManager, serviceManager, {}, {}, job);
     const newDevice = {
       service_id: serviceId,
       name: 'Philips Hue 1',
@@ -119,7 +122,7 @@ describe('Device.notify', () => {
     const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
     stateManager.setState('serviceById', serviceId, service);
 
-    const device = new Device(event, messageManager, stateManager, serviceManager);
+    const device = new Device(event, messageManager, stateManager, serviceManager, {}, {}, job);
     const newDevice = {
       service_id: serviceId,
       name: 'Philips Hue 1',
@@ -140,7 +143,7 @@ describe('Device.notify', () => {
 
     const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
 
-    const device = new Device(event, messageManager, stateManager, serviceManager);
+    const device = new Device(event, messageManager, stateManager, serviceManager, {}, {}, job);
     const newDevice = {
       service_id: serviceId,
       name: 'Philips Hue 1',
@@ -160,7 +163,7 @@ describe('Device.notify', () => {
     const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
     stateManager.setState('serviceById', serviceId, service);
 
-    const device = new Device(event, messageManager, stateManager, serviceManager);
+    const device = new Device(event, messageManager, stateManager, serviceManager, {}, {}, job);
     const newDevice = {
       service_id: serviceId,
       name: 'Philips Hue 1',
@@ -180,7 +183,7 @@ describe('Device.notify', () => {
     const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
     stateManager.setState('serviceById', serviceId, service);
 
-    const device = new Device(event, messageManager, stateManager, serviceManager);
+    const device = new Device(event, messageManager, stateManager, serviceManager, {}, {}, job);
     const newDevice = {
       service_id: serviceId,
       name: 'Philips Hue 1',

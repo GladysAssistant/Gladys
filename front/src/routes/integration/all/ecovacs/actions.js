@@ -4,25 +4,21 @@ import createActionsHouse from '../../../../actions/house';
 import createActionsIntegration from '../../../../actions/integration';
 import debounce from 'debounce';
 
+const HIDDEN_PASSWORD = '*********';
+
 function createActions(store) {
   const houseActions = createActionsHouse(store);
   const integrationActions = createActionsIntegration(store);
   const actions = {
     async loadProps(state) {
-      let ecovacsUsername;
-      let ecovacsPassword;
-      let ecovacsCountryCode;
+      let configuration = {};
       try {
-        ecovacsUsername = await state.httpClient.get('/api/v1/service/ecovacs/variable/ECOVACS_LOGIN');
-        ecovacsCountryCode = await state.httpClient.get('/api/v1/service/ecovacs/variable/ECOVACS_COUNTRY_CODE');
-        if (ecovacsUsername.value) {
-          ecovacsPassword = '*********'; // this is just used so that the field is filled
-        }
+        configuration = await state.httpClient.get('/api/v1/service/ecovacs/config');
       } finally {
         store.setState({
-          ecovacsUsername: (ecovacsUsername || { value: '' }).value,
-          ecovacsCountryCode: (ecovacsCountryCode || { value: '' }).value,
-          ecovacsPassword,
+          ecovacsUsername: configuration.login,
+          ecovacsCountryCode: configuration.countryCode,
+          ecovacsPassword: configuration.login && HIDDEN_PASSWORD,
           passwordChanges: false,
           connected: false
         });
@@ -44,17 +40,12 @@ function createActions(store) {
         ecovacsConnectionError: undefined
       });
       try {
-        await state.httpClient.post('/api/v1/service/ecovacs/variable/ECOVACS_LOGIN', {
-          value: state.ecovacsUsername
+        const { ecovacsUsername, ecovacsCountryCode, ecovacsPassword } = state;
+        await state.httpClient.post('/api/v1/service/ecovacs/config', {
+          accountId: ecovacsUsername,
+          countryCode: ecovacsCountryCode,
+          password: (state.passwordChanges && ecovacsPassword) || undefined
         });
-        await state.httpClient.post('/api/v1/service/ecovacs/variable/ECOVACS_COUNTRY_CODE', {
-          value: state.ecovacsCountryCode
-        });
-        if (state.passwordChanges) {
-          await state.httpClient.post('/api/v1/service/ecovacs/variable/ECOVACS_PASSWORD', {
-            value: state.ecovacsPassword
-          });
-        }
         await state.httpClient.get(`/api/v1/service/ecovacs/connect`);
 
         store.setState({
@@ -178,8 +169,15 @@ function createActions(store) {
         [listName]: devices
       });
     },
-    async saveDevice(state, device) {
-      await state.httpClient.post('/api/v1/device', device);
+    async saveDevice(state, listName, index) {
+      const device = state[listName][index];
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      const devices = update(state[listName], {
+        $splice: [[index, 1, savedDevice]]
+      });
+      store.setState({
+        [listName]: devices
+      });
     },
     async deleteDevice(state, index) {
       const device = state.ecovacsDevices[index];

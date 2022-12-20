@@ -12,6 +12,7 @@ const EcovacsHandlerMock = function EcovacsHandlerMock(gladys, serviceId) {
 
 EcovacsHandlerMock.prototype.stop = fake.returns(null);
 EcovacsHandlerMock.prototype.start = fake.returns(null);
+EcovacsHandlerMock.prototype.pause = fake.returns(null);
 EcovacsHandlerMock.prototype.connect = fake.resolves(true);
 EcovacsHandlerMock.prototype.getStatus = fake.resolves(true);
 EcovacsHandlerMock.prototype.getConfiguration = fake.resolves({

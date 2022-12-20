@@ -29,7 +29,7 @@ module.exports = function UserController(gladys) {
       LOGIN_SESSION_VALIDITY_IN_SECONDS,
       req.headers['user-agent'],
     );
-    const response = Object.assign({}, user, session);
+    const response = { ...user, ...session };
     res.status(201).json(response);
   }
 
@@ -53,7 +53,7 @@ module.exports = function UserController(gladys) {
       LOGIN_SESSION_VALIDITY_IN_SECONDS,
       req.headers['user-agent'],
     );
-    const response = Object.assign({}, user, session);
+    const response = { ...user, ...session };
     res.json(response);
   }
 

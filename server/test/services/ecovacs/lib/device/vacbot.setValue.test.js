@@ -28,7 +28,7 @@ describe('EcovacsHandler setValue', () => {
   it('should set the binary value to 1', async () => {
     await ecovacsService.device.setValue(
       devices[0],
-      { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'switch', type: 'binary' },
+      { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'vacbot', type: 'state' },
       1,
     );
     assert.calledOnce(fakes.clean);
@@ -38,21 +38,34 @@ describe('EcovacsHandler setValue', () => {
   it('should set the binary value to 0', async () => {
     await ecovacsService.device.setValue(
       devices[0],
-      { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'switch', type: 'binary' },
+      { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'vacbot', type: 'state' },
       0,
+    );
+    assert.calledOnce(fakes.pause);
+    assert.notCalled(fakes.clean);
+    assert.notCalled(fakes.stop);
+  });
+
+  it('should set the binary value to -1', async () => {
+    await ecovacsService.device.setValue(
+      devices[0],
+      { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'vacbot', type: 'state' },
+      -1,
     );
     assert.calledOnce(fakes.stop);
     assert.notCalled(fakes.clean);
+    assert.notCalled(fakes.pause);
   });
 
   it('should set the binary value is not handled', async () => {
     await ecovacsService.device.setValue(
       devices[0],
-      { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'switch', type: 'binary' },
+      { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'vacbot', type: 'state' },
       null,
     );
     assert.notCalled(fakes.stop);
     assert.notCalled(fakes.clean);
+    assert.notCalled(fakes.pause);
   });
 
   it('should raise an error', async () => {
@@ -61,7 +74,7 @@ describe('EcovacsHandler setValue', () => {
     try {
       await ecovacsService.device.setValue(
         devices[0],
-        { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'switch', type: 'binary' },
+        { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'vacbot', type: 'state' },
         0,
       );
       assert.fail('Should have fail');
