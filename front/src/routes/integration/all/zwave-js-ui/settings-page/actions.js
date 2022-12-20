@@ -57,8 +57,8 @@ const createActions = store => {
       store.setState(configuration);
     },
     async connect(state) {
-      await this.disconnect(state);
-      await this.saveConfiguration(state);
+      await actions.disconnect(state);
+      await actions.saveConfiguration(state);
       store.setState({
         zwaveConnectStatus: RequestStatus.Getting
       });

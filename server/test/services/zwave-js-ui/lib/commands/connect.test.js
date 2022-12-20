@@ -8,6 +8,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { CONFIGURATION, DEFAULT } = require('../../../../../services/zwave-js-ui/lib/constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
+const { PlatformNotCompatible } = require('../../../../../utils/coreErrors');
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
 const DRIVER_PATH = 'DRIVER_PATH';
@@ -133,6 +134,31 @@ describe('zwaveJSUIManager commands', () => {
       '********',
       ZWAVEJSUI_SERVICE_ID,
     );
+  });
+
+  it('should fail connect to zwave-js-ui gladys instance on non docker system', async () => {
+    gladys.variable.getValue = sinon.stub();
+    gladys.variable.getValue
+      .onCall(0) // EXTERNAL_ZWAVEJSUI
+      .resolves(null)
+      .onCall(1) // MQTT_PASSWORD
+      .resolves(null)
+      .onCall(2) // MQTT_URL
+      .resolves('MQTT_URL')
+      .onCall(3) // MQTT_USERNAME
+      .resolves('MQTT_USERNAME')
+      .onCall(4) // DRIVER_PATH
+      .resolves(null);
+
+    gladys.system.isDocker = fake.resolves(false);
+
+    try {
+      await zwaveJSUIManager.connect();
+      expect().not;
+    } catch(e) {
+      expect(true).to.true;
+      expect(e).to.be.an.instanceof(PlatformNotCompatible);
+    }
   });
 
   it('should connect to zwave-js-ui external instance', async () => {
