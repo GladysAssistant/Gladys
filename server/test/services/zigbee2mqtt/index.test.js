@@ -5,7 +5,11 @@ const { assert, fake } = sinon;
 
 const Zigbee2MqttService = require('../../../services/zigbee2mqtt');
 
-const gladys = {};
+const gladys = {
+  event: {
+    emit: fake.returns,
+  },
+};
 
 describe('zigbee2mqtt service', () => {
   // PREPARE
@@ -35,8 +39,15 @@ describe('zigbee2mqtt service', () => {
     assert.calledOnce(zigbee2MqttService.device.disconnect);
     assert.notCalled(zigbee2MqttService.device.init);
   });
-  it('should return if service is used', async () => {
+  it('isUsed: should return false, service not used', async () => {
     const used = await zigbee2MqttService.isUsed();
     expect(used).to.equal(false);
+  });
+  it('isUsed: should return true, service is used', async () => {
+    zigbee2MqttService.device.gladysConnected = true;
+    // handle one message so that zigbee2mqtt connected is true
+    await zigbee2MqttService.device.handleMqttMessage('zigbee2mqtt/bridge/devices', JSON.stringify([]));
+    const used = await zigbee2MqttService.isUsed();
+    expect(used).to.equal(true);
   });
 });

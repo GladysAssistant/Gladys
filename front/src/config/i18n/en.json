@@ -1150,6 +1150,7 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
+    "duplicateButton": "Duplicate",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
     "addTriggerButton": "Add trigger",
@@ -1714,6 +1715,16 @@
     "iconLabel": "Select an icon for you scene",
     "createSceneButton": "Create scene",
     "invalidName": "Name is required and cannot be 'new'",
+    "invalidIcon": "Icon is required",
+    "sceneAlreadyExist": "A scene with that name already exist."
+  },
+  "duplicateScene": {
+    "cardTitle": "Duplicate scene \"{{name}}\"",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter a new name",
+    "iconLabel": "Select an icon for you scene",
+    "duplicateSceneButton": "Duplicate",
+    "invalidName": "Name is required",
     "invalidIcon": "Icon is required",
     "sceneAlreadyExist": "A scene with that name already exist."
   },
