@@ -284,7 +284,6 @@ class SettingsTab extends Component {
                       <Text id="integration.zwave-js-ui.settings.disconnectButton" />
                     </button>
                   </div>
-                  
                 </form>
               </div>
             </div>
