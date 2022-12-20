@@ -4,6 +4,8 @@ import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 import update from 'immutability-helper';
 
+import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
+
 class Condition extends Component {
   handleChange = selectedOption => {
     const newCondition = update(this.props.condition, {
@@ -23,11 +25,15 @@ class Condition extends Component {
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  handleValueChange = e => {
-    const newValue = Number.parseFloat(e.target.value);
+  handleValueChange = value => {
+    const newValue = !isNaN(Number.parseFloat(value)) ? Number.parseFloat(value) : undefined;
+    const evalValue = isNaN(newValue) && value ? value : undefined;
     const newCondition = update(this.props.condition, {
       value: {
         $set: newValue
+      },
+      evaluate_value: {
+        $set: evalValue
       }
     });
     this.props.handleConditionChange(this.props.index, newCondition);
@@ -113,12 +119,14 @@ class Condition extends Component {
                 </span>
               </label>
               <Localizer>
-                <input
-                  type="number"
-                  class="form-control"
-                  placeholder={<Text id="editScene.triggersCard.newState.valuePlaceholder" />}
-                  value={props.condition.value}
-                  onBlur={this.handleValueChange}
+                <TextWithVariablesInjected
+                  text={
+                    props.condition.value ? Number(props.condition.value).toString() : props.condition.evaluate_value
+                  }
+                  triggersVariables={props.triggersVariables}
+                  actionsGroupsBefore={props.actionsGroupsBefore}
+                  variables={props.variables}
+                  updateText={this.handleValueChange}
                 />
               </Localizer>
             </div>

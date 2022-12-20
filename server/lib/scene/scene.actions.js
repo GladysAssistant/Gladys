@@ -1,6 +1,7 @@
 const Promise = require('bluebird');
 const Handlebars = require('handlebars');
 const cloneDeep = require('lodash.clonedeep');
+const { evaluate } = require('mathjs');
 const set = require('set-value');
 const get = require('get-value');
 const dayjs = require('dayjs');
@@ -27,7 +28,12 @@ const actionsFunc = {
       device = self.stateManager.get('device', action.device);
       deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
     }
-    return self.device.setValue(device, deviceFeature, action.value);
+    const value = action.value || evaluate(Handlebars.compile(action.evaluate_value)(scope));
+    if (!Number(value)) {
+      throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
+    }
+
+    return self.device.setValue(device, deviceFeature, value);
   },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
@@ -139,16 +145,19 @@ const actionsFunc = {
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
     action.conditions.forEach((condition) => {
+      const value = condition.value || evaluate(Handlebars.compile(condition.evaluate_value)(scope));
+      if (!Number(value)) {
+        throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
+      }
+
       // removing brackets
       const variableWithoutBrackets = condition.variable.replace(/\[|\]/g, '');
-      const conditionVerified = compare(condition.operator, get(scope, variableWithoutBrackets), condition.value);
+      const conditionVerified = compare(condition.operator, get(scope, variableWithoutBrackets), value);
       if (conditionVerified) {
         oneConditionVerified = true;
       } else {
         logger.debug(
-          `Condition not verified. Condition: "${get(scope, variableWithoutBrackets)} ${condition.operator} ${
-            condition.value
-          }"`,
+          `Condition not verified. Condition: "${get(scope, variableWithoutBrackets)} ${condition.operator} ${value}"`,
         );
       }
     });

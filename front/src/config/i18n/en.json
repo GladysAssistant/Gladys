@@ -1202,7 +1202,9 @@
       "deviceSetValue": {
         "description": "This action let you control a device.",
         "deviceLabel": "Device",
-        "valueLabel": "Value"
+        "valueLabel": "Value",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Computed"
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",

@@ -1202,7 +1202,9 @@
       "deviceSetValue": {
         "description": "Cette action vous permet de contrôler un appareil.",
         "deviceLabel": "Appareil",
-        "valueLabel": "Valeur"
+        "valueLabel": "Valeur",
+        "valueTypeSimple": "Simple",
+        "valueTypeComputed": "Calculée"
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",

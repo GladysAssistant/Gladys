@@ -18,6 +18,9 @@ const actionSchema = Joi.array().items(
       scene: Joi.string(),
       text: Joi.string(),
       value: Joi.number(),
+      evaluate_value: Joi.string().regex(
+        /^((\+|-|\*|\/|%|[0-9]|\s|\(|\)|>|<|>=|<=|==|!=|===|!==|\?|:)|({{(\d|\.|_|[a-zA-Z])+}})|([a-zA-Z0-9]+\([a-zA-Z0-9]+\)))*$/,
+      ),
       minutes: Joi.number(),
       unit: Joi.string(),
       url: Joi.string().uri(),
@@ -53,6 +56,9 @@ const actionSchema = Joi.array().items(
           .valid('=', '!=', '>', '>=', '<', '<=')
           .required(),
         value: Joi.number(),
+        evaluate_value: Joi.string().regex(
+          /^((\+|-|\*|\/|%|[0-9]|\s|\(|\)|>|<|>=|<=|==|!=|===|!==|\?|:)|({{(\d|\.|_|[a-zA-Z])+}})|([a-zA-Z0-9]+\([a-zA-Z0-9]+\)))*$/,
+        ),
       }),
     }),
   ),

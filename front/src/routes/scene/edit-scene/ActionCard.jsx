@@ -156,6 +156,7 @@ const ActionCard = ({ children, ...props }) => (
             index={props.index}
             updateActionProperty={props.updateActionProperty}
             actionsGroupsBefore={props.actionsGroupsBefore}
+            triggersVariables={props.triggersVariables}
             variables={props.variables}
             setVariables={props.setVariables}
           />
@@ -248,6 +249,9 @@ const ActionCard = ({ children, ...props }) => (
             columnIndex={props.columnIndex}
             index={props.index}
             updateActionProperty={props.updateActionProperty}
+            actionsGroupsBefore={props.actionsGroupsBefore}
+            triggersVariables={props.triggersVariables}
+            variables={props.variables}
           />
         )}
         {props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING && (

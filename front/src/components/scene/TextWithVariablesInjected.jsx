@@ -107,6 +107,8 @@ class TextWithVariablesInjected extends Component {
     this.state = {
       variableWhileList: []
     };
+
+    this.refreshVariables(this.props);
   }
 
   componentDidMount() {
