@@ -26,9 +26,8 @@ describe('gateway.forwardWebsockets', () => {
     variable.destroy = fake.resolves(null);
 
     const scheduler = {
-      scheduleJob: (name, rule, callback) => {
+      scheduleJob: (rule, callback) => {
         return {
-          name,
           callback,
           rule,
           cancel: () => {},

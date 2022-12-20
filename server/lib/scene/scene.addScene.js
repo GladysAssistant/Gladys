@@ -68,7 +68,7 @@ function addScene(sceneRaw) {
           default:
             throw new BadParameters(`${trigger.scheduler_type} not supported`);
         }
-        trigger.nodeScheduleJob = this.scheduler.scheduleJob(scene.selector, rule, () =>
+        trigger.nodeScheduleJob = this.scheduler.scheduleJob(rule, () =>
           this.event.emit(EVENTS.TRIGGERS.CHECK, trigger),
         );
       } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'interval') {

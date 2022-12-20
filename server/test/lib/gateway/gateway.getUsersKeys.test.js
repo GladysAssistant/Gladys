@@ -28,9 +28,8 @@ describe('gateway.getUsersKeys', () => {
     variable.setValue = fake.resolves(null);
 
     const scheduler = {
-      scheduleJob: (name, rule, callback) => {
+      scheduleJob: (rule, callback) => {
         return {
-          name,
           callback,
           rule,
           cancel: () => {},

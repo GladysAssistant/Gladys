@@ -42,9 +42,8 @@ describe('SceneManager.dailyUpdate', () => {
       },
     ]);
 
-    scheduler.scheduleJob = (name, date, callback) => {
+    scheduler.scheduleJob = (date, callback) => {
       return {
-        name,
         callback,
         date,
         cancel: () => {},

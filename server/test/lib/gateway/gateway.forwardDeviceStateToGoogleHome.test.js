@@ -46,9 +46,8 @@ describe('gateway.forwardDeviceStateToGoogleHome', () => {
     };
 
     const scheduler = {
-      scheduleJob: (name, rule, callback) => {
+      scheduleJob: (rule, callback) => {
         return {
-          name,
           callback,
           rule,
           cancel: () => {},

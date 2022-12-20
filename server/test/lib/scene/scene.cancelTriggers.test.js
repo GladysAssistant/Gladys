@@ -16,9 +16,8 @@ describe('SceneManager.cancelTriggers', () => {
     };
 
     const scheduler = {
-      scheduleJob: (name, date, callback) => {
+      scheduleJob: (date, callback) => {
         return {
-          name,
           callback,
           date,
           cancel: () => {},

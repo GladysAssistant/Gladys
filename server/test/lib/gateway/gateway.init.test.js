@@ -4,7 +4,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
 
 const getConfig = require('../../../utils/getConfig');
-const { SYSTEM_VARIABLE_NAMES, JOB_TYPES } = require('../../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 
 const { fake, assert } = sinon;
 const Gateway = proxyquire('../../../lib/gateway', {
@@ -53,9 +53,8 @@ describe('gateway.init', () => {
     const config = getConfig();
 
     const scheduler = {
-      scheduleJob: (name, rule, callback) => {
+      scheduleJob: (rule, callback) => {
         return {
-          name,
           callback,
           rule,
           cancel: () => {},
@@ -85,7 +84,6 @@ describe('gateway.init', () => {
     expect(gateway.connected).to.equal(true);
     expect(gateway.usersKeys).to.deep.equal(userKeys);
     expect(gateway.backupSchedule).to.deep.contains({
-      name: JOB_TYPES.GLADYS_GATEWAY_BACKUP,
       rule: { tz: 'Europe/Paris', hour: 0, minute: 0, second: 0 },
     });
   });
@@ -103,7 +101,6 @@ describe('gateway.init', () => {
     expect(gateway.connected).to.equal(false);
     expect(gateway.usersKeys).to.deep.equal(userKeys);
     expect(gateway.backupSchedule).to.deep.contains({
-      name: JOB_TYPES.GLADYS_GATEWAY_BACKUP,
       rule: { tz: 'Europe/Paris', hour: 0, minute: 0, second: 0 },
     });
   });

@@ -6,7 +6,6 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const nodeScheduleMock = {
   scheduleJob: fake.returns(true),
-  RecurrenceRule: fake.returns({ reccurent: true }),
 };
 
 const Scheduler = proxyquire('../../../lib/scheduler', {
@@ -15,7 +14,7 @@ const Scheduler = proxyquire('../../../lib/scheduler', {
 
 const event = new EventEmitter();
 
-describe('Scheduler cancelJob', () => {
+describe('Scheduler scheduleJob', () => {
   let scheduler;
 
   beforeEach(() => {
@@ -27,24 +26,29 @@ describe('Scheduler cancelJob', () => {
   });
 
   it('should schedule cron rules job', async () => {
-    const jobName = 'my-job';
     const rule = '*/5 * * * * *';
     const jobMethod = fake.returns(true);
 
-    scheduler.scheduleJob(jobName, rule, jobMethod);
+    scheduler.scheduleJob(rule, jobMethod);
 
-    assert.notCalled(nodeScheduleMock.RecurrenceRule);
-    assert.calledOnceWithExactly(nodeScheduleMock.scheduleJob, jobName, rule, jobMethod);
+    assert.calledOnceWithExactly(nodeScheduleMock.scheduleJob, rule, jobMethod);
   });
 
   it('should schedule object ruled job', async () => {
-    const jobName = 'my-job';
     const rule = { hour: 2 };
     const jobMethod = fake.returns(true);
 
-    scheduler.scheduleJob(jobName, rule, jobMethod);
+    scheduler.scheduleJob(rule, jobMethod);
 
-    assert.calledWithNew(nodeScheduleMock.RecurrenceRule);
-    assert.calledOnceWithExactly(nodeScheduleMock.scheduleJob, jobName, { reccurent: true, hour: 2 }, jobMethod);
+    assert.calledOnceWithExactly(nodeScheduleMock.scheduleJob, rule, jobMethod);
+  });
+
+  it('should schedule data ruled job', async () => {
+    const rule = new Date();
+    const jobMethod = fake.returns(true);
+
+    scheduler.scheduleJob(rule, jobMethod);
+
+    assert.calledOnceWithExactly(nodeScheduleMock.scheduleJob, rule, jobMethod);
   });
 });

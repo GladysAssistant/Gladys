@@ -35,7 +35,7 @@ describe('Scheduler init', () => {
 
     jobs.forEach((job, index) => {
       // Check that each job well registered
-      assert.calledWithMatch(nodeScheduleMock.scheduleJob, job.name, job.rule, sinon.match.func);
+      assert.calledWithMatch(nodeScheduleMock.scheduleJob, job.rule, sinon.match.func);
       // Force method call
       nodeScheduleMock.scheduleJob.getCall(index).callback();
       // Check that method is well sending the right event

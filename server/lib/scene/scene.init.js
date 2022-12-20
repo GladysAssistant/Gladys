@@ -25,13 +25,11 @@ async function init() {
 
   // Recurrence rule (00:00 every day) to update sunrise/sunset time.
   const rule = { tz: this.timezone, hour: 0, minute: 0, second: 0 };
-  this.scheduler.scheduleJob('scene-daily-update', rule, this.dailyUpdate.bind(this));
+  this.scheduler.scheduleJob(rule, this.dailyUpdate.bind(this));
   await this.dailyUpdate();
 
   //  At every minute, check if calendar event is coming
-  this.scheduler.scheduleJob(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING, '* * * * *', () =>
-    this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING),
-  );
+  this.scheduler.scheduleJob('* * * * *', () => this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING));
 
   return plainScenes;
 }
