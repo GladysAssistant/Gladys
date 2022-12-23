@@ -155,7 +155,7 @@ describe('zwaveJSUIManager commands', () => {
     try {
       await zwaveJSUIManager.connect();
       expect().not;
-    } catch(e) {
+    } catch (e) {
       expect(true).to.true;
       expect(e).to.be.an.instanceof(PlatformNotCompatible);
     }
