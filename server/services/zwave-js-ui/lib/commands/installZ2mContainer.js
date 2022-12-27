@@ -48,6 +48,7 @@ async function installZ2mContainer() {
       // Prepare Z2M env
       logger.info(`Preparing ZwaveJSUI environment...`);
       const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
+      logger.info(`Creating configuration file ${basePathOnHost}/zwave-js-ui/settings.json...`);
       const brokerEnv = await exec(
         `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnHost} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
       );

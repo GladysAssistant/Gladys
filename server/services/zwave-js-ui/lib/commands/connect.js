@@ -94,7 +94,7 @@ async function connect() {
         await this.gladys.variable.setValue(CONFIGURATION.S0_LEGACY, s0LegacyKey, this.serviceId);
       }
 
-      // await this.installMqttContainer();
+      await this.installMqttContainer();
       if (this.usbConfigured) {
         await this.installZ2mContainer();
       }

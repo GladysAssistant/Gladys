@@ -83,4 +83,4 @@ cat <<EOF >>$zwave-js-ui_config_file
 }
 EOF
 
-echo "zwave-js-ui : configuration written in $zwave-js-ui_config_file"
+echo "zwave-js-ui : configuration written"
