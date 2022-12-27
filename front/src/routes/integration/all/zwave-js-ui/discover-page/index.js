@@ -18,7 +18,7 @@ class ZwaveJSUINodePage extends Component {
       WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE,
       this.scanCompleteListener
     );
-    this.props.getIntegrationByName('zwave');
+    this.props.getIntegrationByName('zwave-js-ui');
     this.props.getNodes();
     this.props.getStatus();
   }
