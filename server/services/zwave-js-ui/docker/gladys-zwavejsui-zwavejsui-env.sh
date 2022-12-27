@@ -4,24 +4,23 @@
 base_path_container=$1
 
 # Configuration path
-zwave-js-ui_dir=${base_path_container}/zwave-js-ui
+zwave_js_ui_dir=${base_path_container}/zwave-js-ui
 # Configuration file
-zwave-js-ui_config_file=${zwave-js-ui_dir}/settings.json
+zwave_js_ui_config_file=${zwave_js_ui_dir}/settings.json
 
 # Create configuration path (if not exists)
-mkdir -p $zwave-js-ui_dir
+mkdir -p $zwave_js_ui_dir
 
 echo "ZwaveJSUI : Writing ZwaveJSUI configuration..."
 
-rm -f $zwave-js-ui_config_file
+rm -f $zwave_js_ui_config_file
 
 # Create config file
-touch $zwave-js-ui_config_file
-chmod o-r $zwave-js-ui_config_file
+touch $zwave_js_ui_config_file
+chmod o-r $zwave_js_ui_config_file
 
 # Write defaults
-
-cat <<EOF >>$zwave-js-ui_config_file
+cat <<EOF >>$zwave_js_ui_config_file
 {
   "mqtt": {
     "name": "Gladys",
