@@ -152,13 +152,15 @@ describe('zwaveJSUIManager commands', () => {
 
     gladys.system.isDocker = fake.resolves(false);
 
+    let exc = null;
     try {
       await zwaveJSUIManager.connect();
-      expect().not;
     } catch (e) {
-      expect(true).to.true;
-      expect(e).to.be.an.instanceof(PlatformNotCompatible);
+      exc = e;
     }
+
+    expect(exc).to.not.equal(null);
+    expect(exc).to.be.an.instanceof(PlatformNotCompatible);
   });
 
   it('should connect to zwave-js-ui external instance', async () => {

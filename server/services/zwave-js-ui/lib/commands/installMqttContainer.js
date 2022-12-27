@@ -37,14 +37,14 @@ async function installMqttContainer() {
       const brokerEnv = await exec(
         `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-mqtt-env.sh ${basePathOnHost}/zwave-js-ui`,
       );
-      logger.trace(brokerEnv);
+      logger.info(brokerEnv);
       containerDescriptorToMutate.HostConfig.Binds.push(
         `${basePathOnHost}/zwave-js-ui/mosquitto/config:/mosquitto/config`,
       );
 
       logger.info(`Creating container...`);
       containerMqtt = await this.gladys.system.createContainer(containerDescriptorToMutate);
-      logger.trace(containerMqtt);
+      logger.info(containerMqtt);
       this.mqttExist = true;
     } catch (e) {
       logger.error('MQTT broker failed to install as Docker container:', e);

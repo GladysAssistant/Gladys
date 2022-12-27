@@ -62,7 +62,7 @@ async function updateConfiguration(configuration) {
 
   if (s0LegacyKey) {
     await this.gladys.variable.setValue(CONFIGURATION.S0_LEGACY, s0LegacyKey, this.serviceId);
-    this.zwavejsSOLegacyKey = s0LegacyKey;
+    this.s0LegacyKey = s0LegacyKey;
   }
 
   if (mqttUrl) {
