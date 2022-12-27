@@ -25,7 +25,7 @@ async function connect() {
       this.serviceId,
     );
   }
-  
+
   // MQTT configuration
   let mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
   if (!mqttPassword) {
@@ -36,11 +36,7 @@ async function connect() {
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, mqttUsername, this.serviceId);
     mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
-    await this.gladys.variable.setValue(
-      CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD_BACKUP,
-      mqttPassword,
-      this.serviceId,
-    );
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD_BACKUP, mqttPassword, this.serviceId);
   }
 
   // Test if dongle is present
@@ -80,11 +76,7 @@ async function connect() {
       let s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
       if (!s2UnauthenticatedKey) {
         s2UnauthenticatedKey = crypto.randomBytes(16).toString('hex');
-        await this.gladys.variable.setValue(
-          CONFIGURATION.S2_UNAUTHENTICATED,
-          s2UnauthenticatedKey,
-          this.serviceId,
-        );
+        await this.gladys.variable.setValue(CONFIGURATION.S2_UNAUTHENTICATED, s2UnauthenticatedKey, this.serviceId);
       }
       let s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);
       if (!s2AuthenticatedKey) {
