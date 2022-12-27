@@ -36,7 +36,6 @@ const ZwaveJSUIManager = function ZwaveJSUIManager(gladys, mqtt, serviceId) {
 
   this.usbConfigured = false;
   this.usbConfigured = false;
-  this.externalZwaveJSUI = true;
 
   this.dockerBased = true;
   this.scanInProgress = false;

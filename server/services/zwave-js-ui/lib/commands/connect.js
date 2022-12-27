@@ -12,44 +12,40 @@ const { PlatformNotCompatible } = require('../../../../utils/coreErrors');
  * connect();
  */
 async function connect() {
-  const externalZwaveJSUI = await this.gladys.variable.getValue(CONFIGURATION.EXTERNAL_ZWAVEJSUI, this.serviceId);
-  if (externalZwaveJSUI) {
-    this.externalZwaveJSUI = externalZwaveJSUI === '1';
+  const externalZwaveJSUIStr = await this.gladys.variable.getValue(CONFIGURATION.EXTERNAL_ZWAVEJSUI, this.serviceId);
+  let externalZwaveJSUI;
+  if (externalZwaveJSUIStr) {
+    externalZwaveJSUI = externalZwaveJSUIStr === '1';
   } else {
-    this.externalZwaveJSUI = DEFAULT.EXTERNAL_ZWAVEJSUI;
+    externalZwaveJSUI = DEFAULT.EXTERNAL_ZWAVEJSUI;
+
     await this.gladys.variable.setValue(
       CONFIGURATION.EXTERNAL_ZWAVEJSUI,
-      this.externalZwaveJSUI ? '1' : '0',
+      externalZwaveJSUI ? '1' : '0',
       this.serviceId,
     );
   }
-
+  
   // MQTT configuration
-  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
+  let mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
   if (!mqttPassword) {
     // First start, use default value for MQTT
-    this.mqttUrl = DEFAULT.ZWAVEJSUI_MQTT_URL_VALUE;
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, this.mqttUrl, this.serviceId);
-    this.mqttUsername = DEFAULT.ZWAVEJSUI_MQTT_USERNAME_VALUE;
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.mqttUsername, this.serviceId);
-    this.mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.mqttPassword, this.serviceId);
+    const mqttUrl = DEFAULT.ZWAVEJSUI_MQTT_URL_VALUE;
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, mqttUrl, this.serviceId);
+    const mqttUsername = DEFAULT.ZWAVEJSUI_MQTT_USERNAME_VALUE;
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, mqttUsername, this.serviceId);
+    mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
     await this.gladys.variable.setValue(
       CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD_BACKUP,
-      this.mqttPassword,
+      mqttPassword,
       this.serviceId,
     );
-  } else {
-    const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, this.serviceId);
-    this.mqttUrl = mqttUrl;
-    const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
-    this.mqttUsername = mqttUsername;
-    this.mqttPassword = mqttPassword;
   }
 
   // Test if dongle is present
   this.usbConfigured = false;
-  if (this.externalZwaveJSUI) {
+  if (externalZwaveJSUI) {
     logger.info(`ZwaveJSUI USB dongle assumed to be attached`);
     this.usbConfigured = true;
     this.driverPath = 'N.A.';
@@ -72,7 +68,6 @@ async function connect() {
           logger.info(`ZwaveJSUI USB dongle attached to ${driverPath}`);
         }
       });
-      this.driverPath = driverPath;
       if (!this.usbConfigured) {
         logger.info(`ZwaveJSUI USB dongle detached to ${driverPath}`);
       }
@@ -82,42 +77,44 @@ async function connect() {
 
     if (this.usbConfigured) {
       // Security keys configuration
-      this.s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
-      if (!this.s2UnauthenticatedKey) {
-        this.s2UnauthenticatedKey = crypto.randomBytes(16).toString('hex');
+      let s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
+      if (!s2UnauthenticatedKey) {
+        s2UnauthenticatedKey = crypto.randomBytes(16).toString('hex');
         await this.gladys.variable.setValue(
           CONFIGURATION.S2_UNAUTHENTICATED,
-          this.s2UnauthenticatedKey,
+          s2UnauthenticatedKey,
           this.serviceId,
         );
       }
-      this.s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);
-      if (!this.s2AuthenticatedKey) {
-        this.s2AuthenticatedKey = crypto.randomBytes(16).toString('hex');
-        await this.gladys.variable.setValue(CONFIGURATION.S2_AUTHENTICATED, this.s2AuthenticatedKey, this.serviceId);
+      let s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);
+      if (!s2AuthenticatedKey) {
+        s2AuthenticatedKey = crypto.randomBytes(16).toString('hex');
+        await this.gladys.variable.setValue(CONFIGURATION.S2_AUTHENTICATED, s2AuthenticatedKey, this.serviceId);
       }
-      this.s2AccessControlKey = await this.gladys.variable.getValue(CONFIGURATION.S2_ACCESS_CONTROL, this.serviceId);
-      if (!this.s2AccessControlKey) {
-        this.s2AccessControlKey = crypto.randomBytes(16).toString('hex');
-        await this.gladys.variable.setValue(CONFIGURATION.S2_ACCESS_CONTROL, this.s2AccessControlKey, this.serviceId);
+      let s2AccessControlKey = await this.gladys.variable.getValue(CONFIGURATION.S2_ACCESS_CONTROL, this.serviceId);
+      if (!s2AccessControlKey) {
+        s2AccessControlKey = crypto.randomBytes(16).toString('hex');
+        await this.gladys.variable.setValue(CONFIGURATION.S2_ACCESS_CONTROL, s2AccessControlKey, this.serviceId);
       }
-      this.s0LegacyKey = await this.gladys.variable.getValue(CONFIGURATION.S0_LEGACY, this.serviceId);
-      if (!this.s0LegacyKey) {
-        this.s0LegacyKey = crypto.randomBytes(16).toString('hex');
-        await this.gladys.variable.setValue(CONFIGURATION.S0_LEGACY, this.s0LegacyKey, this.serviceId);
+      let s0LegacyKey = await this.gladys.variable.getValue(CONFIGURATION.S0_LEGACY, this.serviceId);
+      if (!s0LegacyKey) {
+        s0LegacyKey = crypto.randomBytes(16).toString('hex');
+        await this.gladys.variable.setValue(CONFIGURATION.S0_LEGACY, s0LegacyKey, this.serviceId);
       }
 
-      await this.installMqttContainer();
+      // await this.installMqttContainer();
       if (this.usbConfigured) {
         await this.installZ2mContainer();
       }
     }
   }
 
+  const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, this.serviceId);
+  const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
   if (this.mqttRunning) {
-    this.mqttClient = this.mqtt.connect(this.mqttUrl, {
-      username: this.mqttUsername,
-      password: this.mqttPassword,
+    this.mqttClient = this.mqtt.connect(mqttUrl, {
+      username: mqttUsername,
+      password: mqttPassword,
       // reconnectPeriod: 5000,
       // clientId: DEFAULT.MQTT_CLIENT_ID,
     });

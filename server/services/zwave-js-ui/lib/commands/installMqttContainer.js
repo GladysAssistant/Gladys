@@ -4,6 +4,7 @@ const { exec } = require('../../../../utils/childProcess');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const containerDescriptor = require('../../docker/gladys-zwavejsui-mqtt-container.json');
 const logger = require('../../../../utils/logger');
+const { CONFIGURATION } = require('../constants');
 
 const sleep = promisify(setTimeout);
 
@@ -15,6 +16,9 @@ const sleep = promisify(setTimeout);
 async function installMqttContainer() {
   this.mqttRunning = false;
   this.mqttExist = false;
+
+  const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
+  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
 
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
@@ -66,7 +70,7 @@ async function installMqttContainer() {
       // Copy password in broker container
       logger.info(`Creating user/pass...`);
       await this.gladys.system.exec(containerMqtt.id, {
-        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', this.mqttUsername, this.mqttPassword],
+        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUsername, mqttPassword],
       });
 
       // Container restart to inintialize users configuration

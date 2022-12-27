@@ -4,6 +4,7 @@ const { exec } = require('../../../../utils/childProcess');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const containerDescriptor = require('../../docker/gladys-zwavejsui-zwavejsui-container.json');
 const logger = require('../../../../utils/logger');
+const { CONFIGURATION } = require('../constants');
 
 const sleep = promisify(setTimeout);
 
@@ -16,6 +17,14 @@ async function installZ2mContainer() {
   this.zwaveJSUIExist = false;
   this.zwaveJSUIRunning = false;
 
+  const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
+  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
+  const driverPath = await this.gladys.variable.getValue(CONFIGURATION.DRIVER_PATH, this.serviceId);
+  const s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
+  const s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);
+  const s2AccessControlKey = await this.gladys.variable.getValue(CONFIGURATION.S2_ACCESS_CONTROL, this.serviceId);
+  const s0LegacyKey = await this.gladys.variable.getValue(CONFIGURATION.S0_LEGACY, this.serviceId);
+
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
     filters: { name: [containerDescriptor.name] },
@@ -24,6 +33,8 @@ async function installZ2mContainer() {
 
   if (dockerContainers.length === 0 || (container && container.state === 'created')) {
     if (container && container.state === 'created') {
+      logger.info('ZwaveJSUI is already installed as Docker container...');
+      logger.info(`Removing ${container.id} container...`);
       await this.gladys.system.removeContainer(container.id);
     }
 
@@ -38,12 +49,12 @@ async function installZ2mContainer() {
       logger.info(`Preparing ZwaveJSUI environment...`);
       const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
       const brokerEnv = await exec(
-        `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnHost} ${this.mqttUsername} "${this.mqttPassword}" ${this.driverPath} "${this.s2UnauthenticatedKey}" "${this.s2AuthenticatedKey}" "${this.s2AccessControlKey}" "${this.s0LegacyKey}"`,
+        `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnHost} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
       );
       logger.trace(brokerEnv);
       containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zwave-js-ui:/usr/src/app/store`);
 
-      containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = this.driverPath;
+      containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = driverPath;
 
       logger.info(`Creation of container...`);
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
@@ -77,12 +88,12 @@ async function installZ2mContainer() {
 
     // Check if config is up-to-date
     const devices = await this.gladys.system.getContainerDevices(container.id);
-    if (devices.length === 0 || devices[0].PathOnHost !== this.driverPath) {
+    if (devices.length === 0 || devices[0].PathOnHost !== driverPath) {
       // Update Z2M env
       logger.info(`Updating ZwaveJSUI environment...`);
       const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
       const brokerEnv = await exec(
-        `sh ./server/services/zwave-js-ui/docker/gladys-zwave-js-ui-zwave-js-ui-env.sh ${basePathOnHost} ${this.mqttUsername} "${this.mqttPassword}" ${this.driverPath} "${this.s2UnauthenticatedKey}" "${this.s2AuthenticatedKey}" "${this.s2AccessControlKey}" "${this.s0LegacyKey}"`,
+        `sh ./server/services/zwave-js-ui/docker/gladys-zwave-js-ui-zwave-js-ui-env.sh ${basePathOnHost} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
       );
       logger.trace(brokerEnv);
       logger.info('ZwaveJSUI container is restarting...');
