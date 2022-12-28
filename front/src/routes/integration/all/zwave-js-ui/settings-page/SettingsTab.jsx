@@ -289,65 +289,226 @@ class SettingsTab extends Component {
             </div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">
-              <Text id="integration.zwave-js-ui.settings.serviceStatus" />
-            </h2>
+        <div class="card-header d-none d-sm-block">
+          <h2 class="card-title">
+            <Text id="integration.zwave-js-ui.settings.serviceStatus" />
+          </h2>
+        </div>
+        <div class="row justify-content-center">
+          <div class="col-auto">
+            <table class="table table-responsive table-borderless table-sm d-none d-sm-block">
+              <thead class="text-center">
+                <tr>
+                  <th class="text-center">
+                    <Text id="integration.zwave-js-ui.settings.gladys" />
+                  </th>
+                  <th class="text-center" />
+                  <th class="text-center">{props.mqttExist && 'MQTT'}</th>
+                  <th class="text-center" />
+                  <th class="text-center">{props.zwaveJSUIExist && 'zwaveJSUI'}</th>
+                </tr>
+              </thead>
+              <tbody class="text-center">
+                <tr>
+                  <td class="text-center">
+                    <img
+                      src="/assets/icons/favicon-96x96.png"
+                      alt={`Gladys`}
+                      title={`Gladys`}
+                      width="80"
+                      height="80"
+                    />
+                  </td>
+                  {props.mqttRunning && (
+                    <td className={style.tdCenter}>
+                      <hr className={style.line} />
+                      <i
+                        className={cx('fe', {
+                          'fe-check': props.mqttConnected,
+                          'fe-x': !props.mqttConnected,
+                          greenIcon: props.mqttConnected,
+                          redIcon: !props.mqttConnected
+                        })}
+                      />
+                      <hr className={style.line} />
+                    </td>
+                  )}
+                  <td class="text-center">
+                    {props.mqttExist && (
+                      <img
+                        src="/assets/integrations/logos/logo_mqtt.png"
+                        alt={`MQTT`}
+                        title={`MQTT`}
+                        width="80"
+                        height="80"
+                      />
+                    )}
+                  </td>
+                  {props.zwaveJSUIRunning && (
+                    <td className={('text-center', style.tdCenter)}>
+                      <hr className={style.line} />
+                      <i
+                        className={cx('fe', {
+                          'fe-check': props.zwaveJSUIConnected,
+                          'fe-x': !props.zwaveJSUIConnected,
+                          greenIcon: props.zwaveJSUIConnected,
+                          redIcon: !props.zwaveJSUIConnected
+                        })}
+                      />
+                      <hr className={style.line} />
+                    </td>
+                  )}
+                  <td class="text-center">
+                    {props.zwaveJSUIExist && (
+                      <img
+                        src="/assets/integrations/logos/logo_zwave-js-ui.png"
+                        alt={`zwaveJSUI`}
+                        title={`zwaveJSUI`}
+                        width="80"
+                        height="80"
+                      />
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-center">
+                    <div class="tag tag-success">
+                      <Text id={`systemSettings.containerState.running`} />
+                    </div>
+                  </td>
+                  <td class="text-center" />
+                  <td class="text-center">
+                    {props.mqttRunning && (
+                      <span class="tag tag-success">
+                        <Text id={`systemSettings.containerState.running`} />
+                      </span>
+                    )}
+                  </td>
+                  <td class="text-center" />
+                  <td class="text-center">
+                    {props.zwaveJSUIRunning && (
+                      <span class="tag tag-success">
+                        <Text id={`systemSettings.containerState.running`} />
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="card-body">
-            <div class="row justify-content-center d-sm-none">
-              <div class="col-auto">
-                <table class="table table-responsive table-borderless table-sm">
-                  <thead class="text-center">
-                    <tr>
-                      <th>
-                        <Text id="integration.zwave-js-ui.settings.link" />
-                      </th>
-                      <th>
-                        <Text id="integration.zwave-js-ui.settings.status" />
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="text-center">
-                    <tr>
-                      <td>
-                        <Text id="integration.zwave-js-ui.settings.gladysMqttLink" />
-                      </td>
-                      <td>
-                        {props.mqttRunning && (
-                          <i
-                            className={cx('fe', {
-                              'fe-check': props.gladysConnected,
-                              'fe-x': !props.gladysConnected,
-                              greenIcon: props.gladysConnected,
-                              redIcon: !props.gladysConnected
-                            })}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <Text id="integration.zwave-js-ui.settings.mqttZwavejsLink" />
-                      </td>
-                      <td>
-                        {props.zwaveJSUIRunning && (
-                          <i
-                            className={cx('fe', {
-                              'fe-check': props.zwaveJSUIConnected,
-                              'fe-x': !props.zwaveJSUIConnected,
-                              greenIcon: props.zwaveJSUIConnected,
-                              redIcon: !props.zwaveJSUIConnected
-                            })}
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        </div>
+        <div class="card-header d-sm-none">
+          <h2 class="card-title">
+            <Text id="integration.zwave-js-ui.settings.containersStatus" />
+          </h2>
+        </div>
+        <div class="row justify-content-center d-sm-none">
+          <div class="col-auto">
+            <table class="table table-responsive table-borderless table-sm">
+              <thead class="text-center">
+                <tr>
+                  <th>
+                    <Text id="systemSettings.containers" />
+                  </th>
+                  <th>
+                    <Text id="integration.zwave-js-ui.settings.status" />
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="text-center">
+                <tr>
+                  <td>
+                    <Text id="integration.zwave-js-ui.settings.gladys" />
+                  </td>
+                  <td>
+                    <span class="tag tag-success">
+                      <Text id={`systemSettings.containerState.running`} />
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Text id="integration.zwave-js-ui.settings.mqtt" />
+                  </td>
+                  <td>
+                    {props.mqttRunning && (
+                      <span class="tag tag-success">
+                        <Text id={`systemSettings.containerState.running`} />
+                      </span>
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Text id="integration.zwave-js-ui.settings.zwaveJSUI" />
+                  </td>
+                  <td>
+                    {props.zwaveJSUIRunning && (
+                      <span class="tag tag-success">
+                        <Text id={`systemSettings.containerState.running`} />
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card-header d-sm-none">
+          <h2 class="card-title">
+            <Text id="integration.zwave-js-ui.settings.serviceStatus" />
+          </h2>
+        </div>
+        <div class="row justify-content-center d-sm-none">
+          <div class="col-auto">
+            <table class="table table-responsive table-borderless table-sm">
+              <thead class="text-center">
+                <tr>
+                  <th>
+                    <Text id="integration.zwave-js-ui.settings.link" />
+                  </th>
+                  <th>
+                    <Text id="integration.zwave-js-ui.settings.status" />
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="text-center">
+                <tr>
+                  <td>
+                    <Text id="integration.zwave-js-ui.settings.gladysMqttLink" />
+                  </td>
+                  <td>
+                    {props.mqttRunning && (
+                      <i
+                        className={cx('fe', {
+                          'fe-check': props.mqttConnected,
+                          'fe-x': !props.mqttConnected,
+                          greenIcon: props.mqttConnected,
+                          redIcon: !props.mqttConnected
+                        })}
+                      />
+                    )}
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Text id="integration.zwave-js-ui.settings.mqttZwavejsLink" />
+                  </td>
+                  <td>
+                    {props.zwaveJSUIRunning && (
+                      <i
+                        className={cx('fe', {
+                          'fe-check': props.zwaveJSUIRunning,
+                          'fe-x': !props.zwaveJSUIRunning,
+                          greenIcon: props.zwaveJSUIRunning,
+                          redIcon: !props.zwaveJSUIRunning
+                        })}
+                      />
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </>
