@@ -311,13 +311,7 @@ class SettingsTab extends Component {
               <tbody class="text-center">
                 <tr>
                   <td class="text-center">
-                    <img
-                      src="/assets/icons/favicon-96x96.png"
-                      alt={`Gladys`}
-                      title={`Gladys`}
-                      width="80"
-                      height="80"
-                    />
+                    <img src="/assets/icons/favicon-96x96.png" alt={`Gladys`} title={`Gladys`} width="80" height="80" />
                   </td>
                   {props.mqttRunning && (
                     <td className={style.tdCenter}>
