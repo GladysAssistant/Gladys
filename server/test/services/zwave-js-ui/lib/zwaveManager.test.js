@@ -69,6 +69,7 @@ describe('zwaveJSUIManager commands', () => {
     zwaveJSUIManager.mqttConnected = false;
     zwaveJSUIManager.zwaveJSUIExist = false;
     zwaveJSUIManager.zwaveJSUIRunning = false;
+    zwaveJSUIManager.zwaveJSUIConnected = false;
     zwaveJSUIManager.scanInProgress = false;
     zwaveJSUIManager.usbConfigured = false;
   });
@@ -194,6 +195,7 @@ describe('zwaveJSUIManager commands', () => {
       usbConfigured: false,
       zwaveJSUIExist: false,
       zwaveJSUIRunning: false,
+      zwaveJSUIConnected: false,
     });
   });
 
