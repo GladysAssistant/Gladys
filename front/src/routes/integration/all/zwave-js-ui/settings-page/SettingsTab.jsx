@@ -83,7 +83,7 @@ class SettingsTab extends Component {
 
                 {!props.usbConfigured && (
                   <div class="alert alert-info">
-                    <Text id="integration.zwave-js-ui.settings.usbNotConfigured" />
+                    <Text id="integration.zwave-js-ui.settings.zwaveNotConfiguredError" />
                   </div>
                 )}
 

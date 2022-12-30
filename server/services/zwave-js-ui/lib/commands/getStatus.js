@@ -13,7 +13,7 @@ function getStatus() {
     ready: this.ready,
 
     inclusionState: this.driver && this.driver.ready && this.driver.inclusionState,
-    isHealNetworkActive: this.driver && this.driver.ready && this.driver.isHealNetworkActive,
+    isScanNetworkActive: this.driver && this.driver.ready && this.driver.isScanNetworkActive,
     scanInProgress: this.scanInProgress,
 
     mqttExist: this.mqttExist,
@@ -22,6 +22,7 @@ function getStatus() {
 
     zwaveJSUIExist: this.zwaveJSUIExist,
     zwaveJSUIRunning: this.zwaveJSUIRunning,
+    zwaveJSUIConnected: this.zwaveJSUIConnected,
     usbConfigured: this.usbConfigured,
 
     dockerBased: this.dockerBased,

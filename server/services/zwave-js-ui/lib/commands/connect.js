@@ -4,7 +4,6 @@ const logger = require('../../../../utils/logger');
 const { DEFAULT, CONFIGURATION } = require('../constants');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../../utils/constants');
 const { generate } = require('../../../../utils/password');
-const { PlatformNotCompatible } = require('../../../../utils/coreErrors');
 
 /**
  * @description Initialize service with dependencies and connect to devices.
@@ -42,7 +41,7 @@ async function connect() {
   // Test if dongle is present
   this.usbConfigured = false;
   if (externalZwaveJSUI) {
-    logger.info(`ZwaveJSUI USB dongle assumed to be attached`);
+    logger.info(`ZwaveJS UI USB dongle assumed to be attached`);
     this.usbConfigured = true;
     this.driverPath = 'N.A.';
     this.mqttExist = true;
@@ -50,10 +49,6 @@ async function connect() {
     this.mqttRunning = true;
     this.zwaveJSUIRunning = true;
   } else {
-    this.dockerBased = await this.gladys.system.isDocker();
-    if (!this.dockerBased) {
-      throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
-    }
     const driverPath = await this.gladys.variable.getValue(CONFIGURATION.DRIVER_PATH, this.serviceId);
     if (driverPath) {
       const usb = this.gladys.service.getService('usb');
@@ -61,11 +56,11 @@ async function connect() {
       usbList.forEach((usbPort) => {
         if (driverPath === usbPort.path) {
           this.usbConfigured = true;
-          logger.info(`ZwaveJSUI USB dongle attached to ${driverPath}`);
+          logger.info(`ZwaveJS UI USB dongle attached to ${driverPath}`);
         }
       });
       if (!this.usbConfigured) {
-        logger.info(`ZwaveJSUI USB dongle detached to ${driverPath}`);
+        logger.info(`ZwaveJS UI USB dongle detached to ${driverPath}`);
       }
     } else {
       logger.info(`ZwaveJSUI USB dongle not attached`);
@@ -94,9 +89,17 @@ async function connect() {
         await this.gladys.variable.setValue(CONFIGURATION.S0_LEGACY, s0LegacyKey, this.serviceId);
       }
 
-      await this.installMqttContainer();
-      if (this.usbConfigured) {
-        await this.installZ2mContainer();
+      this.dockerBased = await this.gladys.system.isDocker();
+      if (this.dockerBased) {
+        await this.installMqttContainer();
+        if (this.usbConfigured) {
+          await this.installZ2mContainer();
+        }
+      } else {
+        this.mqttExist = true;
+        this.mqttRunning = true;
+        this.zwaveJSUIExist = true;
+        this.zwaveJSUIRunning = true;
       }
     }
   }
@@ -111,6 +114,7 @@ async function connect() {
       // clientId: DEFAULT.MQTT_CLIENT_ID,
     });
     this.mqttConnected = this.mqttClient !== null;
+    this.zwaveJSUIConnected = true;
 
     if (this.mqttConnected) {
       this.mqttClient.on('connect', () => {
@@ -119,6 +123,7 @@ async function connect() {
           this.mqttClient.subscribe(topic);
         });
         this.mqttConnected = true;
+        this.zwaveJSUIConnected = true;
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
         });

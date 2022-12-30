@@ -7,7 +7,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,ready,externalZwaveJSUI,driverPath,mqttUrl,mqttUsername,mqttPassword,s2UnauthenticatedKey,s2AuthenticatedKey,s2AccessControlKey,s0LegacyKey,usbPorts,usbConfigured,mqttExist,mqttRunning,mqttConnected,zwaveJSUIExist,zwaveJSUIRunning,dockerBased,getConfigurationStatus,getZwaveUsbPortStatus,getStatusStatus,zwaveDisconnectStatus,zwaveConnectStatus',
+  'user,session,ready,externalZwaveJSUI,driverPath,mqttUrl,mqttUsername,mqttPassword,s2UnauthenticatedKey,s2AuthenticatedKey,s2AccessControlKey,s0LegacyKey,usbPorts,usbConfigured,mqttExist,mqttRunning,mqttConnected,zwaveJSUIExist,zwaveJSUIRunning,zwaveJSUIConnected,dockerBased,zwaveGetConfigurationStatus,zwaveGetUsbPortStatus,zwaveGetStatusStatus,zwaveDisconnectStatus,zwaveConnectStatus',
   actions
 )
 class ZwaveJSUISettingsPage extends Component {
@@ -24,9 +24,9 @@ class ZwaveJSUISettingsPage extends Component {
 
   render(props, {}) {
     const loading =
-      props.getStatusStatus === RequestStatus.Getting ||
-      props.getConfigurationStatus === RequestStatus.Getting ||
-      props.getZwaveUsbPortStatus === RequestStatus.Getting ||
+      props.zwaveGetStatusStatus === RequestStatus.Getting ||
+      props.zwaveGetConfigurationStatus === RequestStatus.Getting ||
+      props.zwaveGetUsbPortStatus === RequestStatus.Getting ||
       props.zwaveDisconnectStatus === RequestStatus.Getting ||
       props.zwaveConnectStatus === RequestStatus.Getting;
 

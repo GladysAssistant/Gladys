@@ -125,11 +125,11 @@ describe('zwaveJSUIManager commands', () => {
     clock.restore();
   });
 
-  it('should healNetwork', () => {
+  it('should scanNetwork', () => {
     zwaveJSUIManager.mqttConnected = true;
     zwaveJSUIManager.mqttClient = mqttClient;
 
-    zwaveJSUIManager.healNetwork();
+    zwaveJSUIManager.scanNetwork();
     assert.calledWithExactly(
       zwaveJSUIManager.mqttClient.publish,
       `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`,
@@ -185,7 +185,7 @@ describe('zwaveJSUIManager commands', () => {
     expect(status).to.deep.equal({
       dockerBased: true,
       inclusionState: undefined,
-      isHealNetworkActive: undefined,
+      isScanNetworkActive: undefined,
       mqttConnected: false,
       mqttExist: false,
       mqttRunning: false,

@@ -50,7 +50,7 @@ module.exports = function ZwaveController(gladys, zwaveJSUIManager, serviceId) {
    * @apiGroup ZwaveJSUI
    */
   async function connect(req, res) {
-    zwaveJSUIManager.connect();
+    await zwaveJSUIManager.connect();
     res.json({
       success: true,
     });
@@ -62,19 +62,19 @@ module.exports = function ZwaveController(gladys, zwaveJSUIManager, serviceId) {
    * @apiGroup ZwaveJSUI
    */
   async function disconnect(req, res) {
-    zwaveJSUIManager.disconnect();
+    await zwaveJSUIManager.disconnect();
     res.json({
       success: true,
     });
   }
 
   /**
-   * @api {post} /api/v1/service/zwave-js-ui/heal Heal Zwave network
-   * @apiName healNetwork
+   * @api {post} /api/v1/service/zwave-js-ui/scan Scan Zwave network
+   * @apiName scanNetwork
    * @apiGroup ZwaveJSUI
    */
-  async function healNetwork(req, res) {
-    await zwaveJSUIManager.healNetwork();
+  async function scanNetwork(req, res) {
+    await zwaveJSUIManager.scanNetwork();
     res.json({
       success: true,
     });
@@ -109,9 +109,9 @@ module.exports = function ZwaveController(gladys, zwaveJSUIManager, serviceId) {
       authenticated: true,
       controller: asyncMiddleware(getNodes),
     },
-    'post /api/v1/service/zwave-js-ui/heal': {
+    'post /api/v1/service/zwave-js-ui/scan': {
       authenticated: true,
-      controller: asyncMiddleware(healNetwork),
+      controller: asyncMiddleware(scanNetwork),
     },
     'get /api/v1/service/zwave-js-ui/status': {
       authenticated: false,

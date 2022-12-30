@@ -9,9 +9,8 @@ import { RequestStatus } from '../../../../../utils/consts';
 const NodeTab = ({ children, ...props }) => {
   const zwaveNotConfigured = props.zwaveGetNodesStatus === RequestStatus.ServiceNotConfigured;
   const scanInProgress = get(props, 'zwaveStatus.scanInProgress');
-  const healInProgress = props.zwaveHealNetworkStatus === RequestStatus.Getting;
   const gettingNodesInProgress = props.zwaveGetNodesStatus === RequestStatus.Getting;
-  const zwaveActionsDisabled = scanInProgress || healInProgress || gettingNodesInProgress;
+  const zwaveActionsDisabled = scanInProgress || gettingNodesInProgress;
   const zwaveActionsEnabled = !zwaveActionsDisabled;
   return (
     <div class="card">
@@ -20,8 +19,8 @@ const NodeTab = ({ children, ...props }) => {
           <Text id="integration.zwave-js-ui.discover.title" />
         </h3>
         <div class="page-options d-flex">
-          <button class="btn btn-outline-primary" onClick={props.healNetwork} disabled={zwaveActionsDisabled}>
-            <Text id="integration.zwave-js-ui.discover.healNetworkButton" /> <i class="fe fe-radio" />
+          <button class="btn btn-outline-primary" onClick={props.scanNetwork} disabled={zwaveActionsDisabled}>
+            <Text id="integration.zwave-js-ui.discover.scanButton" /> <i class="fe fe-radio" />
           </button>
           <a href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add' : '#'}>
             <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>

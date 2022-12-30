@@ -33,19 +33,19 @@ const createActions = store => {
         }
       }
     },
-    async healNetwork(state) {
+    async scanNetwork(state) {
       store.setState({
-        zwaveHealNetworkStatus: RequestStatus.Getting
+        zwaveScanNetworkStatus: RequestStatus.Getting
       });
       try {
-        await state.httpClient.post('/api/v1/service/zwave-js-ui/heal');
+        await state.httpClient.post('/api/v1/service/zwave-js-ui/scan');
         store.setState({
-          zwaveHealNetworkStatus: RequestStatus.Success
+          zwaveScanNetworkStatus: RequestStatus.Success
         });
         actions.getStatus(store.getState());
       } catch (e) {
         store.setState({
-          zwaveHealNetworkStatus: RequestStatus.Error
+          zwaveScanNetworkStatus: RequestStatus.Error
         });
       }
     },

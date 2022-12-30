@@ -38,8 +38,8 @@ class ZwaveJSUINodeOperationPage extends Component {
       route('/dashboard/integration/device/zwave-js-ui/discover');
     }
   };
-  healNetwork = () => {
-    this.props.healNetwork();
+  scanNetwork = () => {
+    this.props.scanNetwork();
   };
   addNode = () => {
     this.props.addNode();
@@ -65,8 +65,8 @@ class ZwaveJSUINodeOperationPage extends Component {
   }
   componentWillMount() {
     switch (this.props.action) {
-      case 'heal':
-        this.healNetwork();
+      case 'scan':
+        this.scanNetwork();
         break;
       case 'add':
         this.addNode();

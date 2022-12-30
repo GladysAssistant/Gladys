@@ -6,49 +6,49 @@ const createActions = store => {
   const actions = {
     async getUsbPorts(state) {
       store.setState({
-        getZwaveUsbPortStatus: RequestStatus.Getting
+        zwaveGetUsbPortStatus: RequestStatus.Getting
       });
       try {
         const usbPorts = await state.httpClient.get('/api/v1/service/usb/port');
         store.setState({
           usbPorts,
-          getZwaveUsbPortStatus: RequestStatus.Success
+          zwaveGetUsbPortStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getZwaveUsbPortStatus: RequestStatus.Error
+          zwaveGetUsbPortStatus: RequestStatus.Error
         });
       }
     },
     async getConfiguration(state) {
       store.setState({
-        getConfigurationStatus: RequestStatus.Getting
+        zwaveGetConfigurationStatus: RequestStatus.Getting
       });
       try {
         const configuration = await state.httpClient.get('/api/v1/service/zwave-js-ui/configuration');
         store.setState({
-          getConfigurationStatus: RequestStatus.Success,
+          zwaveGetConfigurationStatus: RequestStatus.Success,
           ...configuration
         });
       } catch (e) {
         store.setState({
-          getConfigurationStatus: RequestStatus.Error
+          zwaveGetConfigurationStatus: RequestStatus.Error
         });
       }
     },
     async getStatus(state) {
       store.setState({
-        getStatusStatus: RequestStatus.Getting
+        zwaveGetStatusStatus: RequestStatus.Getting
       });
       try {
         const zwaveStatus = await state.httpClient.get('/api/v1/service/zwave-js-ui/status');
         store.setState({
-          getStatusStatus: RequestStatus.Success,
+          zwaveGetStatusStatus: RequestStatus.Success,
           ...zwaveStatus
         });
       } catch (e) {
         store.setState({
-          getStatusStatus: RequestStatus.Error,
+          zwaveGetStatusStatus: RequestStatus.Error,
           zwaveConnectionInProgress: false
         });
       }

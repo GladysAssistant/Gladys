@@ -11,6 +11,7 @@ const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
  */
 function handleMqttMessage(topic, message) {
   this.mqttConnected = true;
+  this.zwaveJSUIConnected = true;
 
   switch (topic) {
     case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {

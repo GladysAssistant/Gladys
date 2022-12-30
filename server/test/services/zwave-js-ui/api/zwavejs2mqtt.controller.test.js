@@ -137,14 +137,14 @@ describe('GET /api/v1/service/zwave-js-ui', () => {
     });
   });
 
-  it('should healh network', async () => {
+  it('should scanh network', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
     };
-    zwaveJSUIManager.healNetwork = fake.returns(null);
-    await zwaveJSUIController['post /api/v1/service/zwave-js-ui/heal'].controller(req, res);
-    assert.calledOnce(zwaveJSUIManager.healNetwork);
+    zwaveJSUIManager.scanNetwork = fake.returns(null);
+    await zwaveJSUIController['post /api/v1/service/zwave-js-ui/scan'].controller(req, res);
+    assert.calledOnce(zwaveJSUIManager.scanNetwork);
     assert.calledOnceWithExactly(res.json, {
       success: true,
     });

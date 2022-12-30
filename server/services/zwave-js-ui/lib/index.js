@@ -17,7 +17,7 @@ const { installZ2mContainer } = require('./commands/installZ2mContainer');
 const { getConfiguration } = require('./commands/getConfiguration');
 const { handleMqttMessage } = require('./events/handleMqttMessage');
 const { updateConfiguration } = require('./commands/updateConfiguration');
-const { healNetwork } = require('./commands/healNetwork');
+const { scanNetwork } = require('./commands/scanNetwork');
 
 const ZwaveJSUIManager = function ZwaveJSUIManager(gladys, mqtt, serviceId) {
   this.gladys = gladys;
@@ -33,8 +33,8 @@ const ZwaveJSUIManager = function ZwaveJSUIManager(gladys, mqtt, serviceId) {
 
   this.zwaveJSUIExist = false;
   this.zwaveJSUIRunning = false;
+  this.zwaveJSUIConnected = false;
 
-  this.usbConfigured = false;
   this.usbConfigured = false;
 
   this.dockerBased = true;
@@ -59,7 +59,7 @@ ZwaveJSUIManager.prototype.getConfiguration = getConfiguration;
 ZwaveJSUIManager.prototype.getNodes = getNodes;
 ZwaveJSUIManager.prototype.addNode = addNode;
 ZwaveJSUIManager.prototype.removeNode = removeNode;
-ZwaveJSUIManager.prototype.healNetwork = healNetwork;
+ZwaveJSUIManager.prototype.scanNetwork = scanNetwork;
 ZwaveJSUIManager.prototype.setValue = setValue;
 ZwaveJSUIManager.prototype.updateConfiguration = updateConfiguration;
 ZwaveJSUIManager.prototype.installMqttContainer = installMqttContainer;
