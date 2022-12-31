@@ -34,16 +34,22 @@ class ZWaveDeviceBox extends Component {
     });
   };
   saveDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, error: undefined });
     try {
       await this.props.saveDevice(this.props.device);
+      this.setState({ deviceUpdated: true });
     } catch (e) {
-      this.setState({ error: RequestStatus.Error });
+      const status = get(e, 'response.status');
+      if (status === 409) {
+        this.setState({ error: RequestStatus.ConflictError });
+      } else {
+        this.setState({ error: RequestStatus.Error });
+      }
     }
     this.setState({ loading: false });
   };
   deleteDevice = async () => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, error: undefined });
     try {
       await this.props.deleteDevice(this.props.device, this.props.deviceIndex);
     } catch (e) {
@@ -65,7 +71,7 @@ class ZWaveDeviceBox extends Component {
     this.refreshDeviceProperty();
   }
 
-  render(props, { batteryLevel, mostRecentValueAt, loading }) {
+  render(props, { batteryLevel, mostRecentValueAt, loading, error, deviceUpdated }) {
     return (
       <div class="col-md-6">
         <div class="card">
@@ -84,6 +90,21 @@ class ZWaveDeviceBox extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
+              {error === RequestStatus.Error && (
+                <div class="alert alert-danger">
+                  <Text id="integration.zwave-js-ui.device.updateDeviceError" />
+                </div>
+              )}
+              {error === RequestStatus.ConflictError && (
+                <div class="alert alert-danger">
+                  <Text id="integration.zwave-js-ui.device.conflictError" />
+                </div>
+              )}
+              {deviceUpdated && (
+                <div class="alert alert-success">
+                  <Text id="integration.zwave-js-ui.device.deviceUpdatedSuccess" />
+                </div>
+              )}
               <div class="card-body">
                 <div class="form-group">
                   <label>

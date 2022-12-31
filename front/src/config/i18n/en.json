@@ -642,7 +642,10 @@
         "deleteButton": "Delete",
         "editButton": "Edit",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
-        "noValueReceived": "No value received."
+        "noValueReceived": "No value received.",
+        "conflictError": "Current device is already in Gladys.",
+        "deviceUpdatedSuccess": "The device was successfully added",
+        "updateDeviceError": "There was an error while creating this device in Gladys."
       },
       "discover": {
         "title": "Z-Wave Devices",

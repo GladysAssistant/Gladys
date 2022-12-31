@@ -769,7 +769,10 @@
         "deleteButton": "Supprimer",
         "editButton": "Editer",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
-        "noValueReceived": "Aucune valeur reçue."
+        "noValueReceived": "Aucune valeur reçue.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys.",
+        "deviceUpdatedSuccess": "L'appareil a été ajouté avec succès.",
+        "updateDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys."
       },
       "discover": {
         "title": "Appareils Z-Wave",
