@@ -5,6 +5,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import { ERROR_MESSAGES } from '../../../../../../../server/utils/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import createActionsIntegration from '../../../../../actions/integration';
+import debounce from 'debounce';
 
 const createActions = store => {
   const integrationActions = createActionsIntegration(store);
@@ -14,7 +15,13 @@ const createActions = store => {
         zwaveGetNodesStatus: RequestStatus.Getting
       });
       try {
-        const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave-js-ui/node');
+        const options = {
+          order_dir: state.getZwaveDeviceOrderDir || 'asc'
+        };
+        if (state.zwaveDeviceSearch && state.zwaveDeviceSearch.length) {
+          options.search = state.zwaveDeviceSearch;
+        }
+        const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave-js-ui/node', options);
 
         store.setState({
           zwaveNodes,
@@ -120,9 +127,22 @@ const createActions = store => {
         }
       });
       store.setState(newState);
+    },
+    async search(state, e) {
+      store.setState({
+        zwaveDeviceSearch: e.target.value
+      });
+      await actions.getNodes(store.getState());
+    },
+    async changeOrderDir(state, e) {
+      store.setState({
+        getZwaveDeviceOrderDir: e.target.value
+      });
+      await actions.getNodes(store.getState());
     }
   };
-  return Object.assign({}, actions, integrationActions);
+  actions.debouncedSearch = debounce(actions.search, 200);
+  return Object.assign({}, integrationActions, actions);
 };
 
 export default createActions;

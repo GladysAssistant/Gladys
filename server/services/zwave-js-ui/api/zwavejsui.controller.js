@@ -7,7 +7,7 @@ module.exports = function ZwaveController(gladys, zwaveJSUIManager, serviceId) {
    * @apiGroup ZwaveJSUI
    */
   async function getNodes(req, res) {
-    const nodes = zwaveJSUIManager.getNodes();
+    const nodes = await zwaveJSUIManager.getNodes(req.query);
     res.json(nodes);
   }
 
