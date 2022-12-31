@@ -31,6 +31,7 @@ function valueUpdated(zwaveNode, args) {
   }
 
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  args.fullProperty = fullProperty;
   const newValueUnbind = unbindValue(args, newValue);
   if (node.ready) {
     logger.debug(

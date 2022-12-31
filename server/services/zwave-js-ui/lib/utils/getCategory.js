@@ -26,9 +26,9 @@ function getCategory(node, value) {
     const validComClass = category.COMMAND_CLASSES ? category.COMMAND_CLASSES.includes(value.commandClass) : true;
     const validEndpoint = category.INDEXES ? category.INDEXES.includes(value.endpoint) : true;
     const validProperty = category.PROPERTIES ? category.PROPERTIES.includes(value.property) : true;
-    const validProductId = category.PRODUCT_IDS ? category.PRODUCT_IDS.includes(node.product) : true;
-    const validProductType = category.PRODUCT_TYPES ? category.PRODUCT_TYPES.includes(node.product) : true;
-    found = validComClass && validEndpoint && validProperty && validProductId && validProductType;
+    const validProduct = category.PRODUCTS ? category.PRODUCTS.includes(node.product) : true;
+    const invalidProduct = category.EXCLUDED_PRODUCTS ? category.EXCLUDED_PRODUCTS.includes(node.product) : false;
+    found = validComClass && validEndpoint && validProperty && validProduct && !invalidProduct;
     if (found) {
       categoryFound = {
         category: category.CATEGORY,
@@ -42,14 +42,13 @@ function getCategory(node, value) {
     }
     i += 1;
   }
-  if (found) {
-    return categoryFound;
-  }
 
-  return {
-    category: UNKNOWN_CATEGORY,
-    type: UNKNOWN_TYPE,
-  };
+  return found
+    ? categoryFound
+    : {
+        category: UNKNOWN_CATEGORY,
+        type: UNKNOWN_TYPE,
+      };
 }
 
 module.exports = {

@@ -1,5 +1,5 @@
 const { STATE } = require('../../../../utils/constants');
-const { COMMAND_CLASSES, SCENE_VALUES, NOTIFICATION_VALUES, SMOKE_ALARM_VALUES, PROPERTIES } = require('../constants');
+const { COMMAND_CLASSES, SCENE_VALUES, SMOKE_ALARM_VALUES, PROPERTIES } = require('../constants');
 
 /**
  * @description Bind value
@@ -35,13 +35,10 @@ function unbindValue(valueId, value) {
     return value ? STATE.ON : STATE.OFF;
   }
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION) {
-    if (valueId.property === PROPERTIES.MOTION) {
+    if (valueId.fullProperty === PROPERTIES.MOTION) {
       return value ? STATE.ON : STATE.OFF;
     }
-    if (valueId.property === PROPERTIES.MOTION_ALARM) {
-      return NOTIFICATION_VALUES[value];
-    }
-    if (valueId.property === PROPERTIES.SMOKE_ALARM) {
+    if (valueId.fullProperty === PROPERTIES.SMOKE_ALARM) {
       return SMOKE_ALARM_VALUES[value];
     }
   }
