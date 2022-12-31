@@ -94,8 +94,7 @@ function handleMqttMessage(topic, message) {
 
         let newValue = message;
         if (message === '') {
-          // Notification stateless
-          break;
+          newValue = '';
         } else if (message === 'false') {
           newValue = false;
         } else if (message === 'true') {
