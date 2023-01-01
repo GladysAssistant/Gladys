@@ -1,10 +1,10 @@
-.todoistTask {
+.todolistTask {
   border-bottom: 1px solid #ddd;
   padding: 5px 0;
 }
-.todoistTask:first-of-type {
+.todolistTask:first-of-type {
   padding-top: 0;
 }
-.todoistTask:last-of-type {
+.todolistTask:last-of-type {
   border: none;
 }

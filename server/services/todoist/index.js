@@ -2,24 +2,12 @@ const logger = require('../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 const { Error400 } = require('../../utils/httpErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
-const TodoistController = require('./api/todoist.controller');
 
 const TODOIST_API_KEY = 'TODOIST_API_KEY';
 
 module.exports = function TodoistService(gladys, serviceId) {
-  const { default: axios } = require('axios');
-  let todoistApiKey;
-
-  /**
-   * @description Throws error when missing api key.
-   * @example
-   * ensureApiKey();
-   */
-  function ensureApiKey() {
-    if (!todoistApiKey) {
-      throw new ServiceNotConfiguredError('Todoist Service not configured');
-    }
-  }
+  const { TodoistApi } = require('@doist/todoist-api-typescript');
+  let todoistApi;
 
   /**
    * @public
@@ -29,8 +17,11 @@ module.exports = function TodoistService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Todoist service');
-    todoistApiKey = await gladys.variable.getValue(TODOIST_API_KEY, serviceId);
-    ensureApiKey();
+    const todoistApiKey = await gladys.variable.getValue(TODOIST_API_KEY, serviceId);
+    if (!todoistApiKey) {
+      throw new ServiceNotConfiguredError('Todoist Service not configured');
+    }
+    todoistApi = new TodoistApi(todoistApiKey);
   }
 
   /**
@@ -41,77 +32,77 @@ module.exports = function TodoistService(gladys, serviceId) {
    */
   async function stop() {
     logger.log('stopping Todoist service');
+    todoistApi = null;
   }
 
   /**
    * @public
    * @description Get Todoist tasks.
    * @param {Object} options - Options to send to Todoist API.
-   * @param {number} options.project_id - ProjectId to filter on.
+   * @param {number} options.todolist_id - TodolistId to filter on.
    * @example
-   * gladys.services.todoist.getTasks();
+   * gladys.services.todolist.getTasks();
    */
   async function getTasks(options) {
-    ensureApiKey();
-
-    const url = `https://api.todoist.com/rest/v1/tasks`;
-    try {
-      const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${todoistApiKey}` }, params: options });
-      return data;
-    } catch (e) {
-      logger.error(e);
-      throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+    if (todoistApi) {
+      try {
+        const data = await todoistApi.getTasks(options ? { project_id: options.todolist_id } : undefined);
+        return data;
+      } catch (e) {
+        logger.error(e);
+        throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+      }
+    } else {
+      throw new ServiceNotConfiguredError('Todoist Service not configured');
     }
   }
 
   /**
    * @public
-   * @description Get Todoist tasks.
+   * @description Get Todolist from Todoist.
    * @example
-   * gladys.services.todoist.getProjects();
+   * gladys.services.todolist.get();
    */
-  async function getProjects() {
-    ensureApiKey();
-
-    const url = `https://api.todoist.com/rest/v1/projects`;
-    try {
-      const { data } = await axios.get(url, { headers: { Authorization: `Bearer ${todoistApiKey}` } });
-      return data;
-    } catch (e) {
-      logger.error(e);
-      throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+  async function get() {
+    if (todoistApi) {
+      try {
+        const data = await todoistApi.getProjects();
+        return data;
+      } catch (e) {
+        logger.error(e);
+        throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+      }
+    } else {
+      throw new ServiceNotConfiguredError('Todoist Service not configured');
     }
   }
 
   /**
    * @public
-   * @description Get Todoist tasks.
-   * @param {number} taskId - Id of the task to complete.
+   * @description clost Todoist tasks.
+   * @param {string} taskId - Id of the task to close.
    * @example
-   * gladys.services.todoist.completeTask(123);
+   * gladys.services.todolist.closeTask('123');
    */
-  async function completeTask(taskId) {
-    ensureApiKey();
-
-    const url = `https://api.todoist.com/rest/v1/tasks/${taskId}/close`;
-    try {
-      await axios.post(url, {}, { headers: { Authorization: `Bearer ${todoistApiKey}` } });
-    } catch (e) {
-      logger.error(e);
-      throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+  async function closeTask(taskId) {
+    if (todoistApi) {
+      try {
+        await todoistApi.closeTask(taskId);
+      } catch (e) {
+        logger.error(e);
+        throw new Error400(ERROR_MESSAGES.REQUEST_TO_THIRD_PARTY_FAILED);
+      }
+    } else {
+      throw new ServiceNotConfiguredError('Todoist Service not configured');
     }
   }
-
-  const service = {
+  return Object.freeze({
     start,
     stop,
-    getTasks,
-    getProjects,
-    completeTask,
-  };
-
-  return Object.freeze({
-    ...service,
-    controllers: TodoistController(service),
+    todolist: {
+      getTasks,
+      get,
+      closeTask,
+    },
   });
 };

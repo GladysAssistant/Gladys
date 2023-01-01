@@ -6,7 +6,7 @@ import EditAtHomeBox from '../../components/boxs/user-presence/EditUserPresenceB
 import EditDevicesInRoom from '../../components/boxs/device-in-room/EditDeviceInRoom';
 import EditChart from '../../components/boxs/chart/EditChart';
 import EditEcowatt from '../../components/boxs/ecowatt/EditEcowatt';
-import EditTodoist from '../../components/boxs/todoist/EditTodoistBox';
+import EditTodolistBox from '../../components/boxs/todolist/EditTodolistBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -26,8 +26,8 @@ const Box = ({ children, ...props }) => {
       return <EditChart {...props} />;
     case 'ecowatt':
       return <EditEcowatt {...props} />;
-    case 'todoist':
-      return <EditTodoist {...props} />;
+    case 'todolist':
+      return <EditTodolistBox {...props} />;
   }
 };
 

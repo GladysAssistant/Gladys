@@ -23,7 +23,7 @@ const boxesSchema = Joi.array().items(
       display_variation: Joi.boolean(),
       chart_type: Joi.string(),
       users: Joi.array().items(Joi.string()),
-      todoist_project_id: Joi.number(),
+      todolist_id: Joi.string(),
     }),
   ),
 );

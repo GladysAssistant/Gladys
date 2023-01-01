@@ -2,8 +2,13 @@ import get from 'get-value';
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import actions from '../../../actions/dashboard/boxes/todoist';
-import { DASHBOARD_BOX_DATA_KEY, DASHBOARD_BOX_STATUS_KEY, RequestStatus } from '../../../utils/consts';
+import actions from '../../../actions/dashboard/boxes/todolist';
+import {
+  DASHBOARD_BOX_DATA_KEY,
+  DASHBOARD_BOX_STATUS_KEY,
+  GetTodolistStatus,
+  RequestStatus
+} from '../../../utils/consts';
 import style from './style.css';
 import dayjs from 'dayjs';
 
@@ -20,7 +25,7 @@ const Task = ({ task, onClick }) => {
   };
 
   return (
-    <div class={style.todoistTask}>
+    <div class={style.todolistTask}>
       <div class="container">
         <div class="row">
           <span>
@@ -41,7 +46,7 @@ const Task = ({ task, onClick }) => {
   );
 };
 
-const TodoistBox = ({ children, ...props }) => {
+const TodolistBox = ({ children, ...props }) => {
   const onTaskClick = task => () => {
     props.onTaskClick(task);
   };
@@ -50,16 +55,26 @@ const TodoistBox = ({ children, ...props }) => {
       <div className="card-header">
         <h3 class="card-title">
           <i class="fe fe-list" />
-          <span class="m-1">{props.name || <Text id="dashboard.boxTitle.todoist" />}</span>
+          <span class="m-1">{props.name || <Text id="dashboard.boxTitle.todolist" />}</span>
         </h3>
       </div>
       <div>
+        {props.boxStatus === GetTodolistStatus.ServiceNotConfigured && (
+          <div class="card-body">
+            <p class="alert alert-danger">
+              <i class="fe fe-bell" />
+              <span class="pl-2">
+                <Text id="dashboard.boxes.todolist.serviceNotConfigured" />
+              </span>
+            </p>
+          </div>
+        )}
         {props.boxStatus === RequestStatus.Error && (
           <div class="card-body">
             <p class="alert alert-danger">
               <i class="fe fe-bell" />
               <span class="pl-2">
-                <Text id="dashboard.boxes.todoist.unknownError" />
+                <Text id="dashboard.boxes.todolist.unknownError" />
               </span>
             </p>
           </div>
@@ -82,7 +97,7 @@ const TodoistBox = ({ children, ...props }) => {
               ))}
               {!props.tasks.length && (
                 <i>
-                  <Text id="dashboard.boxes.todoist.emptyTasks" />
+                  <Text id="dashboard.boxes.todolist.emptyTasks" />
                 </i>
               )}
             </div>
@@ -93,25 +108,26 @@ const TodoistBox = ({ children, ...props }) => {
   );
 };
 
-@connect('DashboardBoxDataTodoist,DashboardBoxStatusTodoist', actions)
-class TodoistBoxComponent extends Component {
-  completeTaskUnbound(task) {
-    this.props.completeTask(task.id, this.props.x, this.props.y);
+@connect('DashboardBoxDataTodolist,DashboardBoxStatusTodolist', actions)
+class TodolistBoxComponent extends Component {
+  closeTaskUnbound(task) {
+    this.props.closeTask(task.id, this.props.x, this.props.y);
   }
 
   constructor(props) {
     super(props);
-    this.completeTask = this.completeTaskUnbound.bind(this);
+    this.closeTask = this.closeTaskUnbound.bind(this);
   }
 
   componentDidMount() {
-    const { todoist_project_id: todoistProjectId } = this.props.box;
+    const { todolist_id: todolistId } = this.props.box;
+
     // get tasks
-    this.props.getTasks(todoistProjectId, this.props.x, this.props.y);
+    this.props.getTasks(todolistId, this.props.x, this.props.y);
 
     // refresh tasks every interval
     this.refreshInterval = setInterval(
-      () => this.props.getTasks(todoistProjectId, this.props.x, this.props.y),
+      () => this.props.getTasks(todolistId, this.props.x, this.props.y),
       BOX_REFRESH_INTERVAL_MS
     );
   }
@@ -123,19 +139,20 @@ class TodoistBoxComponent extends Component {
   }
 
   render(props, {}) {
-    const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Todoist.${props.x}_${props.y}`);
-    const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Todoist.${props.x}_${props.y}`);
+    const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Todolist.${props.x}_${props.y}`);
+    const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Todolist.${props.x}_${props.y}`);
     const tasks = get(boxData, 'tasks');
+
     return (
-      <TodoistBox
+      <TodolistBox
         {...props}
         tasks={tasks}
         name={this.props.box.name}
         boxStatus={boxStatus}
-        onTaskClick={this.completeTask}
+        onTaskClick={this.closeTask}
       />
     );
   }
 }
 
-export default TodoistBoxComponent;
+export default TodolistBoxComponent;

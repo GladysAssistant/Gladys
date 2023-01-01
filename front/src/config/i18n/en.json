@@ -204,7 +204,7 @@
       "devices-in-room": "Devices in room",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
-      "todoist": "Todoist"
+      "todolist": "Todolist"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -292,11 +292,12 @@
         "warning": "Network warning",
         "critical": "Network critical"
       },
-      "todoist": {
+      "todolist": {
         "editNameLabel": "Box title",
         "editProjectLabel": "Project to filter tasks (optional)",
         "unknownError": "Unable to fetch tasks list.",
-        "emptyTasks": "No tasks"
+        "emptyTasks": "No tasks",
+        "serviceNotConfigured": "The Todoist service is not configured. Please go to the 'Integrations' tab, and configure the Todoist service."
       }
     }
   },
@@ -1048,7 +1049,7 @@
       "title": "Todoist",
       "description": "List your Todoist tasks",
       "introduction": "This integration helps you to connect to Todoist API and get your tasks in Gladys.",
-      "instructions": "You first have to get your API key on <a href=\"https://todoist.com/prefs/integrations\">https://todoist.com/prefs/integrations</a>.",
+      "instructions": "You first have to get your API key on <a target=\"blank\" href=\"https://todoist.com/app/settings/integrations/developer\">https://todoist.com/app/settings/integrations/developer</a>.",
       "apiKeyLabel": "Enter your API key here:",
       "apiKeyPlaceholder": "Enter your API key",
       "saveButton": "Save",

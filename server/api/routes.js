@@ -19,6 +19,7 @@ const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
+const TodolistController = require('./controllers/todolist.controller');
 
 /**
  * @description Return object of routes.
@@ -49,6 +50,7 @@ function getRoutes(gladys) {
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
+  const todolistController = TodolistController(gladys);
 
   const routes = {};
 
@@ -515,6 +517,24 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+
+    // todolist
+    'get /api/v1/todolist': {
+      authenticated: true,
+      controller: todolistController.getTodolist,
+    },
+    'get /api/v1/todolist/tasks': {
+      authenticated: true,
+      controller: todolistController.getTasks,
+    },
+    'get /api/v1/todolist/:todolist_id/tasks': {
+      authenticated: true,
+      controller: todolistController.getTasksByTodolistId,
+    },
+    'post /api/v1/todolist/tasks/:task_id/close': {
+      authenticated: true,
+      controller: todolistController.closeTask,
     },
   };
 

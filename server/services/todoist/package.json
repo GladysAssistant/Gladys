@@ -13,6 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "axios": "^0.18.0"
+    "axios": "^0.18.0",
+    "@doist/todoist-api-typescript": "^2.1.2"
   }
 }

@@ -94,6 +94,10 @@ export const GetWeatherModes = {
   DailyForecast: 'dailyForecast'
 };
 
+export const GetTodolistStatus = {
+  ServiceNotConfigured: 'ServiceNotConfigured'
+};
+
 export const DASHBOARD_BOX_STATUS_KEY = 'DashboardBoxStatus';
 export const DASHBOARD_BOX_DATA_KEY = 'DashboardBoxData';
 

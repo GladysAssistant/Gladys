@@ -19,3 +19,4 @@ size-plugin.json
 .vscode
 .tmp
 .DS_Store
+.idea/

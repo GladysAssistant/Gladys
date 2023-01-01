@@ -1,196 +1,96 @@
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const sinon = require('sinon');
-
-const { assert, fake } = sinon;
-
 const proxyquire = require('proxyquire').noCallThru();
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
-const { Error400 } = require('../../../utils/httpErrors');
+const TodoistApiMock = require('./TodoistApi.mock');
+const TodoistApiBroken = require('./TodoistApiBroken.mock');
 
-const axiosClientGetTasks = fake.resolves({
-  data: [
-    {
-      id: '1',
-      name: 'Task 1',
-    },
-    {
-      id: '2',
-      name: 'Task 2',
-      parent_id: '2',
-    },
-  ],
-});
-
-const axiosClientGetProjects = fake.resolves({
-  data: [
-    {
-      id: '1',
-      name: 'Project 1',
-    },
-    {
-      id: '2',
-      name: 'Project 2',
-      parent_id: '2',
-    },
-  ],
-});
-
-const axiosClient = {
-  default: {
-    get: null,
-    post: null,
+const todoistApi = {
+  '@doist/todoist-api-typescript': {
+    TodoistApi: TodoistApiMock,
   },
 };
 
-const TodoistService = proxyquire('../../../services/todoist/index', {
-  axios: axiosClient,
-});
+const brokenTodoistApi = {
+  '@doist/todoist-api-typescript': {
+    TodoistApi: TodoistApiBroken,
+  },
+};
+
+const gladys = {
+  variable: {
+    getValue: () => Promise.resolve('TODOIST_API_KEY'),
+  },
+};
 
 describe('TodoistService', () => {
-  const gladys = {
-    variable: {
-      getValue: fake.resolves('value'),
-    },
-  };
+  afterEach(() => {
+    sinon.reset();
+  });
 
-  const todoistService = TodoistService(gladys);
-  it('should have start function', () => {
-    expect(todoistService)
-      .to.have.property('start')
-      .and.be.instanceOf(Function);
-  });
-  it('should have stop function', () => {
-    expect(todoistService)
-      .to.have.property('stop')
-      .and.be.instanceOf(Function);
-  });
-  it('should have getTasks function', () => {
-    expect(todoistService)
-      .to.have.property('getTasks')
-      .and.be.instanceOf(Function);
-  });
-  it('should have getProjects function', () => {
-    expect(todoistService)
-      .to.have.property('getProjects')
-      .and.be.instanceOf(Function);
-  });
-  it('should have completeTask function', () => {
-    expect(todoistService)
-      .to.have.property('completeTask')
-      .and.be.instanceOf(Function);
-  });
-});
-
-describe('ExampleService lifecycle', () => {
-  const gladys = {
-    variable: {
-      getValue: fake.resolves('value'),
-    },
-  };
-  const todoistService = TodoistService(gladys);
-  it('should start the service', async () => {
+  it('should start service', async () => {
+    const TodoistService = proxyquire('../../../services/todoist/index', todoistApi);
+    const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await todoistService.start();
-    assert.callCount(gladys.variable.getValue, 1);
   });
-  it("shouldn't start the service", async () => {
-    gladys.variable.getValue = fake.resolves(null);
-
-    try {
-      await todoistService.start();
-      assert.fail('Should have fail');
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-      assert.callCount(gladys.variable.getValue, 1);
-    }
-  });
-  it('should stop the service', async () => {
+  it('should stop service', async () => {
+    const TodoistService = proxyquire('../../../services/todoist/index', todoistApi);
+    const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await todoistService.stop();
   });
-});
-
-describe('ExampleService.getTasks', () => {
-  const gladys = {
-    variable: {
-      getValue: fake.resolves('value'),
-    },
-  };
-
-  const todoistService = TodoistService(gladys);
-  beforeEach(async () => {
-    axiosClient.default.get = axiosClientGetTasks;
+  it('should return list of tasks', async () => {
+    const TodoistService = proxyquire('../../../services/todoist/index', todoistApi);
+    const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await todoistService.start();
+    const tasks = await todoistService.todolist.getTasks();
+    expect(tasks).to.deep.equal([
+      {
+        id: 'taskId',
+        name: 'Task 1',
+      },
+    ]);
   });
-
-  it('should get tasks ', async () => {
-    const tasks = await todoistService.getTasks();
-    expect(tasks).to.have.length(2);
-  });
-
-  it("shouldn't get tasks because api reply error ", async () => {
-    axiosClient.default.get = fake.throws(new Error());
-    try {
-      await todoistService.getTasks();
-      assert.fail('Should have fail');
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error400);
-    }
-  });
-});
-
-describe('ExampleService.getProjects', () => {
-  const gladys = {
-    variable: {
-      getValue: fake.resolves('value'),
-    },
-  };
-
-  const todoistService = TodoistService(gladys);
-  beforeEach(async () => {
-    axiosClient.default.get = axiosClientGetProjects;
+  it('should return error, unable to contact third party provider', async () => {
+    const TodoistService = proxyquire('../../../services/todoist/index', brokenTodoistApi);
+    const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await todoistService.start();
+    const promise = todoistService.todolist.getTasks();
+
+    return assert.isRejected(promise, 'REQUEST_TO_THIRD_PARTY_FAILED');
   });
 
-  it('should get projects ', async () => {
-    const projects = await todoistService.getProjects();
-    expect(projects).to.have.length(2);
-  });
-
-  it("shouldn't get projects because api reply error ", async () => {
-    axiosClient.default.get = fake.throws(new Error());
-    try {
-      await todoistService.getProjects();
-      assert.fail('Should have fail');
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error400);
-    }
-  });
-});
-
-describe('ExampleService.completeTask', () => {
-  const gladys = {
-    variable: {
-      getValue: fake.resolves('value'),
-    },
-  };
-
-  const todoistService = TodoistService(gladys);
-  beforeEach(async () => {
-    axiosClient.default.get = axiosClientGetProjects;
+  it('should return list of todolist', async () => {
+    const TodoistService = proxyquire('../../../services/todoist/index', todoistApi);
+    const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
     await todoistService.start();
+    const tasks = await todoistService.todolist.get();
+    expect(tasks).to.deep.equal([
+      {
+        id: 'todolistId',
+        name: 'Todolist 1',
+      },
+    ]);
+  });
+  it('should return error, unable to contact third party provider', async () => {
+    const TodoistService = proxyquire('../../../services/todoist/index', brokenTodoistApi);
+    const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await todoistService.start();
+    const promise = todoistService.todolist.get();
+
+    return assert.isRejected(promise, 'REQUEST_TO_THIRD_PARTY_FAILED');
   });
 
-  it('should complete the tasks ', async () => {
-    axiosClient.default.post = fake.resolves();
-    await todoistService.completeTask();
+  it('should close a task', async () => {
+    const TodoistService = proxyquire('../../../services/todoist/index', todoistApi);
+    const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await todoistService.start();
+    await todoistService.todolist.closeTask('taskId');
   });
+  it('should return error, unable to contact third party provider', async () => {
+    const TodoistService = proxyquire('../../../services/todoist/index', brokenTodoistApi);
+    const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+    await todoistService.start();
+    const promise = todoistService.todolist.closeTask('taskId');
 
-  it("shouldn't complete the tasks because api reply error ", async () => {
-    axiosClient.default.post = fake.throws(new Error());
-    try {
-      await todoistService.completeTask();
-      assert.fail('Should have fail');
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error400);
-    }
+    return assert.isRejected(promise, 'REQUEST_TO_THIRD_PARTY_FAILED');
   });
 });

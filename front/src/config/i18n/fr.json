@@ -204,7 +204,7 @@
       "devices-in-room": "Appareils de la pièce",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
-      "todoist": "Todoist"
+      "todolist": "Todolist"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -292,11 +292,12 @@
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
       },
-      "todoist": {
+      "todolist": {
         "editNameLabel": "Titre de la box",
         "editProjectLabel": "Projet pour filtrer les tâches (facultatif)",
         "unknownError": "Impossible de récupérer la liste des tâches.",
-        "emptyTasks": "Aucune tâche"
+        "emptyTasks": "Aucune tâche",
+        "serviceNotConfigured": "Le service Todoist n'est pas configuré. Veuillez accéder à l'onglet «Intégrations» et configurer le service Todoist."
       }
     }
   },
@@ -1048,7 +1049,7 @@
       "title": "Todoist",
       "description": "Lister vos tâches Todoist",
       "introduction": "Cette intégration vous aide à intégrer l'API Todoist pour faire remonter vos tâches dans Gladys.",
-      "instructions": "Vous devez d'abord créer une clé d'API sur <a href=\"https://todoist.com/prefs/integrations\">https://todoist.com/prefs/integrations</a>.",
+      "instructions": "Vous devez d'abord créer une clé d'API sur <a target=\"blank\" href=\"https://todoist.com/app/settings/integrations/developer\">https://todoist.com/app/settings/integrations/developer</a>.",
       "apiKeyLabel": "Saisissez ensuite votre clé API ici :",
       "apiKeyPlaceholder": "Entrer la clé API Todoist",
       "saveButton": "Sauvegarder",

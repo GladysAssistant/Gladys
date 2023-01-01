@@ -7,6 +7,7 @@ const db = require('../models');
 const logger = require('../utils/logger');
 const { seedDb, cleanDb } = require('./helpers/db.test');
 const fakeOpenWeatherService = require('./services/openweather/fakeOpenWeatherService');
+const fakeTodoistService = require('./services/todoist/fakeTodoistService');
 
 chai.use(chaiAsPromised);
 
@@ -38,6 +39,7 @@ before(async function before() {
   }
   await gladys.start();
   gladys.stateManager.setState('service', 'openweather', fakeOpenWeatherService);
+  gladys.stateManager.setState('service', 'todoist', fakeTodoistService);
   gladys.gateway.gladysGatewayClient.accessToken = 'access-token';
   gladys.gateway.gladysGatewayClient.refreshToken = 'refresh-token';
   // @ts-ignore

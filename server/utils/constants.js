@@ -793,7 +793,7 @@ const DASHBOARD_BOX_TYPE = {
   DEVICES_IN_ROOM: 'devices-in-room',
   CHART: 'chart',
   ECOWATT: 'ecowatt',
-  TODOIST: 'todoist',
+  TODOLIST: 'todolist',
 };
 
 const ERROR_MESSAGES = {
