@@ -340,6 +340,7 @@ const actionsFunc = {
       const todayHour = dayjs.tz(dayjs(), self.timezone).hour();
       const todayLiveData = data.signals.find((day) => {
         const signalDate = dayjs(day.jour).format('YYYY-MM-DD');
+        console.log({ todayDate, signalDate });
         return todayDate === signalDate;
       });
       if (!todayLiveData) {
