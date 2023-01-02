@@ -1,0 +1,45 @@
+.padding {
+  padding: 10px 20px 10px 20px;
+}
+
+.analogRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding: 16px;
+}
+
+.analogCol {
+  display: flex;
+  flex-direction: column;
+  flex: auto;
+}
+
+.analogSmallText {
+  font-size: 18px;
+  text-align: left;
+}
+
+.analogBigText {
+  font-size: 30px;
+  text-align: left;
+}
+
+.analogClock {
+  align-items: center;
+  justify-content: center;
+}
+
+.digitalTime {
+  font-size: 40px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.digitalDate {
+  padding-top: 10px;
+  font-size: 16px;
+  text-align: center;
+}
+
+

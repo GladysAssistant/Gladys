@@ -204,6 +204,7 @@
       "devices-in-room": "Appareils de la pièce",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
+      "clock": "Horloge",
       "todolist": "Todolist"
     },
     "boxes": {
@@ -291,6 +292,16 @@
         "ok": "Réseau ok",
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
+      },
+      "clock": {
+        "analog": "Analogique",
+        "digital": "Digitale",
+        "date": "{{day}} {{dayNumber}} {{month}} {{year}}",
+        "smallDate": "{{dayNumber}} {{month}}",
+        "type": "Type de l'horloge ?",
+        "displaySecond": "Afficher les secondes ?",
+        "yes": "Oui",
+        "no": "Non"
       },
       "todolist": {
         "editNameLabel": "Titre de la box",
@@ -1061,6 +1072,7 @@
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
+    "duplicateButton": "Dupliquer",
     "triggersTitle": "Déclencheurs",
     "newTrigger": "Nouveau déclencheur",
     "addTriggerButton": "Ajouter déclencheur",
@@ -1624,6 +1636,16 @@
     "namePlaceholder": "Entrez le nom de votre scène",
     "iconLabel": "Sélectionnez une icône pour votre scène",
     "createSceneButton": "Créer une scène",
+    "invalidName": "Le nom est requis",
+    "invalidIcon": "L'icône est requise",
+    "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
+  },
+  "duplicateScene": {
+    "cardTitle": "Dupliquer la scène \"{{name}}\"",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Entrez un nouveau nom",
+    "iconLabel": "Sélectionnez une icône pour votre scène",
+    "duplicateSceneButton": "Dupliquer",
     "invalidName": "Le nom est requis",
     "invalidIcon": "L'icône est requise",
     "sceneAlreadyExist": "Une scène avec le même nom existe déjà."

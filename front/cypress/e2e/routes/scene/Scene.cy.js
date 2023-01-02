@@ -162,9 +162,41 @@ describe('Scene view', () => {
 
     cy.get('[type="checkbox"]').should('be.checked');
   });
+  it('Should duplicate existing scene', () => {
+    cy.login();
+    cy.visit('/dashboard/scene/my-scene');
+
+    cy.contains('editScene.duplicateButton')
+      .should('have.class', 'btn-warning')
+      .click();
+
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene/duplicate`);
+
+    cy.get('input:visible').then(inputs => {
+      // Zone name
+      cy.wrap(inputs[0]).type('My Duplicated scene');
+    });
+
+    cy.get('.fe-activity').click();
+
+    cy.get('.form-footer')
+      .contains('duplicateScene.duplicateSceneButton')
+      .should('have.class', 'btn-primary')
+      .click();
+
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-duplicated-scene`);
+  });
   it('Should delete existing scene', () => {
     cy.login();
     cy.visit('/dashboard/scene/my-scene');
+
+    cy.contains('editScene.deleteButton')
+      .should('have.class', 'btn-danger')
+      .click();
+
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
+
+    cy.visit('/dashboard/scene/my-duplicated-scene');
 
     cy.contains('editScene.deleteButton')
       .should('have.class', 'btn-danger')

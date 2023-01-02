@@ -47,6 +47,29 @@ describe('GET /api/v1/todolist/:todolistId/tasks', () => {
   });
 });
 
+describe('GET /api/v1/todolist/tasks', () => {
+  it('should return list of task ', async () => {
+    await authenticatedRequest
+      .get('/api/v1/todolist/tasks')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal([
+          {
+            id: 'taskId',
+            name: 'Task 1',
+          },
+        ]);
+      });
+  });
+  it('should return 401 unauthorized', async () => {
+    await request
+      .get('/api/v1/todolist/tasks')
+      .expect('Content-Type', /json/)
+      .expect(401);
+  });
+});
+
 describe('POST /api/v1/todolist/tasks/:task_id/close', () => {
   it('should close a task in the todolist', async () => {
     await authenticatedRequest.post('/api/v1/todolist/tasks/:task_id/close').expect(204);

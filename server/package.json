@@ -58,6 +58,7 @@
     "eslint-plugin-jsdoc": "^4.1.0",
     "eslint-plugin-mocha": "^10.1.0",
     "eslint-plugin-no-call": "^1.2.5",
+    "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-require-jsdoc": "^1.0.4",
     "jsdoc": "^3.6.10",
     "mocha": "^8.3.2",

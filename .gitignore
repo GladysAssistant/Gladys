@@ -17,6 +17,8 @@ stats.json
 size-plugin.json
 # VSCode
 .vscode
+# Webstorm
+.idea
 .tmp
 .DS_Store
 .idea/

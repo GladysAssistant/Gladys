@@ -6,6 +6,7 @@ import AtHomeBox from '../../components/boxs/user-presence/UserPresence';
 import DevicesInRoomsBox from '../../components/boxs/device-in-room/DevicesInRoomsBox';
 import ChartBox from '../../components/boxs/chart/Chart';
 import EcowattBox from '../../components/boxs/ecowatt/Ecowatt';
+import ClockBox from '../../components/boxs/clock/Clock';
 import TodolistBox from '../../components/boxs/todolist/TodolistBox';
 
 const Box = ({ children, ...props }) => {
@@ -26,6 +27,8 @@ const Box = ({ children, ...props }) => {
       return <ChartBox {...props} />;
     case 'ecowatt':
       return <EcowattBox {...props} />;
+    case 'clock':
+      return <ClockBox {...props} />;
     case 'todolist':
       return <TodolistBox {...props} />;
   }
