@@ -13,7 +13,7 @@ describe('scene.ecowattCondition', () => {
   let clock;
   const timezone = 'Europe/Paris';
   beforeEach(async () => {
-    clock = useFakeTimers(new Date('2022-12-09T05:23:57.931Z'));
+    clock = useFakeTimers(new Date('2022-12-09T11:00:57'));
   });
   afterEach(() => {
     clock.restore();
