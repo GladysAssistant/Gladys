@@ -60,6 +60,9 @@ const EditScenePage = ({ children, ...props }) => (
               <button onClick={props.startScene} class="btn btn-sm btn-primary ml-2">
                 <Text id="editScene.startButton" /> <i class="fe fe-play" />
               </button>
+              <button onClick={props.duplicateScene} disabled={props.saving} className="btn btn-sm btn-warning ml-2">
+                <Text id="editScene.duplicateButton" /> <i className="fe fe-copy" />
+              </button>
               <button onClick={props.saveScene} disabled={props.saving} class="btn btn-sm btn-success ml-2">
                 <Text id="editScene.saveButton" /> <i class="fe fe-save" />
               </button>
