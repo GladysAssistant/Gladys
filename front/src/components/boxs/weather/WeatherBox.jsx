@@ -219,7 +219,7 @@ class WeatherBoxComponent extends Component {
   componentDidMount() {
     this.refreshData();
     // refresh weather every interval
-    this.interval = setInterval(() => this.refreshData, BOX_REFRESH_INTERVAL_MS);
+    this.interval = setInterval(() => this.refreshData(), BOX_REFRESH_INTERVAL_MS);
   }
 
   componentDidUpdate(previousProps) {
