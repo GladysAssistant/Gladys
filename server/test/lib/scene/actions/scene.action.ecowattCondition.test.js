@@ -80,7 +80,7 @@ describe('scene.ecowattCondition', () => {
         signals: [
           {
             GenerationFichier: '2022-12-08T23:00:00+01:00',
-            jour: '2022-12-09T00:00:00+01:00',
+            jour: '2022-12-09T12:00:00',
             dvalue: 1,
             message: 'Pas d’alerte.',
             values: [],
