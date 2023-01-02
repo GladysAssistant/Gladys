@@ -24,6 +24,7 @@ describe('mqttHandler.configureContainer', () => {
     fsMock.readFile = fake.resolves('read');
     fsMock.appendFile = fake.resolves(true);
     fsMock.writeFile = fake.resolves('write');
+    fsMock.open = fake.resolves({ close: () => {} });
   });
 
   afterEach(() => {
@@ -44,6 +45,7 @@ describe('mqttHandler.configureContainer', () => {
       constants.R_OK | constants.W_OK,
     );
     assert.calledOnceWithExactly(fsMock.readFile, '/var/lib/gladysassistant/mosquitto/mosquitto.conf');
+    assert.calledOnceWithExactly(fsMock.open, '/var/lib/gladysassistant/mosquitto/mosquitto.passwd', 'w');
     assert.notCalled(fsMock.appendFile);
     assert.notCalled(fsMock.writeFile);
   });
@@ -65,6 +67,7 @@ describe('mqttHandler.configureContainer', () => {
       '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
       `${os.EOL}listener 1883`,
     );
+    assert.calledOnceWithExactly(fsMock.open, '/var/lib/gladysassistant/mosquitto/mosquitto.passwd', 'w');
     assert.notCalled(fsMock.writeFile);
   });
 
@@ -88,5 +91,6 @@ describe('mqttHandler.configureContainer', () => {
       '/var/lib/gladysassistant/mosquitto/mosquitto.conf',
       `allow_anonymous false${os.EOL}connection_messages false${os.EOL}password_file /mosquitto/config/mosquitto.passwd${os.EOL}listener 1883`,
     );
+    assert.calledOnceWithExactly(fsMock.open, '/var/lib/gladysassistant/mosquitto/mosquitto.passwd', 'w');
   });
 });
