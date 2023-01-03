@@ -32,8 +32,9 @@ async function scan(state, peripheralUuid = undefined) {
 
     this.scanCounter += 1;
 
-    if (this.scanPromise && this.scanPromise.isPending()) {
-      this.scanPromise.cancel();
+    if (this.scanPromise) {
+      clearTimeout(this.scanPromise);
+      this.scanPromise = undefined;
     }
 
     return new Promise((resolve, reject) => {
@@ -71,12 +72,9 @@ async function scan(state, peripheralUuid = undefined) {
         this.bluetooth.startScanning([], true);
       }
 
-      this.scanPromise = new Promise(resolve, async () => {
-        await Promise.delay(TIMERS.SCAN);
+      this.scanPromise = setTimeout(() => {
         this.bluetooth.stopScanning();
-        resolve();
-      });
-      this.scanPromise();
+      }, TIMERS.SCAN);
     });
   }
 

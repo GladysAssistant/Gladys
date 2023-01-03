@@ -13,36 +13,21 @@ describe('bluetooth.scan command', () => {
   let bluetooth;
   let bluetoothManager;
 
-  let stopScanning;
-  let stopScanningAsync;
+  let clock;
 
   beforeEach(() => {
-    stopScanning = fake.returns(null);
-    stopScanningAsync = fake.returns(null);
-
     bluetooth = new BluetoothMock();
-    bluetooth.stopScanning = () => {
-      if (bluetoothManager.scanPromise && bluetoothManager.scanPromise.isPending()) {
-        bluetoothManager.scanPromise.cancel();
-      }
-      stopScanning();
-    };
-    bluetooth.stopScanningAsync = () => {
-      if (bluetoothManager.scanPromise && bluetoothManager.scanPromise.isPending()) {
-        bluetoothManager.scanPromise.cancel();
-      }
-      stopScanningAsync();
-    };
+    bluetooth.stopScanning = fake.returns(null);
+    bluetooth.stopScanningAsync = fake.returns(null);
 
     bluetoothManager = new BluetoothManager(gladys, serviceId);
     bluetoothManager.bluetooth = bluetooth;
+
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
-    if (bluetoothManager.scanPromise && bluetoothManager.scanPromise.isPending()) {
-      bluetoothManager.scanPromise.cancel();
-    }
-
+    clock.restore();
     sinon.reset();
   });
 
@@ -51,8 +36,8 @@ describe('bluetooth.scan command', () => {
     await bluetoothManager.scan();
 
     assert.notCalled(bluetooth.startScanning);
-    assert.notCalled(stopScanning);
-    assert.calledOnce(stopScanningAsync);
+    assert.notCalled(bluetooth.stopScanning);
+    assert.calledOnce(bluetooth.stopScanningAsync);
   });
 
   it('should not scan, not ready no args', async () => {
@@ -62,8 +47,8 @@ describe('bluetooth.scan command', () => {
       assert.fail('Should have fail');
     } catch (e) {
       assert.notCalled(bluetooth.startScanning);
-      assert.notCalled(stopScanning);
-      assert.notCalled(stopScanningAsync);
+      assert.notCalled(bluetooth.stopScanning);
+      assert.notCalled(bluetooth.stopScanningAsync);
     }
   });
 
@@ -72,8 +57,8 @@ describe('bluetooth.scan command', () => {
     await bluetoothManager.scan(false);
 
     assert.notCalled(bluetooth.startScanning);
-    assert.notCalled(stopScanning);
-    assert.calledOnce(stopScanningAsync);
+    assert.notCalled(bluetooth.stopScanning);
+    assert.calledOnce(bluetooth.stopScanningAsync);
   });
 
   it('should clear timeout, and discovered devices', async () => {
@@ -84,8 +69,8 @@ describe('bluetooth.scan command', () => {
     await bluetoothManager.scan(false);
 
     assert.calledOnce(bluetooth.startScanning);
-    assert.notCalled(stopScanning);
-    assert.calledOnce(stopScanningAsync);
+    assert.notCalled(bluetooth.stopScanning);
+    assert.calledOnce(bluetooth.stopScanningAsync);
 
     expect(bluetoothManager.discoveredDevices).deep.eq({});
   });
@@ -98,8 +83,8 @@ describe('bluetooth.scan command', () => {
     await bluetoothManager.scan(false);
 
     assert.calledOnce(bluetooth.startScanning);
-    assert.notCalled(stopScanning);
-    assert.calledOnce(stopScanningAsync);
+    assert.notCalled(bluetooth.stopScanning);
+    assert.calledOnce(bluetooth.stopScanningAsync);
 
     expect(bluetoothManager.discoveredDevices).deep.eq({ one: {}, two: {} });
   });
@@ -113,9 +98,29 @@ describe('bluetooth.scan command', () => {
     const peripheral = await bluetoothManager.scan(true, 'any');
 
     assert.notCalled(bluetooth.startScanning);
-    assert.notCalled(stopScanning);
-    assert.notCalled(stopScanningAsync);
+    assert.notCalled(bluetooth.stopScanning);
+    assert.notCalled(bluetooth.stopScanningAsync);
 
     expect(peripheral).deep.eq({ uuid: 'any' });
+  });
+
+  it('should stop discover if device is not found', async () => {
+    bluetoothManager.ready = true;
+
+    const scanPromise = bluetoothManager.scan(true);
+
+    assert.calledOnce(bluetooth.startScanning);
+    assert.notCalled(bluetooth.stopScanning);
+    assert.notCalled(bluetooth.stopScanningAsync);
+    expect(bluetoothManager.scanPromise).to.be.not.equal(undefined);
+
+    // wait for timeout
+    clock.tick(150000);
+    // check that scan is stopped after timeout
+    assert.calledOnce(bluetooth.stopScanning);
+
+    bluetooth.emit('scanStop');
+    const result = await scanPromise;
+    expect(result).to.be.deep.equal({});
   });
 });
