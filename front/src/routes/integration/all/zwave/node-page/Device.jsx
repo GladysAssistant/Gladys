@@ -2,7 +2,6 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import cx from 'classnames';
 import get from 'get-value';
-import { Link } from 'preact-router/match';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
@@ -147,7 +146,7 @@ class ZWaveDeviceBox extends Component {
                     <Text id="integration.zwave.device.featuresLabel" />
                   </label>
                   <DeviceFeatures features={props.device.features} />
-                  <p class="mt-4">
+                  <p class="mt-2">
                     {mostRecentValueAt ? (
                       <Text
                         id="integration.zwave.device.mostRecentValueAt"
@@ -163,19 +162,9 @@ class ZWaveDeviceBox extends Component {
                   </p>
                 </div>
                 <div class="form-group">
-                  <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.zwave.device.saveButton" />
-                  </button>
-                  <button onClick={this.deleteDevice} class="btn btn-danger">
+                  <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                     <Text id="integration.zwave.device.deleteButton" />
                   </button>
-                  <Link href={`/dashboard/integration/device/zwave/edit/${props.device.selector}`}>
-                    <button class="btn btn-secondary float-right">
-                      <Text id="integration.zwave.device.editButton" />
-                    </button>
-                  </Link>
-                </div>
-                <div class="form-group">
                   <button onClick={this.convertDeviceToMqtt} class="btn btn-warning">
                     <Text id="integration.zwave.device.convertToMqtt" />
                   </button>

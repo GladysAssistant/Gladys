@@ -367,8 +367,19 @@ const data = {
         selector: 'main-lamp',
         features: [
           {
-            name: 'Main Lamp',
+            name: 'First lamp',
             selector: 'main-lamp-binary',
+            category: 'light',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          },
+          {
+            name: 'Second lamp ',
+            selector: 'secondary-lamp-binary',
             category: 'light',
             type: 'binary',
             min: 0,
@@ -754,6 +765,24 @@ const data = {
               read_only: true,
               last_value: 74,
               unit: 'percent',
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            }
+          ]
+        },
+        {
+          id: '284d8f68-220c-45fd-a73a-eccb547aff24',
+          name: 'Window sensor',
+          selector: 'opening-sensor',
+          features: [
+            {
+              name: 'Window',
+              selector: 'kitchen-opening-sensor',
+              category: 'opening-sensor',
+              type: 'binary',
+              min: 0,
+              max: 1,
+              read_only: true,
+              last_value: 1,
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
@@ -2730,6 +2759,9 @@ const data = {
   'get /api/v1/device_feature/aggregated_states': [
     {
       device: {
+        name: 'Kitchen temperature'
+      },
+      deviceFeature: {
         name: 'Kitchen temperature'
       },
       values: [

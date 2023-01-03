@@ -46,6 +46,7 @@ import MapNewAreaPage from '../routes/map/NewArea';
 import CalendarPage from '../routes/calendar';
 import ScenePage from '../routes/scene';
 import NewScenePage from '../routes/scene/new-scene';
+import DuplicateScenePage from '../routes/scene/duplicate-scene';
 import EditScenePage from '../routes/scene/edit-scene';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
@@ -66,6 +67,7 @@ import SettingsBackgroundJobs from '../routes/settings/settings-background-jobs'
 import TelegramPage from '../routes/integration/all/telegram';
 import AlexaWelcomePage from '../routes/integration/all/alexa-gateway/welcome';
 import GoogleHomeWelcomePage from '../routes/integration/all/google-home-gateway/welcome';
+import HomeKitPage from '../routes/integration/all/homekit';
 import OwntracksWelcomePage from '../routes/integration/all/owntracks/welcome';
 import CalDAVAccountPage from '../routes/integration/all/caldav/account-page';
 import CalDAVSyncPage from '../routes/integration/all/caldav/sync-page';
@@ -74,15 +76,12 @@ import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
-import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
-import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
-import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
-import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
-import ZwaveNodeOperationPage from '../routes/integration/all/zwave/node-operation-page';
-import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+
+// Deprecated integration
+import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 
 // Broadlink integration
 import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
@@ -216,11 +215,6 @@ const AppRouter = connect(
         <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
-        <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
-        <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
-        <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
-        <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
-        <ZwaveEditPage path="/dashboard/integration/device/zwave/edit/:deviceSelector" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
@@ -241,6 +235,7 @@ const AppRouter = connect(
         <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+        <HomeKitPage path="/dashboard/integration/communication/homekit" />
 
         <OverkizPage path="/dashboard/integration/device/overkiz" />
         <OverkizEditPage path="/dashboard/integration/device/overkiz/edit-page" />
@@ -271,6 +266,7 @@ const AppRouter = connect(
         <CalendarPage path="/dashboard/calendar" />
         <ScenePage path="/dashboard/scene" />
         <NewScenePage path="/dashboard/scene/new" />
+        <DuplicateScenePage path="/dashboard/scene/:scene_selector/duplicate" />
         <EditScenePage path="/dashboard/scene/:scene_selector" />
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />

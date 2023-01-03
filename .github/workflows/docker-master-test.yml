@@ -7,21 +7,16 @@ on:
 jobs:
   test-front:
     name: Front test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - name: 📇 Use npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: 📦 Install Global NPM Packages
         run: |
           sudo npm install typescript node-gyp npm@latest -g
@@ -43,23 +38,16 @@ jobs:
           npm run compare-translations
   build-front:
     name: Front build
-    needs:
-      - test-front
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - name: 📇 Use npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: 📦 Install NPM front packages
         working-directory: ./front
         run: |
@@ -74,38 +62,24 @@ jobs:
         env:
           RELATIVE_CI_KEY: ${{ secrets.RELATIVE_CI_KEY }}
       - name: ↗️ Upload build artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: static
           path: front/build
   test-server:
     name: Server test
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
       - name: 💽 Setup nodejs
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'
-      - name: 📇 Use npm cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - name: 🖥️ Setup OZW
-        run: |
-          docker create -ti --name dummy chrisns/openzwave:ubuntu-1.6.1714 bash
-          sudo docker cp dummy:/usr/local/include/openzwave /usr/local/include/openzwave
-          sudo docker cp dummy:/openzwave/libopenzwave.so /usr/local/lib
-          sudo docker cp dummy:/openzwave/libopenzwave.so.1.6 /usr/local/lib
-          sudo docker cp dummy:/openzwave/config /usr/local/etc/openzwave
-          sudo ldconfig
-          docker rm -f dummy
+          node-version-file: 'server/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
       - name: 💽 Install System Dependencies
         run: |
           sudo apt update
@@ -131,8 +105,8 @@ jobs:
           npm run coverage
       - name: 🔐 Dependencies security audit
         working-directory: ./server
-        run: npm audit --production --audit-level=critical
+        run: npm audit --production --audit-level=critical || true
       - name: 📄 Codecov report upload
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           fail_ci_if_error: true

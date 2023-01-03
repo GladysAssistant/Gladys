@@ -44,7 +44,7 @@
   },
   "device": {
     "noFeatures": "Aucune fonctionnalité",
-    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données. Afin d'éviter que Gladys soit bloquée pendant la suppression de cet appareil, nous avons lancé une suppression lente en arrière-plan de tous les états de cet appareil. D'ici quelques minutes/heures ( selon la rapidité de votre disque ), nous vous invitons à revenir sur cet onglet pour re-tenter une suppression de cet appareil. Pour suivre la suppression, <a href=\"/dashboard/settings/jobs\">c'est ici</a>."
+    "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
   },
   "login": {
     "title": "Gladys Assistant",
@@ -202,7 +202,9 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
-      "chart": "Graphique"
+      "chart": "Graphique",
+      "ecowatt": "Ecowatt ( France )",
+      "clock": "Horloge"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -282,6 +284,26 @@
         "no": "Non",
         "preview": "Prévisualisation",
         "showPreviewButton": "Afficher une prévisualisation"
+      },
+      "ecowatt": {
+        "title": "Ecowatt France",
+        "description": "Cette box vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
+        "error": "Une erreur est survenue lors du rafraichissement via l'API RTE, merci de re-essayer.",
+        "dailyTitle": "Prévisions du jour",
+        "nextDaysTitle": "Prévisions des prochains jours",
+        "ok": "Réseau ok",
+        "warning": "Réseau tendu",
+        "critical": "Réseau très tendu"
+      },
+      "clock": {
+        "analog": "Analogique",
+        "digital": "Digitale",
+        "date": "{{day}} {{dayNumber}} {{month}} {{year}}",
+        "smallDate": "{{dayNumber}} {{month}}",
+        "type": "Type de l'horloge ?",
+        "displaySecond": "Afficher les secondes ?",
+        "yes": "Oui",
+        "no": "Non"
       }
     }
   },
@@ -695,23 +717,28 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "homekit": {
+      "title": "Apple HomeKit",
+      "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
+      "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
+      "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
+      "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
+      "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparait pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
+      "reloadButton": "Relancer"
+    },
     "owntracks": {
       "title": "Owntracks",
       "description": "Envoyez votre position GPS à Gladys via une application",
       "longDescription": "Owntracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser Owntracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer Owntracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
     },
     "zwave": {
-      "title": "Z-Wave",
-      "description": "Contrôlez vos appareils Z-Wave avec Open-Zwave.",
-      "deviceTab": "Appareils",
-      "networkTab": "Réseau",
-      "settingsTab": "Paramètres",
-      "setupTab": "Configuration",
+      "title": "Open-Zwave [OLD]",
+      "description": "En fin de vie, il n'est plus possible de l'utiliser.",
       "device": {
-        "title": "Appareils Z-Wave",
+        "title": "Anciens appareils Open-Zwave",
         "search": "Chercher un appareil",
         "convertToMqtt": "Convertir en appareil MQTT",
-        "oldIntegrationWarning": "Cette intégration est basée sur Open-Zwave, une librairie qui n'est plus maintenue. Nous travaillons sur une nouvelle intégration basée sur ZwaveJS2mqtt, mais en attendant il faut s'armer de patience, et éventuellement utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwavejs2mqtt-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">ZwaveJS2Mqtt + Node-RED</a>. Merci d'arrêter d'utiliser cette intégration avant Novembre 2022. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
+        "oldIntegrationWarning": "Cette intégration était basée sur Open-Zwave, une librairie qui n'est plus maintenue. Cette intégration est en fin de vie. Nous travaillons sur une nouvelle intégration basée sur Zwave-js-ui, mais en attendant il faut s'armer de patience, et utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwave-js-ui-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">Zwave-js-ui + Node-RED + Gladys</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
         "scanButton": "Rechercher",
         "nameLabel": "Nom",
@@ -722,60 +749,6 @@
         "editButton": "Editer",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
-      },
-      "setup": {
-        "title": "Appareils Z-Wave",
-        "addNodeButton": "Ajouter",
-        "addNodeSecureButton": "Ajout sécurisé",
-        "healNetworkButton": "Régler",
-        "removeNode": "Supprimer",
-        "scanButton": "Recherche",
-        "noZwaveDevices": "Aucun appareil Z-Wave trouvé. Avez-vous sélectionné le port USB de votre dongle dans les paramètres ?",
-        "manufacturer": "Fabricant",
-        "name": "Nom",
-        "type": "Type",
-        "scanInProgressText": "Recherche en cours...",
-        "createDeviceInGladys": "Connecter dans Gladys",
-        "features": "Fonctionnalités",
-        "params": "Paramètre",
-        "nodeId": "Noeud",
-        "zwaveNotConfiguredError": "Ce service Z-wave n'est pas configuré. Veuillez sélectionner le port USB où votre clé Z-Wave est branchée dans les paramètres.",
-        "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
-        "conflictError": "Un appareil avec ce nom existe déjà, merci de renommer cet appareil ou de supprimer l'existant.",
-        "deviceCreatedSuccess": "L'appareil a été ajouté avec succès.",
-        "unknowNode": "Noeud inconnu",
-        "sleepingNodeMsg": "Noeud endormi ou mort. Réveillez le noeud puis rafraîchissez cette page.",
-        "createGithubIssue": "Signaler un bug avec cet appareil"
-      },
-      "network": {
-        "title": "Réseau Z-Wave",
-        "nodeId": "ID",
-        "nodeName": "Nom",
-        "nodeNeighbors": "Voisins",
-        "nodeAsleep": "Le noeud z-wave doit être en endormi ou mort.",
-        "node": "Noeud"
-      },
-      "settings": {
-        "title": "Paramètres Z-Wave",
-        "description": "Pour utiliser le Z-Wave dans Gladys, vous devez avoir une clé USB Z-Wave connectée à votre instance Gladys.",
-        "zwaveUsbDriverPathLabel": "Sélectionnez le port USB auquel votre clé Z-Wave est connectée",
-        "connectButton": "Connecter",
-        "disconnectButton": "Déconnecter",
-        "refreshButton": "Rafraîchir la liste USB",
-        "notConnected": "Gladys n'est connectée à aucune clé USB Z-Wave.",
-        "connectedWithSuccess": "Clé USB Z-Wave connectée avec succès.",
-        "connecting": "Tentative de connexion à la clé USB Z-Wave...",
-        "driverFailedError": "Une erreur s'est produite lors de la tentative de connexion à la clé USB Z-Wave."
-      },
-      "nodeOperation": {
-        "addNodeInstructions": "Vous pouvez maintenant inclure votre appareil en suivant les instructions du manuel de celui-ci.",
-        "removeNodeInstructions": "Vous pouvez désormais exclure votre appareil en suivant les instructions du manuel de celui-ci.",
-        "addNodeTitle": "Mode d'inclusion",
-        "removeNodeTitle": "Mode d'exclusion",
-        "seconds": "secondes restantes",
-        "cancelButton": "Annuler",
-        "nodeAddedTitle": "Un nouveau nœud a été trouvé",
-        "nodeAddedDescription": "Attendez quelques secondes pendant que nous obtenons toutes les informations de ce nœud..."
       }
     },
     "openWeather": {
@@ -1130,6 +1103,7 @@
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
+    "duplicateButton": "Dupliquer",
     "triggersTitle": "Déclencheurs",
     "newTrigger": "Nouveau déclencheur",
     "addTriggerButton": "Ajouter déclencheur",
@@ -1246,6 +1220,14 @@
         "whenNotFoundLabel": "Si aucun évènement n'est trouvé",
         "stopScene": "Arrêter la scène",
         "continueScene": "Continuer la scène"
+      },
+      "ecowattCondition": {
+        "description": "Cette condition vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
+        "knowMore": "En savoir plus",
+        "networkStatusLabel": "Continuer la scène si le réseau est",
+        "ok": "Réseau ok",
+        "warning": "Réseau tendu",
+        "critical": "Réseau très tendu"
       }
     },
     "actions": {
@@ -1290,6 +1272,9 @@
       "house": {
         "is-empty": "Si la maison est vide",
         "is-not-empty": "Si la maison n'est pas vide"
+      },
+      "ecowatt": {
+        "condition": "Condition sur Ecowatt ( France )"
       }
     },
     "variables": {
@@ -1686,6 +1671,16 @@
     "invalidIcon": "L'icône est requise",
     "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
   },
+  "duplicateScene": {
+    "cardTitle": "Dupliquer la scène \"{{name}}\"",
+    "nameLabel": "Nom",
+    "namePlaceholder": "Entrez un nouveau nom",
+    "iconLabel": "Sélectionnez une icône pour votre scène",
+    "duplicateSceneButton": "Dupliquer",
+    "invalidName": "Le nom est requis",
+    "invalidIcon": "L'icône est requise",
+    "sceneAlreadyExist": "Une scène avec le même nom existe déjà."
+  },
   "scene": {
     "title": "Scènes",
     "emptySceneSentenceTop": "Impossible de trouver des scènes.",
@@ -1789,6 +1784,7 @@
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "volt-ampere": "Voltampère (VA)",
+    "kilovolt-ampere": "Kilovoltampère (kVA)",
     "volt-ampere-reactive": "Voltampère réactif (var)",
     "mm": "Millimètre (mm)",
     "cm": "Centimètre (cm)",
@@ -1859,6 +1855,7 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "kilovolt-ampere": "kVA",
     "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",
@@ -1934,6 +1931,13 @@
       }
     },
     "category": {
+      "opening-sensor": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Fermé",
+          "one": "Ouvert"
+        }
+      },
       "co-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
@@ -2207,7 +2211,7 @@
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",
     "label": "Sélectionnez votre utilisateur Gladys",
-    "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté locallement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
+    "description": "Avant de sélectionner votre utilisateur ici, vérifiez que celui-ci soit bien accepté localement sur votre instance Gladys (dans \"Paramètres\" => \"Gladys Plus\" => \"Utilisateurs\").",
     "noInstanceFound": "Votre instance Gladys n'est pas connectée à la passerelle Gladys. Vous êtes-vous connecté à votre compte Gladys Plus dans votre installation Gladys ?",
     "error": "Une erreur est survenue. Votre utilisateur est-il autorisé localement dans votre instance Gladys ?",
     "saveButton": "Sauvegarder",

@@ -28,3 +28,22 @@ input[type='range'][class~='light-temperature']::-ms-fill-lower {
 .removeNumberArrow {
   -moz-appearance: textfield;
 }
+
+.thermostatHorizontalControls {
+  display: flex;
+  min-width: 7rem;
+}
+
+.thermostatVerticalControls {
+  display: none;
+}
+
+@media ((min-width: 992px) and (max-width: 1300px)) or (max-width: 400px) {
+  .thermostatVerticalControls {
+    display: block;
+    min-width: 5rem;
+  }
+  .thermostatHorizontalControls {
+    display: none;
+  }
+}

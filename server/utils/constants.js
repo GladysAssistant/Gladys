@@ -291,6 +291,9 @@ const ACTIONS = {
   HTTP: {
     REQUEST: 'http.request',
   },
+  ECOWATT: {
+    CONDITION: 'ecowatt.condition',
+  },
 };
 
 const INTENTS = {
@@ -527,6 +530,7 @@ const DEVICE_FEATURE_UNITS = {
   MILLI_AMPERE: 'milliampere',
   MILLI_VOLT: 'millivolt',
   VOLT: 'volt',
+  KILOVOLT_AMPERE: 'kilovolt-ampere',
   VOLT_AMPERE: 'volt-ampere',
   VOLT_AMPERE_REACTIVE: 'volt-ampere-reactive',
   // Length units
@@ -636,6 +640,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.WATT_HOUR,
     DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
     DEVICE_FEATURE_UNITS.MEGAWATT_HOUR,
+    DEVICE_FEATURE_UNITS.KILOVOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE,
     DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
   ],
@@ -754,14 +759,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
-  ZWAVE: {
-    DRIVER_READY: 'zwave.driver-ready',
-    DRIVER_FAILED: 'zwave.driver-failed',
-    NODE_READY: 'zwave.node-ready',
-    SCAN_COMPLETE: 'zwave.scan-complete',
-    NODE_ADDED: 'zwave.node-added',
-    NODE_REMOVED: 'zwave.node-removed',
-  },
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
@@ -813,6 +810,8 @@ const DASHBOARD_BOX_TYPE = {
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
   CHART: 'chart',
+  ECOWATT: 'ecowatt',
+  CLOCK: 'clock',
 };
 
 const ERROR_MESSAGES = {

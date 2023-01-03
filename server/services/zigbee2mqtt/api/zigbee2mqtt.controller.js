@@ -8,7 +8,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    * @apiGroup Zigbee2mqtt
    */
   async function getDiscoveredDevices(req, res) {
-    logger.log('Get discovered devices');
+    logger.debug('Get discovered devices');
     const devices = zigbee2mqttManager.getDiscoveredDevices();
     res.json(devices);
   }
@@ -19,7 +19,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    * @apiGroup Zigbee2mqtt
    */
   async function status(req, res) {
-    logger.log('Get status');
+    logger.debug('Get status');
     const response = await zigbee2mqttManager.status();
     res.json(response);
   }
@@ -30,7 +30,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    * @apiGroup Zigbee2mqtt
    */
   async function connect(req, res) {
-    logger.log('Entering connect step');
+    logger.debug('Entering connect step');
     await zigbee2mqttManager.init();
     res.json({
       success: true,
@@ -43,7 +43,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    * @apiGroup Zigbee2mqtt
    */
   async function installMqttContainer(req, res) {
-    logger.log('Install MQTT container');
+    logger.debug('Install MQTT container');
     await zigbee2mqttManager.installMqttContainer();
     res.json({
       success: true,
@@ -56,7 +56,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    * @apiGroup Zigbee2mqtt
    */
   async function installZ2mContainer(req, res) {
-    logger.log('Install Z2M container');
+    logger.debug('Install Z2M container');
     await zigbee2mqttManager.installZ2mContainer();
     res.json({
       success: true,
@@ -69,7 +69,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    * @apiGroup Zigbee2mqtt
    */
   async function disconnect(req, res) {
-    logger.log('Entering disconnect step');
+    logger.debug('Entering disconnect step');
     await zigbee2mqttManager.disconnect();
     res.json({
       success: true,
@@ -82,7 +82,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    * @apiGroup Zigbee2mqtt
    */
   async function togglePermitJoin(req, res) {
-    logger.log('Toggle permit_join');
+    logger.debug('Toggle permit_join');
     await zigbee2mqttManager.setPermitJoin();
     res.json({
       success: true,
@@ -95,7 +95,7 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    * @apiGroup Zigbee2mqtt
    */
   async function getPermitJoin(req, res) {
-    logger.log('Get permit_join');
+    logger.debug('Get permit_join');
     const response = zigbee2mqttManager.getPermitJoin();
     res.json(response);
   }

@@ -142,10 +142,12 @@ class Chartbox extends Component {
       const series = data.map((oneFeature, index) => {
         const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
         const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-        const name = oneUnitTranslated ? `${oneFeature.device.name} (${oneUnitTranslated})` : oneFeature.device.name;
+        const { values, deviceFeature } = oneFeature;
+        const deviceName = deviceFeature.name;
+        const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
         return {
           name,
-          data: oneFeature.values.map(value => {
+          data: values.map(value => {
             emptySeries = false;
             return {
               x: value.created_at,

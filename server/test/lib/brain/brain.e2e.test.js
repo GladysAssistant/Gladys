@@ -7,8 +7,8 @@ const { EVENTS, INTENTS } = require('../../../utils/constants');
 describe('brain end-to-end tests', () => {
   const brain = new Brain();
   const event = {
-    emit: fake.returns(),
-    on: fake.returns(),
+    emit: fake.returns(null),
+    on: fake.returns(null),
   };
   const service = {
     getService: fake.returns(null),
@@ -38,6 +38,8 @@ describe('brain end-to-end tests', () => {
     const callArgs = event.emit.getCall(1).args;
     const [, , nlpJsClassification, nlpJsContext] = callArgs;
     expect(nlpJsContext).to.deep.equal({
+      app: undefined,
+      channel: undefined,
       user: { id: '0cd30aef-9c4e-4a23-88e3-3547971296e5', language: 'en' },
       entities: {
         room: {
@@ -53,6 +55,7 @@ describe('brain end-to-end tests', () => {
           utteranceText: 'kitchen',
         },
       },
+      from: null,
       room: 'kitchen',
       slotFill: undefined,
     });

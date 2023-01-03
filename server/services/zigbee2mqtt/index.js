@@ -36,7 +36,7 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
    *  const used = await gladys.services.zigbee2mqtt.isUsed();
    */
   async function isUsed() {
-    return zigbee2mqttManager.gladysConnected && zigbee2mqttManager.z2mEnabled;
+    return zigbee2mqttManager.gladysConnected && zigbee2mqttManager.zigbee2mqttConnected;
   }
 
   return Object.freeze({

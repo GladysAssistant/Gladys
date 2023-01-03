@@ -20,7 +20,7 @@ const DEFAULT_OPTIONS = {
  * const jobs = await gladys.jobs.get();
  */
 async function get(options) {
-  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
+  const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
   const queryParams = {
     raw: true,
     include: [],
