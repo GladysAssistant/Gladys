@@ -671,7 +671,7 @@
       },
       "settings": {
         "title": "Z-Wave Settings",
-        "description": "This service uses two independent docker containers (MQTT broker and ZwaveJS UI). The administration of ZwaveJS UI is available at <a href='http://localhost:8091'>ZwaveJS UI</a>, user = admin, password = zwave.\nLearn more on the ZwaveJS UI documentation page",
+        "description": "This service uses two independent docker containers (MQTT broker and ZwaveJS UI). The administration of ZwaveJS UI is available at <a href=\"http://localhost:8091\">ZwaveJS UI</a>, user = admin, password = zwave.\nLearn more on the ZwaveJS UI documentation page",
         "zwave-js-ui": "Zwavejs UI interface",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
