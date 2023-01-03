@@ -15,7 +15,7 @@ const { TIMERS } = require('../utils/bluetooth.constants');
  */
 async function scan(state, peripheralUuid = undefined) {
   if (!this.ready) {
-    return Promise.reject(new Error('Bluetooth is not ready to scan for peripherals, check BLE adapter.'));
+    throw new Error('Bluetooth is not ready to scan for peripherals, check BLE adapter.');
   }
 
   if (state) {
@@ -71,7 +71,12 @@ async function scan(state, peripheralUuid = undefined) {
         this.bluetooth.startScanning([], true);
       }
 
-      this.scanPromise = Promise.delay(TIMERS.SCAN).then(() => this.bluetooth.stopScanning());
+      this.scanPromise = new Promise(resolve, async () => {
+        await Promise.delay(TIMERS.SCAN);
+        this.bluetooth.stopScanning();
+        resolve();
+      });
+      this.scanPromise();
     });
   }
 

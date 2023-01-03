@@ -10,9 +10,8 @@ const { read } = require('../utils/characteristic/bluetooth.read');
  * await bluetooth.readDevice({ external_id: 'bluetooth:uuid'});
  */
 async function readDevice(peripheral, serviceUuid, characteristicUuid) {
-  return this.getCharacteristic(peripheral, serviceUuid, characteristicUuid).then((characteristic) =>
-    read(characteristic),
-  );
+  const characteristic = await this.getCharacteristic(peripheral, serviceUuid, characteristicUuid);
+  return read(characteristic);
 }
 
 module.exports = {
