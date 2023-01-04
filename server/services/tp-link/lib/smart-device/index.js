@@ -28,6 +28,7 @@ const TPLinkSmartDeviceHandler = function TPLinkSmartDeviceHandler(gladys, tpLin
   this.client = tpLinkClient;
   this.serviceId = serviceId;
   this.tpLinkDevicesBySerialNumber = new Map();
+  this.discoverDevicesDelay = 2000;
 };
 
 TPLinkSmartDeviceHandler.prototype.getDevices = getDevices;
