@@ -1,0 +1,18 @@
+{
+  "name": "gladys-ecowatt",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "dayjs": "^1.11.7"
+  }
+}

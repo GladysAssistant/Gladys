@@ -5,6 +5,8 @@ import EditCameraBox from '../../components/boxs/camera/EditCamera';
 import EditAtHomeBox from '../../components/boxs/user-presence/EditUserPresenceBox';
 import EditDevicesInRoom from '../../components/boxs/device-in-room/EditDeviceInRoom';
 import EditChart from '../../components/boxs/chart/EditChart';
+import EditEcowatt from '../../components/boxs/ecowatt/EditEcowatt';
+import EditClock from '../../components/boxs/clock/EditClock';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -22,6 +24,10 @@ const Box = ({ children, ...props }) => {
       return <EditDevicesInRoom {...props} />;
     case 'chart':
       return <EditChart {...props} />;
+    case 'ecowatt':
+      return <EditEcowatt {...props} />;
+    case 'clock':
+      return <EditClock {...props} />;
   }
 };
 

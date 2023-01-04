@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: ⬇️ Checkout Gladys code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
       - name: 💽 Setup nodejs
@@ -120,7 +120,7 @@ jobs:
       DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: 🐳 Docker meta
         id: docker_meta
         uses: docker/metadata-action@v4
