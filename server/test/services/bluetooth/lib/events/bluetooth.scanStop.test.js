@@ -39,7 +39,21 @@ describe('bluetooth.scanStop event', () => {
     bluetoothManager.ready = true;
     bluetoothManager.scanStop();
 
-    expect(false).eq(bluetoothManager.scanning);
+    expect(bluetoothManager.scanning).to.be.equal(false);
+
+    assert.calledWith(eventWS, {
+      payload: { peripheralLookup: false, ready: true, scanning: false },
+      type: 'bluetooth.status',
+    });
+  });
+
+  it('should handle stop scanning and cancel scan timer', () => {
+    bluetoothManager.ready = true;
+    bluetoothManager.scanTimer = 'anyTimer';
+    bluetoothManager.scanStop();
+
+    expect(bluetoothManager.scanning).to.be.equal(false);
+    expect(bluetoothManager.scanTimer).to.be.equal(undefined);
 
     assert.calledWith(eventWS, {
       payload: { peripheralLookup: false, ready: true, scanning: false },

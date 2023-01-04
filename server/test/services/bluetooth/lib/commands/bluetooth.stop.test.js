@@ -32,7 +32,7 @@ describe('bluetooth.stop command', () => {
 
     expect(bluetoothManager.bluetooth).eq(undefined);
     expect(bluetoothManager.discoveredDevices).deep.eq({});
-    expect(bluetoothManager.scanPromise).eq(undefined);
+    expect(bluetoothManager.scanTimer).eq(undefined);
     expect(bluetoothManager.scanCounter).eq(0);
 
     // No more listener
@@ -42,11 +42,11 @@ describe('bluetooth.stop command', () => {
   });
 
   it('check timers are well removed', async () => {
-    bluetoothManager.scanPromise = 'any-timeout';
+    bluetoothManager.scanTimer = 'any-timeout';
 
     await bluetoothManager.stop();
 
     assert.calledOnce(bluetooth.stopScanning);
-    expect(bluetoothManager.scanPromise).to.be.equal(undefined);
+    expect(bluetoothManager.scanTimer).to.be.equal(undefined);
   });
 });

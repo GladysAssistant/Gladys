@@ -6,9 +6,9 @@ const logger = require('../../../../utils/logger');
  * bluetooth.on('startStop', this.scanStop);
  */
 async function scanStop() {
-  if (this.scanPromise) {
-    clearTimeout(this.scanPromise);
-    this.scanPromise = undefined;
+  if (this.scanTimer) {
+    clearTimeout(this.scanTimer);
+    this.scanTimer = undefined;
   }
   this.scanCounter = 0;
 
