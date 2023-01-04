@@ -37,9 +37,9 @@ async function installMqttContainer() {
 
       // Prepare broker env
       logger.info(`Preparing broker environment...`);
-      const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
+      const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
       const brokerEnv = await exec(
-        `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-mqtt-env.sh ${basePathOnHost}/zwave-js-ui`,
+        `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-mqtt-env.sh ${basePathOnContainer}/zwave-js-ui`,
       );
       logger.info(brokerEnv);
       containerDescriptorToMutate.HostConfig.Binds.push(
