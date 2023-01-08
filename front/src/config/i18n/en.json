@@ -1066,11 +1066,9 @@
         "modelLabel": "",
         "roomLabel": "",
         "featuresLabel": "",
-        "alreadyCreatedButton": "",
-        "updateButton": "",
-        "saveButton": "",
-        "deleteButton": "",
-        "unmanagedModelButton": "",
+        "createButton": "Save",
+        "updateButton": "Update",
+        "deleteButton": "Delete",
         "editButton": ""
       },
       "status": {

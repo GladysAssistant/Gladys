@@ -50,9 +50,10 @@ const DeviceTab = ({ children, ...props }) => (
               props.overkizDevices.map((device, index) => (
                 <OverkizDeviceBox
                   {...props}
-                  editable
-                  updateButton
-                  deleteButton
+                  editable={true}
+                  createButton={false}
+                  updateButton={true}
+                  deleteButton={true}
                   device={device}
                   deviceIndex={index}
                   listName="overkizDevices"

@@ -1,11 +1,41 @@
-const axios = require('axios');
-const retry = require('async-retry');
 const logger = require('../../../../utils/logger');
 
-const { updateGatewayState } = require('../overkiz.util');
-const { updateDevicesState } = require('../overkiz.util');
-const { connect } = require('./overkiz.connect');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+
+/**
+ * @description Update Gateway State.
+ * @param {Object} gateways - List of gateways.
+ * @example
+ * overkiz.updateGatewayState();
+ */
+function updateGatewayState(gateways) {
+  logger.debug('UpdateGatwayState');
+
+  this.gateways = gateways;
+
+  // TODO send event
+}
+
+/**
+ * @description Update Devices State.
+ * @param {Object} devices - Devices.
+ * @param {Object} rootPlace - RootPlace.
+ * @return {Object}
+ * @example
+ * overkiz.updateDevicesState(devices, rootPlace);
+ */
+function updateDevicesState(devices, rootPlace) {
+  logger.debug('UpdateDevicesState');
+
+  devices.forEach((device) => {
+    const placeObj = rootPlace.subPlaces.find((place) => place.oid === device.placeOID);
+    if (placeObj) {
+      device.place = placeObj.name;
+    }
+    this.devices[device.oid] = device;
+    delete this.devices[device.oid].api;
+  });
+}
 
 /**
  * @description Synchronize Overkiz devices.
@@ -18,39 +48,14 @@ async function syncOverkizDevices() {
     throw new ServiceNotConfiguredError('OVERKIZ_NOT_CONNECTED');
   }
   logger.debug(`Overkiz : Starting discovery`);
+
   this.scanInProgress = true;
 
-  const response = await retry(
-    async (bail) => {
-      const tryResponse = await axios.get(`${this.overkizServer.endpoint}setup`, {
-        headers: {
-          'Cache-Control': 'no-cache',
-          Host: this.overkizServer.endpoint.substring(
-            this.overkizServer.endpoint.indexOf('/') + 2,
-            this.overkizServer.endpoint.indexOf('/', 8),
-          ),
-          Connection: 'Keep-Alive',
-          Cookie: `JSESSIONID=${this.sessionCookie}`,
-        },
-      });
-      return tryResponse;
-    },
-    {
-      retries: 5,
-      onRetry: async (err, num) => {
-        if (err.response && err.response.status === 401) {
-          await connect.bind(this)();
-          logger.info(`Overkiz : Connecting Overkiz server...`);
-        } else {
-          throw err;
-        }
-      },
-    },
-  );
+  const setup = await this.overkizServerAPI.getSetup();
+  updateGatewayState.call(this, setup.gateways[0]);
 
-  updateGatewayState.bind(this)(response.data.gateways);
-
-  updateDevicesState.bind(this)(response.data.devices, response.data.rootPlace);
+  const devices = await this.overkizServerAPI.getObjects();
+  updateDevicesState.call(this, devices, setup.rootPlace);
 
   this.scanInProgress = false;
 }

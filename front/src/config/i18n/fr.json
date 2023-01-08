@@ -1065,12 +1065,10 @@
         "namePlaceholder": "Entrez le nom de votre appareil",
         "modelLabel": "Modèle",
         "roomLabel": "Pièce",
-        "saveButton": "Sauvegarder",
+        "createButton": "Sauvegarder",
         "updateButton": "Mettre à jour",
-        "alreadyCreatedButton": "Déjà créé",
         "deleteButton": "Supprimer",        
         "featuresLabel": "",
-        "unmanagedModelButton": "",
         "editButton": ""
       },
       "status": {

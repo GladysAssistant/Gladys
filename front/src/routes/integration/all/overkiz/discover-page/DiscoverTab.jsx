@@ -43,9 +43,9 @@ const DeviceTab = ({ children, ...props }) => (
                 <OverkizDeviceBox
                   {...props}
                   editable={false}
-                  alreadyCreatedButton={device.created_at && !device.updatable}
-                  updateButton={device.updatable}
-                  saveButton={device.updatable}
+                  createButton={true}
+                  updateButton={false}
+                  deleteButton={false}
                   device={device}
                   deviceIndex={index}
                   listName="discoveredDevices"

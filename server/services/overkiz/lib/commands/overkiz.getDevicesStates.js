@@ -1,9 +1,6 @@
-const axios = require('axios');
-const retry = require('async-retry');
 const logger = require('../../../../utils/logger');
 const { getDeviceFeatureExternalId, getNodeStateInfoByExternalId } = require('../utils/overkiz.externalId');
 const { unbindValue } = require('../utils/overkiz.bindValue');
-const { connect } = require('./overkiz.connect');
 const { EVENTS, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 
 /**
@@ -19,41 +16,26 @@ async function getDevicesStates(device) {
   device.features.map(async (feature) => {
     const { deviceURL } = getNodeStateInfoByExternalId(feature);
 
-    const response = await retry(
-      async (bail) => {
-        const tryResponse = await axios.get(
-          `${this.overkizServer.endpoint}setup/devices/${encodeURIComponent(deviceURL)}/states`,
-          {
-            headers: {
-              'Cache-Control': 'no-cache',
-              Host: this.overkizServer.endpoint.substring(
-                this.overkizServer.endpoint.indexOf('/') + 2,
-                this.overkizServer.endpoint.indexOf('/', 8),
-              ),
-              Connection: 'Keep-Alive',
-              Cookie: `JSESSIONID=${this.sessionCookie}`,
-            },
-          },
-        );
-        return tryResponse;
-      },
-      {
-        retries: 5,
-        onRetry: async (err, num) => {
-          if (err.response && err.response.status === 401) {
-            await connect.bind(this)();
-            logger.info(`Overkiz : Connecting Overkiz server...`);
-          } else {
-            throw err;
-          }
-        },
-      },
-    );
+    const deviceStates = await this.overkizServerAPI.get(`setup/devices/${encodeURIComponent(deviceURL)}/states`);
 
     logger.info(`Overkiz : Get new device states: ${deviceURL}`);
 
-    response.data.forEach((state) => {
-      const deviceFeatureExternalId = getDeviceFeatureExternalId({ deviceURL }, state.name);
+    deviceStates.forEach(state => {
+      switch(state.name) {
+        case 'core:ComfortRoomTemperatureState':
+        case 'core:EcoRoomTemperatureState':
+        case 'core:TargetTemperatureState': // Consigne
+        case 'io:EffectiveTemperatureSetpointState':
+        case 'io:TargetHeatingLevelState': // Mode
+          logger.info(`${state.name} has value ${state.value}`);
+          break;
+        default:
+          //
+      }
+    });
+
+    deviceStates.forEach((state) => {
+      const deviceFeatureExternalId = getDeviceFeatureExternalId({ URL: deviceURL }, state.name);
       const newValueUnbind = unbindValue(device, state.name, state.value);
       const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
       if (deviceFeature) {

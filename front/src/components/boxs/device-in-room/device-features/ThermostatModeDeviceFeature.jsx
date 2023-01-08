@@ -1,12 +1,12 @@
-import { getDeviceName } from './utils';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
+import { getDeviceName } from '../../../../utils/device';
 import { THERMOSTAT_MODE } from '../../../../../../server/utils/constants';
 
 const ThermostatModeDeviceType = ({ children, ...props }) => {
   const { device, deviceFeature } = props;
-  const { category, type, last_value: lastValue } = deviceFeature;
+  const { last_value: lastValue } = deviceFeature;
 
   function updateValue(value) {
     props.updateValue(
@@ -41,17 +41,17 @@ const ThermostatModeDeviceType = ({ children, ...props }) => {
         <button type="submit" class={cx('btn btn-sm btn-secondary', {
                 active: lastValue === THERMOSTAT_MODE.OFF
               })} onClick={setOffMode}>
-          <Text id="integration.boxes.devicesInRoom.offMode" />
+          <Text id="dashboard.boxes.devicesInRoom.offMode" />
         </button>
         <button type="submit" class={cx('btn btn-sm btn-secondary', {
                 active: lastValue === THERMOSTAT_MODE.ECO
               })} onClick={setEcoMode}>
-          <Text id="integration.boxes.devicesInRoom.ecoMode" />
+          <Text id="dashboard.boxes.devicesInRoom.ecoMode" />
         </button>
         <button type="submit" class={cx('btn btn-sm btn-secondary', {
                 active: lastValue === THERMOSTAT_MODE.COMFORT
               })} onClick={setComfortMode}>
-          <Text id="integration.boxes.devicesInRoom.comfortMode" />
+          <Text id="dashboard.boxes.devicesInRoom.comfortMode" />
         </button>
       </td>
     </tr>

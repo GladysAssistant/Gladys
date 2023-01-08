@@ -1,5 +1,4 @@
-const axios = require('axios');
-const url = require('url');
+const { API, CozytouchLoginHandler, DefaultLoginHandler } = require('overkiz-api');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
@@ -35,48 +34,30 @@ async function connect() {
     throw new ServiceNotConfiguredError(OVERKIZ_SERVER_PARAM.OVERKIZ_SERVER_PASSWORD);
   }
 
-  this.overkizServer = SUPPORTED_SERVERS[overkizType];
+  const overkizServer = SUPPORTED_SERVERS[overkizType];
+  let platformLoginHandler;
+  switch(overkizType) {
+    case 'atlantic_cozytouch':
+      platformLoginHandler = new CozytouchLoginHandler(
+        overkizUsername,
+        overkizUserpassword,
+      );
+      break;
+    default:
+      platformLoginHandler = new DefaultLoginHandler(
+        overkizUsername,
+        overkizUserpassword,
+      );
 
-  let payload;
-  if (this.overkizServer.jwt) {
-    const params = new url.URLSearchParams({
-      username: overkizUsername,
-      password: overkizUserpassword,
-      grant_type: 'password',
-    });
-    let response = await axios
-      .post(`${this.overkizServer.configuration.COZYTOUCH_ATLANTIC_API}/token`, params, {
-        headers: {
-          Authorization: `Basic ${this.overkizServer.configuration.COZYTOUCH_CLIENT_ID}`,
-        },
-      })
-      .catch((error) => logger.error(error));
-    logger.debug(`access_token: ${response.data.access_token}`);
-
-    response = await axios.get(
-      `${this.overkizServer.configuration.COZYTOUCH_ATLANTIC_API}/gacoma/gacomawcfservice/accounts/jwt`,
-      {
-        headers: {
-          Authorization: `Bearer ${response.data.access_token}`,
-        },
-      },
-    );
-    logger.debug(`JWT: ${response.data}`);
-    payload = {
-      jwt: response.data,
-    };
-  } else {
-    payload = {
-      userId: overkizUsername,
-      userPassword: overkizUserpassword,
-    };
   }
-
-  const response = await axios.post(`${this.overkizServer.endpoint}/login`, new url.URLSearchParams(payload));
-
-  logger.info(`Overkiz : Server connection OK`);
-  const cookie = response.headers['set-cookie'][0];
-  this.sessionCookie = cookie.substring(cookie.indexOf('=') + 1, cookie.indexOf(';'));
+  this.overkizServerAPI = new API({
+    host: overkizServer.host,
+    platformLoginHandler,
+    polling: {
+      always: false,
+      interval: 1000,
+    } 
+  });
   this.connected = true;
 
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -85,7 +66,6 @@ async function connect() {
   });
 
   this.syncOverkizDevices();
-  // this.updateDevicesJob = this.cron.schedule('0 */5 * * * *', this.syncOverkizDevices.bind(this));
 }
 
 module.exports = {

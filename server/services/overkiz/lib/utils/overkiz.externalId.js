@@ -6,7 +6,7 @@
  * getDeviceName(node);
  */
 function getDeviceName(node) {
-  return `${node.label} (${node.place})`;
+  return `${node.name} (${node.place})`;
 }
 
 /**
@@ -17,7 +17,8 @@ function getDeviceName(node) {
  * getDeviceExternalId(node);
  */
 function getDeviceExternalId(node) {
-  return `overkiz:deviceURL:${node.deviceURL}`;
+  const deviceURL = node.URL;
+  return `overkiz:deviceURL:${deviceURL}`;
 }
 
 /**
@@ -29,7 +30,8 @@ function getDeviceExternalId(node) {
  * getDeviceFeatureExternalId(node);
  */
 function getDeviceFeatureExternalId(node, state) {
-  return `overkiz:deviceURL:${node.deviceURL}:state:${state}`;
+  const deviceURL = node.URL;
+  return `overkiz:deviceURL:${deviceURL}:state:${state}`;
 }
 
 /**

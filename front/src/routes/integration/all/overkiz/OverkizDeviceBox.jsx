@@ -4,7 +4,6 @@ import cx from 'classnames';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/overkiz/lib/utils/overkiz.constants';
 import get from 'get-value';
-import { Link } from 'preact-router';
 
 class OverkizDeviceBox extends Component {
   updateName = e => {
@@ -54,7 +53,6 @@ class OverkizDeviceBox extends Component {
   };
 
   render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
-    const validModel = device.features && device.features.length > 0;
     const online = device.params.find(param => param.name === DEVICE_ONLINE).value === '1';
     const firmware = device.params.find(param => param.name === DEVICE_FIRMWARE).value;
 
@@ -99,7 +97,7 @@ class OverkizDeviceBox extends Component {
                       onInput={this.updateName}
                       class="form-control"
                       placeholder={<Text id="integration.overkiz.device.namePlaceholder" />}
-                      disabled={!editable || !validModel}
+                      disabled={!editable}
                     />
                   </Localizer>
                 </div>
@@ -117,7 +115,7 @@ class OverkizDeviceBox extends Component {
                   />
                 </div>
 
-                {props.updateButton && (
+                {editable && (
                   <div class="form-group">
                     <label class="form-label" for={`room_${deviceIndex}`}>
                       <Text id="integration.overkiz.device.roomLabel" />
@@ -126,7 +124,7 @@ class OverkizDeviceBox extends Component {
                       id={`room_${deviceIndex}`}
                       onChange={this.updateRoom}
                       class="form-control"
-                      disabled={!editable || !validModel}
+                      disabled={!editable}
                     >
                       <option value="">
                         <Text id="global.emptySelectOption" />
@@ -145,48 +143,40 @@ class OverkizDeviceBox extends Component {
                   </div>
                 )}
 
-                {validModel && (
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.overkiz.device.featuresLabel" />
-                    </label>
-                    <div class="tags">
-                      {device.features.map(feature => (
-                        <span class="tag">
-                          <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
-                          <div class="tag-addon">
-                            <i
-                              class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
-                            />
-                          </div>
-                        </span>
-                      ))}
-                    </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.overkiz.device.featuresLabel" />
+                  </label>
+                  <div class="tags">
+                    {device.features.map(feature => (
+                      <span class="tag">
+                        <Text id={`deviceFeatureCategory.${feature.category}.${feature.type}`} />
+                        <div class="tag-addon">
+                          <i
+                            class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${feature.category}.${feature.type}`)}`}
+                          />
+                        </div>
+                      </span>
+                    ))}
                   </div>
-                )}
+                </div>
 
                 <div class="form-group">
-                  {validModel && props.alreadyCreatedButton && (
-                    <button class="btn btn-primary mr-2" disabled="true">
-                      <Text id="integration.overkiz.device.alreadyCreatedButton" />
+                  {props.createButton && (
+                    <button onClick={this.saveDevice} class="btn btn-primary mr-2">
+                      <Text id="integration.overkiz.device.createButton" />
                     </button>
                   )}
 
-                  {validModel && props.updateButton && (
+                  {props.updateButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.overkiz.device.updateButton" />
                     </button>
                   )}
 
-                  {validModel && props.deleteButton && (
-                    <button onClick={this.deleteDevice} class="btn btn-danger">
+                  {props.deleteButton && (
+                    <button onClick={this.deleteDevice} class="btn btn-danger mr-2">
                       <Text id="integration.overkiz.device.deleteButton" />
-                    </button>
-                  )}
-
-                  {!validModel && (
-                    <button class="btn btn-dark" disabled>
-                      <Text id="integration.overkiz.device.unmanagedModelButton" />
                     </button>
                   )}
                 </div>

@@ -4,6 +4,7 @@ const DEVICE_ONLINE = 'ONLINE';
 const SUPPORTED_SERVERS = {
   atlantic_cozytouch: {
     name: 'Atlantic Cozytouch',
+    host: 'ha110-1.overkiz.com',
     endpoint: 'https://ha110-1.overkiz.com/enduser-mobile-web/enduserAPI/',
     manufacturer: 'Atlantic',
     jwt: true,
@@ -15,24 +16,28 @@ const SUPPORTED_SERVERS = {
   },
   hi_kumo_asia: {
     name: 'Hitachi Hi Kumo (Asia)',
+    host: 'ha203-1.overkiz.com',
     endpoint: 'https://ha203-1.overkiz.com/enduser-mobile-web/enduserAPI/',
     manufacturer: 'Hitachi',
     configuration_url: undefined,
   },
   hi_kumo_europe: {
     name: 'Hitachi Hi Kumo (Europe)',
+    host: 'ha117-1.overkiz.com',
     endpoint: 'https://ha117-1.overkiz.com/enduser-mobile-web/enduserAPI/',
     manufacturer: 'Hitachi',
     configuration_url: undefined,
   },
   hi_kumo_oceania: {
     name: 'Hitachi Hi Kumo (Oceania)',
+    host: 'ha203-1.overkiz.com',
     endpoint: 'https://ha203-1.overkiz.com/enduser-mobile-web/enduserAPI/',
     manufacturer: 'Hitachi',
     configuration_url: undefined,
   },
   nexity: {
     name: 'Nexity Eugénie',
+    host: 'ha106-1.overkiz.com',
     endpoint: 'https://ha106-1.overkiz.com/enduser-mobile-web/enduserAPI/',
     manufacturer: 'Nexity',
     configuration: {
@@ -69,6 +74,7 @@ const SUPPORTED_SERVERS = {
     configuration_url: undefined,
   },
 };
+
 const OVERKIZ_API = {
   GET_DEVICES: 'setup/devices',
   GET_GATEWAYS: 'setup/gateways',
