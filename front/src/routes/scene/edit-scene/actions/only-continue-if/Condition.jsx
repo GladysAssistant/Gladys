@@ -24,12 +24,7 @@ class Condition extends Component {
   };
 
   handleValueChange = e => {
-    let newValue;
-    if (Number.isInteger(newValue)) {
-      newValue = Number.parseInt(e.target.value, 10);
-    } else {
-      newValue = Number.parseFloat(e.target.value);
-    }
+    const newValue = Number.parseFloat(e.target.value);
     const newCondition = update(this.props.condition, {
       value: {
         $set: newValue
