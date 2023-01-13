@@ -1781,7 +1781,8 @@
     "bytes-per-second": "Bytes per second (B/s)",
     "kilobytes-per-second": "kilobytes per second (kB/s)",
     "megabytes-per-second": "Megabytes per second (MB/s)",
-    "gigabytes-per-second": "Gigabytes per second (GB/s)"
+    "gigabytes-per-second": "Gigabytes per second (GB/s)",
+    "aqi": "Air Quality Index"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1852,7 +1853,8 @@
     "bytes-per-second": "B/s",
     "kilobytes-per-second": "kB/s",
     "megabytes-per-second": "MB/s",
-    "gigabytes-per-second": "GB/s"
+    "gigabytes-per-second": "GB/s",
+    "aqi": "AQI"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2119,6 +2121,10 @@
     "thermostat": {
       "shortCategoryName": "Thermostat",
       "target-temperature": "Thermostat Temperature"
+    },
+    "airquality-sensor": {
+      "shortCategoryName": "Air Quality",
+      "aqi": "Air Quality Index"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
