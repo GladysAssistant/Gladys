@@ -314,7 +314,7 @@ describe('Build service', () => {
           name: "Porte d'entrée",
           category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
-          last_value: 1,
+          last_value: 0,
         },
       ],
     });

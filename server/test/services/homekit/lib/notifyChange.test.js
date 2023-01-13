@@ -109,7 +109,7 @@ describe('Notify change to HomeKit', () => {
 
     const event = {
       type: EVENTS.DEVICE.NEW_STATE,
-      last_value: 0,
+      last_value: 1,
       device_feature: 'home:door:binary',
     };
 
@@ -146,7 +146,7 @@ describe('Notify change to HomeKit', () => {
       },
       {
         device_feature: 'home:door:binary',
-        last_value: 0,
+        last_value: 1,
         type: 'device.new-state',
       },
     ]);

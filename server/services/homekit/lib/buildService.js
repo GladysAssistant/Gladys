@@ -186,7 +186,7 @@ function buildService(device, features, categoryMapping) {
 
         contactCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-          callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
+          callback(undefined, +!updatedFeatures.find((feat) => feat.id === feature.id).last_value);
         });
         break;
       }

@@ -16,7 +16,7 @@ function notifyChange(accessories, event) {
 
   const feature = this.gladys.stateManager.get('deviceFeature', event.device_feature);
   const hkAccessory = accessories.find((accessory) => accessory.UUID === feature.device_id);
-  if (!hkAccessory) {
+  if (!hkAccessory || !mappings[feature.category] || !mappings[feature.category].capabilities[feature.type]) {
     return;
   }
 

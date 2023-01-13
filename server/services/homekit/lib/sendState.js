@@ -16,13 +16,21 @@ function sendState(hkAccessory, feature, event) {
   const { Characteristic, Service } = this.hap;
   switch (`${feature.category}:${feature.type}`) {
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
-    case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
-    case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+    case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`: {
       hkAccessory
         .getService(Service[mappings[feature.category].service])
         .updateCharacteristic(
           Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
           event.last_value,
+        );
+      break;
+    }
+    case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+          +!event.last_value,
         );
       break;
     }

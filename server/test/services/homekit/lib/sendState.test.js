@@ -47,6 +47,31 @@ describe('Notify change to HomeKit', () => {
     const feature = {
       id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
       device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
+      name: 'Light on/off',
+      category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+      type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+    };
+
+    await homekitHandler.sendState(accessory, feature, event);
+
+    expect(updateCharacteristic.args[0]).eql(['ON', 0]);
+  });
+
+  it('should notify binary sensor (reversed)', async () => {
+    const updateCharacteristic = stub().returns();
+    const accessory = {
+      UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
+      getService: stub().returns({ updateCharacteristic }),
+    };
+
+    const event = {
+      type: EVENTS.DEVICE.NEW_STATE,
+      last_value: 0,
+    };
+
+    const feature = {
+      id: '4f7060d7-7960-4c68-b435-8952bf3f40bf',
+      device_id: '4756151c-369e-4772-8bf7-943a6ac70583',
       name: 'Door sensor',
       category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
@@ -54,7 +79,7 @@ describe('Notify change to HomeKit', () => {
 
     await homekitHandler.sendState(accessory, feature, event);
 
-    expect(updateCharacteristic.args[0]).eql(['CONTACTSENSORSTATE', 0]);
+    expect(updateCharacteristic.args[0]).eql(['CONTACTSENSORSTATE', 1]);
   });
 
   it('should notify light brightness', async () => {
