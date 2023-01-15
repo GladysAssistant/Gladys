@@ -19,8 +19,8 @@ module.exports = function LANManagerService(gladys, serviceId) {
    * gladys.services['lan-manager'].start();
    */
   async function start() {
-    await lanManager.init();
     logger.info('Starting LAN Manager service');
+    await lanManager.init();
   }
 
   /**
@@ -30,8 +30,8 @@ module.exports = function LANManagerService(gladys, serviceId) {
    * gladys.services['lan-manager'].stop();
    */
   async function stop() {
-    lanManager.stop();
     logger.info('Stopping LAN Manager service');
+    lanManager.stop();
   }
 
   return Object.freeze({
