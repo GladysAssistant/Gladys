@@ -2155,6 +2155,17 @@ const data = {
       status: 'RUNNING',
       created_at: '2020-11-11T18:41:40.052Z',
       updated_at: '2020-11-28T07:44:07.731Z'
+    },
+    {
+      id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      pod_id: null,
+      name: 'lan-manager',
+      selector: 'lan-manager',
+      version: '0.1.0',
+      has_message_feature: false,
+      status: 'UNKNOWN',
+      created_at: '2023-01-05T08:27:19.567Z',
+      updated_at: '2023-01-05T08:27:19.567Z'
     }
   ],
   'get /api/v1/session': [
@@ -2208,6 +2219,128 @@ const data = {
   'get /api/v1/setup': {
     account_configured: true
   },
+  'get /api/v1/service/lan-manager/device': [
+    {
+      id: '6dbd067a-efdd-428e-8c1b-cb792255eae2',
+      service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'Media server',
+      selector: 'lan-00B0D063C226',
+      external_id: 'lan-00B0D063C226',
+      should_poll: false,
+      poll_frequency: null,
+      created_at: '2023-01-05T08:28:09.567Z',
+      updated_at: '2023-01-05T08:28:09.567Z',
+      features: [
+        {
+          name: 'Presence',
+          selector: 'lan-presence-sensor',
+          category: 'presence-sensor',
+          type: 'push',
+          unit: null,
+          min: 0,
+          max: 1,
+          read_only: true,
+          last_value: 0,
+          last_value_changed: dayjs().add(60, 'second')
+        }
+      ],
+      room: {
+        id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+        name: 'Living Room',
+        selector: 'living-room'
+      },
+      params: [
+        {
+          name: 'DEVICE_MAC',
+          value: '00:B0:D0:63:C2:26'
+        },
+        {
+          name: 'DEVICE_NAME',
+          value: 'media.lan'
+        }
+      ]
+    }
+  ],
+  'get /api/v1/service/lan-manager/status': {
+    scanning: false
+  },
+  'get /api/v1/service/lan-manager/config': {
+    presenceScanner: {
+      frequency: 120000,
+      status: 'enabled'
+    }
+  },
+  'get /api/v1/service/lan-manager/discover': [
+    {
+      id: '6dbd067a-efdd-428e-8c1b-cb792255eae2',
+      service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'Media server',
+      selector: 'lan-00B0D063C226',
+      external_id: 'lan-00B0D063C226',
+      should_poll: false,
+      poll_frequency: null,
+      created_at: '2023-01-05T08:28:09.567Z',
+      updated_at: '2023-01-05T08:28:09.567Z',
+      features: [
+        {
+          name: 'Presence',
+          selector: 'lan-presence-sensor',
+          category: 'presence-sensor',
+          type: 'push',
+          unit: null,
+          min: 0,
+          max: 1,
+          read_only: true,
+          last_value: 0,
+          last_value_changed: dayjs().add(60, 'second')
+        }
+      ],
+      params: [
+        {
+          name: 'DEVICE_MAC',
+          value: '00:B0:D0:63:C2:26'
+        },
+        {
+          name: 'DEVICE_NAME',
+          value: 'media.lan'
+        }
+      ]
+    },
+    {
+      service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      name: 'New device',
+      selector: 'lan-12B0D063C226',
+      external_id: 'lan-12B0D063C226',
+      should_poll: false,
+      poll_frequency: null,
+      features: [
+        {
+          name: 'Presence',
+          selector: 'lan-presence-sensor',
+          category: 'presence-sensor',
+          type: 'push',
+          unit: null,
+          min: 0,
+          max: 1,
+          read_only: true,
+          last_value: 0,
+          last_value_changed: dayjs().add(60, 'second')
+        }
+      ],
+      params: [
+        {
+          name: 'DEVICE_MAC',
+          value: '12:B0:D0:63:C2:26'
+        },
+        {
+          name: 'DEVICE_NAME',
+          value: 'device.lan'
+        }
+      ]
+    }
+  ],
   'get /api/v1/service/xiaomi/sensor': [
     {
       name: 'Xiaomi Temperature',

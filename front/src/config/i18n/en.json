@@ -875,6 +875,40 @@
         }
       }
     },
+    "lanManager": {
+      "title": "LAN Manager",
+      "description": "Manage you device through you local network.",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "setupTab": "Setup",
+      "device": {
+        "title": "LAN Devices",
+        "search": "Search devices",
+        "noDevices": "No LAN devices added yet.",
+        "macAddressLabel": "MAC address",
+        "originalNameLabel": "Hostname"
+      },
+      "discover": {
+        "title": "LAN Discover",
+        "noDevices": "No LAN devices found.",
+        "scanButton": "Scan network",
+        "loadExistingDevices": "Hide already added devices",
+        "alreadyCreatedButton": "Already created",
+        "updateButton": "Update",
+        "discoveringError": "An error occurred, please check logs.",
+        "macAddressLabel": "MAC address"
+      },
+      "setup": {
+        "title": "LANManager settings",
+        "errorLabel": "An error occurred while loading configuration.",
+        "noConfigLabel": "Configuration not loaded, please retry.",
+        "presenceScannerDescription": "The presence scanner feature is doing a network scan at a defined interval. When a device is detected, the device will be flagged as \"seen\" in Gladys. In scene, you can create a trigger on this state change to set you home when a device is detected at home for example.",
+        "presenceScannerStatusLabel": "Enable or disable presence scanner",
+        "presenceScannerFrequencyLabel": "Scanner interval",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Only integers are accepted."
+      }
+    },
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Control Xiaomi home devices with the official hub",
@@ -2268,6 +2302,7 @@
     "externalIdPlaceholder": "Enter external ID",
     "unitLabel": "Unit",
     "saveButton": "Save",
+    "deleteButton": "Delete",
     "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API.",
     "minLabel": "Minimum value",
     "minPlaceholder": "Enter feature minimum value",

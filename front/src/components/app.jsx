@@ -93,6 +93,11 @@ import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page
 import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
 import BroadlinkPeripheralPage from '../routes/integration/all/broadlink/peripheral-page';
 
+// LAN-Manager integration
+import LANManagerDevicePage from '../routes/integration/all/lan-manager/device-page';
+import LANManagerDiscoverPage from '../routes/integration/all/lan-manager/discover-page';
+import LANManagerSettingsPage from '../routes/integration/all/lan-manager/settings-page';
+
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
 import MqttDeviceSetupPage from '../routes/integration/all/mqtt/device-page/setup';
@@ -251,6 +256,10 @@ const AppRouter = connect(
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit" />
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
         <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
+
+        <LANManagerDevicePage path="/dashboard/integration/device/lan-manager" />
+        <LANManagerDiscoverPage path="/dashboard/integration/device/lan-manager/discover" />
+        <LANManagerSettingsPage path="/dashboard/integration/device/lan-manager/config" />
 
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
