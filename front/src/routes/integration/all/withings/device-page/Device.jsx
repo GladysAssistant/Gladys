@@ -69,7 +69,6 @@ class WithingsDeviceBox extends Component {
   }
 
   render(props, { batteryLevel, mostRecentValueAt, loading }) {
-    console.log('Device: ', props.device.name, batteryLevel);
     return (
       <div class="col-md-6">
         <div class="card">
@@ -96,7 +95,7 @@ class WithingsDeviceBox extends Component {
                         class="card-img-top"
                         style="aspect-ratio: 1 / 1;"
                         src={`/assets/images/withings/${WithingsDeviceImgByModel[props.device.model]}`}
-                        alt="/assets/icons/android-icon-192x192-round.png"
+                        alt={<Text id="global.logoAlt" />}
                       />
                     </Localizer>
                   )}

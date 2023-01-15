@@ -31,15 +31,11 @@ const actions = store => ({
         let withingsDevices;
         if (returnGetConfig.client_id) {
           const result = await state.httpClient.post('/api/v1/service/withings/init_devices');
-          console.log(result);
           if (result) {
             withingsDevices = result.withingsDevices;
-            console.log('withingsDevices: ', withingsDevices);
             withingsDevices.forEach(device => {
-              console.log('Device: ', device.name);
               device.features.forEach(feature => {
                 const featureName = dictionary.deviceFeatureCategory[feature.category][feature.type];
-                console.log('Feature: ', feature, featureName);
                 if (featureName) {
                   feature.name = featureName;
                 }
