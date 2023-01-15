@@ -236,8 +236,74 @@ body {
 .loading-border {
   animation: borderBlink 2s infinite;
 }
-@keyframes borderBlink { 
+@keyframes borderBlink {
   50% {
-    border-color: #45aaf2 ; 
+    border-color: #45aaf2 ;
   }
+}
+
+.react-clock {
+  display: block;
+  position: relative;
+}
+.react-clock,
+.react-clock *,
+.react-clock *:before,
+.react-clock *:after {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.react-clock__face {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border: 1px solid rgb(73, 80,87);
+  border-radius: 50%;
+}
+.react-clock__hand {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: 50%;
+}
+.react-clock__hand__body {
+  position: absolute;
+  background-color: rgb(73, 80,87);
+  transform: translateX(-50%);
+}
+.react-clock__mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: 50%;
+}
+.react-clock__mark__body {
+  position: absolute;
+  background-color: rgb(73, 80,87);
+  transform: translateX(-50%);
+}
+.react-clock__mark__number {
+  position: absolute;
+  left: -40px;
+  width: 80px;
+  text-align: center;
+}
+.react-clock__second-hand__body {
+  background-color: rgb(205,32,31);
+}
+
+.react-clock {
+  background-color: white;
+  border-radius: 50%;
+}
+.react-clock__face {
+  border: 1px solid white;
+}
+.react-clock__second-hand {
+  transition: transform cubic-bezier(0.68, 0, 0.27, 1.55) 0.2s;
 }

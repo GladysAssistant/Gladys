@@ -87,6 +87,17 @@ module.exports = function SceneController(gladys) {
     res.json(action);
   }
 
+  /**
+   * @api {post} /api/v1/scene/:scene_selector/duplicate duplicate
+   * @apiName duplicate
+   * @apiGroup Scene
+   *
+   */
+  async function duplicate(req, res) {
+    const scene = await gladys.scene.duplicate(req.params.scene_selector, req.body.name, req.body.icon);
+    res.json(scene);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
@@ -94,5 +105,6 @@ module.exports = function SceneController(gladys) {
     getBySelector: asyncMiddleware(getBySelector),
     update: asyncMiddleware(update),
     start: asyncMiddleware(start),
+    duplicate: asyncMiddleware(duplicate),
   });
 };

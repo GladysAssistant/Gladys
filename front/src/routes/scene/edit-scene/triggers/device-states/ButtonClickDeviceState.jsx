@@ -6,8 +6,8 @@ import { BUTTON_STATUS } from '../../../../../../../server/utils/constants';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 class ButtonClickDeviceState extends Component {
-  handleValueChange = newValue => () => {
-    this.props.updateTriggerProperty(this.props.index, 'value', newValue);
+  handleValueChange = ({ value }) => {
+    this.props.updateTriggerProperty(this.props.index, 'value', value);
   };
 
   getOptions = () => {
