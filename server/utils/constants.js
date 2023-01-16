@@ -793,6 +793,7 @@ const DASHBOARD_BOX_TYPE = {
   DEVICES_IN_ROOM: 'devices-in-room',
   CHART: 'chart',
   ECOWATT: 'ecowatt',
+  CLOCK: 'clock',
 };
 
 const ERROR_MESSAGES = {
