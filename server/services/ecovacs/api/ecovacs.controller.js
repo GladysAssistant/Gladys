@@ -2,11 +2,50 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
 
 module.exports = function EcovacsController(ecovacsHandler) {
+    
+  /**
+   * @api {get} /api/v1/ecovacs/vacbots
+   * @apiName getVacbots
+   * @apiGroup Ecovacs
+   * @apiSuccessExample {json} Success-Response:
+   * [
+   *   {
+   *     "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
+   *     "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
+   *     "room_id": "2398c689-8b47-43cc-ad32-e98d9be098b5",
+   *     "name": "Test camera",
+   *     "selector": "test-camera",
+   *     "external_id": "test-camera-external",
+   *     "should_poll": false,
+   *     "poll_frequency": null,
+   *     "created_at": "2022-02-08T07:49:07.556Z",
+   *     "updated_at": "2022-02-08T07:49:07.556Z",
+   *     "features": [
+   *       {
+   *         "name": "Test camera image",
+   *         "selector": "test-camera-image"
+   *       }
+   *     ],
+   *     "room": {
+   *       "name": "Test room",
+   *       "selector": "test-room"
+   *     }
+   *   }
+   * ]
+   */
+  async function getVacbots(req, res) {
+    const vacbots = await ecovacsHandler.gladys.device.get({
+      service: 'ecovacs'        
+    });
+    res.json(vacbots);
+  }
+
+
   /**
    * @api {get} /api/v1/service/ecovacs/status Get Ecovacs service status
    * @apiName getStatus
    * @apiGroup Ecovacs
-   */
+   */ 
   async function getStatus(req, res) {
     const status = ecovacsHandler.getStatus();
     res.json(status);
@@ -74,6 +113,10 @@ module.exports = function EcovacsController(ecovacsHandler) {
   }
 
   return {
+    'get /api/v1/service/ecovacs/vacbots': {
+      authenticated: true,
+      controller: asyncMiddleware(getVacbots),
+    },
     'get /api/v1/service/ecovacs/status': {
       authenticated: true,
       controller: asyncMiddleware(getStatus),

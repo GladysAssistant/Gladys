@@ -443,6 +443,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   VACBOT: {
     STATE: 'state',
+    INTEGER: 'integer',
   },
   ENERGY_SENSOR: {
     BINARY: 'binary',
@@ -802,6 +803,7 @@ const DASHBOARD_BOX_TYPE = {
   DEVICES_IN_ROOM: 'devices-in-room',
   CHART: 'chart',
   ECOWATT: 'ecowatt',
+  ECOWATT: 'vacbot',
 };
 
 const ERROR_MESSAGES = {

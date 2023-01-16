@@ -16,7 +16,9 @@ async function poll(device) {
   if (!this.connected) {
     await this.connect();
   }
-  const devices = await this.ecovacsClient.devices();
+  await this.listen();
+  logger.debug(`listen to these vacbots : ${this.vacbots}`);
+  const devices = this.vacbots;
   const { deviceNumber } = parseExternalId(device.external_id);
   const vacuum = devices[deviceNumber];
   const vacbot = this.ecovacsClient.getVacBot(
@@ -36,13 +38,21 @@ async function poll(device) {
           logger.debug(`Ecovacs: feature state : ${state}`);
         }
         break;
-        case DEVICE_FEATURE_CATEGORIES.BATTERY: // Binary
-          if (feature.type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER) {
+        case DEVICE_FEATURE_CATEGORIES.BATTERY: // Integer
+          if (feature.type === DEVICE_FEATURE_TYPES.VACBOT.INTEGER) {
             setTimeout(() => {
               vacbot.run('GetBatteryState');
-              vacbot.on('BatteryInfo', eventFunctionWrapper(this.onMessage.bind(this)));
+              // vacbot.on('BatteryInfo', eventFunctionWrapper(this.onMessage.bind(this)));
+              vacbot.on('BatteryInfo', (battery) => {
+                logger.debug(`Battery level: ${Math.round(battery)}`);
+                this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+                  device_feature_external_id: `${feature.external_id}`,
+                  state: Math.round(battery),
+                });
+              });
             }, 6000);
             logger.debug(`Ecovacs: feature state : ${state}`);
+            
           }
           break;
       default:

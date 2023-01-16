@@ -2,11 +2,23 @@ const logger = require('../../../../utils/logger');
 const { eventFunctionWrapper } = require('../../../../utils/functionsWrapper');
 
 
-
+/**
+ * @description Starts Ecovacs device.
+ * @returns {any} Null.
+ * @example
+ * ecovacs.start();
+ */
 function listening() {
   logger.debug(`Ecovacs: Listening`);
 }
 
+/**
+ * @description Convert gladys ecovacs devices to vacbots.
+ * @params Gladys devices
+ * @returns {any} vacbots.
+ * @example
+ * ecovacs.devicesToVacbots();
+ */
 async function devicesToVacbots(devices) {
   let vacbots;
   if (this.configured && !this.connected) {
