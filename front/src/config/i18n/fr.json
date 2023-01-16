@@ -203,7 +203,8 @@
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
       "chart": "Graphique",
-      "ecowatt": "Ecowatt ( France )"
+      "ecowatt": "Ecowatt ( France )",
+      "clock": "Horloge"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -290,6 +291,16 @@
         "ok": "Réseau ok",
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
+      },
+      "clock": {
+        "analog": "Analogique",
+        "digital": "Digitale",
+        "date": "{{day}} {{dayNumber}} {{month}} {{year}}",
+        "smallDate": "{{dayNumber}} {{month}}",
+        "type": "Type de l'horloge ?",
+        "displaySecond": "Afficher les secondes ?",
+        "yes": "Oui",
+        "no": "Non"
       }
     }
   },
