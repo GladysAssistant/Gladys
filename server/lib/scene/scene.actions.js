@@ -8,7 +8,7 @@ const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
 const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
-const { AbortScene, NotFoundError } = require('../../utils/coreErrors');
+const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
 const { parseJsonIfJson } = require('../../utils/json');
 const logger = require('../../utils/logger');
@@ -334,27 +334,31 @@ const actionsFunc = {
     }
   },
   [ACTIONS.ECOWATT.CONDITION]: async (self, action) => {
-    const data = await self.gateway.getEcowattSignals();
-    const todayDate = dayjs.tz(dayjs(), self.timezone).format('YYYY-MM-DD');
-    const todayHour = dayjs.tz(dayjs(), self.timezone).hour();
-    const todayLiveData = data.signals.find((day) => {
-      const signalDate = dayjs(day.jour).format('YYYY-MM-DD');
-      return todayDate === signalDate;
-    });
-    if (!todayLiveData) {
-      throw new NotFoundError('Ecowatt: day not found');
-    }
-    const currentHourNetworkStatus = todayLiveData.values.find((hour) => hour.pas === todayHour);
-    if (!currentHourNetworkStatus) {
-      throw new NotFoundError('Ecowatt: hour not found');
-    }
-    const ECOWATT_STATUSES = {
-      1: 'ok',
-      2: 'warning',
-      3: 'critical',
-    };
-    if (ECOWATT_STATUSES[currentHourNetworkStatus.hvalue] !== action.ecowatt_network_status) {
-      throw new AbortScene('ECOWATT_DIFFERENT_STATUS');
+    try {
+      const data = await self.gateway.getEcowattSignals();
+      const todayDate = dayjs.tz(dayjs(), self.timezone).format('YYYY-MM-DD');
+      const todayHour = dayjs.tz(dayjs(), self.timezone).hour();
+      const todayLiveData = data.signals.find((day) => {
+        const signalDate = dayjs(day.jour).format('YYYY-MM-DD');
+        return todayDate === signalDate;
+      });
+      if (!todayLiveData) {
+        throw new AbortScene('Ecowatt: day not found');
+      }
+      const currentHourNetworkStatus = todayLiveData.values.find((hour) => hour.pas === todayHour);
+      if (!currentHourNetworkStatus) {
+        throw new AbortScene('Ecowatt: hour not found');
+      }
+      const ECOWATT_STATUSES = {
+        1: 'ok',
+        2: 'warning',
+        3: 'critical',
+      };
+      if (ECOWATT_STATUSES[currentHourNetworkStatus.hvalue] !== action.ecowatt_network_status) {
+        throw new AbortScene('ECOWATT_DIFFERENT_STATUS');
+      }
+    } catch (e) {
+      throw new AbortScene(e.message);
     }
   },
 };

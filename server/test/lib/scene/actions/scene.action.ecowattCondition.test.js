@@ -13,7 +13,7 @@ describe('scene.ecowattCondition', () => {
   let clock;
   const timezone = 'Europe/Paris';
   beforeEach(async () => {
-    clock = useFakeTimers(new Date('2022-12-09T05:23:57.931Z'));
+    clock = useFakeTimers(new Date('2022-12-09T11:00:57'));
   });
   afterEach(() => {
     clock.restore();
@@ -55,12 +55,12 @@ describe('scene.ecowattCondition', () => {
     );
     return assert.isRejected(promise, AbortScene);
   });
-  it('should reject, day not found, but continue scene', async () => {
+  it('should reject, day not found', async () => {
     const gateway = {
       getEcowattSignals: fake.resolves({ signals: [] }),
     };
     const scope = {};
-    await executeActions(
+    const promise = executeActions(
       { event, gateway, timezone },
       [
         [
@@ -72,14 +72,15 @@ describe('scene.ecowattCondition', () => {
       ],
       scope,
     );
+    await assert.isRejected(promise, AbortScene, 'Ecowatt: day not found');
   });
-  it('should reject, hour not found, but continue scene', async () => {
+  it('should reject, hour not found', async () => {
     const gateway = {
       getEcowattSignals: fake.resolves({
         signals: [
           {
             GenerationFichier: '2022-12-08T23:00:00+01:00',
-            jour: '2022-12-09T00:00:00+01:00',
+            jour: '2022-12-09T12:00:00',
             dvalue: 1,
             message: 'Pas d’alerte.',
             values: [],
@@ -88,7 +89,7 @@ describe('scene.ecowattCondition', () => {
       }),
     };
     const scope = {};
-    await executeActions(
+    const promise = executeActions(
       { event, gateway, timezone },
       [
         [
@@ -100,5 +101,25 @@ describe('scene.ecowattCondition', () => {
       ],
       scope,
     );
+    await assert.isRejected(promise, AbortScene, 'Ecowatt: hour not found');
+  });
+  it('should not continue scene, ecowatt signals return error', async () => {
+    const gateway = {
+      getEcowattSignals: fake.rejects(new Error('500 - error')),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { event, gateway, timezone },
+      [
+        [
+          {
+            type: ACTIONS.ECOWATT.CONDITION,
+            ecowatt_network_status: 'warning',
+          },
+        ],
+      ],
+      scope,
+    );
+    await assert.isRejected(promise, AbortScene, '500 - error');
   });
 });
