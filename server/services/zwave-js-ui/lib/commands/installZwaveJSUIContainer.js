@@ -11,9 +11,9 @@ const sleep = promisify(setTimeout);
 /**
  * @description Install and starts ZwaveJSUI container.
  * @example
- * installZ2mContainer();
+ * installZwaveJSUIContainer();
  */
-async function installZ2mContainer() {
+async function installZwaveJSUIContainer() {
   this.zwaveJSUIExist = false;
   this.zwaveJSUIRunning = false;
 
@@ -119,5 +119,5 @@ async function installZ2mContainer() {
 }
 
 module.exports = {
-  installZ2mContainer,
+  installZwaveJSUIContainer,
 };

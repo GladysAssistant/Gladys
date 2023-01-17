@@ -13,7 +13,7 @@ const { notification } = require('./events/notification');
 const { scanComplete } = require('./events/scanComplete');
 const { valueNotification } = require('./events/valueNotification');
 const { installMqttContainer } = require('./commands/installMqttContainer');
-const { installZ2mContainer } = require('./commands/installZ2mContainer');
+const { installZwaveJSUIContainer } = require('./commands/installZwaveJSUIContainer');
 const { getConfiguration } = require('./commands/getConfiguration');
 const { handleMqttMessage } = require('./events/handleMqttMessage');
 const { updateConfiguration } = require('./commands/updateConfiguration');
@@ -63,6 +63,6 @@ ZwaveJSUIManager.prototype.scanNetwork = scanNetwork;
 ZwaveJSUIManager.prototype.setValue = setValue;
 ZwaveJSUIManager.prototype.updateConfiguration = updateConfiguration;
 ZwaveJSUIManager.prototype.installMqttContainer = installMqttContainer;
-ZwaveJSUIManager.prototype.installZ2mContainer = installZ2mContainer;
+ZwaveJSUIManager.prototype.installZwaveJSUIContainer = installZwaveJSUIContainer;
 
 module.exports = ZwaveJSUIManager;
