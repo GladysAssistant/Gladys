@@ -16,6 +16,8 @@ async function updateConfiguration(configuration) {
     mqttUrl,
     mqttUsername,
     mqttPassword,
+    mqttTopicPrefix,
+    mqttTopicWithLocation,
     s2UnauthenticatedKey,
     s2AuthenticatedKey,
     s2AccessControlKey,
@@ -58,8 +60,16 @@ async function updateConfiguration(configuration) {
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, mqttUsername, this.serviceId);
   }
 
-  if (mqttPassword) {
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
+  if (mqttTopicPrefix) {
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX, mqttTopicPrefix, this.serviceId);
+  }
+
+  if (mqttTopicWithLocation) {
+    await this.gladys.variable.setValue(
+      CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_WITH_LOCATION,
+      mqttTopicWithLocation ? '1' : '0',
+      this.serviceId,
+    );
   }
 }
 
