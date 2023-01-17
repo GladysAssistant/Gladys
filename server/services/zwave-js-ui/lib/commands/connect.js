@@ -35,7 +35,6 @@ async function connect() {
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, mqttUsername, this.serviceId);
     mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD_BACKUP, mqttPassword, this.serviceId);
   }
 
   // Test if dongle is present
@@ -93,7 +92,7 @@ async function connect() {
       if (this.dockerBased) {
         await this.installMqttContainer();
         if (this.usbConfigured) {
-          await this.installZ2mContainer();
+          await this.installZwaveJSUIContainer();
         }
       } else {
         this.mqttExist = true;
@@ -104,6 +103,19 @@ async function connect() {
     }
   }
 
+  this.mqttTopicPrefix = DEFAULT.ZWAVEJSUI_MQTT_TOPIC_PREFIX;
+  this.mqttTopicWithLocation = false;
+  if (externalZwaveJSUI) {
+    this.mqttTopicPrefix = await this.gladys.variable.getValue(
+      CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX,
+      this.serviceId,
+    );
+    const mqttTopicWithLocationStr = await this.gladys.variable.getValue(
+      CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_WITH_LOCATION,
+      this.serviceId,
+    );
+    this.mqttTopicWithLocation = mqttTopicWithLocationStr === '1';
+  }
   const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, this.serviceId);
   const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
   if (this.mqttRunning) {
@@ -119,9 +131,7 @@ async function connect() {
     if (this.mqttConnected) {
       this.mqttClient.on('connect', () => {
         logger.info('Connected to MQTT container');
-        DEFAULT.TOPICS.forEach((topic) => {
-          this.mqttClient.subscribe(topic);
-        });
+        this.mqttClient.subscribe(`${this.mqttTopicPrefix}/#`);
         this.mqttConnected = true;
         this.zwaveJSUIConnected = true;
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -156,7 +166,10 @@ async function connect() {
       });
 
       this.scanInProgress = true;
-      this.mqttClient.publish(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
+      this.mqttClient.publish(
+        `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`,
+        'true',
+      );
 
       this.driver = {
         controllerId: 'N.A.',

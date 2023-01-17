@@ -14,7 +14,7 @@ function handleMqttMessage(topic, message) {
   this.zwaveJSUIConnected = true;
 
   switch (topic) {
-    case `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {
+    case `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {
       if (this.scanInProgress) {
         const { success, result } = message instanceof Object ? message : JSON.parse(message);
         if (success) {

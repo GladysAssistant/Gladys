@@ -128,12 +128,6 @@ describe('zwaveJSUIManager commands', () => {
       '********',
       ZWAVEJSUI_SERVICE_ID,
     );
-    assert.calledWithExactly(
-      gladys.variable.setValue,
-      CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD_BACKUP,
-      '********',
-      ZWAVEJSUI_SERVICE_ID,
-    );
   });
 
   it('should fail connect to zwave-js-ui gladys instance on non docker system', async () => {
