@@ -13,13 +13,12 @@ function nodeReady(zwaveNode) {
 
   const node = this.nodes[nodeId];
   node.nodeId = nodeId;
-  node.product = `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`;
-  node.type = zwaveNode.nodeType;
+  node.product = zwaveNode.product;
   node.firmwareVersion = zwaveNode.firmwareVersion;
   node.name = `${zwaveNode.name ||
     zwaveNode.label ||
-    `${zwaveNode.manufacturerId}-${zwaveNode.productType}-${zwaveNode.productId}`}`;
-  node.location = zwaveNode.location;
+    `${zwaveNode.product}`}`;
+  node.loc = zwaveNode.loc;
   node.status = zwaveNode.status;
   node.ready = zwaveNode.ready;
   node.classes = {};

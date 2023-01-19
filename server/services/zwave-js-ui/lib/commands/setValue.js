@@ -1,5 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { DEFAULT } = require('../constants');
 const { bindValue } = require('../utils/bindValue');
 const { getNodeInfoByExternalId } = require('../utils/externalId');
 
@@ -17,7 +16,7 @@ function setValue(device, deviceFeature, value) {
   const zwaveValue = bindValue({ nodeId, commandClass, endpoint, property, propertyKey }, value);
 
   this.mqttClient.publish(
-    `${this.mqttTopicPrefix}/nodeID_${nodeId}/${commandClass}/${endpoint}/${property}${
+    `${this.mqttTopicPrefix}/${this.mqttTopicWithLocation ? `${this.nodes[nodeId].loc}/` : ''}nodeID_${nodeId}/${commandClass}/${endpoint}/${property}${
       propertyKey !== undefined ? `/${propertyKey}` : ''
     }/set`,
     zwaveValue.toString(),

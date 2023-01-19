@@ -79,7 +79,11 @@ function handleMqttMessage(topic, message) {
       } else if (this.scanInProgress) {
         logger.info(`ZwaveJSUI scan in progress. Bypass message.`);
       } else if (splittedTopic.length >= 5) {
-        const [, nodeId, commandClass, endpoint, propertyName, propertyKey] = splittedTopic;
+        splittedTopic.shift();
+        if(this.mqttTopicWithLocation) {
+          splittedTopic.shift();
+        }
+        const [nodeId, commandClass, endpoint, propertyName, propertyKey] = splittedTopic;
         if (propertyKey === 'set') {
           // logger.debug(`ZwaveJSUI set. Bypass message.`);
           break;

@@ -106,16 +106,32 @@ async function connect() {
   this.mqttTopicPrefix = DEFAULT.ZWAVEJSUI_MQTT_TOPIC_PREFIX;
   this.mqttTopicWithLocation = false;
   if (externalZwaveJSUI) {
-    this.mqttTopicPrefix = await this.gladys.variable.getValue(
+    const storedMqttTopicPrefix = await this.gladys.variable.getValue(
       CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX,
       this.serviceId,
     );
+    if(storedMqttTopicPrefix) {
+      this.mqttTopicPrefix = storedMqttTopicPrefix;
+    } else {
+      await this.gladys.variable.setValue(
+        CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX,
+        this.mqttTopicPrefix,
+        this.serviceId,
+      );
+    }
     const mqttTopicWithLocationStr = await this.gladys.variable.getValue(
       CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_WITH_LOCATION,
       this.serviceId,
     );
     this.mqttTopicWithLocation = mqttTopicWithLocationStr === '1';
+  } else {
+    await this.gladys.variable.setValue(
+      CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX,
+      this.mqttTopicPrefix,
+      this.serviceId,
+    );
   }
+  
   const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, this.serviceId);
   const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
   if (this.mqttRunning) {

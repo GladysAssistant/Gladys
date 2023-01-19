@@ -49,7 +49,6 @@ function getNodes({ order_dir, search }) {
         ready: node.ready,
         rawZwaveNode: {
           id: node.nodeId,
-          type: node.type,
           product: node.product,
           loc: node.loc,
           keysClasses: Object.keys(node.classes),
