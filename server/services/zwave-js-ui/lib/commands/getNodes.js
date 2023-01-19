@@ -33,10 +33,10 @@ function getNodes({ order_dir, search }) {
   return nodes
     .filter((node) =>
       search
-        ? node.name.includes(search) ||
-          node.product.includes(search) ||
-          node.productLabel.includes(search) ||
-          node.id.toString().includes(search)
+        ? node.name.toLowerCase().includes(search.toLowerCase()) ||
+          node.product.toLowerCase().includes(search.toLowerCase()) ||
+          node.productLabel.toLowerCase().includes(search.toLowerCase()) ||
+          node.id.toString().toLowerCase().includes(search.toLowerCase())
         : true,
     )
     .map((node) => {
@@ -51,6 +51,7 @@ function getNodes({ order_dir, search }) {
           id: node.nodeId,
           type: node.type,
           product: node.product,
+          loc: node.loc,
           keysClasses: Object.keys(node.classes),
         },
         features: [],
