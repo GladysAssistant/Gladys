@@ -43,7 +43,7 @@ function unbindValue(valueId, value) {
     }
   }
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE) {
-    return value === '' ? null : SCENE_VALUES[value % 10];
+    return value === '' ? 0 : SCENE_VALUES[value % 10];
   }
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SCENE_ACTIVATION) {
     return SCENE_VALUES[value % 10];
