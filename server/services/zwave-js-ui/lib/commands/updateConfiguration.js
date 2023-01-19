@@ -60,6 +60,10 @@ async function updateConfiguration(configuration) {
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, mqttUsername, this.serviceId);
   }
 
+  if (mqttPassword) {
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
+  }
+
   if (mqttTopicPrefix) {
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX, mqttTopicPrefix, this.serviceId);
   }
