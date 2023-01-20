@@ -1,14 +1,16 @@
 import { Component } from 'preact';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 
 dayjs.extend(relativeTime);
+dayjs.extend(customParseFormat);
 
 class RelativeTime extends Component {
   refreshTimeDisplay = () => {
     const { datetime, language, futureDisabled } = this.props;
     if (datetime && language) {
-      let relativeTime = dayjs(datetime);
+      let relativeTime = dayjs(datetime, 'YYYY-MM-DD HH:mm:ss.SSS Z');
       const now = dayjs();
 
       if (futureDisabled && relativeTime.isAfter(now)) {
