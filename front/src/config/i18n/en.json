@@ -2313,6 +2313,12 @@
     "title": "Billing",
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
-    "stripeButton": "Edit subscription in Stripe"
+    "stripeButton": "Edit subscription in Stripe",
+    "yourCurrentPlan": "Your plan",
+    "monthlyPlan": "You are currently using the monthly plan. If you want to switch to the annual plan (99.99€/year), you can click on the button below. The first payment will be prorated based on your current month.",
+    "yearlyPlan": "You are currently on the annual plan.",
+    "upgradeToYearly": "Switch to annual plan",
+    "upgradeYearlyError": "An error occured while switching to the annual plan, please contact us by email.",
+    "upgradeYearlySuccess": "Thanks for switching to the annual plan!"
   }
 }
