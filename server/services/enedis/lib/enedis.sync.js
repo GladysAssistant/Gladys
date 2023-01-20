@@ -2,9 +2,50 @@ const Promise = require('bluebird');
 const dayjs = require('dayjs');
 const get = require('get-value');
 const logger = require('../../../utils/logger');
-const { getDeviceFeature } = require('../../../utils/device');
+const { getDeviceFeature, getDeviceParam, setDeviceParam } = require('../../../utils/device');
 const { getUsagePointIdFromExternalId } = require('../utils/parser');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../utils/constants');
+
+const ENEDIS_SYNC_BATCH_SIZE = 100;
+const LAST_DATE_SYNCED = 'LAST_DATE_SYNCED';
+
+/**
+ * @description get one batch of enedis data, then call the next one
+ * @param {Object} gladys - Gladys object reference
+ * @param {string} externalId - Enedis usage point external id.
+ * @param {string} after - Get data after this date.
+ * @returns {Promise<string>} - Resolve with last date
+ * @example await recursiveBatchCall('usage-point');
+ */
+async function recursiveBatchCall(gladys, externalId, after = '2000-01-01') {
+  const usagePointId = getUsagePointIdFromExternalId(externalId);
+  logger.debug(`Enedis: Syncing ${usagePointId} after ${after}`);
+  const data = await gladys.gateway.enedisGetDailyConsumption({
+    usage_point_id: usagePointId,
+    after,
+    take: ENEDIS_SYNC_BATCH_SIZE,
+  });
+
+  // Foreach value returned in the interval, we save it in DB
+  await Promise.each(data, async (value) => {
+    gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: externalId,
+      state: value.value,
+      created_at: new Date(value.created_at),
+    });
+  });
+  await Promise.delay(500);
+
+  // If there was still some data to get
+  if (data.length === ENEDIS_SYNC_BATCH_SIZE) {
+    const lastEntry = data[data.length - 1];
+    return recursiveBatchCall(gladys, externalId, lastEntry.created_at);
+  }
+  if (data.length === 0) {
+    return after;
+  }
+  return data[data.length - 1].created_at;
+}
 
 /**
  * @description Sync Enedis account
@@ -26,58 +67,25 @@ async function sync() {
       DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
     );
 
+    const lastDateSynced = getDeviceParam(usagePoint, LAST_DATE_SYNCED);
+
     if (!usagePointFeature) {
       return;
     }
 
-    // Get the previous sync or start 2 years ago (max amount of data allowed by Enedis)
-    const lastSync = usagePointFeature.last_value_changed
-      ? dayjs(usagePointFeature.last_value_changed)
-      : dayjs().subtract(2, 'years');
+    logger.info(`Enedis: Usage point last sync was ${lastDateSynced}`);
 
-    let currendEndDate = dayjs();
-    const syncTasksArray = [];
+    // syncing all batches
+    const lastDateSync = await recursiveBatchCall(
+      this.gladys,
+      usagePointFeature.external_id,
+      lastDateSynced ? lastDateSynced : undefined,
+    );
 
-    while (currendEndDate > lastSync) {
-      let startDate = currendEndDate.subtract(7, 'days');
-      if (startDate < lastSync) {
-        startDate = lastSync;
-      }
-      syncTasksArray.push({
-        start_date: startDate.format('YYYY-MM-DD'),
-        end_date: currendEndDate.format('YYYY-MM-DD'),
-      });
-      currendEndDate = startDate;
-    }
+    logger.info(`Enedis: Saving new last data sync = ${lastDateSync}`);
 
-    // Foreach interval
-    await Promise.each(syncTasksArray, async (syncTask) => {
-      try {
-        const usagePointId = getUsagePointIdFromExternalId(usagePoint.external_id);
-        logger.debug(`Enedis: Syncing ${usagePointId} from ${syncTask.start_date} to ${syncTask.end_date}`);
-        const data = await this.gladys.gateway.enedisGetDailyConsumption({
-          usage_point_id: usagePointId,
-          start: syncTask.start_date,
-          end: syncTask.end_date,
-        });
-        const values = data.meter_reading.interval_reading;
-
-        // Foreach value returned in the interval
-        await Promise.each(values, async (value) => {
-          if (dayjs(value.date) > lastSync) {
-            this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-              device_feature_external_id: usagePointFeature.external_id,
-              state: value.value,
-              created_at: new Date(value.date),
-            });
-          }
-        });
-        await Promise.delay(500);
-      } catch (e) {
-        const status = get(e, 'response.status');
-        logger.warn(`Enedis: ${syncTask.start_date} - ${syncTask.end_date} : Error ${status}`);
-      }
-    });
+    // save last date synced in DB
+    await this.gladys.device.setParam(usagePoint, LAST_DATE_SYNCED, lastDateSync);
   });
 }
 

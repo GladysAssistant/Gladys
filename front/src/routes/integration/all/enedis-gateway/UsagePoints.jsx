@@ -12,23 +12,41 @@ dayjs.extend(relativeTime);
 dayjs.extend(localizedFormat);
 
 import { getDeviceParam } from '../../../../utils/device';
+import { DEVICE_FEATURE_UNITS } from '../../../../../../server/utils/constants';
 import { DEVICE_PARAMS } from './consts';
 import EnedisPage from './EnedisPage';
 
-const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDeviceParam, saveDevice }) => {
+const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDeviceParam, saveDevice, syncs = [] }) => {
   const usagePointId = device.external_id.split(':')[1];
 
   const contractType = getDeviceParam(device, DEVICE_PARAMS.CONTRACT_TYPE);
   const pricePerKwh = getDeviceParam(device, DEVICE_PARAMS.PRICE_PER_KWH);
   const priceCurrency = getDeviceParam(device, DEVICE_PARAMS.PRICE_CURRENCY);
+  const lastRefresh = getDeviceParam(device, DEVICE_PARAMS.LAST_REFRESH);
+  const numberOfStates = getDeviceParam(device, DEVICE_PARAMS.NUMBER_OF_STATES);
+  const mySyncs = syncs.filter(sync => sync.usage_point_id === usagePointId);
+  let syncInProgress;
+  if (mySyncs.length > 0) {
+    const lastSync = mySyncs[0];
+    if (lastSync.jobs_done < lastSync.jobs_total) {
+      syncInProgress = lastSync;
+      syncInProgress.progress = Math.round((lastSync.jobs_done / lastSync.jobs_total) * 100);
+    }
+  }
 
-  const lastRefresh = dayjs()
-    .locale(language)
-    .format('L LTS');
-  const numberOfStates = 124;
+  const lastRefreshDate = lastRefresh
+    ? dayjs(lastRefresh)
+        .locale(language)
+        .format('L LTS')
+    : undefined;
 
   const updateContractType = e => {
     updateDeviceParam(deviceIndex, DEVICE_PARAMS.CONTRACT_TYPE, e.target.value);
+  };
+
+  const updatePricePerKwh = async e => {
+    await updateDeviceParam(deviceIndex, DEVICE_PARAMS.PRICE_PER_KWH, e.target.value);
+    await updateDeviceParam(deviceIndex, DEVICE_PARAMS.PRICE_CURRENCY, DEVICE_FEATURE_UNITS.EURO);
   };
 
   const save = () => {
@@ -69,45 +87,71 @@ const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDevicePa
                 <Text id="integration.enedis.usagePoints.pricePerKwh" />
               </label>
               <div class="input-group">
-                <input type="text" class="form-control" value={pricePerKwh} />
+                <input type="text" class="form-control" value={pricePerKwh} onChange={updatePricePerKwh} />
                 <div class="input-group-append">
-                  <span class="input-group-text">{priceCurrency}</span>
+                  <span class="input-group-text">
+                    <Text id={`deviceFeatureUnitShort.${priceCurrency}`} />
+                  </span>
                 </div>
               </div>
             </div>
           )}
-          <div class="card">
-            <div class="card-body">
-              <h4>
-                <Text id="integration.enedis.usagePoints.statistics" />
-              </h4>
-              <p>
-                <b>
-                  <Text id="integration.enedis.usagePoints.lastSyncLabel" />
-                </b>{' '}
-                {lastRefresh}
-                <br />
-                <b>
-                  <Text id="integration.enedis.usagePoints.firstValueLabel" />
-                </b>{' '}
-                {lastRefresh}
-                <br />
-                <b>
-                  <Text id="integration.enedis.usagePoints.lastValueLabel" />
-                </b>{' '}
-                {lastRefresh}
-                <br />
-                <b>
-                  <Text id="integration.enedis.usagePoints.numberOfStatesLabel" />
-                </b>{' '}
-                {numberOfStates}
-                <br />
-              </p>
+          {syncInProgress && (
+            <div class="form-group">
+              <label>
+                <Text id="integration.enedis.usagePoints.gladysPlusRefreshProgressLabel" />
+              </label>
+              <div class="progress">
+                <div
+                  class="progress-bar bg-primary"
+                  style={{
+                    width: `${syncInProgress.progress}%`
+                  }}
+                  role="progressbar"
+                  aria-valuenow={syncInProgress.progress}
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-label={syncInProgress.progress}
+                >
+                  <span class="visually-hidden">{syncInProgress.progress}%</span>
+                </div>
+              </div>
+              <div class="mt-2">
+                <small>
+                  <Text id="integration.enedis.usagePoints.gladysPlusRefreshProgressDescription" />
+                </small>
+              </div>
             </div>
-          </div>
-          <button class="btn btn-primary">
-            <Text id="integration.enedis.usagePoints.syncButton" />
-          </button>
+          )}
+          {(lastRefreshDate || numberOfStates) && (
+            <div class="card">
+              <div class="card-body">
+                <h4>
+                  <Text id="integration.enedis.usagePoints.statistics" />
+                </h4>
+                <p>
+                  {lastRefreshDate && (
+                    <span>
+                      <b>
+                        <Text id="integration.enedis.usagePoints.lastSyncLabel" />
+                      </b>{' '}
+                      {lastRefresh}
+                      <br />
+                    </span>
+                  )}
+                  {numberOfStates && (
+                    <span>
+                      <b>
+                        <Text id="integration.enedis.usagePoints.numberOfStatesLabel" />
+                      </b>{' '}
+                      {numberOfStates}
+                      <br />
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
           <button class="btn btn-success" onClick={save}>
             <Text id="integration.enedis.usagePoints.saveButton" />
           </button>
@@ -117,7 +161,7 @@ const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDevicePa
   );
 };
 
-const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceParam, saveDevice }) => (
+const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceParam, saveDevice, syncs, sync }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -129,6 +173,11 @@ const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceP
                   <h3 class="card-title">
                     <Text id="integration.enedis.usagePoints.title" />
                   </h3>
+                  <div class="page-options d-flex">
+                    <button class="btn btn-primary" onClick={sync}>
+                      <i class="fe fe-refresh-cw"></i> <Text id="integration.enedis.usagePoints.refreshLocal" />
+                    </button>
+                  </div>
                 </div>
                 <div class="card-body">
                   <div
@@ -152,6 +201,7 @@ const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceP
                               deviceIndex={index}
                               updateDeviceParam={updateDeviceParam}
                               saveDevice={saveDevice}
+                              syncs={syncs}
                             />
                           ))}
                       </div>
@@ -171,12 +221,15 @@ class EnedisWelcomePageComponent extends Component {
   getCurrentEnedisUsagePoints = async () => {
     try {
       const usagePointsDevices = await this.props.httpClient.get('/api/v1/service/enedis/device');
+      console.log({
+        usagePointsDevices
+      });
       this.setState({ usagePointsDevices });
     } catch (e) {
       console.error(e);
     }
   };
-  updateDeviceParam = (deviceIndex, deviceParam, value) => {
+  updateDeviceParam = async (deviceIndex, deviceParam, value) => {
     const device = this.state.usagePointsDevices[deviceIndex];
     const deviceParamIndex = device.params.findIndex(p => p.name === deviceParam);
     let newUsagePointsDevices;
@@ -206,10 +259,24 @@ class EnedisWelcomePageComponent extends Component {
         }
       });
     }
-    this.setState({ usagePointsDevices: newUsagePointsDevices });
+    await this.setState({ usagePointsDevices: newUsagePointsDevices });
+  };
+  getCurrentSync = async () => {
+    try {
+      const syncs = await this.props.session.gatewayClient.enedisGetSync();
+      this.setState({ syncs });
+    } catch (e) {
+      console.error(e);
+    }
   };
   sync = async () => {
-    await this.props.httpClient.post('/api/v1/service/enedis/sync');
+    await this.setState({ loading: true });
+    try {
+      await this.props.httpClient.post('/api/v1/service/enedis/sync');
+    } catch (e) {
+      console.error(e);
+    }
+    await this.setState({ loading: false });
   };
   saveDevice = async deviceIndex => {
     const device = this.state.usagePointsDevices[deviceIndex];
@@ -218,12 +285,17 @@ class EnedisWelcomePageComponent extends Component {
   init = async () => {
     await this.setState({ loading: true });
     await this.getCurrentEnedisUsagePoints();
+    await this.getCurrentSync();
     await this.setState({ loading: false });
   };
   componentDidMount() {
     this.init();
+    this.refreshInterval = setInterval(this.getCurrentSync, 30 * 1000);
   }
-  render({ user }, { loading, errored, usagePointsDevices }) {
+  componentWillUnmount() {
+    clearInterval(this.refreshInterval);
+  }
+  render({ user }, { loading, errored, usagePointsDevices, syncs }) {
     return (
       <EnedisPage>
         <EnedisUsagePoints
@@ -231,6 +303,7 @@ class EnedisWelcomePageComponent extends Component {
           errored={errored}
           usagePointsDevices={usagePointsDevices}
           sync={this.sync}
+          syncs={syncs}
           language={user.language}
           updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}

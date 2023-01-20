@@ -14,15 +14,7 @@ import {
 
 import EnedisPage from './EnedisPage';
 
-const EnedisWelcomePage = ({
-  redirectUri,
-  errored,
-  loading,
-  usagePointsIds,
-  notOnGladysGateway,
-  sync,
-  requestSyncGladysPlus
-}) => (
+const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -55,22 +47,16 @@ const EnedisWelcomePage = ({
                       )}
                       {usagePointsIds && (
                         <p class="alert alert-success">
-                          <Text
-                            id="integration.enedis.welcome.connectedToUsagePointds"
-                            plural={usagePointsIds.length}
-                            fields={{ count: usagePointsIds.length }}
-                          />{' '}
+                          <Text id="integration.enedis.welcome.connectedToUsagePointds" />{' '}
                           <Text id="integration.enedis.welcome.reconnectInfo" />
                         </p>
                       )}
                       <p>
                         <Text id="integration.enedis.welcome.longDescription" />
                       </p>
-                      {usagePointsIds && (
-                        <button class="btn btn-primary" onClick={requestSyncGladysPlus}>
-                          <Text id="integration.enedis.welcome.syncButton" /> Sync
-                        </button>
-                      )}
+                      <p>
+                        <Text id="integration.enedis.welcome.longDescription2" />
+                      </p>
                       {!notOnGladysGateway && (
                         <div>
                           <p>
@@ -115,15 +101,6 @@ class EnedisWelcomePageComponent extends Component {
       console.error(e);
     }
   };
-  getCurrentEnedisUsagePoints = async () => {
-    try {
-      const data = await this.props.httpClient.get('/api/v1/service/enedis/variable/ENEDIS_USAGE_POINTS_ID');
-      const usagePointsIds = JSON.parse(data.value);
-      this.setState({ usagePointsIds });
-    } catch (e) {
-      console.error(e);
-    }
-  };
   createUsagePointDevice = async (usagePointId, serviceId) => {
     const device = {
       name: 'Enedis',
@@ -138,7 +115,7 @@ class EnedisWelcomePageComponent extends Component {
           min: 0,
           max: 1000000,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
-          external_id: `enedis:${usagePointId}:power`,
+          external_id: `enedis:${usagePointId}:daily-consumption`,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
           unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
           read_only: true,
@@ -187,7 +164,7 @@ class EnedisWelcomePageComponent extends Component {
   };
   init = async () => {
     await this.setState({ loading: true });
-    await Promise.all([this.getRedirectUri(), this.detectCode(), this.getCurrentEnedisUsagePoints()]);
+    await Promise.all([this.getRedirectUri(), this.detectCode()]);
     await this.setState({ loading: false });
   };
   componentDidMount() {
