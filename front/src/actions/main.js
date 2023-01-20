@@ -68,14 +68,15 @@ function createActions(store) {
         const status = get(e, 'response.status');
         const error = get(e, 'response.data.error');
         const gatewayErrorMessage = get(e, 'response.data.error_message');
-        if (status === 401 || status === 403) {
+        const errorMessageOtherFormat = get(e, 'response.data.message');
+        if (status === 401) {
           state.session.reset();
           actions.redirectToLogin();
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
           route('/link-gateway-user');
         } else if (error === 'USER_NOT_ACCEPTED_LOCALLY') {
           route('/link-gateway-user');
-        } else if (gatewayErrorMessage === 'NO_INSTANCE_FOUND') {
+        } else if (gatewayErrorMessage === 'NO_INSTANCE_FOUND' || errorMessageOtherFormat === 'NO_INSTANCE_DETECTED') {
           route('/link-gateway-user');
         } else {
           console.error(e);

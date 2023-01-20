@@ -11,7 +11,7 @@ describe('usb', () => {
   it('should start service', async () => {
     await usbService.start();
   });
-  it('should connect to zwave driver', async () => {
+  it('should connect to usb driver', async () => {
     const ports = await usbService.list();
     expect(ports).to.deep.equal([
       {

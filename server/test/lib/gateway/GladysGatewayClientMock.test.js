@@ -81,6 +81,7 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
     enedisGetDailyConsumptionMaxPower: fake.resolves({
       enedisFunction: 'enedisGetDailyConsumptionMaxPower',
     }),
+    getEcowattSignals: fake.resolves({ signals: [] }),
   };
 };
 

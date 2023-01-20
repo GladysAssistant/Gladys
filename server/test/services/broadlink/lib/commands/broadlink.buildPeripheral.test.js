@@ -68,7 +68,10 @@ describe('broadlink.device.createDevice', () => {
       selector: 'broadlink:0b16',
       features: [{ name: 'feature' }],
       model: 'model',
-      params: [{ name: 'peripheral', value: '0b16' }, { name: 'manufacturer', value: 'Broadlink' }],
+      params: [
+        { name: 'peripheral', value: '0b16' },
+        { name: 'manufacturer', value: 'Broadlink' },
+      ],
       poll_frequency: null,
       should_poll: false,
       service_id: serviceId,
@@ -99,7 +102,10 @@ describe('broadlink.device.createDevice', () => {
       selector: 'broadlink:0b16',
       features: [{ read_only: true }],
       model: 'model',
-      params: [{ name: 'peripheral', value: '0b16' }, { name: 'manufacturer', value: 'Broadlink' }],
+      params: [
+        { name: 'peripheral', value: '0b16' },
+        { name: 'manufacturer', value: 'Broadlink' },
+      ],
       poll_frequency: 60000,
       should_poll: true,
       service_id: serviceId,

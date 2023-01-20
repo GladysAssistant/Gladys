@@ -31,7 +31,7 @@ const SERVICE_ATTRIBUTES = ['id', 'name'];
  * const rooms = await room.get();
  */
 async function get(options) {
-  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
+  const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
   const include = [];
   if (optionsWithDefault.expand.includes('devices')) {
     include.push({

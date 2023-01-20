@@ -1,0 +1,38 @@
+name: Build and publish demo website
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Build and publish demo website
+    steps:
+      - uses: actions/checkout@v3
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: 'front/package.json'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+      - name: 📦 Install NPM front packages
+        working-directory: ./front
+        run: |
+          npm ci
+      - name: 🏗️ Build front
+        working-directory: ./front
+        env:
+          DEMO_MODE: true
+        run: |
+          npm run build
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_PUBLISH_TO_PAGES_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: gladysassistant-demo
+          directory: ./front/build
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main

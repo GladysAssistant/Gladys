@@ -333,6 +333,34 @@ const actionsFunc = {
       );
     }
   },
+  [ACTIONS.ECOWATT.CONDITION]: async (self, action) => {
+    try {
+      const data = await self.gateway.getEcowattSignals();
+      const todayDate = dayjs.tz(dayjs(), self.timezone).format('YYYY-MM-DD');
+      const todayHour = dayjs.tz(dayjs(), self.timezone).hour();
+      const todayLiveData = data.signals.find((day) => {
+        const signalDate = dayjs(day.jour).format('YYYY-MM-DD');
+        return todayDate === signalDate;
+      });
+      if (!todayLiveData) {
+        throw new AbortScene('Ecowatt: day not found');
+      }
+      const currentHourNetworkStatus = todayLiveData.values.find((hour) => hour.pas === todayHour);
+      if (!currentHourNetworkStatus) {
+        throw new AbortScene('Ecowatt: hour not found');
+      }
+      const ECOWATT_STATUSES = {
+        1: 'ok',
+        2: 'warning',
+        3: 'critical',
+      };
+      if (ECOWATT_STATUSES[currentHourNetworkStatus.hvalue] !== action.ecowatt_network_status) {
+        throw new AbortScene('ECOWATT_DIFFERENT_STATUS');
+      }
+    } catch (e) {
+      throw new AbortScene(e.message);
+    }
+  },
 };
 
 module.exports = {

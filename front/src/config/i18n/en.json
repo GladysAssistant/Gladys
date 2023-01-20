@@ -202,7 +202,9 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
-      "chart": "Chart"
+      "chart": "Chart",
+      "ecowatt": "Ecowatt (France)",
+      "clock": "Clock"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -279,6 +281,26 @@
         "no": "No",
         "preview": "Preview",
         "showPreviewButton": "Show preview"
+      },
+      "ecowatt": {
+        "title": "Ecowatt France",
+        "description": "This box let you check the status of the french electricity network.",
+        "error": "An error occured while fetching the RTE API. Please retry.",
+        "dailyTitle": "Daily previsions",
+        "nextDaysTitle": "Next days previsions",
+        "ok": "Network ok",
+        "warning": "Network warning",
+        "critical": "Network critical"
+      },
+      "clock": {
+        "analog": "Analog",
+        "digital": "Digital",
+        "date": "{{day}}, {{month}} {{dayNumber}}, {{year}}",
+        "smallDate": "{{month}} {{dayNumber}}",
+        "type": "Clock type?",
+        "displaySecond": "Display seconds?",
+        "yes": "Yes",
+        "no": "No"
       }
     }
   },
@@ -578,23 +600,28 @@
       },
       "reconnectInfo": "If you want to refresh your Enedis access key, you can re-connect to Enedis at any time. You need to reconnect at least once every 3 years."
     },
+    "homekit": {
+      "title": "Apple HomeKit",
+      "description": "Connect Gladys to HomeKit and use Siri to control your devices.",
+      "introduction": "To connect Gladys to HomeKit, you need an Apple device (iPhone, iPad, iPod touch).",
+      "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
+      "configurationError": "An error appears while getting settings.",
+      "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
+      "reloadButton": "Reload"
+    },
     "owntracks": {
       "title": "Owntracks",
       "description": "Send your GPS location to Gladys with a mobile app",
       "longDescription": "Owntracks is an open-source app running on iOS and Android that let you send your geolocation to a server. You can use Owntracks to trigger scenes based on your geolocation. To configure Owntracks with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>."
     },
     "zwave": {
-      "title": "Z-Wave",
-      "description": "Control your Z-Wave devices with Open-Zwave.",
-      "deviceTab": "Devices",
-      "networkTab": "Network",
-      "settingsTab": "Settings",
-      "setupTab": "Setup",
+      "title": "Open-Zwave [OLD]",
+      "description": "This integration is deprecated, we are migrating to zwave-js-ui.",
       "device": {
-        "title": "Z-Wave Devices",
+        "title": "Legacy Open-Zwave Devices",
         "search": "Search devices",
         "convertToMqtt": "Convert to MQTT device",
-        "oldIntegrationWarning": "This integration is based on Open-Zwave, a library which is no longer supported. We are migrating to ZwaveJS2mqtt, but in the meantime we recommend that you use Node-RED + ZwaveJS2mqtt. Please stop using this integration before end of November 2022. <br /> <br /> If you want to help us develop this integration, join-us on the forum!",
+        "oldIntegrationWarning": "This integration was based on Open-Zwave and is now DEPRECATED. We are migrating to Zwave-js-ui, but in the meantime we recommend that you use Node-RED + Zwave-js-ui + Gladys. <br /> <br /> If you want to help us develop this integration, join-us on the <a href=\"https://en-community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">forum</a>!",
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
         "nameLabel": "Name",
@@ -605,60 +632,6 @@
         "editButton": "Edit",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
         "noValueReceived": "No value received."
-      },
-      "setup": {
-        "title": "Z-Wave Devices",
-        "addNodeButton": "Add",
-        "addNodeSecureButton": "Add Secure",
-        "healNetworkButton": "Heal",
-        "removeNode": "Remove",
-        "scanButton": "Scan",
-        "noZwaveDevices": "No Z-Wave devices found. Have you selected your USB dongle port in Settings?",
-        "manufacturer": "Manufacturer",
-        "name": "Name",
-        "type": "Type",
-        "scanInProgressText": "Scan in Progress...",
-        "createDeviceInGladys": "Connect in Gladys",
-        "features": "Features",
-        "params": "Params",
-        "nodeId": "Node",
-        "zwaveNotConfiguredError": "Z-wave is not configured. Please select the USB port where you Z-Wave key is plugged in settings.",
-        "createDeviceError": "There was an error while creating this device in Gladys.",
-        "conflictError": "A device with this name already exist, please rename the device or delete the existing device.",
-        "deviceCreatedSuccess": "The device was added with success.",
-        "unknowNode": "Unknow node",
-        "sleepingNodeMsg": "Node sleeping or dead. Wake it up then refresh this page.",
-        "createGithubIssue": "Report a bug with this device"
-      },
-      "network": {
-        "title": "Z-Wave Network",
-        "nodeId": "ID",
-        "nodeName": "Name",
-        "nodeNeighbors": "Neighbors",
-        "nodeAsleep": "Node might be asleep or dead",
-        "node": "Node"
-      },
-      "settings": {
-        "title": "Z-Wave Settings",
-        "description": "To use Z-Wave in Gladys, you need to have a Z-Wave USB Stick connected to your Gladys instance.",
-        "zwaveUsbDriverPathLabel": "Select the USB port where your Z-Wave stick is connected",
-        "connectButton": "Connect",
-        "disconnectButton": "Disconnect",
-        "refreshButton": "Refresh USB list",
-        "notConnected": "Gladys is not connected to any Z-Wave USB stick.",
-        "connectedWithSuccess": "Z-Wave USB stick connected with success.",
-        "connecting": "Trying to connect to Z-Wave USB stick...",
-        "driverFailedError": "An error occured while trying to connect to Z-Wave USB stick."
-      },
-      "nodeOperation": {
-        "addNodeInstructions": "You can now include your device following instructions in your device manual.",
-        "removeNodeInstructions": "You can now exclude your device following instructions in your device manual.",
-        "addNodeTitle": "Inclusion Mode",
-        "removeNodeTitle": "Exclusion Mode",
-        "seconds": "seconds remaining",
-        "cancelButton": "Cancel",
-        "nodeAddedTitle": "A new node was found",
-        "nodeAddedDescription": "Wait a few seconds while we get all of the information from this node..."
       }
     },
     "openWeather": {
@@ -1093,6 +1066,7 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
+    "duplicateButton": "Duplicate",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
     "addTriggerButton": "Add trigger",
@@ -1209,6 +1183,14 @@
         "whenNotFoundLabel": "If no event is found",
         "stopScene": "Stop the scene",
         "continueScene": "Continue the scene"
+      },
+      "ecowattCondition": {
+        "description": "This conditions lets you check the status of the french electricity network",
+        "knowMore": "Read more",
+        "networkStatusLabel": "Continue scene if the network is",
+        "ok": "Network ok",
+        "warning": "Network warning",
+        "critical": "Network critical"
       }
     },
     "actions": {
@@ -1253,6 +1235,9 @@
       "house": {
         "is-empty": "If the house is empty",
         "is-not-empty": "If the house is not empty"
+      },
+      "ecowatt": {
+        "condition": "Condition on Ecowatt (France)"
       }
     },
     "variables": {
@@ -1649,6 +1634,16 @@
     "invalidIcon": "Icon is required",
     "sceneAlreadyExist": "A scene with that name already exist."
   },
+  "duplicateScene": {
+    "cardTitle": "Duplicate scene \"{{name}}\"",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter a new name",
+    "iconLabel": "Select an icon for you scene",
+    "duplicateSceneButton": "Duplicate",
+    "invalidName": "Name is required",
+    "invalidIcon": "Icon is required",
+    "sceneAlreadyExist": "A scene with that name already exist."
+  },
   "scene": {
     "title": "Scenes",
     "emptySceneSentenceTop": "Can't find any scenes.",
@@ -1752,6 +1747,7 @@
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "volt-ampere": "Voltampere (VA)",
+    "kilovolt-ampere": "Kilovoltampere (kVA)",
     "volt-ampere-reactive": "Voltampere reactive (var)",
     "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
@@ -1822,6 +1818,7 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "kilovolt-ampere": "kVA",
     "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",
@@ -1897,6 +1894,13 @@
       }
     },
     "category": {
+      "opening-sensor": {
+        "binary": {
+          "other": "No value received",
+          "zero": "Closed",
+          "one": "Opened"
+        }
+      },
       "co-sensor": {
         "binary": {
           "other": "No value received",
@@ -2322,6 +2326,12 @@
     "title": "Billing",
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
-    "stripeButton": "Edit subscription in Stripe"
+    "stripeButton": "Edit subscription in Stripe",
+    "yourCurrentPlan": "Your plan",
+    "monthlyPlan": "You are currently using the monthly plan. If you want to switch to the annual plan (99.99€/year), you can click on the button below. The first payment will be prorated based on your current month.",
+    "yearlyPlan": "You are currently on the annual plan.",
+    "upgradeToYearly": "Switch to annual plan",
+    "upgradeYearlyError": "An error occured while switching to the annual plan, please contact us by email.",
+    "upgradeYearlySuccess": "Thanks for switching to the annual plan!"
   }
 }
