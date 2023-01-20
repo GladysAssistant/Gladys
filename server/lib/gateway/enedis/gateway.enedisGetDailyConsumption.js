@@ -1,6 +1,5 @@
 const get = require('get-value');
 
-const logger = require('../../../utils/logger');
 const { Error403 } = require('../../../utils/httpErrors');
 
 /**
