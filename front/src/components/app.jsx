@@ -225,7 +225,6 @@ const AppRouter = connect(
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
         <TasmotaEditPage path="/dashboard/integration/device/tasmota/edit/:deviceSelector" />
-
         <TasmotaMqttDiscoverPage path="/dashboard/integration/device/tasmota/mqtt" />
         <TasmotaHttpDiscoverPage path="/dashboard/integration/device/tasmota/http" />
         <EweLinkPage path="/dashboard/integration/device/ewelink" />

@@ -1,4 +1,4 @@
-import { GetTodolistStatus, RequestStatus } from '../../../utils/consts';
+import { RequestStatus } from '../../../utils/consts';
 import { ERROR_MESSAGES } from '../../../../../server/utils/constants';
 import createBoxActions from '../boxActions';
 import get from 'get-value';
@@ -23,7 +23,7 @@ function createActions(store) {
       } catch (e) {
         const responseMessage = get(e, 'response.data.message');
         if (responseMessage === ERROR_MESSAGES.SERVICE_NOT_CONFIGURED) {
-          boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetTodolistStatus.ServiceNotConfigured);
+          boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.ServiceNotConfigured);
         } else {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
         }

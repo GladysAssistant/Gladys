@@ -3,18 +3,9 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import actions from '../../../actions/dashboard/boxes/todolist';
-import {
-  DASHBOARD_BOX_DATA_KEY,
-  DASHBOARD_BOX_STATUS_KEY,
-  GetTodolistStatus,
-  RequestStatus
-} from '../../../utils/consts';
+import { DASHBOARD_BOX_DATA_KEY, DASHBOARD_BOX_STATUS_KEY, RequestStatus } from '../../../utils/consts';
 import style from './style.css';
 import dayjs from 'dayjs';
-
-const padding = {
-  padding: '1rem'
-};
 
 const BOX_REFRESH_INTERVAL_MS = 1 * 60 * 1000;
 
@@ -29,14 +20,14 @@ const Task = ({ task, onClick }) => {
       <div class="container">
         <div class="row">
           <span>
-            <i className={`fe fe-${icon}`} style={{ marginRight: '10px', cursor: 'pointer' }} onClick={onClick} />
+            <i class={`fe fe-${icon} mr-2 cursor-pointer`} onClick={onClick} />
             <span style={textStyle}>{task.content}</span>
           </span>
         </div>
         {task.due && (
           <div class="row">
             <span style={{ opacity: '50%', fontSize: '0.80rem' }}>
-              <i className={`fe fe-calendar`} style={{ marginLeft: '20px', marginRight: '6px' }} />
+              <i class={`fe fe-calendar mr-3 ml-1`} />
               <span>{dayjs(task.due.date).format('D MMM')}</span>
             </span>
           </div>
@@ -59,7 +50,7 @@ const TodolistBox = ({ children, ...props }) => {
         </h3>
       </div>
       <div>
-        {props.boxStatus === GetTodolistStatus.ServiceNotConfigured && (
+        {props.boxStatus === RequestStatus.ServiceNotConfigured && (
           <div class="card-body">
             <p class="alert alert-danger">
               <i class="fe fe-bell" />
@@ -84,13 +75,13 @@ const TodolistBox = ({ children, ...props }) => {
             <div class="card-body">
               <div class="dimmer active">
                 <div class="loader" />
-                <div class="dimmer-content" style={padding} />
+                <div class="dimmer-content p-1" />
               </div>
             </div>
           </div>
         )}
         {props.tasks && (
-          <div style={padding} class="card-block o-auto">
+          <div class="card-block o-auto p-4">
             <div>
               {props.tasks.map(task => (
                 <Task key={task.id} task={task} onClick={onTaskClick(task)} />

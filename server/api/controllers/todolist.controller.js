@@ -2,7 +2,7 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 
 module.exports = function TodolistController(gladys) {
   /**
-   * @api {get} /api/v1/todolist/tasks Get Todolist tasks
+   * @api {get} /api/v1/todolist/tasks Get all todolist tasks
    * @apiName getTasks
    * @apiGroup Todolist
    */
@@ -12,7 +12,7 @@ module.exports = function TodolistController(gladys) {
   }
 
   /**
-   * @api {get} /api/v1/todolist Get Todolist
+   * @api {get} /api/v1/todolist Get list of todolist
    * @apiName getTodolist
    * @apiGroup Todolist
    */
@@ -33,7 +33,7 @@ module.exports = function TodolistController(gladys) {
   }
 
   /**
-   * @api {post} /api/v1/todolist/tasks/:task_id/close close Todolist task
+   * @api {post} /api/v1/todolist/tasks/:task_id/close Close a todolist task
    * @apiName closeTask
    * @apiGroup Todolist
    */
