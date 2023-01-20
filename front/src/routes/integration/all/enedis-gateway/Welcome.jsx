@@ -14,7 +14,15 @@ import {
 
 import EnedisPage from './EnedisPage';
 
-const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway, sync }) => (
+const EnedisWelcomePage = ({
+  redirectUri,
+  errored,
+  loading,
+  usagePointsIds,
+  notOnGladysGateway,
+  sync,
+  requestSyncGladysPlus
+}) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -59,7 +67,7 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
                         <Text id="integration.enedis.welcome.longDescription" />
                       </p>
                       {usagePointsIds && (
-                        <button class="btn btn-primary" onClick={sync}>
+                        <button class="btn btn-primary" onClick={requestSyncGladysPlus}>
                           <Text id="integration.enedis.welcome.syncButton" /> Sync
                         </button>
                       )}
@@ -148,7 +156,13 @@ class EnedisWelcomePageComponent extends Component {
     if (this.props.code) {
       try {
         await this.setState({ errored: false });
-        const response = await this.props.session.gatewayClient.finalizeEnedis(this.props.code);
+        const finalizeBody = {
+          code: this.props.code
+        };
+        if (this.props.usage_points_id) {
+          finalizeBody.usage_points_id = this.props.usage_points_id;
+        }
+        const response = await this.props.session.gatewayClient.finalizeEnedis(finalizeBody);
         this.setState({
           usagePointsIds: response.usage_points_id
         });
@@ -168,6 +182,9 @@ class EnedisWelcomePageComponent extends Component {
       }
     }
   };
+  requestSyncGladysPlus = async () => {
+    await this.props.session.gatewayClient.enedisRefreshAllData();
+  };
   init = async () => {
     await this.setState({ loading: true });
     await Promise.all([this.getRedirectUri(), this.detectCode(), this.getCurrentEnedisUsagePoints()]);
@@ -186,6 +203,7 @@ class EnedisWelcomePageComponent extends Component {
           usagePointsIds={usagePointsIds}
           notOnGladysGateway={notOnGladysGateway}
           sync={this.sync}
+          requestSyncGladysPlus={this.requestSyncGladysPlus}
         />
       </EnedisPage>
     );
