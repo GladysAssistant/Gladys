@@ -1,8 +1,6 @@
 const Promise = require('bluebird');
-const dayjs = require('dayjs');
-const get = require('get-value');
 const logger = require('../../../utils/logger');
-const { getDeviceFeature, getDeviceParam, setDeviceParam } = require('../../../utils/device');
+const { getDeviceFeature, getDeviceParam } = require('../../../utils/device');
 const { getUsagePointIdFromExternalId } = require('../utils/parser');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../utils/constants');
 
@@ -10,11 +8,11 @@ const ENEDIS_SYNC_BATCH_SIZE = 100;
 const LAST_DATE_SYNCED = 'LAST_DATE_SYNCED';
 
 /**
- * @description get one batch of enedis data, then call the next one
- * @param {Object} gladys - Gladys object reference
+ * @description Get one batch of enedis data, then call the next one.
+ * @param {Object} gladys - Gladys object reference.
  * @param {string} externalId - Enedis usage point external id.
  * @param {string} after - Get data after this date.
- * @returns {Promise<string>} - Resolve with last date
+ * @returns {Promise<string>} - Resolve with last date.
  * @example await recursiveBatchCall('usage-point');
  */
 async function recursiveBatchCall(gladys, externalId, after = '2000-01-01') {
@@ -67,7 +65,11 @@ async function sync() {
       DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
     );
 
-    const lastDateSynced = getDeviceParam(usagePoint, LAST_DATE_SYNCED);
+    let lastDateSynced = getDeviceParam(usagePoint, LAST_DATE_SYNCED);
+
+    if (!lastDateSynced) {
+      lastDateSynced = undefined;
+    }
 
     if (!usagePointFeature) {
       return;
@@ -76,11 +78,7 @@ async function sync() {
     logger.info(`Enedis: Usage point last sync was ${lastDateSynced}`);
 
     // syncing all batches
-    const lastDateSync = await recursiveBatchCall(
-      this.gladys,
-      usagePointFeature.external_id,
-      lastDateSynced ? lastDateSynced : undefined,
-    );
+    const lastDateSync = await recursiveBatchCall(this.gladys, usagePointFeature.external_id, lastDateSynced);
 
     logger.info(`Enedis: Saving new last data sync = ${lastDateSync}`);
 
