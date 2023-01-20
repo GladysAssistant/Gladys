@@ -1,18 +1,27 @@
 const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 const { expect } = require('chai');
 
 const { assert, fake } = sinon;
 const { MockedMqttClient } = require('../mocks.test');
 const { CONFIGURATION, DEFAULT } = require('../../../../services/mqtt/lib/constants');
 const { NotFoundError } = require('../../../../utils/coreErrors');
-const MqttHandler = require('../../../../services/mqtt/lib');
+
+const saveConfiguration = proxyquire('../../../../services/mqtt/lib/saveConfiguration', {
+  util: {
+    // Fake promisify to revolve it directly
+    promisify: () => () => {},
+  },
+});
+
+const MqttHandler = proxyquire('../../../../services/mqtt/lib', {
+  './saveConfiguration': saveConfiguration,
+});
 
 const serviceId = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 
-describe('mqttHandler.saveConfiguration', function Describe() {
-  this.timeout(15000);
-
-  beforeEach(() => {
+describe('mqttHandler.saveConfiguration', () => {
+  afterEach(() => {
     sinon.reset();
   });
 
