@@ -1009,6 +1009,12 @@ const data = {
         device_feature: 'main-lamp-binary',
         operator: '=',
         value: 1
+      },
+      {
+        type: 'device.new-state',
+        device_feature: 'button-click',
+        operator: '=',
+        value: 2
       }
     ],
     actions: [

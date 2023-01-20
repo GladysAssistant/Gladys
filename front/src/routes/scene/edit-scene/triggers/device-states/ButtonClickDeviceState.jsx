@@ -30,7 +30,9 @@ class ButtonClickDeviceState extends Component {
     this.getOptions();
   }
 
-  render(props, { options }) {
+  render({ trigger }, { options }) {
+    const defaultValue = options.find(option => trigger.value === option.value);
+
     return (
       <Fragment>
         <div class="col-2 col-md-1">
@@ -40,7 +42,7 @@ class ButtonClickDeviceState extends Component {
         </div>
         <div class="col-10 col-md-5">
           <div class="form-group">
-            <Select defaultValue={''} onChange={this.handleValueChange} options={options} />
+            <Select defaultValue={defaultValue || ''} onChange={this.handleValueChange} options={options} />
           </div>
         </div>
       </Fragment>
