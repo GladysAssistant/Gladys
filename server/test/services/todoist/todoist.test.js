@@ -22,6 +22,9 @@ const gladys = {
   variable: {
     getValue: () => Promise.resolve(TODOIST_API_KEY),
   },
+  event: {
+    emit: sinon.fake.resolves(true),
+  },
 };
 
 describe('TodoistService', () => {
@@ -49,7 +52,7 @@ describe('TodoistService', () => {
     });
   });
 
-  describe('start', () => {
+  describe('stop', () => {
     it('should stop service', async () => {
       const TodoistService = proxyquire('../../../services/todoist/index', todoistApi);
       const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
@@ -144,6 +147,17 @@ describe('TodoistService', () => {
       const promise = todoistService.todolist.closeTask('taskId');
 
       return assert.isRejected(promise, 'Todoist Service not configured');
+    });
+  });
+
+  describe('refreshTasks', () => {
+    it('should refresh list of tasks foreach todolist', async () => {
+      const TodoistService = proxyquire('../../../services/todoist/index', todoistApi);
+      const todoistService = TodoistService(gladys, '35deac79-f295-4adf-8512-f2f48e1ea0f8');
+      await todoistService.start();
+      await todoistService.todolist.getTasks();
+      await todoistService.refreshTasks();
+      sinon.assert.calledOnce(gladys.event.emit);
     });
   });
 });

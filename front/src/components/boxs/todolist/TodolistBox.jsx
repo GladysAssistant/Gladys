@@ -6,8 +6,7 @@ import actions from '../../../actions/dashboard/boxes/todolist';
 import { DASHBOARD_BOX_DATA_KEY, DASHBOARD_BOX_STATUS_KEY, RequestStatus } from '../../../utils/consts';
 import style from './style.css';
 import dayjs from 'dayjs';
-
-const BOX_REFRESH_INTERVAL_MS = 1 * 60 * 1000;
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 const Task = ({ task, onClick }) => {
   const icon = task.pending ? 'check-circle' : 'circle';
@@ -99,7 +98,7 @@ const TodolistBox = ({ children, ...props }) => {
   );
 };
 
-@connect('DashboardBoxDataTodolist,DashboardBoxStatusTodolist', actions)
+@connect('session,DashboardBoxDataTodolist,DashboardBoxStatusTodolist', actions)
 class TodolistBoxComponent extends Component {
   closeTaskUnbound(task) {
     this.props.closeTask(task.id, this.props.x, this.props.y);
@@ -110,23 +109,23 @@ class TodolistBoxComponent extends Component {
     this.closeTask = this.closeTaskUnbound.bind(this);
   }
 
+  updateTodolistWebsocket = payload =>
+    this.props.updateTodolistWebsocketEvent(this.props.box, this.props.x, this.props.y, payload);
+
   componentDidMount() {
     const { todolist_id: todolistId } = this.props.box;
 
     // get tasks
     this.props.getTasks(todolistId, this.props.x, this.props.y);
 
-    // refresh tasks every interval
-    this.refreshInterval = setInterval(
-      () => this.props.getTasks(todolistId, this.props.x, this.props.y),
-      BOX_REFRESH_INTERVAL_MS
-    );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.TODOLIST.UPDATED, this.updateTodolistWebsocket);
   }
 
   componentWillUnmount() {
-    if (this.refreshInterval) {
-      clearInterval(this.refreshInterval);
-    }
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.TODOLIST.UPDATED,
+      this.updateTodolistWebsocket
+    );
   }
 
   render(props, {}) {

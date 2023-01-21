@@ -778,6 +778,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     LEARN_MODE: 'broadlink.learn',
     SEND_MODE: 'broadlink.send',
   },
+  TODOLIST: {
+    UPDATED: 'todolist.updated',
+  },
 };
 
 const DASHBOARD_TYPE = {

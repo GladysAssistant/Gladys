@@ -13,6 +13,16 @@ function createActions(store) {
   const boxActions = createBoxActions(store);
 
   const actions = {
+    updateTodolistWebsocketEvent(state, box, x, y, payload) {
+      console.log('updateTodolistWebsocketEvent', box.todolist_id, payload.todolistId);
+      if (box.todolist_id === payload.todolistId) {
+        console.log('Refresh', box.todolist_id, payload.todolistId);
+        boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+          tasks: payload.tasks
+        });
+      }
+    },
+
     async getTasks(state, todolistId, x, y) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
