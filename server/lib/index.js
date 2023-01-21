@@ -13,6 +13,7 @@ const Http = require('./http');
 const Job = require('./job');
 const Location = require('./location');
 const MessageHandler = require('./message');
+const Notification = require('./notification');
 const Service = require('./service');
 const Session = require('./session');
 const User = require('./user');
@@ -61,6 +62,7 @@ function Gladys(params = {}) {
   const room = new Room(brain);
   const service = new Service(services, stateManager);
   const message = new MessageHandler(event, brain, service, stateManager);
+  const notification = new Notification(service);
   const session = new Session(params.jwtSecret, cache);
   const user = new User(session, stateManager, variable);
   const location = new Location(user, event);
@@ -69,7 +71,7 @@ function Gladys(params = {}) {
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
   const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager, service, job);
-  const scene = new Scene(stateManager, event, device, message, variable, house, calendar, http, gateway);
+  const scene = new Scene(stateManager, event, device, message, variable, house, calendar, http, gateway, notification);
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
@@ -84,6 +86,7 @@ function Gladys(params = {}) {
     gateway,
     location,
     message,
+    notification,
     user,
     service,
     scene,

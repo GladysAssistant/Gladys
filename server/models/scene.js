@@ -17,6 +17,7 @@ const actionSchema = Joi.array().items(
       house: Joi.string(),
       scene: Joi.string(),
       text: Joi.string(),
+      topic: Joi.string(),
       value: Joi.number(),
       minutes: Joi.number(),
       unit: Joi.string(),

@@ -32,11 +32,13 @@ const SceneManager = function SceneManager(
   calendar,
   http,
   gateway,
+  notification,
 ) {
   this.stateManager = stateManager;
   this.event = event;
   this.device = device;
   this.message = message;
+  this.notification = notification;
   this.variable = variable;
   this.house = house;
   this.calendar = calendar;

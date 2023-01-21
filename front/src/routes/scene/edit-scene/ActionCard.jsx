@@ -21,6 +21,7 @@ import CheckTime from './actions/CheckTime';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
 import EcowattCondition from './actions/EcowattCondition';
+import SendNotificationParams from './actions/SendNotificationParams';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -33,6 +34,7 @@ const ACTION_ICON = {
   [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
   [ACTIONS.TIME.DELAY]: 'fe fe-clock',
   [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
+  [ACTIONS.NOTIFICATION.SEND]: 'fe fe-send',
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
   [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
   [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
@@ -140,6 +142,17 @@ const ActionCard = ({ children, ...props }) => (
         )}
         {props.action.type === ACTIONS.MESSAGE.SEND && (
           <SendMessageParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+            actionsGroupsBefore={props.actionsGroupsBefore}
+            variables={props.variables}
+            triggersVariables={props.triggersVariables}
+          />
+        )}
+        {props.action.type === ACTIONS.NOTIFICATION.SEND && (
+          <SendNotificationParams
             action={props.action}
             columnIndex={props.columnIndex}
             index={props.index}

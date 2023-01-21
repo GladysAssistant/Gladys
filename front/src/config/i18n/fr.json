@@ -1082,6 +1082,12 @@
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
+      "notificationSend": {
+        "topicLabel": "Sujet",
+        "textLabel": "Message",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
@@ -1190,6 +1196,9 @@
       },
       "message": {
         "send": "Envoyer un message"
+      },
+      "notification": {
+        "send": "Envoyer une notification"
       },
       "delay": "Attendre",
       "light": {

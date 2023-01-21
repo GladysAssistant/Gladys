@@ -266,6 +266,9 @@ const ACTIONS = {
   MESSAGE: {
     SEND: 'message.send',
   },
+  NOTIFICATION: {
+    SEND: 'notification.send',
+  },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
     CHECK_TIME: 'condition.check-time',

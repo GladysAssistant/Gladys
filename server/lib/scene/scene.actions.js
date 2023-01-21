@@ -125,6 +125,10 @@ const actionsFunc = {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     await self.message.sendToUser(action.user, textWithVariables);
   },
+  [ACTIONS.NOTIFICATION.SEND]: async (self, action, scope) => {
+    const textWithVariables = Handlebars.compile(action.text)(scope);
+    await self.notification.send(action.topic, textWithVariables);
+  },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
     set(
