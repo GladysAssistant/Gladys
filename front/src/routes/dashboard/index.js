@@ -249,6 +249,18 @@ class Dashboard extends Component {
     }
   };
 
+  askDeleteCurrentDashboard = async () => {
+    await this.setState({
+      askDeleteDashboard: true
+    });
+  };
+
+  cancelDeleteCurrentDashboard = async () => {
+    await this.setState({
+      askDeleteDashboard: false
+    });
+  };
+
   deleteCurrentDashboard = async () => {
     try {
       await this.props.httpClient.delete(`/api/v1/dashboard/${this.state.currentDashboard.selector}`);
@@ -261,7 +273,8 @@ class Dashboard extends Component {
         dashboards,
         currentDashboard,
         dashboardDropdownOpened: false,
-        dashboardEditMode: false
+        dashboardEditMode: false,
+        askDeleteDashboard: false
       });
       this.init();
       route('/dashboard');
@@ -314,7 +327,8 @@ class Dashboard extends Component {
       dashboardEditMode: false,
       browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
       dashboards: [],
-      newSelectedBoxType: {}
+      newSelectedBoxType: {},
+      askDeleteDashboard: false
     };
   }
 
@@ -349,7 +363,8 @@ class Dashboard extends Component {
       browserFullScreenCompatible,
       dashboardValidationError,
       dashboardAlreadyExistError,
-      unknownError
+      unknownError,
+      askDeleteDashboard
     }
   ) {
     const dashboardConfigured =
@@ -391,7 +406,10 @@ class Dashboard extends Component {
         updateBoxConfig={this.updateBoxConfig}
         toggleFullScreen={this.toggleFullScreen}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
+        askDeleteCurrentDashboard={this.askDeleteCurrentDashboard}
+        cancelDeleteCurrentDashboard={this.cancelDeleteCurrentDashboard}
         deleteCurrentDashboard={this.deleteCurrentDashboard}
+        askDeleteDashboard={askDeleteDashboard}
         fullScreen={props.fullScreen}
       />
     );

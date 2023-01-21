@@ -187,6 +187,7 @@
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "editDashboardDeleteText": "Etes-vous sur de vouloir supprimer ce dashboard ?",
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Editer le tableau de bord",

@@ -189,6 +189,7 @@
     "editDashboardTitle": "Edit dashboard",
     "editDashboardDeleteButton": "Delete",
     "editDashboardCancelButton": "Cancel",
+    "editDashboardDeleteText": "Are you sure you want to delete this dashboard?",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
