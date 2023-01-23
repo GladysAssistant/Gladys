@@ -54,4 +54,14 @@ describe('gateway.openAI.ask', () => {
     const promise = gateway.openAIAsk({ question: 'Question ?' });
     await assert.isRejected(promise, Error429);
   });
+  it('should return 500, server error', async () => {
+    const error = new Error('unknown error');
+    // @ts-ignore
+    error.response = {
+      status: 500,
+    };
+    gateway.gladysGatewayClient.openAIAsk = fake.rejects(error);
+    const promise = gateway.openAIAsk({ question: 'Question ?' });
+    await assert.isRejected(promise, Error);
+  });
 });
