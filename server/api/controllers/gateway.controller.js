@@ -125,6 +125,16 @@ module.exports = function GatewayController(gladys) {
     res.json(keys);
   }
 
+  /**
+   * @api {post} /api/v1/gateway/openai/ask
+   * @apiName askOpenAI
+   * @apiGroup Gateway
+   */
+  async function openAIAsk(req, res) {
+    const response = await gladys.gateway.openAIAsk(req.body);
+    res.json(response);
+  }
+
   return Object.freeze({
     getStatus: asyncMiddleware(getStatus),
     login: asyncMiddleware(login),
@@ -137,5 +147,6 @@ module.exports = function GatewayController(gladys) {
     restoreBackup: asyncMiddleware(restoreBackup),
     getInstanceKeysFingerprint: asyncMiddleware(getInstanceKeysFingerprint),
     getRestoreStatus: asyncMiddleware(getRestoreStatus),
+    openAIAsk: asyncMiddleware(openAIAsk),
   });
 };

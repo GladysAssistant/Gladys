@@ -1046,6 +1046,18 @@
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
       }
+    },
+    "openai": {
+      "title": "OpenAI GPT-3",
+      "description": "Give Gladys the power of artifical intelligence",
+      "firstExplanation": "This is an alpha integration that let you talk to OpenAI GPT-3.",
+      "itDoesNothing": "It has no action in Gladys, it's just a proof-of-concept.",
+      "aFewExamples": "A few examples: ",
+      "turnOnTheLight": "Turn on the light in the kitchen",
+      "sizeOfEiffelTower": "What's the size of the Eiffel Tower ?",
+      "whoIsJulesVerne": "Who is Jules Verne ?",
+      "eggDuration": "How do you make hard boiled eggs ?",
+      "rateLimit": "As GPT-3 API is not free, this integration is only available to Gladys Plus users and limited to 100 requests per month."
     }
   },
   "editScene": {
