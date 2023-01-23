@@ -4,7 +4,7 @@ const { Error403, Error429 } = require('../../utils/httpErrors');
 
 /**
  * @description Ask OpenAI a question
- * @param {Object} body - The query to ask
+ * @param {Object} body - The query to ask.
  * @example
  * openAIAsk({
  *    question
