@@ -1,8 +1,9 @@
-const { expect } = require('chai');
+const { expect, assert } = require('chai');
 const { fake } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
 const GladysGatewayClientMock = require('./GladysGatewayClientMock.test');
+const { Error403, Error429 } = require('../../../utils/httpErrors');
 
 const event = new EventEmitter();
 
@@ -25,9 +26,32 @@ describe('gateway.openAI.ask', () => {
     setValue: fake.resolves(null),
   };
   const system = {};
-  const gateway = new Gateway(variable, event, system, {}, {}, {}, {}, {}, job);
+  let gateway;
+  beforeEach(() => {
+    gateway = new Gateway(variable, event, system, {}, {}, {}, {}, {}, job);
+  });
   it('should ask to GPT-3 a question', async () => {
     const data = await gateway.openAIAsk({ question: 'Question ?' });
     expect(data).to.deep.equal({ answer: 'this is the answer' });
+  });
+  it('should return 403 forbidden', async () => {
+    const error = new Error('Forbidden');
+    // @ts-ignore
+    error.response = {
+      status: 403,
+    };
+    gateway.gladysGatewayClient.openAIAsk = fake.throws(error);
+    const promise = gateway.openAIAsk({ question: 'Question ?' });
+    await assert.isRejected(promise, Error403);
+  });
+  it('should return 429 too many requests', async () => {
+    const error = new Error('too many requests');
+    // @ts-ignore
+    error.response = {
+      status: 429,
+    };
+    gateway.gladysGatewayClient.openAIAsk = fake.rejects(error);
+    const promise = gateway.openAIAsk({ question: 'Question ?' });
+    await assert.isRejected(promise, Error429);
   });
 });
