@@ -99,6 +99,7 @@ class OpenAIGateway extends Component {
   }
 
   render(props, { messages, gladysIsTyping, currentMessageTextInput, error }) {
+    const notOnGladysPlus = props.session && props.session.getGatewayUser === undefined;
     return (
       <Layout>
         <div class="container mt-4">
@@ -139,6 +140,11 @@ class OpenAIGateway extends Component {
               <div class="card">
                 <div class="card-body">
                   {error && <div class="alert alert-danger">{error}</div>}
+                  {notOnGladysPlus && (
+                    <div class="alert alert-danger">
+                      <Text id="integration.openai.rateLimit" />
+                    </div>
+                  )}
                   {messages && messages.length > 0 && (
                     <ChatItems user={props.user} messages={messages} gladysIsTyping={gladysIsTyping} />
                   )}
@@ -151,6 +157,7 @@ class OpenAIGateway extends Component {
                         type="text"
                         class="form-control"
                         placeholder={<Text id="chat.messagePlaceholder" />}
+                        disabled={notOnGladysPlus}
                         value={currentMessageTextInput}
                         onInput={this.updateMessageTextInput}
                         onKeyPress={this.onKeyPress}
