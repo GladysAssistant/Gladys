@@ -24,7 +24,7 @@ class Condition extends Component {
   };
 
   handleValueChange = e => {
-    const newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : null;
+    const newValue = Number.parseFloat(e.target.value);
     const newCondition = update(this.props.condition, {
       value: {
         $set: newValue
@@ -114,11 +114,11 @@ class Condition extends Component {
               </label>
               <Localizer>
                 <input
-                  type="text"
+                  type="number"
                   class="form-control"
                   placeholder={<Text id="editScene.triggersCard.newState.valuePlaceholder" />}
                   value={props.condition.value}
-                  onChange={this.handleValueChange}
+                  onBlur={this.handleValueChange}
                 />
               </Localizer>
             </div>

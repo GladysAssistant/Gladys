@@ -14,19 +14,51 @@ class SettingsBilling extends Component {
       loading: false
     });
   };
+  getCurrentPlan = async () => {
+    try {
+      const { plan } = await this.props.session.gatewayClient.getCurrentPlan();
+      this.setState({
+        plan
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  upgradeMonthlyToYearly = async () => {
+    try {
+      await this.setState({ upgradeYearlyError: false, loading: true });
+      await this.props.session.gatewayClient.upgradeMonthlyToYearly();
+      await this.setState({ upgradeYearlySuccess: true });
+    } catch (e) {
+      await this.setState({ upgradeYearlyError: true });
+      console.error(e);
+    }
+    await this.getCurrentPlan();
+    await this.setState({ loading: false });
+  };
   openStripeBilling = async () => {
     window.open(
       `${this.props.session.gladysGatewayApiUrl}/accounts/stripe_customer_portal/${this.state.setupState.stripe_portal_key}`
     );
   };
+
   componentWillMount() {
     this.getSetupState();
+    this.getCurrentPlan();
   }
 
-  render(props, { loading }) {
+  render(props, { loading, upgradeYearlyError, plan, upgradeYearlySuccess }) {
     return (
       <SettingsLayout>
-        <GatewayBilling openStripeBilling={this.openStripeBilling} loading={loading} />
+        <GatewayBilling
+          openStripeBilling={this.openStripeBilling}
+          getCurrentPlan={this.getCurrentPlan}
+          upgradeMonthlyToYearly={this.upgradeMonthlyToYearly}
+          loading={loading}
+          upgradeYearlyError={upgradeYearlyError}
+          upgradeYearlySuccess={upgradeYearlySuccess}
+          plan={plan}
+        />
       </SettingsLayout>
     );
   }

@@ -265,7 +265,7 @@
         "lastThreeMonths": "Derniers 3 mois",
         "lastYear": "Dernière année",
         "noValue": "Pas de valeurs sur cet intervalle.",
-        "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être aggrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
+        "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être agrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
         "editNameLabel": "Entrez le nom de cette box",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
@@ -1540,9 +1540,9 @@
     "previous": "Précédent",
     "next": "Suivant",
     "jobTypes": {
-      "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
-      "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
-      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire",
+      "monthly-device-state-aggregate": "Agrégation donnée capteur mensuelle",
+      "daily-device-state-aggregate": "Agrégation donnée capteur journalière",
+      "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",
       "gladys-gateway-backup": "Sauvegarde Gladys Plus",
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
       "vacuum": "Nettoyage de la base de donnée"
@@ -2313,6 +2313,12 @@
     "title": "Facturation",
     "informationTitle": "Vos informations de paiement",
     "stripeDescription": "Le paiement est géré par Stripe. Nous ne voyons jamais votre carte de crédit.",
-    "stripeButton": "Gérer la facturation dans Stripe"
+    "stripeButton": "Gérer la facturation dans Stripe",
+    "yourCurrentPlan": "Votre plan actuel",
+    "monthlyPlan": "Vous êtes actuellement en paiement mensuel. Si vous souhaitez passer au plan annuel ( 99.99€/an ), vous pouvez cliquer sur le bouton ci-dessous. Si vous êtes en cours d'un mois, le prix du premier paiement annuel sera fait au pro-rata pour vous éviter de payer plusieurs fois le mois en cours !",
+    "yearlyPlan": "Vous êtes actuellement en paiement annuel.",
+    "upgradeToYearly": "Passer au plan annuel",
+    "upgradeYearlyError": "Une erreur est survenue lors de la mise à jour vers le plan annuel, merci de nous contacter par email ou sur le forum.",
+    "upgradeYearlySuccess": "Merci d'être passé au plan annuel !"
   }
 }
