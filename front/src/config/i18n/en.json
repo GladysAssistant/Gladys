@@ -204,11 +204,8 @@
       "devices-in-room": "Devices in room",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
-<<<<<<< HEAD
-      "vacbot": "Vacuum Robot"
-=======
+      "vacbot": "Vacuum Robot",
       "clock": "Clock"
->>>>>>> upstream/master
     },
     "boxes": {
       "column": "Column {{index}}",
