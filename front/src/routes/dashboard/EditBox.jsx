@@ -7,6 +7,7 @@ import EditDevicesInRoom from '../../components/boxs/device-in-room/EditDeviceIn
 import EditChart from '../../components/boxs/chart/EditChart';
 import EditEcowatt from '../../components/boxs/ecowatt/EditEcowatt';
 import EditVacbot from '../../components/boxs/vacbot/EditVacbot';
+import EditClock from '../../components/boxs/clock/EditClock';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -28,6 +29,8 @@ const Box = ({ children, ...props }) => {
       return <EditEcowatt {...props} />;
     case 'vacbot':
       return <EditVacbot {...props} />;
+    case 'clock':
+      return <EditClock {...props} />;
   }
 };
 

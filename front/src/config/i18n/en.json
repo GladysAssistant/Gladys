@@ -204,7 +204,11 @@
       "devices-in-room": "Devices in room",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
+<<<<<<< HEAD
       "vacbot": "Vacuum Robot"
+=======
+      "clock": "Clock"
+>>>>>>> upstream/master
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -307,6 +311,15 @@
         "ok": "Réseau ok",
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
+      "clock": {
+        "analog": "Analog",
+        "digital": "Digital",
+        "date": "{{day}}, {{month}} {{dayNumber}}, {{year}}",
+        "smallDate": "{{month}} {{dayNumber}}",
+        "type": "Clock type?",
+        "displaySecond": "Display seconds?",
+        "yes": "Yes",
+        "no": "No"
       }
     }
   },
@@ -1117,6 +1130,7 @@
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
+    "duplicateButton": "Duplicate",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
     "addTriggerButton": "Add trigger",
@@ -1681,6 +1695,16 @@
     "iconLabel": "Select an icon for you scene",
     "createSceneButton": "Create scene",
     "invalidName": "Name is required and cannot be 'new'",
+    "invalidIcon": "Icon is required",
+    "sceneAlreadyExist": "A scene with that name already exist."
+  },
+  "duplicateScene": {
+    "cardTitle": "Duplicate scene \"{{name}}\"",
+    "nameLabel": "Name",
+    "namePlaceholder": "Enter a new name",
+    "iconLabel": "Select an icon for you scene",
+    "duplicateSceneButton": "Duplicate",
+    "invalidName": "Name is required",
     "invalidIcon": "Icon is required",
     "sceneAlreadyExist": "A scene with that name already exist."
   },
@@ -2377,6 +2401,12 @@
     "title": "Billing",
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
-    "stripeButton": "Edit subscription in Stripe"
+    "stripeButton": "Edit subscription in Stripe",
+    "yourCurrentPlan": "Your plan",
+    "monthlyPlan": "You are currently using the monthly plan. If you want to switch to the annual plan (99.99€/year), you can click on the button below. The first payment will be prorated based on your current month.",
+    "yearlyPlan": "You are currently on the annual plan.",
+    "upgradeToYearly": "Switch to annual plan",
+    "upgradeYearlyError": "An error occured while switching to the annual plan, please contact us by email.",
+    "upgradeYearlySuccess": "Thanks for switching to the annual plan!"
   }
 }
