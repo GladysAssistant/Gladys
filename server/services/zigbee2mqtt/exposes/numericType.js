@@ -60,6 +60,14 @@ module.exports = {
         max: 1000,
       },
     },
+    current_heating_setpoint: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        min: 5,
+        max: 40,
+      },
+    },
     current_phase_b: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
@@ -152,6 +160,22 @@ module.exports = {
         forceOverride: true,
       },
     },
+    occupied_cooling_setpoint: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        min: 5,
+        max: 40,
+      },
+    },
+    occupied_heating_setpoint: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        min: 5,
+        max: 40,
+      },
+    },
     position: {
       types: {
         cover: {
@@ -182,6 +206,22 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.CELSIUS,
         min: -100,
         max: 150,
+      },
+    },
+    unoccupied_cooling_setpoint: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        min: 5,
+        max: 40,
+      },
+    },
+    unoccupied_heating_setpoint: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+        type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+        min: 5,
+        max: 40,
       },
     },
     voltage: {
