@@ -1057,7 +1057,10 @@
       "sizeOfEiffelTower": "What's the size of the Eiffel Tower ?",
       "whoIsJulesVerne": "Who is Jules Verne ?",
       "eggDuration": "How do you make hard boiled eggs ?",
-      "rateLimit": "As GPT-3 API is not free, this integration is only available to Gladys Plus users and limited to 100 requests per month."
+      "rateLimit": "As GPT-3 API is not free, this integration is only available to Gladys Plus users and limited to 100 requests per month.",
+      "notOnGladysPlus": "As GPT-3 API is not free, this integration is only available to Gladys Plus users.",
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
+      "licenseShouldBeActive": "This integration is only available to users with an active license (at least one payment). For trial users, please contact us on the forum or email."
     }
   },
   "editScene": {

@@ -1057,7 +1057,10 @@
       "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
       "whoIsJulesVerne": "Qui est Jules Verne ?",
       "eggDuration": "Comment cuire les oeufs durs ?",
-      "rateLimit": "L'API GPT-3 étant payante, cette intégration n'est disponible que via Gladys Plus, et est pour l'instant limitée à 100 requêtes par mois."
+      "rateLimit": "L'API GPT-3 étant payante, cette intégration n'est disponible que via Gladys Plus, et est pour l'instant limitée à 100 requêtes par mois.",
+      "notOnGladysPlus": "L'API GPT-3 étant payante, cette intégration est proposée via Gladys Plus uniquement.",
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
+      "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
     }
   },
   "editScene": {

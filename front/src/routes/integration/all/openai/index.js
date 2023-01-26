@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import get from 'get-value';
 import uuid from 'uuid';
 import update from 'immutability-helper';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import ChatItems from '../../../chat/ChatItems';
 import EmptyChat from '../../../chat/EmptyChat';
 import Layout from './Layout';
@@ -30,7 +30,13 @@ class OpenAIGateway extends Component {
         }
       ]
     });
-    await this.setState({ messages: newMessages, currentMessageTextInput: '', error: null, gladysIsTyping: true });
+    await this.setState({
+      messages: newMessages,
+      currentMessageTextInput: '',
+      error: null,
+      accountLicenseShouldBeActive: null,
+      gladysIsTyping: true
+    });
     this.scrollToBottom();
     try {
       const body = {
@@ -68,11 +74,18 @@ class OpenAIGateway extends Component {
     } catch (e) {
       console.error(e);
       const errorMessage = get(e, 'response.data.message');
-      let message = `${e.message},  ${errorMessage}`;
-      this.setState({
-        error: message,
-        gladysIsTyping: false
-      });
+      if (errorMessage === 'Account license should be active') {
+        this.setState({
+          accountLicenseShouldBeActive: true,
+          gladysIsTyping: false
+        });
+      } else {
+        let message = `${e.message},  ${errorMessage}`;
+        this.setState({
+          error: message,
+          gladysIsTyping: false
+        });
+      }
     }
   };
 
@@ -98,7 +111,7 @@ class OpenAIGateway extends Component {
     };
   }
 
-  render(props, { messages, gladysIsTyping, currentMessageTextInput, error }) {
+  render(props, { messages, gladysIsTyping, currentMessageTextInput, error, accountLicenseShouldBeActive }) {
     const notOnGladysPlus = props.session && props.session.getGatewayUser === undefined;
     return (
       <Layout>
@@ -138,18 +151,23 @@ class OpenAIGateway extends Component {
             </div>
             <div class="col-md-8">
               <div class="card">
-                <div class="card-body">
-                  {error && <div class="alert alert-danger">{error}</div>}
-                  {notOnGladysPlus && (
-                    <div class="alert alert-danger">
-                      <Text id="integration.openai.rateLimit" />
-                    </div>
-                  )}
-                  {messages && messages.length > 0 && (
-                    <ChatItems user={props.user} messages={messages} gladysIsTyping={gladysIsTyping} />
-                  )}
-                  {messages && messages.length === 0 && <EmptyChat />}
-                </div>
+                {error && <div class="alert alert-danger">{error}</div>}
+                {accountLicenseShouldBeActive && (
+                  <div class="alert alert-warning">
+                    <Text id="integration.openai.licenseShouldBeActive" />
+                  </div>
+                )}
+                {notOnGladysPlus && (
+                  <div class="alert alert-warning">
+                    <Text id="integration.openai.notOnGladysPlus" />
+                    <br />
+                    <MarkupText id="integration.openai.subscribeToGladysPlus" />
+                  </div>
+                )}
+                {messages && messages.length > 0 && (
+                  <ChatItems user={props.user} messages={messages} gladysIsTyping={gladysIsTyping} />
+                )}
+                {messages && messages.length === 0 && <EmptyChat />}
                 <div class="card-footer">
                   <div class="input-group">
                     <Localizer>
