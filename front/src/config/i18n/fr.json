@@ -187,6 +187,7 @@
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Editer le tableau de bord",
@@ -1062,6 +1063,21 @@
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
+    },
+    "openai": {
+      "title": "OpenAI GPT-3",
+      "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
+      "firstExplanation": "Ceci est une alpha d'une intégration avec l'intelligence artificielle OpenAI GPT-3. Vous pouvez demander ce que vous voulez à Gladys ici.",
+      "itDoesNothing": "Cette alpha ne fait aucune action avec Gladys, ce n'est qu'une preuve de concept qui sera déployée dans Gladys si l'expérience est un succès.",
+      "aFewExamples": "Quelques exemples :",
+      "turnOnTheLight": "Allume la lumière du salon !",
+      "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
+      "whoIsJulesVerne": "Qui est Jules Verne ?",
+      "eggDuration": "Comment cuire les oeufs durs ?",
+      "rateLimit": "L'API GPT-3 étant payante, cette intégration n'est disponible que via Gladys Plus, et est pour l'instant limitée à 100 requêtes par mois.",
+      "notOnGladysPlus": "L'API GPT-3 étant payante, cette intégration est proposée via Gladys Plus uniquement.",
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
+      "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
     }
   },
   "editScene": {
