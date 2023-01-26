@@ -314,6 +314,10 @@ function getRoutes(gladys) {
       admin: true,
       controller: gatewayController.getInstanceKeysFingerprint,
     },
+    'post /api/v1/gateway/openai/ask': {
+      authenticated: true,
+      controller: gatewayController.openAIAsk,
+    },
     // room
     'get /api/v1/room': {
       authenticated: true,

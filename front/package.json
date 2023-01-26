@@ -44,7 +44,7 @@
     "prettier": "^1.17.1"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^4.5.0",
+    "@gladysassistant/gladys-gateway-js": "^4.8.1",
     "@gladysassistant/theme-optimized": "^1.0.3",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "^4.5.0",
@@ -67,6 +67,7 @@
     "preact-router": "^3.2.1",
     "qrcode": "^1.4.2",
     "react-big-calendar": "^0.40.0",
+    "react-clock": "^3.1.0",
     "react-datepicker": "^3.8.0",
     "react-select": "^4.3.1",
     "unistore": "^3.5.2",
