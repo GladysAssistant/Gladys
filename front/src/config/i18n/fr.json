@@ -339,7 +339,7 @@
       "description": "Synchonisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
-      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de Gladys.",
+      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de cette installation Gladys. Ils deviennent ensuite utilisables dans les scènes et affichables dans l'onglet calendrier pour tous les utilisateurs de cette installation.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
