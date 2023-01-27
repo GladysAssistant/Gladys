@@ -45,9 +45,23 @@ const Billing = ({ children, ...props }) => (
                   {props.plan === 'monthly' && <Text id="gatewayBilling.monthlyPlan" />}
                 </p>
                 {props.plan === 'monthly' && (
-                  <button class="btn btn-success mr-2" onClick={props.upgradeMonthlyToYearly}>
-                    <Text id="gatewayBilling.upgradeToYearly" />
-                  </button>
+                  <div>
+                    {!props.confirmUpgrade && (
+                      <button class="btn btn-success mr-2" onClick={props.wantYearlyUpgrade}>
+                        <Text id="gatewayBilling.upgradeToYearly" />
+                      </button>
+                    )}
+                    {props.confirmUpgrade && (
+                      <button class="btn btn-success mr-2" onClick={props.upgradeMonthlyToYearly}>
+                        <Text id="gatewayBilling.confirmUpgradeToYearly" />
+                      </button>
+                    )}
+                    {props.confirmUpgrade && (
+                      <button class="btn btn-danger mr-2" onClick={props.cancelYearlyUpgrade}>
+                        <Text id="gatewayBilling.cancelUpgradeToYearly" />
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

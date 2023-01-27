@@ -2410,6 +2410,8 @@
     "monthlyPlan": "Vous êtes actuellement en paiement mensuel. Si vous souhaitez passer au plan annuel ( 99.99€/an ), vous pouvez cliquer sur le bouton ci-dessous. Si vous êtes en cours d'un mois, le prix du premier paiement annuel sera fait au pro-rata pour vous éviter de payer plusieurs fois le mois en cours !",
     "yearlyPlan": "Vous êtes actuellement en paiement annuel.",
     "upgradeToYearly": "Passer au plan annuel",
+    "confirmUpgradeToYearly": "Confirmer le passage au plan annuel ? Votre moyen de paiement sera débité.",
+    "cancelUpgradeToYearly": "Annuler",
     "upgradeYearlyError": "Une erreur est survenue lors de la mise à jour vers le plan annuel, merci de nous contacter par email ou sur le forum.",
     "upgradeYearlySuccess": "Merci d'être passé au plan annuel !"
   }
