@@ -92,6 +92,7 @@ const DashboardPage = ({ children, ...props }) => (
               )}
               {props.dashboardEditMode && (
                 <EditBoxColumns
+                  dashboards={props.dashboards}
                   updateCurrentDashboardName={props.updateCurrentDashboardName}
                   editDashboardDragEnable={props.editDashboardDragEnable}
                   moveCard={props.moveCard}
@@ -102,6 +103,10 @@ const DashboardPage = ({ children, ...props }) => (
                   updateNewSelectedBox={props.updateNewSelectedBox}
                   removeBox={props.removeBox}
                   updateBoxConfig={props.updateBoxConfig}
+                  showReorderDashboard={props.showReorderDashboard}
+                  toggleReorderDashboard={props.toggleReorderDashboard}
+                  updateDashboardList={props.updateDashboardList}
+                  savingNewDashboardList={props.savingNewDashboardList}
                 />
               )}
               {props.dashboardEditMode && <EditActions {...props} />}

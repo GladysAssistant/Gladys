@@ -11,7 +11,6 @@ extend('$auto', (value, object) => {
   return object ? update(object, value) : update({}, value);
 });
 
-@connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', actions)
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
     this.setState(prevState => {
@@ -78,6 +77,7 @@ class Dashboard extends Component {
     await this.getDashboards();
     if (this.state.currentDashboardSelector) {
       await this.getCurrentDashboard();
+      this.editDashboard();
     }
   };
 
@@ -319,12 +319,39 @@ class Dashboard extends Component {
     this.props.setFullScreen(isFullScreen);
   };
 
+  toggleReorderDashboard = () => {
+    if (this.state.showReorderDashboard) {
+      this.saveNewDashboardList();
+    } else {
+      this.setState({ showReorderDashboard: !this.state.showReorderDashboard });
+    }
+  };
+
+  updateDashboardList = newDashboards => {
+    this.setState({
+      dashboards: newDashboards
+    });
+  };
+
+  saveNewDashboardList = async () => {
+    await this.setState({
+      savingNewDashboardList: true
+    });
+    setTimeout(() => {
+      this.setState({
+        savingNewDashboardList: false,
+        showReorderDashboard: false
+      });
+    }, 500);
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
       dashboardDropdownOpened: false,
       dashboardEditMode: false,
+      showReorderDashboard: false,
       browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
       dashboards: [],
       newSelectedBoxType: {},
@@ -364,7 +391,9 @@ class Dashboard extends Component {
       dashboardValidationError,
       dashboardAlreadyExistError,
       unknownError,
-      askDeleteDashboard
+      askDeleteDashboard,
+      showReorderDashboard,
+      savingNewDashboardList
     }
   ) {
     const dashboardConfigured =
@@ -411,9 +440,13 @@ class Dashboard extends Component {
         deleteCurrentDashboard={this.deleteCurrentDashboard}
         askDeleteDashboard={askDeleteDashboard}
         fullScreen={props.fullScreen}
+        showReorderDashboard={showReorderDashboard}
+        toggleReorderDashboard={this.toggleReorderDashboard}
+        updateDashboardList={this.updateDashboardList}
+        savingNewDashboardList={savingNewDashboardList}
       />
     );
   }
 }
 
-export default Dashboard;
+export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', actions)(Dashboard);

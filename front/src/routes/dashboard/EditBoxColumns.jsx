@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import EditBox from './EditBox';
 import EditAddBoxButton from './EditAddBoxButton';
+import ReorderDashbordList from './ReorderDashbordList';
 import style from './style.css';
 
 const EditBoxColumns = ({ children, ...props }) => (
@@ -24,8 +25,8 @@ const EditBoxColumns = ({ children, ...props }) => (
         <Text id="newDashboard.unknownError" />
       </div>
     )}
-    <div class="row">
-      <div class="col-md-12 mb-4">
+    <div class="row mb-4 align-items-end">
+      <div class="col-md-4">
         <div class="form-group">
           <label class="form-label">
             <Text id="dashboard.editDashboardNameLabel" />
@@ -40,6 +41,34 @@ const EditBoxColumns = ({ children, ...props }) => (
             />
           </Localizer>
         </div>
+      </div>
+      <div class="col-md-2">
+        <div class="form-group">
+          <button
+            onClick={props.toggleReorderDashboard}
+            class={cx('btn', {
+              'btn-primary': !props.showReorderDashboard,
+              'btn-success': props.showReorderDashboard
+            })}
+          >
+            {!props.showReorderDashboard && <Text id="dashboard.reorderDashboardsButton" />}
+            {props.showReorderDashboard && !props.savingNewDashboardList && (
+              <Text id="dashboard.reorderDashboardsButtonActive" />
+            )}
+            {props.showReorderDashboard && props.savingNewDashboardList && (
+              <Text id="dashboard.reorderDashboardsButtonSaving" />
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
+    <div
+      class={cx('row', style.collapse, {
+        [style.showCollapse]: props.showReorderDashboard
+      })}
+    >
+      <div class="col-md-6 mb-6">
+        <ReorderDashbordList dashboards={props.dashboards} updateDashboardList={props.updateDashboardList} />
       </div>
     </div>
     <div class="d-flex flex-row flex-wrap justify-content-center pb-9">

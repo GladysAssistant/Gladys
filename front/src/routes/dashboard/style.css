@@ -45,3 +45,15 @@
     border-radius: 3px;
   }
 }
+
+.collapse {
+  max-height: 0;
+  transition: max-height 0.25s ease-out;
+  overflow: hidden;
+}
+
+.showCollapse {
+  max-height: 500px;
+  overflow: auto;
+  transition: max-height 0.5s ease-in;
+}

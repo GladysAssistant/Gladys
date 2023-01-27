@@ -196,6 +196,10 @@
     "noDashboardSentenceBottom": "Cliquez sur le bouton \"Nouveau\" pour créer un tableau de bord.",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
+    "reorderDashboardsButton": "Re-ordonner mes tableaux de bords",
+    "reorderDashboardsButtonActive": "J'ai fini !",
+    "reorderDashboardsButtonSaving": "Enregistrement...",
+    "reorderDashboardsLabel": "Re-ordonnez cette liste, puis cliquez sur \"J'ai fini\"",
     "boxTitle": {
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
