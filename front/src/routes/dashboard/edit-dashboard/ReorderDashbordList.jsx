@@ -1,7 +1,8 @@
 import { useRef } from 'preact/hooks';
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import cx from 'classnames';
 import update from 'immutability-helper';
+import { route } from 'preact-router';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -10,7 +11,7 @@ const DASHBOARD_LIST_ITEM_TYPE = 'DASHBOARD_LIST_ITEM';
 const DashboardListItem = ({ children, ...props }) => {
   const { index } = props;
   const ref = useRef(null);
-  const [{ isDragging }, drag] = useDrag(() => ({
+  const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: DASHBOARD_LIST_ITEM_TYPE,
     item: () => {
       return { index };
@@ -31,18 +32,25 @@ const DashboardListItem = ({ children, ...props }) => {
       props.insertAtPosition(item.index, index);
     }
   });
-  drag(drop(ref));
+  const openEditPage = () => {
+    route(`/dashboard/${props.selector}/edit`);
+  };
+  preview(drop(ref));
 
   return (
     <li
       ref={ref}
-      class="list-group-item"
+      onClick={openEditPage}
+      class={cx('list-group-item', {
+        active: props.isSelected
+      })}
       style={{
         opacity: isDragging ? 0.5 : 1,
-        backgroundColor: isActive ? '#ecf0f1' : 'white'
+        cursor: 'pointer',
+        backgroundColor: isActive ? '#ecf0f1' : undefined
       }}
     >
-      <i class="fe fe-list mr-2" /> {props.name}
+      <i ref={drag} style={{ cursor: 'move' }} class="fe fe-list mr-2" /> {props.name}
     </li>
   );
 };
@@ -60,12 +68,9 @@ class RedorderDashboardList extends Component {
     this.props.updateDashboardList(newDashboards);
   };
 
-  render({ dashboards }, {}) {
+  render({ dashboards, currentDashboard }, {}) {
     return (
       <DndProvider backend={HTML5Backend}>
-        <label class="form-label">
-          <Text id="dashboard.reorderDashboardsLabel" />
-        </label>
         <ul class="list-group">
           {dashboards &&
             dashboards.map((dashboard, index) => (
@@ -73,6 +78,8 @@ class RedorderDashboardList extends Component {
                 index={index}
                 id={dashboard.id}
                 name={dashboard.name}
+                selector={dashboard.selector}
+                isSelected={dashboard.id === currentDashboard.id}
                 insertAtPosition={this.insertAtPosition}
               />
             ))}

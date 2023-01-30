@@ -196,10 +196,7 @@
     "noDashboardSentenceBottom": "Click on the \"New\" button to create a new dashboard",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
     "editDashboardNameLabel": "Name",
-    "reorderDashboardsButton": "Re-order my dashboards",
-    "reorderDashboardsButtonActive": "Save the order",
-    "reorderDashboardsButtonSaving": "Saving...",
-    "reorderDashboardsLabel": "Re-order this list, then click on \"Save the order\"",
+    "editDashboardMyDashboards": "My dashboards",
     "boxTitle": {
       "weather": "Weather",
       "temperature-in-room": "Temperature in room",

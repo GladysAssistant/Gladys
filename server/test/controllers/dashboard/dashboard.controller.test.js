@@ -86,6 +86,7 @@ describe('PATCH /api/v1/dashboard/:dashboard_selector', () => {
           id: '854dda11-80c0-4476-843b-65cbc95c6a85',
           name: 'new name',
           selector: 'test-dashboard',
+          position: 0,
           user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           type: 'main',
           boxes: [

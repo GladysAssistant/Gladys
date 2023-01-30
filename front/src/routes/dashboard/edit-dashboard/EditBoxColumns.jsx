@@ -2,14 +2,13 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import EditBox from './EditBox';
 import EditAddBoxButton from './EditAddBoxButton';
-import ReorderDashbordList from './ReorderDashbordList';
-import style from './style.css';
+import style from '../style.css';
 
 const EditBoxColumns = ({ children, ...props }) => (
   <div>
-    <h2>
+    <h3>
       <Text id="dashboard.editDashboardTitle" />
-    </h2>
+    </h3>
     {props.dashboardAlreadyExistError && (
       <div class="alert alert-danger">
         <Text id="newDashboard.dashboardAlreadyExist" />
@@ -42,37 +41,10 @@ const EditBoxColumns = ({ children, ...props }) => (
           </Localizer>
         </div>
       </div>
-      <div class="col-md-2">
-        <div class="form-group">
-          <button
-            onClick={props.toggleReorderDashboard}
-            class={cx('btn', {
-              'btn-primary': !props.showReorderDashboard,
-              'btn-success': props.showReorderDashboard
-            })}
-          >
-            {!props.showReorderDashboard && <Text id="dashboard.reorderDashboardsButton" />}
-            {props.showReorderDashboard && !props.savingNewDashboardList && (
-              <Text id="dashboard.reorderDashboardsButtonActive" />
-            )}
-            {props.showReorderDashboard && props.savingNewDashboardList && (
-              <Text id="dashboard.reorderDashboardsButtonSaving" />
-            )}
-          </button>
-        </div>
-      </div>
-    </div>
-    <div
-      class={cx('row', style.collapse, {
-        [style.showCollapse]: props.showReorderDashboard
-      })}
-    >
-      <div class="col-md-6 mb-6">
-        <ReorderDashbordList dashboards={props.dashboards} updateDashboardList={props.updateDashboardList} />
-      </div>
     </div>
     <div class="d-flex flex-row flex-wrap justify-content-center pb-9">
       {props.homeDashboard &&
+        props.homeDashboard.boxes &&
         props.homeDashboard.boxes.map((column, x) => (
           <div
             class={cx('d-flex flex-column col-lg-4', {
