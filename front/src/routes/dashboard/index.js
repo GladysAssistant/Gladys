@@ -77,7 +77,6 @@ class Dashboard extends Component {
     await this.getDashboards();
     if (this.state.currentDashboardSelector) {
       await this.getCurrentDashboard();
-      this.editDashboard();
     }
   };
 
@@ -337,12 +336,18 @@ class Dashboard extends Component {
     await this.setState({
       savingNewDashboardList: true
     });
-    setTimeout(() => {
+    try {
+      const dashboardSelectors = this.state.dashboards.map(d => d.selector);
+      await this.props.httpClient.post('/api/v1/dashboard/order', dashboardSelectors);
       this.setState({
-        savingNewDashboardList: false,
         showReorderDashboard: false
       });
-    }, 500);
+    } catch (e) {
+      console.error(e);
+    }
+    this.setState({
+      savingNewDashboardList: false
+    });
   };
 
   constructor(props) {

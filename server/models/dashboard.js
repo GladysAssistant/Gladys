@@ -55,6 +55,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.ENUM(DASHBOARD_TYPE_LIST),
       },
+      position: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+      },
       selector: {
         allowNull: false,
         unique: true,
