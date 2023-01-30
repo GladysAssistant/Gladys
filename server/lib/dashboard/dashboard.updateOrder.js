@@ -1,10 +1,10 @@
-const db = require('../../models');
 const Promise = require('bluebird');
+const db = require('../../models');
 
 /**
  * @description Update a dashboard.
  * @param {string} userId - The userId querying.
- * @param {Array<String>} dashboards - Dashboard selectors new order.
+ * @param {Array<string>} dashboards - Dashboard selectors new order.
  * @example
  * gladys.dashboard.updateOrder('483b68cb-15ef-4ea3-80df-1e1bed5b402d', ['my-dashboard', 'other-dashboard']);
  */
