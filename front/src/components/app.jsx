@@ -126,6 +126,9 @@ import ZwaveJSUIDiscoverPage from '../routes/integration/all/zwave-js-ui/discove
 import ZwaveJSUISettingsPage from '../routes/integration/all/zwave-js-ui/settings-page';
 import ZwaveJSUIEditPage from '../routes/integration/all/zwave-js-ui/edit-page';
 
+// OpenAI integration
+import OpenAIPage from '../routes/integration/all/openai/index';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -237,6 +240,7 @@ const AppRouter = connect(
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
+        <OpenAIPage path="/dashboard/integration/communication/openai" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

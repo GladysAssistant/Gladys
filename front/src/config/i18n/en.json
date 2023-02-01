@@ -189,6 +189,7 @@
     "editDashboardTitle": "Edit dashboard",
     "editDashboardDeleteButton": "Delete",
     "editDashboardCancelButton": "Cancel",
+    "editDashboardDeleteText": "Are you sure you want to delete this dashboard?",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
@@ -986,7 +987,7 @@
       "description": "Sync your CalDAV calendars and use them in scenes.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "syncIntroduction": "Choose calendars to synchronize.",
-      "shareIntroduction": "Choose calendars you want to share with other Gladys users.",
+      "shareIntroduction": "Choose calendars you want to share with other Gladys users of this installation. If shared, those calendars will be available in scenes, and displayed in the calendar tab to every user of this installation.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
@@ -1160,6 +1161,21 @@
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
       }
+    },
+    "openai": {
+      "title": "OpenAI GPT-3",
+      "description": "Give Gladys the power of artifical intelligence",
+      "firstExplanation": "This is an alpha integration that let you talk to OpenAI GPT-3.",
+      "itDoesNothing": "It has no action in Gladys, it's just a proof-of-concept.",
+      "aFewExamples": "A few examples: ",
+      "turnOnTheLight": "Turn on the light in the kitchen",
+      "sizeOfEiffelTower": "What's the size of the Eiffel Tower ?",
+      "whoIsJulesVerne": "Who is Jules Verne ?",
+      "eggDuration": "How do you make hard boiled eggs ?",
+      "rateLimit": "As GPT-3 API is not free, this integration is only available to Gladys Plus users and limited to 100 requests per month.",
+      "notOnGladysPlus": "As GPT-3 API is not free, this integration is only available to Gladys Plus users.",
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
+      "licenseShouldBeActive": "This integration is only available to users with an active license (at least one payment). For trial users, please contact us on the forum or email."
     }
   },
   "editScene": {
@@ -2427,6 +2443,14 @@
     "title": "Billing",
     "informationTitle": "Your billing information",
     "stripeDescription": "Billing is handled by Stripe. We never see you credit card.",
-    "stripeButton": "Edit subscription in Stripe"
+    "stripeButton": "Edit subscription in Stripe",
+    "yourCurrentPlan": "Your plan",
+    "monthlyPlan": "You are currently using the monthly plan. If you want to switch to the annual plan (99.99€/year), you can click on the button below. The first payment will be prorated based on your current month.",
+    "yearlyPlan": "You are currently on the annual plan.",
+    "upgradeToYearly": "Switch to annual plan",
+    "confirmUpgradeToYearly": "Confirm switching to annual plan? Your payment method will be charged.",
+    "cancelUpgradeToYearly": "Cancel",
+    "upgradeYearlyError": "An error occured while switching to the annual plan, please contact us by email.",
+    "upgradeYearlySuccess": "Thanks for switching to the annual plan!"
   }
 }

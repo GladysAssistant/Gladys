@@ -117,7 +117,7 @@ class Ecowatt extends Component {
         days.push({
           day: dayjs(day.jour)
             .locale(this.props.user.language)
-            .format('LL'),
+            .format('ddd LL'),
           data: day.dvalue
         });
       });

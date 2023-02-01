@@ -16,7 +16,7 @@ const DEFAULT = {
     IN_PROGRESS: 'IN_PROGRESS',
     ERROR: 'ERROR',
   },
-  MOSQUITTO_VERSION: '2',
+  MOSQUITTO_VERSION: '3',
 };
 
 module.exports = {
