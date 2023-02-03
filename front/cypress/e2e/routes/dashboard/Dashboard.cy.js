@@ -25,11 +25,9 @@ describe('Dashboard', () => {
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/my-new-dashboard/edit`);
   });
   it('Should add new boxes', () => {
+    cy.contains('.btn-primary', 'dashboard.addBoxButton').click();
     cy.get('select').then(inputs => {
       cy.wrap(inputs[0]).select('user-presence');
-      cy.get('button').then(inputs => {
-        cy.wrap(inputs[0]).click();
-      });
     });
     cy.get('[class*="-control"]')
       .find('div')
