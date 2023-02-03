@@ -9,16 +9,20 @@ import style from './style.css';
 
 const NewDashboardPage = ({ children, ...props }) => (
   <div class={cx('container', style.containerWithMargin)}>
-    {props.prev && (
-      <Link href={`/dashboard/${props.prev}/edit`} class="btn btn-secondary btn-sm">
-        <Text id="global.backButton" />
-      </Link>
-    )}
-    {!props.prev && (
-      <Link href="/dashboard" class="btn btn-secondary btn-sm">
-        <Text id="global.backButton" />
-      </Link>
-    )}
+    <div class="row">
+      <div class={cx('col', 'mx-auto', style.backButtonDiv)}>
+        {props.prev && (
+          <Link href={`/dashboard/${props.prev}/edit`} class="btn btn-secondary btn-sm">
+            <Text id="global.backButton" />
+          </Link>
+        )}
+        {!props.prev && (
+          <Link href="/dashboard" class="btn btn-secondary btn-sm">
+            <Text id="global.backButton" />
+          </Link>
+        )}
+      </div>
+    </div>
     <div class="row">
       <div class="col col-login mx-auto">
         <form onSubmit={props.createScene} class="card">

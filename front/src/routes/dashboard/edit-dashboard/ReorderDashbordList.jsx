@@ -4,6 +4,7 @@ import cx from 'classnames';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const DASHBOARD_LIST_ITEM_TYPE = 'DASHBOARD_LIST_ITEM';
@@ -56,6 +57,8 @@ const DashboardListItem = ({ children, ...props }) => {
 };
 
 class RedorderDashboardList extends Component {
+  isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
+
   insertAtPosition = (sourceIndex, destinationIndex) => {
     const { dashboards } = this.props;
     const element = dashboards[sourceIndex];
@@ -70,7 +73,7 @@ class RedorderDashboardList extends Component {
 
   render({ dashboards, currentDashboard }, {}) {
     return (
-      <DndProvider backend={HTML5Backend}>
+      <DndProvider backend={this.isTouchDevice ? TouchBackend : HTML5Backend}>
         <ul class="list-group">
           {dashboards &&
             dashboards.map((dashboard, index) => (
