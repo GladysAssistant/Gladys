@@ -1,11 +1,16 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import { DndProvider } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+
 import EditBox from './EditBox';
-import EditAddBoxButton from './EditAddBoxButton';
+import EmptyColumnDropZone from './EmptyColumnDropZone';
+import BottomDropZone from './BottomDropZone';
 import style from '../style.css';
 
 const EditBoxColumns = ({ children, ...props }) => (
-  <div>
+  <div class="pb-6">
     <h3>
       <Text id="dashboard.editDashboardTitle" />
     </h3>
@@ -24,7 +29,7 @@ const EditBoxColumns = ({ children, ...props }) => (
         <Text id="newDashboard.unknownError" />
       </div>
     )}
-    <div class="row mb-4 align-items-end">
+    <div class="row align-items-end">
       <div class="col-md-4">
         <div class="form-group">
           <label class="form-label">
@@ -42,28 +47,45 @@ const EditBoxColumns = ({ children, ...props }) => (
         </div>
       </div>
     </div>
-    <div class="d-flex flex-row flex-wrap justify-content-center pb-9">
-      {props.homeDashboard &&
-        props.homeDashboard.boxes &&
-        props.homeDashboard.boxes.map((column, x) => (
-          <div
-            class={cx('d-flex flex-column col-lg-4', style.removePadding, {
-              [style.removePaddingFirstCol]: x === 0,
-              [style.removePaddingLastCol]: x === 2
-            })}
-          >
-            <h3 class="text-center">
-              <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
-            </h3>
-
-            {column.map((box, y) => (
-              <EditBox {...props} box={box} x={x} y={y} />
-            ))}
-
-            <EditAddBoxButton addBox={props.addBox} updateNewSelectedBox={props.updateNewSelectedBox} x={x} />
-          </div>
-        ))}
+    <div class="row mb-6">
+      <div class="col-md-12">
+        <Text id="dashboard.editDashboardExplanation" />
+      </div>
     </div>
+    <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
+      <div class="d-flex flex-row flex-wrap justify-content-center">
+        {props.homeDashboard &&
+          props.homeDashboard.boxes &&
+          props.homeDashboard.boxes.map((column, x) => (
+            <div
+              class={cx('d-flex flex-column col-lg-4', style.removePadding, {
+                [style.removePaddingFirstCol]: x === 0,
+                [style.removePaddingLastCol]: x === 2
+              })}
+            >
+              <h3 class="text-center">
+                <Text id="dashboard.boxes.column" fields={{ index: x + 1 }} />
+              </h3>
+
+              {column.length > 0 && (
+                <div>
+                  {column.map((box, y) => (
+                    <EditBox {...props} box={box} x={x} y={y} />
+                  ))}
+                  <BottomDropZone moveCard={props.moveCard} x={x} y={column.length} />
+                </div>
+              )}
+
+              {column.length === 0 && <EmptyColumnDropZone moveCard={props.moveCard} x={x} />}
+            </div>
+          ))}
+      </div>
+      <div class="d-flex justify-content-center">
+        <button class="btn btn-primary" onClick={props.addBox}>
+          <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
+        </button>
+      </div>
+    </DndProvider>
   </div>
 );
 
