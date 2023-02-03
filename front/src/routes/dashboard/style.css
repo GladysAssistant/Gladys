@@ -61,6 +61,10 @@
   transition: max-height 0.5s ease-in;
 }
 
+.dropdownItemBiggerLines {
+  line-height: 2.5rem;
+}
+
 .editDashboardText {
   display: inline;
 }
