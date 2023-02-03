@@ -246,7 +246,11 @@ class EditDashboard extends Component {
       await this.setState({
         askDeleteDashboard: false
       });
-      route(`/dashboard/${currentDashboard.selector}/edit`);
+      if (currentDashboard === null) {
+        route('/dashboard');
+      } else {
+        route(`/dashboard/${currentDashboard.selector}/edit`);
+      }
     } catch (e) {
       console.error(e);
     }

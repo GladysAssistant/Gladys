@@ -14,6 +14,11 @@ const NewDashboardPage = ({ children, ...props }) => (
         <Text id="global.backButton" />
       </Link>
     )}
+    {!props.prev && (
+      <Link href="/dashboard" class="btn btn-secondary btn-sm">
+        <Text id="global.backButton" />
+      </Link>
+    )}
     <div class="row">
       <div class="col col-login mx-auto">
         <form onSubmit={props.createScene} class="card">

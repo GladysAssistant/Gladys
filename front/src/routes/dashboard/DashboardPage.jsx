@@ -56,7 +56,7 @@ const DashboardPage = ({ children, ...props }) => (
                       <span class={style.editDashboardText}>
                         <Text id="dashboard.editDashboardButton" />
                       </span>{' '}
-                      <i class="fe fe-settings" />
+                      <i class="fe fe-edit" />
                     </button>
                   )}
                 </div>
