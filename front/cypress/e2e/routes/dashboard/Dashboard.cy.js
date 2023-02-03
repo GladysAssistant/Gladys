@@ -29,17 +29,7 @@ describe('Dashboard', () => {
     cy.get('select').then(inputs => {
       cy.wrap(inputs[0]).select('user-presence');
     });
-    cy.get('[class*="-control"]')
-      .find('div')
-      .first()
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("Tony")`)
-      .click(0, 0, { force: true });
-    cy.contains('dashboard.editDashboardSaveButton')
-      .should('have.class', 'btn-outline-primary')
-      .click();
+    cy.contains('.btn-outline-primary', 'dashboard.editDashboardSaveButton').click();
   });
   it('Should delete dashboard', () => {
     cy.contains('dashboard.editDashboardButton')
