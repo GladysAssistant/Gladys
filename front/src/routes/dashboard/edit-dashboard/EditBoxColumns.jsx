@@ -47,7 +47,7 @@ const EditBoxColumns = ({ children, ...props }) => (
         props.homeDashboard.boxes &&
         props.homeDashboard.boxes.map((column, x) => (
           <div
-            class={cx('d-flex flex-column col-lg-4', {
+            class={cx('d-flex flex-column col-lg-4', style.removePadding, {
               [style.removePaddingFirstCol]: x === 0,
               [style.removePaddingLastCol]: x === 2
             })}
