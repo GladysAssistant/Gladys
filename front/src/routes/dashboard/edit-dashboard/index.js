@@ -305,21 +305,11 @@ class EditDashboard extends Component {
       savingNewDashboardList
     }
   ) {
-    const dashboardConfigured =
-      currentDashboard &&
-      currentDashboard.boxes &&
-      ((currentDashboard.boxes[0] && currentDashboard.boxes[0].length > 0) ||
-        (currentDashboard.boxes[1] && currentDashboard.boxes[1].length > 0) ||
-        (currentDashboard.boxes[2] && currentDashboard.boxes[2].length > 0));
-    const dashboardListEmpty = !(dashboards && dashboards.length > 0);
-    const dashboardNotConfigured = !dashboardConfigured;
     return (
       <EditDashboardPage
         dashboards={dashboards}
-        dashboardListEmpty={dashboardListEmpty}
         currentDashboard={currentDashboard}
         loading={loading}
-        dashboardNotConfigured={dashboardNotConfigured}
         dashboardValidationError={dashboardValidationError}
         dashboardAlreadyExistError={dashboardAlreadyExistError}
         unknownError={unknownError}
