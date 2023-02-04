@@ -5,9 +5,12 @@ const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
-const { installZwaveJSUIContainer } = proxyquire('../../../../../services/zwave-js-ui/lib/commands/installZwaveJSUIContainer', {
-  '../../../../utils/childProcess': { exec: fake.resolves(true) },
-});
+const { installZwaveJSUIContainer } = proxyquire(
+  '../../../../../services/zwave-js-ui/lib/commands/installZwaveJSUIContainer',
+  {
+    '../../../../utils/childProcess': { exec: fake.resolves(true) },
+  },
+);
 const ZwaveJSUIManager = proxyquire('../../../../../services/zwave-js-ui/lib', {
   './commands/installZwaveJSUIContainer': { installZwaveJSUIContainer },
 });
