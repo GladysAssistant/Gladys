@@ -1,15 +1,22 @@
 const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
-
-const proxiquire = require('proxyquire').noCallThru();
 
 const { MockedMqttClient } = require('../mocks.test');
 const { CONFIGURATION, DEFAULT } = require('../../../../services/mqtt/lib/constants');
 
 const installContainerMock = { installContainer: fake.resolves({ id: 'id' }) };
-const MqttHandler = proxiquire('../../../../services/mqtt/lib', {
+const saveConfiguration = proxyquire('../../../../services/mqtt/lib/saveConfiguration', {
+  util: {
+    // Fake promisify to revolve it directly
+    promisify: () => () => {},
+  },
+});
+
+const MqttHandler = proxyquire('../../../../services/mqtt/lib', {
   './installContainer': installContainerMock,
+  './saveConfiguration': saveConfiguration,
 });
 
 const gladys = {
@@ -24,9 +31,7 @@ const gladys = {
 };
 const serviceId = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 
-describe('mqttHandler.updateContainer', function Describe() {
-  this.timeout(8000);
-
+describe('mqttHandler.updateContainer', () => {
   let mqttHandler;
 
   beforeEach(() => {
@@ -50,7 +55,10 @@ describe('mqttHandler.updateContainer', function Describe() {
   });
 
   it('should updateContainer: already up-to-date', async () => {
-    const config = { brokerContainerAvailable: true, mosquittoVersion: '2' };
+    const config = {
+      brokerContainerAvailable: true,
+      mosquittoVersion: DEFAULT.MOSQUITTO_VERSION,
+    };
 
     await mqttHandler.updateContainer(config);
 
@@ -71,8 +79,7 @@ describe('mqttHandler.updateContainer', function Describe() {
     assert.calledOnce(gladys.system.restartContainer);
     assert.calledOnce(installContainerMock.installContainer);
 
-    assert.calledOnce(gladys.variable.setValue);
-    assert.calledWith(
+    assert.calledOnceWithExactly(
       gladys.variable.setValue,
       CONFIGURATION.MQTT_MOSQUITTO_VERSION,
       DEFAULT.MOSQUITTO_VERSION,
@@ -80,8 +87,11 @@ describe('mqttHandler.updateContainer', function Describe() {
     );
   });
 
-  it('should updateContainer: MQTT container found', async () => {
-    const config = { brokerContainerAvailable: true };
+  it('should updateContainer: missing log limitation', async () => {
+    const config = {
+      brokerContainerAvailable: true,
+      mosquittoVersion: '2',
+    };
     gladys.system.getContainers = fake.resolves([{ id: 'container' }]);
 
     await mqttHandler.updateContainer(config);
@@ -95,8 +105,7 @@ describe('mqttHandler.updateContainer', function Describe() {
 
     assert.calledOnce(installContainerMock.installContainer);
 
-    assert.calledOnce(gladys.variable.setValue);
-    assert.calledWith(
+    assert.calledOnceWithExactly(
       gladys.variable.setValue,
       CONFIGURATION.MQTT_MOSQUITTO_VERSION,
       DEFAULT.MOSQUITTO_VERSION,

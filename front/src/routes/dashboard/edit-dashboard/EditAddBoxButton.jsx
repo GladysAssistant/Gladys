@@ -1,5 +1,5 @@
 import { Text } from 'preact-i18n';
-import { DASHBOARD_BOX_TYPE_LIST } from '../../../../server/utils/constants';
+import { DASHBOARD_BOX_TYPE_LIST } from '../../../../../server/utils/constants';
 
 const addBox = (addBoxFunction, x) => () => {
   addBoxFunction(x);
