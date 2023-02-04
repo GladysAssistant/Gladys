@@ -2,13 +2,13 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import EditBox from './EditBox';
 import EditAddBoxButton from './EditAddBoxButton';
-import style from './style.css';
+import style from '../style.css';
 
 const EditBoxColumns = ({ children, ...props }) => (
   <div>
-    <h2>
+    <h3>
       <Text id="dashboard.editDashboardTitle" />
-    </h2>
+    </h3>
     {props.dashboardAlreadyExistError && (
       <div class="alert alert-danger">
         <Text id="newDashboard.dashboardAlreadyExist" />
@@ -24,8 +24,8 @@ const EditBoxColumns = ({ children, ...props }) => (
         <Text id="newDashboard.unknownError" />
       </div>
     )}
-    <div class="row">
-      <div class="col-md-12 mb-4">
+    <div class="row mb-4 align-items-end">
+      <div class="col-md-4">
         <div class="form-group">
           <label class="form-label">
             <Text id="dashboard.editDashboardNameLabel" />
@@ -44,9 +44,10 @@ const EditBoxColumns = ({ children, ...props }) => (
     </div>
     <div class="d-flex flex-row flex-wrap justify-content-center pb-9">
       {props.homeDashboard &&
+        props.homeDashboard.boxes &&
         props.homeDashboard.boxes.map((column, x) => (
           <div
-            class={cx('d-flex flex-column col-lg-4', {
+            class={cx('d-flex flex-column col-lg-4', style.removePadding, {
               [style.removePaddingFirstCol]: x === 0,
               [style.removePaddingLastCol]: x === 2
             })}
