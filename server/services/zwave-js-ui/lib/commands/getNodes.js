@@ -15,12 +15,12 @@ const { transformClasses } = require('../utils/transformClasses');
 
 /**
  * @description Return array of Nodes.
- * @param {Object} options filtering, ordering
+ * @param {Object} options - Filtering, ordering.
  * @returns {Array} Return list of nodes.
  * @example
  * const nodes = zwaveManager.getNodes();
  */
-function getNodes({ order_dir, search }) {
+function getNodes({ orderDir, search }) {
   if (!this.mqttConnected) {
     throw new ServiceNotConfiguredError('ZWAVE_DRIVER_NOT_RUNNING');
   }
@@ -129,7 +129,7 @@ function getNodes({ order_dir, search }) {
       return newDevice;
     })
     .sort((a, b) => {
-      return order_dir === 'asc'
+      return orderDir === 'asc'
         ? b.ready - a.ready || a.rawZwaveNode.id - b.rawZwaveNode.id
         : a.ready - b.ready || b.rawZwaveNode.id - a.rawZwaveNode.id;
     });
