@@ -188,7 +188,7 @@ class OpenAIGateway extends Component {
                         onClick={this.sendMessage}
                         disabled={!currentMessageTextInput || currentMessageTextInput.length === 0}
                       >
-                        <i class="fe fe-send" />
+                        <i class="ti ti-send" />
                       </button>
                     </div>
                   </div>

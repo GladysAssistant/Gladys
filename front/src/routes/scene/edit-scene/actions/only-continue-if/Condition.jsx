@@ -130,7 +130,7 @@ class Condition extends Component {
                   <Text id="editScene.actionsCard.onlyContinueIf.removeLabel" />
                 </label>
                 <button class="btn btn-danger" onClick={this.deleteCondition}>
-                  <i class="fe fe-x" />
+                  <i class="ti ti-x" />
                 </button>
               </div>
             )}

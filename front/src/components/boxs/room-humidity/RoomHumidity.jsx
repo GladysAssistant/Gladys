@@ -14,17 +14,17 @@ const RoomHumidityBox = ({ children, ...props }) => (
     <div class="d-flex align-items-center">
       {props.humidity > 45 && props.humidity < 60 && (
         <span class="stamp stamp-md bg-green mr-3">
-          <i class="fe fe-droplet" />
+          <i class="ti ti-droplet" />
         </span>
       )}
       {props.humidity <= 45 && (
         <span class="stamp stamp-md bg-yellow mr-3">
-          <i class="fe fe-droplet" />
+          <i class="ti ti-droplet" />
         </span>
       )}
       {props.humidity >= 60 && (
         <span class="stamp stamp-md bg-blue mr-3">
-          <i class="fe fe-droplet" />
+          <i class="ti ti-droplet" />
         </span>
       )}
       <div>

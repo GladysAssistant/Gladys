@@ -7,17 +7,17 @@ import get from 'get-value';
 const BOX_KEY = 'Weather';
 
 const WEATHER_ICONS = {
-  snow: 'fe-cloud-snow',
-  rain: 'fe-cloud-rain',
-  clear: 'fe-sun',
-  cloud: 'fe-cloud',
-  fog: 'fe-cloud',
-  sleet: 'fe-cloud-drizzle',
-  wind: 'fe-wind',
-  night: 'fe-moon'
+  snow: 'ti-cloud-snow',
+  rain: 'ti-cloud-rain',
+  clear: 'ti-sun',
+  cloud: 'ti-cloud',
+  fog: 'ti-cloud-fog',
+  sleet: 'ti-mist',
+  wind: 'ti-sun-wind',
+  night: 'ti-moon-starts'
 };
 
-const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'fe-question' });
+const translateWeatherToFeIcon = weather => get(WEATHER_ICONS, weather, { default: 'ti-question' });
 
 function createActions(store) {
   const boxActions = createBoxActions(store);

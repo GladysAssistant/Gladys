@@ -88,15 +88,15 @@ class AlexaGateway extends Component {
                         </h4>
                         <ul class="list-unstyled leading-loose">
                           <li>
-                            <i class="fe fe-check text-success mr-2" aria-hidden="true" />{' '}
+                            <i class="ti ti-check text-success mr-2" aria-hidden="true" />{' '}
                             <Text id="integration.alexa.seeDevices" />
                           </li>
                           <li>
-                            <i class="fe fe-check text-success mr-2" aria-hidden="true" />{' '}
+                            <i class="ti ti-check text-success mr-2" aria-hidden="true" />{' '}
                             <Text id="integration.alexa.controlDevices" />
                           </li>
                           <li>
-                            <i class="fe fe-check text-success mr-2" aria-hidden="true" />{' '}
+                            <i class="ti ti-check text-success mr-2" aria-hidden="true" />{' '}
                             <Text id="integration.alexa.getNewDeviceValues" />
                           </li>
                         </ul>

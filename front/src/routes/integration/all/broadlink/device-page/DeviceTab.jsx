@@ -30,7 +30,7 @@ const DeviceTab = ({
         </select>
         <div class="input-icon ml-2">
           <span class="input-icon-addon">
-            <i class="fe fe-search" />
+            <i class="ti ti-search" />
           </span>
           <Localizer>
             <input
@@ -43,7 +43,7 @@ const DeviceTab = ({
         </div>
         <Link href="/dashboard/integration/device/broadlink/edit">
           <button class="btn btn-outline-primary ml-2">
-            <Text id="integration.broadlink.device.newButton" /> <i class="fe fe-plus" />
+            <Text id="integration.broadlink.device.newButton" /> <i class="ti ti-plus" />
           </button>
         </Link>
       </div>

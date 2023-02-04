@@ -75,7 +75,7 @@ const SetupTab = ({ children, ...props }) => {
               onClick={props.getBridges}
               disabled={props.philipsHueGetBridgesStatus === RequestStatus.Getting}
             >
-              <i class="fe fe-radio" /> <Text id="integration.philipsHue.setup.scanButton" />
+              <i class="ti ti-radio" /> <Text id="integration.philipsHue.setup.scanButton" />
             </button>
           </div>
         </div>

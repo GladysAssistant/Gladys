@@ -77,7 +77,7 @@ class EweLinkDeviceBox extends Component {
           <div class="card-header">
             <Localizer>
               <div title={<Text id={`integration.eWeLink.status.${online ? 'online' : 'offline'}`} />}>
-                <i class={`fe fe-radio text-${online ? 'success' : 'danger'}`} />
+                <i class={`ti ti-radio text-${online ? 'success' : 'danger'}`} />
                 &nbsp;{device.name}
               </div>
             </Localizer>

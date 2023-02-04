@@ -49,7 +49,7 @@ describe('Scene view', () => {
       cy.wrap(inputs[0]).type('My scene');
     });
 
-    cy.get('.fe-activity').click();
+    cy.get('.ti-activity').click();
 
     cy.contains('newScene.createSceneButton')
       .should('have.class', 'btn-primary')
@@ -177,7 +177,7 @@ describe('Scene view', () => {
       cy.wrap(inputs[0]).type('My Duplicated scene');
     });
 
-    cy.get('.fe-activity').click();
+    cy.get('.ti-activity').click();
 
     cy.get('.form-footer')
       .contains('duplicateScene.duplicateSceneButton')

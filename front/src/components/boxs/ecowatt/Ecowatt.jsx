@@ -7,7 +7,7 @@ const EcowattBox = ({ hours, days, loading, error }) => (
   <div class="card">
     <div class="card-header">
       <h3 class="card-title">
-        <i class="fe fe-zap" />
+        <i class="ti ti-zap" />
         <span class="m-1">
           <Text id="dashboard.boxes.ecowatt.title" />
         </span>
@@ -18,7 +18,7 @@ const EcowattBox = ({ hours, days, loading, error }) => (
         <div class="loader" />
         {error && (
           <p class="alert alert-danger">
-            <i class="fe fe-bell" />
+            <i class="ti ti-bell" />
             <span class="pl-2">
               <Text id="dashboard.boxes.ecowatt.error" />
             </span>
@@ -35,12 +35,12 @@ const EcowattBox = ({ hours, days, loading, error }) => (
                   <div style={{ width: '10%', margin: '0.25em 1.25%' }}>
                     <p style={{ margin: 'auto', textAlign: 'center', fontSize: '10px', color: 'grey' }}>{hour.hour}</p>
                     <p style={{ margin: 'auto', textAlign: 'center' }}>
-                      {hour.data === 1 && <i class="fe fe-check" style={{ fontSize: '20px', color: '#00b894' }} />}
+                      {hour.data === 1 && <i class="ti ti-check" style={{ fontSize: '20px', color: '#00b894' }} />}
                       {hour.data === 2 && (
-                        <i class="fe fe-alert-circle" style={{ fontSize: '20px', color: '#fdcb6e' }} />
+                        <i class="ti ti-alert-circle" style={{ fontSize: '20px', color: '#fdcb6e' }} />
                       )}
                       {hour.data === 3 && (
-                        <i class="fe fe-alert-triangle" style={{ fontSize: '20px', color: '#d63031' }} />
+                        <i class="ti ti-alert-triangle" style={{ fontSize: '20px', color: '#d63031' }} />
                       )}
                     </p>
                   </div>

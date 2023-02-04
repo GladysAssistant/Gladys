@@ -38,7 +38,7 @@ const CoverDeviceFeature = ({ children, ...props }) => {
   return (
     <tr>
       <td>
-        <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'sliders' })}`} />
+        <i class={`ti ti-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'adjustments' })}`} />
       </td>
       <td>{getDeviceName(device, deviceFeature)}</td>
 
@@ -54,7 +54,7 @@ const CoverDeviceFeature = ({ children, ...props }) => {
               <Text id={`deviceFeatureAction.category.${category}.${type}`} plural={COVER_STATE.OPEN} />
             </button>
             <button
-              class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
+              class={cx('btn btn-sm btn-secondary', 'ti', 'ti-player-pause', {
                 active: lastValue === COVER_STATE.STOP
               })}
               onClick={stop}

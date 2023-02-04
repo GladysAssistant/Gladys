@@ -7,13 +7,13 @@ const EditActions = props => (
         {!props.askDeleteDashboard && (
           <div class="col-auto">
             <button onClick={props.cancelDashboardEdit} className="btn btn-outline-secondary btn-sm ml-2">
-              <Text id="dashboard.editDashboardCancelButton" /> <i class="fe fe-slash" />
+              <Text id="dashboard.editDashboardCancelButton" /> <i class="ti ti-slash" />
             </button>
             <button onClick={props.askDeleteCurrentDashboard} className="btn btn-outline-danger btn-sm ml-2">
-              <Text id="dashboard.editDashboardDeleteButton" /> <i class="fe fe-trash" />
+              <Text id="dashboard.editDashboardDeleteButton" /> <i class="ti ti-trash" />
             </button>
             <button onClick={props.saveDashboard} className="btn btn-outline-primary btn-sm ml-2">
-              <Text id="dashboard.editDashboardSaveButton" /> <i class="fe fe-check" />
+              <Text id="dashboard.editDashboardSaveButton" /> <i class="ti ti-check" />
             </button>
           </div>
         )}
@@ -22,10 +22,10 @@ const EditActions = props => (
           <div class="col-auto">
             <Text id="dashboard.editDashboardDeleteText" />
             <button onClick={props.deleteCurrentDashboard} className="btn btn-outline-danger btn-sm ml-2">
-              <Text id="dashboard.editDashboardDeleteButton" /> <i class="fe fe-trash" />
+              <Text id="dashboard.editDashboardDeleteButton" /> <i class="ti ti-trash" />
             </button>
             <button onClick={props.cancelDeleteCurrentDashboard} className="btn btn-outline-secondary btn-sm ml-2">
-              <Text id="dashboard.editDashboardCancelButton" /> <i class="fe fe-slash" />
+              <Text id="dashboard.editDashboardCancelButton" /> <i class="ti ti-slash" />
             </button>
           </div>
         )}

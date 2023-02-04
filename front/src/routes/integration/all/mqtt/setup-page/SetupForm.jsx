@@ -77,9 +77,9 @@ class SetupForm extends Component {
             {props.useEmbeddedBroker && (
               <span class="input-icon-addon cursor-pointer" onClick={this.showPassword}>
                 <i
-                  class={cx('fe', {
-                    'fe-eye': !showPassword,
-                    'fe-eye-off': showPassword
+                  class={cx('ti', {
+                    'ti-eye': !showPassword,
+                    'ti-eye-off': showPassword
                   })}
                 />
               </span>

@@ -85,7 +85,7 @@ class ServiceItem extends Component {
                 title={<Text id="servicesSettings.integrationLinkTitle" />}
               >
                 <big>
-                  <i class="fe fe-arrow-right-circle" />
+                  <i class="ti ti-square-rounded-arrow-right" />
                 </big>
               </Link>
             </Localizer>

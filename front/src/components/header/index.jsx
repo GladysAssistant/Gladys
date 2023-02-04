@@ -65,11 +65,11 @@ const Header = ({ ...props }) => {
                   })}
                 >
                   <a class="dropdown-item" href="/dashboard/profile">
-                    <i class="dropdown-icon fe fe-user" /> <Text id="header.profile" />
+                    <i class="dropdown-icon ti ti-user" /> <Text id="header.profile" />
                   </a>
                   {props.user.role === USER_ROLE.ADMIN && (
                     <a class="dropdown-item" href="/dashboard/settings/house">
-                      <i class="dropdown-icon fe fe-settings" /> <Text id="header.settings" />
+                      <i class="dropdown-icon ti ti-settings" /> <Text id="header.settings" />
                     </a>
                   )}
                   <div class="dropdown-divider" />
@@ -79,10 +79,10 @@ const Header = ({ ...props }) => {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <i class="dropdown-icon fe fe-help-circle" /> <Text id="header.needHelp" />
+                    <i class="dropdown-icon ti ti-help" /> <Text id="header.needHelp" />
                   </a>
                   <a class="dropdown-item" href="" onClick={props.logout}>
-                    <i class="dropdown-icon fe fe-log-out" /> <Text id="header.signOut" />
+                    <i class="dropdown-icon ti ti-logout" /> <Text id="header.signOut" />
                   </a>
                 </div>
               </div>
@@ -113,7 +113,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard'
                     })}
                   >
-                    <i class="fe fe-home" /> <Text id="header.home" />
+                    <i class="ti ti-home" /> <Text id="header.home" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -123,7 +123,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/chat'
                     })}
                   >
-                    <i class="fe fe-message-square" /> <Text id="header.chat" />
+                    <i class="ti ti-message-2" /> <Text id="header.chat" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -131,7 +131,7 @@ const Header = ({ ...props }) => {
                     href="/dashboard/integration"
                     class={props.currentUrl.startsWith('/dashboard/integration') ? 'active nav-link' : 'nav-link'}
                   >
-                    <i class="fe fe-grid" /> <Text id="header.integrations" />
+                    <i class="ti ti-layout-grid" /> <Text id="header.integrations" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -141,7 +141,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/calendar'
                     })}
                   >
-                    <i class="fe fe-calendar" /> <Text id="header.calendar" />
+                    <i class="ti ti-calendar" /> <Text id="header.calendar" />
                   </Link>
                 </li>
                 <li class="nav-item">
@@ -152,7 +152,7 @@ const Header = ({ ...props }) => {
                       active: props.currentUrl === '/dashboard/maps'
                     })}
                   >
-                    <i class="fe fe-map" /> <Text id="header.maps" />
+                    <i class="ti ti-map" /> <Text id="header.maps" />
                   </Link>
                 </li>
                 {props.user.role === USER_ROLE.ADMIN && (
@@ -161,7 +161,7 @@ const Header = ({ ...props }) => {
                       href="/dashboard/scene"
                       class={props.currentUrl.startsWith('/dashboard/scene') ? 'active nav-link' : 'nav-link'}
                     >
-                      <i class="fe fe-play" /> <Text id="header.scenes" />
+                      <i class="ti ti-settings-automation" /> <Text id="header.scenes" />
                     </Link>
                   </li>
                 )}

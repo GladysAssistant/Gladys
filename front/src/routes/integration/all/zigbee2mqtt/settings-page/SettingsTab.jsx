@@ -10,7 +10,7 @@ const SettingsTab = ({ children, ...props }) => (
       </h2>
       <div class="page-options d-flex">
         <button class="btn btn-info" onClick={props.getUsbPorts}>
-          <i class="fe fe-rotate-cw" /> <Text id="integration.zigbee2mqtt.settings.refreshButton" />
+          <i class="ti ti-rotate-cw" /> <Text id="integration.zigbee2mqtt.settings.refreshButton" />
         </button>
       </div>
     </div>
@@ -63,7 +63,7 @@ const SettingsTab = ({ children, ...props }) => (
           </div>
           <div class="form-group">
             <button class="btn btn-success" onClick={props.saveDriverPath}>
-              <i class="fe fe-save" /> <Text id="integration.zigbee2mqtt.settings.saveButton" />
+              <i class="ti ti-device-floppy" /> <Text id="integration.zigbee2mqtt.settings.saveButton" />
             </button>
           </div>
         </div>

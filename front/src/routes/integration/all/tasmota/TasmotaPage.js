@@ -20,7 +20,7 @@ const TasmotaPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-link" />
+                      <i class="ti ti-link" />
                     </span>
                     <Text id="integration.tasmota.deviceTab" />
                   </Link>
@@ -31,7 +31,7 @@ const TasmotaPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-radio" />
+                      <i class="ti ti-radio" />
                     </span>
                     <Text id="integration.tasmota.mqttDiscoverTab" />
                   </Link>
@@ -42,7 +42,7 @@ const TasmotaPage = ({ children, user }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-globe" />
+                      <i class="ti ti-globe" />
                     </span>
                     <Text id="integration.tasmota.httpDiscoverTab" />
                   </Link>
@@ -53,7 +53,7 @@ const TasmotaPage = ({ children, user }) => (
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-book-open" />
+                      <i class="ti ti-book-open" />
                     </span>
                     <Text id="integration.tasmota.discover.documentation" />
                   </DeviceConfigurationLink>

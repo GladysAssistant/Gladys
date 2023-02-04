@@ -69,7 +69,7 @@ const DuplicateScenePage = ({ children, ...props }) => (
                           value={icon}
                           className={style.iconInput}
                         />
-                        <i className={`fe fe-${icon}`} />
+                        <i className={`ti ti-${icon}`} />
                       </label>
                     </div>
                   </div>

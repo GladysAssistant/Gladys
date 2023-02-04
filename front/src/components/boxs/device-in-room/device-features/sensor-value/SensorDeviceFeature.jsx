@@ -39,7 +39,7 @@ const SensorDeviceType = ({ children, ...props }) => {
     <tr>
       <td>
         <i
-          class={`mr-2 fe fe-${get(
+          class={`mr-2 ti ti-${get(
             DeviceFeatureCategoriesIcon,
             `${props.deviceFeature.category}.${props.deviceFeature.type}`
           )}`}

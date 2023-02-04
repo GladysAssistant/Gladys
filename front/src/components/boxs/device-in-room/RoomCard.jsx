@@ -13,7 +13,7 @@ const RoomCard = ({ children, ...props }) => {
         <h3 class="card-title">{props.room.name}</h3>
         <div class="card-options">
           <a href="" onClick={collapseRoom} class="card-options-collapse" data-toggle="card-collapse">
-            <i class="fe fe-chevron-up" />
+            <i class="ti ti-chevron-up" />
           </a>
         </div>
       </div>

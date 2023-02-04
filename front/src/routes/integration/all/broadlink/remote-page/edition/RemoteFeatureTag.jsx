@@ -29,7 +29,7 @@ class RemoteFeatureTag extends Component {
       >
         <Text id={`deviceFeatureCategory.${category}.${type}`} />
         <div class="tag-addon">
-          <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`)}`} />
+          <i class={`ti ti-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`)}`} />
         </div>
       </span>
     );

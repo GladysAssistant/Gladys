@@ -47,6 +47,7 @@
     "@gladysassistant/gladys-gateway-js": "^4.8.1",
     "@gladysassistant/theme-optimized": "^1.0.3",
     "@jaames/iro": "^5.5.2",
+    "@tabler/icons-webfont": "^2.2.0",
     "@yaireo/tagify": "^4.5.0",
     "apexcharts": "^3.29.0",
     "axios": "^0.21.1",

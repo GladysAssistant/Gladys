@@ -18,18 +18,18 @@ const deleteTriggerFromList = (deleteTrigger, index) => () => {
 const TriggerCard = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      {props.trigger.type === EVENTS.DEVICE.NEW_STATE && <i class="fe fe-activity" />}
-      {props.trigger.type === EVENTS.TIME.CHANGED && <i class="fe fe-watch" />}
-      {props.trigger.type === EVENTS.TIME.SUNSET && <i class="fe fe-sunset" />}
-      {props.trigger.type === EVENTS.TIME.SUNRISE && <i class="fe fe-sunrise" />}
-      {props.trigger.type === EVENTS.USER_PRESENCE.BACK_HOME && <i class="fe fe-home" />}
-      {props.trigger.type === EVENTS.USER_PRESENCE.LEFT_HOME && <i class="fe fe-home" />}
-      {props.trigger.type === EVENTS.HOUSE.EMPTY && <i class="fe fe-home" />}
-      {props.trigger.type === EVENTS.HOUSE.NO_LONGER_EMPTY && <i class="fe fe-home" />}
-      {props.trigger.type === EVENTS.AREA.USER_ENTERED && <i class="fe fe-compass" />}
-      {props.trigger.type === EVENTS.AREA.USER_LEFT && <i class="fe fe-compass" />}
-      {props.trigger.type === EVENTS.CALENDAR.EVENT_IS_COMING && <i class="fe fe-calendar" />}
-      {props.trigger.type === null && <i class="fe fe-plus-circle" />}
+      {props.trigger.type === EVENTS.DEVICE.NEW_STATE && <i class="ti ti-activity" />}
+      {props.trigger.type === EVENTS.TIME.CHANGED && <i class="ti ti-watch" />}
+      {props.trigger.type === EVENTS.TIME.SUNSET && <i class="ti ti-sunset" />}
+      {props.trigger.type === EVENTS.TIME.SUNRISE && <i class="ti ti-sunrise" />}
+      {props.trigger.type === EVENTS.USER_PRESENCE.BACK_HOME && <i class="ti ti-home" />}
+      {props.trigger.type === EVENTS.USER_PRESENCE.LEFT_HOME && <i class="ti ti-home" />}
+      {props.trigger.type === EVENTS.HOUSE.EMPTY && <i class="ti ti-home" />}
+      {props.trigger.type === EVENTS.HOUSE.NO_LONGER_EMPTY && <i class="ti ti-home" />}
+      {props.trigger.type === EVENTS.AREA.USER_ENTERED && <i class="ti ti-compass" />}
+      {props.trigger.type === EVENTS.AREA.USER_LEFT && <i class="ti ti-compass" />}
+      {props.trigger.type === EVENTS.CALENDAR.EVENT_IS_COMING && <i class="ti ti-calendar" />}
+      {props.trigger.type === null && <i class="ti ti-plus-circle" />}
       <div class="card-title">
         <i
           class={props.trigger.icon}
@@ -43,11 +43,11 @@ const TriggerCard = ({ children, ...props }) => (
       <div class="card-options">
         {false && (
           <a class="card-options-collapse">
-            <i class="fe fe-chevron-down" />
+            <i class="ti ti-chevron-down" />
           </a>
         )}
         <a onClick={deleteTriggerFromList(props.deleteTrigger, props.index)} class="card-options-remove">
-          <i class="fe fe-x" />
+          <i class="ti ti-x" />
         </a>
       </div>
     </div>

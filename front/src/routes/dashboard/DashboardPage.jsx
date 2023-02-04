@@ -46,8 +46,8 @@ const DashboardPage = ({ children, ...props }) => (
                       <span>
                         {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
                         {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
-                        {!props.fullScreen && <i class="fe fe-maximize-2" />}
-                        {props.fullScreen && <i class="fe fe-minimize-2" />}
+                        {!props.fullScreen && <i class="ti ti-maximize" />}
+                        {props.fullScreen && <i class="ti ti-minimize" />}
                       </span>
                     </button>
                   )}
@@ -56,7 +56,7 @@ const DashboardPage = ({ children, ...props }) => (
                       <span class={style.editDashboardText}>
                         <Text id="dashboard.editDashboardButton" />
                       </span>{' '}
-                      <i class="fe fe-edit" />
+                      <i class="ti ti-edit" />
                     </button>
                   )}
                 </div>

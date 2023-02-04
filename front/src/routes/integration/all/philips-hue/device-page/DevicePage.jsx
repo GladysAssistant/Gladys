@@ -22,7 +22,7 @@ const DeviceTab = ({ children, ...props }) => (
         </select>
         <div class="input-icon ml-2">
           <span class="input-icon-addon">
-            <i class="fe fe-search" />
+            <i class="ti ti-search" />
           </span>
           <Localizer>
             <input

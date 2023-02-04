@@ -13,7 +13,7 @@ const IntegrationMenu = ({ integrationCategories, getIntegrations, intl }) => {
         class="list-group-item list-group-item-action d-flex align-items-center"
       >
         <span class="icon mr-3">
-          <i class="fe fe-hash" />
+          <i class="ti ti-hash" />
         </span>
         <Text id="integration.root.menu.all" />
       </Link>
@@ -25,7 +25,7 @@ const IntegrationMenu = ({ integrationCategories, getIntegrations, intl }) => {
           class="list-group-item list-group-item-action d-flex align-items-center"
         >
           <span class="icon mr-3">
-            <i class={`fe fe-${category.icon}`} />
+            <i class={`ti ti-${category.icon}`} />
           </span>
           <Text id={`integration.root.menu.${category.type}`} />
         </Link>

@@ -19,7 +19,7 @@ const BroadlinkPage = ({ children }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-radio" />
+                      <i class="ti ti-radio" />
                     </span>
                     <Text id="integration.broadlink.remoteTab" />
                   </Link>
@@ -30,7 +30,7 @@ const BroadlinkPage = ({ children }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-wifi" />
+                      <i class="ti ti-wifi" />
                     </span>
                     <Text id="integration.broadlink.peripheralTab" />
                   </Link>
