@@ -36,7 +36,10 @@ function getNodes({ order_dir, search }) {
         ? node.name.toLowerCase().includes(search.toLowerCase()) ||
           node.product.toLowerCase().includes(search.toLowerCase()) ||
           node.productLabel.toLowerCase().includes(search.toLowerCase()) ||
-          node.id.toString().toLowerCase().includes(search.toLowerCase())
+          node.id
+            .toString()
+            .toLowerCase()
+            .includes(search.toLowerCase())
         : true,
     )
     .map((node) => {

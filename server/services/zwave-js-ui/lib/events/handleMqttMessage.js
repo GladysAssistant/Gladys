@@ -80,7 +80,7 @@ function handleMqttMessage(topic, message) {
         logger.info(`ZwaveJSUI scan in progress. Bypass message.`);
       } else if (splittedTopic.length >= 5) {
         splittedTopic.shift();
-        if(this.mqttTopicWithLocation) {
+        if (this.mqttTopicWithLocation) {
           splittedTopic.shift();
         }
         const [nodeId, commandClass, endpoint, propertyName, propertyKey] = splittedTopic;

@@ -110,7 +110,7 @@ async function connect() {
       CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX,
       this.serviceId,
     );
-    if(storedMqttTopicPrefix) {
+    if (storedMqttTopicPrefix) {
       this.mqttTopicPrefix = storedMqttTopicPrefix;
     } else {
       await this.gladys.variable.setValue(
@@ -131,7 +131,7 @@ async function connect() {
       this.serviceId,
     );
   }
-  
+
   const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, this.serviceId);
   const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
   if (this.mqttRunning) {

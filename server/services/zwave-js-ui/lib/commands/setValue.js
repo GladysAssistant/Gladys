@@ -16,9 +16,9 @@ function setValue(device, deviceFeature, value) {
   const zwaveValue = bindValue({ nodeId, commandClass, endpoint, property, propertyKey }, value);
 
   this.mqttClient.publish(
-    `${this.mqttTopicPrefix}/${this.mqttTopicWithLocation ? `${this.nodes[nodeId].loc}/` : ''}nodeID_${nodeId}/${commandClass}/${endpoint}/${property}${
-      propertyKey !== undefined ? `/${propertyKey}` : ''
-    }/set`,
+    `${this.mqttTopicPrefix}/${
+      this.mqttTopicWithLocation ? `${this.nodes[nodeId].loc}/` : ''
+    }nodeID_${nodeId}/${commandClass}/${endpoint}/${property}${propertyKey !== undefined ? `/${propertyKey}` : ''}/set`,
     zwaveValue.toString(),
   );
 }
