@@ -5,11 +5,11 @@ const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
-const { installZ2mContainer } = proxyquire('../../../../../services/zwave-js-ui/lib/commands/installZ2mContainer', {
+const { installZwaveJSUIContainer } = proxyquire('../../../../../services/zwave-js-ui/lib/commands/installZwaveJSUIContainer', {
   '../../../../utils/childProcess': { exec: fake.resolves(true) },
 });
 const ZwaveJSUIManager = proxyquire('../../../../../services/zwave-js-ui/lib', {
-  './commands/installZ2mContainer': { installZ2mContainer },
+  './commands/installZwaveJSUIContainer': { installZwaveJSUIContainer },
 });
 
 const event = {
@@ -49,7 +49,7 @@ const gladys = {
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
 
-describe('zwave-js-ui installZ2mContainer', () => {
+describe('zwave-js-ui installZwaveJSUIContainer', () => {
   // PREPARE
   const zwaveJSUIManager = new ZwaveJSUIManager(gladys, null, ZWAVEJSUI_SERVICE_ID);
 
@@ -64,7 +64,7 @@ describe('zwave-js-ui installZ2mContainer', () => {
     this.timeout(11000);
 
     // EXECUTE
-    await zwaveJSUIManager.installZ2mContainer();
+    await zwaveJSUIManager.installZwaveJSUIContainer();
 
     // ASSERT
     assert.calledWith(gladys.system.restartContainer, container.id);
@@ -81,7 +81,7 @@ describe('zwave-js-ui installZ2mContainer', () => {
     gladys.system.getContainers = fake.resolves([container]);
 
     // EXECUTE
-    await zwaveJSUIManager.installZ2mContainer();
+    await zwaveJSUIManager.installZwaveJSUIContainer();
 
     // ASSERT
     assert.calledWith(gladys.system.restartContainer, container.id);
@@ -100,7 +100,7 @@ describe('zwave-js-ui installZ2mContainer', () => {
 
     // EXECUTE
     try {
-      await zwaveJSUIManager.installZ2mContainer();
+      await zwaveJSUIManager.installZwaveJSUIContainer();
       assert.fail();
     } catch (e) {
       assert.match(e.message, 'docker fail');
@@ -123,7 +123,7 @@ describe('zwave-js-ui installZ2mContainer', () => {
 
     // EXECUTE
     try {
-      await zwaveJSUIManager.installZ2mContainer();
+      await zwaveJSUIManager.installZwaveJSUIContainer();
       assert.fail();
     } catch (e) {
       assert.match(e.message, 'docker fail pull');
@@ -150,7 +150,7 @@ describe('zwave-js-ui installZ2mContainer', () => {
     gladys.system.pull = fake.resolves(true);
 
     // EXECUTE
-    await zwaveJSUIManager.installZ2mContainer();
+    await zwaveJSUIManager.installZwaveJSUIContainer();
 
     // ASSERT
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -176,7 +176,7 @@ describe('zwave-js-ui installZ2mContainer', () => {
 
     // EXECUTE
     try {
-      await zwaveJSUIManager.installZ2mContainer();
+      await zwaveJSUIManager.installZwaveJSUIContainer();
       assert.fail();
     } catch (e) {
       assert.match(e.message, 'docker fail restart');
