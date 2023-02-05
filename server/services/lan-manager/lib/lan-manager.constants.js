@@ -17,4 +17,9 @@ const TIMERS = {
   PRESENCE: 120000,
 };
 
-module.exports = { PARAMS, VARIABLES, PRESENCE_STATUS, TIMERS };
+const SCAN_OPTIONS = {
+  INTERFACES: [],
+  IP_FAMILY: ['IPv4'],
+};
+
+module.exports = { PARAMS, VARIABLES, PRESENCE_STATUS, TIMERS, SCAN_OPTIONS };

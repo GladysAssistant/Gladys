@@ -4,8 +4,8 @@
  * await lanManager.init();
  */
 async function init() {
-  // Run the discovery at startup
-  await this.scan();
+  // Load saved config
+  await this.loadConfiguration();
   // Start scanner presence
   this.initPresenceScanner();
 }
