@@ -1,6 +1,5 @@
 .emptyStateDivBox {
-  width: 60%;
-  max-width: 400px;
+  max-width: 450px;
   margin-left: auto;
   margin-right: auto;
   margin-top: 80px;
@@ -17,6 +16,10 @@
 
 .emptyStateText {
   margin-top: 20px;
+}
+
+.largeContainer {
+  max-width: 1600px;
 }
 
 @media (min-width: 992px) {
@@ -43,5 +46,27 @@
     min-width: 1.625rem;
     line-height: 1.33333333;
     border-radius: 3px;
+  }
+}
+
+.collapse {
+  max-height: 0;
+  transition: max-height 0.25s ease-out;
+  overflow: hidden;
+}
+
+.showCollapse {
+  max-height: 500px;
+  overflow: auto;
+  transition: max-height 0.5s ease-in;
+}
+
+.editDashboardText {
+  display: inline;
+}
+
+@media (max-width: 992px) {
+  .editDashboardText {
+    display: none;
   }
 }

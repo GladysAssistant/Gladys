@@ -4,8 +4,10 @@ describe('Dashboard', () => {
   });
   it('Should create new dashboard', () => {
     cy.visit('/dashboard');
-    cy.contains('dashboard.newDashboardButton')
-      .should('have.class', 'btn-outline-success')
+
+    cy.get('a')
+      .contains('dashboard.newDashboardButton')
+      .should('have.class', 'btn-success')
       .click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/create/new`);
@@ -20,12 +22,9 @@ describe('Dashboard', () => {
       .should('have.class', 'btn-primary')
       .click();
 
-    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/my-new-dashboard`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/my-new-dashboard/edit`);
   });
   it('Should add new boxes', () => {
-    cy.contains('dashboard.editDashboardButton')
-      .should('have.class', 'btn-outline-primary')
-      .click();
     cy.get('select').then(inputs => {
       cy.wrap(inputs[0]).select('user-presence');
       cy.get('button').then(inputs => {
@@ -51,5 +50,9 @@ describe('Dashboard', () => {
     cy.contains('dashboard.editDashboardDeleteButton')
       .should('have.class', 'btn-outline-danger')
       .click();
+    cy.contains('dashboard.editDashboardDeleteButton')
+      .should('have.class', 'btn-outline-danger')
+      .click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
   });
 });
