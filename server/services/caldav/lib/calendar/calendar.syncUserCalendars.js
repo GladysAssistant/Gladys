@@ -53,10 +53,8 @@ async function syncUserCalendars(userId) {
 
       // Else update it if sync is enable on calendar & events change
       if (gladysCalendar[0].sync && formatedCalendar.ctag !== gladysCalendar[0].ctag) {
-        await this.gladys.calendar.update(gladysCalendar[0].selector, {
-          ...formatedCalendar,
-          sync: gladysCalendar[0].sync,
-        });
+        delete formatedCalendar.sync;
+        await this.gladys.calendar.update(gladysCalendar[0].selector, formatedCalendar);
         return gladysCalendar[0];
       }
       return null;
