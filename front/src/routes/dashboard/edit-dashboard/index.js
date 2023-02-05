@@ -1,23 +1,11 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { route } from 'preact-router';
-import update, { extend } from 'immutability-helper';
-import DashboardPage from './DashboardPage';
-import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
-import actions from '../../actions/dashboard';
+import update from 'immutability-helper';
+import EditDashboardPage from './EditDashboard';
 import get from 'get-value';
 
-extend('$auto', (value, object) => {
-  return object ? update(object, value) : update({}, value);
-});
-
-class Dashboard extends Component {
-  toggleDashboardDropdown = () => {
-    this.setState(prevState => {
-      return { ...prevState, dashboardDropdownOpened: !this.state.dashboardDropdownOpened };
-    });
-  };
-
+class EditDashboard extends Component {
   getDashboards = async () => {
     try {
       await this.setState({
@@ -80,21 +68,8 @@ class Dashboard extends Component {
     }
   };
 
-  redirectToDashboard = () => {
-    this.setState({
-      dashboardDropdownOpened: false
-    });
-  };
-
-  editDashboard = () => {
-    route(`/dashboard/${this.state.currentDashboard.selector}/edit`);
-  };
-
   cancelDashboardEdit = async () => {
-    this.setState({
-      dashboardEditMode: false
-    });
-    await this.getCurrentDashboard();
+    route(`/dashboard/${this.state.currentDashboardSelector}`);
   };
 
   moveCard = async (originalX, originalY, destX, destY) => {
@@ -225,12 +200,12 @@ class Dashboard extends Component {
         }
       });
 
-      this.setState({
+      await this.setState({
         currentDashboard,
-        dashboardEditMode: false,
         loading: false,
         dashboards: updatedDashboards
       });
+      route(`/dashboard/${currentDashboard.selector}`);
     } catch (e) {
       if (e.response && e.response.status === 422) {
         this.setState({
@@ -269,79 +244,26 @@ class Dashboard extends Component {
       });
       const currentDashboard = dashboards.length > 0 ? dashboards[0] : null;
       await this.setState({
-        dashboards,
-        currentDashboard,
-        dashboardDropdownOpened: false,
-        dashboardEditMode: false,
         askDeleteDashboard: false
       });
-      this.init();
-      route('/dashboard');
+      if (currentDashboard === null) {
+        route('/dashboard');
+      } else {
+        route(`/dashboard/${currentDashboard.selector}/edit`);
+      }
     } catch (e) {
       console.error(e);
     }
   };
 
-  isBrowserFullScreenCompatible = () => {
-    return document.fullscreenEnabled || document.webkitFullscreenEnabled;
-  };
-
-  isFullScreen = () => {
-    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
-  };
-
-  toggleFullScreen = () => {
-    const isFullScreen = this.isFullScreen();
-    if (!isFullScreen) {
-      if (document.documentElement.requestFullscreen) {
-        // chrome & firefox
-        document.documentElement.requestFullscreen();
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        // safari
-        document.documentElement.webkitRequestFullscreen();
-      }
-      this.props.setFullScreen(true);
-    } else {
-      if (document.exitFullscreen) {
-        // chrome & firefox
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        // safari
-        document.webkitExitFullscreen();
-      }
-      this.props.setFullScreen(false);
-    }
-  };
-
-  onFullScreenChange = () => {
-    const isFullScreen = this.isFullScreen();
-    this.props.setFullScreen(isFullScreen);
-  };
-
-  toggleReorderDashboard = () => {
-    if (this.state.showReorderDashboard) {
-      this.saveNewDashboardList();
-    } else {
-      this.setState({ showReorderDashboard: !this.state.showReorderDashboard });
-    }
-  };
-
-  updateDashboardList = newDashboards => {
-    this.setState({
-      dashboards: newDashboards
-    });
-  };
-
-  saveNewDashboardList = async () => {
+  updateDashboardList = async newDashboards => {
     await this.setState({
-      savingNewDashboardList: true
+      savingNewDashboardList: true,
+      dashboards: newDashboards
     });
     try {
       const dashboardSelectors = this.state.dashboards.map(d => d.selector);
       await this.props.httpClient.post('/api/v1/dashboard/order', dashboardSelectors);
-      this.setState({
-        showReorderDashboard: false
-      });
     } catch (e) {
       console.error(e);
     }
@@ -354,10 +276,6 @@ class Dashboard extends Component {
     super(props);
     this.props = props;
     this.state = {
-      dashboardDropdownOpened: false,
-      dashboardEditMode: false,
-      showReorderDashboard: false,
-      browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
       dashboards: [],
       newSelectedBoxType: {},
       askDeleteDashboard: false
@@ -366,9 +284,6 @@ class Dashboard extends Component {
 
   componentDidMount() {
     this.init();
-    document.addEventListener('fullscreenchange', this.onFullScreenChange, false);
-    document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
-    document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
   }
 
   componentDidUpdate(prevProps) {
@@ -377,27 +292,16 @@ class Dashboard extends Component {
     }
   }
 
-  componentWillUnmount() {
-    document.removeEventListener('fullscreenchange', this.onFullScreenChange, false);
-    document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
-    document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
-  }
-
   render(
     props,
     {
-      dashboardDropdownOpened,
       dashboards,
       currentDashboard,
-      dashboardEditMode,
-      gatewayInstanceNotFound,
       loading,
-      browserFullScreenCompatible,
       dashboardValidationError,
       dashboardAlreadyExistError,
       unknownError,
       askDeleteDashboard,
-      showReorderDashboard,
       savingNewDashboardList
     }
   ) {
@@ -409,21 +313,13 @@ class Dashboard extends Component {
         (currentDashboard.boxes[2] && currentDashboard.boxes[2].length > 0));
     const dashboardListEmpty = !(dashboards && dashboards.length > 0);
     const dashboardNotConfigured = !dashboardConfigured;
-    if (props.gatewayAccountExpired === true) {
-      return <GatewayAccountExpired />;
-    }
     return (
-      <DashboardPage
-        {...props}
-        dashboardDropdownOpened={dashboardDropdownOpened}
-        dashboardEditMode={dashboardEditMode}
+      <EditDashboardPage
         dashboards={dashboards}
         dashboardListEmpty={dashboardListEmpty}
         currentDashboard={currentDashboard}
-        gatewayInstanceNotFound={gatewayInstanceNotFound}
         loading={loading}
         dashboardNotConfigured={dashboardNotConfigured}
-        browserFullScreenCompatible={browserFullScreenCompatible}
         dashboardValidationError={dashboardValidationError}
         dashboardAlreadyExistError={dashboardAlreadyExistError}
         unknownError={unknownError}
@@ -438,15 +334,11 @@ class Dashboard extends Component {
         updateNewSelectedBox={this.updateNewSelectedBox}
         saveDashboard={this.saveDashboard}
         updateBoxConfig={this.updateBoxConfig}
-        toggleFullScreen={this.toggleFullScreen}
         updateCurrentDashboardName={this.updateCurrentDashboardName}
         askDeleteCurrentDashboard={this.askDeleteCurrentDashboard}
         cancelDeleteCurrentDashboard={this.cancelDeleteCurrentDashboard}
         deleteCurrentDashboard={this.deleteCurrentDashboard}
         askDeleteDashboard={askDeleteDashboard}
-        fullScreen={props.fullScreen}
-        showReorderDashboard={showReorderDashboard}
-        toggleReorderDashboard={this.toggleReorderDashboard}
         updateDashboardList={this.updateDashboardList}
         savingNewDashboardList={savingNewDashboardList}
       />
@@ -454,4 +346,4 @@ class Dashboard extends Component {
   }
 }
 
-export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', actions)(Dashboard);
+export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', {})(EditDashboard);
