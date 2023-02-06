@@ -77,10 +77,12 @@ class EditDashboard extends Component {
     if (destX < 0 || destY < 0) {
       return null;
     }
-    if (destX >= this.state.currentDashboard.boxes.length || destY >= this.state.currentDashboard.boxes[destX].length) {
+
+    if (destX >= this.state.currentDashboard.boxes.length || destY > this.state.currentDashboard.boxes[destX].length) {
       return null;
     }
     const element = this.state.currentDashboard.boxes[originalX][originalY];
+
     const newStateWithoutElement = update(this.state, {
       currentDashboard: {
         boxes: {
@@ -102,34 +104,20 @@ class EditDashboard extends Component {
     await this.setState(newState);
   };
 
-  moveBoxDown = (x, y) => {
-    this.moveCard(x, y, x, y + 1);
-  };
-
-  moveBoxUp = (x, y) => {
-    this.moveCard(x, y, x, y - 1);
-  };
-
-  addBox = x => {
-    if (this.state.newSelectedBoxType && this.state.newSelectedBoxType[x]) {
-      const newState = update(this.state, {
-        currentDashboard: {
-          boxes: {
-            [x]: {
-              $push: [
-                {
-                  type: this.state.newSelectedBoxType[x]
-                }
-              ]
-            }
+  addBox = () => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        boxes: {
+          0: {
+            $push: [{}]
           }
         }
-      });
-      this.setState(newState);
-    }
+      }
+    });
+    this.setState(newState);
   };
 
-  removeBox = (x, y) => {
+  removeBox = async (x, y) => {
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
@@ -139,7 +127,7 @@ class EditDashboard extends Component {
         }
       }
     });
-    this.setState(newState);
+    await this.setState(newState);
   };
 
   updateCurrentDashboardName = e => {
@@ -168,12 +156,38 @@ class EditDashboard extends Component {
     this.setState(newState);
   };
 
-  updateNewSelectedBox = (x, type) => {
-    const newSelectedBoxType = Object.assign({}, this.state.newSelectedBoxType, {
-      [x]: type
+  updateNewSelectedBox = (x, y, type) => {
+    const newState = update(this.state, {
+      currentDashboard: {
+        boxes: {
+          [x]: {
+            [y]: {
+              type: {
+                $set: type
+              }
+            }
+          }
+        }
+      }
     });
-    this.setState({
-      newSelectedBoxType
+    this.setState(newState);
+  };
+
+  removeEmptyBoxes = async () => {
+    const { currentDashboard } = this.state;
+    // new boxes without empty boxes
+    const newBoxes = currentDashboard.boxes.map(column => {
+      return column.filter(box => {
+        return box.type !== undefined;
+      });
+    });
+    const newDashboard = update(currentDashboard, {
+      boxes: {
+        $set: newBoxes
+      }
+    });
+    await this.setState({
+      currentDashboard: newDashboard
     });
   };
 
@@ -185,6 +199,9 @@ class EditDashboard extends Component {
       unknownError: false
     });
     try {
+      // We purge all empty boxes
+      await this.removeEmptyBoxes();
+
       const { currentDashboard: selectedDashboard, dashboards } = this.state;
       const { selector } = selectedDashboard;
 
@@ -207,6 +224,7 @@ class EditDashboard extends Component {
       });
       route(`/dashboard/${currentDashboard.selector}`);
     } catch (e) {
+      console.error(e);
       if (e.response && e.response.status === 422) {
         this.setState({
           dashboardValidationError: true
@@ -275,6 +293,7 @@ class EditDashboard extends Component {
   constructor(props) {
     super(props);
     this.props = props;
+    this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     this.state = {
       dashboards: [],
       newSelectedBoxType: {},
@@ -305,21 +324,12 @@ class EditDashboard extends Component {
       savingNewDashboardList
     }
   ) {
-    const dashboardConfigured =
-      currentDashboard &&
-      currentDashboard.boxes &&
-      ((currentDashboard.boxes[0] && currentDashboard.boxes[0].length > 0) ||
-        (currentDashboard.boxes[1] && currentDashboard.boxes[1].length > 0) ||
-        (currentDashboard.boxes[2] && currentDashboard.boxes[2].length > 0));
-    const dashboardListEmpty = !(dashboards && dashboards.length > 0);
-    const dashboardNotConfigured = !dashboardConfigured;
     return (
       <EditDashboardPage
+        isTouchDevice={this.isTouchDevice}
         dashboards={dashboards}
-        dashboardListEmpty={dashboardListEmpty}
         currentDashboard={currentDashboard}
         loading={loading}
-        dashboardNotConfigured={dashboardNotConfigured}
         dashboardValidationError={dashboardValidationError}
         dashboardAlreadyExistError={dashboardAlreadyExistError}
         unknownError={unknownError}
@@ -329,6 +339,7 @@ class EditDashboard extends Component {
         cancelDashboardEdit={this.cancelDashboardEdit}
         moveBoxDown={this.moveBoxDown}
         moveBoxUp={this.moveBoxUp}
+        moveCard={this.moveCard}
         addBox={this.addBox}
         removeBox={this.removeBox}
         updateNewSelectedBox={this.updateNewSelectedBox}

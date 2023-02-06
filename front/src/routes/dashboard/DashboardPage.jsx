@@ -28,7 +28,7 @@ const DashboardPage = ({ children, ...props }) => (
                       >
                         {props.dashboards.map(dashboard => (
                           <Link
-                            class="dropdown-item"
+                            class={cx('dropdown-item', style.dropdownItemBiggerLines)}
                             href={`/dashboard/${dashboard.selector}`}
                             onClick={props.redirectToDashboard}
                           >
