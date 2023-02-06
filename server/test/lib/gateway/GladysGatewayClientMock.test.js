@@ -77,6 +77,7 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
       },
     ]),
     getEcowattSignals: fake.resolves({ signals: [] }),
+    openAIAsk: fake.resolves({ answer: 'this is the answer' }),
   };
 };
 

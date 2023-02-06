@@ -74,7 +74,7 @@
     "supertest": "^3.4.2"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^4.7.0",
+    "@gladysassistant/gladys-gateway-js": "^4.10.0",
     "@hapi/joi": "^17.1.0",
     "@hapi/joi-date": "^2.0.1",
     "async-retry": "^1.3.3",

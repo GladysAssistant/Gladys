@@ -62,6 +62,8 @@ async function installContainer(saveConfiguration = true) {
   }
 
   if (saveConfiguration) {
+    logger.info('MQTT saving configuration');
+
     await this.saveConfiguration({
       mqttUrl: 'mqtt://localhost',
       mqttUsername: 'gladys',
@@ -69,6 +71,8 @@ async function installContainer(saveConfiguration = true) {
       useEmbeddedBroker: true,
     });
   }
+
+  logger.info('MQTT installed');
 
   return container;
 }
