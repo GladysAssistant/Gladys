@@ -310,20 +310,17 @@ const INTENTS = {
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
-  LIGHT: 'light',
+  ACCESS_CONTROL: 'access-control',
+  AIRQUALITY_SENSOR: 'airquality-sensor',
   BATTERY: 'battery',
-  TEMPERATURE_SENSOR: 'temperature-sensor',
-  MOTION_SENSOR: 'motion-sensor',
-  LIGHT_SENSOR: 'light-sensor',
-  SMOKE_SENSOR: 'smoke-sensor',
-  SISMIC_SENSOR: 'sismic-sensor',
-  PRESSURE_SENSOR: 'pressure-sensor',
-  OPENING_SENSOR: 'opening-sensor',
-  HUMIDITY_SENSOR: 'humidity-sensor',
-  VIBRATION_SENSOR: 'vibration-sensor',
+  BUTTON: 'button',
+  CAMERA: 'camera',
+  CUBE: 'cube',
+  CURRENCY: 'currency',
   CO_SENSOR: 'co-sensor',
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
+<<<<<<< HEAD
   LEAK_SENSOR: 'leak-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   DISTANCE_SENSOR: 'distance-sensor',
@@ -346,11 +343,39 @@ const DEVICE_FEATURE_CATEGORIES = {
   DURATION: 'duration',
   VOC_SENSOR: 'voc-sensor',
   SHUTTER: 'shutter',
+=======
+>>>>>>> a57bf296 (Add AQI sensor (#1685))
   CURTAIN: 'curtain',
   DATA: 'data',
   DATARATE: 'datarate',
-  UNKNOWN: 'unknown',
+  DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
+  DISTANCE_SENSOR: 'distance-sensor',
+  DURATION: 'duration',
+  ENERGY_SENSOR: 'energy-sensor',
+  HUMIDITY_SENSOR: 'humidity-sensor',
+  LEAK_SENSOR: 'leak-sensor',
+  LIGHT: 'light',
+  LIGHT_SENSOR: 'light-sensor',
+  MOTION_SENSOR: 'motion-sensor',
+  OPENING_SENSOR: 'opening-sensor',
+  PRECIPITATION_SENSOR: 'precipitation-sensor',
+  PRESENCE_SENSOR: 'presence-sensor',
+  PRESSURE_SENSOR: 'pressure-sensor',
+  SHUTTER: 'shutter',
+  SIGNAL: 'signal',
+  SIREN: 'siren',
+  SISMIC_SENSOR: 'sismic-sensor',
+  SMOKE_SENSOR: 'smoke-sensor',
+  SWITCH: 'switch',
+  SPEED_SENSOR: 'speed-sensor',
+  TELEVISION: 'television',
+  TEMPERATURE_SENSOR: 'temperature-sensor',
   THERMOSTAT: 'thermostat',
+  UNKNOWN: 'unknown',
+  UV_SENSOR: 'uv-sensor',
+  VIBRATION_SENSOR: 'vibration-sensor',
+  VOC_SENSOR: 'voc-sensor',
+  VOLUME_SENSOR: 'volume-sensor',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -517,6 +542,9 @@ const DEVICE_FEATURE_TYPES = {
   THERMOSTAT: {
     TARGET_TEMPERATURE: 'target-temperature',
   },
+  AIRQUALITY_SENSOR: {
+    AQI: 'aqi',
+  },
 };
 
 const DEVICE_FEATURE_UNITS = {
@@ -610,6 +638,8 @@ const DEVICE_FEATURE_UNITS = {
   KILOBYTES_PER_SECOND: 'kilobytes-per-second',
   MEGABYTES_PER_SECOND: 'megabytes-per-second',
   GIGABYTES_PER_SECOND: 'gigabytes-per-second',
+  // Airquality Index
+  AQI: 'aqi',
 };
 
 const WEATHER_UNITS = {
@@ -722,6 +752,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.GIGABYTES_PER_SECOND,
   ],
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_UNITS.AQI],
 };
 
 const ACTIONS_STATUS = {
