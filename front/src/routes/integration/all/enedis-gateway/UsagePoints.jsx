@@ -175,7 +175,7 @@ const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceP
                   </h3>
                   <div class="page-options d-flex">
                     <button class="btn btn-primary" onClick={sync}>
-                      <i class="fe fe-refresh-cw"></i> <Text id="integration.enedis.usagePoints.refreshLocal" />
+                      <i class="fe fe-refresh-cw" /> <Text id="integration.enedis.usagePoints.refreshLocal" />
                     </button>
                   </div>
                 </div>
