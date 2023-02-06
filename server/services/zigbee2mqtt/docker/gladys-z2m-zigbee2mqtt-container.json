@@ -4,6 +4,12 @@
   "ExposedPorts": {},
   "HostConfig": {
     "Binds": [],
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {
+        "max-size": "10m"
+      }
+    },
     "PortBindings": {},
     "RestartPolicy": {
       "Name": "always"
