@@ -609,6 +609,7 @@
       },
       "usagePoints": {
         "title": "My meters",
+        "emptyState": "You do not have any synchronized meters. To add a meter, please go to the tab \"Connection with Enedis\".",
         "usagePointName": "Meter",
         "lastRefresh": "Latest data :",
         "usagePointId": "Meter ID",

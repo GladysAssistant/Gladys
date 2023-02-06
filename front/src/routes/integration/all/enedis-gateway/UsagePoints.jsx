@@ -174,9 +174,11 @@ const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceP
                     <Text id="integration.enedis.usagePoints.title" />
                   </h3>
                   <div class="page-options d-flex">
-                    <button class="btn btn-primary" onClick={sync}>
-                      <i class="fe fe-refresh-cw" /> <Text id="integration.enedis.usagePoints.refreshLocal" />
-                    </button>
+                    {usagePointsDevices && usagePointsDevices.length > 0 && (
+                      <button class="btn btn-primary" onClick={sync}>
+                        <i class="fe fe-refresh-cw" /> <Text id="integration.enedis.usagePoints.refreshLocal" />
+                      </button>
+                    )}
                   </div>
                 </div>
                 <div class="card-body">
@@ -190,6 +192,12 @@ const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceP
                       {errored && (
                         <p class="alert alert-danger">
                           <Text id="integration.enedis.welcome.error" />
+                        </p>
+                      )}
+
+                      {usagePointsDevices && usagePointsDevices.length === 0 && (
+                        <p class="alert alert-info">
+                          <Text id="integration.enedis.usagePoints.emptyState" />
                         </p>
                       )}
 
@@ -221,9 +229,6 @@ class EnedisWelcomePageComponent extends Component {
   getCurrentEnedisUsagePoints = async () => {
     try {
       const usagePointsDevices = await this.props.httpClient.get('/api/v1/service/enedis/device');
-      console.log({
-        usagePointsDevices
-      });
       this.setState({ usagePointsDevices });
     } catch (e) {
       console.error(e);

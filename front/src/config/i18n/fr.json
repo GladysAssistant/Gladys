@@ -719,6 +719,7 @@
       },
       "usagePoints": {
         "title": "Mes compteurs",
+        "emptyState": "Vous n'avez pas de compteurs synchronisés. Pour ajouter un compteur, veuillez vous rendre dans l'onglet \"Connexion avec Enedis\".",
         "usagePointName": "Compteur",
         "lastRefresh": "Dernières données :",
         "usagePointId": "Identifiant du compteur",
