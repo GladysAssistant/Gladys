@@ -2123,7 +2123,8 @@
       "binary": "Relais",
       "power": "Puissance",
       "energy": "Energie",
-      "index": "Index"
+      "index": "Index",
+      "daily-consumption": "Consommation journalière"
     },
     "volume-sensor": {
       "shortCategoryName": "Capteur de volume",
