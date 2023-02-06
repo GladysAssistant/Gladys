@@ -11,11 +11,12 @@ const LAST_DATE_SYNCED = 'LAST_DATE_SYNCED';
  * @description Get one batch of enedis data, then call the next one.
  * @param {Object} gladys - Gladys object reference.
  * @param {string} externalId - Enedis usage point external id.
+ * @param {number} syncDelayBetweenCallsInMs - Delay between calls in ms.
  * @param {string} after - Get data after this date.
  * @returns {Promise<string>} - Resolve with last date.
  * @example await recursiveBatchCall('usage-point');
  */
-async function recursiveBatchCall(gladys, externalId, after = '2000-01-01') {
+async function recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs, after = '2000-01-01') {
   const usagePointId = getUsagePointIdFromExternalId(externalId);
   logger.debug(`Enedis: Syncing ${usagePointId} after ${after}`);
   const data = await gladys.gateway.enedisGetDailyConsumption({
@@ -32,7 +33,7 @@ async function recursiveBatchCall(gladys, externalId, after = '2000-01-01') {
       created_at: new Date(value.created_at),
     });
   });
-  await Promise.delay(500);
+  await Promise.delay(syncDelayBetweenCallsInMs);
 
   // If there was still some data to get
   if (data.length === ENEDIS_SYNC_BATCH_SIZE) {
@@ -78,7 +79,12 @@ async function sync() {
     logger.info(`Enedis: Usage point last sync was ${lastDateSynced}`);
 
     // syncing all batches
-    const lastDateSync = await recursiveBatchCall(this.gladys, usagePointFeature.external_id, lastDateSynced);
+    const lastDateSync = await recursiveBatchCall(
+      this.gladys,
+      usagePointFeature.external_id,
+      this.syncDelayBetweenCallsInMs,
+      lastDateSynced,
+    );
 
     logger.info(`Enedis: Saving new last data sync = ${lastDateSync}`);
 
