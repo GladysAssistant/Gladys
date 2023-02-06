@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+
 import EditActions from './EditActions';
 import ReorderDashbordList from './ReorderDashbordList';
 import EditBoxColumns from './EditBoxColumns';
@@ -45,6 +46,7 @@ const EditDashboard = ({ children, ...props }) => (
                     <div class="card-body">
                       {props.currentDashboard && (
                         <EditBoxColumns
+                          isTouchDevice={props.isTouchDevice}
                           dashboards={props.dashboards}
                           updateCurrentDashboardName={props.updateCurrentDashboardName}
                           editDashboardDragEnable={props.editDashboardDragEnable}

@@ -8,6 +8,8 @@ import EditChart from '../../../components/boxs/chart/EditChart';
 import EditEcowatt from '../../../components/boxs/ecowatt/EditEcowatt';
 import EditClock from '../../../components/boxs/clock/EditClock';
 
+import SelectBoxType from '../../../components/boxs/SelectBoxType';
+
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
     case 'weather':
@@ -28,13 +30,9 @@ const Box = ({ children, ...props }) => {
       return <EditEcowatt {...props} />;
     case 'clock':
       return <EditClock {...props} />;
+    default:
+      return <SelectBoxType {...props} />;
   }
 };
 
-const EditBoxWithDragAndDrop = ({ children, ...props }) => (
-  <div>
-    <Box {...props} />
-  </div>
-);
-
-export default EditBoxWithDragAndDrop;
+export default Box;

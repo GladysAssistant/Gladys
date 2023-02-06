@@ -1,0 +1,28 @@
+.dropZone {
+  height: 100%;
+  min-height: 10rem;
+  border-width: 1px;
+  border-radius: 2px;
+  padding: 1rem;
+  border-color: '#eeeeee';
+  border-style: dashed;
+  outline: none;
+  transition: border 0.24s ease-in-out;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  margin-bottom: 1.5rem;
+}
+
+.bottomDropZone {
+  min-height: 20rem;
+  border-width: 1px;
+  border-radius: 2px;
+  padding: 1rem;
+  border-color: '#eeeeee';
+  border-style: dashed;
+  outline: none;
+  transition: border 0.24s ease-in-out;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  margin-bottom: 1.5rem;
+}
