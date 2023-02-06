@@ -6,6 +6,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import EnedisButton from './enedis-button.png';
 import { route } from 'preact-router';
+import config from '../../../../config';
 import {
   DEVICE_FEATURE_CATEGORIES,
   DEVICE_FEATURE_TYPES,
@@ -136,6 +137,9 @@ class EnedisWelcomePageComponent extends Component {
         const finalizeBody = {
           code: this.props.code
         };
+        if (config.enedisForceUsagePoints) {
+          finalizeBody.usage_points_id = config.enedisForceUsagePoints.split(',');
+        }
         if (this.props.usage_points_id) {
           finalizeBody.usage_points_id = this.props.usage_points_id;
         }
@@ -152,6 +156,7 @@ class EnedisWelcomePageComponent extends Component {
         await Promise.each(response.usage_points_id, async usagePointId => {
           await this.createUsagePointDevice(usagePointId, enedisIntegration.id);
         });
+        await this.props.session.gatewayClient.enedisRefreshAllData();
         route('/dashboard/integration/device/enedis');
       } catch (e) {
         console.error(e);
