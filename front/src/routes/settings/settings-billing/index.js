@@ -24,6 +24,16 @@ class SettingsBilling extends Component {
       console.error(e);
     }
   };
+  wantYearlyUpgrade = () => {
+    this.setState({
+      confirmUpgrade: true
+    });
+  };
+  cancelYearlyUpgrade = () => {
+    this.setState({
+      confirmUpgrade: false
+    });
+  };
   upgradeMonthlyToYearly = async () => {
     try {
       await this.setState({ upgradeYearlyError: false, loading: true });
@@ -34,7 +44,7 @@ class SettingsBilling extends Component {
       console.error(e);
     }
     await this.getCurrentPlan();
-    await this.setState({ loading: false });
+    await this.setState({ loading: false, confirmUpgrade: false });
   };
   openStripeBilling = async () => {
     window.open(
@@ -47,7 +57,7 @@ class SettingsBilling extends Component {
     this.getCurrentPlan();
   }
 
-  render(props, { loading, upgradeYearlyError, plan, upgradeYearlySuccess }) {
+  render(props, { loading, upgradeYearlyError, plan, upgradeYearlySuccess, confirmUpgrade }) {
     return (
       <SettingsLayout>
         <GatewayBilling
@@ -57,6 +67,9 @@ class SettingsBilling extends Component {
           loading={loading}
           upgradeYearlyError={upgradeYearlyError}
           upgradeYearlySuccess={upgradeYearlySuccess}
+          confirmUpgrade={confirmUpgrade}
+          wantYearlyUpgrade={this.wantYearlyUpgrade}
+          cancelYearlyUpgrade={this.cancelYearlyUpgrade}
           plan={plan}
         />
       </SettingsLayout>

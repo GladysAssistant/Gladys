@@ -32,6 +32,7 @@ const { restoreBackupEvent } = require('./gateway.restoreBackupEvent');
 const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 const { getEcowattSignals } = require('./gateway.getEcowattSignals');
+const { openAIAsk } = require('./gateway.openAIAsk');
 
 // Enedis API
 const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
@@ -98,6 +99,7 @@ Gateway.prototype.restoreBackupEvent = restoreBackupEvent;
 Gateway.prototype.saveUsersKeys = saveUsersKeys;
 Gateway.prototype.refreshUserKeys = refreshUserKeys;
 Gateway.prototype.getEcowattSignals = getEcowattSignals;
+Gateway.prototype.openAIAsk = openAIAsk;
 
 // Enedis API
 Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;
