@@ -41,7 +41,7 @@ const DashboardPage = ({ children, ...props }) => (
                 </div>
 
                 <div class="page-options d-flex align-content-between flex-wrap">
-                  {!props.dashboardNotConfigured && props.browserFullScreenCompatible && false && (
+                  {!props.dashboardNotConfigured && props.browserFullScreenCompatible && (
                     <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
                       <span>
                         {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
