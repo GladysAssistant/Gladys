@@ -197,6 +197,10 @@
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardMyDashboards": "Mes tableaux de bords",
+    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant par l'étoile en haut à droite de celui-ci.",
+    "addBoxButton": "Ajouter",
+    "selectBoxType": "Sélectionner un type",
+    "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
     "boxTitle": {
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
@@ -210,7 +214,6 @@
     },
     "boxes": {
       "column": "Colonne {{index}}",
-      "dragAndDrop": "Glissez et déposez moi ici",
       "deleteButton": "Supprimer",
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
