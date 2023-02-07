@@ -20,6 +20,7 @@ const HomeKitHandler = function HomeKitHandler(gladys, serviceId, hap) {
   this.hap = hap;
   this.bridge = null;
   this.notifyTimeouts = {};
+  this.notifyCb = null;
 };
 
 HomeKitHandler.prototype.newPinCode = newPinCode;

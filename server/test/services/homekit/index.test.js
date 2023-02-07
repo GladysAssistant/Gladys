@@ -27,6 +27,7 @@ describe('HomeKitService', () => {
       },
       event: {
         on: stub().returns(),
+        removeListener: stub().returns(),
       },
     };
     homekitService = HomeKitService(gladys);

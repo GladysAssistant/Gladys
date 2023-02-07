@@ -37,11 +37,16 @@ async function createBridge() {
     .map((device) => this.buildAccessory(device))
     .filter((accessory) => accessory !== null);
 
-  this.gladys.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.notifyChange.bind(this, accessories)));
+  if (this.notifyCb) {
+    this.gladys.event.removeListener(EVENTS.TRIGGERS.CHECK, this.notifyCb);
+  }
 
   if (this.bridge) {
     await this.bridge.unpublish();
   }
+
+  this.notifyCb = eventFunctionWrapper(this.notifyChange.bind(this, accessories));
+  this.gladys.event.on(EVENTS.TRIGGERS.CHECK, this.notifyCb);
 
   const gladysBridge = new this.hap.Bridge('Gladys', bridgeUuid);
   gladysBridge.addBridgedAccessories(accessories);

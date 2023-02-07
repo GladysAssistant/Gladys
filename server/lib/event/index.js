@@ -22,4 +22,8 @@ Event.prototype.on = function on(event, cb) {
   this.emitter.on(event, cb);
 };
 
+Event.prototype.removeListener = function removeListener(event, cb) {
+  this.emitter.removeListener(event, cb);
+};
+
 module.exports = Event;
