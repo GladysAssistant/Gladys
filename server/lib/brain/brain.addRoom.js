@@ -7,6 +7,7 @@ const { SUPPORTED_LANGUAGES } = require('../../config/brain/index');
  * brain.addRoom(room);
  */
 function addRoom(room) {
+  this.roomsToId.set(room.name.toLowerCase(), room.id);
   this.nlpManager.addNamedEntityText('room', room.id, SUPPORTED_LANGUAGES, [room.name]);
 }
 

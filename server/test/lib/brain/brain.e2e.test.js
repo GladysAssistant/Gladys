@@ -13,7 +13,10 @@ describe('brain end-to-end tests', () => {
   const service = {
     getService: fake.returns(null),
   };
-  const messageHandler = new MessageHandler(event, brain, service);
+  const variable = {
+    getValue: fake.resolves(null),
+  };
+  const messageHandler = new MessageHandler(event, brain, service, {}, variable);
   before('should train brain & add room', async () => {
     await brain.train();
     await brain.addRoom({

@@ -22,4 +22,9 @@ describe('brain', () => {
       },
     });
   });
+  it('should add room, then get room', async () => {
+    brain.addRoom({ id: '7beb1245-15b2-4808-b555-40bcc6e3900a', name: 'SALON' });
+    const id = brain.getEntityIdByName('room', 'Salon');
+    expect(id).to.equal('7beb1245-15b2-4808-b555-40bcc6e3900a');
+  });
 });

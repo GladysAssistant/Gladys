@@ -33,8 +33,21 @@ const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 const { openAIAsk } = require('./gateway.openAIAsk');
+const { forwardMessageToOpenAI } = require('./gateway.forwardMessageToOpenAI');
 
-const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager, serviceManager, job) {
+const Gateway = function Gateway(
+  variable,
+  event,
+  system,
+  sequelize,
+  config,
+  user,
+  stateManager,
+  serviceManager,
+  job,
+  message,
+  brain,
+) {
   this.variable = variable;
   this.event = event;
   this.system = system;
@@ -45,6 +58,8 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.stateManager = stateManager;
   this.serviceManager = serviceManager;
   this.job = job;
+  this.message = message;
+  this.brain = brain;
   this.connected = false;
   this.restoreInProgress = false;
   this.usersKeys = [];
@@ -69,6 +84,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.event.on(EVENTS.GATEWAY.USER_KEYS_CHANGED, eventFunctionWrapper(this.refreshUserKeys.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToGoogleHome.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToAlexa.bind(this)));
+  this.event.on(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, eventFunctionWrapper(this.forwardMessageToOpenAI.bind(this)));
 };
 
 Gateway.prototype.backup = backup;
@@ -95,5 +111,6 @@ Gateway.prototype.saveUsersKeys = saveUsersKeys;
 Gateway.prototype.refreshUserKeys = refreshUserKeys;
 Gateway.prototype.getEcowattSignals = getEcowattSignals;
 Gateway.prototype.openAIAsk = openAIAsk;
+Gateway.prototype.forwardMessageToOpenAI = forwardMessageToOpenAI;
 
 module.exports = Gateway;

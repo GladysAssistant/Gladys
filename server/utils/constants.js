@@ -153,6 +153,7 @@ const EVENTS = {
   },
   MESSAGE: {
     NEW: 'message.new',
+    NEW_FOR_OPEN_AI: 'message.new-for-open-ai',
   },
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
