@@ -16,15 +16,6 @@ const BaseEditBox = ({ children, ...props }) => {
       isDragging: !!monitor.isDragging()
     })
   }));
-  const [{ isDragging: isDraggingMobile }, dragMobile, previewMobile] = useDrag(() => ({
-    type: DASHBOARD_EDIT_BOX_TYPE,
-    item: () => {
-      return { x, y };
-    },
-    collect: monitor => ({
-      isDragging: !!monitor.isDragging()
-    })
-  }));
   const [{ isActive }, drop] = useDrop({
     accept: DASHBOARD_EDIT_BOX_TYPE,
     collect: monitor => ({
@@ -37,29 +28,60 @@ const BaseEditBox = ({ children, ...props }) => {
       props.moveCard(item.x, item.y, x, y);
     }
   });
-  previewMobile(preview(drop(ref)));
+  preview(drop(ref));
   const removeBox = () => {
     props.removeBox(x, y);
   };
   if (props.isMobileReordering) {
-    dragMobile(ref);
+    const [{ isDragging: isDraggingMobile }, dragMobile, previewMobile] = useDrag(() => ({
+      type: DASHBOARD_EDIT_BOX_TYPE,
+      item: () => {
+        return { x, y };
+      },
+      collect: monitor => ({
+        isDragging: !!monitor.isDragging()
+      })
+    }));
+    previewMobile(ref);
+    return (
+      <div
+        ref={ref}
+        class="card"
+        style={{
+          opacity: isDraggingMobile ? 0.5 : 1,
+          cursor: 'pointer',
+          backgroundColor: isActive ? '#ecf0f1' : undefined,
+          userSelect: 'none'
+        }}
+      >
+        <div ref={dragMobile} style={{ minHeight: '2.5rem', padding: '1rem 1.5rem' }}>
+          <div class="d-flex bd-highlight justify-content-between">
+            <div>
+              <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />
+            </div>
+            <div class="flex-fill">
+              <Text id={props.titleKey} />
+            </div>
+            <div class="flex-fill text-right">{props.titleValue && <small>{props.titleValue}</small>}</div>
+          </div>
+        </div>
+      </div>
+    );
   }
-  let isDragging = isDraggingMouse || isDraggingMobile;
   return (
     <div
       ref={ref}
       class="card"
       style={{
-        opacity: isDragging ? 0.5 : 1,
+        opacity: isDraggingMouse ? 0.5 : 1,
         cursor: 'pointer',
-        backgroundColor: isActive ? '#ecf0f1' : undefined,
-        userSelect: props.isMobileReordering ? 'none' : undefined
+        backgroundColor: isActive ? '#ecf0f1' : undefined
       }}
     >
       <div class="card-header">
         <h3 class="card-title">
           {props.isMobileReordering && <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />}
-          <Text id={props.titleKey} />
+          {props.titleKey && <Text id={props.titleKey} />}
         </h3>
         <div class="card-options">
           <a class="card-options-remove">
@@ -72,7 +94,7 @@ const BaseEditBox = ({ children, ...props }) => {
           )}
         </div>
       </div>
-      {!props.isMobileReordering && <div class="card-body">{children}</div>}
+      <div class="card-body">{children}</div>
     </div>
   );
 };
