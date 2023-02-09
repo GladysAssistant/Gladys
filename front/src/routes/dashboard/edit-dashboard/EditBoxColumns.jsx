@@ -47,9 +47,24 @@ const EditBoxColumns = ({ children, ...props }) => (
         </div>
       </div>
     </div>
-    <div class="row mb-6">
+    <div class="row mb-4">
       <div class="col-md-12">
         <Text id="dashboard.editDashboardExplanation" />
+      </div>
+    </div>
+    <div class="row mb-6">
+      <div class="col-md-4 d-lg-none d-xl-none">
+        <button
+          class={cx('btn', {
+            'btn-secondary': !props.isMobileReordering,
+            'btn-warning': props.isMobileReordering
+          })}
+          onClick={props.toggleMobileReorder}
+        >
+          <i class="fe fe-list mr-2" />
+          {!props.isMobileReordering && <Text id="dashboard.reorderDashboardButton" />}
+          {props.isMobileReordering && <Text id="dashboard.stopReorderingDashboardButton" />}
+        </button>
       </div>
     </div>
     <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
@@ -70,9 +85,14 @@ const EditBoxColumns = ({ children, ...props }) => (
               {column.length > 0 && (
                 <div>
                   {column.map((box, y) => (
-                    <EditBox {...props} box={box} x={x} y={y} />
+                    <EditBox {...props} box={box} x={x} y={y} isMobileReordering={props.isMobileReordering} />
                   ))}
-                  <BottomDropZone moveCard={props.moveCard} x={x} y={column.length} />
+                  <BottomDropZone
+                    moveCard={props.moveCard}
+                    x={x}
+                    y={column.length}
+                    isMobileReordering={props.isMobileReordering}
+                  />
                 </div>
               )}
 

@@ -26,3 +26,10 @@
   color: #bdbdbd;
   margin-bottom: 1.5rem;
 }
+
+@media (max-width: 992px) {
+  .bottomDropZone {
+    min-height: 5rem;
+    height: 5rem;
+  }
+}

@@ -290,6 +290,10 @@ class EditDashboard extends Component {
     });
   };
 
+  toggleMobileReorder = () => {
+    this.setState(prevState => ({ ...prevState, isMobileReordering: !prevState.isMobileReordering }));
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
@@ -297,7 +301,8 @@ class EditDashboard extends Component {
     this.state = {
       dashboards: [],
       newSelectedBoxType: {},
-      askDeleteDashboard: false
+      askDeleteDashboard: false,
+      isMobileReordering: false
     };
   }
 
@@ -321,7 +326,8 @@ class EditDashboard extends Component {
       dashboardAlreadyExistError,
       unknownError,
       askDeleteDashboard,
-      savingNewDashboardList
+      savingNewDashboardList,
+      isMobileReordering
     }
   ) {
     return (
@@ -352,6 +358,8 @@ class EditDashboard extends Component {
         askDeleteDashboard={askDeleteDashboard}
         updateDashboardList={this.updateDashboardList}
         savingNewDashboardList={savingNewDashboardList}
+        toggleMobileReorder={this.toggleMobileReorder}
+        isMobileReordering={isMobileReordering}
       />
     );
   }

@@ -198,6 +198,8 @@
     "editDashboardNameLabel": "Name",
     "editDashboardMyDashboards": "My dashboards",
     "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it by the star at the top right of it.",
+    "reorderDashboardButton": "Re-order dashboards",
+    "stopReorderingDashboardButton": "Stop re-ordering dashboards",
     "addBoxButton": "Add",
     "selectBoxType": "Select a type",
     "selectBoxTypeLabel": "Choose which widget to display here",

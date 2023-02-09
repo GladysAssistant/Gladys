@@ -62,6 +62,8 @@ const EditDashboard = ({ children, ...props }) => (
                           toggleReorderDashboard={props.toggleReorderDashboard}
                           updateDashboardList={props.updateDashboardList}
                           savingNewDashboardList={props.savingNewDashboardList}
+                          isMobileReordering={props.isMobileReordering}
+                          toggleMobileReorder={props.toggleMobileReorder}
                         />
                       )}
                     </div>
