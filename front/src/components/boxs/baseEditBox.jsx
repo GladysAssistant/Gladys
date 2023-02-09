@@ -41,6 +41,9 @@ const BaseEditBox = ({ children, ...props }) => {
   const removeBox = () => {
     props.removeBox(x, y);
   };
+  if (props.isMobileReordering) {
+    dragMobile(ref);
+  }
   let isDragging = isDraggingMouse || isDraggingMobile;
   return (
     <div
@@ -55,9 +58,7 @@ const BaseEditBox = ({ children, ...props }) => {
     >
       <div class="card-header">
         <h3 class="card-title">
-          {props.isMobileReordering && (
-            <i ref={dragMobile} style={{ cursor: 'move', height: '15px' }} class="fe fe-list mr-4" />
-          )}
+          {props.isMobileReordering && <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />}
           <Text id={props.titleKey} />
         </h3>
         <div class="card-options">
