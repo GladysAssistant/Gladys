@@ -27,4 +27,13 @@ describe('brain', () => {
     const id = brain.getEntityIdByName('room', 'Salon');
     expect(id).to.equal('7beb1245-15b2-4808-b555-40bcc6e3900a');
   });
+  it('should add room, then get room', async () => {
+    brain.addRoom({ id: '7beb1245-15b2-4808-b555-40bcc6e3900a', name: 'SALON' });
+    const id = brain.getEntityIdByName('room', 'KDFLMSKFMLSDFKL');
+    expect(id).to.equal(undefined);
+  });
+  it('should get unknown entity', async () => {
+    const id = brain.getEntityIdByName('totototo', 'KDFLMSKFMLSDFKL');
+    expect(id).to.equal(undefined);
+  });
 });
