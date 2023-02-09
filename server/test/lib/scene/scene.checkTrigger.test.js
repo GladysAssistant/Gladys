@@ -11,13 +11,17 @@ const house = {
   get: fake.resolves([]),
 };
 
+const brain = {
+  addNamedEntity: fake.returns(null),
+};
+
 describe('scene.checkTrigger', () => {
   it('should execute scene', async () => {
     const stateManager = new StateManager();
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -59,7 +63,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: false,
@@ -101,7 +105,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -142,7 +146,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -183,7 +187,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -224,7 +228,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -264,7 +268,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -304,7 +308,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -346,7 +350,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -388,7 +392,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -430,7 +434,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -472,7 +476,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -514,7 +518,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -558,7 +562,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -602,7 +606,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -644,7 +648,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     expect(() => {
       sceneManager.checkTrigger({
         type: 'one-unknown-event',
@@ -658,7 +662,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     const addedScene = sceneManager.addScene({
       selector: 'my-scene',
       active: true,
@@ -702,7 +706,7 @@ describe('scene.checkTrigger', () => {
     const device = {
       setValue: fake.resolves(null),
     };
-    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {});
+    const sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, brain);
     sceneManager.addScene({
       selector: 'my-scene',
       active: true,

@@ -15,6 +15,8 @@ async function create(scene) {
   const plainScene = createdScene.get({ plain: true });
   // add scene to live store
   this.addScene(plainScene);
+  // add scene to brain
+  this.brain.addNamedEntity('scene', plainScene.selector, plainScene.name);
   // return created scene
   return plainScene;
 }

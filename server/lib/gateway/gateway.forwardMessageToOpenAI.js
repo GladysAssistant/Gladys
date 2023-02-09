@@ -4,6 +4,7 @@ const intentTranslation = {
   TURN_OFF: 'light.turn-off',
   GET_TEMPERATURE: 'temperature-sensor.get-in-room',
   GET_HUMIDITY: 'humidity-sensor.get-in-room',
+  SCENE_START: 'scene.start',
   INFO: 'info.get-info',
 };
 
@@ -35,8 +36,14 @@ async function forwardMessageToOpenAI({ message, previousQuestions, context }) {
 
   // add room entity
   if (response.room) {
-    const roomId = this.brain.getEntityIdByName('room', response.room.toLowerCase());
+    const roomId = this.brain.getEntityIdByName('room', response.room);
     classification.entities = [{ entity: 'room', option: roomId, sourceText: response.room }];
+  }
+
+  // add scene entity
+  if (response.scene) {
+    const sceneSelector = this.brain.getEntityIdByName('scene', response.scene);
+    classification.entities = [{ entity: 'scene', option: sceneSelector, sourceText: response.scene }];
   }
 
   classification.intent = intentTranslation[response.type];

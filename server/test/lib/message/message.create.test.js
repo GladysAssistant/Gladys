@@ -73,24 +73,28 @@ describe('message.create', () => {
       sender_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       receiver_id: null,
       is_read: true,
+      created_at: new Date('2023-02-09T09:55:05.766Z'),
     });
     await db.Message.create({
       text: 'Answer 1',
       sender_id: null,
       receiver_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       is_read: true,
+      created_at: new Date('2023-02-09T09:56:05.766Z'),
     });
     await db.Message.create({
       text: 'Question 2',
       sender_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       receiver_id: null,
       is_read: true,
+      created_at: new Date('2023-02-09T09:57:05.766Z'),
     });
     await db.Message.create({
       text: 'Answer 2',
       sender_id: null,
       receiver_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
       is_read: true,
+      created_at: new Date('2023-02-09T09:58:05.766Z'),
     });
     const messageHandler = new MessageHandler(event, brain, service, {}, variable);
     const message = {

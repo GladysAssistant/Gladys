@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { fake } = require('sinon');
+const { fake, assert } = require('sinon');
 const EventEmitter = require('events');
 const { EVENTS } = require('../../../utils/constants');
 const { BadParameters } = require('../../../utils/coreErrors');
@@ -12,7 +12,10 @@ describe('SceneManager.addScene', () => {
     const house = {
       get: fake.resolves([]),
     };
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -28,12 +31,16 @@ describe('SceneManager.addScene', () => {
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
+    assert.calledOnce(brain.addNamedEntity);
   });
   it('should add a scene with a scheduled trigger, every-week', async () => {
     const house = {
       get: fake.resolves([]),
     };
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -54,7 +61,10 @@ describe('SceneManager.addScene', () => {
     const house = {
       get: fake.resolves([]),
     };
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -74,7 +84,10 @@ describe('SceneManager.addScene', () => {
     const house = {
       get: fake.resolves([]),
     };
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     const in30Minutes = new Date(new Date().getTime() + 30 * 60 * 1000);
     const date = in30Minutes.toISOString().slice(0, 10);
     const time = in30Minutes.toLocaleTimeString('en-US', { hour12: false }).slice(0, 5);
@@ -101,7 +114,10 @@ describe('SceneManager.addScene', () => {
         longitude: 50,
       }),
     };
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -122,7 +138,10 @@ describe('SceneManager.addScene', () => {
     const house = {
       get: fake.resolves([]),
     };
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     try {
       sceneManager.addScene({
         name: 'a-test-scene',
@@ -147,7 +166,10 @@ describe('SceneManager.addScene', () => {
     const house = {
       get: fake.resolves([]),
     };
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     try {
       sceneManager.addScene({
         name: 'a-test-scene',
@@ -169,7 +191,10 @@ describe('SceneManager.addScene', () => {
     }
   });
   it('should add a scene with a scheduled trigger, sunrise', async () => {
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {}, {}, {}, brain);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',
@@ -185,7 +210,10 @@ describe('SceneManager.addScene', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
   });
   it('should add a scene with a scheduled trigger, sunset', async () => {
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {});
+    const brain = {
+      addNamedEntity: fake.returns(null),
+    };
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {}, {}, {}, brain);
     const scene = sceneManager.addScene({
       name: 'a-test-scene',
       icon: 'bell',

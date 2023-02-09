@@ -18,6 +18,8 @@ async function update(selector, scene) {
     },
   });
 
+  let oldName = existingScene.name;
+
   if (existingScene === null) {
     throw new NotFoundError('Scene not found');
   }
@@ -27,6 +29,11 @@ async function update(selector, scene) {
   const plainScene = existingScene.get({ plain: true });
   // add scene to live store
   this.addScene(plainScene);
+  // update scene in brain
+  if (oldName !== plainScene.name) {
+    this.brain.removeNamedEntity('scene', plainScene.selector, oldName);
+    this.brain.addNamedEntity('scene', plainScene.selector, plainScene.name);
+  }
   // return updated scene
   return plainScene;
 }

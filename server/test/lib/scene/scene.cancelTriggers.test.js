@@ -8,10 +8,13 @@ const event = new EventEmitter();
 const house = {
   get: fake.resolves([]),
 };
+const brain = {
+  addNamedEntity: fake.returns(null),
+};
 
 describe('SceneManager.cancelTriggers', () => {
   it('should cancel a node-schedule trigger', async () => {
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     const scene = await sceneManager.create({
       name: 'a-test-scene',
       icon: 'bell',
@@ -30,7 +33,7 @@ describe('SceneManager.cancelTriggers', () => {
     expect(sceneManager.scenes[scene.selector].triggers[0]).not.to.have.property('nodeScheduleJob');
   });
   it('should cancel a js interval trigger', async () => {
-    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {});
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, brain);
     const scene = await sceneManager.create({
       name: 'a-test-scene',
       icon: 'bell',

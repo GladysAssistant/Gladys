@@ -1,8 +1,8 @@
 const { NlpManager } = require('node-nlp');
 const { SUPPORTED_LANGUAGES } = require('../../config/brain/index');
 
-const { addRoom } = require('./brain.addRoom');
-const { removeRoom } = require('./brain.removeRoom');
+const { addNamedEntity } = require('./brain.addNamedEntity');
+const { removeNamedEntity } = require('./brain.removeNamedEntity');
 const { train } = require('./brain.train');
 const { classify } = require('./brain.classify');
 const { getReply } = require('./brain.getReply');
@@ -15,11 +15,14 @@ const Brain = function Brain() {
     nlu: { log: false },
     autoSave: false,
   });
-  this.roomsToId = new Map();
+  this.namedEntities = {
+    room: new Map(),
+    scene: new Map(),
+  };
 };
 
-Brain.prototype.addRoom = addRoom;
-Brain.prototype.removeRoom = removeRoom;
+Brain.prototype.addNamedEntity = addNamedEntity;
+Brain.prototype.removeNamedEntity = removeNamedEntity;
 Brain.prototype.train = train;
 Brain.prototype.load = load;
 Brain.prototype.classify = classify;

@@ -308,6 +308,9 @@ const INTENTS = {
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
   },
+  SCENE: {
+    START: 'intent.scene.start',
+  },
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
