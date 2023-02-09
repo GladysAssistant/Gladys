@@ -1,26 +1,15 @@
 import { Component } from 'preact';
 import { Text, MarkupText } from 'preact-i18n';
-import { RequestStatus } from '../../../../../utils/consts';
-import CheckStatus from './CheckStatus.js';
 import classNames from 'classnames/bind';
+
+import CheckStatus from './CheckStatus.js';
 import style from './style.css';
+import { RequestStatus } from '../../../../../utils/consts';
+import InstallationModePanel from './InstallationModePanel';
 
 let cx = classNames.bind(style);
 
 class SetupTab extends Component {
-  toggle = () => {
-    let checked = this.props.z2mEnabled;
-    checked = !checked;
-
-    if (checked) {
-      this.props.startContainer();
-    } else {
-      this.props.stopContainer();
-    }
-
-    this.props.z2mEnabled = checked;
-  };
-
   render(props, {}) {
     return (
       <div class="card">
@@ -30,6 +19,7 @@ class SetupTab extends Component {
           </h3>
         </div>
         <div class="card-body">
+          <InstallationModePanel {...props} />
           <p>
             <MarkupText id="integration.zigbee2mqtt.setup.description" />
           </p>
