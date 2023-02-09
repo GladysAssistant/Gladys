@@ -7,7 +7,7 @@ const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 const BaseEditBox = ({ children, ...props }) => {
   const { x, y } = props;
   const ref = useRef(null);
-  const [{ isDragging: isDraggingMouse }, drag, preview] = useDrag(() => ({
+  const [{ isDragging }, drag, preview] = useDrag(() => ({
     type: DASHBOARD_EDIT_BOX_TYPE,
     item: () => {
       return { x, y };
@@ -33,28 +33,18 @@ const BaseEditBox = ({ children, ...props }) => {
     props.removeBox(x, y);
   };
   if (props.isMobileReordering) {
-    const [{ isDragging: isDraggingMobile }, dragMobile, previewMobile] = useDrag(() => ({
-      type: DASHBOARD_EDIT_BOX_TYPE,
-      item: () => {
-        return { x, y };
-      },
-      collect: monitor => ({
-        isDragging: !!monitor.isDragging()
-      })
-    }));
-    previewMobile(ref);
     return (
       <div
         ref={ref}
         class="card"
         style={{
-          opacity: isDraggingMobile ? 0.5 : 1,
+          opacity: isDragging ? 0.5 : 1,
           cursor: 'pointer',
           backgroundColor: isActive ? '#ecf0f1' : undefined,
           userSelect: 'none'
         }}
       >
-        <div ref={dragMobile} style={{ minHeight: '2.5rem', padding: '1rem 1.5rem' }}>
+        <div ref={drag} style={{ minHeight: '2.5rem', padding: '1rem 1.5rem' }}>
           <div class="d-flex bd-highlight justify-content-between">
             <div>
               <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />
@@ -73,7 +63,7 @@ const BaseEditBox = ({ children, ...props }) => {
       ref={ref}
       class="card"
       style={{
-        opacity: isDraggingMouse ? 0.5 : 1,
+        opacity: isDragging ? 0.5 : 1,
         cursor: 'pointer',
         backgroundColor: isActive ? '#ecf0f1' : undefined
       }}
