@@ -6,11 +6,11 @@ const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const ScrollBottomMobile = ({ children, ...props }) => {
   const scrollDown = () => {
-    window.scrollBy(0, 20);
+    window.scrollBy(0, 10);
   };
 
   const scrollUp = () => {
-    window.scrollBy(0, -20);
+    window.scrollBy(0, -10);
   };
 
   const autoScrollDropRef = useRef(null);
