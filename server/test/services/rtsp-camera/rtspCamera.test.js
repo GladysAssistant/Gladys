@@ -122,4 +122,21 @@ describe('RtspCameraManager commands', () => {
     const rtspCameraService = RtspCameraService(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
     await rtspCameraService.stop();
   });
+  it.only('should start streaming', async () => {
+    const device = {
+      id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+      selector: 'my-camera',
+      params: [
+        {
+          name: 'CAMERA_URL',
+          value: 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mp4',
+        },
+        {
+          name: 'CAMERA_ROTATION',
+          value: '0',
+        },
+      ],
+    };
+    const liveStreamingProcess = await rtspCameraManager.startStreaming(device);
+  });
 });

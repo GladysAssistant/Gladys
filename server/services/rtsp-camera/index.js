@@ -32,6 +32,6 @@ module.exports = function RtspCameraService(gladys, serviceId) {
     start,
     stop,
     device,
-    controllers: RtspCameraController(device),
+    controllers: RtspCameraController(gladys, device),
   });
 };

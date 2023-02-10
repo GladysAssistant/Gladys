@@ -1,5 +1,7 @@
 const { poll } = require('./poll');
 const { getImage } = require('./getImage');
+const { startStreaming } = require('./startStreaming');
+const { stopStreaming } = require('./stopStreaming');
 
 /**
  * @description Add ability to connect to RTSP camera.
@@ -13,9 +15,12 @@ const RtspCameraHandler = function RtspCameraHandler(gladys, ffmpeg, serviceId) 
   this.gladys = gladys;
   this.ffmpeg = ffmpeg;
   this.serviceId = serviceId;
+  this.liveStreams = new Map();
 };
 
 RtspCameraHandler.prototype.poll = poll;
 RtspCameraHandler.prototype.getImage = getImage;
+RtspCameraHandler.prototype.startStreaming = startStreaming;
+RtspCameraHandler.prototype.stopStreaming = stopStreaming;
 
 module.exports = RtspCameraHandler;
