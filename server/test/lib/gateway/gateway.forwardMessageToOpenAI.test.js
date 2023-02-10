@@ -1,4 +1,4 @@
-const { fake } = require('sinon');
+const { fake, assert } = require('sinon');
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
@@ -12,6 +12,7 @@ const Gateway = proxyquire('../../../lib/gateway', {
 });
 
 const getConfig = require('../../../utils/getConfig');
+const { Error429 } = require('../../../utils/httpErrors');
 
 const sequelize = {
   close: fake.resolves(null),
@@ -32,14 +33,16 @@ const job = {
 
 describe('gateway.forwardMessageToOpenAI', () => {
   let gateway;
+  let messageManager;
   beforeEach(() => {
     const variable = {
       getValue: fake.resolves(null),
       setValue: fake.resolves(null),
     };
     const scheduler = {};
-    const messageManager = {
+    messageManager = {
       reply: fake.resolves(null),
+      replyByIntent: fake.resolves(null),
     };
     const brain = {
       getEntityIdByName: fake.returns('14a8ad23-78fa-45e4-8583-f5452792818d'),
@@ -133,5 +136,15 @@ describe('gateway.forwardMessageToOpenAI', () => {
       ],
       intent: 'scene.start',
     });
+  });
+  it('should send too many requests message', async () => {
+    gateway.gladysGatewayClient.openAIAsk = fake.rejects(new Error429());
+    await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
+    assert.calledWith(messageManager.replyByIntent, message, 'openai.request.tooManyRequests', context);
+  });
+  it('should send unknown error message', async () => {
+    gateway.gladysGatewayClient.openAIAsk = fake.rejects(new Error());
+    await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
+    assert.calledWith(messageManager.replyByIntent, message, 'openai.request.fail', context);
   });
 });
