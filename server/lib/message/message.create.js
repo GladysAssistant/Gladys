@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 
 const logger = require('../../utils/logger');
 const db = require('../../models');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @public
@@ -18,16 +18,24 @@ const { EVENTS } = require('../../utils/constants');
  * message.create(message);
  */
 async function create(message) {
-  const openAiEnabled = await this.variable.getValue('GLADYS_GATEWAY_OPEN_AI_ENABLED');
+  const gladysGatewayOpenAiEnabledVar = await this.variable.getValue(
+    SYSTEM_VARIABLE_NAMES.GLADYS_GATEWAY_OPEN_AI_ENABLED,
+  );
+  const openAiEnabled = gladysGatewayOpenAiEnabledVar === 'true';
 
   let classification;
   let context;
 
   if (!openAiEnabled) {
+    console.log('starting classification');
+    console.time('StartingClassification');
+
     // first, we classify the message to understand the intent
     ({ classification, context } = await this.brain.classify(message.text, message.language, {
       user: message.user,
     }));
+
+    console.timeEnd('StartingClassification');
 
     logger.debug(`Classified "${message.text}" with intent = "${classification.intent}".`);
     logger.debug(classification);

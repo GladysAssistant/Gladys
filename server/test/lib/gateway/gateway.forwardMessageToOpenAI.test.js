@@ -35,6 +35,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
     getValue: fake.resolves(null),
     setValue: fake.resolves(null),
   };
+  const scheduler = {};
   const messageManager = {
     reply: fake.resolves(null),
   };
@@ -53,6 +54,7 @@ describe('gateway.forwardMessageToOpenAI', () => {
     stateManager,
     serviceManager,
     job,
+    scheduler,
     messageManager,
     brain,
   );

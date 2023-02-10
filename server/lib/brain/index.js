@@ -11,6 +11,7 @@ const { getEntityIdByName } = require('./brain.getEntityIdByName');
 
 const Brain = function Brain() {
   this.nlpManager = new NlpManager({
+    ner: { threshold: 0.8, builtins: [] },
     languages: SUPPORTED_LANGUAGES,
     nlu: { log: false },
     autoSave: false,

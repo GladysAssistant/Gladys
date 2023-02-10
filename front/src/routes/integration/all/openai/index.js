@@ -101,17 +101,36 @@ class OpenAIGateway extends Component {
     }
   };
 
+  toggleOpenAI = async () => {
+    const { openAIActiveInChat } = this.state;
+    try {
+      const newOpenAIActiveInChat = !openAIActiveInChat;
+      await this.props.httpClient.post('/api/v1/variable/GLADYS_GATEWAY_OPEN_AI_ENABLED', {
+        value: newOpenAIActiveInChat.toString()
+      });
+      this.setState({
+        openAIActiveInChat: newOpenAIActiveInChat
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
       messages: [],
       currentMessageTextInput: '',
-      gladysIsTyping: false
+      gladysIsTyping: false,
+      openAIActiveInChat: false
     };
   }
 
-  render(props, { messages, gladysIsTyping, currentMessageTextInput, error, accountLicenseShouldBeActive }) {
+  render(
+    props,
+    { messages, gladysIsTyping, currentMessageTextInput, error, accountLicenseShouldBeActive, openAIActiveInChat }
+  ) {
     const notOnGladysPlus = props.session && props.session.getGatewayUser === undefined;
     return (
       <Layout>
@@ -146,6 +165,23 @@ class OpenAIGateway extends Component {
                   <p>
                     <Text id="integration.openai.rateLimit" />
                   </p>
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                  <div>
+                    <Text id="integration.openai.activateOpenAiChat" />
+                  </div>
+
+                  <label class="custom-switch">
+                    <input
+                      type="radio"
+                      name="open-ai-on-off"
+                      value="1"
+                      class="custom-switch-input"
+                      checked={openAIActiveInChat}
+                      onClick={this.toggleOpenAI}
+                    />
+                    <span class="custom-switch-indicator" />
+                  </label>
                 </div>
               </div>
             </div>
