@@ -101,6 +101,17 @@ class OpenAIGateway extends Component {
     }
   };
 
+  getOpenAiEnabledStatus = async () => {
+    try {
+      const response = await this.props.httpClient.get('/api/v1/variable/GLADYS_GATEWAY_OPEN_AI_ENABLED');
+      this.setState({
+        openAIActiveInChat: response.value === 'true'
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   toggleOpenAI = async () => {
     const { openAIActiveInChat } = this.state;
     try {
@@ -116,6 +127,10 @@ class OpenAIGateway extends Component {
     }
   };
 
+  componentDidMount() {
+    this.getOpenAiEnabledStatus();
+  }
+
   constructor(props) {
     super(props);
     this.props = props;
@@ -123,7 +138,7 @@ class OpenAIGateway extends Component {
       messages: [],
       currentMessageTextInput: '',
       gladysIsTyping: false,
-      openAIActiveInChat: false
+      openAIActiveInChat: null
     };
   }
 
@@ -171,17 +186,19 @@ class OpenAIGateway extends Component {
                     <Text id="integration.openai.activateOpenAiChat" />
                   </div>
 
-                  <label class="custom-switch">
-                    <input
-                      type="radio"
-                      name="open-ai-on-off"
-                      value="1"
-                      class="custom-switch-input"
-                      checked={openAIActiveInChat}
-                      onClick={this.toggleOpenAI}
-                    />
-                    <span class="custom-switch-indicator" />
-                  </label>
+                  {openAIActiveInChat !== null && (
+                    <label class="custom-switch">
+                      <input
+                        type="radio"
+                        name="open-ai-on-off"
+                        value="1"
+                        class="custom-switch-input"
+                        checked={openAIActiveInChat}
+                        onClick={this.toggleOpenAI}
+                      />
+                      <span class="custom-switch-indicator" />
+                    </label>
+                  )}
                 </div>
               </div>
             </div>
