@@ -57,6 +57,7 @@ describe('brain end-to-end tests', () => {
       },
       from: null,
       room: 'kitchen',
+      room_0: 'kitchen',
       slotFill: undefined,
     });
     expect(nlpJsClassification.entities).to.deep.equal([
