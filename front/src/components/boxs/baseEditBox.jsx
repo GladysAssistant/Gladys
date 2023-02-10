@@ -32,6 +32,32 @@ const BaseEditBox = ({ children, ...props }) => {
   const removeBox = () => {
     props.removeBox(x, y);
   };
+  if (props.isMobileReordering) {
+    return (
+      <div
+        ref={ref}
+        class="card"
+        style={{
+          opacity: isDragging ? 0.5 : 1,
+          cursor: 'pointer',
+          backgroundColor: isActive ? '#ecf0f1' : undefined,
+          userSelect: 'none'
+        }}
+      >
+        <div ref={drag} style={{ minHeight: '2.5rem', padding: '1rem 1.5rem' }}>
+          <div class="d-flex bd-highlight justify-content-between">
+            <div>
+              <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />
+            </div>
+            <div class="flex-fill">
+              <Text id={props.titleKey} />
+            </div>
+            <div class="flex-fill text-right">{props.titleValue && <small>{props.titleValue}</small>}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div
       ref={ref}
@@ -44,15 +70,18 @@ const BaseEditBox = ({ children, ...props }) => {
     >
       <div class="card-header">
         <h3 class="card-title">
-          <Text id={props.titleKey} />
+          {props.isMobileReordering && <i style={{ cursor: 'move' }} class="fe fe-list mr-4" />}
+          {props.titleKey && <Text id={props.titleKey} />}
         </h3>
         <div class="card-options">
           <a class="card-options-remove">
-            <i ref={drag} style={{ cursor: 'move' }} class="fe fe-move mr-2" />
+            <i ref={drag} style={{ cursor: 'move' }} class="fe fe-move mr-2 d-none d-lg-inline" />
           </a>
-          <a onClick={removeBox} class="card-options-remove">
-            <i class="fe fe-x" />
-          </a>
+          {!props.isMobileReordering && (
+            <a onClick={removeBox} class="card-options-remove">
+              <i class="fe fe-x" />
+            </a>
+          )}
         </div>
       </div>
       <div class="card-body">{children}</div>
