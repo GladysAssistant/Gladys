@@ -10,22 +10,21 @@ const { NotFoundError } = require('../../utils/coreErrors');
  */
 async function command(message, classification, context) {
   const sceneEntity = classification.entities.find((entity) => entity.entity === 'scene');
-  try {
-    switch (classification.intent) {
-      case 'scene.start':
-        if (!sceneEntity) {
-          throw new NotFoundError('Scene not found');
-        }
-        await this.execute(sceneEntity.option);
-        this.messageManager.replyByIntent(message, 'scene.start.success', context);
-        break;
-      default:
-        throw new Error('Not found');
+
+  if (classification.intent === 'scene.start') {
+    try {
+      if (!sceneEntity || !sceneEntity.option) {
+        throw new NotFoundError('Scene not found');
+      }
+      logger.debug(`Starting scene ${sceneEntity.option}, original text = ${sceneEntity.sourceText}`);
+      await this.execute(sceneEntity.option);
+      this.message.replyByIntent(message, 'scene.start.success', context);
+    } catch (e) {
+      logger.debug(e);
+      this.message.replyByIntent(message, 'scene.start.fail', context);
     }
-  } catch (e) {
-    logger.debug(e);
-    this.messageManager.replyByIntent(message, 'scene.start.fail', context);
   }
+
   return null;
 }
 
