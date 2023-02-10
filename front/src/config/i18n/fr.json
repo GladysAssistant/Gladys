@@ -704,14 +704,15 @@
     },
     "enedis": {
       "title": "Enedis",
-      "description": "Connectez votre compte Enedis à Gladys",
+      "description": "Vos données de consommation électrique dans Gladys",
       "welcomeTab": "Connexion avec Enedis",
       "usagePointsTab": "Mes compteurs",
       "welcome": {
         "title": "Connexion à Enedis",
-        "longDescription": "Enedis gère le réseau d'électricité jusqu'au compteur d'électricité. Pour récupérez vos données de consommation et de production d'électricité dans Gladys, autorisez Enedis à nous transmettre vos données Linky.",
+        "longDescription": "Enedis gère le réseau d'électricité jusqu'au compteur d'électricité. Pour récupérez vos données de consommation d'électricité dans Gladys, autorisez Enedis à nous transmettre vos données Linky.",
         "longDescription2": "Enedis est le gestionnaire du réseau public de distribution d'électricité sur 95% du territoire français continental.",
-        "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données.",
+        "longDescription3": "Pour donner votre autorisation, vous devez créer un compte personnel Enedis si vous n'avez pas encore de compte. Il vous permet également de suivre et gérer vos données de consommation d'électricité. Munissez-vous de votre facture d'électricité pour créer votre espace.",
+        "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données :",
         "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer.",
         "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus !",
         "connectedToUsagePointds": "Connecté à Enedis avec succès !",

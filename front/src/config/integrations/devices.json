@@ -49,5 +49,9 @@
   {
     "key": "broadlink",
     "img": "/assets/integrations/cover/broadlink.jpg"
+  },
+  {
+    "key": "enedis",
+    "img": "/assets/integrations/cover/enedis.jpg"
   }
 ]

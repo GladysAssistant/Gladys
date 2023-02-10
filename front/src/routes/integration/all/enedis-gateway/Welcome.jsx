@@ -58,6 +58,9 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
                       <p>
                         <Text id="integration.enedis.welcome.longDescription2" />
                       </p>
+                      <p>
+                        <Text id="integration.enedis.welcome.longDescription3" />
+                      </p>
                       {!notOnGladysGateway && (
                         <div>
                           <p>
