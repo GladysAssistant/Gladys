@@ -10,16 +10,14 @@ const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
 
-const brain = {
-  addNamedEntity: fake.returns(null),
-};
-
 describe('scene.checkTrigger', () => {
   let sceneManager;
 
   const device = {
     setValue: fake.resolves(null),
   };
+
+  const brain = {};
 
   beforeEach(() => {
     const house = {
@@ -36,9 +34,12 @@ describe('scene.checkTrigger', () => {
       },
     };
 
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
+
     const stateManager = new StateManager();
 
-    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler);
+    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain);
   });
 
   afterEach(() => {

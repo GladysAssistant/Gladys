@@ -33,6 +33,7 @@ describe('SceneManager.dailyUpdate', () => {
   const event = {};
   const variable = {};
   const scheduler = {};
+  const brain = {};
 
   beforeEach(async () => {
     house.get = fake.resolves([
@@ -51,10 +52,12 @@ describe('SceneManager.dailyUpdate', () => {
     };
     event.on = fake.resolves(null);
     event.emit = fake.resolves(null);
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
 
     variable.getValue = fake.resolves('UTC');
 
-    sceneManager = new SceneManager({}, event, {}, {}, variable, house, {}, {}, {}, scheduler);
+    sceneManager = new SceneManager({}, event, {}, {}, variable, house, {}, {}, {}, scheduler, brain);
     await sceneManager.init();
     // Reset all fakes invoked within init call
     sinon.reset();

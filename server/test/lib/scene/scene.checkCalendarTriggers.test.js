@@ -20,15 +20,12 @@ const house = {
   get: fake.resolves([]),
 };
 
-const brain = {
-  addNamedEntity: fake.returns(null),
-};
-
 describe('scene.checkCalendarTriggers', () => {
   const stateManager = new StateManager();
   const calendar = new Calendar();
   let sceneManager;
   let clock;
+  const brain = {};
   const now = new Date();
   const startDate = dayjs(now)
     .add(10, 'minute')
@@ -38,7 +35,9 @@ describe('scene.checkCalendarTriggers', () => {
     .toDate();
   beforeEach(async () => {
     clock = useFakeTimers(now);
-    sceneManager = new SceneManager(stateManager, event, {}, {}, {}, house, {}, {}, {}, brain);
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
+    sceneManager = new SceneManager(stateManager, event, {}, {}, {}, house, {}, {}, {}, {}, brain);
     await calendar.createEvent('test-calendar', {
       id: 'a2b57b0a-7148-4961-8540-e493104bfd7c',
       name: 'my test event',

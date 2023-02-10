@@ -9,6 +9,7 @@ const SceneManager = require('../../../lib/scene');
 describe('SceneManager.addScene', () => {
   const house = {};
   const event = {};
+  const brain = {};
 
   let sceneManager;
 
@@ -16,6 +17,8 @@ describe('SceneManager.addScene', () => {
     house.get = fake.resolves([]);
     event.on = fake.returns(null);
     event.emit = fake.returns(null);
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
 
     const scheduler = {
       scheduleJob: (date, callback) => {
@@ -27,7 +30,7 @@ describe('SceneManager.addScene', () => {
       },
     };
 
-    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler);
+    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler, brain);
   });
 
   afterEach(() => {
