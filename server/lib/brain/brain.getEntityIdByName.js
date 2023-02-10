@@ -1,4 +1,5 @@
 const { similarity } = require('@nlpjs/similarity');
+const logger = require('../../utils/logger');
 
 const SIMILAR_THRESHOLD = 3;
 
@@ -11,6 +12,7 @@ const SIMILAR_THRESHOLD = 3;
  * brain.getEntityIdByName('room', 'salon');
  */
 function getEntityIdByName(entity, name) {
+  logger.debug(`Brain: Trying to find entity ${entity} with name ${name}`);
   // if no entity exist with this name
   if (!this.namedEntities[entity]) {
     return undefined;
@@ -32,6 +34,7 @@ function getEntityIdByName(entity, name) {
   // if some similarity are found, we order by similarity
   if (similars.length > 0) {
     similars.sort((a, b) => a.similarNumber - b.similarNumber);
+    logger.debug(similars);
     // and return the first one
     return similars[0].identifier;
   }

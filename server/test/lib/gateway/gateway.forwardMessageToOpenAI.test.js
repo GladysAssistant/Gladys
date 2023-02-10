@@ -31,34 +31,38 @@ const job = {
 };
 
 describe('gateway.forwardMessageToOpenAI', () => {
-  const variable = {
-    getValue: fake.resolves(null),
-    setValue: fake.resolves(null),
-  };
-  const scheduler = {};
-  const messageManager = {
-    reply: fake.resolves(null),
-  };
-  const brain = {
-    getEntityIdByName: fake.returns('14a8ad23-78fa-45e4-8583-f5452792818d'),
-  };
-  const serviceManager = {};
-  const stateManager = {};
-  const gateway = new Gateway(
-    variable,
-    event,
-    system,
-    sequelize,
-    config,
-    {},
-    stateManager,
-    serviceManager,
-    job,
-    scheduler,
-    messageManager,
-    brain,
-  );
-  gateway.connected = true;
+  let gateway;
+  beforeEach(() => {
+    const variable = {
+      getValue: fake.resolves(null),
+      setValue: fake.resolves(null),
+    };
+    const scheduler = {};
+    const messageManager = {
+      reply: fake.resolves(null),
+    };
+    const brain = {
+      getEntityIdByName: fake.returns('14a8ad23-78fa-45e4-8583-f5452792818d'),
+    };
+    const serviceManager = {};
+    const stateManager = {};
+    gateway = new Gateway(
+      variable,
+      event,
+      system,
+      sequelize,
+      config,
+      {},
+      stateManager,
+      serviceManager,
+      job,
+      scheduler,
+      messageManager,
+      brain,
+    );
+    gateway.connected = true;
+  });
+
   const previousQuestions = [];
   const message = {
     text: 'Turn on the light in the living room',
@@ -109,6 +113,25 @@ describe('gateway.forwardMessageToOpenAI', () => {
         },
       ],
       intent: 'temperature-sensor.get-in-room',
+    });
+  });
+  it('should start scene from OpenAI', async () => {
+    gateway.gladysGatewayClient.openAIAsk = fake.resolves({
+      type: 'SCENE_START',
+      answer: 'Starting scene..',
+      room: null,
+      scene: 'woodfire',
+    });
+    const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
+    expect(classification).to.deep.equal({
+      entities: [
+        {
+          entity: 'scene',
+          option: '14a8ad23-78fa-45e4-8583-f5452792818d',
+          sourceText: 'woodfire',
+        },
+      ],
+      intent: 'scene.start',
     });
   });
 });
