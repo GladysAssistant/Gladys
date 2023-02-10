@@ -17,6 +17,8 @@ describe('scene.checkTrigger', () => {
     setValue: fake.resolves(null),
   };
 
+  const brain = {};
+
   beforeEach(() => {
     const house = {
       get: fake.resolves([]),
@@ -32,9 +34,12 @@ describe('scene.checkTrigger', () => {
       },
     };
 
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
+
     const stateManager = new StateManager();
 
-    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler);
+    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain);
   });
 
   afterEach(() => {

@@ -10,5 +10,9 @@
   {
     "label": "temperature-sensor.get-in-room.fail.room-not-found",
     "answers": ["I can't find a room with this name."]
+  },
+  {
+    "label": "temperature-sensor.get-in-room.fail",
+    "answers": ["I didn't manage to get the temperature in this room."]
   }
 ]

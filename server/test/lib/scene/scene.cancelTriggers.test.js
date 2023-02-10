@@ -10,6 +10,8 @@ const event = new EventEmitter();
 describe('SceneManager.cancelTriggers', () => {
   let sceneManager;
 
+  const brain = {};
+
   beforeEach(() => {
     const house = {
       get: fake.resolves([]),
@@ -25,7 +27,10 @@ describe('SceneManager.cancelTriggers', () => {
       },
     };
 
-    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler);
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
+
+    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler, brain);
   });
 
   afterEach(() => {
