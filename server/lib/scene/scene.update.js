@@ -18,11 +18,11 @@ async function update(selector, scene) {
     },
   });
 
-  const oldName = existingScene.name;
-
   if (existingScene === null) {
     throw new NotFoundError('Scene not found');
   }
+
+  const oldName = existingScene.name;
 
   await existingScene.update(scene);
 

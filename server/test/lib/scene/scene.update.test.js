@@ -26,6 +26,6 @@ describe('scene.update', () => {
     const promise = sceneManager.update('not-found-scene', {
       name: 'Updated scene',
     });
-    return assert.isRejected(promise);
+    return assert.isRejected(promise, 'Scene not found');
   });
 });
