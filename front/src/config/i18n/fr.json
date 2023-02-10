@@ -2164,6 +2164,9 @@
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
+    "gpt3Integration": "Intégration avec GPT-3",
+    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec GPT-3, ce qui lui donne une intelligence sur-dimensionné ! Pour en savoir plus,",
+    "gpt3ClickHere": "cliquez-ici !",
     "examples": {
       "whatsTheWeatherLike": "\"Quel temps fait-il ?\"",
       "whatsTheTemperatureKitchen": "\"Quelle est la température dans la cuisine ?\"",

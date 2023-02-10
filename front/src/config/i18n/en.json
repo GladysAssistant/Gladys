@@ -2163,6 +2163,9 @@
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
+    "gpt3Integration": "GPT-3 integration",
+    "gpt3IntegrationExplanation": "Gladys is now compatible with GPT-3, which gives her an over-sized intelligence! For more information,",
+    "gpt3ClickHere": "click-here!",
     "gladysAlt": "Gladys",
     "examples": {
       "whatsTheWeatherLike": "\"What's the weather like?\"",
