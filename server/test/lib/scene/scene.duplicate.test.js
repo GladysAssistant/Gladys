@@ -6,8 +6,18 @@ const { ACTIONS, EVENTS } = require('../../../utils/constants');
 const event = new EventEmitter();
 
 describe('SceneManager', () => {
+  const scheduler = {
+    scheduleJob: (date, callback) => {
+      return {
+        callback,
+        date,
+        cancel: () => {},
+      };
+    },
+  };
+
   it('should duplicate a scene', async () => {
-    const sceneManager = new SceneManager({}, event);
+    const sceneManager = new SceneManager({}, event, {}, {}, {}, {}, {}, {}, {}, scheduler);
 
     const duplicatedScene = await sceneManager.duplicate('to-duplicate-scene', 'new-name', 'new-icon');
     expect(sceneManager.scenes['new-name']).not.to.equal(undefined);
