@@ -78,10 +78,23 @@ function Gladys(params = {}) {
     stateManager,
     service,
     job,
+    scheduler,
     message,
     brain,
   );
-  const scene = new Scene(stateManager, event, device, message, variable, house, calendar, http, gateway, brain);
+  const scene = new Scene(
+    stateManager,
+    event,
+    device,
+    message,
+    variable,
+    house,
+    calendar,
+    http,
+    gateway,
+    scheduler,
+    brain,
+  );
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
