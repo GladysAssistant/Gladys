@@ -95,6 +95,7 @@ function addScene(sceneRaw) {
   }
 
   this.scenes[scene.selector] = scene;
+  this.brain.addNamedEntity('scene', scene.selector, scene.name);
   return scene;
 }
 

@@ -20,6 +20,7 @@ async function init() {
   const plainScenes = scenes.map((scene) => {
     const plainScene = scene.get({ plain: true });
     this.addScene(plainScene);
+    this.brain.addNamedEntity('scene', plainScene.selector, plainScene.name);
     return plainScene;
   });
 

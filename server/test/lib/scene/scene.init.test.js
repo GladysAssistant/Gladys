@@ -4,10 +4,11 @@ const SceneManager = require('../../../lib/scene');
 
 const { fake, assert } = sinon;
 
-describe('SceneManager.init', () => {
+describe('scene.init', () => {
   const event = {};
   const house = {};
   const scheduler = {};
+  const brain = {};
 
   const variable = {};
 
@@ -15,15 +16,16 @@ describe('SceneManager.init', () => {
   beforeEach(() => {
     event.on = fake.returns(null);
     event.emit = fake.returns(null);
-
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
     house.get = fake.resolves([]);
 
-    variable.getValue = () => Promise.resolve(null);
-    variable.setValue = () => Promise.resolve(null);
+    variable.getValue = fake.resolves(null);
+    variable.setValue = fake.resolves(null);
 
     scheduler.scheduleJob = fake.returns(true);
 
-    sceneManager = new SceneManager({}, event, {}, {}, variable, house, {}, {}, {}, scheduler);
+    sceneManager = new SceneManager({}, event, {}, {}, variable, house, {}, {}, {}, scheduler, brain);
   });
 
   afterEach(() => {
