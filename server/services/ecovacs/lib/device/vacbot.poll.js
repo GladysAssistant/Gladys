@@ -17,8 +17,34 @@ async function poll(device) {
     await this.connect();
   }
   await this.listen();
-  logger.debug(`listen to these vacbots : ${this.vacbots}`);
-  const devices = this.vacbots;
+  logger.debug(`REGISTERED vacbot   ${this.vacbots}`);
+  const vacbot = this.vacbots.find(vacbot => vacbot.external_id === device.external_id);
+  logger.debug(`Poliiiiiiiiiiiiiiiiiiiing vacbot `, vacbot);
+  /*
+  for (const vacbot of this.vacbots) {
+    logger.debug(`Vacbot registered  ${vacbot}`);
+    
+  };
+  */
+  await Promise.mapSeries(device.features || [], (feature) => {
+    logger.debug(`Ecovacs: feature: ${JSON.stringify(feature)}`);
+    let state;
+    switch (feature.category) {
+        case DEVICE_FEATURE_CATEGORIES.BATTERY: // Integer
+          if (feature.type === DEVICE_FEATURE_TYPES.VACBOT.INTEGER) {
+            setTimeout(() => {
+              vacbot.run('GetBatteryState');
+            }, 6000);
+            logger.debug(`Ecovacs: feature state : ${state}`);
+            
+          }
+          break;
+      default:
+        break;
+    }
+  });
+
+  /*
   const { deviceNumber } = parseExternalId(device.external_id);
   const vacuum = devices[deviceNumber];
   const vacbot = this.ecovacsClient.getVacBot(
@@ -59,8 +85,10 @@ async function poll(device) {
         break;
     }
     vacbot.disconnect();
-  });
-
+    
+  }
+  );
+*/
 }
 
 module.exports = {

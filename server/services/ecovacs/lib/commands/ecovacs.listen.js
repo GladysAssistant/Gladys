@@ -43,33 +43,77 @@ async function getVacbotObject() {
  * ecovacs.listen();
  */
 async function listen() {
+  if (!this.connected) {
+    await this.connect();
+  }
   const devices = await this.gladys.device.get({
     service: 'ecovacs'        
   });
   logger.debug(`These are the registered device ${JSON.stringify(devices)}`);
-  const registered = await devices.map(
-    async (device) => {       
-      logger.debug(`This is a registered device ${device.deviceExternalId}`);
-      const { deviceNumber } = parseExternalId(device.deviceExternalId);
+  /*
+  let registered = [];
+
+  devices.forEach( async (device) => {
+    logger.debug(`This is a registered device ${device.external_id}`);
+    const { deviceNumber } = parseExternalId(device.external_id);
+    let vacbot;
+    if (this.ecovacsClient) {
       const ecovacsDevices = await this.ecovacsClient.devices();
+      logger.debug(`deviceNumber  =====================================>${deviceNumber} `);
       const vacuum = ecovacsDevices[deviceNumber];
-      const vacbot = this.ecovacsClient.getVacBot(
+      logger.debug(`vacuum  =====================================>`, vacuum);
+      vacbot = this.ecovacsClient.getVacBot(
         this.ecovacsClient.uid,
         this.ecovacsLibrary.EcoVacsAPI.REALM,
         this.ecovacsClient.resource,
-        this.ecovacsClient.user_access_token,
-        vacuum,
+        this.ecovacsClient.user_access_token, 
+        vacuum,  
       );
-      logger.debug(`Agregate device ${JSON.stringify(device)} and vacbot ${JSON.stringify(vacbot)} `);
-      logger.debug(`${ { ...device, ...vacbot } }`);
-      return { ...device, ...vacbot };
-    }
+      const mergedObj = Object.assign(vacbot, device);
+      logger.debug(`merged  =====================================>`, mergedObj);
+      registered.push(mergedObj);
+    }        
+    
+  })
+  */
+  
+  const registered = await Promise.all(
+    devices.map(
+      async (device) => {       
+        logger.debug(`This is a registered device ${device.external_id}`);
+        const { deviceNumber } = parseExternalId(device.external_id);
+        let vacbot;
+        if (this.ecovacsClient) {
+          const ecovacsDevices = await this.ecovacsClient.devices();
+          logger.debug(`deviceNumber  =====================================>${deviceNumber} `);
+          const vacuum = ecovacsDevices[deviceNumber];
+          logger.debug(`vacuum  =====================================>`, vacuum);
+          vacbot = this.ecovacsClient.getVacBot(
+            this.ecovacsClient.uid,
+            this.ecovacsLibrary.EcoVacsAPI.REALM,
+            this.ecovacsClient.resource,
+            this.ecovacsClient.user_access_token, 
+            vacuum,  
+          );
+          const mergedObj = Object.assign(vacbot, device);
+          logger.debug(`merged  =====================================>`, mergedObj);
+          return mergedObj;
+        }        
+        
+      }
+    )
   );
-  this.vacbots.push(registered );
-
+  
+  if (!this.vacbots.includes(registered)) {
+    this.vacbots.push(registered);
+    logger.debug(`Registered device added in controller list : `, registered);
+  }
+  
+  
 
 
   for (const vacbot of this.vacbots) {
+    logger.debug(`Vacbot registered  : `, vacbot);
     vacbot.connect();
   };
   
