@@ -2269,7 +2269,20 @@ const data = {
     presenceScanner: {
       frequency: 120000,
       status: 'enabled'
-    }
+    },
+    ipMasks: [
+      {
+        mask: '192.168.1.1/24',
+        name: 'eth0',
+        networkInterface: true,
+        enabled: false
+      },
+      {
+        mask: '192.168.0.1/10',
+        name: 'Custom',
+        enabled: true
+      }
+    ]
   },
   'get /api/v1/service/lan-manager/discover': [
     {

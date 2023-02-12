@@ -4,6 +4,7 @@ import cx from 'classnames';
 import update from 'immutability-helper';
 
 import LANManagerPresenceScanner from './LANManagerPresenceScanner';
+import LANManagerIPRange from './LANManagerIPRange';
 
 class LANManagerSettingsTab extends Component {
   loadConfiguration = async () => {
@@ -23,6 +24,38 @@ class LANManagerSettingsTab extends Component {
         [configItem]: {
           $set: value
         }
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
+  updateMaskConfig = async (maskIndex, value) => {
+    const updatedConfig = update(this.state.config, {
+      ipMasks: {
+        [maskIndex]: {
+          $set: value
+        }
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
+  addMaskConfig = async value => {
+    const updatedConfig = update(this.state.config, {
+      ipMasks: {
+        $push: [value]
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
+  deleteMaskConfig = async maskIndex => {
+    const updatedConfig = update(this.state.config, {
+      ipMasks: {
+        $splice: [[maskIndex, 1]]
       }
     });
 
@@ -77,6 +110,16 @@ class LANManagerSettingsTab extends Component {
                   config={config.presenceScanner}
                   updateConfig={this.updateConfig}
                   disabled={saving}
+                />
+              )}
+
+              {config && (
+                <LANManagerIPRange
+                  ipMasks={config.ipMasks}
+                  disabled={saving}
+                  updateMaskConfig={this.updateMaskConfig}
+                  addMaskConfig={this.addMaskConfig}
+                  deleteMaskConfig={this.deleteMaskConfig}
                 />
               )}
 

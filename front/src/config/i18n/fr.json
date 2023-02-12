@@ -1062,7 +1062,15 @@
         "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
         "presenceScannerFrequencyLabel": "Fréquence de scan",
         "presenceScannerFrequencyUnit": "minutes",
-        "presenceScannerFrequencyError": "Seul un nombre entier est autorisé."
+        "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
+        "ipMasksLabel": "CIDR à scanner",
+        "maskTableHeader": "CIDR",
+        "nameTableHeader": "Nom",
+        "statusTableHeader": "Actif",
+        "maskTablePlaceholder": "e.g. 192.168.1.1/20",
+        "nameTablePlaceholder": "Entrer le nom du CIDR",
+        "deleteButtonTooltip": "Supprimer",
+        "maskFormatError": "Format CIDR invalide"
       }
     },
     "eWeLink": {
