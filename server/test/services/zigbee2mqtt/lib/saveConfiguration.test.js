@@ -35,17 +35,21 @@ describe('zigbee2mqtt saveConfiguration', () => {
       mqttUrl: 'mqttUrl',
       mqttUsername: 'mqttUsername',
       mqttPassword: 'mqttPassword',
+      dockerMqttVersion: 'dockerMqttVersion',
+      dockerZ2mVersion: 'dockerZ2mVersion',
     };
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 6);
+    assert.callCount(gladys.variable.setValue, 8);
     assert.calledWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_DRIVER_PATH', config.z2mDriverPath, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_USERNAME', config.z2mMqttUsername, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_PASSWORD', config.z2mMqttPassword, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_URL', config.mqttUrl, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'GLADYS_MQTT_USERNAME', config.mqttUsername, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'GLADYS_MQTT_PASSWORD', config.mqttPassword, serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'DOCKER_MQTT_VERSION', config.dockerMqttVersion, serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'DOCKER_Z2M_VERSION', config.dockerZ2mVersion, serviceId);
   });
 
   it('should destroy all variables', async () => {
@@ -54,12 +58,14 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.destroy, 6);
+    assert.callCount(gladys.variable.destroy, 8);
     assert.calledWithExactly(gladys.variable.destroy, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_PASSWORD', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_URL', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'GLADYS_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'GLADYS_MQTT_PASSWORD', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_MQTT_VERSION', serviceId);
+    assert.calledWithExactly(gladys.variable.destroy, 'DOCKER_Z2M_VERSION', serviceId);
   });
 });

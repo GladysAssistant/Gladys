@@ -62,6 +62,7 @@ async function init() {
 
   if (this.usbConfigured) {
     logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
+    await this.checkForContainerUpdates(configuration);
     await this.installMqttContainer(configuration);
     await this.installZ2mContainer(configuration);
 

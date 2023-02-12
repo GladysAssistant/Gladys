@@ -187,6 +187,7 @@
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Editer le tableau de bord",
@@ -195,6 +196,13 @@
     "noDashboardSentenceBottom": "Cliquez sur le bouton \"Nouveau\" pour créer un tableau de bord.",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
+    "editDashboardMyDashboards": "Mes tableaux de bords",
+    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
+    "reorderDashboardButton": "Re-ordonner",
+    "stopReorderingDashboardButton": "Arrêter de reordonner",
+    "addBoxButton": "Ajouter",
+    "selectBoxType": "Sélectionner un type",
+    "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
     "boxTitle": {
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
@@ -208,7 +216,6 @@
     },
     "boxes": {
       "column": "Colonne {{index}}",
-      "dragAndDrop": "Glissez et déposez moi ici",
       "deleteButton": "Supprimer",
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
@@ -339,7 +346,7 @@
       "description": "Synchonisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
-      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de Gladys.",
+      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de cette installation Gladys. Ils deviennent ensuite utilisables dans les scènes et affichables dans l'onglet calendrier pour tous les utilisateurs de cette installation.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
@@ -1046,6 +1053,22 @@
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
+    },
+    "openai": {
+      "title": "OpenAI GPT-3",
+      "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
+      "firstExplanation": "Ceci est une alpha d'une intégration avec l'intelligence artificielle OpenAI GPT-3. Vous pouvez demander ce que vous voulez à Gladys ici.",
+      "itDoesNothing": "Cet onglet est un bac à sable vous permettant de tester les capacités de GPT-3. Pour tester des vrais commandes domotiques, activez GPT-3 dans le chat Gladys.",
+      "aFewExamples": "Quelques exemples :",
+      "turnOnTheLight": "Allume la lumière du salon !",
+      "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
+      "whoIsJulesVerne": "Qui est Jules Verne ?",
+      "eggDuration": "Comment cuire les oeufs durs ?",
+      "activateOpenAiChat": "Activer GPT-3 dans le chat Gladys",
+      "rateLimit": "L'API GPT-3 étant payante, cette intégration est pour l'instant limitée à 100 requêtes par mois.",
+      "notOnGladysPlus": "L'API GPT-3 étant payante, cette intégration est proposée via Gladys Plus uniquement.",
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
+      "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
     }
   },
   "editScene": {
@@ -1781,7 +1804,8 @@
     "bytes-per-second": "Octets par seconde (o/s)",
     "kilobytes-per-second": "Kilooctets par seconde (Ko/s)",
     "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
-    "gigabytes-per-second": "Gigaoctets par seconde (Go/s)"
+    "gigabytes-per-second": "Gigaoctets par seconde (Go/s)",
+    "aqi": "Indice de Qualité de l'Air"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1852,7 +1876,8 @@
     "bytes-per-second": "o/s",
     "kilobytes-per-second": "Ko/s",
     "megabytes-per-second": "Mo/s",
-    "gigabytes-per-second": "Go/s"
+    "gigabytes-per-second": "Go/s",
+    "aqi": "AQI"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2120,6 +2145,10 @@
       "shortCategoryName": "Thermostat",
       "target-temperature": "Température de consigne"
     },
+    "airquality-sensor": {
+      "shortCategoryName": "Qualité de l'air",
+      "aqi": "Indice de qualité de l'air"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
@@ -2137,6 +2166,9 @@
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
+    "gpt3Integration": "Intégration avec GPT-3",
+    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec GPT-3, ce qui lui donne une intelligence sur-dimensionné ! Pour en savoir plus,",
+    "gpt3ClickHere": "cliquez-ici !",
     "examples": {
       "whatsTheWeatherLike": "\"Quel temps fait-il ?\"",
       "whatsTheTemperatureKitchen": "\"Quelle est la température dans la cuisine ?\"",
@@ -2318,6 +2350,8 @@
     "monthlyPlan": "Vous êtes actuellement en paiement mensuel. Si vous souhaitez passer au plan annuel ( 99.99€/an ), vous pouvez cliquer sur le bouton ci-dessous. Si vous êtes en cours d'un mois, le prix du premier paiement annuel sera fait au pro-rata pour vous éviter de payer plusieurs fois le mois en cours !",
     "yearlyPlan": "Vous êtes actuellement en paiement annuel.",
     "upgradeToYearly": "Passer au plan annuel",
+    "confirmUpgradeToYearly": "Confirmer le passage au plan annuel ? Votre moyen de paiement sera débité.",
+    "cancelUpgradeToYearly": "Annuler",
     "upgradeYearlyError": "Une erreur est survenue lors de la mise à jour vers le plan annuel, merci de nous contacter par email ou sur le forum.",
     "upgradeYearlySuccess": "Merci d'être passé au plan annuel !"
   }

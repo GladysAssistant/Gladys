@@ -68,7 +68,7 @@ async function command(message, classification, context) {
     }
   } catch (e) {
     logger.debug(e);
-    this.messageManager.replyByIntent(message, 'light.turn-on.fail', context);
+    this.messageManager.replyByIntent(message, `${classification.intent}.fail`, context);
   }
   return null;
 }

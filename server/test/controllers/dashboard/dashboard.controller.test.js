@@ -8,6 +8,7 @@ describe('POST /api/v1/dashboard', () => {
       .send({
         name: 'my dashboard',
         type: 'main',
+        position: 0,
         boxes: [
           [
             {
@@ -56,7 +57,6 @@ describe('GET /api/v1/dashboard/:dashboard_selector', () => {
           id: '854dda11-80c0-4476-843b-65cbc95c6a85',
           name: 'Test dashboard',
           selector: 'test-dashboard',
-          user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           type: 'main',
           boxes: [
             [
@@ -86,6 +86,7 @@ describe('PATCH /api/v1/dashboard/:dashboard_selector', () => {
           id: '854dda11-80c0-4476-843b-65cbc95c6a85',
           name: 'new name',
           selector: 'test-dashboard',
+          position: 0,
           user_id: '0cd30aef-9c4e-4a23-88e3-3547971296e5',
           type: 'main',
           boxes: [
@@ -99,6 +100,16 @@ describe('PATCH /api/v1/dashboard/:dashboard_selector', () => {
           created_at: '2019-02-12T07:49:07.556Z',
         });
       });
+  });
+});
+
+describe('POST /api/v1/dashboard/order', () => {
+  it('should update order of dashboards', async () => {
+    await authenticatedRequest
+      .post('/api/v1/dashboard/order')
+      .send(['test-dashboard'])
+      .expect('Content-Type', /json/)
+      .expect(200);
   });
 });
 

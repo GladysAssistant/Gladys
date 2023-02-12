@@ -174,6 +174,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: dashboardController.create,
     },
+    'post /api/v1/dashboard/order': {
+      authenticated: true,
+      controller: dashboardController.updateOrder,
+    },
     'get /api/v1/dashboard/:dashboard_selector': {
       authenticated: true,
       controller: dashboardController.getBySelector,
@@ -313,6 +317,10 @@ function getRoutes(gladys) {
       authenticated: true,
       admin: true,
       controller: gatewayController.getInstanceKeysFingerprint,
+    },
+    'post /api/v1/gateway/openai/ask': {
+      authenticated: true,
+      controller: gatewayController.openAIAsk,
     },
     // room
     'get /api/v1/room': {

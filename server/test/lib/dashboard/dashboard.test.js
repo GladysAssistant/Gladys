@@ -2,6 +2,7 @@ const { expect, assert } = require('chai');
 const { DASHBOARD_BOX_TYPE, DASHBOARD_TYPE } = require('../../../utils/constants');
 
 const Dashboard = require('../../../lib/dashboard');
+const db = require('../../../models');
 
 describe('dashboard.create', () => {
   const dashboard = new Dashboard();
@@ -9,6 +10,7 @@ describe('dashboard.create', () => {
     const newDashboard = await dashboard.create('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
       name: 'My new dashboard',
       type: DASHBOARD_TYPE.MAIN,
+      position: 0,
       boxes: [
         [
           {
@@ -73,6 +75,34 @@ describe('dashboard.update', () => {
       name: 'new name',
     });
     return assert.isRejected(promise, 'Dashboard not found');
+  });
+});
+
+describe('dashboard.updateOrder', () => {
+  const dashboard = new Dashboard();
+  it('should update the order of dashboards', async () => {
+    const newDashboard = await dashboard.create('0cd30aef-9c4e-4a23-88e3-3547971296e5', {
+      name: 'My new dashboard',
+      type: DASHBOARD_TYPE.MAIN,
+      position: 0,
+      boxes: [
+        [
+          {
+            type: DASHBOARD_BOX_TYPE.USER_PRESENCE,
+          },
+        ],
+      ],
+    });
+    await dashboard.updateOrder('0cd30aef-9c4e-4a23-88e3-3547971296e5', [newDashboard.selector, 'test-dashboard']);
+    const dashboardsInNewOrder = await db.Dashboard.findAll({
+      attributes: ['selector', 'position'],
+      order: [['position', 'asc']],
+      raw: true,
+    });
+    expect(dashboardsInNewOrder).to.deep.equal([
+      { selector: 'my-new-dashboard', position: 0 },
+      { selector: 'test-dashboard', position: 1 },
+    ]);
   });
 });
 

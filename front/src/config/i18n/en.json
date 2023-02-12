@@ -189,12 +189,20 @@
     "editDashboardTitle": "Edit dashboard",
     "editDashboardDeleteButton": "Delete",
     "editDashboardCancelButton": "Cancel",
+    "editDashboardDeleteText": "Are you sure you want to delete this dashboard?",
     "editDashboardSaveButton": "Save",
     "emptyDashboardSentenceTop": "Looks like your dashboard is not configured yet.",
     "emptyDashboardSentenceBottom": "Click on the \"Edit\" button to design your dashboard.",
     "noDashboardSentenceBottom": "Click on the \"New\" button to create a new dashboard",
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
     "editDashboardNameLabel": "Name",
+    "editDashboardMyDashboards": "My dashboards",
+    "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it and moving it around.",
+    "reorderDashboardButton": "Re-order dashboards",
+    "stopReorderingDashboardButton": "Stop re-ordering dashboards",
+    "addBoxButton": "Add",
+    "selectBoxType": "Select a type",
+    "selectBoxTypeLabel": "Choose which widget to display here",
     "boxTitle": {
       "weather": "Weather",
       "temperature-in-room": "Temperature in room",
@@ -208,7 +216,6 @@
     },
     "boxes": {
       "column": "Column {{index}}",
-      "dragAndDrop": "Drag and drop me here",
       "deleteButton": "Delete",
       "weather": {
         "editHouseLabel": "Select a house. I will use its latitude/longitude to get the weather.",
@@ -872,7 +879,7 @@
       "description": "Sync your CalDAV calendars and use them in scenes.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "syncIntroduction": "Choose calendars to synchronize.",
-      "shareIntroduction": "Choose calendars you want to share with other Gladys users.",
+      "shareIntroduction": "Choose calendars you want to share with other Gladys users of this installation. If shared, those calendars will be available in scenes, and displayed in the calendar tab to every user of this installation.",
       "hostLabel": "CalDAV host",
       "hostInfo": "Choose your calendar host to be helped during configuration.",
       "services": {
@@ -1046,6 +1053,22 @@
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
       }
+    },
+    "openai": {
+      "title": "OpenAI GPT-3",
+      "description": "Give Gladys the power of artifical intelligence",
+      "firstExplanation": "This is an alpha integration that let you talk to OpenAI GPT-3.",
+      "itDoesNothing": "This tab is a sandbox allowing you to test the capabilities of GPT-3. To test real home automation commands, activate GPT-3 in the Gladys chat.",
+      "aFewExamples": "A few examples: ",
+      "turnOnTheLight": "Turn on the light in the kitchen",
+      "sizeOfEiffelTower": "What's the size of the Eiffel Tower ?",
+      "whoIsJulesVerne": "Who is Jules Verne ?",
+      "eggDuration": "How do you make hard boiled eggs ?",
+      "activateOpenAiChat": "Activate GPT-3 in Gladys chat",
+      "rateLimit": "As GPT-3 API is not free, this integration is limited to 100 requests per month.",
+      "notOnGladysPlus": "As GPT-3 API is not free, this integration is only available to Gladys Plus users.",
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
+      "licenseShouldBeActive": "This integration is only available to users with an active license (at least one payment). For trial users, please contact us on the forum or email."
     }
   },
   "editScene": {
@@ -1781,7 +1804,8 @@
     "bytes-per-second": "Bytes per second (B/s)",
     "kilobytes-per-second": "kilobytes per second (kB/s)",
     "megabytes-per-second": "Megabytes per second (MB/s)",
-    "gigabytes-per-second": "Gigabytes per second (GB/s)"
+    "gigabytes-per-second": "Gigabytes per second (GB/s)",
+    "aqi": "Air Quality Index"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1852,7 +1876,8 @@
     "bytes-per-second": "B/s",
     "kilobytes-per-second": "kB/s",
     "megabytes-per-second": "MB/s",
-    "gigabytes-per-second": "GB/s"
+    "gigabytes-per-second": "GB/s",
+    "aqi": "AQI"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2120,6 +2145,10 @@
       "shortCategoryName": "Thermostat",
       "target-temperature": "Thermostat Temperature"
     },
+    "airquality-sensor": {
+      "shortCategoryName": "Air Quality",
+      "aqi": "Air Quality Index"
+    },
     "unknown": {
       "shortCategoryName": "Unknown",
       "unknown": "Unknown"
@@ -2136,6 +2165,9 @@
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
+    "gpt3Integration": "GPT-3 integration",
+    "gpt3IntegrationExplanation": "Gladys is now compatible with GPT-3, which gives her an over-sized intelligence! For more information,",
+    "gpt3ClickHere": "click-here!",
     "gladysAlt": "Gladys",
     "examples": {
       "whatsTheWeatherLike": "\"What's the weather like?\"",
@@ -2318,6 +2350,8 @@
     "monthlyPlan": "You are currently using the monthly plan. If you want to switch to the annual plan (99.99€/year), you can click on the button below. The first payment will be prorated based on your current month.",
     "yearlyPlan": "You are currently on the annual plan.",
     "upgradeToYearly": "Switch to annual plan",
+    "confirmUpgradeToYearly": "Confirm switching to annual plan? Your payment method will be charged.",
+    "cancelUpgradeToYearly": "Cancel",
     "upgradeYearlyError": "An error occured while switching to the annual plan, please contact us by email.",
     "upgradeYearlySuccess": "Thanks for switching to the annual plan!"
   }
