@@ -60,6 +60,15 @@ class Error422 extends HttpError {
   }
 }
 
+class Error429 extends HttpError {
+  constructor(properties) {
+    super();
+    this.status = 429;
+    this.code = 'TOO_MANY_REQUESTS';
+    this.properties = properties;
+  }
+}
+
 class Error500 extends HttpError {
   constructor(error) {
     super();
@@ -77,5 +86,6 @@ module.exports = {
   Error404,
   Error409,
   Error422,
+  Error429,
   Error500,
 };

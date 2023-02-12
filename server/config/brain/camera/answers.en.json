@@ -7,5 +7,9 @@
   {
     "label": "camera.get-image-room.no-image-found",
     "answers": ["Sorry, I can't get a recent image."]
+  },
+  {
+    "label": "camera.get-image-room.fail",
+    "answers": ["Sorry, something wrong happened while getting the camera"]
   }
 ]

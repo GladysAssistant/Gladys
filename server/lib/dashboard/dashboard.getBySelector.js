@@ -11,6 +11,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
  */
 async function getBySelector(userId, selector) {
   const dashboard = await db.Dashboard.findOne({
+    attributes: ['id', 'name', 'selector', 'type', 'created_at', 'updated_at', 'boxes'],
     where: {
       user_id: userId,
       selector,
