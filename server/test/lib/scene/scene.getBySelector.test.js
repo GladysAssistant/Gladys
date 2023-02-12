@@ -5,7 +5,7 @@ const SceneManager = require('../../../lib/scene');
 
 const event = new EventEmitter();
 
-describe('SceneManager', () => {
+describe('scene.getBySelector', () => {
   it('should get a scene by selector', async () => {
     const sceneManager = new SceneManager({}, event);
     const scene = await sceneManager.getBySelector('test-scene');

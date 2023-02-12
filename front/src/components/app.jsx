@@ -36,8 +36,11 @@ import SignupPreferences from '../routes/signup/3-preferences';
 import SignupConfigureHouse from '../routes/signup/4-configure-house';
 import SignupSuccess from '../routes/signup/5-success';
 
+// Dashboard
 import Dashboard from '../routes/dashboard';
 import NewDashboard from '../routes/dashboard/new-dashboard';
+import EditDashboard from '../routes/dashboard/edit-dashboard';
+
 import Device from '../routes/device';
 import IntegrationPage from '../routes/integration';
 import ChatPage from '../routes/chat';
@@ -124,6 +127,9 @@ import EcovacsPage from '../routes/integration/all/ecovacs/device-page';
 import EcovacsDiscoverPage from '../routes/integration/all/ecovacs/discover-page';
 import EcovacsSetupPage from '../routes/integration/all/ecovacs/setup-page';
 
+// OpenAI integration
+import OpenAIPage from '../routes/integration/all/openai/index';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -186,6 +192,7 @@ const AppRouter = connect(
         <SignupSuccess path="/signup/success" />
         <Dashboard path="/dashboard" />
         <Dashboard path="/dashboard/:dashboardSelector" />
+        <EditDashboard path="/dashboard/:dashboardSelector/edit" />
         <NewDashboard path="/dashboard/create/new" />
         <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
@@ -238,6 +245,7 @@ const AppRouter = connect(
         <EcovacsDiscoverPage path="/dashboard/integration/device/ecovacs/discover" />
         <EcovacsSetupPage path="/dashboard/integration/device/ecovacs/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
+        <OpenAIPage path="/dashboard/integration/communication/openai" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

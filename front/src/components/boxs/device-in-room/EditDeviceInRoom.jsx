@@ -75,7 +75,7 @@ class EditDeviceInRoom extends Component {
           });
         }
       });
-      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      await this.setState({ room, deviceOptions, selectedDeviceFeaturesOptions, loading: false });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -94,9 +94,10 @@ class EditDeviceInRoom extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
+  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, room }) {
+    const roomName = room && room.name;
     return (
-      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room">
+      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room" titleValue={roomName}>
         <div class={loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">

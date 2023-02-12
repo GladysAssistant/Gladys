@@ -3,22 +3,22 @@ const { EVENTS } = require('../utils/constants');
 const jobs = [
   {
     name: 'check-gladys-upgrade',
-    frequencyInSeconds: 6 * 60 * 60,
+    rule: '0 0 */6 * * *', // every 6 hours
     event: EVENTS.SYSTEM.CHECK_UPGRADE,
   },
   {
     name: 'purge-device-states',
-    frequencyInSeconds: 4 * 60 * 60,
+    rule: '0 30 */4 * * *', // every 4 hours
     event: EVENTS.DEVICE.PURGE_STATES,
   },
   {
     name: 'hourly-device-state-aggregate',
-    frequencyInSeconds: 60 * 60,
+    rule: '0 0 * * * *', // every hour
     event: EVENTS.DEVICE.CALCULATE_HOURLY_AGGREGATE,
   },
   {
     name: 'daily-purge-of-old-jobs',
-    frequencyInSeconds: 24 * 60 * 60,
+    rule: '0 0 22 * * *', // every day at 22:00
     event: EVENTS.JOB.PURGE_OLD_JOBS,
   },
 ];

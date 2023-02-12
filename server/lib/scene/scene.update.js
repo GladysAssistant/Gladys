@@ -22,9 +22,15 @@ async function update(selector, scene) {
     throw new NotFoundError('Scene not found');
   }
 
+  const oldName = existingScene.name;
+
   await existingScene.update(scene);
 
   const plainScene = existingScene.get({ plain: true });
+  // Remove scene in brain if already present
+  if (oldName !== plainScene.name) {
+    this.brain.removeNamedEntity('scene', plainScene.selector, oldName);
+  }
   // add scene to live store
   this.addScene(plainScene);
   // return updated scene
