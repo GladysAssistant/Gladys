@@ -25,6 +25,8 @@ const LANManager = function LANManager(gladys, serviceId, lanDiscovery) {
     status: PRESENCE_STATUS.ENABLED,
     frequency: TIMERS.PRESENCE,
   };
+
+  this.ipMasks = [];
 };
 
 LANManager.prototype.init = init;

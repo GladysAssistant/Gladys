@@ -37,12 +37,13 @@ describe('LANManager saveConfiguration', () => {
         frequency: TIMERS.PRESENCE,
         status: PRESENCE_STATUS.ENABLED,
       },
+      ipMasks: [],
     };
 
     const savedConfig = await manager.saveConfiguration(configuration);
 
     expect(savedConfig).deep.eq(expectedConfig);
-    assert.notCalled(gladys.variable.setValue);
+    assert.calledOnceWithExactly(gladys.variable.setValue, VARIABLES.IP_MASKS, '[]', serviceId);
     assert.calledOnce(initPresenceScannerMock);
   });
 
@@ -53,12 +54,13 @@ describe('LANManager saveConfiguration', () => {
         frequency: TIMERS.PRESENCE,
         status: PRESENCE_STATUS.ENABLED,
       },
+      ipMasks: [],
     };
 
     const savedConfig = await manager.saveConfiguration(configuration);
 
     expect(savedConfig).deep.eq(expectedConfig);
-    assert.notCalled(gladys.variable.setValue);
+    assert.calledOnceWithExactly(gladys.variable.setValue, VARIABLES.IP_MASKS, '[]', serviceId);
     assert.calledOnce(initPresenceScannerMock);
   });
 
@@ -69,12 +71,13 @@ describe('LANManager saveConfiguration', () => {
         frequency: TIMERS.PRESENCE,
         status: PRESENCE_STATUS.ENABLED,
       },
+      ipMasks: [],
     };
 
     const savedConfig = await manager.saveConfiguration(configuration);
 
     expect(savedConfig).deep.eq(expectedConfig);
-    assert.notCalled(gladys.variable.setValue);
+    assert.calledOnceWithExactly(gladys.variable.setValue, VARIABLES.IP_MASKS, '[]', serviceId);
     assert.calledOnce(initPresenceScannerMock);
   });
 
@@ -85,13 +88,15 @@ describe('LANManager saveConfiguration', () => {
         frequency: 90000,
         status: PRESENCE_STATUS.ENABLED,
       },
+      ipMasks: [],
     };
 
     const savedConfig = await manager.saveConfiguration(configuration);
 
     expect(savedConfig).deep.eq(expectedConfig);
-    assert.calledOnce(gladys.variable.setValue);
+    assert.calledTwice(gladys.variable.setValue);
     assert.calledWith(gladys.variable.setValue, VARIABLES.PRESENCE_FREQUENCY, 90000, serviceId);
+    assert.calledWith(gladys.variable.setValue, VARIABLES.IP_MASKS, '[]', serviceId);
     assert.calledOnce(initPresenceScannerMock);
   });
 
@@ -102,13 +107,15 @@ describe('LANManager saveConfiguration', () => {
         frequency: TIMERS.PRESENCE,
         status: PRESENCE_STATUS.DISABLED,
       },
+      ipMasks: [],
     };
 
     const savedConfig = await manager.saveConfiguration(configuration);
 
     expect(savedConfig).deep.eq(expectedConfig);
-    assert.calledOnce(gladys.variable.setValue);
+    assert.calledTwice(gladys.variable.setValue);
     assert.calledWith(gladys.variable.setValue, VARIABLES.PRESENCE_STATUS, PRESENCE_STATUS.DISABLED, serviceId);
+    assert.calledWith(gladys.variable.setValue, VARIABLES.IP_MASKS, '[]', serviceId);
     assert.calledOnce(initPresenceScannerMock);
   });
 
@@ -119,13 +126,15 @@ describe('LANManager saveConfiguration', () => {
         frequency: TIMERS.PRESENCE,
         status: PRESENCE_STATUS.ENABLED,
       },
+      ipMasks: [],
     };
 
     const savedConfig = await manager.saveConfiguration(configuration);
 
     expect(savedConfig).deep.eq(expectedConfig);
-    assert.calledOnce(gladys.variable.setValue);
+    assert.calledTwice(gladys.variable.setValue);
     assert.calledWith(gladys.variable.setValue, VARIABLES.PRESENCE_STATUS, PRESENCE_STATUS.ENABLED, serviceId);
+    assert.calledWith(gladys.variable.setValue, VARIABLES.IP_MASKS, '[]', serviceId);
     assert.calledOnce(initPresenceScannerMock);
   });
 
@@ -136,14 +145,33 @@ describe('LANManager saveConfiguration', () => {
         frequency: 90000,
         status: PRESENCE_STATUS.DISABLED,
       },
+      ipMasks: [],
     };
 
     const savedConfig = await manager.saveConfiguration(configuration);
 
     expect(savedConfig).deep.eq(expectedConfig);
-    assert.calledTwice(gladys.variable.setValue);
+    assert.calledThrice(gladys.variable.setValue);
     assert.calledWith(gladys.variable.setValue, VARIABLES.PRESENCE_FREQUENCY, 90000, serviceId);
     assert.calledWith(gladys.variable.setValue, VARIABLES.PRESENCE_STATUS, PRESENCE_STATUS.DISABLED, serviceId);
+    assert.calledWith(gladys.variable.setValue, VARIABLES.IP_MASKS, '[]', serviceId);
+    assert.calledOnce(initPresenceScannerMock);
+  });
+
+  it('all ipMasks config param', async () => {
+    const configuration = { ipMasks: [{ item: 1 }] };
+    const expectedConfig = {
+      presenceScanner: {
+        frequency: TIMERS.PRESENCE,
+        status: PRESENCE_STATUS.ENABLED,
+      },
+      ipMasks: [{ item: 1 }],
+    };
+
+    const savedConfig = await manager.saveConfiguration(configuration);
+
+    expect(savedConfig).deep.eq(expectedConfig);
+    assert.calledOnceWithExactly(gladys.variable.setValue, VARIABLES.IP_MASKS, '[{"item":1}]', serviceId);
     assert.calledOnce(initPresenceScannerMock);
   });
 });

@@ -8,6 +8,7 @@ function getConfiguration() {
   const { frequency, status } = this.presenceScanner;
   return {
     presenceScanner: { frequency, status },
+    ipMasks: this.ipMasks,
   };
 }
 

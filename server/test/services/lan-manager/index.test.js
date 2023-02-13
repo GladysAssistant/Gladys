@@ -9,17 +9,25 @@ const LANManagerService = proxyquire('../../../services/lan-manager', {
   arpping: ArppingMock,
 });
 
-const gladys = {};
+const gladys = {
+  variable: {
+    getValue: fake.resolves('[]'),
+  },
+};
 
 describe('LANManagerService', () => {
+  let clock;
+
   beforeEach(() => {
     ArppingMock.prototype.discover = fake.resolves([]);
     gladys.event = {
       emit: fake.returns(true),
     };
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
+    clock.restore();
     sinon.reset();
   });
 
@@ -28,7 +36,8 @@ describe('LANManagerService', () => {
 
   it('should start service', async () => {
     await lanManagerService.start();
-    assert.calledOnceWithExactly(lanDiscovery.discover);
+    assert.callCount(gladys.variable.getValue, 3);
+    assert.notCalled(lanDiscovery.discover);
   });
 
   it('should stop service', async () => {

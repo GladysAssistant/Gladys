@@ -9,7 +9,7 @@ const { VARIABLES, PRESENCE_STATUS } = require('./lan-manager.constants');
  * const config = await this.saveConfiguration({ ... });
  */
 async function saveConfiguration(configuration = {}) {
-  const { presenceScanner = {} } = configuration;
+  const { presenceScanner = {}, ipMasks = [] } = configuration;
 
   // Check and store presence scanner frequency
   if (presenceScanner.frequency !== undefined) {
@@ -29,8 +29,12 @@ async function saveConfiguration(configuration = {}) {
     await this.gladys.variable.setValue(VARIABLES.PRESENCE_STATUS, newStatus, this.serviceId);
   }
 
+  logger.debug('LANManager configuration: storing ip masks...');
+  await this.gladys.variable.setValue(VARIABLES.IP_MASKS, JSON.stringify(ipMasks), this.serviceId);
+
   // Store in memory
   this.presenceScanner = { ...this.presenceScanner, ...presenceScanner, status: newStatus };
+  this.ipMasks = ipMasks;
 
   // Manages presence scanner
   this.initPresenceScanner();

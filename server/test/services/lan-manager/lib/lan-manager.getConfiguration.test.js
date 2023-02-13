@@ -21,6 +21,7 @@ describe('LANManager getConfiguration', () => {
         frequency: 120000,
         status: 'enabled',
       },
+      ipMasks: [],
     });
   });
 });
