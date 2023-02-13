@@ -28,6 +28,10 @@ describe('LANManager scan', () => {
   it('scan devices', async () => {
     const discoveredDevices = [{ name: 'device1' }, { name: 'device2' }];
     lanDiscovery.discover = fake.resolves(discoveredDevices);
+    manager.ipMasks = [
+      { mask: '255.255.255.248/29', enabled: true },
+      { mask: '192.168.0.1/10', enabled: false },
+    ];
 
     const scan = manager.scan();
 
@@ -38,7 +42,40 @@ describe('LANManager scan', () => {
     expect(result).to.deep.equal(discoveredDevices);
     expect(manager.scanning).to.equal(false);
 
-    assert.calledOnceWithExactly(lanDiscovery.discover);
+    assert.calledOnceWithExactly(lanDiscovery.discover, [
+      '255.255.255.249',
+      '255.255.255.250',
+      '255.255.255.251',
+      '255.255.255.252',
+      '255.255.255.253',
+      '255.255.255.254',
+    ]);
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+      payload: {
+        scanning: true,
+      },
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+      payload: {
+        scanning: false,
+      },
+    });
+  });
+
+  it('nothing to scan', async () => {
+    manager.ipMasks = [{ mask: '192.168.0.1/10', enabled: false }];
+
+    const scan = manager.scan();
+
+    const result = await scan;
+    expect(manager.discoveredDevices).to.deep.equal([]);
+    expect(result).to.deep.equal([]);
+    expect(manager.scanning).to.equal(false);
+
+    assert.notCalled(lanDiscovery.discover);
     assert.calledTwice(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
@@ -56,6 +93,7 @@ describe('LANManager scan', () => {
 
   it('fail to scan devices', async () => {
     lanDiscovery.discover = fake.rejects(new Error('ERROR'));
+    manager.ipMasks = [{ mask: '255.255.255.248/29', enabled: true }];
 
     const scan = manager.scan();
 
@@ -66,7 +104,14 @@ describe('LANManager scan', () => {
     expect(result).to.deep.equal([]);
     expect(manager.scanning).to.equal(false);
 
-    assert.calledOnceWithExactly(lanDiscovery.discover);
+    assert.calledOnceWithExactly(lanDiscovery.discover, [
+      '255.255.255.249',
+      '255.255.255.250',
+      '255.255.255.251',
+      '255.255.255.252',
+      '255.255.255.253',
+      '255.255.255.254',
+    ]);
     assert.calledTwice(gladys.event.emit);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,

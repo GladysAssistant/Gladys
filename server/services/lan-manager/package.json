@@ -15,6 +15,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "arpping": "^4.0.0"
+    "arpping": "^4.0.0",
+    "netmask": "^2.0.2"
   }
 }
