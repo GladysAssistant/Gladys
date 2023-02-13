@@ -37,7 +37,7 @@ function addScene(sceneRaw) {
       // First, we had a trigger key, import to uniquely identify this trigger
       trigger.key = uuid.v4();
       if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type !== 'interval') {
-        const rule = new this.schedule.RecurrenceRule();
+        const rule = {};
         rule.tz = this.timezone;
         switch (trigger.scheduler_type) {
           case 'every-month':
@@ -68,7 +68,7 @@ function addScene(sceneRaw) {
           default:
             throw new BadParameters(`${trigger.scheduler_type} not supported`);
         }
-        trigger.nodeScheduleJob = this.schedule.scheduleJob(rule, () =>
+        trigger.nodeScheduleJob = this.scheduler.scheduleJob(rule, () =>
           this.event.emit(EVENTS.TRIGGERS.CHECK, trigger),
         );
       } else if (trigger.type === EVENTS.TIME.CHANGED && trigger.scheduler_type === 'interval') {
@@ -95,6 +95,7 @@ function addScene(sceneRaw) {
   }
 
   this.scenes[scene.selector] = scene;
+  this.brain.addNamedEntity('scene', scene.selector, scene.name);
   return scene;
 }
 
