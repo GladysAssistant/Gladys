@@ -55,19 +55,23 @@ class CameraBoxComponent extends Component {
         }
       }
     });
-    this.hls.on(Hls.Events.MEDIA_ATTACHED, function() {
+    this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
       console.log('video and hls.js are now bound together !');
     });
-    this.hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+    this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
       console.log('manifest loaded, found ' + data.levels.length + ' quality level');
     });
-    this.hls.on(Hls.Events.ERROR, function(event, data) {
+    this.hls.on(Hls.Events.ERROR, (event, data) => {
       console.log(event, data);
       var errorType = data.type;
       var errorDetails = data.details;
       var errorFatal = data.fatal;
       console.log(errorType);
       console.log(errorDetails);
+      console.log(errorFatal);
+      if (errorType === 'networkError') {
+        this.stopStreaming();
+      }
     });
     this.hls.loadSource(
       `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
@@ -79,10 +83,17 @@ class CameraBoxComponent extends Component {
 
   stopStreaming = async () => {
     await this.setState({ loading: true });
-    await this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/stop`);
+    try {
+      await this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/stop`);
+    } catch (e) {
+      console.error(e);
+    }
+
     if (this.hls) {
+      this.hls.stopLoad();
       this.hls.detachMedia();
     }
+
     this.setState({ streaming: false, loading: false });
   };
 

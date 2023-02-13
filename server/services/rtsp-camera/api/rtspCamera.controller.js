@@ -1,6 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
+const logger = require('../../../utils/logger');
+const { Error404 } = require('../../../utils/httpErrors');
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
@@ -20,7 +22,7 @@ module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
    * @apiGroup RtspCamera
    */
   async function startStreaming(req, res) {
-    const response = await rtspCameraHandler.startStreaming(req.params.camera_selector, req.body.origin);
+    const response = await rtspCameraHandler.startStreamingIfNotStarted(req.params.camera_selector, req.body.origin);
     res.send(response);
   }
 
@@ -40,9 +42,17 @@ module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
    * @apiGroup RtspCamera
    */
   async function getStreamingFile(req, res) {
-    const filePath = path.join(gladys.config.tempFolder, req.params.folder, req.params.file);
-    const filestream = fs.createReadStream(filePath);
-    filestream.pipe(res);
+    try {
+      const filePath = path.join(gladys.config.tempFolder, req.params.folder, req.params.file);
+      const filestream = fs.createReadStream(filePath);
+      filestream.on('error', (err) => {
+        res.status(404).end();
+      });
+      filestream.pipe(res);
+    } catch (e) {
+      logger.warn(e);
+      throw new Error404('FILE_NOT_FOUND');
+    }
   }
 
   return {

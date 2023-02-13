@@ -34,6 +34,14 @@ const waitBeforeExist = async (filePath, delay, maxTryLeft) => {
  * startStreaming(device);
  */
 async function startStreaming(cameraSelector, backendUrl) {
+  // If stream already exist, return existing stream
+  if (this.liveStreams.has(cameraSelector)) {
+    const liveStream = this.liveStreams.get(cameraSelector);
+    return {
+      camera_folder: liveStream.cameraFolder,
+      encryption_key: liveStream.encryptionKey,
+    };
+  }
   const device = await this.gladys.device.getBySelector(cameraSelector);
   // we find the camera url in the device
   const cameraUrlParam = device.params && device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_URL);
@@ -61,6 +69,7 @@ async function startStreaming(cameraSelector, backendUrl) {
   const encryptionKeyFilePath = path.join(folderPath, 'index.m3u8.key');
   await fs.writeFile(keyInfoFilePath, `${encryptionKeyUrl}\n${encryptionKeyFilePath}`);
   await fs.writeFile(encryptionKeyFilePath, encryptionKey);
+  console.log(await fs.readdir(folderPath));
   // Build the array of parameters
   const args = [
     '-i',
@@ -87,7 +96,8 @@ async function startStreaming(cameraSelector, backendUrl) {
   ];
 
   if (cameraRotationParam.value === '1') {
-    args.push('-vf hflip,vflip'); // Rotate 180
+    args.push('-vf'); // Rotate 180
+    args.push('hflip,vflip');
   }
   const options = {
     timeout: 10 * 60 * 1000, // 10 minutes
@@ -108,7 +118,12 @@ async function startStreaming(cameraSelector, backendUrl) {
     this.liveStreams.delete(cameraSelector);
   });
 
-  this.liveStreams.set(cameraSelector, liveStreamingProcess);
+  this.liveStreams.set(cameraSelector, {
+    liveStreamingProcess,
+    cameraFolder,
+    encryptionKey,
+    fullFolderPath: folderPath,
+  });
 
   // Wait before the stream started to resolve
   // We'll wait at most 100 * 100 ms = 10 sec

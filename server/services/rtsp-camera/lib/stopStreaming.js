@@ -1,3 +1,7 @@
+const fse = require('fs-extra');
+
+const { NotFoundError } = require('../../../utils/coreErrors');
+
 /**
  * @description Stop streaming
  * @param {Object} cameraSelector - The camera to stream.
@@ -6,11 +10,13 @@
  * stopStreaming('my-camera');
  */
 async function stopStreaming(cameraSelector) {
-  const liveStreamingProcess = this.liveStreams.get(cameraSelector);
-  if (!liveStreamingProcess) {
-    throw new Error();
+  const liveStream = this.liveStreams.get(cameraSelector);
+  if (!liveStream) {
+    throw new NotFoundError('STREAM_NOT_FOUND');
   }
+  const { liveStreamingProcess, fullFolderPath } = liveStream;
   liveStreamingProcess.kill();
+  await fse.remove(fullFolderPath);
   this.liveStreams.delete(cameraSelector);
 }
 

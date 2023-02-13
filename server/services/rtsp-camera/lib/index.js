@@ -1,6 +1,7 @@
 const { poll } = require('./poll');
 const { getImage } = require('./getImage');
 const { startStreaming } = require('./startStreaming');
+const { startStreamingIfNotStarted } = require('./startStreamingIfNotStarted');
 const { stopStreaming } = require('./stopStreaming');
 
 /**
@@ -16,11 +17,13 @@ const RtspCameraHandler = function RtspCameraHandler(gladys, ffmpeg, serviceId) 
   this.ffmpeg = ffmpeg;
   this.serviceId = serviceId;
   this.liveStreams = new Map();
+  this.liveStreamsStarting = new Map();
 };
 
 RtspCameraHandler.prototype.poll = poll;
 RtspCameraHandler.prototype.getImage = getImage;
 RtspCameraHandler.prototype.startStreaming = startStreaming;
+RtspCameraHandler.prototype.startStreamingIfNotStarted = startStreamingIfNotStarted;
 RtspCameraHandler.prototype.stopStreaming = stopStreaming;
 
 module.exports = RtspCameraHandler;
