@@ -92,6 +92,8 @@ class CameraBoxComponent extends Component {
     if (this.hls) {
       this.hls.stopLoad();
       this.hls.detachMedia();
+      this.hls.destroy();
+      delete this.hls;
     }
 
     this.setState({ streaming: false, loading: false });
