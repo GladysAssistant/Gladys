@@ -58,8 +58,8 @@ describe('zwaveJSUIManager commands', () => {
       },
     };
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
-    zwaveJSUIManager.installMqttContainer = fake.returns(true);
-    zwaveJSUIManager.installZ2mContainer = fake.returns(true);
+    zwaveJSUIManager.installMqttContainer = Promise.resolve();
+    zwaveJSUIManager.installZwaveJSUIContainer = Promise.resolve();
   });
 
   beforeEach(() => {
@@ -212,7 +212,7 @@ describe('zwaveJSUIManager commands', () => {
         type: 'type',
         firmwareVersion: 'firmwareVersion',
         name: 'name',
-        location: 'location',
+        loc: 'location',
         status: 'status',
         ready: true,
         nodeType: 'nodeType',
@@ -230,7 +230,7 @@ describe('zwaveJSUIManager commands', () => {
         ready: true,
         rawZwaveNode: {
           id: 1,
-          type: 'type',
+          loc: 'location',
           product: 'product',
           keysClasses: [],
         },
@@ -328,7 +328,7 @@ describe('zwaveJSUIManager events', () => {
       type: 'type',
       firmwareVersion: 'firmwareVersion',
       name: 'name',
-      location: 'location',
+      loc: 'location',
       status: 'status',
       ready: true,
       nodeType: 'nodeType',
@@ -356,11 +356,10 @@ describe('zwaveJSUIManager events', () => {
         nodeId: 1,
         classes: {},
         endpoints: [2],
-        type: 'nodeType',
         firmwareVersion: 'firmwareVersion',
-        product: 'manufacturerId-productType-productId',
+        product: 'product',
         name: 'name',
-        location: 'location',
+        loc: 'location',
         status: 'status',
         ready: true,
       },
@@ -485,7 +484,7 @@ describe('zwaveJSUIManager devices', () => {
         type: 'type',
         firmwareVersion: 'firmwareVersion',
         name: 'name',
-        location: 'location',
+        loc: 'location',
         status: 'status',
         ready: true,
         nodeType: 'nodeType',
@@ -505,7 +504,7 @@ describe('zwaveJSUIManager devices', () => {
         params: [],
         rawZwaveNode: {
           id: 1,
-          type: 'type',
+          loc: 'location',
           product: 'product',
           keysClasses: [],
         },
@@ -525,7 +524,7 @@ describe('zwaveJSUIManager devices', () => {
         type: 'type',
         firmwareVersion: 'firmwareVersion',
         name: 'name',
-        location: 'location',
+        loc: 'location',
         status: 'status',
         ready: true,
         nodeType: 'nodeType',
@@ -575,7 +574,7 @@ describe('zwaveJSUIManager devices', () => {
         params: [],
         rawZwaveNode: {
           id: 1,
-          type: 'type',
+          loc: 'location',
           product: 'product',
           keysClasses: ['49'],
         },
@@ -602,7 +601,7 @@ describe('zwaveJSUIManager devices', () => {
         type: 'type',
         firmwareVersion: 'firmwareVersion',
         name: 'name',
-        location: 'location',
+        loc: 'location',
         status: 'status',
         ready: true,
         nodeType: 'nodeType',
@@ -675,7 +674,7 @@ describe('zwaveJSUIManager devices', () => {
         params: [],
         rawZwaveNode: {
           id: 1,
-          type: 'type',
+          loc: 'location',
           product: 'product',
           keysClasses: ['37'],
         },
@@ -705,7 +704,7 @@ describe('zwaveJSUIManager devices', () => {
         params: [],
         rawZwaveNode: {
           id: 1,
-          type: 'type',
+          loc: 'location',
           product: 'product',
           keysClasses: ['37'],
         },
@@ -735,7 +734,7 @@ describe('zwaveJSUIManager devices', () => {
         params: [],
         rawZwaveNode: {
           id: 1,
-          type: 'type',
+          loc: 'location',
           product: 'product',
           keysClasses: ['37'],
         },
