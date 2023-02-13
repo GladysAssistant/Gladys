@@ -69,9 +69,18 @@ describe('zwave gladys node event', () => {
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
-  it('should default node empty message', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/commandClass/endpoint/propertyName/propertyKey`, '');
-    assert.notCalled(zwaveJSUIManager.valueUpdated);
+  it('should update node empty message', () => {
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, '');
+    assert.calledOnceWithExactly(zwaveJSUIManager.valueUpdated, {
+      id: 1,
+    },
+    {
+      commandClass: 0,
+      endpoint: 0,
+      property: 'propertyName',
+      propertyKey: 'propertyKey',
+      newValue: '',
+    });
   });
 
   it('should default node true message', () => {

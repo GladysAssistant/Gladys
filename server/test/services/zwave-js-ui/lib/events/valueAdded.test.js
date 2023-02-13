@@ -160,16 +160,16 @@ describe('zwaveJSUIManager events', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'motion-sensor',
-        external_id: 'zwave-js-ui:node_id:1:comclass:48:endpoint:0:property:Motion',
+        external_id: 'zwave-js-ui:node_id:1:comclass:48:endpoint:0:property:Any',
         type: 'binary',
         has_feedback: true,
         last_value: 0,
-        name: 'Motion',
+        name: 'Any',
         read_only: true,
         unit: 'watt',
         min: undefined,
         max: undefined,
-        selector: 'zwave-js-ui-node-1-motion-48-0-motion',
+        selector: 'zwave-js-ui-node-1-any-48-0-any',
       },
     ]);
   });
@@ -441,7 +441,7 @@ describe('zwaveJSUIManager events', () => {
         name: 'Ultraviolet',
         read_only: true,
         selector: 'zwave-js-ui-node-1-ultraviolet-49-0-ultraviolet',
-        type: 'decimal',
+        type: 'integer',
         unit: null,
         min: 0,
         max: 100,
