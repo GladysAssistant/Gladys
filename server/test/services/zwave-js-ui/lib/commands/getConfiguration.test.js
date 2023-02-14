@@ -1,5 +1,6 @@
 const sinon = require('sinon');
-const { assert, fake } = sinon;
+
+const { assert } = sinon;
 const ZwaveJSUIManager = require('../../../../../services/zwave-js-ui/lib');
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
