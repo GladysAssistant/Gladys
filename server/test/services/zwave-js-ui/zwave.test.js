@@ -30,7 +30,7 @@ const gladys = {
     isDocker: fake.resolves(true),
   },
   installMqttContainer: fake.returns(true),
-  installZ2mContainer: fake.returns(true),
+  installZwaveJSUIContainer: fake.returns(true),
 };
 
 describe('zwaveJSUIService', () => {

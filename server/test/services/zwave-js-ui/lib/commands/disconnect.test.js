@@ -57,7 +57,7 @@ describe('zwaveJSUIManager commands', () => {
     };
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
     zwaveJSUIManager.installMqttContainer = fake.returns(true);
-    zwaveJSUIManager.installZ2mContainer = fake.returns(true);
+    zwaveJSUIManager.installZwaveJSUIContainer = fake.returns(true);
   });
 
   beforeEach(() => {

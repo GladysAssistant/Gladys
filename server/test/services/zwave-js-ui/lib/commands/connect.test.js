@@ -66,7 +66,7 @@ describe('zwaveJSUIManager commands', () => {
     };
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
     zwaveJSUIManager.installMqttContainer = fake.returns(true);
-    zwaveJSUIManager.installZ2mContainer = fake.returns(true);
+    zwaveJSUIManager.installZwaveJSUIContainer = fake.returns(true);
   });
 
   beforeEach(() => {
@@ -130,33 +130,6 @@ describe('zwaveJSUIManager commands', () => {
     );
   });
 
-  it('should fail connect to zwave-js-ui gladys instance on non docker system', async () => {
-    gladys.variable.getValue = sinon.stub();
-    gladys.variable.getValue
-      .onCall(0) // EXTERNAL_ZWAVEJSUI
-      .resolves(null)
-      .onCall(1) // MQTT_PASSWORD
-      .resolves(null)
-      .onCall(2) // MQTT_URL
-      .resolves('MQTT_URL')
-      .onCall(3) // MQTT_USERNAME
-      .resolves('MQTT_USERNAME')
-      .onCall(4) // DRIVER_PATH
-      .resolves(null);
-
-    gladys.system.isDocker = fake.resolves(false);
-
-    let exc = null;
-    try {
-      await zwaveJSUIManager.connect();
-    } catch (e) {
-      exc = e;
-    }
-
-    expect(exc).to.not.equal(null);
-    expect(exc).to.be.an.instanceof(PlatformNotCompatible);
-  });
-
   it('should connect to zwave-js-ui external instance', async () => {
     gladys.variable.getValue = sinon.stub();
     gladys.variable.getValue
@@ -214,17 +187,17 @@ describe('zwaveJSUIManager commands', () => {
       .resolves('0')
       .onSecondCall() // MQTT_PASSWORD
       .resolves('MQTT_PASSWORD')
-      .onThirdCall() // MQTT_URL
+      .onThirdCall() // DRIVER_PATH
+      .resolves('DRIVER_PATH')
+      .onCall(7) // MQTT_URL
       .resolves('MQTT_URL')
-      .onCall(3) // MQTT_USERNAME
-      .resolves('MQTT_USERNAME')
-      .onCall(4) // DRIVER_PATH
-      .resolves(DRIVER_PATH);
+      .onCall(8) // MQTT_USERNAME
+      .resolves('MQTT_USERNAME');
 
     await zwaveJSUIManager.connect();
     zwaveJSUIManager.mqttClient.emit('connect');
     assert.calledOnce(zwaveJSUIManager.installMqttContainer);
-    assert.calledOnce(zwaveJSUIManager.installZ2mContainer);
+    assert.calledOnce(zwaveJSUIManager.installZwaveJSUIContainer);
 
     assert.calledTwice(zwaveJSUIManager.eventManager.emit);
     assert.calledOnce(mqtt.connect);
