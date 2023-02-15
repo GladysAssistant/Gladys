@@ -8,7 +8,6 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { CONFIGURATION, DEFAULT } = require('../../../../../services/zwave-js-ui/lib/constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
-const { PlatformNotCompatible } = require('../../../../../utils/coreErrors');
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
 const DRIVER_PATH = 'DRIVER_PATH';
