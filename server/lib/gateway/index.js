@@ -1,13 +1,9 @@
 const GladysGatewayClient = require('@gladysassistant/gladys-gateway-js');
 const { webcrypto } = require('crypto');
-const schedule = require('node-schedule');
 
-const getConfig = require('../../utils/getConfig');
 const logger = require('../../utils/logger');
 const { EVENTS, JOB_TYPES } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
-
-const serverUrl = getConfig().gladysGatewayServerUrl;
 
 const { backup } = require('./gateway.backup');
 const { forwardDeviceStateToAlexa } = require('./gateway.forwardDeviceStateToAlexa');
@@ -33,18 +29,34 @@ const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 const { openAIAsk } = require('./gateway.openAIAsk');
+const { forwardMessageToOpenAI } = require('./gateway.forwardMessageToOpenAI');
 
-const Gateway = function Gateway(variable, event, system, sequelize, config, user, stateManager, serviceManager, job) {
+const Gateway = function Gateway(
+  variable,
+  event,
+  system,
+  sequelize,
+  config,
+  user,
+  stateManager,
+  serviceManager,
+  job,
+  scheduler,
+  message,
+  brain,
+) {
   this.variable = variable;
   this.event = event;
   this.system = system;
   this.sequelize = sequelize;
-  this.schedule = schedule;
+  this.scheduler = scheduler;
   this.config = config;
   this.user = user;
   this.stateManager = stateManager;
   this.serviceManager = serviceManager;
   this.job = job;
+  this.message = message;
+  this.brain = brain;
   this.connected = false;
   this.restoreInProgress = false;
   this.usersKeys = [];
@@ -57,7 +69,11 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.backupRandomInterval = 2 * 60 * 60 * 1000; // 2 hours
   this.getLatestGladysVersionInitTimeout = 5 * 60 * 1000; // 5 minutes
   this.GladysGatewayClient = GladysGatewayClient;
-  this.gladysGatewayClient = new GladysGatewayClient({ cryptoLib: webcrypto, serverUrl, logger });
+  this.gladysGatewayClient = new GladysGatewayClient({
+    cryptoLib: webcrypto,
+    serverUrl: config.gladysGatewayServerUrl,
+    logger,
+  });
   this.backup = this.job.wrapper(JOB_TYPES.GLADYS_GATEWAY_BACKUP, this.backup.bind(this));
 
   this.event.on(EVENTS.GATEWAY.CREATE_BACKUP, eventFunctionWrapper(this.backup.bind(this)));
@@ -69,6 +85,7 @@ const Gateway = function Gateway(variable, event, system, sequelize, config, use
   this.event.on(EVENTS.GATEWAY.USER_KEYS_CHANGED, eventFunctionWrapper(this.refreshUserKeys.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToGoogleHome.bind(this)));
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.forwardDeviceStateToAlexa.bind(this)));
+  this.event.on(EVENTS.MESSAGE.NEW_FOR_OPEN_AI, eventFunctionWrapper(this.forwardMessageToOpenAI.bind(this)));
 };
 
 Gateway.prototype.backup = backup;
@@ -95,5 +112,6 @@ Gateway.prototype.saveUsersKeys = saveUsersKeys;
 Gateway.prototype.refreshUserKeys = refreshUserKeys;
 Gateway.prototype.getEcowattSignals = getEcowattSignals;
 Gateway.prototype.openAIAsk = openAIAsk;
+Gateway.prototype.forwardMessageToOpenAI = forwardMessageToOpenAI;
 
 module.exports = Gateway;

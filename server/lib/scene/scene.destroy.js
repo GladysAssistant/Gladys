@@ -18,6 +18,9 @@ async function destroy(selector) {
     throw new NotFoundError('Scene not found');
   }
 
+  // Remove scene from brain
+  this.brain.removeNamedEntity('scene', existingScene.selector, existingScene.name);
+
   await existingScene.destroy();
   // we cancel triggers linked to the scene
   this.cancelTriggers(selector);

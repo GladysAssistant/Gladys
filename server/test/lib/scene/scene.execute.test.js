@@ -5,17 +5,21 @@ const { ACTIONS } = require('../../../utils/constants');
 const SceneManager = require('../../../lib/scene');
 const StateManager = require('../../../lib/state');
 
-const event = new EventEmitter();
-
-const light = {
-  turnOn: fake.resolves(null),
-};
-
-describe('SceneManager', () => {
+describe('scene.execute', () => {
   let sandbox;
+  const event = new EventEmitter();
+  const brain = {};
+  const device = {};
+  let stateManager;
+  let sceneManager;
 
   beforeEach(() => {
     sandbox = createSandbox();
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
+    device.setValue = fake.resolves(null);
+    stateManager = new StateManager(event);
+    sceneManager = new SceneManager(stateManager, event, device, {}, {}, {}, {}, {}, {}, {}, brain);
   });
 
   afterEach(() => {
@@ -23,11 +27,6 @@ describe('SceneManager', () => {
   });
 
   it('should execute one scene', async () => {
-    const stateManager = new StateManager(event);
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    const sceneManager = new SceneManager(stateManager, event, device);
     const scene = {
       selector: 'my-scene',
       triggers: [],
@@ -54,16 +53,11 @@ describe('SceneManager', () => {
     });
   });
   it('should execute one scene and abort scene', async () => {
-    const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
       category: 'light',
       type: 'binary',
       last_value: 15,
     });
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    const sceneManager = new SceneManager(stateManager, event, device);
     const scene = {
       selector: 'my-scene',
       triggers: [],
@@ -105,16 +99,11 @@ describe('SceneManager', () => {
     });
   });
   it('should execute one scene, crash but not crash here', async () => {
-    const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
       category: 'light',
       type: 'binary',
       last_value: 15,
     });
-    const device = {
-      setValue: fake.resolves(null),
-    };
-    const sceneManager = new SceneManager(stateManager, event, device);
     const scene = {
       selector: 'my-scene',
       triggers: [],
@@ -137,13 +126,9 @@ describe('SceneManager', () => {
     });
   });
   it('scene does not exist', async () => {
-    const sceneManager = new SceneManager(light, event);
     return sceneManager.execute('thisscenedoesnotexist');
   });
   it('should execute chained scenes', async () => {
-    const stateManager = new StateManager(event);
-    const sceneManager = new SceneManager(stateManager, event);
-
     const executeSpy = sandbox.spy(sceneManager, 'execute');
     const scope = {};
     const scene = {
@@ -192,9 +177,6 @@ describe('SceneManager', () => {
   });
 
   it('should prevent infinite loop', async () => {
-    const stateManager = new StateManager(event);
-    const sceneManager = new SceneManager(stateManager, event);
-
     const executeSpy = sandbox.spy(sceneManager, 'execute');
     const scope = {};
     const scene = {
