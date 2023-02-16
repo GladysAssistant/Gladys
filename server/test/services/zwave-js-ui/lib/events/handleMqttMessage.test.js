@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 const ZwaveJSUIManager = require('../../../../../services/zwave-js-ui/lib');
 const { DEFAULT } = require('../../../../../services/zwave-js-ui/lib/constants');
@@ -34,6 +35,8 @@ describe('zwave gladys node event', () => {
     };
     zwaveJSUIManager.scanInProgress = false;
     zwaveJSUIManager.valueUpdated = fake.returns(null);
+    zwaveJSUIManager.nodeReady = fake.returns(null);
+    zwaveJSUIManager.scanComplete = fake.resolves(null);
     // sinon.reset();
   });
 
@@ -58,14 +61,14 @@ describe('zwave gladys node event', () => {
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
-  it('should default set', () => {
+  it('should not managed set', () => {
     zwaveJSUIManager.scanInProgress = true;
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeId/commandClass/endpoint/propertyName/set`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
-  it('should default not supported commandClass', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeId/112/endpoint/propertyName/set`, null);
+  it('should not managed not supported commandClass', () => {
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeId/112/endpoint/propertyName`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
@@ -133,6 +136,68 @@ describe('zwave gladys node event', () => {
 
   it('should default node not a number message', () => {
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, '???');
+    assert.notCalled(zwaveJSUIManager.valueUpdated);
+  });
+
+  it('should shift node location', () => {
+    zwaveJSUIManager.mqttTopicWithLocation = true;
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/location/nodeId_1/48/0/propertyName`, 0);
+    zwaveJSUIManager.mqttTopicWithLocation = false;
+    assert.calledOnceWithExactly(
+      zwaveJSUIManager.valueUpdated,
+      {
+        id: 1,
+      },
+      {
+        commandClass: 48,
+        endpoint: 0,
+        property: 'propertyName',
+        propertyKey: undefined,
+        newValue: 0,
+      },
+    );
+  });
+
+  it('should getNodes in scan mode success', () => {
+    zwaveJSUIManager.scanInProgress = true;
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
+      success: true,
+      result: [
+        {
+          id: 1,
+          endpointIndizes: [0],
+          productLabel: 'productLabel',
+        },
+      ],
+    });
+    zwaveJSUIManager.scanInProgress = false;
+    assert.calledOnceWithExactly(zwaveJSUIManager.nodeReady, {
+      nodeId: 1,
+      classes: {},
+      ready: false,
+      endpoints: [
+        {
+          index: 0,
+        },
+      ],
+      label: 'productLabel',
+    });
+    assert.calledOnce(zwaveJSUIManager.scanComplete);
+    expect(Object.keys(zwaveJSUIManager.nodes).length).to.equal(1);
+    expect(zwaveJSUIManager.nodes['1']).to.not.be.null; // eslint-disable-line
+  });
+
+  it('should getNodes in scan mode error', () => {
+    zwaveJSUIManager.scanInProgress = true;
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
+      success: false,
+    });
+    zwaveJSUIManager.scanInProgress = false;
+    assert.notCalled(zwaveJSUIManager.scanComplete);
+  });
+
+  it('should getNodes not in scan mode', () => {
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, 0);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 });

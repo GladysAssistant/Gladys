@@ -1,4 +1,3 @@
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { slugify } = require('../../../../utils/slugify');
 const { getCategory } = require('../utils/getCategory');
 const { getUnit } = require('../utils/getUnit');
@@ -21,9 +20,6 @@ const { transformClasses } = require('../utils/transformClasses');
  * const nodes = zwaveManager.getNodes();
  */
 function getNodes({ orderDir, search } = {}) {
-  if (!this.mqttConnected) {
-    throw new ServiceNotConfiguredError('ZWAVE_DRIVER_NOT_RUNNING');
-  }
   const nodeIds = Object.keys(this.nodes);
 
   // transform object in array

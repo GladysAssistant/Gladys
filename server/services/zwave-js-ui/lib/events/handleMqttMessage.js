@@ -57,6 +57,10 @@ function handleMqttMessage(topic, message) {
                 );
               });
 
+            // Clean node
+            delete node.id;
+            delete node.productLabel;
+            delete node.endpointIndizes;
             delete node.values;
             delete node.groups;
             delete node.deviceConfig;
