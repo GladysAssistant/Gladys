@@ -512,6 +512,62 @@ describe('zwaveJSUIManager devices', () => {
     ]);
   });
 
+  it('should receive node with param', () => {
+    zwaveJSUIManager.nodes = {
+      '1': {
+        nodeId: 1,
+        endpoints: [],
+        manufacturerId: 'manufacturerId',
+        product: 'product',
+        productType: 'productType',
+        productId: 'productId',
+        type: 'type',
+        firmwareVersion: 'firmwareVersion',
+        name: 'name',
+        loc: 'location',
+        status: 'status',
+        ready: true,
+        nodeType: 'nodeType',
+        classes: {
+          112: {
+            0: {
+              'Parameter 1': {
+                genre: 'config',
+                label: 'label',
+                value_id: 'value_id',
+                value: 'value',
+              },
+            },
+          },
+        },
+      },
+    };
+    const devices = zwaveJSUIManager.getNodes();
+    expect(devices).to.deep.equal([
+      {
+        service_id: ZWAVEJSUI_SERVICE_ID,
+        external_id: 'zwave-js-ui:node_id:1',
+        model: 'product firmwareVersion',
+        name: 'name - 1',
+        ready: true,
+        selector: 'zwave-js-ui-node-1-name-1',
+        features: [],
+        params: [
+          {
+            name: '0-label-value-id',
+            value: 'value',
+          },
+        ],
+        rawZwaveNode: {
+          id: 1,
+          loc: 'location',
+          product: 'product',
+          keysClasses: ['112'],
+        },
+      },
+    ]);
+  });
+
   it('should receive node feature Temperature', () => {
     zwaveJSUIManager.nodes = {
       1: {
