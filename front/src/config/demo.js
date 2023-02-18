@@ -2258,6 +2258,10 @@ const data = {
         {
           name: 'DEVICE_NAME',
           value: 'media.lan'
+        },
+        {
+          name: 'MANUFACTURER',
+          value: 'Bob and co.'
         }
       ]
     }
@@ -2318,6 +2322,10 @@ const data = {
         {
           name: 'DEVICE_NAME',
           value: 'media.lan'
+        },
+        {
+          name: 'MANUFACTURER',
+          value: 'Bob and co.'
         }
       ]
     },
