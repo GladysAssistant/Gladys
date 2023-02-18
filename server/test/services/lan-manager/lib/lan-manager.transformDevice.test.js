@@ -53,6 +53,10 @@ describe('LANManager transformDevice', () => {
           name: 'DEVICE_NAME',
           value: 'device1',
         },
+        {
+          name: 'MANUFACTURER',
+          value: '<unknown>',
+        },
       ],
     });
   });

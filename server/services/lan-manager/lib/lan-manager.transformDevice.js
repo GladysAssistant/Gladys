@@ -1,3 +1,5 @@
+const { toVendor } = require('@network-utils/vendor-lookup');
+
 const { addSelector } = require('../../../utils/addSelector');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const { PARAMS } = require('./lan-manager.constants');
@@ -46,6 +48,10 @@ function transformDevice(device) {
       {
         name: PARAMS.NAME,
         value: device.name,
+      },
+      {
+        name: PARAMS.MANUFACTURER,
+        value: toVendor(device.mac),
       },
     ],
   };

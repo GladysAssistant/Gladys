@@ -1,6 +1,7 @@
 const PARAMS = {
   MAC: 'DEVICE_MAC',
   NAME: 'DEVICE_NAME',
+  MANUFACTURER: 'MANUFACTURER',
 };
 
 const VARIABLES = {

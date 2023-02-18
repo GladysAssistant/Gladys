@@ -885,6 +885,7 @@
         "title": "LAN Devices",
         "search": "Search devices",
         "noDevices": "No LAN devices added yet.",
+        "manufacturerLabel": "Manufacturer",
         "macAddressLabel": "MAC address",
         "originalNameLabel": "Hostname"
       },
@@ -895,8 +896,7 @@
         "loadExistingDevices": "Hide already added devices",
         "alreadyCreatedButton": "Already created",
         "updateButton": "Update",
-        "discoveringError": "An error occurred, please check logs.",
-        "macAddressLabel": "MAC address"
+        "discoveringError": "An error occurred, please check logs."
       },
       "setup": {
         "title": "LANManager settings",

@@ -25,6 +25,7 @@ class LANManagerDiscoverDevice extends Component {
   };
 
   render({ device, houses }, { loading }) {
+    const manufacturer = device.params.find(param => param.name === PARAMS.MANUFACTURER);
     const macAddress = device.params.find(param => param.name === PARAMS.MAC);
     const orginalName = device.params.find(param => param.name === PARAMS.NAME);
 
@@ -76,7 +77,15 @@ class LANManagerDiscoverDevice extends Component {
                 </div>
                 <div class="form-group">
                   <label class="form-label">
-                    <Text id="integration.lanManager.discover.macAddressLabel" />
+                    <Text id="integration.lanManager.device.manufacturerLabel" />
+                  </label>
+                  <Localizer>
+                    <input type="text" value={get(manufacturer, 'value')} class="form-control" disabled />
+                  </Localizer>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
+                    <Text id="integration.lanManager.device.macAddressLabel" />
                   </label>
                   <Localizer>
                     <input type="text" value={get(macAddress, 'value')} class="form-control" disabled />

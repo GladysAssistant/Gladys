@@ -423,7 +423,7 @@
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
         "externalIdLabel": "ID externe",
-        "manufacturerLabel": "Fabricant",
+        "manufacturerLabel": "Construteur",
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
@@ -1041,6 +1041,7 @@
         "title": "Appareils LAN",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
+        "manufacturerLabel": "Construteur",
         "macAddressLabel": "Adresse MAC",
         "originalNameLabel": "Nom sur le réseau"
       },
@@ -1051,8 +1052,7 @@
         "loadExistingDevices": "Cacher les appareils déjà ajoutés",
         "alreadyCreatedButton": "Déjà créé",
         "updateButton": "Mettre à jour",
-        "discoveringError": "Une erreur est survenue lors de la recherche, merci de consulter les logs.",
-        "macAddressLabel": "Adresse MAC"
+        "discoveringError": "Une erreur est survenue lors de la recherche, merci de consulter les logs."
       },
       "setup": {
         "title": "Configuration LAN",
