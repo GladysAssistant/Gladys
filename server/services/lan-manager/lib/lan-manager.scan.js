@@ -11,6 +11,8 @@ const logger = require('../../../utils/logger');
  */
 async function scan() {
   if (!this.scanning) {
+    logger.info(`LANManager starts scanning devices...`);
+
     this.scanning = true;
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
@@ -41,6 +43,8 @@ async function scan() {
         payload: this.getStatus(),
       });
     }
+  } else {
+    logger.warn(`LANManager already scanning devices...`);
   }
 
   return this.discoveredDevices;
