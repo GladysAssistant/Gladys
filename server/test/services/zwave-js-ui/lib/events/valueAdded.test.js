@@ -51,7 +51,7 @@ describe('zwaveJSUIManager events', () => {
       },
       stateManager: {
         get: (name, value) => fake.returns(value),
-      }
+      },
     };
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
 
