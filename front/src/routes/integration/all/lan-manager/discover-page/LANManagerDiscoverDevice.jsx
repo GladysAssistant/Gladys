@@ -85,6 +85,14 @@ class LANManagerDiscoverDevice extends Component {
                 </div>
                 <div class="form-group">
                   <label class="form-label">
+                    <Text id="integration.lanManager.device.ipAddressLabel" />
+                  </label>
+                  <Localizer>
+                    <input type="text" value={get(device, 'ip')} class="form-control" disabled />
+                  </Localizer>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">
                     <Text id="integration.lanManager.device.macAddressLabel" />
                   </label>
                   <Localizer>
@@ -105,6 +113,11 @@ class LANManagerDiscoverDevice extends Component {
                   </label>
                   <DeviceFeatures features={device.features} />
                 </div>
+                {!device.created_at && !device.can_save && (
+                  <div class="alert alert-warning">
+                    <Text id="integration.lanManager.discover.randomMacAlert" />
+                  </div>
+                )}
                 <div class="form-group">
                   {device.created_at && (
                     <button class="btn btn-primary mr-2" disabled="true">
@@ -113,7 +126,7 @@ class LANManagerDiscoverDevice extends Component {
                   )}
 
                   {!device.created_at && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
+                    <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!device.can_save}>
                       <Text id="editDeviceForm.saveButton" />
                     </button>
                   )}

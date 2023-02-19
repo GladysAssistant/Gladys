@@ -1042,6 +1042,7 @@
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
         "manufacturerLabel": "Construteur",
+        "ipAddressLabel": "Adresse IP",
         "macAddressLabel": "Adresse MAC",
         "originalNameLabel": "Nom sur le réseau"
       },
@@ -1052,6 +1053,7 @@
         "loadExistingDevices": "Cacher les appareils déjà ajoutés",
         "alreadyCreatedButton": "Déjà créé",
         "updateButton": "Mettre à jour",
+        "randomMacAlert": "Cet appareil changera d'adresse MAC lors de sa prochaine connexion, Gladys ne sait pas le gérer.",
         "discoveringError": "Une erreur est survenue lors de la recherche, merci de consulter les logs."
       },
       "setup": {

@@ -2291,6 +2291,7 @@ const data = {
   'get /api/v1/service/lan-manager/discover': [
     {
       id: '6dbd067a-efdd-428e-8c1b-cb792255eae2',
+      ip: '192.168.1.22',
       service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
       room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
       name: 'Media server',
@@ -2332,6 +2333,8 @@ const data = {
     {
       service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
       name: 'New device',
+      ip: '192.168.1.10',
+      can_save: true,
       selector: 'lan-12B0D063C226',
       external_id: 'lan-12B0D063C226',
       should_poll: false,
@@ -2358,6 +2361,40 @@ const data = {
         {
           name: 'DEVICE_NAME',
           value: 'device.lan'
+        }
+      ]
+    },
+    {
+      service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      name: 'Random MAC device',
+      ip: '192.168.1.100',
+      can_save: false,
+      selector: 'lan-A2B0D063C226',
+      external_id: 'lan-A2B0D063C226',
+      should_poll: false,
+      poll_frequency: null,
+      features: [
+        {
+          name: 'Presence',
+          selector: 'lan-presence-sensor',
+          category: 'presence-sensor',
+          type: 'push',
+          unit: null,
+          min: 0,
+          max: 1,
+          read_only: true,
+          last_value: 0,
+          last_value_changed: dayjs().add(60, 'second')
+        }
+      ],
+      params: [
+        {
+          name: 'DEVICE_MAC',
+          value: 'A2:B0:D0:63:C2:26'
+        },
+        {
+          name: 'DEVICE_NAME',
+          value: 'random.lan'
         }
       ]
     }

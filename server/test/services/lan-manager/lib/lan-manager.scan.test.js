@@ -126,4 +126,17 @@ describe('LANManager scan', () => {
       },
     });
   });
+
+  it('already scanning', async () => {
+    manager.scanning = true;
+
+    const result = await manager.scan();
+
+    expect(manager.discoveredDevices).to.deep.equal([]);
+    expect(result).to.deep.equal([]);
+    expect(manager.scanning).to.equal(true);
+
+    assert.notCalled(lanDiscovery.discover);
+    assert.notCalled(gladys.event.emit);
+  });
 });

@@ -1,4 +1,4 @@
-const { toVendor } = require('@network-utils/vendor-lookup');
+const { isRandomMac, toVendor } = require('@network-utils/vendor-lookup');
 
 const { addSelector } = require('../../../utils/addSelector');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
@@ -32,28 +32,40 @@ const buildPresenceFeature = (deviceExternalId) => {
  * const gladysDevice = lanManager.transformDevice({ ip: '...', mac: '...', name: '...' });
  */
 function transformDevice(device) {
-  const deviceExternalId = `lan-manager:${device.mac.replaceAll(':', '').toLowerCase()}`;
+  const { mac, name = '', ip } = device;
+  const deviceExternalId = `lan-manager:${mac.replaceAll(':', '').toLowerCase()}`;
+
+  const params = [
+    {
+      name: PARAMS.MAC,
+      value: mac,
+    },
+  ];
+
+  if (name.length > 0) {
+    params.push({
+      name: PARAMS.NAME,
+      value: name,
+    });
+  }
+
+  const fixedMac = !isRandomMac(mac);
+  if (fixedMac) {
+    params.push({
+      name: PARAMS.MANUFACTURER,
+      value: toVendor(mac),
+    });
+  }
 
   const gladysDevice = {
-    name: device.name,
+    name,
+    ip,
+    can_save: fixedMac,
     service_id: this.serviceId,
     external_id: deviceExternalId,
     selector: deviceExternalId,
     features: [buildPresenceFeature(deviceExternalId)],
-    params: [
-      {
-        name: PARAMS.MAC,
-        value: device.mac,
-      },
-      {
-        name: PARAMS.NAME,
-        value: device.name,
-      },
-      {
-        name: PARAMS.MANUFACTURER,
-        value: toVendor(device.mac),
-      },
-    ],
+    params,
   };
 
   addSelector(gladysDevice);

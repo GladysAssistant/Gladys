@@ -886,6 +886,7 @@
         "search": "Search devices",
         "noDevices": "No LAN devices added yet.",
         "manufacturerLabel": "Manufacturer",
+        "ipAddressLabel": "IP address",
         "macAddressLabel": "MAC address",
         "originalNameLabel": "Hostname"
       },
@@ -896,6 +897,7 @@
         "loadExistingDevices": "Hide already added devices",
         "alreadyCreatedButton": "Already created",
         "updateButton": "Update",
+        "randomMacAlert": "This device will have a new MAC address on next connexion, Gladys can't manage it.",
         "discoveringError": "An error occurred, please check logs."
       },
       "setup": {
