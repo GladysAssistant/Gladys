@@ -29,7 +29,7 @@ const mqtt = {
   connect: fake.returns(mqttClient),
 };
 
-describe('zwaveJSUIManager valueNotification', () => {
+describe('zwaveJSUIManager valueUpdated', () => {
   let gladys;
   let zwaveJSUIManager;
   let zwaveNode;
@@ -88,12 +88,12 @@ describe('zwaveJSUIManager valueNotification', () => {
     };
   });
 
-  it('should handle value notification 20-0-property', () => {
-    zwaveJSUIManager.valueNotification(zwaveNode, {
+  it('should handle value valueUpdated 20-0-property', () => {
+    zwaveJSUIManager.valueUpdated(zwaveNode, {
       commandClass: 20,
       endpoint: 0,
       property: 'property',
-      value: 'newValue',
+      newValue: 'newValue',
     });
     expect(zwaveJSUIManager.nodes[1].classes[20][0].property).to.deep.equal({
       value: 'newValue',
@@ -104,18 +104,18 @@ describe('zwaveJSUIManager valueNotification', () => {
     });
   });
 
-  it('should handle value notification 43-0-property', () => {
-    zwaveJSUIManager.valueNotification(zwaveNode, {
+  it('should handle value valueUpdated 43-0-property', () => {
+    zwaveJSUIManager.valueUpdated(zwaveNode, {
       commandClass: 43,
       endpoint: 0,
       property: 'property',
-      value: '10',
+      newValue: '10',
     });
     expect(zwaveJSUIManager.nodes[1].classes[43][0].property).to.deep.equal({
       value: 1,
     });
     assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:91:endpoint:1:property:scene-001',
+      device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:43:endpoint:0:property:property',
       state: 1,
     });
   });

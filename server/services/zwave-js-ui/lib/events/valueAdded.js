@@ -34,6 +34,10 @@ function valueAdded(zwaveNode, args) {
   const { commandClass, endpoint, property, propertyKey, newValue } = args;
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
+  if (!node) {
+    logger.info(`Node ${nodeId} not available. By-pass message`);
+    return;
+  }
 
   // Current value is the final state of target value
   if (property === PROPERTIES.CURRENT_VALUE) {

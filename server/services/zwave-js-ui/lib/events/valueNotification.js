@@ -13,6 +13,12 @@ const { getDeviceFeatureExternalId } = require('../utils/externalId');
  */
 function valueNotification(zwaveNode, args) {
   const { commandClass, endpoint, property, propertyKey, value } = args;
+  const nodeId = zwaveNode.id;
+  const node = this.nodes[nodeId];
+  if (!node) {
+    logger.info(`Node ${nodeId} not available. By-pass message`);
+    return;
+  }
 
   // Current value is the final state of target value
   if (property === PROPERTIES.CURRENT_VALUE) {
@@ -22,9 +28,6 @@ function valueNotification(zwaveNode, args) {
     valueNotification.bind(this)(zwaveNode, args);
     return;
   }
-
-  const nodeId = zwaveNode.id;
-  const node = this.nodes[nodeId];
 
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
 
