@@ -8,6 +8,7 @@ const { getDeviceFeatureExternalId } = require('../utils/externalId');
  * @description Notification about a node
  * @param {Object} zwaveNode - ZWave Node.
  * @param {Object} args - ZWave ValueNotificationArgs.
+ * @returns {Object} None.
  * @example
  * valueNotification({ id: 0, }, { commandClass: 0, endpoint: 0, property: '', propertyKey: '' }, 0);
  */
