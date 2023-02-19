@@ -2,14 +2,19 @@ const sinon = require('sinon');
 
 const { expect } = require('chai');
 
-const { stub, fake } = sinon;
+const { stub, fake, assert } = sinon;
 const EventEmitter = require('events');
 
 const ZwaveJSUIManager = require('../../../../../services/zwave-js-ui/lib');
 const { CONFIGURATION } = require('../../../../../services/zwave-js-ui/lib/constants');
+const { EVENTS } = require('../../../../../utils/constants');
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
 const DRIVER_PATH = 'DRIVER_PATH';
+
+const event = {
+  emit: fake.resolves(null),
+};
 
 const eventMqtt = new EventEmitter();
 
@@ -31,6 +36,7 @@ describe('zwaveJSUIManager events', () => {
 
   before(() => {
     gladys = {
+      event,
       user: {
         get: stub().resolves([{ id: ZWAVEJSUI_SERVICE_ID }]),
       },
@@ -43,6 +49,9 @@ describe('zwaveJSUIManager events', () => {
         getValue: (name) => Promise.resolve(CONFIGURATION.EXTERNAL_ZWAVEJSUI ? true : null),
         setValue: (name) => Promise.resolve(null),
       },
+      stateManager: {
+        get: (name, value) => fake.returns(value),
+      }
     };
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
 
@@ -127,6 +136,19 @@ describe('zwaveJSUIManager events', () => {
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
     expect(nodes[0].features).to.have.lengthOf(0);
+  });
+
+  it('should handle value added with value', () => {
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 38,
+      endpoint: 0,
+      property: 'Test',
+      newValue: 'newValue',
+    });
+    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:38:endpoint:0:property:Test',
+      state: 'newValue',
+    });
   });
 
   it('should handle value added 48-0-Any', () => {
