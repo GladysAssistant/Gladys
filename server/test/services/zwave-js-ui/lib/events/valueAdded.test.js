@@ -95,13 +95,11 @@ describe('zwaveJSUIManager valueAdded', () => {
 
   it('should handle no metadata', () => {
     delete zwaveNode.getValueMetadata;
-    zwaveJSUIManager.valueAdded(zwaveNode,
-      {
-        commandClass: 20,
-        endpoint: 0,
-        property: 'property',
-      },
-    );
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 20,
+      endpoint: 0,
+      property: 'property',
+    });
     expect(zwaveJSUIManager.nodes[1].classes[20][0].property).to.deep.equal({
       commandClass: 20,
       endpoint: 0,

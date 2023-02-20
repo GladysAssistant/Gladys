@@ -203,22 +203,30 @@ describe('zwave gladys node event', () => {
       ],
       label: 'productLabel',
     });
-    assert.calledWithExactly(zwaveJSUIManager.valueAdded, {
-      id: 1,
-    }, {
-      commandClass: 38,
-      endpoint: 0,
-      property: 'property property',
-      propertyKey: undefined,
-    });
-    assert.calledWithExactly(zwaveJSUIManager.valueAdded, {
-      id: 1,
-    }, {
-      commandClass: 48,
-      endpoint: 0,
-      property: 'propertyName propertyName',
-      propertyKey: undefined,
-    });
+    assert.calledWithExactly(
+      zwaveJSUIManager.valueAdded,
+      {
+        id: 1,
+      },
+      {
+        commandClass: 38,
+        endpoint: 0,
+        property: 'property property',
+        propertyKey: undefined,
+      },
+    );
+    assert.calledWithExactly(
+      zwaveJSUIManager.valueAdded,
+      {
+        id: 1,
+      },
+      {
+        commandClass: 48,
+        endpoint: 0,
+        property: 'propertyName propertyName',
+        propertyKey: undefined,
+      },
+    );
     assert.calledOnce(zwaveJSUIManager.scanComplete);
     expect(Object.keys(zwaveJSUIManager.nodes).length).to.equal(1);
     expect(zwaveJSUIManager.nodes['1']).to.not.be.null; // eslint-disable-line
@@ -243,5 +251,4 @@ describe('zwave gladys node event', () => {
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/driver/status`, JSON.stringify(message));
     assert.notCalled(event.emit);
   });
-
 });
