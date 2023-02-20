@@ -165,7 +165,11 @@ describe('zwave gladys node event', () => {
       result: [
         {
           id: 1,
-          endpointIndizes: [0],
+          endpoints: [
+            {
+              index: 0,
+            },
+          ],
           productLabel: 'productLabel',
         },
       ],
