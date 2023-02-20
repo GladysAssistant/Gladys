@@ -62,7 +62,7 @@ describe('zwave-js-ui installZwaveJSUIContainer', () => {
     zwaveJSUIManager.zwaveJSUIExist = false;
   });
 
-  it('it should restart Z2m container', async function Test() {
+  it('it should restart ZwaveJSUI container', async function Test() {
     // PREPARE
     this.timeout(11000);
 
@@ -95,7 +95,7 @@ describe('zwave-js-ui installZwaveJSUIContainer', () => {
     assert.match(zwaveJSUIManager.zwaveJSUIExist, true);
   });
 
-  it('it should fail to start Z2m container', async function Test() {
+  it('it should fail to start ZwaveJSUI container', async function Test() {
     // PREPARE
     this.timeout(6000);
     gladys.system.getContainers = fake.resolves([containerStopped]);
@@ -119,7 +119,7 @@ describe('zwave-js-ui installZwaveJSUIContainer', () => {
     gladys.system.restartContainer = fake.resolves(true);
   });
 
-  it('it should fail to install Z2m container', async () => {
+  it('it should fail to install ZwaveJSUI container', async () => {
     // PREPARE
     gladys.system.getContainers = fake.resolves([]);
     gladys.system.pull = fake.throws(new Error('docker fail pull'));
@@ -140,7 +140,7 @@ describe('zwave-js-ui installZwaveJSUIContainer', () => {
     assert.match(zwaveJSUIManager.zwaveJSUIExist, false);
   });
 
-  it('it should install Z2m container', async function Test() {
+  it('it should install ZwaveJSUI container', async function Test() {
     // PREPARE
     this.timeout(11000);
     const getContainersStub = sinon.stub();
@@ -165,7 +165,7 @@ describe('zwave-js-ui installZwaveJSUIContainer', () => {
     assert.match(zwaveJSUIManager.zwaveJSUIExist, true);
   });
 
-  it('it should fail to configure Z2m container', async function Test() {
+  it('it should fail to configure ZwaveJSUI container', async function Test() {
     // PREPARE
     this.timeout(11000);
     const getContainersStub = sinon.stub();

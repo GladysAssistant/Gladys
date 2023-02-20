@@ -59,12 +59,12 @@ function valueAdded(zwaveNode, args) {
     `Value Added: nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}, value = ${newValue}`,
   );
 
-  const metadata = getValueMetadata(zwaveNode, args);
   if ((GENRE[commandClass] || 'user') !== 'user') {
     // TODO Do not add non-user metadata, latter converted as device parameters
     return;
   }
 
+  const metadata = getValueMetadata(zwaveNode, args);
   node.classes[commandClass][endpoint][fullProperty] = Object.assign(args, metadata, {
     genre: GENRE[commandClass] || 'user',
     // For technical use: number as key > string

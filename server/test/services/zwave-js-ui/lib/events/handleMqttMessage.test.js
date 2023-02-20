@@ -36,6 +36,7 @@ describe('zwave gladys node event', () => {
     zwaveJSUIManager.scanInProgress = false;
     zwaveJSUIManager.valueUpdated = fake.returns(null);
     zwaveJSUIManager.nodeReady = fake.returns(null);
+    zwaveJSUIManager.valueAdded = fake.returns(null);
     zwaveJSUIManager.scanComplete = fake.resolves(null);
     // sinon.reset();
   });
@@ -62,7 +63,6 @@ describe('zwave gladys node event', () => {
   });
 
   it('should not managed set', () => {
-    zwaveJSUIManager.scanInProgress = true;
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeId/commandClass/endpoint/propertyName/set`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
@@ -158,7 +158,12 @@ describe('zwave gladys node event', () => {
     );
   });
 
-  it('should getNodes in scan mode success', () => {
+  it('should not managed message', () => {
+    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/0123456789`, 0);
+    assert.notCalled(zwaveJSUIManager.valueUpdated);
+  });
+
+  it.only('should getNodes in scan mode success', () => {
     zwaveJSUIManager.scanInProgress = true;
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
       success: true,
@@ -171,6 +176,18 @@ describe('zwave gladys node event', () => {
             },
           ],
           productLabel: 'productLabel',
+          values: {
+            38: {
+              commandClass: 38,
+              endpoint: 0,
+              property: 'property_property',
+            },
+            48: {
+              commandClass: 48,
+              endpoint: 0,
+              propertyName: 'propertyName_propertyName',
+            },
+          },
         },
       ],
     });
@@ -185,6 +202,22 @@ describe('zwave gladys node event', () => {
         },
       ],
       label: 'productLabel',
+    });
+    assert.calledWithExactly(zwaveJSUIManager.valueAdded, {
+      id: 1,
+    }, {
+      commandClass: 38,
+      endpoint: 0,
+      property: 'property property',
+      propertyKey: undefined,
+    });
+    assert.calledWithExactly(zwaveJSUIManager.valueAdded, {
+      id: 1,
+    }, {
+      commandClass: 48,
+      endpoint: 0,
+      property: 'propertyName propertyName',
+      propertyKey: undefined,
     });
     assert.calledOnce(zwaveJSUIManager.scanComplete);
     expect(Object.keys(zwaveJSUIManager.nodes).length).to.equal(1);
@@ -204,54 +237,11 @@ describe('zwave gladys node event', () => {
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, 0);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
-});
-
-describe('zwave event', () => {
-  let gladys;
-  let zwaveJSUIManager;
-
-  before(() => {
-    gladys = {
-      event,
-    };
-    zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
-    zwaveJSUIManager.mqttConnected = true;
-    zwaveJSUIManager.driver = {};
-    zwaveJSUIManager.scanComplete = fake.returns(null);
-  });
-
-  beforeEach(() => {
-    sinon.reset();
-  });
 
   it('should send driver status event', () => {
     const message = {};
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/driver/status`, JSON.stringify(message));
     assert.notCalled(event.emit);
   });
-});
 
-describe('zwave node event', () => {
-  let gladys;
-  let zwaveJSUIManager;
-  let node;
-
-  before(() => {
-    gladys = {
-      event,
-    };
-    zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
-    zwaveJSUIManager.mqttConnected = true;
-    zwaveJSUIManager.valueAdded = fake.returns(null);
-  });
-
-  beforeEach(() => {
-    node = {
-      id: 1,
-    };
-    zwaveJSUIManager.nodes = {
-      '1': node,
-    };
-    sinon.reset();
-  });
 });

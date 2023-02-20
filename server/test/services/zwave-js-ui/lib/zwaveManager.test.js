@@ -247,7 +247,9 @@ describe('zwaveJSUIManager commands', () => {
       mqttUrl: 'mqttUrl',
       mqttUsername: 'mqttUsername',
       mqttPassword: 'mqttPassword',
-      s2UnauthenticatedKe: 's2UnauthenticatedKey',
+      mqttTopicPrefix: 'mqttTopicPrefix',
+      mqttTopicWithLocation: true,
+      s2UnauthenticatedKey: 's2UnauthenticatedKey',
       s2AuthenticatedKey: 's2AuthenticatedKey',
       s2AccessControlKey: 's2AccessControlKey',
       s0LegacyKey: 's0LegacyKey',
@@ -268,6 +270,10 @@ describe('zwaveJSUIManager commands', () => {
     setValueStub.calledOnceWith(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, 'mqttUsername', ZWAVEJSUI_SERVICE_ID);
 
     setValueStub.calledOnceWith(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, 'mqttPassword', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX, 'mqttTopicPrefix', ZWAVEJSUI_SERVICE_ID);
+
+    setValueStub.calledOnceWith(CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_WITH_LOCATION, '1', ZWAVEJSUI_SERVICE_ID);
 
     setValueStub.calledOnceWith(CONFIGURATION.S2_UNAUTHENTICATED, 's2UnauthenticatedKey', ZWAVEJSUI_SERVICE_ID);
 

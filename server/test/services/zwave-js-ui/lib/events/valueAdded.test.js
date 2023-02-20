@@ -29,7 +29,7 @@ const mqtt = {
   connect: fake.returns(mqttClient),
 };
 
-describe('zwaveJSUIManager events', () => {
+describe('zwaveJSUIManager valueAdded', () => {
   let gladys;
   let zwaveJSUIManager;
   let zwaveNode;
@@ -91,6 +91,24 @@ describe('zwaveJSUIManager events', () => {
     );
     expect(zwaveJSUIManager.nodes[1].classes).to.be.empty; // eslint-disable-line
     assert.notCalled(zwaveJSUIManager.eventManager.emit);
+  });
+
+  it('should handle no metadata', () => {
+    delete zwaveNode.getValueMetadata;
+    zwaveJSUIManager.valueAdded(zwaveNode,
+      {
+        commandClass: 20,
+        endpoint: 0,
+        property: 'property',
+      },
+    );
+    expect(zwaveJSUIManager.nodes[1].classes[20][0].property).to.deep.equal({
+      commandClass: 20,
+      endpoint: 0,
+      genre: 'user',
+      nodeId: 1,
+      property: 'property',
+    });
   });
 
   it('should handle value added 37-0-currentValue', () => {
