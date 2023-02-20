@@ -31,12 +31,12 @@ function valueUpdated(zwaveNode, args) {
   }
 
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
-  args.fullProperty = fullProperty;
   const newValueUnbind = unbindValue(args, newValue);
+  logger.debug(
+    `Value Updated: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${node.classes[commandClass][endpoint][fullProperty].value} > ${newValueUnbind}`,
+  );
+
   if (node.ready) {
-    logger.debug(
-      `Value Updated: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${node.classes[commandClass][endpoint][fullProperty].value} > ${newValueUnbind}`,
-    );
     node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
     const deviceFeatureExternalId = getDeviceFeatureExternalId({
       nodeId,

@@ -78,6 +78,22 @@ describe('zwaveJSUIManager events', () => {
     };
   });
 
+  it('should handle unknown node', () => {
+    zwaveJSUIManager.valueAdded(
+      {
+        id: 999,
+      },
+      {
+        commandClass: 20,
+        endpoint: 0,
+        property: 'property',
+        newValue: 'newValue',
+      },
+    );
+    expect(zwaveJSUIManager.nodes[1].classes).to.be.empty; // eslint-disable-line
+    assert.notCalled(zwaveJSUIManager.eventManager.emit);
+  });
+
   it('should handle value added 37-0-currentValue', () => {
     zwaveNode.getValueMetadata = (args) => {
       return {

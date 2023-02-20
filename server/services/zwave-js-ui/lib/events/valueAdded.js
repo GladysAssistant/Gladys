@@ -48,16 +48,16 @@ function valueAdded(zwaveNode, args) {
     return;
   }
 
-  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
-  logger.debug(
-    `Value Added: nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}, value = ${newValue}`,
-  );
   if (!node.classes[commandClass]) {
     node.classes[commandClass] = {};
   }
   if (!node.classes[commandClass][endpoint]) {
     node.classes[commandClass][endpoint] = {};
   }
+  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  logger.debug(
+    `Value Added: nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}, value = ${newValue}`,
+  );
 
   const metadata = getValueMetadata(zwaveNode, args);
   if ((GENRE[commandClass] || 'user') !== 'user') {

@@ -88,6 +88,22 @@ describe('zwaveJSUIManager valueUpdated', () => {
     };
   });
 
+  it('should handle unknown node', () => {
+    zwaveJSUIManager.valueUpdated(
+      {
+        id: 999,
+      },
+      {
+        commandClass: 20,
+        endpoint: 0,
+        property: 'property',
+        newValue: 'newValue',
+      },
+    );
+    expect(zwaveJSUIManager.nodes[1].classes[20][0].property).to.be.empty; // eslint-disable-line
+    assert.notCalled(zwaveJSUIManager.eventManager.emit);
+  });
+
   it('should handle value valueUpdated 20-0-property', () => {
     zwaveJSUIManager.valueUpdated(zwaveNode, {
       commandClass: 20,

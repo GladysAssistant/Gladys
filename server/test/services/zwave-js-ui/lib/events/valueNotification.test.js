@@ -76,6 +76,7 @@ describe('zwaveJSUIManager valueNotification', () => {
           '20': {
             0: {
               property: {},
+              targetValue: {},
             },
           },
           '43': {
@@ -86,6 +87,39 @@ describe('zwaveJSUIManager valueNotification', () => {
         },
       },
     };
+  });
+
+  it('should handle unknown node', () => {
+    zwaveJSUIManager.valueNotification(
+      {
+        id: 999,
+      },
+      {
+        commandClass: 20,
+        endpoint: 0,
+        property: 'property',
+        newValue: 'newValue',
+      },
+    );
+    expect(zwaveJSUIManager.nodes[1].classes[20][0].property).to.be.empty; // eslint-disable-line
+    assert.notCalled(zwaveJSUIManager.eventManager.emit);
+  });
+
+  it('should handle property currentValue', () => {
+    zwaveJSUIManager.valueNotification(zwaveNode, {
+      commandClass: 20,
+      endpoint: 0,
+      property: 'currentValue',
+      value: 'newValue',
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[20][0].currentValue).to.be.undefined; // eslint-disable-line
+    expect(zwaveJSUIManager.nodes[1].classes[20][0].targetValue).to.deep.equal({
+      value: 'newValue',
+    });
+    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:20:endpoint:0:property:targetValue',
+      state: 'newValue',
+    });
   });
 
   it('should handle value notification 20-0-property', () => {

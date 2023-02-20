@@ -31,11 +31,11 @@ function valueNotification(zwaveNode, args) {
   }
 
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
-
   const valueUnbind = unbindValue(args, value);
   logger.debug(
     `Value Notification: nodeId = ${nodeId} (Ready: ${node.ready}), comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${valueUnbind}`,
   );
+
   if (node.ready) {
     node.classes[commandClass][endpoint || 0][fullProperty].value = valueUnbind;
     let deviceFeatureExternalId;
