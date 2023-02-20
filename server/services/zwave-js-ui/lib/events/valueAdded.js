@@ -82,7 +82,7 @@ function valueAdded(zwaveNode, args) {
       property: fullProperty,
     });
     const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
-    
+
     if (newValue) {
       const newValueUnbind = unbindValue(args, newValue);
       node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;

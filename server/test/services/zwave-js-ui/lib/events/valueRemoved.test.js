@@ -128,5 +128,4 @@ describe('zwaveJSUIManager valueRemoved', () => {
       device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:20:endpoint:0:property:property',
     });
   });
-  
 });
