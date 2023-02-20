@@ -76,6 +76,7 @@ describe('zwaveJSUIManager valueUpdated', () => {
           '20': {
             0: {
               property: {},
+              targetValue: {},
             },
           },
           '43': {
@@ -102,6 +103,23 @@ describe('zwaveJSUIManager valueUpdated', () => {
     );
     expect(zwaveJSUIManager.nodes[1].classes[20][0].property).to.be.empty; // eslint-disable-line
     assert.notCalled(zwaveJSUIManager.eventManager.emit);
+  });
+
+  it('should handle property currentValue', () => {
+    zwaveJSUIManager.valueUpdated(zwaveNode, {
+      commandClass: 20,
+      endpoint: 0,
+      property: 'currentValue',
+      newValue: 'newValue',
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[20][0].currentValue).to.be.undefined; // eslint-disable-line
+    expect(zwaveJSUIManager.nodes[1].classes[20][0].targetValue).to.deep.equal({
+      value: 'newValue',
+    });
+    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:20:endpoint:0:property:targetValue',
+      state: 'newValue',
+    });
   });
 
   it('should handle value valueUpdated 20-0-property', () => {
