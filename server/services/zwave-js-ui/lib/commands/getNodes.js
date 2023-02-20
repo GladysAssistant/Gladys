@@ -24,8 +24,6 @@ function getNodes({ orderDir, search } = {}) {
 
   // transform object in array
   const nodes = nodeIds.map((nodeId) => this.nodes[nodeId]).flatMap((node) => splitNode(node));
-  // .flatMap((node) => splitNodeWithScene(node))
-  // foreach node in RAM, we format it with the gladys device format
   return nodes
     .filter((node) =>
       search

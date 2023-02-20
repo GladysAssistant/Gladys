@@ -1,7 +1,5 @@
 const cloneDeep = require('lodash.clonedeep');
 const logger = require('../../../../utils/logger');
-const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
-const { COMMAND_CLASSES } = require('../constants');
 
 /**
  * @description Split Node into each endpoints.
@@ -47,60 +45,6 @@ function splitNode(node) {
   return nodes;
 }
 
-/**
- * @description Split Node into each scene classes.
- * @param {Object} node - Z-Wave node .
- * @returns {Array} Splitted nodes.
- * @example
- * const nodes = zwaveManager.splitNodeWithScene({});
- */
-function splitNodeWithScene(node) {
-  if (
-    node.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE] === undefined ||
-    node.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE][0] === undefined
-  ) {
-    return node;
-  }
-
-  const commonNode = cloneDeep(node);
-  const nodes = [commonNode];
-
-  let i = 1;
-  Object.keys(node.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE][0])
-    .filter((sceneProperty) => {
-      return sceneProperty !== 'slowRefresh';
-    })
-    .forEach((sceneProperty) => {
-      const eNode = cloneDeep(node);
-      eNode.endpoint = i;
-      eNode.classes = {};
-      eNode.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE] = {
-        i: {
-          sceneProperty: {
-            property: sceneProperty,
-            genre: 'user',
-            label: sceneProperty,
-            type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-            unit: 'number',
-            min: 0,
-            max: 1,
-            commandClass: COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE,
-            endpoint: i,
-            writeable: false,
-          },
-        },
-      };
-      if (commonNode.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE]) {
-        delete commonNode.classes[COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE][0];
-      }
-      nodes.push(eNode);
-      i += 1;
-    });
-  logger.debug(`splitNodeWithScene: got ${nodes.length} devices`);
-  return nodes;
-}
-
 module.exports = {
   splitNode,
-  splitNodeWithScene,
 };

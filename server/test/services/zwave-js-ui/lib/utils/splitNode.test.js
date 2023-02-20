@@ -8,6 +8,7 @@ describe('zwave.splitNode', () => {
     });
     expect(nodes).to.not.be.an('array');
   });
+
   it('should get 3 nodes for 2 endpoint', () => {
     const nodes = splitNode({
       endpoints: [

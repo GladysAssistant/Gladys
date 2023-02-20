@@ -25,11 +25,6 @@ function handleMqttMessage(topic, message) {
               classes: {},
               values: {},
               ready: false,
-              endpoints: data.endpointIndizes.map((idx) => {
-                return {
-                  index: idx,
-                };
-              }),
               ...data,
             };
 
