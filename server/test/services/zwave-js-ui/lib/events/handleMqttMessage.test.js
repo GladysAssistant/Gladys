@@ -163,7 +163,7 @@ describe('zwave gladys node event', () => {
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
-  it.only('should getNodes in scan mode success', () => {
+  it('should getNodes in scan mode success', () => {
     zwaveJSUIManager.scanInProgress = true;
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
       success: true,
