@@ -87,7 +87,6 @@ describe('zwaveJSUIManager events', () => {
         commandClass: 20,
         endpoint: 0,
         property: 'property',
-        newValue: 'newValue',
       },
     );
     expect(zwaveJSUIManager.nodes[1].classes).to.be.empty; // eslint-disable-line
