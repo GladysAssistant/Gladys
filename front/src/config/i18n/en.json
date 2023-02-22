@@ -885,6 +885,13 @@
               "other": "Close"
             }
           },
+          "vacbot": {
+            "state": {
+              "none": "Pause",
+              "one": "Clean",
+              "other": "Stop"
+            }
+          },
           "television": {
             "binary": {
               "none": "Off",
