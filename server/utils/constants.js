@@ -343,19 +343,11 @@ const DEVICE_FEATURE_CATEGORIES = {
   PRESSURE_SENSOR: 'pressure-sensor',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
-<<<<<<< HEAD
-  DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
-  TELEVISION: 'television',
   VACBOT: 'vacbot',
-  ENERGY_SENSOR: 'energy-sensor',
-  VOLUME_SENSOR: 'volume-sensor',
-  CURRENCY: 'currency',
-=======
   SIREN: 'siren',
   SISMIC_SENSOR: 'sismic-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
   SWITCH: 'switch',
->>>>>>> upstream/master
   SPEED_SENSOR: 'speed-sensor',
   TELEVISION: 'television',
   TEMPERATURE_SENSOR: 'temperature-sensor',
