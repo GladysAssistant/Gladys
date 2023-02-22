@@ -109,6 +109,9 @@ class OpenAIGateway extends Component {
       });
     } catch (e) {
       console.error(e);
+      this.setState({
+        openAIActiveInChat: false
+      });
     }
   };
 
