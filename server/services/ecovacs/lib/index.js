@@ -6,6 +6,8 @@ const ecovacsHandler = function EcovacsHandler(gladys, ecovacsDeebot, serviceId)
 
   this.configured = false;
   this.connected = false;
+
+  this.vacbots = new Map();
 };
 
 const { start } = require('./commands/ecovacs.start');
@@ -13,6 +15,7 @@ const { stop } = require('./commands/ecovacs.stop');
 const { connect } = require('./commands/ecovacs.connect');
 const { getStatus } = require('./commands/ecovacs.getStatus');
 const { discover } = require('./device/vacbot.discover');
+const { getVacbotObj } = require('./device/vacbot.getVacbotObj');
 const { getDeviceStatus } = require('./device/vacbot.getStatus');
 const { setValue } = require('./device/vacbot.setValue');
 const { getConfiguration } = require('./config/ecovacs.getConfiguration');
@@ -31,6 +34,7 @@ ecovacsHandler.prototype.saveConfiguration = saveConfiguration;
 // DEVICE
 ecovacsHandler.prototype.discover = discover;
 ecovacsHandler.prototype.setValue = setValue;
+ecovacsHandler.prototype.getVacbotObj = getVacbotObj;
 ecovacsHandler.prototype.getDeviceStatus = getDeviceStatus;
 
 module.exports = ecovacsHandler;
