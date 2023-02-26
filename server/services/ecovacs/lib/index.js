@@ -14,6 +14,7 @@ const { start } = require('./commands/ecovacs.start');
 const { stop } = require('./commands/ecovacs.stop');
 const { connect } = require('./commands/ecovacs.connect');
 const { getStatus } = require('./commands/ecovacs.getStatus');
+const { loadVacbots } = require('./commands/ecovacs.loadVacbots');
 const { discover } = require('./device/vacbot.discover');
 const { getVacbotObj } = require('./device/vacbot.getVacbotObj');
 const { getDeviceStatus } = require('./device/vacbot.getStatus');
@@ -26,6 +27,7 @@ ecovacsHandler.prototype.start = start;
 ecovacsHandler.prototype.stop = stop;
 ecovacsHandler.prototype.connect = connect;
 ecovacsHandler.prototype.getStatus = getStatus;
+ecovacsHandler.prototype.loadVacbots = loadVacbots;
 
 // CONFIG
 ecovacsHandler.prototype.getConfiguration = getConfiguration;

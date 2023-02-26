@@ -1,11 +1,9 @@
 const logger = require('../../../../utils/logger');
-const { parseExternalId } = require('../utils/ecovacs.externalId');
-
 
 /**
- * @description Vacbot status.
+ * @description Get the vacbot status.
  * @param {string} deviceExternalId - The deviceExternalId to control.
- * @returns {Promise<Object>} Promise object representing the status of the vacbot
+ * @returns {Promise<Object>} Promise object representing the status of the vacbot.
  * @example
  * vacbot.getDeviceStatus();
  */
