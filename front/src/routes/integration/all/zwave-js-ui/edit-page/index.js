@@ -10,7 +10,7 @@ const ZWAVE_PAGE_PATH = '/dashboard/integration/device/zwave-js-ui';
 class EditZwaveJSUIDevice extends Component {
   render(props, {}) {
     return (
-      <ZwaveJSUIPage>
+      <ZwaveJSUIPage user="{props.user}">
         <UpdateDevice
           {...props}
           integrationName="zwave-js-ui"

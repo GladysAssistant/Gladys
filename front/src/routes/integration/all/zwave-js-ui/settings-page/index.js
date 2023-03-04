@@ -31,7 +31,7 @@ class ZwaveJSUISettingsPage extends Component {
       props.zwaveConnectStatus === RequestStatus.Getting;
 
     return (
-      <ZwaveJSUIPage>
+      <ZwaveJSUIPage user="{props.user}">
         <SettingsTab {...props} loading={loading} />
       </ZwaveJSUIPage>
     );

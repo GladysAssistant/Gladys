@@ -635,6 +635,7 @@
       "networkTab": "Network",
       "settingsTab": "Settings",
       "discoverTab": "Discover",
+      "documentation": "Z-Wave JS UI documentation",
       "status": {
         "error": "Failed to connect to Zwave network",
         "connected": "Zwave network connected",

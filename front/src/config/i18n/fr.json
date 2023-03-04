@@ -762,6 +762,7 @@
       "networkTab": "Réseau",
       "settingsTab": "Paramètres",
       "discoverTab": "Découverte Z-Wave",
+      "documentation": "Documentation Z-Wave JS UI",
       "status": {
         "error": "Impossible de se connecter au réseau Zwave",
         "connected": "Réseau Zwave connecté",

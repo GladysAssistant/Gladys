@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const DashboardSettings = ({ children }) => (
+const DashboardSettings = ({ children, user }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -45,6 +46,17 @@ const DashboardSettings = ({ children }) => (
                     </span>
                     <Text id="integration.zwave-js-ui.settingsTab" />
                   </Link>
+
+                  <DeviceConfigurationLink
+                    user={user}
+                    documentKey="zwave-js-ui"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.zwave-js-ui.documentation" />
+                  </DeviceConfigurationLink>
                 </div>
               </div>
             </div>

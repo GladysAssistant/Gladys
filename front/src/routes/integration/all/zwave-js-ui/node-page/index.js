@@ -13,7 +13,7 @@ class ZwaveJSUINodePage extends Component {
 
   render(props, {}) {
     return (
-      <ZwaveJSUIPage>
+      <ZwaveJSUIPage user="{props.user}">
         <NodeTab {...props} />
       </ZwaveJSUIPage>
     );

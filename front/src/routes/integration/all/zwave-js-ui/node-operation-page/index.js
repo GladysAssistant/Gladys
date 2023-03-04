@@ -99,7 +99,7 @@ class ZwaveJSUINodeOperationPage extends Component {
 
   render(props, { remainingTimeInSeconds, nodeAdded }) {
     return (
-      <ZwaveJSUIPage>
+      <ZwaveJSUIPage user="{props.user}">
         <NodeOperationPage
           {...props}
           remainingTimeInSeconds={remainingTimeInSeconds}
