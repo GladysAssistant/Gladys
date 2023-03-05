@@ -175,7 +175,7 @@ describe('zwave gladys node event', () => {
               index: 0,
             },
           ],
-          productLabel: 'productLabel',
+          label: 'productLabel',
           values: {
             38: {
               commandClass: 38,
@@ -195,7 +195,6 @@ describe('zwave gladys node event', () => {
     assert.calledOnceWithExactly(zwaveJSUIManager.nodeReady, {
       nodeId: 1,
       classes: {},
-      ready: false,
       endpoints: [
         {
           index: 0,
