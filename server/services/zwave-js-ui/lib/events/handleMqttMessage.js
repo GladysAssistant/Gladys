@@ -14,6 +14,10 @@ function handleMqttMessage(topic, message) {
   this.zwaveJSUIConnected = true;
 
   switch (topic) {
+    case `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/version`: {
+      this.zwaveJSUIVersion = JSON.parse(message).value;
+      break;
+    }
     case `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {
       if (this.scanInProgress) {
         const { success, result } = message instanceof Object ? message : JSON.parse(message);
@@ -24,12 +28,10 @@ function handleMqttMessage(topic, message) {
               nodeId: data.id,
               classes: {},
               values: {},
-              ready: false,
               ...data,
             };
 
             this.nodes[data.id] = node;
-            node.label = node.productLabel;
 
             this.nodeReady(node);
             Object.keys(node.values)
@@ -54,8 +56,6 @@ function handleMqttMessage(topic, message) {
 
             // Clean node
             delete node.id;
-            delete node.productLabel;
-            delete node.endpointIndizes;
             delete node.values;
             delete node.groups;
             delete node.deviceConfig;

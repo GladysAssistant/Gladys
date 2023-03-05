@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { CONFIGURATION } = require('../constants');
+const { CONFIGURATION, DEFAULT } = require('../constants');
 
 /**
  * @description Getting Z-Wave information.
@@ -32,6 +32,8 @@ async function getConfiguration() {
   if (externalZwaveJSUI) {
     return {
       externalZwaveJSUI,
+      zwaveJSUIVersion: this.zwaveJSUIVersion,
+      zwaveJSUIExpectedVersion: DEFAULT.ZWAVEJSUI_VERSION_EXPECTED,
       mqttUrl,
       mqttUsername,
       mqttPassword,
@@ -41,6 +43,8 @@ async function getConfiguration() {
   }
   return {
     externalZwaveJSUI,
+    zwaveJSUIVersion: this.zwaveJSUIVersion,
+    zwaveJSUIExpectedVersion: DEFAULT.ZWAVEJSUI_VERSION_EXPECTED,
     driverPath,
     s2UnauthenticatedKey,
     s2AuthenticatedKey,

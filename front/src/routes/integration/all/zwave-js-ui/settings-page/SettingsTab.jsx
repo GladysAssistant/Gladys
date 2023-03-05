@@ -1,8 +1,9 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import classNames from 'classnames/bind';
 import style from './style.css';
+import semver from 'semver';
 
 let cx = classNames.bind(style);
 
@@ -89,6 +90,15 @@ class SettingsTab extends Component {
                     </>
                   )}
                 </p>
+
+                {props.zwaveJSUIVersion && props.zwaveJSUIExpectedVersion && semver.gt(props.zwaveJSUIVersion, props.zwaveJSUIExpectedVersion) && (
+                  <div class="alert alert-warning">
+                    <MarkupText
+                      id="integration.zwave-js-ui.settings.zwaveJSUIVersionError"
+                      fields={{ expectedVersion: props.zwaveJSUIExpectedVersion, currentVersion: props.zwaveJSUIVersion }}
+                    />
+                  </div>
+                )}
 
                 {!props.usbConfigured && (
                   <div class="alert alert-info">
