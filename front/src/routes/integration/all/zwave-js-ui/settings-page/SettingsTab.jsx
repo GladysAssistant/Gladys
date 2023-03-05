@@ -91,14 +91,19 @@ class SettingsTab extends Component {
                   )}
                 </p>
 
-                {props.zwaveJSUIVersion && props.zwaveJSUIExpectedVersion && semver.gt(props.zwaveJSUIVersion, props.zwaveJSUIExpectedVersion) && (
-                  <div class="alert alert-warning">
-                    <MarkupText
-                      id="integration.zwave-js-ui.settings.zwaveJSUIVersionError"
-                      fields={{ expectedVersion: props.zwaveJSUIExpectedVersion, currentVersion: props.zwaveJSUIVersion }}
-                    />
-                  </div>
-                )}
+                {props.zwaveJSUIVersion &&
+                  props.zwaveJSUIExpectedVersion &&
+                  semver.gt(props.zwaveJSUIVersion, props.zwaveJSUIExpectedVersion) && (
+                    <div class="alert alert-warning">
+                      <MarkupText
+                        id="integration.zwave-js-ui.settings.zwaveJSUIVersionError"
+                        fields={{
+                          expectedVersion: props.zwaveJSUIExpectedVersion,
+                          currentVersion: props.zwaveJSUIVersion
+                        }}
+                      />
+                    </div>
+                  )}
 
                 {!props.usbConfigured && (
                   <div class="alert alert-info">
