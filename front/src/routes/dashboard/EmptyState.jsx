@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import style from './style.css';
 
 const EmptyState = ({ children, ...props }) => (
@@ -9,6 +10,11 @@ const EmptyState = ({ children, ...props }) => (
       <br /> {!props.dashboardListEmpty && <Text id="dashboard.emptyDashboardSentenceBottom" />}
       {props.dashboardListEmpty && <Text id="dashboard.noDashboardSentenceBottom" />}
     </p>
+    {props.dashboardListEmpty && (
+      <Link href="/dashboard/create/new" class="btn btn-success">
+        <Text id="dashboard.newDashboardButton" /> <i class="fe fe-plus" />
+      </Link>
+    )}
   </div>
 );
 

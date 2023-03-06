@@ -40,6 +40,7 @@ describe('zigbee2mqtt init', () => {
 
     zigbee2mqttManager.getConfiguration = sinon.stub();
     zigbee2mqttManager.saveConfiguration = sinon.stub();
+    zigbee2mqttManager.checkForContainerUpdates = sinon.stub();
     zigbee2mqttManager.installMqttContainer = sinon.stub();
     zigbee2mqttManager.installZ2mContainer = sinon.stub();
     zigbee2mqttManager.isEnabled = sinon.stub();
@@ -68,6 +69,7 @@ describe('zigbee2mqtt init', () => {
     expect(zigbee2mqttManager.dockerBased).to.equal(false);
     assert.notCalled(zigbee2mqttManager.getConfiguration);
     assert.notCalled(zigbee2mqttManager.saveConfiguration);
+    assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
@@ -88,6 +90,7 @@ describe('zigbee2mqtt init', () => {
     expect(zigbee2mqttManager.networkModeValid).to.equal(false);
     assert.notCalled(zigbee2mqttManager.getConfiguration);
     assert.notCalled(zigbee2mqttManager.saveConfiguration);
+    assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
@@ -104,6 +107,7 @@ describe('zigbee2mqtt init', () => {
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
+    assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
@@ -120,6 +124,7 @@ describe('zigbee2mqtt init', () => {
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
+    assert.notCalled(zigbee2mqttManager.checkForContainerUpdates);
     assert.notCalled(zigbee2mqttManager.installMqttContainer);
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
@@ -137,6 +142,7 @@ describe('zigbee2mqtt init', () => {
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.checkForContainerUpdates, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
@@ -162,6 +168,8 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
     assert.calledOnce(zigbee2mqttManager.saveConfiguration);
     assert.calledWithMatch(zigbee2mqttManager.saveConfiguration, sinon.match(expectedNewConfig));
+    assert.calledOnce(zigbee2mqttManager.checkForContainerUpdates);
+    assert.calledWithMatch(zigbee2mqttManager.checkForContainerUpdates, sinon.match(expectedNewConfig));
     assert.calledOnce(zigbee2mqttManager.installMqttContainer);
     assert.calledWithMatch(zigbee2mqttManager.installMqttContainer, sinon.match(expectedNewConfig));
     assert.calledOnce(zigbee2mqttManager.installZ2mContainer);
@@ -181,6 +189,7 @@ describe('zigbee2mqtt init', () => {
     // ASSERT
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.checkForContainerUpdates, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);

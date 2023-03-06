@@ -30,13 +30,15 @@ describe('zigbee2mqtt getConfiguration', () => {
     // EXECUTE
     const result = await zigbee2MqttManager.getConfiguration();
     // ASSERT
-    assert.callCount(gladys.variable.getValue, 6);
+    assert.callCount(gladys.variable.getValue, 8);
     assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_PASSWORD', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_URL', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'GLADYS_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'GLADYS_MQTT_PASSWORD', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'DOCKER_MQTT_VERSION', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'DOCKER_Z2M_VERSION', serviceId);
 
     expect(result).to.deep.equal({
       z2mDriverPath: 'fake',
@@ -45,6 +47,8 @@ describe('zigbee2mqtt getConfiguration', () => {
       mqttUrl: 'fake',
       mqttUsername: 'fake',
       mqttPassword: 'fake',
+      dockerMqttVersion: 'fake',
+      dockerZ2mVersion: 'fake',
     });
   });
 });

@@ -60,7 +60,7 @@ function Gladys(params = {}) {
   const house = new House(event, stateManager);
   const room = new Room(brain);
   const service = new Service(services, stateManager);
-  const message = new MessageHandler(event, brain, service, stateManager);
+  const message = new MessageHandler(event, brain, service, stateManager, variable);
   const session = new Session(params.jwtSecret, cache);
   const user = new User(session, stateManager, variable);
   const location = new Location(user, event);
@@ -68,8 +68,33 @@ function Gladys(params = {}) {
   const calendar = new Calendar(service);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
-  const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager, service, job);
-  const scene = new Scene(stateManager, event, device, message, variable, house, calendar, http, gateway);
+  const gateway = new Gateway(
+    variable,
+    event,
+    system,
+    db.sequelize,
+    config,
+    user,
+    stateManager,
+    service,
+    job,
+    scheduler,
+    message,
+    brain,
+  );
+  const scene = new Scene(
+    stateManager,
+    event,
+    device,
+    message,
+    variable,
+    house,
+    calendar,
+    http,
+    gateway,
+    scheduler,
+    brain,
+  );
 
   const gladys = {
     version: '0.1.0', // todo, read package.json
