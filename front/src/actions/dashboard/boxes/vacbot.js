@@ -3,6 +3,7 @@ import createBoxActions from '../boxActions';
 
 const BOX_KEY = 'Vacbot';
 
+/*
 const VACBOT_ICONS = {
   clean: 'fe-plat',
   clean2: 'fe-play-circle',
@@ -12,20 +13,21 @@ const VACBOT_ICONS = {
   map: 'fe-map',
   info: 'fe-info'
 };
-
+*/
 
 function createActions(store) {
   const boxActions = createBoxActions(store);
-  
+
   const actions = {
     async getVacbot(state, box, x, y) {
-      console.log(`getVacbot : ${JSON.stringify(box)} ${x} ${y}`)
+      console.log(`getVacbot : ${JSON.stringify(box)} ${x} ${y}`);
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-        const vacbot = await state.httpClient.get(`/api/v1/service/ecovacs/${box.vacbot}/status`);
-        console.log(`/api/v1/service/ecovacs/${box.vacbot}/status`);
+        const vacbotStatus = await state.httpClient.get(`/api/v1/service/ecovacs/${box.name}/status`);
+        console.log(`status ${JSON.stringify(vacbotStatus)}`);
+        // console.log(`/api/v1/service/ecovacs/${box.name}/status`);
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          vacbot
+          vacbot: vacbotStatus
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
@@ -34,7 +36,7 @@ function createActions(store) {
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
       }
-    },
+    }
     /*
     deviceFeatureWebsocketEvent(state, box, x, y, payload) {
       if (box.vacbot === payload.device) {

@@ -2,7 +2,6 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
 
 module.exports = function EcovacsController(ecovacsHandler) {
-    
   /**
    * @api {get} /api/v1/ecovacs/vacbots
    * @apiName getVacbots
@@ -35,17 +34,17 @@ module.exports = function EcovacsController(ecovacsHandler) {
    */
   async function getVacbots(req, res) {
     const vacbots = await ecovacsHandler.gladys.device.get({
-      service: 'ecovacs'        
+      service: 'ecovacs',
     });
     res.json(vacbots);
   }
-
 
   /**
    * @api {get} /api/v1/service/ecovacs/status Get Ecovacs service status
    * @apiName getStatus
    * @apiGroup Ecovacs
-   */ 
+   */
+
   async function getStatus(req, res) {
     const status = ecovacsHandler.getStatus();
     res.json(status);

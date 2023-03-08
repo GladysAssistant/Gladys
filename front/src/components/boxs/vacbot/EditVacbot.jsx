@@ -4,7 +4,6 @@ import { Text, Localizer } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 import actions from '../../../actions/dashboard/boxActions';
 
-
 const EditVacbotBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.vacbot">
     <div class="form-group">
@@ -75,21 +74,20 @@ class EditVacbotBoxComponent extends Component {
     }
   };
 
-
   componentDidMount() {
     this.getVacbots();
   }
 
   render(props, { vacbots }) {
     return (
-      <EditVacbotBox 
-        {...props} 
-        vacbots={vacbots} 
-        updateBoxVacbot={this.updateBoxVacbot} 
-        updateBoxName={this.updateBoxName} 
+      <EditVacbotBox
+        {...props}
+        vacbots={vacbots}
+        updateBoxVacbot={this.updateBoxVacbot}
+        updateBoxName={this.updateBoxName}
       />
     );
   }
 }
 
-export default  EditVacbotBoxComponent;
+export default EditVacbotBoxComponent;

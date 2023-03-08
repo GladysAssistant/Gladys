@@ -1,19 +1,17 @@
 const logger = require('../../../../utils/logger');
-const {
-  EVENTS,
-} = require('../../../../utils/constants');
+const { EVENTS } = require('../../../../utils/constants');
 
 const BATTERY_FEATURE_INDEX = 1;
 
 /**
- * @description Xiaomi onMessage callback.
- * @param {Buffer} msg - The message buffer.
- * @param {Object} rsinfo - Rs info.
+ * @description Ecovacs onMessage callback.
+ * @param {string} type - Type of event.
+ * @param {Object} device - Concerned Gladys device.
+ * @param {any} value - Value from event.
  * @example
- * vacbot.onMessage('{"model": "motion"}');
+ * vacbot.onMessage('BatteryInfo', device, 100);
  */
 function onMessage(type, device, value) {
-
   logger.trace(`ECOVACS EVENT TYPE: ${type}`);
   logger.trace(`ECOVACS EVENT VALUE: ${value}`);
   logger.trace(`Device ExtID: ${device.external_id}`);

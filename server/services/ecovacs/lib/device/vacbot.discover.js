@@ -1,7 +1,13 @@
 const Promise = require('bluebird');
 const logger = require('../../../../utils/logger');
 const { getExternalId } = require('../utils/ecovacs.externalId');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES, COVER_STATE } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_UNITS,
+  DEVICE_POLL_FREQUENCIES,
+  COVER_STATE,
+} = require('../../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
 const READ_VALUE_MAPPING = {};
@@ -97,7 +103,7 @@ async function discover() {
             min: 0,
             max: 100,
           });
-          
+
           unknownDevices.push(newDevice);
         }
       },

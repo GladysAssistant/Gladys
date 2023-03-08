@@ -15,10 +15,7 @@ async function start() {
   if (this.configured && !this.connected) {
     await this.connect();
     await this.loadVacbots();
-    //logger.trace('GO LISTEN OMG')
-    //await this.listen();
   }
-  
 }
 
 module.exports = {

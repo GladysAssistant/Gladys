@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import actions from '../../../actions/dashboard/boxes/vacbot';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY, RequestStatus } from '../../../utils/consts';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+// import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
 
 const BOX_REFRESH_INTERVAL_MS = 30 * 60 * 1000;
@@ -21,10 +21,13 @@ const VacbotBox = ({ children, ...props }) => (
       </div>
     )}
     <div class="card-body d-flex flex-column">
-      <h4>{props.box && props.box.name}</h4>
+      <h4>{props.name}</h4>
     </div>
     <div>
-      {props.box.device_feature}
+      <img src={props.imageUrl} />
+      {props.hasMappingCapabilities}
+      {props.hasCustomAreaCleaningMode}
+      {props.hasMoppingSystem}
     </div>
   </div>
 );
@@ -38,7 +41,7 @@ class VacbotBoxComponent extends Component {
 
   componentDidMount() {
     this.refreshData();
-    // refresh weather every interval
+    // refresh vacbot every interval
     this.interval = setInterval(() => this.refreshData, BOX_REFRESH_INTERVAL_MS);
   }
 
@@ -57,9 +60,27 @@ class VacbotBoxComponent extends Component {
   render(props, {}) {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Vacbot.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Vacbot.${props.x}_${props.y}`);
-    const vacbotObject = get(boxData, 'vacbot');
+    const name = get(boxData, 'vacbot.name');
+    const imageUrl = get(boxData, 'vacbot.imageUrl');
+    const hasMappingCapabilities = get(boxData, 'vacbot.hasMappingCapabilities');
+    const hasCustomAreaCleaningMode = get(boxData, 'vacbot.hasCustomAreaCleaningMode');
+    const hasMoppingSystem = get(boxData, 'vacbot.hasMoppingSystem');
+
+    console.log(`get in boxdata : ${JSON.stringify(boxData)}`);
+    console.log(`${boxStatus}`);
     const error = boxStatus === RequestStatus.Error;
-    return <VacbotBox {...props} vacbot={vacbotObject} boxStatus={boxStatus} error={error} />;
+    return (
+      <VacbotBox
+        {...props}
+        name={name}
+        imageUrl={imageUrl}
+        hasMappingCapabilities={hasMappingCapabilities}
+        hasCustomAreaCleaningMode={hasCustomAreaCleaningMode}
+        hasMoppingSystem={hasMoppingSystem}
+        boxStatus={boxStatus}
+        error={error}
+      />
+    );
   }
 }
 

@@ -7,10 +7,10 @@ const { eventFunctionWrapper } = require('../../../../utils/functionsWrapper');
  * ecovacs.listen();
  */
 async function listen() {
-  logger.trace(`Listen to vacbots ! They deserve to be heard \o/ `);
+  logger.trace(`Listen to vacbots ! They deserve to be heard`);
   if (!this.connected) {
     await this.connect();
-  };
+  }
   await this.loadVacbots();
   logger.trace(`Listen to vacbots :`, this.vacbots.size);
   this.vacbots.forEach(async (vacbot) => {
@@ -19,7 +19,7 @@ async function listen() {
       logger.trace(`Connect vacbot `);
       vacbot.connect();
     }
-    vacbot.on('BatteryInfo', eventFunctionWrapper(this.onMessage.bind(this, 'BatteryInfo')));     
+    vacbot.on('BatteryInfo', eventFunctionWrapper(this.onMessage.bind(this, 'BatteryInfo')));
   });
 }
 

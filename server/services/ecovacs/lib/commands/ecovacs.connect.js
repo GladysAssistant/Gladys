@@ -11,7 +11,7 @@ const logger = require('../../../../utils/logger');
  */
 async function connect() {
   logger.debug(`Ecovacs: connect`);
-  
+
   if (!this.connected) {
     const { EcoVacsAPI } = this.ecovacsLibrary;
 

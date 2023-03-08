@@ -1,5 +1,5 @@
-const logger = require('../../../../utils/logger');
 const Promise = require('bluebird');
+const logger = require('../../../../utils/logger');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 /**
@@ -18,21 +18,21 @@ async function poll(device) {
   this.vacbots.forEach((value, key) => {
     if (key.external_id === device.external_id) {
       vacbot = value;
-    }   
+    }
   });
-  
+
   await Promise.mapSeries(device.features || [], (feature) => {
     logger.debug(`Ecovacs: feature: ${JSON.stringify(feature)}`);
     let state;
     switch (feature.category) {
-        case DEVICE_FEATURE_CATEGORIES.BATTERY: // Integer
-          if (feature.type === DEVICE_FEATURE_TYPES.VACBOT.INTEGER) {
-            setTimeout(() => {
-              vacbot.run('GetBatteryState');
-            }, 1000);
-            logger.debug(`Ecovacs: feature state : ${state}`);
-          }
-          break;
+      case DEVICE_FEATURE_CATEGORIES.BATTERY: // Integer
+        if (feature.type === DEVICE_FEATURE_TYPES.VACBOT.INTEGER) {
+          setTimeout(() => {
+            vacbot.run('GetBatteryState');
+          }, 1000);
+          logger.debug(`Ecovacs: feature state : ${state}`);
+        }
+        break;
       default:
         break;
     }

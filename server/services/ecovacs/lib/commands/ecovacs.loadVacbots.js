@@ -20,8 +20,8 @@ async function loadVacbots() {
       logger.trace(`Connect vacbot `);
       vacbot.connect();
     }
-    vacbot.on('BatteryInfo', eventFunctionWrapper(this.onMessage.bind(this, 'BatteryInfo', device))); 
-    
+    vacbot.on('BatteryInfo', eventFunctionWrapper(this.onMessage.bind(this, 'BatteryInfo', device)));
+
     this.vacbots.set(device, vacbot);
     logger.debug(this.vacbots.get(device));
     logger.debug(
@@ -31,7 +31,6 @@ async function loadVacbots() {
     );
     logger.trace(`Number of registered vacbots : ${this.vacbots.size}.`);
   });
-  
 }
 
 module.exports = {
