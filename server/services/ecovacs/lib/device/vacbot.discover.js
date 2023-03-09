@@ -92,8 +92,8 @@ async function discover() {
           });
           newDevice.features.push({
             name: 'battery',
-            selector: `ecovacs:${discoveredDevice.pid}:${DEVICE_FEATURE_TYPES.BATTERY}:${discoveredDevice.deviceNumber}`,
-            external_id: `ecovacs:${discoveredDevice.pid}:${DEVICE_FEATURE_TYPES.BATTERY}:${discoveredDevice.deviceNumber}`,
+            selector: `ecovacs:${discoveredDevice.pid}:battery:${discoveredDevice.deviceNumber}`,
+            external_id: `ecovacs:${discoveredDevice.pid}:battery:${discoveredDevice.deviceNumber}`,
             category: DEVICE_FEATURE_CATEGORIES.BATTERY,
             type: DEVICE_FEATURE_TYPES.VACBOT.INTEGER,
             unit: DEVICE_FEATURE_UNITS.PERCENT,
