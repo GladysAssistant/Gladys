@@ -9,6 +9,8 @@ const ecovacsGetVacbotObjMock = fake.resolves({
   name: 'E0001278919601690356',
   deviceName: 'DEEBOT OZMO 920 Series',
   deviceNumber: 0,
+  connect: fake.resolves(true),
+  on: fake.resolves(true),
 });
 
 const EcovacsHandler = proxyquire('../../../../../services/ecovacs/lib', {

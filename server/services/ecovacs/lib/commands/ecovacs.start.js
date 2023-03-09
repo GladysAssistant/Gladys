@@ -14,8 +14,8 @@ async function start() {
   }
   if (this.configured && !this.connected) {
     await this.connect();
-    await this.loadVacbots();
   }
+  await this.loadVacbots();
 }
 
 module.exports = {

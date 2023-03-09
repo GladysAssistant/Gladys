@@ -24,6 +24,9 @@ EcovacsHandlerMock.prototype.discover = fake.returns(['device']);
 EcovacsHandlerMock.prototype.setValue = fake.resolves(true);
 EcovacsHandlerMock.prototype.poll = fake.resolves(true);
 EcovacsHandlerMock.prototype.getDeviceStatus = fake.resolves(vacbotStatus);
+EcovacsHandlerMock.prototype.onMessage = fake.resolves(true);
+EcovacsHandlerMock.prototype.loadVacbots = fake.resolves(true);
+EcovacsHandlerMock.prototype.getVacbotObj = fake.resolves(true);
 
 module.exports = {
   EcovacsHandlerMock,
