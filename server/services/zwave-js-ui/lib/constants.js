@@ -152,10 +152,10 @@ const PROPERTIES = {
 };
 
 const PREF_LABELS = {
-  MOTION_SENSOR : {
+  MOTION_SENSOR: {
     en: 'Motion sensor',
-    fr: 'Détecteur de présence'
-  }
+    fr: 'Détecteur de présence',
+  },
 };
 
 const CATEGORIES = [
