@@ -13,10 +13,12 @@ const { splitNode } = require('../utils/splitNode');
 const { transformClasses } = require('../utils/transformClasses');
 
 /**
- * Check if keyword matches value.
- * @param {String} value
- * @param {String} keyword
- * @returns {boolean} True if keyword matches value
+ * @description Check if keyword matches value.
+ * @param {string} value - Value to check.
+ * @param {string} keyword - Keyword to match.
+ * @returns {boolean} True if keyword matches value.
+ * @example
+ * const res = zwaveManager.match('test', 'te');
  */
 function match(value, keyword) {
   return value ? value.toLowerCase().includes(keyword.toLowerCase()) : true;
