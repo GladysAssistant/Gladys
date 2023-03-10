@@ -30,7 +30,7 @@ function getDeviceExternalId(node) {
  * getDeviceFeatureName(feature);
  */
 function getDeviceFeatureName(property) {
-  return `${property.label}${property.endpoint > 0 ? ` [${property.endpoint}]` : ''}`;
+  return `${property.prefLabel ? property.prefLabel : property.label}${property.endpoint > 0 ? ` [${property.endpoint}]` : ''}`;
 }
 
 /**

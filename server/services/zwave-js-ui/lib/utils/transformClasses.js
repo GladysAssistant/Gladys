@@ -17,6 +17,12 @@ function transformClasses(node) {
     ) {
       delete filteredClasses[COMMAND_CLASSES.COMMAND_CLASS_SENSOR_BINARY][0][PROPERTIES.ANY];
     }
+    if (
+      filteredClasses[COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION] &&
+      filteredClasses[COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION][0]
+    ) {
+      delete filteredClasses[COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION][0][PROPERTIES.MOTION_ALARM];
+    }
   }
   return filteredClasses;
 }

@@ -13,6 +13,16 @@ const { splitNode } = require('../utils/splitNode');
 const { transformClasses } = require('../utils/transformClasses');
 
 /**
+ * Check if keyword matches value.
+ * @param {String} value
+ * @param {String} keyword
+ * @returns {boolean} True if keyword matches value
+ */
+function match(value, keyword) {
+  return value ? value.toLowerCase().includes(keyword.toLowerCase()) : true;
+}
+
+/**
  * @description Return array of Nodes.
  * @param {Object} options - Filtering, ordering.
  * @returns {Array} Return list of nodes.
@@ -27,13 +37,10 @@ function getNodes({ orderDir, search } = {}) {
   return nodes
     .filter((node) =>
       search
-        ? node.name.toLowerCase().includes(search.toLowerCase()) ||
-          node.product.toLowerCase().includes(search.toLowerCase()) ||
-          node.productLabel.toLowerCase().includes(search.toLowerCase()) ||
-          node.id
-            .toString()
-            .toLowerCase()
-            .includes(search.toLowerCase())
+        ? match(node.name, search) ||
+          match(node.productLabel, search) ||
+          match(node.productDescription, search) ||
+          match(node.nodeId.toString(), search)
         : true,
     )
     .map((node) => {
@@ -70,7 +77,7 @@ function getNodes({ orderDir, search } = {}) {
             let { min, max } = propertyValue;
             const { value } = propertyValue;
             if (genre === 'user') {
-              const { category, type, min: categoryMin, max: categoryMax, hasFeedback } = getCategory(node, {
+              const { category, type, min: categoryMin, max: categoryMax, hasFeedback, prefLabel } = getCategory(node, {
                 commandClass,
                 endpoint,
                 property,
@@ -91,7 +98,7 @@ function getNodes({ orderDir, search } = {}) {
                   value,
                 );
                 newDevice.features.push({
-                  name: getDeviceFeatureName({ label, endpoint }),
+                  name: getDeviceFeatureName({ label, prefLabel, endpoint }),
                   selector: slugify(`zwave-js-ui-node-${node.nodeId}-${property}-${commandClass}-${endpoint}-${label}`),
                   category,
                   type,

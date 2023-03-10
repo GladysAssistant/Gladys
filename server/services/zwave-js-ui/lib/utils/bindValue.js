@@ -35,8 +35,8 @@ function unbindValue(valueId, value) {
     return value ? STATE.ON : STATE.OFF;
   }
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION) {
-    if (valueId.fullProperty === PROPERTIES.MOTION) {
-      return value ? STATE.ON : STATE.OFF;
+    if (valueId.fullProperty === PROPERTIES.MOTION_ALARM) {
+      return value === '8' ? STATE.ON : STATE.OFF;
     }
     if (valueId.fullProperty === PROPERTIES.SMOKE_ALARM) {
       return SMOKE_ALARM_VALUES[value];

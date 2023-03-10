@@ -33,6 +33,7 @@ function getCategory(node, value) {
       categoryFound = {
         category: category.CATEGORY,
         type: category.TYPE,
+        prefLabel: category.LABEL,
         min: category.MIN,
         max: category.MAX,
         hasFeedback: true, // TODO
