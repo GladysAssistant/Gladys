@@ -63,21 +63,21 @@ describe('zwave.unbindValue', () => {
   it('should unbindValue commandClass COMMAND_CLASS_NOTIFICATION - Motion ON', () => {
     const valueId = {
       commandClass: COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION,
-      fullProperty: PROPERTIES.MOTION,
+      fullProperty: PROPERTIES.MOTION_ALARM,
     };
     const value = true;
     const unbindedValue = unbindValue(valueId, value);
-    expect(unbindedValue).to.equal(STATE.ON);
+    expect(unbindedValue).to.equal(8);
   });
 
   it('should unbindValue commandClass COMMAND_CLASS_NOTIFICATION - Motion OFF', () => {
     const valueId = {
       commandClass: COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION,
-      fullProperty: PROPERTIES.MOTION,
+      fullProperty: PROPERTIES.MOTION_ALARM,
     };
     const value = false;
     const unbindedValue = unbindValue(valueId, value);
-    expect(unbindedValue).to.equal(STATE.OFF);
+    expect(unbindedValue).to.equal(0);
   });
 
   it('should unbindValue commandClass COMMAND_CLASS_NOTIFICATION - Smoke Alarm-Sensor status OFF', () => {
