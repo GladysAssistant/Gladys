@@ -23,20 +23,20 @@ async function poll(device) {
 
   await Promise.mapSeries(device.features || [], (feature) => {
     logger.debug(`Ecovacs: feature: ${JSON.stringify(feature)}`);
-    let state;
     switch (feature.category) {
       case DEVICE_FEATURE_CATEGORIES.BATTERY: // Integer
         if (feature.type === DEVICE_FEATURE_TYPES.VACBOT.INTEGER) {
-          setTimeout(() => {
-            vacbot.run('GetBatteryState');
-          }, 1000);
-          logger.debug(`Ecovacs: feature state : ${state}`);
+          vacbot.run('GetBatteryState');      
         }
         break;
       default:
         break;
     }
   });
+  // Retrieve states
+  // vacbot.run('GetCleanState'); // retrieve the cleaning status
+  // vacbot.run('GetChargeState'); // retrieve the charging status
+  // vacbot.run('GetSleepStatus'); 
 }
 
 module.exports = {

@@ -22,6 +22,9 @@ function onMessage(type, device, value) {
         state: Math.round(value),
       });
       break;
+    case 'CleanReport':
+        logger.trace(`CleanReport: ${value}`);
+        break;
     default:
       logger.info(`Event is not handled yet.`);
   }
