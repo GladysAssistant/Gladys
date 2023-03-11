@@ -7,6 +7,7 @@
 function getStatus() {
   return {
     scanning: this.scanning,
+    configured: this.configured,
   };
 }
 

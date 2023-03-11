@@ -47,13 +47,15 @@ const LANManager = proxyquire('../../../../services/lan-manager/lib', {
 
 const gladys = {};
 const serviceId = '2f3b1972-63ec-4a9b-b46c-d87611feba69';
-const lanDiscovery = {};
+const ScanClass = stub();
 
 describe('LANManager loadConfiguration', () => {
   let manager;
 
   beforeEach(() => {
-    manager = new LANManager(gladys, serviceId, lanDiscovery);
+    manager = new LANManager(gladys, serviceId, ScanClass);
+    ScanClass.prototype.startScan = fake.returns(null);
+    ScanClass.prototype.on = fake.returns(null);
 
     gladys.variable = {
       setValue: fake.resolves('value'),

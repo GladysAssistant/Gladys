@@ -5,14 +5,13 @@ const LANManager = require('../../../../services/lan-manager/lib');
 
 const gladys = {};
 const serviceId = '2f3b1972-63ec-4a9b-b46c-d87611feba69';
-const lanDiscovery = {};
 
 describe('LANManager transformDevice', () => {
   let manager;
   let clock;
 
   beforeEach(() => {
-    manager = new LANManager(gladys, serviceId, lanDiscovery);
+    manager = new LANManager(gladys, serviceId, null);
     clock = sinon.useFakeTimers({ now: 1483228800000 });
   });
 
@@ -21,12 +20,11 @@ describe('LANManager transformDevice', () => {
   });
 
   it('transform device', async () => {
-    const device = { ip: 'xxx.xxx.xxx.xxx', mac: 'xx:xx:xx:xx:xx', name: 'device1' };
+    const device = { ip: 'xxx.xxx.xxx.xxx', mac: 'xx:xx:xx:xx:xx', hostname: 'device1' };
     const transformedDevice = manager.transformDevice(device);
     expect(transformedDevice).to.deep.equal({
       name: 'device1',
       ip: 'xxx.xxx.xxx.xxx',
-      can_save: true,
       service_id: serviceId,
       external_id: 'lan-manager:xxxxxxxxxx',
       selector: 'lan-manager-xxxxxxxxxx',
@@ -48,16 +46,12 @@ describe('LANManager transformDevice', () => {
       ],
       params: [
         {
-          name: 'DEVICE_MAC',
-          value: 'xx:xx:xx:xx:xx',
-        },
-        {
           name: 'DEVICE_NAME',
           value: 'device1',
         },
         {
-          name: 'MANUFACTURER',
-          value: '<unknown>',
+          name: 'DEVICE_MAC',
+          value: 'xx:xx:xx:xx:xx',
         },
       ],
     });
@@ -69,7 +63,6 @@ describe('LANManager transformDevice', () => {
     expect(transformedDevice).to.deep.equal({
       name: '',
       ip: 'xxx.xxx.xxx.xxx',
-      can_save: true,
       service_id: serviceId,
       external_id: 'lan-manager:xxxxxxxxxx',
       selector: 'lan-manager-xxxxxxxxxx',
@@ -94,21 +87,16 @@ describe('LANManager transformDevice', () => {
           name: 'DEVICE_MAC',
           value: 'xx:xx:xx:xx:xx',
         },
-        {
-          name: 'MANUFACTURER',
-          value: '<unknown>',
-        },
       ],
     });
   });
 
   it('transform device with random MAC (x2:xx...)', async () => {
-    const device = { ip: 'xxx.xxx.xxx.xxx', mac: 'x2:xx:xx:xx:xx' };
+    const device = { ip: 'xxx.xxx.xxx.xxx', mac: 'x2:xx:xx:xx:xx', vendor: 'VENDOR' };
     const transformedDevice = manager.transformDevice(device);
     expect(transformedDevice).to.deep.equal({
       name: '',
       ip: 'xxx.xxx.xxx.xxx',
-      can_save: false,
       service_id: serviceId,
       external_id: 'lan-manager:x2xxxxxxxx',
       selector: 'lan-manager-x2xxxxxxxx',
@@ -132,6 +120,10 @@ describe('LANManager transformDevice', () => {
         {
           name: 'DEVICE_MAC',
           value: 'x2:xx:xx:xx:xx',
+        },
+        {
+          name: 'MANUFACTURER',
+          value: 'VENDOR',
         },
       ],
     });

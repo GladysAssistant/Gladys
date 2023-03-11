@@ -8,6 +8,8 @@ const { SCAN_OPTIONS, VARIABLES } = require('./lan-manager.constants');
  * await this.loadConfiguration();
  */
 async function loadConfiguration() {
+  this.configured = false;
+
   // Load scanner status
   const scanPresenceStatus = await this.gladys.variable.getValue(VARIABLES.PRESENCE_STATUS, this.serviceId);
   if (scanPresenceStatus !== null) {
@@ -59,6 +61,7 @@ async function loadConfiguration() {
   });
 
   this.ipMasks = ipMasks;
+  this.configured = !!this.ipMasks.find((mask) => mask.enabled);
 }
 
 module.exports = {

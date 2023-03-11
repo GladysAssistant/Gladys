@@ -20,7 +20,6 @@ const TIMERS = {
 };
 
 const SCAN_OPTIONS = {
-  INTERFACES: [],
   IP_FAMILY: ['IPv4'],
 };
 

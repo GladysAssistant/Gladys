@@ -1,16 +1,11 @@
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 
-const { assert, fake } = sinon;
+const { assert, fake, stub } = sinon;
 
-const discoveredDevices = [
-  {
-    mac: 'AA:BB:CC:DD',
-  },
-];
-const lanManagerScanMock = fake.resolves(discoveredDevices);
+const scanMock = stub();
 const LANManager = proxyquire('../../../../services/lan-manager/lib', {
-  './lan-manager.scan.js': { scan: lanManagerScanMock },
+  './lan-manager.scan': { scan: scanMock },
 });
 const { DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
 
@@ -23,13 +18,17 @@ const gladys = {
   },
 };
 const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
-const lanDiscovery = {};
 
 describe('LANManager scanPresence', () => {
   let manager;
 
   beforeEach(() => {
-    manager = new LANManager(gladys, serviceId, lanDiscovery);
+    manager = new LANManager(gladys, serviceId, null);
+    manager.discoveredDevices = [
+      {
+        mac: 'AA:BB:CC:DD',
+      },
+    ];
 
     gladys.event = {
       emit: fake.returns(true),
@@ -44,7 +43,6 @@ describe('LANManager scanPresence', () => {
     await manager.scanPresence();
 
     assert.calledOnce(gladys.device.get);
-    assert.notCalled(lanManagerScanMock);
     assert.notCalled(gladys.event.emit);
   });
 
@@ -65,7 +63,6 @@ describe('LANManager scanPresence', () => {
       service: 'lan-manager',
       device_feature_category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
     });
-    assert.notCalled(lanManagerScanMock);
     assert.notCalled(gladys.event.emit);
   });
 
@@ -81,13 +78,13 @@ describe('LANManager scanPresence', () => {
       },
     ]);
 
+    scanMock.resolves([]);
     await manager.scanPresence();
 
     assert.calledOnceWithExactly(gladys.device.get, {
       service: 'lan-manager',
       device_feature_category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
     });
-    assert.calledOnceWithExactly(lanManagerScanMock);
     assert.notCalled(gladys.event.emit);
   });
 
@@ -103,13 +100,14 @@ describe('LANManager scanPresence', () => {
       },
     ]);
 
+    scanMock.resolves([{ mac: 'aabbccdd' }]);
+
     await manager.scanPresence();
 
     assert.calledOnceWithExactly(gladys.device.get, {
       service: 'lan-manager',
       device_feature_category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
     });
-    assert.calledOnceWithExactly(lanManagerScanMock);
     assert.calledOnce(gladys.event.emit);
   });
 });

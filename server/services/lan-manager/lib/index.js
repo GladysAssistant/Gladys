@@ -13,12 +13,14 @@ const { scanPresence } = require('./lan-manager.scanPresence');
 
 const { PRESENCE_STATUS, TIMERS } = require('./lan-manager.constants');
 
-const LANManager = function LANManager(gladys, serviceId, lanDiscovery) {
+const LANManager = function LANManager(gladys, serviceId, ScannerClass) {
   this.gladys = gladys;
   this.serviceId = serviceId;
 
+  this.configured = false;
   this.scanning = false;
-  this.lanDiscovery = lanDiscovery;
+  this.ScannerClass = ScannerClass;
+  this.scanner = null;
   this.discoveredDevices = [];
 
   this.presenceScanner = {

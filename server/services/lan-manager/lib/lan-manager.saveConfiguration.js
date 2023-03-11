@@ -9,6 +9,7 @@ const { VARIABLES, PRESENCE_STATUS } = require('./lan-manager.constants');
  * const config = await this.saveConfiguration({ ... });
  */
 async function saveConfiguration(configuration = {}) {
+  this.configured = false;
   const { presenceScanner = {}, ipMasks = [] } = configuration;
 
   // Check and store presence scanner frequency
@@ -35,9 +36,10 @@ async function saveConfiguration(configuration = {}) {
   // Store in memory
   this.presenceScanner = { ...this.presenceScanner, ...presenceScanner, status: newStatus };
   this.ipMasks = ipMasks;
+  this.configured = !!this.ipMasks.find((mask) => mask.enabled);
 
   // Manages presence scanner
-  this.initPresenceScanner();
+  await this.initPresenceScanner();
 
   return this.getConfiguration();
 }

@@ -897,7 +897,6 @@
         "loadExistingDevices": "Hide already added devices",
         "alreadyCreatedButton": "Already created",
         "updateButton": "Update",
-        "randomMacAlert": "This device will have a new MAC address on next connexion, Gladys can't manage it.",
         "discoveringError": "An error occurred, please check logs."
       },
       "setup": {

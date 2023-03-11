@@ -6,7 +6,7 @@ const { PRESENCE_STATUS } = require('./lan-manager.constants');
  * @example
  * this.initPresenceScanner();
  */
-function initPresenceScanner() {
+async function initPresenceScanner() {
   // Manages presence scanner
   const { status, frequency, timer } = this.presenceScanner;
   if (timer) {
@@ -14,9 +14,9 @@ function initPresenceScanner() {
     clearInterval(timer);
     this.presenceScanner.timer = undefined;
   }
-  if (status === PRESENCE_STATUS.ENABLED) {
+  if (this.configured && status === PRESENCE_STATUS.ENABLED) {
     logger.info(`LANManager configuration: starting presence scanner`);
-    this.scanPresence();
+    await this.scanPresence();
     this.presenceScanner.timer = setInterval(this.scanPresence.bind(this), frequency);
   }
 }

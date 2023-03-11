@@ -7,13 +7,12 @@ const LANManager = require('../../../../services/lan-manager/lib');
 
 const gladys = {};
 const serviceId = '2f3b1972-63ec-4a9b-b46c-d87611feba69';
-const lanDiscovery = {};
 
 describe('LANManager getDiscoveredDevices', () => {
   let manager;
 
   beforeEach(() => {
-    manager = new LANManager(gladys, serviceId, lanDiscovery);
+    manager = new LANManager(gladys, serviceId, null);
     gladys.stateManager = {
       get: stub()
         .returns(null)

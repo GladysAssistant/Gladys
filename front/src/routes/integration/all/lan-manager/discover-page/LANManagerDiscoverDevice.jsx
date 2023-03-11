@@ -50,7 +50,9 @@ class LANManagerDiscoverDevice extends Component {
                       type="text"
                       value={device.name}
                       onInput={this.updateName}
-                      class="form-control"
+                      class={cx('form-control', {
+                        'is-invalid': !device.name || device.name === ''
+                      })}
                       placeholder={<Text id="editDeviceForm.namePlaceholder" />}
                     />
                   </Localizer>
@@ -113,11 +115,6 @@ class LANManagerDiscoverDevice extends Component {
                   </label>
                   <DeviceFeatures features={device.features} />
                 </div>
-                {!device.created_at && !device.can_save && (
-                  <div class="alert alert-warning">
-                    <Text id="integration.lanManager.discover.randomMacAlert" />
-                  </div>
-                )}
                 <div class="form-group">
                   {device.created_at && (
                     <button class="btn btn-primary mr-2" disabled="true">
@@ -126,7 +123,11 @@ class LANManagerDiscoverDevice extends Component {
                   )}
 
                   {!device.created_at && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2" disabled={!device.can_save}>
+                    <button
+                      onClick={this.saveDevice}
+                      class="btn btn-success mr-2"
+                      disabled={!device.name || device.name === ''}
+                    >
                       <Text id="editDeviceForm.saveButton" />
                     </button>
                   )}

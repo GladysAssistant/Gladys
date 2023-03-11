@@ -17,13 +17,12 @@ const gladys = {
   },
 };
 const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
-const lanDiscovery = {};
 
 describe('LANManager saveConfiguration', () => {
   let manager;
 
   beforeEach(() => {
-    manager = new LANManager(gladys, serviceId, lanDiscovery);
+    manager = new LANManager(gladys, serviceId, null);
   });
 
   afterEach(() => {

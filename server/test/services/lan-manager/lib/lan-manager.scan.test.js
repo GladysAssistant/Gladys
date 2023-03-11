@@ -1,20 +1,27 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { fake, assert } = sinon;
+const { fake, assert, stub } = sinon;
 
 const LANManager = require('../../../../services/lan-manager/lib');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const gladys = {};
 const serviceId = '2f3b1972-63ec-4a9b-b46c-d87611feba69';
-const lanDiscovery = {};
+const NmapScan = stub();
 
 describe('LANManager scan', () => {
   let manager;
 
   beforeEach(() => {
-    manager = new LANManager(gladys, serviceId, lanDiscovery);
+    manager = new LANManager(gladys, serviceId, NmapScan);
+    manager.configured = true;
+
+    NmapScan.prototype.startScan = fake.returns([]);
+    NmapScan.prototype.cancelScan = fake.returns([]);
+    NmapScan.prototype.removeAllListeners = fake.returns([]);
+    NmapScan.prototype.on = stub();
 
     gladys.event = {
       emit: fake.returns(true),
@@ -26,103 +33,65 @@ describe('LANManager scan', () => {
   });
 
   it('scan devices', async () => {
-    const discoveredDevices = [{ name: 'device1' }, { name: 'device2' }];
-    lanDiscovery.discover = fake.resolves(discoveredDevices);
+    manager.configured = true;
     manager.ipMasks = [
       { mask: '255.255.255.248/29', enabled: true },
       { mask: '192.168.0.1/10', enabled: false },
     ];
 
-    const scan = manager.scan();
+    NmapScan.prototype.on.onCall(1).yieldsRight([{ device: '1' }, { device: '2', mac: 'mac' }]);
 
-    expect(manager.scanning).to.equal(true);
+    const result = await manager.scan();
 
-    const result = await scan;
-    expect(manager.discoveredDevices).to.deep.equal(discoveredDevices);
-    expect(result).to.deep.equal(discoveredDevices);
     expect(manager.scanning).to.equal(false);
+    expect(result).deep.equal([{ device: '2', mac: 'mac' }]);
 
-    assert.calledOnceWithExactly(lanDiscovery.discover, [
-      '255.255.255.249',
-      '255.255.255.250',
-      '255.255.255.251',
-      '255.255.255.252',
-      '255.255.255.253',
-      '255.255.255.254',
-    ]);
+    assert.calledWithNew(NmapScan);
     assert.calledTwice(gladys.event.emit);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
       payload: {
         scanning: true,
+        configured: true,
       },
     });
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
       payload: {
         scanning: false,
+        configured: true,
       },
     });
   });
 
-  it('nothing to scan', async () => {
-    manager.ipMasks = [{ mask: '192.168.0.1/10', enabled: false }];
+  it('scan devices error', async () => {
+    manager.configured = true;
+    manager.ipMasks = [
+      { mask: '255.255.255.248/29', enabled: true },
+      { mask: '192.168.0.1/10', enabled: false },
+    ];
 
-    const scan = manager.scan();
+    NmapScan.prototype.on.onCall(0).yieldsRight(new Error('this is an error'));
 
-    const result = await scan;
-    expect(manager.discoveredDevices).to.deep.equal([]);
-    expect(result).to.deep.equal([]);
+    const result = await manager.scan();
+
     expect(manager.scanning).to.equal(false);
+    expect(result).deep.equal([]);
 
-    assert.notCalled(lanDiscovery.discover);
+    assert.calledWithNew(NmapScan);
     assert.calledTwice(gladys.event.emit);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
       payload: {
         scanning: true,
+        configured: true,
       },
     });
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
       payload: {
         scanning: false,
-      },
-    });
-  });
-
-  it('fail to scan devices', async () => {
-    lanDiscovery.discover = fake.rejects(new Error('ERROR'));
-    manager.ipMasks = [{ mask: '255.255.255.248/29', enabled: true }];
-
-    const scan = manager.scan();
-
-    expect(manager.scanning).to.equal(true);
-
-    const result = await scan;
-    expect(manager.discoveredDevices).to.deep.equal([]);
-    expect(result).to.deep.equal([]);
-    expect(manager.scanning).to.equal(false);
-
-    assert.calledOnceWithExactly(lanDiscovery.discover, [
-      '255.255.255.249',
-      '255.255.255.250',
-      '255.255.255.251',
-      '255.255.255.252',
-      '255.255.255.253',
-      '255.255.255.254',
-    ]);
-    assert.calledTwice(gladys.event.emit);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
-      payload: {
-        scanning: true,
-      },
-    });
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
-      payload: {
-        scanning: false,
+        configured: true,
       },
     });
   });
@@ -130,13 +99,23 @@ describe('LANManager scan', () => {
   it('already scanning', async () => {
     manager.scanning = true;
 
-    const result = await manager.scan();
+    await manager.scan();
 
-    expect(manager.discoveredDevices).to.deep.equal([]);
-    expect(result).to.deep.equal([]);
     expect(manager.scanning).to.equal(true);
 
-    assert.notCalled(lanDiscovery.discover);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('not configured', async () => {
+    manager.configured = false;
+
+    try {
+      await manager.scan();
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(ServiceNotConfiguredError);
+    }
+
     assert.notCalled(gladys.event.emit);
   });
 });

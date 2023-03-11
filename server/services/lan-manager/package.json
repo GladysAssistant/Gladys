@@ -15,8 +15,6 @@
   ],
   "scripts": {},
   "dependencies": {
-    "@network-utils/vendor-lookup": "^1.0.7",
-    "arpping": "^4.0.0",
-    "netmask": "^2.0.2"
+    "node-sudo-nmap": "^4.0.4"
   }
 }
