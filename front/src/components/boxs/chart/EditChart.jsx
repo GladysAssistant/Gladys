@@ -151,7 +151,7 @@ class EditChart extends Component {
 
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview }) {
     return (
-      <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart">
+      <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart" titleValue={props.box.title}>
         <div class={loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">

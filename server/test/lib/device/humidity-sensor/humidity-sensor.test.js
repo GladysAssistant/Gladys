@@ -90,8 +90,8 @@ describe('HumiditySensor.command', () => {
   });
   it('should ask the humidity in a room with no values', async () => {
     const brain = {
-      addRoom: fake.returns(null),
-      removeRoom: fake.returns(null),
+      addNamedEntity: fake.returns(null),
+      removeNamedEntity: fake.returns(null),
     };
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);
@@ -166,8 +166,8 @@ describe('HumiditySensor.command', () => {
   });
   it('should return error when incorrect intent', async () => {
     const brain = {
-      addRoom: fake.returns(null),
-      removeRoom: fake.returns(null),
+      addNamedEntity: fake.returns(null),
+      removeNamedEntity: fake.returns(null),
     };
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, messageManager, stateManager, {}, {}, {}, job);

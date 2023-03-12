@@ -28,11 +28,8 @@ async function update(selector, room) {
   const updatedRoomPlain = existingRoom.get({ plain: true });
 
   if (oldName !== updatedRoomPlain.name) {
-    this.brain.removeRoom({
-      id: updatedRoomPlain.id,
-      name: oldName,
-    });
-    this.brain.addRoom(updatedRoomPlain);
+    this.brain.removeNamedEntity('room', updatedRoomPlain.id, oldName);
+    this.brain.addNamedEntity('room', updatedRoomPlain.id, updatedRoomPlain.name);
   }
 
   return updatedRoomPlain;

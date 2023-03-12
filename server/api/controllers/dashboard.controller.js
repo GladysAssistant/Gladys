@@ -16,7 +16,7 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
  * @apiSuccess {Array} [boxes] Array of boxes in the dashboard.
  */
 
-module.exports = function HouseController(gladys) {
+module.exports = function DashboardController(gladys) {
   /**
    * @api {post} /api/v1/dashboard create
    * @apiName createDashoard
@@ -53,6 +53,17 @@ module.exports = function HouseController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/dashboard/order updateOrder
+   * @apiName updateOrder
+   * @apiGroup Dashboard
+   * @apiParam {Array} [selectors] Array of selectors in new order.
+   */
+  async function updateOrder(req, res) {
+    await gladys.dashboard.updateOrder(req.user.id, req.body);
+    res.json({ success: true });
+  }
+
+  /**
    * @api {get} /api/v1/dashboard/:dashboard_selector getBySelector
    * @apiName getBySelector
    * @apiGroup Dashboard
@@ -82,5 +93,6 @@ module.exports = function HouseController(gladys) {
     get: asyncMiddleware(get),
     getBySelector: asyncMiddleware(getBySelector),
     update: asyncMiddleware(update),
+    updateOrder: asyncMiddleware(updateOrder),
   });
 };

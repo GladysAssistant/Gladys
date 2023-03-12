@@ -6,6 +6,12 @@
   },
   "HostConfig": {
     "Binds": [],
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {
+        "max-size": "10m"
+      }
+    },
     "PortBindings": {
       "1884/tcp": [
         {

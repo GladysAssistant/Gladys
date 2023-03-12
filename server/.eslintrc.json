@@ -1,5 +1,5 @@
 {
-  "plugins": ["jsdoc", "require-jsdoc", "no-call", "mocha"],
+  "plugins": ["jsdoc", "require-jsdoc", "no-call", "mocha", "promise"],
   "extends": ["airbnb-base", "plugin:jsdoc/recommended", "prettier"],
   "parserOptions": {
     "ecmaVersion": 2018
@@ -130,7 +130,8 @@
     "max-classes-per-file": "off",
     "import/no-import-module-exports": "off",
     "import/no-relative-packages": "off",
-    "default-param-last": "warn"
+    "default-param-last": "warn",
+    "promise/prefer-await-to-then": "warn"
   },
   "overrides": [
     {

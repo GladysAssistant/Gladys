@@ -35,6 +35,7 @@
     "eslint-plugin-compat": "^4.0.2",
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-json": "^3.1.0",
+    "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.29.4",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
@@ -43,7 +44,7 @@
     "prettier": "^1.17.1"
   },
   "dependencies": {
-    "@gladysassistant/gladys-gateway-js": "^4.5.0",
+    "@gladysassistant/gladys-gateway-js": "^4.8.1",
     "@gladysassistant/theme-optimized": "^1.0.3",
     "@jaames/iro": "^5.5.2",
     "@yaireo/tagify": "^4.5.0",
@@ -66,7 +67,11 @@
     "preact-router": "^3.2.1",
     "qrcode": "^1.4.2",
     "react-big-calendar": "^0.40.0",
+    "react-clock": "^3.1.0",
     "react-datepicker": "^3.8.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "react-dnd-touch-backend": "^16.0.1",
     "react-select": "^4.3.1",
     "unistore": "^3.5.2",
     "useragent-parser-js": "^1.0.3",

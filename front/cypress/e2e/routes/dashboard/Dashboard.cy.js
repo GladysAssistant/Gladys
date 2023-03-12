@@ -4,8 +4,10 @@ describe('Dashboard', () => {
   });
   it('Should create new dashboard', () => {
     cy.visit('/dashboard');
-    cy.contains('dashboard.newDashboardButton')
-      .should('have.class', 'btn-outline-success')
+
+    cy.get('a')
+      .contains('dashboard.newDashboardButton')
+      .should('have.class', 'btn-success')
       .click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/create/new`);
@@ -20,29 +22,14 @@ describe('Dashboard', () => {
       .should('have.class', 'btn-primary')
       .click();
 
-    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/my-new-dashboard`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/my-new-dashboard/edit`);
   });
   it('Should add new boxes', () => {
-    cy.contains('dashboard.editDashboardButton')
-      .should('have.class', 'btn-outline-primary')
-      .click();
+    cy.contains('.btn-primary', 'dashboard.addBoxButton').click();
     cy.get('select').then(inputs => {
       cy.wrap(inputs[0]).select('user-presence');
-      cy.get('button').then(inputs => {
-        cy.wrap(inputs[0]).click();
-      });
     });
-    cy.get('[class*="-control"]')
-      .find('div')
-      .first()
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("Tony")`)
-      .click(0, 0, { force: true });
-    cy.contains('dashboard.editDashboardSaveButton')
-      .should('have.class', 'btn-outline-primary')
-      .click();
+    cy.contains('.btn-outline-primary', 'dashboard.editDashboardSaveButton').click();
   });
   it('Should delete dashboard', () => {
     cy.contains('dashboard.editDashboardButton')
@@ -51,5 +38,9 @@ describe('Dashboard', () => {
     cy.contains('dashboard.editDashboardDeleteButton')
       .should('have.class', 'btn-outline-danger')
       .click();
+    cy.contains('dashboard.editDashboardDeleteButton')
+      .should('have.class', 'btn-outline-danger')
+      .click();
+    cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard`);
   });
 });
