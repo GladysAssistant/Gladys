@@ -11,7 +11,7 @@ function getDiscoveredDevices(filters = {}) {
     .map((device) => this.mergeWithExistingDevice(device));
 
   const { filterExisting } = filters;
-  if (filterExisting === true) {
+  if (`${filterExisting}` === 'true') {
     devices = devices.filter((device) => device.id === undefined);
   }
 

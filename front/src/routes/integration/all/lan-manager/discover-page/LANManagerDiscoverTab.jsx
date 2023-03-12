@@ -11,7 +11,7 @@ const LANManagerDiscoverTab = ({
   lanManagerGetDiscoveredDevicesStatus,
   lanManagerDiscoveredDevices = [],
   lanManagerStatus = {},
-  filterExisting,
+  filterExisting = true,
   scan,
   ...props
 }) => {
@@ -42,13 +42,13 @@ const LANManagerDiscoverTab = ({
             <input
               type="checkbox"
               class="custom-switch-input"
-              checked={!filterExisting}
+              checked={filterExisting}
               onClick={props.toggleFilterOnExisting}
               disabled={loading}
             />
             <span class="custom-switch-indicator mr-1" />
             <span class="custom-switch-description">
-              <Text id="integration.lanManager.discover.loadExistingDevices" />
+              <Text id="integration.lanManager.discover.hideExistingDevices" />
             </span>
           </label>
         </li>

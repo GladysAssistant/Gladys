@@ -1050,7 +1050,7 @@
         "title": "Découverte LAN",
         "noDevices": "Aucun appareil LAN n'a encore été trouvé.",
         "scanButton": "Recherche sur le réseau",
-        "loadExistingDevices": "Cacher les appareils déjà ajoutés",
+        "hideExistingDevices": "Cacher les appareils déjà ajoutés",
         "alreadyCreatedButton": "Déjà créé",
         "updateButton": "Mettre à jour",
         "discoveringError": "Une erreur est survenue lors de la recherche, merci de consulter les logs."

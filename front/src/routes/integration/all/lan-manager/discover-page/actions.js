@@ -11,7 +11,7 @@ const createActions = store => {
         lanManagerGetDiscoveredDevicesStatus: RequestStatus.Getting
       });
       try {
-        const { filterExisting = false } = state;
+        const { filterExisting = true } = state;
         const lanManagerDiscoveredDevices = await state.httpClient.get('/api/v1/service/lan-manager/discover', {
           filterExisting
         });
@@ -26,7 +26,7 @@ const createActions = store => {
       }
     },
     async toggleFilterOnExisting(state) {
-      const { filterExisting = false } = state;
+      const { filterExisting = true } = state;
       store.setState({
         filterExisting: !filterExisting
       });
