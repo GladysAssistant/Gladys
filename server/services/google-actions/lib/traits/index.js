@@ -1,8 +1,9 @@
-const { colorSettingTrait } = require('./googleActions.colorSetting.trait');
 const { brightnessTrait } = require('./googleActions.brightness.trait');
-const { onOffTrait } = require('./googleActions.on_off.trait');
+const { colorSettingTrait } = require('./googleActions.colorSetting.trait');
+const { onOffTrait } = require('./googleActions.onOff.trait');
+const { openCloseTrait } = require('./googleActions.openClose.trait');
 
-const TRAITS = [brightnessTrait, colorSettingTrait, onOffTrait];
+const TRAITS = [brightnessTrait, colorSettingTrait, onOffTrait, openCloseTrait];
 
 const TRAIT_BY_COMMAND = {};
 TRAITS.forEach((trait) => {
