@@ -17,7 +17,11 @@ async function getDeviceStatus(deviceExternalId) {
     hasMappingCapabilities: vacbot.hasMappingCapabilities(),
     hasCustomAreaCleaningMode: vacbot.hasCustomAreaCleaningMode(),
     hasMoppingSystem: vacbot.hasMoppingSystem(),
+    chargeStatus: vacbot.chargeStatus,
+    cleanStatus: vacbot.cleanStatus,
+    connected: vacbot.connectionFailed,
   };
+  logger.trace(`Vacbot charge status : ${vacbot.chargestatus}`);
   logger.debug(`Vacbot ${deviceExternalId} status : ${JSON.stringify(status)}`);
   return status;
 }

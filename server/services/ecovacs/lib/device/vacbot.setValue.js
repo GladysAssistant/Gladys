@@ -27,6 +27,7 @@ async function setValue(device, deviceFeature, value) {
         vacbot.pause();
       } else if (value === -1) {
         vacbot.stop();
+        vacbot.charge();
       }
       break;
     default:

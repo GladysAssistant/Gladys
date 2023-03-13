@@ -23,6 +23,11 @@ const VacbotBox = ({ children, ...props }) => (
     <div class="card-body d-flex flex-column">
       <h4>{props.name}</h4>
     </div>
+    <div> 
+    {props.chargestatus}
+    {props.cleanstatus}
+    {props.connectionFailed}
+    </div>
     <div>
       <img src={props.imageUrl} />
       {props.hasMappingCapabilities}

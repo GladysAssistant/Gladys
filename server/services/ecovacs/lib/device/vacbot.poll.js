@@ -34,9 +34,9 @@ async function poll(device) {
     }
   });
   // Retrieve states
-  // vacbot.run('GetCleanState'); // retrieve the cleaning status
-  // vacbot.run('GetChargeState'); // retrieve the charging status
-  // vacbot.run('GetSleepStatus'); 
+  vacbot.run('GetCleanState'); // retrieve the cleaning status
+  vacbot.run('GetChargeState'); // retrieve the charging status
+  vacbot.run('GetSleepStatus'); 
 }
 
 module.exports = {
