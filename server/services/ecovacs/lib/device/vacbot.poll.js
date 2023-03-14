@@ -37,6 +37,10 @@ async function poll(device) {
   vacbot.run('GetCleanState'); // retrieve the cleaning status
   vacbot.run('GetChargeState'); // retrieve the charging status
   vacbot.run('GetSleepStatus'); 
+  logger.trace(`POLL vacbot : `, vacbot);
+  if (vacbot.errorCode != 0) {
+    logger.error(`Error ${vacbot.errorCode} occured : ${vacbot.errorDescription}.`);
+  } 
 }
 
 module.exports = {
