@@ -9,6 +9,7 @@ const ecovacsHandler = function EcovacsHandler(gladys, ecovacsDeebot, serviceId)
   this.connected = false;
 
   this.vacbots = new Map();
+
 };
 
 const { start } = require('./commands/ecovacs.start');
@@ -25,6 +26,9 @@ const { setValue } = require('./device/vacbot.setValue');
 const { getConfiguration } = require('./config/ecovacs.getConfiguration');
 const { saveConfiguration } = require('./config/ecovacs.saveConfiguration');
 const { onMessage } = require('./event/ecovacs.onMessage');
+
+// GLADYS EVENTMANAGER
+ecovacsHandler.prototype.postCreate = loadVacbots;
 
 // COMMANDS
 ecovacsHandler.prototype.start = start;
