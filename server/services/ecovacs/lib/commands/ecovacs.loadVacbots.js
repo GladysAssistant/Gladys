@@ -17,13 +17,6 @@ async function loadVacbots() {
   registered.forEach(async (device) => {
     const vacbot = await this.getVacbotObj(device.external_id);
     this.listen(vacbot, device);
-    /*
-    if (!vacbot.is_ready) {
-      logger.trace(`Connect vacbot `, vacbot);
-      vacbot.connect();
-    }
-    vacbot.on('BatteryInfo', eventFunctionWrapper(this.onMessage.bind(this, 'BatteryInfo', device)));
-    */
     this.vacbots.set(device, vacbot);
     logger.debug(
       `Loaded in memory and ready to be handled : ${device.external_id} (gladys device) ====> ${
