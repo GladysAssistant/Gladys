@@ -23,9 +23,8 @@ function createActions(store) {
       console.log(`getVacbot : ${JSON.stringify(box)} ${x} ${y}`);
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
-        const vacbotStatus = await state.httpClient.get(`/api/v1/service/ecovacs/${box.name}/status`);
+        const vacbotStatus = await state.httpClient.get(`/api/v1/service/ecovacs/${box.device_feature}/status`);
         console.log(`status ${JSON.stringify(vacbotStatus)}`);
-        // console.log(`/api/v1/service/ecovacs/${box.name}/status`);
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           vacbot: vacbotStatus
         });
@@ -37,8 +36,9 @@ function createActions(store) {
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
       }
     }
-    /*
+    /*,
     deviceFeatureWebsocketEvent(state, box, x, y, payload) {
+      console.log(payload);
       if (box.vacbot === payload.device) {
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           vacbot: payload.last_value_string
