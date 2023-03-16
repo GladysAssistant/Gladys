@@ -33,7 +33,11 @@ const VacbotBox = ({ children, ...props }) => (
         name : {props.name}
         </li>
         <li class="list-separated-item">
-        clean report : {props.cleanReport}
+        
+        clean report (auto, idle, returning) : {props.cleanReport}
+        </li>
+        <li class="list-separated-item">
+        charge status (charging, idle, returning) : {props.chargeStatus}
         </li>
         <li class="list-separated-item">
         hasMappingCapabilities : {props.hasMappingCapabilities}
@@ -64,7 +68,7 @@ class VacbotBoxComponent extends Component {
     /*
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
-      this.updateDeviceStateWebsocket
+      this.deviceFeatureWebsocketEvent
     );
     */
   }
@@ -91,20 +95,12 @@ class VacbotBoxComponent extends Component {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Vacbot.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Vacbot.${props.x}_${props.y}`);
     const name = get(boxData, 'vacbot.name');
-    console.log(`name in boxdata : ${name}`);
     const imageUrl = get(boxData, 'vacbot.imageUrl');
-    console.log(`imageUrl in boxdata : ${imageUrl}`);
     const hasMappingCapabilities = get(boxData, 'vacbot.hasMappingCapabilities');
     const hasCustomAreaCleaningMode = get(boxData, 'vacbot.hasCustomAreaCleaningMode');
     const hasMoppingSystem = get(boxData, 'vacbot.hasMoppingSystem');
     const chargeStatus = get(boxData, 'vacbot.chargeStatus');
     const cleanReport = get(boxData, 'vacbot.cleanReport');
-    console.log(`cleanReport in boxdata : ${cleanReport}`);
-    const connected = get(boxData, 'vacbot.connectionFailed');
-    console.log(`connected in boxdata : ${connected}`);
-    
-    
-    
     const error = boxStatus === RequestStatus.Error;
     return (
       <VacbotBox
@@ -117,7 +113,6 @@ class VacbotBoxComponent extends Component {
         chargeStatus={chargeStatus}
         cleanReport={cleanReport}
         boxStatus={boxStatus}
-        connected={connected}
         error={error}
       />
     );
