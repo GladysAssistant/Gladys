@@ -60,6 +60,7 @@ describe('LANManager scan', () => {
       payload: {
         scanning: false,
         configured: true,
+        deviceChanged: true,
       },
     });
   });
@@ -92,6 +93,7 @@ describe('LANManager scan', () => {
       payload: {
         scanning: false,
         configured: true,
+        deviceChanged: false,
       },
     });
   });

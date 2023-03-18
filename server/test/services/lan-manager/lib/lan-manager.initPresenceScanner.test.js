@@ -26,7 +26,7 @@ describe('LANManager initPresenceScanner', () => {
     sinon.reset();
   });
 
-  it('stop scanner', async () => {
+  it('stop scanner', () => {
     sinon.spy(clock, 'clearInterval');
 
     const timer = setInterval(() => {}, 5000);
@@ -36,14 +36,14 @@ describe('LANManager initPresenceScanner', () => {
       timer,
     };
 
-    await manager.initPresenceScanner();
+    manager.initPresenceScanner();
 
     expect(manager.presenceScanner.timer).eq(undefined);
     assert.notCalled(scanMock);
     assert.calledOnce(clock.clearInterval);
   });
 
-  it('stop scanner (not configured)', async () => {
+  it('stop scanner (not configured)', () => {
     sinon.spy(clock, 'clearInterval');
 
     const timer = setInterval(() => {}, 5000);
@@ -55,7 +55,7 @@ describe('LANManager initPresenceScanner', () => {
       timer,
     };
 
-    await manager.initPresenceScanner();
+    manager.initPresenceScanner();
 
     expect(manager.presenceScanner.timer).eq(undefined);
     assert.notCalled(scanMock);
@@ -66,7 +66,7 @@ describe('LANManager initPresenceScanner', () => {
     assert.notCalled(scanMock);
   });
 
-  it('restart scanner (configured)', async () => {
+  it('restart scanner (configured)', () => {
     sinon.spy(clock, 'clearInterval');
 
     const timer = setInterval(() => {}, 5000);
@@ -78,18 +78,18 @@ describe('LANManager initPresenceScanner', () => {
       timer,
     };
 
-    await manager.initPresenceScanner();
+    manager.initPresenceScanner();
 
     expect(manager.presenceScanner.timer).not.eq(undefined);
-    assert.calledOnce(scanMock);
+    assert.notCalled(scanMock);
     assert.calledOnce(clock.clearInterval);
 
     clock.tick(6000);
 
-    assert.callCount(scanMock, 2);
+    assert.callCount(scanMock, 1);
   });
 
-  it('start scanner', async () => {
+  it('start scanner', () => {
     manager.configured = true;
     manager.scanning = true;
     manager.presenceScanner = {
@@ -97,13 +97,13 @@ describe('LANManager initPresenceScanner', () => {
       frequency: 5000,
     };
 
-    await manager.initPresenceScanner();
+    manager.initPresenceScanner();
 
     expect(manager.presenceScanner.timer).not.eq(undefined);
-    assert.calledOnce(scanMock);
+    assert.notCalled(scanMock);
 
     clock.tick(6000);
 
-    assert.callCount(scanMock, 2);
+    assert.callCount(scanMock, 1);
   });
 });

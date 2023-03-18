@@ -7,7 +7,7 @@ async function init() {
   // Load saved config
   await this.loadConfiguration();
   // Start scanner presence
-  await this.initPresenceScanner();
+  this.initPresenceScanner();
 }
 
 module.exports = {

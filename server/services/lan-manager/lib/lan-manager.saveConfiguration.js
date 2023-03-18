@@ -39,7 +39,7 @@ async function saveConfiguration(configuration = {}) {
   this.configured = !!this.ipMasks.find((mask) => mask.enabled);
 
   // Manages presence scanner
-  await this.initPresenceScanner();
+  this.initPresenceScanner();
 
   return this.getConfiguration();
 }

@@ -10,8 +10,10 @@ const LANManagerDiscoverTab = ({
   children,
   lanManagerGetDiscoveredDevicesStatus,
   lanManagerDiscoveredDevices = [],
+  lanManagerDiscoverUpdate = true,
   lanManagerStatus = {},
   filterExisting = true,
+  getDiscoveredDevices,
   scan,
   ...props
 }) => {
@@ -24,6 +26,14 @@ const LANManagerDiscoverTab = ({
           <Text id="integration.lanManager.discover.title" />
         </h3>
         <div class="page-options d-flex">
+          {lanManagerDiscoverUpdate && (
+            <button class="btn btn-outline-success mr-2" onClick={getDiscoveredDevices}>
+              <span class="d-none d-md-inline mr-2">
+                <Text id="integration.lanManager.discover.deviceUpdateButton" />
+              </span>
+              <i class="fe fe-refresh-cw" />
+            </button>
+          )}
           <button
             class={cx('btn', {
               'btn-outline-danger': lanManagerStatus.scanning,
@@ -32,7 +42,10 @@ const LANManagerDiscoverTab = ({
             onClick={scan}
             disabled={loading}
           >
-            <Text id="integration.lanManager.discover.scanButton" /> <i class="fe fe-radio" />
+            <span class="d-none d-md-inline mr-2">
+              <Text id="integration.lanManager.discover.scanButton" />
+            </span>
+            <i class="fe fe-radio" />
           </button>
         </div>
       </div>
@@ -62,23 +75,22 @@ const LANManagerDiscoverTab = ({
 
         <div
           class={cx('dimmer', {
-            active: loading,
-            [style.lanManagerListBody]: loading
+            active: loading && lanManagerDiscoveredDevices.length === 0,
+            [style.lanManagerListBody]: loading && lanManagerDiscoveredDevices.length === 0
           })}
         >
           <div class="loader" />
           <div class="dimmer-content">
             <div class="row">
-              {!loading &&
-                lanManagerDiscoveredDevices.map((lanManagerDevice, index) => (
-                  <LANManagerDiscoverDevice
-                    device={lanManagerDevice}
-                    deviceIndex={index}
-                    houses={props.houses}
-                    updateDeviceProperty={props.updateDeviceProperty}
-                    saveDevice={props.saveDevice}
-                  />
-                ))}
+              {lanManagerDiscoveredDevices.map((lanManagerDevice, index) => (
+                <LANManagerDiscoverDevice
+                  device={lanManagerDevice}
+                  deviceIndex={index}
+                  houses={props.houses}
+                  updateDeviceProperty={props.updateDeviceProperty}
+                  saveDevice={props.saveDevice}
+                />
+              ))}
               {lanManagerDiscoveredDevices.length === 0 && (
                 <EmptyState id="integration.lanManager.discover.noDevices" />
               )}

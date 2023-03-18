@@ -30,12 +30,12 @@ const buildPresenceFeature = (deviceExternalId) => {
  * const gladysDevice = lanManager.transformDevice({ ip: '...', mac: '...', hostname: '...' });
  */
 function transformDevice(device) {
-  const { mac, hostname = '', ip, vendor } = device;
+  const { mac, hostname, ip, vendor } = device;
   const deviceExternalId = `lan-manager:${mac.replaceAll(':', '').toLowerCase()}`;
 
   const params = [];
 
-  if (hostname !== '') {
+  if (hostname) {
     params.push({
       name: PARAMS.NAME,
       value: hostname,

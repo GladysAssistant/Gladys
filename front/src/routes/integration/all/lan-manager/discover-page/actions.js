@@ -17,7 +17,8 @@ const createActions = store => {
         });
         store.setState({
           lanManagerDiscoveredDevices,
-          lanManagerGetDiscoveredDevicesStatus: RequestStatus.Success
+          lanManagerGetDiscoveredDevicesStatus: RequestStatus.Success,
+          lanManagerDiscoverUpdate: false
         });
       } catch (e) {
         store.setState({
@@ -61,8 +62,10 @@ const createActions = store => {
         lanManagerStatus: status
       });
 
-      if (!status.scanning) {
-        await actions.getDiscoveredDevices(store.getState());
+      if (!status.scanning && status.deviceChanged) {
+        store.setState({
+          lanManagerDiscoverUpdate: true
+        });
       }
     },
     async saveDevice(state, deviceIndex) {

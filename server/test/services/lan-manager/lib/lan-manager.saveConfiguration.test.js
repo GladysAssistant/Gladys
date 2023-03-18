@@ -4,7 +4,7 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert } = sinon;
 
-const initPresenceScannerMock = fake.resolves(null);
+const initPresenceScannerMock = fake.returns(null);
 const LANManager = proxyquire('../../../../services/lan-manager/lib', {
   './lan-manager.initPresenceScanner': { initPresenceScanner: initPresenceScannerMock },
 });

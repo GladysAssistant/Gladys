@@ -33,9 +33,9 @@ async function scan() {
       };
 
       const onSuccess = (foundDevices = []) => {
-        this.discoveredDevices = foundDevices.filter((device) => device.mac);
-        logger.info(`LANManager discovers ${this.discoveredDevices.length} devices`);
-        return resolve(this.discoveredDevices);
+        const discoveredDevices = foundDevices.filter((device) => device.mac);
+        logger.info(`LANManager discovers ${discoveredDevices.length} devices`);
+        return resolve(discoveredDevices);
       };
 
       const enabledMasks = this.ipMasks.filter((mask) => mask.enabled).map(({ mask }) => mask);
@@ -46,9 +46,16 @@ async function scan() {
 
     this.stop();
 
+    const nbDevices = result.length;
+    let deviceChanged = false;
+    if (nbDevices > 0) {
+      deviceChanged = this.discoveredDevices.length !== nbDevices;
+      this.discoveredDevices = result;
+    }
+
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
-      payload: this.getStatus(),
+      payload: { ...this.getStatus(), deviceChanged },
     });
 
     return result;

@@ -894,6 +894,7 @@
         "title": "LAN Discover",
         "noDevices": "No LAN devices found.",
         "scanButton": "Scan network",
+        "deviceUpdateButton": "New devices available",
         "hideExistingDevices": "Hide already added devices",
         "alreadyCreatedButton": "Already created",
         "updateButton": "Update",
