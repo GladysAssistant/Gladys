@@ -19,6 +19,7 @@ const { getPermitJoin } = require('./getPermitJoin');
 const { saveZ2mBackup } = require('./saveZ2mBackup');
 const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 const { backup } = require('./backup');
+const { getManagedAdapters } = require('./getManagedAdapters');
 const { JOB_TYPES } = require('../../../utils/constants');
 
 /**
@@ -77,5 +78,6 @@ Zigbee2mqttManager.prototype.getPermitJoin = getPermitJoin;
 Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
 Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
+Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
 
 module.exports = Zigbee2mqttManager;

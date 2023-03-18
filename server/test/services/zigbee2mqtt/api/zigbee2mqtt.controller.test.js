@@ -12,6 +12,7 @@ const gladys = {
 };
 const zigbee2mqttManager = {
   getDiscoveredDevices: fake.returns(['device']),
+  getManagedAdapters: fake.returns(['adapter']),
   status: fake.returns(true),
   init: fake.returns(true),
   installMqttContainer: fake.returns(true),
@@ -39,6 +40,18 @@ describe('zigbee2mqtt API', () => {
 
     assert.calledOnce(zigbee2mqttManager.getDiscoveredDevices);
     assert.calledWith(res.json, ['device']);
+  });
+
+  it('get /api/v1/service/zigbee2mqtt/adapter', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/zigbee2mqtt/adapter'].controller(req, res);
+
+    assert.calledOnce(zigbee2mqttManager.getManagedAdapters);
+    assert.calledWith(res.json, ['adapter']);
   });
 
   it('get /api/v1/service/zigbee2mqtt/status', async () => {
