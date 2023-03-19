@@ -82,7 +82,12 @@ class LANManagerDiscoverDevice extends Component {
                     <Text id="integration.lanManager.device.manufacturerLabel" />
                   </label>
                   <Localizer>
-                    <input type="text" value={get(manufacturer, 'value')} class="form-control" disabled />
+                    <input
+                      type="text"
+                      value={get(manufacturer, 'value', { default: '' })}
+                      class="form-control"
+                      disabled
+                    />
                   </Localizer>
                 </div>
                 <div class="form-group">
@@ -90,7 +95,7 @@ class LANManagerDiscoverDevice extends Component {
                     <Text id="integration.lanManager.device.ipAddressLabel" />
                   </label>
                   <Localizer>
-                    <input type="text" value={get(device, 'ip')} class="form-control" disabled />
+                    <input type="text" value={get(device, 'ip', { default: '' })} class="form-control" disabled />
                   </Localizer>
                 </div>
                 <div class="form-group">
@@ -106,7 +111,12 @@ class LANManagerDiscoverDevice extends Component {
                     <Text id="integration.lanManager.device.originalNameLabel" />
                   </label>
                   <Localizer>
-                    <input type="text" value={get(orginalName, 'value')} class="form-control" disabled />
+                    <input
+                      type="text"
+                      value={get(orginalName, 'value', { default: '' })}
+                      class="form-control"
+                      disabled
+                    />
                   </Localizer>
                 </div>
                 <div class="form-group">

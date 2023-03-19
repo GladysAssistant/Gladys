@@ -46,14 +46,14 @@ const createActions = store => {
     },
     async scan(state) {
       store.setState({
-        lanManagerGetDiscoveredDevicesStatus: RequestStatus.Getting
+        lanManagerStatus: { scanning: true }
       });
 
       try {
         await state.httpClient.post('/api/v1/service/lan-manager/discover');
       } catch (e) {
         store.setState({
-          lanManagerGetDiscoveredDevicesStatus: RequestStatus.Error
+          lanManagerStatus: { scanning: false }
         });
       }
     },
@@ -62,10 +62,17 @@ const createActions = store => {
         lanManagerStatus: status
       });
 
-      if (!status.scanning && status.deviceChanged) {
-        store.setState({
-          lanManagerDiscoverUpdate: true
-        });
+      // when scan stops
+      if (!status.scanning) {
+        const { lanManagerDiscoveredDevices = [] } = state;
+        // if no device are currently fetched, refresh list
+        if (lanManagerDiscoveredDevices.length === 0) {
+          await actions.getDiscoveredDevices();
+        } else if (status.deviceChanged)
+          // or display refresh button
+          store.setState({
+            lanManagerDiscoverUpdate: true
+          });
       }
     },
     async saveDevice(state, deviceIndex) {

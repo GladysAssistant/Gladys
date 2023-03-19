@@ -17,7 +17,7 @@ const LANManagerDiscoverTab = ({
   scan,
   ...props
 }) => {
-  const loading = lanManagerStatus.scanning || lanManagerGetDiscoveredDevicesStatus === RequestStatus.Getting;
+  const loading = lanManagerGetDiscoveredDevicesStatus === RequestStatus.Getting;
 
   return (
     <div class="card">
@@ -40,7 +40,7 @@ const LANManagerDiscoverTab = ({
               'btn-outline-primary': !lanManagerStatus.scanning
             })}
             onClick={scan}
-            disabled={loading}
+            disabled={lanManagerStatus.scanning}
           >
             <span class="d-none d-md-inline mr-2">
               <Text id="integration.lanManager.discover.scanButton" />
@@ -75,8 +75,8 @@ const LANManagerDiscoverTab = ({
 
         <div
           class={cx('dimmer', {
-            active: loading && lanManagerDiscoveredDevices.length === 0,
-            [style.lanManagerListBody]: loading && lanManagerDiscoveredDevices.length === 0
+            active: loading,
+            [style.lanManagerListBody]: loading
           })}
         >
           <div class="loader" />
