@@ -1894,6 +1894,13 @@
           "one": "Open",
           "other": "Close"
         }
+      },
+      "air-conditioning": {
+        "mode": {
+          "auto": "Auto",
+          "cooling": "Cool",
+          "heating": "Heat"
+        }
       }
     }
   },
@@ -2053,6 +2060,12 @@
     "signal": {
       "shortCategoryName": "Signal",
       "integer": "Signal strength"
+    },
+    "air-conditioning": {
+      "shortCategoryName": "Air Conditioning",
+      "binary": "Switch (On/Off)",
+      "mode": "Mode",
+      "target-temperature": "Temperature"
     },
     "television": {
       "shortCategoryName": "Television",
