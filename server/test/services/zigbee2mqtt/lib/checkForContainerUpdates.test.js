@@ -15,6 +15,13 @@ describe('zigbee2mqtt checkForContainerUpdates', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       system: {
         getContainers: fake.resolves([]),
         removeContainer: fake.resolves(true),

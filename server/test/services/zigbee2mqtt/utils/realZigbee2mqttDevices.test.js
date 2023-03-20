@@ -4,6 +4,15 @@ const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 const { convertDevice } = require('../../../../services/zigbee2mqtt/utils/convertDevice');
 const payloads = require('./payloads');
 
+const gladys = {
+  job: {
+    wrapper: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
+  },
+};
 const serviceId = 'a4c859f0-32d2-46b7-8f5a-3285960f498a';
 
 describe('Decoding real devices', () => {
@@ -12,7 +21,7 @@ describe('Decoding real devices', () => {
 
     let service;
     beforeEach(() => {
-      service = new Zigbee2mqttManager(null, null, null);
+      service = new Zigbee2mqttManager(gladys, null, null);
       service.discoveredDevices = {
         [name]: mqttDevice,
       };
