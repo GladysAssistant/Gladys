@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
-const { event, serviceId, devices, vacbotMock, variableOk } = require('../../consts.test');
+const { event, serviceId, devices, variableOk } = require('../../consts.test');
 const EcovacsApiMock = require('../../mocks/ecovacs-api.mock.test');
 const { EcoVacsAPI, fakes } = require('../../mocks/ecovacs-api.mock.test');
 const { NotFoundError } = require('../../../../../utils/coreErrors');
@@ -23,14 +23,14 @@ describe('Ecovacs : vacbot polling', () => {
 
   beforeEach(() => {
     sinon.reset();
-    ecovacsService.device.vacbots.set(devices[0], vacbotMock);
+    ecovacsService.device.vacbots.set(devices[0], fakes);
   });
 
   it('should poll device', async () => {
     await ecovacsService.device.poll(devices[0]);
-    assert.calledWith(vacbotMock.run, 'GetBatteryState');
-    assert.calledWith(vacbotMock.run, 'GetCleanState');
-    assert.calledWith(vacbotMock.run, 'GetChargeState');
-    assert.calledWith(vacbotMock.run, 'GetSleepStatus'); 
+    assert.calledWith(fakes.run, 'GetBatteryState');
+    assert.calledWith(fakes.run, 'GetCleanState');
+    assert.calledWith(fakes.run, 'GetChargeState');
+    assert.calledWith(fakes.run, 'GetSleepStatus'); 
   });
 });

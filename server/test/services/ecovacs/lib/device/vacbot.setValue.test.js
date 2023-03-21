@@ -33,6 +33,7 @@ describe('EcovacsHandler setValue', () => {
     );
     assert.calledOnce(fakes.clean);
     assert.notCalled(fakes.stop);
+    assert.notCalled(fakes.charge);
   });
 
   it('should set the binary value to 0', async () => {
@@ -44,6 +45,7 @@ describe('EcovacsHandler setValue', () => {
     assert.calledOnce(fakes.pause);
     assert.notCalled(fakes.clean);
     assert.notCalled(fakes.stop);
+    assert.notCalled(fakes.charge);
   });
 
   it('should set the binary value to -1', async () => {
@@ -53,6 +55,7 @@ describe('EcovacsHandler setValue', () => {
       -1,
     );
     assert.calledOnce(fakes.stop);
+    assert.calledOnce(fakes.charge);
     assert.notCalled(fakes.clean);
     assert.notCalled(fakes.pause);
   });
