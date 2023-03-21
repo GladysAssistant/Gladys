@@ -17,6 +17,16 @@ describe('ecovacs.connect command', () => {
     sinon.reset();
   });
 
+  it('should do nothing since service is connected', async () => {
+    const gladys = { event, variable: variableOk };
+    ecovacsService.device.connected = true;
+    const ecovacsService = EcovacsService(gladys, serviceId);
+    await ecovacsService.device.connect();
+    assert.notCalled(gladys.variable.setValue);
+    assert.notCalled(gladys.event.emit);
+
+  });
+
   it('should connect and receive success', async () => {
     const gladys = { event, variable: variableOk };
     const ecovacsService = EcovacsService(gladys, serviceId);
