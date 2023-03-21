@@ -21,15 +21,9 @@ const vacbotMock = {
   hasMappingCapabilities: fake.returns(true),
   hasCustomAreaCleaningMode: fake.returns(true),
   hasMoppingSystem: fake.returns(true),
-  GetBatteryState: fake.resolves(true),
-  GetCleanState: fake.resolves(true),
-  GetChargeState: fake.resolves(true),
-  GetSleepStatus: fake.resolves(true),
   connect: fake.resolves(true),
   run: fake.resolves(true),
   charge: fake.resolves(true),
-  
-  
 };
 
 const devices = [
