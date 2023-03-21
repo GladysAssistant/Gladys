@@ -29,8 +29,12 @@ const ecovacsHandler = {
   },
 };
 
+let req = {};
+let res = {
+  json: fake.returns(null),
+};
 
-describe.only('GET /api/v1/service/ecovacs/vacbots', () => {
+describe('GET /api/v1/service/ecovacs/vacbots', () => {
   let controller;
 
   beforeEach(() => {
@@ -39,13 +43,8 @@ describe.only('GET /api/v1/service/ecovacs/vacbots', () => {
   });
 
   it('should return vacbots', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
     await controller['get /api/v1/service/ecovacs/vacbots'].controller(req, res);
-    assert.calledOnce(ecovacsHandler.getVacbots);
+    assert.calledWith(ecovacsHandler.gladys.device.get, { service: 'ecovacs' });
     assert.calledOnce(res.json);
   });
 });
@@ -59,11 +58,6 @@ describe('GET /api/v1/service/ecovacs/connect', () => {
   });
 
   it('should connect', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
     await controller['get /api/v1/service/ecovacs/connect'].controller(req, res);
     assert.calledOnce(ecovacsHandler.connect);
     assert.calledOnce(res.json);
@@ -79,11 +73,6 @@ describe('GET /api/v1/service/ecovacs/discover', () => {
   });
 
   it('should connect', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
     await controller['get /api/v1/service/ecovacs/discover'].controller(req, res);
     assert.calledOnce(ecovacsHandler.discover);
     assert.calledOnce(res.json);
@@ -99,12 +88,7 @@ describe('GET /api/v1/service/ecovacs/status', () => {
   });
 
   it('should get ecovacs service status', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
-    await controller['get /api/v1/service/ecovacs/status'].controller(req, res);
+   await controller['get /api/v1/service/ecovacs/status'].controller(req, res);
     assert.calledOnce(ecovacsHandler.getStatus);
     assert.calledOnce(res.json);
   });
@@ -119,11 +103,6 @@ describe('GET /api/v1/service/ecovacs/config', () => {
   });
 
   it('should get ecovacs configuration', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
     await controller['get /api/v1/service/ecovacs/config'].controller(req, res);
     assert.calledOnce(ecovacsHandler.getConfiguration);
     assert.calledOnce(res.json);
