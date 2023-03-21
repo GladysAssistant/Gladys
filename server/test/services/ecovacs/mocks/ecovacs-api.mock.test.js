@@ -12,19 +12,24 @@ const countries = {
 };
 
 const fakes = {
+  // Attributes
   did: '0ccdd884-b00f-4838-a50b-bf4fb3fc7a12',
-  getName: fake.returns('DEEBOT OZMO 920 Series'),
   deviceName: 'DEEBOT OZMO 920 Series',
   deviceNumber: 0,
   deviceModel: 'Ecovacs',
   deviceImageURL: 'http://image.url',
   mainBrush: true,
+  is_ready: true,
   chargeStatus: 'idle',
   cleanReport: 'idle',
   hasMainBrush: fake.returns(true),
   hasMappingCapabilities: fake.returns(true),
   hasCustomAreaCleaningMode: fake.returns(true),
   hasMoppingSystem: fake.returns(true),
+  // Events
+  on: fake.resolves(true),
+  // Methods
+  getName: fake.returns('DEEBOT OZMO 920 Series'),
   connect: fake.resolves(true),
   run: fake.resolves(true),
   clean: fake.resolves(true),
