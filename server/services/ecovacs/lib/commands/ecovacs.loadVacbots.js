@@ -23,7 +23,6 @@ async function loadVacbots() {
         this.vacbots.get(device).vacuum.deviceName
       } (vacbot object)`,
     );
-    logger.trace(`Number of registered vacbots : ${this.vacbots.size}.`);
   });
 }
 
