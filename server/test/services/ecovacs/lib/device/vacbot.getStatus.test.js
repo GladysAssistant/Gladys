@@ -2,7 +2,8 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 
-const { event, serviceId, devices, variableOk } = require('../../consts.test');
+const { fake } = sinon;
+const { event, serviceId, devices, vacbotMock, variableOk } = require('../../consts.test');
 
 const EcovacsApiMock = require('../../mocks/ecovacs-api.mock.test');
 
@@ -21,6 +22,7 @@ describe('Ecovacs : vacbot status', () => {
   beforeEach(() => {
     sinon.reset();
     ecovacsService.device.connected = false;
+    ecovacsService.device.vacbots.set(devices[0], vacbotMock);
   });
 
   it('should return status of a device', async () => {
@@ -34,6 +36,8 @@ describe('Ecovacs : vacbot status', () => {
       hasMappingCapabilities: true,
       hasCustomAreaCleaningMode: true,
       hasMoppingSystem: true,
+      chargeStatus: 'idle',
+      cleanReport: 'idle'
     };
     expect(status).to.deep.equal(expected);
   });
