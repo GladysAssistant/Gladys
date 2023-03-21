@@ -12,17 +12,17 @@ module.exports = function EcovacsController(ecovacsHandler) {
    *     "id": "fbedb47f-4d25-4381-8923-2633b23192a0",
    *     "service_id": "a810b8db-6d04-4697-bed3-c4b72c996279",
    *     "room_id": "2398c689-8b47-43cc-ad32-e98d9be098b5",
-   *     "name": "Test camera",
-   *     "selector": "test-camera",
-   *     "external_id": "test-camera-external",
-   *     "should_poll": false,
-   *     "poll_frequency": null,
+   *     "name": "Test vacbot",
+   *     "selector": "test-vacbot",
+   *     "external_id": "test-vacbot-external",
+   *     "should_poll": true,
+   *     "poll_frequency": 3600,
    *     "created_at": "2022-02-08T07:49:07.556Z",
    *     "updated_at": "2022-02-08T07:49:07.556Z",
    *     "features": [
    *       {
-   *         "name": "Test camera image",
-   *         "selector": "test-camera-image"
+   *         "name": "Test vacuum bot",
+   *         "selector": "test-vacuum-bot"
    *       }
    *     ],
    *     "room": {

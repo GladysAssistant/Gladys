@@ -10,6 +10,7 @@ const vacbotStatus = {
 };
 
 const ecovacsHandler = {
+  getVacbots: fake.resolves(true),
   start: fake.resolves(true),
   stop: fake.resolves(true),
   connect: fake.resolves(true),
@@ -23,9 +24,31 @@ const ecovacsHandler = {
   gladys: {
     device: {
       getBySelector: fake.returns({ external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:0' }),
+      get: fake.resolves(true),
     },
   },
 };
+
+
+describe.only('GET /api/v1/service/ecovacs/vacbots', () => {
+  let controller;
+
+  beforeEach(() => {
+    sinon.reset();
+    controller = EcovacsController(ecovacsHandler);
+  });
+
+  it('should return vacbots', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['get /api/v1/service/ecovacs/vacbots'].controller(req, res);
+    assert.calledOnce(ecovacsHandler.getVacbots);
+    assert.calledOnce(res.json);
+  });
+});
 
 describe('GET /api/v1/service/ecovacs/connect', () => {
   let controller;
