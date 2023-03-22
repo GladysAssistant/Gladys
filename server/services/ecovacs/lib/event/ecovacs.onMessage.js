@@ -12,9 +12,6 @@ const BATTERY_FEATURE_INDEX = 1;
  * vacbot.onMessage('BatteryInfo', device, 100);
  */
 function onMessage(type, device, value) {
-  logger.trace(`ECOVACS EVENT TYPE: ${type}`);
-  logger.trace(`ECOVACS EVENT VALUE: ${value}`);
-  logger.trace(`Device ExtID: ${device.external_id}`);
   switch (type) {
     case 'BatteryInfo':
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -22,9 +19,11 @@ function onMessage(type, device, value) {
         state: Math.round(value),
       });
       break;
+    /*
     case 'CleanReport':
         logger.trace(`CleanReport: ${value}`);
         break;
+    */
     default:
       logger.info(`Event is not handled yet.`);
   }
