@@ -44,11 +44,11 @@ async function updateConfiguration(configuration) {
       this.serviceId,
     );
 
-    const mqttPassword = await this.gladys.variable.getValue(
+    const defaultMqttPassword = await this.gladys.variable.getValue(
       CONFIGURATION.DEFAULT_ZWAVEJSUI_MQTT_PASSWORD,
       this.serviceId,
     );
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
+    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, defaultMqttPassword, this.serviceId);
 
     if (driverPath) {
       await this.gladys.variable.setValue(CONFIGURATION.DRIVER_PATH, driverPath, this.serviceId);
