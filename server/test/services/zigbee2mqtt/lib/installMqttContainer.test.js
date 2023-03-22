@@ -32,6 +32,13 @@ describe('zigbee2mqtt installMqttContainer', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       event: {
         emit: fake.resolves(null),
       },

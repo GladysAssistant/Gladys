@@ -868,6 +868,7 @@ const JOB_TYPES = {
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   VACUUM: 'vacuum',
+  SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
 };
 
 const JOB_STATUS = {
