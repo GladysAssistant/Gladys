@@ -35,6 +35,8 @@ async function connect() {
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, mqttUsername, this.serviceId);
     mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
     await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
+    // Keep copy in case switch between external/gladys ZwaveJS UI
+    await this.gladys.variable.setValue(CONFIGURATION.DEFAULT_ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
   }
 
   // Test if dongle is present

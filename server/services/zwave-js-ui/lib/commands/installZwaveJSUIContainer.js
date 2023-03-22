@@ -18,7 +18,10 @@ async function installZwaveJSUIContainer() {
   this.zwaveJSUIRunning = false;
 
   const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
-  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
+  const mqttPassword = await this.gladys.variable.getValue(
+    CONFIGURATION.DEFAULT_ZWAVEJSUI_MQTT_PASSWORD,
+    this.serviceId,
+  );
   const driverPath = await this.gladys.variable.getValue(CONFIGURATION.DRIVER_PATH, this.serviceId);
   const s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
   const s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);

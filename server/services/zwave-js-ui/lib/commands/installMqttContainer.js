@@ -18,7 +18,10 @@ async function installMqttContainer() {
   this.mqttExist = false;
 
   const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
-  const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
+  const mqttPassword = await this.gladys.variable.getValue(
+    CONFIGURATION.DEFAULT_ZWAVEJSUI_MQTT_PASSWORD,
+    this.serviceId,
+  );
 
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,

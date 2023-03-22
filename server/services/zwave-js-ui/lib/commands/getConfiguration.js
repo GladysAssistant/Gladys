@@ -29,18 +29,6 @@ async function getConfiguration() {
   const s2AccessControlKey = await this.gladys.variable.getValue(CONFIGURATION.S2_ACCESS_CONTROL, this.serviceId);
   const s0LegacyKey = await this.gladys.variable.getValue(CONFIGURATION.S0_LEGACY, this.serviceId);
 
-  if (externalZwaveJSUI) {
-    return {
-      externalZwaveJSUI,
-      zwaveJSUIVersion: this.zwaveJSUIVersion,
-      zwaveJSUIExpectedVersion: DEFAULT.ZWAVEJSUI_VERSION_EXPECTED,
-      mqttUrl,
-      mqttUsername,
-      mqttPassword,
-      mqttTopicPrefix,
-      mqttTopicWithLocation,
-    };
-  }
   return {
     externalZwaveJSUI,
     zwaveJSUIVersion: this.zwaveJSUIVersion,
@@ -50,6 +38,11 @@ async function getConfiguration() {
     s2AuthenticatedKey,
     s2AccessControlKey,
     s0LegacyKey,
+    mqttUrl,
+    mqttUsername,
+    mqttPassword,
+    mqttTopicPrefix,
+    mqttTopicWithLocation,
   };
 }
 
