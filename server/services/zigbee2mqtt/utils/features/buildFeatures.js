@@ -10,7 +10,7 @@ const { completeFeature } = require('./completeFeature');
  *
  * @example buildByParentType({ switch: {}, light: {}}, 'light');
  */
-function buildByParentType(types = {}, parentType) {
+function buildByParentType(types, parentType) {
   return types[parentType];
 }
 
@@ -24,7 +24,7 @@ function buildByParentType(types = {}, parentType) {
  *
  * @example buildByName({ state: {}}, 'state', 'light');
  */
-function buildByName(names = {}, name, parentType) {
+function buildByName(names, name, parentType) {
   const { types = {}, feature } = names[name] || {};
   const byType = buildByParentType(types, parentType);
 
@@ -44,7 +44,7 @@ function buildByName(names = {}, name, parentType) {
  *
  * @example buildFeature('MyDevice', {}, 'light');
  */
-function buildFeatures(deviceName, expose = {}, parentType) {
+function buildFeatures(deviceName, expose, parentType) {
   const { type, name, property, access, value_min: minValue, value_max: maxValue, unit: deviceUnit, values } = expose;
   const { names = {}, feature, getFeatureIndexes = () => [''] } = exposesMap[type] || {};
   const byName = buildByName(names, name, parentType);
