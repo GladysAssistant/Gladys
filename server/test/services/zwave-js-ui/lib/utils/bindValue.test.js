@@ -22,6 +22,24 @@ describe('zwave.bindValue', () => {
     expect(bindedValue).to.equal(15);
   });
 
+  it('should bindValue commandClass COMMAND_CLASS_NOTIFICATION ON', () => {
+    const valueId = {
+      commandClass: COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION,
+    };
+    const value = '8';
+    const bindedValue = bindValue(valueId, value);
+    expect(bindedValue).to.equal(true);
+  });
+
+  it('should bindValue commandClass COMMAND_CLASS_NOTIFICATION OFF', () => {
+    const valueId = {
+      commandClass: COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION,
+    };
+    const value = '0';
+    const bindedValue = bindValue(valueId, value);
+    expect(bindedValue).to.equal(false);
+  });
+
   it('should bindValue commandClass other', () => {
     const valueId = {
       commandClass: COMMAND_CLASSES.COMMAND_CLASS_BASIC,

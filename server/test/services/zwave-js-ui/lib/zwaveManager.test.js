@@ -746,4 +746,71 @@ describe('zwaveJSUIManager devices', () => {
       },
     ]);
   });
+
+  it('should receive node feature Motion 113', () => {
+    zwaveJSUIManager.nodes = {
+      1: {
+        nodeId: 1,
+        endpoints: [],
+        manufacturerId: 'manufacturerId',
+        product: 'product',
+        productType: 'productType',
+        productId: 'productId',
+        type: 'type',
+        firmwareVersion: 'firmwareVersion',
+        name: 'name',
+        loc: 'location',
+        status: 'status',
+        ready: true,
+        nodeType: 'nodeType',
+        classes: {
+          113: {
+            0: {
+              'Home Security-Motion sensor status': {
+                genre: 'user',
+                label: 'label',
+                readOnly: true,
+                commandClass: 113,
+                endpoint: 0,
+                property: 'Home Security-Motion sensor status',
+              },
+            },
+          },
+        },
+      },
+    };
+    const devices = zwaveJSUIManager.getNodes();
+    expect(devices).to.deep.equal([
+      {
+        service_id: ZWAVEJSUI_SERVICE_ID,
+        external_id: 'zwave-js-ui:node_id:1',
+        selector: 'zwave-js-ui-node-1-name-1',
+        model: 'product firmwareVersion',
+        name: 'name - 1',
+        ready: true,
+        features: [
+          {
+            name: 'Détecteur de présence',
+            selector: 'zwave-js-ui-node-1-home-security-motion-sensor-status-113-0-label',
+            category: 'motion-sensor',
+            external_id: 'zwave-js-ui:node_id:1:comclass:113:endpoint:0:property:Home Security-Motion sensor status',
+            type: 'binary',
+            min: undefined,
+            max: undefined,
+            unit: null,
+            read_only: true,
+            has_feedback: true,
+            last_value: undefined,
+          },
+        ],
+        params: [],
+        rawZwaveNode: {
+          id: 1,
+          loc: 'location',
+          product: 'product',
+          keysClasses: ['113'],
+        },
+      },
+    ]);
+  });
 });

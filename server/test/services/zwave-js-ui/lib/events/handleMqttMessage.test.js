@@ -56,6 +56,18 @@ describe('zwave gladys node event', () => {
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
+  it('should get zwaveJSUI Version', () => {
+    const message = {
+      value: 'version',
+    };
+    zwaveJSUIManager.handleMqttMessage(
+      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/version`,
+      JSON.stringify(message),
+    );
+    assert.notCalled(zwaveJSUIManager.valueUpdated);
+    expect(zwaveJSUIManager.zwaveJSUIVersion).to.equal('version');
+  });
+
   it('should default scanInProgress', () => {
     zwaveJSUIManager.scanInProgress = true;
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/???`, null);
