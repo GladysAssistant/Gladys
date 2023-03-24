@@ -164,7 +164,8 @@ class HttpRequestAction extends Component {
       });
       const { data, headers } = await this.props.httpClient.post('/api/v1/http/request', actionWithCorrectHeader);
       let responseData = data;
-      const isJsonResponse = headers['content-type'].indexOf('application/json') !== -1;
+      const isJsonResponse =
+        headers && headers['content-type'] && headers['content-type'].indexOf('application/json') !== -1;
       if (isJsonResponse) {
         responseData = JSON.stringify(data, null, 2);
       }
