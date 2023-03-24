@@ -197,7 +197,9 @@
     "gatewayInstanceNotFoundError": "Your Gladys instance is not connected to the Gladys Gateway",
     "editDashboardNameLabel": "Name",
     "editDashboardMyDashboards": "My dashboards",
-    "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it by the star at the top right of it.",
+    "editDashboardExplanation": "Each dashboard has 3 columns, which you can fill in according to your preferences. Click on the + button to add a new widget. You can move this widget by grabbing it and moving it around.",
+    "reorderDashboardButton": "Re-order dashboards",
+    "stopReorderingDashboardButton": "Stop re-ordering dashboards",
     "addBoxButton": "Add",
     "selectBoxType": "Select a type",
     "selectBoxTypeLabel": "Choose which widget to display here",
@@ -1566,7 +1568,8 @@
       "hourly-device-state-aggregate": "Hourly sensors aggregation",
       "gladys-gateway-backup": "Gladys Plus backup",
       "device-state-purge-single-feature": "Single device feature states clean",
-      "vacuum": "Database cleaning"
+      "vacuum": "Database cleaning",
+      "service-zigbee2mqtt-backup": "Zigbee2MQTT backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -1904,6 +1907,17 @@
       }
     },
     "category": {
+      "button": {
+        "click": {
+          "unknown": "{{value}} (unknown value)",
+          "1": "Simple click",
+          "2": "Double click",
+          "3": "Long click press",
+          "4": "Long click release",
+          "5": "Hold click",
+          "6": "Long click"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "No value received",

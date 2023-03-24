@@ -1,6 +1,5 @@
 const cloneDeep = require('lodash.clonedeep');
 const logger = require('../../../utils/logger');
-const { exec } = require('../../../utils/childProcess');
 const { generate } = require('../../../utils/password');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
@@ -31,8 +30,7 @@ async function installContainer(saveConfiguration = true) {
 
     // Prepare broker env
     logger.info(`Preparing broker environment...`);
-    const brokerEnv = await exec('sh ./services/mqtt/docker/eclipse-mosquitto-env.sh');
-    logger.trace(brokerEnv);
+    await this.configureContainer();
 
     logger.info(`Creating container...`);
     const containerDescriptorToMutate = cloneDeep(containerDescriptor);

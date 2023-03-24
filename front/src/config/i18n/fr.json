@@ -197,7 +197,9 @@
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardMyDashboards": "Mes tableaux de bords",
-    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant par l'étoile en haut à droite de celui-ci.",
+    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
+    "reorderDashboardButton": "Re-ordonner",
+    "stopReorderingDashboardButton": "Arrêter de reordonner",
     "addBoxButton": "Ajouter",
     "selectBoxType": "Sélectionner un type",
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
@@ -1566,7 +1568,8 @@
       "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",
       "gladys-gateway-backup": "Sauvegarde Gladys Plus",
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
-      "vacuum": "Nettoyage de la base de donnée"
+      "vacuum": "Nettoyage de la base de donnée",
+      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -1904,6 +1907,17 @@
       }
     },
     "category": {
+      "button": {
+        "click": {
+          "unknown": "{{value}} (valeur inconnue)",
+          "1": "Clic simple",
+          "2": "Clic double",
+          "3": "Pression clic long",
+          "4": "Relâche clic long",
+          "5": "Clic maintenu",
+          "6": "Clic long"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
