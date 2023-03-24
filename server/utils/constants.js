@@ -55,6 +55,7 @@ const SYSTEM_VARIABLE_NAMES = {
   GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
     'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY: 'GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY',
+  GLADYS_GATEWAY_OPEN_AI_ENABLED: 'GLADYS_GATEWAY_OPEN_AI_ENABLED',
   TIMEZONE: 'TIMEZONE',
 };
 
@@ -153,6 +154,7 @@ const EVENTS = {
   },
   MESSAGE: {
     NEW: 'message.new',
+    NEW_FOR_OPEN_AI: 'message.new-for-open-ai',
   },
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
@@ -306,6 +308,9 @@ const INTENTS = {
   },
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
+  },
+  SCENE: {
+    START: 'intent.scene.start',
   },
 };
 
@@ -831,6 +836,7 @@ const JOB_TYPES = {
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   VACUUM: 'vacuum',
+  SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
 };
 
 const JOB_STATUS = {

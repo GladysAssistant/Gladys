@@ -4,7 +4,7 @@ import { Text, Localizer } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 
 const EditCameraBox = ({ children, ...props }) => (
-  <BaseEditBox {...props} titleKey="dashboard.boxTitle.camera">
+  <BaseEditBox {...props} titleKey="dashboard.boxTitle.camera" titleValue={props.box.name}>
     <div class="form-group">
       <label>
         <Text id="dashboard.boxes.camera.editCameraLabel" />

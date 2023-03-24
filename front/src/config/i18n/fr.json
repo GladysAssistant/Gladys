@@ -197,7 +197,9 @@
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
     "editDashboardMyDashboards": "Mes tableaux de bords",
-    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant par l'étoile en haut à droite de celui-ci.",
+    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
+    "reorderDashboardButton": "Re-ordonner",
+    "stopReorderingDashboardButton": "Arrêter de reordonner",
     "addBoxButton": "Ajouter",
     "selectBoxType": "Sélectionner un type",
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
@@ -1095,13 +1097,14 @@
       "title": "OpenAI GPT-3",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
       "firstExplanation": "Ceci est une alpha d'une intégration avec l'intelligence artificielle OpenAI GPT-3. Vous pouvez demander ce que vous voulez à Gladys ici.",
-      "itDoesNothing": "Cette alpha ne fait aucune action avec Gladys, ce n'est qu'une preuve de concept qui sera déployée dans Gladys si l'expérience est un succès.",
+      "itDoesNothing": "Cet onglet est un bac à sable vous permettant de tester les capacités de GPT-3. Pour tester des vrais commandes domotiques, activez GPT-3 dans le chat Gladys.",
       "aFewExamples": "Quelques exemples :",
       "turnOnTheLight": "Allume la lumière du salon !",
       "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
       "whoIsJulesVerne": "Qui est Jules Verne ?",
       "eggDuration": "Comment cuire les oeufs durs ?",
-      "rateLimit": "L'API GPT-3 étant payante, cette intégration n'est disponible que via Gladys Plus, et est pour l'instant limitée à 100 requêtes par mois.",
+      "activateOpenAiChat": "Activer GPT-3 dans le chat Gladys",
+      "rateLimit": "L'API GPT-3 étant payante, cette intégration est pour l'instant limitée à 100 requêtes par mois.",
       "notOnGladysPlus": "L'API GPT-3 étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
       "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
@@ -1604,7 +1607,8 @@
       "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",
       "gladys-gateway-backup": "Sauvegarde Gladys Plus",
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
-      "vacuum": "Nettoyage de la base de donnée"
+      "vacuum": "Nettoyage de la base de donnée",
+      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -1942,6 +1946,17 @@
       }
     },
     "category": {
+      "button": {
+        "click": {
+          "unknown": "{{value}} (valeur inconnue)",
+          "1": "Clic simple",
+          "2": "Clic double",
+          "3": "Pression clic long",
+          "4": "Relâche clic long",
+          "5": "Clic maintenu",
+          "6": "Clic long"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
@@ -2203,6 +2218,9 @@
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
+    "gpt3Integration": "Intégration avec GPT-3",
+    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec GPT-3, ce qui lui donne une intelligence sur-dimensionné ! Pour en savoir plus,",
+    "gpt3ClickHere": "cliquez-ici !",
     "examples": {
       "whatsTheWeatherLike": "\"Quel temps fait-il ?\"",
       "whatsTheTemperatureKitchen": "\"Quelle est la température dans la cuisine ?\"",

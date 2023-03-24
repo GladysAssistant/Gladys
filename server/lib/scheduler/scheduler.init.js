@@ -1,22 +1,21 @@
 const logger = require('../../utils/logger');
 
+const jobs = require('../../config/scheduler-jobs');
+
 /**
- * @description Init scheduler.
+ * @description Init event job scheduler.
  * @example
- * scheduler.init();
+ * scheduler.initEventJobs();
  */
-async function init() {
+function init() {
   logger.debug(`Scheduler.init`);
   // foreach job
-  this.jobs.forEach((job) => {
-    // if the job is already scheduled, we cancel it
-    if (this.jobsScheduled[job.name]) {
-      clearInterval(this.jobsScheduled[job.name]);
-    }
-    // then schedule it
-    this.jobsScheduled[job.name] = setInterval(() => {
-      this.run(job);
-    }, job.frequencyInSeconds * 1000);
+  jobs.forEach((job) => {
+    // schedule it
+    this.scheduleJob(job.rule, () => {
+      logger.debug(`Running job "${job.name}" at ${new Date()}`);
+      this.event.emit(job.event);
+    });
   });
 }
 
