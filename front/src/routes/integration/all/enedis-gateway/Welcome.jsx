@@ -143,8 +143,8 @@ class EnedisWelcomePageComponent extends Component {
         if (config.enedisForceUsagePoints) {
           finalizeBody.usage_points_id = config.enedisForceUsagePoints.split(',');
         }
-        if (this.props.usage_points_id) {
-          finalizeBody.usage_points_id = this.props.usage_points_id;
+        if (this.props.usage_point_id) {
+          finalizeBody.usage_points_id = this.props.usage_point_id.split(',');
         }
         const response = await this.props.session.gatewayClient.finalizeEnedis(finalizeBody);
         this.setState({
