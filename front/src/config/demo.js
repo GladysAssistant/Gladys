@@ -157,7 +157,8 @@ const data = {
             'main-tv-channel',
             'main-presence-sensor',
             'main-signal-sensor',
-            'air-conditioning'
+            'air-conditioning',
+            'button-click'
           ]
         }
       ],
@@ -346,6 +347,17 @@ const data = {
             read_only: true,
             last_value: 4,
             last_value_changed: dayjs().add(60, 'second')
+          },
+          {
+            name: 'Button',
+            selector: 'button-click',
+            category: 'button',
+            type: 'click',
+            min: 0,
+            max: 6,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
           }
         ]
       },
@@ -511,7 +523,7 @@ const data = {
             min: 0,
             max: 30,
             read_only: false,
-            last_value: 15,
+            last_value: 24,
             last_value_changed: '2022-10-10 07:49:07.556 +00:00',
             unit: 'celsius'
           }
@@ -794,6 +806,17 @@ const data = {
               last_value: 0,
               unit: 'percent',
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            },
+            {
+              name: 'Button',
+              selector: 'button-click',
+              category: 'button',
+              type: 'click',
+              min: 0,
+              max: 6,
+              read_only: true,
+              last_value: 1,
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
         }
@@ -819,6 +842,23 @@ const data = {
               read_only: true,
               last_value: 60,
               unit: ' lux',
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            }
+          ]
+        },
+        {
+          id: 'f10ae5bc-1da6-484e-b0d0-953ee94e5ccc',
+          name: 'Button click',
+          selector: 'button-click',
+          features: [
+            {
+              name: 'Remote',
+              selector: 'kitchen-button-click',
+              category: 'button',
+              type: 'click',
+              min: 0,
+              max: 6,
+              read_only: true,
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
@@ -1011,6 +1051,12 @@ const data = {
         device_feature: 'main-lamp-binary',
         operator: '=',
         value: 1
+      },
+      {
+        type: 'device.new-state',
+        device_feature: 'button-click',
+        operator: '=',
+        value: 2
       }
     ],
     actions: [

@@ -17,6 +17,7 @@ const DEFAULT = {
     ERROR: 'ERROR',
   },
   MOSQUITTO_VERSION: '3',
+  PASSWORD_FILE_PATH: '/mosquitto/config/mosquitto.passwd',
 };
 
 module.exports = {

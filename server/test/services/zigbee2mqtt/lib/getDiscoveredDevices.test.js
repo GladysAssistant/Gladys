@@ -7,6 +7,13 @@ const discoveredDevices = require('./payloads/mqtt_devices_get.json');
 const expectedDevicesPayload = require('./payloads/event_device_result.json');
 
 const gladys = {
+  job: {
+    wrapper: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
+  },
   stateManager: {
     get: {},
   },
