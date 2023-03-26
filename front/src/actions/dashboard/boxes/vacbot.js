@@ -3,7 +3,7 @@ import createBoxActions from '../boxActions';
 
 const BOX_KEY = 'Vacbot';
 
-
+/*
 const VACBOT_ICONS = {
   clean: 'fe-plat',
   clean2: 'fe-play-circle',
@@ -11,10 +11,12 @@ const VACBOT_ICONS = {
   pause2: 'fe-pause-circle',
   stop: 'fe-stop',
   map: 'fe-map',
+  idle: 'fe-coffee',
   info: 'fe-info'
 };
 
 const translateVacbotStatusToFeIcon = vacbot_status => get(VACBOT_ICONS, vacbot_status, { default: 'fe-question' });
+*/
 
 function createActions(store) {
   const boxActions = createBoxActions(store);

@@ -23,30 +23,41 @@ const VacbotBox = ({ children, ...props }) => (
     <div class="card-body d-flex flex-column">
       <h4>{props.name}</h4>
     </div>
-    
-    <div class="card-body d-flex flex-column">
-      <img src={props.imageUrl} />
+    <div class="row" style={{fontSize: '1.5em'}}>
+          <div class="col-9" >
+          {props.cleanReport == 'idle' && <i class={`fe fe-disc`} />}
+          {props.chargeStatus == 'returning' && <i class={`list-separated-item fe fe-dowload`} />}
+          {props.cleanReport == 'auto' && <i class={`list-separated-item fe fe-play-circle`} />}
+          {props.cleanReport}
+          </div>
+          <div class="col-3">
+            {props.chargeStatus == 'charging' && <i class={`fe fe-battery-charging`} style={{fontSize: '20px'}} >{props.batteryLevel}% </i>}
+            {props.chargeStatus != 'charging' && <i class={`fe fe-battery`} style={{fontSize: '20px'}}>{props.batteryLevel}%</i> }
+          </div>
     </div>
+    <div class="row">
+      <div class="card-body d-flex col-9">
+        <img src={props.imageUrl} style="width: 80%;" />
+      </div>
+      <div class="col-3" style={{fontSize: '20px'}}>
+        <ul class="list-unstyled mb-0" style={{marginTop: '50px'}}>
+          {props.hasMappingCapabilities && <li class={`fe fe-map`} />}
+          {props.hasCustomAreaCleaningMode && <li class={`fe fe-codepen`} />}
+      </ul> 
+
+      </div>
+    </div>
+    
     <div class="mt-3">
       <ul class="list-unstyled list-separated mb-0">
         <li class="list-separated-item">
-        name : {props.name}
-        </li>
-        <li class="list-separated-item">
-        
-        clean report (auto, idle, returning) : {props.cleanReport}
-        </li>
-        <li class="list-separated-item">
-        charge status (charging, idle, returning) : {props.chargeStatus}
-        </li>
-        <li class="list-separated-item">
-        hasMappingCapabilities : {props.hasMappingCapabilities}
-        </li>
-        <li class="list-separated-item">
-        hasCustomAreaCleaningMode : {props.hasCustomAreaCleaningMode}
-        </li>
-        <li class="list-separated-item">
         hasMoppingSystem : {props.hasMoppingSystem}
+        </li>
+        <li class="list-separated-item">
+        chargeStatus : {props.chargeStatus}
+        </li>
+        <li class="list-separated-item">
+        cleanReport : {props.cleanReport}
         </li>
       </ul> 
     </div>
@@ -101,6 +112,7 @@ class VacbotBoxComponent extends Component {
     const hasMoppingSystem = get(boxData, 'vacbot.hasMoppingSystem');
     const chargeStatus = get(boxData, 'vacbot.chargeStatus');
     const cleanReport = get(boxData, 'vacbot.cleanReport');
+    const batteryLevel = get(boxData, 'vacbot.batteryLevel');
     const error = boxStatus === RequestStatus.Error;
     return (
       <VacbotBox
@@ -112,7 +124,7 @@ class VacbotBoxComponent extends Component {
         hasMoppingSystem={hasMoppingSystem}
         chargeStatus={chargeStatus}
         cleanReport={cleanReport}
-        boxStatus={boxStatus}
+        batteryLevel={batteryLevel}
         error={error}
       />
     );
