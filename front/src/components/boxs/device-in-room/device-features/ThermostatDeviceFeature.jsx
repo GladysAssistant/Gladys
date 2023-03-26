@@ -12,8 +12,8 @@ const isNullOrUndefined = val => val === null || val === undefined;
 const DEFAULT_TEMPERATURE_IN_CASE_EMPTY = 18;
 
 const ThermostatDeviceFeature = ({ children, ...props }) => {
-  const TEMPERATURE_STEP = (props.deviceFeature.category == DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING)?1:0.5;
-  
+  const TEMPERATURE_STEP = props.deviceFeature.category == DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING ? 1 : 0.5;
+
   function updateValue(value) {
     props.updateValueWithDebounce(
       props.x,
