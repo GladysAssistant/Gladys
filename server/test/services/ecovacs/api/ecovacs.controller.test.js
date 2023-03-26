@@ -88,7 +88,7 @@ describe('GET /api/v1/service/ecovacs/status', () => {
   });
 
   it('should get ecovacs service status', async () => {
-   await controller['get /api/v1/service/ecovacs/status'].controller(req, res);
+    await controller['get /api/v1/service/ecovacs/status'].controller(req, res);
     assert.calledOnce(ecovacsHandler.getStatus);
     assert.calledOnce(res.json);
   });
@@ -118,10 +118,10 @@ describe('POST /api/v1/service/ecovacs/config', () => {
   });
 
   it('should save ecovacs configuration', async () => {
-    const req = {
+    req = {
       body: [],
     };
-    const res = {
+    res = {
       json: fake.returns({ success: true }),
     };
 
@@ -133,7 +133,7 @@ describe('POST /api/v1/service/ecovacs/config', () => {
 
 describe('GET /api/v1/service/ecovacs/:device_selector/status', () => {
   let controller;
-  const res = {
+  res = {
     json: fake.returns(null),
   };
 
@@ -143,7 +143,7 @@ describe('GET /api/v1/service/ecovacs/:device_selector/status', () => {
   });
 
   it('should get vacbot (ecovacs device) status', async () => {
-    const req = {
+    req = {
       params: {
         device_selector: 'ecovacs:5c19a8f3a1e6ee0001782247:0',
       },
@@ -154,7 +154,7 @@ describe('GET /api/v1/service/ecovacs/:device_selector/status', () => {
   });
 
   it('should not get vacbot (ecovacs device) status without an external_id', async () => {
-    const req = {
+    req = {
       params: {
         device_selector: '',
       },

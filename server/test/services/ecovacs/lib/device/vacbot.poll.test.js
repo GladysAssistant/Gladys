@@ -1,13 +1,10 @@
-const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
 const { event, serviceId, devices, variableOk } = require('../../consts.test');
 const EcovacsApiMock = require('../../mocks/ecovacs-api.mock.test');
-const { EcoVacsAPI, fakes } = require('../../mocks/ecovacs-api.mock.test');
-const { NotFoundError } = require('../../../../../utils/coreErrors');
+const { fakes } = require('../../mocks/ecovacs-api.mock.test');
 
-const { assert, fake } = sinon;
-
+const { assert } = sinon;
 
 const EcovacsService = proxyquire('../../../../../services/ecovacs/index', {
   'ecovacs-deebot': EcovacsApiMock,
@@ -31,6 +28,6 @@ describe('Ecovacs : vacbot polling', () => {
     assert.calledWith(fakes.run, 'GetBatteryState');
     assert.calledWith(fakes.run, 'GetCleanState');
     assert.calledWith(fakes.run, 'GetChargeState');
-    assert.calledWith(fakes.run, 'GetSleepStatus'); 
+    assert.calledWith(fakes.run, 'GetSleepStatus');
   });
 });

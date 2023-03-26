@@ -1,7 +1,6 @@
 const sinon = require('sinon');
 
-const { assert, fake } = sinon;
-const { expect } = require('chai');
+const { assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const { event, serviceId, devices } = require('../../consts.test');
 const EcovacsApiMock = require('../../mocks/ecovacs-api.mock.test');
