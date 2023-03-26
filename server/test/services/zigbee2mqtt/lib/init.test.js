@@ -15,9 +15,17 @@ describe('zigbee2mqtt init', () => {
   // PREPARE
   let zigbee2mqttManager;
   let gladys;
+  let clock;
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       system: {
         getContainers: fake.resolves([container]),
         stopContainer: fake.resolves(true),
@@ -49,9 +57,12 @@ describe('zigbee2mqtt init', () => {
     zigbee2mqttManager.dockerBased = undefined;
     zigbee2mqttManager.networkModeValid = undefined;
     zigbee2mqttManager.usbConfigured = undefined;
+
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
+    clock.restore();
     sinon.reset();
   });
 
@@ -183,6 +194,29 @@ describe('zigbee2mqtt init', () => {
     const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
     zigbee2mqttManager.getConfiguration.resolves({ ...config });
     zigbee2mqttManager.isEnabled.returns(true);
+
+    gladys.scheduler = {
+      scheduleJob: fake.returns(true),
+    };
+
+    // EXECUTE
+    await zigbee2mqttManager.init();
+    // ASSERT
+    assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
+    assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
+    assert.calledOnceWithExactly(zigbee2mqttManager.connect, config);
+    assert.calledOnce(gladys.scheduler.scheduleJob);
+  });
+
+  it('it should connect and scheduler already there', async () => {
+    // PREPARE
+    const config = { z2mDriverPath: '/dev/ttyUSB0', mqttPassword: 'mqttPassword' };
+    zigbee2mqttManager.getConfiguration.resolves({ ...config });
+    zigbee2mqttManager.isEnabled.returns(true);
+    zigbee2mqttManager.backupScheduledJob = 'this is not null';
 
     // EXECUTE
     await zigbee2mqttManager.init();

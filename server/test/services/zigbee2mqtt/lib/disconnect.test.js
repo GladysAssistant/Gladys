@@ -25,6 +25,13 @@ describe('zigbee2mqtt disconnect', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       event: {
         emit: fake.resolves(null),
       },
@@ -77,5 +84,16 @@ describe('zigbee2mqtt disconnect', () => {
     expect(zigbee2MqttManager.mqttClient).to.equal(null);
     assert.calledOnce(mqtt.end);
     assert.calledOnce(mqtt.removeAllListeners);
+  });
+
+  it('clear backup interval', async () => {
+    // PREPARE
+    zigbee2MqttManager.backupScheduledJob = {
+      cancel: fake.returns(true),
+    };
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    assert.calledOnceWithExactly(zigbee2MqttManager.backupScheduledJob.cancel);
   });
 });
