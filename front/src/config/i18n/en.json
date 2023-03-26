@@ -2040,6 +2040,10 @@
       "shortCategoryName": "Humidity sensor",
       "decimal": "Humidity (decimal)"
     },
+    "soil-moisture-sensor": {
+      "shortCategoryName": "Soil moisture sensor",
+      "decimal": "Soil moisture (decimal)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
       "binary": "Vibrate (yes/no)",

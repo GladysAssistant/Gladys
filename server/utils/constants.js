@@ -346,6 +346,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SIREN: 'siren',
   SISMIC_SENSOR: 'sismic-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
+  SOIL_MOISTURE_SENSOR: 'soil-moisture-sensor',
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
   TELEVISION: 'television',
