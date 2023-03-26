@@ -1,6 +1,29 @@
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 
 export const MANAGED_FEATURES = {
+  [DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING]: {
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.BINARY]: {
+      feature: {
+        min: 0,
+        max: 1
+      },
+      values: [0, 1]
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: {
+      feature: {
+        min: 0,
+        max: 2
+      },
+      values: [0, 1, 2]
+    },
+    [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: {
+      feature: {
+        min: 18,
+        max: 30
+      },
+      values: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+    }
+  },
   [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
     [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: {
       feature: {

@@ -783,6 +783,17 @@
         "learnAllModeLabel": "Next learn in {{timeLeft}} secondes...",
         "quitLearnModeLabel": "Stop learning features",
         "features": {
+          "air-conditioning": {
+            "binary": {
+              "none": "Off",
+              "one": "On"
+            },
+            "mode": {
+              "none": "Auto",
+              "one": "Cool",
+              "other": "Heat"
+            }
+          },
           "curtain": {
             "state": {
               "none": "Stop",

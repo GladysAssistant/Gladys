@@ -62,6 +62,25 @@ describe('broadlink.remote', () => {
       assert.calledOnceWithExactly(peripheral.sendData, Buffer.from([13]));
     });
 
+    it('send code with sub value for DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE', async () => {
+      const device = {
+        params: [
+          {
+            name: 'ir_code_target-temperature-20',
+            value: '0b',
+          },
+        ],
+      };
+      const feature = {
+        type: 'target-temperature',
+      };
+      const value = 20;
+
+      await remote.setValue(peripheral, device, feature, value);
+
+      assert.calledOnceWithExactly(peripheral.sendData, Buffer.from([11]));
+    });
+
     it('send multiple codes', async () => {
       const device = {
         params: [

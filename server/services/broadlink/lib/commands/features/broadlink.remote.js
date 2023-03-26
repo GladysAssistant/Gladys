@@ -4,6 +4,7 @@ const Promise = require('bluebird');
 const { NoValuesFoundError } = require('../../../../../utils/coreErrors');
 const logger = require('../../../../../utils/logger');
 const { PARAMS } = require('../../utils/broadlink.constants');
+const { DEVICE_FEATURE_TYPES } = require('../../../../../utils/constants');
 
 /**
  * @description Builds light Broadlink features.
@@ -29,17 +30,27 @@ async function setValue(broadlinkDevice, gladysDevice, deviceFeature, value) {
   const { type } = deviceFeature;
   const valueStr = value.toString();
 
-  const nbExpectedCodes = valueStr.length;
+  let nbExpectedCodes = valueStr.length;
   const relatedParams = [];
 
   // Get all related params with code first
-  for (let i = 0; i < nbExpectedCodes; i += 1) {
-    const subValue = valueStr[i];
-    const paramNames = [`${PARAMS.IR_CODE}${type}`, `${PARAMS.IR_CODE}${type}-${subValue}`];
+  if (type === DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE) {
+    nbExpectedCodes = 1;
+    const paramNames = [`${PARAMS.IR_CODE}${type}`, `${PARAMS.IR_CODE}${type}-${valueStr}`];
     const param = gladysDevice.params.find((p) => paramNames.includes(p.name));
 
     if (param) {
       relatedParams.push(param);
+    }
+  } else {
+    for (let i = 0; i < nbExpectedCodes; i += 1) {
+      const subValue = valueStr[i];
+      const paramNames = [`${PARAMS.IR_CODE}${type}`, `${PARAMS.IR_CODE}${type}-${subValue}`];
+      const param = gladysDevice.params.find((p) => paramNames.includes(p.name));
+
+      if (param) {
+        relatedParams.push(param);
+      }
     }
   }
 

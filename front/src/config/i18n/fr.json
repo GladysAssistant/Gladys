@@ -910,6 +910,17 @@
         "learnAllModeLabel": "Prochain bouton dans {{timeLeft}} secondes...",
         "quitLearnModeLabel": "Arrêter le mode apprentissage",
         "features": {
+          "air-conditioning": {
+            "binary": {
+              "none": "Eteindre",
+              "one": "Allumer"
+            },
+            "mode": {
+              "none": "Auto",
+              "one": "Clim.",
+              "other": "Chauffage"
+            }
+          },
           "curtain": {
             "state": {
               "none": "Arrêter",
