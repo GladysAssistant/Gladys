@@ -24,7 +24,6 @@ describe('ecovacs.connect command', () => {
     await ecovacsService.device.connect();
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.event.emit);
-
   });
 
   it('should connect and receive success', async () => {

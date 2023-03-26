@@ -5,8 +5,6 @@ const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
 const event = { emit: fake.resolves(null) };
 
-
-
 const vacbotMock = {
   did: '0ccdd884-b00f-4838-a50b-bf4fb3fc7a12',
   getName: fake.returns('DEEBOT OZMO 920 Series'),
@@ -60,7 +58,7 @@ const devices = [
         has_feedback: true,
         min: 0,
         max: 100,
-      },  
+      },
     ],
     params: [],
   },
@@ -97,7 +95,7 @@ const devices = [
         has_feedback: true,
         min: 0,
         max: 100,
-      }, 
+      },
     ],
     params: [],
   },
@@ -134,7 +132,7 @@ const devices = [
         has_feedback: true,
         min: 0,
         max: 100,
-      }, 
+      },
     ],
     params: [],
   },

@@ -23,13 +23,13 @@ const EcovacsHandler = proxyquire('../../../../../services/ecovacs/lib', {
 
 const EcovacsService = proxyquire('../../../../../services/ecovacs/index', {
   'ecovacs-deebot': EcovacsApiMock,
-  './lib': EcovacsHandler
+  './lib': EcovacsHandler,
 });
 const EcovacsApiEmptyMock = require('../../mocks/ecovacs-api-empty.mock.test');
 
 const EcovacsServiceEmpty = proxyquire('../../../../../services/ecovacs/index', {
   'ecovacs-deebot': EcovacsApiEmptyMock,
-  './lib': EcovacsHandler
+  './lib': EcovacsHandler,
 });
 
 const gladysWith0Devices = {
@@ -58,7 +58,7 @@ describe('Ecovacs : vacbot discovering', () => {
   it('should find 2 new devices', async () => {
     const ecovacsService = EcovacsService(gladysWith0Devices, serviceId);
     ecovacsService.device.connected = true;
-    ecovacsService.device.ecovacsClient =  new EcovacsApiMock.EcoVacsAPI();
+    ecovacsService.device.ecovacsClient = new EcovacsApiMock.EcoVacsAPI();
     const newDevices = await ecovacsService.device.discover();
     assert.notCalled(ecovacsService.device.connect);
     expect(newDevices.length).to.equal(3);
@@ -67,7 +67,7 @@ describe('Ecovacs : vacbot discovering', () => {
   it('should connect to ecovacs first and find 3 devices, 2 of these are already in Gladys and 1 is a new unknown device', async () => {
     const ecovacsService = EcovacsService(gladysWith2Devices, serviceId);
     ecovacsService.device.connected = false;
-    ecovacsService.device.ecovacsClient =  new EcovacsApiMock.EcoVacsAPI();
+    ecovacsService.device.ecovacsClient = new EcovacsApiMock.EcoVacsAPI();
     const newDevices = await ecovacsService.device.discover();
     assert.calledOnce(ecovacsService.device.connect);
     expect(newDevices.length).to.equal(1);

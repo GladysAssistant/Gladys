@@ -9,7 +9,6 @@ const ecovacsHandler = function EcovacsHandler(gladys, ecovacsDeebot, serviceId)
   this.connected = false;
 
   this.vacbots = new Map();
-
 };
 
 const { start } = require('./commands/ecovacs.start');

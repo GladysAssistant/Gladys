@@ -8,7 +8,7 @@ const logger = require('../../../../utils/logger');
  * vacbot.getDeviceStatus();
  */
 async function getDeviceStatus(deviceExternalId) {
-  // TODO: is there a better way to do this ? 
+  // TODO: is there a better way to do this ?
   let vacbot;
   this.vacbots.forEach((value, key) => {
     if (key.external_id === deviceExternalId) {
@@ -25,10 +25,10 @@ async function getDeviceStatus(deviceExternalId) {
     hasCustomAreaCleaningMode: vacbot.hasCustomAreaCleaningMode(),
     hasMoppingSystem: vacbot.hasMoppingSystem(),
     chargeStatus: vacbot.chargeStatus,
-    cleanReport: vacbot.cleanReport
-    
+    cleanReport: vacbot.cleanReport,
+    batteryLevel: vacbot.batteryLevel,
   };
-  logger.trace(`Vacbot charge status : ${Object.keys(vacbot)}`); 
+  logger.trace(`Vacbot charge status : ${Object.keys(vacbot)}`);
   logger.debug(`Vacbot ${deviceExternalId} status : ${JSON.stringify(status)}`);
   return status;
 }
