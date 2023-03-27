@@ -13,6 +13,7 @@ module.exports = function EnedisService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting enedis service');
+    enedisHandler.init();
   }
 
   /**

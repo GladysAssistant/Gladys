@@ -1,3 +1,4 @@
+const { init } = require('./enedis.init');
 const { sync } = require('./enedis.sync');
 
 const EnedisHandler = function EnedisHandler(gladys, serviceId) {
@@ -6,6 +7,7 @@ const EnedisHandler = function EnedisHandler(gladys, serviceId) {
   this.syncDelayBetweenCallsInMs = 500;
 };
 
+EnedisHandler.prototype.init = init;
 EnedisHandler.prototype.sync = sync;
 
 module.exports = EnedisHandler;

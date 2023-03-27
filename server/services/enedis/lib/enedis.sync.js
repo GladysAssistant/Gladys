@@ -38,7 +38,7 @@ async function recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs,
   // If there was still some data to get
   if (data.length === ENEDIS_SYNC_BATCH_SIZE) {
     const lastEntry = data[data.length - 1];
-    return recursiveBatchCall(gladys, externalId, lastEntry.created_at);
+    return recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs, lastEntry.created_at);
   }
   if (data.length === 0) {
     return after;
