@@ -2052,6 +2052,10 @@
       "shortCategoryName": "Capteur d'humidité",
       "decimal": "Humidité (pourcentage)"
     },
+    "soil-moisture-sensor": {
+      "shortCategoryName": "Capteur d'humidité du sol",
+      "decimal": "Humidité du sol (decimal)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
       "binary": "Vibration (Oui/Non)",
