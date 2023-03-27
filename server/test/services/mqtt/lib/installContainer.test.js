@@ -1,27 +1,33 @@
 const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 const { expect } = require('chai');
 
 const { assert, fake } = sinon;
-
-const proxiquire = require('proxyquire').noCallThru();
 
 const { MockedMqttClient } = require('../mocks.test');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { DEFAULT } = require('../../../../services/mqtt/lib/constants');
 
 const execMock = { exec: fake.resolves('command well executed') };
-const installContainer = proxiquire('../../../../services/mqtt/lib/installContainer', {
+const installContainer = proxyquire('../../../../services/mqtt/lib/installContainer', {
   '../../../utils/childProcess': execMock,
 });
-const MqttHandler = proxiquire('../../../../services/mqtt/lib', {
+const saveConfiguration = proxyquire('../../../../services/mqtt/lib/saveConfiguration', {
+  util: {
+    // Fake promisify to revolve it directly
+    promisify: () => () => {},
+  },
+});
+
+const MqttHandler = proxyquire('../../../../services/mqtt/lib', {
   './installContainer': installContainer,
+  './saveConfiguration': saveConfiguration,
 });
 
 const serviceId = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 
-describe('mqttHandler.installContainer', function Describe() {
-  this.timeout(8000);
-  beforeEach(() => {
+describe('mqttHandler.installContainer', () => {
+  afterEach(() => {
     sinon.reset();
   });
 
@@ -41,13 +47,14 @@ describe('mqttHandler.installContainer', function Describe() {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.configureContainer = fake.resolves(null);
 
     try {
       await mqttHandler.installContainer();
       assert.fail('should have fail');
     } catch (e) {
       expect(e).to.be.eq(error);
-      assert.notCalled(execMock.exec);
+      assert.notCalled(mqttHandler.configureContainer);
       assert.calledOnce(gladys.event.emit);
       assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.MQTT.INSTALLATION_STATUS,
@@ -83,11 +90,12 @@ describe('mqttHandler.installContainer', function Describe() {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.configureContainer = fake.resolves(null);
 
     await mqttHandler.installContainer();
 
     assert.callCount(gladys.variable.setValue, 5);
-    assert.calledOnce(execMock.exec);
+    assert.calledOnce(mqttHandler.configureContainer);
     assert.calledOnce(gladys.system.pull);
     assert.calledOnce(gladys.system.createContainer);
     assert.calledOnce(gladys.system.getNetworkMode);
@@ -124,11 +132,12 @@ describe('mqttHandler.installContainer', function Describe() {
     };
 
     const mqttHandler = new MqttHandler(gladys, MockedMqttClient, serviceId);
+    mqttHandler.configureContainer = fake.resolves(null);
 
     await mqttHandler.installContainer(false);
 
     assert.notCalled(gladys.variable.setValue);
-    assert.calledOnce(execMock.exec);
+    assert.calledOnce(mqttHandler.configureContainer);
     assert.calledOnce(gladys.system.pull);
     assert.calledOnce(gladys.system.createContainer);
     assert.calledOnce(gladys.system.getNetworkMode);

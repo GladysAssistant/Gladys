@@ -1,5 +1,4 @@
 const sunCalc = require('suncalc');
-const schedule = require('node-schedule');
 
 const queue = require('queue');
 const { addScene } = require('./scene.addScene');
@@ -16,8 +15,9 @@ const { executeSingleAction } = require('./scene.executeSingleAction');
 const { update } = require('./scene.update');
 const { dailyUpdate } = require('./scene.dailyUpdate');
 const { duplicate } = require('./scene.duplicate');
+const { command } = require('./scene.command');
 
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, INTENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
@@ -32,6 +32,8 @@ const SceneManager = function SceneManager(
   calendar,
   http,
   gateway,
+  scheduler,
+  brain,
 ) {
   this.stateManager = stateManager;
   this.event = event;
@@ -42,6 +44,7 @@ const SceneManager = function SceneManager(
   this.calendar = calendar;
   this.http = http;
   this.gateway = gateway;
+  this.brain = brain;
   this.scenes = {};
   this.timezone = DEFAULT_TIMEZONE;
   // @ts-ignore
@@ -49,7 +52,7 @@ const SceneManager = function SceneManager(
     autostart: true,
   });
   this.sunCalc = sunCalc;
-  this.schedule = schedule;
+  this.scheduler = scheduler;
   this.jobs = [];
   this.event.on(EVENTS.TRIGGERS.CHECK, eventFunctionWrapper(this.checkTrigger.bind(this)));
   this.event.on(EVENTS.ACTION.TRIGGERED, eventFunctionWrapper(this.executeSingleAction.bind(this)));
@@ -60,6 +63,7 @@ const SceneManager = function SceneManager(
   this.event.on(EVENTS.HOUSE.UPDATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
   this.event.on(EVENTS.HOUSE.DELETED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
   this.event.on(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING, eventFunctionWrapper(this.checkCalendarTriggers.bind(this)));
+  this.event.on(INTENTS.SCENE.START, this.command.bind(this));
 };
 
 SceneManager.prototype.addScene = addScene;
@@ -76,5 +80,6 @@ SceneManager.prototype.execute = execute;
 SceneManager.prototype.executeSingleAction = executeSingleAction;
 SceneManager.prototype.update = update;
 SceneManager.prototype.duplicate = duplicate;
+SceneManager.prototype.command = command;
 
 module.exports = SceneManager;

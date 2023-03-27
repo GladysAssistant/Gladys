@@ -126,6 +126,11 @@ const data = {
           type: 'camera',
           camera: 'living-room-camera',
           name: 'Garden'
+        },
+        {
+          type: 'devices-in-room',
+          room: 'exterior',
+          device_features: ['aqi-city']
         }
       ],
       [
@@ -151,7 +156,8 @@ const data = {
             'main-tv-volume',
             'main-tv-channel',
             'main-presence-sensor',
-            'main-signal-sensor'
+            'main-signal-sensor',
+            'button-click'
           ]
         }
       ],
@@ -263,7 +269,7 @@ const data = {
       }
     ]
   },
-  'get /api/v1/room/living-room?expand=temperature': {
+  'get /api/v1/room/living-room?expand=temperature,devices': {
     id: '1c634ff4-0476-4733-a084-b4a43d649c84',
     name: 'Living Room',
     selector: 'living-room',
@@ -340,6 +346,17 @@ const data = {
             read_only: true,
             last_value: 4,
             last_value_changed: dayjs().add(60, 'second')
+          },
+          {
+            name: 'Button',
+            selector: 'button-click',
+            category: 'button',
+            type: 'click',
+            min: 0,
+            max: 6,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
           }
         ]
       },
@@ -467,6 +484,32 @@ const data = {
             read_only: true,
             last_value: 27,
             last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      }
+    ]
+  },
+  'get /api/v1/room/exterior?expand=devices': {
+    id: 'af3e166e-64f1-444d-a5fe-90ceaa1fc176',
+    name: 'Exterior',
+    selector: 'exterior',
+    devices: [
+      {
+        id: 'ed62adc6-b1b6-4a2b-b6d1-8e676d470e10',
+        name: 'Air Quality Index',
+        selector: 'aq-sensors',
+        features: [
+          {
+            name: 'Air Quality Index',
+            selector: 'aqi-city',
+            category: 'airquality-sensor',
+            type: 'aqi',
+            min: 0,
+            max: 1000,
+            read_only: true,
+            unit: 'aqi',
+            last_value: 101,
+            last_value_changed: '2023-01-23 08:50:06.556 +00:00'
           }
         ]
       }
@@ -721,6 +764,17 @@ const data = {
               last_value: 0,
               unit: 'percent',
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            },
+            {
+              name: 'Button',
+              selector: 'button-click',
+              category: 'button',
+              type: 'click',
+              min: 0,
+              max: 6,
+              read_only: true,
+              last_value: 1,
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
         }
@@ -746,6 +800,23 @@ const data = {
               read_only: true,
               last_value: 60,
               unit: ' lux',
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            }
+          ]
+        },
+        {
+          id: 'f10ae5bc-1da6-484e-b0d0-953ee94e5ccc',
+          name: 'Button click',
+          selector: 'button-click',
+          features: [
+            {
+              name: 'Remote',
+              selector: 'kitchen-button-click',
+              category: 'button',
+              type: 'click',
+              min: 0,
+              max: 6,
+              read_only: true,
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
@@ -784,6 +855,32 @@ const data = {
               read_only: true,
               last_value: 1,
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'af3e166e-64f1-444d-a5fe-90ceaa1fc176',
+      name: 'Exterior',
+      selector: 'exterior',
+      devices: [
+        {
+          id: 'ed62adc6-b1b6-4a2b-b6d1-8e676d470e10',
+          name: 'Air Quality Index',
+          selector: 'aq-sensors',
+          features: [
+            {
+              name: 'Air Quality Index',
+              selector: 'aqi-city',
+              category: 'airquality-sensor',
+              type: 'aqi',
+              min: 0,
+              max: 1000,
+              read_only: true,
+              unit: 'aqi',
+              last_value: 101,
+              last_value_changed: '2023-01-23 08:50:06.556 +00:00'
             }
           ]
         }
@@ -912,6 +1009,12 @@ const data = {
         device_feature: 'main-lamp-binary',
         operator: '=',
         value: 1
+      },
+      {
+        type: 'device.new-state',
+        device_feature: 'button-click',
+        operator: '=',
+        value: 2
       }
     ],
     actions: [

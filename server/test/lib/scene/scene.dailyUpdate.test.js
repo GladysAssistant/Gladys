@@ -1,9 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert } = sinon;
-
-const proxyquire = require('proxyquire').noCallThru();
 
 const SceneManager = proxyquire('../../../lib/scene', {
   suncalc: {
@@ -13,16 +12,6 @@ const SceneManager = proxyquire('../../../lib/scene', {
         sunset: new Date(Date.now() + 60 * 60 * 1000),
       };
     },
-  },
-  'node-schedule': {
-    scheduleJob: (date, callback) => {
-      return {
-        callback,
-        date,
-        cancel: () => {},
-      };
-    },
-    RecurrenceRule: function RecurrenceRule() {},
   },
 });
 
@@ -35,37 +24,40 @@ const SceneManagerWithPastSunriseSunset = proxyquire('../../../lib/scene', {
       };
     },
   },
-  'node-schedule': {
-    scheduleJob: (date, callback) => {
-      return null;
-    },
-    RecurrenceRule: function RecurrenceRule() {},
-  },
 });
-
-const house = {
-  get: fake.resolves([
-    {
-      latitude: 12,
-      longitude: 13,
-    },
-  ]),
-};
-
-const event = {
-  on: fake.resolves(null),
-  emit: fake.resolves(null),
-};
-
-const variable = {
-  getValue: fake.resolves('UTC'),
-};
 
 describe('SceneManager.dailyUpdate', () => {
   let sceneManager;
 
+  const house = {};
+  const event = {};
+  const variable = {};
+  const scheduler = {};
+  const brain = {};
+
   beforeEach(async () => {
-    sceneManager = new SceneManager({}, event, {}, {}, variable, house);
+    house.get = fake.resolves([
+      {
+        latitude: 12,
+        longitude: 13,
+      },
+    ]);
+
+    scheduler.scheduleJob = (date, callback) => {
+      return {
+        callback,
+        date,
+        cancel: () => {},
+      };
+    };
+    event.on = fake.resolves(null);
+    event.emit = fake.resolves(null);
+    brain.addNamedEntity = fake.returns(null);
+    brain.removeNamedEntity = fake.returns(null);
+
+    variable.getValue = fake.resolves('UTC');
+
+    sceneManager = new SceneManager({}, event, {}, {}, variable, house, {}, {}, {}, scheduler, brain);
     await sceneManager.init();
     // Reset all fakes invoked within init call
     sinon.reset();
@@ -87,7 +79,21 @@ describe('SceneManager.dailyUpdate', () => {
   });
 
   it('should not scheduleJob for sunrise/sunset, sunset/sunrise is in the past', async () => {
-    const sceneManagerPast = new SceneManagerWithPastSunriseSunset({}, event, {}, {}, variable, house);
+    scheduler.scheduleJob = () => {
+      return null;
+    };
+    const sceneManagerPast = new SceneManagerWithPastSunriseSunset(
+      {},
+      event,
+      {},
+      {},
+      variable,
+      house,
+      {},
+      {},
+      {},
+      scheduler,
+    );
     await sceneManagerPast.dailyUpdate();
     expect(sceneManagerPast.jobs).to.deep.equal([]);
   });

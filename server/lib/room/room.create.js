@@ -26,7 +26,7 @@ async function create(selector, room) {
   const roomPlain = roomCreated.get({ plain: true });
 
   // add room to the brain
-  this.brain.addRoom(roomPlain);
+  this.brain.addNamedEntity('room', roomPlain.id, roomPlain.name);
 
   return roomPlain;
 }

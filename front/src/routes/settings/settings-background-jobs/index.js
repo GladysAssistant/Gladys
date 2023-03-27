@@ -8,10 +8,20 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 const NUMBER_OF_JOBS_PER_PAGE = 15;
 
 class SettingsSystem extends Component {
+  /*
+   * Function to replace "2023-01-23 14:20:23.594 +00:00" by "2023-01-23T14:20:23.594+00:00"
+   * to be Firefox compatible (ISO8601)
+   */
+  convertGladysDateToISO8601 = gladysDate => {
+    return gladysDate.replace(' ', 'T').replace(' ', '');
+  };
+
   getJobs = async page => {
     try {
       const skip = page * NUMBER_OF_JOBS_PER_PAGE;
       const jobs = await this.props.httpClient.get(`/api/v1/job?take=${NUMBER_OF_JOBS_PER_PAGE}&skip=${skip}`);
+
+      jobs.forEach(job => (job.created_at = this.convertGladysDateToISO8601(job.created_at)));
 
       this.setState({
         jobs,
@@ -46,6 +56,7 @@ class SettingsSystem extends Component {
     const { jobs, currentPage } = this.state;
     // only add jobs to page if we are at the first page
     if (currentPage === 0) {
+      payload.created_at = this.convertGladysDateToISO8601(payload.created_at);
       jobs.unshift(payload);
       this.setState({
         jobs
@@ -57,6 +68,7 @@ class SettingsSystem extends Component {
     const { jobs } = this.state;
     const previousJobIndex = jobs.findIndex(j => j.id === payload.id);
     if (previousJobIndex !== -1) {
+      payload.created_at = this.convertGladysDateToISO8601(payload.created_at);
       jobs[previousJobIndex] = payload;
       this.setState({
         jobs

@@ -89,6 +89,19 @@ const IntegrationPage = connect(
                     </ul>
                   </div>
                 </div>
+                <div class="card">
+                  <div class="card-header">
+                    <h3 class="card-title">
+                      <Text id="chat.gpt3Integration" />
+                    </h3>
+                  </div>
+                  <div class="card-body">
+                    <Text id="chat.gpt3IntegrationExplanation" />{' '}
+                    <a href="/dashboard/integration/communication/openai">
+                      <Text id="chat.gpt3ClickHere" />
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -23,6 +23,8 @@ const boxesSchema = Joi.array().items(
       display_variation: Joi.boolean(),
       chart_type: Joi.string(),
       users: Joi.array().items(Joi.string()),
+      clock_type: Joi.string(),
+      clock_display_second: Joi.boolean(),
     }),
   ),
 );
@@ -52,6 +54,11 @@ module.exports = (sequelize, DataTypes) => {
       type: {
         allowNull: false,
         type: DataTypes.ENUM(DASHBOARD_TYPE_LIST),
+      },
+      position: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
       selector: {
         allowNull: false,

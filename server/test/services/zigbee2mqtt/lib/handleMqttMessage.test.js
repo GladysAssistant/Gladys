@@ -20,11 +20,15 @@ describe('zigbee2mqtt handleMqttMessage', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       event: {
         emit: fake.resolves(null),
-      },
-      variable: {
-        setValue: fake.resolves(true),
       },
       stateManager: {
         get: fake.resolves(true),
@@ -208,5 +212,18 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/device', `{"humidity":86}`);
     // ASSERT
     assert.calledOnce(gladys.event.emit);
+  });
+
+  it('it should store backup', async () => {
+    zigbee2mqttManager.saveZ2mBackup = fake.resolves(true);
+
+    // PREPARE
+    const payload = {
+      status: 'ko',
+    };
+    // EXECUTE
+    await zigbee2mqttManager.handleMqttMessage('zigbee2mqtt/bridge/response/backup', JSON.stringify(payload));
+    // ASSERT
+    assert.calledOnceWithExactly(zigbee2mqttManager.saveZ2mBackup, payload);
   });
 });

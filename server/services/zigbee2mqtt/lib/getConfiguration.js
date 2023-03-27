@@ -1,11 +1,12 @@
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 const { CONFIGURATION } = require('./constants');
 
 /**
- * @description Get MQTT configuration.
- * @returns {Promise} Current MQTT network configuration.
+ * @description Get Z2M configuration.
+ * @returns {Promise} Current Z2M network configuration.
  * @example
- * getConfiguration();
+ * const config = await z2m.getConfiguration();
  */
 async function getConfiguration() {
   logger.debug('Zigbee2mqtt: loading stored configuration...');
@@ -20,6 +21,12 @@ async function getConfiguration() {
   const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_USERNAME_KEY, this.serviceId);
   const mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
 
+  // Load version parameters
+  const dockerMqttVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_MQTT_VERSION, this.serviceId);
+  const dockerZ2mVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_Z2M_VERSION, this.serviceId);
+  // Gladys params
+  const timezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
+
   return {
     z2mDriverPath,
     z2mMqttUsername,
@@ -27,6 +34,9 @@ async function getConfiguration() {
     mqttUrl,
     mqttUsername,
     mqttPassword,
+    dockerMqttVersion,
+    dockerZ2mVersion,
+    timezone,
   };
 }
 

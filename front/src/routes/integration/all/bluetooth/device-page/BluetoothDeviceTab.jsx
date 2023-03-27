@@ -5,6 +5,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import BluetoothDevice from './BluetoothDevice';
 import EmptyState from '../EmptyState';
 import style from '../style.css';
+import CardFilter from '../../../../../components/layout/CardFilter';
 
 const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevices, ...props }) => (
   <div class="card">
@@ -13,27 +14,15 @@ const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevi
         <Text id="integration.bluetooth.device.title" />
       </h3>
       <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.bluetooth.device.search" />}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
+        <Localizer>
+          <CardFilter
+            changeOrderDir={props.changeOrderDir}
+            orderValue={props.getBluetoothDeviceOrderDir}
+            search={props.debouncedSearch}
+            searchValue={props.bluetoothDeviceSearch}
+            searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
+          />
+        </Localizer>
       </div>
     </div>
     <div class="card-body">
