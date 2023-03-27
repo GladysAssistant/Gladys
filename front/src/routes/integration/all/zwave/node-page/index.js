@@ -19,4 +19,7 @@ class ZwaveNodePage extends Component {
   }
 }
 
-export default connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)(ZwaveNodePage);
+export default connect(
+  'session,user,zwaveDevices,houses,getZwaveDevicesStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch',
+  actions
+)(ZwaveNodePage);

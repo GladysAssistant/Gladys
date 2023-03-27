@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
 import Device from './Device';
 import style from './style.css';
+import CardFilter from '../../../../components/layout/CardFilter';
 
 const DevicePanel = ({ children, ...props }) => (
   <div class="card">
@@ -12,28 +13,15 @@ const DevicePanel = ({ children, ...props }) => (
         <Text id="integration.xiaomi.device.title" />
       </h3>
       <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.xiaomi.device.searchPlaceholder" />}
-              value={props.xiaomiDeviceSearch}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
+        <Localizer>
+          <CardFilter
+            changeOrderDir={props.changeOrderDir}
+            orderValue={props.getXiaomiDeviceOrderDir}
+            search={props.debouncedSearch}
+            searchValue={props.xiaomiDeviceSearch}
+            searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
+          />
+        </Localizer>
       </div>
     </div>
     <div class="card-body">
