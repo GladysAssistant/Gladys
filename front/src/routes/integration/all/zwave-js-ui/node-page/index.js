@@ -4,7 +4,7 @@ import actions from './actions';
 import ZwaveJSUIPage from '../ZwaveJSUIPage';
 import NodeTab from './NodeTab';
 
-@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
+@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch', actions)
 class ZwaveJSUINodePage extends Component {
   componentWillMount() {
     this.props.getZWaveDevices();

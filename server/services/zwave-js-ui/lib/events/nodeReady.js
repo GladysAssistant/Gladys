@@ -13,7 +13,7 @@ function nodeReady(zwaveNode) {
 
   const node = this.nodes[nodeId];
   node.nodeId = nodeId;
-  node.product = zwaveNode.product;
+  node.product = zwaveNode.deviceId;
   node.firmwareVersion = zwaveNode.firmwareVersion;
   node.name = `${zwaveNode.name || zwaveNode.productLabel || `${zwaveNode.product}`}`;
   node.loc = zwaveNode.loc;

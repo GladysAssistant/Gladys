@@ -5,6 +5,7 @@ import cx from 'classnames';
 import Node from './Node';
 import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
+import CardFilter from '../../../../../components/layout/CardFilter';
 
 const NodeTab = ({ children, ...props }) => {
   const zwaveNotConfigured = props.zwaveGetNodesStatus === RequestStatus.ServiceNotConfigured;
@@ -19,27 +20,15 @@ const NodeTab = ({ children, ...props }) => {
           <Text id="integration.zwave-js-ui.discover.title" />
         </h3>
         <div class="page-options d-flex">
-          <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-            <option value="asc">
-              <Text id="global.orderDirAsc" />
-            </option>
-            <option value="desc">
-              <Text id="global.orderDirDesc" />
-            </option>
-          </select>
-          <div class="input-icon ml-2">
-            <span class="input-icon-addon">
-              <i class="fe fe-search" />
-            </span>
-            <Localizer>
-              <input
-                type="text"
-                class="form-control w-10"
-                placeholder={<Text id="integration.zwave-js-ui.device.search" />}
-                onInput={props.debouncedSearch}
-              />
-            </Localizer>
-          </div>
+          <Localizer>
+            <CardFilter
+              changeOrderDir={props.changeOrderDir}
+              orderValue={props.getZwaveDeviceOrderDir}
+              search={props.debouncedSearch}
+              searchValue={props.zwaveDeviceSearch}
+              searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
+            />
+          </Localizer>
           <button class="btn btn-outline-primary" onClick={props.scanNetwork} disabled={zwaveActionsDisabled}>
             <Text id="integration.zwave-js-ui.discover.scanButton" /> <i class="fe fe-radio" />
           </button>
