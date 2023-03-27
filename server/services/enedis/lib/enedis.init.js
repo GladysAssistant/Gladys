@@ -5,13 +5,15 @@
  * init();
  */
 function init() {
-  // We sync a first time at 9AM to check if new daily data are ready.
+  // We sync a first time at 8:50AM to check if new daily data are ready.
+  // We do it at 50 because at 00 the aggregation is running, so data will be ready for hourly aggregate
   if (!this.syncEnedisFirstJob) {
-    this.syncEnedisFirstJob = this.gladys.scheduler.scheduleJob('0 0 9 * * *', () => this.sync());
+    this.syncEnedisFirstJob = this.gladys.scheduler.scheduleJob('0 50 8 * * *', () => this.sync());
   }
-  // We sync a second time at 11AM, in case the data were only available later in the morning.
+
+  // We sync a second time at 10:50, in case the data were only available later in the morning.
   if (!this.syncEnedisSecondJob) {
-    this.syncEnedisSecondJob = this.gladys.scheduler.scheduleJob('0 0 11 * * *', () => this.sync());
+    this.syncEnedisSecondJob = this.gladys.scheduler.scheduleJob('0 50 10 * * *', () => this.sync());
   }
 
   return null;
