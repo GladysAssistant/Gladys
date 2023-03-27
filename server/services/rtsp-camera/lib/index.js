@@ -8,13 +8,15 @@ const { stopStreaming } = require('./stopStreaming');
  * @description Add ability to connect to RTSP camera.
  * @param {Object} gladys - Gladys instance.
  * @param {Object} ffmpeg - Ffmpeg library.
+ * @param {Object} childProcess - childProcess library.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const rtspCameraHandler = new RtspCameraHandler(gladys, ffmpeg, serviceId);
  */
-const RtspCameraHandler = function RtspCameraHandler(gladys, ffmpeg, serviceId) {
+const RtspCameraHandler = function RtspCameraHandler(gladys, ffmpeg, childProcess, serviceId) {
   this.gladys = gladys;
   this.ffmpeg = ffmpeg;
+  this.childProcess = childProcess;
   this.serviceId = serviceId;
   this.liveStreams = new Map();
   this.liveStreamsStarting = new Map();

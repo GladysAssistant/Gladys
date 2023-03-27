@@ -1,8 +1,12 @@
 const { assert, fake } = require('sinon');
 const RtspCameraController = require('../../../../services/rtsp-camera/api/rtspCamera.controller');
 
+const gladys = {};
+
 const rtspCameraService = {
   getImage: fake.resolves('base64image'),
+  startStreamingIfNotStarted: fake.resolves({}),
+  stopStreaming: fake.resolves({}),
 };
 
 const res = {
@@ -23,11 +27,40 @@ describe('POST /api/v1/service/rtsp-camera/camera/test', () => {
         },
       ],
     };
-    const rtspCameraController = RtspCameraController(rtspCameraService);
+    const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
     const req = {
       body: device,
     };
     await rtspCameraController['post /api/v1/service/rtsp-camera/camera/test'].controller(req, res);
     assert.calledWith(rtspCameraService.getImage, device);
+  });
+  it('should start streaming', async () => {
+    const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
+    const req = {
+      params: {
+        camera_selector: 'my-camera',
+      },
+      body: {
+        origin: 'http://origin',
+      },
+    };
+    await rtspCameraController['post /api/v1/service/rtsp-camera/camera/:camera_selector/streaming/start'].controller(
+      req,
+      res,
+    );
+    assert.calledWith(rtspCameraService.startStreamingIfNotStarted, 'my-camera', 'http://origin');
+  });
+  it('should stop streaming', async () => {
+    const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
+    const req = {
+      params: {
+        camera_selector: 'my-camera',
+      },
+    };
+    await rtspCameraController['post /api/v1/service/rtsp-camera/camera/:camera_selector/streaming/stop'].controller(
+      req,
+      res,
+    );
+    assert.calledWith(rtspCameraService.stopStreaming, 'my-camera');
   });
 });

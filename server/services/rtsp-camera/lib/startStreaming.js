@@ -4,7 +4,6 @@ const { promises: fs } = require('fs');
 const path = require('path');
 const util = require('util');
 const randomBytes = util.promisify(require('crypto').randomBytes);
-const { spawn } = require('child_process');
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
@@ -69,7 +68,7 @@ async function startStreaming(cameraSelector, backendUrl) {
   const encryptionKeyFilePath = path.join(folderPath, 'index.m3u8.key');
   await fs.writeFile(keyInfoFilePath, `${encryptionKeyUrl}\n${encryptionKeyFilePath}`);
   await fs.writeFile(encryptionKeyFilePath, encryptionKey);
-  console.log(await fs.readdir(folderPath));
+
   // Build the array of parameters
   const args = [
     '-i',
@@ -103,7 +102,7 @@ async function startStreaming(cameraSelector, backendUrl) {
     timeout: 10 * 60 * 1000, // 10 minutes
   };
 
-  const liveStreamingProcess = spawn('ffmpeg', args, options);
+  const liveStreamingProcess = this.childProcess.spawn('ffmpeg', args, options);
 
   liveStreamingProcess.stdout.on('data', (data) => {
     logger.debug(`stdout: ${data}`);
