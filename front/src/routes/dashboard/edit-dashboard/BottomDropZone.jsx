@@ -23,7 +23,7 @@ const BottomDropZone = ({ children, ...props }) => {
       ref={ref}
       class={cx('text-center', style.bottomDropZone)}
       style={{
-        display: canDrop ? 'block' : 'none',
+        display: canDrop || props.isMobileReordering ? 'block' : 'none',
         backgroundColor: isActive ? '#ecf0f1' : undefined
       }}
     />

@@ -1,17 +1,16 @@
-const jobs = require('../../config/scheduler-jobs');
+const schedule = require('node-schedule');
 
-const { cancel } = require('./scheduler.cancel');
+const { scheduleJob } = require('./scheduler.scheduleJob');
+const { cancelJob } = require('./scheduler.cancelJob');
 const { init } = require('./scheduler.init');
-const { run } = require('./scheduler.run');
 
 const Scheduler = function Scheduler(event) {
   this.event = event;
-  this.jobs = jobs;
-  this.jobsScheduled = {};
+  this.nodeSchedule = schedule;
 };
 
-Scheduler.prototype.cancel = cancel;
+Scheduler.prototype.scheduleJob = scheduleJob;
+Scheduler.prototype.cancelJob = cancelJob;
 Scheduler.prototype.init = init;
-Scheduler.prototype.run = run;
 
 module.exports = Scheduler;

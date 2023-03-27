@@ -6,11 +6,12 @@ const { handleEvent } = require('./message.handleEvent');
 const { replyByIntent } = require('./message.replyByIntent');
 const { sendToUser } = require('./message.sendToUser');
 
-const MessageHandler = function MessageHandler(event, brain, service, state) {
+const MessageHandler = function MessageHandler(event, brain, service, state, variable) {
   this.event = event;
   this.brain = brain;
   this.service = service;
   this.state = state;
+  this.variable = variable;
   event.on(EVENTS.MESSAGE.NEW, (message) => this.handleEvent(message));
 };
 
