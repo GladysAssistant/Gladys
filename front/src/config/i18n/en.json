@@ -647,7 +647,7 @@
       },
       "device": {
         "title": "Z-Wave Devices",
-        "noDeviceDiscovered": "No new device discovered, please click on scan button.",
+        "noDevice": "No new device discovered, please click on scan button.",
         "search": "Search devices",
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
