@@ -49,17 +49,7 @@ const VacbotBox = ({ children, ...props }) => (
     </div>
     
     <div class="mt-3">
-      <ul class="list-unstyled list-separated mb-0">
-        <li class="list-separated-item">
-        hasMoppingSystem : {props.hasMoppingSystem}
-        </li>
-        <li class="list-separated-item">
-        chargeStatus : {props.chargeStatus}
-        </li>
-        <li class="list-separated-item">
-        cleanReport : {props.cleanReport}
-        </li>
-      </ul> 
+        hasMoppingSystem : {props.hasMoppingSystem}, chargeStatus : {props.chargeStatus},  cleanReport : {props.cleanReport}
     </div>
   </div>
 );
