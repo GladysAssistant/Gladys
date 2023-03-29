@@ -5,6 +5,7 @@ import actions from '../../../actions/dashboard/boxes/vacbot';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY, RequestStatus } from '../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
+import cx from 'classnames';
 
 const BOX_REFRESH_INTERVAL_MS = 3 * 6 * 1000;
 
@@ -35,18 +36,60 @@ const VacbotBox = ({ children, ...props }) => (
             {props.chargeStatus != 'charging' && <i class={`fe fe-battery`} style={{fontSize: '20px'}}>{props.batteryLevel}%</i> }
           </div>
     </div>
-    <div class="row">
-      <div class="card-body d-flex col-9">
-        <img src={props.imageUrl} style="width: 80%;" />
-      </div>
-      <div class="col-3" style={{fontSize: '20px'}}>
-        <ul class="list-unstyled mb-0" style={{marginTop: '50px'}}>
-          {props.hasMappingCapabilities && <li class={`fe fe-map`} />}
-          {props.hasCustomAreaCleaningMode && <li class={`fe fe-codepen`} />}
-      </ul> 
+ 
+    
+        <div class="position-relative" style={{fontSize: '20px'}}>
+          
+          <img src={props.imageUrl}  />
+  
+  
+          <span class="position-absolute top-0 start-100  badge rounded-pill bg-secondary">
+          
+          {props.hasMappingCapabilities && <button class={`btn btn-sm fe fe-map`} />}
+          {props.hasCustomAreaCleaningMode && <button class={`btn btn-sm fe fe-codepen`} />}
+       
+          </span>
+      
+        
+      
+        
 
-      </div>
+      
     </div>
+    
+      <div class="d-flex justify-content-center">
+        <div class="btn-group" role="group">
+          <button
+            class={cx('btn btn-sm btn-secondary', 'fe', 'fe-play', {
+              active: 1
+            })}
+            onClick={props.clean}
+          >
+            
+          </button>
+          <button
+            class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
+              active: 1
+            })}
+            onClick={props.pause}
+          />
+          <button
+            class={cx('btn btn-sm btn-secondary', 'fe', 'fe-square', {
+              active: 1
+            })}
+            onClick={props.stop}
+          >
+          </button>
+          <button
+            class={cx('btn btn-sm btn-secondary', 'fe', 'fe-home', {
+              active: 1
+            })}
+            onClick={props.home}
+          ></button>
+        </div>
+      </div>
+    
+   
     
     <div class="mt-3">
         hasMoppingSystem : {props.hasMoppingSystem}, chargeStatus : {props.chargeStatus},  cleanReport : {props.cleanReport}

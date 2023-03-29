@@ -38,6 +38,18 @@ function createActions(store) {
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
       }
+    },
+    async clean(state, box, x, y) {
+      console.log(`clean`);
+    },
+    async stop(state, box, x, y) {
+      console.log(`stop`);
+    },
+    async pause(state, box, x, y) {
+      console.log(`pause`);
+    },
+    async home(state, box, x, y) {
+      console.log(`home`);
     }
     /*,
     deviceFeatureWebsocketEvent(state, box, x, y, payload) {
