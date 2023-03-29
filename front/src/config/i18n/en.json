@@ -647,7 +647,6 @@
       },
       "device": {
         "title": "Z-Wave Devices",
-        "noDevice": "No new device discovered, please click on scan button.",
         "search": "Search devices",
         "noDevices": "No Z-Wave devices added yet.",
         "scanButton": "Scan",
@@ -665,11 +664,11 @@
       },
       "discover": {
         "title": "Z-Wave Devices",
+        "noDeviceDiscovered": "No Z-Wave devices found. Have you correctly configured Zwavejs UI in Settings?",
         "addNodeButton": "Add",
         "addNodeSecureButton": "Add Secure",
         "removeNode": "Remove",
         "scanButton": "Scan",
-        "noZwaveDevices": "No Z-Wave devices found. Have you correctly configured Zwavejs UI in Settings?",
         "manufacturer": "Manufacturer",
         "name": "Name",
         "scanInProgressText": "Scan in Progress...",
@@ -738,6 +737,7 @@
         "removeNodeTitle": "Exclusion Mode",
         "seconds": "seconds remaining",
         "cancelButton": "Cancel",
+        "noNodeAdded": "No new device discovered, please click on scan button.",
         "nodeAddedTitle": "A new node was found",
         "nodeAddedDescription": "Wait a few seconds while we get all of the information from this node..."
       }

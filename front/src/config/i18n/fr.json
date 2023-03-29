@@ -663,7 +663,7 @@
       "discover": {
         "title": "Découverte du réseau Zigbee",
         "permitJoin": "Autoriser l'association",
-        "noDevice": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
+        "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "serverNoResponse": "Gladys n'est pas accessible.",
         "serverNoResponseWebSocker": "Gladys n'est pas accessible. Veuillez actualiser la page.",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
@@ -790,12 +790,11 @@
       },
       "discover": {
         "title": "Appareils Z-Wave",
-        "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.",
+        "noDeviceDiscovered": "Aucun appareil Z-Wave trouvé. Avez-vous correctemnt configuré Zwavejs UI dans les paramètres ?",
         "addNodeButton": "Ajouter",
         "addNodeSecureButton": "Ajout sécurisé",
         "removeNode": "Supprimer",
         "scanButton": "Recherche",
-        "noZwaveDevices": "Aucun appareil Z-Wave trouvé. Avez-vous correctemnt configuré Zwavejs UI dans les paramètres ?",
         "manufacturer": "Fabricant",
         "name": "Nom",
         "scanInProgressText": "Recherche en cours...",
@@ -864,6 +863,7 @@
         "removeNodeTitle": "Mode d'exclusion",
         "seconds": "secondes restantes",
         "cancelButton": "Annuler",
+        "noNodeAdded": "Aucun nouvel appareil Z-Wave n'a encore été ajouté, essayez .",
         "nodeAddedTitle": "Un nouveau nœud a été trouvé",
         "nodeAddedDescription": "Attendez quelques secondes pendant que nous obtenons toutes les informations de ce nœud..."
       }
