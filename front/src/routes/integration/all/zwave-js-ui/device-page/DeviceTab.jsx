@@ -1,6 +1,7 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
+import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../../utils/consts';
 import Device from './Device';
 import style from './style.css';
@@ -32,11 +33,7 @@ const NodeTab = ({ children, ...props }) => (
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {props.zwaveDevices && props.zwaveDevices.length === 0 && (
-            <div class="alert alert-info">
-              <Text id="integration.zwave-js-ui.device.noDevices" />
-            </div>
-          )}
+          {props.zwaveDevices && props.zwaveDevices.length === 0 && <EmptyState />}
           {props.getZwaveDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.zwaveDevices &&

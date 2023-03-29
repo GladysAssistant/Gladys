@@ -2,10 +2,10 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import ZwaveJSUIPage from '../ZwaveJSUIPage';
-import NodeTab from './NodeTab';
+import DeviceTab from './DeviceTab';
 
 @connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch', actions)
-class ZwaveJSUINodePage extends Component {
+class ZwaveJSUIDevicePage extends Component {
   componentWillMount() {
     this.props.getZWaveDevices();
     this.props.getHouses();
@@ -14,10 +14,10 @@ class ZwaveJSUINodePage extends Component {
   render(props, {}) {
     return (
       <ZwaveJSUIPage user="{props.user}">
-        <NodeTab {...props} />
+        <DeviceTab {...props} />
       </ZwaveJSUIPage>
     );
   }
 }
 
-export default ZwaveJSUINodePage;
+export default ZwaveJSUIDevicePage;

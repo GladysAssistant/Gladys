@@ -106,13 +106,13 @@ class SettingsTab extends Component {
                   )}
 
                 {!props.usbConfigured && (
-                  <div class="alert alert-info">
+                  <div class="alert alert-danger">
                     <Text id="integration.zwave-js-ui.settings.zwaveNotConfiguredError" />
                   </div>
                 )}
 
                 {!props.mqttConnected && (
-                  <div class="alert alert-info">
+                  <div class="alert alert-warning">
                     <Text id="integration.zwave-js-ui.settings.notConnected" />
                   </div>
                 )}
@@ -247,6 +247,9 @@ class SettingsTab extends Component {
                       <label class="form-label">
                         <Text id="integration.zwave-js-ui.settings.zwaveUsbDriverPathLabel" />
                       </label>
+                      <button class="btn btn-info" onClick={props.getUsbPorts}>
+                        <Text id="integration.zwave-js-ui.settings.refreshButton" />
+                      </button>
                       <select class="form-control" onChange={this.updateUsbDriverPath}>
                         <option>
                           <Text id="global.emptySelectOption" />
@@ -263,9 +266,6 @@ class SettingsTab extends Component {
                               )
                           )}
                       </select>
-                      <button class="btn btn-info ml-2" onClick={props.getUsbPorts}>
-                        <Text id="integration.zwave-js-ui.settings.refreshButton" />
-                      </button>
                     </div>
                     <div class="form-group">
                       <label for="s2UnauthenticatedKey" class="form-label">

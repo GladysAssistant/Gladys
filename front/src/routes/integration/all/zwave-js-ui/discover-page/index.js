@@ -9,7 +9,7 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
   'user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus,zwaveScanNetworkStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch',
   actions
 )
-class ZwaveJSUINodePage extends Component {
+class ZwaveJSUIDevicePage extends Component {
   nodeReadyListener = () => this.props.getNodes();
   scanCompleteListener = () => {
     this.props.getStatus();
@@ -43,4 +43,4 @@ class ZwaveJSUINodePage extends Component {
   }
 }
 
-export default ZwaveJSUINodePage;
+export default ZwaveJSUIDevicePage;

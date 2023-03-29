@@ -164,6 +164,7 @@ async function connect() {
           payload: err,
         });
         this.mqttConnected = false;
+        this.scanInProgress = false;
       });
 
       this.mqttClient.on('offline', () => {
@@ -173,6 +174,7 @@ async function connect() {
           payload: 'DISCONNECTED',
         });
         this.mqttConnected = false;
+        this.scanInProgress = false;
       });
 
       this.mqttClient.on('message', (topic, message) => {

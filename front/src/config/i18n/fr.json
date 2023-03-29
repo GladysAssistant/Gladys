@@ -790,6 +790,7 @@
       },
       "discover": {
         "title": "Appareils Z-Wave",
+        "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.",
         "addNodeButton": "Ajouter",
         "addNodeSecureButton": "Ajout sécurisé",
         "removeNode": "Supprimer",

@@ -123,8 +123,8 @@ import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
 // ZwaveJSUI
-import ZwaveJSUINodePage from '../routes/integration/all/zwave-js-ui/node-page';
-import ZwaveJSUINodeOperationPage from '../routes/integration/all/zwave-js-ui/node-operation-page';
+import ZwaveJSUIDevicePage from '../routes/integration/all/zwave-js-ui/device-page';
+import ZwaveJSUIDeviceOperationPage from '../routes/integration/all/zwave-js-ui/node-operation-page';
 import ZwaveJSUIDiscoverPage from '../routes/integration/all/zwave-js-ui/discover-page';
 import ZwaveJSUISettingsPage from '../routes/integration/all/zwave-js-ui/settings-page';
 import ZwaveJSUIEditPage from '../routes/integration/all/zwave-js-ui/edit-page';
@@ -257,11 +257,11 @@ const AppRouter = connect(
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
         <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
 
-        <ZwaveJSUINodePage path="/dashboard/integration/device/zwave-js-ui" />
-        <ZwaveJSUINodePage path="/dashboard/integration/device/zwave-js-ui/node" />
+        <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwave-js-ui" />
+        <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwave-js-ui/node" />
         <ZwaveJSUIDiscoverPage path="/dashboard/integration/device/zwave-js-ui/discover" />
         <ZwaveJSUISettingsPage path="/dashboard/integration/device/zwave-js-ui/settings" />
-        <ZwaveJSUINodeOperationPage path="/dashboard/integration/device/zwave-js-ui/node-operation" />
+        <ZwaveJSUIDeviceOperationPage path="/dashboard/integration/device/zwave-js-ui/node-operation" />
         <ZwaveJSUIEditPage path="/dashboard/integration/device/zwave-js-ui/edit/:deviceSelector" />
 
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
