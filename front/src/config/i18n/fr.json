@@ -813,9 +813,10 @@
       },
       "settings": {
         "title": "Paramètres Z-Wave",
-        "description": "Ce service utilise deux containers Docker (MQTT broker and ZwaveJS UI). L'interface ZwaveJS UI est disponible à l'URL ci-dessous avec user = admin, mot de passe = zwave.\nPour en savoir plus, rendez-vous sur la page de documentation ZwaveJS UI\n<a href=\"http://localhost:8091\">ZwaveJS UI</a>",
+        "description": "Ce service utilise deux containers Docker (MQTT broker and ZwaveJS UI). L'interface ZwaveJS UI est disponible à l'URL ci-dessous avec user = admin, mot de passe = zwave.",
         "zwave-js-ui": "Zwavejs UI interface",
         "zwaveJSUIVersionError": "Zwavejs UI version non supportée: version supportée {{expectedVersion}} mais version actuelle est {{currentVersion}} ",
+        "securityKeysDescription": "Si vous migrer un réseau ZWave existant, spécifier ci-dessous les 4 clés de sécurité du réseau. Si vous utilisez ZWave JS UI, vous trouverez ces clés dans l'interface d'administration ZWave JS UI: Section Settings > Z-Wave.",
         "urlLabel": "URL du broker",
         "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
         "userLabel": "Nom d'utilisateur",

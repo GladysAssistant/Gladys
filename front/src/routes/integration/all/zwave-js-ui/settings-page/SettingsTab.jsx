@@ -67,6 +67,13 @@ class SettingsTab extends Component {
             <h2 class="card-title">
               <Text id="integration.zwave-js-ui.settings.title" />
             </h2>
+            {!props.externalZwaveJSUI && (
+              <div class="page-options d-flex">
+                <button class="btn btn-info" onClick={props.getUsbPorts}>
+                  <Text id="integration.zwave-js-ui.settings.refreshButton" />
+                </button>
+              </div>
+            )}
           </div>
           <div class="card-body">
             <div
@@ -247,9 +254,6 @@ class SettingsTab extends Component {
                       <label class="form-label">
                         <Text id="integration.zwave-js-ui.settings.zwaveUsbDriverPathLabel" />
                       </label>
-                      <button class="btn btn-info" onClick={props.getUsbPorts}>
-                        <Text id="integration.zwave-js-ui.settings.refreshButton" />
-                      </button>
                       <select class="form-control" onChange={this.updateUsbDriverPath}>
                         <option>
                           <Text id="global.emptySelectOption" />
@@ -267,6 +271,9 @@ class SettingsTab extends Component {
                           )}
                       </select>
                     </div>
+                    <p>
+                      <Text id={`integration.zwave-js-ui.settings.securityKeysDescription`} />
+                    </p>
                     <div class="form-group">
                       <label for="s2UnauthenticatedKey" class="form-label">
                         <Text id={`integration.zwave-js-ui.settings.s2UnauthenticatedKeyLabel`} />

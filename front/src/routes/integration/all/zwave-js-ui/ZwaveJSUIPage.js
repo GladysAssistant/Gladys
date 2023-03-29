@@ -9,9 +9,9 @@ const DashboardSettings = ({ children, user }) => (
         <div class="container">
           <div class="row">
             <div class="col-lg-3">
-              <h3 class="page-title mb-5">
+              <h2 class="page-title mb-5">
                 <Text id="integration.zwave-js-ui.title" />
-              </h3>
+              </h2>
               <div>
                 <div class="list-group list-group-transparent mb-0">
                   <Link

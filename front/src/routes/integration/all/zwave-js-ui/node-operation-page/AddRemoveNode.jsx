@@ -3,13 +3,13 @@ import { Text } from 'preact-i18n';
 const AddNode = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">
+      <h2 class="card-title">
         {props.action === 'remove' ? (
           <Text id="integration.zwave-js-ui.nodeOperation.removeNodeTitle" />
         ) : (
           <Text id="integration.zwave-js-ui.nodeOperation.addNodeTitle" />
         )}
-      </h3>
+      </h2>
       <div class="card-options">
         <button class="btn btn-danger" onClick={props.cancel}>
           <Text id="integration.zwave-js-ui.nodeOperation.cancelButton" />

@@ -52,11 +52,11 @@ class ZwaveNode extends Component {
         <div class="card">
           <div class="card-header">
             {props.node.ready ? (
-              <h3 class="card-title">{props.node.name}</h3>
+              <h2 class="card-title">{props.node.name}</h2>
             ) : (
-              <h3 class="card-title">
+              <h2 class="card-title">
                 <Text id="integration.zwave-js-ui.discover.unknowNode" />
-              </h3>
+              </h2>
             )}
             <div class="card-options">
               <span class="tag">

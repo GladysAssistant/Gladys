@@ -10,9 +10,9 @@ import CardFilter from '../../../../../components/layout/CardFilter';
 const NodeTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">
+      <h2 class="card-title">
         <Text id="integration.zwave-js-ui.device.title" />
-      </h3>
+      </h2>
       <div class="page-options d-flex">
         <Localizer>
           <CardFilter
