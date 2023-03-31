@@ -402,7 +402,7 @@ describe('zwaveJSUIManager events', () => {
         classes: {},
         endpoints: [2],
         product: 'deviceId',
-        firmwareVersion: 'firmwareVersion',        
+        firmwareVersion: 'firmwareVersion',
         name: 'name',
         loc: 'location',
         status: 'status',
