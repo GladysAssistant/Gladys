@@ -31,11 +31,6 @@ function createActions(store) {
           });
         }
       }
-    },
-    async saveUser(state, userId) {
-      await state.session.gatewayClient.updateUserIdInGladys(userId);
-      // hard redirect, to reload websocket connection
-      window.location = '/dashboard';
     }
   };
   return actions;

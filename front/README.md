@@ -1,4 +1,11 @@
-# gladys
+<h1 align="center">
+  <br>
+	<img src="https://gladysassistant.com/en/img/external/github-gladys-logo.png" width="200">
+  <br>
+  Gladys Assistant
+</h1>
+
+<h4 align="center">A privacy-first, open-source home assistant</h4>
 
 ## CLI Commands
 
