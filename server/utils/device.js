@@ -108,9 +108,82 @@ function hasDeviceChanged(newDevice, existingDevice = {}) {
   return deviceChanged;
 }
 
+/**
+ * @description Merge feature attributes from existing with the new one.
+ * It keeps 'name' attribute from existing.
+ *
+ * @param {Object} newFeature - Newly created feature.
+ * @param {Object} existingFeature - Already existing feature.
+ * @returns {Object} A new feature merged with existing one.
+ *
+ * @example
+ * mergeFeatures({ name: 'Default name' }, { name: 'Overriden name' })
+ */
+function mergeFeatures(newFeature, existingFeature = {}) {
+  const { name } = existingFeature || {};
+
+  if (name) {
+    return { ...newFeature, name };
+  }
+
+  return newFeature;
+}
+
+/**
+ * @description Merge device attributes from existing with the new one.
+ * It keeps 'name', 'room_id' attributes from existing.
+ *
+ * @param {Object} newDevice - Newly created device.
+ * @param {Object} existingDevice - Already existing device.
+ * @param {string} updateAttribute - The attribute to add on the device to check if it is still new or update.
+ * @returns {Object} A new device merged with existing one, or the new device if it didn't change.
+ *
+ * @example
+ * mergeDevices({ name: 'Default name', features: [] }, { name: 'Overriden name', features: [] })
+ */
+function mergeDevices(newDevice, existingDevice, updateAttribute = 'updatable') {
+  // No existing device
+  if (!existingDevice) {
+    return newDevice;
+  }
+
+  const { features: newFeatures = [], params: newParams = [] } = newDevice;
+  const { features: oldFeatures = [], params: oldParams = [], name, room_id: roomId } = existingDevice;
+
+  let deviceChanged = oldFeatures.length !== newFeatures.length || oldParams.length !== newParams.length;
+
+  // Group old features by external id
+  const oldFeatureByExternalId = {};
+  oldFeatures.forEach((oldFeature) => {
+    oldFeatureByExternalId[oldFeature.external_id] = oldFeature;
+  });
+
+  // Merge matching features
+  const features = newFeatures.map((newFeature) => {
+    const oldFeature = oldFeatureByExternalId[newFeature.external_id];
+
+    if (!oldFeature) {
+      deviceChanged = true;
+      return newFeature;
+    }
+
+    return mergeFeatures(newFeature, oldFeature);
+  });
+
+  let i = 0;
+  while (!deviceChanged && newParams[i]) {
+    deviceChanged = matchParam(oldParams, newParams[i]) < 0;
+    i += 1;
+  }
+
+  return { ...existingDevice, ...newDevice, name, room_id: roomId, features, [updateAttribute]: deviceChanged };
+}
+
 module.exports = {
   getDeviceParam,
   setDeviceParam,
   getDeviceFeature,
   hasDeviceChanged,
+  mergeFeatures,
+  mergeDevices,
 };

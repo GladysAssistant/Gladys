@@ -157,6 +157,7 @@ const data = {
             'main-tv-channel',
             'main-presence-sensor',
             'main-signal-sensor',
+            'air-conditioning',
             'button-click'
           ]
         }
@@ -484,6 +485,47 @@ const data = {
             read_only: true,
             last_value: 27,
             last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      },
+      {
+        id: 'db3e81b6-00d4-4f9b-8aa6-0e50e719a729',
+        name: 'AC Conditioning',
+        selector: 'air-conditioning',
+        features: [
+          {
+            name: 'AC Conditioning',
+            selector: 'air-conditioning',
+            category: 'air-conditioning',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2022-10-10 07:49:07.556 +00:00'
+          },
+          {
+            name: 'AC Conditioning',
+            selector: 'air-conditioning',
+            category: 'air-conditioning',
+            type: 'mode',
+            min: 0,
+            max: 2,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2022-10-10 07:49:07.556 +00:00'
+          },
+          {
+            name: 'AC Conditioning',
+            selector: 'air-conditioning',
+            category: 'air-conditioning',
+            type: 'target-temperature',
+            min: 0,
+            max: 30,
+            read_only: false,
+            last_value: 24,
+            last_value_changed: '2022-10-10 07:49:07.556 +00:00',
+            unit: 'celsius'
           }
         ]
       }
