@@ -4,6 +4,7 @@ import cx from 'classnames';
 
 import { getDeviceName } from '../../../../utils/device';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
 import style from './style.css';
 
@@ -11,6 +12,8 @@ const isNullOrUndefined = val => val === null || val === undefined;
 const DEFAULT_TEMPERATURE_IN_CASE_EMPTY = 18;
 
 const ThermostatDeviceFeature = ({ children, ...props }) => {
+  const TEMPERATURE_STEP = props.deviceFeature.category == DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING ? 1 : 0.5;
+
   function updateValue(value) {
     props.updateValueWithDebounce(
       props.x,
@@ -32,14 +35,14 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
     const prevValue = isNullOrUndefined(props.deviceFeature.last_value)
       ? DEFAULT_TEMPERATURE_IN_CASE_EMPTY
       : props.deviceFeature.last_value;
-    updateValue(prevValue + 0.5);
+    updateValue(prevValue + TEMPERATURE_STEP);
   }
 
   function substract() {
     const prevValue = isNullOrUndefined(props.deviceFeature.last_value)
       ? DEFAULT_TEMPERATURE_IN_CASE_EMPTY
       : props.deviceFeature.last_value;
-    updateValue(prevValue - 0.5);
+    updateValue(prevValue - TEMPERATURE_STEP);
   }
 
   return (
@@ -69,7 +72,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
                 value={props.deviceFeature.last_value}
                 class={cx('form-control text-center', style.removeNumberArrow)}
                 onChange={updateValueEvent}
-                step={0.5}
+                step={TEMPERATURE_STEP}
                 min={props.deviceFeature.min}
                 max={props.deviceFeature.max}
               />
@@ -92,7 +95,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
                     value={props.deviceFeature.last_value}
                     class={cx('form-control text-center input-sm', style.removeNumberArrow)}
                     onChange={updateValueEvent}
-                    step={0.5}
+                    step={TEMPERATURE_STEP}
                     min={props.deviceFeature.min}
                     max={props.deviceFeature.max}
                   />

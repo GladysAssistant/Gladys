@@ -9,6 +9,13 @@ const gladys = {
   event: {
     emit: fake.returns,
   },
+  job: {
+    wrapper: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
+  },
 };
 
 describe('zigbee2mqtt service', () => {
