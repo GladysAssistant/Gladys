@@ -85,29 +85,39 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
     if (!valueIsMoreRecentThanCurrentValue) {
       // We need to update last aggregate value
       // So that aggregate is calculated again
-      const firstOfTheMonth = new Date(newValueCreatedAtDate.getFullYear(), newValueCreatedAtDate.getMonth(), 1);
-      const dateAtMidnight = new Date(newValueCreatedAtDate);
-      dateAtMidnight.setHours(0, 0, 0, 0);
+      const lastDayOfPreviousMonth = new Date(
+        newValueCreatedAtDate.getFullYear(),
+        newValueCreatedAtDate.getMonth() - 1,
+        0,
+      );
+      const dayBeforeJustBeforeMidnight = new Date(
+        newValueCreatedAtDate.getFullYear(),
+        newValueCreatedAtDate.getMonth(),
+        newValueCreatedAtDate.getDate(),
+        23,
+        59,
+        59,
+      );
 
       const newMonthlyAggregateIsBeforeCurrent =
-        firstOfTheMonth < new Date(previousDeviceFeature.last_monthly_aggregate || 0);
+        lastDayOfPreviousMonth < new Date(previousDeviceFeature.last_monthly_aggregate || 0);
       const newDailyAggregateIsBeforeCurrent =
-        dateAtMidnight < new Date(previousDeviceFeature.last_daily_aggregate || 0);
+        dayBeforeJustBeforeMidnight < new Date(previousDeviceFeature.last_daily_aggregate || 0);
       const newHourlyAggregateIsBeforeCurrent =
-        dateAtMidnight < new Date(previousDeviceFeature.last_hourly_aggregate || 0);
+        dayBeforeJustBeforeMidnight < new Date(previousDeviceFeature.last_hourly_aggregate || 0);
       const toUpdate = {};
       if (newMonthlyAggregateIsBeforeCurrent) {
-        toUpdate.last_monthly_aggregate = firstOfTheMonth;
+        toUpdate.last_monthly_aggregate = lastDayOfPreviousMonth;
       }
       if (newDailyAggregateIsBeforeCurrent) {
-        toUpdate.last_daily_aggregate = dateAtMidnight;
+        toUpdate.last_daily_aggregate = dayBeforeJustBeforeMidnight;
       }
       if (newHourlyAggregateIsBeforeCurrent) {
-        toUpdate.last_hourly_aggregate = dateAtMidnight;
+        toUpdate.last_hourly_aggregate = dayBeforeJustBeforeMidnight;
       }
       if (Object.keys(toUpdate).length > 0) {
         // Update data in RAM
-        this.stateManager.setState('deviceFeature', previousDeviceFeature.selector, toUpdate);
+        this.stateManager.setState('deviceFeature', deviceFeature.selector, toUpdate);
         // Update DB
         await db.DeviceFeature.update(toUpdate, {
           where: {
