@@ -366,6 +366,7 @@ describe('zwaveJSUIManager events', () => {
     const zwaveNode = {
       id: 1,
       manufacturerId: 'manufacturerId',
+      deviceId: 'deviceId',
       product: 'product',
       productType: 'productType',
       productId: 'productId',
@@ -400,8 +401,8 @@ describe('zwaveJSUIManager events', () => {
         nodeId: 1,
         classes: {},
         endpoints: [2],
-        firmwareVersion: 'firmwareVersion',
-        product: 'product',
+        product: 'deviceId',
+        firmwareVersion: 'firmwareVersion',        
         name: 'name',
         loc: 'location',
         status: 'status',
