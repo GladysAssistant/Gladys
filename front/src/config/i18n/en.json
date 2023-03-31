@@ -1046,18 +1046,18 @@
       }
     },
     "openai": {
-      "title": "OpenAI GPT-3",
+      "title": "OpenAI ChatGPT",
       "description": "Give Gladys the power of artifical intelligence",
-      "firstExplanation": "This is an alpha integration that let you talk to OpenAI GPT-3.",
-      "itDoesNothing": "This tab is a sandbox allowing you to test the capabilities of GPT-3. To test real home automation commands, activate GPT-3 in the Gladys chat.",
+      "firstExplanation": "This is an alpha integration that let you talk to OpenAI ChatGPT.",
+      "itDoesNothing": "This tab is a sandbox allowing you to test the capabilities of ChatGPT. To test real home automation commands, activate ChatGPT in the Gladys chat.",
       "aFewExamples": "A few examples: ",
       "turnOnTheLight": "Turn on the light in the kitchen",
       "sizeOfEiffelTower": "What's the size of the Eiffel Tower ?",
       "whoIsJulesVerne": "Who is Jules Verne ?",
       "eggDuration": "How do you make hard boiled eggs ?",
-      "activateOpenAiChat": "Activate GPT-3 in Gladys chat",
-      "rateLimit": "As GPT-3 API is not free, this integration is limited to 100 requests per month.",
-      "notOnGladysPlus": "As GPT-3 API is not free, this integration is only available to Gladys Plus users.",
+      "activateOpenAiChat": "Activate ChatGPT in Gladys chat",
+      "rateLimit": "As ChatGPT API is not free, this integration is limited to 1000 requests per month.",
+      "notOnGladysPlus": "As ChatGPT API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
       "licenseShouldBeActive": "This integration is only available to users with an active license (at least one payment). For trial users, please contact us on the forum or email."
     }
@@ -2181,8 +2181,8 @@
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
-    "gpt3Integration": "GPT-3 integration",
-    "gpt3IntegrationExplanation": "Gladys is now compatible with GPT-3, which gives her an over-sized intelligence! For more information,",
+    "gpt3Integration": "ChatGPT integration",
+    "gpt3IntegrationExplanation": "Gladys is now compatible with ChatGPT, which gives her an over-sized intelligence! For more information,",
     "gpt3ClickHere": "click-here!",
     "gladysAlt": "Gladys",
     "examples": {
