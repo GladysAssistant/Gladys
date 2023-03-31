@@ -228,7 +228,7 @@ describe('Device.saveHistoricalState', () => {
     expect(newDeviceFeatureInDB.last_hourly_aggregate).to.deep.equal(oldDeviceInDb.last_hourly_aggregate);
     expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
   });
-  it.only('should save old state and update recent aggregate', async () => {
+  it('should save old state and update recent aggregate', async () => {
     const event = {
       emit: stub().returns(null),
       on: stub().returns(null),
