@@ -18,6 +18,12 @@ const COVER_STATE = {
   CLOSE: -1,
 };
 
+const AC_MODE = {
+  AUTO: 0,
+  COOLING: 1,
+  HEATING: 2,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -317,6 +323,7 @@ const INTENTS = {
 const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROL: 'access-control',
   AIRQUALITY_SENSOR: 'airquality-sensor',
+  AIR_CONDITIONING: 'air-conditioning',
   BATTERY: 'battery',
   BUTTON: 'button',
   CAMERA: 'camera',
@@ -417,6 +424,11 @@ const DEVICE_FEATURE_TYPES = {
   },
   SIGNAL: {
     QUALITY: 'integer',
+  },
+  AIR_CONDITIONING: {
+    BINARY: 'binary',
+    MODE: 'mode',
+    TARGET_TEMPERATURE: 'target-temperature',
   },
   TELEVISION: {
     BINARY: 'binary',
@@ -886,6 +898,7 @@ const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.COVER_STATE = COVER_STATE;
+module.exports.AC_MODE = AC_MODE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
