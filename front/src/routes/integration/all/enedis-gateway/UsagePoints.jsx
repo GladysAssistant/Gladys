@@ -16,7 +16,15 @@ import { DEVICE_FEATURE_UNITS } from '../../../../../../server/utils/constants';
 import { DEVICE_PARAMS } from './consts';
 import EnedisPage from './EnedisPage';
 
-const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDeviceParam, saveDevice, syncs = [] }) => {
+const UsagePointDevice = ({
+  device,
+  language = 'fr',
+  deviceIndex,
+  updateDeviceParam,
+  saveDevice,
+  destroyDevice,
+  syncs = []
+}) => {
   const usagePointId = device.external_id.split(':')[1];
 
   const contractType = getDeviceParam(device, DEVICE_PARAMS.CONTRACT_TYPE);
@@ -25,6 +33,7 @@ const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDevicePa
   const lastRefresh = getDeviceParam(device, DEVICE_PARAMS.LAST_REFRESH);
   const numberOfStates = getDeviceParam(device, DEVICE_PARAMS.NUMBER_OF_STATES);
   const mySyncs = syncs.filter(sync => sync.usage_point_id === usagePointId);
+
   let syncInProgress;
   if (mySyncs.length > 0) {
     const lastSync = mySyncs[0];
@@ -53,6 +62,10 @@ const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDevicePa
     saveDevice(deviceIndex);
   };
 
+  const destroy = () => {
+    destroyDevice(deviceIndex);
+  };
+
   return (
     <div class="col-md-6">
       <div class="card">
@@ -68,19 +81,21 @@ const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDevicePa
             </label>
             <input type="text" class="form-control" value={usagePointId} disabled />
           </div>
-          <div class="form-group">
-            <label>
-              <Text id="integration.enedis.usagePoints.contractType" />
-            </label>
-            <select class="form-control" onChange={updateContractType} value={contractType}>
-              <option value="base">
-                <Text id="integration.enedis.usagePoints.contracts.base" />
-              </option>
-              <option value="hc-hp">
-                <Text id="integration.enedis.usagePoints.contracts.hc-hp" />
-              </option>
-            </select>
-          </div>
+          {false && (
+            <div class="form-group">
+              <label>
+                <Text id="integration.enedis.usagePoints.contractType" />
+              </label>
+              <select class="form-control" onChange={updateContractType} value={contractType}>
+                <option value="base">
+                  <Text id="integration.enedis.usagePoints.contracts.base" />
+                </option>
+                <option value="hc-hp">
+                  <Text id="integration.enedis.usagePoints.contracts.hc-hp" />
+                </option>
+              </select>
+            </div>
+          )}
           {contractType === 'base' && (
             <div class="form-group">
               <label>
@@ -155,13 +170,25 @@ const UsagePointDevice = ({ device, language = 'fr', deviceIndex, updateDevicePa
           <button class="btn btn-success" onClick={save}>
             <Text id="integration.enedis.usagePoints.saveButton" />
           </button>
+          <button class="btn btn-danger ml-2" onClick={destroy}>
+            <Text id="integration.enedis.usagePoints.deleteButton" />
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceParam, saveDevice, syncs, sync }) => (
+const EnedisUsagePoints = ({
+  errored,
+  loading,
+  usagePointsDevices,
+  updateDeviceParam,
+  saveDevice,
+  destroyDevice,
+  syncs,
+  sync
+}) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -201,6 +228,12 @@ const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceP
                         </p>
                       )}
 
+                      {usagePointsDevices && usagePointsDevices.length > 0 && (
+                        <p class="alert alert-primary">
+                          <Text id="integration.enedis.usagePoints.explanation" />
+                        </p>
+                      )}
+
                       <div class="row">
                         {usagePointsDevices &&
                           usagePointsDevices.map((usagePointDevice, index) => (
@@ -209,6 +242,7 @@ const EnedisUsagePoints = ({ errored, loading, usagePointsDevices, updateDeviceP
                               deviceIndex={index}
                               updateDeviceParam={updateDeviceParam}
                               saveDevice={saveDevice}
+                              destroyDevice={destroyDevice}
                               syncs={syncs}
                             />
                           ))}
@@ -284,8 +318,26 @@ class EnedisWelcomePageComponent extends Component {
     await this.setState({ loading: false });
   };
   saveDevice = async deviceIndex => {
-    const device = this.state.usagePointsDevices[deviceIndex];
-    await this.props.httpClient.post('/api/v1/device', device);
+    await this.setState({ loading: true });
+    try {
+      const device = this.state.usagePointsDevices[deviceIndex];
+      await this.props.httpClient.post('/api/v1/device', device);
+    } catch (e) {
+      console.error(e);
+    }
+    await this.setState({ loading: false });
+  };
+  destroyDevice = async deviceIndex => {
+    await this.setState({ loading: true });
+    try {
+      const device = this.state.usagePointsDevices[deviceIndex];
+      await this.props.httpClient.delete(`/api/v1/device/${device.selector}`);
+      await this.getCurrentEnedisUsagePoints();
+      await this.getCurrentSync();
+    } catch (e) {
+      console.error(e);
+    }
+    await this.setState({ loading: false });
   };
   init = async () => {
     await this.setState({ loading: true });
@@ -312,6 +364,7 @@ class EnedisWelcomePageComponent extends Component {
           language={user.language}
           updateDeviceParam={this.updateDeviceParam}
           saveDevice={this.saveDevice}
+          destroyDevice={this.destroyDevice}
         />
       </EnedisPage>
     );

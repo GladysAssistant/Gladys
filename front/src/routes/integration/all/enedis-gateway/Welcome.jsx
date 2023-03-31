@@ -48,7 +48,9 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
                       )}
                       {usagePointsIds && (
                         <p class="alert alert-success">
-                          <Text id="integration.enedis.welcome.connectedToUsagePointds" />{' '}
+                          <Text id="integration.enedis.welcome.connectedToUsagePointds" />
+                          <br />
+                          <br />
                           <Text id="integration.enedis.welcome.reconnectInfo" />
                         </p>
                       )}

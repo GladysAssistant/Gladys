@@ -717,7 +717,7 @@
         "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données :",
         "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer.",
         "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus !",
-        "connectedToUsagePointds": "Connecté à Enedis avec succès !",
+        "connectedToUsagePointds": "Connecté à Enedis avec succès ! La première synchronisation peut prendre entre 2h et 3h selon le volume de requêtes sur l'API Enedis. Il n'est pas nécessaire de garder cet onglet ouvert, la synchronisation a lieu en arrière-plan.",
         "reconnectInfo": "Si jamais vous voulez rafraichir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 3 ans."
       },
       "usagePoints": {
@@ -738,9 +738,11 @@
         "lastValueLabel": "Dernière valeur :",
         "numberOfStatesLabel": "Nombre d'états synchronisés:",
         "gladysPlusRefreshProgressLabel": "Synchronisation en cours...",
-        "gladysPlusRefreshProgressDescription": "Gladys Plus est entrain de rafraîchir son cache via l'API Enedis. Cette synchronisation peut prendre du temps, car Enedis impose des limites de requêtes.",
+        "gladysPlusRefreshProgressDescription": "Gladys Plus est entrain de rafraîchir son cache via l'API Enedis. Cette synchronisation peut prendre du temps, car Enedis impose des limites de requêtes. Il n'est pas nécessaire de garder cet onglet ouvert.",
         "refreshLocal": "Synchroniser avec Gladys Plus",
-        "saveButton": "Enregistrer"
+        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponible en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
+        "saveButton": "Enregistrer",
+        "deleteButton": "Supprimer"
       }
     },
     "alexa": {
