@@ -39,7 +39,7 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     // PREPARE
     gladys.stateManager.get
       .onFirstCall()
-      .returns(true)
+      .returns({ room_id: 'room_id', name: 'device-name' })
       .onSecondCall()
       .returns(false)
       .onThirdCall()
