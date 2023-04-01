@@ -910,6 +910,8 @@
         "presenceScannerFrequencyUnit": "minutes",
         "presenceScannerFrequencyError": "Only integers are accepted.",
         "ipMasksLabel": "CIDR to scan",
+        "masksDescription": "CIDR (Classless Inter-Domain Routing) is a notation to describe a range of IP addresses in a sub-network. You can write it as an IP address, followed by a network mask number, both separated by a slash (example: 192.168.1.1/10). There is many CIDR calculators on the Internet which will help you to compute your own.",
+        "networkInterfaceDescription": "Masks defined by your computer on your networks, with network interfaces, can't be removed.",
         "maskTableHeader": "CIDR",
         "nameTableHeader": "Name",
         "statusTableHeader": "Active",

@@ -32,6 +32,9 @@ class LANManagerIPRange extends Component {
           <label class="form-label">
             <Text id="integration.lanManager.setup.ipMasksLabel" />
           </label>
+          <div class="alert alert-secondary">
+            <Text id="integration.lanManager.setup.masksDescription" />
+          </div>
           <div class="table-responsive">
             <table class="table table-vcenter card-table table-striped">
               <thead>
@@ -101,12 +104,12 @@ class LANManagerIPRange extends Component {
                       </Localizer>
                     </div>
                   </td>
-                  <td />
                   <td class="align-top">
                     <button class="btn btn-primary btn-sm" onClick={this.addMask} disabled={disabled || !valid}>
                       <i class="fe fe-plus" />
                     </button>
                   </td>
+                  <td />
                 </tr>
               </tfoot>
             </table>

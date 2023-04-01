@@ -1066,6 +1066,8 @@
         "presenceScannerFrequencyUnit": "minutes",
         "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
         "ipMasksLabel": "CIDR à scanner",
+        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
+        "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne pourrant pas être supprimés.",
         "maskTableHeader": "CIDR",
         "nameTableHeader": "Nom",
         "statusTableHeader": "Actif",

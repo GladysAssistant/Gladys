@@ -32,18 +32,22 @@ class LANManagerIPLine extends Component {
           </label>
         </td>
         <td>
-          {editable && (
-            <Localizer>
-              <button
-                class="btn btn-danger btn-sm"
-                disabled={disabled}
-                onClick={this.deleteMask}
-                title={<Text id="integration.lanManager.setup.deleteButtonTooltip" />}
-              >
-                <i class="fe fe-trash" />
-              </button>
-            </Localizer>
-          )}
+          <Localizer>
+            <button
+              class="btn btn-danger btn-sm"
+              disabled={!editable || disabled}
+              onClick={this.deleteMask}
+              title={
+                editable ? (
+                  <Text id="integration.lanManager.setup.deleteButtonTooltip" />
+                ) : (
+                  <Text id="integration.lanManager.setup.networkInterfaceDescription" />
+                )
+              }
+            >
+              <i class="fe fe-trash" />
+            </button>
+          </Localizer>
         </td>
       </tr>
     );
