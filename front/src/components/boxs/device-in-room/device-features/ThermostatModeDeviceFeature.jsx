@@ -38,19 +38,31 @@ const ThermostatModeDeviceType = ({ children, ...props }) => {
       </td>
       <td>{getDeviceName(props.device, props.deviceFeature)}</td>
       <td class="text-right">
-        <button type="submit" class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === THERMOSTAT_MODE.OFF
-              })} onClick={setOffMode}>
+        <button
+          type="submit"
+          class={cx('btn btn-sm btn-secondary', {
+            active: lastValue === THERMOSTAT_MODE.OFF
+          })}
+          onClick={setOffMode}
+        >
           <Text id="dashboard.boxes.devicesInRoom.offMode" />
         </button>
-        <button type="submit" class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === THERMOSTAT_MODE.ECO
-              })} onClick={setEcoMode}>
+        <button
+          type="submit"
+          class={cx('btn btn-sm btn-secondary', {
+            active: lastValue === THERMOSTAT_MODE.ECO
+          })}
+          onClick={setEcoMode}
+        >
           <Text id="dashboard.boxes.devicesInRoom.ecoMode" />
         </button>
-        <button type="submit" class={cx('btn btn-sm btn-secondary', {
-                active: lastValue === THERMOSTAT_MODE.COMFORT
-              })} onClick={setComfortMode}>
+        <button
+          type="submit"
+          class={cx('btn btn-sm btn-secondary', {
+            active: lastValue === THERMOSTAT_MODE.COMFORT
+          })}
+          onClick={setComfortMode}
+        >
           <Text id="dashboard.boxes.devicesInRoom.comfortMode" />
         </button>
       </td>
