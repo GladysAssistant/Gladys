@@ -1,5 +1,5 @@
 /**
- * @description Get all found preipherals as devices.
+ * @description Get all found network devices as Gladys devices.
  * @param {Object} filters - Filters to apply.
  * @returns {Array} Return list of devices.
  * @example
