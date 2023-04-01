@@ -20,8 +20,8 @@ async function getDevicesStates(device) {
 
     logger.info(`Overkiz : Get new device states: ${deviceURL}`);
 
-    deviceStates.forEach(state => {
-      switch(state.name) {
+    deviceStates.forEach((state) => {
+      switch (state.name) {
         case 'core:ComfortRoomTemperatureState':
         case 'core:EcoRoomTemperatureState':
         case 'core:TargetTemperatureState': // Consigne
@@ -30,7 +30,7 @@ async function getDevicesStates(device) {
           logger.info(`${state.name} has value ${state.value}`);
           break;
         default:
-          //
+        //
       }
     });
 
@@ -39,12 +39,11 @@ async function getDevicesStates(device) {
       const newValueUnbind = unbindValue(device, state.name, state.value);
       const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
       if (deviceFeature) {
-        if(deviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR ||
-          newValueUnbind !== 0) {
-            this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-              device_feature_external_id: deviceFeatureExternalId,
-              state: newValueUnbind,
-            });
+        if (deviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR || newValueUnbind !== 0) {
+          this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: deviceFeatureExternalId,
+            state: newValueUnbind,
+          });
         }
       }
     });

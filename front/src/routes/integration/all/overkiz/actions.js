@@ -62,7 +62,7 @@ function createActions(store) {
         });
       }
     },
-    displayConnectedMessage(state) {
+    displayConnectedMessage() {
       // display 3 seconds a message "Overkiz connected"
       store.setState({
         overkizConnected: true,

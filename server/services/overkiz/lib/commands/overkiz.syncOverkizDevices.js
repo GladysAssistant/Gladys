@@ -12,15 +12,13 @@ function updateGatewayState(gateways) {
   logger.debug('UpdateGatwayState');
 
   this.gateways = gateways;
-
-  // TODO send event
 }
 
+// eslint-disable-next-line jsdoc/require-returns
 /**
  * @description Update Devices State.
- * @param {Object} devices - Devices.
- * @param {Object} rootPlace - RootPlace.
- * @return {Object}
+ * @param {Object} devices - List of devices.
+ * @param {Object} rootPlace - Root place.
  * @example
  * overkiz.updateDevicesState(devices, rootPlace);
  */
@@ -62,4 +60,5 @@ async function syncOverkizDevices() {
 
 module.exports = {
   syncOverkizDevices,
+  updateDevicesState,
 };

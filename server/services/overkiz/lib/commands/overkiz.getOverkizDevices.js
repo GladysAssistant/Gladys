@@ -25,7 +25,7 @@ async function getOverkizDevices() {
 
   // Search for main device (non-pod system device)
   const newDevices = deviceOids
-    .map((deviceOid) => ({ id: deviceOid, ...this.devices[deviceOid]}))
+    .map((deviceOid) => ({ id: deviceOid, ...this.devices[deviceOid] }))
     .filter((node) => node.type === DEVICE_TYPES.SYSTEM)
     .filter((node) => node.uiClass !== DEVICE_UID_CLASSES.POD)
     .map((node) => {
@@ -68,97 +68,101 @@ async function getOverkizDevices() {
     })
     .reduce((map, obj) => {
       // Remove #<idx> to get all nodes from the same physical device
-      const deviceURL = obj.rawOverkizDevice.URL.includes('#') ? 
-        obj.rawOverkizDevice.URL.substring(0, obj.rawOverkizDevice.URL.indexOf('#')) : obj.rawOverkizDevice.URL;
+      const deviceURL = obj.rawOverkizDevice.URL.includes('#')
+        ? obj.rawOverkizDevice.URL.substring(0, obj.rawOverkizDevice.URL.indexOf('#'))
+        : obj.rawOverkizDevice.URL;
       map[deviceURL] = obj;
       return map;
     }, {});
-    
+
   // Search for device associated to main device (same base URL)
   deviceOids
-    .map((deviceOid) => ({ id: deviceOid, ...this.devices[deviceOid]}))
+    .map((deviceOid) => ({ id: deviceOid, ...this.devices[deviceOid] }))
     .filter((node) => {
-      const deviceURL = node.URL.includes('#') ? 
-        node.URL.substring(0, node.URL.indexOf('#')) : node.URL;
+      const deviceURL = node.URL.includes('#') ? node.URL.substring(0, node.URL.indexOf('#')) : node.URL;
       return newDevices[deviceURL] !== undefined;
     })
     .map((node) => {
-      const deviceURL = node.URL.includes('#') ? 
-        node.URL.substring(0, node.URL.indexOf('#')) : node.URL;
+      const deviceURL = node.URL.includes('#') ? node.URL.substring(0, node.URL.indexOf('#')) : node.URL;
       const newDevice = newDevices[deviceURL];
       const newFeature = {
         // rawOverkizDevice: node,
       };
       if (node.uiClass === DEVICE_UID_CLASSES.HEATER) {
-        newDevice.features.push(
-          { ...newFeature, name: `Mode`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.HEATING_LEVEL_STATE}`,
-            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.HEATING_LEVEL_STATE),
-            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-            type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
-            read_only: false,
-            has_feedback: true,
-            min: 0,
-            max: HEATING_LEVELS.length - 1,},
-        );
-        newDevice.features.push(
-          { ...newFeature, name: `Comfort mode temperature`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.COMFORT_TEMPERATURE_STATE}`,
-            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.COMFORT_TEMPERATURE_STATE),
-            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-            read_only: false,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            has_feedback: true,
-            min: 0,
-            max: 40,},
-        );
-        newDevice.features.push(
-          { ...newFeature, name: `Eco mode temperature`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.ECO_TEMPERATURE_STATE}`,
-            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.ECO_TEMPERATURE_STATE),
-            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-            read_only: false,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            has_feedback: true,
-            min: 0,
-            max: 40,},
-        );
+        newDevice.features.push({
+          ...newFeature,
+          name: `Mode`,
+          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.HEATING_LEVEL_STATE}`,
+          external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.HEATING_LEVEL_STATE),
+          category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+          type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+          read_only: false,
+          has_feedback: true,
+          min: 0,
+          max: HEATING_LEVELS.length - 1,
+        });
+        newDevice.features.push({
+          ...newFeature,
+          name: `Comfort mode temperature`,
+          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.COMFORT_TEMPERATURE_STATE}`,
+          external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.COMFORT_TEMPERATURE_STATE),
+          category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+          type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+          read_only: false,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+          has_feedback: true,
+          min: 0,
+          max: 40,
+        });
+        newDevice.features.push({
+          ...newFeature,
+          name: `Eco mode temperature`,
+          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.ECO_TEMPERATURE_STATE}`,
+          external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.ECO_TEMPERATURE_STATE),
+          category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+          type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+          read_only: false,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+          has_feedback: true,
+          min: 0,
+          max: 40,
+        });
       } else if (node.uiClass === DEVICE_UID_CLASSES.TEMPERATURE) {
-        newDevice.features.push(
-          { ...newFeature, name: `Temperature`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.TEMPERATURE_STATE}`,
-            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.TEMPERATURE_STATE),
-            category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
-            read_only: true,
-            unit: DEVICE_FEATURE_UNITS.CELSIUS,
-            has_feedback: true,
-            min: 0,
-            max: 40,},
-        );
+        newDevice.features.push({
+          ...newFeature,
+          name: `Temperature`,
+          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.TEMPERATURE_STATE}`,
+          external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.TEMPERATURE_STATE),
+          category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.CELSIUS,
+          has_feedback: true,
+          min: 0,
+          max: 40,
+        });
       } else if (node.uiClass === DEVICE_UID_CLASSES.OCCUPANCY) {
-        newDevice.features.push(
-          { ...newFeature, name: `Occupancy`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.OCCUPANCY_STATE}`,
-            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.OCCUPANCY_STATE),
-            category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
-            type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,
-            min: 0,
-            max: 1,
-            read_only: true,
-            has_feedback: false,
-            keep_history: true,},
-        );
+        newDevice.features.push({
+          ...newFeature,
+          name: `Occupancy`,
+          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.OCCUPANCY_STATE}`,
+          external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.OCCUPANCY_STATE),
+          category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,
+          min: 0,
+          max: 1,
+          read_only: true,
+          has_feedback: false,
+          keep_history: true,
+        });
       }
-      
+
       return newDevice;
     });
 
   const newDevicesOids = Object.keys(newDevices);
   return newDevicesOids
-    .map((newDevicesOid) => ({ ...newDevices[newDevicesOid]}))
+    .map((newDevicesOid) => ({ ...newDevices[newDevicesOid] }))
     .sort((a, b) => {
       return b.ready - a.ready || a.rawOverkizDevice.id - b.rawOverkizDevice.id;
     });

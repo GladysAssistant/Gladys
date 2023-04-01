@@ -9,7 +9,7 @@ const logger = require('../../../../utils/logger');
 async function disconnect() {
   logger.info(`Overkiz : Disonnecting Overkiz...`);
 
-  if(this.updateDevicesJob) {
+  if (this.updateDevicesJob) {
     this.updateDevicesJob.stop();
   }
 }

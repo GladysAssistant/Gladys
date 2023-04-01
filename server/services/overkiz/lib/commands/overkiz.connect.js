@@ -36,19 +36,12 @@ async function connect() {
 
   const overkizServer = SUPPORTED_SERVERS[overkizType];
   let platformLoginHandler;
-  switch(overkizType) {
+  switch (overkizType) {
     case 'atlantic_cozytouch':
-      platformLoginHandler = new CozytouchLoginHandler(
-        overkizUsername,
-        overkizUserpassword,
-      );
+      platformLoginHandler = new CozytouchLoginHandler(overkizUsername, overkizUserpassword);
       break;
     default:
-      platformLoginHandler = new DefaultLoginHandler(
-        overkizUsername,
-        overkizUserpassword,
-      );
-
+      platformLoginHandler = new DefaultLoginHandler(overkizUsername, overkizUserpassword);
   }
   this.overkizServerAPI = new API({
     host: overkizServer.host,
@@ -56,7 +49,7 @@ async function connect() {
     polling: {
       always: false,
       interval: 1000,
-    } 
+    },
   });
   this.connected = true;
 

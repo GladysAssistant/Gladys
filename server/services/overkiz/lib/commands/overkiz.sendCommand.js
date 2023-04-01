@@ -1,9 +1,4 @@
-const axios = require('axios');
-const retry = require('async-retry');
-const sleep = require('sleep-promise');
 const logger = require('../../../../utils/logger');
-
-const { connect } = require('./overkiz.connect');
 
 /**
  * @description Connect to OverKiz server.
@@ -11,7 +6,7 @@ const { connect } = require('./overkiz.connect');
  * @example
  * overkiz.getExecutionStates();
  */
-async function getExecutionStates() {
+/* async function getExecutionStates() {
   const response = await retry(
     async (bail) => {
       const tryResponse = await axios.get(`${this.overkizServer.endpoint}exec/current`, {
@@ -41,7 +36,7 @@ async function getExecutionStates() {
   );
 
   return response;
-}
+} */
 
 /**
  * @description Connect to OverKiz server.
@@ -50,7 +45,7 @@ async function getExecutionStates() {
  * @example
  * overkiz.getExecutionState('01234');
  */
-async function getExecutionState(execId) {
+/* async function getExecutionState(execId) {
   const response = await retry(
     async (bail) => {
       const tryResponse = await axios.get(`${this.overkizServer.endpoint}exec/current/${execId}`, {
@@ -80,7 +75,7 @@ async function getExecutionState(execId) {
   );
 
   return response;
-}
+} */
 
 /**
  * @description Connect to OverKiz server.
