@@ -23,6 +23,13 @@ describe('zigbee2mqtt connect', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       event: {
         emit: fake.resolves(null),
       },

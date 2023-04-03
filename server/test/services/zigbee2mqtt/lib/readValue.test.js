@@ -4,7 +4,15 @@ const Zigbee2MqttService = require('../../../../services/zigbee2mqtt');
 
 const discoveredDevices = require('./payloads/mqtt_devices_get.json');
 
-const gladys = {};
+const gladys = {
+  job: {
+    wrapper: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
+  },
+};
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 describe('zigbee2mqtt readValue', () => {

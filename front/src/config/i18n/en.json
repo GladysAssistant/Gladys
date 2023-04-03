@@ -43,6 +43,7 @@
     "noCalendarsConnected": "No calendars connected. To connect an external calendar, go to the integrations page or ask a user in your Gladys instance to share you his calendars."
   },
   "device": {
+    "searchPlaceHolder": "Search devices",
     "noFeatures": "No features",
     "tooMuchStatesToDelete": "This device has {{count}} states in database. To prevent your Gladys instance to be slow while deleting them, we've started a delete of those states slowly in background. You can come back to delete this device later when the device will not have any states anymore. To follow the delete job, <a href=\"/dashboard/settings/jobs\">click here</a>."
   },
@@ -368,7 +369,6 @@
         "title": "Devices in Gladys",
         "deviceOnNetworkTitle": "Devices detected on network",
         "connectButton": "Connect/Reconnect",
-        "search": "Search devices",
         "noDevices": "No Philips Hue device added yet.",
         "deviceNotHandled": "Device not handled yet, please contact us to help us connect it in Gladys!",
         "noDevicesFound": "No devices found. Make sure you have connected one Philips Hue bridge in the setup tab.",
@@ -407,7 +407,6 @@
       "httpDiscoverTab": "HTTP discover",
       "device": {
         "title": "Tasmota devices in Gladys",
-        "search": "Search devices",
         "editButton": "Edit",
         "noDeviceFound": "No Tasmota device found.",
         "protocolLabel": "Protocol",
@@ -470,7 +469,6 @@
         "noNameLabel": "No name",
         "roomLabel": "Room",
         "featuresLabel": "Features",
-        "search": "Search devices",
         "connectButton": "Connect/Reconnect",
         "scanButton": "Scan network",
         "saveButton": "Save",
@@ -534,7 +532,6 @@
       },
       "device": {
         "title": "Zigbee2mqtt devices",
-        "search": "Search devices",
         "editButton": "Edit"
       },
       "discover": {
@@ -613,7 +610,6 @@
       "description": "This integration is deprecated, we are migrating to zwave-js-ui.",
       "device": {
         "title": "Legacy Open-Zwave Devices",
-        "search": "Search devices",
         "convertToMqtt": "Convert to MQTT device",
         "oldIntegrationWarning": "This integration was based on Open-Zwave and is now DEPRECATED. We are migrating to Zwave-js-ui, but in the meantime we recommend that you use Node-RED + Zwave-js-ui + Gladys. <br /> <br /> If you want to help us develop this integration, join-us on the <a href=\"https://en-community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">forum</a>!",
         "noDevices": "No Z-Wave devices added yet.",
@@ -650,7 +646,6 @@
       },
       "device": {
         "title": "MQTT Devices",
-        "search": "Search devices",
         "noDevices": "No MQTT devices added yet.",
         "noNameLabel": "No name",
         "nameLabel": "Name",
@@ -738,7 +733,6 @@
       },
       "device": {
         "title": "Broadlink devices",
-        "searchPlaceholder": "Search for devices",
         "newButton": "Create",
         "noRemoteFound": "No Broadlink device or remote found.",
         "saveError": "There was an error saving the device.",
@@ -846,7 +840,6 @@
       "device": {
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
-        "searchPlaceholder": "Search Xiaomi devices",
         "sidLabel": "Xiaomi SID",
         "ipLabel": "IP Address",
         "roomLabel": "Room",
@@ -950,7 +943,6 @@
       "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
       "device": {
         "title": "Bluetooth Devices",
-        "search": "Search devices",
         "noDevices": "No Bluetooth devices added yet.",
         "nameLabel": "Name",
         "namePlaceholder": "Enter device name",
@@ -1022,7 +1014,6 @@
       },
       "device": {
         "title": "Devices in Gladys",
-        "search": "Search devices",
         "updates": "Check updates",
         "editButton": "Edit",
         "noDeviceFound": "No eWeLink device found.",
@@ -1055,18 +1046,18 @@
       }
     },
     "openai": {
-      "title": "OpenAI GPT-3",
+      "title": "OpenAI ChatGPT",
       "description": "Give Gladys the power of artifical intelligence",
-      "firstExplanation": "This is an alpha integration that let you talk to OpenAI GPT-3.",
-      "itDoesNothing": "This tab is a sandbox allowing you to test the capabilities of GPT-3. To test real home automation commands, activate GPT-3 in the Gladys chat.",
+      "firstExplanation": "This is an alpha integration that let you talk to OpenAI ChatGPT.",
+      "itDoesNothing": "This tab is a sandbox allowing you to test the capabilities of ChatGPT. To test real home automation commands, activate ChatGPT in the Gladys chat.",
       "aFewExamples": "A few examples: ",
       "turnOnTheLight": "Turn on the light in the kitchen",
       "sizeOfEiffelTower": "What's the size of the Eiffel Tower ?",
       "whoIsJulesVerne": "Who is Jules Verne ?",
       "eggDuration": "How do you make hard boiled eggs ?",
-      "activateOpenAiChat": "Activate GPT-3 in Gladys chat",
-      "rateLimit": "As GPT-3 API is not free, this integration is limited to 100 requests per month.",
-      "notOnGladysPlus": "As GPT-3 API is not free, this integration is only available to Gladys Plus users.",
+      "activateOpenAiChat": "Activate ChatGPT in Gladys chat",
+      "rateLimit": "As ChatGPT API is not free, this integration is limited to 1000 requests per month.",
+      "notOnGladysPlus": "As ChatGPT API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
       "licenseShouldBeActive": "This integration is only available to users with an active license (at least one payment). For trial users, please contact us on the forum or email."
     }
@@ -1440,8 +1431,6 @@
   "housesSettings": {
     "searchPlaceholder": "Search houses",
     "newButton": "New",
-    "orderDirAsc": "A - Z",
-    "orderDirDesc": "Z - A",
     "defaultNewHouseName": "New House",
     "noHouseFound": "No houses found."
   },
@@ -1568,7 +1557,8 @@
       "hourly-device-state-aggregate": "Hourly sensors aggregation",
       "gladys-gateway-backup": "Gladys Plus backup",
       "device-state-purge-single-feature": "Single device feature states clean",
-      "vacuum": "Database cleaning"
+      "vacuum": "Database cleaning",
+      "service-zigbee2mqtt-backup": "Zigbee2MQTT backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant restarted while this job was still running, so it was purged. It doesn't mean the job has failed, it's a normal behavior."
@@ -1657,8 +1647,6 @@
   "scene": {
     "title": "Scenes",
     "emptySceneSentenceTop": "Can't find any scenes.",
-    "orderDirAsc": "A - Z",
-    "orderDirDesc": "Z - A",
     "newButton": "New",
     "editButton": "Edit",
     "startButton": "Start",
@@ -1894,6 +1882,13 @@
           "one": "Open",
           "other": "Close"
         }
+      },
+      "air-conditioning": {
+        "mode": {
+          "auto": "Auto",
+          "cooling": "Cool",
+          "heating": "Heat"
+        }
       }
     }
   },
@@ -1906,6 +1901,17 @@
       }
     },
     "category": {
+      "button": {
+        "click": {
+          "unknown": "{{value}} (unknown value)",
+          "1": "Simple click",
+          "2": "Double click",
+          "3": "Long click press",
+          "4": "Long click release",
+          "5": "Hold click",
+          "6": "Long click"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "No value received",
@@ -2040,6 +2046,10 @@
       "shortCategoryName": "Humidity sensor",
       "decimal": "Humidity (decimal)"
     },
+    "soil-moisture-sensor": {
+      "shortCategoryName": "Soil moisture sensor",
+      "decimal": "Soil moisture (decimal)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
       "binary": "Vibrate (yes/no)",
@@ -2053,6 +2063,12 @@
     "signal": {
       "shortCategoryName": "Signal",
       "integer": "Signal strength"
+    },
+    "air-conditioning": {
+      "shortCategoryName": "Air Conditioning",
+      "binary": "Switch (On/Off)",
+      "mode": "Mode",
+      "target-temperature": "Temperature"
     },
     "television": {
       "shortCategoryName": "Television",
@@ -2165,8 +2181,8 @@
     "messagePlaceholder": "Type your message...",
     "sendingInProgress": "Sending...",
     "typingInProgress": "Typing...",
-    "gpt3Integration": "GPT-3 integration",
-    "gpt3IntegrationExplanation": "Gladys is now compatible with GPT-3, which gives her an over-sized intelligence! For more information,",
+    "gpt3Integration": "ChatGPT integration",
+    "gpt3IntegrationExplanation": "Gladys is now compatible with ChatGPT, which gives her an over-sized intelligence! For more information,",
     "gpt3ClickHere": "click-here!",
     "gladysAlt": "Gladys",
     "examples": {
