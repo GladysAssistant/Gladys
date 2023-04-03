@@ -289,15 +289,15 @@ describe('Device.saveHistoricalState', () => {
 
     // Verify device in DB
     expect(dailyFormat(newDeviceFeatureInDB.last_monthly_aggregate)).to.deep.equal('2021-08-31');
-    expect(hourlyFormat(newDeviceFeatureInDB.last_daily_aggregate)).to.deep.equal('2021-10-04 23:59');
-    expect(hourlyFormat(newDeviceFeatureInDB.last_hourly_aggregate)).to.deep.equal('2021-10-04 23:59');
+    expect(hourlyFormat(newDeviceFeatureInDB.last_daily_aggregate)).to.deep.equal('2021-10-03 23:59');
+    expect(hourlyFormat(newDeviceFeatureInDB.last_hourly_aggregate)).to.deep.equal('2021-10-03 23:59');
     expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
 
     // Verify device in RAM
     const deviceInRam = stateManager.get('deviceFeature', 'test-device-feature');
     expect(dailyFormat(deviceInRam.last_monthly_aggregate)).to.deep.equal('2021-08-31');
-    expect(hourlyFormat(deviceInRam.last_daily_aggregate)).to.deep.equal('2021-10-04 23:59');
-    expect(hourlyFormat(deviceInRam.last_hourly_aggregate)).to.deep.equal('2021-10-04 23:59');
+    expect(hourlyFormat(deviceInRam.last_daily_aggregate)).to.deep.equal('2021-10-03 23:59');
+    expect(hourlyFormat(deviceInRam.last_hourly_aggregate)).to.deep.equal('2021-10-03 23:59');
     expect(deviceInRam.last_value).to.deep.equal(5);
   });
   it('should return error, invalid number', async () => {

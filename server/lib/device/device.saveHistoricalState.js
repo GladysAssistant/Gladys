@@ -93,7 +93,7 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
       const dayBeforeJustBeforeMidnight = new Date(
         newValueCreatedAtDate.getFullYear(),
         newValueCreatedAtDate.getMonth(),
-        newValueCreatedAtDate.getDate(),
+        newValueCreatedAtDate.getDate() - 1,
         23,
         59,
         59,
