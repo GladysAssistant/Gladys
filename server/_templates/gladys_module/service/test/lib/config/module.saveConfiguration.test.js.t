@@ -1,5 +1,5 @@
 ---
-to: test/services/<%= module %>/lib/config/<%= module %>.getConfiguration.test.js
+to: test/services/<%= module %>/lib/config/<%= module %>.saveConfiguration.test.js
 ---
 const sinon = require('sinon');
 const { serviceId } = require('../../mocks/consts.test');

@@ -31,7 +31,7 @@ describe('<%= module %>.getConfiguration config command', () => {
       login: null,
       password: null,
     };
-    assert.calledThrice(gladys.variable.getValue);
+    assert.calledTwice(gladys.variable.getValue);
     expect(result).deep.eq(expected);
   });
 });
