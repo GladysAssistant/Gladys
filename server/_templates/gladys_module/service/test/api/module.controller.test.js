@@ -2,69 +2,56 @@
 to: test/services/<%= module %>/api/<%= module %>.controller.test.js
 ---
 const sinon = require('sinon');
-const <%= attributeName %>HandlerMock = require('../mocks/<%= module %>.mock.test.js');
+const proxyquire = require('proxyquire').noCallThru();
+const { <%= className %>HandlerMock } = require('../mocks/ecovacs.mock.test');
+
+const <%= className %>Service = proxyquire('../../../../services/ecovacs', {
+  './lib': <%= className %>HandlerMock,
+});
 
 const { assert, fake } = sinon;
-const <%= className %>Controller = require('../../../../services/<%= module %>/api/<%= module %>.controller');
+const <%= attributeName %>Service = <%= className %>Service({}, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
 
 describe('GET /api/v1/service/<%= module %>/status', () => {
-  let controller;
-
   beforeEach(() => {
-    controller = <%= className %>Controller(<%= attributeName %>HandlerMock);
-  });
-
-  afterEach(() => {
     sinon.reset();
   });
 
-  it('Get <%= module %> service status', () => {
+  it('Get <%= module %> service status', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/<%= module %>/status'].controller(req, res);
-    assert.calledOnce(controller.getStatus);
+    await <%= attributeName %>Service.controllers['get /api/v1/service/<%= module %>/status'].controller(req, res);
+    assert.calledOnce(<%= attributeName %>Service.device.getStatus);
     assert.calledOnce(res.json);
   });
 });
 
 describe('GET /api/v1/service/<%= module %>/config', () => {
-  let controller;
-
   beforeEach(() => {
-    controller = <%= className %>Controller(<%= attributeName %>HandlerMock);
-  });
-
-  afterEach(() => {
     sinon.reset();
   });
 
-  it('Get <%= module %> configuration', () => {
+  it('Get <%= module %> configuration', async () => {
     const req = {};
     const res = {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/<%= module %>/config'].controller(req, res);
-    assert.calledOnce(<%= attributeName %>HandlerMock.getConfiguration);
+    await <%= attributeName %>Service.controllers['get /api/v1/service/<%= module %>/config'].controller(req, res);
+    assert.calledOnce(<%= attributeName %>Service.device.getConfiguration);
     assert.calledOnce(res.json);
   });
 });
 
 describe('POST /api/v1/service/<%= module %>/config', () => {
-  let controller;
-
   beforeEach(() => {
-    controller = <%= className %>Controller(<%= attributeName %>HandlerMock);
-  });
-
-  afterEach(() => {
     sinon.reset();
   });
 
-  it('Save <%= module %> configuration', () => {
+  it('Save <%= module %> configuration', async () => {
     const req = {
       body: []
     };
@@ -72,9 +59,9 @@ describe('POST /api/v1/service/<%= module %>/config', () => {
       json: fake.returns(null),
     };
 
-    controller['post /api/v1/service/<%= module %>/config'].controller(req, res);
-    assert.calledOnce(<%= attributeName %>HandlerMock.saveConfiguration);
-    assert.calledWith(<%= attributeName %>HandlerMock.saveConfiguration, req.body);
+    await <%= attributeName %>Service.controllers['post /api/v1/service/<%= module %>/config'].controller(req, res);
+    assert.calledOnce(<%= attributeName %>Service.device.saveConfiguration);
+    assert.calledWith(<%= attributeName %>Service.device.saveConfiguration, req.body);
     assert.calledOnce(res.json);
   });
 });
