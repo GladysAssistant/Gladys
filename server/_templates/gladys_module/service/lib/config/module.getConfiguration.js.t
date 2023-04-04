@@ -6,9 +6,9 @@ const { CONFIGURATION } = require('../utils/<%= module %>.constants');
 
 /**
  * @description Returns <%= className %> configuration informations.
- * @returns {Object} configuration Service connection informations.
- * @returns {string} configuration.login Login to the service.
- * @returns {string} configuration.password  Password to the service.
+ * @returns {Object} [configuration] Service connection informations.
+ * @returns {string} [configuration.login] Login to the service.
+ * @returns {string} [configuration.password]  Password to the service.
  * @example
  * <%= module %>.getConfiguration();
  */

@@ -6,7 +6,7 @@ const { CONFIGURATION } = require('../utils/<%= module %>.constants');
 
 /**
  * @description Return <%= className %> status.
- * @param {Object} configuration - <%= className %> configuration.
+ * @param {Object} [configuration] - <%= className %> configuration.
  * @param {string} [configuration.login] - <%= className %> username.
  * @param {string} [configuration.password] -  <%= className %> password.
  * @returns {any} Null.
