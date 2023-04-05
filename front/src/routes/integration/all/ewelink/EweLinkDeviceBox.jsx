@@ -68,8 +68,8 @@ class EweLinkDeviceBox extends Component {
     { loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
-    const online = device.params.find(param => param.name === DEVICE_ONLINE).value === '1';
-    const firmware = device.params.find(param => param.name === DEVICE_FIRMWARE).value;
+    const online = device.params.find(param => param.name === DEVICE_PARAMS.ONLINE).value === '1';
+    const firmware = device.params.find(param => param.name === DEVICE_PARAMS.FIRMWARE).value;
 
     return (
       <div class="col-md-6">

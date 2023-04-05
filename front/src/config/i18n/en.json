@@ -1053,10 +1053,10 @@
     "overkiz": {
       "title": "Overkiz",
       "description": "Control your Overkiz devices.",
-      "deviceTab": "",
-      "discoverTab": "",
+      "deviceTab": "Devices",
+      "discoverTab": "Overkiz discover",
       "discoverDeviceDescr": "",
-      "setupTab": "",
+      "settingsTab": "Configuration",
       "documentation": "Overkiz documentation",
       "device": {
         "title": "",
@@ -1082,18 +1082,25 @@
         "description": "",
         "noDeviceFound": "No Overkiz device found."
       },
-      "setup": {
+      "settings": {
         "title": "Overkiz configuration",
         "overkizDescription": "You can connect Gladys to your Overkiz cloud account to command the associated devices.",
+        "typeLabel": "Type",
+        "typePlaceholder": "Enter Overkiz type",
         "userLabel": "Username",
         "userPlaceholder": "Enter Overkiz username",
         "passwordLabel": "Password",
         "passwordPlaceholder": "Enter Overkiz password",
-        "saveLabel": "Save configuration",
+        "connectButton": "Connection",
         "error": "An error occured while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your Overkiz cloud account...",
         "connected": "Connected to the Overkiz cloud account with success !",
         "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
       }
     }
   },

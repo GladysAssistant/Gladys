@@ -6,59 +6,68 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async loadProps(state) {
-      let overkizUsername;
-      let overkizPassword;
+    async getConfiguration(state) {
+      store.setState({
+        overkizGetConfigurationStatus: RequestStatus.Getting
+      });
       try {
-        overkizUsername = await state.httpClient.get('/api/v1/service/overkiz/variable/OVERKIZ_SERVER_USERNAME');
-        overkizPassword = await state.httpClient.get('/api/v1/service/overkiz/variable/OVERKIZ_SERVER_PASSWORD');
-        if (overkizPassword.value) {
-          overkizPassword = '*********'; // this is just used so that the field is filled
-        }
-      } finally {
+        const configuration = await state.httpClient.get('/api/v1/service/overkiz/configuration');
         store.setState({
-          overkizUsername: (overkizUsername || { value: '' }).value,
-          overkizPassword,
-          passwordChanges: false,
-          connected: false
+          overkizGetConfigurationStatus: RequestStatus.Success,
+          ...configuration
+        });
+      } catch (e) {
+        store.setState({
+          overkizGetConfigurationStatus: RequestStatus.Error
         });
       }
-    },
-    updateConfigration(state, e) {
-      const data = {};
-      data[e.target.name] = e.target.value;
-      if (e.target.name === 'overkizPassword') {
-        data.passwordChanges = true;
+    },    
+    updateConfiguration(state, configuration) {
+      store.setState(configuration);
+    },    
+    async connect(state) {
+      await actions.disconnect(state);
+      await actions.saveConfiguration(state);
+      store.setState({
+        overkizConnectStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/overkiz/connect');
+        await actions.getStatus(store.getState());
+        store.setState({
+          overkizConnectStatus: RequestStatus.Success,
+          overkizConnectionInProgress: true
+        });
+      } catch (e) {
+        store.setState({
+          overkizConnectStatus: RequestStatus.Error
+        });
       }
-      store.setState(data);
     },
     async saveConfiguration(state) {
       event.preventDefault();
       store.setState({
-        connectOverkizStatus: RequestStatus.Getting,
-        overkizConnected: false,
-        overkizConnectionError: undefined
+        saveConfigurationStatus: RequestStatus.Getting
       });
+
+      const {
+        overkizType,
+        overkizUsername,
+        overkizPassword,
+      } = state;
       try {
-        await state.httpClient.post('/api/v1/service/overkiz/variable/OVERKIZ_SERVER_USERNAME', {
-          value: state.overkizUsername
+        await state.httpClient.post(`/api/v1/service/overkiz/configuration`, {
+          overkizType,
+          overkizUsername,
+          overkizPassword,
         });
-        if (state.passwordChanges) {
-          await state.httpClient.post('/api/v1/service/overkiz/variable/OVERKIZ_SERVER_PASSWORD', {
-            value: state.overkizPassword
-          });
-        }
-        await state.httpClient.post(`/api/v1/service/overkiz/connect`);
 
         store.setState({
-          connectOverkizStatus: RequestStatus.Success
+          saveConfigurationStatus: RequestStatus.Success
         });
-
-        setTimeout(() => store.setState({ connectOverkizStatus: undefined }), 3000);
       } catch (e) {
         store.setState({
-          connectOverkizStatus: RequestStatus.Error,
-          passwordChanges: false
+          saveConfigurationStatus: RequestStatus.Error
         });
       }
     },

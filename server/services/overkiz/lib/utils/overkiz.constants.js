@@ -1,5 +1,8 @@
-const DEVICE_FIRMWARE = 'FIRMWARE';
-const DEVICE_ONLINE = 'ONLINE';
+const DEVICE_PARAMS = {
+  FIRMWARE: 'FIRMWARE',
+  ONLINE: 'ONLINE',
+  STATE: 'STATE',
+};
 
 const SUPPORTED_SERVERS = {
   atlantic_cozytouch: {
@@ -115,10 +118,12 @@ const DEVICE_STATES = {
   HEATING_LEVEL_STATE: 'io:TargetHeatingLevelState',
   OCCUPANCY_STATE: 'core:OccupancyState',
   TEMPERATURE_STATE: 'core:TemperatureState',
+  TARGET_TEMPERATURE_STATE: 'core:TargetTemperatureState',
   COMFORT_TEMPERATURE_STATE: 'core:ComfortRoomTemperatureState',
   ECO_TEMPERATURE_STATE: 'io:EffectiveTemperatureSetpointState', // 'core:EcoRoomTemperatureState',
   ON_OFF_STATE: 'core:OnOffState',
-  ELECTRIC_ENERGY_CONSUMTION_STATE: 'core:ElectricEnergyConsumptionState',
+  ELECTRIC_ENERGY_CONSUMPTION_STATE: 'core:ElectricEnergyConsumptionState',
+  OPERATING_MODE_STATE: 'core:OperatingModeState',
 };
 
 const DEVICE_COMMANDS = {
@@ -132,17 +137,24 @@ const DEVICE_COMMANDS = {
   REFRESH_COMFORT_TEMPERATURE: 'refreshComfortTemperature',
 };
 
-const HEATING_LEVELS = ['off', 'frost-protection', 'eco', 'comfort-2', 'comfort-1', 'comfort'];
+const HEATING_MODES = ['off', 'frost-protection', 'eco', 'comfort-2', 'comfort-1', 'comfort'];
+
+const HEATING_STATES = {
+  STOPPED: 'standby',
+  BASIC: 'basic',
+  PROG: 'internal', // mode suivant un planing horaire
+  AUTO: 'auto',
+};
 
 module.exports = {
   SUPPORTED_SERVERS,
   OVERKIZ_SERVER_PARAM,
   OVERKIZ_API,
-  DEVICE_FIRMWARE,
-  DEVICE_ONLINE,
+  DEVICE_PARAMS,
   DEVICE_TYPES,
   DEVICE_UID_CLASSES,
   DEVICE_STATES,
   DEVICE_COMMANDS,
-  HEATING_LEVELS,
+  HEATING_MODES,
+  HEATING_STATES,
 };

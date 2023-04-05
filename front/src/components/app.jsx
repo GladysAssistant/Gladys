@@ -123,7 +123,7 @@ import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 import OverkizPage from '../routes/integration/all/overkiz/device-page';
 import OverkizEditPage from '../routes/integration/all/overkiz/edit-page';
 import OverkizDiscoverPage from '../routes/integration/all/overkiz/discover-page';
-import OverkizSetupPage from '../routes/integration/all/overkiz/setup-page';
+import OverkizSetupPage from '../routes/integration/all/overkiz/settings-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -240,7 +240,7 @@ const AppRouter = connect(
         <OverkizPage path="/dashboard/integration/device/overkiz" />
         <OverkizEditPage path="/dashboard/integration/device/overkiz/edit-page" />
         <OverkizDiscoverPage path="/dashboard/integration/device/overkiz/discover-page" />
-        <OverkizSetupPage path="/dashboard/integration/device/overkiz/setup-page" />
+        <OverkizSetupPage path="/dashboard/integration/device/overkiz/settings-page" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

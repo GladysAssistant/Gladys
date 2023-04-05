@@ -5,12 +5,12 @@ const {
   DEVICE_POLL_FREQUENCIES,
 } = require('../../../../utils/constants');
 const {
-  DEVICE_ONLINE,
-  DEVICE_FIRMWARE,
+  DEVICE_PARAMS,
   DEVICE_UID_CLASSES,
   DEVICE_STATES,
   DEVICE_TYPES,
-  HEATING_LEVELS,
+  HEATING_MODES,
+  HEATING_STATES,
 } = require('../utils/overkiz.constants');
 const { getDeviceName, getDeviceFeatureExternalId, getDeviceExternalId } = require('../utils/overkiz.externalId');
 
@@ -54,12 +54,16 @@ async function getOverkizDevices() {
         features: [],
         params: [
           {
-            name: DEVICE_ONLINE,
+            name: DEVICE_PARAMS.ONLINE,
             value: states[DEVICE_STATES.STATUS_STATE],
           },
           {
-            name: DEVICE_FIRMWARE,
+            name: DEVICE_PARAMS.FIRMWARE,
             value: attributes[DEVICE_STATES.FIRMWARE_REVISION_STATE],
+          },
+          {
+            name: DEVICE_PARAMS.STATE,
+            value: states[DEVICE_STATES.OPERATING_MODE_STATE],
           },
         ],
       };
@@ -85,48 +89,65 @@ async function getOverkizDevices() {
     .map((node) => {
       const deviceURL = node.URL.includes('#') ? node.URL.substring(0, node.URL.indexOf('#')) : node.URL;
       const newDevice = newDevices[deviceURL];
+      const operatingModeState = newDevice.params.find((param) => param.name === DEVICE_PARAMS.STATE).value;
       const newFeature = {
         // rawOverkizDevice: node,
       };
       if (node.uiClass === DEVICE_UID_CLASSES.HEATER) {
-        newDevice.features.push({
-          ...newFeature,
-          name: `Mode`,
-          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.HEATING_LEVEL_STATE}`,
-          external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.HEATING_LEVEL_STATE),
-          category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-          type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
-          read_only: false,
-          has_feedback: true,
-          min: 0,
-          max: HEATING_LEVELS.length - 1,
-        });
-        newDevice.features.push({
-          ...newFeature,
-          name: `Comfort mode temperature`,
-          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.COMFORT_TEMPERATURE_STATE}`,
-          external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.COMFORT_TEMPERATURE_STATE),
-          category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-          type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-          read_only: false,
-          unit: DEVICE_FEATURE_UNITS.CELSIUS,
-          has_feedback: true,
-          min: 0,
-          max: 40,
-        });
-        newDevice.features.push({
-          ...newFeature,
-          name: `Eco mode temperature`,
-          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.ECO_TEMPERATURE_STATE}`,
-          external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.ECO_TEMPERATURE_STATE),
-          category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-          type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-          read_only: false,
-          unit: DEVICE_FEATURE_UNITS.CELSIUS,
-          has_feedback: true,
-          min: 0,
-          max: 40,
-        });
+        if (operatingModeState === HEATING_STATES.PROG) {
+          newDevice.features.push({
+            ...newFeature,
+            name: `Mode`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.HEATING_LEVEL_STATE}`,
+            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.HEATING_LEVEL_STATE),
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
+            read_only: false,
+            has_feedback: true,
+            min: 0,
+            max: HEATING_MODES.length - 1,
+          });
+          newDevice.features.push({
+            ...newFeature,
+            name: `Comfort mode temperature`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.COMFORT_TEMPERATURE_STATE}`,
+            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.COMFORT_TEMPERATURE_STATE),
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+            read_only: false,
+            unit: DEVICE_FEATURE_UNITS.CELSIUS,
+            has_feedback: true,
+            min: 0,
+            max: 40,
+          });
+          newDevice.features.push({
+            ...newFeature,
+            name: `Eco mode temperature`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.ECO_TEMPERATURE_STATE}`,
+            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.ECO_TEMPERATURE_STATE),
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+            read_only: false,
+            unit: DEVICE_FEATURE_UNITS.CELSIUS,
+            has_feedback: true,
+            min: 0,
+            max: 40,
+          });
+        } else if (operatingModeState === HEATING_STATES.BASIC) {
+          newDevice.features.push({
+            ...newFeature,
+            name: `Temperature`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.TARGET_TEMPERATURE_STATE}`,
+            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.TARGET_TEMPERATURE_STATE),
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+            read_only: false,
+            unit: DEVICE_FEATURE_UNITS.CELSIUS,
+            has_feedback: true,
+            min: 0,
+            max: 40,
+          });
+        }
       } else if (node.uiClass === DEVICE_UID_CLASSES.TEMPERATURE) {
         newDevice.features.push({
           ...newFeature,

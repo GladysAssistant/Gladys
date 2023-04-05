@@ -1,4 +1,4 @@
-const { DEVICE_STATES, HEATING_LEVELS } = require('./overkiz.constants');
+const { DEVICE_STATES, HEATING_MODES } = require('./overkiz.constants');
 const { getNodeStateInfoByExternalId } = require('./overkiz.externalId');
 
 /**
@@ -16,7 +16,7 @@ function bindValue(device, deviceFeature, value) {
     return value === 0 ? 'noPersonInside' : 'personInside';
   }
   if (state === DEVICE_STATES.HEATING_LEVEL_STATE) {
-    return HEATING_LEVELS[value];
+    return HEATING_MODES[value];
   }
   if (state === DEVICE_STATES.COMFORT_TEMPERATURE_STATE || state === DEVICE_STATES.ECO_TEMPERATURE_STATE) {
     return parseFloat(value);
@@ -38,7 +38,7 @@ function unbindValue(device, stateName, stateValue) {
     return stateValue === 'noPersonInside' ? 0 : 1;
   }
   if (stateName === DEVICE_STATES.HEATING_LEVEL_STATE) {
-    return HEATING_LEVELS.indexOf(stateValue);
+    return HEATING_MODES.indexOf(stateValue);
   }
   return stateValue;
 }

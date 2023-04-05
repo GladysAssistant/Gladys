@@ -1054,9 +1054,9 @@
       "title": "Overkiz",
       "description": "Contrôler vos appareils Overkiz.",
       "deviceTab": "Appareils",
-      "discoverTab": "Découverte",
+      "discoverTab": "Découverte Overkiz",
       "discoverDeviceDescr": "",
-      "setupTab": "Configuration",
+      "settingsTab": "Configuration",
       "documentation": "Documentation Overkiz",
       "device": {
         "title": "",
@@ -1082,18 +1082,25 @@
         "description": "Les appareils Overkiz sont automatiquement découverts. Vos appareils Overkiz doivent être ajoutés à votre compte cloud Overkiz avant.",
         "noDeviceFound": "Aucun périphérique Overkiz détecté."
       },
-      "setup": {
+      "settings": {
         "title": "Configuration Overkiz",
         "overkizDescription": "Vous pouvez connecter Gladys à votre compte cloud Overkiz pour commander les appareils associés.",
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Overkiz...",
         "connected": "Connexion réussie au compte cloud Overkiz !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "typeLabel": "Type",
+        "typePlaceholder": "Entrez le type Overkiz",
         "userLabel": "Nom d'utilisateur",
         "userPlaceholder": "Entrez le nom d'utilisateur Overkiz",
         "passwordLabel": "Mot de passe",
         "passwordPlaceholder": "Entrez le mot de passe utilisateur Overkiz",
-        "saveLabel": "Enregistrer"
+        "connectButton": "Connexion"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     }
   },

@@ -37,14 +37,14 @@ const OverkizPage = ({ children, user }) => (
                   </Link>
 
                   <Link
-                    href="/dashboard/integration/device/overkiz/setup-page"
+                    href="/dashboard/integration/device/overkiz/settings-page"
                     activeClassName="active"
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
                       <i class="fe fe-sliders" />
                     </span>
-                    <Text id="integration.overkiz.setupTab" />
+                    <Text id="integration.overkiz.settingsTab" />
                   </Link>
 
                   <DeviceConfigurationLink

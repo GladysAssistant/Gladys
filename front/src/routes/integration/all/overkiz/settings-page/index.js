@@ -2,17 +2,19 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from '../actions';
 import OverkizPage from '../OverkizPage';
-import SetupTab from './SetupTab';
+import SettingsTab from './SettingsTab';
+import { SUPPORTED_SERVERS } from '../../../../../../../server/services/overkiz/lib/utils/overkiz.constants';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'user,session,overkizUsername,overkizPassword,connectOverkizStatus,overkizConnected,overkizConnectionError',
+  'user,session,overkizType,overkizUsername,overkizPassword,overkizGetConfigurationStatus,saveConfigurationStatus',
   actions
 )
-class OverkizSetupPage extends Component {
+class OverkizSettingsTab extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('overkiz');
-    this.props.loadProps();
+    this.props.getConfiguration();
+    this.props.overkizTypes = SUPPORTED_SERVERS;
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.OVERKIZ.CONNECTED,
       this.props.displayConnectedMessage
@@ -30,11 +32,11 @@ class OverkizSetupPage extends Component {
 
   render(props, {}) {
     return (
-      <OverkizPage>
-        <SetupTab {...props} />
+      <OverkizPage user="{props.user}">
+        <SettingsTab {...props} />
       </OverkizPage>
     );
   }
 }
 
-export default OverkizSetupPage;
+export default OverkizSettingsTab;

@@ -1,7 +1,7 @@
 const Bottleneck = require('bottleneck/es5');
 const cron = require('node-cron');
 
-const { enableDiscovery, disableDiscovery, config } = require('./commands/overkiz.config');
+const { getConfiguration, updateConfiguration } = require('./commands/overkiz.configuration');
 const { connect } = require('./commands/overkiz.connect');
 const { disconnect } = require('./commands/overkiz.disconnect');
 const { getDevicesStates } = require('./commands/overkiz.getDevicesStates');
@@ -20,7 +20,7 @@ const setValueLimiter = new Bottleneck({
   minTime: 100, // 100 ms
 });
 
-const OverkizHandler = function OverkizHandler(gladys, serviceId) {
+const OverkizManager = function OverkizManager(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.eventManager = gladys.event;
@@ -30,14 +30,13 @@ const OverkizHandler = function OverkizHandler(gladys, serviceId) {
   this.scanInProgress = false;
 };
 
-OverkizHandler.prototype.connect = connect;
-OverkizHandler.prototype.disconnect = disconnect;
-OverkizHandler.prototype.syncOverkizDevices = syncOverkizDevices;
-OverkizHandler.prototype.getOverkizDevices = getOverkizDevices;
-OverkizHandler.prototype.poll = pollLimiter.wrap(getDevicesStates);
-OverkizHandler.prototype.setValue = setValueLimiter.wrap(setValue);
-OverkizHandler.prototype.enableDiscovery = enableDiscovery;
-OverkizHandler.prototype.disableDiscovery = disableDiscovery;
-OverkizHandler.prototype.config = config;
+OverkizManager.prototype.connect = connect;
+OverkizManager.prototype.disconnect = disconnect;
+OverkizManager.prototype.syncOverkizDevices = syncOverkizDevices;
+OverkizManager.prototype.getOverkizDevices = getOverkizDevices;
+OverkizManager.prototype.poll = pollLimiter.wrap(getDevicesStates);
+OverkizManager.prototype.setValue = setValueLimiter.wrap(setValue);
+OverkizManager.prototype.getConfiguration = getConfiguration;
+OverkizManager.prototype.updateConfiguration = updateConfiguration;
 
-module.exports = OverkizHandler;
+module.exports = OverkizManager;
