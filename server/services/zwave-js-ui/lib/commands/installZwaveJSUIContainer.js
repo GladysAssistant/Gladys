@@ -55,14 +55,14 @@ async function installZwaveJSUIContainer() {
       const brokerEnv = await exec(
         `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnContainer} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
       );
-      logger.trace(brokerEnv);
+      logger.info(brokerEnv);
       containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zwave-js-ui:/usr/src/app/store`);
 
       containerDescriptorToMutate.HostConfig.Devices[0].PathOnHost = driverPath;
 
       logger.info(`Creation of container...`);
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
-      logger.trace(containerLog);
+      logger.info(containerLog);
       logger.info('ZwaveJSUI successfully installed and configured as Docker container');
       this.zwaveJSUIExist = true;
     } catch (e) {
@@ -98,7 +98,7 @@ async function installZwaveJSUIContainer() {
       const brokerEnv = await exec(
         `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnContainer} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
       );
-      logger.trace(brokerEnv);
+      logger.info(brokerEnv);
       logger.info('ZwaveJSUI container is restarting...');
       await this.gladys.system.restartContainer(container.id);
       // wait 5 seconds for the container to restart
