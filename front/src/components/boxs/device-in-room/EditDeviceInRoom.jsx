@@ -120,6 +120,12 @@ class EditDeviceInRoom extends Component {
                   isMulti
                   onChange={this.updateDeviceFeatures}
                   options={deviceOptions}
+                  styles={{
+                    container: (base, state) => {
+                      base.zIndex = '1031'; // it needs to be more than the footer bar
+                      return base;
+                    }
+                  }}
                 />
               </div>
             )}
