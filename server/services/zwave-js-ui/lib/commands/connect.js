@@ -26,7 +26,7 @@ async function connect() {
   }
 
   let mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
-    
+
   // Test if dongle is present
   this.usbConfigured = false;
   if (externalZwaveJSUI) {
@@ -142,7 +142,7 @@ async function connect() {
       // reconnectPeriod: 5000,
       // clientId: DEFAULT.MQTT_CLIENT_ID,
     };
-    if(mqttUsername && mqttPassword) {
+    if (mqttUsername && mqttPassword) {
       options.username = mqttUsername;
       options.password = mqttPassword;
     }
@@ -187,10 +187,7 @@ async function connect() {
     });
 
     this.scanInProgress = true;
-    this.mqttClient.publish(
-      `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`,
-      'true',
-    );
+    this.mqttClient.publish(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
 
     this.driver = {
       controllerId: 'N.A.',

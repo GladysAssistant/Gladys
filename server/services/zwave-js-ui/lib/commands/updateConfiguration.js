@@ -91,7 +91,7 @@ async function updateConfiguration(configuration) {
     if (mqttPassword === '') {
       await this.gladys.variable.destroy(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
     }
-    
+
     if (mqttTopicPrefix) {
       await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX, mqttTopicPrefix, this.serviceId);
     }
