@@ -25,20 +25,8 @@ async function connect() {
     );
   }
 
-  // MQTT configuration
   let mqttPassword = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, this.serviceId);
-  if (!mqttPassword) {
-    // First start, use default value for MQTT
-    const mqttUrl = DEFAULT.ZWAVEJSUI_MQTT_URL_VALUE;
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, mqttUrl, this.serviceId);
-    const mqttUsername = DEFAULT.ZWAVEJSUI_MQTT_USERNAME_VALUE;
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, mqttUsername, this.serviceId);
-    mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
-    await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
-    // Keep copy in case switch between external/gladys ZwaveJS UI
-    await this.gladys.variable.setValue(CONFIGURATION.DEFAULT_ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
-  }
-
+    
   // Test if dongle is present
   this.usbConfigured = false;
   if (externalZwaveJSUI) {
@@ -50,6 +38,19 @@ async function connect() {
     this.mqttRunning = true;
     this.zwaveJSUIRunning = true;
   } else {
+    // MQTT configuration
+    if (!mqttPassword) {
+      // First start, use default value for MQTT
+      const mqttUrl = DEFAULT.ZWAVEJSUI_MQTT_URL_VALUE;
+      await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, mqttUrl, this.serviceId);
+      const mqttUsername = DEFAULT.ZWAVEJSUI_MQTT_USERNAME_VALUE;
+      await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, mqttUsername, this.serviceId);
+      mqttPassword = generate(20, { number: true, lowercase: true, uppercase: true });
+      await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
+      // Keep copy in case switch between external/gladys ZwaveJS UI
+      await this.gladys.variable.setValue(CONFIGURATION.DEFAULT_ZWAVEJSUI_MQTT_PASSWORD, mqttPassword, this.serviceId);
+    }
+
     const driverPath = await this.gladys.variable.getValue(CONFIGURATION.DRIVER_PATH, this.serviceId);
     if (driverPath) {
       const usb = this.gladys.service.getService('usb');
@@ -137,66 +138,63 @@ async function connect() {
   const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_URL, this.serviceId);
   const mqttUsername = await this.gladys.variable.getValue(CONFIGURATION.ZWAVEJSUI_MQTT_USERNAME, this.serviceId);
   if (this.mqttRunning) {
-    this.mqttClient = this.mqtt.connect(mqttUrl, {
-      username: mqttUsername,
-      password: mqttPassword,
+    const options = {
       // reconnectPeriod: 5000,
       // clientId: DEFAULT.MQTT_CLIENT_ID,
-    });
-    this.mqttConnected = this.mqttClient !== null;
-    this.zwaveJSUIConnected = true;
-
-    if (this.mqttConnected) {
-      this.mqttClient.on('connect', () => {
-        logger.info('Connected to MQTT container');
-        this.mqttClient.subscribe(`${this.mqttTopicPrefix}/#`);
-        this.mqttConnected = true;
-        this.zwaveJSUIConnected = true;
-        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
-        });
-      });
-
-      this.mqttClient.on('error', (err) => {
-        logger.warn(`Error while connecting to MQTT - ${err}`);
-        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.MQTT_ERROR,
-          payload: err,
-        });
-        this.mqttConnected = false;
-        this.scanInProgress = false;
-      });
-
-      this.mqttClient.on('offline', () => {
-        logger.warn(`Disconnected from MQTT server`);
-        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
-          payload: 'DISCONNECTED',
-        });
-        this.mqttConnected = false;
-        this.scanInProgress = false;
-      });
-
-      this.mqttClient.on('message', (topic, message) => {
-        try {
-          this.handleMqttMessage(topic, message.toString());
-        } catch (e) {
-          logger.error(`Unable to process message on topic ${topic}: ${e}`);
-        }
-      });
-
-      this.scanInProgress = true;
-      this.mqttClient.publish(
-        `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`,
-        'true',
-      );
-
-      this.driver = {
-        controllerId: 'N.A.',
-      };
-    } else {
-      logger.warn("Can't connect Gladys cause MQTT not connected !");
+    };
+    if(mqttUsername && mqttPassword) {
+      options.username = mqttUsername;
+      options.password = mqttPassword;
     }
+    this.mqttClient = this.mqtt.connect(mqttUrl, options);
+
+    this.mqttClient.on('connect', () => {
+      logger.info('Connected to MQTT container');
+      this.mqttClient.subscribe(`${this.mqttTopicPrefix}/#`);
+      this.mqttConnected = true;
+      this.zwaveJSUIConnected = true;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+      });
+    });
+
+    this.mqttClient.on('error', (err) => {
+      logger.warn(`Error while connecting to MQTT - ${err}`);
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.MQTT_ERROR,
+        payload: err,
+      });
+      this.mqttConnected = false;
+      this.scanInProgress = false;
+    });
+
+    this.mqttClient.on('offline', () => {
+      logger.warn(`Disconnected from MQTT server`);
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
+        payload: 'DISCONNECTED',
+      });
+      this.mqttConnected = false;
+      this.scanInProgress = false;
+    });
+
+    this.mqttClient.on('message', (topic, message) => {
+      try {
+        this.handleMqttMessage(topic, message.toString());
+      } catch (e) {
+        logger.error(`Unable to process message on topic ${topic}: ${e}`);
+      }
+    });
+
+    this.scanInProgress = true;
+    this.mqttClient.publish(
+      `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`,
+      'true',
+    );
+
+    this.driver = {
+      controllerId: 'N.A.',
+    };
   } else {
     logger.warn("Can't connect Gladys cause MQTT not running !");
   }
