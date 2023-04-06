@@ -28,6 +28,7 @@ async function installZwaveJSUIContainer() {
   const s2AccessControlKey = await this.gladys.variable.getValue(CONFIGURATION.S2_ACCESS_CONTROL, this.serviceId);
   const s0LegacyKey = await this.gladys.variable.getValue(CONFIGURATION.S0_LEGACY, this.serviceId);
 
+  const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
     filters: { name: [containerDescriptor.name] },
@@ -50,7 +51,6 @@ async function installZwaveJSUIContainer() {
 
       // Prepare Z2M env
       logger.info(`Preparing ZwaveJSUI environment...`);
-      const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
       logger.info(`Creating configuration file ${basePathOnHost}/zwave-js-ui/settings.json...`);
       const brokerEnv = await exec(
         `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnContainer} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
@@ -95,9 +95,8 @@ async function installZwaveJSUIContainer() {
     if (devices.length === 0 || devices[0].PathOnHost !== driverPath) {
       // Update Z2M env
       logger.info(`Updating ZwaveJSUI environment...`);
-      const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
       const brokerEnv = await exec(
-        `sh ./server/services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnHost} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
+        `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnContainer} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
       );
       logger.trace(brokerEnv);
       logger.info('ZwaveJSUI container is restarting...');
