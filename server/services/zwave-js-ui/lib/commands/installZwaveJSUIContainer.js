@@ -97,7 +97,7 @@ async function installZwaveJSUIContainer() {
       logger.info(`Updating ZwaveJSUI environment...`);
       const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
       const brokerEnv = await exec(
-        `sh ./server/services/zwave-js-ui/docker/gladys-zwave-js-ui-zwave-js-ui-env.sh ${basePathOnHost} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
+        `sh ./server/services/zwave-js-ui/docker/gladys-zwavejsui-zwavejsui-env.sh ${basePathOnHost} ${mqttUsername} "${mqttPassword}" ${driverPath} "${s2UnauthenticatedKey}" "${s2AuthenticatedKey}" "${s2AccessControlKey}" "${s0LegacyKey}"`,
       );
       logger.trace(brokerEnv);
       logger.info('ZwaveJSUI container is restarting...');
