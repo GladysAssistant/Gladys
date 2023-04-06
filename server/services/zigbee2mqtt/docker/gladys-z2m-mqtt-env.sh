@@ -27,6 +27,9 @@ if [ ! -f "$mosquitto_config_file" ]; then
   echo "# connection_messages false" >> $mosquitto_config_file
   echo "password_file ${internal_mosquitto_passwd_file}" >> $mosquitto_config_file
 
+  echo "persistence true" >> $mosquitto_config_file
+  echo "persistence_location /mosquitto/config/" >> $mosquitto_config_file
+
   echo "Zigbee2mqtt : MQTT configuration written"
 else
   echo "Zigbee2mqtt : MQTT configuration file already exists."
