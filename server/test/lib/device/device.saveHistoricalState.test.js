@@ -16,6 +16,13 @@ describe('Device.saveHistoricalState', () => {
     const job = new Job(event);
     const newDate = new Date().toISOString();
     const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('deviceFeature', 'test-device-feature', {
+      last_value: 5,
+      last_value_changed: null,
+      last_monthly_aggregate: null,
+      last_daily_aggregate: null,
+      last_hourly_aggregate: null,
+    });
     await device.saveHistoricalState(
       {
         id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
