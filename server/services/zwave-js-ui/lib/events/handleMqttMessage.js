@@ -71,6 +71,8 @@ function handleMqttMessage(topic, message) {
       const splittedTopic = topic.split('/');
       if (splittedTopic[1] === '_CLIENTS') {
         // Nothing to do
+      } else if (splittedTopic[1] === '_EVENTS') {
+        // Nothing to do
       } else if (splittedTopic[2] === 'status') {
         break;
       } else if (splittedTopic[2] === 'nodeinfo') {
