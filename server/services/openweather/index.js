@@ -67,7 +67,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
     if (!openWeatherApiKey) {
       throw new ServiceNotConfiguredError('Open Weather API Key not found');
     }
-    const url = `http://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&lang=${language}&units=${units}&cnt=1&appid=${openWeatherApiKey}`;
+    const url = `http://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&lang=${language}&units=${units}&cnt=1&appid=${openWeatherApiKey}`;
     try {
       logger.log(`OpenWeather URL : ${url}`);
       const { data } = await axios.get(url);
