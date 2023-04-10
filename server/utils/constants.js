@@ -492,6 +492,7 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',
+    DAILY_CONSUMPTION: 'daily-consumption',
   },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',
@@ -805,6 +806,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_PROGRESS: 'upgrade.download-progress',
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
+  },
+  LAN: {
+    SCANNING: 'lan.scanning',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',

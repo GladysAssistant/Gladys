@@ -591,6 +591,47 @@
       "cancelButton": "Cancel",
       "connectButton": "Link"
     },
+    "enedis": {
+      "title": "Enedis",
+      "description": "Your electricity consumption data in Gladys",
+      "welcomeTab": "Connection with Enedis",
+      "usagePointsTab": "My meters",
+      "welcome": {
+        "title": "Connection with Enedis",
+        "longDescription": "Enedis manages the electricity network up to the electricity meter. To retrieve your electricity consumption in Gladys, authorise Enedis to send us your Linky data.",
+        "longDescription2": "Enedis is the operator of the public electricity distribution network in 95% of mainland France.",
+        "longDescription3": "To give your permission, you must create a personal Enedis account if you do not already have one. It also allows you to monitor and manage your electricity consumption data. You will need your electricity bill to create your account.",
+        "buttonDescription": "By clicking on this button, you will access your personal Enedis account where you can give your consent for Enedis to transmit your data to us:",
+        "error": "An error occurred during the linking process with your Enedis account, please try again.",
+        "notOnGladysGateway": "This integration is available via Gladys Plus, to connect/re-connect go to the Gladys Plus interface!",
+        "connectedToUsagePointds": "Successfully connected to Enedis! The first sync will take from 2 to 3 hours depending on the volume of request on Enedis API. No need to keep this tab open during this time.",
+        "reconnectInfo": "If you ever want to refresh your access key, you can repeat the login process. It is necessary to log in again once every 2 years."
+      },
+      "usagePoints": {
+        "title": "My meters",
+        "emptyState": "You do not have any synchronized meters. To add a meter, please go to the tab \"Connection with Enedis\".",
+        "usagePointName": "Meter",
+        "lastRefresh": "Latest data :",
+        "usagePointId": "Meter ID",
+        "contractType": "Contract type",
+        "contracts": {
+          "hc-hp": "Off-peak/peak hours",
+          "base": "Basic rate"
+        },
+        "pricePerKwh": "Rate per kWh",
+        "statistics": "Statistics",
+        "lastSyncLabel": "Last synchronisation : ",
+        "firstValueLabel": "1st value :",
+        "lastValueLabel": "Last value :",
+        "numberOfStatesLabel": "Number of synchronised states:",
+        "gladysPlusRefreshProgressLabel": "Synchronisation in progress...",
+        "gladysPlusRefreshProgressDescription": "Gladys Plus is currently refreshing its cache via the Enedis API. This synchronisation may take some time, as Enedis imposes query limits. No needs to keep this tab open.",
+        "refreshLocal": "Synchronise with Gladys Plus",
+        "explanation": "The synchronization with Enedis is done automatically between Gladys Plus and Enedis every day between 8:30 and 11:30. It is possible that on some days the data may be available late. On the Gladys side, Gladys automatically synchronizes with Gladys Plus every hour.",
+        "saveButton": "Save",
+        "deleteButton": "Delete"
+      }
+    },
     "homekit": {
       "title": "Apple HomeKit",
       "description": "Connect Gladys to HomeKit and use Siri to control your devices.",
@@ -832,6 +873,52 @@
             }
           }
         }
+      }
+    },
+    "lanManager": {
+      "title": "LAN Manager",
+      "description": "Manage you device through you local network.",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "setupTab": "Setup",
+      "device": {
+        "title": "LAN Devices",
+        "search": "Search devices",
+        "noDevices": "No LAN devices added yet.",
+        "manufacturerLabel": "Manufacturer",
+        "ipAddressLabel": "IP address",
+        "macAddressLabel": "MAC address",
+        "originalNameLabel": "Hostname"
+      },
+      "discover": {
+        "title": "LAN Discover",
+        "noDevices": "No LAN devices found.",
+        "scanButton": "Scan network",
+        "deviceUpdateButton": "New devices available",
+        "hideExistingDevices": "Hide already added devices",
+        "alreadyCreatedButton": "Already created",
+        "updateButton": "Update",
+        "discoveringError": "An error occurred, please check logs."
+      },
+      "setup": {
+        "title": "LANManager settings",
+        "errorLabel": "An error occurred while loading configuration.",
+        "noConfigLabel": "Configuration not loaded, please retry.",
+        "presenceScannerDescription": "The presence scanner feature is doing a network scan at a defined interval. When a device is detected, the device will be flagged as \"seen\" in Gladys. In scene, you can create a trigger on this state change to set you home when a device is detected at home for example.",
+        "presenceScannerStatusLabel": "Enable or disable presence scanner",
+        "presenceScannerFrequencyLabel": "Scanner interval",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Only integers are accepted.",
+        "ipMasksLabel": "CIDR to scan",
+        "masksDescription": "CIDR (Classless Inter-Domain Routing) is a notation to describe a range of IP addresses in a sub-network. You can write it as an IP address, followed by a network mask number, both separated by a slash (example: 192.168.1.1/10). There is many CIDR calculators on the Internet which will help you to compute your own.",
+        "networkInterfaceDescription": "Masks defined by your computer on your networks, with network interfaces, can't be removed.",
+        "maskTableHeader": "CIDR",
+        "nameTableHeader": "Name",
+        "statusTableHeader": "Active",
+        "maskTablePlaceholder": "e.g. 192.168.1.1/20",
+        "nameTablePlaceholder": "Enter CIDR name",
+        "deleteButtonTooltip": "Delete",
+        "maskFormatError": "Invalid CIDR format"
       }
     },
     "xiaomi": {
@@ -2182,7 +2269,8 @@
       "binary": "Switch",
       "power": "Power",
       "energy": "Energy",
-      "index": "Index"
+      "index": "Index",
+      "daily-consumption": "Daily Consumption"
     },
     "volume-sensor": {
       "shortCategoryName": "Volume sensor",
@@ -2301,6 +2389,7 @@
     "externalIdPlaceholder": "Enter external ID",
     "unitLabel": "Unit",
     "saveButton": "Save",
+    "deleteButton": "Delete",
     "externalIdMessage": "The feature external ID is an unique ID which helps you identify this feature outside of Gladys, for example when calling the API.",
     "minLabel": "Minimum value",
     "minPlaceholder": "Enter feature minimum value",

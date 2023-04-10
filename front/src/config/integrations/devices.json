@@ -53,5 +53,14 @@
   {
     "key": "withings",
     "img": "/assets/integrations/cover/withings.jpg"
+  },
+  {
+    "key": "enedis",
+    "img": "/assets/integrations/cover/enedis.jpg"
+  },
+  {
+    "key": "lanManager",
+    "link": "lan-manager",
+    "img": "/assets/integrations/cover/lan-manager.jpg"
   }
 ]
