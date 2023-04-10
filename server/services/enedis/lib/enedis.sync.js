@@ -25,13 +25,14 @@ async function recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs,
     take: ENEDIS_SYNC_BATCH_SIZE,
   });
 
-  // Foreach value returned in the interval, we save it in DB
+  // Foreach value returned in the interval, we save it slowly in DB
   await Promise.each(data, async (value) => {
     gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: externalId,
       state: value.value,
       created_at: new Date(value.created_at),
     });
+    await Promise.delay(syncDelayBetweenCallsInMs / 10);
   });
   await Promise.delay(syncDelayBetweenCallsInMs);
 
