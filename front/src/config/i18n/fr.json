@@ -1030,7 +1030,8 @@
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
       }
-    },"withings": {
+    },
+    "withings": {
       "settings": {
         "oauth2": {
           "title": "Withings Configuration",
