@@ -700,6 +700,47 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "enedis": {
+      "title": "Enedis",
+      "description": "Vos données de consommation électrique dans Gladys",
+      "welcomeTab": "Connexion avec Enedis",
+      "usagePointsTab": "Mes compteurs",
+      "welcome": {
+        "title": "Connexion à Enedis",
+        "longDescription": "Enedis gère le réseau d'électricité jusqu'au compteur d'électricité. Pour récupérez vos données de consommation d'électricité dans Gladys, autorisez Enedis à nous transmettre vos données Linky.",
+        "longDescription2": "Enedis est le gestionnaire du réseau public de distribution d'électricité sur 95% du territoire français continental.",
+        "longDescription3": "Pour donner votre autorisation, vous devez créer un compte personnel Enedis si vous n'avez pas encore de compte. Il vous permet également de suivre et gérer vos données de consommation d'électricité. Munissez-vous de votre facture d'électricité pour créer votre espace.",
+        "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données :",
+        "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer.",
+        "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus !",
+        "connectedToUsagePointds": "Connecté à Enedis avec succès ! La première synchronisation peut prendre entre 2h et 3h selon le volume de requêtes sur l'API Enedis. Il n'est pas nécessaire de garder cet onglet ouvert, la synchronisation a lieu en arrière-plan.",
+        "reconnectInfo": "Si jamais vous voulez rafraichir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 2 ans."
+      },
+      "usagePoints": {
+        "title": "Mes compteurs",
+        "emptyState": "Vous n'avez pas de compteurs synchronisés. Pour ajouter un compteur, veuillez vous rendre dans l'onglet \"Connexion avec Enedis\".",
+        "usagePointName": "Compteur",
+        "lastRefresh": "Dernières données :",
+        "usagePointId": "Identifiant du compteur",
+        "contractType": "Type de contrat",
+        "contracts": {
+          "hc-hp": "Heures creuses/heures pleines",
+          "base": "Tarif base"
+        },
+        "pricePerKwh": "Tarif au kWh",
+        "statistics": "Statistiques",
+        "lastSyncLabel": "Dernière synchronisation : ",
+        "firstValueLabel": "1ère valeur :",
+        "lastValueLabel": "Dernière valeur :",
+        "numberOfStatesLabel": "Nombre d'états synchronisés:",
+        "gladysPlusRefreshProgressLabel": "Synchronisation en cours...",
+        "gladysPlusRefreshProgressDescription": "Gladys Plus est entrain de rafraîchir son cache via l'API Enedis. Cette synchronisation peut prendre du temps, car Enedis impose des limites de requêtes. Il n'est pas nécessaire de garder cet onglet ouvert.",
+        "refreshLocal": "Synchroniser avec Gladys Plus",
+        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponible en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
+        "saveButton": "Enregistrer",
+        "deleteButton": "Supprimer"
+      }
+    },
     "alexa": {
       "title": "Amazon Alexa",
       "description": "Contrôlez vos appareils Gladys à la voix dans Alexa",
@@ -2107,7 +2148,8 @@
       "binary": "Relais",
       "power": "Puissance",
       "energy": "Energie",
-      "index": "Index"
+      "index": "Index",
+      "daily-consumption": "Consommation journalière"
     },
     "volume-sensor": {
       "shortCategoryName": "Capteur de volume",

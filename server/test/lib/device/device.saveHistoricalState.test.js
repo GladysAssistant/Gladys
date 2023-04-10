@@ -1,5 +1,6 @@
 const { expect, assert: chaiAssert } = require('chai');
 const { assert, stub } = require('sinon');
+const dayjs = require('dayjs');
 const db = require('../../../models');
 const Device = require('../../../lib/device');
 const StateManager = require('../../../lib/state');
@@ -15,6 +16,13 @@ describe('Device.saveHistoricalState', () => {
     const job = new Job(event);
     const newDate = new Date().toISOString();
     const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('deviceFeature', 'test-device-feature', {
+      last_value: 5,
+      last_value_changed: null,
+      last_monthly_aggregate: null,
+      last_daily_aggregate: null,
+      last_hourly_aggregate: null,
+    });
     await device.saveHistoricalState(
       {
         id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
@@ -226,6 +234,78 @@ describe('Device.saveHistoricalState', () => {
     expect(newDeviceFeatureInDB.last_daily_aggregate).to.deep.equal(oldDeviceInDb.last_daily_aggregate);
     expect(newDeviceFeatureInDB.last_hourly_aggregate).to.deep.equal(oldDeviceInDb.last_hourly_aggregate);
     expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
+  });
+  it('should save old state and update recent aggregate', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const job = new Job(event);
+    const dateInThePast = dayjs('2021-10-04T06:00:00.000Z').toISOString();
+    const dateInTheFuture = dayjs('2022-10-10T16:00:00.000Z').toDate();
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('deviceFeature', 'test-device-feature', {
+      name: 'Thermostat',
+      last_value: 5,
+      last_value_changed: dateInTheFuture,
+      last_monthly_aggregate: dateInTheFuture,
+      last_daily_aggregate: dateInTheFuture,
+      last_hourly_aggregate: dateInTheFuture,
+    });
+    const deviceFeature = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+    });
+    deviceFeature.set({
+      last_value: 5,
+      last_value_changed: dateInTheFuture,
+      last_monthly_aggregate: dateInTheFuture,
+      last_daily_aggregate: dateInTheFuture,
+      last_hourly_aggregate: dateInTheFuture,
+    });
+    await deviceFeature.save();
+    await device.saveHistoricalState(
+      {
+        id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+        selector: 'test-device-feature',
+        has_feedback: false,
+        keep_history: true,
+      },
+      12,
+      dateInThePast,
+    );
+    assert.notCalled(event.emit);
+    const newDeviceFeatureInDB = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+      attributes: [
+        'last_monthly_aggregate',
+        'last_daily_aggregate',
+        'last_hourly_aggregate',
+        'last_value',
+        'last_value_changed',
+      ],
+      raw: true,
+    });
+
+    const dailyFormat = (date) => dayjs(date, 'Europe/Paris').format('YYYY-MM-DD');
+    const hourlyFormat = (date) => dayjs(date, 'Europe/Paris').format('YYYY-MM-DD HH:mm');
+
+    // Verify device in DB
+    expect(dailyFormat(newDeviceFeatureInDB.last_monthly_aggregate)).to.deep.equal('2021-08-31');
+    expect(hourlyFormat(newDeviceFeatureInDB.last_daily_aggregate)).to.deep.equal('2021-10-03 23:59');
+    expect(hourlyFormat(newDeviceFeatureInDB.last_hourly_aggregate)).to.deep.equal('2021-10-03 23:59');
+    expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
+
+    // Verify device in RAM
+    const deviceInRam = stateManager.get('deviceFeature', 'test-device-feature');
+    expect(dailyFormat(deviceInRam.last_monthly_aggregate)).to.deep.equal('2021-08-31');
+    expect(hourlyFormat(deviceInRam.last_daily_aggregate)).to.deep.equal('2021-10-03 23:59');
+    expect(hourlyFormat(deviceInRam.last_hourly_aggregate)).to.deep.equal('2021-10-03 23:59');
+    expect(deviceInRam.last_value).to.deep.equal(5);
   });
   it('should return error, invalid number', async () => {
     const event = {
