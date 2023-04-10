@@ -774,6 +774,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
+  LAN: {
+    SCANNING: 'lan.scanning',
+  },
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',

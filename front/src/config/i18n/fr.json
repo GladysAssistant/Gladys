@@ -423,7 +423,7 @@
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
         "externalIdLabel": "ID externe",
-        "manufacturerLabel": "Fabricant",
+        "manufacturerLabel": "Construteur",
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
@@ -1029,6 +1029,52 @@
         "cube": "Contrôleur",
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
+      }
+    },
+    "lanManager": {
+      "title": "LAN Manager",
+      "description": "Gérez les appareils sur votre réseau local.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
+      "setupTab": "Configuration",
+      "device": {
+        "title": "Appareils LAN",
+        "search": "Chercher un appareil",
+        "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
+        "manufacturerLabel": "Construteur",
+        "ipAddressLabel": "Adresse IP",
+        "macAddressLabel": "Adresse MAC",
+        "originalNameLabel": "Nom sur le réseau"
+      },
+      "discover": {
+        "title": "Découverte LAN",
+        "noDevices": "Aucun appareil LAN n'a encore été trouvé.",
+        "scanButton": "Recherche sur le réseau",
+        "deviceUpdateButton": "Nouveaux appareils disponibles",
+        "hideExistingDevices": "Cacher les appareils déjà ajoutés",
+        "alreadyCreatedButton": "Déjà créé",
+        "updateButton": "Mettre à jour",
+        "discoveringError": "Une erreur est survenue lors de la recherche, merci de consulter les logs."
+      },
+      "setup": {
+        "title": "Configuration LAN",
+        "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
+        "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan sur le réseau à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil est détecté sur le réseau.",
+        "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
+        "presenceScannerFrequencyLabel": "Fréquence de scan",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
+        "ipMasksLabel": "CIDR à scanner",
+        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
+        "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne pourrant pas être supprimés.",
+        "maskTableHeader": "CIDR",
+        "nameTableHeader": "Nom",
+        "statusTableHeader": "Actif",
+        "maskTablePlaceholder": "e.g. 192.168.1.1/20",
+        "nameTablePlaceholder": "Entrer le nom du CIDR",
+        "deleteButtonTooltip": "Supprimer",
+        "maskFormatError": "Format CIDR invalide"
       }
     },
     "eWeLink": {
@@ -2268,6 +2314,7 @@
     "externalIdPlaceholder": "Entrez une ID externe",
     "unitLabel": "Unité",
     "saveButton": "Sauvegarder",
+    "deleteButton": "Supprimer",
     "externalIdMessage": "L'ID externe de la fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys, par exemple lors de l'appel de l'API.",
     "minLabel": "Valeur minimum",
     "minPlaceholder": "Entrez la valeur minimum",
