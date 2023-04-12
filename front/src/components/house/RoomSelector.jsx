@@ -71,7 +71,7 @@ class RoomSelector extends Component {
   }
 
   render({}, { selectedRoom, houseOptions }) {
-    return <Select value={selectedRoom} options={houseOptions} onChange={this.updateSelection} />;
+    return <Select value={selectedRoom} options={houseOptions} onChange={this.updateSelection} maxMenuHeight={220} />;
   }
 }
 

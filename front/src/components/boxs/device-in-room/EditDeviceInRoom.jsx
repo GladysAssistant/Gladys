@@ -120,6 +120,7 @@ class EditDeviceInRoom extends Component {
                   isMulti
                   onChange={this.updateDeviceFeatures}
                   options={deviceOptions}
+                  maxMenuHeight={220}
                 />
               </div>
             )}

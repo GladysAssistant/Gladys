@@ -1,0 +1,20 @@
+{
+  "name": "gladys-enedis",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "bluebird": "^3.7.0",
+    "dayjs": "^1.11.5",
+    "get-value": "^3.0.1"
+  }
+}

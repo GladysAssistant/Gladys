@@ -29,7 +29,7 @@ class CheckUserPresence extends Component {
         const feature = device.features.find(f => f.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR);
         if (feature) {
           deviceOptions.push({
-            label: feature.name,
+            label: device.name,
             value: feature.selector
           });
         }

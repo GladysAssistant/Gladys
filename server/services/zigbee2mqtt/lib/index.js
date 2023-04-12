@@ -49,6 +49,8 @@ const Zigbee2mqttManager = function Zigbee2mqttManager(gladys, mqttLibrary, serv
   this.networkModeValid = true;
   this.dockerBased = true;
 
+  this.containerRestartWaitTimeInMs = 5 * 1000;
+
   this.backup = gladys.job.wrapper(JOB_TYPES.SERVICE_ZIGBEE2MQTT_BACKUP, this.backup.bind(this));
   this.backupJob = {};
   this.backupScheduledJob = null;

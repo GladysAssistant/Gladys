@@ -1,0 +1,20 @@
+{
+  "name": "gladys-lan-manager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "freebsd",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "node-sudo-nmap": "^4.0.4"
+  }
+}
