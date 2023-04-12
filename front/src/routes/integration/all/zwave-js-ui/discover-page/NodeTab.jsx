@@ -51,62 +51,58 @@ const NodeTab = ({ children, ...props }) => {
               })}
             >
               {(!props.zwaveNodes || props.zwaveNodes.length === 0) && <EmptyState />}
-              {props.zwaveNodes &&
-                props.zwaveNodes.length != 0 &&
-                !get(props, 'zwaveStatus.scanInProgress') && (
-                  <>
-                    <div class="page-options d-flex">
-                      <button
-                        class="btn btn-outline-primary"
-                        onClick={props.scanNetwork}
-                        disabled={zwaveActionsDisabled}
-                      >
-                        <Text id="integration.zwave-js-ui.discover.scanButton" /> <i class="fe fe-radio" />
-                      </button>
-                      <a
-                        href={
-                          zwaveActionsEnabled
-                            ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add'
-                            : '#'
-                        }
-                      >
-                        <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-                          <Text id="integration.zwave-js-ui.discover.addNodeButton" /> <i class="fe fe-plus" />
-                        </button>
-                      </a>
-                      <a
-                        href={
-                          zwaveActionsEnabled
-                            ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add-secure'
-                            : '#'
-                        }
-                      >
-                        <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-                          <Text id="integration.zwave-js-ui.discover.addNodeSecureButton" /> <i class="fe fe-plus" />
-                        </button>
-                      </a>
-                      <a
-                        href={
-                          zwaveActionsEnabled
-                            ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=remove'
-                            : '#'
-                        }
-                      >
-                        <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
-                          <Text id="integration.zwave-js-ui.discover.removeNode" /> <i class="fe fe-trash" />
-                        </button>
-                      </a>
-                    </div>
-                  </>
-                ) &&
-                props.zwaveNodes.map((zwaveNode, index) => (
-                  <Node
-                    node={zwaveNode}
-                    nodeIndex={index}
-                    createDevice={props.createDevice}
-                    editNodeName={props.editNodeName}
-                  />
-                ))}
+              {props.zwaveNodes && props.zwaveNodes.length > 0 && (
+                <div class="page-options d-flex">
+                  <button
+                    class="btn btn-outline-primary"
+                    onClick={props.scanNetwork}
+                    disabled={zwaveActionsDisabled}
+                  >
+                    <Text id="integration.zwave-js-ui.discover.scanButton" /> <i class="fe fe-radio" />
+                  </button>
+                  <a
+                    href={
+                      zwaveActionsEnabled
+                        ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add'
+                        : '#'
+                    }
+                  >
+                    <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
+                      <Text id="integration.zwave-js-ui.discover.addNodeButton" /> <i class="fe fe-plus" />
+                    </button>
+                  </a>
+                  <a
+                    href={
+                      zwaveActionsEnabled
+                        ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add-secure'
+                        : '#'
+                    }
+                  >
+                    <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
+                      <Text id="integration.zwave-js-ui.discover.addNodeSecureButton" /> <i class="fe fe-plus" />
+                    </button>
+                  </a>
+                  <a
+                    href={
+                      zwaveActionsEnabled
+                        ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=remove'
+                        : '#'
+                    }
+                  >
+                    <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
+                      <Text id="integration.zwave-js-ui.discover.removeNode" /> <i class="fe fe-trash" />
+                    </button>
+                  </a>
+                </div>
+              )}
+              {props.zwaveNodes && props.zwaveNodes.length > 0 && props.zwaveNodes.map((zwaveNode, index) => (
+                <Node
+                  node={zwaveNode}
+                  nodeIndex={index}
+                  createDevice={props.createDevice}
+                  editNodeName={props.editNodeName}
+                />
+              ))}
             </div>
           </div>
         </div>
