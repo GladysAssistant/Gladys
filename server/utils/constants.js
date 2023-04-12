@@ -466,6 +466,7 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',
+    DAILY_CONSUMPTION: 'daily-consumption',
   },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',
@@ -805,6 +806,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     NODE_READY: 'zwave-js-ui.node-ready',
     NODE_ADDED: 'zwave-js-ui.node-added',
     NODE_REMOVED: 'zwave-js-ui.node-removed',
+  },
+  LAN: {
+    SCANNING: 'lan.scanning',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',

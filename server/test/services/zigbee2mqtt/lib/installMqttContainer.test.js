@@ -1,14 +1,13 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const { promises: fs } = require('fs');
 
 const { assert, fake } = sinon;
 
 const proxyquire = require('proxyquire').noCallThru();
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const { installMqttContainer } = proxyquire('../../../../services/zigbee2mqtt/lib/installMqttContainer', {
-  '../../../utils/childProcess': { exec: fake.resolves(true) },
-});
+const { installMqttContainer } = proxyquire('../../../../services/zigbee2mqtt/lib/installMqttContainer', {});
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
   './installMqttContainer': { installMqttContainer },
 });
@@ -26,6 +25,7 @@ const containerStopped = {
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 describe('zigbee2mqtt installMqttContainer', () => {
+  const TEMP_GLADYS_FOLDER = process.env.TEMP_FOLDER || '../.tmp';
   // PREPARE
   let zigbee2mqttManager;
   let gladys;
@@ -51,7 +51,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
         exec: fake.resolves(true),
         getGladysBasePath: fake.resolves({
           basePathOnHost: '/var/lib/gladysassistant',
-          basePathOnContainer: '/var/lib/gladysassistant',
+          basePathOnContainer: TEMP_GLADYS_FOLDER,
         }),
       },
     };
@@ -59,13 +59,14 @@ describe('zigbee2mqtt installMqttContainer', () => {
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
     zigbee2mqttManager.zigbee2mqttRunning = false;
     zigbee2mqttManager.zigbee2mqttExist = false;
+    zigbee2mqttManager.containerRestartWaitTimeInMs = 0;
   });
 
   afterEach(() => {
     sinon.reset();
   });
 
-  it('it should restart MQTT container', async function Test() {
+  it('should restart MQTT container', async function Test() {
     // PREPARE
     this.timeout(6000);
     const config = {};
@@ -80,7 +81,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
     expect(zigbee2mqttManager.mqttExist).to.equal(true);
   });
 
-  it('it should do nothing', async () => {
+  it('should do nothing', async () => {
     // PREPARE
     const config = {};
     gladys.system.getContainers = fake.resolves([container]);
@@ -95,7 +96,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
     expect(zigbee2mqttManager.mqttExist).to.equal(true);
   });
 
-  it('it should fail to start MQTT container', async () => {
+  it('should fail to start MQTT container', async () => {
     // PREPARE
     const config = {};
     gladys.system.getContainers = fake.resolves([containerStopped]);
@@ -116,7 +117,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
     expect(zigbee2mqttManager.mqttExist).to.equal(true);
   });
 
-  it('it should fail to install MQTT container', async () => {
+  it('should fail to install MQTT container', async () => {
     // PREPARE
     const config = {};
     gladys.system.getContainers = fake.resolves([]);
@@ -136,7 +137,7 @@ describe('zigbee2mqtt installMqttContainer', () => {
     expect(zigbee2mqttManager.mqttExist).to.equal(false);
   });
 
-  it('it should install MQTT container', async function Test() {
+  it('should install MQTT container', async function Test() {
     // PREPARE
     const config = {};
     this.timeout(11000);
@@ -159,8 +160,15 @@ describe('zigbee2mqtt installMqttContainer', () => {
     assert.calledTwice(gladys.system.restartContainer);
     expect(zigbee2mqttManager.mqttRunning).to.equal(true);
     expect(zigbee2mqttManager.mqttExist).to.equal(true);
+    const mosquittoConfPath = `${TEMP_GLADYS_FOLDER}/zigbee2mqtt/mqtt/mosquitto.conf`;
+    const mosquittoConfContent = await fs.readFile(mosquittoConfPath, 'utf-8');
+    expect(mosquittoConfContent).to.contain('listener 1884');
+    expect(mosquittoConfContent).to.contain('allow_anonymous false');
+    expect(mosquittoConfContent).to.contain('password_file /mosquitto/config/mosquitto.passwd');
+    expect(mosquittoConfContent).to.contain('persistence true');
+    expect(mosquittoConfContent).to.contain('persistence_location /mosquitto/config/');
   });
-  it('it should fail to configure MQTT container', async function Test() {
+  it('should fail to configure MQTT container', async function Test() {
     // PREPARE
     this.timeout(11000);
     const config = {};
