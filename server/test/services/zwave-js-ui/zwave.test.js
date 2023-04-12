@@ -54,7 +54,9 @@ describe('zwaveJSUIService', () => {
       .onSecondCall() // DRIVER_PATH
       .resolves(DRIVER_PATH);
     await zwaveJSUIService.start();
+    zwaveJSUIService.device.mqttClient.emit('connect');
     expect(zwaveJSUIService.device.mqttConnected).to.equal(true);
+    expect(zwaveJSUIService.device.scanInProgress).to.equal(true);
   });
 
   it('should stop service', async () => {
