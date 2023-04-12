@@ -16,8 +16,7 @@ function addNode(secure = true) {
 
   setTimeout(() => {
     this.mqttClient.publish(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/stopInclusion/set`);
-    this.mqttClient.publish(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
-    this.scanInProgress = true;
+    this.scanNetwork();
   }, ADD_NODE_TIMEOUT);
 }
 

@@ -108,7 +108,7 @@ class ZwaveNode extends Component {
                     </button>
                   </div>
                   <div>
-                    <a
+                    <Link
                       href={createGithubUrl(props.node)}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -118,7 +118,7 @@ class ZwaveNode extends Component {
                         <i class="fe fe-external-link" />
                       </span>
                       <Text id="integration.zwave-js-ui.discover.createGithubIssue" />
-                    </a>
+                    </Link>
                   </div>
                 </div>
               ) : (

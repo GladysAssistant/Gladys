@@ -12,8 +12,6 @@ function getStatus() {
   return {
     ready: this.ready,
 
-    inclusionState: this.driver && this.driver.ready && this.driver.inclusionState,
-    isScanNetworkActive: this.driver && this.driver.ready && this.driver.isScanNetworkActive,
     scanInProgress: this.scanInProgress,
 
     mqttExist: this.mqttExist,

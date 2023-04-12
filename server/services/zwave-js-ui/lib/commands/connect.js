@@ -186,12 +186,7 @@ async function connect() {
       }
     });
 
-    this.scanInProgress = true;
-    this.mqttClient.publish(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
-
-    this.driver = {
-      controllerId: 'N.A.',
-    };
+    this.scanNetwork();
   } else {
     logger.warn("Can't connect Gladys cause MQTT not running !");
   }

@@ -15,8 +15,7 @@ function removeNode() {
 
   setTimeout(() => {
     this.mqttClient.publish(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/stopExclusion/set`);
-    this.mqttClient.publish(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
-    this.scanInProgress = true;
+    this.scanNetwork();
   }, REMOVE_NODE_TIMEOUT);
 }
 

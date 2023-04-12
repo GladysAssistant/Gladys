@@ -131,10 +131,11 @@ function getNodes({ orderDir, search } = {}) {
 
       return newDevice;
     })
+    .filter((newDevice) => newDevice.features && newDevice.features.length > 0)
     .sort((a, b) => {
       return orderDir === 'asc'
-        ? b.ready - a.ready || a.rawZwaveNode.id - b.rawZwaveNode.id
-        : a.ready - b.ready || b.rawZwaveNode.id - a.rawZwaveNode.id;
+        ? a.ready - b.ready || a.rawZwaveNode.id - b.rawZwaveNode.id
+        : b.ready - a.ready || b.rawZwaveNode.id - a.rawZwaveNode.id;
     });
 }
 

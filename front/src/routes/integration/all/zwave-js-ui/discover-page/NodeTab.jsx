@@ -53,18 +53,12 @@ const NodeTab = ({ children, ...props }) => {
               {(!props.zwaveNodes || props.zwaveNodes.length === 0) && <EmptyState />}
               {props.zwaveNodes && props.zwaveNodes.length > 0 && (
                 <div class="page-options d-flex">
-                  <button
-                    class="btn btn-outline-primary"
-                    onClick={props.scanNetwork}
-                    disabled={zwaveActionsDisabled}
-                  >
+                  <button class="btn btn-outline-primary" onClick={props.scanNetwork} disabled={zwaveActionsDisabled}>
                     <Text id="integration.zwave-js-ui.discover.scanButton" /> <i class="fe fe-radio" />
                   </button>
                   <a
                     href={
-                      zwaveActionsEnabled
-                        ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add'
-                        : '#'
+                      zwaveActionsEnabled ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add' : '#'
                     }
                   >
                     <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
@@ -95,14 +89,16 @@ const NodeTab = ({ children, ...props }) => {
                   </a>
                 </div>
               )}
-              {props.zwaveNodes && props.zwaveNodes.length > 0 && props.zwaveNodes.map((zwaveNode, index) => (
-                <Node
-                  node={zwaveNode}
-                  nodeIndex={index}
-                  createDevice={props.createDevice}
-                  editNodeName={props.editNodeName}
-                />
-              ))}
+              {props.zwaveNodes &&
+                props.zwaveNodes.length > 0 &&
+                props.zwaveNodes.map((zwaveNode, index) => (
+                  <Node
+                    node={zwaveNode}
+                    nodeIndex={index}
+                    createDevice={props.createDevice}
+                    editNodeName={props.editNodeName}
+                  />
+                ))}
             </div>
           </div>
         </div>

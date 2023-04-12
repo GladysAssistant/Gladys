@@ -185,8 +185,6 @@ describe('zwaveJSUIManager commands', () => {
     const status = zwaveJSUIManager.getStatus();
     expect(status).to.deep.equal({
       dockerBased: true,
-      inclusionState: undefined,
-      isScanNetworkActive: undefined,
       mqttConnected: false,
       mqttExist: false,
       mqttRunning: false,

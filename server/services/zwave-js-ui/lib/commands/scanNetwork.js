@@ -9,8 +9,8 @@ const { DEFAULT } = require('../constants');
 function scanNetwork() {
   logger.debug(`Zwave : Scaning network`);
 
-  this.scanInProgress = true;
   this.mqttClient.publish(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes/set`, 'true');
+  this.scanInProgress = true;
 }
 
 module.exports = {
