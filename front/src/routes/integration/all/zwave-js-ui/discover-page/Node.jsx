@@ -114,6 +114,9 @@ class ZwaveNode extends Component {
                       rel="noopener noreferrer"
                       onClick={displayRawNode(props.node)}
                     >
+                      <span class="icon mr-3">
+                        <i class="fe fe-external-link" />
+                      </span>
                       <Text id="integration.zwave-js-ui.discover.createGithubIssue" />
                     </a>
                   </div>
@@ -122,24 +125,6 @@ class ZwaveNode extends Component {
                 <div class="card-body">
                   <div class="alert alert-warning" role="alert">
                     <Text id="integration.zwave-js-ui.discover.sleepingNodeMsg" />
-                  </div>
-                  <div class="form-group">
-                    <button class="btn btn-success" onClick={this.createDevice}>
-                      <Text id="integration.zwave-js-ui.discover.createDeviceInGladys" />
-                    </button>
-                  </div>
-                  <div>
-                    <Link
-                      href={createGithubUrl(props.node)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={displayRawNode(props.node)}
-                    >
-                      <span class="icon mr-3">
-                        <i class="fe fe-external-link" />
-                      </span>
-                      <Text id="integration.zwave-js-ui.discover.createGithubIssue" />
-                    </Link>
                   </div>
                 </div>
               )}
