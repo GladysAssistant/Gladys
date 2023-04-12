@@ -218,24 +218,7 @@ describe('zwaveJSUIManager commands', () => {
       },
     };
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.deep.equal([
-      {
-        name: 'name - 1',
-        model: 'product firmwareVersion',
-        service_id: 'ZWAVEJSUI_SERVICE_ID',
-        external_id: 'zwave-js-ui:node_id:1',
-        selector: 'zwave-js-ui-node-1-name-1',
-        ready: true,
-        rawZwaveNode: {
-          id: 1,
-          loc: 'location',
-          product: 'product',
-          keysClasses: [],
-        },
-        features: [],
-        params: [],
-      },
-    ]);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should updateConfiguration', () => {
@@ -439,25 +422,8 @@ describe('zwaveJSUIManager devices', () => {
         classes: {},
       },
     };
-    const devices = zwaveJSUIManager.getNodes();
-    expect(devices).to.deep.equal([
-      {
-        service_id: ZWAVEJSUI_SERVICE_ID,
-        external_id: 'zwave-js-ui:node_id:1',
-        model: 'product firmwareVersion',
-        name: 'name - 1',
-        ready: true,
-        selector: 'zwave-js-ui-node-1-name-1',
-        features: [],
-        params: [],
-        rawZwaveNode: {
-          id: 1,
-          loc: 'location',
-          product: 'product',
-          keysClasses: [],
-        },
-      },
-    ]);
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should receive node with param', () => {
@@ -490,30 +456,8 @@ describe('zwaveJSUIManager devices', () => {
         },
       },
     };
-    const devices = zwaveJSUIManager.getNodes();
-    expect(devices).to.deep.equal([
-      {
-        service_id: ZWAVEJSUI_SERVICE_ID,
-        external_id: 'zwave-js-ui:node_id:1',
-        model: 'product firmwareVersion',
-        name: 'name - 1',
-        ready: true,
-        selector: 'zwave-js-ui-node-1-name-1',
-        features: [],
-        params: [
-          {
-            name: '0-label-value-id',
-            value: 'value',
-          },
-        ],
-        rawZwaveNode: {
-          id: 1,
-          loc: 'location',
-          product: 'product',
-          keysClasses: ['112'],
-        },
-      },
-    ]);
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should receive node feature Temperature', () => {

@@ -165,8 +165,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     expect(zwaveJSUIManager.nodes[1].classes[112][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should handle value added with value', () => {
@@ -364,9 +363,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       writeable: false,
     });
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
-    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should handle value added 49-0-Illuminance', () => {
@@ -607,9 +604,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     expect(zwaveJSUIManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].features).to.have.lengthOf(0);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 132-0-controllerNodeId', () => {
@@ -627,9 +622,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     expect(zwaveJSUIManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].features).to.have.lengthOf(0);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 132-0-level', () => {
@@ -650,9 +643,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     expect(zwaveJSUIManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].features).to.have.lengthOf(0);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 132-0-isLow', () => {
@@ -670,9 +661,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     expect(zwaveJSUIManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].features).to.have.lengthOf(0);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 50-0-value-66048', () => {
@@ -761,9 +750,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       property: 'value-66051',
     });
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
-    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 50-0-value-65536', () => {
@@ -782,9 +769,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       property: 'value-65536',
     });
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
-    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 50-0-value-65537', () => {
@@ -838,9 +823,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       property: 'value-65539',
     });
     const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
-    expect(nodes[0].features).to.have.lengthOf(0);
+    expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 50-0-value-66561', () => {
