@@ -1,3 +1,4 @@
+const { SYSTEM_VARIABLE_NAMES } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 const { CONFIGURATION } = require('./constants');
 
@@ -23,6 +24,8 @@ async function getConfiguration() {
   // Load version parameters
   const dockerMqttVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_MQTT_VERSION, this.serviceId);
   const dockerZ2mVersion = await this.gladys.variable.getValue(CONFIGURATION.DOCKER_Z2M_VERSION, this.serviceId);
+  // Gladys params
+  const timezone = await this.gladys.variable.getValue(SYSTEM_VARIABLE_NAMES.TIMEZONE);
 
   return {
     z2mDriverPath,
@@ -33,6 +36,7 @@ async function getConfiguration() {
     mqttPassword,
     dockerMqttVersion,
     dockerZ2mVersion,
+    timezone,
   };
 }
 

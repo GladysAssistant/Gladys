@@ -702,5 +702,14 @@ module.exports = {
         max: 5500,
       },
     },
+    soil_moisture: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.SOIL_MOISTURE_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        unit: DEVICE_FEATURE_UNITS.PERCENT,
+        min: 0,
+        max: 100,
+      },
+    },
   },
 };

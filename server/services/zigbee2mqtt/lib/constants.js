@@ -1,5 +1,6 @@
 const CONFIGURATION = {
   Z2M_DRIVER_PATH: 'ZIGBEE2MQTT_DRIVER_PATH',
+  Z2M_BACKUP: 'Z2M_BACKUP',
   MQTT_URL_KEY: 'Z2M_MQTT_URL',
   MQTT_URL_VALUE: 'mqtt://localhost:1884',
   Z2M_MQTT_USERNAME_KEY: 'Z2M_MQTT_USERNAME',
@@ -16,8 +17,8 @@ const DEFAULT = {
   TOPICS: [
     'zigbee2mqtt/#', // Default zigbee2mqtt topic
   ],
-  DOCKER_MQTT_VERSION: '2', // Last version of MQTT docker file
-  DOCKER_Z2M_VERSION: '2', // Last version of Z2M docker file
+  DOCKER_MQTT_VERSION: '3', // Last version of MQTT docker file
+  DOCKER_Z2M_VERSION: '3', // Last version of Z2M docker file
 };
 
 module.exports = {

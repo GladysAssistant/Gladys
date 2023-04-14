@@ -88,7 +88,7 @@ describe('GET /api/v1/service/mqtt/config', () => {
     assert.calledOnce(mqttHandler.getConfiguration);
     assert.calledWith(res.json, {
       useEmbeddedBroker: false,
-      mqttPassword: '*********',
+      mqttPassword: 'my_password',
     });
   });
 
