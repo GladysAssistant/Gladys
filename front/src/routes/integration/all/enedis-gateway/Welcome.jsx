@@ -43,7 +43,10 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
                       )}
                       {notOnGladysGateway && (
                         <p class="alert alert-info">
-                          <Text id="integration.enedis.welcome.notOnGladysGateway" />
+                          <Text id="integration.enedis.welcome.notOnGladysGateway" />{' '}
+                          <a target="_blank" rel="noopener noreferrer" href="https://plus.gladysassistant.com">
+                            plus.gladysassistant.com
+                          </a>
                         </p>
                       )}
                       {usagePointsIds && (
