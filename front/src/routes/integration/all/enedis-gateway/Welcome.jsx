@@ -123,7 +123,7 @@ class EnedisWelcomePageComponent extends Component {
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           external_id: `enedis:${usagePointId}:daily-consumption`,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
           read_only: true,
           has_feedback: false,
           keep_history: true
