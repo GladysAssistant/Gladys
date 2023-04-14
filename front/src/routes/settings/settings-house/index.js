@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import HousePage from './HousePage';
 import actions from '../../../actions/house';
 
-@connect('user,houses,housesSearch,housesGetStatus,houseUpdateStatus', actions)
+@connect('user,houses,housesSearch,housesGetStatus,houseUpdateStatus,getHousesOrderDir,housesSearch', actions)
 class SettingsHouses extends Component {
   componentWillMount() {
     this.props.getHouses();

@@ -8,9 +8,10 @@ const { EVENTS } = require('../../../utils/constants');
  * notifyNewDevice(discorveredDevice)
  */
 function notifyNewDevice(device, event) {
+  const payload = this.mergeWithExistingDevice(device);
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: event,
-    payload: device,
+    payload,
   });
 }
 

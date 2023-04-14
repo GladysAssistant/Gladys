@@ -28,10 +28,9 @@ function handleMessage(topic, message) {
     }
     // Device secondary features
     case 'STATUS8': {
-      let device = this.pendingDevices[deviceExternalId];
+      const device = this.pendingDevices[deviceExternalId];
       if (device) {
         this.subStatus(device, message);
-        device = this.tasmotaHandler.mergeWithExistingDevice(device);
 
         this.discoveredDevices[deviceExternalId] = device;
         delete this.pendingDevices[deviceExternalId];

@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import IntegrationMenu from './IntegrationMenu';
 import IntegrationCategory from './IntegrationCategory';
+import CardFilter from '../../components/layout/CardFilter';
 
 class IntegrationPage extends Component {
   changeOrderDirWithI18n = e => this.props.changeOrderDir(e, this.props.intl);
@@ -23,28 +24,15 @@ class IntegrationPage extends Component {
                     <Text id="integration.root.subtitle" fields={{ length: integrations.length, total: totalSize }} />
                   </div>
                   <div class="page-options d-flex">
-                    <select class="form-control custom-select w-auto" onChange={this.changeOrderDirWithI18n}>
-                      <option value="asc" selected={orderDir === 'asc'}>
-                        <Text id="global.orderDirAsc" />
-                      </option>
-                      <option value="desc" selected={orderDir === 'desc'}>
-                        <Text id="global.orderDirDesc" />
-                      </option>
-                    </select>
-                    <div class="input-icon ml-2">
-                      <span class="input-icon-addon">
-                        <i class="fe fe-search" />
-                      </span>
-                      <Localizer>
-                        <input
-                          type="text"
-                          class="form-control w-10"
-                          placeholder={<Text id="integration.root.searchPlaceholder" />}
-                          value={searchKeyword}
-                          onInput={this.searchWithI18n}
-                        />
-                      </Localizer>
-                    </div>
+                    <Localizer>
+                      <CardFilter
+                        changeOrderDir={this.changeOrderDirWithI18n}
+                        orderValue={orderDir}
+                        search={this.searchWithI18n}
+                        searchValue={searchKeyword}
+                        searchPlaceHolder={<Text id="integration.root.searchPlaceholder" />}
+                      />
+                    </Localizer>
                   </div>
                 </div>
                 <div class="row">

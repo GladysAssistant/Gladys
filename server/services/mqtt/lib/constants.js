@@ -10,7 +10,6 @@ const DEFAULT = {
   TOPICS: [
     'gladys/master/#', // Default gladys topic
   ],
-  HIDDEN_PASSWORD: '*********',
   INSTALLATION_STATUS: {
     DONE: 'DONE',
     IN_PROGRESS: 'IN_PROGRESS',
