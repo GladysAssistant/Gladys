@@ -156,7 +156,9 @@ const data = {
             'main-tv-volume',
             'main-tv-channel',
             'main-presence-sensor',
-            'main-signal-sensor'
+            'main-signal-sensor',
+            'air-conditioning',
+            'button-click'
           ]
         }
       ],
@@ -345,6 +347,17 @@ const data = {
             read_only: true,
             last_value: 4,
             last_value_changed: dayjs().add(60, 'second')
+          },
+          {
+            name: 'Button',
+            selector: 'button-click',
+            category: 'button',
+            type: 'click',
+            min: 0,
+            max: 6,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2019-02-12 07:49:07.556 +00:00'
           }
         ]
       },
@@ -472,6 +485,47 @@ const data = {
             read_only: true,
             last_value: 27,
             last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          }
+        ]
+      },
+      {
+        id: 'db3e81b6-00d4-4f9b-8aa6-0e50e719a729',
+        name: 'AC Conditioning',
+        selector: 'air-conditioning',
+        features: [
+          {
+            name: 'AC Conditioning',
+            selector: 'air-conditioning',
+            category: 'air-conditioning',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2022-10-10 07:49:07.556 +00:00'
+          },
+          {
+            name: 'AC Conditioning',
+            selector: 'air-conditioning',
+            category: 'air-conditioning',
+            type: 'mode',
+            min: 0,
+            max: 2,
+            read_only: false,
+            last_value: 1,
+            last_value_changed: '2022-10-10 07:49:07.556 +00:00'
+          },
+          {
+            name: 'AC Conditioning',
+            selector: 'air-conditioning',
+            category: 'air-conditioning',
+            type: 'target-temperature',
+            min: 0,
+            max: 30,
+            read_only: false,
+            last_value: 24,
+            last_value_changed: '2022-10-10 07:49:07.556 +00:00',
+            unit: 'celsius'
           }
         ]
       }
@@ -752,6 +806,17 @@ const data = {
               last_value: 0,
               unit: 'percent',
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            },
+            {
+              name: 'Button',
+              selector: 'button-click',
+              category: 'button',
+              type: 'click',
+              min: 0,
+              max: 6,
+              read_only: true,
+              last_value: 1,
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
         }
@@ -777,6 +842,23 @@ const data = {
               read_only: true,
               last_value: 60,
               unit: ' lux',
+              last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+            }
+          ]
+        },
+        {
+          id: 'f10ae5bc-1da6-484e-b0d0-953ee94e5ccc',
+          name: 'Button click',
+          selector: 'button-click',
+          features: [
+            {
+              name: 'Remote',
+              selector: 'kitchen-button-click',
+              category: 'button',
+              type: 'click',
+              min: 0,
+              max: 6,
+              read_only: true,
               last_value_changed: '2019-02-12 07:49:07.556 +00:00'
             }
           ]
@@ -969,6 +1051,12 @@ const data = {
         device_feature: 'main-lamp-binary',
         operator: '=',
         value: 1
+      },
+      {
+        type: 'device.new-state',
+        device_feature: 'button-click',
+        operator: '=',
+        value: 2
       }
     ],
     actions: [
@@ -2143,6 +2231,17 @@ const data = {
       status: 'RUNNING',
       created_at: '2020-11-11T18:41:40.052Z',
       updated_at: '2020-11-28T07:44:07.731Z'
+    },
+    {
+      id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      pod_id: null,
+      name: 'lan-manager',
+      selector: 'lan-manager',
+      version: '0.1.0',
+      has_message_feature: false,
+      status: 'UNKNOWN',
+      created_at: '2023-01-05T08:27:19.567Z',
+      updated_at: '2023-01-05T08:27:19.567Z'
     }
   ],
   'get /api/v1/session': [
@@ -2196,6 +2295,186 @@ const data = {
   'get /api/v1/setup': {
     account_configured: true
   },
+  'get /api/v1/service/lan-manager/device': [
+    {
+      id: '6dbd067a-efdd-428e-8c1b-cb792255eae2',
+      service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'Media server',
+      selector: 'lan-00B0D063C226',
+      external_id: 'lan-00B0D063C226',
+      should_poll: false,
+      poll_frequency: null,
+      created_at: '2023-01-05T08:28:09.567Z',
+      updated_at: '2023-01-05T08:28:09.567Z',
+      features: [
+        {
+          name: 'Presence',
+          selector: 'lan-presence-sensor',
+          category: 'presence-sensor',
+          type: 'push',
+          unit: null,
+          min: 0,
+          max: 1,
+          read_only: true,
+          last_value: 0,
+          last_value_changed: dayjs().add(60, 'second')
+        }
+      ],
+      room: {
+        id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+        name: 'Living Room',
+        selector: 'living-room'
+      },
+      params: [
+        {
+          name: 'DEVICE_MAC',
+          value: '00:B0:D0:63:C2:26'
+        },
+        {
+          name: 'DEVICE_NAME',
+          value: 'media.lan'
+        },
+        {
+          name: 'MANUFACTURER',
+          value: 'Bob and co.'
+        }
+      ]
+    }
+  ],
+  'get /api/v1/service/lan-manager/status': {
+    scanning: false
+  },
+  'get /api/v1/service/lan-manager/config': {
+    presenceScanner: {
+      frequency: 120000,
+      status: 'enabled'
+    },
+    ipMasks: [
+      {
+        mask: '192.168.1.1/24',
+        name: 'eth0',
+        networkInterface: true,
+        enabled: false
+      },
+      {
+        mask: '192.168.0.1/10',
+        name: 'Custom',
+        enabled: true
+      }
+    ]
+  },
+  'get /api/v1/service/lan-manager/discover': [
+    {
+      id: '6dbd067a-efdd-428e-8c1b-cb792255eae2',
+      ip: '192.168.1.22',
+      service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      room_id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
+      name: 'Media server',
+      selector: 'lan-00B0D063C226',
+      external_id: 'lan-00B0D063C226',
+      should_poll: false,
+      poll_frequency: null,
+      created_at: '2023-01-05T08:28:09.567Z',
+      updated_at: '2023-01-05T08:28:09.567Z',
+      features: [
+        {
+          name: 'Presence',
+          selector: 'lan-presence-sensor',
+          category: 'presence-sensor',
+          type: 'push',
+          unit: null,
+          min: 0,
+          max: 1,
+          read_only: true,
+          last_value: 0,
+          last_value_changed: dayjs().add(60, 'second')
+        }
+      ],
+      params: [
+        {
+          name: 'DEVICE_MAC',
+          value: '00:B0:D0:63:C2:26'
+        },
+        {
+          name: 'DEVICE_NAME',
+          value: 'media.lan'
+        },
+        {
+          name: 'MANUFACTURER',
+          value: 'Bob and co.'
+        }
+      ]
+    },
+    {
+      service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      name: 'New device',
+      ip: '192.168.1.10',
+      can_save: true,
+      selector: 'lan-12B0D063C226',
+      external_id: 'lan-12B0D063C226',
+      should_poll: false,
+      poll_frequency: null,
+      features: [
+        {
+          name: 'Presence',
+          selector: 'lan-presence-sensor',
+          category: 'presence-sensor',
+          type: 'push',
+          unit: null,
+          min: 0,
+          max: 1,
+          read_only: true,
+          last_value: 0,
+          last_value_changed: dayjs().add(60, 'second')
+        }
+      ],
+      params: [
+        {
+          name: 'DEVICE_MAC',
+          value: '12:B0:D0:63:C2:26'
+        },
+        {
+          name: 'DEVICE_NAME',
+          value: 'device.lan'
+        }
+      ]
+    },
+    {
+      service_id: 'd1af258c-2016-4dc9-b0cc-d2e92dd2fcec',
+      name: 'Random MAC device',
+      ip: '192.168.1.100',
+      can_save: false,
+      selector: 'lan-A2B0D063C226',
+      external_id: 'lan-A2B0D063C226',
+      should_poll: false,
+      poll_frequency: null,
+      features: [
+        {
+          name: 'Presence',
+          selector: 'lan-presence-sensor',
+          category: 'presence-sensor',
+          type: 'push',
+          unit: null,
+          min: 0,
+          max: 1,
+          read_only: true,
+          last_value: 0,
+          last_value_changed: dayjs().add(60, 'second')
+        }
+      ],
+      params: [
+        {
+          name: 'DEVICE_MAC',
+          value: 'A2:B0:D0:63:C2:26'
+        },
+        {
+          name: 'DEVICE_NAME',
+          value: 'random.lan'
+        }
+      ]
+    }
+  ],
   'get /api/v1/service/xiaomi/sensor': [
     {
       name: 'Xiaomi Temperature',

@@ -13,6 +13,13 @@ describe('zigbee2mqtt saveConfiguration', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       variable: {
         setValue: fake.resolves('setValue'),
         destroy: fake.resolves('destroy'),

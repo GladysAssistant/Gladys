@@ -31,6 +31,11 @@ const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 const { openAIAsk } = require('./gateway.openAIAsk');
 const { forwardMessageToOpenAI } = require('./gateway.forwardMessageToOpenAI');
 
+// Enedis API
+const { enedisGetConsumptionLoadCurve } = require('./enedis/gateway.enedisGetConsumptionLoadCurve');
+const { enedisGetDailyConsumption } = require('./enedis/gateway.enedisGetDailyConsumption');
+const { enedisGetDailyConsumptionMaxPower } = require('./enedis/gateway.enedisGetDailyConsumptionMaxPower');
+
 const Gateway = function Gateway(
   variable,
   event,
@@ -113,5 +118,10 @@ Gateway.prototype.refreshUserKeys = refreshUserKeys;
 Gateway.prototype.getEcowattSignals = getEcowattSignals;
 Gateway.prototype.openAIAsk = openAIAsk;
 Gateway.prototype.forwardMessageToOpenAI = forwardMessageToOpenAI;
+
+// Enedis API
+Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;
+Gateway.prototype.enedisGetDailyConsumption = enedisGetDailyConsumption;
+Gateway.prototype.enedisGetDailyConsumptionMaxPower = enedisGetDailyConsumptionMaxPower;
 
 module.exports = Gateway;

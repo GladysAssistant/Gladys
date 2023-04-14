@@ -6,7 +6,7 @@ import DevicePage from './DevicePage';
 import FoundDevices from './FoundDevices';
 
 @connect(
-  'session,user,philipsHueDevices,houses,getPhilipsHueDevicesStatus,philipsHueNewDevices,getPhilipsHueCreateDeviceStatus,getPhilipsHueNewDevicesStatus',
+  'session,user,philipsHueDevices,houses,getPhilipsHueDevicesStatus,philipsHueNewDevices,getPhilipsHueCreateDeviceStatus,getPhilipsHueNewDevicesStatus,philipsHueDeviceSearch,getPhilipsHueDeviceOrderDir',
   actions
 )
 class PhilipsHueDevicePage extends Component {

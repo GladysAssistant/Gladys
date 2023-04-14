@@ -1,6 +1,8 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
+
+import CardFilter from '../../components/layout/CardFilter';
 import SceneCards from './SceneCards';
 import EmptyState from './EmptyState';
 import style from './style.css';
@@ -15,27 +17,15 @@ const ScenePage = ({ children, ...props }) => (
               <Text id="scene.title" />
             </h1>
             <div class="page-options d-flex">
-              <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-                <option value="asc">
-                  <Text id="scene.orderDirAsc" />
-                </option>
-                <option value="desc">
-                  <Text id="scene.orderDirDesc" />
-                </option>
-              </select>
-              <div class="input-icon ml-2">
-                <span class="input-icon-addon">
-                  <i class="fe fe-search" />
-                </span>
-                <Localizer>
-                  <input
-                    type="text"
-                    class="form-control w-10"
-                    placeholder={<Text id="scene.searchPlaceholder" />}
-                    onInput={props.debouncedSearch}
-                  />
-                </Localizer>
-              </div>
+              <Localizer>
+                <CardFilter
+                  changeOrderDir={props.changeOrderDir}
+                  orderValue={props.getScenesOrderDir}
+                  search={props.debouncedSearch}
+                  searchValue={props.sceneSearch}
+                  searchPlaceHolder={<Text id="scene.searchPlaceholder" />}
+                />
+              </Localizer>
               <Link href="/dashboard/scene/new" class="btn btn-outline-primary ml-2">
                 <Text id="scene.newButton" /> <i class="fe fe-plus" />
               </Link>
