@@ -13,6 +13,7 @@
     "arm64"
   ],
   "dependencies": {
+    "fs-extra": "^11.1.1",
     "jszip": "^3.10.1",
     "lodash.clonedeep": "^4.5.0",
     "mqtt": "^4.2.6"

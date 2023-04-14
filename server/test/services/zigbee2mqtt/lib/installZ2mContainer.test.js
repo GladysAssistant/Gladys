@@ -63,6 +63,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
     zigbee2mqttManager.zigbee2mqttRunning = false;
     zigbee2mqttManager.zigbee2mqttExist = false;
+    zigbee2mqttManager.containerRestartWaitTimeInMs = 0;
   });
 
   afterEach(() => {
