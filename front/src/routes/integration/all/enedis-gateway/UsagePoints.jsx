@@ -189,7 +189,7 @@ const EnedisUsagePoints = ({
   syncs,
   sync
 }) => (
-  <div class="page">
+  <div class="page mt-4 mt-lg-0">
     <div class="page-main">
       <div class="my-3 my-md-5">
         <div class="container">
@@ -203,7 +203,10 @@ const EnedisUsagePoints = ({
                   <div class="page-options d-flex">
                     {usagePointsDevices && usagePointsDevices.length > 0 && (
                       <button class="btn btn-primary" onClick={sync}>
-                        <i class="fe fe-refresh-cw" /> <Text id="integration.enedis.usagePoints.refreshLocal" />
+                        <i class="fe fe-refresh-cw" />{' '}
+                        <span class="d-none d-sm-inline-block ml-2">
+                          <Text id="integration.enedis.usagePoints.refreshLocal" />
+                        </span>
                       </button>
                     )}
                   </div>
