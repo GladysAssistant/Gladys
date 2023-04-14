@@ -34,23 +34,42 @@ class CameraBoxComponent extends Component {
       return;
     }
     await this.setState({ streaming: true, loading: true });
+    const isGladysPlus = this.props.session.gatewayClient !== undefined;
     const streamingParams = await this.props.httpClient.post(
       `/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/start`,
       {
-        origin: config.localApiUrl
+        origin: isGladysPlus ? config.gladysGatewayApiUrl : config.localApiUrl,
+        is_gladys_gateway: isGladysPlus
       }
     );
+
     this.hls = new Hls({
       xhrSetup: xhr => {
-        xhr.setRequestHeader('Authorization', `Bearer ${this.props.session.getAccessToken()}`);
+        // We set the correct access token
+        const accessToken = isGladysPlus
+          ? this.props.session.gatewayClient.accessToken
+          : this.props.session.getAccessToken();
+        xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
       },
       loader: class CustomLoader extends Hls.DefaultConfig.loader {
         load(context, config, callbacks) {
           let { type, url } = context;
 
-          // Custom behavior
-          console.log('loading = ' + type + ' ' + url);
+          console.log(`Loading URL = ${url}`);
 
+          // For the encryption key, we hot replace the key with the data
+          // Coming from Gladys to ensure End-to-End Encryption
+          // When using with Gladys Plus
+          if (url && url.endsWith('index.m3u8.key')) {
+            const onSuccess = callbacks.onSuccess;
+            callbacks.onSuccess = function(response, stats, context) {
+              const enc = new TextEncoder();
+              // Encryption key is replaced here:
+              response.data = enc.encode(streamingParams.encryption_key);
+
+              onSuccess(response, stats, context);
+            };
+          }
           super.load(context, config, callbacks);
         }
       }
@@ -70,12 +89,17 @@ class CameraBoxComponent extends Component {
       console.log(errorDetails);
       console.log(errorFatal);
       if (errorType === 'networkError') {
-        this.stopStreaming();
+        //  this.stopStreaming();
       }
     });
-    this.hls.loadSource(
-      `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
-    );
+    if (isGladysPlus) {
+      this.hls.loadSource(`${config.gladysGatewayApiUrl}/cameras/${streamingParams.camera_folder}/index.m3u8`);
+    } else {
+      this.hls.loadSource(
+        `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
+      );
+    }
+
     // bind them together
     this.hls.attachMedia(this.videoRef.current);
     await this.setState({ loading: false });

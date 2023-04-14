@@ -22,7 +22,11 @@ module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
    * @apiGroup RtspCamera
    */
   async function startStreaming(req, res) {
-    const response = await rtspCameraHandler.startStreamingIfNotStarted(req.params.camera_selector, req.body.origin);
+    const response = await rtspCameraHandler.startStreamingIfNotStarted(
+      req.params.camera_selector,
+      req.body.origin,
+      req.body.is_gladys_gateway,
+    );
     res.send(response);
   }
 

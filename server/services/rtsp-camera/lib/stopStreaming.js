@@ -14,8 +14,9 @@ async function stopStreaming(cameraSelector) {
   if (!liveStream) {
     throw new NotFoundError('STREAM_NOT_FOUND');
   }
-  const { liveStreamingProcess, fullFolderPath } = liveStream;
+  const { liveStreamingProcess, fullFolderPath, watchAbortController } = liveStream;
   liveStreamingProcess.kill();
+  watchAbortController.abort();
   await fse.remove(fullFolderPath);
   this.liveStreams.delete(cameraSelector);
 }

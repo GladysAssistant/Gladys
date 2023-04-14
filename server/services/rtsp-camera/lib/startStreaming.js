@@ -1,6 +1,7 @@
 const fse = require('fs-extra');
 const Promise = require('bluebird');
 const { promises: fs } = require('fs');
+const fsWithoutPromise = require('fs');
 const path = require('path');
 const util = require('util');
 const randomBytes = util.promisify(require('crypto').randomBytes);
@@ -24,15 +25,31 @@ const waitBeforeExist = async (filePath, delay, maxTryLeft) => {
   }
 };
 
+const waitBeforeIndexExistOnGladysPlus = async (sharedObjectToVerify, delay, maxTryLeft) => {
+  try {
+    if (!sharedObjectToVerify.indexUploaded || !sharedObjectToVerify.keyUploaded) {
+      throw new Error('Not uploaded yet');
+    }
+  } catch (e) {
+    if (maxTryLeft > 0) {
+      const newMaxTryLeft = maxTryLeft - 1;
+      await Promise.delay(delay);
+      return waitBeforeIndexExistOnGladysPlus(sharedObjectToVerify, delay, newMaxTryLeft);
+    }
+    throw new Error('Max try reached, file does not exist on Gladys Plus');
+  }
+};
+
 /**
  * @description Start streaming
  * @param {Object} cameraSelector - The camera to stream.
  * @param {string} backendUrl - URL of the backend
+ * @param {boolean} isGladysGateway - If the stream starts from Gladys Gateway or local
  * @returns {Promise} Resolve when stream started.
  * @example
  * startStreaming(device);
  */
-async function startStreaming(cameraSelector, backendUrl) {
+async function startStreaming(cameraSelector, backendUrl, isGladysGateway) {
   // If stream already exist, return existing stream
   if (this.liveStreams.has(cameraSelector)) {
     const liveStream = this.liveStreams.get(cameraSelector);
@@ -63,9 +80,46 @@ async function startStreaming(cameraSelector, backendUrl) {
   const indexFilePath = path.join(folderPath, 'index.m3u8');
   // We create an encryption key
   const encryptionKey = (await randomBytes(16)).toString('hex');
-  const encryptionKeyUrl = `${backendUrl}/api/v1/service/rtsp-camera/camera/streaming/${cameraFolder}/index.m3u8.key`;
+  const encryptionKeyUrl = isGladysGateway
+    ? `${backendUrl}/cameras/${cameraFolder}/index.m3u8.key`
+    : `${backendUrl}/api/v1/service/rtsp-camera/camera/streaming/${cameraFolder}/index.m3u8.key`;
   const keyInfoFilePath = path.join(folderPath, 'key_info_file.txt');
   const encryptionKeyFilePath = path.join(folderPath, 'index.m3u8.key');
+
+  const watchAbortController = new AbortController();
+  const sharedObjectToVerify = {};
+
+  if (isGladysGateway) {
+    // We watch the folder to upload any change to Gladys Plus
+    fsWithoutPromise.watch(folderPath, { signal: watchAbortController.signal }, async (eventType, filename) => {
+      if (filename) {
+        try {
+          const fileChangedPath = path.join(folderPath, filename);
+          let fileContent = await fs.readFile(fileChangedPath);
+          // We don't upload the key to Gladys Plus
+          // So the end-to-end encryption is respected.
+          // Instead, we upload a dumb file that will be
+          // hot replaced on the client side with the correct key
+          // The key is sent end-to-end encrypted in Websockets :)
+          if (filename === 'index.m3u8.key') {
+            fileContent = Buffer.from('not-a-key');
+          }
+          logger.debug(`Streaming: Uploading ${filename} to gateway.`);
+          await this.gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
+          if (filename === 'index.m3u8') {
+            sharedObjectToVerify.indexUploaded = true;
+          }
+          if (filename === 'index.m3u8.key') {
+            sharedObjectToVerify.keyUploaded = true;
+          }
+        } catch (e) {
+          logger.error(`Unable to upload file ${filename}`);
+          logger.error(e);
+        }
+      }
+    });
+  }
+
   await fs.writeFile(keyInfoFilePath, `${encryptionKeyUrl}\n${encryptionKeyFilePath}`);
   await fs.writeFile(encryptionKeyFilePath, encryptionKey);
 
@@ -121,12 +175,17 @@ async function startStreaming(cameraSelector, backendUrl) {
     liveStreamingProcess,
     cameraFolder,
     encryptionKey,
+    watchAbortController,
     fullFolderPath: folderPath,
   });
 
   // Wait before the stream started to resolve
   // We'll wait at most 100 * 100 ms = 10 sec
   await waitBeforeExist(indexFilePath, 100, 100);
+
+  if (isGladysGateway) {
+    await waitBeforeIndexExistOnGladysPlus(sharedObjectToVerify, 100, 100);
+  }
 
   return {
     camera_folder: cameraFolder,
