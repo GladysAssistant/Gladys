@@ -151,6 +151,7 @@ async function connect() {
     this.mqttClient.on('connect', () => {
       logger.info('Connected to MQTT container');
       this.mqttClient.subscribe(`${this.mqttTopicPrefix}/#`);
+      logger.info(`Listening to MQTT topics ${this.mqttTopicPrefix}/#`);
       this.mqttConnected = true;
       this.zwaveJSUIConnected = true;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {

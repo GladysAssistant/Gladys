@@ -19,10 +19,11 @@ async function getConfiguration() {
     CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX,
     this.serviceId,
   );
-  const mqttTopicWithLocation = await this.gladys.variable.getValue(
+  const mqttTopicWithLocationStr = await this.gladys.variable.getValue(
     CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_WITH_LOCATION,
     this.serviceId,
   );
+  const mqttTopicWithLocation = mqttTopicWithLocationStr !== undefined && mqttTopicWithLocationStr === '1';
   const driverPath = await this.gladys.variable.getValue(CONFIGURATION.DRIVER_PATH, this.serviceId);
   const s2UnauthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_UNAUTHENTICATED, this.serviceId);
   const s2AuthenticatedKey = await this.gladys.variable.getValue(CONFIGURATION.S2_AUTHENTICATED, this.serviceId);
