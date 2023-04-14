@@ -423,7 +423,7 @@
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
         "externalIdLabel": "ID externe",
-        "manufacturerLabel": "Fabricant",
+        "manufacturerLabel": "Construteur",
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
@@ -699,6 +699,47 @@
       "privacyPolicy": "Lire la <a href=\"http://policies.google.com/?hl=fr\">politique de confidentialité de Google</a>.",
       "cancelButton": "Annuler",
       "connectButton": "Lier"
+    },
+    "enedis": {
+      "title": "Enedis",
+      "description": "Vos données de consommation électrique dans Gladys",
+      "welcomeTab": "Connexion avec Enedis",
+      "usagePointsTab": "Mes compteurs",
+      "welcome": {
+        "title": "Connexion à Enedis",
+        "longDescription": "Enedis gère le réseau d'électricité jusqu'au compteur d'électricité. Pour récupérez vos données de consommation d'électricité dans Gladys, autorisez Enedis à nous transmettre vos données Linky.",
+        "longDescription2": "Enedis est le gestionnaire du réseau public de distribution d'électricité sur 95% du territoire français continental.",
+        "longDescription3": "Pour donner votre autorisation, vous devez créer un compte personnel Enedis si vous n'avez pas encore de compte. Il vous permet également de suivre et gérer vos données de consommation d'électricité. Munissez-vous de votre facture d'électricité pour créer votre espace.",
+        "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données :",
+        "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer.",
+        "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus, disponible ici :",
+        "connectedToUsagePointds": "Connecté à Enedis avec succès ! La première synchronisation peut prendre entre 2h et 3h selon le volume de requêtes sur l'API Enedis. Il n'est pas nécessaire de garder cet onglet ouvert, la synchronisation a lieu en arrière-plan.",
+        "reconnectInfo": "Si jamais vous voulez rafraichir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 2 ans."
+      },
+      "usagePoints": {
+        "title": "Mes compteurs",
+        "emptyState": "Vous n'avez pas de compteurs synchronisés. Pour ajouter un compteur, veuillez vous rendre dans l'onglet \"Connexion avec Enedis\".",
+        "usagePointName": "Compteur",
+        "lastRefresh": "Dernières données :",
+        "usagePointId": "Identifiant du compteur",
+        "contractType": "Type de contrat",
+        "contracts": {
+          "hc-hp": "Heures creuses/heures pleines",
+          "base": "Tarif base"
+        },
+        "pricePerKwh": "Tarif au kWh",
+        "statistics": "Statistiques",
+        "lastSyncLabel": "Dernière synchronisation : ",
+        "firstValueLabel": "1ère valeur :",
+        "lastValueLabel": "Dernière valeur :",
+        "numberOfStatesLabel": "Nombre d'états synchronisés:",
+        "gladysPlusRefreshProgressLabel": "Synchronisation en cours...",
+        "gladysPlusRefreshProgressDescription": "Gladys Plus est entrain de rafraîchir son cache via l'API Enedis. Cette synchronisation peut prendre du temps, car Enedis impose des limites de requêtes. Il n'est pas nécessaire de garder cet onglet ouvert.",
+        "refreshLocal": "Synchroniser avec Gladys Plus",
+        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponible en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
+        "saveButton": "Enregistrer",
+        "deleteButton": "Supprimer"
+      }
     },
     "alexa": {
       "title": "Amazon Alexa",
@@ -988,6 +1029,52 @@
         "cube": "Contrôleur",
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
+      }
+    },
+    "lanManager": {
+      "title": "LAN Manager",
+      "description": "Gérez les appareils sur votre réseau local.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
+      "setupTab": "Configuration",
+      "device": {
+        "title": "Appareils LAN",
+        "search": "Chercher un appareil",
+        "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
+        "manufacturerLabel": "Construteur",
+        "ipAddressLabel": "Adresse IP",
+        "macAddressLabel": "Adresse MAC",
+        "originalNameLabel": "Nom sur le réseau"
+      },
+      "discover": {
+        "title": "Découverte LAN",
+        "noDevices": "Aucun appareil LAN n'a encore été trouvé.",
+        "scanButton": "Recherche sur le réseau",
+        "deviceUpdateButton": "Nouveaux appareils disponibles",
+        "hideExistingDevices": "Cacher les appareils déjà ajoutés",
+        "alreadyCreatedButton": "Déjà créé",
+        "updateButton": "Mettre à jour",
+        "discoveringError": "Une erreur est survenue lors de la recherche, merci de consulter les logs."
+      },
+      "setup": {
+        "title": "Configuration LAN",
+        "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
+        "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan sur le réseau à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil est détecté sur le réseau.",
+        "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
+        "presenceScannerFrequencyLabel": "Fréquence de scan",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
+        "ipMasksLabel": "CIDR à scanner",
+        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
+        "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne pourrant pas être supprimés.",
+        "maskTableHeader": "CIDR",
+        "nameTableHeader": "Nom",
+        "statusTableHeader": "Actif",
+        "maskTablePlaceholder": "e.g. 192.168.1.1/20",
+        "nameTablePlaceholder": "Entrer le nom du CIDR",
+        "deleteButtonTooltip": "Supprimer",
+        "maskFormatError": "Format CIDR invalide"
       }
     },
     "eWeLink": {
@@ -2107,7 +2194,8 @@
       "binary": "Relais",
       "power": "Puissance",
       "energy": "Energie",
-      "index": "Index"
+      "index": "Index",
+      "daily-consumption": "Consommation journalière"
     },
     "volume-sensor": {
       "shortCategoryName": "Capteur de volume",
@@ -2226,6 +2314,7 @@
     "externalIdPlaceholder": "Entrez une ID externe",
     "unitLabel": "Unité",
     "saveButton": "Sauvegarder",
+    "deleteButton": "Supprimer",
     "externalIdMessage": "L'ID externe de la fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys, par exemple lors de l'appel de l'API.",
     "minLabel": "Valeur minimum",
     "minPlaceholder": "Entrez la valeur minimum",
