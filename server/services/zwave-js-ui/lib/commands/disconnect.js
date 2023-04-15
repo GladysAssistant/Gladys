@@ -7,12 +7,12 @@ const logger = require('../../../../utils/logger');
  * zwave.disconnect();
  */
 async function disconnect() {
-  if (this.mqttConnected) {
-    logger.debug(`ZwaveJSUI : Disconnecting...`);
-    this.mqttClient.end();
-    this.mqttClient.removeAllListeners();
-    this.mqttClient = null;
+  logger.debug(`ZwaveJSUI : Disconnecting...`);
+  this.mqttClient.end();
+  this.mqttClient.removeAllListeners();
+  this.mqttClient = null;
 
+  if (this.mqttConnected) {
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
     });
