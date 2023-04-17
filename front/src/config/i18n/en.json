@@ -262,7 +262,15 @@
         "editCameraLabel": "Select the camera you want to display here.",
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
-        "editBoxNamePlaceholder": "Name of the box"
+        "editBoxNamePlaceholder": "Name of the box",
+        "latencyBoxName": "Latency",
+        "latencyBoxDescription": "The lower the latency you select, the faster the live stream will start. However, to have a low latency, you need a very fast internet connection with a minimum of ping or the video will be jerky. We recommend medium or low latency.",
+        "latency": {
+          "ultraLow": "Ultra low",
+          "low": "Low",
+          "medium": "Medium",
+          "standard": "Standard"
+        }
       },
       "chart": {
         "defaultInterval": "Default interval",
