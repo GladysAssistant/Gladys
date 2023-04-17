@@ -28,7 +28,9 @@ const actionsFunc = {
       device = self.stateManager.get('device', action.device);
       deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
     }
-    const value = action.value || evaluate(Handlebars.compile(action.evaluate_value)(scope));
+
+    const value = action.value || evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
+
     if (!Number(value)) {
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }
