@@ -26,6 +26,7 @@ module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
       req.params.camera_selector,
       req.body.origin,
       req.body.is_gladys_gateway,
+      req.body.segment_duration,
     );
     res.send(response);
   }

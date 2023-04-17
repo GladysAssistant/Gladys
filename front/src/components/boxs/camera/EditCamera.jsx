@@ -35,6 +35,30 @@ const EditCameraBox = ({ children, ...props }) => (
         />
       </Localizer>
     </div>
+    <div class="form-group">
+      <label>
+        <Text id="dashboard.boxes.camera.latencyBoxName" />
+      </label>
+      <select class="form-control" value={props.box.camera_latency} onInput={props.updateBoxLatency}>
+        <option value="ultra-low">
+          <Text id="dashboard.boxes.camera.latency.ultraLow" />
+        </option>
+        <option value="low">
+          <Text id="dashboard.boxes.camera.latency.low" />
+        </option>
+        <option value="medium">
+          <Text id="dashboard.boxes.camera.latency.medium" />
+        </option>
+        <option value="standard">
+          <Text id="dashboard.boxes.camera.latency.standard" />
+        </option>
+      </select>
+      <p>
+        <small class="text-muted">
+          <Text id="dashboard.boxes.camera.latencyBoxDescription" />
+        </small>
+      </p>
+    </div>
   </BaseEditBox>
 );
 
@@ -49,6 +73,12 @@ class EditCameraBoxComponent extends Component {
   updateBoxName = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       name: e.target.value
+    });
+  };
+
+  updateBoxLatency = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      camera_latency: e.target.value
     });
   };
 
@@ -69,13 +99,28 @@ class EditCameraBoxComponent extends Component {
     }
   };
 
+  initLatency = () => {
+    if (!this.props.box.camera_latency) {
+      this.props.updateBoxConfig(this.props.x, this.props.y, {
+        camera_latency: 'low'
+      });
+    }
+  };
+
   componentDidMount() {
     this.getCameras();
+    this.initLatency();
   }
 
   render(props, { cameras }) {
     return (
-      <EditCameraBox {...props} cameras={cameras} updateCamera={this.updateCamera} updateBoxName={this.updateBoxName} />
+      <EditCameraBox
+        {...props}
+        cameras={cameras}
+        updateCamera={this.updateCamera}
+        updateBoxName={this.updateBoxName}
+        updateBoxLatency={this.updateBoxLatency}
+      />
     );
   }
 }

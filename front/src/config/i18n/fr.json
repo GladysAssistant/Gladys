@@ -262,7 +262,15 @@
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
-        "editBoxNamePlaceholder": "Nom de la box"
+        "editBoxNamePlaceholder": "Nom de la box",
+        "latencyBoxName": "Latence",
+        "latencyBoxDescription": "Plus vous sélectionnez une latence basse, et plus vite le live démarrera. Néanmoins, pour avoir une latence basse, il faut une connexion internet très rapide et avec un minimum de ping sinon la vidéo sera saccadée. Nous conseillons une latence moyenne ou basse.",
+        "latency": {
+          "ultraLow": "Très basse",
+          "low": "Basse",
+          "medium": "Moyenne",
+          "standard": "Standard"
+        }
       },
       "chart": {
         "defaultInterval": "Intervalle par défaut",

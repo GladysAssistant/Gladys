@@ -46,11 +46,12 @@ const waitBeforeIndexExistOnGladysPlus = async (sharedObjectToVerify, delay, max
  * @param {Object} cameraSelector - The camera to stream.
  * @param {string} backendUrl - URL of the backend.
  * @param {boolean} isGladysGateway - If the stream starts from Gladys Gateway or local.
+ * @param {number} segmentDuration - The duration of one segment in seconds.
  * @returns {Promise} Resolve when stream started.
  * @example
  * startStreaming(device);
  */
-async function startStreaming(cameraSelector, backendUrl, isGladysGateway) {
+async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segmentDuration = 1) {
   // If stream already exist, return existing stream
   if (this.liveStreams.has(cameraSelector)) {
     const liveStream = this.liveStreams.get(cameraSelector);
@@ -106,7 +107,10 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway) {
             fileContent = Buffer.from('not-a-key', 'utf8');
           }
           logger.debug(`Streaming: Uploading ${filename} to gateway.`);
+          const start = Date.now();
           await this.gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
+          const end = Date.now();
+          logger.info(`Camera streaming: Uploaded file to gateway in ${end - start} ms`);
           if (filename === 'index.m3u8') {
             sharedObjectToVerify.indexUploaded = true;
           }
@@ -137,7 +141,7 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway) {
     '-g',
     '25',
     '-hls_time',
-    '1',
+    segmentDuration.toString(),
     '-hls_list_size',
     '10',
     '-hls_enc',
@@ -153,6 +157,7 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway) {
     args.push('-vf'); // Rotate 180
     args.push('hflip,vflip');
   }
+
   const options = {
     timeout: 10 * 60 * 1000, // 10 minutes
   };
@@ -169,7 +174,7 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway) {
 
   liveStreamingProcess.on('close', (code) => {
     logger.debug(`child process exited with code ${code}`);
-    this.liveStreams.delete(cameraSelector);
+    this.stopStreaming(cameraSelector);
   });
 
   this.liveStreams.set(cameraSelector, {

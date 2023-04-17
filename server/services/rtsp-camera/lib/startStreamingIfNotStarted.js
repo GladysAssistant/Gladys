@@ -5,16 +5,17 @@ const Promise = require('bluebird');
  * @param {Object} cameraSelector - The camera to stream.
  * @param {string} backendUrl - URL of the backend.
  * @param {boolean} isGladysGateway - If the streaming start from Gladys Gateway or local.
+ * @param {number} segmentDuration - The duration of one segment in seconds.
  * @returns {Promise} Resolve when stream started.
  * @example
  * startStreaming(device);
  */
-async function startStreamingIfNotStarted(cameraSelector, backendUrl, isGladysGateway) {
+async function startStreamingIfNotStarted(cameraSelector, backendUrl, isGladysGateway, segmentDuration) {
   const liveStreamingStarted = this.liveStreamsStarting.get(cameraSelector);
   if (liveStreamingStarted) {
     await liveStreamingStarted;
   }
-  const liveStreamStartingPromise = this.startStreaming(cameraSelector, backendUrl, isGladysGateway);
+  const liveStreamStartingPromise = this.startStreaming(cameraSelector, backendUrl, isGladysGateway, segmentDuration);
   this.liveStreamsStarting.set(cameraSelector, liveStreamStartingPromise);
   try {
     const result = await liveStreamStartingPromise;

@@ -8,6 +8,13 @@ import config from '../../../config';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
 
+const SEGMENT_DURATIONS_PER_LATENCY = {
+  'ultra-low': 1,
+  low: 2,
+  medium: 3,
+  standard: 6
+};
+
 class CameraBoxComponent extends Component {
   videoRef = createRef();
 
@@ -35,11 +42,17 @@ class CameraBoxComponent extends Component {
     }
     await this.setState({ streaming: true, loading: true });
     const isGladysPlus = this.props.session.gatewayClient !== undefined;
+
+    const segmentationDuration = this.props.box.camera_latency
+      ? SEGMENT_DURATIONS_PER_LATENCY[this.props.box.camera_latency]
+      : SEGMENT_DURATIONS_PER_LATENCY.low;
+
     const streamingParams = await this.props.httpClient.post(
       `/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/start`,
       {
         origin: isGladysPlus ? config.gladysGatewayApiUrl : config.localApiUrl,
-        is_gladys_gateway: isGladysPlus
+        is_gladys_gateway: isGladysPlus,
+        segment_duration: segmentationDuration
       }
     );
 

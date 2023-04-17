@@ -1,4 +1,5 @@
 const fse = require('fs-extra');
+const logger = require('../../../utils/logger');
 
 const { NotFoundError } = require('../../../utils/coreErrors');
 
@@ -15,9 +16,17 @@ async function stopStreaming(cameraSelector) {
     throw new NotFoundError('STREAM_NOT_FOUND');
   }
   const { liveStreamingProcess, fullFolderPath, watchAbortController } = liveStream;
-  liveStreamingProcess.kill();
   watchAbortController.abort();
-  await fse.remove(fullFolderPath);
+  try {
+    liveStreamingProcess.kill();
+  } catch (e) {
+    logger.debug(e);
+  }
+  try {
+    await fse.remove(fullFolderPath);
+  } catch (e) {
+    logger.debug(e);
+  }
   this.liveStreams.delete(cameraSelector);
 }
 
