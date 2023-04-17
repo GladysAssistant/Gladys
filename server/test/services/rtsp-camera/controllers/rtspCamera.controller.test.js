@@ -1,8 +1,22 @@
 const { assert: chaiAssert } = require('chai');
 const { assert, fake } = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 const fse = require('fs-extra');
 const path = require('path');
+const EventEmitter = require('events');
+
 const RtspCameraController = require('../../../../services/rtsp-camera/api/rtspCamera.controller');
+
+const RtspCameraControllerWithFsMocked = proxyquire('../../../../services/rtsp-camera/api/rtspCamera.controller', {
+  fs: {
+    createReadStream: () => {
+      const event = new EventEmitter();
+      // @ts-ignore
+      event.pipe = () => event.emit('error');
+      return event;
+    },
+  },
+});
 
 const gladys = {
   config: {
@@ -101,7 +115,7 @@ describe('camera controller test', () => {
     );
   });
   it('should return 404, file not found (res.status) ', async () => {
-    const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
+    const rtspCameraController = RtspCameraControllerWithFsMocked(gladys, rtspCameraService);
     const req = {
       params: {
         folder: 'camera-1',
