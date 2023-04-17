@@ -3,8 +3,8 @@ const Promise = require('bluebird');
 /**
  * @description Start streaming
  * @param {Object} cameraSelector - The camera to stream.
- * @param {string} backendUrl - URL of the backend
- * @param {boolean} isGladysGateway - If the streaming start from Gladys Gateway or local
+ * @param {string} backendUrl - URL of the backend.
+ * @param {boolean} isGladysGateway - If the streaming start from Gladys Gateway or local.
  * @returns {Promise} Resolve when stream started.
  * @example
  * startStreaming(device);

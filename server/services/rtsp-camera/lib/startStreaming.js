@@ -30,6 +30,7 @@ const waitBeforeIndexExistOnGladysPlus = async (sharedObjectToVerify, delay, max
     if (!sharedObjectToVerify.indexUploaded || !sharedObjectToVerify.keyUploaded) {
       throw new Error('Not uploaded yet');
     }
+    return null;
   } catch (e) {
     if (maxTryLeft > 0) {
       const newMaxTryLeft = maxTryLeft - 1;
@@ -43,8 +44,8 @@ const waitBeforeIndexExistOnGladysPlus = async (sharedObjectToVerify, delay, max
 /**
  * @description Start streaming
  * @param {Object} cameraSelector - The camera to stream.
- * @param {string} backendUrl - URL of the backend
- * @param {boolean} isGladysGateway - If the stream starts from Gladys Gateway or local
+ * @param {string} backendUrl - URL of the backend.
+ * @param {boolean} isGladysGateway - If the stream starts from Gladys Gateway or local.
  * @returns {Promise} Resolve when stream started.
  * @example
  * startStreaming(device);
@@ -102,7 +103,7 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway) {
           // hot replaced on the client side with the correct key
           // The key is sent end-to-end encrypted in Websockets :)
           if (filename === 'index.m3u8.key') {
-            fileContent = Buffer.from('not-a-key');
+            fileContent = Buffer.from('not-a-key', 'utf8');
           }
           logger.debug(`Streaming: Uploading ${filename} to gateway.`);
           await this.gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
