@@ -53,7 +53,7 @@ class CameraBoxComponent extends Component {
       },
       loader: class CustomLoader extends Hls.DefaultConfig.loader {
         load(context, config, callbacks) {
-          let { type, url } = context;
+          let { url } = context;
 
           console.log(`Loading URL = ${url}`);
 
@@ -78,13 +78,13 @@ class CameraBoxComponent extends Component {
       console.log('video and hls.js are now bound together !');
     });
     this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-      console.log('manifest loaded, found ' + data.levels.length + ' quality level');
+      console.log(`manifest loaded, found ${data.levels.length} quality level`);
     });
     this.hls.on(Hls.Events.ERROR, (event, data) => {
       console.log(event, data);
-      var errorType = data.type;
-      var errorDetails = data.details;
-      var errorFatal = data.fatal;
+      const errorType = data.type;
+      const errorDetails = data.details;
+      const errorFatal = data.fatal;
       console.log(errorType);
       console.log(errorDetails);
       console.log(errorFatal);
