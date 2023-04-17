@@ -42,6 +42,16 @@ module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
   }
 
   /**
+   * @api {post} /api/v1/service/rtsp-camera/camera/:camera_selector/streaming/ping Live still active ping
+   * @apiName streamingPing
+   * @apiGroup RtspCamera
+   */
+  async function streamingPing(req, res) {
+    await rtspCameraHandler.liveActivePing(req.params.camera_selector);
+    res.send({ success: true });
+  }
+
+  /**
    * @api {get} /api/v1/service/rtsp-camera/camera/streaming/:folder/:file Get streaming file
    * @apiName getStreamingFile
    * @apiGroup RtspCamera
@@ -75,6 +85,11 @@ module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
       authenticated: true,
       admin: false,
       controller: asyncMiddleware(stopStreaming),
+    },
+    'post /api/v1/service/rtsp-camera/camera/:camera_selector/streaming/ping': {
+      authenticated: true,
+      admin: false,
+      controller: asyncMiddleware(streamingPing),
     },
     'get /api/v1/service/rtsp-camera/camera/streaming/:folder/:file': {
       authenticated: true,

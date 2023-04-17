@@ -15,19 +15,28 @@ async function stopStreaming(cameraSelector) {
   if (!liveStream) {
     throw new NotFoundError('STREAM_NOT_FOUND');
   }
+  // First, remove the live stream from the Map
+  this.liveStreams.delete(cameraSelector);
   const { liveStreamingProcess, fullFolderPath, watchAbortController } = liveStream;
+  // Abort the file watcher
   watchAbortController.abort();
+  // Kill the ffmpeg process
   try {
     liveStreamingProcess.kill();
   } catch (e) {
     logger.debug(e);
   }
+  // Delete the temp folder
   try {
     await fse.remove(fullFolderPath);
   } catch (e) {
     logger.debug(e);
   }
-  this.liveStreams.delete(cameraSelector);
+  // We clear the interval that checks every X seconds if a live is active
+  if (this.liveStreams.size === 0 && this.checkIfLiveActiveInterval) {
+    clearInterval(this.checkIfLiveActiveInterval);
+    this.checkIfLiveActiveInterval = null;
+  }
 }
 
 module.exports = {

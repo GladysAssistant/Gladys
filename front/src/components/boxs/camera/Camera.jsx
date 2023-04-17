@@ -17,6 +17,9 @@ const SEGMENT_DURATIONS_PER_LATENCY = {
 
 class CameraBoxComponent extends Component {
   videoRef = createRef();
+  state = {
+    cameraStreamingErrorCount: 0
+  };
 
   refreshData = async () => {
     try {
@@ -36,11 +39,22 @@ class CameraBoxComponent extends Component {
     }
   };
 
+  newNetworkError = () => {
+    this.setState(prevState => {
+      const { cameraStreamingErrorCount } = prevState;
+      return {
+        ...prevState,
+        cameraStreamingErrorCount: cameraStreamingErrorCount + 1
+      };
+    });
+  };
+
   startStreaming = async () => {
     if (!Hls.isSupported()) {
       return;
     }
     await this.setState({ streaming: true, loading: true });
+
     const isGladysPlus = this.props.session.gatewayClient !== undefined;
 
     const segmentationDuration = this.props.box.camera_latency
@@ -56,6 +70,8 @@ class CameraBoxComponent extends Component {
       }
     );
 
+    const cameraComponent = this;
+
     this.hls = new Hls({
       xhrSetup: xhr => {
         // We set the correct access token
@@ -67,8 +83,6 @@ class CameraBoxComponent extends Component {
       loader: class CustomLoader extends Hls.DefaultConfig.loader {
         load(context, config, callbacks) {
           let { url } = context;
-
-          console.log(`Loading URL = ${url}`);
 
           // For the encryption key, we hot replace the key with the data
           // Coming from Gladys to ensure End-to-End Encryption
@@ -83,6 +97,15 @@ class CameraBoxComponent extends Component {
               onSuccess(response, stats, context);
             };
           }
+
+          if (url && url.endsWith('index.m3u8')) {
+            const onSuccess = callbacks.onSuccess;
+            callbacks.onSuccess = function(response, stats, context) {
+              cameraComponent.setState({ cameraStreamingErrorCount: 0 });
+              onSuccess(response, stats, context);
+            };
+          }
+
           super.load(context, config, callbacks);
         }
       }
@@ -94,15 +117,16 @@ class CameraBoxComponent extends Component {
       console.log(`manifest loaded, found ${data.levels.length} quality level`);
     });
     this.hls.on(Hls.Events.ERROR, (event, data) => {
-      console.log(event, data);
+      console.error(event, data);
       const errorType = data.type;
       const errorDetails = data.details;
       const errorFatal = data.fatal;
-      console.log(errorType);
-      console.log(errorDetails);
-      console.log(errorFatal);
+      console.error(errorType);
+      console.error(errorDetails);
+      console.error(errorFatal);
       if (errorType === 'networkError') {
         //  this.stopStreaming();
+        this.newNetworkError();
       }
     });
     if (isGladysPlus) {
@@ -112,6 +136,13 @@ class CameraBoxComponent extends Component {
         `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
       );
     }
+
+    if (this.liveActiveInterval) {
+      clearInterval(this.liveActiveInterval);
+    }
+
+    // Every 3 seconds, sends a ping to Gladys to tell Gladys the live is still active
+    this.liveActiveInterval = setInterval(this.liveActivePing, 3000);
 
     // bind them together
     this.hls.attachMedia(this.videoRef.current);
@@ -134,6 +165,14 @@ class CameraBoxComponent extends Component {
     }
 
     this.setState({ streaming: false, loading: false });
+  };
+
+  liveActivePing = async () => {
+    try {
+      await this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/ping`);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   componentDidMount() {
@@ -162,7 +201,7 @@ class CameraBoxComponent extends Component {
     }
   }
 
-  render(props, { image, error, streaming, loading }) {
+  render(props, { image, error, streaming, loading, cameraStreamingErrorCount }) {
     if (streaming) {
       return (
         <div class="card">
@@ -179,6 +218,11 @@ class CameraBoxComponent extends Component {
           <div class="card-header">
             <h3 class="card-title">{props.box && props.box.name}</h3>
             <div class="card-options">
+              {cameraStreamingErrorCount > 5 && (
+                <div class="alert alert-danger">
+                  <Text id="dashboard.boxes.camera.noImageToShow" />
+                </div>
+              )}
               <button class="btn btn-primary btn-sm" onClick={this.stopStreaming}>
                 <i class="fe fe-pause" />
               </button>

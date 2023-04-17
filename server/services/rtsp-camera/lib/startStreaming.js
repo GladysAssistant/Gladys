@@ -93,36 +93,42 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
 
   if (isGladysGateway) {
     // We watch the folder to upload any change to Gladys Plus
-    fsWithoutPromise.watch(folderPath, { signal: watchAbortController.signal }, async (eventType, filename) => {
-      if (filename) {
-        try {
-          const fileChangedPath = path.join(folderPath, filename);
-          let fileContent = await fs.readFile(fileChangedPath);
-          // We don't upload the key to Gladys Plus
-          // So the end-to-end encryption is respected.
-          // Instead, we upload a dumb file that will be
-          // hot replaced on the client side with the correct key
-          // The key is sent end-to-end encrypted in Websockets :)
-          if (filename === 'index.m3u8.key') {
-            fileContent = Buffer.from('not-a-key', 'utf8');
+    fsWithoutPromise.watch(
+      folderPath,
+      {
+        signal: watchAbortController.signal,
+      },
+      async (eventType, filename) => {
+        if (filename) {
+          try {
+            const fileChangedPath = path.join(folderPath, filename);
+            let fileContent = await fs.readFile(fileChangedPath);
+            // We don't upload the key to Gladys Plus
+            // So the end-to-end encryption is respected.
+            // Instead, we upload a dumb file that will be
+            // hot replaced on the client side with the correct key
+            // The key is sent end-to-end encrypted in Websockets :)
+            if (filename === 'index.m3u8.key') {
+              fileContent = Buffer.from('not-a-key', 'utf8');
+            }
+            logger.debug(`Streaming: Uploading ${filename} to gateway.`);
+            const start = Date.now();
+            await this.gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
+            const end = Date.now();
+            logger.info(`Camera streaming: Uploaded file to gateway in ${end - start} ms`);
+            if (filename === 'index.m3u8') {
+              sharedObjectToVerify.indexUploaded = true;
+            }
+            if (filename === 'index.m3u8.key') {
+              sharedObjectToVerify.keyUploaded = true;
+            }
+          } catch (e) {
+            logger.error(`Unable to upload file ${filename}`);
+            logger.error(e);
           }
-          logger.debug(`Streaming: Uploading ${filename} to gateway.`);
-          const start = Date.now();
-          await this.gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
-          const end = Date.now();
-          logger.info(`Camera streaming: Uploaded file to gateway in ${end - start} ms`);
-          if (filename === 'index.m3u8') {
-            sharedObjectToVerify.indexUploaded = true;
-          }
-          if (filename === 'index.m3u8.key') {
-            sharedObjectToVerify.keyUploaded = true;
-          }
-        } catch (e) {
-          logger.error(`Unable to upload file ${filename}`);
-          logger.error(e);
         }
-      }
-    });
+      },
+    );
   }
 
   await fs.writeFile(keyInfoFilePath, `${encryptionKeyUrl}\n${encryptionKeyFilePath}`);
@@ -169,13 +175,23 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
   });
 
   liveStreamingProcess.stderr.on('data', (data) => {
-    logger.warn(`stderr: ${data}`);
+    logger.debug(`stderr: ${data}`);
   });
 
   liveStreamingProcess.on('close', (code) => {
     logger.debug(`child process exited with code ${code}`);
-    this.stopStreaming(cameraSelector);
+    if (code !== 255) {
+      this.stopStreaming(cameraSelector);
+    }
   });
+
+  // Wait before the stream started to resolve
+  // We'll wait at most 100 * 100 ms = 10 sec
+  await waitBeforeExist(indexFilePath, 100, 100);
+
+  if (isGladysGateway) {
+    await waitBeforeIndexExistOnGladysPlus(sharedObjectToVerify, 100, 100);
+  }
 
   this.liveStreams.set(cameraSelector, {
     liveStreamingProcess,
@@ -185,12 +201,13 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
     fullFolderPath: folderPath,
   });
 
-  // Wait before the stream started to resolve
-  // We'll wait at most 100 * 100 ms = 10 sec
-  await waitBeforeExist(indexFilePath, 100, 100);
-
-  if (isGladysGateway) {
-    await waitBeforeIndexExistOnGladysPlus(sharedObjectToVerify, 100, 100);
+  // Every X seconds, we verify if the live is active
+  // If not, we stop the live to avoid wasting ressources
+  if (!this.checkIfLiveActiveInterval) {
+    this.checkIfLiveActiveInterval = setInterval(
+      this.checkIfLiveActive.bind(this),
+      this.checkIfLiveActiveFrequencyInSeconds * 1000,
+    );
   }
 
   return {
