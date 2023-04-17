@@ -13,11 +13,11 @@ const Promise = require('bluebird');
 async function startStreamingIfNotStarted(cameraSelector, backendUrl, isGladysGateway, segmentDuration) {
   const liveStreamingStarted = this.liveStreamsStarting.get(cameraSelector);
   if (liveStreamingStarted) {
-    await liveStreamingStarted;
+    return liveStreamingStarted;
   }
-  const liveStreamStartingPromise = this.startStreaming(cameraSelector, backendUrl, isGladysGateway, segmentDuration);
-  this.liveStreamsStarting.set(cameraSelector, liveStreamStartingPromise);
   try {
+    const liveStreamStartingPromise = this.startStreaming(cameraSelector, backendUrl, isGladysGateway, segmentDuration);
+    this.liveStreamsStarting.set(cameraSelector, liveStreamStartingPromise);
     const result = await liveStreamStartingPromise;
     this.liveStreamsStarting.delete(cameraSelector);
     return result;

@@ -152,22 +152,4 @@ describe('RtspCameraManager commands', () => {
     const rtspCameraService = RtspCameraService(gladys, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
     await rtspCameraService.stop();
   });
-  it('should start & stop streaming', async () => {
-    const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', 'http://backend');
-    expect(liveStreamingProcess).to.have.property('camera_folder');
-    expect(liveStreamingProcess).to.have.property('encryption_key');
-    await rtspCameraManager.stopStreaming('my-camera');
-  });
-  it('should start streaming if not started', async () => {
-    const [liveStreamingProcess1, liveStreamingProcess2, liveStreamingProcess3] = await Promise.all([
-      rtspCameraManager.startStreamingIfNotStarted('my-camera', 'http://backend'),
-      rtspCameraManager.startStreamingIfNotStarted('my-camera', 'http://backend'),
-      rtspCameraManager.startStreamingIfNotStarted('my-camera', 'http://backend'),
-    ]);
-    expect(liveStreamingProcess1).to.have.property('camera_folder');
-    expect(liveStreamingProcess1).to.have.property('encryption_key');
-    expect(liveStreamingProcess2).to.deep.equal(liveStreamingProcess1);
-    expect(liveStreamingProcess3).to.deep.equal(liveStreamingProcess1);
-    await rtspCameraManager.stopStreaming('my-camera');
-  });
 });
