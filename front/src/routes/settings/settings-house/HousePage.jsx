@@ -5,6 +5,7 @@ import SettingsLayout from '../SettingsLayout';
 import House from './House';
 import EmptySearch from './EmptySearch';
 import { RequestStatus } from '../../../utils/consts';
+import CardFilter from '../../../components/layout/CardFilter';
 
 const loaderHeight = {
   height: '20rem'
@@ -14,27 +15,15 @@ const HousePage = ({ children, ...props }) => (
   <SettingsLayout>
     <div class="page-header">
       <div class="page-options d-flex">
-        <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="housesSettings.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="housesSettings.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="housesSettings.searchPlaceholder" />}
-              onInput={props.debouncedSearch}
-            />
-          </Localizer>
-        </div>
+        <Localizer>
+          <CardFilter
+            changeOrderDir={props.changeOrderDir}
+            orderValue={props.getHousesOrderDir}
+            search={props.debouncedSearch}
+            searchValue={props.housesSearch}
+            searchPlaceHolder={<Text id="housesSettings.searchPlaceholder" />}
+          />
+        </Localizer>
         <button onClick={props.addHouse} class="btn btn-outline-primary ml-2">
           <Text id="housesSettings.newButton" /> <i class="fe fe-plus" />
         </button>

@@ -51,14 +51,14 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
     if (oldUser) {
       // Delete old user
       await this.gladys.system.exec(container.id, {
-        Cmd: ['mosquitto_passwd', '-D', '/mosquitto/config/mosquitto.passwd', oldUser],
+        Cmd: ['mosquitto_passwd', '-D', DEFAULT.PASSWORD_FILE_PATH, oldUser],
       });
     }
 
     if (mqttUsername) {
       // Generate password
       await this.gladys.system.exec(container.id, {
-        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUsername, mqttPassword],
+        Cmd: ['mosquitto_passwd', '-b', DEFAULT.PASSWORD_FILE_PATH, mqttUsername, mqttPassword],
       });
     }
 

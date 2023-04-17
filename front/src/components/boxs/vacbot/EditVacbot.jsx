@@ -8,7 +8,7 @@ const EditVacbotBox = ({ children, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.vacbot">
     <div class={props.loading ? 'dimmer active' : 'dimmer'}>
       <div class="loader" />
-        
+
       <div class="form-group">
         <label>
           <Text id="dashboard.boxes.vacbot.editVacbotLabel" />
@@ -40,7 +40,6 @@ const EditVacbotBox = ({ children, ...props }) => (
           />
         </Localizer>
       </div>
-
     </div>
   </BaseEditBox>
 );

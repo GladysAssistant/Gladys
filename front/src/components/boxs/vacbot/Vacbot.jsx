@@ -21,41 +21,74 @@ const VacbotBox = ({ children, ...props }) => (
         </p>
       </div>
     )}
-    
+
     <div class="card-body ">
-      <div class="d-flex justify-content-center">
-            <div class="col" >
-            {props.cleanReport == 'idle' && <i class={`fe fe-disc`} />}
-            {props.chargeStatus == 'returning' && <i class={`list-separated-item fe fe-dowload`} />}
-            {props.cleanReport == 'auto' && <i class={`list-separated-item fe fe-play-circle`} />}
-            {props.cleanReport}
-            </div>
-            <div class="col-md-auto">
-              {props.chargeStatus == 'charging' && <i class={`fe fe-battery-charging`} style={{fontSize: '20px'}} >{props.batteryLevel}% </i>}
-              {props.chargeStatus != 'charging' && <i class={`fe fe-battery`} style={{fontSize: '20px'}}>{props.batteryLevel}%</i> }
-            </div>
-      </div>
-      <h4 class="mx-auto">{props.name}</h4>
-      
-      <div class="position-relative" style={{fontSize: '20px'}}>
-          <img src={props.imageUrl} class="img-fluid" />
-          <span class="position-absolute top-0 start-100">
-          {props.hasMappingCapabilities && <button class={`btn btn-sm fe fe-map`} />}
-          {props.hasCustomAreaCleaningMode && <button class={`btn btn-sm fe fe-codepen`} />}
-          </span>  
+    <div class="card-header">
+        <h3 class="card-title">{props.name}</h3>
+        <div class="card-options">
+        {props.cleanReport == 'idle' && <i class={`fe fe-disc`} />}
+          {props.chargeStatus == 'returning' && <i class={`list-separated-item fe fe-dowload`} />}
+          {props.cleanReport == 'auto' && <i class={`list-separated-item fe fe-play-circle`} />}
+          {props.cleanReport}
+        {props.chargeStatus == 'charging' && (
+            <i class={`fe fe-battery-charging`} >
+              {props.batteryLevel}%{' '}
+            </i>
+          )}
+          {props.chargeStatus != 'charging' && (
+            <i class={`fe fe-battery`} style={{ fontSize: '20px' }}>
+              {props.batteryLevel}%
+            </i>
+          )}
         </div>
-    </div>
- 
-    <div class="d-flex justify-content-center">
+      </div>
+      <div class="row" style={{ fontSize: '20px' }}>
+        <div class="col">
+          {props.cleanReport == 'idle' && <i class={`fe fe-disc`} />}
+          {props.chargeStatus == 'returning' && <i class={`list-separated-item fe fe-dowload`} />}
+          {props.cleanReport == 'auto' && <i class={`list-separated-item fe fe-play-circle`} />}
+          {props.cleanReport}
+        </div>
+        <h4 class="col">{props.name}</h4>
+        <div class="col">
+          {props.chargeStatus == 'charging' && (
+            <i class={`fe fe-battery-charging`} >
+              {props.batteryLevel}%{' '}
+            </i>
+          )}
+          {props.chargeStatus != 'charging' && (
+            <i class={`fe fe-battery`} style={{ fontSize: '20px' }}>
+              {props.batteryLevel}%
+            </i>
+          )}
+        </div>
+      </div>
+
+      <div class="card-img-top bg-image d-flex justify-content-center align-items-center"
+           style="
+              background-image: url('https://site-static.ecovacs.com/upload/fr/image/product/2022/09/21/051248_2326-DEEBOT-T9AIVI-1280x1280.jpg');
+              background-position: center;
+              background-size: cover;            
+              width: 100%;
+              height: 250px;
+            "
+      >
+      
+      <div>
+        <span class="position-absolute top-0 start-100">
+            {props.hasMappingCapabilities && <button class={`btn btn-sm fe fe-map`} />}
+            {props.hasCustomAreaCleaningMode && <button class={`btn btn-sm fe fe-codepen`} />}
+        </span>
+      </div>
+      
+      <div class="d-flex justify-content-center">
       <div class="btn-group" role="group">
         <button
           class={cx('btn btn-sm btn-secondary', 'fe', 'fe-play', {
             active: 1
           })}
           onClick={props.clean}
-        >
-          
-        </button>
+        ></button>
         <button
           class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
             active: 1
@@ -67,8 +100,7 @@ const VacbotBox = ({ children, ...props }) => (
             active: 1
           })}
           onClick={props.stop}
-        >
-        </button>
+        ></button>
         <button
           class={cx('btn btn-sm btn-secondary', 'fe', 'fe-home', {
             active: 1
@@ -77,11 +109,16 @@ const VacbotBox = ({ children, ...props }) => (
         ></button>
       </div>
     </div>
+
+      </div>
+      
+      
+    </div>
+
     
-   
-    
-    <div class="mt-3 position-relative">
-        hasMoppingSystem : {props.hasMoppingSystem}, chargeStatus : {props.chargeStatus},  cleanReport : {props.cleanReport}
+    <div class="mt-3">
+      hasMoppingSystem : {props.hasMoppingSystem}, chargeStatus : {props.chargeStatus}, cleanReport :{' '}
+      {props.cleanReport}
     </div>
   </div>
 );

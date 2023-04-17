@@ -1,6 +1,7 @@
 module.exports.alexa = require('./alexa');
 module.exports.example = require('./example');
 module.exports.caldav = require('./caldav');
+module.exports.enedis = require('./enedis');
 module.exports.openweather = require('./openweather');
 module.exports.ecowatt = require('./ecowatt');
 module.exports.mqtt = require('./mqtt');
@@ -18,3 +19,4 @@ module.exports['google-actions'] = require('./google-actions');
 module.exports.homekit = require('./homekit');
 module.exports.broadlink = require('./broadlink');
 module.exports.ecovacs = require('./ecovacs');
+module.exports['lan-manager'] = require('./lan-manager');

@@ -18,6 +18,12 @@ const COVER_STATE = {
   CLOSE: -1,
 };
 
+const AC_MODE = {
+  AUTO: 0,
+  COOLING: 1,
+  HEATING: 2,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -317,6 +323,7 @@ const INTENTS = {
 const DEVICE_FEATURE_CATEGORIES = {
   ACCESS_CONTROL: 'access-control',
   AIRQUALITY_SENSOR: 'airquality-sensor',
+  AIR_CONDITIONING: 'air-conditioning',
   BATTERY: 'battery',
   BUTTON: 'button',
   CAMERA: 'camera',
@@ -347,6 +354,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SIREN: 'siren',
   SISMIC_SENSOR: 'sismic-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
+  SOIL_MOISTURE_SENSOR: 'soil-moisture-sensor',
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
   TELEVISION: 'television',
@@ -418,6 +426,11 @@ const DEVICE_FEATURE_TYPES = {
   SIGNAL: {
     QUALITY: 'integer',
   },
+  AIR_CONDITIONING: {
+    BINARY: 'binary',
+    MODE: 'mode',
+    TARGET_TEMPERATURE: 'target-temperature',
+  },
   TELEVISION: {
     BINARY: 'binary',
     SOURCE: 'source',
@@ -458,6 +471,7 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',
+    DAILY_CONSUMPTION: 'daily-consumption',
   },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',
@@ -620,6 +634,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KM,
   ],
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.SOIL_MOISTURE_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [
     DEVICE_FEATURE_UNITS.PASCAL,
@@ -764,6 +779,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
+  LAN: {
+    SCANNING: 'lan.scanning',
+  },
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
@@ -895,6 +913,7 @@ const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.COVER_STATE = COVER_STATE;
+module.exports.AC_MODE = AC_MODE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
