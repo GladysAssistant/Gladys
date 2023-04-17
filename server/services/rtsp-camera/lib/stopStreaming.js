@@ -27,11 +27,7 @@ async function stopStreaming(cameraSelector) {
     logger.debug(e);
   }
   // Delete the temp folder
-  try {
-    await fse.remove(fullFolderPath);
-  } catch (e) {
-    logger.debug(e);
-  }
+  await fse.remove(fullFolderPath);
   // We clear the interval that checks every X seconds if a live is active
   if (this.liveStreams.size === 0 && this.checkIfLiveActiveInterval) {
     clearInterval(this.checkIfLiveActiveInterval);

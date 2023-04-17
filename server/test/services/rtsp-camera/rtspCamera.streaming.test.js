@@ -1,5 +1,6 @@
 const { expect, assert } = require('chai');
 const fse = require('fs-extra');
+const path = require('path');
 const { fake, assert: fakeAssert } = require('sinon');
 const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
@@ -117,5 +118,33 @@ describe('Camera.streaming', () => {
     const promise = rtspCameraManagerWithFail.startStreamingIfNotStarted('my-camera', 'http://backend', false, 1);
     await assert.isRejected(promise, 'test');
     expect(rtspCameraManagerWithFail.liveStreamsStarting.size).to.equal(0);
+  });
+  it('should stop streaming, but kill is not working', async () => {
+    const rtspCameraManagerWithFail = new RtspCameraManager(
+      gladys,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    rtspCameraManagerWithFail.liveStreams.set('my-camera', {
+      liveStreamingProcess: {
+        kill: fake.rejects('error'),
+      },
+      watchAbortController: {
+        abort: fake.returns(null),
+      },
+      fullFolderPath: path.join(gladys.config.tempFolder, 'lalalalallalala'),
+    });
+    await rtspCameraManagerWithFail.stopStreaming('my-camera');
+  });
+  it('should return not found in stopStreaming', async () => {
+    const rtspCameraManagerEmpty = new RtspCameraManager(
+      gladys,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    const promise = rtspCameraManagerEmpty.stopStreaming('my-camera');
+    await assert.isRejected(promise, 'STREAM_NOT_FOUND');
   });
 });
