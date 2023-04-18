@@ -18,7 +18,42 @@ const DEFAULT = {
     'zigbee2mqtt/#', // Default zigbee2mqtt topic
   ],
   DOCKER_MQTT_VERSION: '3', // Last version of MQTT docker file
-  DOCKER_Z2M_VERSION: '3', // Last version of Z2M docker file
+  DOCKER_Z2M_VERSION: '3', // Last version of Z2M docker file,
+  CONFIGURATION_PATH: 'zigbee2mqtt/z2m/configuration.yaml',
+  CONFIGURATION_CONTENT: {
+    homeassistant: false,
+    permit_join: false,
+    mqtt: {
+      base_topic: 'zigbee2mqtt',
+      server: 'mqtt://localhost:1884',
+    },
+    serial: {
+      port: '/dev/ttyACM0',
+    },
+    frontend: {
+      port: 8080,
+    },
+    map_options: {
+      graphviz: {
+        colors: {
+          fill: {
+            enddevice: '#fff8ce',
+            coordinator: '#e04e5d',
+            router: '#4ea3e0',
+          },
+          font: {
+            coordinator: '#ffffff',
+            router: '#ffffff',
+            enddevice: '#000000',
+          },
+          line: {
+            active: '#009900',
+            inactive: '#994444',
+          },
+        },
+      },
+    },
+  },
 };
 
 module.exports = {

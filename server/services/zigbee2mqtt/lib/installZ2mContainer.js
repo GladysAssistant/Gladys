@@ -1,7 +1,6 @@
 const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 
-const { exec } = require('../../../utils/childProcess');
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
@@ -16,7 +15,7 @@ const sleep = promisify(setTimeout);
  * await z2m.installZ2mContainer(config);
  */
 async function installZ2mContainer(config) {
-  const { z2mDriverPath, z2mMqttUsername, z2mMqttPassword } = config;
+  const { z2mDriverPath } = config;
 
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
@@ -55,12 +54,7 @@ async function installZ2mContainer(config) {
     }
   }
 
-  // Prepare Z2M env
-  logger.info(`Preparing Zigbee2mqtt environment...`);
-  const brokerEnv = await exec(
-    `sh ./services/zigbee2mqtt/docker/gladys-z2m-zigbee2mqtt-env.sh ${basePathOnContainer} ${z2mMqttUsername} "${z2mMqttPassword}"`,
-  );
-  logger.trace(brokerEnv);
+  await this.configureContainer(basePathOnContainer, config);
 
   try {
     dockerContainers = await this.gladys.system.getContainers({
