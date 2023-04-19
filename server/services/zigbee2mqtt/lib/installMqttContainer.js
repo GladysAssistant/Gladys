@@ -1,7 +1,8 @@
 const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
+const path = require('path');
+const fse = require('fs-extra');
 
-const { exec } = require('../../../utils/childProcess');
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
@@ -33,9 +34,18 @@ async function installMqttContainer(config) {
       logger.info(`Preparing broker environment...`);
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
       const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
-      const brokerEnv = await exec(`sh ./services/zigbee2mqtt/docker/gladys-z2m-mqtt-env.sh ${basePathOnContainer}`);
-      logger.trace(brokerEnv);
-      containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/mqtt:/mosquitto/config`);
+
+      const mosquittoFolderPath = path.join(basePathOnContainer, '/zigbee2mqtt/mqtt');
+      const mosquittoConfigFilePath = path.join(mosquittoFolderPath, 'mosquitto.conf');
+
+      logger.info(`Writing Mosquitto config file in ${mosquittoConfigFilePath}`);
+
+      // Ensure that the mosquitto folder exist
+      await fse.ensureDir(mosquittoFolderPath);
+      const mosquittoConfContent = await fse.readFile(path.join(__dirname, '../docker/mosquitto.conf'));
+      await fse.writeFile(mosquittoConfigFilePath, mosquittoConfContent, 'utf-8');
+
+      await containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/mqtt:/mosquitto/config`);
 
       logger.info(`Creating container with data in "${basePathOnHost}" on host...`);
       containerMqtt = await this.gladys.system.createContainer(containerDescriptorToMutate);
@@ -53,8 +63,9 @@ async function installMqttContainer(config) {
     try {
       logger.info('MQTT broker is restarting...');
       await this.gladys.system.restartContainer(containerMqtt.id);
-      // wait 5 seconds for the container to restart
-      await sleep(5 * 1000);
+
+      // Wait a few seconds for the container to restart
+      await sleep(this.containerRestartWaitTimeInMs);
 
       // Copy password in broker container
       const { z2mMqttUsername, z2mMqttPassword, mqttUsername, mqttPassword } = config;
@@ -70,7 +81,8 @@ async function installMqttContainer(config) {
       logger.info('MQTT broker is restarting...');
       await this.gladys.system.restartContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart
-      await sleep(5 * 1000);
+      await sleep(this.containerRestartWaitTimeInMs);
+
       logger.info('MQTT broker container successfully started and configured');
 
       this.mqttRunning = true;
@@ -97,8 +109,8 @@ async function installMqttContainer(config) {
       if (container.state !== 'running') {
         logger.info('MQTT broker is starting...');
         await this.gladys.system.restartContainer(container.id);
-        // wait 5 seconds for the container to restart
-        await sleep(5 * 1000);
+        // wait a few seconds for the container to restart
+        await sleep(this.containerRestartWaitTimeInMs);
       }
 
       logger.info('MQTT broker container successfully started');

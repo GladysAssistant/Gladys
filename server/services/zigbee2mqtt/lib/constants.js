@@ -17,8 +17,8 @@ const DEFAULT = {
   TOPICS: [
     'zigbee2mqtt/#', // Default zigbee2mqtt topic
   ],
-  DOCKER_MQTT_VERSION: '2', // Last version of MQTT docker file
-  DOCKER_Z2M_VERSION: '2', // Last version of Z2M docker file
+  DOCKER_MQTT_VERSION: '3', // Last version of MQTT docker file
+  DOCKER_Z2M_VERSION: '3', // Last version of Z2M docker file
 };
 
 module.exports = {
