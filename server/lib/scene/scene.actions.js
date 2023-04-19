@@ -37,7 +37,7 @@ const { evaluate } = create({
   largerEqDependencies,
   modDependencies,
   smallerEqDependencies,
-  roundDependencies
+  roundDependencies,
 });
 
 const actionsFunc = {
