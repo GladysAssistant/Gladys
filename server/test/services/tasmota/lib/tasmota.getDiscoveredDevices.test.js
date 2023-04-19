@@ -7,6 +7,7 @@ const existingDevice = {
   external_id: 'alreadyExists',
   name: 'alreadyExists',
   model: 'sonoff-basic',
+  room_id: 'room_id',
   features: [
     {
       name: 'feature 1',
@@ -57,13 +58,10 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
   });
 
   it('discovered already in Gladys', () => {
-    protocolHandler.discoveredDevices.alreadyExists = {
-      external_id: 'alreadyExists',
-      model: 'sonoff-basic',
-    };
+    protocolHandler.discoveredDevices.alreadyExists = existingDevice;
     const result = tasmotaHandler.getDiscoveredDevices(protocol);
     expect(result).to.be.lengthOf(1);
-    expect(result).deep.eq([existingDevice]);
+    expect(result).deep.eq([{ ...existingDevice, updatable: false }]);
   });
 
   it('discovered already in Gladys, but updated (basic to pow)', () => {
@@ -82,6 +80,7 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
           type: 'type 2',
           category: 'category 2',
           external_id: 'external_id:2',
+          min: 10,
         },
         {
           name: 'feature 3',
@@ -98,6 +97,7 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
       external_id: 'alreadyExists',
       model: 'sonoff-pow',
       name: 'alreadyExists',
+      room_id: 'room_id',
       features: [
         {
           name: 'feature 1',
@@ -106,10 +106,11 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
           external_id: 'external_id:1',
         },
         {
-          name: 'feature 2 bis',
+          name: 'feature 2',
           type: 'type 2',
           category: 'category 2',
           external_id: 'external_id:2',
+          min: 10,
         },
         {
           name: 'feature 3',
@@ -118,10 +119,10 @@ describe('Tasmota - MQTT - getDiscoveredDevices', () => {
           external_id: 'external_id:3',
         },
       ],
+      updatable: true,
       params: [],
     };
-    expectedDevice.updatable = true;
-    expectedDevice.name = 'alreadyExists';
+
     expect(result).deep.eq([expectedDevice]);
   });
 
@@ -152,13 +153,10 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
   });
 
   it('discovered already in Gladys', () => {
-    protocolHandler.discoveredDevices.alreadyExists = {
-      external_id: 'alreadyExists',
-      model: 'sonoff-basic',
-    };
+    protocolHandler.discoveredDevices.alreadyExists = existingDevice;
     const result = tasmotaHandler.getDiscoveredDevices(protocol);
     expect(result).to.be.lengthOf(1);
-    expect(result).deep.eq([existingDevice]);
+    expect(result).deep.eq([{ ...existingDevice, updatable: false }]);
   });
 
   it('discovered already in Gladys, but updated (basic to pow)', () => {
@@ -177,6 +175,7 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
           type: 'type 2',
           category: 'category 2',
           external_id: 'external_id:2',
+          min: 0,
         },
         {
           name: 'feature 3',
@@ -193,6 +192,8 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
       external_id: 'alreadyExists',
       model: 'sonoff-pow',
       name: 'alreadyExists',
+      updatable: true,
+      room_id: 'room_id',
       features: [
         {
           name: 'feature 1',
@@ -201,10 +202,11 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
           external_id: 'external_id:1',
         },
         {
-          name: 'feature 2 bis',
+          name: 'feature 2',
           type: 'type 2',
           category: 'category 2',
           external_id: 'external_id:2',
+          min: 0,
         },
         {
           name: 'feature 3',
@@ -215,8 +217,7 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
       ],
       params: [],
     };
-    expectedDevice.updatable = true;
-    expectedDevice.name = 'alreadyExists';
+
     expect(result).deep.eq([expectedDevice]);
   });
 
@@ -253,6 +254,8 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
       external_id: 'alreadyExists',
       name: 'alreadyExists',
       model: 'sonoff-basic',
+      updatable: true,
+      room_id: 'room_id',
       features: [
         {
           name: 'feature 1',
@@ -274,8 +277,7 @@ describe('Tasmota - HTTP - getDiscoveredDevices', () => {
         },
       ],
     };
-    expectedDevice.updatable = true;
-    expectedDevice.name = 'alreadyExists';
+
     expect(result).deep.eq([expectedDevice]);
   });
 
