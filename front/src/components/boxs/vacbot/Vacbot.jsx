@@ -23,7 +23,7 @@ const VacbotBox = ({ children, ...props }) => (
     )}
 
     <div class="card-body ">
-    <div class="card-header">
+      <div class="card-header">
         <div class="d-flex bd-highlight mb-3">
         
           <h2 class="card-title me-auto p-2 bd-highlight">{props.name}</h2>
@@ -54,7 +54,7 @@ const VacbotBox = ({ children, ...props }) => (
         </div> 
       </div>
       
-      <div class="bg-image"
+      <div class="bg-image d-flex flex-row-reverse"
            style={{ 
               backgroundImage: `url(${props.imageUrl})`,
               backgroundPosition:'center',
@@ -62,16 +62,14 @@ const VacbotBox = ({ children, ...props }) => (
               width:'100%',
               height:'250px',
               position:'relative'
-                }}
+            }}
       >
        
-        <div class="justify-content-right">
-              {props.hasMappingCapabilities && <button class={`btn btn-sm fe fe-map`} />}
-              {props.hasCustomAreaCleaningMode && <button class={`btn btn-sm fe fe-codepen`} />}
+        <div class="p-2">
+            {props.hasMappingCapabilities && <button class={`btn btn-sm fe fe-map`} />}
+            {props.hasCustomAreaCleaningMode && <button class={`btn btn-sm fe fe-codepen`} />}
         </div>
-        
-      </div>    
-      <div class="row d-flex justify-content-center">
+        <div class="d-flex align-items-center justify-content-center">
           <div class="btn-group" role="group">
             <button
               class={cx('btn btn-sm btn-secondary', 'fe', 'fe-play', {
@@ -98,7 +96,9 @@ const VacbotBox = ({ children, ...props }) => (
               onClick={props.home}
             ></button>
           </div>
-        </div>
+      </div>
+      </div>    
+      
     </div>
 
     
