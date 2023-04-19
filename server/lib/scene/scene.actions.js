@@ -1,7 +1,18 @@
 const Promise = require('bluebird');
 const Handlebars = require('handlebars');
 const cloneDeep = require('lodash.clonedeep');
-const { evaluate } = require('mathjs');
+const {
+  create,
+  addDependencies,
+  divideDependencies,
+  evaluateDependencies,
+  largerDependencies,
+  largerEqDependencies,
+  modDependencies,
+  roundDependencies,
+  smallerDependencies,
+  smallerEqDependencies,
+} = require('mathjs');
 const set = require('set-value');
 const get = require('get-value');
 const dayjs = require('dayjs');
@@ -16,6 +27,18 @@ const logger = require('../../utils/logger');
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
+
+const { evaluate } = create({
+  addDependencies,
+  divideDependencies,
+  evaluateDependencies,
+  largerDependencies,
+  smallerDependencies,
+  largerEqDependencies,
+  modDependencies,
+  smallerEqDependencies,
+  roundDependencies
+});
 
 const actionsFunc = {
   [ACTIONS.DEVICE.SET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
@@ -148,6 +171,7 @@ const actionsFunc = {
     let oneConditionVerified = false;
     action.conditions.forEach((condition) => {
       const value = condition.value || evaluate(Handlebars.compile(condition.evaluate_value)(scope));
+
       if (!Number(value)) {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
       }
