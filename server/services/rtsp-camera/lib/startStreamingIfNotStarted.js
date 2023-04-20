@@ -12,6 +12,11 @@ const Promise = require('bluebird');
  */
 async function startStreamingIfNotStarted(cameraSelector, backendUrl, isGladysGateway, segmentDuration) {
   const liveStreamingStarted = this.liveStreamsStarting.get(cameraSelector);
+  const liveStream = this.liveStreams.get(cameraSelector);
+  // Converting a local stream to gateway stream if needed
+  if (liveStream && liveStream.isGladysGateway === false && isGladysGateway === true) {
+    await this.convertLocalStreamToGateway(cameraSelector, backendUrl);
+  }
   if (liveStreamingStarted) {
     return liveStreamingStarted;
   }

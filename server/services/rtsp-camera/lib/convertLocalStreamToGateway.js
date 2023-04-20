@@ -23,16 +23,18 @@ async function convertLocalStreamToGateway(cameraSelector, backendUrl) {
     isGladysGateway: true,
     gatewayBackendUrl: backendUrl,
   });
-  const event = new EvenEmitter();
-  const filesInFolder = await fs.readdir(fullFolderPath, {
-    withFileTypes: true,
-  });
-  await Promise.map(filesInFolder, async (file) => {
-    if (file.isFile()) {
-      logger.debug(`ConvertLocalStreamToGateway: Uploading ${file.name} to Gateway`);
-      await this.onNewCameraFile(cameraSelector, fullFolderPath, cameraFolder, file.name, {}, event);
-    }
-  });
+  if (fullFolderPath && cameraFolder) {
+    const event = new EvenEmitter();
+    const filesInFolder = await fs.readdir(fullFolderPath, {
+      withFileTypes: true,
+    });
+    await Promise.map(filesInFolder, async (file) => {
+      if (file.isFile()) {
+        logger.debug(`ConvertLocalStreamToGateway: Uploading ${file.name} to Gateway`);
+        await this.onNewCameraFile(cameraSelector, fullFolderPath, cameraFolder, file.name, {}, event);
+      }
+    });
+  }
   return null;
 }
 

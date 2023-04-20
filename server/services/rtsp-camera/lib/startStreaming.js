@@ -36,6 +36,12 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
       encryption_key: liveStream.encryptionKey,
     };
   }
+  // Init the stream object
+  this.liveStreams.set(cameraSelector, {
+    isGladysGateway,
+    backendUrl,
+  });
+
   const device = await this.gladys.device.getBySelector(cameraSelector);
   // we find the camera url in the device
   const cameraUrlParam = device.params && device.params.find((param) => param.name === DEVICE_PARAM_CAMERA_URL);
