@@ -4,12 +4,18 @@ const { promises: fs } = require('fs');
 const fsWithoutPromise = require('fs');
 const path = require('path');
 const util = require('util');
+const Bottleneck = require('bottleneck');
 const randomBytes = util.promisify(require('crypto').randomBytes);
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
+
+// @ts-ignore
+const limiter = new Bottleneck({
+  maxConcurrent: 4,
+});
 
 const waitBeforeExist = async (filePath, delay, maxTryLeft) => {
   try {
@@ -40,6 +46,16 @@ const waitBeforeIndexExistOnGladysPlus = async (sharedObjectToVerify, delay, max
     throw new Error('Max try reached, file does not exist on Gladys Plus');
   }
 };
+
+const sendCameraFile = async (gladys, cameraFolder, filename, fileContent) => {
+  logger.debug(`Streaming: Uploading ${filename} to gateway.`);
+  const start = Date.now();
+  await gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
+  const end = Date.now();
+  logger.info(`Camera streaming: Uploaded file to gateway in ${end - start} ms`);
+};
+
+const sendCameraFileLimited = limiter.wrap(sendCameraFile);
 
 /**
  * @description Start streaming
@@ -91,14 +107,15 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
   const watchAbortController = new AbortController();
   const sharedObjectToVerify = {};
 
-  if (isGladysGateway) {
-    // We watch the folder to upload any change to Gladys Plus
-    fsWithoutPromise.watch(
-      folderPath,
-      {
-        signal: watchAbortController.signal,
-      },
-      async (eventType, filename) => {
+  // We watch the folder to upload any change to Gladys Plus
+  fsWithoutPromise.watch(
+    folderPath,
+    {
+      signal: watchAbortController.signal,
+    },
+    async (eventType, filename) => {
+      logger.info(`New camera file ${filename}`);
+      if (isGladysGateway) {
         if (filename) {
           try {
             const fileChangedPath = path.join(folderPath, filename);
@@ -111,11 +128,8 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
             if (filename === 'index.m3u8.key') {
               fileContent = Buffer.from('not-a-key', 'utf8');
             }
-            logger.debug(`Streaming: Uploading ${filename} to gateway.`);
-            const start = Date.now();
-            await this.gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
-            const end = Date.now();
-            logger.info(`Camera streaming: Uploaded file to gateway in ${end - start} ms`);
+            // Uploading file (with limit, 1 by 1)
+            await sendCameraFileLimited(this.gladys, cameraFolder, filename, fileContent);
             if (filename === 'index.m3u8') {
               sharedObjectToVerify.indexUploaded = true;
             }
@@ -127,9 +141,9 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
             logger.error(e);
           }
         }
-      },
-    );
-  }
+      }
+    },
+  );
 
   await fs.writeFile(keyInfoFilePath, `${encryptionKeyUrl}\n${encryptionKeyFilePath}`);
   await fs.writeFile(encryptionKeyFilePath, encryptionKey);
@@ -199,6 +213,7 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
     encryptionKey,
     watchAbortController,
     fullFolderPath: folderPath,
+    isGladysGateway,
   });
 
   // Every X seconds, we verify if the live is active

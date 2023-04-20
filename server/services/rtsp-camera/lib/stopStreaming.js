@@ -17,9 +17,11 @@ async function stopStreaming(cameraSelector) {
   }
   // First, remove the live stream from the Map
   this.liveStreams.delete(cameraSelector);
-  const { liveStreamingProcess, fullFolderPath, watchAbortController } = liveStream;
+  const { liveStreamingProcess, fullFolderPath, watchAbortController, isGladysGateway, cameraFolder } = liveStream;
   // Abort the file watcher
-  watchAbortController.abort();
+  if (watchAbortController.abort) {
+    watchAbortController.abort();
+  }
   // Kill the ffmpeg process
   try {
     liveStreamingProcess.kill();
@@ -32,6 +34,14 @@ async function stopStreaming(cameraSelector) {
   if (this.liveStreams.size === 0 && this.checkIfLiveActiveInterval) {
     clearInterval(this.checkIfLiveActiveInterval);
     this.checkIfLiveActiveInterval = null;
+  }
+  // if the live is a gateway live, clean camera folder
+  if (isGladysGateway) {
+    try {
+      await this.gladys.gateway.gladysGatewayClient.cameraCleanSession(cameraFolder);
+    } catch (e) {
+      logger.debug(e);
+    }
   }
 }
 
