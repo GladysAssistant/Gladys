@@ -46,7 +46,44 @@ describe('scene.continue-only-if', () => {
       ],
       scope,
     );
-    return chaiAssert.isRejected(promise, AbortScene);
+    return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
+  });
+  it('should abort scene, condition value is not a number', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    const promise = executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '=',
+                value: 'wrong_string',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+    return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_VALUE_NOT_A_NUMBER');
   });
   it('should finish scene, condition is verified', async () => {
     const stateManager = new StateManager(event);
