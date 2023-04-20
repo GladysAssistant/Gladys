@@ -1,7 +1,10 @@
 const { checkIfLiveActive } = require('./checkIfLiveActive');
+const { convertLocalStreamToGateway } = require('./convertLocalStreamToGateway');
+const { onNewCameraFile } = require('./onNewCameraFile');
 const { poll } = require('./poll');
 const { getImage } = require('./getImage');
 const { liveActivePing } = require('./liveActivePing');
+const { sendCameraFileToGateway, sendCameraFileToGatewayLimited } = require('./sendCameraFileToGateway');
 const { startStreaming } = require('./startStreaming');
 const { startStreamingIfNotStarted } = require('./startStreamingIfNotStarted');
 const { stopStreaming } = require('./stopStreaming');
@@ -26,9 +29,13 @@ const RtspCameraHandler = function RtspCameraHandler(gladys, ffmpeg, childProces
 };
 
 RtspCameraHandler.prototype.checkIfLiveActive = checkIfLiveActive;
+RtspCameraHandler.prototype.convertLocalStreamToGateway = convertLocalStreamToGateway;
+RtspCameraHandler.prototype.onNewCameraFile = onNewCameraFile;
 RtspCameraHandler.prototype.poll = poll;
 RtspCameraHandler.prototype.getImage = getImage;
 RtspCameraHandler.prototype.liveActivePing = liveActivePing;
+RtspCameraHandler.prototype.sendCameraFileToGateway = sendCameraFileToGateway;
+RtspCameraHandler.prototype.sendCameraFileToGatewayLimited = sendCameraFileToGatewayLimited;
 RtspCameraHandler.prototype.startStreaming = startStreaming;
 RtspCameraHandler.prototype.startStreamingIfNotStarted = startStreamingIfNotStarted;
 RtspCameraHandler.prototype.stopStreaming = stopStreaming;

@@ -2,60 +2,15 @@ const fse = require('fs-extra');
 const Promise = require('bluebird');
 const { promises: fs } = require('fs');
 const fsWithoutPromise = require('fs');
+const EvenEmitter = require('events');
 const path = require('path');
 const util = require('util');
-const Bottleneck = require('bottleneck');
 const randomBytes = util.promisify(require('crypto').randomBytes);
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
-
-// @ts-ignore
-const limiter = new Bottleneck({
-  maxConcurrent: 4,
-});
-
-const waitBeforeExist = async (filePath, delay, maxTryLeft) => {
-  try {
-    await fs.access(filePath, fs.constants.F_OK);
-    return null;
-  } catch (e) {
-    if (maxTryLeft > 0) {
-      const newMaxTryLeft = maxTryLeft - 1;
-      await Promise.delay(delay);
-      return waitBeforeExist(filePath, delay, newMaxTryLeft);
-    }
-    throw new Error('Max try reached, file does not exist');
-  }
-};
-
-const waitBeforeIndexExistOnGladysPlus = async (sharedObjectToVerify, delay, maxTryLeft) => {
-  try {
-    if (!sharedObjectToVerify.indexUploaded || !sharedObjectToVerify.keyUploaded) {
-      throw new Error('Not uploaded yet');
-    }
-    return null;
-  } catch (e) {
-    if (maxTryLeft > 0) {
-      const newMaxTryLeft = maxTryLeft - 1;
-      await Promise.delay(delay);
-      return waitBeforeIndexExistOnGladysPlus(sharedObjectToVerify, delay, newMaxTryLeft);
-    }
-    throw new Error('Max try reached, file does not exist on Gladys Plus');
-  }
-};
-
-const sendCameraFile = async (gladys, cameraFolder, filename, fileContent) => {
-  logger.debug(`Streaming: Uploading ${filename} to gateway.`);
-  const start = Date.now();
-  await gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
-  const end = Date.now();
-  logger.info(`Camera streaming: Uploaded file to gateway in ${end - start} ms`);
-};
-
-const sendCameraFileLimited = limiter.wrap(sendCameraFile);
 
 /**
  * @description Start streaming
@@ -68,9 +23,14 @@ const sendCameraFileLimited = limiter.wrap(sendCameraFile);
  * startStreaming(device);
  */
 async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segmentDuration = 1) {
+  const start = Date.now();
   // If stream already exist, return existing stream
   if (this.liveStreams.has(cameraSelector)) {
     const liveStream = this.liveStreams.get(cameraSelector);
+    // If we are in a local stream, and new request come from Gladys Plus
+    if (liveStream.isGladysGateway === false && isGladysGateway === true) {
+      await this.convertLocalStreamToGateway(cameraSelector, backendUrl);
+    }
     return {
       camera_folder: liveStream.cameraFolder,
       encryption_key: liveStream.encryptionKey,
@@ -104,6 +64,7 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
   const keyInfoFilePath = path.join(folderPath, 'key_info_file.txt');
   const encryptionKeyFilePath = path.join(folderPath, 'index.m3u8.key');
 
+  const streamingReadyEvent = new EvenEmitter();
   const watchAbortController = new AbortController();
   const sharedObjectToVerify = {};
 
@@ -113,40 +74,33 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
     {
       signal: watchAbortController.signal,
     },
-    async (eventType, filename) => {
+    (eventType, filename) => {
       logger.info(`New camera file ${filename}`);
-      if (isGladysGateway) {
-        if (filename) {
-          try {
-            const fileChangedPath = path.join(folderPath, filename);
-            let fileContent = await fs.readFile(fileChangedPath);
-            // We don't upload the key to Gladys Plus
-            // So the end-to-end encryption is respected.
-            // Instead, we upload a dumb file that will be
-            // hot replaced on the client side with the correct key
-            // The key is sent end-to-end encrypted in Websockets :)
-            if (filename === 'index.m3u8.key') {
-              fileContent = Buffer.from('not-a-key', 'utf8');
-            }
-            // Uploading file (with limit, 1 by 1)
-            await sendCameraFileLimited(this.gladys, cameraFolder, filename, fileContent);
-            if (filename === 'index.m3u8') {
-              sharedObjectToVerify.indexUploaded = true;
-            }
-            if (filename === 'index.m3u8.key') {
-              sharedObjectToVerify.keyUploaded = true;
-            }
-          } catch (e) {
-            logger.error(`Unable to upload file ${filename}`);
-            logger.error(e);
-          }
-        }
+      // if it's the first time that the index file is seen
+      // We throw an event to signify that index exist
+      if (filename === 'index.m3u8' && !sharedObjectToVerify.indexExist) {
+        sharedObjectToVerify.indexExist = true;
+        streamingReadyEvent.emit('index-ready');
       }
+      this.onNewCameraFile(
+        cameraSelector,
+        folderPath,
+        cameraFolder,
+        filename,
+        sharedObjectToVerify,
+        streamingReadyEvent,
+      );
     },
   );
 
-  await fs.writeFile(keyInfoFilePath, `${encryptionKeyUrl}\n${encryptionKeyFilePath}`);
-  await fs.writeFile(encryptionKeyFilePath, encryptionKey);
+  console.log(`Init = ${Date.now() - start}ms`);
+
+  await Promise.all([
+    fs.writeFile(keyInfoFilePath, `${encryptionKeyUrl}\n${encryptionKeyFilePath}`),
+    fs.writeFile(encryptionKeyFilePath, encryptionKey),
+  ]);
+
+  console.log(`Write file = ${Date.now() - start}ms`);
 
   // Build the array of parameters
   const args = [
@@ -184,12 +138,22 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
 
   const liveStreamingProcess = this.childProcess.spawn('ffmpeg', args, options);
 
+  this.liveStreams.set(cameraSelector, {
+    liveStreamingProcess,
+    cameraFolder,
+    encryptionKey,
+    watchAbortController,
+    fullFolderPath: folderPath,
+    isGladysGateway,
+    backendUrl,
+  });
+
   liveStreamingProcess.stdout.on('data', (data) => {
-    logger.debug(`stdout: ${data}`);
+    //  logger.log(`stdout: ${data}`);
   });
 
   liveStreamingProcess.stderr.on('data', (data) => {
-    logger.debug(`stderr: ${data}`);
+    // logger.log(`stderr: ${data}`);
   });
 
   liveStreamingProcess.on('close', (code) => {
@@ -199,22 +163,7 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
     }
   });
 
-  // Wait before the stream started to resolve
-  // We'll wait at most 100 * 100 ms = 10 sec
-  await waitBeforeExist(indexFilePath, 100, 100);
-
-  if (isGladysGateway) {
-    await waitBeforeIndexExistOnGladysPlus(sharedObjectToVerify, 100, 100);
-  }
-
-  this.liveStreams.set(cameraSelector, {
-    liveStreamingProcess,
-    cameraFolder,
-    encryptionKey,
-    watchAbortController,
-    fullFolderPath: folderPath,
-    isGladysGateway,
-  });
+  console.log(`Spawn = ${Date.now() - start}ms`);
 
   // Every X seconds, we verify if the live is active
   // If not, we stop the live to avoid wasting ressources
@@ -225,10 +174,33 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
     );
   }
 
-  return {
-    camera_folder: cameraFolder,
-    encryption_key: encryptionKey,
-  };
+  return new Promise((resolve) => {
+    let alreadyResolved = false;
+    streamingReadyEvent.on('index-ready', () => {
+      if (!isGladysGateway) {
+        console.log(`IndexReady = ${Date.now() - start}ms `);
+        if (alreadyResolved) {
+          return;
+        }
+        alreadyResolved = true;
+        resolve({
+          camera_folder: cameraFolder,
+          encryption_key: encryptionKey,
+        });
+      }
+    });
+    streamingReadyEvent.on('gateway-ready', () => {
+      if (alreadyResolved) {
+        return;
+      }
+      console.log(`GatewayReady = ${Date.now() - start}ms `);
+      alreadyResolved = true;
+      resolve({
+        camera_folder: cameraFolder,
+        encryption_key: encryptionKey,
+      });
+    });
+  });
 }
 
 module.exports = {
