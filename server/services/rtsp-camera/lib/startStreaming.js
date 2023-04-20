@@ -15,21 +15,20 @@ const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
 /**
  * @description Start streaming
  * @param {Object} cameraSelector - The camera to stream.
- * @param {string} backendUrl - URL of the backend.
  * @param {boolean} isGladysGateway - If the stream starts from Gladys Gateway or local.
  * @param {number} segmentDuration - The duration of one segment in seconds.
  * @returns {Promise} Resolve when stream started.
  * @example
  * startStreaming(device);
  */
-async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segmentDuration = 1) {
+async function startStreaming(cameraSelector, isGladysGateway, segmentDuration = 1) {
   const start = Date.now();
   // If stream already exist, return existing stream
   if (this.liveStreams.has(cameraSelector)) {
     const liveStream = this.liveStreams.get(cameraSelector);
     // If we are in a local stream, and new request come from Gladys Plus
     if (liveStream.isGladysGateway === false && isGladysGateway === true) {
-      await this.convertLocalStreamToGateway(cameraSelector, backendUrl);
+      await this.convertLocalStreamToGateway(cameraSelector);
     }
     return {
       camera_folder: liveStream.cameraFolder,
@@ -39,7 +38,6 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
   // Init the stream object
   this.liveStreams.set(cameraSelector, {
     isGladysGateway,
-    backendUrl,
   });
 
   const device = await this.gladys.device.getBySelector(cameraSelector);
@@ -64,9 +62,9 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
   const indexFilePath = path.join(folderPath, 'index.m3u8');
   // We create an encryption key
   const encryptionKey = (await randomBytes(16)).toString('hex');
-  const encryptionKeyUrl = isGladysGateway
-    ? `${backendUrl}/cameras/${cameraFolder}/index.m3u8.key`
-    : `${backendUrl}/api/v1/service/rtsp-camera/camera/streaming/${cameraFolder}/index.m3u8.key`;
+  // The "BACKEND_URL_TO_REPLACE" will be replaced by the client with his API URL.
+  // On the Gateway side, it'll be replaced by the Gateway server url
+  const encryptionKeyUrl = `BACKEND_URL_TO_REPLACE/api/v1/service/rtsp-camera/camera/streaming/${cameraFolder}/index.m3u8.key`;
   const keyInfoFilePath = path.join(folderPath, 'key_info_file.txt');
   const encryptionKeyFilePath = path.join(folderPath, 'index.m3u8.key');
 
@@ -151,7 +149,6 @@ async function startStreaming(cameraSelector, backendUrl, isGladysGateway, segme
     watchAbortController,
     fullFolderPath: folderPath,
     isGladysGateway,
-    backendUrl,
   });
 
   liveStreamingProcess.stdout.on('data', (data) => {

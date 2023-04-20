@@ -69,7 +69,7 @@ class CameraBoxComponent extends Component {
           segment_duration: segmentationDuration
         }
       );
-
+      const { localApiUrl } = config;
       const cameraComponent = this;
 
       this.hls = new Hls({
@@ -102,6 +102,13 @@ class CameraBoxComponent extends Component {
               const onSuccess = callbacks.onSuccess;
               callbacks.onSuccess = function(response, stats, context) {
                 cameraComponent.setState({ cameraStreamingErrorCount: 0 });
+
+                if (!isGladysPlus) {
+                  // In the index.m3u8, we replace the backend URL with the local API file
+                  // This is useful for local streaming only
+                  response.data = response.data.replace('BACKEND_URL_TO_REPLACE', localApiUrl);
+                }
+
                 onSuccess(response, stats, context);
               };
             }

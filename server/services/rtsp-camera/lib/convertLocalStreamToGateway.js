@@ -7,11 +7,10 @@ const { NotFoundError } = require('../../../utils/coreErrors');
 /**
  * @description Convert a local stream to a gateway stream
  * @param {string} cameraSelector - The camera selector.
- * @param {string} backendUrl - The new backend URL.
  * @example
  * sendCameraFileToGateway(cameraFolder, filename, fileContent)
  */
-async function convertLocalStreamToGateway(cameraSelector, backendUrl) {
+async function convertLocalStreamToGateway(cameraSelector) {
   logger.debug(`Streaming: ConvertLocalStreamToGateway for camera ${cameraSelector}`);
   const liveStream = this.liveStreams.get(cameraSelector);
   if (!liveStream) {
@@ -21,7 +20,6 @@ async function convertLocalStreamToGateway(cameraSelector, backendUrl) {
   this.liveStreams.set(cameraSelector, {
     ...liveStream,
     isGladysGateway: true,
-    gatewayBackendUrl: backendUrl,
   });
   if (fullFolderPath && cameraFolder) {
     const event = new EvenEmitter();
