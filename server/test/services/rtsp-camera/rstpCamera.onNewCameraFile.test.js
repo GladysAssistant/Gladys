@@ -1,4 +1,4 @@
-const { expect, assert } = require('chai');
+const { expect } = require('chai');
 const fse = require('fs-extra');
 const path = require('path');
 const { fake, assert: fakeAssert } = require('sinon');

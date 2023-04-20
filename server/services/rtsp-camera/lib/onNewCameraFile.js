@@ -14,7 +14,7 @@ const config = getConfig();
  * @param {string} filename - The filename that changed.
  * @param {Object} sharedObjectToVerify - A shared object to init.
  * @param {Object} streamingReadyEvent - To emit an event when gateway is ready.
- * @returns Promise
+ * @returns {Promise} - Resolve when camera file is handled.
  * @example onNewCameraFile();
  */
 async function onNewCameraFile(
