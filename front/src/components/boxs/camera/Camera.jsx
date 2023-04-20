@@ -54,98 +54,101 @@ class CameraBoxComponent extends Component {
       return;
     }
     await this.setState({ streaming: true, loading: true });
+    try {
+      const isGladysPlus = this.props.session.gatewayClient !== undefined;
 
-    const isGladysPlus = this.props.session.gatewayClient !== undefined;
+      const segmentationDuration = this.props.box.camera_latency
+        ? SEGMENT_DURATIONS_PER_LATENCY[this.props.box.camera_latency]
+        : SEGMENT_DURATIONS_PER_LATENCY.low;
 
-    const segmentationDuration = this.props.box.camera_latency
-      ? SEGMENT_DURATIONS_PER_LATENCY[this.props.box.camera_latency]
-      : SEGMENT_DURATIONS_PER_LATENCY.low;
-
-    const streamingParams = await this.props.httpClient.post(
-      `/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/start`,
-      {
-        origin: isGladysPlus ? config.gladysGatewayApiUrl : config.localApiUrl,
-        is_gladys_gateway: isGladysPlus,
-        segment_duration: segmentationDuration
-      }
-    );
-
-    const cameraComponent = this;
-
-    this.hls = new Hls({
-      xhrSetup: xhr => {
-        // We set the correct access token
-        const accessToken = isGladysPlus
-          ? this.props.session.gatewayClient.accessToken
-          : this.props.session.getAccessToken();
-        xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
-      },
-      loader: class CustomLoader extends Hls.DefaultConfig.loader {
-        load(context, config, callbacks) {
-          let { url } = context;
-
-          // For the encryption key, we hot replace the key with the data
-          // Coming from Gladys to ensure End-to-End Encryption
-          // When using with Gladys Plus
-          if (url && url.endsWith('index.m3u8.key')) {
-            const onSuccess = callbacks.onSuccess;
-            callbacks.onSuccess = function(response, stats, context) {
-              const enc = new TextEncoder();
-              // Encryption key is replaced here:
-              response.data = enc.encode(streamingParams.encryption_key);
-
-              onSuccess(response, stats, context);
-            };
-          }
-
-          if (url && url.endsWith('index.m3u8')) {
-            const onSuccess = callbacks.onSuccess;
-            callbacks.onSuccess = function(response, stats, context) {
-              cameraComponent.setState({ cameraStreamingErrorCount: 0 });
-              onSuccess(response, stats, context);
-            };
-          }
-
-          super.load(context, config, callbacks);
+      const streamingParams = await this.props.httpClient.post(
+        `/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/start`,
+        {
+          origin: isGladysPlus ? config.gladysGatewayApiUrl : config.localApiUrl,
+          is_gladys_gateway: isGladysPlus,
+          segment_duration: segmentationDuration
         }
-      }
-    });
-    this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-      console.log('video and hls.js are now bound together !');
-    });
-    this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
-      console.log(`manifest loaded, found ${data.levels.length} quality level`);
-    });
-    this.hls.on(Hls.Events.ERROR, (event, data) => {
-      console.error(event, data);
-      const errorType = data.type;
-      const errorDetails = data.details;
-      const errorFatal = data.fatal;
-      console.error(errorType);
-      console.error(errorDetails);
-      console.error(errorFatal);
-      if (errorType === 'networkError') {
-        //  this.stopStreaming();
-        this.newNetworkError();
-      }
-    });
-    if (isGladysPlus) {
-      this.hls.loadSource(`${config.gladysGatewayApiUrl}/cameras/${streamingParams.camera_folder}/index.m3u8`);
-    } else {
-      this.hls.loadSource(
-        `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
       );
+
+      const cameraComponent = this;
+
+      this.hls = new Hls({
+        xhrSetup: xhr => {
+          // We set the correct access token
+          const accessToken = isGladysPlus
+            ? this.props.session.gatewayClient.accessToken
+            : this.props.session.getAccessToken();
+          xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+        },
+        loader: class CustomLoader extends Hls.DefaultConfig.loader {
+          load(context, config, callbacks) {
+            let { url } = context;
+
+            // For the encryption key, we hot replace the key with the data
+            // Coming from Gladys to ensure End-to-End Encryption
+            // When using with Gladys Plus
+            if (url && url.endsWith('index.m3u8.key')) {
+              const onSuccess = callbacks.onSuccess;
+              callbacks.onSuccess = function(response, stats, context) {
+                const enc = new TextEncoder();
+                // Encryption key is replaced here:
+                response.data = enc.encode(streamingParams.encryption_key);
+
+                onSuccess(response, stats, context);
+              };
+            }
+
+            if (url && url.endsWith('index.m3u8')) {
+              const onSuccess = callbacks.onSuccess;
+              callbacks.onSuccess = function(response, stats, context) {
+                cameraComponent.setState({ cameraStreamingErrorCount: 0 });
+                onSuccess(response, stats, context);
+              };
+            }
+
+            super.load(context, config, callbacks);
+          }
+        }
+      });
+      this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+        console.log('video and hls.js are now bound together !');
+      });
+      this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+        console.log(`manifest loaded, found ${data.levels.length} quality level`);
+      });
+      this.hls.on(Hls.Events.ERROR, (event, data) => {
+        console.error(event, data);
+        const errorType = data.type;
+        const errorDetails = data.details;
+        const errorFatal = data.fatal;
+        console.error(errorType);
+        console.error(errorDetails);
+        console.error(errorFatal);
+        if (errorType === 'networkError') {
+          this.newNetworkError();
+        }
+      });
+      if (isGladysPlus) {
+        this.hls.loadSource(`${config.gladysGatewayApiUrl}/cameras/${streamingParams.camera_folder}/index.m3u8`);
+      } else {
+        this.hls.loadSource(
+          `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
+        );
+      }
+
+      if (this.liveActiveInterval) {
+        clearInterval(this.liveActiveInterval);
+      }
+
+      // Every 3 seconds, sends a ping to Gladys to tell Gladys the live is still active
+      this.liveActiveInterval = setInterval(this.liveActivePing, 3000);
+
+      // bind them together
+      this.hls.attachMedia(this.videoRef.current);
+    } catch (e) {
+      console.error(e);
+      await this.stopStreaming();
     }
-
-    if (this.liveActiveInterval) {
-      clearInterval(this.liveActiveInterval);
-    }
-
-    // Every 3 seconds, sends a ping to Gladys to tell Gladys the live is still active
-    this.liveActiveInterval = setInterval(this.liveActivePing, 3000);
-
-    // bind them together
-    this.hls.attachMedia(this.videoRef.current);
     await this.setState({ loading: false });
   };
 
@@ -166,7 +169,7 @@ class CameraBoxComponent extends Component {
       delete this.hls;
     }
 
-    this.setState({ streaming: false, loading: false });
+    await this.setState({ streaming: false, loading: false });
   };
 
   liveActivePing = async () => {
@@ -220,11 +223,6 @@ class CameraBoxComponent extends Component {
           <div class="card-header">
             <h3 class="card-title">{props.box && props.box.name}</h3>
             <div class="card-options">
-              {cameraStreamingErrorCount > 5 && (
-                <div class="alert alert-danger">
-                  <Text id="dashboard.boxes.camera.noImageToShow" />
-                </div>
-              )}
               <button class="btn btn-primary btn-sm" onClick={this.stopStreaming}>
                 <i class="fe fe-pause" />
               </button>
