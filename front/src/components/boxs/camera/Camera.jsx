@@ -151,13 +151,12 @@ class CameraBoxComponent extends Component {
 
   stopStreaming = async () => {
     await this.setState({ loading: true });
+
+    // We clear the live active interval
+    // The streaming will be automatically stopped
+    // After some time
     if (this.liveActiveInterval) {
       clearInterval(this.liveActiveInterval);
-    }
-    try {
-      await this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/stop`);
-    } catch (e) {
-      console.error(e);
     }
 
     if (this.hls) {
