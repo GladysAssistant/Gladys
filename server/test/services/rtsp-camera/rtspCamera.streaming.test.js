@@ -62,14 +62,14 @@ describe('Camera.streaming', () => {
     await fse.ensureDir(gladys.config.tempFolder);
   });
   it('should start, ping & stop streaming', async () => {
-    const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', 'http://backend', false, 1);
+    const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);
     expect(liveStreamingProcess).to.have.property('camera_folder');
     expect(liveStreamingProcess).to.have.property('encryption_key');
     await rtspCameraManager.liveActivePing('my-camera');
     await rtspCameraManager.stopStreaming('my-camera');
   });
   it('should start, ping, verify for last ping and stop streaming', async () => {
-    await rtspCameraManager.startStreaming('my-camera', 'http://backend', false, 1);
+    await rtspCameraManager.startStreaming('my-camera', false, 1);
     await rtspCameraManager.liveActivePing('my-camera');
     const liveStream = rtspCameraManager.liveStreams.get('my-camera');
     rtspCameraManager.liveStreams.set('my-camera', { ...liveStream, lastPing: Date.now() - 120 * 1000 });
@@ -78,9 +78,9 @@ describe('Camera.streaming', () => {
   });
   it('should start streaming if not started', async () => {
     const [liveStreamingProcess1, liveStreamingProcess2, liveStreamingProcess3] = await Promise.all([
-      rtspCameraManager.startStreamingIfNotStarted('my-camera', 'http://backend', false, 1),
-      rtspCameraManager.startStreamingIfNotStarted('my-camera', 'http://backend', false, 1),
-      rtspCameraManager.startStreamingIfNotStarted('my-camera', 'http://backend', false, 1),
+      rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1),
+      rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1),
+      rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1),
     ]);
     expect(liveStreamingProcess1).to.have.property('camera_folder');
     expect(liveStreamingProcess1).to.have.property('encryption_key');
@@ -99,9 +99,9 @@ describe('Camera.streaming', () => {
     // @ts-ignore
     rtspCameraManagerWithFakeStart.startStreaming = fake.resolves({});
     await Promise.all([
-      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', 'http://backend', false, 1),
-      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', 'http://backend', false, 1),
-      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', 'http://backend', false, 1),
+      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', false, 1),
+      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', false, 1),
+      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', false, 1),
     ]);
     // @ts-ignore
     fakeAssert.calledOnce(rtspCameraManagerWithFakeStart.startStreaming);
@@ -115,7 +115,7 @@ describe('Camera.streaming', () => {
     );
     // @ts-ignore
     rtspCameraManagerWithFail.startStreaming = fake.rejects(new Error('test'));
-    const promise = rtspCameraManagerWithFail.startStreamingIfNotStarted('my-camera', 'http://backend', false, 1);
+    const promise = rtspCameraManagerWithFail.startStreamingIfNotStarted('my-camera', false, 1);
     await assert.isRejected(promise, 'test');
     expect(rtspCameraManagerWithFail.liveStreamsStarting.size).to.equal(0);
   });
