@@ -1,8 +1,6 @@
 const fse = require('fs-extra');
 const logger = require('../../../utils/logger');
 
-const { NotFoundError } = require('../../../utils/coreErrors');
-
 /**
  * @description Stop streaming
  * @param {Object} cameraSelector - The camera to stream.
