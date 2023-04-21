@@ -184,6 +184,8 @@ class CameraBoxComponent extends Component {
       await this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/ping`);
     } catch (e) {
       console.error(e);
+      // If the ping fails, it means the stream ended. We stop the stream.
+      this.stopStreaming();
     }
   };
 
@@ -213,7 +215,7 @@ class CameraBoxComponent extends Component {
     }
   }
 
-  render(props, { image, error, streaming, loading, cameraStreamingErrorCount }) {
+  render(props, { image, error, streaming, loading }) {
     if (streaming) {
       return (
         <div class="card">
