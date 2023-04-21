@@ -80,7 +80,7 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
         signal: watchAbortController.signal,
       },
       (eventType, filename) => {
-        logger.info(`New camera file ${filename}`);
+        logger.debug(`New camera file ${filename}`);
         // if it's the first time that the index file is seen
         // We throw an event to signify that index exist
         if (filename === 'index.m3u8' && !sharedObjectToVerify.indexExist) {
@@ -134,7 +134,7 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
     }
 
     const options = {
-      timeout: 10 * 60 * 1000, // 10 minutes
+      timeout: 5 * 60 * 1000, // 5 minutes
     };
 
     const liveStreamingProcess = this.childProcess.spawn('ffmpeg', args, options);
@@ -159,9 +159,7 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
     liveStreamingProcess.on('close', (code) => {
       logger.debug(`child process exited with code ${code}`);
       streamingReadyEvent.emit('init-error', new Error(`Child process exited with code ${code}`));
-      if (code !== 255) {
-        this.stopStreaming(cameraSelector);
-      }
+      this.stopStreaming(cameraSelector);
     });
 
     // Every X seconds, we verify if the live is active

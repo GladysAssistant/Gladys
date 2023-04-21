@@ -374,14 +374,13 @@ describe('Camera.streaming', () => {
     });
     await rtspCameraManagerWithFail.stopStreaming('my-camera');
   });
-  it('should return not found in stopStreaming', async () => {
+  it('should return even if stream does not exist in stopStreaming', async () => {
     const rtspCameraManagerEmpty = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    const promise = rtspCameraManagerEmpty.stopStreaming('my-camera');
-    await assert.isRejected(promise, 'STREAM_NOT_FOUND');
+    await rtspCameraManagerEmpty.stopStreaming('unknown stream');
   });
 });

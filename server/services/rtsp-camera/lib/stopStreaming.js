@@ -13,7 +13,7 @@ const { NotFoundError } = require('../../../utils/coreErrors');
 async function stopStreaming(cameraSelector) {
   const liveStream = this.liveStreams.get(cameraSelector);
   if (!liveStream) {
-    throw new NotFoundError('STREAM_NOT_FOUND');
+    return;
   }
   // First, remove the live stream from the Map
   this.liveStreams.delete(cameraSelector);
