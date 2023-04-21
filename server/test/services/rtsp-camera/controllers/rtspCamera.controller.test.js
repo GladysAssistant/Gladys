@@ -63,14 +63,15 @@ describe('camera controller test', () => {
         camera_selector: 'my-camera',
       },
       body: {
-        origin: 'http://origin',
+        is_gladys_gateway: false,
+        segment_duration: 4,
       },
     };
     await rtspCameraController['post /api/v1/service/rtsp-camera/camera/:camera_selector/streaming/start'].controller(
       req,
       res,
     );
-    assert.calledWith(rtspCameraService.startStreamingIfNotStarted, 'my-camera', 'http://origin');
+    assert.calledWith(rtspCameraService.startStreamingIfNotStarted, 'my-camera', false, 4);
   });
   it('should stop streaming', async () => {
     const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
