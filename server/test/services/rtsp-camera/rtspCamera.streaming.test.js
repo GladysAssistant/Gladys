@@ -1,9 +1,11 @@
+// @ts-nocheck
 const { expect, assert } = require('chai');
 const fse = require('fs-extra');
 const path = require('path');
 const { fake, assert: fakeAssert } = require('sinon');
 const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
+const { NotFoundError } = require('../../../utils/coreErrors');
 
 const device = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
@@ -35,9 +37,9 @@ const gladys = {
 const childProcessMock = {
   spawn: (command, args, options) => {
     const writeFile = () => {
-      fse.writeFileSync(args[args.length - 1], 'hello');
+      fse.writeFileSync(args[20], 'hello');
     };
-    setTimeout(writeFile, 100);
+    setTimeout(writeFile, 10);
     return {
       kill: fake.returns(null),
       stdout: {
@@ -61,12 +63,85 @@ describe('Camera.streaming', () => {
   before(async () => {
     await fse.ensureDir(gladys.config.tempFolder);
   });
+  it('should not start, camera url does not exist', async () => {
+    const wrongGladys = {
+      device: {
+        getBySelector: fake.resolves({
+          id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+          selector: 'my-camera',
+          params: [],
+        }),
+      },
+    };
+    const rtspCameraManagerWithoutDevice = new RtspCameraManager(
+      wrongGladys,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    const promise = rtspCameraManagerWithoutDevice.startStreaming('my-camera', false, 1);
+    await assert.isRejected(promise, NotFoundError);
+    wrongGladys.device.getBySelector = fake.resolves({
+      id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+      selector: 'my-camera',
+      params: [
+        {
+          name: 'CAMERA_URL',
+          value: '',
+        },
+      ],
+    });
+    const promise2 = rtspCameraManagerWithoutDevice.startStreaming('my-camera', false, 1);
+    await assert.isRejected(promise2, NotFoundError);
+  });
   it('should start, ping & stop streaming', async () => {
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
     const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);
     expect(liveStreamingProcess).to.have.property('camera_folder');
     expect(liveStreamingProcess).to.have.property('encryption_key');
     await rtspCameraManager.liveActivePing('my-camera');
     await rtspCameraManager.stopStreaming('my-camera');
+    fakeAssert.called(rtspCameraManager.onNewCameraFile);
+  });
+  it('should star with rotation & stop streaming', async () => {
+    const gladysDeviceWithRotation = {
+      config: {
+        tempFolder: '/tmp/gladys',
+      },
+      device: {
+        getBySelector: fake.resolves({
+          id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+          selector: 'my-camera',
+          params: [
+            {
+              name: 'CAMERA_URL',
+              value: 'test',
+            },
+            {
+              name: 'CAMERA_ROTATION',
+              value: '1',
+            },
+          ],
+        }),
+      },
+    };
+    const rtspCameraManagerWithRotation = new RtspCameraManager(
+      gladysDeviceWithRotation,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    rtspCameraManagerWithRotation.onNewCameraFile = fake.resolves(null);
+    const liveStreamingProcess = await rtspCameraManagerWithRotation.startStreaming('my-camera', false, 1);
+    expect(liveStreamingProcess).to.have.property('camera_folder');
+    expect(liveStreamingProcess).to.have.property('encryption_key');
+    await rtspCameraManagerWithRotation.liveActivePing('my-camera');
+    await rtspCameraManagerWithRotation.stopStreaming('my-camera');
+    fakeAssert.called(rtspCameraManagerWithRotation.onNewCameraFile);
+  });
+  it('should ping and get 404', async () => {
+    const promise = rtspCameraManager.liveActivePing('lalalallala');
+    await assert.isRejected(promise, NotFoundError);
   });
   it('should start, ping, verify for last ping and stop streaming', async () => {
     await rtspCameraManager.startStreaming('my-camera', false, 1);
@@ -118,6 +193,35 @@ describe('Camera.streaming', () => {
     const promise = rtspCameraManagerWithFail.startStreamingIfNotStarted('my-camera', false, 1);
     await assert.isRejected(promise, 'test');
     expect(rtspCameraManagerWithFail.liveStreamsStarting.size).to.equal(0);
+  });
+  it('should start streaming locally, then convert local stream to online stream during init', async () => {
+    const rtspCameraManagerConvertToGateway = new RtspCameraManager(
+      gladys,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    // @ts-ignore
+    rtspCameraManagerConvertToGateway.convertLocalStreamToGateway = fake.resolves(null);
+    const promise = rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', false, 1);
+    const promiseGateway = rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', true, 1);
+    await Promise.all([promise, promiseGateway]);
+    // @ts-ignore
+    fakeAssert.calledOnce(rtspCameraManagerConvertToGateway.convertLocalStreamToGateway);
+  });
+  it('should start streaming locally, then convert local stream to online stream after stream started', async () => {
+    const rtspCameraManagerConvertToGateway = new RtspCameraManager(
+      gladys,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    // @ts-ignore
+    rtspCameraManagerConvertToGateway.convertLocalStreamToGateway = fake.resolves(null);
+    await rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', false, 1);
+    await rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', true, 1);
+    // @ts-ignore
+    fakeAssert.calledOnce(rtspCameraManagerConvertToGateway.convertLocalStreamToGateway);
   });
   it('should stop streaming, but kill is not working', async () => {
     const rtspCameraManagerWithFail = new RtspCameraManager(

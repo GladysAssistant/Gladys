@@ -1,3 +1,4 @@
+const { NotFoundError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 
 /**
@@ -9,12 +10,13 @@ const logger = require('../../../utils/logger');
 async function liveActivePing(cameraSelector) {
   logger.debug(`Camera streaming: Received active ping for camera ${cameraSelector}`);
   const liveStream = this.liveStreams.get(cameraSelector);
-  if (liveStream) {
-    this.liveStreams.set(cameraSelector, {
-      ...liveStream,
-      lastPing: Date.now(),
-    });
+  if (!liveStream) {
+    throw new NotFoundError('Stream not found');
   }
+  this.liveStreams.set(cameraSelector, {
+    ...liveStream,
+    lastPing: Date.now(),
+  });
 }
 
 module.exports = {

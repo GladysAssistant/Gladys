@@ -13,7 +13,7 @@ async function startStreamingIfNotStarted(cameraSelector, isGladysGateway, segme
   const liveStreamingStarted = this.liveStreamsStarting.get(cameraSelector);
   const liveStream = this.liveStreams.get(cameraSelector);
   // Converting a local stream to gateway stream if needed
-  if (liveStream && liveStream.isGladysGateway === false && isGladysGateway === true) {
+  if (liveStreamingStarted && liveStream && liveStream.isGladysGateway === false && isGladysGateway === true) {
     await this.convertLocalStreamToGateway(cameraSelector);
   }
   if (liveStreamingStarted) {
