@@ -26,6 +26,11 @@ const gladys = {
   config: {
     tempFolder: '/tmp/gladys',
   },
+  gateway: {
+    gladysGatewayClient: {
+      cameraCleanSession: fake.resolves(null),
+    },
+  },
   device: {
     camera: {
       setImage: fake.resolves(null),
@@ -43,12 +48,16 @@ const childProcessMock = {
     return {
       kill: fake.returns(null),
       stdout: {
-        on: fake.returns(null),
+        on: (type, cb) => {
+          cb('log log log');
+        },
       },
       stderr: {
-        on: fake.returns(null),
+        on: (type, cb) => {
+          cb('stderr log log');
+        },
       },
-      on: fake.returns(null),
+      on: (type, cb) => {},
     };
   },
 };
@@ -222,17 +231,102 @@ describe('Camera.streaming', () => {
     await rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', true, 1);
     // @ts-ignore
     fakeAssert.calledOnce(rtspCameraManagerConvertToGateway.convertLocalStreamToGateway);
+    await rtspCameraManagerConvertToGateway.stopStreaming('my-camera');
   });
-  it('should stop streaming, but kill is not working', async () => {
-    const rtspCameraManagerWithFail = new RtspCameraManager(
+  it('should start streaming and should crash immediately', async () => {
+    const childProcessMockWithCrash = {
+      spawn: (command, args, options) => {
+        return {
+          stdout: {
+            on: (type, cb) => {
+              cb('log log log');
+            },
+          },
+          stderr: {
+            on: (type, cb) => {
+              cb('stderr log log');
+            },
+          },
+          on: (type, cb) => {
+            // Exit with code 100
+            setTimeout(() => cb(100), 5);
+          },
+        };
+      },
+    };
+    const rtspCameraManagerWithSpawnCrash = new RtspCameraManager(
       gladys,
+      FfmpegMock,
+      childProcessMockWithCrash,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    const promise = rtspCameraManagerWithSpawnCrash.startStreamingIfNotStarted('my-camera', false, 1);
+    await assert.isRejected(promise, 'Child process exited with code 100');
+    expect(rtspCameraManagerWithSpawnCrash.liveStreams.size).to.equal(0);
+  });
+  it('should start streaming and write multiple time the index', async () => {
+    const childProcessMockWithCrash = {
+      spawn: (command, args, options) => {
+        const writeFile = () => {
+          fse.writeFileSync(args[20], 'hello');
+          fse.writeFileSync(args[20], 'hello');
+        };
+        setTimeout(writeFile, 5);
+        return {
+          stdout: {
+            on: (type, cb) => {
+              cb('log log log');
+            },
+          },
+          stderr: {
+            on: (type, cb) => {
+              cb('stderr log log');
+            },
+          },
+          on: (type, cb) => {
+            // Exit with code 100
+            setTimeout(() => cb(100), 5);
+          },
+        };
+      },
+    };
+    const rtspCameraManagerWithSpawnCrash = new RtspCameraManager(
+      gladys,
+      FfmpegMock,
+      childProcessMockWithCrash,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    const promise = rtspCameraManagerWithSpawnCrash.startStreamingIfNotStarted('my-camera', false, 1);
+    await assert.isRejected(promise, 'Child process exited with code 100');
+    expect(rtspCameraManagerWithSpawnCrash.liveStreams.size).to.equal(0);
+  });
+  it('should stop streaming, but kill + clean is not working', async () => {
+    const gladysWithFailClean = {
+      config: {
+        tempFolder: '/tmp/gladys',
+      },
+      gateway: {
+        gladysGatewayClient: {
+          cameraCleanSession: fake.rejects('CANNOT CLEAN'),
+        },
+      },
+      device: {
+        camera: {
+          setImage: fake.resolves(null),
+        },
+        getBySelector: fake.resolves(device),
+      },
+    };
+    const rtspCameraManagerWithFail = new RtspCameraManager(
+      gladysWithFailClean,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
     rtspCameraManagerWithFail.liveStreams.set('my-camera', {
+      isGladysGateway: true,
       liveStreamingProcess: {
-        kill: fake.rejects('error'),
+        kill: fake.throws('CANNOT KILL!'),
       },
       watchAbortController: {
         abort: fake.returns(null),

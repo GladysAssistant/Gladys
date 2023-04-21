@@ -158,6 +158,7 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
 
     liveStreamingProcess.on('close', (code) => {
       logger.debug(`child process exited with code ${code}`);
+      streamingReadyEvent.emit('init-error', new Error(`Child process exited with code ${code}`));
       if (code !== 255) {
         this.stopStreaming(cameraSelector);
       }
@@ -172,13 +173,10 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       );
     }
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let alreadyResolved = false;
       streamingReadyEvent.on('index-ready', () => {
-        if (!isGladysGateway) {
-          if (alreadyResolved) {
-            return;
-          }
+        if (!isGladysGateway && !alreadyResolved) {
           alreadyResolved = true;
           resolve({
             camera_folder: cameraFolder,
@@ -186,15 +184,21 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
           });
         }
       });
-      streamingReadyEvent.on('gateway-ready', () => {
-        if (alreadyResolved) {
-          return;
+      // If there was an error during start, and we haven't resolved
+      streamingReadyEvent.on('init-error', (e) => {
+        if (!alreadyResolved) {
+          alreadyResolved = true;
+          reject(e);
         }
-        alreadyResolved = true;
-        resolve({
-          camera_folder: cameraFolder,
-          encryption_key: encryptionKey,
-        });
+      });
+      streamingReadyEvent.on('gateway-ready', () => {
+        if (!alreadyResolved) {
+          alreadyResolved = true;
+          resolve({
+            camera_folder: cameraFolder,
+            encryption_key: encryptionKey,
+          });
+        }
       });
     });
   } catch (e) {
