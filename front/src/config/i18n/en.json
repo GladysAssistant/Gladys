@@ -603,7 +603,7 @@
         "longDescription3": "To give your permission, you must create a personal Enedis account if you do not already have one. It also allows you to monitor and manage your electricity consumption data. You will need your electricity bill to create your account.",
         "buttonDescription": "By clicking on this button, you will access your personal Enedis account where you can give your consent for Enedis to transmit your data to us:",
         "error": "An error occurred during the linking process with your Enedis account, please try again.",
-        "notOnGladysGateway": "This integration is available via Gladys Plus, to connect/re-connect go to the Gladys Plus interface!",
+        "notOnGladysGateway": "This integration is available via Gladys Plus, to connect/re-connect go to the Gladys Plus interface, available here:",
         "connectedToUsagePointds": "Successfully connected to Enedis! The first sync will take from 2 to 3 hours depending on the volume of request on Enedis API. No need to keep this tab open during this time.",
         "reconnectInfo": "If you ever want to refresh your access key, you can repeat the login process. It is necessary to log in again once every 2 years."
       },
