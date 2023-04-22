@@ -161,7 +161,8 @@ async function connect() {
 
     this.mqttClient.on('error', (err) => {
       logger.warn(`Error while connecting to MQTT - ${err}`);
-      if(err.code === 5 || err.code === 'ECONNREFUSED') { // Connection refused: Not authorized
+      if (err.code === 5 || err.code === 'ECONNREFUSED') {
+        // Connection refused: Not authorized
         this.disconnect();
       }
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {

@@ -368,7 +368,7 @@ const DEFAULT = {
   ZWAVEJSUI_MQTT_USERNAME_VALUE: 'gladys',
   MQTT_CLIENT_ID: 'gladys-main-instance',
   ZWAVEJSUI_CLIENT_ID: 'ZWAVE_GATEWAY-Gladys',
-  ZWAVEJSUI_VERSION_EXPECTED: '8.13.1',
+  ZWAVEJSUI_VERSION_EXPECTED: '8.14.1',
 };
 
 module.exports = {

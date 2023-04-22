@@ -96,7 +96,7 @@ async function updateConfiguration(configuration) {
       await this.gladys.variable.setValue(CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_PREFIX, mqttTopicPrefix, this.serviceId);
     }
 
-    if (mqttTopicWithLocation) {
+    if (mqttTopicWithLocation !== undefined) {
       await this.gladys.variable.setValue(
         CONFIGURATION.ZWAVEJSUI_MQTT_TOPIC_WITH_LOCATION,
         mqttTopicWithLocation ? '1' : '0',
