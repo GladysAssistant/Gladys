@@ -253,6 +253,57 @@ describe('scene.executeActions', () => {
       1,
     );
   });
+  it('should execute action device.setValue with evaluable value', async () => {
+    const example = {
+      stop: fake.resolves(null),
+    };
+    const stateManager = new StateManager(event);
+    stateManager.setState('service', 'example', example);
+    stateManager.setState('device', 'my-device', {
+      id: 'device-id',
+      features: [
+        {
+          category: 'light',
+          type: 'binary',
+        },
+      ],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device: 'my-device',
+            feature_category: 'light',
+            feature_type: 'binary',
+            evaluate_value: '0 + 1',
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [
+          {
+            category: 'light',
+            type: 'binary',
+          },
+        ],
+      },
+      {
+        category: 'light',
+        type: 'binary',
+      },
+      1,
+    );
+  });
   it('should abort scene value is not valid number in device.setValue', async () => {
     const example = {
       stop: fake.resolves(null),

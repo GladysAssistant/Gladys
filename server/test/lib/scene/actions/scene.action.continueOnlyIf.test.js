@@ -121,6 +121,42 @@ describe('scene.continue-only-if', () => {
       scope,
     );
   });
+  it('should finish scene, condition is verified with evaluable value', async () => {
+    const stateManager = new StateManager(event);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 15,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '=',
+                evaluate_value: '5 * 3',
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+  });
   it('should finish scene, condition is verified', async () => {
     const stateManager = new StateManager(event);
     const http = {
