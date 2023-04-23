@@ -28,7 +28,10 @@ async function loadConfiguration() {
   const rawIPMasks = await this.gladys.variable.getValue(VARIABLES.IP_MASKS, this.serviceId);
   if (rawIPMasks !== null) {
     const loadedIPMasks = JSON.parse(rawIPMasks);
-    loadedIPMasks.forEach((option) => ipMasks.push(option));
+    loadedIPMasks.forEach((option) => {
+      const mask = { ...option, networkInterface: false };
+      ipMasks.push(mask);
+    });
   }
 
   // Complete masks with network interfaces
@@ -44,11 +47,15 @@ async function loadConfiguration() {
         const boundMask = ipMasks.find((currentMask) => currentMask.mask === mask);
         // Add not already bound masks
         if (!boundMask) {
+          // Check subnet mask
+          const subnetMask = mask.split('/')[1];
+          // Default disable for large IP ranges (minimum value /24 to enable interface)
+          const enabled = Number.parseInt(subnetMask, 10) >= 24;
           const networkInterfaceMask = {
             mask,
             name: interfaceName,
             networkInterface: true,
-            enabled: true,
+            enabled,
           };
           ipMasks.push(networkInterfaceMask);
         } else {
