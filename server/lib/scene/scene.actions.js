@@ -52,7 +52,10 @@ const actionsFunc = {
       deviceFeature = getDeviceFeature(device, action.feature_category, action.feature_type);
     }
 
-    const value = action.value || evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
+    let { value } = action;
+    if (action.evaluate_value) {
+      value = evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
+    }
 
     if (!Number(value)) {
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
@@ -170,7 +173,10 @@ const actionsFunc = {
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: async (self, action, scope) => {
     let oneConditionVerified = false;
     action.conditions.forEach((condition) => {
-      const value = condition.value || evaluate(Handlebars.compile(condition.evaluate_value)(scope));
+      let { value } = condition;
+      if (condition.evaluate_value !== undefined) {
+        value = evaluate(Handlebars.compile(condition.evaluate_value)(scope).replace(/\s/g, ''));
+      }
 
       if (!Number(value)) {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');

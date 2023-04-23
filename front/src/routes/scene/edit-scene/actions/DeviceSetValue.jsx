@@ -70,6 +70,14 @@ class DeviceSetValue extends Component {
     if (this.state.computed) {
       return (
         <div>
+          <div
+            style={{
+              fontSize: 12,
+              marginBottom: '.375rem'
+            }}
+          >
+            <Text id="editScene.actionsCard.deviceSetValue.explanationText" />
+          </div>
           <div class="input-group">
             <Localizer>
               <TextWithVariablesInjected
@@ -184,7 +192,7 @@ class DeviceSetValue extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <div className="nav-tabs" style={'display: flex'}>
+          <div className="nav-tabs" style={{ display: 'flex', margin: 0 }}>
             <span
               class={`nav-link ${this.state.computed ? '' : 'active'}`}
               style={'width: 50%'}

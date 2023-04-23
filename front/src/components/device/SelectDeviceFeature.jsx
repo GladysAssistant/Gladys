@@ -120,6 +120,12 @@ class SelectDeviceFeature extends Component {
     return (
       <Select
         class="select-device-feature"
+        styles={{
+          menu: baseStyles => ({
+            ...baseStyles,
+            zIndex: 10
+          })
+        }}
         defaultValue={''}
         value={selectedOption}
         onChange={this.handleChange}

@@ -1204,7 +1204,8 @@
         "deviceLabel": "Appareil",
         "valueLabel": "Valeur",
         "valueTypeSimple": "Simple",
-        "valueTypeComputed": "Calculée"
+        "valueTypeComputed": "Calculée",
+        "explanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -1212,7 +1213,8 @@
         "valueLabel": "Valeur",
         "removeLabel": "Effacer",
         "orText": "OU",
-        "orButton": "+ OU"
+        "orButton": "+ OU",
+        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",

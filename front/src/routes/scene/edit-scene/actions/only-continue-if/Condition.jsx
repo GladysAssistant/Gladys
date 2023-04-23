@@ -6,6 +6,8 @@ import update from 'immutability-helper';
 
 import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
 
+import style from './Condition.css';
+
 class Condition extends Component {
   handleChange = selectedOption => {
     const newCondition = update(this.props.condition, {
@@ -60,6 +62,14 @@ class Condition extends Component {
     const selectedOption = this.getSelectedOption();
     return (
       <div>
+        <div
+          style={{
+            fontSize: 12,
+            marginBottom: '.375rem'
+          }}
+        >
+          <Text id="editScene.actionsCard.onlyContinueIf.explanationText" />
+        </div>
         <div class="row">
           <div class="col-md-4">
             <div class="form-group">
@@ -71,6 +81,12 @@ class Condition extends Component {
               </label>
               <Select
                 defaultValue={''}
+                styles={{
+                  menu: baseStyles => ({
+                    ...baseStyles,
+                    zIndex: 10
+                  })
+                }}
                 value={selectedOption}
                 onChange={this.handleChange}
                 options={props.variableOptions}
@@ -127,6 +143,7 @@ class Condition extends Component {
                   actionsGroupsBefore={props.actionsGroupsBefore}
                   variables={props.variables}
                   updateText={this.handleValueChange}
+                  class={style.conditionTagify}
                 />
               </Localizer>
             </div>

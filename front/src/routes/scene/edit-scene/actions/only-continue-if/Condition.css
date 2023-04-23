@@ -1,0 +1,5 @@
+.conditionTagify {
+  min-height: 2.375rem;
+  display: flex;
+  align-items: center;
+}
