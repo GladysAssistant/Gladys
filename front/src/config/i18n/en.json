@@ -898,7 +898,7 @@
         "hideExistingDevices": "Hide already added devices",
         "alreadyCreatedButton": "Already created",
         "updateButton": "Update",
-        "discoveringError": "An error occurred, please check logs."
+        "discoveringError": "An error occurred, check scanner configuration, or check logs."
       },
       "setup": {
         "title": "LANManager settings",

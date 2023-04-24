@@ -6,7 +6,7 @@ import LANManagerDiscoverTab from './LANManagerDiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 @connect(
-  'session,houses,lanManagerDiscoveredDevices,lanManagerGetDiscoveredDevicesStatus,lanManagerDiscoverUpdate,lanManagerStatus,filterExisting',
+  'session,httpClient,houses,lanManagerDiscoveredDevices,lanManagerGetDiscoveredDevicesStatus,lanManagerDiscoverUpdate,lanManagerStatus,filterExisting',
   actions
 )
 class LANManagerDiscoverPage extends Component {
