@@ -53,10 +53,13 @@ describe('LANManagerService', () => {
     const scanner = {
       removeAllListeners: fake.returns(null),
       cancelScan: fake.returns(null),
+      stopTimer: fake.returns(null),
+      scanResults: [],
     };
     lanManagerService.device.scanner = scanner;
 
     lanManagerService.stop();
+    assert.calledOnce(scanner.stopTimer);
     assert.calledOnce(scanner.cancelScan);
     assert.calledOnce(scanner.removeAllListeners);
 

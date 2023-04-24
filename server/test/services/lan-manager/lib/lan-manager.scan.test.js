@@ -20,6 +20,7 @@ describe('LANManager scan', () => {
 
     NmapScan.prototype.startScan = fake.returns([]);
     NmapScan.prototype.cancelScan = fake.returns([]);
+    NmapScan.prototype.stopTimer = fake.returns([]);
     NmapScan.prototype.removeAllListeners = fake.returns([]);
     NmapScan.prototype.on = stub();
 
@@ -61,6 +62,7 @@ describe('LANManager scan', () => {
         scanning: false,
         configured: true,
         deviceChanged: true,
+        success: true,
       },
     });
   });
@@ -94,6 +96,7 @@ describe('LANManager scan', () => {
         scanning: false,
         configured: true,
         deviceChanged: false,
+        success: false,
       },
     });
   });
