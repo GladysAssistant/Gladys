@@ -167,6 +167,9 @@ describe('zigbee2mqtt installMqttContainer', () => {
     expect(mosquittoConfContent).to.contain('password_file /mosquitto/config/mosquitto.passwd');
     expect(mosquittoConfContent).to.contain('persistence true');
     expect(mosquittoConfContent).to.contain('persistence_location /mosquitto/config/');
+    const mosquittoPwdPath = `${TEMP_GLADYS_FOLDER}/zigbee2mqtt/mqtt/mosquitto.passwd`;
+    const mosquittoPwdContent = await fs.readFile(mosquittoPwdPath, 'utf-8');
+    expect(mosquittoPwdContent).to.equal('');
   });
   it('should fail to configure MQTT container', async function Test() {
     // PREPARE
