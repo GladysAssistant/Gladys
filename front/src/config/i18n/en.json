@@ -17,7 +17,8 @@
     "celsius": "C",
     "fahrenheit": "F",
     "metersPerSec": "m/s",
-    "milesPerHour": "m/h"
+    "milesPerHour": "m/h",
+    "selectPlaceholder": "Select..."
   },
   "color": {
     "blue": "Blue",
