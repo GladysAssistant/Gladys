@@ -831,7 +831,7 @@
       },
       "discover": {
         "title": "Appareils Z-Wave",
-        "noDeviceDiscovered": "Aucun appareil Z-Wave trouvé. Avez-vous correctemnt configuré Zwavejs UI dans les paramètres ?",
+        "noDeviceDiscovered": "Aucun appareil Z-Wave trouvé. Avez-vous correctement configuré Zwavejs UI dans les paramètres ?",
         "addNodeButton": "Ajouter",
         "addNodeSecureButton": "Ajout sécurisé",
         "removeNode": "Supprimer",
