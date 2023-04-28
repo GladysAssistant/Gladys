@@ -46,8 +46,7 @@ class MqttDeviceSetupPage extends Component {
     });
 
     this.setState({
-      device,
-      selectedFeature: undefined
+      device
     });
   }
 
