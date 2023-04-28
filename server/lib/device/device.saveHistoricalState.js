@@ -75,6 +75,18 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
   }
   // if the deviceFeature should keep history, we save a new deviceFeatureState
   if (deviceFeature.keep_history) {
+    const valueAlreadyExistInDb = await db.DeviceFeatureState.findOne({
+      where: {
+        device_feature_id: deviceFeature.id,
+        value: newValue,
+        created_at: newValueCreatedAtDate,
+      },
+    });
+    // if the value already exist in the DB, don't re-create it
+    if (valueAlreadyExistInDb !== null) {
+      logger.debug('device.saveHistoricalState: Not saving value in history, value already exists');
+      return;
+    }
     await db.DeviceFeatureState.create({
       device_feature_id: deviceFeature.id,
       value: newValue,

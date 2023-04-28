@@ -1,6 +1,8 @@
-const getApexChartAreaOptions = ({ displayAxes, height, series, COLORS }) => {
+const getApexChartAreaOptions = ({ displayAxes, height, series, COLORS, locales, defaultLocale }) => {
   const options = {
     chart: {
+      locales,
+      defaultLocale,
       type: 'area',
       fontFamily: 'inherit',
       height,
