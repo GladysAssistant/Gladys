@@ -20,7 +20,7 @@ const LAST_DATE_SYNCED = 'LAST_DATE_SYNCED';
  */
 async function recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs, after = '2000-01-01') {
   const usagePointId = getUsagePointIdFromExternalId(externalId);
-  logger.debug(`Enedis: Syncing ${usagePointId} after ${after}`);
+  logger.info(`Enedis: Syncing ${usagePointId} after ${after}`);
   const data = await gladys.gateway.enedisGetDailyConsumption({
     usage_point_id: usagePointId,
     after,
@@ -57,11 +57,11 @@ async function recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs,
  * sync();
  */
 async function sync(fromStart = false) {
-  logger.info('Enedis: Syncing account');
+  logger.debug('Enedis: Syncing account');
   const usagePoints = await this.gladys.device.get({
     service: 'enedis',
   });
-  logger.info(`Enedis: Found ${usagePoints.length} usage points to sync`);
+  logger.debug(`Enedis: Found ${usagePoints.length} usage points to sync`);
   // Foreach usage point
   return Promise.mapSeries(usagePoints, async (usagePoint) => {
     const usagePointFeature = getDeviceFeature(
@@ -86,7 +86,7 @@ async function sync(fromStart = false) {
       return null;
     }
 
-    logger.info(`Enedis: Usage point last sync was ${lastDateSynced}, syncing from ${syncFromDate}`);
+    logger.debug(`Enedis: Usage point last sync was ${lastDateSynced}, syncing from ${syncFromDate}`);
 
     // syncing all batches
     const lastDateSync = await recursiveBatchCall(
@@ -96,7 +96,7 @@ async function sync(fromStart = false) {
       syncFromDate,
     );
 
-    logger.info(`Enedis: Saving new last data sync = ${lastDateSync}`);
+    logger.debug(`Enedis: Saving new last data sync = ${lastDateSync}`);
 
     // save last date synced in DB
     await this.gladys.device.setParam(usagePoint, LAST_DATE_SYNCED, lastDateSync);
