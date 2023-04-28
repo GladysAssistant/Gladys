@@ -2089,7 +2089,7 @@
       "decimal": "Valeur de fumée décimale"
     },
     "co-sensor": {
-      "shortCategoryName": "Capteur de monoxyde de carbon (CO)",
+      "shortCategoryName": "Capteur de monoxyde de carbone (CO)",
       "binary": "Détection de CO"
     },
     "co2-sensor": {
