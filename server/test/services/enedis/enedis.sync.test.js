@@ -82,6 +82,34 @@ describe('enedis.sync', () => {
     assert.callCount(gladys.event.emit, 110);
     assert.calledOnce(gladys.device.setParam);
   });
+  it('should not do anything, feature not found', async () => {
+    const dailyConsumptionStub = stub();
+    dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
+    dailyConsumptionStub.onCall(1).resolves(getDailyConsumptionArray(10));
+    const gladys = {
+      device: {
+        get: fake.resolves([
+          {
+            id: '865f0fd8-970c-4670-9e1d-f6926a0abed6',
+            external_id: 'enedis:16401220101758',
+            features: [],
+            params: [],
+          },
+        ]),
+        setParam: fake.resolves(null),
+      },
+      event: {
+        emit: fake.returns(null),
+      },
+      gateway: {
+        enedisGetDailyConsumption: dailyConsumptionStub,
+      },
+    };
+    const enedisService = new Enedis(gladys);
+    enedisService.syncDelayBetweenCallsInMs = 0;
+    const syncResult = await enedisService.sync(false);
+    expect(syncResult).to.deep.equal([null]);
+  });
   it('should sync from one week ago', async () => {
     const dailyConsumptionStub = stub();
     dailyConsumptionStub.onCall(0).resolves(getDailyConsumptionArray(100));
