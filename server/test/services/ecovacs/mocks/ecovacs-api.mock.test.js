@@ -22,6 +22,7 @@ const fakes = {
   is_ready: true,
   chargeStatus: 'idle',
   cleanReport: 'idle',
+  batteryLevel: 100,
   hasMainBrush: fake.returns(true),
   hasMappingCapabilities: fake.returns(true),
   hasCustomAreaCleaningMode: fake.returns(true),
