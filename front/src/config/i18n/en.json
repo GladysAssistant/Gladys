@@ -1112,7 +1112,8 @@
         "label": "Select the lights you want to turn off"
       },
       "toggleLights": {
-        "label": "Select the lights you want to toggle"
+        "label": "Select the lights you want to toggle",
+        "description": "This action turn on the light if state is off or turn off the light if state is on"
       },
       "turnOnSwitches": {
         "label": "Select the switches you want to turn on"
@@ -1121,7 +1122,8 @@
         "label": "Select the switches you want to turn off"
       },
       "toggleSwitches": {
-        "label": "Select the switches you want to toggle"
+        "label": "Select the switches you want to toggle",
+        "description": "This action turn on the switch if state is off or turn off the switch if state is on"
       },
       "deviceGetValue": {
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",

@@ -67,6 +67,11 @@ class TurnOnOffLight extends Component {
           {props.action.type === ACTIONS.LIGHT.TURN_OFF && <Text id="editScene.actionsCard.turnOffLights.label" />}
           {props.action.type === ACTIONS.LIGHT.TOGGLE && <Text id="editScene.actionsCard.toggleLights.label" />}
         </label>
+        {props.action.type === ACTIONS.LIGHT.TOGGLE && (
+          <p>
+            <Text id="editScene.actionsCard.toggleLights.description" />
+          </p>
+        )}
         <Select
           defaultValue={[]}
           isMulti

@@ -72,6 +72,11 @@ class TurnOnOffSwitch extends Component {
           {props.action.type === ACTIONS.SWITCH.TURN_OFF && <Text id="editScene.actionsCard.turnOffSwitches.label" />}
           {props.action.type === ACTIONS.SWITCH.TOGGLE && <Text id="editScene.actionsCard.toggleSwitches.label" />}
         </label>
+        {props.action.type === ACTIONS.SWITCH.TOGGLE && (
+          <p>
+            <Text id="editScene.actionsCard.toggleSwitches.description" />
+          </p>
+        )}
         <Select
           defaultValue={[]}
           isMulti
