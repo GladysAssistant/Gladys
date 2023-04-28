@@ -1,4 +1,6 @@
 const Promise = require('bluebird');
+const dayjs = require('dayjs');
+
 const logger = require('../../../utils/logger');
 const { getDeviceFeature, getDeviceParam } = require('../../../utils/device');
 const { getUsagePointIdFromExternalId } = require('../utils/parser');
@@ -49,48 +51,62 @@ async function recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs,
 
 /**
  * @description Sync Enedis account
+ * @param {Boolean} fromStart - Sync from start.
  * @returns {Promise} Resolving when finished.
  * @example
  * sync();
  */
-async function sync() {
+async function sync(fromStart = false) {
   logger.info('Enedis: Syncing account');
   const usagePoints = await this.gladys.device.get({
     service: 'enedis',
   });
   logger.info(`Enedis: Found ${usagePoints.length} usage points to sync`);
   // Foreach usage point
-  await Promise.each(usagePoints, async (usagePoint) => {
+  return Promise.mapSeries(usagePoints, async (usagePoint) => {
     const usagePointFeature = getDeviceFeature(
       usagePoint,
       DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
       DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
     );
 
-    let lastDateSynced = getDeviceParam(usagePoint, LAST_DATE_SYNCED);
+    const lastDateSynced = getDeviceParam(usagePoint, LAST_DATE_SYNCED);
+    let syncFromDate = lastDateSynced;
 
-    if (!lastDateSynced) {
-      lastDateSynced = undefined;
+    // We take a 1 week margin in case some days were lost
+    if (lastDateSynced && !fromStart) {
+      syncFromDate = dayjs(lastDateSynced, 'YYYY-MM-DD')
+        .subtract(7, 'days')
+        .format('YYYY-MM-DD');
+    } else {
+      syncFromDate = undefined;
     }
 
     if (!usagePointFeature) {
       return;
     }
 
-    logger.info(`Enedis: Usage point last sync was ${lastDateSynced}`);
+    logger.info(`Enedis: Usage point last sync was ${lastDateSynced}, syncing from ${syncFromDate}`);
 
     // syncing all batches
     const lastDateSync = await recursiveBatchCall(
       this.gladys,
       usagePointFeature.external_id,
       this.syncDelayBetweenCallsInMs,
-      lastDateSynced,
+      syncFromDate,
     );
 
     logger.info(`Enedis: Saving new last data sync = ${lastDateSync}`);
 
     // save last date synced in DB
     await this.gladys.device.setParam(usagePoint, LAST_DATE_SYNCED, lastDateSync);
+
+    return {
+      syncFromDate,
+      lastDateSynced,
+      lastDateSync,
+      usagePointExternalId: usagePointFeature.external_id,
+    };
   });
 }
 
