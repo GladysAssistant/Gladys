@@ -1054,7 +1054,7 @@
         "hideExistingDevices": "Cacher les appareils déjà ajoutés",
         "alreadyCreatedButton": "Déjà créé",
         "updateButton": "Mettre à jour",
-        "discoveringError": "Une erreur est survenue lors de la recherche, merci de consulter les logs."
+        "discoveringError": "Une erreur est survenue lors de la recherche, vérifiez la configuration du scanner, sinon consultez les logs."
       },
       "setup": {
         "title": "Configuration LAN",

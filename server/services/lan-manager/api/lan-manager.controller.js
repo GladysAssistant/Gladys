@@ -16,8 +16,13 @@ module.exports = function LANManagerController(lanManager) {
    * @apiGroup LANManager
    */
   function scan(req, res) {
-    lanManager.scan();
-    res.status(200);
+    if (req.body.scan === 'on') {
+      lanManager.scan();
+    } else {
+      lanManager.stop();
+    }
+
+    res.json(lanManager.getStatus());
   }
 
   /**
