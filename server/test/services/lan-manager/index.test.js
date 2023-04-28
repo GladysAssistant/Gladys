@@ -6,8 +6,29 @@ const proxyquire = require('proxyquire').noCallThru();
 
 const NmapScan = stub();
 
+const mockOS = {
+  networkInterfaces: () => {
+    return {
+      eth0: [
+        {
+          cidr: '192.168.1.17/24',
+          family: 'IPv4',
+          internal: false,
+        },
+      ],
+    };
+  },
+};
+const proxyLoadConfiguration = proxyquire('../../../services/lan-manager/lib/lan-manager.loadConfiguration', {
+  os: mockOS,
+});
+const LANManager = proxyquire('../../../services/lan-manager/lib', {
+  './lan-manager.loadConfiguration': proxyLoadConfiguration,
+});
+
 const LANManagerService = proxyquire('../../../services/lan-manager', {
   'node-sudo-nmap': { NmapScan },
+  './lib': LANManager,
 });
 
 const gladys = {
