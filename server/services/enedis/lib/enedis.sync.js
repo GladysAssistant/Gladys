@@ -51,7 +51,7 @@ async function recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs,
 
 /**
  * @description Sync Enedis account
- * @param {Boolean} fromStart - Sync from start.
+ * @param {boolean} fromStart - Sync from start.
  * @returns {Promise} Resolving when finished.
  * @example
  * sync();
@@ -83,7 +83,7 @@ async function sync(fromStart = false) {
     }
 
     if (!usagePointFeature) {
-      return;
+      return null;
     }
 
     logger.info(`Enedis: Usage point last sync was ${lastDateSynced}, syncing from ${syncFromDate}`);
