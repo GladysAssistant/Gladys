@@ -287,7 +287,7 @@ class Chartbox extends Component {
             <div class={cx(style.subheader)}>{props.box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               <div class="dropdown">
-                <a class="dropdown-toggle text-muted" onClick={this.toggleDropdown}>
+                <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                   {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
                   {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
                   {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
