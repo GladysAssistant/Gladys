@@ -17,7 +17,8 @@
     "celsius": "C",
     "fahrenheit": "F",
     "metersPerSec": "m/s",
-    "milesPerHour": "m/h"
+    "milesPerHour": "m/h",
+    "selectPlaceholder": "Sélectionnez..."
   },
   "color": {
     "blue": "Bleu",
@@ -2088,11 +2089,11 @@
       "decimal": "Valeur de fumée décimale"
     },
     "co-sensor": {
-      "shortCategoryName": "Capteur de monxyde de carbon (CO)",
+      "shortCategoryName": "Capteur de monoxyde de carbone (CO)",
       "binary": "Détection de CO"
     },
     "co2-sensor": {
-      "shortCategoryName": "Capteur de Co2",
+      "shortCategoryName": "Capteur de dioxyde de carbone (Co2)",
       "decimal": "Niveau de CO2"
     },
     "switch": {
@@ -2127,7 +2128,7 @@
       "binary": "Fuite (Oui/Non)"
     },
     "opening-sensor": {
-      "shortCategoryName": "Capteur d'ouverture",
+      "shortCategoryName": "Détecteur d'ouverture",
       "binary": "Ouverture (Oui/Non)"
     },
     "humidity-sensor": {
