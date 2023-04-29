@@ -177,7 +177,15 @@ const data = {
         {
           type: 'devices-in-room',
           room: 'parental-room',
-          device_features: ['curtain-actions', 'shutter-actions', 'shutter-position', 'thermostat']
+          device_features: [
+            'curtain-actions',
+            'shutter-actions',
+            'shutter-position',
+            'thermostat',
+            'water-leak',
+            'smoke-sensor',
+            'light-sensor'
+          ]
         }
       ]
     ],
@@ -562,6 +570,46 @@ const data = {
     name: 'Parental Room',
     selector: 'parental-room',
     devices: [
+      {
+        id: 'f131fbf2-445a-4c2c-9426-83abaf534662',
+        name: 'Room sensors',
+        selector: 'room-sensors',
+        features: [
+          {
+            name: 'Water Leak',
+            selector: 'water-leak',
+            category: 'leak-sensor',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+          },
+          {
+            name: 'Smoke sensor',
+            selector: 'smoke-sensor',
+            category: 'smoke-sensor',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+          },
+          {
+            name: 'Light sensor',
+            selector: 'light-sensor',
+            category: 'light-sensor',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+          }
+        ]
+      },
       {
         id: 'cb3b1a30-d1b6-4624-ac18-e581e3e3b00f',
         name: 'Main curtain',
