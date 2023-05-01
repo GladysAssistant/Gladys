@@ -4,7 +4,6 @@ import actions from '../actions';
 import TasmotaPage from '../TasmotaPage';
 import DeviceTab from './DeviceTab';
 
-@connect('user,tasmotaDevices,housesWithRooms,getTasmotaStatus,tasmotaSearch,getTasmotaOrderDir', actions)
 class TasmotaIntegration extends Component {
   componentWillMount() {
     this.props.getTasmotaDevices();
@@ -21,4 +20,7 @@ class TasmotaIntegration extends Component {
   }
 }
 
-export default TasmotaIntegration;
+export default connect(
+  'user,tasmotaDevices,housesWithRooms,getTasmotaStatus,tasmotaSearch,getTasmotaOrderDir',
+  actions
+)(TasmotaIntegration);

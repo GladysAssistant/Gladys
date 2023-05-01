@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
-@connect('httpClient', {})
 class RoomSelector extends Component {
   updateSelection = option => {
     this.props.updateRoomSelection(option.room);
@@ -75,4 +74,4 @@ class RoomSelector extends Component {
   }
 }
 
-export default RoomSelector;
+export default connect('httpClient', {})(RoomSelector);

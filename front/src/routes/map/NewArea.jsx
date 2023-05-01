@@ -133,7 +133,6 @@ const NewAreaPage = ({ children, ...props }) => (
   </div>
 );
 
-@connect('httpClient', actions)
 class NewArea extends Component {
   setName = e => {
     this.setState({ name: e.target.value });
@@ -261,4 +260,4 @@ class NewArea extends Component {
   }
 }
 
-export default NewArea;
+export default connect('httpClient', actions)(NewArea);
