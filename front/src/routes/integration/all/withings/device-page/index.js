@@ -5,10 +5,6 @@ import WithingsPage from '../WithingsPage';
 import WithingsDevices from './WithingsDevices';
 import { RequestStatus } from '../../../../../utils/consts';
 
-@connect(
-  'user,session,houses,withingsClientId,withingsSaveStatus,withingsGetStatus,withingsImgMap,withingsDevices',
-  actions
-)
 class WithingsDevicePage extends Component {
   componentWillMount() {
     this.props.getWithingsDevice();
@@ -25,4 +21,7 @@ class WithingsDevicePage extends Component {
   }
 }
 
-export default WithingsDevicePage;
+export default connect(
+  'user,session,houses,withingsClientId,withingsSaveStatus,withingsGetStatus,withingsImgMap,withingsDevices',
+  actions
+)(WithingsDevicePage);

@@ -5,7 +5,6 @@ import UpdateDevice from '../../../../../components/device';
 
 const WITHINGS_PAGE_PATH = '/dashboard/integration/health/withings/device';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
 class WithingsEditDevicePage extends Component {
   render(props, {}) {
     return (
@@ -21,4 +20,6 @@ class WithingsEditDevicePage extends Component {
   }
 }
 
-export default WithingsEditDevicePage;
+export default connect(
+  'user,session,httpClient,currentIntegration,houses', {}
+)(WithingsEditDevicePage);

@@ -17,8 +17,6 @@ async function destroyByServiceId(serviceId) {
   await Promise.each(devices, async (device) => {
     await device.destroy();
   });
-
-  return null;
 }
 
 module.exports = {

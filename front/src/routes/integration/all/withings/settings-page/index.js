@@ -11,10 +11,6 @@ import { combineActions } from '../../../../../utils/combineActions';
 import Device from '../device-page/Device';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
-@connect(
-  'user,session,clientIdInDb,withingsSaveStatus,oauth2GetStatus,oauth2ErrorMsg,houses,withingsClientId,withingsGetStatus,withingsImgMap,withingsDevices',
-  combineActions(actions, actionsOAuth2, actionsWithingsDevice, actionsCommon)
-)
 class WithingsSettingsPage extends Component {
   async componentWillMount() {
     await this.props.getIntegrationByName('withings');
@@ -60,4 +56,7 @@ class WithingsSettingsPage extends Component {
   }
 }
 
-export default withIntlAsProp(WithingsSettingsPage);
+export default connect(
+  'user,session,clientIdInDb,withingsSaveStatus,oauth2GetStatus,oauth2ErrorMsg,houses,withingsClientId,withingsGetStatus,withingsImgMap,withingsDevices',
+  combineActions(actions, actionsOAuth2, actionsWithingsDevice, actionsCommon)
+)(withIntlAsProp(WithingsSettingsPage));

@@ -7,7 +7,7 @@ module.exports = function WithingsService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the WithingsService service
+   * @description This function starts the WithingsService service.
    * @example
    * gladys.services.withings.start();
    */
@@ -17,7 +17,7 @@ module.exports = function WithingsService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the WithingsService service
+   * @description This function stops the WithingsService service.
    * @example
    * gladys.services.withings.stop();
    */

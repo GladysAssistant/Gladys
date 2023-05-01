@@ -7,13 +7,13 @@ const { OAUTH2 } = require('./utils/constants');
 /**
  *
  * @description Refresh Oauth2 token in case of it expired .
- * @param {Object} variable - Gladys variable manager.
+ * @param {object} variable - Gladys variable manager.
  * @param {string} serviceId - Gladys service id call method.
  * @param {string} userId - Gladys userId of current session.
  * @param {string} tokenHost - Token host url.
  * @param {string} tokenPath - Token path.
  * @param {string} additionalAccessTokenRequestActionParam - Additional action parameter.
- * @returns {Object} Response of oauth2 refresh token query .
+ * @returns {object} Response of oauth2 refresh token query .
  * @example
  * oauth2.refreshTokenAccess('7fdsf4s68r4gfr68f4r63csd7f6f4c3r85',
  *    {...}, '78v4f3df83g74v1fsd8375f63gvrf5c',

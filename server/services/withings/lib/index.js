@@ -13,9 +13,9 @@ const { getAndSaveMeasures } = require('./utils/withings.getAndSaveMeasures');
 const { getAndSaveBatteryLevel } = require('./utils/withings.getAndSaveBatteryLevel');
 
 /**
- * @param {Object} gladys - The gladys object.
+ * @param {object} gladys - The gladys object.
  * @param {string} serviceId - Identification of the service.
- * @description Create all device if not exist by listening
+ * @description Create all device if not exist by listening.
  * @example
  * const withingsHandler = WithingsHandler(gladys, serviceId)
  */

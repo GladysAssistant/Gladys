@@ -3,7 +3,7 @@
  *
  * @param {string} userId - Gladys userId of current session.
  * @param {string} params - Additionnal params to get measures (optional).
- * @returns {Object} List of withings measures.
+ * @returns {object} List of withings measures.
  * @example
  * getMeasures('rzede-jlkunv-rze23f-csdcs-fsdfsd')
  */

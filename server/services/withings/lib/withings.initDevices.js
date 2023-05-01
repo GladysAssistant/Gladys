@@ -11,10 +11,9 @@ const {
 
 /**
  * @description Build a new gladys device from withings device.
- *
- * @param {Object} withingsDevice - Withings device to transform.
+ * @param {object} withingsDevice - Withings device to transform.
  * @param {string} serviceId - Withings service id.
- * @returns {Object} Return a gladys device.
+ * @returns {object} Return a gladys device.
  * @example
  * withings.buildNewDevice('7fdsf4s68r4gfr68f4r63csd7f6f4c3r85', '78v4f3df83g74v1fsd8375f63gvrf5c');
  */
@@ -78,8 +77,8 @@ function buildNewDevice(withingsDevice, serviceId) {
 
 /**
  * @description  Build features of gladys device.
- * @param {Object} currentGroup - Withings measure groups to transform.
- * @param {Object} device - Current device.
+ * @param {object} currentGroup - Withings measure groups to transform.
+ * @param {object} device - Current device.
  * @param {Array} currentFeatures - CurrentFeature array to update if exist.
  * @returns {Array} Return array of features.
  * @example

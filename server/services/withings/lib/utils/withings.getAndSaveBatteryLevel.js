@@ -4,10 +4,9 @@ const withingsBatUtils = require('./withings.buildBatteryLevelValues');
 
 /**
  * @description Call Withings WS to get measures of feature and save it.
- *
- * @param {Object} featureBattery - Withings battery feature to poll.
- * @param {Object} withingsDeviceId - Withings device id type to poll.
- * @param {Object} userId - Current user id.
+ * @param {object} featureBattery - Withings battery feature to poll.
+ * @param {object} withingsDeviceId - Withings device id type to poll.
+ * @param {object} userId - Current user id.
  * @example
  * getAndSaveBatteryLevel(feature, 1459, 'rezrz-uiop-mlljl-jklmj-ji34k')
  */

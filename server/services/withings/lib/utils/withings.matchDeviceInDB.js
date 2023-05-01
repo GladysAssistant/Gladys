@@ -1,8 +1,7 @@
 /**
  * @description Returns the gladys device match with withings device.
- *
- * @param {Object} withingsDevice - Withings device to match.
- * @returns {Object} Withings device in DB.
+ * @param {object} withingsDevice - Withings device to match.
+ * @returns {object} Withings device in DB.
  * @example
  * matchDeviceInDB('rzede-jlkunv-rze23f-csdcs-fsdfsd')
  */

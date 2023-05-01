@@ -4,9 +4,8 @@ const { OAUTH2 } = require('../../../../services/withings/lib/oauth2-client/util
 /**
  *
  * @description Return a json measure with specified type.
- *
  * @param {number} type - Type of measure need.
- * @returns {Object} Json measure.
+ * @returns {object} Json measure.
  * @example getWithingsMeasure(1);
  */
 function getWithingsMeasure(type) {
@@ -21,12 +20,11 @@ function getWithingsMeasure(type) {
 }
 
 /**
- * @description Return a HttpServer corresponding to withings server
- *
+ * @description Return a HttpServer corresponding to withings server.
  * @param {string} host - Host of server.
  * @param {number} port - Port of server.
  * @param {boolean} withHistoricalData - Flag to choose if lot of historical data must be send in get measures.
- * @returns {Object} Return HTTP server instance.
+ * @returns {object} Return HTTP server instance.
  * @example serverHttpWithingsMock.getHttpServer('localhost', 9192 );
  */
 function getHttpServer(host, port, withHistoricalData) {
@@ -147,8 +145,7 @@ function getHttpServer(host, port, withHistoricalData) {
 
 /**
  *
- * @description Return a HttpServer corresponding to withings server
- *
+ * @description Return a HttpServer corresponding to withings server.
  * @param {string} key - Key of fariable to return.
  * @returns {string} Value of variable.
  * @example serverHttpWithingsMock.getHttgetVariablepServer(OAUTH2.VARIABLE.TOKEN_HOST, 'localhost', 9192 );

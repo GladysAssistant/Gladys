@@ -39,7 +39,7 @@ const gladys = {
 };
 
 /**
- * Verify componant to implement oauth2manager executeQuery
+ * Verify componant to implement oauth2manager executeQuery.
  */
 describe('oauth2manager test', () => {
   before(async () => {

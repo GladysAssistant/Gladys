@@ -1,8 +1,7 @@
 /**
  * @description Returns map of measures by withings device id.
- *
- * @param {Object} measuregrps - List of withings measures.
- * @returns {Object} Map of measures by withings device id.
+ * @param {object} measuregrps - List of withings measures.
+ * @returns {object} Map of measures by withings device id.
  * @example
  * buildMapOfMeasures(measuregrps)
  */

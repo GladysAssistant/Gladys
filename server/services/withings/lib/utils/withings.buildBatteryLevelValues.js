@@ -1,6 +1,5 @@
 /**
  * @description Returns array with battery value(index 0 = numeric value, index 1 = string value).
- *
  * @param {string} currentBatValueString - String withings value of battery.
  * @returns {Array} Array with battery value(index 0 = numeric value, index 1 = string value).
  * @example

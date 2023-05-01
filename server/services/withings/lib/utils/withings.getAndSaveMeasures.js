@@ -2,10 +2,9 @@ const Promise = require('bluebird');
 
 /**
  * @description Call Withings WS to get measures of feature and save it.
- *
- * @param {Object} feature - Withings feature to poll.
- * @param {Object} withingsType - Withings measure type to poll.
- * @param {Object} userId - Current user id.
+ * @param {object} feature - Withings feature to poll.
+ * @param {object} withingsType - Withings measure type to poll.
+ * @param {object} userId - Current user id.
  * @example
  * getAndSaveMeasures(feature, 1, 'rezrz-uiop-mlljl-jklmj-ji34k')
  */

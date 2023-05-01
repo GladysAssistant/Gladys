@@ -5,7 +5,7 @@ const { OAUTH2 } = require('./oauth2-client/utils/constants');
 
 /**
  * @description Poll value of a withings device.
- * @param {Object} device - The device to update value.
+ * @param {object} device - The device to update value.
  * @returns {Promise} Resolve.
  * @example
  * poll(device);
