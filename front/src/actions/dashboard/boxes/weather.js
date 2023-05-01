@@ -47,6 +47,7 @@ function createActions(store) {
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
+        console.error(e);
         const responseMessage = get(e, 'response.data.message');
         if (responseMessage === ERROR_MESSAGES.HOUSE_HAS_NO_COORDINATES) {
           boxActions.updateBoxStatus(state, BOX_KEY, x, y, GetWeatherStatus.HouseHasNoCoordinates);
