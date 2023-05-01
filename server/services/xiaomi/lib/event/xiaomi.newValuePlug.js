@@ -10,8 +10,8 @@ const { PLUG_STATUS } = require('../utils/deviceStatus');
 
 /**
  * @description New value plug received.
- * @param {Object} message - Message received.
- * @param {Object} data - Data received.
+ * @param {object} message - Message received.
+ * @param {object} data - Data received.
  * @example
  * newValuePlug(122324, {
  *    voltage: 3000,

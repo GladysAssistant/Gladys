@@ -304,7 +304,6 @@ const AppRouter = connect(
   </div>
 ));
 
-@connect('user', actions)
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
@@ -320,9 +319,11 @@ class MainApp extends Component {
   }
 }
 
+const MainAppConnected = connect('user', actions)(MainApp);
+
 const App = () => (
   <Provider store={store}>
-    <MainApp />
+    <MainAppConnected />
   </Provider>
 );
 

@@ -2,7 +2,7 @@ const { EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Get all discovered devices, and if device already created, the Gladys device.
- * @param {Object} device - Discovered device.
+ * @param {object} device - Discovered device.
  * @param {string} event - The vent to publish to.
  * @example
  * notifyNewDevice(discorveredDevice)

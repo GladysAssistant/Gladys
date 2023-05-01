@@ -4,7 +4,6 @@ import SignupLayout from '../layout';
 import PreferencesTab from './PreferencesTab';
 import actions from '../../../actions/signup/signupSetPreferences';
 
-@connect('signupUserPreferences,signupSystemPreferences', actions)
 class Preferences extends Component {
   componentWillMount() {
     this.props.resetPreferences();
@@ -27,4 +26,4 @@ class Preferences extends Component {
   }
 }
 
-export default Preferences;
+export default connect('signupUserPreferences,signupSystemPreferences', actions)(Preferences);

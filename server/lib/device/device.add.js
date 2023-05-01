@@ -2,7 +2,8 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../utils/constants');
 
 /**
  * @description Load device in memory.
- * @param {Object} device - Device object.
+ * @param {object} device - Device object.
+ * @returns {null} Return when device was added.
  * @example
  * device.add(device);
  */

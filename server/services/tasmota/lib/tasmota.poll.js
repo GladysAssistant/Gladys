@@ -1,6 +1,6 @@
 /**
  * @description Polling requested device.
- * @param {Object} device - Device to poll.
+ * @param {object} device - Device to poll.
  * @example
  * tasmotaManager.poll({}),
  */

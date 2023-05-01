@@ -1,5 +1,5 @@
 /**
- * @description Train the brain
+ * @description Train the brain.
  * @example
  * brain.train();
  */

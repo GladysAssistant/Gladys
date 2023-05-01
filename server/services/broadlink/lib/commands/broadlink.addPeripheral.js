@@ -2,7 +2,7 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Store discovered peripheral.
- * @param {Object} broadlinkDevice - Broadlink device.
+ * @param {object} broadlinkDevice - Broadlink device.
  * @example
  * await gladys.broadlink.addPeripheral({
  *  name: 'RM3 Pro Plus',

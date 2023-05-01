@@ -38,7 +38,6 @@ const EditCameraBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('httpClient', {})
 class EditCameraBoxComponent extends Component {
   updateCamera = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -80,4 +79,4 @@ class EditCameraBoxComponent extends Component {
   }
 }
 
-export default EditCameraBoxComponent;
+export default connect('httpClient', {})(EditCameraBoxComponent);

@@ -9,8 +9,8 @@ const { status } = require('./status');
 
 /**
  * @description Add ability to control an eWeLink device.
- * @param {Object} gladys - Gladys instance.
- * @param {Object} eweLinkApi - EweLink Client.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} eweLinkApi - EweLink Client.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const EweLinkHandler = new EweLinkHandler(gladys, client, serviceId);
@@ -28,7 +28,7 @@ const EweLinkHandler = function EweLinkHandler(gladys, eweLinkApi, serviceId) {
 
 /**
  * @description Throw error if EweLinkApi call response has error.
- * @param {Object} response - EweLinkApi call response.
+ * @param {object} response - EweLinkApi call response.
  * @param {boolean} emit - True to emit message.
  * @param {boolean} config - True to reset config.
  * @example

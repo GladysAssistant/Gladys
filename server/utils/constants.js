@@ -260,10 +260,12 @@ const ACTIONS = {
   LIGHT: {
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
+    TOGGLE: 'light.toggle',
   },
   SWITCH: {
     TURN_ON: 'switch.turn-on',
     TURN_OFF: 'switch.turn-off',
+    TOGGLE: 'switch.toggle',
   },
   TIME: {
     DELAY: 'delay',

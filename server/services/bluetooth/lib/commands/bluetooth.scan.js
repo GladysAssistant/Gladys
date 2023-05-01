@@ -9,7 +9,7 @@ const { TIMERS } = require('../utils/bluetooth.constants');
  * @description Scan Bluetooth peripherals.
  * @param {boolean} state - Set _true_ to start scanning, default _false_.
  * @param {string} peripheralUuid - Peripheral UUID to look for.
- * @returns {Promise<Object>} Found peripherals by uuid, or single requested peripheral.
+ * @returns {Promise<object>} Found peripherals by uuid, or single requested peripheral.
  * @example
  * bluetooth.scan(true);
  */

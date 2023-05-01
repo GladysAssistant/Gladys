@@ -4,7 +4,7 @@ const { DEVICE_PARAM_NAME } = require('../tasmota.constants');
 
 /**
  * @description Build URL from device.
- * @param {Object} device - Device.
+ * @param {object} device - Device.
  * @param {string} command - Command to send.
  * @returns {string} The build URL.
  * @example
@@ -40,6 +40,7 @@ function buildUrl(device, command = undefined) {
  * @param {Function} dataCallback - Called if success.
  * @param {Function} authErrorCallback - Called if authentication error.
  * @param {Function} errorCallback - Called if error.
+ * @returns {null} Return when request started.
  * @example
  * request(
  *   'http://192.168.1.1/cm?cmnd=Status',

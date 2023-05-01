@@ -5,7 +5,6 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import Layout from './Layout';
 import style from './style.css';
 
-@connect('user,session', {})
 class GoogleHomeGateway extends Component {
   cancel = async e => {
     e.preventDefault();
@@ -133,4 +132,4 @@ class GoogleHomeGateway extends Component {
   }
 }
 
-export default GoogleHomeGateway;
+export default connect('user,session', {})(GoogleHomeGateway);

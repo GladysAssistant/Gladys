@@ -1,3 +1,5 @@
+const logger = require('../../../utils/logger');
+
 /**
  * @description Stop LAN manager.
  * @example
@@ -7,7 +9,11 @@ function stop() {
   this.scanning = false;
 
   if (this.scanner) {
-    this.scanner.cancelScan();
+    logger.info('LANManager stops scanning devices');
+    this.scanner.stopTimer();
+    if (this.scanner.scanResults) {
+      this.scanner.cancelScan();
+    }
     this.scanner.removeAllListeners();
   }
 

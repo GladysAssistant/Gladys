@@ -17,7 +17,8 @@
     "celsius": "C",
     "fahrenheit": "F",
     "metersPerSec": "m/s",
-    "milesPerHour": "m/h"
+    "milesPerHour": "m/h",
+    "selectPlaceholder": "Sélectionnez..."
   },
   "color": {
     "blue": "Bleu",
@@ -712,9 +713,10 @@
         "longDescription3": "Pour donner votre autorisation, vous devez créer un compte personnel Enedis si vous n'avez pas encore de compte. Il vous permet également de suivre et gérer vos données de consommation d'électricité. Munissez-vous de votre facture d'électricité pour créer votre espace.",
         "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données :",
         "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer.",
-        "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus !",
+        "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus, disponible ici :",
         "connectedToUsagePointds": "Connecté à Enedis avec succès ! La première synchronisation peut prendre entre 2h et 3h selon le volume de requêtes sur l'API Enedis. Il n'est pas nécessaire de garder cet onglet ouvert, la synchronisation a lieu en arrière-plan.",
-        "reconnectInfo": "Si jamais vous voulez rafraichir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 2 ans."
+        "reconnectInfo": "Si jamais vous voulez rafraichir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 2 ans.",
+        "dailyConsumptionFeatureName": "Consommation quotidienne"
       },
       "usagePoints": {
         "title": "Mes compteurs",
@@ -736,7 +738,7 @@
         "gladysPlusRefreshProgressLabel": "Synchronisation en cours...",
         "gladysPlusRefreshProgressDescription": "Gladys Plus est entrain de rafraîchir son cache via l'API Enedis. Cette synchronisation peut prendre du temps, car Enedis impose des limites de requêtes. Il n'est pas nécessaire de garder cet onglet ouvert.",
         "refreshLocal": "Synchroniser avec Gladys Plus",
-        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponible en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
+        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponibles en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
         "saveButton": "Enregistrer",
         "deleteButton": "Supprimer"
       }
@@ -1095,7 +1097,7 @@
         "hideExistingDevices": "Cacher les appareils déjà ajoutés",
         "alreadyCreatedButton": "Déjà créé",
         "updateButton": "Mettre à jour",
-        "discoveringError": "Une erreur est survenue lors de la recherche, merci de consulter les logs."
+        "discoveringError": "Une erreur est survenue lors de la recherche, vérifiez la configuration du scanner, sinon consultez les logs."
       },
       "setup": {
         "title": "Configuration LAN",
@@ -1108,7 +1110,7 @@
         "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
         "ipMasksLabel": "CIDR à scanner",
         "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
-        "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne pourrant pas être supprimés.",
+        "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne peuvent pas être supprimés.",
         "maskTableHeader": "CIDR",
         "nameTableHeader": "Nom",
         "statusTableHeader": "Actif",
@@ -1230,11 +1232,19 @@
       "turnOffLights": {
         "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
+      "toggleLights": {
+        "label": "Sélectionnez les lumières que vous souhaitez inverser",
+        "description": "Cette action allume la lumière si éteinte, sinon éteins la lumière"
+      },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
       },
       "turnOffSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez éteindre"
+      },
+      "toggleSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez inverser",
+        "description": "Cette action allume la prise si elle est éteinte, sinon éteins la prise"
       },
       "deviceGetValue": {
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
@@ -1335,12 +1345,14 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer les lumières",
-        "turn-off": "Eteindre les lumières"
+        "turn-on": "Allumer la lumière",
+        "turn-off": "Eteindre les lumières",
+        "toggle": "Inverser les lumières"
       },
       "switch": {
         "turn-on": "Allumer les prises",
-        "turn-off": "Eteindre les prises"
+        "turn-off": "Eteindre les prises",
+        "toggle": "Inverser les prises"
       },
       "scene": {
         "start": "Démarrer la scène"
@@ -2136,11 +2148,11 @@
       "decimal": "Valeur de fumée décimale"
     },
     "co-sensor": {
-      "shortCategoryName": "Capteur de monxyde de carbon (CO)",
+      "shortCategoryName": "Capteur de monoxyde de carbone (CO)",
       "binary": "Détection de CO"
     },
     "co2-sensor": {
-      "shortCategoryName": "Capteur de Co2",
+      "shortCategoryName": "Capteur de dioxyde de carbone (Co2)",
       "decimal": "Niveau de CO2"
     },
     "switch": {
@@ -2175,7 +2187,7 @@
       "binary": "Fuite (Oui/Non)"
     },
     "opening-sensor": {
-      "shortCategoryName": "Capteur d'ouverture",
+      "shortCategoryName": "Détecteur d'ouverture",
       "binary": "Ouverture (Oui/Non)"
     },
     "humidity-sensor": {

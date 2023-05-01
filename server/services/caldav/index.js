@@ -29,7 +29,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function sync calendars for all users
+   * @description This function sync calendars for all users.
    * @example
    * gladys.services.caldav.syncAllUsers();
    */
@@ -56,7 +56,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function sync webcals for all users
+   * @description This function sync webcals for all users.
    * @example
    * gladys.services.caldav.syncAllUsersWebcals();
    */
@@ -80,7 +80,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
    * @public
    * @description This function starts the CalDAV service
    * and start interval to sync all users CalDAV calendars every 30mn
-   * and start interval to sync all users Webcals calendars every 12h
+   * and start interval to sync all users Webcals calendars every 12h.
    * @example
    * gladys.services.caldav.start();
    */
@@ -93,7 +93,7 @@ module.exports = function CalDAVService(gladys, serviceId) {
   /**
    * @public
    * @description This function stops the CalDAV service
-   * and clear sync interval
+   * and clear sync interval.
    * @example
    * gladys.services.caldav.stop();
    */

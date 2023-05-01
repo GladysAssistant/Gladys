@@ -2,7 +2,7 @@ const os = require('os');
 const semver = require('semver');
 
 /**
- * @description Return system informations
+ * @description Return system informations.
  * @returns {Promise} Resolve with all system metrics.
  * @example
  * system.getInfos();

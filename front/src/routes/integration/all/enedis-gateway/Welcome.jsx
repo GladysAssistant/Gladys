@@ -3,8 +3,10 @@ import { connect } from 'unistore/preact';
 import uuid from 'uuid';
 import Promise from 'bluebird';
 import { Text, Localizer } from 'preact-i18n';
+import get from 'get-value';
 import cx from 'classnames';
 import EnedisButton from './enedis-button.png';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import { route } from 'preact-router';
 import config from '../../../../config';
 import {
@@ -43,7 +45,10 @@ const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notO
                       )}
                       {notOnGladysGateway && (
                         <p class="alert alert-info">
-                          <Text id="integration.enedis.welcome.notOnGladysGateway" />
+                          <Text id="integration.enedis.welcome.notOnGladysGateway" />{' '}
+                          <a target="_blank" rel="noopener noreferrer" href="https://plus.gladysassistant.com">
+                            plus.gladysassistant.com
+                          </a>
                         </p>
                       )}
                       {usagePointsIds && (
@@ -116,14 +121,14 @@ class EnedisWelcomePageComponent extends Component {
       features: [
         {
           id: uuid.v4(),
-          name: 'Enedis daily consumption',
+          name: get(this.props.intl.dictionary, 'integration.enedis.welcome.dailyConsumptionFeatureName'),
           selector: `enedis-${usagePointId}-daily-consumption`,
           min: 0,
           max: 1000000,
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           external_id: `enedis:${usagePointId}:daily-consumption`,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.DAILY_CONSUMPTION,
-          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
           read_only: true,
           has_feedback: false,
           keep_history: true
@@ -197,4 +202,4 @@ class EnedisWelcomePageComponent extends Component {
   }
 }
 
-export default connect('user,session,httpClient', {})(EnedisWelcomePageComponent);
+export default withIntlAsProp(connect('user,session,httpClient', {})(EnedisWelcomePageComponent));

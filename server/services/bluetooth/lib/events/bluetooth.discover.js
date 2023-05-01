@@ -5,7 +5,7 @@ const { transformToDevice } = require('../device/bluetooth.transformToDevice');
 
 /**
  * @description When the Bluetooth discovers peripheral, add it to managed peripherals.
- * @param {Object} noblePeripheral - Noble peripheral.
+ * @param {object} noblePeripheral - Noble peripheral.
  * @example
  * bluetooth.on('discover', this.discover);
  */

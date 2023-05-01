@@ -2,7 +2,7 @@ const logger = require('../../utils/logger');
 
 /**
  * @description Forward websocket message to Gateway.
- * @param {Object} event - Websocket event.
+ * @param {object} event - Websocket event.
  * @example
  * forwardWebsockets({
  *   type: ''
