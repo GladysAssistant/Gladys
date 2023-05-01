@@ -22,15 +22,10 @@ async function create(message) {
   let context;
 
   if (!openAiEnabled) {
-    console.log('starting classification');
-    console.time('StartingClassification');
-
     // first, we classify the message to understand the intent
     ({ classification, context } = await this.brain.classify(message.text, message.language, {
       user: message.user,
     }));
-
-    console.timeEnd('StartingClassification');
 
     logger.debug(`Classified "${message.text}" with intent = "${classification.intent}".`);
     logger.debug(classification);
