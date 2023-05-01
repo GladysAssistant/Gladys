@@ -7,7 +7,7 @@ const { write } = require('../utils/characteristic/bluetooth.write');
  * @param {string} characteristicUuid - Characteristic UUID.
  * @param {Array | Buffer} value - Value to send to peripheral.
  * @param {boolean} withoutResponse - Use "write without response" property (default false).
- * @returns {Promise<Object>} The write value.
+ * @returns {Promise<object>} The write value.
  * @example
  * await writeDevice({ uuid: 'peripheral' }, 'service1', 'char1')
  */

@@ -9,8 +9,9 @@ const { NotFoundError } = require('../../utils/coreErrors');
 const RESTORE_FOLDER = 'restore';
 
 /**
- * @description Restore a backup
+ * @description Restore a backup.
  * @param {string} fileUrl - The url of the backup.
+ * @returns {Promise<object>} Resolve when backup is downloaded.
  * @example
  * restoreBackup();
  */

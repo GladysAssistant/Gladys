@@ -1,5 +1,5 @@
 /**
- * @description Return instance keys fingerprint
+ * @description Return instance keys fingerprint.
  * @returns {Promise} Resolve with the keys.
  * @example
  * getInstanceKeysFingerprint();

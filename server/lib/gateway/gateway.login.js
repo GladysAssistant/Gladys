@@ -8,6 +8,7 @@ const { Error403, Error500 } = require('../../utils/httpErrors');
  * @description Login to Gladys Gateway.
  * @param {string} email - User email.
  * @param {string} password - User password.
+ * @returns {Promise<object>} Resolve with login response.
  * @example
  * login('tony.stark@test.fr', 'warmachine123');
  */

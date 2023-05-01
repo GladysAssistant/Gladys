@@ -5,9 +5,10 @@ const db = require('../../models');
 const UPDATABLE_FIELDS = ['category', 'type', 'unit', 'min', 'max'];
 
 /**
- * @description Add a feature to a device
+ * @description Add a feature to a device.
  * @param {string} deviceSelector - The selector of the device.
- * @param {Object} feature - The new device feature.
+ * @param {object} feature - The new device feature.
+ * @returns {Promise<object>} Resolve with new device.
  * @example
  * device.addFeature('device', {
  *    name: 'On/Off',

@@ -1,6 +1,6 @@
 /**
  * @description Get all found preipherals as devices.
- * @returns {Object} Return list of devices.
+ * @returns {object} Return list of devices.
  * @example
  * const devices = bluetoothManager.getDiscoveredDevices();
  */

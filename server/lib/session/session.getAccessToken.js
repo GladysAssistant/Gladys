@@ -6,7 +6,7 @@ const { hashRefreshToken } = require('../../utils/refreshToken');
 const { generateAccessToken } = require('../../utils/accessToken');
 
 /**
- * @description Create and save in database a refresh_token
+ * @description Create and save in database a refresh_token.
  * @param {string} refreshToken - The refresh token of the user.
  * @param {Array} scope - The scope to allow.
  * @returns {Promise} Resolving with the refreshToken.

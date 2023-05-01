@@ -1,8 +1,8 @@
 /**
  * @description Schedule new job.
- * @param {Object|string|Date} rule - Rule to execute the job.
+ * @param {object | string | Date} rule - Rule to execute the job.
  * @param {Function} method - The method to execute.
- * @returns {Object} The scheduled job.
+ * @returns {object} The scheduled job.
  * @example
  * scheduler.scheduleJob({ hour: 12 }, () => console.log('job is running'));
  */

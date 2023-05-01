@@ -10,8 +10,9 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * @description Get list of device
- * @param {Object} [options] - Options of the query.
+ * @description Get list of device.
+ * @param {object} [options] - Options of the query.
+ * @returns {Promise<Array>} Resolve with list of devices.
  * @example
  * const devices = await gladys.device.get({
  *  take: 20,

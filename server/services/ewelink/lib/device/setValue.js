@@ -7,8 +7,8 @@ const { parseExternalId } = require('../utils/externalId');
 
 /**
  * @description Change value of an eWeLink device.
- * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The deviceFeature to control.
+ * @param {object} device - The device to control.
+ * @param {object} deviceFeature - The deviceFeature to control.
  * @param {string|number} value - The new value.
  * @example
  * setValue(device, deviceFeature);

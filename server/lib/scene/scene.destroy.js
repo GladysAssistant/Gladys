@@ -2,7 +2,7 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Destroy a scene
+ * @description Destroy a scene.
  * @param {string} selector - The selector of the scene.
  * @example
  * scene.destroy('my-scene');

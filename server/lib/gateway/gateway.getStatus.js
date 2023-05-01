@@ -1,5 +1,5 @@
 /**
- * @description Return if gateway is connected
+ * @description Return if gateway is connected.
  * @returns {Promise} Return status.
  * @example
  * getStatus();

@@ -5,7 +5,7 @@ const { featureStatus } = require('../utils/tasmota.featureStatus');
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
- * @param {Object} message - The message sent.
+ * @param {object} message - The message sent.
  * @example
  * handleMessage('stat/tasmota/POWER', 'ON');
  */

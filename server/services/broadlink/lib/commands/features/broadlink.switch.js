@@ -10,7 +10,7 @@ const {
  * @description Builds switch Broadlink features.
  * @param {string} deviceName - Device name.
  * @param {string} deviceExternalId - Device external ID.
- * @param {Object} broadlinkDevice - Broadlink device.
+ * @param {object} broadlinkDevice - Broadlink device.
  * @returns {Array} Gladys features.
  * @example
  * buildFeatures(a1Device);
@@ -60,9 +60,9 @@ function buildFeatures(deviceName, deviceExternalId, broadlinkDevice) {
 
 /**
  * @description Send value to switch device.
- * @param {Object} broadlinkDevice - Broadlink device.
- * @param {Object} gladysDevice - Gladys device.
- * @param {Object} gladysFeature - Gladys feature.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @param {object} gladysDevice - Gladys device.
+ * @param {object} gladysFeature - Gladys feature.
  * @param {number} value - Value to send.
  * @example
  * async setValue({}, {}, {}, 3);
@@ -82,8 +82,8 @@ async function setValue(broadlinkDevice, gladysDevice, gladysFeature, value) {
 
 /**
  * @description Polling Broadlink device values.
- * @param {Object} broadlinkDevice - Broadlink device.
- * @param {Object} gladysDevice - Gladys device.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @param {object} gladysDevice - Gladys device.
  * @returns {Promise} Messages to emit.
  * @example
  * await poll(broadlinkDevice, device);

@@ -6,7 +6,7 @@ const z2mContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-contain
 
 /**
  * @description Checks if version is the latest for this service, if not, it removes existing containers.
- * @param {Object} config - Service configuration properties.
+ * @param {object} config - Service configuration properties.
  * @example
  * await z2m.checkForContainerUpdates(config);
  */

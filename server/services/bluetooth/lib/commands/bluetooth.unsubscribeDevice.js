@@ -4,10 +4,10 @@ const { unsubscribe } = require('../utils/characteristic/bluetooth.unsubscribe')
 
 /**
  * @description Unsubscribes to peripheral characteristic.
- * @param {Object} peripheral - Connected Noble peripheral.
+ * @param {object} peripheral - Connected Noble peripheral.
  * @param {string} serviceUuid - Service UUID.
  * @param {string} characteristicUuid - Characteristic UUID.
- * @returns {Promise<Object>} Unscription status.
+ * @returns {Promise<object>} Unscription status.
  * @example
  * await subscribeDevice({ uuid: 'peripheral' }, 'service1', 'char1')
  */
