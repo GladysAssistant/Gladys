@@ -1,6 +1,7 @@
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
+const { TIMERS } = require('./lan-manager.constants');
 
 /**
  * @description Scan for network devices.
@@ -16,7 +17,6 @@ async function scan() {
     return [];
   } else {
     logger.info(`LANManager starts scanning devices...`);
-    this.stop();
 
     this.scanning = true;
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -24,39 +24,46 @@ async function scan() {
       payload: this.getStatus(),
     });
 
+    const enabledMasks = this.ipMasks.filter((mask) => mask.enabled).map(({ mask }) => mask);
+    this.scanner = new this.ScannerClass(enabledMasks, '-sn -R');
+    this.scanner.scanTimeout = TIMERS.SCAN;
+
+    const scanDone = (discoveredDevices, success) => {
+      const nbDevices = discoveredDevices.length;
+      let deviceChanged = false;
+      if (nbDevices > 0) {
+        deviceChanged = this.discoveredDevices.length !== nbDevices;
+        this.discoveredDevices = discoveredDevices;
+      }
+
+      this.scanning = false;
+      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+        payload: { ...this.getStatus(), deviceChanged, success },
+      });
+    };
+
     const result = await new Promise((resolve) => {
       const onError = (err) => {
         if (err !== 'Scan cancelled') {
           logger.error('LANManager fails to discover devices over network -', err);
         }
+        scanDone([], false);
         return resolve([]);
       };
 
       const onSuccess = (foundDevices = []) => {
         const discoveredDevices = foundDevices.filter((device) => device.mac);
         logger.info(`LANManager discovers ${discoveredDevices.length} devices`);
+        scanDone(discoveredDevices, true);
         return resolve(discoveredDevices);
       };
 
-      const enabledMasks = this.ipMasks.filter((mask) => mask.enabled).map(({ mask }) => mask);
-      this.scanner = new this.ScannerClass(enabledMasks, '-sn -R');
       this.scanner.on('error', onError);
       this.scanner.on('complete', onSuccess);
     });
 
     this.stop();
-
-    const nbDevices = result.length;
-    let deviceChanged = false;
-    if (nbDevices > 0) {
-      deviceChanged = this.discoveredDevices.length !== nbDevices;
-      this.discoveredDevices = result;
-    }
-
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
-      payload: { ...this.getStatus(), deviceChanged },
-    });
 
     return result;
   }

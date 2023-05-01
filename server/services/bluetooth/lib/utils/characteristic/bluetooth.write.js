@@ -7,10 +7,10 @@ const { TIMERS } = require('../bluetooth.constants');
 
 /**
  * @description Try to write Noble characteristic.
- * @param {Object} characteristic - Noble characteristic.
+ * @param {object} characteristic - Noble characteristic.
  * @param {Array | Buffer} value - Value to send to peripheral.
  * @param {boolean} withoutResponse - Use "write without response" property (default false).
- * @returns {Promise<Object>} Write value.
+ * @returns {Promise<object>} Write value.
  * @example
  * await write(characteristic, [0x01]);
  */

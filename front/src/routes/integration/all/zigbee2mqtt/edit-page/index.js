@@ -7,7 +7,6 @@ import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/con
 
 const ZIGBEE2MQTT_PAGE_PATH = '/dashboard/integration/device/zigbee2mqtt';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
 class EditZigbee2mqttDevice extends Component {
   canEditCategory = (device, feature) => {
     return feature.category === DEVICE_FEATURE_CATEGORIES.SHUTTER;
@@ -28,4 +27,4 @@ class EditZigbee2mqttDevice extends Component {
   }
 }
 
-export default EditZigbee2mqttDevice;
+export default connect('user,session,httpClient,currentIntegration,houses', {})(EditZigbee2mqttDevice);

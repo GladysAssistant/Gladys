@@ -2,7 +2,7 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Get a user by selector
+ * @description Get a user by selector.
  * @param {string} selector - The selector of the user.
  * @returns {Promise} - Resolve with the user.
  * @example

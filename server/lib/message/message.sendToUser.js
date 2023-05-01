@@ -7,6 +7,7 @@ const db = require('../../models');
  * @param {string} userSelector - The selector of the user.
  * @param {string} text - The answer to send.
  * @param {string} [file] - An optional file sent with the message.
+ * @returns {Promise} Resolve with created message.
  * @example
  * reply(originalMessage, 'thanks!');
  */

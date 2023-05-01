@@ -10,7 +10,7 @@ const { subStatus } = require('./tasmota.http.subStatus');
 
 /**
  * @description Add ability to connect to Tasmota HTTP devices.
- * @param {Object} tasmotaHandler - Tasmota instance.
+ * @param {object} tasmotaHandler - Tasmota instance.
  * @example
  * const tasmotaHandler = new TasmotaHandler(tasmotaHandler);
  */

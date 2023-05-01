@@ -4,8 +4,9 @@ const { generateApiKey } = require('../../../utils/refreshToken');
 const CACHE_KEY_BASE = 'telegram:deeplinking:user';
 
 /**
- * @description Get custom link
+ * @description Get custom link.
  * @param {string} userId - The user requesting the link.
+ * @returns {Promise<string>} Resolve with URL.
  * @example
  * const link = await getCustomLink();
  */

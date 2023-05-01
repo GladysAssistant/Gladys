@@ -4,7 +4,7 @@ const { JOB_STATUS, JOB_ERROR_TYPES } = require('../../utils/constants');
 
 /**
  * @public
- * @description Init
+ * @description Init.
  * @returns {Promise} Return updated job.
  * @example
  * gladys.job.init(');

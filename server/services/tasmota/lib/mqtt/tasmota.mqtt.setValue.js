@@ -1,6 +1,6 @@
 /**
  * @description Try to discover HTTP device.
- * @param {Object} device - Device.
+ * @param {object} device - Device.
  * @param {string} topic - Device network address.
  * @param {string} command - Command to send.
  * @param {string} value - Value to send.

@@ -1,8 +1,9 @@
 /**
  * @description Return true if two objects are equal.
- * @param {Object} actual - The actual object.
- * @param {Object} newObject - The new object.
+ * @param {object} actual - The actual object.
+ * @param {object} newObject - The new object.
  * @param {Array} fields - The array of fields to compare.
+ * @returns {boolean} Return true if objects are equal.
  * @example
  * const shouldBeFalse = areObjectsEqual({ name: 'test'}, { name: 'modified' }, ['name']);
  */
@@ -18,8 +19,9 @@ function areObjectsEqual(actual, newObject, fields) {
 
 /**
  * @description Pick only properties in fields array.
- * @param {Object} actual - Current object.
+ * @param {object} actual - Current object.
  * @param {Array} fields - Array of fields to pick.
+ * @returns {object} Return object with selected properties.
  * @example
  * const newObject = pick({ name: 'test', id: 1 }, ['id']);
  */

@@ -1,7 +1,7 @@
 const { NotFoundError } = require('../../../../utils/coreErrors');
 
 /**
- * @description Active Philips Hue scene
+ * @description Active Philips Hue scene.
  * @param {string} bridgeSerialNumber - The bridge serial number.
  * @param {string} sceneId - The Id of the scene.
  * @example

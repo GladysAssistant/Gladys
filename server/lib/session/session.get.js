@@ -20,9 +20,9 @@ const FIELDS = [
 ];
 
 /**
- * @description Get all sessions
+ * @description Get all sessions.
  * @param {string} userId - Id of the user.
- * @param {Object} [options] - Options of the request.
+ * @param {object} [options] - Options of the request.
  * @returns {Promise} Resolve with list of sessions.
  * @example
  * session.get('70edd65d-2bde-4f54-885b-84e9330db346');

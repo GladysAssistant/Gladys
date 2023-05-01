@@ -8,7 +8,7 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts service
+   * @description This function starts service.
    * @example
    * gladys.services.zigbee2mqtt.start();
    */
@@ -19,7 +19,7 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    *  gladys.services.zigbee2mqtt.stop();
    */
@@ -30,7 +30,7 @@ module.exports = function Zigbee2mqttService(gladys, serviceId) {
 
   /**
    * @public
-   * @description Test if Zigbee2mqtt is running
+   * @description Test if Zigbee2mqtt is running.
    * @returns {Promise<boolean>} Returns true if Z2M is used.
    * @example
    *  const used = await gladys.services.zigbee2mqtt.isUsed();

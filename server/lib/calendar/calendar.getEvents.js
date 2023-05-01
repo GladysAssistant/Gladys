@@ -2,9 +2,10 @@ const { Op } = require('sequelize');
 const db = require('../../models');
 
 /**
- * @description Get calendar events
+ * @description Get calendar events.
  * @param {string} userId - The user id.
- * @param {Object} options - Options of the query.
+ * @param {object} options - Options of the query.
+ * @returns {Promise<Array>} Return list of events.
  * @example
  * gladys.calendar.getEvents();
  */

@@ -2,7 +2,7 @@ const { DEVICE_EXTERNAL_ID_BASE } = require('./constants');
 
 /**
  * @description Get the external ID of the eWeLink device.
- * @param {Object} device - The eWeLink device.
+ * @param {object} device - The eWeLink device.
  * @returns {string} Return the external ID of the Gladys device.
  * @example
  * getExternalId(device, 1);
@@ -14,7 +14,7 @@ function getExternalId(device) {
 /**
  * @description Parse the external ID of the Gladys device.
  * @param {string} externalId - External ID of the Gladys device.
- * @returns {Object} Return the prefix, the device ID, the channel count and the type.
+ * @returns {object} Return the prefix, the device ID, the channel count and the type.
  * @example
  * parseExternalId('eWeLink:100069d0d4:power:4');
  */

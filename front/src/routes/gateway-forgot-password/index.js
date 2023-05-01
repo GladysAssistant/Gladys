@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import linkState from 'linkstate';
 import ForgotPassword from './ForgotPassword';
 
-@connect('session', {})
 class ForgotPasswordPage extends Component {
   state = {
     email: '',
@@ -35,4 +34,4 @@ class ForgotPasswordPage extends Component {
   }
 }
 
-export default ForgotPasswordPage;
+export default connect('session', {})(ForgotPasswordPage);

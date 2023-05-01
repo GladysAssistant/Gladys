@@ -4,7 +4,7 @@ const { SERVICE_STATUS } = require('../../utils/constants');
 
 /**
  * @public
- * @description Start all services
+ * @description Start all services.
  * @returns {Promise} - Resolve when all services are started.
  * @example
  * service.startAll();

@@ -8,7 +8,7 @@ const { discoverCharacteristics } = require('../utils/service/bluetooth.discover
  * @param {string} connectedPeripheral - Connected Noble peripheral.
  * @param {string} serviceUuid - Service UUID.
  * @param {string} characteristicUuid - Characteristic UUID.
- * @returns {Promise<Object>} The requs=est  characteristic.
+ * @returns {Promise<object>} The requs=est  characteristic.
  * @example
  * await getCharacteristic({ uuid: 'peripheral' }, 'service1', 'char1')
  */

@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 
-@connect('currentUrl,httpClient', {})
 class ResetPassword extends Component {
   updateTemperatureUnit = e => {
     this.setState({
@@ -78,4 +77,4 @@ class ResetPassword extends Component {
   }
 }
 
-export default ResetPassword;
+export default connect('currentUrl,httpClient', {})(ResetPassword);

@@ -21,7 +21,8 @@ const ipToInt = (ipStr) => {
 
 /**
  * @description Scan for HTTP devices.
- * @param {Object} options - IP to scan.
+ * @param {object} options - IP to scan.
+ * @returns {null} Return when scan started.
  * @example
  * tasmotaManager.scanHttp({ singleAddress: '192.168.1.1' });
  * @example

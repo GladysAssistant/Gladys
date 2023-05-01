@@ -6,10 +6,6 @@ import DiscoverTab from './DiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
-@connect(
-  'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled',
-  actions
-)
 class Zigbee2mqttIntegration extends Component {
   componentWillMount() {
     this.props.session.dispatcher.addListener(
@@ -49,4 +45,9 @@ class Zigbee2mqttIntegration extends Component {
   }
 }
 
-export default withIntlAsProp(Zigbee2mqttIntegration);
+export default withIntlAsProp(
+  connect(
+    'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled',
+    actions
+  )(Zigbee2mqttIntegration)
+);

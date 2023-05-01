@@ -7,6 +7,7 @@ const logger = require('../../utils/logger');
 /**
  * @description Destroy a device.
  * @param {string} selector - Device selector.
+ * @returns {Promise} Resolve when device is destroyed.
  * @example
  * device.destroy('test-device');
  */

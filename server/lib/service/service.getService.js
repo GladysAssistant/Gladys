@@ -1,8 +1,8 @@
 /**
  * @public
- * @description Load all services
+ * @description Load all services.
  * @param {string} name - Name of the service to get.
- * @returns {Object} Return the service or null if not present.
+ * @returns {object} Return the service or null if not present.
  * @example
  * service.getService('telegram');
  */

@@ -13,8 +13,9 @@ const { writeValues, readValues } = require('./deviceMappings');
 
 /**
  * @public
- * @param {Object} body - The body of the request.
+ * @param {object} body - The body of the request.
  * @description Returns response.
+ * @returns {object} Return execute response.
  * @example
  * onExecute();
  */

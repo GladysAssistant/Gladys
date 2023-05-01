@@ -4,7 +4,6 @@ import actions from '../actions';
 import EweLinkPage from '../EweLinkPage';
 import DiscoverTab from './DiscoverTab';
 
-@connect('user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading', actions)
 class EweLinkIntegration extends Component {
   async componentWillMount() {
     this.props.getDiscoveredEweLinkDevices();
@@ -21,4 +20,7 @@ class EweLinkIntegration extends Component {
   }
 }
 
-export default EweLinkIntegration;
+export default connect(
+  'user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading',
+  actions
+)(EweLinkIntegration);

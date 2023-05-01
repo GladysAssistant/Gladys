@@ -13,7 +13,7 @@ const { EVENTS } = require('../../utils/constants');
 dayjs.extend(LocalizedFormat);
 
 /**
- * @description Run every minute to check if a calendar event match
+ * @description Run every minute to check if a calendar event match.
  * @returns {Promise} Resolve.
  * @example
  * gladys.scene.checkCalendarTriggers()

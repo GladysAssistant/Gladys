@@ -14,17 +14,11 @@ const disableOpenAiFirstReply = new Set(['GET_TEMPERATURE', 'GET_HUMIDITY']);
 
 /**
  * @public
- * @description handle a new message sent by a user to Gladys.
- * @param {Object} request - A request sent.
+ * @description Handle a new message sent by a user to Gladys.
+ * @param {object} request - A request sent.
+ * @param {object} request.message - A message sent by a user.
  * @param {Array} request.previousQuestions - List of previous messages.
- * @param {Object} request.context - Context of messages (user, etc...).
- * @param {Object} request.message - A message sent by a user.
- * @param {string} request.message.text - The text of the message.
- * @param {string} request.message.language - The language of the message.
- * @param {string} request.message.source - The name of the service where the message comes from.
- * @param {string} request.message.source_user_id - The user id for the source service.
- * @param {Object} request.message.user - A user object.
- * @param {Object} request.message.id - Id of the message.
+ * @param {object} request.context - Context of messages (user, etc...).
  * @returns {Promise} Return classification.
  * @example
  * forwardMessageToOpenAI(request);

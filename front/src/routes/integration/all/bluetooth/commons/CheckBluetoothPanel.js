@@ -4,7 +4,6 @@ import actions from './actions';
 import { Text } from 'preact-i18n';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect('user,session,bluetoothStatus', actions)
 class CheckBluetoothPanel extends Component {
   componentWillMount() {
     this.props.getStatus();
@@ -28,4 +27,4 @@ class CheckBluetoothPanel extends Component {
   }
 }
 
-export default CheckBluetoothPanel;
+export default connect('user,session,bluetoothStatus', actions)(CheckBluetoothPanel);

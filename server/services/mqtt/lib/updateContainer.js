@@ -4,7 +4,7 @@ const containerParams = require('../docker/eclipse-mosquitto-container.json');
 
 /**
  * @description Updates MQTT container configuration according to required changes.
- * @param {Object} configuration - MQTT service configuration.
+ * @param {object} configuration - MQTT service configuration.
  * @returns {Promise} Current MQTT network configuration.
  * @example
  * updateContainer({ mqttUrl, mqttPort });

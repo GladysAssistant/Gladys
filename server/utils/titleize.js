@@ -1,5 +1,5 @@
 /**
- * @description Converts first letter of each word to uppercase. (useful for name or title)
+ * @description Converts first letter of each word to uppercase. (useful for name or title).
  * @param {string} str - The object/string to transform.
  * @returns {string} Return the titleized string.
  * @example
