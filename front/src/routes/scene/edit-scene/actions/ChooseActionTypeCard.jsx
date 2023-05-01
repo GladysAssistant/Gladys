@@ -33,8 +33,7 @@ const TRANSLATIONS = ACTION_LIST.reduce((acc, action) => {
   acc[`editScene.actions.${action}`] = `editScene.actions.${action}`;
   return acc;
 }, {});
-@withText(TRANSLATIONS)
-@connect('httpClient', {})
+
 class ChooseActionType extends Component {
   state = {
     currentAction: null
@@ -78,4 +77,4 @@ class ChooseActionType extends Component {
   }
 }
 
-export default ChooseActionType;
+export default withText(TRANSLATIONS)(connect('httpClient', {})(ChooseActionType));

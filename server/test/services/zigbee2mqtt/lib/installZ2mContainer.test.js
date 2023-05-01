@@ -1,5 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const path = require('path');
+const fs = require('fs');
 
 const { assert, fake, stub } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
@@ -32,8 +34,18 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       event: {
         emit: fake.resolves(null),
+      },
+      variable: {
+        getValue: fake.resolves(null),
       },
       system: {
         getContainers: fake.resolves([containerStopped]),
@@ -42,8 +54,8 @@ describe('zigbee2mqtt installz2mContainer', () => {
         restartContainer: fake.resolves(true),
         createContainer: fake.resolves(true),
         getGladysBasePath: fake.resolves({
-          basePathOnHost: '/var/lib/gladysassistant',
-          basePathOnContainer: '/var/lib/gladysassistant',
+          basePathOnHost: path.join(__dirname, 'host'),
+          basePathOnContainer: path.join(__dirname, 'container'),
         }),
       },
     };
@@ -51,9 +63,12 @@ describe('zigbee2mqtt installz2mContainer', () => {
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
     zigbee2mqttManager.zigbee2mqttRunning = false;
     zigbee2mqttManager.zigbee2mqttExist = false;
+    zigbee2mqttManager.containerRestartWaitTimeInMs = 0;
   });
 
   afterEach(() => {
+    fs.rmSync(path.join(__dirname, 'host'), { force: true, recursive: true });
+    fs.rmSync(path.join(__dirname, 'container'), { force: true, recursive: true });
     sinon.reset();
   });
 

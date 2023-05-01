@@ -5,7 +5,6 @@ import { route } from 'preact-router';
 import { RequestStatus } from '../../../utils/consts';
 import get from 'get-value';
 
-@connect('httpClient', {})
 class DuplicateScene extends Component {
   goBack = async () => {
     route(`/dashboard/scene/${this.props.scene_selector}`);
@@ -126,4 +125,4 @@ class DuplicateScene extends Component {
   }
 }
 
-export default DuplicateScene;
+export default connect('httpClient', {})(DuplicateScene);

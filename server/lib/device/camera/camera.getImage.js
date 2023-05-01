@@ -4,6 +4,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../ut
 /**
  * @description Get image of a camera.
  * @param {string} selector - Selector of the camera.
+ * @returns {Promise} Resolve with camera image.
  * @example
  * camera.getImage('test-camera');
  */

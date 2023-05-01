@@ -2,10 +2,10 @@ const get = require('get-value');
 const { mappings } = require('./deviceMappings');
 
 /**
- * @description Format a Gladys device the Alexa way
+ * @description Format a Gladys device the Alexa way.
  * @example const deviceAlexa = syncDeviceConverter(device);
- * @param {Object} device - The device to convert.
- * @returns {Object|null} Return the alexa formatted device or null if not handled.
+ * @param {object} device - The device to convert.
+ * @returns {object | null} Return the alexa formatted device or null if not handled.
  */
 function syncDeviceConverter(device) {
   const endpoint = {

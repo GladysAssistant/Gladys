@@ -4,8 +4,8 @@ const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 /**
  * @description Send telegram message.
  * @param {string} chatId - Telegram Chat Id.
- * @param {Object} message - Message object to send.
- * @param {Object} [options] - Options.
+ * @param {object} message - Message object to send.
+ * @param {object} [options] - Options.
  * @example
  * send('11212', {
  *   text: 'Hey'

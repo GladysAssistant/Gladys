@@ -5,7 +5,6 @@ import { Text, Localizer } from 'preact-i18n';
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
-@connect('httpClient', {})
 class CheckUserPresence extends Component {
   getOptions = async () => {
     try {
@@ -29,7 +28,7 @@ class CheckUserPresence extends Component {
         const feature = device.features.find(f => f.category === DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR);
         if (feature) {
           deviceOptions.push({
-            label: feature.name,
+            label: device.name,
             value: feature.selector
           });
         }
@@ -186,4 +185,4 @@ class CheckUserPresence extends Component {
   }
 }
 
-export default CheckUserPresence;
+export default connect('httpClient', {})(CheckUserPresence);

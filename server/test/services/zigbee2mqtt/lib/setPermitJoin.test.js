@@ -16,6 +16,13 @@ describe('zigbee2mqtt setPermitJoin', () => {
 
   beforeEach(() => {
     gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
       event: {
         emit: fake.resolves(null),
       },

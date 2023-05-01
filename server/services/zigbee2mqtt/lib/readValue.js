@@ -4,7 +4,7 @@ const exposesMap = require('../exposes');
  * @description Convert Zigbee2mqtt device value into Gladys value.
  * @param {string} deviceName - Device name.
  * @param {string} property - Zigbee device feature property.
- * @param {number|string|boolean|Object} value - Device value.
+ * @param {number | string | boolean | object} value - Device value.
  * @returns {number|string|boolean} Gladys value.
  * @example
  * readValue('deviceName', 'alarm', 'ON');

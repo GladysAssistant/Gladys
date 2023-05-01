@@ -2,8 +2,8 @@ const { determineTypeAndTraits } = require('./googleActions.determineTypeAndTrai
 
 /**
  * @description Converts a Gladys device into a Google Actions device.
- * @param {Object} gladysDevice - Gladys device.
- * @returns {Object} GoogleActions device.
+ * @param {object} gladysDevice - Gladys device.
+ * @returns {object} GoogleActions device.
  * @example
  * syncDeviceConverter(device);
  */

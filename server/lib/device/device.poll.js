@@ -4,7 +4,7 @@ const logger = require('../../utils/logger');
 
 /**
  * @description Poll a device to get new value.
- * @param {Object} device - The device which is going to be polled.
+ * @param {object} device - The device which is going to be polled.
  * @example
  * poll(device);
  */

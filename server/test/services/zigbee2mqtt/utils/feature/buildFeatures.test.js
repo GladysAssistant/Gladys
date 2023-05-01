@@ -8,7 +8,7 @@ const {
 
 describe('zigbee2mqtt buildByParentType', () => {
   it(`no type map`, () => {
-    const result = buildByParentType(undefined, undefined);
+    const result = buildByParentType({}, undefined);
     expect(result).eq(undefined);
   });
 
@@ -31,7 +31,7 @@ describe('zigbee2mqtt buildByParentType', () => {
 
 describe('zigbee2mqtt buildByName', () => {
   it(`all empty`, () => {
-    const result = buildByName(undefined, 'binary', 'light');
+    const result = buildByName({}, 'binary', 'light');
     expect(result).eq(undefined);
   });
 
@@ -71,7 +71,7 @@ describe('zigbee2mqtt buildByName', () => {
 
 describe('zigbee2mqtt buildFeature', () => {
   it(`no data`, () => {
-    const result = buildFeatures('deviceName', undefined, undefined);
+    const result = buildFeatures('deviceName', {}, undefined);
     expect(result).deep.eq([]);
   });
 

@@ -5,7 +5,6 @@ import update from 'immutability-helper';
 import OpenApi from './OpenApi';
 import linkState from 'linkstate';
 
-@connect('session,user', {})
 class SettingsGatewayOpenApi extends Component {
   state = {
     apiKeys: [],
@@ -59,4 +58,4 @@ class SettingsGatewayOpenApi extends Component {
   }
 }
 
-export default SettingsGatewayOpenApi;
+export default connect('session,user', {})(SettingsGatewayOpenApi);

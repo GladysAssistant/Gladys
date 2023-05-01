@@ -4,7 +4,6 @@ import debounce from 'debounce';
 import update from 'immutability-helper';
 import ScenePage from './ScenePage';
 
-@connect('httpClient,currentUrl', {})
 class Scene extends Component {
   getScenes = async () => {
     this.setState({
@@ -114,4 +113,4 @@ class Scene extends Component {
   }
 }
 
-export default Scene;
+export default connect('httpClient,currentUrl', {})(Scene);

@@ -3,7 +3,7 @@ const db = require('../../models');
 /**
  * @description Create a new dashboard.
  * @param {string} userId - The userId querying.
- * @param {Object} dashboard - A dashboard object.
+ * @param {object} dashboard - A dashboard object.
  * @returns {Promise} Resolve with created dashboard.
  * @example
  * gladys.dashboard.create({

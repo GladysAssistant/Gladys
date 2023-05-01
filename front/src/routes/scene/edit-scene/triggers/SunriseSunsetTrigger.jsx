@@ -5,7 +5,6 @@ import { Text } from 'preact-i18n';
 import 'react-datepicker/dist/react-datepicker.css';
 import { RequestStatus } from '../../../../utils/consts';
 
-@connect('httpClient,user', {})
 class SunriseSunsetTrigger extends Component {
   getHouses = async () => {
     this.setState({
@@ -111,4 +110,4 @@ class SelectSunriseSunset extends Component {
   }
 }
 
-export default SunriseSunsetTrigger;
+export default connect('httpClient,user', {})(SunriseSunsetTrigger);

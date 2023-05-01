@@ -7,9 +7,9 @@ const { TIMERS } = require('../bluetooth.constants');
 
 /**
  * @description Try to subscribe to Noble characteristic.
- * @param {Object} characteristic - Noble characteristic.
- * @param {Object} onNotify - Value callback.
- * @returns {Promise<Object>} Subscrption status.
+ * @param {object} characteristic - Noble characteristic.
+ * @param {object} onNotify - Value callback.
+ * @returns {Promise<object>} Subscrption status.
  * @example
  * await subscribe(characteristic, (value) => console.log(value));
  */

@@ -3,9 +3,10 @@ const { PARAMS } = require('../utils/broadlink.constants');
 
 /**
  * @description Send the new device value to Broadlink device.
- * @param {Object} device - Updated Gladys device.
- * @param {Object} deviceFeature - Updated Gladys device feature.
+ * @param {object} device - Updated Gladys device.
+ * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
+ * @returns {Promise<object>} Resolve with new value.
  * @example
  * await setValue(device, deviceFeature, 0);
  */

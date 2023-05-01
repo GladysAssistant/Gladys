@@ -5,7 +5,6 @@ import Select from 'react-select';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
-@connect('httpClient', {})
 class TurnOnOffLight extends Component {
   getOptions = async () => {
     try {
@@ -84,4 +83,4 @@ class TurnOnOffLight extends Component {
   }
 }
 
-export default TurnOnOffLight;
+export default connect('httpClient', {})(TurnOnOffLight);

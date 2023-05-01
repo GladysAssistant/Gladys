@@ -1,7 +1,7 @@
 /**
  * @description Return asked raw Peripheral, or undefined, from Bluetooth library.
  * @param {string} uuid - Wanted peripheral UUID.
- * @returns {Object} Returns peripheral according to this UUID.
+ * @returns {object} Returns peripheral according to this UUID.
  * @example
  * const peripheral = bluetoothManager.getPeripheral('99dd77cba4');
  */

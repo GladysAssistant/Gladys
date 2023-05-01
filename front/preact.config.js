@@ -8,7 +8,8 @@ const {
   DEMO_REQUEST_TIME,
   WEBSOCKET_URL,
   GATEWAY_MODE,
-  STRIPE_API_KEY
+  STRIPE_API_KEY,
+  ENEDIS_FORCE_USAGE_POINTS
 } = process.env;
 import { DefinePlugin } from 'webpack';
 
@@ -22,7 +23,8 @@ export default {
         'process.env.DEMO_REQUEST_TIME': JSON.stringify(DEMO_REQUEST_TIME),
         'process.env.WEBSOCKET_URL': JSON.stringify(WEBSOCKET_URL),
         'process.env.GATEWAY_MODE': JSON.stringify(GATEWAY_MODE),
-        'process.env.STRIPE_API_KEY': JSON.stringify(STRIPE_API_KEY)
+        'process.env.STRIPE_API_KEY': JSON.stringify(STRIPE_API_KEY),
+        'process.env.ENEDIS_FORCE_USAGE_POINTS': JSON.stringify(ENEDIS_FORCE_USAGE_POINTS)
       })
     );
 

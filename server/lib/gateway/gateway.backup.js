@@ -25,7 +25,7 @@ const UPLOAD_ONE_CHUNK_RETRY_OPTIONS = {
 };
 
 /**
- * @description Create a backup and upload it to the Gateway
+ * @description Create a backup and upload it to the Gateway.
  * @param {string} jobId - The job id.
  * @returns {Promise} - Resolve when backup is finished.
  * @example

@@ -4,7 +4,7 @@ import cx from 'classnames';
 
 import { Text } from 'preact-i18n';
 import style from './style.css';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
@@ -24,6 +24,8 @@ const intervalByName = {
   'last-three-months': THREE_MONTHS_IN_MINUTES,
   'last-year': ONE_YEAR_IN_MINUTES
 };
+
+const UNITS_WHEN_DOWN_IS_POSITIVE = [DEVICE_FEATURE_UNITS.WATT_HOUR];
 
 const notNullNotUndefined = value => {
   return value !== undefined && value !== null;
@@ -189,6 +191,7 @@ class Chartbox extends Component {
             lastValuesArray.push(lastValue);
           });
           newState.variation = average(variationArray);
+          newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
           newState.lastValueRounded = roundWith2DecimalIfNeeded(average(lastValuesArray));
           newState.unit = unit;
         } else {
@@ -199,6 +202,7 @@ class Chartbox extends Component {
             const firstElement = values[0];
             const lastElement = values[values.length - 1];
             newState.variation = calculateVariation(firstElement.value, lastElement.value);
+            newState.variationDownIsPositive = UNITS_WHEN_DOWN_IS_POSITIVE.includes(unit);
             newState.lastValueRounded = roundWith2DecimalIfNeeded(lastElement.value);
             newState.unit = unit;
           }
@@ -260,7 +264,21 @@ class Chartbox extends Component {
       this.updateDeviceStateWebsocket
     );
   }
-  render(props, { initialized, loading, series, dropdown, variation, lastValueRounded, interval, emptySeries, unit }) {
+  render(
+    props,
+    {
+      initialized,
+      loading,
+      series,
+      dropdown,
+      variation,
+      variationDownIsPositive,
+      lastValueRounded,
+      interval,
+      emptySeries,
+      unit
+    }
+  ) {
     const displayVariation = props.box.display_variation;
     return (
       <div class={cx('card', { 'loading-border': initialized && loading })}>
@@ -269,7 +287,7 @@ class Chartbox extends Component {
             <div class={cx(style.subheader)}>{props.box.title}</div>
             <div class={cx(style.msAuto, style.lh1)}>
               <div class="dropdown">
-                <a class="dropdown-toggle text-muted" onClick={this.toggleDropdown}>
+                <a class="dropdown-toggle text-muted text-nowrap" onClick={this.toggleDropdown}>
                   {interval === ONE_HOUR_IN_MINUTES && <Text id="dashboard.boxes.chart.lastHour" />}
                   {interval === ONE_DAY_IN_MINUTES && <Text id="dashboard.boxes.chart.lastDay" />}
                   {interval === SEVEN_DAYS_IN_MINUTES && <Text id="dashboard.boxes.chart.lastSevenDays" />}
@@ -345,9 +363,11 @@ class Chartbox extends Component {
               )}
               <div
                 class={cx(style.meAuto, {
-                  [style.textGreen]: variation > 0,
+                  [style.textGreen]:
+                    (variation > 0 && !variationDownIsPositive) || (variation < 0 && variationDownIsPositive),
                   [style.textYellow]: variation === 0,
-                  [style.textRed]: variation < 0
+                  [style.textRed]:
+                    (variation > 0 && variationDownIsPositive) || (variation < 0 && !variationDownIsPositive)
                 })}
               >
                 {variation !== undefined && (

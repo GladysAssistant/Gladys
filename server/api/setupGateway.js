@@ -6,9 +6,9 @@ const { EVENTS } = require('../utils/constants');
 const { NotFoundError } = require('../utils/coreErrors');
 
 /**
- * @description Setup Gateway API calls
- * @param {Object} gladys - Gladys object.
- * @param {Object} routes - List of routes.
+ * @description Setup Gateway API calls.
+ * @param {object} gladys - Gladys object.
+ * @param {object} routes - List of routes.
  * @example
  * setupGateway(gladys, app);
  */

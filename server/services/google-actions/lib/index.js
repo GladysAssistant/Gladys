@@ -4,7 +4,7 @@ const { onExecute } = require('./smarthome/googleActions.onExecute');
 
 /**
  * @description Add ability to connect to Google Actions.
- * @param {Object} gladys - Gladys instance.
+ * @param {object} gladys - Gladys instance.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);

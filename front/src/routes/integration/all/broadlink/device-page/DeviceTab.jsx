@@ -5,12 +5,15 @@ import { Link } from 'preact-router/match';
 import DeviceBox from './DeviceBox';
 import EmptyState from '../EmptyState';
 import { RequestStatus } from '../../../../../utils/consts';
+import CardFilter from '../../../../../components/layout/CardFilter';
 
 const DeviceTab = ({
   housesWithRooms,
   changeOrderDir,
   debouncedSearch,
   getBroadlinkDevicesStatus,
+  getBroadlinkDeviceOrderDir,
+  broadlinkDeviceSearch,
   broadlinkDevices = [],
   ...props
 }) => (
@@ -20,27 +23,15 @@ const DeviceTab = ({
         <Text id="integration.broadlink.device.title" />
       </h1>
       <div class="page-options d-flex">
-        <select onChange={changeOrderDir} class="form-control custom-select w-auto">
-          <option value="asc">
-            <Text id="global.orderDirAsc" />
-          </option>
-          <option value="desc">
-            <Text id="global.orderDirDesc" />
-          </option>
-        </select>
-        <div class="input-icon ml-2">
-          <span class="input-icon-addon">
-            <i class="fe fe-search" />
-          </span>
-          <Localizer>
-            <input
-              type="text"
-              class="form-control w-10"
-              placeholder={<Text id="integration.broadlink.device.searchPlaceholder" />}
-              onInput={debouncedSearch}
-            />
-          </Localizer>
-        </div>
+        <Localizer>
+          <CardFilter
+            changeOrderDir={changeOrderDir}
+            orderValue={getBroadlinkDeviceOrderDir}
+            search={debouncedSearch}
+            searchValue={broadlinkDeviceSearch}
+            searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
+          />
+        </Localizer>
         <Link href="/dashboard/integration/device/broadlink/edit">
           <button class="btn btn-outline-primary ml-2">
             <Text id="integration.broadlink.device.newButton" /> <i class="fe fe-plus" />

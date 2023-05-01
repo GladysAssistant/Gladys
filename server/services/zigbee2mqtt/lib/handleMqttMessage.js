@@ -5,12 +5,12 @@ const { convertFeature } = require('../utils/convertFeature');
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
- * @param {Object} message - The message sent.
- * @returns {Object} Null.
+ * @param {object} message - The message sent.
+ * @returns {object} Null.
  * @example
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */
-function handleMqttMessage(topic, message) {
+async function handleMqttMessage(topic, message) {
   this.zigbee2mqttConnected = true;
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -71,6 +71,11 @@ function handleMqttMessage(topic, message) {
         type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.PERMIT_JOIN,
         payload: this.z2mPermitJoin,
       });
+      break;
+    }
+    case 'zigbee2mqtt/bridge/response/backup': {
+      const payload = JSON.parse(message);
+      await this.saveZ2mBackup(payload);
       break;
     }
     default: {

@@ -7,10 +7,6 @@ import CreateAccountLocalTab from './CreateAccountLocalTab';
 import { RequestStatus, CreateUserErrors } from '../../../utils/consts';
 import actions from '../../../actions/signup/signupCreateLocalAccount';
 
-@connect(
-  'newUser,years,months,days,validPassword,validPasswordRepeat,signupErrors,createLocalAccountStatus,createLocalAccountError,newProfilePicture,newProfilePictureFormValue',
-  actions
-)
 class CreateAccountLocal extends Component {
   updateFirstname = e => {
     this.props.updateNewUserProperty('firstname', e.target.value);
@@ -81,4 +77,7 @@ class CreateAccountLocal extends Component {
   }
 }
 
-export default CreateAccountLocal;
+export default connect(
+  'newUser,years,months,days,validPassword,validPasswordRepeat,signupErrors,createLocalAccountStatus,createLocalAccountError,newProfilePicture,newProfilePictureFormValue',
+  actions
+)(CreateAccountLocal);

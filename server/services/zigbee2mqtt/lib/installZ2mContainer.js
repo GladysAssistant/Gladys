@@ -11,7 +11,7 @@ const sleep = promisify(setTimeout);
 
 /**
  * @description Install and starts Zigbee2mqtt container.
- * @param {Object} config - Service configuration properties.
+ * @param {object} config - Service configuration properties.
  * @example
  * await z2m.installZ2mContainer(config);
  */
@@ -27,6 +27,9 @@ async function installZ2mContainer(config) {
   const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
   const containerPath = `${basePathOnHost}/zigbee2mqtt/z2m`;
   if (dockerContainers.length === 0) {
+    // Restore backup only in case of new installation
+    await this.restoreZ2mBackup(containerPath);
+
     try {
       logger.info('Zigbee2mqtt is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
@@ -68,8 +71,8 @@ async function installZ2mContainer(config) {
     if (container.state !== 'running') {
       logger.info('Zigbee2mqtt container is starting...');
       await this.gladys.system.restartContainer(container.id);
-      // wait 5 seconds for the container to restart
-      await sleep(5 * 1000);
+      // wait a few seconds for the container to restart
+      await sleep(this.containerRestartWaitTimeInMs);
     }
 
     logger.info('Zigbee2mqtt container successfully started');

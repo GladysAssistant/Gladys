@@ -5,6 +5,7 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
 /**
  * @description Prepares service and starts connection with broker if needed.
+ * @returns {Promise} Resolve when init finished.
  * @example
  * await z2m.init();
  */
@@ -68,6 +69,11 @@ async function init() {
 
     if (this.isEnabled()) {
       await this.connect(configuration);
+
+      // Schedule reccurent job if not already scheduled
+      if (!this.backupScheduledJob) {
+        this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
+      }
     }
   }
 
