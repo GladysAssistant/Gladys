@@ -17,7 +17,7 @@
       }
     ],
     "no-restricted-syntax": [
-      "warn",
+      "error",
       {
         "selector": "Decorator[expression.callee.name='connect']",
         "message": "The @connect decorator is not allowed anymore. Please use connect() function instead. See doc: https://github.com/developit/unistore"
