@@ -2,7 +2,7 @@
   "name": "gladys-front",
   "engines": {
     "node": "18.x",
-    "npm": "8.x"
+    "npm": "9.x"
   },
   "scripts": {
     "start": "per-env",
@@ -36,7 +36,7 @@
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-json": "^3.1.0",
     "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-react": "^7.29.4",
+    "eslint-plugin-react": "^7.32.2",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^21.2.1",
     "per-env": "^1.0.2",
