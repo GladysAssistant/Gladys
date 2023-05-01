@@ -9,7 +9,6 @@ import { route } from 'preact-router';
 
 const DEFAULT_COORDS = [48.8583, 2.2945];
 
-@connect('httpClient', {})
 class MapComponent extends Component {
   initMap = () => {
     if (this.leafletMap) {
@@ -168,4 +167,4 @@ class MapComponent extends Component {
   }
 }
 
-export default MapComponent;
+export default connect('httpClient', {})(MapComponent);

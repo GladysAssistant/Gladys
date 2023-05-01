@@ -5,7 +5,6 @@ import update from 'immutability-helper';
 import Map from './Map';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 
-@connect('session,httpClient', actions)
 class MapPage extends Component {
   getUsersWithLocation = async () => {
     try {
@@ -100,4 +99,4 @@ class MapPage extends Component {
   }
 }
 
-export default MapPage;
+export default connect('session,httpClient', actions)(MapPage);
