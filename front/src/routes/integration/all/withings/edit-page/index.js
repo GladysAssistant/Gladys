@@ -20,6 +20,4 @@ class WithingsEditDevicePage extends Component {
   }
 }
 
-export default connect(
-  'user,session,httpClient,currentIntegration,houses', {}
-)(WithingsEditDevicePage);
+export default connect('user,session,httpClient,currentIntegration,houses', {})(WithingsEditDevicePage);
