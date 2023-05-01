@@ -3,6 +3,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const weatherData = require('./weather-data-new.json');
 const weatherForecast = require('./weather-forecast.json');
 const expectedResult = require('./expected-result.json');
+const { translateWeatherOWToGladys } = require('../../../services/openweather/lib/formatResults');
 
 const workingAxios = {
   axios: {
@@ -72,5 +73,9 @@ describe('OpenWeatherService', () => {
       longitude: 10,
     });
     return assert.isRejected(promise, 'REQUEST_TO_THIRD_PARTY_FAILED');
+  });
+  it('should return unknown weather type', async () => {
+    const result = translateWeatherOWToGladys({ main: 'UNKNWOWN' });
+    expect(result).to.equal('unknown');
   });
 });

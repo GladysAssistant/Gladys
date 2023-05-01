@@ -106,4 +106,5 @@ function formatResults(options, result, forecast) {
 
 module.exports = {
   formatResults,
+  translateWeatherOWToGladys,
 };
