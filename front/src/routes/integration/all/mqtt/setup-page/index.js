@@ -5,10 +5,6 @@ import MqttPage from '../MqttPage';
 import SetupTab from './SetupTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,httpClient,mqttUrl,mqttUsername,mqttPassword,useEmbeddedBroker,brokerContainerAvailable,dockerBased,networkModeValid,connectMqttStatus,mqttConnected,mqttConnectionError',
-  actions
-)
 class MqttNodePage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('mqtt');
@@ -38,4 +34,7 @@ class MqttNodePage extends Component {
   }
 }
 
-export default MqttNodePage;
+export default connect(
+  'user,session,httpClient,mqttUrl,mqttUsername,mqttPassword,useEmbeddedBroker,brokerContainerAvailable,dockerBased,networkModeValid,connectMqttStatus,mqttConnected,mqttConnectionError',
+  actions
+)(MqttNodePage);

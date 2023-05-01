@@ -21,7 +21,6 @@ const TRIGGER_LIST = [
   EVENTS.CALENDAR.EVENT_IS_COMING
 ];
 
-@connect('httpClient', {})
 class ChooseTriggerType extends Component {
   handleChange = selectedOption => {
     if (selectedOption) {
@@ -80,4 +79,4 @@ class ChooseTriggerType extends Component {
   }
 }
 
-export default withIntlAsProp(ChooseTriggerType);
+export default withIntlAsProp(connect('httpClient', {})(ChooseTriggerType));

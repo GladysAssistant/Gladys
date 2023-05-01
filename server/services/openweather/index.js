@@ -12,7 +12,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the service
+   * @description This function starts the service.
    * @example
    * gladys.services.openWeather.start();
    */
@@ -26,7 +26,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    * gladys.services.openWeather.stop();
    */
@@ -36,12 +36,13 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
 
   /**
    * @description Get the weather.
-   * @param {Object} options - Options parameters.
+   * @param {object} options - Options parameters.
    * @param {number} options.latitude - The latitude to get the weather from.
    * @param {number} options.longitude - The longitude to get the weather from.
    * @param {number} options.offset - Get weather in the future, offset is in hour.
    * @param {string} [options.language] - The language of the report.
    * @param {string} [options.units] - Unit of the weather [metric, us].
+   * @returns {Promise<object>} Resolve with weather.
    * @example
    * gladys.services.openWeather.weather.get({
    *   latitude: 112,

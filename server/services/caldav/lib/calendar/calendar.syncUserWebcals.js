@@ -4,7 +4,7 @@ const { slugify } = require('../../../../utils/slugify');
 
 /**
  * @description Start user's WEBCAL calendars synchronization.
- * @param {Object} userId - Gladys user to synchronize.
+ * @param {object} userId - Gladys user to synchronize.
  * @returns {Promise} Resolving.
  * @example
  * syncUserWebcals(user.id)

@@ -8,7 +8,7 @@ module.exports = function RtspCameraService(gladys, serviceId) {
   const device = new RtspCameraHandler(gladys, ffmpeg, serviceId);
   /**
    * @public
-   * @description This function starts service
+   * @description This function starts service.
    * @example
    * gladys.services['rtsp-camera'].start();
    */
@@ -20,7 +20,7 @@ module.exports = function RtspCameraService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    *  gladys.services['rtsp-camera'].stop();
    */

@@ -13,7 +13,6 @@ import fr from 'date-fns/locale/fr';
 
 const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-@connect('user', {})
 class CheckTime extends Component {
   handleBeforeTimeChange = time => {
     const timeFormatted = time ? format(time, 'HH:mm') : undefined;
@@ -116,4 +115,4 @@ class CheckTime extends Component {
   }
 }
 
-export default CheckTime;
+export default connect('user', {})(CheckTime);

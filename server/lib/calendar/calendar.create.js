@@ -2,7 +2,7 @@ const db = require('../../models');
 
 /**
  * @description Create a calendar.
- * @param {Object} calendar - A calendar object.
+ * @param {object} calendar - A calendar object.
  * @returns {Promise} Resolve with created calendar.
  * @example
  * gladys.calendar.create({

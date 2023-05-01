@@ -10,7 +10,7 @@ dayjs.extend(timezone);
 dayjs.extend(relativeTime);
 
 /**
- * @description Add Schedule job for sunset and sunrise for each house
+ * @description Add Schedule job for sunset and sunrise for each house.
  * @returns {Promise} Resolve when success.
  * @example
  * scene.dailyUpdate();

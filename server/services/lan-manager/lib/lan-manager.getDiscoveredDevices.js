@@ -1,6 +1,6 @@
 /**
  * @description Get all found network devices as Gladys devices.
- * @param {Object} filters - Filters to apply.
+ * @param {object} filters - Filters to apply.
  * @returns {Array} Return list of devices.
  * @example
  * const devices = lanManager.getDiscoveredDevices();

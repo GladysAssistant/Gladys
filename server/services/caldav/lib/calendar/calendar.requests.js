@@ -3,7 +3,7 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Search elements as getElementsByTagName with regex instead of string.
- * @param {Object} container - Element where execute research.
+ * @param {object} container - Element where execute research.
  * @param {RegExp} regex - Regex to search.
  * @returns {Array} Elements that match with regex.
  * @example
@@ -15,7 +15,7 @@ function getElementsByTagRegex(container, regex) {
 
 /**
  * @description Get calendars from caldav server.
- * @param {Object} xhr - Request with dav credentials.
+ * @param {object} xhr - Request with dav credentials.
  * @param {string} homeUrl - Request url.
  * @returns {Promise} Resolving with list of calendars.
  * @example
@@ -69,8 +69,8 @@ async function requestCalendars(xhr, homeUrl) {
 
 /**
  * @description Get events that have changed from caldav server.
- * @param {Object} xhr - Request with dav credentials.
- * @param {Object} calendarToUpdate - Calendar that needs updating.
+ * @param {object} xhr - Request with dav credentials.
+ * @param {object} calendarToUpdate - Calendar that needs updating.
  * @returns {Promise} Resolving with list of events to update.
  * @example
  * requestChanges(xhr, calendarToUpdate)
@@ -94,9 +94,9 @@ async function requestChanges(xhr, calendarToUpdate) {
 
 /**
  * @description Get change details from caldav server.
- * @param {Object} xhr - Request with dav credentials.
+ * @param {object} xhr - Request with dav credentials.
  * @param {string} calendarUrl - Request url.
- * @param {Object} eventsToUpdate - Event that needs updating.
+ * @param {object} eventsToUpdate - Event that needs updating.
  * @param {string} calDavHost - Server host.
  * @returns {Promise} Resolving with all detailed events.
  * @example

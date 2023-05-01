@@ -1,7 +1,7 @@
 const { read } = require('../utils/characteristic/bluetooth.read');
 
 /**
- * @description Read value of a Bluetooth device
+ * @description Read value of a Bluetooth device.
  * @param {string} peripheral - Connected Noble peripheral.
  * @param {string} serviceUuid - Service UUID.
  * @param {string} characteristicUuid - Characteristic UUID.

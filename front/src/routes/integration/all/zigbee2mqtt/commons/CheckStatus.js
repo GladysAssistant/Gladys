@@ -4,7 +4,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import { Text } from 'preact-i18n';
 
-@connect('user,session,usbConfigured,z2mEnabled,zigbee2mqttStatusMqttConnected,zigbee2mqttStatusUsbConfigured', actions)
 class CheckStatus extends Component {
   componentWillMount() {
     this.props.checkStatus();
@@ -37,4 +36,7 @@ class CheckStatus extends Component {
   }
 }
 
-export default CheckStatus;
+export default connect(
+  'user,session,usbConfigured,z2mEnabled,zigbee2mqttStatusMqttConnected,zigbee2mqttStatusUsbConfigured',
+  actions
+)(CheckStatus);

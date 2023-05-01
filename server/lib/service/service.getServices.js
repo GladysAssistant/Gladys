@@ -1,7 +1,7 @@
 /**
  * @public
  * @description Return all services.
- * @returns {Object} Return all services.
+ * @returns {object} Return all services.
  * @example
  * service.getServices();
  */

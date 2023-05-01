@@ -6,7 +6,6 @@ module.exports = function VariableController(gladys) {
    * @api {post} /api/service/:service_name/variable/:variable_key Save service variable
    * @apiName SaveVariable
    * @apiGroup Variable
-   *
    * @apiParam {string} value value to save
    */
   async function setForLocalService(req, res) {
@@ -20,7 +19,6 @@ module.exports = function VariableController(gladys) {
    * @api {get} /api/service/:service_name/variable/:variable_key Get service variable
    * @apiName GetVariableByService
    * @apiGroup Variable
-   *
    */
   async function getByLocalService(req, res) {
     const userId = req.query.userRelated ? req.user.id : null;
@@ -38,7 +36,6 @@ module.exports = function VariableController(gladys) {
    * @api {post} /api/variable/:variable_key Save variable
    * @apiName SaveVariable
    * @apiGroup Variable
-   *
    * @apiParam {string} value value to save
    */
   async function setValue(req, res) {
@@ -50,7 +47,6 @@ module.exports = function VariableController(gladys) {
    * @api {get} /api/variable/:variable_key Get variable
    * @apiName getVariable
    * @apiGroup Variable
-   *
    * @apiParam {string} value value to save
    */
   async function getValue(req, res) {

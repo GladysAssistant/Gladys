@@ -2,7 +2,7 @@ const { slugify } = require('./slugify');
 
 /**
  * @description Add a selector to a given object.
- * @param {Object} item - Any object to add a selector to.
+ * @param {object} item - Any object to add a selector to.
  * @example
  * addSelector({
  *  name: 'my object'

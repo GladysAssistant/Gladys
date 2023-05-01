@@ -5,7 +5,6 @@ import { Text } from 'preact-i18n';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
-@connect('httpClient', {})
 class HouseEmptyOrNotCondition extends Component {
   getOptions = async () => {
     try {
@@ -84,4 +83,4 @@ class HouseEmptyOrNotCondition extends Component {
   }
 }
 
-export default HouseEmptyOrNotCondition;
+export default connect('httpClient', {})(HouseEmptyOrNotCondition);

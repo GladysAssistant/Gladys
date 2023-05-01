@@ -4,9 +4,10 @@ const { NotFoundError, NoValuesFoundError } = require('../../../utils/coreErrors
 
 /**
  * @description Get the average temperature in a room.
- * @param {Object} message - The message sent by the user.
- * @param {Object} classification - The classification calculated by the brain.
- * @param {Object} context - The context object containing found variables in question.
+ * @param {object} message - The message sent by the user.
+ * @param {object} classification - The classification calculated by the brain.
+ * @param {object} context - The context object containing found variables in question.
+ * @returns {Promise} Resolve when command was executed.
  * @example
  * command(message, classification, context);
  */

@@ -3,7 +3,8 @@ const { BadParameters } = require('../../utils/coreErrors');
 
 /**
  * @description Handle New Gateway Owntracks Location.
- * @param {Object} data - Gateway data message.
+ * @param {object} data - Gateway data message.
+ * @returns {Promise<object>} Resolve with location created.
  * @example
  * handleNewGatewayOwntracksLocation(data);
  */

@@ -1,7 +1,7 @@
 const logger = require('./logger');
 
 /**
- * @description Wrap a function used to receive an event in a try catch with logging
+ * @description Wrap a function used to receive an event in a try catch with logging.
  * @param {Function} func - The function to wrap.
  * @returns {Function} Return wrap function.
  * @example

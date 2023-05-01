@@ -4,10 +4,6 @@ import actions from './actions';
 import BluetoothPage from '../BluetoothPage';
 import BluetoothDeviceTab from './BluetoothDeviceTab';
 
-@connect(
-  'session,user,bluetoothDevices,houses,getBluetoothDevicesStatus,bluetoothDeviceSearch,getBluetoothDeviceOrderDir',
-  actions
-)
 class BluetoothDevicePage extends Component {
   componentWillMount() {
     this.props.getBluetoothDevices();
@@ -23,4 +19,7 @@ class BluetoothDevicePage extends Component {
   }
 }
 
-export default BluetoothDevicePage;
+export default connect(
+  'session,user,bluetoothDevices,houses,getBluetoothDevicesStatus,bluetoothDeviceSearch,getBluetoothDeviceOrderDir',
+  actions
+)(BluetoothDevicePage);

@@ -25,7 +25,7 @@ const sendEvent = (gladysEvent, deviceExternalId, featureTemplate, fullKey, comm
  * @description Handle Tasmota 'stat/+/SENSOR' topics.
  * @param {string} deviceExternalId - Device external id.
  * @param {string} message - Tasmota message.
- * @param {Object} gladysEvent - Gladys event emitter.
+ * @param {object} gladysEvent - Gladys event emitter.
  * @param {string} key - Default object key.
  * @returns {any} NULL.
  * @example

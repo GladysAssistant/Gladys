@@ -5,7 +5,6 @@ import Select from 'react-select';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
-@connect('httpClient', {})
 class TurnOnOffLight extends Component {
   getOptions = async () => {
     try {
@@ -65,7 +64,13 @@ class TurnOnOffLight extends Component {
         <label class="form-label">
           {props.action.type === ACTIONS.LIGHT.TURN_ON && <Text id="editScene.actionsCard.turnOnLights.label" />}
           {props.action.type === ACTIONS.LIGHT.TURN_OFF && <Text id="editScene.actionsCard.turnOffLights.label" />}
+          {props.action.type === ACTIONS.LIGHT.TOGGLE && <Text id="editScene.actionsCard.toggleLights.label" />}
         </label>
+        {props.action.type === ACTIONS.LIGHT.TOGGLE && (
+          <p>
+            <Text id="editScene.actionsCard.toggleLights.description" />
+          </p>
+        )}
         <Select
           defaultValue={[]}
           isMulti
@@ -78,4 +83,4 @@ class TurnOnOffLight extends Component {
   }
 }
 
-export default TurnOnOffLight;
+export default connect('httpClient', {})(TurnOnOffLight);

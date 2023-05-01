@@ -2,9 +2,9 @@ const { triggersFunc } = require('./scene.triggers');
 const logger = require('../../utils/logger');
 
 /**
- * @description checkTrigger verify if the current event verify
+ * @description CheckTrigger verify if the current event verify
  * a trigger.
- * @param {Object} event - The event to check.
+ * @param {object} event - The event to check.
  * @example
  * checkTrigger({ type: 'device.new-state' })
  */

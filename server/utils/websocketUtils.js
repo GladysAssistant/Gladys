@@ -2,6 +2,7 @@
  * @description Format a websocket message.
  * @param {string} type - The type of the websocket message.
  * @param {*} payload - The payload of the message.
+ * @returns {string} Return websocket message in string.
  * @example
  * formatWebsocketMessage('message.new', { text: 'test' });
  */
@@ -16,6 +17,7 @@ function formatWebsocketMessage(type, payload) {
 /**
  * @description Parse a websocket message.
  * @param {string} message - Websocket message.
+ * @returns {object} Return a websocket message object.
  * @example
  * parseWebsocketMessage('{}');
  */

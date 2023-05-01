@@ -12,7 +12,7 @@ const WEATHER_OW_TO_GLADYS = {
 /**
  * @description Transform OpenWeather weather information to gladys weather information.
  * @param {string} weatherInformation - OpenWeather weather information.
- * @returns {Object} Return gladys weather information.
+ * @returns {object} Return gladys weather information.
  * @example
  * const weather = translateIconToWeather(weather);
  */
@@ -26,9 +26,9 @@ const translateWeatherOWToGladys = (weatherInformation) => {
 
 /**
  * @description Transform OpenWeather JSON to Gladys data.
- * @param {Object} options - The weather call options.
- * @param {Object} result - The result of the API call to OpenWeather.
- * @returns {Object} Return a formatted weather object.
+ * @param {object} options - The weather call options.
+ * @param {object} result - The result of the API call to OpenWeather.
+ * @returns {object} Return a formatted weather object.
  * @example
  * const formatted = formatResults(options, result);
  */

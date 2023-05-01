@@ -1,8 +1,8 @@
 /**
  * @description Add or update a param to a device.
- * @param {Object} device - Device to add parameter.
- * @param {Object} feature - The feature to add.
- * @returns {Object} The device.
+ * @param {object} device - Device to add parameter.
+ * @param {object} feature - The feature to add.
+ * @returns {object} The device.
  * @example
  * setDeviceParam({ features: [] }, { selector: 'feature' })
  */
