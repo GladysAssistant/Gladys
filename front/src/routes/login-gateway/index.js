@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from '../../actions/login/loginGateway';
 import LoginGatewayPage from './LoginGatewayPage';
 
-@connect('gatewayLoginStep2,gatewayLoginStatus', actions)
 class Login extends Component {
   componentWillMount() {
     this.props.init(this.props.return_url);
@@ -14,4 +13,4 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default connect('gatewayLoginStep2,gatewayLoginStatus', actions)(Login);

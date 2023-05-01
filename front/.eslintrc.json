@@ -9,7 +9,14 @@
     "jest/valid-expect": "off",
     "no-async-promise-executor": "off",
     "react/jsx-key": "off",
-    "promise/prefer-await-to-then": "warn"
+    "promise/prefer-await-to-then": "warn",
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Decorator[expression.callee.name='connect']",
+        "message": "The @connect decorator is not allowed anymore. Please use connect() function instead. See doc: https://github.com/developit/unistore"
+      }
+    ]
   },
   "env": {
     "browser": true
