@@ -13,9 +13,7 @@ class TurnOnOffLight extends Component {
         device_feature_type: 'binary'
       });
       const deviceFeatureOptions = deviceFeatures
-        .flatMap(device => (
-          device.features
-        ))
+        .flatMap(device => device.features)
         .map(deviceFeature => ({
           value: deviceFeature.selector,
           label: deviceFeature.name
@@ -39,7 +37,9 @@ class TurnOnOffLight extends Component {
     const selectedOptions = [];
     if (nextProps.action.device_features && this.state.deviceFeatureOptions) {
       nextProps.action.device_features.forEach(light => {
-        const deviceFeatureOption = this.state.deviceFeatureOptions.find(deviceFeatureOption => deviceFeatureOption.value === light);
+        const deviceFeatureOption = this.state.deviceFeatureOptions.find(
+          deviceFeatureOption => deviceFeatureOption.value === light
+        );
         if (deviceFeatureOption) {
           selectedOptions.push(deviceFeatureOption);
         }

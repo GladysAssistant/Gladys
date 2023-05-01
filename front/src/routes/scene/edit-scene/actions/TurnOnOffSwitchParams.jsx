@@ -18,9 +18,7 @@ class TurnOnOffSwitch extends Component {
         return writeSwitch !== undefined;
       });
       const deviceFeatureOptions = deviceFeaturesFiltered
-        .flatMap(device => (
-          device.features
-        ))
+        .flatMap(device => device.features)
         .map(device_feature => ({
           value: device_feature.selector,
           label: device_feature.name
@@ -44,7 +42,9 @@ class TurnOnOffSwitch extends Component {
     const selectedOptions = [];
     if (nextProps.action.device_features && this.state.deviceFeatureOptions) {
       nextProps.action.device_features.forEach(switches => {
-        const deviceFeatureOption = this.state.deviceFeatureOptions.find(deviceFeatureOption => deviceFeatureOption.value === switches);
+        const deviceFeatureOption = this.state.deviceFeatureOptions.find(
+          deviceFeatureOption => deviceFeatureOption.value === switches
+        );
         if (deviceFeatureOption) {
           selectedOptions.push(deviceFeatureOption);
         }
