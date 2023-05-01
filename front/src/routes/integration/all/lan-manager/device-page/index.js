@@ -4,7 +4,6 @@ import actions from './actions';
 import LANManagerPage from '../LANManagerPage';
 import LANManagerDeviceTab from './LANManagerDeviceTab';
 
-@connect('session,httpClient,user,lanManagerDevices,houses,getLANManagerDevicesStatus', actions)
 class LANManagerDevicePage extends Component {
   componentWillMount() {
     this.props.getLANManagerDevices();
@@ -20,4 +19,7 @@ class LANManagerDevicePage extends Component {
   }
 }
 
-export default LANManagerDevicePage;
+export default connect(
+  'session,httpClient,user,lanManagerDevices,houses,getLANManagerDevicesStatus',
+  actions
+)(LANManagerDevicePage);

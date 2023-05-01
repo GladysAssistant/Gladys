@@ -30,8 +30,8 @@ const getByExternalId = async (externalId) => {
 };
 
 /**
- * @description Create a device, its feature and params
- * @param {Object} device - The device object to create.
+ * @description Create a device, its feature and params.
+ * @param {object} device - The device object to create.
  * @returns {Promise} Resolve with the device created.
  * @example
  * gladys.device.create({

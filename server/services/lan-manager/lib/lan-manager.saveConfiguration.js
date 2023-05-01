@@ -3,7 +3,7 @@ const { VARIABLES, PRESENCE_STATUS } = require('./lan-manager.constants');
 
 /**
  * @description Save LANManager configuration.
- * @param {Object} configuration - Configuration to store.
+ * @param {object} configuration - Configuration to store.
  * @returns {Promise} - New configuration.
  * @example
  * const config = await this.saveConfiguration({ ... });

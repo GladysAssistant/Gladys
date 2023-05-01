@@ -4,7 +4,7 @@ const logger = require('../../utils/logger');
 const SIMILAR_THRESHOLD = 3;
 
 /**
- * @description Return entity id by name
+ * @description Return entity id by name.
  * @param {string} entity - The entity type.
  * @param {string} name - The name of the entity.
  * @returns {string} Return the id of the entity.

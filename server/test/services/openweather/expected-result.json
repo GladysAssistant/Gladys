@@ -1,0 +1,100 @@
+{
+  "temperature": 14.94,
+  "humidity": 78,
+  "pressure": 1018,
+  "datetime": "2023-05-01T10:50:55.000Z",
+  "units": "metric",
+  "wind_speed": 3.72,
+  "wind_direction": 300,
+  "weather": "cloud",
+  "hours": [
+    {
+      "temperature": 15,
+      "humidity": 77,
+      "pressure": 1018,
+      "datetime": "2023-05-01T15:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 4.75,
+      "wind_direction": 311,
+      "weather": "rain"
+    },
+    {
+      "temperature": 13,
+      "humidity": 81,
+      "pressure": 1019,
+      "datetime": "2023-05-01T18:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 3.14,
+      "wind_direction": 297,
+      "weather": "rain"
+    },
+    {
+      "temperature": 9,
+      "humidity": 95,
+      "pressure": 1021,
+      "datetime": "2023-05-01T21:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 1.69,
+      "wind_direction": 265,
+      "weather": "cloud"
+    },
+    {
+      "temperature": 7,
+      "humidity": 97,
+      "pressure": 1022,
+      "datetime": "2023-05-02T00:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 1.58,
+      "wind_direction": 260,
+      "weather": "cloud"
+    },
+    {
+      "temperature": 6,
+      "humidity": 99,
+      "pressure": 1023,
+      "datetime": "2023-05-02T03:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 1.16,
+      "wind_direction": 262,
+      "weather": "cloud"
+    },
+    {
+      "temperature": 8,
+      "humidity": 98,
+      "pressure": 1024,
+      "datetime": "2023-05-02T06:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 0.97,
+      "wind_direction": 291,
+      "weather": "cloud"
+    },
+    {
+      "temperature": 12,
+      "humidity": 79,
+      "pressure": 1024,
+      "datetime": "2023-05-02T09:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 2.01,
+      "wind_direction": 8,
+      "weather": "cloud"
+    },
+    {
+      "temperature": 17,
+      "humidity": 52,
+      "pressure": 1022,
+      "datetime": "2023-05-02T12:00:00.000Z",
+      "units": "metric",
+      "wind_speed": 2.92,
+      "wind_direction": 20,
+      "weather": "cloud"
+    }
+  ],
+  "days": [
+    { "datetime": "2023-05-01T12:00:00.000Z", "temperature_min": 9, "temperature_max": 15 },
+    { "datetime": "2023-05-02T00:00:00.000Z", "temperature_min": 6, "temperature_max": 18 },
+    { "datetime": "2023-05-03T00:00:00.000Z", "temperature_min": 5, "temperature_max": 20 },
+    { "datetime": "2023-05-04T00:00:00.000Z", "temperature_min": 8, "temperature_max": 23 },
+    { "datetime": "2023-05-05T00:00:00.000Z", "temperature_min": 10, "temperature_max": 22 },
+    { "datetime": "2023-05-06T00:00:00.000Z", "temperature_min": 13, "temperature_max": 22 }
+  ]
+}

@@ -5,10 +5,6 @@ import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import SettingsTab from './SettingsTab';
 import { RequestStatus } from '../../../../../utils/consts';
 
-@connect(
-  'user,session,usbPorts,zigbee2mqttStatus,zigbee2mqttDriverPath,getZigbee2mqttUsbPortStatus,getCurrentZigbee2mqttDriverPathStatus,zigbee2mqttGetStatusStatus,zigbee2mqttSaveStatus,zigbee2mqttSavingInProgress',
-  actions
-)
 class Zigbee2mqttSettingsPage extends Component {
   componentWillMount() {
     this.props.getUsbPorts();
@@ -33,4 +29,7 @@ class Zigbee2mqttSettingsPage extends Component {
   }
 }
 
-export default Zigbee2mqttSettingsPage;
+export default connect(
+  'user,session,usbPorts,zigbee2mqttStatus,zigbee2mqttDriverPath,getZigbee2mqttUsbPortStatus,getCurrentZigbee2mqttDriverPathStatus,zigbee2mqttGetStatusStatus,zigbee2mqttSaveStatus,zigbee2mqttSavingInProgress',
+  actions
+)(Zigbee2mqttSettingsPage);

@@ -2,7 +2,7 @@ const { NotFoundError } = require('../../../utils/coreErrors');
 /**
  * @description Get handler according to requested protocol.
  * @param {string} protocol - Protocol to get handler.
- * @returns {Object} Requested handler.
+ * @returns {object} Requested handler.
  * @example
  * getHandler('http');
  */

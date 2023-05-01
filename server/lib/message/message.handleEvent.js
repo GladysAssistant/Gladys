@@ -3,7 +3,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
 /**
  * @description Handle a message event.
- * @param {Object} message - The message sent by the user.
+ * @param {object} message - The message sent by the user.
  * @example
  * message.handleEvent(message);
  */

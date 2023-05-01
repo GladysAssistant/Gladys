@@ -5,10 +5,6 @@ import LANManagerPage from '../LANManagerPage';
 import LANManagerDiscoverTab from './LANManagerDiscoverTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'session,httpClient,houses,lanManagerDiscoveredDevices,lanManagerGetDiscoveredDevicesStatus,lanManagerDiscoverUpdate,lanManagerStatus,filterExisting',
-  actions
-)
 class LANManagerDiscoverPage extends Component {
   componentWillMount() {
     this.props.getLanManagerStatus();
@@ -31,4 +27,7 @@ class LANManagerDiscoverPage extends Component {
   }
 }
 
-export default LANManagerDiscoverPage;
+export default connect(
+  'session,httpClient,houses,lanManagerDiscoveredDevices,lanManagerGetDiscoveredDevicesStatus,lanManagerDiscoverUpdate,lanManagerStatus,filterExisting',
+  actions
+)(LANManagerDiscoverPage);

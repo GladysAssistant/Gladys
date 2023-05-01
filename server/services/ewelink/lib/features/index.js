@@ -51,9 +51,9 @@ function readOnlineValue(online) {
 /**
  * @description Create an eWeLink device for Gladys.
  * @param {string} serviceId - The UUID of the service.
- * @param {Object} device - The eWeLink device.
+ * @param {object} device - The eWeLink device.
  * @param {number} channel - The channel of the device to control.
- * @returns {Object} Return Gladys device.
+ * @returns {object} Return Gladys device.
  * @example
  * getDevice(serviceId, device, channel);
  */

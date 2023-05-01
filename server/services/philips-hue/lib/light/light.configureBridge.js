@@ -14,6 +14,7 @@ const {
 /**
  * @description Configure the philips hue bridge.
  * @param {string} serialNumber - Serial number of the Philips Hue Bridge.
+ * @returns {Promise<object>} Resolve with created device.
  * @example
  * configureBridge('162.198.1.1');
  */

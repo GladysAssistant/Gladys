@@ -1,6 +1,6 @@
 /**
  * @description Get Bluetooth configuration.
- * @returns {Object} - Configuration.
+ * @returns {object} - Configuration.
  * @example
  * this.getConfiguration();
  */

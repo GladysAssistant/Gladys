@@ -11,7 +11,7 @@ const sleep = promisify(setTimeout);
 
 /**
  * @description Install and starts Zigbee2mqtt container.
- * @param {Object} config - Service configuration properties.
+ * @param {object} config - Service configuration properties.
  * @example
  * await z2m.installZ2mContainer(config);
  */

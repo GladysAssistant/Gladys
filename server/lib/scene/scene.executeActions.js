@@ -6,9 +6,9 @@ const logger = require('../../utils/logger');
 
 /**
  * @description Execute one action.
- * @param {Object} self - Reference to the SceneManager.
- * @param {Object} action - An Action from the db.
- * @param {Object} scope - The scope passed to all actions.
+ * @param {object} self - Reference to the SceneManager.
+ * @param {object} action - An Action from the db.
+ * @param {object} scope - The scope passed to all actions.
  * @param {number} [columnIndex] - The X index of the action in the array of actions.
  * @param {number} [rowIndex] - The Y index of the action in the array of actions.
  * @returns {Promise} Resolve if the action was executed with success.
@@ -51,9 +51,9 @@ async function executeAction(self, action, scope, columnIndex, rowIndex) {
 
 /**
  * @description Execute an array of array of action.
- * @param {Object} self - Reference to the SceneManager.
- * @param {Object} actions - An array of array of actions from the db.
- * @param {Object} scope - The scope passed to all actions.
+ * @param {object} self - Reference to the SceneManager.
+ * @param {object} actions - An array of array of actions from the db.
+ * @param {object} scope - The scope passed to all actions.
  * @returns {Promise} Resolve if the action was executed with success.
  * @example
  * executeActions(this, actions, {});

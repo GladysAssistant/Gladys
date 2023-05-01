@@ -11,7 +11,7 @@ const saveOrDestroy = async (variableManager, key, value, serviceId) => {
 
 /**
  * @description Save Z2M configuration.
- * @param {Object} config - Z2M service configuration.
+ * @param {object} config - Z2M service configuration.
  * @returns {Promise} Current MQTT network configuration.
  * @example
  * await z2m.saveConfiguration(config);

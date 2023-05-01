@@ -4,7 +4,8 @@ const { NotFoundError } = require('../../utils/coreErrors');
 /**
  * @description Update a area.
  * @param {string} selector - Area selector.
- * @param {Object} area - The new area.
+ * @param {object} area - The new area.
+ * @returns {Promise<object>} Resolve with updated area.
  * @example
  * gladys.area.update('my-area', {
  *    name: 'New name',

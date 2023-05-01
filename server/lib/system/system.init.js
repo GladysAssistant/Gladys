@@ -3,7 +3,7 @@ const path = require('path');
 const logger = require('../../utils/logger');
 
 /**
- * @description Init the system, connect to docker if in docker
+ * @description Init the system, connect to docker if in docker.
  * @example
  * init();
  */

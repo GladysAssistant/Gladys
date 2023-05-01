@@ -3,7 +3,6 @@ const { EVENTS } = require('../../utils/constants');
 
 /**
  * @description Generate a number between 0 and max included.
- *
  * @param {number} max - The upper bound included.
  * @returns {number} - Return a random value.
  * @example
@@ -15,7 +14,7 @@ function generateRandomInteger(max) {
 }
 
 /**
- * @description Check if a backup is needed
+ * @description Check if a backup is needed.
  * @example
  * checkIfBackupNeeded();
  */

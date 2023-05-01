@@ -1,7 +1,7 @@
 const db = require('../../models');
 
 /**
- * @description Init areas in local RAM
+ * @description Init areas in local RAM.
  * @returns {Promise} Resolve.
  * @example
  * gladys.device.init();

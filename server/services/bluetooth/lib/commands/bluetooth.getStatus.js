@@ -1,5 +1,6 @@
 /**
  * @description Retrieve current Bluetooth status.
+ * @returns {object} Return status.
  * @example
  * bluetooth.getStatus();
  */

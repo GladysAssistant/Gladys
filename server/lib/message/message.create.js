@@ -6,14 +6,9 @@ const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
  * @public
- * @description handle a new message sent by a user to Gladys.
- * @param {Object} message - A message sent by a user.
- * @param {string} message.text - The text of the message.
- * @param {string} message.language - The language of the message.
- * @param {string} message.source - The name of the service where the message comes from.
- * @param {string} message.source_user_id - The user id for the source service.
- * @param {Object} message.user - A user object.
- * @param {Object} message.id - Id of the message.
+ * @description Handle a new message sent by a user to Gladys.
+ * @param {object} message - A message sent by a user.
+ * @returns {Promise<object>} Resolve with created message.
  * @example
  * message.create(message);
  */
@@ -27,15 +22,10 @@ async function create(message) {
   let context;
 
   if (!openAiEnabled) {
-    console.log('starting classification');
-    console.time('StartingClassification');
-
     // first, we classify the message to understand the intent
     ({ classification, context } = await this.brain.classify(message.text, message.language, {
       user: message.user,
     }));
-
-    console.timeEnd('StartingClassification');
 
     logger.debug(`Classified "${message.text}" with intent = "${classification.intent}".`);
     logger.debug(classification);

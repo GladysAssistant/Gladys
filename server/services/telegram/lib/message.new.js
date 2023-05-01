@@ -4,7 +4,7 @@ const { EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Called when a new telegram message arrives.
- * @param {Object} msg - Telegram Message.
+ * @param {object} msg - Telegram Message.
  * @returns {Promise} - Resolve with null.
  * @example
  * newMessage({
