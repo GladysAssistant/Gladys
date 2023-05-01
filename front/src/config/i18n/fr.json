@@ -738,7 +738,7 @@
         "gladysPlusRefreshProgressLabel": "Synchronisation en cours...",
         "gladysPlusRefreshProgressDescription": "Gladys Plus est entrain de rafraîchir son cache via l'API Enedis. Cette synchronisation peut prendre du temps, car Enedis impose des limites de requêtes. Il n'est pas nécessaire de garder cet onglet ouvert.",
         "refreshLocal": "Synchroniser avec Gladys Plus",
-        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponible en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
+        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponibles en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
         "saveButton": "Enregistrer",
         "deleteButton": "Supprimer"
       }
