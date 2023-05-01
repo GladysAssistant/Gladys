@@ -10,6 +10,12 @@
     "no-async-promise-executor": "off",
     "react/jsx-key": "off",
     "promise/prefer-await-to-then": "warn",
+    "react/forbid-dom-props": [
+      "warn",
+      {
+        "forbid": [{ "propName": "style", "message": "Using inline style is not recommended. Please use a .css file." }]
+      }
+    ],
     "no-restricted-syntax": [
       "warn",
       {
@@ -25,7 +31,7 @@
   "env": {
     "browser": true
   },
-  "plugins": ["json", "cypress", "promise"],
+  "plugins": ["json", "cypress", "promise", "react"],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
