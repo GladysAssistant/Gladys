@@ -8,22 +8,26 @@ import { ACTIONS } from '../../../../../../server/utils/constants';
 class TurnOnOffSwitch extends Component {
   getOptions = async () => {
     try {
-      const devices = await this.props.httpClient.get('/api/v1/device', {
+      const deviceFeatures = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'switch',
         device_feature_type: 'binary'
       });
       // keep only write switches, not read only
-      const devicesFiltered = devices.filter(device => {
+      const deviceFeaturesFiltered = deviceFeatures.filter(device => {
         const writeSwitch = device.features.find(f => f.read_only === false);
         return writeSwitch !== undefined;
       });
-      const deviceOptions = devicesFiltered.map(device => ({
-        value: device.selector,
-        label: device.name
-      }));
-      await this.setState({ deviceOptions });
+      const deviceFeatureOptions = deviceFeaturesFiltered
+        .flatMap(device => (
+          device.features
+        ))
+        .map(device_feature => ({
+          value: device_feature.selector,
+          label: device_feature.name
+        }));
+      await this.setState({ deviceFeatureOptions });
       this.refreshSelectedOptions(this.props);
-      return deviceOptions;
+      return deviceFeatureOptions;
     } catch (e) {
       console.error(e);
     }
@@ -31,18 +35,18 @@ class TurnOnOffSwitch extends Component {
   handleChange = selectedOptions => {
     if (selectedOptions) {
       const switches = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', switches);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'device_features', switches);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'device_features', []);
     }
   };
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
-    if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(switches => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === switches);
-        if (deviceOption) {
-          selectedOptions.push(deviceOption);
+    if (nextProps.action.device_features && this.state.deviceFeatureOptions) {
+      nextProps.action.device_features.forEach(switches => {
+        const deviceFeatureOption = this.state.deviceFeatureOptions.find(deviceFeatureOption => deviceFeatureOption.value === switches);
+        if (deviceFeatureOption) {
+          selectedOptions.push(deviceFeatureOption);
         }
       });
     }
@@ -51,7 +55,7 @@ class TurnOnOffSwitch extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      deviceOptions: null,
+      deviceFeatureOptions: null,
       selectedOptions: []
     };
   }
@@ -63,7 +67,7 @@ class TurnOnOffSwitch extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOptions, deviceOptions }) {
+  render(props, { selectedOptions, deviceFeatureOptions }) {
     return (
       <div class="form-group">
         <label class="form-label">
@@ -81,7 +85,7 @@ class TurnOnOffSwitch extends Component {
           isMulti
           value={selectedOptions}
           onChange={this.handleChange}
-          options={deviceOptions}
+          options={deviceFeatureOptions}
         />
       </div>
     );

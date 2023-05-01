@@ -8,17 +8,21 @@ import { ACTIONS } from '../../../../../../server/utils/constants';
 class TurnOnOffLight extends Component {
   getOptions = async () => {
     try {
-      const devices = await this.props.httpClient.get('/api/v1/device', {
+      const deviceFeatures = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'light',
         device_feature_type: 'binary'
       });
-      const deviceOptions = devices.map(device => ({
-        value: device.selector,
-        label: device.name
-      }));
-      await this.setState({ deviceOptions });
+      const deviceFeatureOptions = deviceFeatures
+        .flatMap(device => (
+          device.features
+        ))
+        .map(deviceFeature => ({
+          value: deviceFeature.selector,
+          label: deviceFeature.name
+        }));
+      await this.setState({ deviceFeatureOptions });
       this.refreshSelectedOptions(this.props);
-      return deviceOptions;
+      return deviceFeatureOptions;
     } catch (e) {
       console.error(e);
     }
@@ -26,18 +30,18 @@ class TurnOnOffLight extends Component {
   handleChange = selectedOptions => {
     if (selectedOptions) {
       const lights = selectedOptions.map(selectedOption => selectedOption.value);
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', lights);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'device_features', lights);
     } else {
-      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
+      this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'device_features', []);
     }
   };
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
-    if (nextProps.action.devices && this.state.deviceOptions) {
-      nextProps.action.devices.forEach(light => {
-        const deviceOption = this.state.deviceOptions.find(deviceOption => deviceOption.value === light);
-        if (deviceOption) {
-          selectedOptions.push(deviceOption);
+    if (nextProps.action.device_features && this.state.deviceFeatureOptions) {
+      nextProps.action.device_features.forEach(light => {
+        const deviceFeatureOption = this.state.deviceFeatureOptions.find(deviceFeatureOption => deviceFeatureOption.value === light);
+        if (deviceFeatureOption) {
+          selectedOptions.push(deviceFeatureOption);
         }
       });
     }
@@ -46,7 +50,7 @@ class TurnOnOffLight extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      deviceOptions: null,
+      deviceFeatureOptions: null,
       selectedOptions: []
     };
   }
@@ -58,7 +62,7 @@ class TurnOnOffLight extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOptions, deviceOptions }) {
+  render(props, { selectedOptions, deviceFeatureOptions }) {
     return (
       <div class="form-group">
         <label class="form-label">
@@ -76,7 +80,7 @@ class TurnOnOffLight extends Component {
           isMulti
           value={selectedOptions}
           onChange={this.handleChange}
-          options={deviceOptions}
+          options={deviceFeatureOptions}
         />
       </div>
     );

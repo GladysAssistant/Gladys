@@ -30,14 +30,10 @@ const actionsFunc = {
     return self.device.setValue(device, deviceFeature, action.value);
   },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
+    await Promise.map(action.device_features, async (deviceSelector) => {
       try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.LIGHT,
-          DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        );
+        const deviceFeature = self.stateManager.get('deviceFeature', deviceSelector);
+        const device = self.stateManager.get('deviceById', deviceFeature.device_id);
         await self.device.setValue(device, deviceFeature, 1);
       } catch (e) {
         logger.warn(e);
@@ -45,14 +41,10 @@ const actionsFunc = {
     });
   },
   [ACTIONS.LIGHT.TURN_OFF]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
+    await Promise.map(action.device_features, async (deviceSelector) => {
       try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.LIGHT,
-          DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        );
+        const deviceFeature = self.stateManager.get('deviceFeature', deviceSelector);
+        const device = self.stateManager.get('deviceById', deviceFeature.device_id);
         await self.device.setValue(device, deviceFeature, 0);
       } catch (e) {
         logger.warn(e);
@@ -75,14 +67,10 @@ const actionsFunc = {
     });
   },
   [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
+    await Promise.map(action.device_features, async (deviceSelector) => {
       try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.SWITCH,
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        );
+        const deviceFeature = self.stateManager.get('deviceFeature', deviceSelector);
+        const device = self.stateManager.get('deviceById', deviceFeature.device_id);
         await self.device.setValue(device, deviceFeature, 1);
       } catch (e) {
         logger.warn(e);
@@ -90,14 +78,10 @@ const actionsFunc = {
     });
   },
   [ACTIONS.SWITCH.TURN_OFF]: async (self, action, scope) => {
-    await Promise.map(action.devices, async (deviceSelector) => {
+    await Promise.map(action.device_features, async (deviceSelector) => {
       try {
-        const device = self.stateManager.get('device', deviceSelector);
-        const deviceFeature = getDeviceFeature(
-          device,
-          DEVICE_FEATURE_CATEGORIES.SWITCH,
-          DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        );
+        const deviceFeature = self.stateManager.get('deviceFeature', deviceSelector);
+        const device = self.stateManager.get('deviceById', deviceFeature.device_id);
         await self.device.setValue(device, deviceFeature, 0);
       } catch (e) {
         logger.warn(e);
