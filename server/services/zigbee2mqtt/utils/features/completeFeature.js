@@ -2,13 +2,11 @@ const { addSelector } = require('../../../../utils/addSelector');
 
 /**
  * @description Complete feature with externalId and selector generated values.
- *
  * @param {string} deviceName - Zigbee friendly device name.
- * @param {Object} feature - Related Gladys feature.
+ * @param {object} feature - Related Gladys feature.
  * @param {string} property - Related Zigbee property.
  * @param {number} suffixIndex - Related Zigbee sub-feature index.
- * @returns {Object} Completed Galdys feature.
- *
+ * @returns {object} Completed Galdys feature.
  * @example completeFeature('MyDevice', { category: 'light', type: 'binary' }, 'state');
  */
 function completeFeature(deviceName, feature, property, suffixIndex = 0) {

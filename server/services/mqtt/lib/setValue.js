@@ -2,9 +2,9 @@ const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
- * @description Control a remote MQTT device
- * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The binary deviceFeature to control.
+ * @description Control a remote MQTT device.
+ * @param {object} device - The device to control.
+ * @param {object} deviceFeature - The binary deviceFeature to control.
  * @param {string|number} value - The new value.
  * @returns {Promise} Resolve when the mqtt message is published.
  * @example

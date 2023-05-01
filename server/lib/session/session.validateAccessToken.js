@@ -5,12 +5,13 @@ const { Error401 } = require('../../utils/httpErrors');
  * @description Validate an access token.
  * @param {string} accessToken - The access token to verify.
  * @param {string} scope - The scope required.
+ * @returns {object} Return decoded access token.
  * @example
  * gladys.session.validateAccessToken('test', 'dashboard:write');
  */
 function validateAccessToken(accessToken, scope) {
   /**
-   * @type {Object} decoded
+   * @type {object} decoded
    */
   const decoded = jwt.verify(accessToken, this.jwtSecret, {
     issuer: 'gladys',

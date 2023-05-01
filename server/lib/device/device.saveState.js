@@ -5,7 +5,7 @@ const { BadParameters } = require('../../utils/coreErrors');
 
 /**
  * @description Save new device feature state in DB.
- * @param {Object} deviceFeature - A DeviceFeature object.
+ * @param {object} deviceFeature - A DeviceFeature object.
  * @param {number} newValue - The new value of the deviceFeature to save.
  * @example
  * saveState({

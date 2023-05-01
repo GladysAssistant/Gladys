@@ -11,7 +11,7 @@ const LAST_DATE_SYNCED = 'LAST_DATE_SYNCED';
 
 /**
  * @description Get one batch of enedis data, then call the next one.
- * @param {Object} gladys - Gladys object reference.
+ * @param {object} gladys - Gladys object reference.
  * @param {string} externalId - Enedis usage point external id.
  * @param {number} syncDelayBetweenCallsInMs - Delay between calls in ms.
  * @param {string} after - Get data after this date.
@@ -50,7 +50,7 @@ async function recursiveBatchCall(gladys, externalId, syncDelayBetweenCallsInMs,
 }
 
 /**
- * @description Sync Enedis account
+ * @description Sync Enedis account.
  * @param {boolean} fromStart - Sync from start.
  * @returns {Promise} Resolving when finished.
  * @example

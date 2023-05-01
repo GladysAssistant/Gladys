@@ -18,8 +18,8 @@ const nodeScheduleDaysOfWeek = {
 
 /**
  * @description Add a scene to the scene manager.
- * @param {Object} sceneRaw - Scene object from DB.
- * @returns {Object} Return the scene.
+ * @param {object} sceneRaw - Scene object from DB.
+ * @returns {object} Return the scene.
  * @example
  * addScene({
  *  selector: 'test'

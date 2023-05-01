@@ -2,7 +2,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 const { ACTIONS } = require('../utils/broadlink.constants');
 /**
  * @description Waiting for code learning.
- * @param {Object} broadlinkDevice - Braodlink device.
+ * @param {object} broadlinkDevice - Braodlink device.
  * @param {string} peripheralIdentifier - The peripheral address.
  * @param {number} iteration - Number of retry.
  * @example

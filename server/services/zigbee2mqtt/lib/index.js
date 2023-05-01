@@ -23,8 +23,8 @@ const { JOB_TYPES } = require('../../../utils/constants');
 
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
- * @param {Object} gladys - Gladys instance.
- * @param {Object} mqttLibrary - MQTT lib.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} mqttLibrary - MQTT lib.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const zigbee2mqttManager = new Zigbee2mqttManager(gladys, mqttLibrary, serviceId);
