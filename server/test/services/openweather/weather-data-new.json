@@ -1,0 +1,24 @@
+{
+  "coord": { "lon": 2.8153, "lat": 46.381 },
+  "weather": [{ "id": 803, "main": "Clouds", "description": "nuageux", "icon": "04d" }],
+  "base": "stations",
+  "main": {
+    "temp": 14.94,
+    "feels_like": 14.53,
+    "temp_min": 14.94,
+    "temp_max": 14.94,
+    "pressure": 1018,
+    "humidity": 78,
+    "sea_level": 1018,
+    "grnd_level": 986
+  },
+  "visibility": 10000,
+  "wind": { "speed": 3.72, "deg": 300, "gust": 4.89 },
+  "clouds": { "all": 83 },
+  "dt": 1682938255,
+  "sys": { "type": 2, "id": 2006989, "country": "FR", "sunrise": 1682915720, "sunset": 1682967374 },
+  "timezone": 7200,
+  "id": 2993204,
+  "name": "Monsenoux",
+  "cod": 200
+}
