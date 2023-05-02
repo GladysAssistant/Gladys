@@ -1204,7 +1204,7 @@
       },
       "discover": {
         "title": "Appareils détectés sur le réseau",
-        "description": "Les appareils Yeelight configurés sont automatiquement découverts sur le réseau LAN. Vos appareils Yeelight doivent avoir le \"LAN Control\" activé. En savoir plus <a href=\"https://gladysassistant.com/en/docs/integrations/yeelight#activate-lan-control\" target=\"_blank\">ici</a>.",
+        "description": "Les appareils Yeelight configurés sont automatiquement découverts sur le réseau LAN. Vos appareils Yeelight doivent avoir le \"LAN Control\" activé. En savoir plus <a href=\"https://gladysassistant.com/fr/docs/integrations/yeelight#activer-lan-control\" target=\"_blank\">ici</a>.",
         "error": "Erreur lors de la découverte des appareils Yeelight.",
         "noDeviceFound": "Aucun appareil Yeelight découvert. Êtes-vous sûr que vous êtes connecté au même réseau que votre appareil et que celui-ci a le \"LAN Control\" activé?",
         "documentation": "Documentation Yeelight",
