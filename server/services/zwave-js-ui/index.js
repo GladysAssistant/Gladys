@@ -9,7 +9,7 @@ module.exports = function ZwaveJSUIService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the service
+   * @description This function starts the service.
    * @example
    * gladys.services.zwave-js-ui.start();
    */
@@ -20,7 +20,7 @@ module.exports = function ZwaveJSUIService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    * gladys.services.zwave-js-ui.stop();
    */

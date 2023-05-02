@@ -5,10 +5,9 @@ const { unbindValue } = require('../utils/bindValue');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
 /**
- * @description Notification about a node
- * @param {Object} zwaveNode - ZWave Node.
- * @param {Object} args - ZWave ValueNotificationArgs.
- * @returns {Object} None.
+ * @description Notification about a node.
+ * @param {object} zwaveNode - ZWave Node.
+ * @param {object} args - ZWave ValueNotificationArgs.
  * @example
  * valueNotification({ id: 0, }, { commandClass: 0, endpoint: 0, property: '', propertyKey: '' }, 0);
  */

@@ -2,9 +2,9 @@ const cloneDeep = require('lodash.clonedeep');
 const { COMMAND_CLASSES, PROPERTIES } = require('../constants');
 
 /**
- * @description Return filtered classes (e.g. manage command classs version).
- * @param {Object} node - Z-Wave node.
- * @returns {Object} Return filtered classes.
+ * @description Return filtered classes (e.g. Manage command classs version).
+ * @param {object} node - Z-Wave node.
+ * @returns {object} Return filtered classes.
  * @example
  * const filteredClasses = zwaveManager.transformClasses({});
  */

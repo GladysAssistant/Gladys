@@ -3,7 +3,7 @@ const { CONFIGURATION, DEFAULT } = require('../constants');
 
 /**
  * @description Update Z-Wave configuration.
- * @param {Object} configuration - The configuration data.
+ * @param {object} configuration - The configuration data.
  * @example
  * zwave.updateConfiguration({ driverPath: '' });
  */

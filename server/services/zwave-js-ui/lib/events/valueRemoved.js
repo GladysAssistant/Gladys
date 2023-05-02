@@ -5,9 +5,8 @@ const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
 /**
  * @description When a value is removed.
- * @param {Object} zwaveNode - ZWave Node.
- * @param {Object} args - Zwave ValueRemovedArgs.
- * @returns {Object} None.
+ * @param {object} zwaveNode - ZWave Node.
+ * @param {object} args - Zwave ValueRemovedArgs.
  * @example
  * zwave.on('value removed', this.valueRemoved);
  */

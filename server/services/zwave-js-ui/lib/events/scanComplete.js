@@ -2,7 +2,7 @@ const logger = require('../../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 /**
- * @description When the scan is complete
+ * @description When the scan is complete.
  * @example
  * this.scanComplete();
  */

@@ -335,7 +335,7 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   /**
-   * Power should be handled by Meter command class
+   * Power should be handled by Meter command class.
    */
   it('should handle value added 49-0-Power', () => {
     zwaveNode.getValueMetadata = (args) => {

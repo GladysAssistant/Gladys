@@ -6,9 +6,8 @@ const { PROPERTIES } = require('../constants');
 
 /**
  * @description When a value changed.
- * @param {Object} zwaveNode - ZWave Node.
- * @param {Object} args - ValueUpdatedArgs.
- * @returns {Object} None.
+ * @param {object} zwaveNode - ZWave Node.
+ * @param {object} args - ValueUpdatedArgs.
  * @example
  * zwave.on('value updated', this.valueUpdated);
  */

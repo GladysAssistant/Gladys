@@ -3,7 +3,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 
 /**
  * @description When a node is ready.
- * @param {Object} zwaveNode - Informations about the node.
+ * @param {object} zwaveNode - Informations about the node.
  * @example
  * zwave.on('node ready', this.nodeReady);
  */

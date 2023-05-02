@@ -4,7 +4,7 @@ const { DEFAULT } = require('../constants');
 const ADD_NODE_TIMEOUT = 60 * 1000;
 
 /**
- * @description Add node
+ * @description Add node.
  * @param {boolean} secure - Secure node.
  * @example
  * zwave.addNode(true);

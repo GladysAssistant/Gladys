@@ -3,7 +3,7 @@ const { CONFIGURATION, DEFAULT } = require('../constants');
 
 /**
  * @description Getting Z-Wave information.
- * @returns {Promise<Object>} Return Object of information.
+ * @returns {Promise<object>} Return Object of information.
  * @example
  * zwave.getConfiguration();
  */

@@ -11,10 +11,10 @@ const logger = require('../../../../utils/logger');
 }; */
 
 /**
- * @description Notification about a node
- * @param {Object} zwaveNode - ZWave Node.
- * @param {Object} commandClass - CommandClass.
- * @param {Object} args - CommandClass arguments.
+ * @description Notification about a node.
+ * @param {object} zwaveNode - ZWave Node.
+ * @param {object} commandClass - CommandClass.
+ * @param {object} args - CommandClass arguments.
  * @example
  * zwave.on('notification', this.notification);
  */

@@ -3,7 +3,7 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Split Node into each endpoints.
- * @param {Object} node - Z-Wave node .
+ * @param {object} node - Z-Wave node .
  * @returns {Array} Splitted nodes.
  * @example
  * const nodes = zwaveManager.splitNode({});

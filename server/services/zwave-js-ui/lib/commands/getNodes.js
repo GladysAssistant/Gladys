@@ -26,7 +26,9 @@ function match(value, keyword) {
 
 /**
  * @description Return array of Nodes.
- * @param {Object} options - Filtering, ordering.
+ * @param {object} pagination - Filtering and ordering.
+ * @param {string} pagination.orderDir - Ordering.
+ * @param {string} pagination.search - Keyword to filter nodes.
  * @returns {Array} Return list of nodes.
  * @example
  * const nodes = zwaveManager.getNodes();

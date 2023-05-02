@@ -4,7 +4,7 @@ const { DEFAULT } = require('../constants');
 const REMOVE_NODE_TIMEOUT = 60 * 1000;
 
 /**
- * @description Add node
+ * @description Add node.
  * @example
  * zwave.removeNode();
  */

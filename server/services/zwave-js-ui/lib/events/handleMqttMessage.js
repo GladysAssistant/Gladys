@@ -4,8 +4,8 @@ const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
- * @param {Object} message - The message sent.
- * @returns {Object} Null.
+ * @param {object} message - The message sent.
+ * @returns {object} Null.
  * @example
  * handleMqttMessage('zwave-js-ui/POWER', 'ON');
  */

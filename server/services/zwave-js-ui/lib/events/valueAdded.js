@@ -7,9 +7,9 @@ const { getDeviceFeatureExternalId } = require('../utils/externalId');
 /**
  *
  * @description Get value metadata.
- * @param {Object} zwaveNode - Node.
- * @param {Object} args - ZWaveNodeValueAddedArgs.
- * @returns {Object} ZWaveNode value metadata.
+ * @param {object} zwaveNode - Node.
+ * @param {object} args - ZWaveNodeValueAddedArgs.
+ * @returns {object} ZWaveNode value metadata.
  * @example
  * getValueMetadata(9, {});
  */
@@ -22,11 +22,9 @@ function getValueMetadata(zwaveNode, args) {
 
 /**
  * ValueAddedArgs.
- *
  * @description When a value is added.
- * @param {Object} zwaveNode - ZWave Node.
- * @param {Object} args - ZWaveNodeValueAddedArgs.
- * @returns {Object} None.
+ * @param {object} zwaveNode - ZWave Node.
+ * @param {object} args - ZWaveNodeValueAddedArgs.
  * @example
  * valueAdded({id: 0}, { commandClass: 0, endpoint: 0, property: '', propertyKey: '' });
  */

@@ -2,10 +2,10 @@ const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { CATEGORIES, UNKNOWN_CATEGORY, UNKNOWN_TYPE } = require('../constants');
 
 /**
- * @description Get a ZWave value and return a category in Gladys
- * @param {Object} node - The node object.
- * @param {Object} value - Value object.
- * @returns {Object} Return the category in Gladys.
+ * @description Get a ZWave value and return a category in Gladys.
+ * @param {object} node - The node object.
+ * @param {object} value - Value object.
+ * @returns {object} Return the category in Gladys.
  * @example
  * const { category, type } = getCategory({
  *  product: '',

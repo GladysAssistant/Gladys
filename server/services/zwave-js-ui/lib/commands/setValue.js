@@ -4,8 +4,8 @@ const { getNodeInfoByExternalId } = require('../utils/externalId');
 
 /**
  * @description Set value.
- * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The device feature to control.
+ * @param {object} device - The device to control.
+ * @param {object} deviceFeature - The device feature to control.
  * @param {number} value - The value to set.
  * @example
  * zwave.setValue();

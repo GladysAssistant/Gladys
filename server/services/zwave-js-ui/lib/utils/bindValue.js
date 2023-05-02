@@ -2,10 +2,10 @@ const { STATE } = require('../../../../utils/constants');
 const { COMMAND_CLASSES, SCENE_VALUES, SMOKE_ALARM_VALUES, PROPERTIES } = require('../constants');
 
 /**
- * @description Bind value
- * @param {Object} valueId - Value ID.
- * @param {Object} value - Value object to send.
- * @returns {Object} Return the value adapted.
+ * @description Bind value.
+ * @param {object} valueId - Value ID.
+ * @param {object} value - Value object to send.
+ * @returns {object} Return the value adapted.
  * @example
  * const value = bindValue(6, 0x4501, 12, 1);
  */
@@ -23,10 +23,10 @@ function bindValue(valueId, value) {
 }
 
 /**
- * @description Unbind value
- * @param {Object} valueId - Value ID.
- * @param {Object} value - Value object received.
- * @returns {Object} Return the value adapted.
+ * @description Unbind value.
+ * @param {object} valueId - Value ID.
+ * @param {object} value - Value object received.
+ * @returns {object} Return the value adapted.
  * @example
  * const value = unbindValue(6, 0x4501, 12, 1);
  */

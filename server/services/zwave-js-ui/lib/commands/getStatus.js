@@ -2,7 +2,7 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Getting Z-Wave status.
- * @returns {Object} Return Object of status.
+ * @returns {object} Return Object of status.
  * @example
  * zwave.getStatus();
  */

@@ -1,8 +1,8 @@
 const { COMMAND_CLASSES } = require('../constants');
 
 /**
- * @description Return name of device
- * @param {Object} node - The zwave node.
+ * @description Return name of device.
+ * @param {object} node - The zwave node.
  * @returns {string} Return name.
  * @example
  * getDeviceName(node);
@@ -12,8 +12,8 @@ function getDeviceName(node) {
 }
 
 /**
- * @description Return external id of device
- * @param {Object} node - The zwave node.
+ * @description Return external id of device.
+ * @param {object} node - The zwave node.
  * @returns {string} Return external id.
  * @example
  * getDeviceExternalId(node);
@@ -23,8 +23,8 @@ function getDeviceExternalId(node) {
 }
 
 /**
- * @description Return name of device feature
- * @param {Object} property - The zwave property.
+ * @description Return name of device feature.
+ * @param {object} property - The zwave property.
  * @returns {string} Return name.
  * @example
  * getDeviceFeatureName(feature);
@@ -36,8 +36,8 @@ function getDeviceFeatureName(property) {
 }
 
 /**
- * @description Return external id of deviceFeature
- * @param {Object} property - The zwave property.
+ * @description Return external id of deviceFeature.
+ * @param {object} property - The zwave property.
  * @returns {string} Return external id.
  * @example
  * getDeviceFeatureExternalId(property);
@@ -51,8 +51,8 @@ function getDeviceFeatureExternalId(property) {
 
 /**
  * @description Return node info of devicefeature.
- * @param {Object} externalId - The externalId.
- * @returns {Object} Return all informations.
+ * @param {object} externalId - The externalId.
+ * @returns {object} Return all informations.
  * @example
  * getNodeInfoByExternalId(externalId);
  */
