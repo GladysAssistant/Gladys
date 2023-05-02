@@ -6,7 +6,6 @@ import UpdateDevice from '../../../../../components/device';
 
 const ZWAVE_PAGE_PATH = '/dashboard/integration/device/zwave-js-ui';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
 class EditZwaveJSUIDevice extends Component {
   render(props, {}) {
     return (
@@ -22,4 +21,4 @@ class EditZwaveJSUIDevice extends Component {
   }
 }
 
-export default EditZwaveJSUIDevice;
+export default connect('user,session,httpClient,currentIntegration,houses', {})(EditZwaveJSUIDevice);

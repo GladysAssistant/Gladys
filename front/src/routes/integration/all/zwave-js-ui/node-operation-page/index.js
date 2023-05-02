@@ -6,7 +6,6 @@ import ZwaveJSUIPage from '../ZwaveJSUIPage';
 import NodeOperationPage from './AddRemoveNode';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
 class ZwaveJSUIDeviceOperationPage extends Component {
   scanCompletedListener = () => {
     this.setState({
@@ -111,4 +110,4 @@ class ZwaveJSUIDeviceOperationPage extends Component {
   }
 }
 
-export default ZwaveJSUIDeviceOperationPage;
+export default connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)(ZwaveJSUIDeviceOperationPage);

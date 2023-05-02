@@ -4,7 +4,6 @@ import actions from './actions';
 import ZwaveJSUIPage from '../ZwaveJSUIPage';
 import DeviceTab from './DeviceTab';
 
-@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch', actions)
 class ZwaveJSUIDevicePage extends Component {
   componentWillMount() {
     this.props.getZWaveDevices();
@@ -20,4 +19,7 @@ class ZwaveJSUIDevicePage extends Component {
   }
 }
 
-export default ZwaveJSUIDevicePage;
+export default connect(
+  'session,user,zwaveDevices,houses,getZwaveDevicesStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch',
+  actions
+)(ZwaveJSUIDevicePage);

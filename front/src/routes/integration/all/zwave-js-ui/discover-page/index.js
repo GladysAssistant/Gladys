@@ -5,10 +5,6 @@ import ZwaveJSUIPage from '../ZwaveJSUIPage';
 import NodeTab from './NodeTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus,zwaveScanNetworkStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch',
-  actions
-)
 class ZwaveJSUIDevicePage extends Component {
   nodeReadyListener = () => this.props.getNodes();
   scanCompleteListener = () => {
@@ -43,4 +39,7 @@ class ZwaveJSUIDevicePage extends Component {
   }
 }
 
-export default ZwaveJSUIDevicePage;
+export default connect(
+  'user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus,zwaveScanNetworkStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch',
+  actions
+)(ZwaveJSUIDevicePage);

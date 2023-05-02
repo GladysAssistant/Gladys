@@ -4,7 +4,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import { Text } from 'preact-i18n';
 
-@connect('user,session,usbConfigured,mqttExist,mqttRunning,mqttConnected,zwaveJSUIExist,zwaveJSUIRunning', actions)
 class CheckStatus extends Component {
   componentWillMount() {
     this.props.getStatus();
@@ -41,4 +40,5 @@ class CheckStatus extends Component {
   }
 }
 
-export default CheckStatus;
+export default connect('user,session,usbConfigured,mqttExist,mqttRunning,mqttConnected,zwaveJSUIExist,zwaveJSUIRunning', actions)
+(CheckStatus);

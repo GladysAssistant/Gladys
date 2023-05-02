@@ -6,10 +6,6 @@ import SettingsTab from './SettingsTab';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,ready,externalZwaveJSUI,driverPath,mqttUrl,mqttUsername,mqttPassword,mqttTopicPrefix,mqttTopicWithLocation,s2UnauthenticatedKey,s2AuthenticatedKey,s2AccessControlKey,s0LegacyKey,usbPorts,usbConfigured,mqttExist,mqttRunning,mqttConnected,zwaveJSUIExist,zwaveJSUIRunning,zwaveJSUIConnected,zwaveJSUIVersion,zwaveJSUIExpectedVersion,dockerBased,zwaveGetConfigurationStatus,zwaveGetUsbPortStatus,zwaveGetStatusStatus,zwaveDisconnectStatus,zwaveConnectStatus',
-  actions
-)
 class ZwaveJSUISettingsPage extends Component {
   componentWillMount() {
     this.props.getStatus();
@@ -38,4 +34,7 @@ class ZwaveJSUISettingsPage extends Component {
   }
 }
 
-export default ZwaveJSUISettingsPage;
+export default connect(
+  'user,session,ready,externalZwaveJSUI,driverPath,mqttUrl,mqttUsername,mqttPassword,mqttTopicPrefix,mqttTopicWithLocation,s2UnauthenticatedKey,s2AuthenticatedKey,s2AccessControlKey,s0LegacyKey,usbPorts,usbConfigured,mqttExist,mqttRunning,mqttConnected,zwaveJSUIExist,zwaveJSUIRunning,zwaveJSUIConnected,zwaveJSUIVersion,zwaveJSUIExpectedVersion,dockerBased,zwaveGetConfigurationStatus,zwaveGetUsbPortStatus,zwaveGetStatusStatus,zwaveDisconnectStatus,zwaveConnectStatus',
+  actions
+)(ZwaveJSUISettingsPage);
