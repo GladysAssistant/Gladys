@@ -5,6 +5,7 @@ const yaml = require('yaml');
 
 const logger = require('../../../utils/logger');
 const { DEFAULT } = require('./constants');
+const { DEFAULT_KEY, CONFIG_KEYS, ADAPTERS_BY_CONFIG_KEY } = require('../adapters');
 
 /**
  * @description Configure Z2M container.
@@ -35,11 +36,30 @@ async function configureContainer(basePathOnContainer, config) {
   const loadedConfig = yaml.parse(fileContent.toString());
   const { mqtt = {} } = loadedConfig;
 
+  let configChanged = false;
   if (mqtt.user !== config.mqttUsername || mqtt.password !== config.mqttPassword) {
     mqtt.user = config.mqttUsername;
     mqtt.password = config.mqttPassword;
     loadedConfig.mqtt = mqtt;
+    configChanged = true;
+  }
 
+  // Setup adapter
+  const adapterKey = Object.values(CONFIG_KEYS).find((configKey) =>
+    ADAPTERS_BY_CONFIG_KEY[configKey].includes(config.z2mDongleName),
+  );
+  const adapterSetup = adapterKey && adapterKey !== DEFAULT_KEY;
+  const { serial = {} } = loadedConfig;
+
+  if (!adapterSetup && serial.adapter) {
+    delete loadedConfig.serial.adapter;
+    configChanged = true;
+  } else if (adapterSetup && serial.adapter !== adapterKey) {
+    loadedConfig.serial.adapter = adapterKey;
+    configChanged = true;
+  }
+
+  if (configChanged) {
     await fs.writeFile(configFilepath, yaml.stringify(loadedConfig));
   }
 }

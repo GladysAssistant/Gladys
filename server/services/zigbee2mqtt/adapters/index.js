@@ -50,27 +50,4 @@ const ADAPTERS = Object.values(ADAPTERS_BY_CONFIG_KEY)
   .flatMap((values) => values)
   .sort((a, b) => a.localeCompare(b));
 
-// The config mapper uses "immutability-helper" library commands to setup confi object
-const CONFIG = {
-  [CONFIG_KEYS.DECONZ]: {
-    serial: {
-      adapter: {
-        $set: 'deconz',
-      },
-    },
-  },
-  [CONFIG_KEYS.EZSP]: {
-    serial: {
-      adapter: {
-        $set: 'ezsp',
-      },
-    },
-  },
-  [CONFIG_KEYS.NONE]: {
-    serial: {
-      $unset: ['adapter'],
-    },
-  },
-};
-
-module.exports = { ADAPTERS, CONFIG, CONFIG_KEYS, DEFAULT_KEY: CONFIG_KEYS.NONE };
+module.exports = { ADAPTERS, ADAPTERS_BY_CONFIG_KEY, CONFIG_KEYS, DEFAULT_KEY: CONFIG_KEYS.NONE };
