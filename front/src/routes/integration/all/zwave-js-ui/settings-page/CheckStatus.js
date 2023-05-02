@@ -40,5 +40,7 @@ class CheckStatus extends Component {
   }
 }
 
-export default connect('user,session,usbConfigured,mqttExist,mqttRunning,mqttConnected,zwaveJSUIExist,zwaveJSUIRunning', actions)
-(CheckStatus);
+export default connect(
+  'user,session,usbConfigured,mqttExist,mqttRunning,mqttConnected,zwaveJSUIExist,zwaveJSUIRunning',
+  actions
+)(CheckStatus);
