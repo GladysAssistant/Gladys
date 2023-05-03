@@ -10,6 +10,9 @@ describe('scene.execute', () => {
   const event = new EventEmitter();
   const brain = {};
   const device = {};
+  const deviceFeature = {
+    device_id: 'light-1',
+  };
   let stateManager;
   let sceneManager;
 
@@ -19,6 +22,8 @@ describe('scene.execute', () => {
     brain.removeNamedEntity = fake.returns(null);
     device.setValue = fake.resolves(null);
     stateManager = new StateManager(event);
+    stateManager.setState('deviceById', 'light-1', device);
+    stateManager.setState('deviceFeature', 'light-1-binary', deviceFeature);
     sceneManager = new SceneManager(stateManager, event, device, {}, {}, {}, {}, {}, {}, {}, brain);
   });
 
@@ -34,7 +39,7 @@ describe('scene.execute', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
