@@ -1719,6 +1719,30 @@ const data = {
     name: 'ZIGBEE2MQTT_DRIVER_PATH',
     value: '/dev/ttyUSB0'
   },
+  'get /api/v1/service/zigbee2mqtt/variable/ZIGBEE_DONGLE_NAME': {
+    name: 'ZIGBEE_DONGLE_NAME',
+    value: 'Electrolama zig-a-zig-ah! (zzh!)'
+  },
+  'get /api/v1/service/zigbee2mqtt/adapters': [
+    'ConBee',
+    'ConBee II',
+    'RaspBee',
+    'RaspBee II',
+    'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P',
+    "Slaesh's CC2652RB stick",
+    'SMLIGHT CC2652P Zigbee USB Adapter SLZB-02',
+    'SMLIGHT SLZB-06 Zigbee ethernet USB POE WiFi LAN adapter',
+    'SMLIGHT Zigbee LAN Adapter CC2652P Model SLZB-05',
+    'Vision CC2538+CC2592 Dongle(VS203)',
+    'Vision CC2652 dongle',
+    'XGG Gateway',
+    'XGG 52PZ2MGateway',
+    'ZigStar LAN Coordinator',
+    'ZigStar PoE Coordinator',
+    'ZigStar Stick v4',
+    'ZigStar ZigiHAT PoE'
+  ],
+  'post /api/v1/service/zigbee2mqtt/setup': {},
   'get /api/v1/service/zigbee2mqtt/status': {
     usbConfigured: true,
     mqttExist: true,

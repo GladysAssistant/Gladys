@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
+import Creatable from 'react-select/creatable';
 
 const SettingsTab = ({ children, ...props }) => (
   <div class="card">
@@ -51,7 +52,7 @@ const SettingsTab = ({ children, ...props }) => (
               {props.usbPorts.map(
                 usbPort =>
                   usbPort.comPath && (
-                    <option value={usbPort.comPath} selected={props.zigbee2mqttDriverPath === usbPort.comPath}>
+                    <option value={usbPort.comPath} selected={props.zigbeeDriverPath === usbPort.comPath}>
                       {usbPort.comPath}
                       {usbPort.comName ? ` - ${usbPort.comName}` : ''}
                       {usbPort.comVID ? ` - ${usbPort.comVID}` : ''}
@@ -59,6 +60,17 @@ const SettingsTab = ({ children, ...props }) => (
                   )
               )}
             </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              <Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDongleNameLabel" />
+            </label>
+            <Creatable
+              value={{ label: props.zigbeeDongleName, value: props.zigbeeDongleName }}
+              onChange={props.updateZigbeeDongleName}
+              options={props.zigbeeAdapters}
+              formatCreateLabel={input => input}
+            />
           </div>
           <div class="form-group">
             <button class="btn btn-success" onClick={props.saveDriverPath}>
