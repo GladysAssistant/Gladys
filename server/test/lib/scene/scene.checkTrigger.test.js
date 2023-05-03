@@ -17,6 +17,10 @@ describe('scene.checkTrigger', () => {
     setValue: fake.resolves(null),
   };
 
+  const deviceFeature = {
+    device_id: 'light-1',
+  };
+
   const brain = {};
 
   beforeEach(() => {
@@ -38,6 +42,8 @@ describe('scene.checkTrigger', () => {
     brain.removeNamedEntity = fake.returns(null);
 
     const stateManager = new StateManager();
+    stateManager.setState('deviceById', 'light-1', device);
+    stateManager.setState('deviceFeature', 'light-1-binary', deviceFeature);
 
     sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain);
   });
@@ -54,7 +60,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -91,7 +97,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -128,7 +134,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -164,7 +170,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -200,7 +206,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -236,7 +242,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -271,7 +277,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -306,7 +312,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -343,7 +349,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -380,7 +386,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -417,7 +423,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -454,7 +460,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -491,7 +497,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -530,7 +536,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -569,7 +575,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -615,7 +621,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -654,7 +660,7 @@ describe('scene.checkTrigger', () => {
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
