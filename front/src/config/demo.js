@@ -1205,10 +1205,13 @@ const data = {
   'get /api/v1/service/usb/port': [
     {
       comPath: '/dev/ttyUSB0',
-      serialNumber: 'f75ab720-bbb3-4a1c-8729-84aa02ebdca0',
-      locationId: '14530000',
-      vendorId: '0658',
-      productId: '0200'
+      comVID: '0658',
+      comName: '0200'
+    },
+    {
+      comPath: '/dev/ttyUSB1',
+      comVID: '0478',
+      comName: '0910'
     }
   ],
   'get /api/v1/area': [

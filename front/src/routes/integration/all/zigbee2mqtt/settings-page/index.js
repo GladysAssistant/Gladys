@@ -22,7 +22,13 @@ class Zigbee2mqttSettingsPage extends Component {
 
   loadUsbPorts = async () => {
     try {
-      const usbPorts = await this.props.httpClient.get('/api/v1/service/usb/port');
+      const rawUsbPorts = await this.props.httpClient.get('/api/v1/service/usb/port');
+      const usbPorts = rawUsbPorts.map(usbPort => ({
+        label: `${usbPort.comPath} ${usbPort.comName ? ` - ${usbPort.comName}` : ''} ${
+          usbPort.comVID ? ` - ${usbPort.comVID}` : ''
+        }`,
+        value: usbPort.comPath
+      }));
       this.setState({
         usbPorts,
         getZigbee2mqttUsbPortStatus: RequestStatus.Success
@@ -76,9 +82,9 @@ class Zigbee2mqttSettingsPage extends Component {
     }
   };
 
-  updateZigbee2mqttDriverPath = e => {
+  updateZigbeeDriverPath = option => {
     this.setState({
-      zigbee2mqttDriverPath: e.target.value
+      zigbeeDriverPath: option.value
     });
   };
 
@@ -100,10 +106,12 @@ class Zigbee2mqttSettingsPage extends Component {
         zigbeeDriverPath = '';
       }
 
-      await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', {
+      const payload = {
         ZIGBEE2MQTT_DRIVER_PATH: zigbeeDriverPath,
         ZIGBEE_DONGLE_NAME: zigbeeDongleName
-      });
+      };
+
+      await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', payload);
 
       this.setState({
         zigbee2mqttSaveStatus: RequestStatus.Success
@@ -153,7 +161,7 @@ class Zigbee2mqttSettingsPage extends Component {
           {...state}
           loading={loading}
           saveDriverPath={this.saveDriverPath}
-          updateZigbee2mqttDriverPath={this.updateZigbee2mqttDriverPath}
+          updateZigbeeDriverPath={this.updateZigbeeDriverPath}
           updateZigbeeDongleName={this.updateZigbeeDongleName}
         />
       </Zigbee2mqttPage>
