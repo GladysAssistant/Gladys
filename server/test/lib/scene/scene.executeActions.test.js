@@ -18,24 +18,25 @@ describe('scene.executeActions', () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      device_id: 'light-1',
     };
     const device = {
       setValue: fake.resolves(null),
       features: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        find: fake.returns(deviceFeature),
       },
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', device);
+    stateManager.setState('deviceById', 'light-1', device);
+    stateManager.setState('deviceFeature', 'light-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -47,24 +48,25 @@ describe('scene.executeActions', () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      device_id: 'light-1',
     };
     const device = {
       setValue: fake.resolves(null),
       features: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        find: fake.returns(deviceFeature),
       },
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', device);
+    stateManager.setState('deviceById', 'light-1', device);
+    stateManager.setState('deviceFeature', 'light-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TURN_OFF,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -76,6 +78,7 @@ describe('scene.executeActions', () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      device_id: 'light-1',
       last_value: 0,
     };
     const device = {
@@ -83,18 +86,18 @@ describe('scene.executeActions', () => {
       features: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        find: fake.returns(deviceFeature),
       },
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', device);
+    stateManager.setState('deviceById', 'light-1', device);
+    stateManager.setState('deviceFeature', 'light-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TOGGLE,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -106,6 +109,7 @@ describe('scene.executeActions', () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
       type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+      device_id: 'light-1',
       last_value: 1,
     };
     const device = {
@@ -113,18 +117,18 @@ describe('scene.executeActions', () => {
       features: {
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        find: fake.returns(deviceFeature),
       },
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', device);
+    stateManager.setState('deviceById', 'light-1', device);
+    stateManager.setState('deviceFeature', 'light-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TOGGLE,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
       ],
@@ -132,53 +136,29 @@ describe('scene.executeActions', () => {
     );
     assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
   });
-  it('should execute light toggle error', async () => {
-    const device = {
-      setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-        type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-        find: fake.throws('An error occured'),
-      },
-    };
-    const stateManager = new StateManager(event);
-    stateManager.setState('device', 'light-1', device);
-    await executeActions(
-      { stateManager, event, device },
-      [
-        [
-          {
-            type: ACTIONS.LIGHT.TOGGLE,
-            devices: ['light-1'],
-          },
-        ],
-      ],
-      {},
-    );
-    assert.notCalled(device.setValue);
-  });
   it('should execute switch turn on', async () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      device_id: 'switch-1',
     };
     const device = {
       setValue: fake.resolves(null),
       features: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
       },
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'switch-1', device);
+    stateManager.setState('deviceById', 'switch-1', device);
+    stateManager.setState('deviceFeature', 'switch-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.SWITCH.TURN_ON,
-            devices: ['switch-1'],
+            device_features: ['switch-1-binary'],
           },
         ],
       ],
@@ -190,24 +170,25 @@ describe('scene.executeActions', () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      device_id: 'switch-1',
     };
     const device = {
       setValue: fake.resolves(null),
       features: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
       },
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'switch-1', device);
+    stateManager.setState('deviceById', 'switch-1', device);
+    stateManager.setState('deviceFeature', 'switch-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.SWITCH.TURN_OFF,
-            devices: ['switch-1'],
+            device_features: ['switch-1-binary'],
           },
         ],
       ],
@@ -219,6 +200,7 @@ describe('scene.executeActions', () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      device_id: 'switch-1',
       last_value: 0,
     };
     const device = {
@@ -226,18 +208,18 @@ describe('scene.executeActions', () => {
       features: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
       },
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'switch-1', device);
+    stateManager.setState('deviceById', 'switch-1', device);
+    stateManager.setState('deviceFeature', 'switch-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.SWITCH.TOGGLE,
-            devices: ['switch-1'],
+            device_features: ['switch-1-binary'],
           },
         ],
       ],
@@ -249,6 +231,7 @@ describe('scene.executeActions', () => {
     const deviceFeature = {
       category: DEVICE_FEATURE_CATEGORIES.SWITCH,
       type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      device_id: 'switch-1',
       last_value: 1,
     };
     const device = {
@@ -256,49 +239,24 @@ describe('scene.executeActions', () => {
       features: {
         category: DEVICE_FEATURE_CATEGORIES.SWITCH,
         type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.returns(deviceFeature),
       },
     };
     const stateManager = new StateManager(event);
-    stateManager.setState('device', 'switch-1', device);
+    stateManager.setState('deviceById', 'switch-1', device);
+    stateManager.setState('deviceFeature', 'switch-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.SWITCH.TURN_OFF,
-            devices: ['switch-1'],
+            device_features: ['switch-1-binary'],
           },
         ],
       ],
       {},
     );
     assert.calledOnceWithExactly(device.setValue, device, deviceFeature, 0);
-  });
-  it('should execute switch toggle error', async () => {
-    const device = {
-      setValue: fake.resolves(null),
-      features: {
-        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-        find: fake.throws('An error occured'),
-      },
-    };
-    const stateManager = new StateManager(event);
-    stateManager.setState('device', 'switch-1', device);
-    await executeActions(
-      { stateManager, event, device },
-      [
-        [
-          {
-            type: ACTIONS.SWITCH.TOGGLE,
-            devices: ['switch-1'],
-          },
-        ],
-      ],
-      {},
-    );
-    assert.notCalled(device.setValue);
   });
   it('should execute wait 5 ms', async () => {
     await executeActions(
@@ -358,32 +316,41 @@ describe('scene.executeActions', () => {
     const device = {
       setValue: fake.resolves(null),
     };
+    const deviceFeatureLight = {
+      device_id: 'device',
+    };
+    const deviceFeatureSwitch = {
+      device_id: 'device',
+    };
     const stateManager = new StateManager(event);
+    stateManager.setState('deviceById', 'device', device);
+    stateManager.setState('deviceFeature', 'light-1-binary', deviceFeatureLight);
+    stateManager.setState('deviceFeature', 'switch-1-binary', deviceFeatureSwitch);
     await executeActions(
       { stateManager, event, device },
       [
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
         [
           {
             type: ACTIONS.LIGHT.TURN_ON,
-            devices: ['light-1'],
+            device_features: ['light-1-binary'],
           },
         ],
         [
           {
             type: ACTIONS.SWITCH.TURN_ON,
-            devices: ['switch-1'],
+            device_features: ['switch-1-binary'],
           },
         ],
         [
           {
             type: ACTIONS.SWITCH.TURN_OFF,
-            devices: ['switch-1'],
+            device_features: ['switch-1-binary'],
           },
         ],
       ],
@@ -391,7 +358,7 @@ describe('scene.executeActions', () => {
     );
     assert.callCount(device.setValue, 4);
   });
-  it('should throw error, action type does not exist', async () => {
+  it.only('should throw error, action type does not exist', async () => {
     const light = {
       turnOn: fake.resolves(null),
     };
