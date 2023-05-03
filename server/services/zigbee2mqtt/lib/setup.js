@@ -14,10 +14,7 @@ async function setup(usbConfig) {
   await this.gladys.variable.setValue(CONFIGURATION.ZIGBEE_DONGLE_NAME, z2mDongleName, this.serviceId);
 
   // Reload z2m container with new USB configuration
-  if (this.zigbee2mqttRunning) {
-    const configuration = await this.getConfiguration();
-    await this.installZ2mContainer(configuration);
-  }
+  await this.init();
 }
 
 module.exports = {
