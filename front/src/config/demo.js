@@ -1726,7 +1726,7 @@ const data = {
     name: 'ZIGBEE_DONGLE_NAME',
     value: 'Electrolama zig-a-zig-ah! (zzh!)'
   },
-  'get /api/v1/service/zigbee2mqtt/adapters': [
+  'get /api/v1/service/zigbee2mqtt/adapter': [
     'ConBee',
     'ConBee II',
     'RaspBee',

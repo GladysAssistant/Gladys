@@ -1,7 +1,6 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
-import Creatable from 'react-select/creatable';
 import Select from 'react-select';
 
 const SettingsTab = ({ children, ...props }) => (
@@ -56,11 +55,11 @@ const SettingsTab = ({ children, ...props }) => (
             <label class="form-label">
               <Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDongleNameLabel" />
             </label>
-            <Creatable
+            <Select
               value={{ label: props.zigbeeDongleName, value: props.zigbeeDongleName }}
               onChange={props.updateZigbeeDongleName}
               options={props.zigbeeAdapters}
-              formatCreateLabel={input => input}
+              isClearable
             />
           </div>
           <div class="form-group">

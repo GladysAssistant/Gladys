@@ -1,5 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import get from 'get-value';
+
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import SettingsTab from './SettingsTab';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -43,7 +45,7 @@ class Zigbee2mqttSettingsPage extends Component {
 
   loadZigbeeAdapters = async () => {
     try {
-      const zigbeeAdapterLabels = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/adapters');
+      const zigbeeAdapterLabels = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/adapter');
       const zigbeeAdapters = zigbeeAdapterLabels.map(adapter => ({
         label: adapter,
         value: adapter
@@ -62,24 +64,32 @@ class Zigbee2mqttSettingsPage extends Component {
   };
 
   loadZ2MConfiguration = async () => {
+    let zigbeeDriverPath;
+    let zigbeeDongleName;
+
     try {
-      const { value: zigbeeDriverPath } = await this.props.httpClient.get(
+      let zigbeeDriverPathVariable = await this.props.httpClient.get(
         '/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH'
       );
-      const { value: zigbeeDongleName } = await this.props.httpClient.get(
+      zigbeeDriverPath = zigbeeDriverPathVariable.value;
+    } catch (e) {
+      // Variable is not set yet
+    }
+
+    try {
+      let zigbeeDongleNameVariable = await this.props.httpClient.get(
         '/api/v1/service/zigbee2mqtt/variable/ZIGBEE_DONGLE_NAME'
       );
-      this.setState({
-        zigbeeDriverPath,
-        zigbeeDongleName,
-        getCurrentZigbee2mqttDriverPathStatus: RequestStatus.Success
-      });
+      zigbeeDongleName = zigbeeDongleNameVariable.value;
     } catch (e) {
-      console.error(e);
-      this.setState({
-        getCurrentZigbee2mqttDriverPathStatus: RequestStatus.Error
-      });
+      // Variable is not set yet
     }
+
+    this.setState({
+      zigbeeDriverPath,
+      zigbeeDongleName,
+      getCurrentZigbee2mqttDriverPathStatus: RequestStatus.Success
+    });
   };
 
   updateZigbeeDriverPath = option => {
@@ -89,8 +99,9 @@ class Zigbee2mqttSettingsPage extends Component {
   };
 
   updateZigbeeDongleName = option => {
+    const zigbeeDongleName = get(option, 'value', { default: '' });
     this.setState({
-      zigbeeDongleName: option.value
+      zigbeeDongleName
     });
   };
 
