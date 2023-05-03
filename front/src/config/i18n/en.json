@@ -1149,6 +1149,59 @@
       "notOnGladysPlus": "As ChatGPT API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
       "licenseShouldBeActive": "This integration is only available to users with an active license (at least one payment). For trial users, please contact us on the forum or email."
+    },
+    "overkiz": {
+      "title": "Overkiz",
+      "description": "Control your Overkiz devices.",
+      "deviceTab": "Devices",
+      "discoverTab": "Overkiz discover",
+      "discoverDeviceDescr": "",
+      "settingsTab": "Configuration",
+      "documentation": "Overkiz documentation",
+      "device": {
+        "title": "",
+        "search": "",
+        "noDeviceFound": "",
+        "nameLabel": "",
+        "namePlaceholder": "",
+        "modelLabel": "",
+        "roomLabel": "",
+        "featuresLabel": "",
+        "createButton": "Save",
+        "updateButton": "Update",
+        "deleteButton": "Delete",
+        "editButton": ""
+      },
+      "status": {
+        "notConnected": "",
+        "setupPageLink": ""
+      },
+      "discover": {
+        "title": "Overkiz devices in Gladys",
+        "scan": "Search devices",
+        "description": "",
+        "noDeviceFound": "No Overkiz device found."
+      },
+      "settings": {
+        "title": "Overkiz configuration",
+        "overkizDescription": "You can connect Gladys to your Overkiz cloud account to command the associated devices.",
+        "typeLabel": "Type",
+        "typePlaceholder": "Enter Overkiz type",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter Overkiz username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter Overkiz password",
+        "connectButton": "Connection",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your Overkiz cloud account...",
+        "connected": "Connected to the Overkiz cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
     }
   },
   "editScene": {

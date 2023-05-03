@@ -1,0 +1,23 @@
+{
+  "name": "gladys-overkiz",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "async-retry": "^1.3.3",
+    "axios": "^0.21.1",
+    "bluebird": "^3.7.0",
+    "bottleneck": "^2.19.5",
+    "node-cron": "^3.0.2",
+    "overkiz-api": "^2.0.1"
+  }
+}

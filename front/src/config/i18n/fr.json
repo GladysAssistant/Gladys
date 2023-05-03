@@ -1149,6 +1149,59 @@
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
       "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
+    },
+    "overkiz": {
+      "title": "Overkiz",
+      "description": "Contrôler vos appareils Overkiz.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Overkiz",
+      "discoverDeviceDescr": "",
+      "settingsTab": "Configuration",
+      "documentation": "Documentation Overkiz",
+      "device": {
+        "title": "",
+        "search": "",
+        "noDeviceFound": "Aucun périphérique Overkiz détecté.",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "modelLabel": "Modèle",
+        "roomLabel": "Pièce",
+        "createButton": "Sauvegarder",
+        "updateButton": "Mettre à jour",
+        "deleteButton": "Supprimer",
+        "featuresLabel": "",
+        "editButton": ""
+      },
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Overkiz, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Overkiz."
+      },
+      "discover": {
+        "title": "Découverte Overkiz",
+        "scan": "Rechercher",
+        "description": "Les appareils Overkiz sont automatiquement découverts. Vos appareils Overkiz doivent être ajoutés à votre compte cloud Overkiz avant.",
+        "noDeviceFound": "Aucun périphérique Overkiz détecté."
+      },
+      "settings": {
+        "title": "Configuration Overkiz",
+        "overkizDescription": "Vous pouvez connecter Gladys à votre compte cloud Overkiz pour commander les appareils associés.",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Overkiz...",
+        "connected": "Connexion réussie au compte cloud Overkiz !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "typeLabel": "Type",
+        "typePlaceholder": "Entrez le type Overkiz",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur Overkiz",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe utilisateur Overkiz",
+        "connectButton": "Connexion"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
     }
   },
   "editScene": {
