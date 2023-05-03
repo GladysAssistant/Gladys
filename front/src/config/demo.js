@@ -1204,7 +1204,7 @@ const data = {
   ],
   'get /api/v1/service/usb/port': [
     {
-      comName: '/dev/tty.usbmodem145301',
+      comPath: '/dev/ttyUSB0',
       serialNumber: 'f75ab720-bbb3-4a1c-8729-84aa02ebdca0',
       locationId: '14530000',
       vendorId: '0658',
@@ -1715,7 +1715,10 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH': {},
+  'get /api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH': {
+    name: 'ZIGBEE2MQTT_DRIVER_PATH',
+    value: '/dev/ttyUSB0'
+  },
   'get /api/v1/service/zigbee2mqtt/status': {
     usbConfigured: true,
     mqttExist: true,

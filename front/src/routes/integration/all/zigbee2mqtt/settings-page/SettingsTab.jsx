@@ -1,6 +1,6 @@
 import { Text } from 'preact-i18n';
-import get from 'get-value';
 import cx from 'classnames';
+import { RequestStatus } from '../../../../../utils/consts';
 
 const SettingsTab = ({ children, ...props }) => (
   <div class="card">
@@ -22,17 +22,17 @@ const SettingsTab = ({ children, ...props }) => (
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {get(props, 'zigbee2mqttStatus.usbConfigured') && (
+          {props.usbConfigured && (
             <div class="alert alert-success">
               <Text id="integration.zigbee2mqtt.settings.attached" />
             </div>
           )}
-          {!get(props, 'zigbee2mqttStatus.usbConfigured') && (
+          {!props.usbConfigured && (
             <div class="alert alert-warning">
               <Text id="integration.zigbee2mqtt.settings.notAttached" />
             </div>
           )}
-          {props.zigbee2mqttSavingInProgress && (
+          {props.zigbee2mqttSaveStatus === RequestStatus.Getting && (
             <div class="alert alert-info">
               <Text id="integration.zigbee2mqtt.settings.saving" />
             </div>
@@ -48,17 +48,16 @@ const SettingsTab = ({ children, ...props }) => (
               <option>
                 <Text id="global.emptySelectOption" />
               </option>
-              {props.usbPorts &&
-                props.usbPorts.map(
-                  usbPort =>
-                    usbPort.comPath && (
-                      <option value={usbPort.comPath} selected={props.zigbee2mqttDriverPath === usbPort.comPath}>
-                        {usbPort.comPath}
-                        {usbPort.comName ? ` - ${usbPort.comName}` : ''}
-                        {usbPort.comVID ? ` - ${usbPort.comVID}` : ''}
-                      </option>
-                    )
-                )}
+              {props.usbPorts.map(
+                usbPort =>
+                  usbPort.comPath && (
+                    <option value={usbPort.comPath} selected={props.zigbee2mqttDriverPath === usbPort.comPath}>
+                      {usbPort.comPath}
+                      {usbPort.comName ? ` - ${usbPort.comName}` : ''}
+                      {usbPort.comVID ? ` - ${usbPort.comVID}` : ''}
+                    </option>
+                  )
+              )}
             </select>
           </div>
           <div class="form-group">
