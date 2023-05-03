@@ -14,6 +14,7 @@ const zigbee2mqttManager = {
   getDiscoveredDevices: fake.returns(['device']),
   getManagedAdapters: fake.returns(['adapter']),
   status: fake.returns(true),
+  setup: fake.returns(true),
   init: fake.returns(true),
   installMqttContainer: fake.returns(true),
   installZ2mContainer: fake.returns(true),
@@ -63,6 +64,19 @@ describe('zigbee2mqtt API', () => {
     await controller['get /api/v1/service/zigbee2mqtt/status'].controller(req, res);
     assert.calledOnce(zigbee2mqttManager.status);
     assert.calledWith(res.json, true);
+  });
+
+  it('post /api/v1/service/zigbee2mqtt/setup', async () => {
+    const req = {
+      body: { attr: 'value' },
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/zigbee2mqtt/setup'].controller(req, res);
+    assert.calledOnceWithExactly(zigbee2mqttManager.setup, req.body);
+    assert.calledOnceWithExactly(res.json, { success: true });
   });
 
   it('post /api/v1/service/zigbee2mqtt/connect', async () => {

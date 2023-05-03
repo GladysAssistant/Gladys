@@ -36,6 +36,19 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   }
 
   /**
+   * @api {post} /api/v1/service/zigbee2mqtt/setup Setup
+   * @apiName setup
+   * @apiGroup Zigbee2mqtt
+   */
+  async function setup(req, res) {
+    logger.debug('Entering setup step');
+    await zigbee2mqttManager.setup(req.body);
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
    * @api {post} /api/v1/service/zigbee2mqtt/connect Connect
    * @apiName connect
    * @apiGroup Zigbee2mqtt
@@ -123,6 +136,10 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
     'get /api/v1/service/zigbee2mqtt/status': {
       authenticated: true,
       controller: asyncMiddleware(status),
+    },
+    'post /api/v1/service/zigbee2mqtt/setup': {
+      authenticated: true,
+      controller: asyncMiddleware(setup),
     },
     'post /api/v1/service/zigbee2mqtt/connect': {
       authenticated: true,
