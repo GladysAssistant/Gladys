@@ -358,7 +358,7 @@ describe('scene.executeActions', () => {
     );
     assert.callCount(device.setValue, 4);
   });
-  it.only('should throw error, action type does not exist', async () => {
+  it('should throw error, action type does not exist', async () => {
     const light = {
       turnOn: fake.resolves(null),
     };
