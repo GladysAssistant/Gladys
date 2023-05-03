@@ -17,7 +17,8 @@ const LANManagerDiscoverTab = ({
   scan,
   ...props
 }) => {
-  const loading = lanManagerGetDiscoveredDevicesStatus === RequestStatus.Getting;
+  const { scanning } = lanManagerStatus;
+  const displayLoader = scanning && lanManagerDiscoveredDevices.length === 0;
 
   return (
     <div class="card">
@@ -36,11 +37,10 @@ const LANManagerDiscoverTab = ({
           )}
           <button
             class={cx('btn', {
-              'btn-outline-danger': lanManagerStatus.scanning,
-              'btn-outline-primary': !lanManagerStatus.scanning
+              'btn-outline-danger': scanning,
+              'btn-outline-primary': !scanning
             })}
             onClick={scan}
-            disabled={lanManagerStatus.scanning}
           >
             <span class="d-none d-md-inline mr-2">
               <Text id="integration.lanManager.discover.scanButton" />
@@ -57,15 +57,20 @@ const LANManagerDiscoverTab = ({
               class="custom-switch-input"
               checked={filterExisting}
               onClick={props.toggleFilterOnExisting}
-              disabled={loading}
+              disabled={scanning}
             />
-            <span class="custom-switch-indicator mr-1" />
+            <span class={cx('custom-switch-indicator', 'mr-1', { 'bg-light': scanning })} />
             <span class="custom-switch-description">
               <Text id="integration.lanManager.discover.hideExistingDevices" />
             </span>
           </label>
         </li>
       </ul>
+      {scanning && lanManagerDiscoveredDevices.length > 0 && (
+        <div class="progress progress-xs">
+          <div class="progress-bar progress-bar-indeterminate" />
+        </div>
+      )}
       <div class="card-body">
         {lanManagerGetDiscoveredDevicesStatus === RequestStatus.Error && (
           <div class="alert alert-danger">
@@ -75,8 +80,8 @@ const LANManagerDiscoverTab = ({
 
         <div
           class={cx('dimmer', {
-            active: loading,
-            [style.lanManagerListBody]: loading
+            active: displayLoader,
+            [style.lanManagerListBody]: displayLoader
           })}
         >
           <div class="loader" />

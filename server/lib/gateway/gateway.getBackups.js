@@ -5,7 +5,7 @@ const { ERROR_MESSAGES } = require('../../utils/constants');
 const { Error403, Error500 } = require('../../utils/httpErrors');
 
 /**
- * @description Get list of backups
+ * @description Get list of backups.
  * @returns {Promise} Resolve with list of backups.
  * @example
  * getBackups();

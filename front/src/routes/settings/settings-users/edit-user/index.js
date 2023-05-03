@@ -6,10 +6,6 @@ import actions from '../../../../actions/profile';
 import SettingsLayout from '../../SettingsLayout';
 import { RequestStatus } from '../../../../utils/consts';
 
-@connect(
-  'currentUrl,newUser,years,months,days,createUserStatus,createUserError,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue,ProfilePatchStatus,ProfileGetStatus',
-  actions
-)
 class SettingsUsers extends Component {
   updateFirstname = e => {
     this.props.updateNewUserProperty('firstname', e.target.value);
@@ -121,4 +117,7 @@ class SettingsUsers extends Component {
   }
 }
 
-export default SettingsUsers;
+export default connect(
+  'currentUrl,newUser,years,months,days,createUserStatus,createUserError,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue,ProfilePatchStatus,ProfileGetStatus',
+  actions
+)(SettingsUsers);

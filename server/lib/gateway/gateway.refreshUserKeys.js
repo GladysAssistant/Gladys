@@ -1,6 +1,6 @@
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 /**
- * @description Refresh cache of gateway user keys
+ * @description Refresh cache of gateway user keys.
  * @example
  * this.refreshUserKeys();
  */

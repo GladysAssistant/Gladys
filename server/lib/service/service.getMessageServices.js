@@ -2,7 +2,7 @@ const db = require('../../models');
 
 /**
  * @public
- * @description Load all services
+ * @description Load all services.
  * @returns {Promise} Return the service or null if not present.
  * @example
  * service.getService('telegram');

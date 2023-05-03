@@ -2,8 +2,8 @@ const { mappings } = require('./deviceMappings');
 
 /**
  * @description Create HomeKit accessory.
- * @param {Object} device - Gladys device to format as HomeKit accessory.
- * @returns {Object} HomeKit accessory to expose.
+ * @param {object} device - Gladys device to format as HomeKit accessory.
+ * @returns {object} HomeKit accessory to expose.
  * @example
  * buildAccessory(device)
  */

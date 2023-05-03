@@ -17,7 +17,8 @@
     "celsius": "C",
     "fahrenheit": "F",
     "metersPerSec": "m/s",
-    "milesPerHour": "m/h"
+    "milesPerHour": "m/h",
+    "selectPlaceholder": "Select..."
   },
   "color": {
     "blue": "Blue",
@@ -605,7 +606,8 @@
         "error": "An error occurred during the linking process with your Enedis account, please try again.",
         "notOnGladysGateway": "This integration is available via Gladys Plus, to connect/re-connect go to the Gladys Plus interface, available here:",
         "connectedToUsagePointds": "Successfully connected to Enedis! The first sync will take from 2 to 3 hours depending on the volume of request on Enedis API. No need to keep this tab open during this time.",
-        "reconnectInfo": "If you ever want to refresh your access key, you can repeat the login process. It is necessary to log in again once every 2 years."
+        "reconnectInfo": "If you ever want to refresh your access key, you can repeat the login process. It is necessary to log in again once every 2 years.",
+        "dailyConsumptionFeatureName": "Daily consumption"
       },
       "usagePoints": {
         "title": "My meters",
@@ -898,7 +900,7 @@
         "hideExistingDevices": "Hide already added devices",
         "alreadyCreatedButton": "Already created",
         "updateButton": "Update",
-        "discoveringError": "An error occurred, please check logs."
+        "discoveringError": "An error occurred, check scanner configuration, or check logs."
       },
       "setup": {
         "title": "LANManager settings",
@@ -1189,11 +1191,19 @@
       "turnOffLights": {
         "label": "Select the lights you want to turn off"
       },
+      "toggleLights": {
+        "label": "Select the lights you want to toggle",
+        "description": "This action turn on the light if state is off or turn off the light if state is on"
+      },
       "turnOnSwitches": {
         "label": "Select the switches you want to turn on"
       },
       "turnOffSwitches": {
         "label": "Select the switches you want to turn off"
+      },
+      "toggleSwitches": {
+        "label": "Select the switches you want to toggle",
+        "description": "This action turn on the switch if state is off or turn off the switch if state is on"
       },
       "deviceGetValue": {
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",
@@ -1295,11 +1305,13 @@
       "delay": "Wait",
       "light": {
         "turn-on": "Turn On the Lights",
-        "turn-off": "Turn Off the Lights"
+        "turn-off": "Turn Off the Lights",
+        "toggle": "Toggle the Lights"
       },
       "switch": {
         "turn-on": "Turn On the Switches",
-        "turn-off": "Turn Off the Switches"
+        "turn-off": "Turn Off the Switches",
+        "toggle": "Toggle the Switches"
       },
       "scene": {
         "start": "Start scene"

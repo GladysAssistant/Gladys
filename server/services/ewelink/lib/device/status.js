@@ -1,6 +1,6 @@
 /**
  * @description Get eWeLink status.
- * @returns {Object} Current eWeLink network status.
+ * @returns {object} Current eWeLink network status.
  * @example
  * status();
  */

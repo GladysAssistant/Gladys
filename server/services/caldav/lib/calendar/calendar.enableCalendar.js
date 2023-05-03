@@ -3,6 +3,7 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Enable calendar synchronization.
  * @param {string} selector - Calendar selector to update.
+ * @returns {Promise<object>} Resolve with updated calendar.
  * @example
  * enableCalendar('personnal')
  */

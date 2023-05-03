@@ -1,5 +1,5 @@
 /**
- * @description Cancel job
+ * @description Cancel job.
  * @param {string} jobName - Job name to cancel.
  * @example
  * scheduler.cancelJob('my-job');

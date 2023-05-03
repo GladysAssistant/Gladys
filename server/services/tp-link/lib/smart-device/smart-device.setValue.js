@@ -3,9 +3,9 @@ const { NotFoundError } = require('../../../../utils/coreErrors');
 const { TP_LINK_ON, TP_LINK_OFF, TP_LINK_IP_ADDRESS } = require('../utils/consts');
 
 /**
- * @description Change value of a TP-Link Device
- * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The device feature to control.
+ * @description Change value of a TP-Link Device.
+ * @param {object} device - The device to control.
+ * @param {object} deviceFeature - The device feature to control.
  * @param {string|number} value - The new value.
  * @returns {Promise} Promise.
  * @example

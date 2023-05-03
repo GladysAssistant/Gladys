@@ -8,9 +8,9 @@ const { sendState } = require('./sendState');
 
 /**
  * @description Add ability to connect to HomeKit.
- * @param {Object} gladys - Gladys instance.
+ * @param {object} gladys - Gladys instance.
  * @param {string} serviceId - UUID of the service in DB.
- * @param {Object} hap - UUID of the service in DB.
+ * @param {object} hap - UUID of the service in DB.
  * @example
  * const homekitHandler = new HomeKitHandler(gladys, serviceId, hap);
  */

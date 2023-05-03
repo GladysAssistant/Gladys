@@ -4,11 +4,12 @@ const DEFAULT_TIMEOUT = 20 * 1000;
 
 /**
  * @public
- * @description Make an HTTP request
+ * @description Make an HTTP request.
  * @param {string} method - The method of the request.
  * @param {string} url - The URL to call.
  * @param {string} [body] - Optional body.
  * @param {string} [headers] - Options headers.
+ * @returns {Promise} Resolve with HTTP request response.
  * @example
  * request('post', 'http://localhost:3000', '{}');
  */

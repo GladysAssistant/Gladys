@@ -2,7 +2,7 @@ const { JOB_TYPES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
 
 /**
- * @description It's time to do the daily device state aggregate
+ * @description It's time to do the daily device state aggregate.
  * @example
  * onHourlyDeviceAggregateEvent()
  */

@@ -3,7 +3,11 @@ import cx from 'classnames';
 
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 
-const DANGER_ON_VALUE_SENSORS = [DEVICE_FEATURE_CATEGORIES.CO_SENSOR];
+const DANGER_ON_VALUE_SENSORS = [
+  DEVICE_FEATURE_CATEGORIES.CO_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR
+];
 
 const BinaryDeviceValue = ({ deviceFeature }) => {
   const { category, last_value: lastValue = null } = deviceFeature;

@@ -17,9 +17,9 @@ function buildFeatures() {
 
 /**
  * @description Send IR code using Broadlink device.
- * @param {Object} broadlinkDevice - Broadlink device.
- * @param {Object} gladysDevice - Gladys device.
- * @param {Object} deviceFeature - Gladys device feature.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @param {object} gladysDevice - Gladys device.
+ * @param {object} deviceFeature - Gladys device feature.
  * @param {string|number} value - The new device feature value.
  * @returns {Promise} Null.
  * @example

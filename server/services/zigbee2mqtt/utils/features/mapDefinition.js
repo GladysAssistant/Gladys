@@ -3,9 +3,8 @@ const { mapExpose } = require('./mapExpose');
 /**
  * @description Build Gladys features according to Zigbee device.
  * @param {string} deviceName - Device name.
- * @param {Object} definition - Zigbee device definition.
+ * @param {object} definition - Zigbee device definition.
  * @returns {Array} The related Gladys features.
- *
  * @example mapDefinition('MyDevice', {});
  */
 function mapDefinition(deviceName, definition = {}) {
