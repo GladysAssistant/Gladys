@@ -17,4 +17,7 @@ class NextcloudTalkIntegration extends Component {
   }
 }
 
-export default connect('user,nextcloudUrl,nextcloudBotUsername,nextcloudBotPassword,nextcloudTalkToken,nextcloudTalkSaveSettingsStatus,nextcloudTalkGetSettingsStatus', actions)(NextcloudTalkIntegration);
+export default connect(
+  'user,nextcloudUrl,nextcloudBotUsername,nextcloudBotPassword,nextcloudTalkToken,nextcloudTalkSaveSettingsStatus,nextcloudTalkGetSettingsStatus',
+  actions
+)(NextcloudTalkIntegration);
