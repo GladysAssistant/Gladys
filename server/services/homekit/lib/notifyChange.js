@@ -3,8 +3,8 @@ const { mappings } = require('./deviceMappings');
 
 /**
  * @description Add delay before send new state to Homekit.
- * @param {Object} accessories - HomeKit accessories.
- * @param {Object} event - Gladys event to forward to HomeKit.
+ * @param {object} accessories - HomeKit accessories.
+ * @param {object} event - Gladys event to forward to HomeKit.
  * @returns {undefined}
  * @example
  * notifyChange(accessories, event)

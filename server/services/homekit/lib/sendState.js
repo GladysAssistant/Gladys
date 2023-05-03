@@ -6,9 +6,9 @@ const { mappings } = require('./deviceMappings');
 
 /**
  * @description Forward new state value to HomeKit.
- * @param {Object} hkAccessory - HomeKit accessories.
- * @param {Object} feature - Updated Gladys feature.
- * @param {Object} event - Gladys event to forward to HomeKit.
+ * @param {object} hkAccessory - HomeKit accessories.
+ * @param {object} feature - Updated Gladys feature.
+ * @param {object} event - Gladys event to forward to HomeKit.
  * @example
  * sendState(accessories, event)
  */
