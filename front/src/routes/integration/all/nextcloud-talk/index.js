@@ -4,10 +4,6 @@ import actions from './actions';
 import NextcloudTalkPage from './NextcloudTalk';
 import { RequestStatus } from '../../../../utils/consts';
 
-@connect(
-  'user,nextcloudUrl,nextcloudBotUsername,nextcloudBotPassword,nextcloudTalkToken,nextcloudTalkSaveSettingsStatus,nextcloudTalkGetSettingsStatus',
-  actions
-)
 class NextcloudTalkIntegration extends Component {
   componentWillMount() {
     this.props.getNextcloudTalkSetting();
@@ -21,4 +17,4 @@ class NextcloudTalkIntegration extends Component {
   }
 }
 
-export default NextcloudTalkIntegration;
+export default connect('user,nextcloudUrl,nextcloudBotUsername,nextcloudBotPassword,nextcloudTalkToken,nextcloudTalkSaveSettingsStatus,nextcloudTalkGetSettingsStatus', actions)(NextcloudTalkIntegration);

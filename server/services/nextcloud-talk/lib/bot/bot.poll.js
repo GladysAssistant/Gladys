@@ -2,7 +2,7 @@ const get = require('get-value');
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Poll for new message
+ * @description Poll for new message.
  * @param {string} userId - User to send message to.
  * @returns {Promise} - Resolve.
  * @example

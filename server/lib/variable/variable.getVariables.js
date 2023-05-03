@@ -1,9 +1,10 @@
 const db = require('../../models');
 
 /**
- * @description Get all variables matching with key
+ * @description Get all variables matching with key.
  * @param {string} key - The unique key of the variable.
  * @param {string} [serviceId] - The unique ID of a service, or null.
+ * @returns {Promise<Array>} Resolves with list of variables.
  * @example
  * gladys.user.getVariables();
  */

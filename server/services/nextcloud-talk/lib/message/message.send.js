@@ -4,7 +4,7 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Send Nextcloud Talk message.
  * @param {string} token - Nextcloud Talk token.
- * @param {Object} message - Message object to send.
+ * @param {object} message - Message object to send.
  * @returns {Promise} - Resolve.
  * @example
  * send('1abcd2ef', {

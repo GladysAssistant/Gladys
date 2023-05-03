@@ -1,5 +1,5 @@
 /**
- * @description Disconnect Nextcloud Talk
+ * @description Disconnect Nextcloud Talk.
  * @returns {Promise} - Resolve.
  * @example
  * disconnect();

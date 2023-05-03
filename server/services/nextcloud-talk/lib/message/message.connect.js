@@ -1,7 +1,7 @@
 const EventEmitter = require('events');
 
 /**
- * @description Connect Nextcloud Talk
+ * @description Connect Nextcloud Talk.
  * @param {Array} tokens - Nextcloud Talk tokens.
  * @example
  * connect([

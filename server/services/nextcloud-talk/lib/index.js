@@ -8,9 +8,9 @@ const { poll } = require('./bot/bot.poll');
 
 /**
  * @description Add ability to send/receive Nextcloud Talk message.
- * @param {Object} gladys - Gladys instance.
+ * @param {object} gladys - Gladys instance.
  * @param {string} serviceId - UUID of the service in DB.
- * @param {Object} axios - Axios library.
+ * @param {object} axios - Axios library.
  * @example
  * const messageHandler = new MessageHandler(gladys, serviceId, axios);
  */

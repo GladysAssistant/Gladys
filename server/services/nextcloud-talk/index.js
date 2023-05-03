@@ -8,7 +8,7 @@ module.exports = function NextcloudTalkService(gladys, serviceId) {
   const messageHandler = new MessageHandler(gladys, serviceId, axios);
   /**
    * @public
-   * @description This function starts the Nextcloud Talk Service
+   * @description This function starts the Nextcloud Talk Service.
    * @example
    * gladys.services.nextcloudTalk.start();
    */
@@ -24,7 +24,7 @@ module.exports = function NextcloudTalkService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the Nextcloud Talk Service
+   * @description This function stops the Nextcloud Talk Service.
    * @example
    * gladys.services.nextcloudTalk.stop();
    */
@@ -35,7 +35,7 @@ module.exports = function NextcloudTalkService(gladys, serviceId) {
 
   /**
    * @public
-   * @description Test if Nextcloud Talk is running
+   * @description Test if Nextcloud Talk is running.
    * @returns {Promise<boolean>} Returns true if Nextcloud Talk is used.
    * @example
    *  const used = await gladys.services.nextcloudTalk.isUsed();

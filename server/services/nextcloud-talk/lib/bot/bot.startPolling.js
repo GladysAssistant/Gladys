@@ -1,7 +1,7 @@
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Initiate bot poll
+ * @description Initiate bot poll.
  * @param {string} userId - User to send message to.
  * @returns {Promise} - Resolve.
  * @example

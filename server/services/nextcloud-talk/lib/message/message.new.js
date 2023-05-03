@@ -4,7 +4,7 @@ const { EVENTS } = require('../../../../utils/constants');
 
 /**
  * @description Called when a new Nextcloud Talk message arrives.
- * @param {Object} msg - Nextcloud Talk Message.
+ * @param {object} msg - Nextcloud Talk Message.
  * @returns {Promise} - Resolve with null.
  * @example
  * newMessage({...});
