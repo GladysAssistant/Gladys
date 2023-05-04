@@ -5,10 +5,6 @@ import { RequestStatus } from '../../utils/consts';
 import DashboardProfilePage from './DashboardProfilePage';
 import actions from '../../actions/profile';
 
-@connect(
-  'newUser,years,months,days,ProfileGetStatus,ProfilePatchStatus,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue',
-  actions
-)
 class Profile extends Component {
   updateFirstname = e => {
     this.props.updateNewUserProperty('firstname', e.target.value);
@@ -75,4 +71,7 @@ class Profile extends Component {
   }
 }
 
-export default Profile;
+export default connect(
+  'newUser,years,months,days,ProfileGetStatus,ProfilePatchStatus,profileUpdateErrors,profilePicture,newProfilePicture,newProfilePictureFormValue',
+  actions
+)(Profile);

@@ -3,10 +3,11 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Get Location By User
+ * @description Get Location by user.
  * @param {string} userSelector - The selector of the user to get location from.
  * @param {string} [from] - Start date.
  * @param {string} [to] - End date.
+ * @returns {Promise<Array>} Returns locations from this user.
  * @example
  * gladys.location.get('tony', '2019-04-02 04:41:09', '2019-04-02 04:41:09');
  */

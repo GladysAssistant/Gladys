@@ -7,7 +7,8 @@ const TOKEN_VALIDITY_IN_SECONDS = 60 * 60; // 1 hour
 /**
  * @description Generate a forgot password link and send it to the user.
  * @param {string} email - Email of the user who forgot his password.
- * @param {Object} useragent - Device linked to this session.
+ * @param {object} useragent - Device linked to this session.
+ * @returns {Promise<object>} Resolve with created session.
  * @example
  * gladys.user.forgotPassword('test@test.fr', {});
  */

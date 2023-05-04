@@ -1,7 +1,7 @@
 /**
  * @description Complete device with Gladys exting information.
- * @param {Object} device - Device to check.
- * @returns {Object} Returns completed device.
+ * @param {object} device - Device to check.
+ * @returns {object} Returns completed device.
  * @example
  * const device = bluetoothManager.completeDevice({});
  */

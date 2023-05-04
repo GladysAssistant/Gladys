@@ -3,7 +3,7 @@ const { PlatformNotCompatible } = require('../../utils/coreErrors');
 /**
  * @description Remove an Docker container.
  * @param {string} containerId - Container id.
- * @param {Object} options - Options for removal (see https://docs.docker.com/engine/api/v1.37/#operation/ContainerDelete).
+ * @param {object} options - Options for removal (see https://docs.docker.com/engine/api/v1.37/#operation/ContainerDelete).
  * @returns {Promise} The removed container.
  * @example
  * await removeContainer(options);

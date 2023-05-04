@@ -5,8 +5,8 @@ const { DIRECTIVE_NAMESPACES_LIST } = require('../../services/alexa/lib/alexa.co
 
 /**
  * @description Handle a new Gladys Alexa Gateway message.
- * @param {Object} data - Gateway message.
- * @param {Object} rawMessage - Message with metadata.
+ * @param {object} data - Gateway message.
+ * @param {object} rawMessage - Message with metadata.
  * @param {Function} cb - Callback.
  * @returns {Promise} Resolve when finished.
  * @example

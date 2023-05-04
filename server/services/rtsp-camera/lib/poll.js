@@ -1,8 +1,8 @@
 const logger = require('../../../utils/logger');
 
 /**
- * @description Poll a camera
- * @param {Object} device - The camera to poll.
+ * @description Poll a camera.
+ * @param {object} device - The camera to poll.
  * @example
  * poll(device);
  */

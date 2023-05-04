@@ -1,6 +1,6 @@
 /**
  * @description Get service status.
- * @returns {Object} The service status.
+ * @returns {object} The service status.
  * @example
  * const status = lanManager.getStatus();
  */

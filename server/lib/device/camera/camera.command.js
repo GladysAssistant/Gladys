@@ -2,9 +2,10 @@ const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 /**
  * @description Command a light.
- * @param {Object} message - The message sent by the user.
- * @param {Object} classification - The classification calculated by the brain.
- * @param {Object} context - The context object containing found variables in question.
+ * @param {object} message - The message sent by the user.
+ * @param {object} classification - The classification calculated by the brain.
+ * @param {object} context - The context object containing found variables in question.
+ * @returns {Promise} Resolve when command has been executed or failed.
  * @example
  * light.command(message, classification, context);
  */

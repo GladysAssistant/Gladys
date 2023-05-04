@@ -27,7 +27,7 @@ const AGGREGATE_STATES_PER_INTERVAL = 100;
 const SCRIPT_PATH = path.join(__dirname, 'device.calculcateAggregateChildProcess.js');
 
 /**
- * @description Calculate Aggregates
+ * @description Calculate Aggregates.
  * @param {string} [type] - Type of the aggregate.
  * @param {string} [jobId] - Id of the job in db.
  * @returns {Promise} - Resolve when finished.

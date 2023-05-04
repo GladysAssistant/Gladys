@@ -10,8 +10,9 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * @description Get list of scenes
- * @param {Object} [options] - Options of the query.
+ * @description Get list of scenes.
+ * @param {object} [options] - Options of the query.
+ * @returns {Promise<Array>} Resolve with list of scenes.
  * @example
  * const scenes = await gladys.scene.get({
  *  take: 20,

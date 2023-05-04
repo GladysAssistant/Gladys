@@ -11,7 +11,7 @@ const dateSchema = Joi.date()
 
 /**
  * @description Save historical device feature state in DB.
- * @param {Object} deviceFeature - A DeviceFeature object.
+ * @param {object} deviceFeature - A DeviceFeature object.
  * @param {number} newValue - The new value of the deviceFeature to save.
  * @param {string} newValueCreatedAt - The date of the new state.
  * @example
@@ -75,6 +75,18 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
   }
   // if the deviceFeature should keep history, we save a new deviceFeatureState
   if (deviceFeature.keep_history) {
+    const valueAlreadyExistInDb = await db.DeviceFeatureState.findOne({
+      where: {
+        device_feature_id: deviceFeature.id,
+        value: newValue,
+        created_at: newValueCreatedAtDate,
+      },
+    });
+    // if the value already exist in the DB, don't re-create it
+    if (valueAlreadyExistInDb !== null) {
+      logger.debug('device.saveHistoricalState: Not saving value in history, value already exists');
+      return;
+    }
     await db.DeviceFeatureState.create({
       device_feature_id: deviceFeature.id,
       value: newValue,

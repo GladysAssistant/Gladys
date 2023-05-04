@@ -7,9 +7,9 @@ const { TIMERS } = require('../bluetooth.constants');
 
 /**
  * @description Try to discover Noble peripheral services.
- * @param {Object} peripheral - Noble peripheral.
+ * @param {object} peripheral - Noble peripheral.
  * @param {string[]} serviceUuids - Requested service uuids.
- * @returns {Promise<Object>} The map of services by UUID.
+ * @returns {Promise<object>} The map of services by UUID.
  * @example
  * await discoverServices(peripheral, ['2a29']);
  */

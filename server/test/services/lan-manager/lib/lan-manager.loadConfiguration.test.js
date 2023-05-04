@@ -11,7 +11,7 @@ const mockOS = {
     return {
       eth0: [
         {
-          cidr: '192.168.1.17/10',
+          cidr: '192.168.1.17/24',
           family: 'IPv4',
           internal: false,
         },
@@ -23,16 +23,23 @@ const mockOS = {
       ],
       wlan0: [
         {
-          cidr: '195.168.1.17/10',
+          cidr: '195.168.1.17/24',
           family: 'IPv4',
           internal: false,
         },
       ],
       lo: [
         {
-          cidr: '127.0.0.17/10',
+          cidr: '127.0.0.17/24',
           family: 'IPv4',
           internal: true,
+        },
+      ],
+      docker0: [
+        {
+          cidr: '172.17.0.1/10',
+          family: 'IPv4',
+          internal: false,
         },
       ],
     };
@@ -82,16 +89,22 @@ describe('LANManager loadConfiguration', () => {
     expect(manager.presenceScanner).deep.eq({ status: PRESENCE_STATUS.ENABLED, frequency: TIMERS.PRESENCE });
     expect(manager.ipMasks).deep.eq([
       {
-        mask: '192.168.1.17/10',
+        mask: '192.168.1.17/24',
         name: 'eth0',
         networkInterface: true,
         enabled: true,
       },
       {
-        mask: '195.168.1.17/10',
+        mask: '195.168.1.17/24',
         name: 'wlan0',
         networkInterface: true,
         enabled: true,
+      },
+      {
+        mask: '172.17.0.1/10',
+        name: 'docker0',
+        networkInterface: true,
+        enabled: false,
       },
     ]);
   });
@@ -99,12 +112,12 @@ describe('LANManager loadConfiguration', () => {
   it('all config in db', async () => {
     const storedMasks = [
       {
-        mask: '195.168.1.17/10',
+        mask: '195.168.1.17/24',
         name: 'anotherName',
         enabled: false,
       },
       {
-        mask: '200.168.1.17/10',
+        mask: '200.168.1.17/24',
         name: 'custom name',
         enabled: true,
       },
@@ -131,21 +144,28 @@ describe('LANManager loadConfiguration', () => {
     expect(manager.presenceScanner).deep.eq({ status: PRESENCE_STATUS.DISABLED, frequency: 60000 });
     expect(manager.ipMasks).deep.eq([
       {
-        mask: '195.168.1.17/10',
+        mask: '195.168.1.17/24',
         name: 'wlan0',
         networkInterface: true,
         enabled: false,
       },
       {
-        mask: '200.168.1.17/10',
+        mask: '200.168.1.17/24',
         name: 'custom name',
+        networkInterface: false,
         enabled: true,
       },
       {
-        mask: '192.168.1.17/10',
+        mask: '192.168.1.17/24',
         name: 'eth0',
         networkInterface: true,
         enabled: true,
+      },
+      {
+        mask: '172.17.0.1/10',
+        name: 'docker0',
+        networkInterface: true,
+        enabled: false,
       },
     ]);
   });

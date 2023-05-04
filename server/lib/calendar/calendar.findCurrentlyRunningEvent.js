@@ -2,12 +2,13 @@ const { Op } = require('sequelize');
 const db = require('../../models');
 
 /**
- * @description Delete events from a calendar.
+ * @description Find currently running event.
  * @param {Array} calendars - Array of calendars.
  * @param {string} calendarEventNameComparator - Comparator with event name.
  * @param {string} calendarEventName - Name of the event to search.
+ * @returns {Promise<Array>} Resolve with arrays of events.
  * @example
- * gladys.calendar.destroyEvents('0dc03aef-4a23-9c4e-88e3-5437971269e5');
+ * gladys.calendar.findCurrentlyRunningEvent(calendars, calendarEventNameComparator, calendarEventName);
  */
 async function findCurrentlyRunningEvent(calendars, calendarEventNameComparator, calendarEventName) {
   const now = new Date();

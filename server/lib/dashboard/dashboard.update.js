@@ -5,7 +5,8 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * @description Update a dashboard.
  * @param {string} userId - The userId querying.
  * @param {string} selector - The selector.
- * @param {Object} newDashboard - The new dashboard object.
+ * @param {object} newDashboard - The new dashboard object.
+ * @returns {Promise<object>} Return dashboard updated.
  * @example
  * gladys.dashboard.update('main-dashboard', {
  *    name: 'new name',

@@ -6,7 +6,6 @@ module.exports = function MessageController(gladys) {
    * @api {post} /api/v1/message Send message to Gladys
    * @apiName SendMessage
    * @apiGroup Message
-   *
    * @apiParam {string} text Text to send
    * @apiSuccessExample {json} Success-Example
    * {
@@ -41,7 +40,6 @@ module.exports = function MessageController(gladys) {
    * @api {get} /api/v1/message get
    * @apiName get
    * @apiGroup Message
-   *
    */
   async function get(req, res) {
     const messages = await gladys.message.get(req.user.id);

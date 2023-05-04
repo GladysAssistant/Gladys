@@ -20,7 +20,7 @@ const { getProtocolFromDevice } = require('./tasmota.getProtocolFromDevice');
 
 /**
  * @description Add ability to connect to Tasmota devices.
- * @param {Object} gladys - Gladys instance.
+ * @param {object} gladys - Gladys instance.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const tasmotaHandler = new TasmotaHandler(gladys, serviceId);

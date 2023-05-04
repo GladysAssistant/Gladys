@@ -8,7 +8,6 @@ import SignupGeneratingKeys from './SignupGeneratingKeys';
 const ACCEPTED_LANGUAGES = ['en', 'fr'];
 const DEFAULT_LANGUAGE = 'en';
 
-@connect('session', {})
 class SignupPage extends Component {
   state = {
     name: '',
@@ -160,4 +159,4 @@ class SignupPage extends Component {
   }
 }
 
-export default SignupPage;
+export default connect('session', {})(SignupPage);

@@ -4,9 +4,9 @@ const db = require('../../models');
 
 /**
  * @public
- * @description Get usage
+ * @description Get usage.
  * @param {string} [podId] - Id of the pod.
- * @returns {Promise<Object>} Get all services used.
+ * @returns {Promise<object>} Get all services used.
  * @example
  * const usage = await service.getUsage();
  * // {zigbee: true, xiaomi: false}
