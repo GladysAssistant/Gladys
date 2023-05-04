@@ -11,6 +11,7 @@ import { DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
 import '../../../../components/boxs/device-in-room/device-features/style.css';
+import style from './DeviceSetValue.css';
 
 class DeviceSetValue extends Component {
   constructor(props) {
@@ -20,6 +21,8 @@ class DeviceSetValue extends Component {
       computed: props.action.evaluate_value || false
     };
   }
+
+  toggleType = () => this.setState({ computed: !this.state.computed });
 
   onDeviceFeatureChange = (deviceFeature, device) => {
     const { columnIndex, index } = this.props;
@@ -70,13 +73,8 @@ class DeviceSetValue extends Component {
     if (this.state.computed) {
       return (
         <div>
-          <div
-            style={{
-              fontSize: 12,
-              marginBottom: '.375rem'
-            }}
-          >
-            <Text id="editScene.actionsCard.deviceSetValue.explanationText" />
+          <div className={style.explanationText}>
+            <Text id="editScene.actionsCard.deviceSetValue.computedExplanationText" />
           </div>
           <div class="input-group">
             <Localizer>
@@ -126,6 +124,9 @@ class DeviceSetValue extends Component {
 
     return (
       <div>
+        <div className={style.explanationText}>
+          <Text id="editScene.actionsCard.deviceSetValue.simpleExplanationText" />
+        </div>
         <div class="input-group">
           <Localizer>
             <input
@@ -186,24 +187,16 @@ class DeviceSetValue extends Component {
           />
         </div>
         <div class="form-group">
-          <label class="form-label">
-            <Text id="editScene.actionsCard.deviceSetValue.valueLabel" />
-            <span class="form-required">
-              <Text id="global.requiredField" />
-            </span>
-          </label>
-          <div className="nav-tabs" style={{ display: 'flex', margin: 0 }}>
+          <div className={cx('nav-tabs', style.valueTypeTab)}>
             <span
-              class={`nav-link ${this.state.computed ? '' : 'active'}`}
-              style={'width: 50%'}
-              onClick={() => this.setState({ computed: false })}
+              class={cx('nav-link', style.valueTypeLink, { active: !this.state.computed })}
+              onClick={this.toggleType}
             >
               <Text id="editScene.actionsCard.deviceSetValue.valueTypeSimple" />
             </span>
             <span
-              class={`nav-link ${this.state.computed ? 'active' : ''}`}
-              style={'width: 50%'}
-              onClick={() => this.setState({ computed: true })}
+              class={cx('nav-link', style.valueTypeLink, { active: this.state.computed })}
+              onClick={this.toggleType}
             >
               <Text id="editScene.actionsCard.deviceSetValue.valueTypeComputed" />
             </span>

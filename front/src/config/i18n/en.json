@@ -1214,8 +1214,9 @@
         "deviceLabel": "Device",
         "valueLabel": "Value",
         "valueTypeSimple": "Simple",
+        "simpleExplanationText": "Enter the new value you wish to assign to your device here.",
         "valueTypeComputed": "Computed",
-        "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",

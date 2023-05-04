@@ -53,7 +53,7 @@ const actionsFunc = {
     }
 
     let { value } = action;
-    if (action.evaluate_value) {
+    if (action.evaluate_value !== undefined) {
       value = evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
     }
 
