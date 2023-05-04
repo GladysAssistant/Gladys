@@ -6,7 +6,6 @@ import { route } from 'preact-router';
 import { RequestStatus } from '../../../utils/consts';
 import EditScenePage from './EditScenePage';
 
-@connect('session,httpClient', {})
 class EditScene extends Component {
   getSceneBySelector = async () => {
     this.setState({
@@ -373,4 +372,4 @@ class EditScene extends Component {
   }
 }
 
-export default EditScene;
+export default connect('session,httpClient', {})(EditScene);

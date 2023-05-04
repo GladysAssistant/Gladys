@@ -4,7 +4,8 @@ const { NotFoundError } = require('../../utils/coreErrors');
 /**
  * @description Create a room in a house.
  * @param {string} selector - The selector of a house.
- * @param {Object} room - The room to create.
+ * @param {object} room - The room to create.
+ * @returns {Promise<object>} Resolve with created room.
  * @example
  * gladys.room.create('my-house', {
  *    name: 'Kitchen'

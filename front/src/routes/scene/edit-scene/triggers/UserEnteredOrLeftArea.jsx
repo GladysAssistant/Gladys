@@ -5,7 +5,6 @@ import { Text } from 'preact-i18n';
 import Select from 'react-select';
 import { EVENTS } from '../../../../../../server/utils/constants';
 
-@connect('httpClient,user', {})
 class UserPresenceTrigger extends Component {
   getOptions = async () => {
     try {
@@ -117,4 +116,4 @@ class UserPresenceTrigger extends Component {
   }
 }
 
-export default UserPresenceTrigger;
+export default connect('httpClient,user', {})(UserPresenceTrigger);

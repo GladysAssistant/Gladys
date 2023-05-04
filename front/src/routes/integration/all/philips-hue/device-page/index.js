@@ -5,10 +5,6 @@ import PhilipsHuePage from '../PhilipsHuePage';
 import DevicePage from './DevicePage';
 import FoundDevices from './FoundDevices';
 
-@connect(
-  'session,user,philipsHueDevices,houses,getPhilipsHueDevicesStatus,philipsHueNewDevices,getPhilipsHueCreateDeviceStatus,getPhilipsHueNewDevicesStatus,philipsHueDeviceSearch,getPhilipsHueDeviceOrderDir',
-  actions
-)
 class PhilipsHueDevicePage extends Component {
   componentWillMount() {
     this.props.getPhilipsHueDevices();
@@ -27,4 +23,7 @@ class PhilipsHueDevicePage extends Component {
   }
 }
 
-export default PhilipsHueDevicePage;
+export default connect(
+  'session,user,philipsHueDevices,houses,getPhilipsHueDevicesStatus,philipsHueNewDevices,getPhilipsHueCreateDeviceStatus,getPhilipsHueNewDevicesStatus,philipsHueDeviceSearch,getPhilipsHueDeviceOrderDir',
+  actions
+)(PhilipsHueDevicePage);

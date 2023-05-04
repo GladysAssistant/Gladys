@@ -17,8 +17,8 @@ const { setValue } = require('./setValue');
 
 /**
  * @description Add ability to connect to a MQTT broker.
- * @param {Object} gladys - Gladys instance.
- * @param {Object} mqttLibrary - MQTT lib.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} mqttLibrary - MQTT lib.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const mqttHandler = new MqttHandler(gladys, client, serviceId);

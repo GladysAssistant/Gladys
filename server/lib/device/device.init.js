@@ -3,7 +3,7 @@ const { EVENTS } = require('../../utils/constants');
 const logger = require('../../utils/logger');
 
 /**
- * @description Init devices in local RAM
+ * @description Init devices in local RAM.
  * @param {boolean} startDeviceStateAggregate - Start the device aggregate task.
  * @returns {Promise} Resolve with inserted devices.
  * @example

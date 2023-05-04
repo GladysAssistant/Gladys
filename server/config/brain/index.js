@@ -15,7 +15,8 @@ const addLanguage = (arr, language) =>
   });
 
 /**
- * @description return brain configuration.
+ * @description Return brain configuration.
+ * @returns {object} Return brain configuration.
  * @example
  * const config = getConfiguration();
  */

@@ -3,10 +3,9 @@ const { buildFeatures } = require('./buildFeatures');
 /**
  * @description Build a Gladys feature according to Zigbee "expose" and "features" values.
  * @param {string} deviceName - Device friendly name.
- * @param {Object} expose - Zigbee "expose" values.
+ * @param {object} expose - Zigbee "expose" values.
  * @param {string} parentType - Requested parent type.
- * @returns {Object} The related Gladys feature, or undefined.
- *
+ * @returns {object} The related Gladys feature, or undefined.
  * @example mapExpose('MyDevice', {}, 'light');
  */
 function mapExpose(deviceName, expose, parentType = undefined) {

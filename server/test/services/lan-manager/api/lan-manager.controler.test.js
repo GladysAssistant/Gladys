@@ -6,6 +6,7 @@ const LANManagerController = require('../../../../services/lan-manager/api/lan-m
 const lanManager = {
   getDiscoveredDevices: fake.returns(true),
   scan: fake.resolves(true),
+  stop: fake.resolves(true),
   getStatus: fake.returns(true),
   getConfiguration: fake.returns({ config: true }),
   saveConfiguration: fake.resolves({ config: true }),
@@ -59,14 +60,35 @@ describe('POST /api/v1/service/lan-manager/discover', () => {
   });
 
   it('scan for devices', async () => {
-    const req = {};
+    const req = {
+      body: {
+        scan: 'on',
+      },
+    };
     const res = {
-      status: fake.returns(null),
+      json: fake.returns(null),
     };
 
     controller['post /api/v1/service/lan-manager/discover'].controller(req, res);
     assert.calledOnceWithExactly(lanManager.scan);
-    assert.calledOnceWithExactly(res.status, 200);
+    assert.notCalled(lanManager.stop);
+    assert.calledOnceWithExactly(res.json, true);
+  });
+
+  it('stop scan for devices', async () => {
+    const req = {
+      body: {
+        scan: 'off',
+      },
+    };
+    const res = {
+      json: fake.returns(null),
+    };
+
+    controller['post /api/v1/service/lan-manager/discover'].controller(req, res);
+    assert.notCalled(lanManager.scan);
+    assert.calledOnceWithExactly(lanManager.stop);
+    assert.calledOnceWithExactly(res.json, true);
   });
 });
 

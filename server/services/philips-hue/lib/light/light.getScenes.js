@@ -6,7 +6,7 @@ const { getDeviceParam } = require('../../../../utils/device');
 const { BRIDGE_SERIAL_NUMBER } = require('../utils/consts');
 
 /**
- * @description Get philips hue scenes
+ * @description Get philips hue scenes.
  * @returns {Promise<Array>} Resolve with array of scenes.
  * @example
  * getScenes();

@@ -1,6 +1,6 @@
 /**
  * @description Get MQTT status.
- * @returns {Object} Current MQTT network status.
+ * @returns {object} Current MQTT network status.
  * @example
  * status();
  */

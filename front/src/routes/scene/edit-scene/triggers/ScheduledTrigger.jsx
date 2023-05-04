@@ -12,7 +12,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 const DAYS_OF_THE_MONTH = new Array(31).fill(0, 0, 31).map((val, index) => index + 1);
 
-@connect('httpClient,user', {})
 class TurnOnLight extends Component {
   resetForm = () => {
     this.props.updateTriggerProperty(this.props.index, 'date', undefined);
@@ -319,4 +318,4 @@ class TurnOnLight extends Component {
   }
 }
 
-export default TurnOnLight;
+export default connect('httpClient,user', {})(TurnOnLight);

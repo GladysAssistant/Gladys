@@ -4,10 +4,9 @@ const { completeFeature } = require('./completeFeature');
 
 /**
  * @description Load feature from parent type.
- * @param {Object} types - Zigbee "expose" parent type features.
+ * @param {object} types - Zigbee "expose" parent type features.
  * @param {string} parentType - Requested parent type.
- * @returns {Object} The related Gladys feature, or undefined.
- *
+ * @returns {object} The related Gladys feature, or undefined.
  * @example buildByParentType({ switch: {}, light: {}}, 'light');
  */
 function buildByParentType(types, parentType) {
@@ -16,12 +15,10 @@ function buildByParentType(types, parentType) {
 
 /**
  * @description Load feature from property name, completed by parent type.
- *
- * @param {Object} names - Zigbee "expose" proerty name features.
+ * @param {object} names - Zigbee "expose" proerty name features.
  * @param {string} name - Zigbee "expose" property name.
  * @param {string} parentType - Requested parent type.
- * @returns {Object} The related Gladys feature, or undefined.
- *
+ * @returns {object} The related Gladys feature, or undefined.
  * @example buildByName({ state: {}}, 'state', 'light');
  */
 function buildByName(names, name, parentType) {
@@ -38,10 +35,9 @@ function buildByName(names, name, parentType) {
 /**
  * @description Build a Gladys feature according to Zigbee "expose" values.
  * @param {string} deviceName - Device friendly name.
- * @param {Object} expose - Zigbee "expose" values.
+ * @param {object} expose - Zigbee "expose" values.
  * @param {string} parentType - Requested parent type.
  * @returns {Array} The related Gladys features.
- *
  * @example buildFeature('MyDevice', {}, 'light');
  */
 function buildFeatures(deviceName, expose, parentType) {

@@ -14,7 +14,6 @@ import CheckBluetoothPanel from '../../commons/CheckBluetoothPanel';
 
 import style from '../../style.css';
 
-@connect('session,httpClient,houses,bluetoothStatus', actions)
 class BluetoothConnnectPage extends Component {
   updatePeripheral = peripheral => {
     if (peripheral.uuid === this.state.peripheral.uuid) {
@@ -99,4 +98,4 @@ class BluetoothConnnectPage extends Component {
   }
 }
 
-export default BluetoothConnnectPage;
+export default connect('session,httpClient,houses,bluetoothStatus', actions)(BluetoothConnnectPage);

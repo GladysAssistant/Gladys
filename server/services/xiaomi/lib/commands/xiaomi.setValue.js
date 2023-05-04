@@ -7,9 +7,9 @@ const SERVER_PORT = 9898;
 
 /**
  * @description Set value.
- * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The feature to control.
- * @param {Object} state - The new state.
+ * @param {object} device - The device to control.
+ * @param {object} deviceFeature - The feature to control.
+ * @param {object} state - The new state.
  * @example
  * xiaomi.setValue();
  */

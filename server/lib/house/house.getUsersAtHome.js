@@ -3,8 +3,9 @@ const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
  * @public
- * @description Get users at home
+ * @description Get users at home.
  * @param {string} selector - Selector of the house.
+ * @returns {Promise<Array>} Return list of users at home.
  * @example
  * const users = await gladys.house.getUsersAtHome('my-house');
  */

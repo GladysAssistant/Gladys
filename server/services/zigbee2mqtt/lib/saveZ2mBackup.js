@@ -3,7 +3,7 @@ const { CONFIGURATION } = require('./constants');
 
 /**
  * @description Save Z2M backup.
- * @param {Object} payload - Z2M MQTT backup payload.
+ * @param {object} payload - Z2M MQTT backup payload.
  * @returns {Promise} The status of backup JOB, or null.
  * @example
  * await z2m.saveZ2mBackup({ status: 'ok', data: { zip: 'base64_backup' }});

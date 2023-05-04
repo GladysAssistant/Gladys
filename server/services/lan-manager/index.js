@@ -20,7 +20,7 @@ module.exports = function LANManagerService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the Bluetooth service
+   * @description This function stops the Bluetooth service.
    * @example
    * gladys.services['lan-manager'].stop();
    */

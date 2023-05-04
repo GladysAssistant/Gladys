@@ -5,6 +5,7 @@ const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../tasmota.constants'
  * @description Handle Tasmota 'stat/+/STATUS' topics.
  * @param {string} deviceExternalId - Device external id.
  * @param {string} message - MQTT message.
+ * @returns {object} Return device.
  * @example
  * status('tasmota:tasmota-plug', '{"key": "value"}', 'service-id');
  */

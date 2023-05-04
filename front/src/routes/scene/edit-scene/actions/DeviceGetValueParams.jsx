@@ -7,7 +7,6 @@ import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeatu
 import { getDeviceFeatureName } from '../../../../utils/device';
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
-@connect('httpClient', {})
 class DeviceGetValue extends Component {
   onDeviceFeatureChange = (deviceFeature, device) => {
     const { columnIndex, index } = this.props;
@@ -69,4 +68,4 @@ class DeviceGetValue extends Component {
   }
 }
 
-export default withIntlAsProp(DeviceGetValue);
+export default withIntlAsProp(connect('httpClient', {})(DeviceGetValue));

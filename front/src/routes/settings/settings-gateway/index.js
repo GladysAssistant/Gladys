@@ -3,10 +3,6 @@ import { connect } from 'unistore/preact';
 import GatewayPage from './GatewayPage';
 import actions from '../../../actions/gateway';
 
-@connect(
-  'user,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
-  actions
-)
 class SettingsGateway extends Component {
   componentWillMount() {
     this.props.cancelGatewayLogin();
@@ -21,4 +17,7 @@ class SettingsGateway extends Component {
   }
 }
 
-export default SettingsGateway;
+export default connect(
+  'user,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
+  actions
+)(SettingsGateway);

@@ -3,8 +3,8 @@ const exposesMap = require('../exposes');
 
 /**
  * @description Set the new device value from Gladys to MQTT.
- * @param {Object} device - Updated Gladys device.
- * @param {Object} deviceFeature - Updated Gladys device feature.
+ * @param {object} device - Updated Gladys device.
+ * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string} value - The new device feature value.
  * @example
  * setValue(device, deviceFeature, 0);

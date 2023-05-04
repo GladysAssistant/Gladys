@@ -4,7 +4,7 @@ const db = require('../../models');
 const logger = require('../../utils/logger');
 
 /**
- * @description Purge device states of a specific feature
+ * @description Purge device states of a specific feature.
  * @param {string} deviceFeatureId - Id of a device feature.
  * @param {string} jobId - Id of the job.
  * @returns {Promise} Resolve when finished.

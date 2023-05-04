@@ -7,8 +7,8 @@ const { disconnect } = require('./message.disconnect');
 
 /**
  * @description Add ability to send/receive telegram message.
- * @param {Object} gladys - Gladys instance.
- * @param {Object} NodeTelegramBotApi - Node telegram bot API.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} NodeTelegramBotApi - Node telegram bot API.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const rtspCameraHandler = new RtspCameraHandler(gladys, ffmpeg, serviceId);

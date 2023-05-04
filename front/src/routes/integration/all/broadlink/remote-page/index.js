@@ -17,7 +17,6 @@ import UpdateDevice from '../../../../../components/device/UpdateDevice';
 
 const BROADLINK_PAGE_PATH = '/dashboard/integration/device/broadlink';
 
-@connect('session,user,httpClient,currentIntegration,housesWithRooms,broadlinkPeripherals', actions)
 class BroadlinkDeviceSetupPage extends Component {
   constructor(props) {
     super(props);
@@ -100,4 +99,7 @@ class BroadlinkDeviceSetupPage extends Component {
   }
 }
 
-export default BroadlinkDeviceSetupPage;
+export default connect(
+  'session,user,httpClient,currentIntegration,housesWithRooms,broadlinkPeripherals',
+  actions
+)(BroadlinkDeviceSetupPage);

@@ -14,10 +14,10 @@ const sleep = promisify(setTimeout);
 
 /**
  * @description Create HomeKit accessory service.
- * @param {Object} device - Gladys device to format as HomeKit accessory.
- * @param {Object} features - Device features to associate to service.
- * @param {Object} categoryMapping - Homekit mapping for the current device category.
- * @returns {Object} HomeKit service to expose.
+ * @param {object} device - Gladys device to format as HomeKit accessory.
+ * @param {object} features - Device features to associate to service.
+ * @param {object} categoryMapping - Homekit mapping for the current device category.
+ * @returns {object} HomeKit service to expose.
  * @example
  * buildService(device, features, categoryMapping)
  */

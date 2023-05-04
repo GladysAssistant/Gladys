@@ -4,7 +4,8 @@ const { NotFoundError } = require('../../utils/coreErrors');
 /**
  * @description Update a room.
  * @param {string} selector - The selector of the room.
- * @param {Object} room - The new room.
+ * @param {object} room - The new room.
+ * @returns {Promise<object>} Resolve with updated room.
  * @example
  * gladys.room.update('kitchen', {
  *    name: 'New Kitchen'

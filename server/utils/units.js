@@ -42,7 +42,6 @@ const hueToRgb = (p, q, t2) => {
 
 /**
  * @description Converts an HSL color value to RGB.
- *
  * @param {number} h - The hue.
  * @param {number} s - The saturation.
  * @param {number} l - The lightness/brightness.

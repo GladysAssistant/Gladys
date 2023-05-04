@@ -3,8 +3,9 @@ const logger = require('../../utils/logger');
 const { Error403, Error429 } = require('../../utils/httpErrors');
 
 /**
- * @description Ask OpenAI a question
- * @param {Object} body - The query to ask.
+ * @description Ask OpenAI a question.
+ * @param {object} body - The query to ask.
+ * @returns {Promise} Resolve with OpenAI response.
  * @example
  * openAIAsk({
  *    question

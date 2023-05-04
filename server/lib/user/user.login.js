@@ -3,14 +3,13 @@ const { PasswordNotMatchingError, NotFoundError } = require('../../utils/coreErr
 
 /**
  * @private
- * @description This function login a user
+ * @description This function login a user.
  * @name gladys.user.login
  * @param {string} email - The email of the user.
  * @param {string} password - The password for his account.
  * @returns {Promise} Promise.
  * @example
  * await gladys.user.login('test@test.fr', 'mypassword');
- *
  */
 async function login(email, password) {
   const user = await db.User.findOne({

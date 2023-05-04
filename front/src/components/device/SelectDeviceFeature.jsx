@@ -5,7 +5,6 @@ import Select from 'react-select';
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 
-@connect('httpClient', {})
 class SelectDeviceFeature extends Component {
   getOptions = async () => {
     try {
@@ -129,4 +128,4 @@ class SelectDeviceFeature extends Component {
   }
 }
 
-export default withIntlAsProp(SelectDeviceFeature);
+export default withIntlAsProp(connect('httpClient', {})(SelectDeviceFeature));

@@ -11,8 +11,8 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * @description Get list of users
- * @param {Object} options - Options of the query.
+ * @description Get list of users.
+ * @param {object} options - Options of the query.
  * @returns {Promise} Return list of users.
  * @example
  * const users = await gladys.user.get({

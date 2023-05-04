@@ -4,7 +4,7 @@ const { generateRefreshToken } = require('../../utils/refreshToken');
 const { generateAccessToken } = require('../../utils/accessToken');
 
 /**
- * @description Create and save in database a refresh_token
+ * @description Create and save in database a refresh_token.
  * @param {string} userId - The uuid of a user.
  * @param {Array} scope - Scope the refresh token is able to access.
  * @param {number} validityInSeconds - Validity of the refreshToken.

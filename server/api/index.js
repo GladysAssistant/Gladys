@@ -12,10 +12,11 @@ const { setupRoutes } = require('./setupRoutes');
 const STATIC_FOLDER = path.join(__dirname, '/../static');
 
 /**
- * @description Start Gladys server
- * @param {Object} gladys - Gladys library.
+ * @description Start Gladys server.
+ * @param {object} gladys - Gladys library.
  * @param {number} port - Server port to listen to.
- * @param {Object} options - Options to start the server.
+ * @param {object} options - Options to start the server.
+ * @returns {object} Return app & server object when ready.
  * @example
  * server.start(gladys, 1337);
  */

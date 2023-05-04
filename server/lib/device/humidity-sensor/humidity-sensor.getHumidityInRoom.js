@@ -10,7 +10,7 @@ const DEFAULT_PARAMETERS = {
 /**
  * @description Return the average value of the humidity in a room.
  * @param {string} roomId - The uuid of the room.
- * @param {Object} [options] - Options of the query (units).
+ * @param {object} [options] - Options of the query (units).
  * @returns {Promise} - Resolve with the humidity and the unit.
  * @example
  * getHumidityInRoom('d65deccf-d8fc-4674-ac50-3d98d1d87aba', {
