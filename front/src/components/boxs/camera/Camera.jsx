@@ -190,6 +190,9 @@ class CameraBoxComponent extends Component {
 
   componentDidMount() {
     this.refreshData();
+    if (this.props.box.camera_live_auto_start === true) {
+      this.startStreaming();
+    }
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
       this.updateDeviceStateWebsocket

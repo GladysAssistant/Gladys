@@ -267,6 +267,8 @@
         "latencyBoxName": "Latence",
         "latencyBoxDescription": "Plus vous sélectionnez une latence basse, et plus vite le live démarrera. Néanmoins, pour avoir une latence basse, il faut une connexion internet très rapide et avec un minimum de ping sinon la vidéo sera saccadée. Nous conseillons une latence moyenne ou basse.",
         "liveStartError": "Une erreur est survenue en démarrant le streaming. Est-ce que l'URL de votre caméra est bien une URL d'un flux vidéo et pas une image ?",
+        "liveAutoStartLabel": "Lancer automatiquement le streaming",
+        "liveAutoStartDescription": "Attention: Cette option peut augmenter la charge sur votre machine/réseau.",
         "latency": {
           "ultraLow": "Très basse",
           "low": "Basse",
