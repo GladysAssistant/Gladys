@@ -53,7 +53,7 @@ class CameraBoxComponent extends Component {
     if (!Hls.isSupported()) {
       return;
     }
-    await this.setState({ streaming: true, loading: true });
+    await this.setState({ streaming: true, loading: true, liveStartError: false });
     try {
       const isGladysPlus = this.props.session.gatewayClient !== undefined;
 
@@ -117,9 +117,7 @@ class CameraBoxComponent extends Component {
           }
         }
       });
-      this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {
-        console.log('video and hls.js are now bound together !');
-      });
+      this.hls.on(Hls.Events.MEDIA_ATTACHED, () => {});
       this.hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
         console.log(`manifest loaded, found ${data.levels.length} quality level`);
       });
@@ -153,6 +151,7 @@ class CameraBoxComponent extends Component {
       // bind them together
       this.hls.attachMedia(this.videoRef.current);
     } catch (e) {
+      this.setState({ liveStartError: true });
       console.error(e);
       await this.stopStreaming();
     }
@@ -215,7 +214,7 @@ class CameraBoxComponent extends Component {
     }
   }
 
-  render(props, { image, error, streaming, loading }) {
+  render(props, { image, error, streaming, loading, liveStartError }) {
     if (streaming) {
       return (
         <div class="card">
@@ -257,6 +256,16 @@ class CameraBoxComponent extends Component {
           <div class="dimmer active">
             <div class="dimmer-content" style={{ height: '100px' }} />
             <div class="loader" />
+          </div>
+        )}
+        {liveStartError && (
+          <div>
+            <p class="alert alert-danger">
+              <i class="fe fe-bell" />
+              <span class="pl-2">
+                <Text id="dashboard.boxes.camera.liveStartError" />
+              </span>
+            </p>
           </div>
         )}
         <div class="card-header">
