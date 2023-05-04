@@ -1,8 +1,8 @@
 const Promise = require('bluebird');
 
 /**
- * @description Start streaming
- * @param {Object} cameraSelector - The camera to stream.
+ * @description Start streaming.
+ * @param {string} cameraSelector - The camera to stream.
  * @param {boolean} isGladysGateway - If the streaming start from Gladys Gateway or local.
  * @param {number} segmentDuration - The duration of one segment in seconds.
  * @returns {Promise} Resolve when stream started.

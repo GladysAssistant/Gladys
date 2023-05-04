@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 
 /**
- * @description Check if a live is active
+ * @description Check if a live is active.
  * @example
  * checkIfLiveActive();
  */

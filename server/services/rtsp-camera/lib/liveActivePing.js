@@ -2,8 +2,8 @@ const { NotFoundError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 
 /**
- * @description Send a ping to tell Gladys the live is still active
- * @param {Object} cameraSelector - The camera still active.
+ * @description Send a ping to tell Gladys the live is still active.
+ * @param {string} cameraSelector - The camera still active.
  * @example
  * liveActivePing(cameraSelector);
  */

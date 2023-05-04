@@ -13,8 +13,8 @@ const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
 
 /**
- * @description Start streaming
- * @param {Object} cameraSelector - The camera to stream.
+ * @description Start streaming.
+ * @param {string} cameraSelector - The camera to stream.
  * @param {boolean} isGladysGateway - If the stream starts from Gladys Gateway or local.
  * @param {number} segmentDuration - The duration of one segment in seconds.
  * @returns {Promise} Resolve when stream started.

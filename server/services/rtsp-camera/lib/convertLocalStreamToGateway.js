@@ -5,8 +5,9 @@ const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
 
 /**
- * @description Convert a local stream to a gateway stream
+ * @description Convert a local stream to a gateway stream.
  * @param {string} cameraSelector - The camera selector.
+ * @returns {Promise} Resolve when finished.
  * @example
  * sendCameraFileToGateway(cameraFolder, filename, fileContent)
  */

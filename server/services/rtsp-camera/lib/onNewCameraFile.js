@@ -12,8 +12,8 @@ const config = getConfig();
  * @param {string} folderPath - The full path to camera folder.
  * @param {string} cameraFolder - The name of the camera folder.
  * @param {string} filename - The filename that changed.
- * @param {Object} sharedObjectToVerify - A shared object to init.
- * @param {Object} streamingReadyEvent - To emit an event when gateway is ready.
+ * @param {object} sharedObjectToVerify - A shared object to init.
+ * @param {object} streamingReadyEvent - To emit an event when gateway is ready.
  * @returns {Promise} - Resolve when camera file is handled.
  * @example onNewCameraFile();
  */

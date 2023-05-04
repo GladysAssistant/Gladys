@@ -2,8 +2,8 @@ const fse = require('fs-extra');
 const logger = require('../../../utils/logger');
 
 /**
- * @description Stop streaming
- * @param {Object} cameraSelector - The camera to stream.
+ * @description Stop streaming.
+ * @param {string} cameraSelector - The camera to stream.
  * @returns {Promise} Resolve when stream stopped.
  * @example
  * stopStreaming('my-camera');
