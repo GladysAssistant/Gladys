@@ -518,7 +518,6 @@
       "description": "Control your Zigbee devices with Zigbee2mqtt",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
-      "settingsTab": "Settings",
       "setupTab": "Setup",
       "status": {
         "notConfigured": "Zigbee2mqtt USB dongle is not configured, please go to ",
@@ -532,31 +531,41 @@
         "settingsPageLink": "USB dongle configuration page",
         "setupPageLink": "Zigbee2mqtt configuration page"
       },
-      "settings": {
-        "title": "Zigbee2mqtt USB dongle Settings",
-        "description": "To use Zigbee2mqtt in Gladys, you need to have a Zigbee2mqtt USB Dongle attached to your Gladys instance.",
-        "zigbee2mqttUsbDriverPathLabel": "Select the USB port where your Zigbee2mqtt Dongle is connected",
-        "zigbee2mqttUsbDriverPathPlaceholder": "USB port",
-        "zigbee2mqttUsbDongleNameLabel": "Select your Zigbee Dongle model",
-        "zigbee2mqttUsbDongleNamePlaceholder": "Zigbee Dongle model",
-        "saveButton": "Save Settings",
-        "refreshButton": "Refresh USB list",
-        "notAttached": "Gladys is not attached to any Zigbee2mqtt USB Dongle.",
-        "attached": "Zigbee2mqtt USB Dongle configured.",
-        "saving": "Saving USB Dongle configuration..."
-      },
       "setup": {
         "title": "Zigbe2mqtt configuration",
-        "allInOneLabel": "Installation with Gladys",
-        "allInOneDescription": "Gladys will setup both MQTT and Zigbee2mqtt docker containers.",
-        "requirementsLabel": "Requirements:",
-        "dockerInstallationRequirementLabel": "Gladys should run on Docker",
-        "dockerNetworkHostRequirementLabel": "Gladys should be configured with \"host\" network mode",
-        "usbDongleRequirementLabel": "Zigbee dongle should be plugged directly on Gladys",
-        "advancedLabel": "Manual installation",
-        "advancedDescription": "Setup a constumize installation.<br />Setup manually a Zigbee2mqtt application.",
+        "modes": {
+          "local": {
+            "title": "Installation with Gladys",
+            "description": "Gladys will setup both MQTT and Zigbee2mqtt docker containers.",
+            "dockerInstallationRequirementLabel": "Gladys should run on Docker",
+            "dockerNetworkHostRequirementLabel": "Gladys should be configured with \"host\" network mode",
+            "usbDongleRequirementLabel": "Zigbee dongle should be plugged directly on Gladys",
+            "detailsDescription": "To use Zigbee2mqtt in Gladys, you need to have a Zigbee USB Dongle attached to your Gladys instance.",
+            "usbDriverPathLabel": "Select the USB port on which your Zigbee Dongle is plugged",
+            "usbDriverPathPlaceholder": "USB port",
+            "usbDongleNameLabel": "Select your Zigbee Dongle model",
+            "usbDongleNamePlaceholder": "Zigbee Dongle model",
+            "summary": {
+              "title": "Configuration:",
+              "usbPort": "USB port: {{usbPort}}",
+              "dongleName": "Dongle: {{dongleName}}"
+            }
+          },
+          "remote": {
+            "title": "Connect to an existing installation",
+            "description": "Gladys will connect to a remote installation through MQTT.",
+            "z2mInstallationRequirementLabel": "A self managed Zigbee2Mqtt application",
+            "mqttBrokerRequirementLabel": "A MQTT broker connected to the Zigbee2Mqtt application",
+            "commingSoonRequirementLabel": "Ongoing development"
+          }
+        },
+        "requirementsLabel": "<u>Requirements</u>:",
         "selectInstallationMode": "Select",
-        "description": "This service uses two independent docker containers (MQTT broker and Zigbee2mqtt). Enable Zigbee2mqtt for deploying these containers.\nLearn more on the Zigbee2mqtt documentation page",
+        "changeButtonLabel": "Edit",
+        "continueLabel": "Continue",
+        "resetLabel": "Cancel",
+        "saveError": "Configuration cannot be saved to due a technical error. Please check logs.",
+        "saveInformation": "You are going to setup Zigbee2Mqtt on Gladys. If you agree with your configuration, you can continue.",
         "enableLabel": "Zigbee2mqtt activation",
         "nonDockerEnv": "Gladys is not running on Docker, you cannot install a MQTT broker from here.",
         "invalidDockerNetwork": "Gladys is under custom installation, to install broker from here, Gladys container should be configured with \"host\" network mode.",
