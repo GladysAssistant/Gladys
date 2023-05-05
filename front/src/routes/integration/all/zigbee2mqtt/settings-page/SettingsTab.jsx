@@ -11,7 +11,10 @@ const SettingsTab = ({ children, ...props }) => (
       </h2>
       <div class="page-options d-flex">
         <button class="btn btn-info" onClick={props.loadUsbPorts} disabled={props.loading}>
-          <i class="fe fe-rotate-cw" /> <Text id="integration.zigbee2mqtt.settings.refreshButton" />
+          <i class="fe fe-rotate-cw" />
+          <span class="d-none d-md-inline-block ml-2">
+            <Text id="integration.zigbee2mqtt.settings.refreshButton" />
+          </span>
         </button>
       </div>
     </div>
