@@ -10,7 +10,7 @@ import withIntlAsProp from '../../../../utils/withIntlAsProp';
 class TurnOnOffLight extends Component {
   getOptions = async () => {
     try {
-      const deviceFeatures = await this.props.httpClient.get('/api/v1/device', {
+      const devices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'light',
         device_feature_type: 'binary'
       });
