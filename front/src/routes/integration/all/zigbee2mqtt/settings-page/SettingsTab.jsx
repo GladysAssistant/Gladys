@@ -46,10 +46,11 @@ const SettingsTab = ({ children, ...props }) => (
               <Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDriverPathLabel" />
             </label>
             <Select
-              value={{ label: props.zigbeeDriverPath, value: props.zigbeeDriverPath }}
+              value={props.zigbeeDriverPath ? { label: props.zigbeeDriverPath, value: props.zigbeeDriverPath } : null}
               onChange={props.updateZigbeeDriverPath}
               options={props.usbPorts}
               isLoading={props.getZigbee2mqttUsbPortStatus === RequestStatus.Getting}
+              placeholder={<Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDriverPathPlaceholder" />}
             />
           </div>
           <div class="form-group">
@@ -57,10 +58,11 @@ const SettingsTab = ({ children, ...props }) => (
               <Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDongleNameLabel" />
             </label>
             <Select
-              value={{ label: props.zigbeeDongleName, value: props.zigbeeDongleName }}
+              value={props.zigbeeDongleName ? { label: props.zigbeeDongleName, value: props.zigbeeDongleName } : null}
               onChange={props.updateZigbeeDongleName}
               options={props.zigbeeAdapters}
               isClearable
+              placeholder={<Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDongleNamePlaceholder" />}
             />
           </div>
           <div class="form-group">
