@@ -1212,7 +1212,11 @@
       "deviceSetValue": {
         "description": "This action let you control a device.",
         "deviceLabel": "Device",
-        "valueLabel": "Value"
+        "valueLabel": "Value",
+        "valueTypeSimple": "Simple",
+        "simpleExplanationText": "Enter the new value you wish to assign to your device here.",
+        "valueTypeComputed": "Computed",
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -1220,7 +1224,8 @@
         "valueLabel": "Value",
         "removeLabel": "Remove",
         "orText": "OR",
-        "orButton": "+ OR"
+        "orButton": "+ OR",
+        "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "checkTime": {
         "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
