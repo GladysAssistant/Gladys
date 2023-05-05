@@ -57,7 +57,7 @@ const actionsFunc = {
       value = evaluate(Handlebars.compile(action.evaluate_value)(scope).replace(/\s/g, ''));
     }
 
-    if (!Number(value)) {
+    if (Number.isNaN(Number(value))) {
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }
 
@@ -208,7 +208,7 @@ const actionsFunc = {
         value = evaluate(Handlebars.compile(condition.evaluate_value)(scope).replace(/\s/g, ''));
       }
 
-      if (!Number(value)) {
+      if (Number.isNaN(Number(value))) {
         throw new AbortScene('CONDITION_VALUE_NOT_A_NUMBER');
       }
 
