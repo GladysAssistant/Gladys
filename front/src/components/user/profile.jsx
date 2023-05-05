@@ -103,6 +103,9 @@ const Profile = ({ children, ...props }) => {
         <label class="form-label">
           <Text id="profile.emailLabel" />
         </label>
+        <small>
+          <Text id="profile.emailText" />
+        </small>
         <Localizer>
           <input
             type="email"
@@ -157,75 +160,77 @@ const Profile = ({ children, ...props }) => {
           </select>
         </div>
       )}
-      <div class="form-group">
-        <label class="form-label">
-          <Text id="profile.birthdateLabel" />
-        </label>
-        <div class="row gutters-xs">
-          <div class="col-4">
-            <select
-              value={props.newUser.birthdateYear}
-              onInput={props.updateBirthdateYear}
-              class={cx('form-control', 'custom-select', {
-                'is-invalid': get(props, 'errors.birthdate')
-              })}
-            >
-              <option value="">
-                <Text id="profile.year" />
-              </option>
-              {props.years.map(year => (
-                <option value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-          <div class="col-5">
-            <select
-              value={props.newUser.birthdateMonth}
-              onInput={props.updateBirthdateMonth}
-              class={cx('form-control', 'custom-select', {
-                'is-invalid': get(props, 'errors.birthdate')
-              })}
-            >
-              <option value="">
-                <Text id="profile.month" />
-              </option>
-              {props.months.map(month => (
-                <option value={month}>
-                  {dayjs()
-                    .set('month', month - 1)
-                    .locale(props.newUser.language)
-                    .format('MMMM')}
+      {!props.disableBirthdate && (
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="profile.birthdateLabel" />
+          </label>
+          <div class="row gutters-xs">
+            <div class="col-4">
+              <select
+                value={props.newUser.birthdateYear}
+                onInput={props.updateBirthdateYear}
+                class={cx('form-control', 'custom-select', {
+                  'is-invalid': get(props, 'errors.birthdate')
+                })}
+              >
+                <option value="">
+                  <Text id="profile.year" />
                 </option>
-              ))}
-            </select>
+                {props.years.map(year => (
+                  <option value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <div class="col-5">
+              <select
+                value={props.newUser.birthdateMonth}
+                onInput={props.updateBirthdateMonth}
+                class={cx('form-control', 'custom-select', {
+                  'is-invalid': get(props, 'errors.birthdate')
+                })}
+              >
+                <option value="">
+                  <Text id="profile.month" />
+                </option>
+                {props.months.map(month => (
+                  <option value={month}>
+                    {dayjs()
+                      .set('month', month - 1)
+                      .locale(props.newUser.language)
+                      .format('MMMM')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div class="col-3">
+              <select
+                value={props.newUser.birthdateDay}
+                onInput={props.updateBirthdateDay}
+                class={cx('form-control', 'custom-select', {
+                  'is-invalid': get(props, 'errors.birthdate')
+                })}
+              >
+                <option value="">
+                  <Text id="profile.day" />
+                </option>
+                {props.days.map(day => (
+                  <option value={day}>{day}</option>
+                ))}
+              </select>
+            </div>
           </div>
-          <div class="col-3">
-            <select
-              value={props.newUser.birthdateDay}
-              onInput={props.updateBirthdateDay}
-              class={cx('form-control', 'custom-select', {
-                'is-invalid': get(props, 'errors.birthdate')
-              })}
-            >
-              <option value="">
-                <Text id="profile.day" />
-              </option>
-              {props.days.map(day => (
-                <option value={day}>{day}</option>
-              ))}
-            </select>
+          <input
+            type="hidden"
+            class={cx('form-control', {
+              'is-invalid': get(props, 'errors.birthdate')
+            })}
+          />
+          <div class="invalid-feedback">
+            <Text id="profile.birthdateError" />
           </div>
         </div>
-        <input
-          type="hidden"
-          class={cx('form-control', {
-            'is-invalid': get(props, 'errors.birthdate')
-          })}
-        />
-        <div class="invalid-feedback">
-          <Text id="profile.birthdateError" />
-        </div>
-      </div>
+      )}
       {!props.disablePreferences && (
         <div class="form-group">
           <label class="form-label">

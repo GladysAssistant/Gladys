@@ -1,0 +1,13 @@
+.explanationText {
+  font-size: 12px;
+  margin-bottom: .375rem;
+}
+
+.valueTypeTab {
+  display: flex;
+  margin: 0;
+}
+
+.valueTypeLink {
+  width: 50%;
+}

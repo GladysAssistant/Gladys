@@ -31,7 +31,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
 const DeviceRow = ({ children, ...props }) => {
   // if device is a sensor, we display the sensor deviceFeature
   if (props.deviceFeature.read_only) {
-    return <SensorDeviceFeature user={props.user} deviceFeature={props.deviceFeature} />;
+    return <SensorDeviceFeature user={props.user} device={props.device} deviceFeature={props.deviceFeature} />;
   }
 
   const elementType = ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
