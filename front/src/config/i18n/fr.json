@@ -60,7 +60,7 @@
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre e-mail",
     "passwordLabel": "Mot de passe",
-    "forgotPasswordLabel": "J’ai oublié mon mot de passe",
+    "forgotPasswordLabel": "J'ai oublié mon mot de passe",
     "passwordPlaceholder": "Entrez votre mot de passe",
     "loginButtonText": "Connexion",
     "wrongCredentials": "Adresse e-mail ou mot de passe invalide",
@@ -69,14 +69,14 @@
   },
   "signup": {
     "welcome": {
-      "title": "Bienvenue dans Gladys 🙋",
-      "introSentence": "Tout d'abord, merci de m'avoir choisie. Je suis Gladys, une assistante à domicile respectueuse de la vie privée de votre maison.",
+      "title": "Bienvenue dans Gladys !",
+      "introSentence": "Tout d'abord, merci de m'avoir choisie. Je suis Gladys, un logiciel de domotique open-source qui respecte votre vie privée.",
       "introTimeToCreateAccount": "Il est temps de créer un compte local pour votre installation Gladys.",
       "introDontWorryLocal": "Ne vous inquiétez pas : Gladys est entièrement auto-hébergé et toutes les informations que vous saisirez sont simplement enregistrées dans la base de données locale de Gladys.",
-      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://gladysassistant.com/fr/docs/\">documentation</a> ou posez une question sur <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
+      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://gladysassistant.com/fr/docs/\">documentation</a> ou posez une question sur le <a href =\"https://community.gladysassistant.com\">forum Gladys</a>.",
       "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
-      "buttonCreateAccountGladysGateway": "Restaurer une sauvegarde Gladys Plus",
-      "buttonCreateAccountWithEmail": "Créer un compte local avec votre e-mail"
+      "buttonCreateAccountGladysGateway": "Restauration Gladys Plus",
+      "buttonCreateAccountWithEmail": "Créer un compte local"
     },
     "createLocalAccount": {
       "title": "Créer votre compte local Gladys",
@@ -175,10 +175,10 @@
       "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères."
     },
     "success": {
-      "title": "Merci 🙏",
-      "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\"> Pierre-Gilles Leymarie </a>, et j'ai fondé Gladys Assistant en 2013.",
-      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys 🙌 J'espère que vous apprécierez utiliser ce logiciel.",
-      "ifYouWantToSupportThisSotware": "Gladys étant mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\">Gladys Plus</a>.",
+      "title": "Merci !",
+      "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\"> Pierre-Gilles Leymarie</a>, et j'ai commencé à travailler sur Gladys Assistant en 2013.",
+      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys. J'espère que vous apprécierez utiliser ce logiciel.",
+      "ifYouWantToSupportThisSotware": "J'essaie de faire de Gladys mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\">Gladys Plus</a>.",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
   },
@@ -1521,6 +1521,7 @@
     "profilePictureLabel": "Photo de profil",
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
+    "emailText": "Votre email sert juste d'identifiant, il n'est enregistré qu'en local",
     "emailPlaceholder": "Entrez votre e-mail",
     "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",
