@@ -37,6 +37,8 @@ describe('bluetooth.scanDevice', () => {
   let bluetoothManager;
   let bluetooth;
 
+  let clock;
+
   beforeEach(() => {
     services = [];
 
@@ -71,13 +73,12 @@ describe('bluetooth.scanDevice', () => {
     bluetooth.stopScanning = () => {
       bluetooth.emit('scanStop');
     };
+
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
-    if (bluetoothManager.scanPromise && bluetoothManager.scanPromise.isPending()) {
-      bluetoothManager.scanPromise.cancel();
-    }
-
+    clock.restore();
     sinon.reset();
   });
 
