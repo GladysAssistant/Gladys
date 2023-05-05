@@ -5,49 +5,44 @@ const { assert, fake } = sinon;
 const GoogleActionsHandler = require('../../../../../../services/google-actions/lib');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../../../../utils/constants');
 
-const device = {
-  name: 'Device 1',
-  selector: 'device-1',
-  external_id: 'device-1-external-id',
-  features: [
-    {
-      category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-      type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
-      last_value: 73,
-    },
-  ],
-  model: 'device-model',
-  room: {
-    name: 'living-room',
-  },
-};
-
-const gladys = {
-  event: {
-    emit: fake.resolves(null),
-  },
-  stateManager: {
-    get: fake.returns(device),
-    state: {
-      device: {
-        device_1: {
-          get: fake.returns(device),
-        },
-      },
-    },
-  },
-};
 const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
-
 const headers = {
   authentication: 'Bearer my-bearer-token',
 };
-let body;
-let expectedResult;
 
-describe('GoogleActions Handler - onSync - openClose', () => {
+describe('GoogleActions Handler - onSync - openClose - shutter', () => {
+  let gladys;
+  let device;
+  let body;
+  let expectedResult;
+
   beforeEach(() => {
-    sinon.reset();
+    device = {
+      name: 'Device 1',
+      selector: 'device-1',
+      external_id: 'device-1-external-id',
+      features: [],
+      model: 'device-model',
+      room: {
+        name: 'living-room',
+      },
+    };
+
+    gladys = {
+      event: {
+        emit: fake.resolves(null),
+      },
+      stateManager: {
+        get: fake.returns(device),
+        state: {
+          device: {
+            device_1: {
+              get: fake.returns(device),
+            },
+          },
+        },
+      },
+    };
 
     body = {
       requestId: 'request-id',
@@ -65,7 +60,20 @@ describe('GoogleActions Handler - onSync - openClose', () => {
     };
   });
 
-  it('onSync', async () => {
+  afterEach(() => {
+    sinon.reset();
+  });
+
+  it('onSync - position only - actionnable', async () => {
+    device.features = [
+      {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        last_value: 73,
+        read_only: false,
+      },
+    ];
+
     const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
     const result = await googleActionsHandler.onSync(body);
 
@@ -75,7 +83,8 @@ describe('GoogleActions Handler - onSync - openClose', () => {
         type: 'action.devices.types.SHUTTER',
         traits: ['action.devices.traits.OpenClose'],
         attributes: {
-          commandOnlyOpenClose: true,
+          discreteOnlyOpenClose: false,
+          queryOnlyOpenClose: false,
         },
         name: {
           name: 'Device 1',
@@ -91,7 +100,52 @@ describe('GoogleActions Handler - onSync - openClose', () => {
     assert.calledOnce(gladys.stateManager.state.device.device_1.get);
   });
 
-  it('onQuery', async () => {
+  it('onSync - position only - not actionnable', async () => {
+    device.features = [
+      {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        last_value: 73,
+        read_only: true,
+      },
+    ];
+
+    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
+    const result = await googleActionsHandler.onSync(body);
+
+    expectedResult.payload.devices = [
+      {
+        id: 'device-1',
+        type: 'action.devices.types.SHUTTER',
+        traits: ['action.devices.traits.OpenClose'],
+        attributes: {
+          discreteOnlyOpenClose: false,
+          queryOnlyOpenClose: true,
+        },
+        name: {
+          name: 'Device 1',
+        },
+        deviceInfo: {
+          model: 'device-model',
+        },
+        roomHint: 'living-room',
+        willReportState: true,
+      },
+    ];
+    expect(result).to.deep.eq(expectedResult);
+    assert.calledOnce(gladys.stateManager.state.device.device_1.get);
+  });
+
+  it('onQuery - with position', async () => {
+    device.features = [
+      {
+        category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+        type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+        last_value: 73,
+        read_only: false,
+      },
+    ];
+
     body.inputs = [
       {
         payload: {
@@ -128,7 +182,7 @@ describe('GoogleActions Handler - onSync - openClose', () => {
                 {
                   command: 'action.devices.commands.OpenClose',
                   params: {
-                    openPercent: 12,
+                    openPercent: 73,
                   },
                 },
               ],
@@ -148,13 +202,23 @@ describe('GoogleActions Handler - onSync - openClose', () => {
       },
     ];
     expect(result).to.deep.eq(expectedResult);
-    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
       device: 'device-1',
       feature_category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
       feature_type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
       status: 'pending',
       type: 'device.set-value',
-      value: 12,
+      value: 73,
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device: 'device-1',
+      feature_category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
+      feature_type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
+      status: 'pending',
+      type: 'device.set-value',
+      value: 73,
     });
   });
 });

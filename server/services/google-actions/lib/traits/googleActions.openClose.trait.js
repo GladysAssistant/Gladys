@@ -16,16 +16,24 @@ const openCloseTrait = {
     },
   ],
   generateAttributes: (device) => {
-    const feature = device.features.find(
+    const attributes = {
+      discreteOnlyOpenClose: true,
+      queryOnlyOpenClose: true,
+    };
+
+    const positionFeature = device.features.find(
       ({ category, type }) =>
         (category === DEVICE_FEATURE_CATEGORIES.CURTAIN && type === DEVICE_FEATURE_TYPES.CURTAIN.POSITION) ||
         (category === DEVICE_FEATURE_CATEGORIES.SHUTTER && type === DEVICE_FEATURE_TYPES.SHUTTER.POSITION),
     );
-    const { has_feedback: hasFeedback = false } = feature || {};
+    if (positionFeature) {
+      const { read_only: readOnly } = positionFeature;
 
-    return {
-      commandOnlyOpenClose: !hasFeedback,
-    };
+      attributes.discreteOnlyOpenClose = false;
+      attributes.queryOnlyOpenClose = readOnly;
+    }
+
+    return attributes;
   },
   states: [
     {
@@ -51,6 +59,10 @@ const openCloseTrait = {
             type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
           },
         ],
+      },
+      followUpToken: {
+        writeValue: () => null,
+        features: [],
       },
     },
   },
