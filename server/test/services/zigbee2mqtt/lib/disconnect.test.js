@@ -52,16 +52,23 @@ describe('zigbee2mqtt disconnect', () => {
     // EXECUTE
     await zigbee2MqttManager.disconnect();
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-    });
     assert.calledThrice(gladys.event.emit);
+    assert.alwaysCalledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: {
+        dockerBased: true,
+        gladysConnected: false,
+        mqttExist: false,
+        mqttRunning: false,
+        networkModeValid: true,
+        usbConfigured: false,
+        z2mEnabled: false,
+        zigbee2mqttConnected: false,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+      },
+    });
     assert.calledTwice(gladys.system.stopContainer);
-
-    expect(zigbee2MqttManager.gladysConnected).to.equal(false);
-    expect(zigbee2MqttManager.mqttRunning).to.equal(false);
-    expect(zigbee2MqttManager.zigbee2mqttRunning).to.equal(false);
-    expect(zigbee2MqttManager.zigbee2mqttConnected).to.equal(false);
   });
 
   it('mqtt connected', async () => {
@@ -70,20 +77,27 @@ describe('zigbee2mqtt disconnect', () => {
     // EXECUTE
     await zigbee2MqttManager.disconnect();
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-    });
     assert.calledThrice(gladys.event.emit);
+    assert.alwaysCalledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: {
+        dockerBased: true,
+        gladysConnected: false,
+        mqttExist: false,
+        mqttRunning: false,
+        networkModeValid: true,
+        usbConfigured: false,
+        z2mEnabled: false,
+        zigbee2mqttConnected: false,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+      },
+    });
     assert.calledTwice(gladys.system.stopContainer);
-    expect(zigbee2MqttManager.gladysConnected).to.equal(false);
-
-    expect(zigbee2MqttManager.mqttRunning).to.equal(false);
-    expect(zigbee2MqttManager.zigbee2mqttRunning).to.equal(false);
-    expect(zigbee2MqttManager.zigbee2mqttConnected).to.equal(false);
-
-    expect(zigbee2MqttManager.mqttClient).to.equal(null);
     assert.calledOnce(mqtt.end);
     assert.calledOnce(mqtt.removeAllListeners);
+
+    expect(zigbee2MqttManager.mqttClient).to.equal(null);
   });
 
   it('clear backup interval', async () => {
@@ -94,6 +108,21 @@ describe('zigbee2mqtt disconnect', () => {
     // EXECUTE
     await zigbee2MqttManager.disconnect();
     // ASSERT
-    assert.calledOnceWithExactly(zigbee2MqttManager.backupScheduledJob.cancel);
+    assert.calledThrice(gladys.event.emit);
+    assert.alwaysCalledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      payload: {
+        dockerBased: true,
+        gladysConnected: false,
+        mqttExist: false,
+        mqttRunning: false,
+        networkModeValid: true,
+        usbConfigured: false,
+        z2mEnabled: false,
+        zigbee2mqttConnected: false,
+        zigbee2mqttExist: false,
+        zigbee2mqttRunning: false,
+      },
+    });
   });
 });

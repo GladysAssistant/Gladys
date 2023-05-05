@@ -24,6 +24,9 @@ const { backup } = require('./backup');
 const { getManagedAdapters } = require('./getManagedAdapters');
 const { JOB_TYPES } = require('../../../utils/constants');
 
+// EVENTS
+const { emitStatusEvent } = require('./events/emitStatusEvent');
+
 /**
  * @description Add ability to connect to Zigbee2mqtt devices.
  * @param {object} gladys - Gladys instance.
@@ -83,5 +86,8 @@ Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
 Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
 Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
+
+// EVENTS
+Zigbee2mqttManager.prototype.emitStatusEvent = emitStatusEvent;
 
 module.exports = Zigbee2mqttManager;
