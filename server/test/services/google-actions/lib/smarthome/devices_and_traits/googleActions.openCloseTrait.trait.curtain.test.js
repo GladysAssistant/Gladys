@@ -171,7 +171,7 @@ describe('GoogleActions Handler - onSync - openClose - curtain', () => {
     assert.calledOnce(gladys.stateManager.get);
   });
 
-  it('onExecute', async () => {
+  it('onExecute - openPercent', async () => {
     body.inputs = [
       {
         payload: {
@@ -220,5 +220,40 @@ describe('GoogleActions Handler - onSync - openClose - curtain', () => {
       type: 'device.set-value',
       value: 73,
     });
+  });
+
+  it('onExecute - followUpToken', async () => {
+    body.inputs = [
+      {
+        payload: {
+          commands: [
+            {
+              devices: [{ id: 'device-1' }],
+              execution: [
+                {
+                  command: 'action.devices.commands.OpenClose',
+                  params: {
+                    followUpToken: '456',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ];
+
+    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
+    const result = await googleActionsHandler.onExecute(body, headers);
+
+    expectedResult.payload.commands = [
+      {
+        ids: ['device-1'],
+        status: 'PENDING',
+      },
+    ];
+    expect(result).to.deep.eq(expectedResult);
+
+    assert.notCalled(gladys.event.emit);
   });
 });
