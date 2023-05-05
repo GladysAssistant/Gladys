@@ -4,6 +4,8 @@ import { Text } from 'preact-i18n';
 import Select from 'react-select';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
+import { getDeviceFeatureName } from '../../../../utils/device';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 class TurnOnOffLight extends Component {
   getOptions = async () => {
@@ -12,12 +14,17 @@ class TurnOnOffLight extends Component {
         device_feature_category: 'light',
         device_feature_type: 'binary'
       });
-      const deviceFeatureOptions = deviceFeatures
-        .flatMap(device => device.features)
-        .map(deviceFeature => ({
-          value: deviceFeature.selector,
-          label: deviceFeature.name
-        }));
+      // keep only write lights, not read only
+      const deviceFeatureOptions = [];
+      devices.forEach(device => {
+        device.features
+          .filter(deviceFeature => deviceFeature.read_only === false)
+          .map(deviceFeature => ({
+            value: deviceFeature.selector,
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, deviceFeature)
+          }))
+          .forEach(deviceFeatureOption => deviceFeatureOptions.push(deviceFeatureOption));
+      });
       await this.setState({ deviceFeatureOptions });
       this.refreshSelectedOptions(this.props);
       return deviceFeatureOptions;
@@ -87,4 +94,4 @@ class TurnOnOffLight extends Component {
   }
 }
 
-export default connect('httpClient', {})(TurnOnOffLight);
+export default withIntlAsProp(connect('httpClient', {})(TurnOnOffLight));

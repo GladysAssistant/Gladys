@@ -4,25 +4,27 @@ import { Text } from 'preact-i18n';
 import Select from 'react-select';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
+import { getDeviceFeatureName } from '../../../../utils/device';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 class TurnOnOffSwitch extends Component {
   getOptions = async () => {
     try {
-      const deviceFeatures = await this.props.httpClient.get('/api/v1/device', {
+      const devices = await this.props.httpClient.get('/api/v1/device', {
         device_feature_category: 'switch',
         device_feature_type: 'binary'
       });
       // keep only write switches, not read only
-      const deviceFeaturesFiltered = deviceFeatures.filter(device => {
-        const writeSwitch = device.features.find(f => f.read_only === false);
-        return writeSwitch !== undefined;
+      const deviceFeatureOptions = [];
+      devices.forEach(device => {
+        device.features
+          .filter(deviceFeature => deviceFeature.read_only === false)
+          .map(deviceFeature => ({
+            value: deviceFeature.selector,
+            label: getDeviceFeatureName(this.props.intl.dictionary, device, deviceFeature)
+          }))
+          .forEach(deviceFeatureOption => deviceFeatureOptions.push(deviceFeatureOption));
       });
-      const deviceFeatureOptions = deviceFeaturesFiltered
-        .flatMap(device => device.features)
-        .map(device_feature => ({
-          value: device_feature.selector,
-          label: device_feature.name
-        }));
       await this.setState({ deviceFeatureOptions });
       this.refreshSelectedOptions(this.props);
       return deviceFeatureOptions;
@@ -92,4 +94,4 @@ class TurnOnOffSwitch extends Component {
   }
 }
 
-export default connect('httpClient', {})(TurnOnOffSwitch);
+export default withIntlAsProp(connect('httpClient', {})(TurnOnOffSwitch));
