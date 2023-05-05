@@ -263,7 +263,18 @@
         "editCameraLabel": "Select the camera you want to display here.",
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
-        "editBoxNamePlaceholder": "Name of the box"
+        "editBoxNamePlaceholder": "Name of the box",
+        "latencyBoxName": "Latency",
+        "latencyBoxDescription": "The lower the latency you select, the faster the live stream will start. However, to have a low latency, you need a very fast internet connection with a minimum of ping or the video will be jerky. We recommend medium or low latency.",
+        "liveStartError": "An error occured while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
+        "liveAutoStartLabel": "Start automatically the live streaming",
+        "liveAutoStartDescription": "Warning: This can increase the load on your machine/network.",
+        "latency": {
+          "ultraLow": "Ultra low",
+          "low": "Low",
+          "medium": "Medium",
+          "standard": "Standard"
+        }
       },
       "chart": {
         "defaultInterval": "Default interval",
@@ -381,6 +392,7 @@
       "description": "Display your cameras video flux in Gladys.",
       "search": "Search cameras",
       "new": "New",
+      "documentationButton": "Documentation",
       "nameLabel": "Camera Name",
       "namePlaceholder": "Enter the name of your camera",
       "roomLabel": "Room",
@@ -392,6 +404,7 @@
       "every1Seconds": "Every second (at your own risk)",
       "urlLabel": "Camera RTSP/HTTP Flux",
       "urlPlaceholder": "Ex: rtsp://[username]:[password]@[camera-ip-address]:554/media",
+      "urlExplanation": "URL needs to be a video flux if you want to use the live stream feature, not a fixed image.",
       "noCameraFound": "No cameras found.",
       "testConnectionButton": "Test connection",
       "saveButton": "Save",

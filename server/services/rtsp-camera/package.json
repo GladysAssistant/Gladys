@@ -13,6 +13,8 @@
     "arm64"
   ],
   "dependencies": {
+    "bluebird": "^3.7.2",
+    "bottleneck": "^2.19.5",
     "fluent-ffmpeg": "^2.1.2",
     "fs-extra": "^8.0.1"
   }
