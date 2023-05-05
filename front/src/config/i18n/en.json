@@ -1518,6 +1518,7 @@
     "month": "Month",
     "day": "Day",
     "selectorText": "The selector is the unique identifier of your user. It can be used in the API.",
+    "emailText": "Your email is just an identifier for login, it's only saved locally",
     "profilePictureLabel": "Profile Picture",
     "chooseFileLabel": "Choose file",
     "emailLabel": "Email",
