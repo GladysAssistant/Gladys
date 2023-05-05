@@ -23,6 +23,10 @@ class Zigbee2mqttSettingsPage extends Component {
   };
 
   loadUsbPorts = async () => {
+    this.setState({
+      getZigbee2mqttUsbPortStatus: RequestStatus.Getting
+    });
+
     try {
       const rawUsbPorts = await this.props.httpClient.get('/api/v1/service/usb/port');
       const usbPorts = rawUsbPorts.map(usbPort => ({
@@ -159,7 +163,6 @@ class Zigbee2mqttSettingsPage extends Component {
 
   render(props, state) {
     const loading =
-      state.getZigbee2mqttUsbPortStatus === RequestStatus.Getting ||
       state.getCurrentZigbee2mqttDriverPathStatus === RequestStatus.Getting ||
       state.zigbee2mqttGetStatusStatus === RequestStatus.Getting ||
       state.getZigbeeAdaptersStatus === RequestStatus.Getting ||
@@ -174,6 +177,7 @@ class Zigbee2mqttSettingsPage extends Component {
           saveDriverPath={this.saveDriverPath}
           updateZigbeeDriverPath={this.updateZigbeeDriverPath}
           updateZigbeeDongleName={this.updateZigbeeDongleName}
+          loadUsbPorts={this.loadUsbPorts}
         />
       </Zigbee2mqttPage>
     );

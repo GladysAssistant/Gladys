@@ -10,7 +10,7 @@ const SettingsTab = ({ children, ...props }) => (
         <Text id="integration.zigbee2mqtt.settings.title" />
       </h2>
       <div class="page-options d-flex">
-        <button class="btn btn-info" onClick={props.getUsbPorts}>
+        <button class="btn btn-info" onClick={props.loadUsbPorts} disabled={props.loading}>
           <i class="fe fe-rotate-cw" /> <Text id="integration.zigbee2mqtt.settings.refreshButton" />
         </button>
       </div>
@@ -49,6 +49,7 @@ const SettingsTab = ({ children, ...props }) => (
               value={{ label: props.zigbeeDriverPath, value: props.zigbeeDriverPath }}
               onChange={props.updateZigbeeDriverPath}
               options={props.usbPorts}
+              isLoading={props.getZigbee2mqttUsbPortStatus === RequestStatus.Getting}
             />
           </div>
           <div class="form-group">
@@ -63,7 +64,16 @@ const SettingsTab = ({ children, ...props }) => (
             />
           </div>
           <div class="form-group">
-            <button class="btn btn-success" onClick={props.saveDriverPath}>
+            <button
+              class="btn btn-success"
+              onClick={props.saveDriverPath}
+              disabled={
+                props.loading ||
+                props.getZigbee2mqttUsbPortStatus === RequestStatus.Getting ||
+                !props.zigbeeDriverPath ||
+                props.zigbeeDriverPath === ''
+              }
+            >
               <i class="fe fe-save" /> <Text id="integration.zigbee2mqtt.settings.saveButton" />
             </button>
           </div>
