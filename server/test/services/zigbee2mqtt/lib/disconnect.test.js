@@ -42,6 +42,8 @@ describe('zigbee2mqtt disconnect', () => {
     };
 
     zigbee2MqttManager = new Zigbee2mqttManager(gladys, mqtt, serviceId);
+    zigbee2MqttManager.dockerBased = true;
+    zigbee2MqttManager.networkModeValid = true;
   });
 
   afterEach(() => {

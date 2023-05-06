@@ -37,6 +37,8 @@ describe('zigbee2mqtt handleMqttMessage', () => {
 
     zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
     zigbee2mqttManager.zigbee2mqttConnected = true;
+    zigbee2mqttManager.dockerBased = true;
+    zigbee2mqttManager.networkModeValid = true;
   });
 
   afterEach(() => {
