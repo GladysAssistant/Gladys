@@ -13,37 +13,32 @@ class Zigbee2mqttSetupPage extends Component {
   };
 
   loadZ2MStatus = async () => {
-    let z2mDriverPath;
-    let z2mDongleName;
-
-    try {
-      let zigbeeDriverPathVariable = await this.props.httpClient.get(
-        '/api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH'
-      );
-      z2mDriverPath = zigbeeDriverPathVariable.value;
-    } catch (e) {
-      // Variable is not set yet
-    }
-
-    try {
-      let zigbeeDongleNameVariable = await this.props.httpClient.get(
-        '/api/v1/service/zigbee2mqtt/variable/ZIGBEE_DONGLE_NAME'
-      );
-      z2mDongleName = zigbeeDongleNameVariable.value;
-    } catch (e) {
-      // Variable is not set yet
-    }
-
     try {
       const zigbee2mqttStatus = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/status');
       this.setState({
         zigbee2mqttStatus,
-        configuration: { z2mDriverPath, z2mDongleName },
         loadZigbee2mqttStatus: RequestStatus.Success
       });
     } catch (e) {
       console.error('Failed to load Zigbee2Mqtt service status', e);
       this.setState({ loadZigbee2mqttStatus: RequestStatus.Error });
+    }
+  };
+
+  loadZ2MConfig = async () => {
+    try {
+      const zigbee2mqttStatus = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
+      const configuration = {
+        z2mDriverPath: zigbee2mqttStatus.ZIGBEE2MQTT_DRIVER_PATH,
+        z2mDongleName: zigbee2mqttStatus.ZIGBEE_DONGLE_NAME
+      };
+      this.setState({
+        configuration,
+        loadZigbee2mqttConfig: RequestStatus.Success
+      });
+    } catch (e) {
+      console.error('Failed to load Zigbee2Mqtt service config', e);
+      this.setState({ loadZigbee2mqttConfig: RequestStatus.Error });
     }
   };
 
@@ -73,12 +68,14 @@ class Zigbee2mqttSetupPage extends Component {
 
     this.state = {
       zigbee2mqttStatus: {},
-      loadZigbee2mqttStatus: RequestStatus.Getting
+      loadZigbee2mqttStatus: RequestStatus.Getting,
+      loadZigbee2mqttConfig: RequestStatus.Getting
     };
   }
 
   componentDidMount() {
     this.loadZ2MStatus();
+    this.loadZ2MConfig();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE, this.handleZ2MStatus);
   }
 

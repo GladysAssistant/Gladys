@@ -564,6 +564,7 @@
         "changeButtonLabel": "Edit",
         "continueLabel": "Continue",
         "resetLabel": "Cancel",
+        "errorLoadingStatesLabel": "An error occured while loading Gladys service information. Make sure you are using the latest verison of Gladys, or check logs.",
         "saveError": "Configuration cannot be saved to due a technical error. Please check logs.",
         "saveInformation": "You are going to setup Zigbee2Mqtt on Gladys. If you agree with your configuration, you can continue.",
         "enableLabel": "Zigbee2mqtt activation",

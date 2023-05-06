@@ -690,6 +690,7 @@
         "changeButtonLabel": "Modifier",
         "continueLabel": "Continuer",
         "resetLabel": "Annuler",
+        "errorLoadingStatesLabel": "Une erreur est survenue du chargement des informations du service Gladys. Assurez-vous que Gladys est bien à jour, sinon consultez les logs.",
         "saveError": "La configuration n'a pas pu être sauvegardée à cause d'une erreur technique. Merci de consulter les logs.",
         "saveInformation": "Zigbee2Mqtt est sur le point d'être mis en place sur Gladys. Si votre configuration vous semble correcte, vous pouvez continuer.",
         "enableLabel": "Activation du service Zigbee2mqtt",

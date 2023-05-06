@@ -12,6 +12,15 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         fixture: 'integration/routes/integration/zigbee2mqtt/status_ready_to_setup.json'
       }
     );
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/service/zigbee2mqtt/setup`
+      },
+      {
+        body: {}
+      }
+    );
     cy.visit('/dashboard/integration/device/zigbee2mqtt/setup');
   });
 

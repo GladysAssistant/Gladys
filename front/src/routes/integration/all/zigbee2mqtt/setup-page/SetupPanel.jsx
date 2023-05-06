@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import { Component, Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 
 import { RequestStatus } from '../../../../../utils/consts';
@@ -46,7 +46,7 @@ class SetupPanel extends Component {
     const disabled = setupZigee2mqttStatus === RequestStatus.Getting;
 
     return (
-      <div class="card-body">
+      <Fragment>
         <ul class="list-group list-group-flush list-unstyled">
           <li class="list-group-item">
             <SetupModePanel
@@ -107,7 +107,7 @@ class SetupPanel extends Component {
             </li>
           )}
         </ul>
-      </div>
+      </Fragment>
     );
   }
 }

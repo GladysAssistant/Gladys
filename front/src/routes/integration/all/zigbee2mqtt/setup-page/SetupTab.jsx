@@ -5,22 +5,36 @@ import { RequestStatus } from '../../../../../utils/consts';
 
 import SetupPanel from './SetupPanel';
 
-const SetupTab = props => (
-  <div class="card" data-cy="z2m-setup-wizard">
-    <div class="card-header">
-      <h2 class="card-title">
-        <Text id="integration.zigbee2mqtt.setup.title" />
-      </h2>
-    </div>
-    <div
-      class={cx('dimmer', {
-        active: props.loadZigbee2mqttStatus === RequestStatus.Getting
-      })}
-    >
-      <div class="loader py-3" />
-      <div class="dimmer-content">
-        {props.loadZigbee2mqttStatus === RequestStatus.Success && <SetupPanel {...props} />}
-        {/**
+const SetupTab = props => {
+  const { loadZigbee2mqttStatus, loadZigbee2mqttConfig } = props;
+  const loading = loadZigbee2mqttStatus === RequestStatus.Getting || loadZigbee2mqttConfig === RequestStatus.Getting;
+  const error = loadZigbee2mqttStatus === RequestStatus.Error || loadZigbee2mqttConfig === RequestStatus.Error;
+  const success = loadZigbee2mqttStatus === RequestStatus.Success && loadZigbee2mqttConfig === RequestStatus.Success;
+
+  return (
+    <div class="card" data-cy="z2m-setup-wizard">
+      <div class="card-header">
+        <h2 class="card-title">
+          <Text id="integration.zigbee2mqtt.setup.title" />
+        </h2>
+      </div>
+      <div
+        class={cx('dimmer', {
+          active: loading,
+          'py-5': loading
+        })}
+      >
+        <div class="loader" />
+        <div class="dimmer-content">
+          <div class="card-body">
+            {error && (
+              <div class="alert alert-danger">
+                <Text id="integration.zigbee2mqtt.setup.errorLoadingStatesLabel" />
+              </div>
+            )}
+            {success && <SetupPanel {...props} />}
+          </div>
+          {/**
            
           <p>
             <MarkupText id="integration.zigbee2mqtt.setup.description" />
@@ -39,9 +53,10 @@ const SetupTab = props => (
           )}
           </div>
         */}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default SetupTab;
