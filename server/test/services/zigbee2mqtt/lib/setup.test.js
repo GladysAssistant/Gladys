@@ -1,6 +1,7 @@
 const sinon = require('sinon');
-const { fake, assert } = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
+
+const { fake, assert } = sinon;
 
 const init = fake.resolves(true);
 const Zigbee2MqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
