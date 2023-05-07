@@ -1,20 +1,17 @@
 import { Component, Fragment } from 'preact';
 import { Text } from 'preact-i18n';
 
-import { RequestStatus } from '../../../../../utils/consts';
-
 import { SETUP_MODES } from './constants.js';
 import SetupModePanel from './SetupModePanel.jsx';
 import SetupLocalMode from './local/SetupLocalMode.jsx';
-import RunningStatus from './RunningStatus';
 
 class SetupPanel extends Component {
   resetSetupMode = () => {
-    this.setState({ setupMode: null, edited: true });
+    this.setState({ setupMode: null });
   };
 
   selectSetupMode = setupMode => {
-    this.setState({ setupMode, edited: true });
+    this.setState({ setupMode, edited: this.state.originalMode !== setupMode });
   };
 
   resetConfiguration = () => {
@@ -27,6 +24,7 @@ class SetupPanel extends Component {
   };
 
   setup = () => {
+    this.setState({ edited: false });
     this.props.saveConfiguration(this.state.configuration);
   };
 
@@ -36,77 +34,60 @@ class SetupPanel extends Component {
     const { configuration, zigbee2mqttStatus = {} } = props;
 
     this.state = {
+      originalMode: zigbee2mqttStatus.usbConfigured ? SETUP_MODES.LOCAL : null,
       setupMode: zigbee2mqttStatus.usbConfigured ? SETUP_MODES.LOCAL : null,
       configuration
     };
   }
 
-  render({ zigbee2mqttStatus = {}, setupZigee2mqttStatus, httpClient }, { setupMode, configuration, edited }) {
+  render({ zigbee2mqttStatus = {}, httpClient, disabled }, { setupMode, configuration, edited }) {
     const { dockerBased, networkModeValid, usbConfigured } = zigbee2mqttStatus;
-    const disabled = setupZigee2mqttStatus === RequestStatus.Getting;
 
     return (
       <Fragment>
-        <ul class="list-group list-group-flush list-unstyled">
+        <li class="list-group-item">
+          <SetupModePanel
+            dockerBased={dockerBased}
+            networkModeValid={networkModeValid}
+            usbConfigured={usbConfigured}
+            setupMode={setupMode}
+            selectSetupMode={this.selectSetupMode}
+            resetSetupMode={this.resetSetupMode}
+            disabled={disabled}
+          />
+        </li>
+        {setupMode === SETUP_MODES.LOCAL && (
           <li class="list-group-item">
-            <SetupModePanel
-              dockerBased={dockerBased}
-              networkModeValid={networkModeValid}
-              usbConfigured={usbConfigured}
-              setupMode={setupMode}
-              selectSetupMode={this.selectSetupMode}
-              resetSetupMode={this.resetSetupMode}
+            <SetupLocalMode
+              configuration={configuration}
+              httpClient={httpClient}
+              saveConfiguration={this.saveConfiguration}
               disabled={disabled}
             />
           </li>
-          {setupMode === SETUP_MODES.LOCAL && (
-            <li class="list-group-item">
-              <SetupLocalMode
-                configuration={configuration}
-                httpClient={httpClient}
-                saveConfiguration={this.saveConfiguration}
+        )}
+        {edited && configuration && (
+          <li class="list-group-item">
+            <div class="alert alert-secondary" data-cy="z2m-setup-save-information">
+              <Text id="integration.zigbee2mqtt.setup.saveInformation" />
+            </div>
+            <div class="d-flex">
+              <button class="btn btn-success mx-auto" onClick={this.setup} disabled={disabled} data-cy="z2m-setup-save">
+                <i class="fe fe-save mr-2" />
+                <Text id="global.save" />
+              </button>
+              <button
+                class="btn btn-primary mx-auto"
+                onClick={this.resetConfiguration}
                 disabled={disabled}
-              />
-            </li>
-          )}
-          {edited && configuration && (
-            <li class="list-group-item">
-              {setupZigee2mqttStatus === RequestStatus.Error && (
-                <div class="alert alert-danger" data-cy="z2m-setup-save-error">
-                  <Text id="integration.zigbee2mqtt.setup.saveError" />
-                </div>
-              )}
-              <div class="alert alert-secondary" data-cy="z2m-setup-save-information">
-                <Text id="integration.zigbee2mqtt.setup.saveInformation" />
-              </div>
-              <div class="d-flex">
-                <button
-                  class="btn btn-success mx-auto"
-                  onClick={this.setup}
-                  disabled={disabled}
-                  data-cy="z2m-setup-save"
-                >
-                  <i class="fe fe-save mr-2" />
-                  <Text id="global.save" />
-                </button>
-                <button
-                  class="btn btn-primary mx-auto"
-                  onClick={this.resetConfiguration}
-                  disabled={disabled}
-                  data-cy="z2m-setup-reset"
-                >
-                  <i class="fe fe-rotate-ccw mr-2" />
-                  <Text id="integration.zigbee2mqtt.setup.resetLabel" />
-                </button>
-              </div>
-            </li>
-          )}
-          {!edited && (
-            <li class="list-group-item">
-              <RunningStatus zigbee2mqttStatus={zigbee2mqttStatus} />
-            </li>
-          )}
-        </ul>
+                data-cy="z2m-setup-reset"
+              >
+                <i class="fe fe-rotate-ccw mr-2" />
+                <Text id="integration.zigbee2mqtt.setup.resetLabel" />
+              </button>
+            </div>
+          </li>
+        )}
       </Fragment>
     );
   }

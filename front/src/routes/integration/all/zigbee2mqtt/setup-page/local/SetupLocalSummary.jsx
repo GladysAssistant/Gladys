@@ -6,25 +6,27 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
     <div class="form-inline" data-cy="z2m-setup-local-summary">
       <div class="form-group">
         <div>
-          <Text id={`integration.zigbee2mqtt.setup.modes.local.summary.title`} />
-          <ul class="list-unstyled list-separated ml-2">
-            <li>
-              <small>
-                <Text
-                  id={`integration.zigbee2mqtt.setup.modes.local.summary.usbPort`}
-                  fields={{ usbPort: z2mDriverPath }}
-                />
-              </small>
-            </li>
-            <li>
-              <small>
-                <Text
-                  id={`integration.zigbee2mqtt.setup.modes.local.summary.dongleName`}
-                  fields={{ dongleName: z2mDongleName }}
-                />
-              </small>
-            </li>
-          </ul>
+          <div class="form-label">
+            <Text id="integration.zigbee2mqtt.setup.modes.local.summary.title" />
+          </div>
+          <div class="table-responsive pl-3">
+            <small>
+              <table>
+                <tr>
+                  <td class="pr-3">
+                    <Text id="integration.zigbee2mqtt.setup.modes.local.summary.usbPort" />
+                  </td>
+                  <td class="text-muted">{z2mDriverPath}</td>
+                </tr>
+                <tr>
+                  <td class="pr-3">
+                    <Text id="integration.zigbee2mqtt.setup.modes.local.summary.dongleName" />
+                  </td>
+                  <td class="text-muted">{z2mDongleName}</td>
+                </tr>
+              </table>
+            </small>
+          </div>
         </div>
       </div>
       <button class="btn btn-primary btn-sm ml-auto" onClick={enableEditionMode} disabled={disabled}>

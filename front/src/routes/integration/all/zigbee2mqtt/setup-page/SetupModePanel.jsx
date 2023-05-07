@@ -16,7 +16,9 @@ const SetupModePanel = ({
     return (
       <div class="form-inline">
         <div class="form-group">
-          <Text id={`integration.zigbee2mqtt.setup.modes.${setupMode}.title`} />
+          <div class="form-label">
+            <Text id={`integration.zigbee2mqtt.setup.modes.${setupMode}.title`} />
+          </div>
         </div>
         <button class="btn btn-primary btn-sm ml-auto" onClick={resetSetupMode} disabled={disabled}>
           <Text id="integration.zigbee2mqtt.setup.changeButtonLabel" />
