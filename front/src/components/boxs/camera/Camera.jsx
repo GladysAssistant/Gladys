@@ -51,6 +51,7 @@ class CameraBoxComponent extends Component {
 
   startStreaming = async () => {
     if (!Hls.isSupported()) {
+      this.setState({ liveNotSupportedBrowser: true });
       return;
     }
     await this.setState({ streaming: true, loading: true, liveStartError: false });
@@ -217,7 +218,7 @@ class CameraBoxComponent extends Component {
     }
   }
 
-  render(props, { image, error, streaming, loading, liveStartError }) {
+  render(props, { image, error, streaming, loading, liveStartError, liveNotSupportedBrowser }) {
     if (streaming) {
       return (
         <div class="card">
@@ -267,6 +268,16 @@ class CameraBoxComponent extends Component {
               <i class="fe fe-bell" />
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.liveStartError" />
+              </span>
+            </p>
+          </div>
+        )}
+        {liveNotSupportedBrowser && (
+          <div>
+            <p class="alert alert-warning">
+              <i class="fe fe-compass" />
+              <span class="pl-2">
+                <Text id="dashboard.boxes.camera.notNotSupportedBrowser" />
               </span>
             </p>
           </div>
