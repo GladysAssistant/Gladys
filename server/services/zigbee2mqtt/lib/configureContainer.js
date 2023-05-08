@@ -27,7 +27,7 @@ async function configureContainer(basePathOnContainer, config) {
     await fs.access(configFilepath, constants.R_OK | constants.W_OK);
     logger.info('Z2M configuration file already exists.');
   } catch (e) {
-    logger.info('Writting default eclipse-mosquitto configuration...');
+    logger.info('Writting default Z2M configuration...');
     await fs.writeFile(configFilepath, yaml.stringify(DEFAULT.CONFIGURATION_CONTENT));
   }
 
@@ -60,6 +60,7 @@ async function configureContainer(basePathOnContainer, config) {
   }
 
   if (configChanged) {
+    logger.info('Writting MQTT and USB adapter information to Z2M configuration...');
     await fs.writeFile(configFilepath, yaml.stringify(loadedConfig));
   }
 }
