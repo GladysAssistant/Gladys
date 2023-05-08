@@ -91,7 +91,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
-    assert.notCalled(gladys.system.restartContainer);
+    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,

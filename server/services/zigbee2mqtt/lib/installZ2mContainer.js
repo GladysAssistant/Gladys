@@ -62,12 +62,12 @@ async function installZ2mContainer(config) {
       filters: { name: [containerDescriptor.name] },
     });
     [container] = dockerContainers;
-    if (container.state !== 'running') {
-      logger.info('Zigbee2mqtt container is starting...');
-      await this.gladys.system.restartContainer(container.id);
-      // wait a few seconds for the container to restart
-      await sleep(this.containerRestartWaitTimeInMs);
-    }
+
+    // Force restart the container to take the new configuration
+    logger.info('Zigbee2mqtt container is (re)starting...');
+    await this.gladys.system.restartContainer(container.id);
+    // wait a few seconds for the container to restart
+    await sleep(this.containerRestartWaitTimeInMs);
 
     logger.info('Zigbee2mqtt container successfully started');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
