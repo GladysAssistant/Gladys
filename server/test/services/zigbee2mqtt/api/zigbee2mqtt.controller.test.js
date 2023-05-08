@@ -88,7 +88,7 @@ describe('zigbee2mqtt API', () => {
 
     await controller['post /api/v1/service/zigbee2mqtt/setup'].controller(req, res);
     assert.calledOnceWithExactly(zigbee2mqttManager.setup, req.body);
-    assert.calledOnceWithExactly(res.json, { success: true });
+    assert.calledOnceWithExactly(res.json, { config: 'values' });
   });
 
   it('post /api/v1/service/zigbee2mqtt/connect', async () => {

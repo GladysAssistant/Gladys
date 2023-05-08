@@ -7,6 +7,12 @@ import { RequestStatus } from '../../../../../utils/consts';
 import Zigbee2mqttPage from '../Zigbee2mqttPage';
 import SetupTab from './SetupTab';
 
+const VARIABLE_MAP = {
+  ZIGBEE2MQTT_DRIVER_PATH: 'z2mDriverPath',
+  ZIGBEE_DONGLE_NAME: 'z2mDongleName',
+  Z2M_TCP_PORT: 'z2mTcpPort'
+};
+
 class Zigbee2mqttSetupPage extends Component {
   handleZ2MStatus = zigbee2mqttStatus => {
     this.setState({ zigbee2mqttStatus });
@@ -27,11 +33,9 @@ class Zigbee2mqttSetupPage extends Component {
 
   loadZ2MConfig = async () => {
     try {
-      const zigbee2mqttStatus = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
-      const configuration = {
-        z2mDriverPath: zigbee2mqttStatus.ZIGBEE2MQTT_DRIVER_PATH,
-        z2mDongleName: zigbee2mqttStatus.ZIGBEE_DONGLE_NAME
-      };
+      const savedConfig = await this.props.httpClient.get('/api/v1/service/zigbee2mqtt/setup');
+      const configuration = {};
+      Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
         configuration,
         loadZigbee2mqttConfig: RequestStatus.Success
@@ -42,17 +46,19 @@ class Zigbee2mqttSetupPage extends Component {
     }
   };
 
-  saveConfiguration = async configuration => {
+  saveConfiguration = async nextConfiguration => {
     this.setState({
       setupZigee2mqttStatus: RequestStatus.Getting
     });
     try {
-      const mapping = {
-        ZIGBEE2MQTT_DRIVER_PATH: configuration.z2mDriverPath,
-        ZIGBEE_DONGLE_NAME: configuration.z2mDongleName
-      };
-      await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', mapping);
+      const mapping = {};
+      Object.keys(VARIABLE_MAP).forEach(key => (mapping[key] = nextConfiguration[VARIABLE_MAP[key]]));
+      const savedConfig = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', mapping);
+
+      const configuration = {};
+      Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({
+        configuration,
         setupZigee2mqttStatus: RequestStatus.Success
       });
     } catch (e) {

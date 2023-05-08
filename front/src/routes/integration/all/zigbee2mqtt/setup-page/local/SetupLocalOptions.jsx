@@ -16,9 +16,15 @@ class SetupLocalOptions extends Component {
     this.setState({ z2mDongleName });
   };
 
+  updateTcpPort = e => {
+    const { value } = e.target;
+    const z2mTcpPort = value.trim() === '' ? null : value;
+    this.setState({ z2mTcpPort });
+  };
+
   saveConfiguration = () => {
-    const { z2mDriverPath, z2mDongleName } = this.state;
-    this.props.saveConfiguration({ z2mDriverPath, z2mDongleName });
+    const { z2mDriverPath, z2mDongleName, z2mTcpPort } = this.state;
+    this.props.saveConfiguration({ z2mDriverPath, z2mDongleName, z2mTcpPort: z2mTcpPort ? z2mTcpPort : 0 });
   };
 
   resetConfiguration = () => {
@@ -87,7 +93,7 @@ class SetupLocalOptions extends Component {
     super(props);
 
     const { configuration } = props;
-    const { z2mDriverPath, z2mDongleName } = configuration;
+    const { z2mDriverPath, z2mDongleName, z2mTcpPort } = configuration;
 
     this.state = {
       z2mDriverPath,
@@ -95,7 +101,8 @@ class SetupLocalOptions extends Component {
       loadUsbPortsStatus: RequestStatus.Getting,
       z2mDongleName,
       zigbeeAdapters: [],
-      loadZigbeeAdaptersStatus: RequestStatus.Getting
+      loadZigbeeAdaptersStatus: RequestStatus.Getting,
+      z2mTcpPort: z2mTcpPort === 0 ? null : z2mTcpPort
     };
   }
 
@@ -104,7 +111,10 @@ class SetupLocalOptions extends Component {
     this.loadZigbeeAdapters();
   }
 
-  render({}, { z2mDriverPath, usbPorts, loadUsbPortsStatus, z2mDongleName, zigbeeAdapters, loadZigbeeAdaptersStatus }) {
+  render(
+    {},
+    { z2mDriverPath, usbPorts, loadUsbPortsStatus, z2mDongleName, zigbeeAdapters, loadZigbeeAdaptersStatus, z2mTcpPort }
+  ) {
     return (
       <div>
         <p>
@@ -160,6 +170,27 @@ class SetupLocalOptions extends Component {
               </button>
             </div>
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="integration.zigbee2mqtt.setup.modes.local.z2mTcpPortLabel" />
+          </label>
+          <div class="row">
+            <div class="col col-sm-11" data-cy="z2m-setup-local-tcp-field">
+              <input
+                type="number"
+                class="form-control"
+                value={z2mTcpPort}
+                onChange={this.updateTcpPort}
+                placeholder="8080"
+                min="1"
+                max="65535"
+              />
+            </div>
+          </div>
+          <small class="form-text text-muted">
+            <Text id="integration.zigbee2mqtt.setup.modes.local.z2mTcpPortDescription" />
+          </small>
         </div>
         <div class="form-group d-flex">
           <button

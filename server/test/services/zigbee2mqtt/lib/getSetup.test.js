@@ -38,14 +38,16 @@ describe('zigbee2mqtt getSetup', () => {
     // EXECUTE
     const config = await zigbee2MqttManager.getSetup();
     // ASSERT
-    assert.callCount(gladys.variable.getValue, 2);
+    assert.callCount(gladys.variable.getValue, 3);
     assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE_DONGLE_NAME', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'Z2M_TCP_PORT', serviceId);
 
     // z2m was not running, we don't reload it
     expect(config).deep.eq({
       ZIGBEE2MQTT_DRIVER_PATH: 'fake',
       ZIGBEE_DONGLE_NAME: 'fake',
+      Z2M_TCP_PORT: 'fake',
     });
   });
 });

@@ -38,6 +38,7 @@ describe('zigbee2mqtt saveConfiguration', () => {
     const config = {
       z2mDriverPath: 'z2mDriverPath',
       z2mDongleName: 'z2mDongleName',
+      z2mTcpPort: 'z2mTcpPort',
       z2mMqttUsername: 'z2mMqttUsername',
       z2mMqttPassword: 'z2mMqttPassword',
       mqttUrl: 'mqttUrl',
@@ -49,7 +50,8 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.setValue, 7);
+    assert.callCount(gladys.variable.setValue, 8);
+    assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', config.z2mTcpPort, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_USERNAME', config.z2mMqttUsername, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_PASSWORD', config.z2mMqttPassword, serviceId);
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_MQTT_URL', config.mqttUrl, serviceId);
@@ -65,7 +67,8 @@ describe('zigbee2mqtt saveConfiguration', () => {
     // EXECUTE
     await zigbee2MqttManager.saveConfiguration(config);
     // ASSERT
-    assert.callCount(gladys.variable.destroy, 7);
+    assert.callCount(gladys.variable.destroy, 8);
+    assert.calledWithExactly(gladys.variable.destroy, 'Z2M_TCP_PORT', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_PASSWORD', serviceId);
     assert.calledWithExactly(gladys.variable.destroy, 'Z2M_MQTT_URL', serviceId);

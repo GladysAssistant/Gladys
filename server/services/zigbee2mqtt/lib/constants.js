@@ -2,6 +2,7 @@ const CONFIGURATION = {
   Z2M_DRIVER_PATH: 'ZIGBEE2MQTT_DRIVER_PATH',
   Z2M_BACKUP: 'Z2M_BACKUP',
   ZIGBEE_DONGLE_NAME: 'ZIGBEE_DONGLE_NAME',
+  Z2M_TCP_PORT: 'Z2M_TCP_PORT',
   MQTT_URL_KEY: 'Z2M_MQTT_URL',
   MQTT_URL_VALUE: 'mqtt://localhost:1884',
   Z2M_MQTT_USERNAME_KEY: 'Z2M_MQTT_USERNAME',
@@ -14,7 +15,7 @@ const CONFIGURATION = {
   DOCKER_Z2M_VERSION: 'DOCKER_Z2M_VERSION', // Variable to identify last version of Z2M docker file is installed
 };
 
-const SETUP_VARIABLES = [CONFIGURATION.Z2M_DRIVER_PATH, CONFIGURATION.ZIGBEE_DONGLE_NAME];
+const SETUP_VARIABLES = [CONFIGURATION.Z2M_DRIVER_PATH, CONFIGURATION.ZIGBEE_DONGLE_NAME, CONFIGURATION.Z2M_TCP_PORT];
 
 const DEFAULT = {
   TOPICS: [
@@ -32,9 +33,6 @@ const DEFAULT = {
     },
     serial: {
       port: '/dev/ttyACM0',
-    },
-    frontend: {
-      port: 8080,
     },
     map_options: {
       graphviz: {
@@ -56,6 +54,10 @@ const DEFAULT = {
         },
       },
     },
+  },
+  CONFIGURATION_PORTS: {
+    min: 12000,
+    max: 12999,
   },
 };
 

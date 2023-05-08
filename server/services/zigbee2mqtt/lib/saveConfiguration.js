@@ -12,6 +12,7 @@ async function saveConfiguration(config) {
   logger.debug('Zigbee2mqtt: storing configuration...');
 
   const keyValueMap = {
+    [CONFIGURATION.Z2M_TCP_PORT]: config.z2mTcpPort,
     [CONFIGURATION.Z2M_MQTT_USERNAME_KEY]: config.z2mMqttUsername,
     [CONFIGURATION.Z2M_MQTT_PASSWORD_KEY]: config.z2mMqttPassword,
     [CONFIGURATION.MQTT_URL_KEY]: config.mqttUrl,

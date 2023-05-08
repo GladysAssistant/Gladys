@@ -539,10 +539,14 @@
             "usbDriverPathPlaceholder": "USB port",
             "usbDongleNameLabel": "Select your Zigbee Dongle model",
             "usbDongleNamePlaceholder": "Zigbee Dongle model",
+            "z2mTcpPortLabel": "Enter the TCP port to expose Zigbee2Mqtt web application",
+            "z2mTcpPortDescription": "If you keep it empty, a random port will be used.",
             "summary": {
               "title": "Configuration",
               "usbPort": "USB port",
-              "dongleName": "Dongle"
+              "dongleName": "Dongle",
+              "tcpPort": "TCP port",
+              "randomTcpPort": "Random"
             }
           },
           "remote": {

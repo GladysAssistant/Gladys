@@ -54,9 +54,8 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
   async function setup(req, res) {
     logger.debug('Entering setup step');
     await zigbee2mqttManager.setup(req.body);
-    res.json({
-      success: true,
-    });
+    const configuration = await zigbee2mqttManager.getSetup();
+    res.json(configuration);
   }
 
   /**
