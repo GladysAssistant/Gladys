@@ -75,6 +75,12 @@ describe('Camera.streaming', () => {
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
   });
+  afterEach(() => {
+    // remove interval
+    if (rtspCameraManager.checkIfLiveActiveInterval) {
+      clearInterval(rtspCameraManager.checkIfLiveActiveInterval);
+    }
+  });
   it('should not start, camera url does not exist', async () => {
     const wrongGladys = {
       device: {
@@ -85,13 +91,13 @@ describe('Camera.streaming', () => {
         }),
       },
     };
-    const rtspCameraManagerWithoutDevice = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       wrongGladys,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    const promise = rtspCameraManagerWithoutDevice.startStreaming('my-camera', false, 1);
+    const promise = rtspCameraManager.startStreaming('my-camera', false, 1);
     await assert.isRejected(promise, NotFoundError);
     wrongGladys.device.getBySelector = fake.resolves({
       id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
@@ -103,7 +109,7 @@ describe('Camera.streaming', () => {
         },
       ],
     });
-    const promise2 = rtspCameraManagerWithoutDevice.startStreaming('my-camera', false, 1);
+    const promise2 = rtspCameraManager.startStreaming('my-camera', false, 1);
     await assert.isRejected(promise2, NotFoundError);
   });
   it('should start, ping & stop streaming', async () => {
@@ -146,19 +152,19 @@ describe('Camera.streaming', () => {
         }),
       },
     };
-    const rtspCameraManagerWithRotation = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladysDeviceWithRotation,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    rtspCameraManagerWithRotation.onNewCameraFile = fake.resolves(null);
-    const liveStreamingProcess = await rtspCameraManagerWithRotation.startStreaming('my-camera', false, 1);
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
+    const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);
     expect(liveStreamingProcess).to.have.property('camera_folder');
     expect(liveStreamingProcess).to.have.property('encryption_key');
-    await rtspCameraManagerWithRotation.liveActivePing('my-camera');
-    await rtspCameraManagerWithRotation.stopStreaming('my-camera');
-    fakeAssert.called(rtspCameraManagerWithRotation.onNewCameraFile);
+    await rtspCameraManager.liveActivePing('my-camera');
+    await rtspCameraManager.stopStreaming('my-camera');
+    fakeAssert.called(rtspCameraManager.onNewCameraFile);
   });
   it('should star with not rotation params & stop streaming after', async () => {
     const gladysDeviceWithRotation = {
@@ -178,19 +184,19 @@ describe('Camera.streaming', () => {
         }),
       },
     };
-    const rtspCameraManagerWithRotation = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladysDeviceWithRotation,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    rtspCameraManagerWithRotation.onNewCameraFile = fake.resolves(null);
-    const liveStreamingProcess = await rtspCameraManagerWithRotation.startStreaming('my-camera', false, 1);
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
+    const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);
     expect(liveStreamingProcess).to.have.property('camera_folder');
     expect(liveStreamingProcess).to.have.property('encryption_key');
-    await rtspCameraManagerWithRotation.liveActivePing('my-camera');
-    await rtspCameraManagerWithRotation.stopStreaming('my-camera');
-    fakeAssert.called(rtspCameraManagerWithRotation.onNewCameraFile);
+    await rtspCameraManager.liveActivePing('my-camera');
+    await rtspCameraManager.stopStreaming('my-camera');
+    fakeAssert.called(rtspCameraManager.onNewCameraFile);
   });
   it('should ping and get 404', async () => {
     const promise = rtspCameraManager.liveActivePing('lalalallala');
@@ -217,7 +223,7 @@ describe('Camera.streaming', () => {
     await rtspCameraManager.stopStreaming('my-camera');
   });
   it('should start streaming only once', async () => {
-    const rtspCameraManagerWithFakeStart = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMock,
@@ -225,57 +231,57 @@ describe('Camera.streaming', () => {
     );
 
     // @ts-ignore
-    rtspCameraManagerWithFakeStart.startStreaming = fake.resolves({});
+    rtspCameraManager.startStreaming = fake.resolves({});
     await Promise.all([
-      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', false, 1),
-      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', false, 1),
-      rtspCameraManagerWithFakeStart.startStreamingIfNotStarted('my-camera', false, 1),
+      rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1),
+      rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1),
+      rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1),
     ]);
     // @ts-ignore
-    fakeAssert.calledOnce(rtspCameraManagerWithFakeStart.startStreaming);
+    fakeAssert.calledOnce(rtspCameraManager.startStreaming);
   });
   it('should start streaming if not started', async () => {
-    const rtspCameraManagerWithFail = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
     // @ts-ignore
-    rtspCameraManagerWithFail.startStreaming = fake.rejects(new Error('test'));
-    const promise = rtspCameraManagerWithFail.startStreamingIfNotStarted('my-camera', false, 1);
+    rtspCameraManager.startStreaming = fake.rejects(new Error('test'));
+    const promise = rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
     await assert.isRejected(promise, 'test');
-    expect(rtspCameraManagerWithFail.liveStreamsStarting.size).to.equal(0);
+    expect(rtspCameraManager.liveStreamsStarting.size).to.equal(0);
   });
   it('should start streaming locally, then convert local stream to online stream during init', async () => {
-    const rtspCameraManagerConvertToGateway = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
     // @ts-ignore
-    rtspCameraManagerConvertToGateway.convertLocalStreamToGateway = fake.resolves(null);
-    const promise = rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', false, 1);
-    const promiseGateway = rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', true, 1);
+    rtspCameraManager.convertLocalStreamToGateway = fake.resolves(null);
+    const promise = rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
+    const promiseGateway = rtspCameraManager.startStreamingIfNotStarted('my-camera', true, 1);
     await Promise.all([promise, promiseGateway]);
     // @ts-ignore
-    fakeAssert.calledOnce(rtspCameraManagerConvertToGateway.convertLocalStreamToGateway);
+    fakeAssert.calledOnce(rtspCameraManager.convertLocalStreamToGateway);
   });
   it('should start streaming locally, then convert local stream to online stream after stream started', async () => {
-    const rtspCameraManagerConvertToGateway = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
     // @ts-ignore
-    rtspCameraManagerConvertToGateway.convertLocalStreamToGateway = fake.resolves(null);
-    await rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', false, 1);
-    await rtspCameraManagerConvertToGateway.startStreamingIfNotStarted('my-camera', true, 1);
+    rtspCameraManager.convertLocalStreamToGateway = fake.resolves(null);
+    await rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
+    await rtspCameraManager.startStreamingIfNotStarted('my-camera', true, 1);
     // @ts-ignore
-    fakeAssert.calledOnce(rtspCameraManagerConvertToGateway.convertLocalStreamToGateway);
-    await rtspCameraManagerConvertToGateway.stopStreaming('my-camera');
+    fakeAssert.calledOnce(rtspCameraManager.convertLocalStreamToGateway);
+    await rtspCameraManager.stopStreaming('my-camera');
   });
   it('should start streaming and should crash immediately', async () => {
     const childProcessMockWithCrash = {
@@ -298,15 +304,15 @@ describe('Camera.streaming', () => {
         };
       },
     };
-    const rtspCameraManagerWithSpawnCrash = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMockWithCrash,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    const promise = rtspCameraManagerWithSpawnCrash.startStreamingIfNotStarted('my-camera', false, 1);
+    const promise = rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
     await assert.isRejected(promise, 'Child process exited with code 100');
-    expect(rtspCameraManagerWithSpawnCrash.liveStreams.size).to.equal(0);
+    expect(rtspCameraManager.liveStreams.size).to.equal(0);
   });
   it('should start streaming and write multiple time the index', async () => {
     const childProcessMockWithCrash = {
@@ -331,13 +337,13 @@ describe('Camera.streaming', () => {
         };
       },
     };
-    const rtspCameraManagerWithSpawnCrash = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMockWithCrash,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    await rtspCameraManagerWithSpawnCrash.startStreamingIfNotStarted('my-camera', false, 1);
+    await rtspCameraManager.startStreamingIfNotStarted('my-camera', false, 1);
   });
   it('should stop streaming, but kill + clean is not working', async () => {
     const gladysWithFailClean = {
@@ -356,13 +362,13 @@ describe('Camera.streaming', () => {
         getBySelector: fake.resolves(device),
       },
     };
-    const rtspCameraManagerWithFail = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladysWithFailClean,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    rtspCameraManagerWithFail.liveStreams.set('my-camera', {
+    rtspCameraManager.liveStreams.set('my-camera', {
       isGladysGateway: true,
       liveStreamingProcess: {
         kill: fake.throws('CANNOT KILL!'),
@@ -372,15 +378,15 @@ describe('Camera.streaming', () => {
       },
       fullFolderPath: path.join(gladys.config.tempFolder, 'lalalalallalala'),
     });
-    await rtspCameraManagerWithFail.stopStreaming('my-camera');
+    await rtspCameraManager.stopStreaming('my-camera');
   });
   it('should return even if stream does not exist in stopStreaming', async () => {
-    const rtspCameraManagerEmpty = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    await rtspCameraManagerEmpty.stopStreaming('unknown stream');
+    await rtspCameraManager.stopStreaming('unknown stream');
   });
 });

@@ -40,13 +40,7 @@ describe('Camera.onNewCameraFile', () => {
   const indexFilePath = path.join(folderPath, 'index.m3u8');
   const keyfilePath = path.join(folderPath, 'index.m3u8.key');
   const videoFilePath = path.join(folderPath, 'index0.ts');
-  const rtspCameraManager = new RtspCameraManager(
-    gladys,
-    FfmpegMock,
-    childProcessMock,
-    'de051f90-f34a-4fd5-be2e-e502339ec9bc',
-  );
-  rtspCameraManager.sendCameraFileToGatewayLimited = fake.resolves(null);
+  let rtspCameraManager;
   before(async () => {
     await fse.ensureDir(folderPath);
     await fse.writeFile(indexFilePath, 'this is index');
@@ -55,6 +49,15 @@ describe('Camera.onNewCameraFile', () => {
   });
   after(async () => {
     await fse.remove(folderPath);
+  });
+  beforeEach(() => {
+    rtspCameraManager = new RtspCameraManager(
+      gladys,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    rtspCameraManager.sendCameraFileToGatewayLimited = fake.resolves(null);
   });
   it('should return directly, no live stream', async () => {
     const res = await rtspCameraManager.onNewCameraFile('my-camera', folderPath, 'camera-folder', 'index.m3u8', {}, {});
@@ -108,19 +111,19 @@ describe('Camera.onNewCameraFile', () => {
     fakeAssert.calledWith(eventEmitter.emit, 'gateway-ready');
   });
   it('should upload a file that fail, and return null', async () => {
-    const rtspCameraManager2 = new RtspCameraManager(
+    rtspCameraManager = new RtspCameraManager(
       gladys,
       FfmpegMock,
       childProcessMock,
       'de051f90-f34a-4fd5-be2e-e502339ec9bc',
     );
-    rtspCameraManager2.sendCameraFileToGatewayLimited = fake.rejects(null);
-    rtspCameraManager2.liveStreams.set('my-camera', {
+    rtspCameraManager.sendCameraFileToGatewayLimited = fake.rejects(null);
+    rtspCameraManager.liveStreams.set('my-camera', {
       isGladysGateway: true,
     });
     const sharedObject = {};
     const eventEmitter = {};
-    const res = await rtspCameraManager2.onNewCameraFile(
+    const res = await rtspCameraManager.onNewCameraFile(
       'my-camera',
       folderPath,
       folderName,
@@ -129,7 +132,7 @@ describe('Camera.onNewCameraFile', () => {
       eventEmitter,
     );
     expect(res).to.equal(null);
-    fakeAssert.called(rtspCameraManager2.sendCameraFileToGatewayLimited);
+    fakeAssert.called(rtspCameraManager.sendCameraFileToGatewayLimited);
   });
   it('should upload index and hot replace url in case of a mixed live (local&gateway)', async () => {
     await fse.writeFile(

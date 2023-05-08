@@ -26,6 +26,7 @@ const RtspCameraHandler = function RtspCameraHandler(gladys, ffmpeg, childProces
   this.checkIfLiveActiveFrequencyInSeconds = 10;
   this.liveStreams = new Map();
   this.liveStreamsStarting = new Map();
+  this.checkIfLiveActiveInterval = null;
 };
 
 RtspCameraHandler.prototype.checkIfLiveActive = checkIfLiveActive;
