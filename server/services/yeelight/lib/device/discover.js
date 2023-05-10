@@ -15,10 +15,12 @@ async function discover() {
     this.discoveryInProgress = true;
 
     if (!this.discovery || this.discovery.isDestroyed) {
-      this.discovery = new this.yeelightApi.Discover({ fallback: false });
+      logger.debug(`Yeelight: New Discover`);
+      this.discovery = new this.yeelightApi.Discover({ debug: true, fallback: false });
     }
 
     this.discovery.on('error', (error) => {
+      logger.error(`Yeelight: ${error}`);
       throw error;
     });
 
@@ -28,7 +30,9 @@ async function discover() {
     }, 10000);
 
     const discoveredDevices = await this.discovery.start();
+    logger.debug(`Yeelight: Discovered devices: ${discoveredDevices}`);
     discoveredDevices.forEach((discoveredDevice) => {
+      logger.debug(`Yeelight: Discovered device: ${discoveredDevice}`);
       // ...check if it is already in Gladys...
       const deviceInGladys = this.gladys.stateManager.get(
         'deviceByExternalId',

@@ -19,6 +19,7 @@ async function poll(device) {
   const light = new this.yeelightApi.Yeelight({ lightIp, lightPort });
 
   try {
+    logger.debug(`Yeelight: Start Pooling...`);
     await light.connect();
     if (!light || !light.connected) {
       throw new NotFoundError(`YEELIGHT_DEVICE_NOT_FOUND`);
@@ -55,6 +56,7 @@ async function poll(device) {
     logger.debug(`Yeelight: RGB: ${rgb} (${currentColorValue})`);
     emitNewState(this.gladys, device, DEVICE_FEATURE_TYPES.LIGHT.COLOR, currentColorValue);
   } catch (error) {
+    logger.error(`Yeelight: ${error}`);
     await light.disconnect();
     throw new NotFoundError(`YEELIGHT_DEVICE_NOT_FOUND`);
   }

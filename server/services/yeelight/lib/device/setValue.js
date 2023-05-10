@@ -60,6 +60,7 @@ async function setValue(device, deviceFeature, value) {
         break;
     }
   } catch (error) {
+    logger.error(`Yeelight: ${error}`);
     throw new NotFoundError(`YEELIGHT_DEVICE_NOT_FOUND`);
   }
 }
