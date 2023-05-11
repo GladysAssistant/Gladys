@@ -45,6 +45,7 @@ const EditScenePage = ({ children, ...props }) => (
                 <span onClick={props.toggleIsNameEditable}>{props.scene.name}</span>
               )}
             </h1>
+
             <label class="custom-switch m-0 ml-4">
               <input
                 type="checkbox"
@@ -70,6 +71,25 @@ const EditScenePage = ({ children, ...props }) => (
                 <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
               </button>
             </div>
+          </div>
+          <div class="page-header sceneDescription" >
+            <h5 class="font-weight-normal">
+              <Text id="editScene.descriptionTitle" />
+            </h5>
+            <form class="w-100" onSubmit={props.saveScene}>
+              <div class="input-group">
+                <Localizer>
+                  <textarea
+                    cols="40" rows="5"
+                    type="text"
+                    className="form-control form-control-sm "
+                    onChange={props.updateSceneDescription}
+                    value={props.scene.description}
+                    ref={props.setDescriptionInputRef}
+                  />
+                </Localizer>
+              </div>
+            </form>
           </div>
           <div>
             {props.error && (

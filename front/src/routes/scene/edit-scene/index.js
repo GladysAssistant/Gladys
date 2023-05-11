@@ -86,6 +86,8 @@ class EditScene extends Component {
     if (e) {
       e.preventDefault();
     }
+    console.log(this.state);
+
     this.setState({ saving: true, error: false });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
@@ -303,6 +305,10 @@ class EditScene extends Component {
     this.nameInput = nameInput;
   };
 
+  setDescriptionInputRef = descriptionInput => {
+    this.descriptionInput = descriptionInput;
+  };
+
   updateSceneName = e => {
     this.setState(prevState => {
       const newState = update(prevState, {
@@ -315,6 +321,21 @@ class EditScene extends Component {
       return newState;
     });
   };
+
+  updateSceneDescription = e => {
+    console.log(e);
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        scene: {
+          description: {
+            $set: e.target.value
+          }
+        }
+      });
+      return newState;
+    });
+  };
+
   duplicateScene = () => {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
@@ -366,6 +387,8 @@ class EditScene extends Component {
           updateSceneName={this.updateSceneName}
           setNameInputRef={this.setNameInputRef}
           duplicateScene={this.duplicateScene}
+          updateSceneDescription={this.updateSceneDescription}
+          setDescriptionInputRef={this.setDescriptionInputRef}
         />
       )
     );

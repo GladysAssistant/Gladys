@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
-  fields: ['id', 'name', 'icon', 'selector', 'active', 'last_executed', 'updated_at'],
+  fields: ['id', 'name', 'description', 'icon', 'selector', 'active', 'last_executed', 'updated_at'],
   skip: 0,
   order_dir: 'ASC',
   order_by: 'name',
@@ -40,8 +40,9 @@ async function get(options) {
 
   const scenes = await db.Scene.findAll(queryParams);
 
+  console.log('scenes', scenes);
   const scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
-
+  console.log('scenesPlain', scenesPlain);
   return scenesPlain;
 }
 

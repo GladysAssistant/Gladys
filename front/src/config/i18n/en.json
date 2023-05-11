@@ -1183,6 +1183,7 @@
   },
   "editScene": {
     "editNamePlaceholder": "Enter a scene name",
+    "descriptionTitle": "Description",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
