@@ -86,8 +86,6 @@ class EditScene extends Component {
     if (e) {
       e.preventDefault();
     }
-    console.log(this.state);
-
     this.setState({ saving: true, error: false });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
@@ -323,7 +321,6 @@ class EditScene extends Component {
   };
 
   updateSceneDescription = e => {
-    console.log(e);
     this.setState(prevState => {
       const newState = update(prevState, {
         scene: {

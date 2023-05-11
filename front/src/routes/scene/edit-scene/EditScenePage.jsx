@@ -72,7 +72,7 @@ const EditScenePage = ({ children, ...props }) => (
               </button>
             </div>
           </div>
-          <div class="page-header sceneDescription" >
+          <div class="page-header">
             <h5 class="font-weight-normal">
               <Text id="editScene.descriptionTitle" />
             </h5>
@@ -80,7 +80,8 @@ const EditScenePage = ({ children, ...props }) => (
               <div class="input-group">
                 <Localizer>
                   <textarea
-                    cols="40" rows="5"
+                    cols="40"
+                    rows="5"
                     type="text"
                     className="form-control form-control-sm "
                     onChange={props.updateSceneDescription}
