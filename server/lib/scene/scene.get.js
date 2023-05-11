@@ -40,9 +40,7 @@ async function get(options) {
 
   const scenes = await db.Scene.findAll(queryParams);
 
-  console.log('scenes', scenes);
   const scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
-  console.log('scenesPlain', scenesPlain);
   return scenesPlain;
 }
 
