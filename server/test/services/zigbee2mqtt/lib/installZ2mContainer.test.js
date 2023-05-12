@@ -7,7 +7,7 @@ const { assert, fake, stub } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const configureContainer = fake.resolves(true);
+const configureContainer = fake.resolves(false);
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
   './configureContainer': { configureContainer },
 });
@@ -68,14 +68,30 @@ describe('zigbee2mqtt installz2mContainer', () => {
     sinon.reset();
   });
 
-  it('it should restart z2m container', async function test() {
+  it('it should restart z2m container (container stopped)', async () => {
     // PREPARE
-    this.timeout(6000);
     const config = {};
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config);
+    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+    });
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+  });
+
+  it('it should restart z2m container (container running but config changed)', async () => {
+    // PREPARE
+    const config = {};
+    gladys.system.getContainers = fake.resolves([container]);
+    zigbee2mqttManager.configureContainer = fake.resolves(true);
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnceWithExactly(zigbee2mqttManager.configureContainer, basePathOnContainer, config);
     assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
@@ -91,7 +107,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
     // EXECUTE
     await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
-    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+    assert.notCalled(gladys.system.restartContainer);
     assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
