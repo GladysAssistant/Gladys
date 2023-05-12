@@ -4,7 +4,6 @@ import ResetPasswordPage from './ResetPasswordPage';
 import actions from '../../actions/resetPassword';
 import { RequestStatus, ResetPasswordStatus } from '../../utils/consts';
 
-@connect('resetPasswordStatus,resetPasswordErrors,resetPasswordPassword,resetPasswordPasswordRepeat', actions)
 class ResetPassword extends Component {
   componentWillMount() {
     this.props.updateResetToken(this.props.token);
@@ -19,4 +18,7 @@ class ResetPassword extends Component {
   }
 }
 
-export default ResetPassword;
+export default connect(
+  'resetPasswordStatus,resetPasswordErrors,resetPasswordPassword,resetPasswordPasswordRepeat',
+  actions
+)(ResetPassword);

@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 
-@connect('', {})
 class WaitActionParams extends Component {
   handleChangeDuration = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
@@ -56,4 +55,4 @@ class WaitActionParams extends Component {
   }
 }
 
-export default WaitActionParams;
+export default connect('', {})(WaitActionParams);

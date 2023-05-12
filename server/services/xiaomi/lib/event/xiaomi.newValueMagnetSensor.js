@@ -14,8 +14,8 @@ const MAX_VOLT = 3300;
 
 /**
  * @description Add Xiaomi Magnet Sensor.
- * @param {Object} message - Message received.
- * @param {Object} data - Data received.
+ * @param {object} message - Message received.
+ * @param {object} data - Data received.
  * @example
  * addMagnetSensor(122324, {
  *    voltage: 3000,

@@ -24,7 +24,6 @@ const SUPPORTED_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE
 ];
 
-@connect('httpClient', {})
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
@@ -131,4 +130,4 @@ class EditDeviceInRoom extends Component {
   }
 }
 
-export default withIntlAsProp(EditDeviceInRoom);
+export default withIntlAsProp(connect('httpClient', {})(EditDeviceInRoom));

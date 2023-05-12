@@ -1,6 +1,8 @@
-const getApexChartBarOptions = ({ displayAxes, series, COLORS }) => {
+const getApexChartBarOptions = ({ displayAxes, series, COLORS, locales, defaultLocale }) => {
   const options = {
     chart: {
+      locales,
+      defaultLocale,
       type: 'bar',
       fontFamily: 'inherit',
       height: displayAxes ? 200 : 100,

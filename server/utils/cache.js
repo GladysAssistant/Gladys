@@ -1,5 +1,5 @@
 /**
- * We want to cache some data in RAM
+ * We want to cache some data in RAM.
  */
 class Cache {
   constructor() {

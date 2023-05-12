@@ -27,9 +27,9 @@ const { listen } = require('./commands/xiaomi.listen');
 const { setValue } = require('./commands/xiaomi.setValue');
 
 /**
- * @param {Object} gladys - The gladys object.
+ * @param {object} gladys - The gladys object.
  * @param {string} serviceId - Identification of the service.
- * @description Create all device if not exist by listening
+ * @description Create all device if not exist by listening.
  * @example
  * XiaomiManager(gladys, serviceId)
  */

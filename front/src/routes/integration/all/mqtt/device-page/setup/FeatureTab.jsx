@@ -63,6 +63,7 @@ const FeatureTab = ({ children, ...props }) => (
                     onChange={props.selectFeature}
                     value={props.selectedFeatureOption}
                     options={props.deviceFeaturesOptions}
+                    placeholder={<Text id="global.selectPlaceholder" />}
                   />
                 </div>
                 <div>

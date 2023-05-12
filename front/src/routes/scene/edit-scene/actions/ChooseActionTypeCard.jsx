@@ -8,8 +8,10 @@ import { ACTIONS } from '../../../../../../server/utils/constants';
 const ACTION_LIST = [
   ACTIONS.LIGHT.TURN_ON,
   ACTIONS.LIGHT.TURN_OFF,
+  ACTIONS.LIGHT.TOGGLE,
   ACTIONS.SWITCH.TURN_ON,
   ACTIONS.SWITCH.TURN_OFF,
+  ACTIONS.SWITCH.TOGGLE,
   ACTIONS.TIME.DELAY,
   ACTIONS.MESSAGE.SEND,
   ACTIONS.DEVICE.GET_VALUE,
@@ -31,8 +33,7 @@ const TRANSLATIONS = ACTION_LIST.reduce((acc, action) => {
   acc[`editScene.actions.${action}`] = `editScene.actions.${action}`;
   return acc;
 }, {});
-@withText(TRANSLATIONS)
-@connect('httpClient', {})
+
 class ChooseActionType extends Component {
   state = {
     currentAction: null
@@ -76,4 +77,4 @@ class ChooseActionType extends Component {
   }
 }
 
-export default ChooseActionType;
+export default withText(TRANSLATIONS)(connect('httpClient', {})(ChooseActionType));

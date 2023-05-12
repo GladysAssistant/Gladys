@@ -4,7 +4,7 @@ const { ServiceNotConfiguredError, NotFoundError } = require('../../../../utils/
 
 /**
  * @description Start user's calendars synchronization.
- * @param {Object} userId - Gladys user to connect & synchronize.
+ * @param {object} userId - Gladys user to connect & synchronize.
  * @returns {Promise} Resolving.
  * @example
  * syncUserCalendars(user.id)

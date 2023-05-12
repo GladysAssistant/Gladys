@@ -10,7 +10,7 @@ const { chunk } = require('../../utils/chunks');
 
 /**
  * @description This function calculate aggregate device values from a child process.
- * @param {Object} params - Parameters.
+ * @param {object} params - Parameters.
  * @returns {Promise} - Resolve when finished.
  * @example
  * await calculateAggregateChildProcess({});

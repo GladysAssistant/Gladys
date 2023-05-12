@@ -42,6 +42,39 @@ describe('Device.saveHistoricalState', () => {
       type: 'device.new-state',
     });
   });
+  it('should not be able to save 2 times the same value', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const job = new Job(event);
+    const newDate = new Date().toISOString();
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('deviceFeature', 'test-device-feature', {
+      last_value: 5,
+      last_value_changed: null,
+      last_monthly_aggregate: null,
+      last_daily_aggregate: null,
+      last_hourly_aggregate: null,
+    });
+    const deviceFeature = {
+      id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      selector: 'test-device-feature',
+      has_feedback: false,
+      keep_history: true,
+    };
+    // Should not save 2 times the same event
+    await device.saveHistoricalState(deviceFeature, 12, newDate);
+    await device.saveHistoricalState(deviceFeature, 12, newDate);
+    const deviceStates = await db.DeviceFeatureState.findAll({
+      where: {
+        device_feature_id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+      },
+      raw: true,
+    });
+    expect(deviceStates).to.have.lengthOf(1);
+  });
   it('should save old state and keep history, and update aggregate', async () => {
     const event = {
       emit: stub().returns(null),

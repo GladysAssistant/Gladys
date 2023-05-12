@@ -3,7 +3,7 @@
  * @param {Array} features - Gladys features of the device.
  * @param {string} zigbeeFeatureField - Zigbee feature field.
  * @param {any} zigbeeFeatureValue - Zigbee feature value.
- * @returns {Object} Gladys feature.
+ * @returns {object} Gladys feature.
  * @example
  * convertFeature(feature);
  */

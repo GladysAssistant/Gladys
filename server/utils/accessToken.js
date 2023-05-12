@@ -4,7 +4,7 @@ const ACCESS_TOKEN_VALIDITY = 24 * 60 * 60; // access token is valid 24 hour
 
 /**
  * @private
- * @description Generate an access token token
+ * @description Generate an access token token.
  * @param {string} userId - The UserId.
  * @param {Array} scope - The scope.
  * @param {string} sessionId - The session ID.

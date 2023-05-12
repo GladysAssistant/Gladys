@@ -4,8 +4,8 @@ const db = require('../../models');
 
 /**
  * @public
- * @description Load all services
- * @param {Object} gladys - Gladys object.
+ * @description Load all services.
+ * @param {object} gladys - Gladys object.
  * @returns {Promise} Resolve when init is finished.
  * @example
  * service.load(gladys);

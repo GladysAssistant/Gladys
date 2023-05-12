@@ -17,6 +17,7 @@ describe('bluetooth.writeDevice', () => {
   let peripheral;
 
   let bluetooth;
+  let clock;
 
   beforeEach(() => {
     throwError = false;
@@ -52,13 +53,12 @@ describe('bluetooth.writeDevice', () => {
     };
 
     bluetooth = new BluetoothManager(gladys, serviceId);
+
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
-    if (bluetooth.scanPromise && bluetooth.scanPromise.isPending()) {
-      bluetooth.scanPromise.cancel();
-    }
-
+    clock.restore();
     sinon.reset();
   });
 

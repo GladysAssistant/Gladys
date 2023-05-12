@@ -13,7 +13,6 @@ module.exports = function HouseController(gladys) {
    * @api {post} /api/v1/house create
    * @apiName create
    * @apiGroup House
-   *
    * @apiUse HouseParam
    * @apiSuccessExample {json} Success-Example
    * {
@@ -70,7 +69,6 @@ module.exports = function HouseController(gladys) {
    * @api {delete} /api/v1/house/:house_selector delete
    * @apiName delete
    * @apiGroup House
-   *
    */
   async function destroy(req, res) {
     await gladys.house.destroy(req.params.house_selector);
@@ -84,7 +82,6 @@ module.exports = function HouseController(gladys) {
    * @apiName userSeen
    * @apiGroup House
    * @apiDescription Call this API if a user is seen in a house.
-   *
    * @apiSuccessExample {json} Success-Example
    * {
    *   "id": "e4e3f03e-60b9-485e-bc0a-c582b69089bd",
@@ -105,7 +102,6 @@ module.exports = function HouseController(gladys) {
    * @api {get} /api/v1/house/:house_selector/room getRooms
    * @apiName getRooms
    * @apiGroup House
-   *
    */
   async function getRooms(req, res) {
     const rooms = await gladys.house.getRooms(req.params.house_selector);

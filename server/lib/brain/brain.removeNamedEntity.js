@@ -1,7 +1,7 @@
 const { SUPPORTED_LANGUAGES } = require('../../config/brain/index');
 
 /**
- * @description Remove a room
+ * @description Remove a room.
  * @param {string} entity - The entity type.
  * @param {string} identifier - The identifier of the entity.
  * @param {string} name - The name of the entity.

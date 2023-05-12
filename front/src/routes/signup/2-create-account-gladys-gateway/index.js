@@ -11,10 +11,6 @@ import SetRestoreKey from './SetRestoreKey';
 import RestoreInProgress from './RestoreInProgress';
 import linkState from 'linkstate';
 
-@connect(
-  'user,session,httpClient,gatewayBackups,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
-  actions
-)
 class CreateAccountGladysGateway extends Component {
   state = {
     step: 1,
@@ -144,4 +140,7 @@ class CreateAccountGladysGateway extends Component {
   }
 }
 
-export default CreateAccountGladysGateway;
+export default connect(
+  'user,session,httpClient,gatewayBackups,gatewayStatus,gatewayLoginEmail,gatewayLoginPassword,gatewayLoginTwoFactorCode,gatewayGetStatusStatus,displayGatewayLogin,gatewayLoginStatus,gatewayLoginStep2,gatewayUsersKeys,gatewayInstanceKeys,gatewayGetKeysStatus,gatewayDisconnectStatus,gatewayBackupKey,gatewaySaveBackupKeyStatus,displayConnectedSuccess',
+  actions
+)(CreateAccountGladysGateway);

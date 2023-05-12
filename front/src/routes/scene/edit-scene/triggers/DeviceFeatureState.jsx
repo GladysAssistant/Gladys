@@ -10,7 +10,6 @@ import ThresholdDeviceState from './device-states/ThresholdDeviceState';
 import DefaultDeviceState from './device-states/DefaultDeviceState';
 import ButtonClickDeviceState from './device-states/ButtonClickDeviceState';
 
-@connect('httpClient', {})
 class TurnOnLight extends Component {
   onDeviceFeatureChange = deviceFeature => {
     this.setState({ selectedDeviceFeature: deviceFeature });
@@ -62,4 +61,4 @@ class TurnOnLight extends Component {
   }
 }
 
-export default TurnOnLight;
+export default connect('httpClient', {})(TurnOnLight);

@@ -5,6 +5,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * @public
  * @description Get rooms in a house.
  * @param {string} selector - Selector of the house.
+ * @returns {Promise<Array>} Resolve with list of rooms in house.
  * @example
  * const rooms = await gladys.house.getRooms('my-house');
  */

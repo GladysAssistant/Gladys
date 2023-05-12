@@ -3,7 +3,7 @@ const { recursiveSearch, addFeature } = require('../features');
 
 /**
  * @description Handle Tasmota 'stat/+/STATUS' topics to create device features.
- * @param {Object} device - Relative device.
+ * @param {object} device - Relative device.
  * @param {string} message - MQTT message.
  * @returns {any} NULL.
  * @example

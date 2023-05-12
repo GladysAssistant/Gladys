@@ -4,7 +4,7 @@ const { VARIABLES, PRESENCE_STATUS, TIMERS } = require('../utils/bluetooth.const
 
 /**
  * @description Save Bluetooth configuration.
- * @param {Object} configuration - Configuration to store.
+ * @param {object} configuration - Configuration to store.
  * @returns {Promise} - Always null.
  * @example
  * await this.saveConfiguration({ ... });

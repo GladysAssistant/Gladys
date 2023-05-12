@@ -11,7 +11,7 @@ const FUNC_BY_EVENT = {
 
 /**
  * @description Notify a device is created.
- * @param {Object} device - Created device.
+ * @param {object} device - Created device.
  * @param {string} event - Event to send.
  * @example
  * device.notify({ service_id: 'a810b8db-6d04-4697-bed3-c4b72c996279'}, 'device.create');

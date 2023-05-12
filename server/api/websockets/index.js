@@ -13,7 +13,10 @@ const WebsocketManager = function WebsocketManager(wss, gladys) {
 
 /**
  * @description Send a websocket message to the user.
- * @param {Object} event - Event.
+ * @param {object} event - The event to send.
+ * @param {string} event.type - The type of event to send.
+ * @param {object} event.payload - The payload of the event containing data.
+ * @param {string} event.userId - The userId to send the message to.
  * @example
  * sendMessageUser(event);
  */
@@ -30,7 +33,9 @@ function sendMessageUser({ type, payload, userId }) {
 
 /**
  * @description Send a websocket message to all user.
- * @param {Object} event - Event.
+ * @param {object} event - Event.
+ * @param {string} event.type - Type of event.
+ * @param {object} event.payload - Payload to send.
  * @example
  * sendMessageAllUsers(event);
  */
@@ -47,8 +52,9 @@ function sendMessageAllUsers({ type, payload }) {
 
 /**
  * @description When a user is connected.
- * @param {Object} user - User Object.
- * @param {Object} client - Websocket client.
+ * @param {object} user - User Object.
+ * @param {object} client - Websocket client.
+ * @returns {null} Return when finished.
  * @example
  * userConnected(user, ws);
  */
@@ -71,8 +77,9 @@ function userConnected(user, client) {
 
 /**
  * @description When a user is disconnected.
- * @param {Object} user - User Object.
- * @param {Object} client - Websocket client.
+ * @param {object} user - User Object.
+ * @param {object} client - Websocket client.
+ * @returns {null} Return when finished.
  * @example
  * userDisconnected(user, ws);
  */
@@ -92,6 +99,7 @@ function userDisconnected(user, client) {
 
 /**
  * @description Init websocket server.
+ * @returns {null} Returns when finished.
  * @example
  * init();
  */

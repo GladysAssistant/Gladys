@@ -47,8 +47,8 @@ function buildFeatures(deviceName, deviceExternalId) {
 
 /**
  * @description Polling Broadlink device values.
- * @param {Object} broadlinkDevice - Broadlink device.
- * @param {Object} gladysDevice - Gladys device.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @param {object} gladysDevice - Gladys device.
  * @returns {Promise} Messages to emit.
  * @example
  * await poll(broadlinkDevice, device);

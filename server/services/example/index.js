@@ -13,7 +13,7 @@ module.exports = function ExampleService(gladys) {
 
   /**
    * @public
-   * @description This function starts the ExampleService service
+   * @description This function starts the ExampleService service.
    * @example
    * gladys.services.example.start();
    */
@@ -23,7 +23,7 @@ module.exports = function ExampleService(gladys) {
 
   /**
    * @public
-   * @description This function stops the ExampleService service
+   * @description This function stops the ExampleService service.
    * @example
    * gladys.services.example.stop();
    */

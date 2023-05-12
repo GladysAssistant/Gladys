@@ -8,9 +8,9 @@ const { syncDeviceConverter } = require('../../services/alexa/lib/syncDeviceConv
 
 // eslint-disable-next-line jsdoc/require-returns
 /**
- * @description send a current state to google
- * @param {Object} stateManager - The state manager.
- * @param {Object} gladysGatewayClient - The gladysGatewayClient.
+ * @description Send a current state to google.
+ * @param {object} stateManager - The state manager.
+ * @param {object} gladysGatewayClient - The gladysGatewayClient.
  * @param {string} deviceFeatureSelector - The selector of the device feature to send.
  * @example
  * sendCurrentState(stateManager, 'light');
@@ -83,7 +83,7 @@ async function sendCurrentState(stateManager, gladysGatewayClient, deviceFeature
 
 /**
  * @description Forward websocket message to Gateway.
- * @param {Object} event - Websocket event.
+ * @param {object} event - Websocket event.
  * @returns {Promise} - Resolve when finished.
  * @example
  * forwardWebsockets({
