@@ -11,6 +11,7 @@ const { DEFAULT_KEY, CONFIG_KEYS, ADAPTERS_BY_CONFIG_KEY } = require('../adapter
  * @description Configure Z2M container.
  * @param {string} basePathOnContainer - Zigbee2mqtt base path.
  * @param {object} config - Gladys Z2M stored configuration.
+ * @returns {Promise} Indicates if the configuration file has been creted or modified.
  * @example
  * await this.configureContainer({});
  */
@@ -22,6 +23,7 @@ async function configureContainer(basePathOnContainer, config) {
   await fs.mkdir(path.dirname(configFilepath), { recursive: true });
 
   // Check if config file not already exists
+  let configCreated = false;
   try {
     // eslint-disable-next-line no-bitwise
     await fs.access(configFilepath, constants.R_OK | constants.W_OK);
@@ -29,6 +31,7 @@ async function configureContainer(basePathOnContainer, config) {
   } catch (e) {
     logger.info('Writting default Z2M configuration...');
     await fs.writeFile(configFilepath, yaml.stringify(DEFAULT.CONFIGURATION_CONTENT));
+    configCreated = true;
   }
 
   // Check for changes
@@ -63,6 +66,8 @@ async function configureContainer(basePathOnContainer, config) {
     logger.info('Writting MQTT and USB adapter information to Z2M configuration...');
     await fs.writeFile(configFilepath, yaml.stringify(loadedConfig));
   }
+
+  return configCreated || configChanged;
 }
 
 module.exports = {
