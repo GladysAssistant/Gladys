@@ -19,7 +19,7 @@ class CreateAccountLocal extends Component {
       role: 'admin',
       // there is no way to ALTER a column in SQlite, so we set a default value
       // here to simplify the login process
-      birthdate: '01/01/2000',
+      birthdate: new Date(2000, 0, 1),
       language: navigator.language === 'fr' ? 'fr' : 'en',
       password: '',
       passwordRepeat: ''
