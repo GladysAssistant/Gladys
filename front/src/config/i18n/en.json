@@ -1149,6 +1149,49 @@
       "notOnGladysPlus": "As ChatGPT API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus.",
       "licenseShouldBeActive": "This integration is only available to users with an active license (at least one payment). For trial users, please contact us on the forum or email."
+    },
+    "sunspec": {
+      "title": "SunSpec",
+      "description": "Manage you SunSpec device through you local network.",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover",
+      "setupTab": "Setup",
+      "device": {
+        "title": "SunSpec Devices",
+        "search": "Search devices",
+        "noDevices": "No SunSpec devices added yet.",
+        "manufacturerLabel": "Manufacturer",
+        "ipAddressLabel": "IP address",
+        "macAddressLabel": "MAC address",
+        "originalNameLabel": "Hostname"
+      },
+      "discover": {
+        "title": "SunSpec Discover",
+        "noDevices": "No SunSpec devices found.",
+        "scanButton": "Scan network",
+        "deviceUpdateButton": "New devices available",
+        "hideExistingDevices": "Hide already added devices",
+        "alreadyCreatedButton": "Already created",
+        "updateButton": "Update",
+        "discoveringError": "An error occurred, check scanner configuration, or check logs."
+      },
+      "setup": {
+        "title": "SunSpec settings",
+        "errorLabel": "An error occurred while loading configuration.",
+        "noConfigLabel": "Configuration not loaded, please retry.",
+        "sunspecUrl": "SunSpec URL",
+        "sunspecUrlPlaceholder": "Ex: [sunspec-address]:[port]",
+        "ipMasksLabel": "CIDR to scan",
+        "masksDescription": "CIDR (Classless Inter-Domain Routing) is a notation to describe a range of IP addresses in a sub-network. You can write it as an IP address, followed by a network mask number, both separated by a slash (example: 192.168.1.1/10). There is many CIDR calculators on the Internet which will help you to compute your own.",
+        "networkInterfaceDescription": "Masks defined by your computer on your networks, with network interfaces, can't be removed.",
+        "maskTableHeader": "CIDR",
+        "nameTableHeader": "Name",
+        "statusTableHeader": "Active",
+        "maskTablePlaceholder": "e.g. 192.168.1.1/20",
+        "nameTablePlaceholder": "Enter CIDR name",
+        "deleteButtonTooltip": "Delete",
+        "maskFormatError": "Invalid CIDR format"
+      }
     }
   },
   "editScene": {
@@ -2264,6 +2307,13 @@
     "airquality-sensor": {
       "shortCategoryName": "Air Quality",
       "aqi": "Air Quality Index"
+    },
+    "pv": {
+      "shortCategoryName": "Photovoltaic",
+      "voltage": "Voltage",
+      "current": "Current",
+      "power": "Power",
+      "energy": "Energy"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

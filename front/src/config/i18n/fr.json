@@ -1149,6 +1149,49 @@
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
       "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
+    },
+    "sunspec": {
+      "title": "SunSpec Manager",
+      "description": "Gérez les appareils SunSpec sur votre réseau local.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
+      "setupTab": "Configuration",
+      "device": {
+        "title": "Appareils SunSpec",
+        "search": "Chercher un appareil",
+        "noDevices": "Aucun appareil SunSpec n'a encore été ajouté.",
+        "manufacturerLabel": "Construteur",
+        "ipAddressLabel": "Adresse IP",
+        "macAddressLabel": "Adresse MAC",
+        "originalNameLabel": "Nom sur le réseau"
+      },
+      "discover": {
+        "title": "Découverte SunSpec",
+        "noDevices": "Aucun appareil SunSpec n'a encore été trouvé.",
+        "scanButton": "Recherche sur le réseau",
+        "deviceUpdateButton": "Nouveaux appareils disponibles",
+        "hideExistingDevices": "Cacher les appareils déjà ajoutés",
+        "alreadyCreatedButton": "Déjà créé",
+        "updateButton": "Mettre à jour",
+        "discoveringError": "Une erreur est survenue lors de la recherche, vérifiez la configuration du scanner, sinon consultez les logs."
+      },
+      "setup": {
+        "title": "Configuration SunSpec",
+        "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
+        "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
+        "sunspecUrl": "SunSpec URL",
+        "sunspecUrlPlaceholder": "Ex: [sunspec-address]:[port]",
+        "ipMasksLabel": "CIDR à scanner",
+        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
+        "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne peuvent pas être supprimés.",
+        "maskTableHeader": "CIDR",
+        "nameTableHeader": "Nom",
+        "statusTableHeader": "Actif",
+        "maskTablePlaceholder": "e.g. 192.168.1.1/20",
+        "nameTablePlaceholder": "Entrer le nom du CIDR",
+        "deleteButtonTooltip": "Supprimer",
+        "maskFormatError": "Format CIDR invalide"
+      }
     }
   },
   "editScene": {
@@ -2264,6 +2307,13 @@
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
       "aqi": "Indice de qualité de l'air"
+    },
+    "pv": {
+      "shortCategoryName": "Photovoltaique",
+      "voltage": "Tension",
+      "current": "Intensité",
+      "power": "Puissance",
+      "energy": "Energie"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

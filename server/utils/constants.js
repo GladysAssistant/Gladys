@@ -366,6 +366,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
   VOLUME_SENSOR: 'volume-sensor',
+  PV: 'pv',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -515,6 +516,12 @@ const DEVICE_FEATURE_TYPES = {
   },
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
+  },
+  PV: {
+    POWER: 'power',
+    ENERGY: 'energy',
+    VOLTAGE: 'voltage',
+    CURRENT: 'current',
   },
 };
 
@@ -809,6 +816,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
   BROADLINK: {
     LEARN_MODE: 'broadlink.learn',
     SEND_MODE: 'broadlink.send',
+  },
+  SUNSPEC: {
+    CONNECTED: 'sunspec.connected',
+    STATUS_CHANGE: 'sunspec.status-change',
   },
 };
 

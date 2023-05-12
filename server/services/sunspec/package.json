@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "modbus-serial": "^8.0.11"
+  }
+}
