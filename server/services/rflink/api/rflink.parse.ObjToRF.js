@@ -3,9 +3,10 @@ const logger = require('../../../utils/logger');
 // eslint-disable-next-line jsdoc/check-alignment
 /**
  * @description convert a rflink device object to a string that can be sent to rflink
- * @param {Object} device - Secure node.
+ * @param {object} device - Secure node.
  * @param {string} deviceFeature - The devicce feature.
  * @param {any} state - The state of the device.
+ * @returns {string} Rfcode - A code understable for rflink gateway.
  * @example
  * rflink.ObjToRF(device);
  */

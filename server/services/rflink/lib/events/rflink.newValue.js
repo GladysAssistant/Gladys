@@ -3,7 +3,7 @@ const { EVENTS } = require('../../../../utils/constants');
 // eslint-disable-next-line jsdoc/require-param
 /**
  * @description When a new value is received.
- * @param {Object} device - Device to update.
+ * @param {object} device - Device to update.
  * @param {string} deviceFeature - Feature to update.
  * @param {string} state - State.
  * @example

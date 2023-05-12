@@ -8,7 +8,6 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Connect to Rflink
  * @param {string} path - Path to the Rflink gateway.
- * @returns {string} Status.
  * @example
  * rflink.connect(path);
  */

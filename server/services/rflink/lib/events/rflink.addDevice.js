@@ -3,7 +3,7 @@
 
 /**
  * @description Add device.
- * @param {Object} deviceList - Device list to add.
+ * @param {object} deviceList - Device list to add.
  * @example
  * Rflink.addDevice(device);
  */

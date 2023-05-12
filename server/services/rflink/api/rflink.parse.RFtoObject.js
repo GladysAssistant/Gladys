@@ -3,7 +3,7 @@
 /**
  * @description convert a rflink message to an array.
  * @param {string} data - Secure node.
- * @returns {Object} Return an array with an index for each value.
+ * @returns {object} Return an array with an index for each value.
  * @example
  * rflink.RftoObj(data);
  */

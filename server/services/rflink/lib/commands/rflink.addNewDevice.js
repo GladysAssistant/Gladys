@@ -3,7 +3,7 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Add a new device that can be added to Gladys.
- * @param {Object} device - Device to add in the list of new discovered devices.
+ * @param {object} device - Device to add in the list of new discovered devices.
  * @example
  * Rflink.addNewDevice(device);
  */
