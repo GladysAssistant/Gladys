@@ -266,8 +266,5 @@ class RflinkDeviceSetupPage extends Component {
 }
 
 export default withIntlAsProp(
-  connect(
-    'session,user,httpClient,houses,currentIntegration',
-    actions
-  )(RflinkDeviceSetupPage)
+  connect('session,user,httpClient,houses,currentIntegration', actions)(RflinkDeviceSetupPage)
 );

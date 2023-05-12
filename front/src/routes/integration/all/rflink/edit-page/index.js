@@ -16,7 +16,4 @@ class EditRflinkDevice extends Component {
   }
 }
 
-export default connect(
-  'user,session,httpClient,currentIntegration,houses',
-  {}
-)(EditRflinkDevice);
+export default connect('user,session,httpClient,currentIntegration,houses', {})(EditRflinkDevice);
