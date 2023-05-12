@@ -51,6 +51,7 @@ class CameraBoxComponent extends Component {
 
   startStreaming = async () => {
     if (!Hls.isSupported()) {
+      this.setState({ liveNotSupportedBrowser: true });
       return;
     }
     await this.setState({ streaming: true, loading: true, liveStartError: false });
@@ -126,11 +127,16 @@ class CameraBoxComponent extends Component {
         const errorType = data.type;
         const errorDetails = data.details;
         const errorFatal = data.fatal;
+        const response = data.response;
         console.error(errorType);
         console.error(errorDetails);
         console.error(errorFatal);
         if (errorType === 'networkError') {
           this.newNetworkError();
+        }
+        if (response && response.code === 429) {
+          this.setState({ liveTooManyRequestsError: true });
+          this.stopStreaming();
         }
       });
       if (isGladysPlus) {
@@ -217,7 +223,10 @@ class CameraBoxComponent extends Component {
     }
   }
 
-  render(props, { image, error, streaming, loading, liveStartError }) {
+  render(
+    props,
+    { image, error, streaming, loading, liveStartError, liveNotSupportedBrowser, liveTooManyRequestsError }
+  ) {
     if (streaming) {
       return (
         <div class="card">
@@ -267,6 +276,26 @@ class CameraBoxComponent extends Component {
               <i class="fe fe-bell" />
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.liveStartError" />
+              </span>
+            </p>
+          </div>
+        )}
+        {liveNotSupportedBrowser && (
+          <div>
+            <p class="alert alert-warning">
+              <i class="fe fe-compass" />
+              <span class="pl-2">
+                <Text id="dashboard.boxes.camera.notNotSupportedBrowser" />
+              </span>
+            </p>
+          </div>
+        )}
+        {liveTooManyRequestsError && (
+          <div>
+            <p class="alert alert-warning">
+              <i class="fe fe-alert-triangle" />
+              <span class="pl-2">
+                <Text id="dashboard.boxes.camera.tooManyRequests" />
               </span>
             </p>
           </div>

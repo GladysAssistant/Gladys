@@ -149,11 +149,11 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
     });
 
     liveStreamingProcess.stdout.on('data', (data) => {
-      logger.log(`stdout: ${data}`);
+      logger.debug(`stdout: ${data}`);
     });
 
     liveStreamingProcess.stderr.on('data', (data) => {
-      logger.log(`stderr: ${data}`);
+      logger.debug(`stderr: ${data}`);
     });
 
     liveStreamingProcess.on('close', (code) => {

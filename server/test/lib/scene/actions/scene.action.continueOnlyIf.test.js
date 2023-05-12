@@ -8,11 +8,16 @@ const { executeActions } = require('../../../../lib/scene/scene.executeActions')
 
 const StateManager = require('../../../../lib/state');
 
-const event = new EventEmitter();
-
 describe('scene.continue-only-if', () => {
+  let event;
+  let stateManager;
+
+  beforeEach(() => {
+    event = new EventEmitter();
+    stateManager = new StateManager(event);
+  });
+
   it('should abort scene, condition is not verified', async () => {
-    const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
       category: 'light',
       type: 'binary',
@@ -49,7 +54,6 @@ describe('scene.continue-only-if', () => {
     return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_NOT_VERIFIED');
   });
   it('should abort scene, condition value is not a number', async () => {
-    const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
       category: 'light',
       type: 'binary',
@@ -86,7 +90,6 @@ describe('scene.continue-only-if', () => {
     return chaiAssert.isRejected(promise, AbortScene, 'CONDITION_VALUE_NOT_A_NUMBER');
   });
   it('should finish scene, condition is verified', async () => {
-    const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
       category: 'light',
       type: 'binary',
@@ -121,8 +124,42 @@ describe('scene.continue-only-if', () => {
       scope,
     );
   });
+  it('should finish scene, condition is verified (value=0)', async () => {
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      category: 'light',
+      type: 'binary',
+      last_value: 0,
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.GET_VALUE,
+            device_feature: 'my-device-feature',
+          },
+        ],
+        [
+          {
+            type: ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+            conditions: [
+              {
+                variable: '0.0.last_value',
+                operator: '=',
+                value: 0,
+              },
+            ],
+          },
+        ],
+      ],
+      scope,
+    );
+  });
   it('should finish scene, condition is verified with evaluable value', async () => {
-    const stateManager = new StateManager(event);
     stateManager.setState('deviceFeature', 'my-device-feature', {
       category: 'light',
       type: 'binary',
@@ -158,7 +195,6 @@ describe('scene.continue-only-if', () => {
     );
   });
   it('should finish scene, condition is verified', async () => {
-    const stateManager = new StateManager(event);
     const http = {
       request: fake.resolves({ result: [18], error: null }),
     };

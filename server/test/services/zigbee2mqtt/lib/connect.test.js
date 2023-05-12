@@ -36,6 +36,8 @@ describe('zigbee2mqtt connect', () => {
     };
     mqttClient = Object.assign(eventMqtt, {
       subscribe: fake.resolves(null),
+      end: fake.resolves(null),
+      removeAllListeners: fake.resolves(null),
     });
     mqttLibrary = {
       connect: fake.returns(mqttClient),
@@ -48,6 +50,19 @@ describe('zigbee2mqtt connect', () => {
     sinon.reset();
   });
 
+  it('it should disconnect from mqtt', async () => {
+    // PREPARE
+    zigbee2mqttManager.mqttRunning = false;
+    zigbee2mqttManager.mqttClient = mqttClient;
+    // EXECUTE
+    await zigbee2mqttManager.connect(configuration);
+    // ASSERT
+    assert.notCalled(mqttLibrary.connect);
+    assert.calledOnceWithExactly(mqttClient.end);
+    assert.calledOnceWithExactly(mqttClient.removeAllListeners);
+    expect(zigbee2mqttManager.mqttClient).to.eq(null);
+  });
+
   it('it should not try to connect to mqtt', async () => {
     // PREPARE
     zigbee2mqttManager.mqttRunning = false;
@@ -55,6 +70,8 @@ describe('zigbee2mqtt connect', () => {
     await zigbee2mqttManager.connect(configuration);
     // ASSERT
     assert.notCalled(mqttLibrary.connect);
+    assert.notCalled(mqttClient.end);
+    assert.notCalled(mqttClient.removeAllListeners);
   });
 
   it('it should try to connect to mqtt', async () => {
@@ -65,6 +82,8 @@ describe('zigbee2mqtt connect', () => {
     // ASSERT
     // TODO: check parameters
     assert.calledOnce(mqttLibrary.connect);
+    assert.notCalled(mqttClient.end);
+    assert.notCalled(mqttClient.removeAllListeners);
   });
 
   it('it should receive mqtt connect message', async () => {
