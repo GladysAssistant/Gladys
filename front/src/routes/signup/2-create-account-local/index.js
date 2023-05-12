@@ -7,6 +7,7 @@ import slugify from '../../../utils/slugify';
 import CreateAccountLocalTab from './CreateAccountLocalTab';
 import validateEmail from '../../../utils/validateEmail';
 import { RequestStatus, CreateUserErrors } from '../../../utils/consts';
+import actions from '../../../actions/signup/signupCreateLocalAccount';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -163,6 +164,7 @@ class CreateAccountLocal extends Component {
       });
       this.props.session.saveUser(user);
       this.props.session.init();
+      await this.props.getMySelf();
       route('/signup/preference');
     } catch (e) {
       console.error(e);
@@ -216,4 +218,4 @@ class CreateAccountLocal extends Component {
   }
 }
 
-export default connect('httpClient,session', {})(CreateAccountLocal);
+export default connect('httpClient,session', actions)(CreateAccountLocal);
