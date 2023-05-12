@@ -6,10 +6,6 @@ import DevicePage from './DevicePage';
 import FoundDevices from './FoundDevices';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'session,user,rflinkDevices,houses,getRflinkDevicesStatus,currentIntegration,rflinkNewDevices,getRflinkCreateDeviceStatus,getRflinkNewDevicesStatus',
-  actions
-)
 class RflinkDevicePage extends Component {
   componentWillMount() {
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.RFLINK.NEW_DEVICE, () => {
@@ -31,4 +27,7 @@ class RflinkDevicePage extends Component {
   }
 }
 
-export default RflinkDevicePage;
+export default connect(
+  'session,user,rflinkDevices,houses,getRflinkDevicesStatus,currentIntegration,rflinkNewDevices,getRflinkCreateDeviceStatus,getRflinkNewDevicesStatus',
+  actions
+)(RflinkDevicePage);

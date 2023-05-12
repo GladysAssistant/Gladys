@@ -10,7 +10,6 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
 
-@connect('session,user,httpClient,houses,currentIntegration', actions)
 class RflinkDeviceSetupPage extends Component {
   selectFeature(selectedFeatureOption) {
     if (selectedFeatureOption && selectedFeatureOption.value) {
@@ -266,4 +265,9 @@ class RflinkDeviceSetupPage extends Component {
   }
 }
 
-export default withIntlAsProp(RflinkDeviceSetupPage);
+export default withIntlAsProp(
+  connect(
+    'session,user,httpClient,houses,currentIntegration',
+    actions
+  )(RflinkDeviceSetupPage)
+);

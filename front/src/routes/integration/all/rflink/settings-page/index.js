@@ -6,10 +6,6 @@ import SettingsTab from './SettingsTab';
 import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,usbPorts,RflinkPath,rflinkStatus,getRflinkUsbPortStatus,getCurrentRflinkPathStatus,rflinkGetStatusStatus,rflinkFailed,rflinkDisconnectStatus,connectRflinkStatus,RflinkConnectionInProgress,currentMilightGateway,currentMilightZone',
-  actions
-)
 class RflinkSettingsPage extends Component {
   rflinkReadyListener = () => this.props.getStatus();
   rflinkFailedListener = () => this.props.rflinkFailed();
@@ -48,4 +44,7 @@ class RflinkSettingsPage extends Component {
   }
 }
 
-export default RflinkSettingsPage;
+export default connect(
+  'user,session,usbPorts,RflinkPath,rflinkStatus,getRflinkUsbPortStatus,getCurrentRflinkPathStatus,rflinkGetStatusStatus,rflinkFailed,rflinkDisconnectStatus,connectRflinkStatus,RflinkConnectionInProgress,currentMilightGateway,currentMilightZone',
+  actions
+)(RflinkSettingsPage);

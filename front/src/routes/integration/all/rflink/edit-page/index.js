@@ -6,7 +6,6 @@ import UpdateDevice from '../../../../../components/device';
 
 const RFLINK_PAGE_PATH = '/dashboard/integration/device/rflink';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
 class EditRflinkDevice extends Component {
   render(props, {}) {
     return (
@@ -17,4 +16,7 @@ class EditRflinkDevice extends Component {
   }
 }
 
-export default EditRflinkDevice;
+export default connect(
+  'user,session,httpClient,currentIntegration,houses',
+  {}
+)(EditRflinkDevice);
