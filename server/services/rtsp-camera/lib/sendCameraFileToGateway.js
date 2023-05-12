@@ -19,7 +19,7 @@ async function sendCameraFileToGateway(cameraFolder, filename, fileContent) {
   const start = Date.now();
   await this.gladys.gateway.gladysGatewayClient.cameraUploadFile(cameraFolder, filename, fileContent);
   const end = Date.now();
-  logger.info(`Camera streaming: Uploaded file to gateway in ${end - start} ms`);
+  logger.debug(`Camera streaming: Uploaded file to gateway in ${end - start} ms`);
 }
 
 module.exports = {
