@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { assert, fake } = sinon;
+const { assert } = sinon;
 
 const BluetoothManager = require('../../../../../services/bluetooth/lib');
 const BluetoothMock = require('../../BluetoothMock.test');
@@ -32,7 +32,7 @@ describe('bluetooth.stop command', () => {
 
     expect(bluetoothManager.bluetooth).eq(undefined);
     expect(bluetoothManager.discoveredDevices).deep.eq({});
-    expect(bluetoothManager.scanPromise).eq(undefined);
+    expect(bluetoothManager.scanTimer).eq(undefined);
     expect(bluetoothManager.scanCounter).eq(0);
 
     // No more listener
@@ -41,29 +41,12 @@ describe('bluetooth.stop command', () => {
     assert.calledOnce(bluetooth.stopScanning);
   });
 
-  it('check only pending timers are well removed', async () => {
-    const scanPromise = {
-      isPending: () => false,
-      cancel: fake.returns(false),
-    };
-    bluetoothManager.scanPromise = scanPromise;
-
-    await bluetoothManager.stop();
-
-    assert.calledOnce(bluetooth.stopScanning);
-    assert.notCalled(scanPromise.cancel);
-  });
-
   it('check timers are well removed', async () => {
-    const scanPromise = {
-      isPending: () => true,
-      cancel: fake.returns(false),
-    };
-    bluetoothManager.scanPromise = scanPromise;
+    bluetoothManager.scanTimer = 'any-timeout';
 
     await bluetoothManager.stop();
 
     assert.calledOnce(bluetooth.stopScanning);
-    assert.calledOnce(scanPromise.cancel);
+    expect(bluetoothManager.scanTimer).to.be.equal(undefined);
   });
 });

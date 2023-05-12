@@ -14,7 +14,7 @@ class ConfigureHouse extends Component {
   }
   render(props, {}) {
     return (
-      <SignupLayout>
+      <SignupLayout currentUrl="/signup/configure-house">
         <ConfigureHouseTab {...props} />
       </SignupLayout>
     );
