@@ -11,9 +11,9 @@ module.exports = {
     await Promise.each(scenes, async (scene) => {
       let actionsModified = false;
       const updatedActions = await Promise.all(
-        scene.actions.map(async subactions => {
+        scene.actions.map(async (subactions) => {
           return Promise.all(
-            subactions.map(async action => {
+            subactions.map(async (action) => {
               if (
                 action.type === 'switch.turn-on' ||
                 action.type === 'switch.turn-off' ||
@@ -32,18 +32,18 @@ module.exports = {
                   type = DEVICE_FEATURE_TYPES.LIGHT.BINARY;
                 }
                 if (action.devices) {
-                  const devices = await Promise.all(action.devices
-                    .map((deviceSelector) =>
+                  const devices = await Promise.all(
+                    action.devices.map((deviceSelector) =>
                       db.Device.findOne({
                         where: {
                           selector: deviceSelector,
                         },
                       }),
-                    )
+                    ),
                   );
-                  const deviceIds = devices.map(device => device.id);
-                  const deviceFeatures = await Promise.all(deviceIds
-                    .map(async (deviceId) =>
+                  const deviceIds = devices.map((device) => device.id);
+                  const deviceFeatures = await Promise.all(
+                    deviceIds.map(async (deviceId) =>
                       db.DeviceFeature.findOne({
                         where: {
                           device_id: deviceId,
@@ -51,17 +51,17 @@ module.exports = {
                           type,
                         },
                       }),
-                    )
+                    ),
                   );
-                  action.device_features = deviceFeatures.map(deviceFeature => deviceFeature.selector);
+                  action.device_features = deviceFeatures.map((deviceFeature) => deviceFeature.selector);
                   delete action.devices;
                   actionsModified = true;
                 }
               }
               return action;
-            })
+            }),
           );
-        })
+        }),
       );
 
       logger.info(`Scene migration: Updating scene ${scene.id} with new actions`);
