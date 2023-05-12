@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
 import get from 'get-value';
 import cx from 'classnames';
@@ -80,7 +80,7 @@ class RtspCameraBox extends Component {
 
   render(props, { loading, saveError, testConnectionError, testConnectionErrorMessage }) {
     return (
-      <div class="col-md-4">
+      <div class="col-lg-4">
         <div class="card">
           <div
             class={cx('dimmer', {
@@ -173,6 +173,11 @@ class RtspCameraBox extends Component {
                       placeholder={<Text id="integration.rtspCamera.urlPlaceholder" />}
                     />
                   </Localizer>
+                  <p class="mt-2">
+                    <small>
+                      <MarkupText id="integration.rtspCamera.urlExplanation" />
+                    </small>
+                  </p>
                 </div>
                 <div class="form-group">
                   <label class="custom-switch">
@@ -197,7 +202,7 @@ class RtspCameraBox extends Component {
                   <button onClick={this.saveCamera} class="btn btn-success mr-2">
                     <Text id="integration.rtspCamera.saveButton" />
                   </button>
-                  <button onClick={this.deleteCamera} class="btn btn-danger">
+                  <button onClick={this.deleteCamera} class="btn btn-danger mt-4 mt-lg-0">
                     <Text id="integration.rtspCamera.deleteButton" />
                   </button>
                 </div>

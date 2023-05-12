@@ -1,8 +1,12 @@
 import { Component } from 'preact';
-
 import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 import update from 'immutability-helper';
+import cx from 'classnames';
+
+import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
+
+import style from './Condition.css';
 
 class Condition extends Component {
   handleChange = selectedOption => {
@@ -23,11 +27,15 @@ class Condition extends Component {
     this.props.handleConditionChange(this.props.index, newCondition);
   };
 
-  handleValueChange = e => {
-    const newValue = Number.parseFloat(e.target.value);
+  handleValueChange = value => {
+    const newValue = !isNaN(Number.parseFloat(value)) ? Number.parseFloat(value) : undefined;
+    const evalValue = isNaN(newValue) && value ? value : undefined;
     const newCondition = update(this.props.condition, {
       value: {
         $set: newValue
+      },
+      evaluate_value: {
+        $set: evalValue
       }
     });
     this.props.handleConditionChange(this.props.index, newCondition);
@@ -54,6 +62,9 @@ class Condition extends Component {
     const selectedOption = this.getSelectedOption();
     return (
       <div>
+        <div className={style.explanationText}>
+          <Text id="editScene.actionsCard.onlyContinueIf.explanationText" />
+        </div>
         <div class="row">
           <div class="col-md-4">
             <div class="form-group">
@@ -65,6 +76,7 @@ class Condition extends Component {
               </label>
               <Select
                 defaultValue={''}
+                className={cx(style.deviceSelector)}
                 value={selectedOption}
                 onChange={this.handleChange}
                 options={props.variableOptions}
@@ -113,12 +125,15 @@ class Condition extends Component {
                 </span>
               </label>
               <Localizer>
-                <input
-                  type="number"
-                  class="form-control"
-                  placeholder={<Text id="editScene.triggersCard.newState.valuePlaceholder" />}
-                  value={props.condition.value}
-                  onBlur={this.handleValueChange}
+                <TextWithVariablesInjected
+                  text={
+                    props.condition.value ? Number(props.condition.value).toString() : props.condition.evaluate_value
+                  }
+                  triggersVariables={props.triggersVariables}
+                  actionsGroupsBefore={props.actionsGroupsBefore}
+                  variables={props.variables}
+                  updateText={this.handleValueChange}
+                  class={style.conditionTagify}
                 />
               </Localizer>
             </div>

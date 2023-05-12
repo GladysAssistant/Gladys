@@ -3,8 +3,12 @@ const { EVENTS } = require('../../utils/constants');
 const logger = require('../../utils/logger');
 
 /**
- * @description Check if the new location of the user is in an area
- * @param {Object} event - The new location event.
+ * @description Check if the new location of the user is in an area.
+ * @param {object} event - Location event.
+ * @param {string} event.userSelector - Selector of the user.
+ * @param {object} event.previousLocation - Previous location of the user.
+ * @param {object} event.newLocation - New location of the user.
+ * @returns {object} Return old and new areas.
  * @example
  * checkNewLocation(location);
  */

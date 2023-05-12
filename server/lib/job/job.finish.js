@@ -4,10 +4,10 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
 /**
  * @public
- * @description Finish a job
+ * @description Finish a job.
  * @param {string} id - Id of the job.
  * @param {string} status - Status of the job.
- * @param {Object} data - Data of the job.
+ * @param {object} data - Data of the job.
  * @returns {Promise} Return updated job.
  * @example
  * gladys.job.finish('18e1672b-af38-4148-a265-eea9b6549184', 'success');

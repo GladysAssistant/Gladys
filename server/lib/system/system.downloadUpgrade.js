@@ -6,7 +6,7 @@ const logger = require('../../utils/logger');
 const config = getConfig();
 
 /**
- * @description Download new release of Gladys
+ * @description Download new release of Gladys.
  * @param {string} tag - Tag to download.
  * @example
  * await downloadUpgrade('v4.0.0');

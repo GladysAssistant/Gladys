@@ -3,8 +3,8 @@ const { PlatformNotCompatible } = require('../../utils/coreErrors');
 /**
  * @description Execute a command in a container image.
  * @param {string} containerId - Container id.
- * @param {Object} options - Command to execute.
- * @returns {Promise<Object>} The state of the command.
+ * @param {object} options - Command to execute.
+ * @returns {Promise<object>} The state of the command.
  * @example
  * const state = await exec(containerId, options);
  */

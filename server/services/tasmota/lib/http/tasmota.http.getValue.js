@@ -3,7 +3,7 @@ const { request, buildUrl } = require('./tasmota.http.request');
 
 /**
  * @description Try to discover HTTP device.
- * @param {Object} device - Galdys device.
+ * @param {object} device - Galdys device.
  * @example
  * getHttpValue({});
  */

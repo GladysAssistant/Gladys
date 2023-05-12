@@ -9,7 +9,6 @@ module.exports = function UserController(gladys) {
    * @api {post} /api/v1/user Create
    * @apiName CreateUser
    * @apiGroup User
-   *
    * @apiParam {String} firstname Firstname of the user
    * @apiParam {String} lastname Lastname of the user
    * @apiParam {String} email Email of the user
@@ -17,7 +16,6 @@ module.exports = function UserController(gladys) {
    * @apiParam {string="admin","habitant", "guest"} role role of the user
    * @apiParam {date} birthdate Birthdate of the user
    * @apiParam {string="en", "fr"} language Language of the user
-   *
    * @apiSuccess {String} id id of the created user
    */
   async function create(req, res, next) {
@@ -37,10 +35,8 @@ module.exports = function UserController(gladys) {
    * @api {post} /api/v1/login Login
    * @apiName LoginUser
    * @apiGroup User
-   *
    * @apiParam {String} email Email of the user
    * @apiParam {String} password Password of the user
-   *
    * @apiSuccess {String} refresh_token the refresh token
    * @apiSuccess {String} access_token the access token
    */
@@ -61,7 +57,6 @@ module.exports = function UserController(gladys) {
    * @api {get} /api/v1/user getUsers
    * @apiName getUsers
    * @apiGroup User
-   *
    */
   async function getUsers(req, res, next) {
     const options = req.query;
@@ -79,7 +74,6 @@ module.exports = function UserController(gladys) {
    * @api {get} /api/v1/user/:user_selector getUserBySelector
    * @apiName getUserBySelector
    * @apiGroup User
-   *
    */
   async function getUserBySelector(req, res) {
     const user = await gladys.user.getBySelector(req.params.user_selector);
@@ -90,7 +84,6 @@ module.exports = function UserController(gladys) {
    * @api {patch} /api/v1/user/:user_selector updateUser
    * @apiName updateUser
    * @apiGroup User
-   *
    */
   async function update(req, res) {
     const user = await gladys.user.updateBySelector(req.params.user_selector, req.body);
@@ -101,7 +94,6 @@ module.exports = function UserController(gladys) {
    * @api {delete} /api/v1/user/:user_selector deleteUser
    * @apiName deleteUser
    * @apiGroup User
-   *
    */
   async function deleteUser(req, res) {
     if (req.user.selector === req.params.user_selector) {
@@ -117,7 +109,6 @@ module.exports = function UserController(gladys) {
    * @api {get} /api/v1/me getMySelf
    * @apiName getMySelf
    * @apiGroup User
-   *
    */
   async function getMySelf(req, res, next) {
     const user = await gladys.user.getById(req.user.id);
@@ -128,7 +119,6 @@ module.exports = function UserController(gladys) {
    * @api {get} /api/v1/me/picture getMyPicture
    * @apiName getMyPicture
    * @apiGroup User
-   *
    */
   async function getMyPicture(req, res, next) {
     const picture = await gladys.user.getPicture(req.user.id);
@@ -139,7 +129,6 @@ module.exports = function UserController(gladys) {
    * @api {patch} /api/v1/me updateMySelf
    * @apiName updateMySelf
    * @apiGroup User
-   *
    */
   async function updateMySelf(req, res, next) {
     const newUser = await gladys.user.update(req.user.id, req.body);
@@ -150,7 +139,6 @@ module.exports = function UserController(gladys) {
    * @api {post} /api/v1/access_token getAccessToken
    * @apiName getAccessToken
    * @apiGroup User
-   *
    */
   async function getAccessToken(req, res) {
     const scope = req.body.scope || ['dashboard:write', 'dashboard:read'];
@@ -181,7 +169,6 @@ module.exports = function UserController(gladys) {
    * @api {post} /api/v1/reset_password resetPassword
    * @apiName resetPassword
    * @apiGroup User
-   *
    */
   async function resetPassword(req, res) {
     const user = await gladys.user.updatePassword(req.user.id, req.body.password);
@@ -193,7 +180,6 @@ module.exports = function UserController(gladys) {
    * @api {get} /api/v1/setup getSetupState
    * @apiName getSetupState
    * @apiGroup Setup
-   *
    */
   async function getSetupState(req, res) {
     const userCount = gladys.user.getUserCount();

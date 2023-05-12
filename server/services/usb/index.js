@@ -5,7 +5,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
   const SerialPort = require('serialport');
   /**
    * @public
-   * @description This function starts the service
+   * @description This function starts the service.
    * @example
    * gladys.services.usb.start();
    */
@@ -25,7 +25,7 @@ module.exports = function ZwaveService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    * gladys.services.usb.stop();
    */

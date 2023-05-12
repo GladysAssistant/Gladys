@@ -19,7 +19,7 @@ dayjs.extend(utc);
 /**
  * @description Dayjs with UTC for test (can't use dayjs.utc.duration).
  * @param {*} date - Initial date.
- * @returns {Object} Dayjs instance.
+ * @returns {object} Dayjs instance.
  * @example
  * dayjsUTCOverride(1619816485)
  */

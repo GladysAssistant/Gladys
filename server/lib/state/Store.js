@@ -4,7 +4,7 @@ const Store = function Store() {
 
 /**
  * @description Merge a given state with the current state.
- * @param {Object} update - Object to merge in the state.
+ * @param {object} update - Object to merge in the state.
  * @example
  * store.setState({
  *   alarm: 'disarmed',

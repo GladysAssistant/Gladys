@@ -7,9 +7,10 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../ut
 
 /**
  * @description Command a light.
- * @param {Object} message - The message sent by the user.
- * @param {Object} classification - The classification calculated by the brain.
- * @param {Object} context - The context object containing found variables in question.
+ * @param {object} message - The message sent by the user.
+ * @param {object} classification - The classification calculated by the brain.
+ * @param {object} context - The context object containing found variables in question.
+ * @returns {Promise} Resolve when the command was executed.
  * @example
  * light.command(message, classification, context);
  */

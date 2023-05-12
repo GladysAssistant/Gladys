@@ -17,7 +17,7 @@ module.exports = {
     backupsFolder: './gladys-backups',
     gladysGatewayServerUrl: process.env.GLADYS_GATEWAY_SERVER_URL || 'https://api.gladysgateway.com',
     dockerImage: 'gladysassistant/gladys-4-playground',
-    tempFolder: '/tmp/gladys',
+    tempFolder: process.env.TEMP_FOLDER || '/tmp/gladys',
   },
   test: {
     dialect: 'sqlite',

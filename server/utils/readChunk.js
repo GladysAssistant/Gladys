@@ -8,12 +8,12 @@ const fsOpenP = promisify(fs.open);
 const fsCloseP = promisify(fs.close);
 
 /**
- * @description Read one chunk of a file
- *
+ * @description Read one chunk of a file.
  * @param {string} filePath - The path of the file to read.
- * @param {Object} options - Options.
+ * @param {object} options - Options.
+ * @param {number} options.length - Length to read.
+ * @param {number} options.startPosition - Where to start.
  * @returns {Promise} Return the chunk of the file.
- *
  * @example const data = await readChunk('./file.txt', {length: 10, startPosition: 10});
  */
 async function readChunk(filePath, { length, startPosition }) {

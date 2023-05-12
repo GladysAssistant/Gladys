@@ -53,7 +53,6 @@ const EditWeatherBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('httpClient', actions)
 class EditWeatherBoxComponent extends Component {
   updateBoxHouse = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -105,4 +104,4 @@ class EditWeatherBoxComponent extends Component {
   }
 }
 
-export default EditWeatherBoxComponent;
+export default connect('httpClient', actions)(EditWeatherBoxComponent);

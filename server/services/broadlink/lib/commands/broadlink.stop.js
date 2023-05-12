@@ -1,5 +1,6 @@
 /**
  * @description Unsubscribe to Broadlink events.
+ * @returns {null} Returns when stopped.
  * @example
  * gladys.broadlink.stop();
  */

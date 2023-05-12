@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import DevicePage from './DevicePage';
 import actions from '../../actions/device';
 
-@connect('', actions)
 class Device extends Component {
   componentWillMount() {
     this.props.getDevicesByRoom();
@@ -14,4 +13,4 @@ class Device extends Component {
   }
 }
 
-export default Device;
+export default connect('', actions)(Device);

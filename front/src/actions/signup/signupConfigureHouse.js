@@ -2,6 +2,9 @@ import { RequestStatus } from '../../utils/consts';
 import { route } from 'preact-router';
 import update from 'immutability-helper';
 import leaflet from 'leaflet';
+import JSConfetti from 'js-confetti';
+
+const jsConfetti = new JSConfetti();
 
 const icon = leaflet.icon({
   iconUrl: '/assets/leaflet/marker-icon.png',
@@ -128,10 +131,11 @@ function createActions(store) {
           })
         );
         await Promise.all(promises);
-
         store.setState({
           signupSaveHouse: RequestStatus.Success
         });
+        // Confetti for success!
+        jsConfetti.addConfetti();
         route('/signup/success');
       } catch (e) {
         store.setState({

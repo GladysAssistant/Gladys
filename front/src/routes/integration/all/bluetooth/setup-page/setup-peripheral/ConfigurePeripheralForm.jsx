@@ -14,7 +14,6 @@ import actions from '../actions';
 import UpdateDeviceFeature from '../../../../../../components/device/UpdateDeviceFeature';
 import BluetoothPeripheralFeatures from '../BluetoothPeripheralFeatures';
 
-@connect('session,httpClient,houses,currentIntegration', actions)
 class ConfigurePeripheralForm extends Component {
   updateName = e => {
     this.setState({
@@ -255,4 +254,6 @@ class ConfigurePeripheralForm extends Component {
   }
 }
 
-export default withIntlAsProp(ConfigurePeripheralForm);
+export default withIntlAsProp(
+  connect('session,httpClient,houses,currentIntegration', actions)(ConfigurePeripheralForm)
+);

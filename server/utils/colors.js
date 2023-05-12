@@ -25,7 +25,6 @@ function intToRgb(intColor) {
  * @description Convert hsb color to rgb.
  * @param {Array} hsb - Hue, saturation, brightness.
  * @returns {Array} [ red, green, blue ] object.
- *
  * @example const [r, g, b] = hsbToRgb([1, 2, 3]);
  */
 function hsbToRgb(hsb) {
@@ -43,7 +42,6 @@ function hsbToRgb(hsb) {
  * @description Convert rgb to hsb.
  * @param {Array} rgb - Rgb color.
  * @returns {Array} [ h, s, b] object.
- *
  * @example  const [h, s, b] = rgbToHsb([1, 2, 3]);
  */
 function rgbToHsb(rgb) {

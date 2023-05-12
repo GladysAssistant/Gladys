@@ -3,8 +3,10 @@ import { connect } from 'unistore/preact';
 import uuid from 'uuid';
 import Promise from 'bluebird';
 import { Text, Localizer } from 'preact-i18n';
+import get from 'get-value';
 import cx from 'classnames';
 import EnedisButton from './enedis-button.png';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
 import { route } from 'preact-router';
 import config from '../../../../config';
 import {
@@ -119,7 +121,7 @@ class EnedisWelcomePageComponent extends Component {
       features: [
         {
           id: uuid.v4(),
-          name: 'Enedis daily consumption',
+          name: get(this.props.intl.dictionary, 'integration.enedis.welcome.dailyConsumptionFeatureName'),
           selector: `enedis-${usagePointId}-daily-consumption`,
           min: 0,
           max: 1000000,
@@ -200,4 +202,4 @@ class EnedisWelcomePageComponent extends Component {
   }
 }
 
-export default connect('user,session,httpClient', {})(EnedisWelcomePageComponent);
+export default withIntlAsProp(connect('user,session,httpClient', {})(EnedisWelcomePageComponent));

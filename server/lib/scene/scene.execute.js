@@ -5,7 +5,8 @@ const { AbortScene } = require('../../utils/coreErrors');
 /**
  * @description Execute a scene by its selector.
  * @param {string} sceneSelector - The selector of the scene to execute.
- * @param {Object} [scope] - The scope of the event triggering the scene.
+ * @param {object} [scope] - The scope of the event triggering the scene.
+ * @returns {Promise} Resolve when scene was executed.
  * @example
  * sceneManager.execute('test');
  */

@@ -1,8 +1,8 @@
 const db = require('../../models');
 
 /**
- * @description Create/Update a deviceParam
- * @param {Object} device - The device where the param should be created.
+ * @description Create/Update a deviceParam.
+ * @param {object} device - The device where the param should be created.
  * @param {string} name - The name of the param.
  * @param {string} value - The value of the param.
  * @example

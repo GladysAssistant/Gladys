@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import ConfigureTwoFactorForm from './ConfigureTwoFactorForm';
 import QRCode from 'qrcode';
 
-@connect('session', {})
 class ConfigureTwoFactorPage extends Component {
   state = {
     dataUrl: null,
@@ -91,4 +90,4 @@ class ConfigureTwoFactorPage extends Component {
   }
 }
 
-export default ConfigureTwoFactorPage;
+export default connect('session', {})(ConfigureTwoFactorPage);

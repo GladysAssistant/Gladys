@@ -1,22 +1,14 @@
 import { Text, Localizer } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import cx from 'classnames';
+import style from './style.css';
 
 const SignupLayout = ({ children, ...props }) => (
   <div class="page">
-    <div
-      class="page-single"
-      style={{
-        marginTop: '10px'
-      }}
-    >
+    <div class="page-single mt-4">
       <div class="container">
         <div class="row">
-          <div
-            class="col mx-auto"
-            style={{
-              maxWidth: '60rem'
-            }}
-          >
+          <div class="col mx-auto">
             <div class="text-center mb-6">
               <h2>
                 <Localizer>
@@ -32,57 +24,71 @@ const SignupLayout = ({ children, ...props }) => (
             <div class="card">
               <div class="card-body">
                 <ul class="nav nav-pills nav-fill">
-                  <li class="nav-item">
+                  <li
+                    class={cx('nav-item', {
+                      'd-none d-lg-block': props.currentUrl !== '/signup'
+                    })}
+                  >
                     <Link
-                      class={props.currentUrl && props.currentUrl === '/signup' ? 'active nav-link' : 'nav-link'}
+                      class={cx('nav-link', style.navLinkWithoutCursor, {
+                        active: props.currentUrl === '/signup'
+                      })}
                       href="#"
                     >
                       <Text id="login.welcome" />
                     </Link>
                   </li>
-                  <li class="nav-item">
+                  <li
+                    class={cx('nav-item', {
+                      'd-none d-lg-block': props.currentUrl !== '/signup/create-account-local'
+                    })}
+                  >
                     <Link
-                      class={
-                        props.currentUrl && props.currentUrl.startsWith('/signup/create-account')
-                          ? 'active nav-link'
-                          : 'nav-link'
-                      }
+                      class={cx('nav-link', style.navLinkWithoutCursor, {
+                        active: props.currentUrl === '/signup/create-account-local'
+                      })}
                       href="#"
                     >
                       <Text id="login.createAccountStep" />
                     </Link>
                   </li>
-                  <li class="nav-item">
+                  <li
+                    class={cx('nav-item', {
+                      'd-none d-lg-block': props.currentUrl !== '/signup/preference'
+                    })}
+                  >
                     <Link
-                      class={
-                        props.currentUrl && props.currentUrl.startsWith('/signup/preference')
-                          ? 'active nav-link'
-                          : 'nav-link'
-                      }
+                      class={cx('nav-link', style.navLinkWithoutCursor, {
+                        active: props.currentUrl && props.currentUrl === '/signup/preference'
+                      })}
                       href="#"
                     >
                       <Text id="login.preferencesStep" />
                     </Link>
                   </li>
-                  <li class="nav-item">
+                  <li
+                    class={cx('nav-item', {
+                      'd-none d-lg-block': props.currentUrl !== '/signup/configure-house'
+                    })}
+                  >
                     <Link
-                      class={
-                        props.currentUrl && props.currentUrl.startsWith('/signup/configure-house')
-                          ? 'active nav-link'
-                          : 'nav-link'
-                      }
+                      class={cx('nav-link', style.navLinkWithoutCursor, {
+                        active: props.currentUrl && props.currentUrl === '/signup/configure-house'
+                      })}
                       href="#"
                     >
                       <Text id="login.houseStep" />
                     </Link>
                   </li>
-                  <li class="nav-item">
+                  <li
+                    class={cx('nav-item', {
+                      'd-none d-lg-block': props.currentUrl !== '/signup/success'
+                    })}
+                  >
                     <Link
-                      class={
-                        props.currentUrl && props.currentUrl.startsWith('/signup/success')
-                          ? 'active nav-link'
-                          : 'nav-link'
-                      }
+                      class={cx('nav-link', style.navLinkWithoutCursor, {
+                        active: props.currentUrl && props.currentUrl === '/signup/success'
+                      })}
                       href="#"
                     >
                       <Text id="login.success" />

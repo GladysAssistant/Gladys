@@ -2,8 +2,8 @@ const { DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 
 /**
  * @description Add functions to light object.
- * @param {Object} device - The device to build the light object from.
- * @returns {Object} Return a device with functions.
+ * @param {object} device - The device to build the light object from.
+ * @returns {object} Return a device with functions.
  * @example
  * buildLightObject({
  *    id: '3d8496a6-bfff-4920-8f12-4767d93fd67f',

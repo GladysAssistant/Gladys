@@ -5,7 +5,6 @@ import IntegrationPage from './IntegrationPage';
 import actions from '../../actions/integration';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 
-@connect('user,integrations,integrationCategories,currentUrl,totalSize,searchKeyword,orderDir', actions)
 class Integration extends Component {
   componentWillMount() {
     this.props.getIntegrations(this.props.intl);
@@ -22,4 +21,6 @@ class Integration extends Component {
   }
 }
 
-export default withIntlAsProp(Integration);
+export default withIntlAsProp(
+  connect('user,integrations,integrationCategories,currentUrl,totalSize,searchKeyword,orderDir', actions)(Integration)
+);

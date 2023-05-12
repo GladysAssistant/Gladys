@@ -5,7 +5,7 @@ const passwordUtils = require('../../utils/password');
 /**
  * @description Update a user by his selector.
  * @param {string} selector - The user selector.
- * @param {Object} newUser - The new user.
+ * @param {object} newUser - The new user.
  * @returns {Promise} Return the updated user.
  * @example
  * gladys.user.updateBySelector('tony', {

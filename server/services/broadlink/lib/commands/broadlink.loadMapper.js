@@ -2,8 +2,8 @@ const { DEVICE_MAPPERS } = require('./features');
 
 /**
  * @description Load Broadlink device mapper.
- * @param {Object} broadlinkDevice - Broadlink device.
- * @returns {Object} The matching device mapper.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @returns {object} The matching device mapper.
  * @example
  * loadMapper({});
  */

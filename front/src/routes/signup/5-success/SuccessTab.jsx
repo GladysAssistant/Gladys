@@ -1,40 +1,36 @@
 import { Text, MarkupText } from 'preact-i18n';
-import style from '../style.css';
 import { Link } from 'preact-router/match';
-import cx from 'classnames';
 
 const ConfigureHouseTab = () => (
   <div class="card">
     <div class="card-body">
-      <div class={cx('row', style.equal)}>
-        <div class="col-md">
-          <img src="/assets/images/pierre-gilles-bali.jpg" />
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="d-flex flex-column p-2">
+            <div>
+              <h2>
+                <Text id="signup.success.title" />
+              </h2>
+              <p class="text">
+                <MarkupText id="signup.success.introduction" />
+              </p>
+              <p class="text">
+                <MarkupText id="signup.success.thanksForChoosingOpenSource" />
+              </p>
+              <p class="text">
+                <MarkupText id="signup.success.ifYouWantToSupportThisSotware" />
+              </p>
+            </div>
+
+            <div>
+              <Link class="btn btn-primary" href="/dashboard">
+                <Text id="signup.success.goToDashboardButton" />
+              </Link>
+            </div>
+          </div>
         </div>
-        <div
-          class="col-md"
-          style={{
-            height: '100%'
-          }}
-        >
-          <div class="d-flex flex-column">
-            <h4>
-              <Text id="signup.success.title" />
-            </h4>
-            <p class="text">
-              <MarkupText id="signup.success.introduction" />
-            </p>
-            <p class="text">
-              <MarkupText id="signup.success.thanksForChoosingOpenSource" />
-            </p>
-            <p class="text">
-              <MarkupText id="signup.success.ifYouWantToSupportThisSotware" />
-            </p>
-          </div>
-          <div class="text-right align-items-end">
-            <Link class="btn btn-primary" href="/dashboard">
-              <Text id="signup.success.goToDashboardButton" />
-            </Link>
-          </div>
+        <div class="col-lg-6 mt-4 mt-lg-0">
+          <img class="img-fluid" src="/assets/images/welcome.jpg" />
         </div>
       </div>
     </div>

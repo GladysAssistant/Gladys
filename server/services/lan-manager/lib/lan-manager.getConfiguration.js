@@ -1,6 +1,6 @@
 /**
  * @description Get LANManager configuration.
- * @returns {Object} - Configuration.
+ * @returns {object} - Configuration.
  * @example
  * this.getConfiguration();
  */

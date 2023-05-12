@@ -3,8 +3,8 @@ const { determineTrait } = require('./googleActions.determineTrait');
 
 /**
  * @description Determine Google Actions device type from Galdys device.
- * @param {Object} device - Gladys device.
- * @returns {Object} GoogleActions device type and traits.
+ * @param {object} device - Gladys device.
+ * @returns {object} GoogleActions device type and traits.
  * @example
  * determineTypeAndTraits(device);
  */
