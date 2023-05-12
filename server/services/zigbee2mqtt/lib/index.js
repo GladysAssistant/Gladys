@@ -14,11 +14,14 @@ const { subscribe } = require('./subscribe');
 const { checkForContainerUpdates } = require('./checkForContainerUpdates');
 const { installMqttContainer } = require('./installMqttContainer');
 const { installZ2mContainer } = require('./installZ2mContainer');
+const { configureContainer } = require('./configureContainer');
+const { setup } = require('./setup');
 const { setPermitJoin } = require('./setPermitJoin');
 const { getPermitJoin } = require('./getPermitJoin');
 const { saveZ2mBackup } = require('./saveZ2mBackup');
 const { restoreZ2mBackup } = require('./restoreZ2mBackup');
 const { backup } = require('./backup');
+const { getManagedAdapters } = require('./getManagedAdapters');
 const { JOB_TYPES } = require('../../../utils/constants');
 
 /**
@@ -72,10 +75,13 @@ Zigbee2mqttManager.prototype.subscribe = subscribe;
 Zigbee2mqttManager.prototype.checkForContainerUpdates = checkForContainerUpdates;
 Zigbee2mqttManager.prototype.installMqttContainer = installMqttContainer;
 Zigbee2mqttManager.prototype.installZ2mContainer = installZ2mContainer;
+Zigbee2mqttManager.prototype.configureContainer = configureContainer;
+Zigbee2mqttManager.prototype.setup = setup;
 Zigbee2mqttManager.prototype.setPermitJoin = setPermitJoin;
 Zigbee2mqttManager.prototype.getPermitJoin = getPermitJoin;
 Zigbee2mqttManager.prototype.saveZ2mBackup = saveZ2mBackup;
 Zigbee2mqttManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
 Zigbee2mqttManager.prototype.backup = backup;
+Zigbee2mqttManager.prototype.getManagedAdapters = getManagedAdapters;
 
 module.exports = Zigbee2mqttManager;

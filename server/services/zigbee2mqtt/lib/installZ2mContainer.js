@@ -1,7 +1,6 @@
 const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 
-const { exec } = require('../../../utils/childProcess');
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
@@ -16,7 +15,7 @@ const sleep = promisify(setTimeout);
  * await z2m.installZ2mContainer(config);
  */
 async function installZ2mContainer(config) {
-  const { z2mDriverPath, z2mMqttUsername, z2mMqttPassword } = config;
+  const { z2mDriverPath } = config;
 
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
@@ -55,12 +54,7 @@ async function installZ2mContainer(config) {
     }
   }
 
-  // Prepare Z2M env
-  logger.info(`Preparing Zigbee2mqtt environment...`);
-  const brokerEnv = await exec(
-    `sh ./services/zigbee2mqtt/docker/gladys-z2m-zigbee2mqtt-env.sh ${basePathOnContainer} ${z2mMqttUsername} "${z2mMqttPassword}"`,
-  );
-  logger.trace(brokerEnv);
+  const configChanged = await this.configureContainer(basePathOnContainer, config);
 
   try {
     dockerContainers = await this.gladys.system.getContainers({
@@ -68,8 +62,10 @@ async function installZ2mContainer(config) {
       filters: { name: [containerDescriptor.name] },
     });
     [container] = dockerContainers;
-    if (container.state !== 'running') {
-      logger.info('Zigbee2mqtt container is starting...');
+
+    // Check if we need to restart the container (container is not running / config changed)
+    if (container.state !== 'running' || configChanged) {
+      logger.info('Zigbee2mqtt container is (re)starting...');
       await this.gladys.system.restartContainer(container.id);
       // wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
