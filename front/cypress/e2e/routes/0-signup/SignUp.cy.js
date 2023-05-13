@@ -20,7 +20,7 @@ describe('Sign-up', () => {
 
     // Count fields
     cy.get('input:visible').should('be.length', 6);
-    cy.get('select').should('be.length', 4);
+    cy.get('select').should('be.length', 1);
     cy.get('button').should('be.length', 1);
   });
 
@@ -30,13 +30,12 @@ describe('Sign-up', () => {
 
     // Check errors
     cy.get('.invalid-feedback:visible')
-      .should('be.length', 5)
+      .should('be.length', 4)
       .then(elements => {
         cy.wrap(elements[0]).i18n('profile.firstnameError');
         cy.wrap(elements[1]).i18n('profile.lastnameError');
         cy.wrap(elements[2]).i18n('profile.emailError');
-        cy.wrap(elements[3]).i18n('profile.birthdateError');
-        cy.wrap(elements[4]).i18n('profile.passwordError');
+        cy.wrap(elements[3]).i18n('profile.passwordError');
       });
   });
 
@@ -61,13 +60,6 @@ describe('Sign-up', () => {
     cy.get('select:visible').then(selects => {
       // Language
       cy.wrap(selects[0]).select(language);
-
-      // Year of birth
-      cy.wrap(selects[1]).select(tony.birthYear);
-      // Month of birth
-      cy.wrap(selects[2]).select(tony.birthMonth);
-      // Day of birth
-      cy.wrap(selects[3]).select(tony.birthDay);
     });
 
     // Submit empty form

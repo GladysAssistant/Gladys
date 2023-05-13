@@ -6,17 +6,6 @@ const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const RtspCameraService = require('../../../services/rtsp-camera');
 
-const gladys = {
-  config: {
-    tempFolder: '/tmp/gladys',
-  },
-  device: {
-    camera: {
-      setImage: fake.resolves(null),
-    },
-  },
-};
-
 const device = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
   selector: 'my-camera',
@@ -30,6 +19,18 @@ const device = {
       value: '0',
     },
   ],
+};
+
+const gladys = {
+  config: {
+    tempFolder: '/tmp/gladys',
+  },
+  device: {
+    camera: {
+      setImage: fake.resolves(null),
+    },
+    getBySelector: fake.resolves(device),
+  },
 };
 
 const deviceFlipped = {
@@ -69,8 +70,32 @@ const deviceThatResultInNoImage = {
   ],
 };
 
+const childProcessMock = {
+  spawn: (command, args, options) => {
+    const writeFile = () => {
+      fse.writeFileSync(args[args.length - 1], 'hello');
+    };
+    setTimeout(writeFile, 100);
+    return {
+      kill: fake.returns(null),
+      stdout: {
+        on: fake.returns(null),
+      },
+      stderr: {
+        on: fake.returns(null),
+      },
+      on: fake.returns(null),
+    };
+  },
+};
+
 describe('RtspCameraManager commands', () => {
-  const rtspCameraManager = new RtspCameraManager(gladys, FfmpegMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+  const rtspCameraManager = new RtspCameraManager(
+    gladys,
+    FfmpegMock,
+    childProcessMock,
+    'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+  );
   before(async () => {
     await fse.ensureDir(gladys.config.tempFolder);
   });
@@ -114,7 +139,12 @@ describe('RtspCameraManager commands', () => {
     assert.calledWith(gladys.device.camera.setImage, 'my-camera', 'image/png;base64,aW1hZ2U=');
   });
   it('should fail to poll, but not crash', async () => {
-    const rtspCameraManagerBroken = new RtspCameraManager(gladys, FfmpegMock, 'de051f90-f34a-4fd5-be2e-e502339ec9bc');
+    const rtspCameraManagerBroken = new RtspCameraManager(
+      gladys,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
     rtspCameraManagerBroken.getImage = fake.rejects('NOT_WORKI?NG');
     await rtspCameraManagerBroken.poll(device);
   });
