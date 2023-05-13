@@ -6,7 +6,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../utils/co
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     const scenes = await db.Scene.findAll();
-    logger.info(`Scene migration: Found ${scenes.length} scene`);
+    logger.info(`Scene migration: Found ${scenes.length} scene(s)`);
 
     await Promise.each(scenes, async (scene) => {
       let actionsModified = false;
@@ -42,9 +42,7 @@ module.exports = {
                     ),
                   );
 
-                  devices.forEach((device) => console.log(device));
-
-                  const deviceIds = devices.filter((device) => device !== undefined).map((device) => device.id);
+                  const deviceIds = devices.filter((device) => device).map((device) => device.id);
                   const deviceFeatures = await Promise.all(
                     deviceIds.map(async (deviceId) =>
                       db.DeviceFeature.findOne({
