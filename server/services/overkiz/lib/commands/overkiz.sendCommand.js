@@ -2,7 +2,7 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Connect to OverKiz server.
- * @returns {Promise<Object>} Return state of Execution.
+ * @returns {Promise<object>} Return state of Execution.
  * @example
  * overkiz.getExecutionStates();
  */
@@ -41,7 +41,7 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Connect to OverKiz server.
  * @param {string} execId - Execution Id.
- * @returns {Promise<Object>} Return state of Execution.
+ * @returns {Promise<object>} Return state of Execution.
  * @example
  * overkiz.getExecutionState('01234');
  */
@@ -79,10 +79,10 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Connect to OverKiz server.
- * @param {Object} command - Command to send.
+ * @param {object} command - Command to send.
  * @param {string} deviceURL - DeviceURL.
- * @param {Object} data - Command data to send.
- * @returns {Promise<Object>} Return Object of informations.
+ * @param {object} data - Command data to send.
+ * @returns {Promise<object>} Return object of informations.
  * @example
  * overkiz.sendCommand();
  */

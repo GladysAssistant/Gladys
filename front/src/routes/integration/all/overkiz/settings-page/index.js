@@ -34,4 +34,7 @@ class OverkizSettingsTab extends Component {
   }
 }
 
-export default connect('user,session,overkizType,overkizUsername,overkizPassword,overkizGetConfigurationStatus,saveConfigurationStatus', {})(OverkizSettingsTab);
+export default connect(
+  'user,session,overkizType,overkizUsername,overkizPassword,overkizGetConfigurationStatus,saveConfigurationStatus',
+  {}
+)(OverkizSettingsTab);

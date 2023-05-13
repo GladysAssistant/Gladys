@@ -2,7 +2,7 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Disconnect to OverKiz server.
- * @returns {Promise<Object>} Return Object of informations.
+ * @returns {Promise<object>} Return Object of informations.
  * @example
  * overkiz.disconnect();
  */

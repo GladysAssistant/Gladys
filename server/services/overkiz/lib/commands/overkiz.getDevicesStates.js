@@ -5,8 +5,8 @@ const { EVENTS, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constan
 
 /**
  * @description Update device states.
- * @param {Object} device - Deviceto update states.
- * @returns {Promise<Object>} Return Object of informations.
+ * @param {object} device - Deviceto update states.
+ * @returns {Promise<object>} Return Object of informations.
  * @example
  * overkiz.getDevicesStates();
  */

@@ -1,6 +1,6 @@
 /**
  * @description Return name of device
- * @param {Object} node - The zwave value.
+ * @param {object} node - The zwave value.
  * @returns {string} Return name.
  * @example
  * getDeviceName(node);
@@ -11,7 +11,7 @@ function getDeviceName(node) {
 
 /**
  * @description Return external id of device
- * @param {Object} node - The zwave value.
+ * @param {object} node - The zwave value.
  * @returns {string} Return external id.
  * @example
  * getDeviceExternalId(node);
@@ -23,8 +23,8 @@ function getDeviceExternalId(node) {
 
 /**
  * @description Return external id of deviceFeature
- * @param {Object} node - The node feature.
- * @param {Object} state - The node state feature.
+ * @param {object} node - The node feature.
+ * @param {object} state - The node state feature.
  * @returns {string} Return external id.
  * @example
  * getDeviceFeatureExternalId(node);
@@ -36,8 +36,8 @@ function getDeviceFeatureExternalId(node, state) {
 
 /**
  * @description Return node info of device.
- * @param {Object} device - The device.
- * @returns {Object} Return all informations.
+ * @param {object} device - The device.
+ * @returns {object} Return all informations.
  * @example
  * getNodeInfoByExternalId({external_id: ''});
  */
@@ -50,8 +50,8 @@ function getNodeInfoByExternalId(device) {
 
 /**
  * @description Return node info of devicefeature.
- * @param {Object} deviceFeature - The devicefeature.
- * @returns {Object} Return all informations.
+ * @param {object} deviceFeature - The devicefeature.
+ * @returns {object} Return all informations.
  * @example
  * getNodeStateInfoByExternalId({external_id: ''});
  */

@@ -6,7 +6,7 @@ const { OVERKIZ_SERVER_PARAM, SUPPORTED_SERVERS } = require('../utils/overkiz.co
 
 /**
  * @description Connect to OverKiz server.
- * @returns {Promise<Object>} Return Object of informations.
+ * @returns {Promise<object>} Return Object of informations.
  * @example
  * overkiz.connect();
  */

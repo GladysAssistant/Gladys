@@ -3,10 +3,10 @@ const { getNodeStateInfoByExternalId } = require('./overkiz.externalId');
 
 /**
  * @description Bind value
- * @param {Object} device - Device.
- * @param {Object} deviceFeature - Device feature.
- * @param {Object} value - Value to send.
- * @returns {Object} Return the value adapted.
+ * @param {object} device - Device.
+ * @param {object} deviceFeature - Device feature.
+ * @param {object} value - Value to send.
+ * @returns {object} Return the value adapted.
  * @example
  * const value = bindValue({}, {}}, 1);
  */
@@ -26,10 +26,10 @@ function bindValue(device, deviceFeature, value) {
 
 /**
  * @description Unbind value
- * @param {Object} device - Device.
+ * @param {object} device - Device.
  * @param {string} stateName - Device state name.
  * @param {string} stateValue - Device state value.
- * @returns {Object} Return the value adapted.
+ * @returns {object} Return the value adapted.
  * @example
  * const value = unbindValue({}, 'name', 1);
  */

@@ -50,16 +50,12 @@ function createActions(store) {
         saveConfigurationStatus: RequestStatus.Getting
       });
 
-      const {
-        overkizType,
-        overkizUsername,
-        overkizPassword,
-      } = state;
+      const { overkizType, overkizUsername, overkizPassword } = state;
       try {
         await state.httpClient.post(`/api/v1/service/overkiz/configuration`, {
           overkizType,
           overkizUsername,
-          overkizPassword,
+          overkizPassword
         });
 
         store.setState({

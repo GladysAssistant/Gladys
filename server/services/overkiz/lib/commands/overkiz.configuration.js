@@ -3,7 +3,7 @@ const { OVERKIZ_SERVER_PARAM } = require('../utils/overkiz.constants');
 
 /**
  * @description Get Overkiz configuration.
- * @returns {Promise<Object>} Return Overkiz configuration.
+ * @returns {Promise<object>} Return Overkiz configuration.
  * @example
  * overkiz.getConfiguration();
  */

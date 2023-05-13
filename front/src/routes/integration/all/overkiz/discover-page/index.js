@@ -19,4 +19,7 @@ class OverkizIntegration extends Component {
   }
 }
 
-export default connect('user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading', {})(OverkizIntegration);
+export default connect(
+  'user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading',
+  {}
+)(OverkizIntegration);

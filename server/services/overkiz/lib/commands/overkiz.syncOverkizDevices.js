@@ -4,7 +4,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 /**
  * @description Update Gateway State.
- * @param {Object} gateways - List of gateways.
+ * @param {object} gateways - List of gateways.
  * @example
  * overkiz.updateGatewayState();
  */
@@ -17,8 +17,8 @@ function updateGatewayState(gateways) {
 // eslint-disable-next-line jsdoc/require-returns
 /**
  * @description Update Devices State.
- * @param {Object} devices - List of devices.
- * @param {Object} rootPlace - Root place.
+ * @param {object} devices - List of devices.
+ * @param {object} rootPlace - Root place.
  * @example
  * overkiz.updateDevicesState(devices, rootPlace);
  */

@@ -6,9 +6,9 @@ const { sendCommand } = require('./overkiz.sendCommand');
 
 /**
  * @description Connect to OverKiz server.
- * @param {Object} device - Device to set feature value.
- * @param {Object} deviceFeature - Device feature to set value.
- * @param {Object} value - Value to set.
+ * @param {object} device - Device to set feature value.
+ * @param {object} deviceFeature - Device feature to set value.
+ * @param {object} value - Value to set.
  * @example
  * overkiz.setValue();
  */
