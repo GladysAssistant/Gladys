@@ -43,20 +43,22 @@ module.exports = {
                   );
 
                   const deviceIds = devices.filter((device) => device).map((device) => device.id);
-                  const deviceFeatures = await Promise.all(
-                    deviceIds.map(async (deviceId) =>
-                      db.DeviceFeature.findOne({
-                        where: {
-                          device_id: deviceId,
-                          category,
-                          type,
-                        },
-                      }),
-                    ),
-                  );
-                  action.device_features = deviceFeatures.map((deviceFeature) => deviceFeature.selector);
-                  delete action.devices;
-                  actionsModified = true;
+                  if(deviceIds && deviceIds.length > 0) {
+                    const deviceFeatures = await Promise.all(
+                      deviceIds.map(async (deviceId) =>
+                        db.DeviceFeature.findOne({
+                          where: {
+                            device_id: deviceId,
+                            category,
+                            type,
+                          },
+                        }),
+                      ),
+                    );
+                    action.device_features = deviceFeatures.map((deviceFeature) => deviceFeature.selector);
+                    delete action.devices;
+                    actionsModified = true;
+                  }
                 }
               }
               return action;
