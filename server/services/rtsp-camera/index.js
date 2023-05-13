@@ -1,11 +1,13 @@
 const fse = require('fs-extra');
+const childProcess = require('child_process');
+
 const logger = require('../../utils/logger');
 const RtspCameraHandler = require('./lib');
 const RtspCameraController = require('./api/rtspCamera.controller');
 
 module.exports = function RtspCameraService(gladys, serviceId) {
   const ffmpeg = require('fluent-ffmpeg');
-  const device = new RtspCameraHandler(gladys, ffmpeg, serviceId);
+  const device = new RtspCameraHandler(gladys, ffmpeg, childProcess, serviceId);
   /**
    * @public
    * @description This function starts service.
@@ -32,6 +34,6 @@ module.exports = function RtspCameraService(gladys, serviceId) {
     start,
     stop,
     device,
-    controllers: RtspCameraController(device),
+    controllers: RtspCameraController(gladys, device),
   });
 };

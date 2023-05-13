@@ -10,3 +10,19 @@
   display: flex;
   flex-direction: column;
 }
+
+@media (max-width: 768px) {
+  .signupTitle {
+    font-size: 1.5rem;
+  }
+}
+
+.navLinkWithoutCursor {
+  cursor: default;
+}
+
+@media (max-width: 768px) {
+  .navResponsive .nav-item {
+    display: none;
+  }
+}

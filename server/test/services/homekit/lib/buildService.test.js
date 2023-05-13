@@ -82,6 +82,8 @@ describe('Build service', () => {
         name: 'Luminosité',
         category: DEVICE_FEATURE_CATEGORIES.LIGHT,
         type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+        min: 0,
+        max: 100,
       },
       {
         id: '81d2dc15-cb98-4235-96f4-5c12007b6ccd',
@@ -302,5 +304,57 @@ describe('Build service', () => {
     expect(cb.args[0][1]).to.equal(15);
     expect(cb.args[1][1]).to.equal(20);
     expect(cb.args[2][1]).to.equal(25);
+  });
+
+  it('should build contact sensor service', async () => {
+    homekitHandler.gladys.device.getBySelector = stub().resolves({
+      features: [
+        {
+          id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+          name: "Porte d'entrée",
+          category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+          type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+          last_value: 0,
+        },
+      ],
+    });
+    const on = stub();
+    const getCharacteristic = stub().returns({
+      on,
+    });
+    const ContactSensor = stub().returns({
+      getCharacteristic,
+    });
+
+    homekitHandler.hap = {
+      Characteristic: {
+        ContactSensorState: 'CONTACTSENSORSTATE',
+      },
+      CharacteristicEventTypes: stub(),
+      Service: {
+        ContactSensor,
+      },
+    };
+    const device = {
+      name: "Porte d'entrée",
+    };
+    const features = [
+      {
+        id: '31c6a4a7-9710-4951-bf34-04eeae5b9ff7',
+        name: 'Capteur ouverture',
+        category: DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      },
+    ];
+
+    const cb = stub();
+
+    await homekitHandler.buildService(device, features, mappings[DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]);
+    await on.args[0][1](cb);
+
+    expect(ContactSensor.args[0][0]).to.equal("Porte d'entrée");
+    expect(on.callCount).to.equal(1);
+    expect(getCharacteristic.args[0][0]).to.equal('CONTACTSENSORSTATE');
+    expect(cb.args[0][1]).to.equal(1);
   });
 });
