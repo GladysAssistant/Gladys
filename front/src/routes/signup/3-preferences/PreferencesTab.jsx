@@ -1,4 +1,5 @@
 import { Text } from 'preact-i18n';
+import style from '../style.css';
 import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
 
 const updateUserProperty = (property, func) => e => {
@@ -12,7 +13,7 @@ const updateSystemProperty = (property, func) => e => {
 const CreateLocalGladysAccount = ({ children, ...props }) => (
   <div class="row">
     <div class="col-md-8 mx-auto">
-      <h2>
+      <h2 class={style.signupTitle}>
         <Text id="signup.preferences.title" />
       </h2>
       <p>

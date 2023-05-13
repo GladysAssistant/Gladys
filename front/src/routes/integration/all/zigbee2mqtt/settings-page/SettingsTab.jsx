@@ -1,6 +1,7 @@
 import { Text } from 'preact-i18n';
-import get from 'get-value';
 import cx from 'classnames';
+import { RequestStatus } from '../../../../../utils/consts';
+import Select from 'react-select';
 
 const SettingsTab = ({ children, ...props }) => (
   <div class="card">
@@ -9,8 +10,11 @@ const SettingsTab = ({ children, ...props }) => (
         <Text id="integration.zigbee2mqtt.settings.title" />
       </h2>
       <div class="page-options d-flex">
-        <button class="btn btn-info" onClick={props.getUsbPorts}>
-          <i class="fe fe-rotate-cw" /> <Text id="integration.zigbee2mqtt.settings.refreshButton" />
+        <button class="btn btn-info" onClick={props.loadUsbPorts} disabled={props.loading}>
+          <i class="fe fe-rotate-cw" />
+          <span class="d-none d-md-inline-block ml-2">
+            <Text id="integration.zigbee2mqtt.settings.refreshButton" />
+          </span>
         </button>
       </div>
     </div>
@@ -22,17 +26,17 @@ const SettingsTab = ({ children, ...props }) => (
       >
         <div class="loader" />
         <div class="dimmer-content">
-          {get(props, 'zigbee2mqttStatus.usbConfigured') && (
+          {props.usbConfigured && (
             <div class="alert alert-success">
               <Text id="integration.zigbee2mqtt.settings.attached" />
             </div>
           )}
-          {!get(props, 'zigbee2mqttStatus.usbConfigured') && (
+          {!props.usbConfigured && (
             <div class="alert alert-warning">
               <Text id="integration.zigbee2mqtt.settings.notAttached" />
             </div>
           )}
-          {props.zigbee2mqttSavingInProgress && (
+          {props.zigbee2mqttSaveStatus === RequestStatus.Getting && (
             <div class="alert alert-info">
               <Text id="integration.zigbee2mqtt.settings.saving" />
             </div>
@@ -44,25 +48,37 @@ const SettingsTab = ({ children, ...props }) => (
             <label class="form-label">
               <Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDriverPathLabel" />
             </label>
-            <select class="form-control" onChange={props.updateZigbee2mqttDriverPath}>
-              <option>
-                <Text id="global.emptySelectOption" />
-              </option>
-              {props.usbPorts &&
-                props.usbPorts.map(
-                  usbPort =>
-                    usbPort.comPath && (
-                      <option value={usbPort.comPath} selected={props.zigbee2mqttDriverPath === usbPort.comPath}>
-                        {usbPort.comPath}
-                        {usbPort.comName ? ` - ${usbPort.comName}` : ''}
-                        {usbPort.comVID ? ` - ${usbPort.comVID}` : ''}
-                      </option>
-                    )
-                )}
-            </select>
+            <Select
+              value={props.zigbeeDriverPath ? { label: props.zigbeeDriverPath, value: props.zigbeeDriverPath } : null}
+              onChange={props.updateZigbeeDriverPath}
+              options={props.usbPorts}
+              isLoading={props.getZigbee2mqttUsbPortStatus === RequestStatus.Getting}
+              placeholder={<Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDriverPathPlaceholder" />}
+            />
           </div>
           <div class="form-group">
-            <button class="btn btn-success" onClick={props.saveDriverPath}>
+            <label class="form-label">
+              <Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDongleNameLabel" />
+            </label>
+            <Select
+              value={props.zigbeeDongleName ? { label: props.zigbeeDongleName, value: props.zigbeeDongleName } : null}
+              onChange={props.updateZigbeeDongleName}
+              options={props.zigbeeAdapters}
+              isClearable
+              placeholder={<Text id="integration.zigbee2mqtt.settings.zigbee2mqttUsbDongleNamePlaceholder" />}
+            />
+          </div>
+          <div class="form-group">
+            <button
+              class="btn btn-success"
+              onClick={props.saveDriverPath}
+              disabled={
+                props.loading ||
+                props.getZigbee2mqttUsbPortStatus === RequestStatus.Getting ||
+                !props.zigbeeDriverPath ||
+                props.zigbeeDriverPath === ''
+              }
+            >
               <i class="fe fe-save" /> <Text id="integration.zigbee2mqtt.settings.saveButton" />
             </button>
           </div>

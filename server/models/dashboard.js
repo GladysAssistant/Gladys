@@ -25,6 +25,8 @@ const boxesSchema = Joi.array().items(
       users: Joi.array().items(Joi.string()),
       clock_type: Joi.string(),
       clock_display_second: Joi.boolean(),
+      camera_latency: Joi.string(),
+      camera_live_auto_start: Joi.boolean(),
     }),
   ),
 );
