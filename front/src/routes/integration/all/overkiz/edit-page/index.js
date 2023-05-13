@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import OverkizPage from '../OverkizPage';
 import UpdateDevice from '../../../../../components/device';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
 class EditOverkizDevice extends Component {
   render(props, {}) {
     return (
@@ -19,4 +18,4 @@ class EditOverkizDevice extends Component {
   }
 }
 
-export default EditOverkizDevice;
+export default connect('user,session,httpClient,currentIntegration,houses', {})(EditOverkizDevice);

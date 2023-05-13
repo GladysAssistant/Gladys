@@ -1,10 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import actions from '../actions';
 import OverkizPage from '../OverkizPage';
 import DiscoverTab from './DiscoverTab';
 
-@connect('user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading', actions)
 class OverkizIntegration extends Component {
   async componentWillMount() {
     this.props.getDiscoveredOverkizDevices();
@@ -21,4 +19,4 @@ class OverkizIntegration extends Component {
   }
 }
 
-export default OverkizIntegration;
+export default connect('user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading', {})(OverkizIntegration);

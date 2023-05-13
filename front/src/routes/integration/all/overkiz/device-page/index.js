@@ -1,10 +1,8 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import actions from '../actions';
 import OverkizPage from '../OverkizPage';
 import DeviceTab from './DeviceTab';
 
-@connect('user,overkizDevices,housesWithRooms,getOverkizStatus', actions)
 class OverkizIntegration extends Component {
   componentWillMount() {
     this.props.getOverkizDevices();
@@ -21,4 +19,4 @@ class OverkizIntegration extends Component {
   }
 }
 
-export default OverkizIntegration;
+export default connect('user,overkizDevices,housesWithRooms,getOverkizStatus', {})(OverkizIntegration);

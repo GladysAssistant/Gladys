@@ -131,10 +131,6 @@ class SetupTab extends Component {
       </div>
     );
   }
-<<<<<<< HEAD
-}
-=======
 };
->>>>>>> 93baf60bd1a494649413ef2e51d4d4c0f3d0750a
 
 export default SetupTab;

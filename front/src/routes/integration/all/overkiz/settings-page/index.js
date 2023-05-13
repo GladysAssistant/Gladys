@@ -1,15 +1,10 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import actions from '../actions';
 import OverkizPage from '../OverkizPage';
 import SettingsTab from './SettingsTab';
 import { SUPPORTED_SERVERS } from '../../../../../../../server/services/overkiz/lib/utils/overkiz.constants';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,overkizType,overkizUsername,overkizPassword,overkizGetConfigurationStatus,saveConfigurationStatus',
-  actions
-)
 class OverkizSettingsTab extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('overkiz');
@@ -39,4 +34,4 @@ class OverkizSettingsTab extends Component {
   }
 }
 
-export default OverkizSettingsTab;
+export default connect('user,session,overkizType,overkizUsername,overkizPassword,overkizGetConfigurationStatus,saveConfigurationStatus', {})(OverkizSettingsTab);
