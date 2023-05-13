@@ -67,9 +67,7 @@ class OverkizDeviceBox extends Component {
               </div>
             </Localizer>
             <div class="page-options d-flex">
-              {firmware && (
-                <div class="tag tag-blue">{`Firmware: ${firmware}`}</div>
-              )}
+              {firmware && <div class="tag tag-blue">{`Firmware: ${firmware}`}</div>}
             </div>
           </div>
           <div

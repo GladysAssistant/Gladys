@@ -21,10 +21,10 @@ function createActions(store) {
           overkizGetConfigurationStatus: RequestStatus.Error
         });
       }
-    },    
+    },
     updateConfiguration(state, configuration) {
       store.setState(configuration);
-    },    
+    },
     async connect(state) {
       await actions.disconnect(state);
       await actions.saveConfiguration(state);
@@ -50,16 +50,12 @@ function createActions(store) {
         saveConfigurationStatus: RequestStatus.Getting
       });
 
-      const {
-        overkizType,
-        overkizUsername,
-        overkizPassword,
-      } = state;
+      const { overkizType, overkizUsername, overkizPassword } = state;
       try {
         await state.httpClient.post(`/api/v1/service/overkiz/configuration`, {
           overkizType,
           overkizUsername,
-          overkizPassword,
+          overkizPassword
         });
 
         store.setState({

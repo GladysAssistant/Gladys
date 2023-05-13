@@ -5,7 +5,6 @@ import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 
 class SetupTab extends Component {
-
   updateOverkizType = e => {
     this.props.updateConfiguration({ overkizType: e.target.value });
   };
@@ -131,6 +130,6 @@ class SetupTab extends Component {
       </div>
     );
   }
-};
+}
 
 export default SetupTab;
