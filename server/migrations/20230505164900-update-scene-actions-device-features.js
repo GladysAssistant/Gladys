@@ -43,7 +43,7 @@ module.exports = {
                   );
 
                   const deviceIds = devices.filter((device) => device).map((device) => device.id);
-                  if(deviceIds && deviceIds.length > 0) {
+                  if (deviceIds && deviceIds.length > 0) {
                     const deviceFeatures = await Promise.all(
                       deviceIds.map(async (deviceId) =>
                         db.DeviceFeature.findOne({
