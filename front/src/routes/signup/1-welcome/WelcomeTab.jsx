@@ -1,19 +1,11 @@
 import style from '../style.css';
 import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import cx from 'classnames';
-
-const margin70px = {
-  marginTop: '70px'
-};
-const margin20px = {
-  marginTop: '20px'
-};
 
 const WelcomeStep = () => (
-  <div class={cx('row', style.equal)}>
+  <div class="d-flex flex-column flex-lg-row">
     <div class="col-lg-6">
-      <h2>
+      <h2 class={style.signupTitle}>
         <Text id="signup.welcome.title" />
       </h2>
       <p>
@@ -32,20 +24,15 @@ const WelcomeStep = () => (
         <MarkupText id="signup.welcome.introReadMoreGladysGateway" />
       </p>
     </div>
-    <div class="col-lg-6">
-      <div class="row" style={margin70px}>
-        <div class="col text-center">
-          <Link class="btn btn-info btn-block" href="/signup/create-account-gladys-gateway">
-            <i class="fe fe-download-cloud" /> <Text id="signup.welcome.buttonCreateAccountGladysGateway" />
-          </Link>
-        </div>
-      </div>
-      <div class="row" style={margin20px}>
-        <div class="col text-center">
-          <Link class="btn btn-success btn-block" href="/signup/create-account-local">
-            <i class="fe fe-mail" /> <Text id="signup.welcome.buttonCreateAccountWithEmail" />
-          </Link>
-        </div>
+    <div class="col-lg-6 d-flex flex-row align-items-center">
+      <div class="w-100">
+        <Link class="btn btn-secondary btn-block mb-4 text-wrap" href="/signup/create-account-gladys-gateway">
+          <i class="fe fe-download-cloud mr-1" /> <Text id="signup.welcome.buttonCreateAccountGladysGateway" />
+        </Link>
+
+        <Link class="btn btn-primary btn-block" href="/signup/create-account-local">
+          <i class="fe fe-mail mr-1" /> <Text id="signup.welcome.buttonCreateAccountWithEmail" />
+        </Link>
       </div>
     </div>
   </div>

@@ -1,0 +1,20 @@
+{
+  "name": "gladys-nextcloud-talk",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "axios": "^1.2.1",
+    "get-value": "^3.0.1",
+    "uuid": "^8.3.2"
+  }
+}
