@@ -211,7 +211,7 @@ describe('scene.executeActions', () => {
       },
     };
     stateManager.setState('deviceById', 'switch-1', device);
-    stateManager.setState('deviceFeature', 'switch-1-binary', deviceFeature)
+    stateManager.setState('deviceFeature', 'switch-1-binary', deviceFeature);
     await executeActions(
       { stateManager, event, device },
       [

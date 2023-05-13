@@ -41,9 +41,10 @@ module.exports = {
                       }),
                     ),
                   );
-                  const deviceIds = devices
-                    .filter(device => device !== undefined)
-                    .map((device) => device.id);
+
+                  devices.forEach((device) => console.log(device));
+
+                  const deviceIds = devices.filter((device) => device !== undefined).map((device) => device.id);
                   const deviceFeatures = await Promise.all(
                     deviceIds.map(async (deviceId) =>
                       db.DeviceFeature.findOne({
