@@ -19,11 +19,11 @@ async function stop() {
   logger.debug(`Bluetooth: Reset service status`);
   this.bluetooth = undefined;
 
-  if (this.scanPromise && this.scanPromise.isPending()) {
-    this.scanPromise.cancel();
+  if (this.scanTimer) {
+    clearTimeout(this.scanTimer);
   }
 
-  this.scanPromise = undefined;
+  this.scanTimer = undefined;
   this.scanCounter = 0;
 }
 

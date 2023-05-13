@@ -8,10 +8,22 @@ import SelectDeviceFeature from '../../../../components/device/SelectDeviceFeatu
 import withIntlAsProp from '../../../../utils/withIntlAsProp';
 
 import { DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
 import '../../../../components/boxs/device-in-room/device-features/style.css';
+import style from './DeviceSetValue.css';
 
 class DeviceSetValue extends Component {
+  constructor(props) {
+    super(props);
+    this.props = props;
+    this.state = {
+      computed: props.action.evaluate_value || false
+    };
+  }
+
+  toggleType = () => this.setState({ computed: !this.state.computed });
+
   onDeviceFeatureChange = (deviceFeature, device) => {
     const { columnIndex, index } = this.props;
     const deviceFeatureChanged = this.props.action.device_feature !== deviceFeature.selector;
@@ -22,6 +34,7 @@ class DeviceSetValue extends Component {
     }
     if (deviceFeatureChanged) {
       this.props.updateActionProperty(columnIndex, index, 'value', undefined);
+      this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
     }
     this.setState({ deviceFeature, device });
   };
@@ -29,11 +42,13 @@ class DeviceSetValue extends Component {
   handleNewValue = e => {
     const { columnIndex, index } = this.props;
     this.props.updateActionProperty(columnIndex, index, 'value', e.target.value);
+    this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
   };
 
   handleNewColorValue = color => {
     const { columnIndex, index } = this.props;
     this.props.updateActionProperty(columnIndex, index, 'value', color);
+    this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
   };
 
   toggleBinaryValue = () => {
@@ -41,11 +56,50 @@ class DeviceSetValue extends Component {
     const previousValue = action.value !== undefined ? action.value : 0;
     const newValue = previousValue === 1 ? 0 : 1;
     this.props.updateActionProperty(columnIndex, index, 'value', newValue);
+    this.props.updateActionProperty(columnIndex, index, 'evaluate_value', undefined);
+  };
+
+  handleNewEvalValue = text => {
+    const { columnIndex, index } = this.props;
+    this.props.updateActionProperty(columnIndex, index, 'value', undefined);
+    this.props.updateActionProperty(columnIndex, index, 'evaluate_value', text);
   };
 
   getDeviceFeatureControl = () => {
     if (!this.state.deviceFeature) {
       return null;
+    }
+
+    if (this.state.computed) {
+      return (
+        <div>
+          <div className={style.explanationText}>
+            <Text id="editScene.actionsCard.deviceSetValue.computedExplanationText" />
+          </div>
+          <div class="input-group">
+            <Localizer>
+              <TextWithVariablesInjected
+                text={
+                  this.props.action.value
+                    ? Number(this.props.action.value).toString()
+                    : this.props.action.evaluate_value
+                }
+                triggersVariables={this.props.triggersVariables}
+                actionsGroupsBefore={this.props.actionsGroupsBefore}
+                variables={this.props.variables}
+                updateText={this.handleNewEvalValue}
+              />
+            </Localizer>
+            {this.state.deviceFeature.unit && (
+              <span class="input-group-append" id="basic-addon2">
+                <span class="input-group-text">
+                  <Text id={`deviceFeatureUnitShort.${this.state.deviceFeature.unit}`} />
+                </span>
+              </span>
+            )}
+          </div>
+        </div>
+      );
     }
 
     if (this.state.deviceFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
@@ -70,6 +124,9 @@ class DeviceSetValue extends Component {
 
     return (
       <div>
+        <div className={style.explanationText}>
+          <Text id="editScene.actionsCard.deviceSetValue.simpleExplanationText" />
+        </div>
         <div class="input-group">
           <Localizer>
             <input
@@ -130,12 +187,20 @@ class DeviceSetValue extends Component {
           />
         </div>
         <div class="form-group">
-          <label class="form-label">
-            <Text id="editScene.actionsCard.deviceSetValue.valueLabel" />
-            <span class="form-required">
-              <Text id="global.requiredField" />
+          <div className={cx('nav-tabs', style.valueTypeTab)}>
+            <span
+              class={cx('nav-link', style.valueTypeLink, { active: !this.state.computed })}
+              onClick={this.toggleType}
+            >
+              <Text id="editScene.actionsCard.deviceSetValue.valueTypeSimple" />
             </span>
-          </label>
+            <span
+              class={cx('nav-link', style.valueTypeLink, { active: this.state.computed })}
+              onClick={this.toggleType}
+            >
+              <Text id="editScene.actionsCard.deviceSetValue.valueTypeComputed" />
+            </span>
+          </div>
         </div>
         <div class="form-group">{this.getDeviceFeatureControl()}</div>
       </div>

@@ -12,9 +12,8 @@ const { unsubscribe } = require('../utils/characteristic/bluetooth.unsubscribe')
  * await subscribeDevice({ uuid: 'peripheral' }, 'service1', 'char1')
  */
 async function unsubscribeDevice(peripheral, serviceUuid, characteristicUuid) {
-  return this.getCharacteristic(peripheral, serviceUuid, characteristicUuid).then((characteristic) =>
-    unsubscribe(characteristic),
-  );
+  const characteristic = await this.getCharacteristic(peripheral, serviceUuid, characteristicUuid);
+  return unsubscribe(characteristic);
 }
 
 module.exports = {
