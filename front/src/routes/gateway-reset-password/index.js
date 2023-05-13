@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import linkState from 'linkstate';
 import ResetPassword from './ResetPassword';
 
-@connect('session', {})
 class ResetPasswordPage extends Component {
   state = {
     password: '',
@@ -78,4 +77,4 @@ class ResetPasswordPage extends Component {
   }
 }
 
-export default ResetPasswordPage;
+export default connect('session', {})(ResetPasswordPage);

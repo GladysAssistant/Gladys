@@ -14,8 +14,8 @@ const { send } = require('./learn/broadlink.send');
 
 /**
  * @description Add ability to connect to a Broadlink broker.
- * @param {Object} gladys - Gladys instance.
- * @param {Object} broadlink - Broadlink lib.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} broadlink - Broadlink lib.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const broadlinkHandler = new BroadlinkHandler(gladys, client, serviceId);

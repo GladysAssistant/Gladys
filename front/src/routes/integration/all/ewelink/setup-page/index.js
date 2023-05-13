@@ -5,10 +5,6 @@ import EweLinkPage from '../EweLinkPage';
 import SetupTab from './SetupTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,eweLinkUsername,eweLinkPassword,connectEweLinkStatus,eweLinkConnected,eweLinkConnectionError',
-  actions
-)
 class EweLinkSetupPage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('ewelink');
@@ -37,4 +33,7 @@ class EweLinkSetupPage extends Component {
   }
 }
 
-export default EweLinkSetupPage;
+export default connect(
+  'user,session,eweLinkUsername,eweLinkPassword,connectEweLinkStatus,eweLinkConnected,eweLinkConnectionError',
+  actions
+)(EweLinkSetupPage);

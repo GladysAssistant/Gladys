@@ -2,7 +2,7 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Destroy a scene
+ * @description Destroy a scene.
  * @param {string} selector - The selector of the scene.
  * @example
  * scene.destroy('my-scene');
@@ -17,6 +17,9 @@ async function destroy(selector) {
   if (existingScene === null) {
     throw new NotFoundError('Scene not found');
   }
+
+  // Remove scene from brain
+  this.brain.removeNamedEntity('scene', existingScene.selector, existingScene.name);
 
   await existingScene.destroy();
   // we cancel triggers linked to the scene

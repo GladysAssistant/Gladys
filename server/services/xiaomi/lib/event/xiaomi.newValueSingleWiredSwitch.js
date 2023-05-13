@@ -5,8 +5,8 @@ const { WIRED_SWITCH_STATUS } = require('../utils/deviceStatus');
 
 /**
  * @description New value single wired switch received.
- * @param {Object} message - Message received.
- * @param {Object} data - Data received.
+ * @param {object} message - Message received.
+ * @param {object} data - Data received.
  * @example
  * newValueSingleWiredSwitch({model:''}, {
  *    channel_0: 'on'

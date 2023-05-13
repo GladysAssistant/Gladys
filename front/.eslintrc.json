@@ -9,12 +9,29 @@
     "jest/valid-expect": "off",
     "no-async-promise-executor": "off",
     "react/jsx-key": "off",
-    "promise/prefer-await-to-then": "warn"
+    "promise/prefer-await-to-then": "warn",
+    "react/forbid-dom-props": [
+      "warn",
+      {
+        "forbid": [{ "propName": "style", "message": "Using inline style is not recommended. Please use a .css file." }]
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "Decorator[expression.callee.name='connect']",
+        "message": "The @connect decorator is not allowed anymore. Please use connect() function instead. See doc: https://github.com/developit/unistore"
+      }
+      /* { FOR LATER
+        "selector": "CallExpression[callee.object.name='store'][callee.property.name='setState']",
+        "message": "Usage of unistore is not recommended anymore, please use local states instead."
+      } */
+    ]
   },
   "env": {
     "browser": true
   },
-  "plugins": ["json", "cypress", "promise"],
+  "plugins": ["json", "cypress", "promise", "react"],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true

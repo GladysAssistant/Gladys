@@ -3,7 +3,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
 /**
  * @description Add device.
  * @param {string} sid - Xiaomi SID.
- * @param {Object} device - Device to add.
+ * @param {object} device - Device to add.
  * @example
  * xiaomi.addDevice(sid, device);
  */

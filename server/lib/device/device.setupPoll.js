@@ -1,7 +1,7 @@
 const { DEVICE_POLL_FREQUENCIES_LIST } = require('../../utils/constants');
 
 /**
- * @description Setup poll setInterval
+ * @description Setup poll setInterval.
  * @example
  * setupPoll();
  */

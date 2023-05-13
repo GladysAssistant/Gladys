@@ -17,7 +17,8 @@
     "celsius": "C",
     "fahrenheit": "F",
     "metersPerSec": "m/s",
-    "milesPerHour": "m/h"
+    "milesPerHour": "m/h",
+    "selectPlaceholder": "Sélectionnez..."
   },
   "color": {
     "blue": "Bleu",
@@ -43,6 +44,7 @@
     "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
+    "searchPlaceHolder": "Chercher un appareil",
     "noFeatures": "Aucune fonctionnalité",
     "tooMuchStatesToDelete": "Cet appareil a {{count}} états dans la base de données et ne peut être supprimé immédiatement. Gladys a lancé une suppression lente en arrière-plan de tous les états de cet appareil afin d'éviter qu'elle ne soit bloquée pendant la suppression de ceux-ci. Cette suppression peut durer quelques minutes /heures ( selon la rapidité de votre disque). Vous pouvez suivre la progression de la suppression <a href=\"/dashboard/settings/jobs\"> ici</a>. Lorsque ce processus sera terminé, nous vous invitons à revenir sur cet onglet pour effectuer la suppression définitive de cet appareil."
   },
@@ -187,6 +189,7 @@
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
+    "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Editer le tableau de bord",
@@ -195,6 +198,13 @@
     "noDashboardSentenceBottom": "Cliquez sur le bouton \"Nouveau\" pour créer un tableau de bord.",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
+    "editDashboardMyDashboards": "Mes tableaux de bords",
+    "editDashboardExplanation": "Chaque tableau de bord comporte 3 colonnes, que vous pouvez remplir selon vos préférences. Cliquez sur le bouton + pour ajouter un nouveau widget. Vous pouvez déplacer ce widget en l'attrapant et en le déplaçant.",
+    "reorderDashboardButton": "Re-ordonner",
+    "stopReorderingDashboardButton": "Arrêter de réordonner",
+    "addBoxButton": "Ajouter",
+    "selectBoxType": "Sélectionner un type",
+    "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
     "boxTitle": {
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
@@ -208,7 +218,6 @@
     },
     "boxes": {
       "column": "Colonne {{index}}",
-      "dragAndDrop": "Glissez et déposez moi ici",
       "deleteButton": "Supprimer",
       "weather": {
         "editHouseLabel": "Sélectionnez une maison. J'utiliserai les latitude/longitude pour obtenir la météo.",
@@ -268,7 +277,7 @@
         "lastThreeMonths": "Derniers 3 mois",
         "lastYear": "Dernière année",
         "noValue": "Pas de valeurs sur cet intervalle.",
-        "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être aggrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
+        "noValueWarning": "Attention, si vous venez de configurer cet appareil, les données peuvent mettre un certain temps avant d'être agrégées. Pour les intervalles supérieurs à 24h, cela prend jusqu'à 24h le temps que Gladys collecte assez de données.",
         "editNameLabel": "Entrez le nom de cette box",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher",
@@ -342,7 +351,7 @@
       "description": "Synchonisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
-      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de Gladys.",
+      "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de cette installation Gladys. Ils deviennent ensuite utilisables dans les scènes et affichables dans l'onglet calendrier pour tous les utilisateurs de cette installation.",
       "hostLabel": "Hébergement CalDAV",
       "hostInfo": "Choisissez le type de calendrier que vous utilisez pour être aidé pendant la configuration.",
       "services": {
@@ -413,13 +422,12 @@
       "bluetoothNotReadyError": "Le module Bluetooth n'est pas disponible, merci de vérifier qu'il est bien activé.",
       "device": {
         "title": "Appareils Bluetooth",
-        "search": "Chercher un appareil",
         "noDevices": "Aucun appareil Bluetooth n'a encore été ajouté.",
         "nameLabel": "Nom de l'appareil",
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
         "externalIdLabel": "ID externe",
-        "manufacturerLabel": "Fabricant",
+        "manufacturerLabel": "Construteur",
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
@@ -491,7 +499,6 @@
         "title": "Appareils dans Gladys",
         "deviceOnNetworkTitle": "Appareils détectés sur le réseau",
         "connectButton": "Connecter/Reconnecter",
-        "search": "Recherche d'appareils",
         "noDevices": "Aucun appareil Philips Hue ajouté.",
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
         "noDevicesFound": "Aucun appareil trouvé. Assurez-vous d'avoir connecté un pont Philips Hue dans l'onglet de configuration.",
@@ -530,7 +537,6 @@
       "httpDiscoverTab": "Découverte HTTP",
       "device": {
         "title": "Appareils Tasmota dans Gladys",
-        "search": "Chercher un appareil",
         "editButton": "Modifier",
         "noDeviceFound": "Aucun appareil Tasmota trouvé. Vous pouvez ajouter des appareils avec les actions suivantes :",
         "protocolLabel": "Protocole",
@@ -593,7 +599,6 @@
         "noNameLabel": "Pas de nom",
         "roomLabel": "Pièce",
         "featuresLabel": "Fonctionnalités",
-        "search": "Recherche d'appareils",
         "connectButton": "Connecter/Reconnecter",
         "scanButton": "Recherche sur le réseau",
         "saveButton": "Sauvegarder",
@@ -657,7 +662,6 @@
       },
       "device": {
         "title": "Appareils Zigbee",
-        "search": "Chercher un appareil",
         "editButton": "Editer"
       },
       "discover": {
@@ -700,6 +704,48 @@
       "cancelButton": "Annuler",
       "connectButton": "Lier"
     },
+    "enedis": {
+      "title": "Enedis",
+      "description": "Vos données de consommation électrique dans Gladys",
+      "welcomeTab": "Connexion avec Enedis",
+      "usagePointsTab": "Mes compteurs",
+      "welcome": {
+        "title": "Connexion à Enedis",
+        "longDescription": "Enedis gère le réseau d'électricité jusqu'au compteur d'électricité. Pour récupérez vos données de consommation d'électricité dans Gladys, autorisez Enedis à nous transmettre vos données Linky.",
+        "longDescription2": "Enedis est le gestionnaire du réseau public de distribution d'électricité sur 95% du territoire français continental.",
+        "longDescription3": "Pour donner votre autorisation, vous devez créer un compte personnel Enedis si vous n'avez pas encore de compte. Il vous permet également de suivre et gérer vos données de consommation d'électricité. Munissez-vous de votre facture d'électricité pour créer votre espace.",
+        "buttonDescription": "En cliquant sur ce bouton, vous allez accéder à votre compte personnel Enedis où vous pourrez donner votre accord pour qu'Enedis nous transmette vos données :",
+        "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer.",
+        "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus, disponible ici :",
+        "connectedToUsagePointds": "Connecté à Enedis avec succès ! La première synchronisation peut prendre entre 2h et 3h selon le volume de requêtes sur l'API Enedis. Il n'est pas nécessaire de garder cet onglet ouvert, la synchronisation a lieu en arrière-plan.",
+        "reconnectInfo": "Si jamais vous voulez rafraichir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 2 ans.",
+        "dailyConsumptionFeatureName": "Consommation quotidienne"
+      },
+      "usagePoints": {
+        "title": "Mes compteurs",
+        "emptyState": "Vous n'avez pas de compteurs synchronisés. Pour ajouter un compteur, veuillez vous rendre dans l'onglet \"Connexion avec Enedis\".",
+        "usagePointName": "Compteur",
+        "lastRefresh": "Dernières données :",
+        "usagePointId": "Identifiant du compteur",
+        "contractType": "Type de contrat",
+        "contracts": {
+          "hc-hp": "Heures creuses/heures pleines",
+          "base": "Tarif base"
+        },
+        "pricePerKwh": "Tarif au kWh",
+        "statistics": "Statistiques",
+        "lastSyncLabel": "Dernière synchronisation : ",
+        "firstValueLabel": "1ère valeur :",
+        "lastValueLabel": "Dernière valeur :",
+        "numberOfStatesLabel": "Nombre d'états synchronisés:",
+        "gladysPlusRefreshProgressLabel": "Synchronisation en cours...",
+        "gladysPlusRefreshProgressDescription": "Gladys Plus est entrain de rafraîchir son cache via l'API Enedis. Cette synchronisation peut prendre du temps, car Enedis impose des limites de requêtes. Il n'est pas nécessaire de garder cet onglet ouvert.",
+        "refreshLocal": "Synchroniser avec Gladys Plus",
+        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponibles en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
+        "saveButton": "Enregistrer",
+        "deleteButton": "Supprimer"
+      }
+    },
     "alexa": {
       "title": "Amazon Alexa",
       "description": "Contrôlez vos appareils Gladys à la voix dans Alexa",
@@ -736,7 +782,6 @@
       "description": "En fin de vie, il n'est plus possible de l'utiliser.",
       "device": {
         "title": "Anciens appareils Open-Zwave",
-        "search": "Chercher un appareil",
         "convertToMqtt": "Convertir en appareil MQTT",
         "oldIntegrationWarning": "Cette intégration était basée sur Open-Zwave, une librairie qui n'est plus maintenue. Cette intégration est en fin de vie. Nous travaillons sur une nouvelle intégration basée sur Zwave-js-ui, mais en attendant il faut s'armer de patience, et utiliser <a href=\"https://community.gladysassistant.com/t/node-red-zwave-js-ui-et-volet-roulants-zmnhcd1/6589\" target=\"_blank\" rel=\"noopener noreferrer\">Zwave-js-ui + Node-RED + Gladys</a>. <br /><br />Nous sommes à la recherche de testeurs/développeurs pour la nouvelle intégration sur <a href=\"https://community.gladysassistant.com/t/v4-integration-z-wave/6057/98\" target=\"_blank\" rel=\"noopener noreferrer\">ce sujet sur le forum</a> :)",
         "noDevices": "Aucun appareil Z-Wave n'a encore été ajouté.",
@@ -773,7 +818,6 @@
       },
       "device": {
         "title": "Appareils MQTT",
-        "search": "Chercher un appareil",
         "noDevices": "Aucun appareil MQTT n'a encore été ajouté.",
         "noNameLabel": "Pas de nom",
         "nameLabel": "Nom",
@@ -861,7 +905,6 @@
       },
       "device": {
         "title": "Appareils Broadlink",
-        "searchPlaceholder": "Rechercher des appareils",
         "newButton": "Créer",
         "noRemoteFound": "Aucun appareil ou télécommande Broadlink trouvé.",
         "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
@@ -969,7 +1012,6 @@
       "device": {
         "title": "Appareils Xiaomi dans Gladys",
         "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",
-        "searchPlaceholder": "Chercher un appareil",
         "sidLabel": "SID Xiaomi",
         "ipLabel": "Adresse IP",
         "roomLabel": "Pièce",
@@ -992,6 +1034,52 @@
         "cube": "Contrôleur",
         "leak": "Capteur de fuite",
         "magnet": "Capteur magnétique"
+      }
+    },
+    "lanManager": {
+      "title": "LAN Manager",
+      "description": "Gérez les appareils sur votre réseau local.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte",
+      "setupTab": "Configuration",
+      "device": {
+        "title": "Appareils LAN",
+        "search": "Chercher un appareil",
+        "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
+        "manufacturerLabel": "Construteur",
+        "ipAddressLabel": "Adresse IP",
+        "macAddressLabel": "Adresse MAC",
+        "originalNameLabel": "Nom sur le réseau"
+      },
+      "discover": {
+        "title": "Découverte LAN",
+        "noDevices": "Aucun appareil LAN n'a encore été trouvé.",
+        "scanButton": "Recherche sur le réseau",
+        "deviceUpdateButton": "Nouveaux appareils disponibles",
+        "hideExistingDevices": "Cacher les appareils déjà ajoutés",
+        "alreadyCreatedButton": "Déjà créé",
+        "updateButton": "Mettre à jour",
+        "discoveringError": "Une erreur est survenue lors de la recherche, vérifiez la configuration du scanner, sinon consultez les logs."
+      },
+      "setup": {
+        "title": "Configuration LAN",
+        "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
+        "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
+        "presenceScannerDescription": "Le scanner de présence effectue un scan sur le réseau à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil est détecté sur le réseau.",
+        "presenceScannerStatusLabel": "Activer ou désactiver l'analyse de présence d'appareils",
+        "presenceScannerFrequencyLabel": "Fréquence de scan",
+        "presenceScannerFrequencyUnit": "minutes",
+        "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
+        "ipMasksLabel": "CIDR à scanner",
+        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
+        "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne peuvent pas être supprimés.",
+        "maskTableHeader": "CIDR",
+        "nameTableHeader": "Nom",
+        "statusTableHeader": "Actif",
+        "maskTablePlaceholder": "e.g. 192.168.1.1/20",
+        "nameTablePlaceholder": "Entrer le nom du CIDR",
+        "deleteButtonTooltip": "Supprimer",
+        "maskFormatError": "Format CIDR invalide"
       }
     },
     "eWeLink": {
@@ -1018,7 +1106,6 @@
       },
       "device": {
         "title": "Appareils eWeLink dans Gladys",
-        "search": "Rechercher les appareils",
         "updates": "Vérifier les mises à jour",
         "editButton": "Editer",
         "noDeviceFound": "Aucun appareil eWeLink trouvé.",
@@ -1049,6 +1136,22 @@
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
+    },
+    "openai": {
+      "title": "OpenAI ChatGPT",
+      "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
+      "firstExplanation": "Ceci est une alpha d'une intégration avec l'intelligence artificielle OpenAI ChatGPT. Vous pouvez demander ce que vous voulez à Gladys ici.",
+      "itDoesNothing": "Cet onglet est un bac à sable vous permettant de tester les capacités de ChatGPT. Pour tester des vrais commandes domotiques, activez ChatGPT dans le chat Gladys.",
+      "aFewExamples": "Quelques exemples :",
+      "turnOnTheLight": "Allume la lumière du salon !",
+      "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
+      "whoIsJulesVerne": "Qui est Jules Verne ?",
+      "eggDuration": "Comment cuire les oeufs durs ?",
+      "activateOpenAiChat": "Activer ChatGPT dans le chat Gladys",
+      "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
+      "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
+      "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
     },
     "overkiz": {
       "title": "Overkiz",
@@ -1144,11 +1247,19 @@
       "turnOffLights": {
         "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
+      "toggleLights": {
+        "label": "Sélectionnez les lumières que vous souhaitez inverser",
+        "description": "Cette action allume la lumière si éteinte, sinon éteins la lumière"
+      },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
       },
       "turnOffSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez éteindre"
+      },
+      "toggleSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez inverser",
+        "description": "Cette action allume la prise si elle est éteinte, sinon éteins la prise"
       },
       "deviceGetValue": {
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
@@ -1249,12 +1360,14 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer les lumières",
-        "turn-off": "Eteindre les lumières"
+        "turn-on": "Allumer la lumière",
+        "turn-off": "Eteindre les lumières",
+        "toggle": "Inverser les lumières"
       },
       "switch": {
         "turn-on": "Allumer les prises",
-        "turn-off": "Eteindre les prises"
+        "turn-off": "Eteindre les prises",
+        "toggle": "Inverser les prises"
       },
       "scene": {
         "start": "Démarrer la scène"
@@ -1473,8 +1586,6 @@
   "housesSettings": {
     "searchPlaceholder": "Chercher une maison",
     "newButton": "Nouveau",
-    "orderDirAsc": "A - Z",
-    "orderDirDesc": "Z - A",
     "defaultNewHouseName": "Nouvelle Maison",
     "noHouseFound": "Aucune maison trouvée"
   },
@@ -1596,12 +1707,13 @@
     "previous": "Précédent",
     "next": "Suivant",
     "jobTypes": {
-      "monthly-device-state-aggregate": "Aggrégation donnée capteur mensuelle",
-      "daily-device-state-aggregate": "Aggrégation donnée capteur journalière",
-      "hourly-device-state-aggregate": "Aggrégation donnée capteur horaire",
+      "monthly-device-state-aggregate": "Agrégation donnée capteur mensuelle",
+      "daily-device-state-aggregate": "Agrégation donnée capteur journalière",
+      "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",
       "gladys-gateway-backup": "Sauvegarde Gladys Plus",
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
-      "vacuum": "Nettoyage de la base de donnée"
+      "vacuum": "Nettoyage de la base de donnée",
+      "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant a redémarré alors que cette tâche était en cours. Cela ne veut pas dire que cette tâche a échouée, c'est un comportement normal."
@@ -1690,8 +1802,6 @@
   "scene": {
     "title": "Scènes",
     "emptySceneSentenceTop": "Impossible de trouver des scènes.",
-    "orderDirAsc": "A - Z",
-    "orderDirDesc": "Z - A",
     "newButton": "Nouveau",
     "editButton": "Editer",
     "startButton": "Démarrer",
@@ -1837,7 +1947,8 @@
     "bytes-per-second": "Octets par seconde (o/s)",
     "kilobytes-per-second": "Kilooctets par seconde (Ko/s)",
     "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
-    "gigabytes-per-second": "Gigaoctets par seconde (Go/s)"
+    "gigabytes-per-second": "Gigaoctets par seconde (Go/s)",
+    "aqi": "Indice de Qualité de l'Air"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -1908,7 +2019,8 @@
     "bytes-per-second": "o/s",
     "kilobytes-per-second": "Ko/s",
     "megabytes-per-second": "Mo/s",
-    "gigabytes-per-second": "Go/s"
+    "gigabytes-per-second": "Go/s",
+    "aqi": "AQI"
   },
   "deviceFeatureAction": {
     "category": {
@@ -1925,6 +2037,13 @@
           "one": "Ouvrir",
           "other": "Fermer"
         }
+      },
+      "air-conditioning": {
+        "mode": {
+          "auto": "Auto",
+          "cooling": "Clim.",
+          "heating": "Chauffage"
+        }
       }
     }
   },
@@ -1937,6 +2056,17 @@
       }
     },
     "category": {
+      "button": {
+        "click": {
+          "unknown": "{{value}} (valeur inconnue)",
+          "1": "Clic simple",
+          "2": "Clic double",
+          "3": "Pression clic long",
+          "4": "Relâche clic long",
+          "5": "Clic maintenu",
+          "6": "Clic long"
+        }
+      },
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
@@ -2025,11 +2155,11 @@
       "decimal": "Valeur de fumée décimale"
     },
     "co-sensor": {
-      "shortCategoryName": "Capteur de monxyde de carbon (CO)",
+      "shortCategoryName": "Capteur de monoxyde de carbone (CO)",
       "binary": "Détection de CO"
     },
     "co2-sensor": {
-      "shortCategoryName": "Capteur de Co2",
+      "shortCategoryName": "Capteur de dioxyde de carbone (Co2)",
       "decimal": "Niveau de CO2"
     },
     "switch": {
@@ -2064,12 +2194,16 @@
       "binary": "Fuite (Oui/Non)"
     },
     "opening-sensor": {
-      "shortCategoryName": "Capteur d'ouverture",
+      "shortCategoryName": "Détecteur d'ouverture",
       "binary": "Ouverture (Oui/Non)"
     },
     "humidity-sensor": {
       "shortCategoryName": "Capteur d'humidité",
       "decimal": "Humidité (pourcentage)"
+    },
+    "soil-moisture-sensor": {
+      "shortCategoryName": "Capteur d'humidité du sol",
+      "decimal": "Humidité du sol (decimal)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
@@ -2084,6 +2218,12 @@
     "signal": {
       "shortCategoryName": "Signal",
       "integer": "Intensité du signal"
+    },
+    "air-conditioning": {
+      "shortCategoryName": "Climatisation",
+      "binary": "Commutateur",
+      "mode": "Mode",
+      "target-temperature": "Température"
     },
     "television": {
       "shortCategoryName": "Télévision",
@@ -2122,7 +2262,8 @@
       "binary": "Relais",
       "power": "Puissance",
       "energy": "Energie",
-      "index": "Index"
+      "index": "Index",
+      "daily-consumption": "Consommation journalière"
     },
     "volume-sensor": {
       "shortCategoryName": "Capteur de volume",
@@ -2177,6 +2318,10 @@
       "target-temperature": "Température de consigne",
       "mode": "Mode"
     },
+    "airquality-sensor": {
+      "shortCategoryName": "Qualité de l'air",
+      "aqi": "Indice de qualité de l'air"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"
@@ -2194,6 +2339,9 @@
     "sendingInProgress": "Envoi en cours ...",
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
+    "gpt3Integration": "Intégration avec ChatGPT",
+    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec ChatGPT, ce qui lui donne une intelligence sur-dimensionné ! Pour en savoir plus,",
+    "gpt3ClickHere": "cliquez-ici !",
     "examples": {
       "whatsTheWeatherLike": "\"Quel temps fait-il ?\"",
       "whatsTheTemperatureKitchen": "\"Quelle est la température dans la cuisine ?\"",
@@ -2235,6 +2383,7 @@
     "externalIdPlaceholder": "Entrez une ID externe",
     "unitLabel": "Unité",
     "saveButton": "Sauvegarder",
+    "deleteButton": "Supprimer",
     "externalIdMessage": "L'ID externe de la fonctionnalité est un ID unique qui vous aide à identifier cette fonctionnalité en dehors de Gladys, par exemple lors de l'appel de l'API.",
     "minLabel": "Valeur minimum",
     "minPlaceholder": "Entrez la valeur minimum",
@@ -2370,6 +2519,14 @@
     "title": "Facturation",
     "informationTitle": "Vos informations de paiement",
     "stripeDescription": "Le paiement est géré par Stripe. Nous ne voyons jamais votre carte de crédit.",
-    "stripeButton": "Gérer la facturation dans Stripe"
+    "stripeButton": "Gérer la facturation dans Stripe",
+    "yourCurrentPlan": "Votre plan actuel",
+    "monthlyPlan": "Vous êtes actuellement en paiement mensuel. Si vous souhaitez passer au plan annuel ( 99.99€/an ), vous pouvez cliquer sur le bouton ci-dessous. Si vous êtes en cours d'un mois, le prix du premier paiement annuel sera fait au pro-rata pour vous éviter de payer plusieurs fois le mois en cours !",
+    "yearlyPlan": "Vous êtes actuellement en paiement annuel.",
+    "upgradeToYearly": "Passer au plan annuel",
+    "confirmUpgradeToYearly": "Confirmer le passage au plan annuel ? Votre moyen de paiement sera débité.",
+    "cancelUpgradeToYearly": "Annuler",
+    "upgradeYearlyError": "Une erreur est survenue lors de la mise à jour vers le plan annuel, merci de nous contacter par email ou sur le forum.",
+    "upgradeYearlySuccess": "Merci d'être passé au plan annuel !"
   }
 }

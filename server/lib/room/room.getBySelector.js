@@ -21,9 +21,10 @@ const DEVICE_FEATURES_ATTRIBUTES = [
 const SERVICE_ATTRIBUTES = ['name'];
 
 /**
- * @description Get a room by selector
+ * @description Get a room by selector.
  * @param {string} selector - The selector of the room.
- * @param {Object} [options] - Options of the query.
+ * @param {object} [options] - Options of the query.
+ * @returns {Promise<object>} Resolve with room.
  * @example
  * gladys.room.getBySelector('living-room');
  */

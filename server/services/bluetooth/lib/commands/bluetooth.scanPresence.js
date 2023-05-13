@@ -3,6 +3,7 @@ const { DEVICE_FEATURE_CATEGORIES, EVENTS } = require('../../../../utils/constan
 
 /**
  * @description Scan periodically for device presence.
+ * @returns {Promise} Resolve when scan finished.
  * @example
  * await this.scanPresence();
  */

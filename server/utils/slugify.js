@@ -1,5 +1,5 @@
 /**
- * @description Transform a string to a valid slug (useful for selector)
+ * @description Transform a string to a valid slug (useful for selector).
  * @param {string} str - The string to transform.
  * @returns {string} Return the slug.
  * @example

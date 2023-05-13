@@ -1,5 +1,9 @@
 import { Component, createRef } from 'preact';
 import ApexCharts from 'apexcharts';
+
+import fr from 'apexcharts/dist/locales/fr.json';
+import en from 'apexcharts/dist/locales/en.json';
+
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { getApexChartBarOptions } from './ApexChartBarOptions';
@@ -38,7 +42,9 @@ class ApexChartComponent extends Component {
     const options = getApexChartBarOptions({
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      COLORS
+      COLORS,
+      locales: [fr, en],
+      defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
     return options;
@@ -56,7 +62,9 @@ class ApexChartComponent extends Component {
       height,
       series: this.props.series,
       displayAxes: this.props.display_axes,
-      COLORS
+      COLORS,
+      locales: [fr, en],
+      defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
 
@@ -75,7 +83,9 @@ class ApexChartComponent extends Component {
       height,
       COLORS,
       displayAxes: this.props.display_axes,
-      series: this.props.series
+      series: this.props.series,
+      locales: [fr, en],
+      defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
     return options;
@@ -93,7 +103,9 @@ class ApexChartComponent extends Component {
       height,
       COLORS,
       displayAxes: this.props.display_axes,
-      series: this.props.series
+      series: this.props.series,
+      locales: [fr, en],
+      defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
     return options;

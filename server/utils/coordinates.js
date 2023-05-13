@@ -1,6 +1,5 @@
 /**
  * ToRad.
- *
  * @description Convert degrees to radian.
  * @param {number} value - Value in degree.
  * @returns {number} Returns value in radian.

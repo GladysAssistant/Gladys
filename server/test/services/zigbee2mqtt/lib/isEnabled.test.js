@@ -2,7 +2,15 @@ const { expect } = require('chai');
 
 const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
-const gladys = {};
+const gladys = {
+  job: {
+    wrapper: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
+  },
+};
 const mqttLibrary = {};
 const serviceId = '625a8a9a-aa9d-474f-8cec-0718dd4ade04';
 

@@ -3,8 +3,8 @@ const { STATE, EVENTS } = require('../../../utils/constants');
 
 /**
  * @description TurnOff a given deviceFeature.
- * @param {Object} device - The device to turnOff.
- * @param {Object} deviceFeature - The deviceFeature to turnOff.
+ * @param {object} device - The device to turnOff.
+ * @param {object} deviceFeature - The deviceFeature to turnOff.
  * @example
  * light.turnOff(device, deviceFeature);
  */

@@ -3,8 +3,8 @@ const { FEATURE_TEMPLATES } = require('./features');
 
 /**
  * @description Send the new device value over device protocol.
- * @param {Object} device - Updated Gladys device.
- * @param {Object} deviceFeature - Updated Gladys device feature.
+ * @param {object} device - Updated Gladys device.
+ * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
  * @example
  * setValue(device, deviceFeature, 0);

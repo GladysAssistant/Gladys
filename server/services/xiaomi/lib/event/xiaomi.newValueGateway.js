@@ -8,8 +8,8 @@ const {
 
 /**
  * @description Add Xiaomi Gateway.
- * @param {Object} message - Message received.
- * @param {Object} data - Data received.
+ * @param {object} message - Message received.
+ * @param {object} data - Data received.
  * @example
  * newValueGateway({ sid: 34344 }, {
  *    status: 1

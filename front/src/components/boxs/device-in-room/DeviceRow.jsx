@@ -9,7 +9,11 @@ import MultiLevelDeviceFeature from './device-features/MultiLevelDeviceFeature';
 import NumberDeviceFeature from './device-features/NumberDeviceFeature';
 import CoverDeviceFeature from './device-features/CoverDeviceFeature';
 import ThermostatDeviceFeature from './device-features/ThermostatDeviceFeature';
+<<<<<<< HEAD
 import ThermostatModeDeviceFeature from './device-features/ThermostatModeDeviceFeature';
+=======
+import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
+>>>>>>> 93baf60bd1a494649413ef2e51d4d4c0f3d0750a
 
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
@@ -24,7 +28,12 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: CoverDeviceFeature,
   [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: ThermostatDeviceFeature,
+<<<<<<< HEAD
   [DEVICE_FEATURE_TYPES.THERMOSTAT.MODE]: ThermostatModeDeviceFeature
+=======
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature,
+  [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: ThermostatDeviceFeature
+>>>>>>> 93baf60bd1a494649413ef2e51d4d4c0f3d0750a
 };
 
 const DeviceRow = ({ children, ...props }) => {

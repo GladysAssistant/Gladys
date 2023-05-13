@@ -6,7 +6,8 @@ const { EVENTS } = require('../../utils/constants');
  * @public
  * @description Update a house.
  * @param {string} selector - The selector of the use to update.
- * @param {Object} newHouse - The object to update.
+ * @param {object} newHouse - The object to update.
+ * @returns {Promise<object>} Resolve with updated house.
  * @example
  * gladys.house.update('my-house', {
  *    name: 'my-new-name'

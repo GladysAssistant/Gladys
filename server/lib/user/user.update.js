@@ -5,7 +5,7 @@ const passwordUtils = require('../../utils/password');
 /**
  * @description Update a user.
  * @param {string} userId - The user id to update.
- * @param {Object} newUser - The new user.
+ * @param {object} newUser - The new user.
  * @returns {Promise} Return the updated user.
  * @example
  * gladys.user.update('184515e8-27c0-45c3-97f5-f5e7d14aecce', {

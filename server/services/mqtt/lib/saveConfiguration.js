@@ -15,11 +15,12 @@ const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
 
 /**
  * @description Save MQTT configuration.
- * @param {Object} configuration - MQTT configuration.
+ * @param {object} configuration - MQTT configuration.
  * @param {string} [configuration.mqttUrl] - MQTT URL.
  * @param {string} [configuration.mqttUsername] - MQTT username.
  * @param {string} [configuration.mqttPassword] - MQTT password.
  * @param {boolean} [configuration.useEmbeddedBroker] - MQTT embedded broker.
+ * @returns {Promise} Resolve when configuration updated & connected.
  * @example
  * saveConfiguration(configuration);
  */
@@ -51,14 +52,14 @@ async function saveConfiguration({ mqttUrl, mqttUsername, mqttPassword, useEmbed
     if (oldUser) {
       // Delete old user
       await this.gladys.system.exec(container.id, {
-        Cmd: ['mosquitto_passwd', '-D', '/mosquitto/config/mosquitto.passwd', oldUser],
+        Cmd: ['mosquitto_passwd', '-D', DEFAULT.PASSWORD_FILE_PATH, oldUser],
       });
     }
 
     if (mqttUsername) {
       // Generate password
       await this.gladys.system.exec(container.id, {
-        Cmd: ['mosquitto_passwd', '-b', '/mosquitto/config/mosquitto.passwd', mqttUsername, mqttPassword],
+        Cmd: ['mosquitto_passwd', '-b', DEFAULT.PASSWORD_FILE_PATH, mqttUsername, mqttPassword],
       });
     }
 

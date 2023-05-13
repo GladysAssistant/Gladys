@@ -2,8 +2,18 @@ const { lstatSync, readdirSync, readFileSync, existsSync } = require('fs');
 const { join } = require('path');
 const { expect } = require('chai');
 
+const gladys = {
+  job: {
+    wrapper: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
+  },
+};
+
 /**
- * Verify that all services follow the requirements
+ * Verify that all services follow the requirements.
  */
 describe('services', () => {
   const isDirectory = (source) => lstatSync(source).isDirectory();
@@ -32,7 +42,7 @@ describe('services', () => {
         expect(indexFileExist).to.be.true; // eslint-disable-line
       });
       const index = require(indexFilePath); // eslint-disable-line
-      const service = index({}, 'd07bf09b-2846-4c94-8191-026ba7d62bf0');
+      const service = index(gladys, 'd07bf09b-2846-4c94-8191-026ba7d62bf0');
       it('index.js should expose start function', () => {
         expect(service).to.have.property('start');
         expect(service.start).to.be.instanceOf(Function);

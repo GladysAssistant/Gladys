@@ -7,10 +7,6 @@ import actions from '../../../actions/system';
 import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
 import { RequestStatus } from '../../../utils/consts';
 
-@connect(
-  'httpClient,session,systemPing,systemInfos,systemDiskSpace,systemContainers,downloadUpgradeProgress,downloadUpgradeStatus',
-  actions
-)
 class SettingsSystem extends Component {
   updateTimezone = async option => {
     this.setState({
@@ -130,4 +126,7 @@ class SettingsSystem extends Component {
   }
 }
 
-export default SettingsSystem;
+export default connect(
+  'httpClient,session,systemPing,systemInfos,systemDiskSpace,systemContainers,downloadUpgradeProgress,downloadUpgradeStatus',
+  actions
+)(SettingsSystem);

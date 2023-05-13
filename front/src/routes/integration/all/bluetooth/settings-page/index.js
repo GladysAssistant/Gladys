@@ -5,7 +5,6 @@ import BluetoothPage from '../BluetoothPage';
 import BluetoothSettingsTab from './BluetoothSettingsTab';
 import actions from '../commons/actions';
 
-@connect('user,httpClient,bluetoothStatus', actions)
 class BluetoothSettingsPage extends Component {
   render(props) {
     return (
@@ -16,4 +15,4 @@ class BluetoothSettingsPage extends Component {
   }
 }
 
-export default BluetoothSettingsPage;
+export default connect('user,httpClient,bluetoothStatus', actions)(BluetoothSettingsPage);

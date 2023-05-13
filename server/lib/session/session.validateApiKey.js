@@ -4,7 +4,7 @@ const { Error401 } = require('../../utils/httpErrors');
 const { hashRefreshToken } = require('../../utils/refreshToken');
 
 /**
- * @description Validate an API key
+ * @description Validate an API key.
  * @param {string} apiKey - The api key of the user.
  * @param {Array} scope - The scope to allow.
  * @returns {Promise} Resolving with userId.

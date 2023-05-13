@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 
 /**
- * @description Connect telegram API
+ * @description Connect telegram API.
  * @param {string} token - Telegram API token.
  * @example
  * connect('test');

@@ -6,7 +6,6 @@ import ShareTab from './ShareTab';
 import { RequestStatus } from '../../../../../utils/consts';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
-@connect('gladysUsers,caldavCalendars,caldavSaveSharingStatus,caldavGetSettingsStatus,calendarsSharing', actions)
 class SharePage extends Component {
   componentWillMount() {
     this.props.getCaldavSetting();
@@ -24,4 +23,9 @@ class SharePage extends Component {
   }
 }
 
-export default withIntlAsProp(SharePage);
+export default withIntlAsProp(
+  connect(
+    'gladysUsers,caldavCalendars,caldavSaveSharingStatus,caldavGetSettingsStatus,calendarsSharing',
+    actions
+  )(SharePage)
+);

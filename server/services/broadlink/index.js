@@ -8,7 +8,7 @@ module.exports = function BroadlinkService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts service
+   * @description This function starts service.
    * @example
    * gladys.services.broadlink.start();
    */
@@ -19,7 +19,7 @@ module.exports = function BroadlinkService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    *  gladys.services.broadlink.stop();
    */

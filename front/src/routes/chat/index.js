@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import ChatPage from './ChatPage';
 import actions from '../../actions/message';
 
-@connect('session', actions)
 class Chat extends Component {
   newChatMessage = payload => this.props.pushMessage(payload);
   syncChatMessage = payload => this.props.syncMessage(payload);
@@ -24,4 +23,4 @@ class Chat extends Component {
   }
 }
 
-export default Chat;
+export default connect('session', actions)(Chat);

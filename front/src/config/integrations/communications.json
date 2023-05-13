@@ -14,5 +14,9 @@
   {
     "key": "homekit",
     "img": "/assets/integrations/cover/homekit.jpg"
+  },
+  {
+    "key": "openai",
+    "img": "/assets/integrations/cover/openai.jpg"
   }
 ]

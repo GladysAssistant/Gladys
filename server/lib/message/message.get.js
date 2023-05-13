@@ -10,9 +10,10 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * @description Get messages of a user
+ * @description Get messages of a user.
  * @param {string} userId - The id of the user.
- * @param {Object} options - Options of the request.
+ * @param {object} options - Options of the request.
+ * @returns {Promise<Array>} Resolve with list of messages.
  * @example
  * gladys.message.get('f6cc6e0c-1b48-4b59-8ac7-9a0ad2e0ed3c', options);
  */
