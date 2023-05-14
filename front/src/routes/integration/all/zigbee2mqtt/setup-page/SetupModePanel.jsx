@@ -28,7 +28,7 @@ const SetupModePanel = ({
   }
 
   return (
-    <div class="card-deck" data-cy="z2m-setup-local-panel">
+    <div class="card-deck">
       <SetupLocalModeCard
         dockerBased={dockerBased}
         networkModeValid={networkModeValid}

@@ -6,19 +6,14 @@ class InstallationCard extends Component {
     this.props.selectSetupMode(this.props.setupMode);
   };
 
-  render({ title, children, disabled }) {
+  render({ dataCy, title, children, disabled }) {
     return (
-      <div class="card bg-light">
+      <div class="card bg-light" data-cy={dataCy}>
         <div class="card-body d-flex flex-column">
           <h3 class="card-title">{title}</h3>
           <div class="card-text">{children}</div>
           <div class="mt-auto">
-            <button
-              class="btn btn-primary btn-sm float-right mt-3"
-              disabled={disabled}
-              onClick={this.selectSetupMode}
-              data-cy="z2m-setup-select-local"
-            >
+            <button class="btn btn-primary btn-sm float-right mt-3" disabled={disabled} onClick={this.selectSetupMode}>
               <Text id="integration.zigbee2mqtt.setup.selectInstallationMode" />
             </button>
           </div>

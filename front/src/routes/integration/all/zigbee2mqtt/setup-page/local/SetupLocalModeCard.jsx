@@ -10,6 +10,7 @@ const SetupLocalModeCard = ({ dockerBased, networkModeValid, usbConfigured, disa
     disabled={!dockerBased || !networkModeValid || disabled}
     setupMode={SETUP_MODES.LOCAL}
     selectSetupMode={selectSetupMode}
+    dataCy="z2m-setup-local-panel"
   >
     <p>
       <Text id="integration.zigbee2mqtt.setup.modes.local.description" />

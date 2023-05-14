@@ -1,4 +1,4 @@
-import { Component } from 'preact';
+import { Component, Fragment } from 'preact';
 import { MarkupText, Text } from 'preact-i18n';
 
 import { RequestStatus } from '../../../../../../utils/consts';
@@ -32,32 +32,41 @@ class EnableStatus extends Component {
     }
   }
 
-  render({ disabled, loadZigbee2mqttStatus }, { z2mEnabled }) {
+  render({ disabled, loadZigbee2mqttStatus, toggleZigee2mqttStatus }, { z2mEnabled }) {
     return (
-      <div class="d-flex flex-row">
-        <div class="form-group">
-          <label for="enableZigbee2mqtt" class="form-label">
-            <Text id="integration.zigbee2mqtt.setup.enableLabel" />
-          </label>
-          <small class="form-text">
-            <MarkupText id="integration.zigbee2mqtt.setup.enableDescription" />
-          </small>
+      <Fragment>
+        <div class="d-flex flex-row">
+          <div class="form-group">
+            <label for="enableZigbee2mqtt" class="form-label">
+              <Text id="integration.zigbee2mqtt.setup.enableLabel" />
+            </label>
+            <small class="form-text">
+              <MarkupText id="integration.zigbee2mqtt.setup.enableDescription" />
+            </small>
+          </div>
+          <div class="ml-auto mr-3">
+            <label class="custom-switch">
+              <input
+                type="checkbox"
+                id="enableZigbee2mqtt"
+                name="enableZigbee2mqtt"
+                class="custom-switch-input"
+                checked={z2mEnabled}
+                onClick={this.toggleZ2M}
+                disabled={disabled || loadZigbee2mqttStatus === RequestStatus.Error}
+              />
+              <span class="custom-switch-indicator" />
+            </label>
+          </div>
         </div>
-        <div class="ml-auto mr-3">
-          <label class="custom-switch">
-            <input
-              type="checkbox"
-              id="enableZigbee2mqtt"
-              name="enableZigbee2mqtt"
-              class="custom-switch-input"
-              checked={z2mEnabled}
-              onClick={this.toggleZ2M}
-              disabled={disabled || loadZigbee2mqttStatus === RequestStatus.Error}
-            />
-            <span class="custom-switch-indicator" />
-          </label>
+        <div>
+          {toggleZigee2mqttStatus === RequestStatus.Error && (
+            <div class="alert alert-danger my-3" data-cy="z2m-setup-save-error">
+              <Text id="integration.zigbee2mqtt.setup.toggleError" />
+            </div>
+          )}
         </div>
-      </div>
+      </Fragment>
     );
   }
 }

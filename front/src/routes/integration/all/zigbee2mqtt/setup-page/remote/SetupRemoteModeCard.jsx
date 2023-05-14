@@ -10,6 +10,7 @@ const SetupRemoteModeCard = ({ selectSetupMode, disabled }) => (
     disabled={disabled}
     setupMode={SETUP_MODES.REMOTE}
     selectSetupMode={selectSetupMode}
+    dataCy="z2m-setup-remote-panel"
   >
     <p>
       <Text id="integration.zigbee2mqtt.setup.modes.remote.description" />

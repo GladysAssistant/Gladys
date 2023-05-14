@@ -4,6 +4,7 @@ import get from 'get-value';
 
 import { RequestStatus } from '../../../../../../utils/consts';
 import Select from 'react-select';
+import SubmitConfiguration from '../components/SubmitConfiguration';
 
 class SetupLocalOptions extends Component {
   updateZigbeeDriverPath = option => {
@@ -24,11 +25,15 @@ class SetupLocalOptions extends Component {
 
   saveConfiguration = () => {
     const { z2mDriverPath, z2mDongleName, z2mTcpPort } = this.state;
-    this.props.saveConfiguration({ z2mDriverPath, z2mDongleName, z2mTcpPort: z2mTcpPort ? z2mTcpPort : 0 });
+    this.props.saveConfiguration({ z2mDriverPath, z2mDongleName, z2mTcpPort });
   };
 
   resetConfiguration = () => {
-    this.props.disableEditionMode();
+    const { configuration } = this.props;
+    const { z2mDriverPath, z2mDongleName, z2mTcpPort } = configuration;
+
+    this.setState({ z2mDriverPath, z2mDongleName, z2mTcpPort });
+    this.props.resetConfiguration();
   };
 
   loadUsbPorts = async () => {
@@ -102,7 +107,7 @@ class SetupLocalOptions extends Component {
       z2mDongleName,
       zigbeeAdapters: [],
       loadZigbeeAdaptersStatus: RequestStatus.Getting,
-      z2mTcpPort: z2mTcpPort === 0 ? null : z2mTcpPort
+      z2mTcpPort
     };
   }
 
@@ -112,7 +117,7 @@ class SetupLocalOptions extends Component {
   }
 
   render(
-    {},
+    { disabled },
     { z2mDriverPath, usbPorts, loadUsbPortsStatus, z2mDongleName, zigbeeAdapters, loadZigbeeAdaptersStatus, z2mTcpPort }
   ) {
     return (
@@ -192,21 +197,12 @@ class SetupLocalOptions extends Component {
             <Text id="integration.zigbee2mqtt.setup.modes.local.z2mTcpPortDescription" />
           </small>
         </div>
-        <div class="form-group d-flex">
-          <button
-            class="btn btn-success mx-auto"
-            onClick={this.saveConfiguration}
-            disabled={!z2mDriverPath}
-            data-cy="z2m-setup-local-save"
-          >
-            <i class="fe fe-check mr-2" />
-            <Text id="integration.zigbee2mqtt.setup.continueLabel" />
-          </button>
-          <button class="btn btn-primary mx-auto" onClick={this.resetConfiguration} data-cy="z2m-setup-local-reset">
-            <i class="fe fe-rotate-ccw mr-2" />
-            <Text id="integration.zigbee2mqtt.setup.resetLabel" />
-          </button>
-        </div>
+        <SubmitConfiguration
+          saveDisabled={!z2mDriverPath}
+          disabled={disabled}
+          saveConfiguration={this.saveConfiguration}
+          resetConfiguration={this.resetConfiguration}
+        />
       </div>
     );
   }

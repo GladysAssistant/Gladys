@@ -71,7 +71,7 @@ class Zigbee2mqttSetupPage extends Component {
 
   toggleZ2M = async enable => {
     this.setState({
-      setupZigee2mqttStatus: RequestStatus.Getting
+      toggleZigee2mqttStatus: RequestStatus.Getting
     });
 
     try {
@@ -81,12 +81,12 @@ class Zigbee2mqttSetupPage extends Component {
         await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/disconnect');
       }
       this.setState({
-        setupZigee2mqttStatus: RequestStatus.Success
+        toggleZigee2mqttStatus: RequestStatus.Success
       });
     } catch (e) {
       console.error(e);
       this.setState({
-        setupZigee2mqttStatus: RequestStatus.Error
+        toggleZigee2mqttStatus: RequestStatus.Error
       });
     }
   };

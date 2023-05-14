@@ -16,19 +16,23 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
                   <td class="pr-4">
                     <Text id="integration.zigbee2mqtt.setup.modes.local.summary.usbPort" />
                   </td>
-                  <td class="text-muted">{z2mDriverPath}</td>
+                  <td class="text-muted" data-cy="z2m-setup-local-usb-summary">
+                    {z2mDriverPath}
+                  </td>
                 </tr>
                 <tr>
                   <td class="pr-4">
                     <Text id="integration.zigbee2mqtt.setup.modes.local.summary.dongleName" />
                   </td>
-                  <td class="text-muted">{z2mDongleName}</td>
+                  <td class="text-muted" data-cy="z2m-setup-local-dongle-summary">
+                    {z2mDongleName}
+                  </td>
                 </tr>
                 <tr>
                   <td class="pr-4">
                     <Text id="integration.zigbee2mqtt.setup.modes.local.summary.tcpPort" />
                   </td>
-                  <td class="text-muted">
+                  <td class="text-muted" data-cy="z2m-setup-local-tcp-summary">
                     {z2mTcpPort}
                     {!z2mTcpPort && <Text id="integration.zigbee2mqtt.setup.modes.local.summary.randomTcpPort" />}
                   </td>
