@@ -101,6 +101,40 @@ describe('LANManager scan', () => {
     });
   });
 
+  it('scan devices cancel', async () => {
+    manager.configured = true;
+    manager.ipMasks = [
+      { mask: '255.255.255.248/29', enabled: true },
+      { mask: '192.168.0.1/10', enabled: false },
+    ];
+
+    NmapScan.prototype.on.onCall(0).yieldsRight('Scan cancelled');
+
+    const result = await manager.scan();
+
+    expect(manager.scanning).to.equal(false);
+    expect(result).deep.equal([]);
+
+    assert.calledWithNew(NmapScan);
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+      payload: {
+        scanning: true,
+        configured: true,
+      },
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+      payload: {
+        scanning: false,
+        configured: true,
+        deviceChanged: false,
+        success: true,
+      },
+    });
+  });
+
   it('already scanning', async () => {
     manager.scanning = true;
 

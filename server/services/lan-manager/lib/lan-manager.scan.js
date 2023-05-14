@@ -45,10 +45,11 @@ async function scan() {
 
     const result = await new Promise((resolve) => {
       const onError = (err) => {
-        if (err !== 'Scan cancelled') {
+        const cancelled = err === 'Scan cancelled';
+        if (!cancelled) {
           logger.error('LANManager fails to discover devices over network -', err);
         }
-        scanDone([], false);
+        scanDone([], cancelled);
         return resolve([]);
       };
 
