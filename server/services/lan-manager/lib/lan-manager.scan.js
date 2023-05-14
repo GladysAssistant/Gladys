@@ -33,7 +33,15 @@ async function scan() {
       let deviceChanged = false;
       if (nbDevices > 0) {
         deviceChanged = this.discoveredDevices.length !== nbDevices;
-        this.discoveredDevices = discoveredDevices;
+        // Filter unique MAC
+        const filteredDevices = {};
+        discoveredDevices.forEach((device) => {
+          const { mac } = device;
+          if (mac && mac.length > 0) {
+            filteredDevices[mac] = device;
+          }
+        });
+        this.discoveredDevices = Object.values(filteredDevices);
       }
 
       this.scanning = false;
