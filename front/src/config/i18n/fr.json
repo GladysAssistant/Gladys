@@ -268,6 +268,7 @@
         "latencyBoxDescription": "Plus vous sélectionnez une latence basse, et plus vite le live démarrera. Néanmoins, pour avoir une latence basse, il faut une connexion internet très rapide et avec un minimum de ping sinon la vidéo sera saccadée. Nous conseillons une latence moyenne ou basse.",
         "liveStartError": "Une erreur est survenue en démarrant le streaming. Est-ce que l'URL de votre caméra est bien une URL d'un flux vidéo et pas une image ?",
         "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est malheureusement pas disponible sur Safari iPhone. Etrangement, cette fonctionnalité est disponible sur Safari iPad et MacOS... Il faudra s'armer de patience, espérons que l'API arrive vite sur iPhone !",
+        "tooManyRequests": "Vous avez atteint votre limite mensuelle de bande passante vidéo. Contactez-nous par email ou sur le forum pour avoir plus de bande passante !",
         "liveAutoStartLabel": "Lancer automatiquement le streaming",
         "liveAutoStartDescription": "Attention: Cette option peut augmenter la charge sur votre machine/réseau.",
         "latency": {
@@ -662,6 +663,9 @@
         "title": "Paramétrage du dongle USB Zigbee2mqtt",
         "description": "Pour utiliser Zigbee2mqtt avec Gladys, il faut insérer un dongle USB Zigbee2mqtt.",
         "zigbee2mqttUsbDriverPathLabel": "Sélectionner le port USB sur lequel le dongle Zigbee2mqtt est inséré",
+        "zigbee2mqttUsbDriverPathPlaceholder": "Port USB",
+        "zigbee2mqttUsbDongleNameLabel": "Sélectionner le modèle du dongle Zigbee utilisé",
+        "zigbee2mqttUsbDongleNamePlaceholder": "Modèle du dongle Zigbee",
         "saveButton": "Sauvegarde",
         "refreshButton": "Rafraîchir la liste des appareils USB",
         "notAttached": "Aucun dongle USB Zigbee2mqtt n'est attaché à Gladys.",
