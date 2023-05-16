@@ -6,7 +6,6 @@ import { RequestStatus } from '../../../../../../utils/consts';
 import ConfigurePeripheralSuccess from './ConfigurePeripheralSuccess';
 import ConfigurePeripheralForm from './ConfigurePeripheralForm';
 
-@connect('bluetoothSaveStatus', actions)
 class ConfigurePeripheral extends Component {
   componentDidMount() {
     this.props.resetSaveStatus();
@@ -33,4 +32,4 @@ class ConfigurePeripheral extends Component {
   }
 }
 
-export default ConfigurePeripheral;
+export default connect('bluetoothSaveStatus', actions)(ConfigurePeripheral);

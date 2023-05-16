@@ -13,7 +13,7 @@ const { parseExternalId } = require('../utils/externalId');
 /**
  *
  * @description Poll values of an eWeLink device.
- * @param {Object} device - The device to poll.
+ * @param {object} device - The device to poll.
  * @returns {Promise} Promise of nothing.
  * @example
  * poll(device);

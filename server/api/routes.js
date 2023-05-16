@@ -22,8 +22,8 @@ const WeatherController = require('./controllers/weather.controller');
 
 /**
  * @description Return object of routes.
- * @param {Object} gladys - Gladys object.
- * @returns {Object} Return object of routes.
+ * @param {object} gladys - Gladys object.
+ * @returns {object} Return object of routes.
  * @example
  * getRoutes(gladys);
  */

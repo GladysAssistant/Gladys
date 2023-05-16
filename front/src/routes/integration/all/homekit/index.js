@@ -4,7 +4,6 @@ import actions from './actions';
 import HomeKitPage from './HomeKit';
 import { RequestStatus } from '../../../../utils/consts';
 
-@connect('user,homekitSetupDataUrl,homkitGetSettingsStatus,homekitReloadStatus', actions)
 class HomeKitIntegration extends Component {
   componentWillMount() {
     this.props.getHomeKitSettings();
@@ -17,4 +16,7 @@ class HomeKitIntegration extends Component {
   }
 }
 
-export default HomeKitIntegration;
+export default connect(
+  'user,homekitSetupDataUrl,homkitGetSettingsStatus,homekitReloadStatus',
+  actions
+)(HomeKitIntegration);

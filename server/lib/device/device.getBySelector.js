@@ -3,6 +3,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
 /**
  * @description Get a device by selector.
  * @param {string} selector - Device selector.
+ * @returns {Promise<object>} Resolve with device.
  * @example
  * device.getBySelector('test-devivce');
  */

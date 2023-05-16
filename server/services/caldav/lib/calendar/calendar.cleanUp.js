@@ -3,7 +3,7 @@ const logger = require('../../../../utils/logger');
 
 /**
  * @description Delete all CalDAV calendars and events.
- * @param {Object} userId - Gladys user to clean up.
+ * @param {object} userId - Gladys user to clean up.
  * @returns {Promise} Resolving with client connected.
  * @example
  * cleanUp(user.id)

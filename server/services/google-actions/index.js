@@ -6,7 +6,7 @@ module.exports = function GoogleActionsService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts service
+   * @description This function starts service.
    * @example
    * gladys.services['google-actions'].start();
    */
@@ -16,7 +16,7 @@ module.exports = function GoogleActionsService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    *  gladys.services['google-actions'].stop();
    */

@@ -4,7 +4,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import { Text } from 'preact-i18n';
 
-@connect('user,session,mqttStatusConnected,mqttStatusConfigured,mqttStatusLoaded', actions)
 class CheckMqttPanel extends Component {
   componentWillMount() {
     this.props.checkStatus();
@@ -35,4 +34,7 @@ class CheckMqttPanel extends Component {
   }
 }
 
-export default CheckMqttPanel;
+export default connect(
+  'user,session,mqttStatusConnected,mqttStatusConfigured,mqttStatusLoaded',
+  actions
+)(CheckMqttPanel);

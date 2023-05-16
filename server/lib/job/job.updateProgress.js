@@ -5,7 +5,7 @@ const logger = require('../../utils/logger');
 
 /**
  * @public
- * @description Finish a job
+ * @description Finish a job.
  * @param {string} id - Id of the job.
  * @param {number} progress - Progress of the job in percent.
  * @returns {Promise} Return updated job.

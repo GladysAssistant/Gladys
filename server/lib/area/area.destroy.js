@@ -4,6 +4,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
 /**
  * @description Delete an area.
  * @param {string} selector - Area selector.
+ * @returns {Promise} Resolve when area is deleted.
  * @example
  * gladys.area.destroy('my-area');
  */

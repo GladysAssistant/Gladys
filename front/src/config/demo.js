@@ -183,7 +183,15 @@ const data = {
         {
           type: 'devices-in-room',
           room: 'parental-room',
-          device_features: ['curtain-actions', 'shutter-actions', 'shutter-position', 'thermostat']
+          device_features: [
+            'curtain-actions',
+            'shutter-actions',
+            'shutter-position',
+            'thermostat',
+            'water-leak',
+            'smoke-sensor',
+            'light-sensor'
+          ]
         }
       ]
     ],
@@ -600,6 +608,46 @@ const data = {
     name: 'Parental Room',
     selector: 'parental-room',
     devices: [
+      {
+        id: 'f131fbf2-445a-4c2c-9426-83abaf534662',
+        name: 'Room sensors',
+        selector: 'room-sensors',
+        features: [
+          {
+            name: 'Water Leak',
+            selector: 'water-leak',
+            category: 'leak-sensor',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+          },
+          {
+            name: 'Smoke sensor',
+            selector: 'smoke-sensor',
+            category: 'smoke-sensor',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+          },
+          {
+            name: 'Light sensor',
+            selector: 'light-sensor',
+            category: 'light-sensor',
+            type: 'binary',
+            min: 0,
+            max: 1,
+            read_only: true,
+            last_value: 1,
+            last_value_changed: '2023-01-23 08:50:06.556 +00:00'
+          }
+        ]
+      },
       {
         id: 'cb3b1a30-d1b6-4624-ac18-e581e3e3b00f',
         name: 'Main curtain',
@@ -1194,11 +1242,14 @@ const data = {
   ],
   'get /api/v1/service/usb/port': [
     {
-      comName: '/dev/tty.usbmodem145301',
-      serialNumber: 'f75ab720-bbb3-4a1c-8729-84aa02ebdca0',
-      locationId: '14530000',
-      vendorId: '0658',
-      productId: '0200'
+      comPath: '/dev/ttyUSB0',
+      comVID: '0658',
+      comName: '0200'
+    },
+    {
+      comPath: '/dev/ttyUSB1',
+      comVID: '0478',
+      comName: '0910'
     }
   ],
   'get /api/v1/area': [
@@ -1705,7 +1756,34 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH': {},
+  'get /api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH': {
+    name: 'ZIGBEE2MQTT_DRIVER_PATH',
+    value: '/dev/ttyUSB0'
+  },
+  'get /api/v1/service/zigbee2mqtt/variable/ZIGBEE_DONGLE_NAME': {
+    name: 'ZIGBEE_DONGLE_NAME',
+    value: 'Electrolama zig-a-zig-ah! (zzh!)'
+  },
+  'get /api/v1/service/zigbee2mqtt/adapter': [
+    'ConBee',
+    'ConBee II',
+    'RaspBee',
+    'RaspBee II',
+    'SONOFF Zigbee 3.0 USB Dongle Plus ZBDongle-P',
+    "Slaesh's CC2652RB stick",
+    'SMLIGHT CC2652P Zigbee USB Adapter SLZB-02',
+    'SMLIGHT SLZB-06 Zigbee ethernet USB POE WiFi LAN adapter',
+    'SMLIGHT Zigbee LAN Adapter CC2652P Model SLZB-05',
+    'Vision CC2538+CC2592 Dongle(VS203)',
+    'Vision CC2652 dongle',
+    'XGG Gateway',
+    'XGG 52PZ2MGateway',
+    'ZigStar LAN Coordinator',
+    'ZigStar PoE Coordinator',
+    'ZigStar Stick v4',
+    'ZigStar ZigiHAT PoE'
+  ],
+  'post /api/v1/service/zigbee2mqtt/setup': {},
   'get /api/v1/service/zigbee2mqtt/status': {
     usbConfigured: true,
     mqttExist: true,

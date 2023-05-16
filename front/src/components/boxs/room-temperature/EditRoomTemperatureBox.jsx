@@ -23,7 +23,6 @@ const EditRoomTemperatureBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('', {})
 class EditRoomTemperatureBoxComponent extends Component {
   updateBoxRoom = (x, y, room) => {
     this.props.updateBoxConfig(x, y, {
@@ -35,4 +34,4 @@ class EditRoomTemperatureBoxComponent extends Component {
   }
 }
 
-export default EditRoomTemperatureBoxComponent;
+export default connect('', {})(EditRoomTemperatureBoxComponent);

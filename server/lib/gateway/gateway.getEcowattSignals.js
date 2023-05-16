@@ -1,5 +1,5 @@
 /**
- * @description Get ecowatt signals
+ * @description Get ecowatt signals.
  * @returns {Promise} Resolve data from ecowatt.
  * @example
  * const data = await getEcowattSignals();

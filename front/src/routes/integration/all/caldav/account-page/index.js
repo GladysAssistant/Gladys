@@ -6,10 +6,6 @@ import AccountTab from './AccountTab';
 import { RequestStatus } from '../../../../../utils/consts';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
-@connect(
-  'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavCleanUpStatus,caldavSyncStatus',
-  actions
-)
 class AccountPage extends Component {
   componentWillMount() {
     this.props.getCaldavSetting();
@@ -29,4 +25,9 @@ class AccountPage extends Component {
   }
 }
 
-export default withIntlAsProp(AccountPage);
+export default withIntlAsProp(
+  connect(
+    'user,caldavHost,caldavUrl,caldavUsername,caldavPassword,caldavSaveSettingsStatus,caldavGetSettingsStatus,caldavCleanUpStatus,caldavSyncStatus',
+    actions
+  )(AccountPage)
+);

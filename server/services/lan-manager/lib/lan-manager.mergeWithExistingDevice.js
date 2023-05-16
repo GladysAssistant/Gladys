@@ -1,7 +1,7 @@
 /**
  * @description Get all discovered devices, and if device already created, the Gladys device.
- * @param {Object} lanDevice - Discovered device.
- * @returns {Object} Device merged with Gladys existing one.
+ * @param {object} lanDevice - Discovered device.
+ * @returns {object} Device merged with Gladys existing one.
  * @example
  * const mergedDevice = lanManager.mergeWithExistingDevice(discorveredDevice)
  */

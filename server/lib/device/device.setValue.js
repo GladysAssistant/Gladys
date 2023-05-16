@@ -4,8 +4,8 @@ const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
  * @description Control a specific device.
- * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The deviceFeature to control.
+ * @param {object} device - The device to control.
+ * @param {object} deviceFeature - The deviceFeature to control.
  * @param {string|number} value - The new state to set.
  * @example
  * device.setValue(device, deviceFeature);

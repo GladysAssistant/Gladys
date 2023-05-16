@@ -64,12 +64,11 @@ const execSubCommand = (
 /**
  * @description The function that will run for an EXECUTE request.
  * It should return a valid response or a Promise that resolves to valid response.
- * @param {Object} body - Request body.
- * @param {Object} headers - Request headers.
+ * @param {object} body - Request body.
+ * @param {object} headers - Request headers.
  * @returns {Promise} A valid response.
  * @example
  * googleActions.onExecute({}, {});
- *
  * @see https://actions-on-google.github.io/actions-on-google-nodejs/interfaces/smarthome.smarthomeapp.html#onexecute
  */
 async function onExecute(body, headers) {

@@ -4,10 +4,6 @@ import actions from './actions';
 import PhilipsHuePage from '../PhilipsHuePage';
 import SetupTab from './SetupTab';
 
-@connect(
-  'user,philipsHueBridges,philipsHueBridgesDevices,philipsHueGetDevicesStatus,philipsHueCreateDeviceStatus,philipsHueGetBridgesStatus,philipsHueDeleteDeviceStatus',
-  actions
-)
 class PhilipsHueSetupPage extends Component {
   componentWillMount() {
     // this.props.getIntegrationByName('philips-hue');
@@ -24,4 +20,7 @@ class PhilipsHueSetupPage extends Component {
   }
 }
 
-export default PhilipsHueSetupPage;
+export default connect(
+  'user,philipsHueBridges,philipsHueBridgesDevices,philipsHueGetDevicesStatus,philipsHueCreateDeviceStatus,philipsHueGetBridgesStatus,philipsHueDeleteDeviceStatus',
+  actions
+)(PhilipsHueSetupPage);

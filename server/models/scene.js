@@ -18,6 +18,7 @@ const actionSchema = Joi.array().items(
       scene: Joi.string(),
       text: Joi.string(),
       value: Joi.number(),
+      evaluate_value: Joi.string(),
       minutes: Joi.number(),
       unit: Joi.string(),
       url: Joi.string().uri(),
@@ -53,6 +54,7 @@ const actionSchema = Joi.array().items(
           .valid('=', '!=', '>', '>=', '<', '<=')
           .required(),
         value: Joi.number(),
+        evaluate_value: Joi.string(),
       }),
     }),
   ),

@@ -2,7 +2,7 @@ const db = require('../../models');
 
 /**
  * @description Create an area.
- * @param {Object} area - An area object.
+ * @param {object} area - An area object.
  * @returns {Promise} Resolve with created area.
  * @example
  * gladys.area.create({

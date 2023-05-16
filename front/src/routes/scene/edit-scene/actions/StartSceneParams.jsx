@@ -5,7 +5,6 @@ import Select from 'react-select';
 
 import actions from '../../../../actions/scene';
 
-@connect('scenes', actions)
 class StartSceneParams extends Component {
   handleChange = selectedOption => {
     if (selectedOption) {
@@ -66,4 +65,4 @@ class StartSceneParams extends Component {
   }
 }
 
-export default StartSceneParams;
+export default connect('scenes', actions)(StartSceneParams);

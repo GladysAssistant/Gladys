@@ -11,7 +11,7 @@ const dateSchema = Joi.date()
 
 /**
  * @description Save historical device feature state in DB.
- * @param {Object} deviceFeature - A DeviceFeature object.
+ * @param {object} deviceFeature - A DeviceFeature object.
  * @param {number} newValue - The new value of the deviceFeature to save.
  * @param {string} newValueCreatedAt - The date of the new state.
  * @example

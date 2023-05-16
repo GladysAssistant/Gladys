@@ -69,14 +69,14 @@
   },
   "signup": {
     "welcome": {
-      "title": "Welcome to Gladys 🙋",
+      "title": "Welcome to Gladys!",
       "introSentence": "First, thank you for choosing me. I'm Gladys, a privacy-friendly home assistant for your house.",
       "introTimeToCreateAccount": "It's time to create a local account for your Gladys setup.",
       "introDontWorryLocal": "Don't worry: Gladys is fully self-hosted, and all the information you'll enter is only saved in the local database of Gladys.",
-      "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a href=\"https://gladysassistant.com/en/docs/\">documentation</a> or ask a question on <a href=\"https://community.gladysassistant.com\">Gladys community</a>.",
-      "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com\">Gladys Plus.</a>",
-      "buttonCreateAccountGladysGateway": "Restore a Gladys Plus Backup",
-      "buttonCreateAccountWithEmail": "Create local account with your Email"
+      "introInCaseOfIssues": "In case you have issues installing Gladys, check out our <a  href=\"https://gladysassistant.com/docs\" target=\"_blank\" rel=\"noopener noreferrer\">documentation</a> or ask a question on <a href=\"https://en-community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys community</a>.",
+      "introReadMoreGladysGateway": "Read more about <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus.</a>",
+      "buttonCreateAccountGladysGateway": "Gladys Plus backup restore",
+      "buttonCreateAccountWithEmail": "Create local account"
     },
     "createLocalAccount": {
       "title": "Create your local Gladys account",
@@ -175,11 +175,11 @@
       "validationErrorRoom": "Room name should be between 1 and 40 characters"
     },
     "success": {
-      "title": "Allow me to thank you 🙏",
-      "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\">Pierre-Gilles Leymarie</a>, and I founded Gladys Assistant in 2013.",
-      "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys 🙌 I hope you'll enjoy using this software as much as I enjoyed building it.",
-      "ifYouWantToSupportThisSotware": "As Gladys is now my main job, I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\">Gladys Plus</a>.",
-      "goToDashboardButton": "Go to Dashboard"
+      "title": "Thank you!",
+      "introduction": "I'm <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\">Pierre-Gilles Leymarie</a>, and I started working on Gladys Assistant in 2013.",
+      "thanksForChoosingOpenSource": "I would like to thank you for choosing Gladys. I hope you'll enjoy using this software as much as I enjoyed building it.",
+      "ifYouWantToSupportThisSotware": "I rely on contributions to make this project substainable. If you want to support Gladys and get access to additional features, read more about <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
+      "goToDashboardButton": "Go to the Dashboard"
     }
   },
   "dashboard": {
@@ -264,7 +264,20 @@
         "editCameraLabel": "Select the camera you want to display here.",
         "noImageToShow": "No image to show",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
-        "editBoxNamePlaceholder": "Name of the box"
+        "editBoxNamePlaceholder": "Name of the box",
+        "latencyBoxName": "Latency",
+        "latencyBoxDescription": "The lower the latency you select, the faster the live stream will start. However, to have a low latency, you need a very fast internet connection with a minimum of ping or the video will be jerky. We recommend medium or low latency.",
+        "liveStartError": "An error occured while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
+        "notNotSupportedBrowser": "This browser is not supported. In order to enable end-to-end encryption of this video stream, we use the MediaSource API, which is unfortunately not available on Safari iPhone. Strangely, this feature is available on Safari iPad and MacOS... We'll have to be patient, let's hope the API will be available on iPhone soon!",
+        "tooManyRequests": "You have reached your monthly video bandwidth limit. Contact us by email or on the forum to get more bandwidth!",
+        "liveAutoStartLabel": "Start automatically the live streaming",
+        "liveAutoStartDescription": "Warning: This can increase the load on your machine/network.",
+        "latency": {
+          "ultraLow": "Ultra low",
+          "low": "Low",
+          "medium": "Medium",
+          "standard": "Standard"
+        }
       },
       "chart": {
         "defaultInterval": "Default interval",
@@ -365,6 +378,22 @@
       "apiKey": "Telegram Bot API Key",
       "saveButton": "Save"
     },
+    "nextcloudTalk": {
+      "title": "Nextcloud Talk",
+      "description": "Speak with Gladys thanks to Nextcloud Talk.",
+      "introduction": "To speak through Nextcloud Talk, you need a specific Nextcloud account for your bot.",
+      "url": "Nextcloud host",
+      "urlInfo": "Enter your Nextcloud base URL.",
+      "username": "Username Nextcloud bot account",
+      "usernameInfo": "Enter Nextcloud bot account username.",
+      "password": "Password Nextcloud bot account",
+      "passwordInfo": "Enter Nextcloud bot account password.",
+      "token": "Bot conversation token",
+      "tokenInfo": "Enter conversation token between your Nextcloud account and the bot account.",
+      "configurationError": "Failed to save configuration.",
+      "configurationSuccess": "Successfully saved configuration.",
+      "buttonSave": "Save"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Control Philips Hue Lights and plugs with the official hub",
@@ -396,6 +425,7 @@
       "description": "Display your cameras video flux in Gladys.",
       "search": "Search cameras",
       "new": "New",
+      "documentationButton": "Documentation",
       "nameLabel": "Camera Name",
       "namePlaceholder": "Enter the name of your camera",
       "roomLabel": "Room",
@@ -407,6 +437,7 @@
       "every1Seconds": "Every second (at your own risk)",
       "urlLabel": "Camera RTSP/HTTP Flux",
       "urlPlaceholder": "Ex: rtsp://[username]:[password]@[camera-ip-address]:554/media",
+      "urlExplanation": "URL needs to be a video flux if you want to use the live stream feature, not a fixed image.",
       "noCameraFound": "No cameras found.",
       "testConnectionButton": "Test connection",
       "saveButton": "Save",
@@ -579,6 +610,9 @@
         "title": "Zigbee2mqtt USB dongle Settings",
         "description": "To use Zigbee2mqtt in Gladys, you need to have a Zigbee2mqtt USB Dongle attached to your Gladys instance.",
         "zigbee2mqttUsbDriverPathLabel": "Select the USB port where your Zigbee2mqtt Dongle is connected",
+        "zigbee2mqttUsbDriverPathPlaceholder": "USB port",
+        "zigbee2mqttUsbDongleNameLabel": "Select your Zigbee Dongle model",
+        "zigbee2mqttUsbDongleNamePlaceholder": "Zigbee Dongle model",
         "saveButton": "Save Settings",
         "refreshButton": "Refresh USB list",
         "notAttached": "Gladys is not attached to any Zigbee2mqtt USB Dongle.",
@@ -1271,11 +1305,19 @@
       "turnOffLights": {
         "label": "Select the lights you want to turn off"
       },
+      "toggleLights": {
+        "label": "Select the lights you want to toggle",
+        "description": "This action turn on the light if state is off or turn off the light if state is on"
+      },
       "turnOnSwitches": {
         "label": "Select the switches you want to turn on"
       },
       "turnOffSwitches": {
         "label": "Select the switches you want to turn off"
+      },
+      "toggleSwitches": {
+        "label": "Select the switches you want to toggle",
+        "description": "This action turn on the switch if state is off or turn off the switch if state is on"
       },
       "deviceGetValue": {
         "description": "This will get the last value of the selected device, so you can use it later in the scene.",
@@ -1284,7 +1326,11 @@
       "deviceSetValue": {
         "description": "This action let you control a device.",
         "deviceLabel": "Device",
-        "valueLabel": "Value"
+        "valueLabel": "Value",
+        "valueTypeSimple": "Simple",
+        "simpleExplanationText": "Enter the new value you wish to assign to your device here.",
+        "valueTypeComputed": "Computed",
+        "computedExplanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -1292,7 +1338,8 @@
         "valueLabel": "Value",
         "removeLabel": "Remove",
         "orText": "OR",
-        "orButton": "+ OR"
+        "orButton": "+ OR",
+        "explanationText": "Instead of a fixed value, you can enter here a calculation based on a scene variable. To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
       "checkTime": {
         "description": "The scene will continue only if current time is between the selected limits, in the selected days. If a field is left empty, it'll not be taken into account.",
@@ -1377,11 +1424,13 @@
       "delay": "Wait",
       "light": {
         "turn-on": "Turn On the Lights",
-        "turn-off": "Turn Off the Lights"
+        "turn-off": "Turn Off the Lights",
+        "toggle": "Toggle the Lights"
       },
       "switch": {
         "turn-on": "Turn On the Switches",
-        "turn-off": "Turn Off the Switches"
+        "turn-off": "Turn Off the Switches",
+        "toggle": "Toggle the Switches"
       },
       "scene": {
         "start": "Start scene"
@@ -1554,6 +1603,7 @@
     "month": "Month",
     "day": "Day",
     "selectorText": "The selector is the unique identifier of your user. It can be used in the API.",
+    "emailText": "Your email is just an identifier for login, it's only saved locally",
     "profilePictureLabel": "Profile Picture",
     "chooseFileLabel": "Choose file",
     "emailLabel": "Email",

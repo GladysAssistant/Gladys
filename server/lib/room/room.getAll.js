@@ -1,7 +1,8 @@
 const db = require('../../models');
 
 /**
- * @description Get all rooms
+ * @description Get all rooms.
+ * @returns {Promise<Array>} Resolve with list of rooms.
  * @example
  * const rooms = await room.getAll();
  */

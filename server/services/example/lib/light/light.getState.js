@@ -3,7 +3,7 @@ const { STATE } = require('../../../../utils/constants');
 /**
  * @private
  * @description Get the current state of a device.
- * @param {Object} deviceFeature - The deviceFeature object.
+ * @param {object} deviceFeature - The deviceFeature object.
  * @returns {Promise} Resolving with deviceFeature state.
  * @example
  * getState(deviceFeature);

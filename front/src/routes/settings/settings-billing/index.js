@@ -4,7 +4,6 @@ import GatewayBilling from './GatewayBilling';
 import SettingsLayout from '../SettingsLayout';
 import actions from '../../../actions/gateway';
 
-@connect('session', actions)
 class SettingsBilling extends Component {
   getSetupState = async () => {
     await this.setState({ loading: true });
@@ -77,4 +76,4 @@ class SettingsBilling extends Component {
   }
 }
 
-export default SettingsBilling;
+export default connect('session', actions)(SettingsBilling);

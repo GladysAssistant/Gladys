@@ -9,7 +9,7 @@ module.exports = function EcowattService(gladys, serviceId) {
   dayjs.extend(timezone);
   /**
    * @public
-   * @description This function starts the service
+   * @description This function starts the service.
    * @example
    * gladys.services.ecowatt.start();
    */
@@ -19,7 +19,7 @@ module.exports = function EcowattService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    * gladys.services.ecowatt.stop();
    */
@@ -29,7 +29,7 @@ module.exports = function EcowattService(gladys, serviceId) {
 
   /**
    * @description Return ecowatt data formatted.
-   * @returns {Promise<Object>} - Return ecowatt data.
+   * @returns {Promise<object>} - Return ecowatt data.
    * @example const data = await getSignals();
    */
   async function getSignals() {

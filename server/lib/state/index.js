@@ -4,7 +4,7 @@ const Store = require('./Store');
  * @description Update the state in a given entity.
  * @param {string} entity - The type of entity we should save the state to.
  * @param {string} entitySelector - The selector of the entity.
- * @param {Object} update - The object to merge into the state.
+ * @param {object} update - The object to merge into the state.
  * @example
  * stateManager.setState('house', 'main-house', {
  *   alarm: 'disarmed'

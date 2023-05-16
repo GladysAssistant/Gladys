@@ -4,7 +4,7 @@ const { onReportState } = require('./alexa.onReportState');
 
 /**
  * @description Add ability to connect to Alexa.
- * @param {Object} gladys - Gladys instance.
+ * @param {object} gladys - Gladys instance.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const alexaHandler = new AlexaHandler(gladys, serviceId);

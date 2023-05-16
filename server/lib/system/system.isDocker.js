@@ -1,7 +1,7 @@
 const fs = require('fs');
 
 /**
- * @description Return true if process is running inside Docker
+ * @description Return true if process is running inside Docker.
  * @returns {Promise<boolean>} Resolve with true if inside Docker.
  * @example
  * isDocker();

@@ -24,8 +24,8 @@ const buildPresenceFeature = (deviceExternalId) => {
 
 /**
  * @description Transform network device to Gladys device.
- * @param {Object} device - Network device.
- * @returns {Object} Return Gladys deviec.
+ * @param {object} device - Network device.
+ * @returns {object} Return Gladys deviec.
  * @example
  * const gladysDevice = lanManager.transformDevice({ ip: '...', mac: '...', hostname: '...' });
  */

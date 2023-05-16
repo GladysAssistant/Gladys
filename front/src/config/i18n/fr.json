@@ -60,7 +60,7 @@
     "emailLabel": "Adresse e-mail",
     "emailPlaceholder": "Entrez votre e-mail",
     "passwordLabel": "Mot de passe",
-    "forgotPasswordLabel": "J’ai oublié mon mot de passe",
+    "forgotPasswordLabel": "J'ai oublié mon mot de passe",
     "passwordPlaceholder": "Entrez votre mot de passe",
     "loginButtonText": "Connexion",
     "wrongCredentials": "Adresse e-mail ou mot de passe invalide",
@@ -69,14 +69,14 @@
   },
   "signup": {
     "welcome": {
-      "title": "Bienvenue dans Gladys 🙋",
-      "introSentence": "Tout d'abord, merci de m'avoir choisie. Je suis Gladys, une assistante à domicile respectueuse de la vie privée de votre maison.",
+      "title": "Bienvenue dans Gladys !",
+      "introSentence": "Tout d'abord, merci de m'avoir choisie. Je suis Gladys, un logiciel de domotique open-source qui respecte votre vie privée.",
       "introTimeToCreateAccount": "Il est temps de créer un compte local pour votre installation Gladys.",
       "introDontWorryLocal": "Ne vous inquiétez pas : Gladys est entièrement auto-hébergé et toutes les informations que vous saisirez sont simplement enregistrées dans la base de données locale de Gladys.",
-      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://gladysassistant.com/fr/docs/\">documentation</a> ou posez une question sur <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
-      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com\">Gladys Plus</a>.",
-      "buttonCreateAccountGladysGateway": "Restaurer une sauvegarde Gladys Plus",
-      "buttonCreateAccountWithEmail": "Créer un compte local avec votre e-mail"
+      "introInCaseOfIssues": "Si vous rencontrez des problèmes lors de l'installation de Gladys, consultez notre <a href=\"https://gladysassistant.com/fr/docs/\" target=\"_blank\" rel=\"noopener noreferrer\">documentation</a> ou posez une question sur le <a href =\"https://community.gladysassistant.com\" target=\"_blank\" rel=\"noopener noreferrer\">forum Gladys</a>.",
+      "introReadMoreGladysGateway": "En savoir plus sur <a href=\"https://gladysassistant.com/fr/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
+      "buttonCreateAccountGladysGateway": "Restauration Gladys Plus",
+      "buttonCreateAccountWithEmail": "Créer un compte local"
     },
     "createLocalAccount": {
       "title": "Créer votre compte local Gladys",
@@ -175,10 +175,10 @@
       "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères."
     },
     "success": {
-      "title": "Merci 🙏",
-      "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\"> Pierre-Gilles Leymarie </a>, et j'ai fondé Gladys Assistant en 2013.",
-      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys 🙌 J'espère que vous apprécierez utiliser ce logiciel.",
-      "ifYouWantToSupportThisSotware": "Gladys étant mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\">Gladys Plus</a>.",
+      "title": "Merci !",
+      "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\"> Pierre-Gilles Leymarie</a>, et j'ai commencé à travailler sur Gladys Assistant en 2013.",
+      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys. J'espère que vous apprécierez utiliser ce logiciel.",
+      "ifYouWantToSupportThisSotware": "J'essaie de faire de Gladys mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
   },
@@ -264,7 +264,20 @@
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
         "noImageToShow": "Aucune image à afficher",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
-        "editBoxNamePlaceholder": "Nom de la box"
+        "editBoxNamePlaceholder": "Nom de la box",
+        "latencyBoxName": "Latence",
+        "latencyBoxDescription": "Plus vous sélectionnez une latence basse, et plus vite le live démarrera. Néanmoins, pour avoir une latence basse, il faut une connexion internet très rapide et avec un minimum de ping sinon la vidéo sera saccadée. Nous conseillons une latence moyenne ou basse.",
+        "liveStartError": "Une erreur est survenue en démarrant le streaming. Est-ce que l'URL de votre caméra est bien une URL d'un flux vidéo et pas une image ?",
+        "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est malheureusement pas disponible sur Safari iPhone. Etrangement, cette fonctionnalité est disponible sur Safari iPad et MacOS... Il faudra s'armer de patience, espérons que l'API arrive vite sur iPhone !",
+        "tooManyRequests": "Vous avez atteint votre limite mensuelle de bande passante vidéo. Contactez-nous par email ou sur le forum pour avoir plus de bande passante !",
+        "liveAutoStartLabel": "Lancer automatiquement le streaming",
+        "liveAutoStartDescription": "Attention: Cette option peut augmenter la charge sur votre machine/réseau.",
+        "latency": {
+          "ultraLow": "Très basse",
+          "low": "Basse",
+          "medium": "Moyenne",
+          "standard": "Standard"
+        }
       },
       "chart": {
         "defaultInterval": "Intervalle par défaut",
@@ -492,6 +505,22 @@
       "apiKey": "Clé API du Bot Telegram",
       "saveButton": "Sauvegarder"
     },
+    "nextcloudTalk": {
+      "title": "Nextcloud Talk",
+      "description": "Parlez à Gladys grâce à Nextcloud Talk.",
+      "introduction": "Pour communiquer via Talk il vous créer un compte spécifique Nextcloud représentant votre bot.",
+      "url": "URL de l'instance Nextcloud",
+      "urlInfo": "Entrez l'url de base de votre instance Nextcloud.",
+      "username": "Nom d'utilisateur bot Nextcloud",
+      "usernameInfo": "Entrez le nom d'utilisateur du compte Nextcloud représentant le bot Gladys.",
+      "password": "Mot de passe bot Nextcloud",
+      "passwordInfo": "Entrez le mot de passe du compte Nextcloud représentant le bot.",
+      "token": "Token de la conversion avec le bot",
+      "tokenInfo": "Entrez le token de la conversation entre votre compte Nextcloud et le compte du bot.",
+      "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
+      "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
+      "buttonSave": "Sauvegarder"
+    },
     "philipsHue": {
       "title": "Philips Hue",
       "description": "Contrôler les lumières Philips Hue.",
@@ -523,6 +552,7 @@
       "description": "Récupérez le flux vidéos de vos caméras dans Gladys",
       "search": "Chercher une caméra",
       "new": "Nouveau",
+      "documentationButton": "Documentation",
       "nameLabel": "Nom de la caméra",
       "namePlaceholder": "Entrez le nom de votre caméra",
       "roomLabel": "Pièce",
@@ -534,6 +564,7 @@
       "every1Seconds": "Chaque seconde (à vos risques et périls)",
       "urlLabel": "Flux RTSP/HTTP de la caméra",
       "urlPlaceholder": "Ex: rtsp://[identifiant]:[mot-de-passe]@[adresse-ip-camera]:554/media",
+      "urlExplanation": "Cette URL doit-être un flux vidéo, et non juste une image, si vous voulez utiliser le streaming live.",
       "noCameraFound": "Aucune caméra trouvée",
       "testConnectionButton": "Tester",
       "saveButton": "Sauvegarder",
@@ -706,6 +737,9 @@
         "title": "Paramétrage du dongle USB Zigbee2mqtt",
         "description": "Pour utiliser Zigbee2mqtt avec Gladys, il faut insérer un dongle USB Zigbee2mqtt.",
         "zigbee2mqttUsbDriverPathLabel": "Sélectionner le port USB sur lequel le dongle Zigbee2mqtt est inséré",
+        "zigbee2mqttUsbDriverPathPlaceholder": "Port USB",
+        "zigbee2mqttUsbDongleNameLabel": "Sélectionner le modèle du dongle Zigbee utilisé",
+        "zigbee2mqttUsbDongleNamePlaceholder": "Modèle du dongle Zigbee",
         "saveButton": "Sauvegarde",
         "refreshButton": "Rafraîchir la liste des appareils USB",
         "notAttached": "Aucun dongle USB Zigbee2mqtt n'est attaché à Gladys.",
@@ -812,7 +846,7 @@
         "gladysPlusRefreshProgressLabel": "Synchronisation en cours...",
         "gladysPlusRefreshProgressDescription": "Gladys Plus est entrain de rafraîchir son cache via l'API Enedis. Cette synchronisation peut prendre du temps, car Enedis impose des limites de requêtes. Il n'est pas nécessaire de garder cet onglet ouvert.",
         "refreshLocal": "Synchroniser avec Gladys Plus",
-        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponible en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
+        "explanation": "La synchronisation avec Enedis se fait automatiquement entre Gladys Plus et Enedis tous les jours entre 8h30 et 11h30. Il est possible certains jours que les données soient disponibles en retard. Côté Gladys, Gladys se synchronise automatiquement avec Gladys Plus toutes les heures.",
         "saveButton": "Enregistrer",
         "deleteButton": "Supprimer"
       }
@@ -1272,11 +1306,19 @@
       "turnOffLights": {
         "label": "Sélectionnez les lumières que vous souhaitez éteindre"
       },
+      "toggleLights": {
+        "label": "Sélectionnez les lumières que vous souhaitez inverser",
+        "description": "Cette action allume la lumière si éteinte, sinon éteins la lumière"
+      },
       "turnOnSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez allumer"
       },
       "turnOffSwitches": {
         "label": "Sélectionnez les prises que vous souhaitez éteindre"
+      },
+      "toggleSwitches": {
+        "label": "Sélectionnez les prises que vous souhaitez inverser",
+        "description": "Cette action allume la prise si elle est éteinte, sinon éteins la prise"
       },
       "deviceGetValue": {
         "description": "La scène récupèrera le dernier état de l'appareil sélectionné, vous pourrez l'utiliser plus tard dans celle-ci.",
@@ -1285,7 +1327,11 @@
       "deviceSetValue": {
         "description": "Cette action vous permet de contrôler un appareil.",
         "deviceLabel": "Appareil",
-        "valueLabel": "Valeur"
+        "valueLabel": "Valeur",
+        "valueTypeSimple": "Simple",
+        "simpleExplanationText": "Entrez ici la nouvelle valeur que vous souhaitez assigner à votre appareil.",
+        "valueTypeComputed": "Calculée",
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -1293,7 +1339,8 @@
         "valueLabel": "Valeur",
         "removeLabel": "Effacer",
         "orText": "OU",
-        "orButton": "+ OU"
+        "orButton": "+ OU",
+        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
       },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
@@ -1377,12 +1424,14 @@
       },
       "delay": "Attendre",
       "light": {
-        "turn-on": "Allumer les lumières",
-        "turn-off": "Eteindre les lumières"
+        "turn-on": "Allumer la lumière",
+        "turn-off": "Eteindre les lumières",
+        "toggle": "Inverser les lumières"
       },
       "switch": {
         "turn-on": "Allumer les prises",
-        "turn-off": "Eteindre les prises"
+        "turn-off": "Eteindre les prises",
+        "toggle": "Inverser les prises"
       },
       "scene": {
         "start": "Démarrer la scène"
@@ -1558,6 +1607,7 @@
     "profilePictureLabel": "Photo de profil",
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
+    "emailText": "Votre email sert juste d'identifiant, il n'est enregistré qu'en local",
     "emailPlaceholder": "Entrez votre e-mail",
     "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",

@@ -9,7 +9,7 @@ module.exports = function HomeKitService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the HomeKit service and expose devices
+   * @description This function starts the HomeKit service and expose devices.
    * @returns {Promise} Empty promise once service is started.
    * @example
    * gladys.services.homekit.start();
@@ -27,7 +27,7 @@ module.exports = function HomeKitService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the HomeKit service
+   * @description This function stops the HomeKit service.
    * @example
    * gladys.services.homekit.stop();
    */

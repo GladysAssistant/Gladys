@@ -2,7 +2,7 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Get a scene by selector
+ * @description Get a scene by selector.
  * @param {string} selector - The selector of the scene.
  * @returns {Promise} - Resolve with the scene.
  * @example

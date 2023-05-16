@@ -5,7 +5,7 @@ const { PARAMS } = require('../utils/broadlink.constants');
 
 /**
  * @description Poll device feature values.
- * @param {Object} device - Gladys device.
+ * @param {object} device - Gladys device.
  * @example
  * await poll(device);
  */

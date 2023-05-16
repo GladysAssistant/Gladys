@@ -3,8 +3,8 @@ const { PARAMS } = require('../utils/broadlink.constants');
 
 /**
  * @description Creates Broadlink plug device.
- * @param {Object} broadlinkDevice - Broadlink device.
- * @returns {Object} Gladys device if Broadlink device has compatible features, else 'null'.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @returns {object} Gladys device if Broadlink device has compatible features, else 'null'.
  * @example
  * buildPeripheral({}, 'broadlink-service-id')
  */
