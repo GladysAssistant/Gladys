@@ -57,6 +57,24 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene`);
   });
+  it('Should edit the scene description', () => {
+    cy.visit('/dashboard/scene/my-scene');
+
+
+    const i18n = Cypress.env('i18n');
+
+    cy.get('textarea[class*="-control"]')
+      .type('My scene description')
+
+    // I don't know why, but I'm unable to get this button with
+    // the text. Using the class but it's not recommended otherwise!!
+    cy.get('.btn-success').then(buttons => {
+      cy.wrap(buttons[0]).click();
+    });
+
+    cy.get('textarea[class*="-control"]')
+      .should('have.value','My scene description');
+  });
   it('Should add new condition house empty', () => {
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addActionButton')
@@ -65,7 +83,7 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('[class*="-control"]')
+    cy.get('div[class*="-control"]')
       .click(0, 0, { force: true })
       .get('[class*="-menu"]')
       .find('[class*="-option"]')
@@ -78,7 +96,7 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.get('[class*="-control"]')
+    cy.get('div[class*="-control"]')
       .click(0, 0, { force: true })
       .get('[class*="-menu"]')
       .find('[class*="-option"]')
@@ -93,7 +111,7 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('[class*="-control"]')
+    cy.get('div[class*="-control"]')
       .click(0, 0, { force: true })
       .get('[class*="-menu"]')
       .find('[class*="-option"]')
@@ -106,7 +124,7 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.get('[class*="-control"]')
+    cy.get('div[class*="-control"]')
       .click(0, 0, { force: true })
       .get('[class*="-menu"]')
       .find('[class*="-option"]')
@@ -121,7 +139,7 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('[class*="-control"]')
+    cy.get('div[class*="-control"]')
       .click(0, 0, { force: true })
       .get('[class*="-menu"]')
       .find('[class*="-option"]')
