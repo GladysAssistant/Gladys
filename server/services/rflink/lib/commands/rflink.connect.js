@@ -6,7 +6,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Connect to Rflink
+ * @description Connect to Rflink.
  * @param {string} path - Path to the Rflink gateway.
  * @example
  * rflink.connect(path);

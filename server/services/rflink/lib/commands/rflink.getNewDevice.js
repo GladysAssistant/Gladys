@@ -1,5 +1,5 @@
 /**
- * @description return a list of the rflink devices discovered by the gateway
+ * @description Return a list of the rflink devices discovered by the gateway.
  * @example
  * rflink.getNewDevices();
  * @returns {object} Devices.

@@ -1,7 +1,7 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 /**
- * @description pair a milight device
+ * @description Pair a milight device.
  * @param {string} currentMilightGateway - Milight gateway.
  * @param {string} milightZone - Milight zone.
  * @example

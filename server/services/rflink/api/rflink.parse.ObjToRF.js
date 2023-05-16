@@ -2,7 +2,7 @@ const logger = require('../../../utils/logger');
 
 // eslint-disable-next-line jsdoc/check-alignment
 /**
- * @description convert a rflink device object to a string that can be sent to rflink
+ * @description Convert a rflink device object to a string that can be sent to rflink.
  * @param {object} device - Secure node.
  * @param {string} deviceFeature - The devicce feature.
  * @param {any} state - The state of the device.

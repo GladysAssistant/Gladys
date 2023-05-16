@@ -2,7 +2,7 @@ const logger = require('../../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 /**
- * @description When the gateway is connected
+ * @description When the gateway is connected.
  * @example
  * rflink.on('connected', this.connected);
  */

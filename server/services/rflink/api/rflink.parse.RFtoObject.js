@@ -1,7 +1,7 @@
 /* eslint-disable prefer-destructuring */
 // eslint-disable-next-line jsdoc/check-alignment
 /**
- * @description convert a rflink message to an array.
+ * @description Convert a rflink message to an array.
  * @param {string} data - Secure node.
  * @returns {object} Return an array with an index for each value.
  * @example

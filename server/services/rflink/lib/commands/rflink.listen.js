@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
 /**
- * @description listen
+ * @description Listen to usb port.
  * @example
  * rflink.listen();
  */
