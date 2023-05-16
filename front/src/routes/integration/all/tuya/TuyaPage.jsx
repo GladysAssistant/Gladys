@@ -1,5 +1,5 @@
-import {Text} from 'preact-i18n';
-import {Link} from "preact-router/match";
+import { Text } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 
 const TuyaPage = ({ children }) => (
   <div class="page">

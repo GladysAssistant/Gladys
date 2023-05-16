@@ -1,8 +1,7 @@
 import { RequestStatus } from '../../../../utils/consts';
-import update from "immutability-helper";
-import debounce from "debounce";
-import createActionsIntegration from "../../../../actions/integration";
-
+import update from 'immutability-helper';
+import debounce from 'debounce';
+import createActionsIntegration from '../../../../actions/integration';
 
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
@@ -38,7 +37,7 @@ function createActions(store) {
           loading: false,
           errorLoading: false
         });
-        console.log(discoveredDevices)
+        console.log(discoveredDevices);
       } catch (e) {
         store.setState({
           loading: false,
@@ -71,7 +70,6 @@ function createActions(store) {
       }
     },
 
-
     updateConfiguration(state, e) {
       const data = {};
       data[e.target.name] = e.target.value;
@@ -87,25 +85,24 @@ function createActions(store) {
         tuyaGetSettingsStatus: RequestStatus.Getting,
         tuyaBaseUrl,
         tuyaAccessKey,
-        tuyaSecretKey,
+        tuyaSecretKey
       });
       try {
-        const {value: url} = await state.httpClient.get('/api/v1/service/tuya/variable/BASE_URL');
+        const { value: url } = await state.httpClient.get('/api/v1/service/tuya/variable/BASE_URL');
         tuyaBaseUrl = url;
 
-        const {value: accessKey} = await state.httpClient.get('/api/v1/service/tuya/variable/ACCESS_KEY');
+        const { value: accessKey } = await state.httpClient.get('/api/v1/service/tuya/variable/ACCESS_KEY');
         tuyaAccessKey = accessKey;
 
-        const {value: secretKey} = await state.httpClient.get('/api/v1/service/tuya/variable/SECRET_KEY');
+        const { value: secretKey } = await state.httpClient.get('/api/v1/service/tuya/variable/SECRET_KEY');
         tuyaSecretKey = secretKey;
 
         store.setState({
           tuyaGetSettingsStatus: RequestStatus.Success,
           tuyaBaseUrl,
           tuyaAccessKey,
-          tuyaSecretKey,
+          tuyaSecretKey
         });
-
       } catch (e) {
         store.setState({
           tuyaGetSettingsStatus: RequestStatus.Error
@@ -119,7 +116,6 @@ function createActions(store) {
         tuyaSaveSettingsStatus: RequestStatus.Getting
       });
       try {
-
         await state.httpClient.post('/api/v1/service/tuya/variable/BASE_URL', {
           value: state.tuyaBaseUrl.trim()
         });
@@ -192,13 +188,11 @@ function createActions(store) {
         getTuyaOrderDir: e.target.value
       });
       await actions.getTuyaDevices(store.getState());
-    },
+    }
   };
 
   actions.debouncedSearch = debounce(actions.search, 200);
   return Object.assign({}, integrationActions, actions);
 }
-
-
 
 export default createActions;

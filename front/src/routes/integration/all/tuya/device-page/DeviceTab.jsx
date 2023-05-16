@@ -5,7 +5,7 @@ import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import CardFilter from '../../../../../components/layout/CardFilter';
-import TuyaDeviceBox from "../TuyaDeviceBox";
+import TuyaDeviceBox from '../TuyaDeviceBox';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">

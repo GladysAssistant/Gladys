@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from '../actions';
 import DiscoverTab from './DiscoverTab';
-import TuyaPage from "../TuyaPage";
+import TuyaPage from '../TuyaPage';
 
 class TuyaDiscoverPage extends Component {
   async componentWillMount() {

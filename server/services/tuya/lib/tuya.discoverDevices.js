@@ -3,7 +3,7 @@ const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 
 const { STATUS } = require('./utils/tuya.constants');
-const {convertDevice} = require('./device/tuya.convertDevice');
+const { convertDevice } = require('./device/tuya.convertDevice');
 
 /**
  * @description Discover Tuya cloud devices.
@@ -38,21 +38,21 @@ async function discoverDevices() {
     logger.error('Unable to load Tuya devices', e);
   }
 
-  this.discoveredDevices = await Promise.allSettled(devices.map((device) => this.loadDeviceDetails(device))).then(
-    (results) => results.filter((result) => result.status === 'fulfilled').map((result) => result.value),
-  );
+  this.discoveredDevices = await Promise.allSettled(
+    devices.map((device) => this.loadDeviceDetails(device)),
+  ).then((results) => results.filter((result) => result.status === 'fulfilled').map((result) => result.value));
 
-  this.discoveredDevices = this.discoveredDevices.map((device) => ({
-    ...convertDevice(device),
-    service_id: this.serviceId,
-  })).filter((device) => {
-    console.log('device', device);
-    const existInGladys = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
-    console.log('existInGladys', existInGladys);
-    return existInGladys === null;
-  });
-
-
+  this.discoveredDevices = this.discoveredDevices
+    .map((device) => ({
+      ...convertDevice(device),
+      service_id: this.serviceId,
+    }))
+    .filter((device) => {
+      console.log('device', device);
+      const existInGladys = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
+      console.log('existInGladys', existInGladys);
+      return existInGladys === null;
+    });
 
   this.status = STATUS.CONNECTED;
 

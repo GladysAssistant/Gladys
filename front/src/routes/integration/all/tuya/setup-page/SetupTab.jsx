@@ -57,13 +57,13 @@ const SetupTab = ({ children, ...props }) => {
 
               <div class="form-group">
                 <label htmlFor="tuyaSecretKey" className="form-label">
-                  <Text id={`integration.tuya.setup.secretKey`}/>
+                  <Text id={`integration.tuya.setup.secretKey`} />
                 </label>
                 <Localizer>
                   <input
                     name="tuyaSecretKey"
                     type="text"
-                    placeholder={<Text id="integration.tuya.setup.secretKeyPlaceholder"/>}
+                    placeholder={<Text id="integration.tuya.setup.secretKeyPlaceholder" />}
                     value={props.tuyaSecretKey}
                     className="form-control"
                     onInput={props.updateConfiguration}

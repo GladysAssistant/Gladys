@@ -86,7 +86,6 @@ import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
 
-
 // Deprecated integration
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 
@@ -136,8 +135,8 @@ import OpenAIPage from '../routes/integration/all/openai/index';
 
 // Tuya integration
 import TuyaPage from '../routes/integration/all/tuya/device-page';
-import TuyaSetupPage from "../routes/integration/all/tuya/setup-page";
-import TuyaDiscoverPage from "../routes/integration/all/tuya/discover-page";
+import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
+import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);

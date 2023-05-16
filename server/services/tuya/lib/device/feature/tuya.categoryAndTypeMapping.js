@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES} = require('../../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../../utils/constants');
 
 const CATEGORY_AND_TYPE_BY_CODE = {
   // Metering socket
@@ -16,19 +16,19 @@ const CATEGORY_AND_TYPE_BY_CODE = {
     type: {},
   },
 
-  'switch_1': {
+  switch_1: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
   },
-  'switch_2': {
+  switch_2: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
   },
-  'switch_3': {
+  switch_3: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
   },
-  'switch_4': {
+  switch_4: {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
   },

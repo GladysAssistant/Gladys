@@ -11,8 +11,6 @@ const { loadDevices } = require('./tuya.loadDevices');
 const { loadDeviceDetails } = require('./tuya.loadDeviceDetails');
 const { setValue } = require('./tuya.setValue');
 
-
-
 const { STATUS } = require('./utils/tuya.constants');
 
 const TuyaHandler = function TuyaHandler(gladys, serviceId) {

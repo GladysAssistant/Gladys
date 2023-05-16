@@ -4,7 +4,7 @@ import cx from 'classnames';
 
 import EmptyState from './EmptyState';
 import style from './style.css';
-import TuyaDeviceBox from "../TuyaDeviceBox";
+import TuyaDeviceBox from '../TuyaDeviceBox';
 
 const DeviceTab = ({ children, ...props }) => (
   <div class="card">
@@ -13,11 +13,7 @@ const DeviceTab = ({ children, ...props }) => (
         <Text id="integration.tuya.discover.title" />
       </h1>
       <div class="page-options d-flex">
-        <button
-          onClick={props.getDiscoveredDevices}
-          class="btn btn-outline-primary ml-2"
-          disabled={props.loading}
-        >
+        <button onClick={props.getDiscoveredDevices} class="btn btn-outline-primary ml-2" disabled={props.loading}>
           <Text id="integration.tuya.discover.scan" /> <i class="fe fe-radio" />
         </button>
       </div>

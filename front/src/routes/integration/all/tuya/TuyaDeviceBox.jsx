@@ -67,7 +67,6 @@ class TuyaDeviceBox extends Component {
     { deviceIndex, device, housesWithRooms, editable, ...props },
     { loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
-
     const validModel = device.features && device.features.length > 0;
     const online = device.online;
 

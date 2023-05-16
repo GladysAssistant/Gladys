@@ -17,7 +17,6 @@ async function connect(configuration) {
 
   console.log('Tuya', baseUrl, accessKey, secretKey);
 
-
   if (!baseUrl || !accessKey || !secretKey) {
     this.status = STATUS.NOT_INITIALIZED;
     throw new ServiceNotConfiguredError('Tuya is not configured.');

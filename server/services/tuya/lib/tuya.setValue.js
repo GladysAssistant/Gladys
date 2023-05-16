@@ -1,10 +1,10 @@
 const { TuyaContext } = require('@tuya/tuya-connector-nodejs');
 
 const logger = require('../../../utils/logger');
-const { ServiceNotConfiguredError, BadParameters} = require('../../../utils/coreErrors');
+const { ServiceNotConfiguredError, BadParameters } = require('../../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 
-const { STATUS, API} = require('./utils/tuya.constants');
+const { STATUS, API } = require('./utils/tuya.constants');
 
 /**
  * @description Send the new device value over device protocol.
@@ -36,13 +36,11 @@ async function setValue(device, deviceFeature, value) {
       commands: [
         {
           code: command,
-          value
-        }
-      ]
-    }
+          value,
+        },
+      ],
+    },
   });
-
-
 }
 
 module.exports = {

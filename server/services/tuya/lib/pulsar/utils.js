@@ -36,7 +36,9 @@ export function buildQuery(query) {
  */
 export function buildPassword(accessId, accessKey) {
   const key = MD5(accessKey).toString();
-  return MD5(`${accessId}${key}`).toString().substr(8, 16);
+  return MD5(`${accessId}${key}`)
+    .toString()
+    .substr(8, 16);
 }
 
 /**

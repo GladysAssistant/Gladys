@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from '../actions';
 import SetupTab from './SetupTab';
-import TuyaPage from "../TuyaPage";
+import TuyaPage from '../TuyaPage';
 
 class TuyaSetupPage extends Component {
   componentWillMount() {

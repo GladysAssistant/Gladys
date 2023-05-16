@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import { RequestStatus } from '../../../../utils/consts';
-import TuyaPage from "./TuyaPage";
+import TuyaPage from './TuyaPage';
 
 class TuyaIntegration extends Component {
   componentWillMount() {
@@ -11,8 +11,7 @@ class TuyaIntegration extends Component {
 
   render(props, {}) {
     const loading =
-      props.tuyaGetSettingsStatus === RequestStatus.Getting ||
-      props.tuyaSaveSettingsStatus === RequestStatus.Getting;
+      props.tuyaGetSettingsStatus === RequestStatus.Getting || props.tuyaSaveSettingsStatus === RequestStatus.Getting;
     return <TuyaPage {...props} loading={loading} />;
   }
 }
