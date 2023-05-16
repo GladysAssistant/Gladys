@@ -160,7 +160,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.checkForContainerUpdates, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
@@ -212,7 +212,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
     assert.calledOnceWithExactly(zigbee2mqttManager.connect, config);
     assert.calledOnce(gladys.scheduler.scheduleJob);
@@ -233,7 +233,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.checkForContainerUpdates, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
     assert.calledOnceWithExactly(zigbee2mqttManager.connect, config);
     assert.calledThrice(zigbee2mqttManager.emitStatusEvent);

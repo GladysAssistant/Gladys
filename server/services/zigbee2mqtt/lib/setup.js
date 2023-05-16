@@ -13,7 +13,7 @@ async function setup(config) {
   await Promise.all(SETUP_VARIABLES.map((key) => this.saveOrDestroyVariable(key, config[key])));
 
   // Reload z2m container with new USB configuration
-  await this.init();
+  await this.init(true);
 }
 
 module.exports = {

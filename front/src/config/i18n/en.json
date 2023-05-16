@@ -545,8 +545,8 @@
               "title": "Configuration",
               "usbPort": "USB port",
               "dongleName": "Dongle",
-              "tcpPort": "TCP port",
-              "randomTcpPort": "Random"
+              "unknownDongle": "Not defined",
+              "tcpPort": "TCP port"
             }
           },
           "remote": {

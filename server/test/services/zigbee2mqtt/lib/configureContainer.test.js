@@ -73,10 +73,10 @@ describe('zigbee2mqtt configureContainer', () => {
   it('it should force override to random TCP port', async () => {
     // PREPARE
     const config = {
-      z2mTcpPort: 0,
+      z2mTcpPort: null,
     };
     // EXECUTE
-    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config);
+    const changed = await zigbee2mqttManager.configureContainer(basePathOnContainer, config, true);
     // ASSERT
     const resultContent = fs.readFileSync(configFilePath, 'utf8');
     const expectedContent = fs.readFileSync(defaultConfigFilePath, 'utf8');

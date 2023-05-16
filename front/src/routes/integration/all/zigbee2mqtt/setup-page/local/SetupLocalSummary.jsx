@@ -25,7 +25,7 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
                     <Text id="integration.zigbee2mqtt.setup.modes.local.summary.dongleName" />
                   </td>
                   <td class="text-muted" data-cy="z2m-setup-local-dongle-summary">
-                    {z2mDongleName}
+                    {z2mDongleName || <Text id="integration.zigbee2mqtt.setup.modes.local.summary.unknownDongle" />}
                   </td>
                 </tr>
                 <tr>
@@ -34,7 +34,6 @@ const SetupLocalSummary = ({ configuration, enableEditionMode, disabled }) => {
                   </td>
                   <td class="text-muted" data-cy="z2m-setup-local-tcp-summary">
                     {z2mTcpPort}
-                    {!z2mTcpPort && <Text id="integration.zigbee2mqtt.setup.modes.local.summary.randomTcpPort" />}
                   </td>
                 </tr>
               </table>

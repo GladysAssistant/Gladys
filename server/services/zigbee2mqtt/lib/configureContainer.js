@@ -14,11 +14,12 @@ const YAML_CONFIG = { singleQuote: true };
  * @description Configure Z2M container.
  * @param {string} basePathOnContainer - Zigbee2mqtt base path.
  * @param {object} config - Gladys Z2M stored configuration.
+ * @param {boolean} setupMode - In setup mode.
  * @returns {Promise} Indicates if the configuration file has been created or modified.
  * @example
  * await this.configureContainer({});
  */
-async function configureContainer(basePathOnContainer, config) {
+async function configureContainer(basePathOnContainer, config, setupMode = false) {
   logger.info('Z2M Docker container is being configured...');
 
   // Create configuration path (if not exists)
@@ -72,16 +73,14 @@ async function configureContainer(basePathOnContainer, config) {
   const { port } = frontend;
 
   const existingPortConfig = !Number.isNaN(Number(port));
-  // Use ZERO value to force random port
-  // Or z2mTcpPort is not set and port is missing in configuration file
   const generateRandomPort =
-    config.z2mTcpPort === 0 || (!existingPortConfig && Number.isNaN(Number(config.z2mTcpPort)));
+    (setupMode || !existingPortConfig) && (config.z2mTcpPort === null || Number.isNaN(Number(config.z2mTcpPort)));
 
   // Only if incoming port
   if (generateRandomPort) {
     // Set random port
     logger.debug('Generated random z2m port...');
-    const { min, max } = DEFAULT.CONFIGURATION_PORTS;
+    const { min, max, defaultPort } = DEFAULT.CONFIGURATION_PORTS;
     try {
       config.z2mTcpPort = await portfinder.getPortPromise({
         port: min,
@@ -89,6 +88,7 @@ async function configureContainer(basePathOnContainer, config) {
       });
     } catch (e) {
       logger.error('Unable to get a random port for zigbee2mqtt configuration', e);
+      config.z2mTcpPort = defaultPort;
     }
   } else if (existingPortConfig) {
     // TCP Port is not found in config, but z2m is alrady configured

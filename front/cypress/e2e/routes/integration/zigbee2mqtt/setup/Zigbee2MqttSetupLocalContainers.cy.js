@@ -38,13 +38,6 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
         cy.get('.requirement').should('be.length', 3);
       });
 
-    cy.get('[data-cy=z2m-setup-remote-panel]')
-      .should('exist')
-      .within(() => {
-        cy.get('button').should('be.disabled');
-        cy.get('.requirement').should('be.length', 3);
-      });
-
     cy.get('[data-cy=z2m-toggle-status]').should('exist');
     cy.get('[data-cy=z2m-running-status]').should('exist');
   });
@@ -137,6 +130,7 @@ describe('Zigbee2Mqtt setup wizard local mode from scratch', () => {
     ).as('setup');
 
     cy.get('[data-cy=z2m-setup-save]').click();
+
     cy.wait('@setup')
       .its('request.body')
       .should('deep.eq', {

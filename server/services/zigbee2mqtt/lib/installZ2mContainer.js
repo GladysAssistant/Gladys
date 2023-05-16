@@ -10,10 +10,11 @@ const sleep = promisify(setTimeout);
 /**
  * @description Install and starts Zigbee2mqtt container.
  * @param {object} config - Service configuration properties.
+ * @param {boolean} setupMode - In setup mode.
  * @example
  * await z2m.installZ2mContainer(config);
  */
-async function installZ2mContainer(config) {
+async function installZ2mContainer(config, setupMode = false) {
   const { z2mDriverPath } = config;
 
   let dockerContainers = await this.gladys.system.getContainers({
@@ -52,7 +53,7 @@ async function installZ2mContainer(config) {
     }
   }
 
-  const configChanged = await this.configureContainer(basePathOnContainer, config);
+  const configChanged = await this.configureContainer(basePathOnContainer, config, setupMode);
 
   try {
     dockerContainers = await this.gladys.system.getContainers({

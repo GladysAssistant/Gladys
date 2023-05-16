@@ -58,6 +58,7 @@ const DEFAULT = {
   CONFIGURATION_PORTS: {
     min: 12000,
     max: 12999,
+    defaultPort: 8080,
   },
 };
 

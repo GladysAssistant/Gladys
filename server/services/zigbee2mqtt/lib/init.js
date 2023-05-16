@@ -5,11 +5,12 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
 /**
  * @description Prepares service and starts connection with broker if needed.
+ * @param {boolean} setupMode - In setup mode.
  * @returns {Promise} Resolve when init finished.
  * @example
  * await z2m.init();
  */
-async function init() {
+async function init(setupMode = false) {
   // Reset status
   this.usbConfigured = false;
   this.mqttExist = false;
@@ -82,7 +83,7 @@ async function init() {
     logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
     await this.checkForContainerUpdates(configuration);
     await this.installMqttContainer(configuration);
-    await this.installZ2mContainer(configuration);
+    await this.installZ2mContainer(configuration, setupMode);
 
     if (this.isEnabled()) {
       await this.connect(configuration);

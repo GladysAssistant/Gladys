@@ -53,6 +53,6 @@ describe('zigbee2mqtt setup', () => {
     assert.calledWithExactly(gladys.variable.setValue, 'Z2M_TCP_PORT', 'tcpPort', serviceId);
 
     // z2m was not running, we don't reload it
-    assert.calledOnceWithExactly(init);
+    assert.calledOnceWithExactly(init, true);
   });
 });
