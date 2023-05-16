@@ -86,6 +86,7 @@ import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
 
+
 // Deprecated integration
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 
@@ -132,6 +133,11 @@ import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
 // OpenAI integration
 import OpenAIPage from '../routes/integration/all/openai/index';
+
+// Tuya integration
+import TuyaPage from '../routes/integration/all/tuya/device-page';
+import TuyaSetupPage from "../routes/integration/all/tuya/setup-page";
+import TuyaDiscoverPage from "../routes/integration/all/tuya/discover-page";
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -251,6 +257,11 @@ const AppRouter = connect(
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
         <OpenAIPage path="/dashboard/integration/communication/openai" />
+
+        <TuyaPage path="/dashboard/integration/device/tuya" />
+
+        <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
+        <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

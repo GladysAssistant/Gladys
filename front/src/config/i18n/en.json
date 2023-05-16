@@ -711,6 +711,16 @@
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
     },
+    "tuya": {
+      "title": "Tuya",
+      "description": "TODO",
+      "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
+      "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
+      "apiKeyLabel": "Then, enter your API key here:",
+      "apiKeyPlaceholder": "Enter OpenWeather API key",
+      "saveButton": "Save",
+      "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connect to a local or remote MQTT server",

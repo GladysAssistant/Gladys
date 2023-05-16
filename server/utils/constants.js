@@ -810,6 +810,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     LEARN_MODE: 'broadlink.learn',
     SEND_MODE: 'broadlink.send',
   },
+  TUYA: {
+    STATUS: 'tuya.status',
+    DISCOVER: 'tuya.discover',
+  },
 };
 
 const DASHBOARD_TYPE = {

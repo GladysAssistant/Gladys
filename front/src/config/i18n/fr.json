@@ -837,6 +837,52 @@
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
     },
+    "tuya": {
+      "title": "Tuya",
+      "description": "TODO",
+      "saveButton": "Sauvegarder",
+      "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Tuya",
+      "setupTab": "Configuration",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Tuya, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Tuya.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "setup": {
+        "title": "Configuration Tuya",
+        "description": "Vous pouvez connecter Gladys à votre compte cloud Tuya pour commander les appareils associés.",
+        "baseUrl": "Base URL",
+        "baseUrlPlaceholder": "Entrez le l'url de tuya",
+        "accessKey": "Access Key",
+        "accessKeyPlaceholder": "Entrez l'access key de Tuya",
+        "secretKey": "Secret Key",
+        "secretKeyPlaceholder": "Entrez la secrete key de Tuya",
+        "saveLabel": "Enregistrer la configuration",
+
+
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud eWeLink...",
+        "connected": "Connexion réussie au compte cloud eWeLink !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud Tuya",
+        "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
+        "error": "Erreur de découverte des appareils Tuya. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil Tuya n'a été découvert.",
+        "scan": "Scanner"
+      },
+      "device": {
+        "title": "Appareils Tuya dans Gladys",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil Tuya trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      }
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connexion à un serveur MQTT, en local ou en distant.",
