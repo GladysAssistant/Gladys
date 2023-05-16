@@ -2,6 +2,10 @@ const { fake } = require('sinon');
 
 const EventEmitter = require('events');
 
+const ReadlineParserMock = function ReadlineParser() {};
+
+ReadlineParserMock.prototype = Object.create(new EventEmitter());
+
 const SerialPort = function SerialPort(path) {
   this.path = path;
 };
@@ -25,4 +29,4 @@ SerialPort.list = () => {
   });
 };
 
-module.exports = SerialPort;
+module.exports = { SerialPort, ReadlineParserMock };

@@ -1,22 +1,22 @@
 How To
 ======
 
+Let's google it.
 
+Changelog
+=========
+MAJOR 05-2023 Upgrading to "serialport": "11.x.x" & "@serialport/parser-readline": "11.x.x" (some code changes are required)
 
 Todos
 =====
 
-1. Real life test
+1. Real life test (On going since 2021)
 
 2. Videos to show this working (in progress)
 
 3. Documentation
 
-4. Front tests (Cypress)
-
-5.  Upgrading to "serialport": "10.x.x" & "@serialport/parser-readline": "10.x.x" (some code changes are required)
-
-
+4. Front tests (Cypress) : Ok for integration route
 
 
 Known issues
@@ -72,3 +72,17 @@ Improvments
 
 * Show RFLink gateway status
   10;status; => to display if RF and MiLight are ON on the RFLink gateway
+
+Devices compliance
+==================
+
+433Mhz
+------
+
+* Chacon DiO
+* Chinese movement detector
+
+2,4Ghz
+------
+
+* MiLight gu10, E27, ...  

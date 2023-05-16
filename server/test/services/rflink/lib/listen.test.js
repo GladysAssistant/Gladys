@@ -1,5 +1,6 @@
 const sinon = require('sinon');
-const Readline = require('../../../../services/rflink/node_modules/@serialport/parser-readline');
+
+const { ReadlineParserMock } = require('../SerialPortMock.test');
 const RFLinkHandler = require('../../../../services/rflink/lib');
 
 const { assert, stub } = sinon;
@@ -22,7 +23,7 @@ describe('RFLinkHandler.listen', () => {
   });
 
   it('should store the message listened', async () => {
-    rflinkHandler.usb = new Readline();
+    rflinkHandler.usb = new ReadlineParserMock();
     rflinkHandler.message = stub().returns(true);
     rflinkHandler.listen();
     rflinkHandler.usb.emit('data');
