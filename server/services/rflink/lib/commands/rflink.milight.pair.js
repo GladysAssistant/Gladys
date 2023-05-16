@@ -18,8 +18,6 @@ function pair(currentMilightGateway, milightZone) {
     // }
     const msg = `10;MiLightv1;${this.currentMilightGateway};0${number};34BC;PAIR;`;
     this.sendUsb.write(msg, (error) => {});
-    this.sendUsb.write(msg, (error) => {});
-    this.sendUsb.write(msg, (error) => {});
 
     newLight = {
       service_id: this.serviceId,

@@ -11,7 +11,7 @@ module.exports = function RfLink(gladys, serviceId) {
 
   /**
    * @public
-   * @description start rflink module
+   * @description Start rflink service.
    * @example
    * gladys.services.rflink.start();
    */
@@ -19,8 +19,6 @@ module.exports = function RfLink(gladys, serviceId) {
     RflinkPath = await gladys.variable.getValue(RFLINK_PATH, serviceId);
     if (!RflinkPath) {
       throw new ServiceNotConfiguredError('RFLINK_PATH_NOT_FOUND');
-    } else if (rfLinkManager === undefined) {
-      throw new ServiceNotConfiguredError('RFLINK_GATEWAY_ERROR');
     } else {
       logger.info('Starting Rflink service');
     }
@@ -38,7 +36,7 @@ module.exports = function RfLink(gladys, serviceId) {
 
   /**
    * @public
-   * @description stop rfllink module
+   * @description Stop rfllink service.
    * @example
    * gladys.services.rflink.stop();
    */

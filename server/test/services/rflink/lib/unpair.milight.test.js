@@ -10,17 +10,17 @@ const RFLinkHandler = proxyquire('../../../../services/rflink/lib', {
 const { assert, fake, stub } = sinon;
 
 describe('RFLinkHandler.unpair', () => {
+  let gladys;
   beforeEach(() => {
     sinon.reset();
-  });
-
-  it('should unpair a milight device', async () => {
-    const gladys = {
+    gladys = {
       event: {
         emit: fake.returns(null),
       },
     };
+  });
 
+  it('should unpair a milight device', async () => {
     const currentMilightGateway = 'F746';
     const milightZone = '2';
     const rflinkHandler = new RFLinkHandler(gladys, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');

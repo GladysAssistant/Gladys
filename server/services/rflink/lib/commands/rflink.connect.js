@@ -40,9 +40,9 @@ function connect(path) {
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.RFLINK.DRIVER_FAILED,
         });
-        return logger.error(`Error opening port: : ${err.message}`);
+        logger.error(`Error opening port: : ${err.message}`);
       }
-      return logger.info(`Success on opening port`);
+      logger.info(`Success on opening port`);
     });
 
     const readline = new Readline({

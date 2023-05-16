@@ -85,6 +85,19 @@ describe('RFLinkHandler.setValue', () => {
     expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
   });
 
+  it('should send a message to change value of a BUTTON where feature is binary and state is false', async () => {
+    const device = DEVICES[0];
+    const deviceFeature = {
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+    };
+    const state = false;
+    const expectedMsg = '10;Tristate;86aa7;11;DOWN;\n'; // cmd;model;deviceId;external_id last item;cmd
+    await rflinkHandler.setValue(device, deviceFeature, state);
+    assert.calledOnce(rflinkHandler.sendUsb.write);
+    expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
+  });
+
   it('should send a message to change value of a BUTTON where feature is binary and state is 1', async () => {
     const device = DEVICES[0];
     const deviceFeature = {
@@ -92,6 +105,19 @@ describe('RFLinkHandler.setValue', () => {
       category: DEVICE_FEATURE_CATEGORIES.BUTTON,
     };
     const state = 1;
+    const expectedMsg = '10;Tristate;86aa7;11;UP;\n'; // cmd;model;deviceId;external_id last item;cmd
+    await rflinkHandler.setValue(device, deviceFeature, state);
+    assert.calledOnce(rflinkHandler.sendUsb.write);
+    expect(rflinkHandler.sendUsb.write.args[0][0]).to.equal(expectedMsg);
+  });
+
+  it('should send a message to change value of a BUTTON where feature is binary and state is true', async () => {
+    const device = DEVICES[0];
+    const deviceFeature = {
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+      category: DEVICE_FEATURE_CATEGORIES.BUTTON,
+    };
+    const state = true;
     const expectedMsg = '10;Tristate;86aa7;11;UP;\n'; // cmd;model;deviceId;external_id last item;cmd
     await rflinkHandler.setValue(device, deviceFeature, state);
     assert.calledOnce(rflinkHandler.sendUsb.write);
