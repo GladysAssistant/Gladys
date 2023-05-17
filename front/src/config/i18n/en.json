@@ -2104,9 +2104,10 @@
       },
       "vacbot": {
         "state": {
-          "zero": "Pause",
-          "one": "Clean",
-          "other": "Stop"
+          "pause": "Pause",
+          "clean": "Clean",
+          "stop": "Stop",
+          "charge": "Charge"
         }
       },
       "air-conditioning": {

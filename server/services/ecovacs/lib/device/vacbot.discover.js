@@ -6,7 +6,7 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
   DEVICE_POLL_FREQUENCIES,
-  COVER_STATE,
+  VACBOT_MODE,
 } = require('../../../../utils/constants');
 
 const WRITE_VALUE_MAPPING = {};
@@ -22,9 +22,10 @@ const addMapping = (exposeName, gladysValue, ecovacsValue) => {
   READ_VALUE_MAPPING[exposeName] = readExposeMapping;
 };
 
-addMapping('state', COVER_STATE.OPEN, 'OPEN');
-addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
-addMapping('state', COVER_STATE.STOP, 'STOP');
+addMapping('state', VACBOT_MODE.CLEAN, 'CLEAN');
+addMapping('state', VACBOT_MODE.PAUSE, 'PAUSE');
+addMapping('state', VACBOT_MODE.STOP, 'STOP');
+addMapping('state', VACBOT_MODE.CHARGE, 'CHARGE');
 
 /**
  * @description Retrieve ecovacs devices from cloud.

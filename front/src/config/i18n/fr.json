@@ -2105,9 +2105,10 @@
       },
       "vacbot": {
         "state": {
-          "zero": "Pause",
-          "one": "Nettoyer",
-          "other": "Stop"
+          "pause": "Pause",
+          "clean": "Nettoyer",
+          "stop": "Stop",
+          "charge": "Charger"
         }
       },
       "air-conditioning": {
