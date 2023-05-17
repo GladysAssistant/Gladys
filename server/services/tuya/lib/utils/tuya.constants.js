@@ -1,9 +1,18 @@
 const GLADYS_VARIABLES = {
-  BASE_URL: 'BASE_URL',
+  ENDPOINT: 'ENDPOINT',
   ACCESS_KEY: 'ACCESS_KEY',
   SECRET_KEY: 'SECRET_KEY',
   ACCESS_TOKEN: 'ACCESS_TOKEN',
   REFRESH_TOKEN: 'REFRESH_TOKEN',
+};
+
+const TUYA_ENDPOINTS = {
+  china: 'https://openapi.tuyacn.com',
+  westernAmerica: 'https://openapi.tuyaus.com',
+  easternAmerica: 'https://openapi-ueaz.tuyaus.com',
+  centralEurope: 'https://openapi.tuyaeu.com',
+  westernEurope: 'https://openapi-weaz.tuyaeu.com',
+  india: 'https://openapi.tuyain.com'
 };
 
 const STATUS = {
@@ -20,6 +29,7 @@ const API = {
 
 module.exports = {
   GLADYS_VARIABLES,
+  TUYA_ENDPOINTS,
   STATUS,
   API,
 };

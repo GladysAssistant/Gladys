@@ -6,7 +6,7 @@ import TuyaPage from '../TuyaPage';
 
 class TuyaSetupPage extends Component {
   componentWillMount() {
-    //this.props.getIntegrationByName('tuya');
+    this.props.getIntegrationByName('tuya');
     this.props.getTuyaConfiguration();
     /*
     this.props.session.dispatcher.addListener(
@@ -37,6 +37,6 @@ class TuyaSetupPage extends Component {
 }
 
 export default connect(
-  'user,session,currentIntegration,tuyaBaseUrl,tuyaAccessKey,tuyaSecretKey,tuyaGetSettingsStatus,tuyaSaveSettingsStatus',
+  'user,session,currentIntegration,tuyaEndpoint,tuyaAccessKey,tuyaSecretKey,tuyaGetSettingsStatus,tuyaSaveSettingsStatus',
   actions
 )(TuyaSetupPage);

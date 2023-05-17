@@ -71,25 +71,27 @@ function createActions(store) {
     },
 
     updateConfiguration(state, e) {
+      console.log(e);
       const data = {};
       data[e.target.name] = e.target.value;
+      console.log(data);
       store.setState(data);
     },
 
     async getTuyaConfiguration(state) {
-      let tuyaBaseUrl = '';
+      let tuyaEndpoint = '';
       let tuyaAccessKey = '';
       let tuyaSecretKey = '';
 
       store.setState({
         tuyaGetSettingsStatus: RequestStatus.Getting,
-        tuyaBaseUrl,
+        tuyaEndpoint,
         tuyaAccessKey,
         tuyaSecretKey
       });
       try {
-        const { value: url } = await state.httpClient.get('/api/v1/service/tuya/variable/BASE_URL');
-        tuyaBaseUrl = url;
+        const { value: endpoint } = await state.httpClient.get('/api/v1/service/tuya/variable/ENDPOINT');
+        tuyaEndpoint = endpoint;
 
         const { value: accessKey } = await state.httpClient.get('/api/v1/service/tuya/variable/ACCESS_KEY');
         tuyaAccessKey = accessKey;
@@ -97,9 +99,11 @@ function createActions(store) {
         const { value: secretKey } = await state.httpClient.get('/api/v1/service/tuya/variable/SECRET_KEY');
         tuyaSecretKey = secretKey;
 
+        console.log(tuyaEndpoint);
+
         store.setState({
           tuyaGetSettingsStatus: RequestStatus.Success,
-          tuyaBaseUrl,
+          tuyaEndpoint,
           tuyaAccessKey,
           tuyaSecretKey
         });
@@ -115,9 +119,10 @@ function createActions(store) {
       store.setState({
         tuyaSaveSettingsStatus: RequestStatus.Getting
       });
+      console.log(state);
       try {
-        await state.httpClient.post('/api/v1/service/tuya/variable/BASE_URL', {
-          value: state.tuyaBaseUrl.trim()
+        await state.httpClient.post('/api/v1/service/tuya/variable/ENDPOINT', {
+          value: state.tuyaEndpoint
         });
 
         await state.httpClient.post('/api/v1/service/tuya/variable/ACCESS_KEY', {

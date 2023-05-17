@@ -839,7 +839,7 @@
     },
     "tuya": {
       "title": "Tuya",
-      "description": "TODO",
+      "description": "Contrôler vos appareils Tuya",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo.",
       "deviceTab": "Appareils",
@@ -854,7 +854,15 @@
       "setup": {
         "title": "Configuration Tuya",
         "description": "Vous pouvez connecter Gladys à votre compte cloud Tuya pour commander les appareils associés.",
-        "baseUrl": "Base URL",
+        "endpoints": {
+          "china": "China",
+          "westernAmerica": "Western America",
+          "easternAmerica": "Eastern America",
+          "centralEurope": "Central Europe",
+          "westernEurope": "Western Europe",
+          "india": "India"
+        },
+        "endpoint": "Endpoint",
         "baseUrlPlaceholder": "Entrez le l'url de tuya",
         "accessKey": "Access Key",
         "accessKeyPlaceholder": "Entrez l'access key de Tuya",

@@ -35,8 +35,8 @@ Add `@see` attribute in method comment to keep a link on official documentation.
 We store Tuya parameters in Gladys service parameters:
 
 | Parameter name  | Description           | How to value it?                                                                                                                                 |
-| :-------------- | :-------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `BASE_URL`      | Tuya cloud URL        | This can be America / Europe / Asia regions.<br />So this should be configurable with a select box in front configuration page.                  |
+|:----------------|:----------------------| :----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ENDPOINT`      | Tuya cloud endpoint   | This can be America / Europe / Asia regions.<br />So this should be configurable with a select box in front configuration page.                  |
 | `ACCESS_KEY`    | Tuya cloud access key | This should be configurable with a select box in front configuration page.                                                                       |
 | `SECRET_KEY`    | Tuya cloud secret key | This should be configurable with a select box in front configuration page.                                                                       |
 | `ACCESS_TOKEN`  | Tuya access token     | Hidden parameter.<br/>Once well connected on Tuya cloud, we store access token in database to be able to concat Tuya cloud after Gladys restart  |

@@ -7,12 +7,12 @@ const { GLADYS_VARIABLES } = require('./utils/tuya.constants');
  * @param {object} configuration - Configuration to save.
  * @returns {Promise} Tuya configuration.
  * @example
- * await saveConfiguration({ baseUrl: '...', accessKey: '...', secretKey: '...'});
+ * await saveConfiguration({ endpoint: '...', accessKey: '...', secretKey: '...'});
  */
 async function saveConfiguration(configuration) {
   logger.debug('Saving Tuya configuration...');
-  const { baseUrl, accessKey, secretKey } = configuration;
-  await this.gladys.variable.setValue(GLADYS_VARIABLES.BASE_URL, baseUrl, this.serviceId);
+  const { endpoint, accessKey, secretKey } = configuration;
+  await this.gladys.variable.setValue(GLADYS_VARIABLES.ENDPOINT, endpoint, this.serviceId);
   await this.gladys.variable.setValue(GLADYS_VARIABLES.ACCESS_KEY, accessKey, this.serviceId);
   await this.gladys.variable.setValue(GLADYS_VARIABLES.SECRET_KEY, secretKey, this.serviceId);
 

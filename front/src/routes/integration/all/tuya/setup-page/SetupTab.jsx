@@ -25,18 +25,30 @@ const SetupTab = ({ children, ...props }) => {
 
             <form>
               <div class="form-group">
-                <label for="tuyaBaseUrl" class="form-label">
-                  <Text id={`integration.tuya.setup.baseUrl`} />
+                <label for="tuyaEndpoint" class="form-label">
+                  <Text id={`integration.tuya.setup.endpoint`} />
                 </label>
-                <Localizer>
-                  <input
-                    name="tuyaBaseUrl"
-                    placeholder={<Text id="integration.tuya.setup.userPlaceholder" />}
-                    value={props.tuyaBaseUrl}
-                    class="form-control"
-                    onInput={props.updateConfiguration}
-                  />
-                </Localizer>
+                <select className="form-control" name="tuyaEndpoint" value={props.tuyaEndpoint}
+                  onChange={props.updateConfiguration}>
+                  <option value="china">
+                    <Text id="integration.tuya.setup.endpoints.china"/>
+                  </option>
+                  <option value="westernAmerica">
+                    <Text id="integration.tuya.setup.endpoints.westernAmerica"/>
+                  </option>
+                  <option value="easternAmerica">
+                    <Text id="integration.tuya.setup.endpoints.easternAmerica"/>
+                  </option>
+                  <option value="centralEurope">
+                    <Text id="integration.tuya.setup.endpoints.centralEurope"/>
+                  </option>
+                  <option value="westernEurope">
+                    <Text id="integration.tuya.setup.endpoints.westernEurope"/>
+                  </option>
+                  <option value="india">
+                    <Text id="integration.tuya.setup.endpoints.india"/>
+                  </option>
+                </select>
               </div>
 
               <div class="form-group">
@@ -73,7 +85,7 @@ const SetupTab = ({ children, ...props }) => {
 
               <div class="row mt-5">
                 <div class="col">
-                  <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
+                  <button type="submit" class="btn btn-success" onClick={props.saveTuyaConfiguration}>
                     <Text id="integration.tuya.setup.saveLabel" />
                   </button>
                 </div>
