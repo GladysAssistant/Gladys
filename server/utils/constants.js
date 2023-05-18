@@ -366,6 +366,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
   VOLUME_SENSOR: 'volume-sensor',
+  TEXT: 'text',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -517,6 +518,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
+  },
+  TEXT: {
+    TEXT: 'text',
   },
 };
 
