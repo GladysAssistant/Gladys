@@ -1,30 +1,15 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
+import dayjs from 'dayjs';
 import actions from '../../actions/calendar';
 import { isBright } from '../../utils/color';
 import withIntlAsProp from '../../utils/withIntlAsProp';
-import dayjs from 'dayjs';
-import minMax from 'dayjs/plugin/minMax';
-import weekday from 'dayjs/plugin/weekday';
-import isBetween from 'dayjs/plugin/isBetween';
-import localeData from 'dayjs/plugin/localeData';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { Calendar, dayjsLocalizer } from 'react-big-calendar';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-dayjs.extend(minMax);
-dayjs.extend(weekday);
-dayjs.extend(isBetween);
-dayjs.extend(localeData);
-dayjs.extend(isSameOrAfter);
-dayjs.extend(isSameOrBefore);
-dayjs.extend(localizedFormat);
-
-const localizer = momentLocalizer(dayjs);
+const localizer = dayjsLocalizer(dayjs);
 
 class Map extends Component {
   onRangeChange = range => {
