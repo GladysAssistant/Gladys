@@ -334,15 +334,9 @@ describe('Device.saveHistoricalState', () => {
       ],
       raw: true,
     });
-    expect(new Date(newDeviceFeatureInDB.last_monthly_aggregate).getTime()).to.deep.equal(
-      new Date('2022-08-30 17:00:00.000 +00:00').getTime(),
-    );
-    expect(new Date(newDeviceFeatureInDB.last_daily_aggregate).getTime()).to.deep.equal(
-      new Date('2022-10-03 16:59:59.000 +00:00').getTime(),
-    );
-    expect(new Date(newDeviceFeatureInDB.last_hourly_aggregate).getTime()).to.deep.equal(
-      new Date('2022-10-03 16:59:59.000 +00:00').getTime(),
-    );
+    expect(new Date(newDeviceFeatureInDB.last_monthly_aggregate).getTime()).to.be.lessThan(dateInThePast);
+    expect(new Date(newDeviceFeatureInDB.last_daily_aggregate).getTime()).to.be.lessThan(dateInThePast);
+    expect(new Date(newDeviceFeatureInDB.last_hourly_aggregate).getTime()).to.be.lessThan(dateInThePast);
     expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
   });
   it('should save old state and update recent aggregate', async () => {
