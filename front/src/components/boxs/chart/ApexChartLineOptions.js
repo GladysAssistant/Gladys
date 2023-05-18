@@ -49,6 +49,7 @@ const getApexChartLineOptions = ({ height, displayAxes, series, COLORS, locales,
       type: 'datetime'
     },
     yaxis: {
+      decimalsInFloat: 0,
       labels: {
         padding: 4
       }

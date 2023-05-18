@@ -169,7 +169,8 @@ const data = {
           interval: 'last-month',
           unit: 'celsius',
           title: 'Temperature',
-          display_variation: true
+          display_variation: true,
+          display_axes: true
         },
         {
           type: 'user-presence'
@@ -3221,7 +3222,7 @@ const data = {
           created_at: dayjs()
             .subtract(1, 'day')
             .toDate(),
-          value: 33
+          value: 33.0001
         },
         {
           created_at: dayjs()

@@ -50,6 +50,7 @@ const getApexChartAreaOptions = ({ displayAxes, height, series, COLORS, locales,
       type: 'datetime'
     },
     yaxis: {
+      decimalsInFloat: 0,
       labels: {
         padding: 4
       }

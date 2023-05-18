@@ -48,6 +48,7 @@ const getApexChartStepLineOptions = ({ height, displayAxes, series, COLORS, loca
       type: 'datetime'
     },
     yaxis: {
+      decimalsInFloat: 0,
       labels: {
         padding: 4
       }

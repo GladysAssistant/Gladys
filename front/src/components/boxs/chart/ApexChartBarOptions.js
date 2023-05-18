@@ -58,6 +58,7 @@ const getApexChartBarOptions = ({ displayAxes, series, COLORS, locales, defaultL
       type: 'datetime'
     },
     yaxis: {
+      decimalsInFloat: 0,
       labels: {
         padding: 4
       }
