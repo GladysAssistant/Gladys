@@ -155,11 +155,14 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
       },
     );
 
-    if (Object.keys(toUpdate).length > 0) {
-      // Update data in RAM
-      this.stateManager.setState('deviceFeature', deviceFeature.selector, toUpdate);
-      // Update DB
-    }
+    const newDeviceInDb = await db.DeviceFeature.findOne({
+      where: {
+        id: deviceFeature.id,
+      },
+      raw: true,
+    });
+
+    this.stateManager.setState('deviceFeature', deviceFeature.selector, newDeviceInDb);
   }
 }
 
