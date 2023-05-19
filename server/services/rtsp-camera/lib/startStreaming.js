@@ -113,28 +113,30 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       'veryfast',
       '-flags',
       '+cgop',
+      '-vf',
+      'scale=1920:-1', // Full HD resolution
       '-r',
-      '25', // frames (rate) per second
+      '25', // Frames (rate) per second
       '-g',
       '25', // Set key frame placement. The GOP size sets the maximum distance between key frames;
       '-b:v',
       '1000k', // Bitrate
       '-maxrate',
-      '2M', // maximum bitrate nevertheless of the quality factor crf
+      '1500k', // Maximum bitrate nevertheless of the quality factor crf
       '-bufsize',
-      '4M', // Based on the -bufsize option, ffmpeg will calculate and correct the average bit rate produced.
+      '3000k', // Based on the -bufsize option, ffmpeg will calculate and correct the average bit rate produced.
       // If we specify a smaller -bufsize, ffmpeg will more frequently check for the output bit rate
       // and constrain it to the specified average bit rate from the command line
       '-crf',
-      '25', // quality of the video Constant Rate Factor 17-18 visually lossless, 23 default, 0 lossless, 51 highest
+      '25', // Quality of the video Constant Rate Factor 17-18 visually lossless, 23 default, 0 lossless, 51 highest
       '-sc_threshold',
-      '0', // disable scene detection
+      '0', // Disable scene detection
       '-c:a',
-      'aac', // audio codec aac
+      'aac', // Audio codec aac
       '-b:a',
-      '128k', // bitrate for the audio
+      '128k', // Bitrate for the audio
       '-ac',
-      '2', // audio channels, 2 = stereo
+      '2', // Audio channels, 2 = stereo
       '-hls_time',
       segmentDuration.toString(),
       '-hls_list_size',
