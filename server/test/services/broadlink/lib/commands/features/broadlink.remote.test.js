@@ -43,6 +43,25 @@ describe('broadlink.remote', () => {
       assert.calledOnceWithExactly(peripheral.sendData, Buffer.from([13]));
     });
 
+    it('send code with matching value', async () => {
+      const device = {
+        params: [
+          {
+            name: 'ir_code_binary-12',
+            value: '0d',
+          },
+        ],
+      };
+      const feature = {
+        type: 'binary',
+      };
+      const value = 12;
+
+      await remote.setValue(peripheral, device, feature, value);
+
+      assert.calledOnceWithExactly(peripheral.sendData, Buffer.from([13]));
+    });
+
     it('send code with sub value', async () => {
       const device = {
         params: [

@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { Op } = require('sequelize');
 const db = require('../../models');
 const logger = require('../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
@@ -109,33 +110,59 @@ async function saveHistoricalState(deviceFeature, newValue, newValueCreatedAt) {
       59,
     );
 
-    const newMonthlyAggregateIsBeforeCurrent =
-      lastDayOfPreviousMonth < new Date(previousDeviceFeature.last_monthly_aggregate || 0);
-    const newDailyAggregateIsBeforeCurrent =
-      dayBeforeJustBeforeMidnight < new Date(previousDeviceFeature.last_daily_aggregate || 0);
-    const newHourlyAggregateIsBeforeCurrent =
-      dayBeforeJustBeforeMidnight < new Date(previousDeviceFeature.last_hourly_aggregate || 0);
-    const toUpdate = {};
-
-    if (newMonthlyAggregateIsBeforeCurrent) {
-      toUpdate.last_monthly_aggregate = lastDayOfPreviousMonth;
-    }
-    if (newDailyAggregateIsBeforeCurrent) {
-      toUpdate.last_daily_aggregate = dayBeforeJustBeforeMidnight;
-    }
-    if (newHourlyAggregateIsBeforeCurrent) {
-      toUpdate.last_hourly_aggregate = dayBeforeJustBeforeMidnight;
-    }
-    if (Object.keys(toUpdate).length > 0) {
-      // Update data in RAM
-      this.stateManager.setState('deviceFeature', deviceFeature.selector, toUpdate);
-      // Update DB
-      await db.DeviceFeature.update(toUpdate, {
+    // We update last monthly aggregate only if current last monthly aggregate is more recent
+    await db.DeviceFeature.update(
+      {
+        last_monthly_aggregate: lastDayOfPreviousMonth,
+      },
+      {
         where: {
           id: deviceFeature.id,
+          last_monthly_aggregate: {
+            [Op.gt]: lastDayOfPreviousMonth,
+          },
         },
-      });
-    }
+      },
+    );
+
+    // We update last daily aggregate only if current last daily aggregate is more recent
+    await db.DeviceFeature.update(
+      {
+        last_daily_aggregate: dayBeforeJustBeforeMidnight,
+      },
+      {
+        where: {
+          id: deviceFeature.id,
+          last_daily_aggregate: {
+            [Op.gt]: dayBeforeJustBeforeMidnight,
+          },
+        },
+      },
+    );
+
+    // We update last hourly aggregate only if current last hourly aggregate is more recent
+    await db.DeviceFeature.update(
+      {
+        last_hourly_aggregate: dayBeforeJustBeforeMidnight,
+      },
+      {
+        where: {
+          id: deviceFeature.id,
+          last_hourly_aggregate: {
+            [Op.gt]: dayBeforeJustBeforeMidnight,
+          },
+        },
+      },
+    );
+
+    const newDeviceInDb = await db.DeviceFeature.findOne({
+      where: {
+        id: deviceFeature.id,
+      },
+      raw: true,
+    });
+
+    this.stateManager.setState('deviceFeature', deviceFeature.selector, newDeviceInDb);
   }
 }
 

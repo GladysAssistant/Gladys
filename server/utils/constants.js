@@ -483,6 +483,8 @@ const DEVICE_FEATURE_TYPES = {
     PLAY: 'play',
     PAUSE: 'pause',
     STOP: 'stop',
+    PREVIOUS: 'previous',
+    NEXT: 'next',
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
