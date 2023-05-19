@@ -74,6 +74,10 @@ class CameraBoxComponent extends Component {
       const cameraComponent = this;
 
       this.hls = new Hls({
+        liveMaxLatencyDurationCount: 3,
+        liveSyncDurationCount: 2,
+        maxLiveSyncPlaybackRate: 1.5,
+        liveDurationInfinity: true,
         xhrSetup: xhr => {
           // We set the correct access token
           const accessToken = isGladysPlus
