@@ -38,7 +38,7 @@ const brightnessTrait = {
         });
       }
 
-      return events;
+      return { events };
     },
   },
 };

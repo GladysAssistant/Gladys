@@ -13,9 +13,7 @@ const { TRAIT_BY_COMMAND } = require('../traits');
  * @see https://actions-on-google.github.io/actions-on-google-nodejs/interfaces/smarthome.smarthomeapp.html#onexecute
  */
 function onExecute(body) {
-  // Get requested Gladys devices
-  const pendingDevices = [];
-  const errorneousDevices = [];
+  const commands = [];
 
   body.inputs
     .filter((input) => input.payload && input.payload.commands)
@@ -32,7 +30,7 @@ function onExecute(body) {
               const gladysDevice = this.gladys.stateManager.get('device', device.id);
 
               if (!gladysDevice) {
-                errorneousDevices.push(device.id);
+                commands.push({ ids: [device.id], status: 'ERROR' });
               }
 
               return gladysDevice;
@@ -43,22 +41,21 @@ function onExecute(body) {
             // Each execution triggered
             execution.forEach((exec) => {
               const trait = TRAIT_BY_COMMAND[exec.command];
+              const deviceStatus = { ids: [device.selector], status: 'ERROR' };
 
               if (!trait || !trait.commands[exec.command]) {
                 // Command key not found
                 logger.error(`GoogleActions "${exec.command}" command is not managed.`);
                 // All devices are failure
-                errorneousDevices.push(device.selector);
+                deviceStatus.status = 'ERROR';
               } else {
                 const commandExecutor = trait.commands[exec.command];
 
                 // Build related feature events according incomping attributes
-                const eventMessages = commandExecutor(device, exec.params);
+                const { events = [], states } = commandExecutor(device, exec.params);
 
-                if (!eventMessages || !eventMessages.length) {
-                  errorneousDevices.push(device.selector);
-                } else {
-                  eventMessages.forEach((eventMessage) => {
+                if (events.length > 0) {
+                  events.forEach((eventMessage) => {
                     const action = {
                       type: ACTIONS.DEVICE.SET_VALUE,
                       status: ACTIONS_STATUS.PENDING,
@@ -66,31 +63,21 @@ function onExecute(body) {
                       ...eventMessage,
                     };
                     this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+                    deviceStatus.status = 'PENDING';
                   });
+                }
 
-                  pendingDevices.push(device.selector);
+                if (states) {
+                  deviceStatus.status = 'SUCCESS';
+                  deviceStatus.states = states;
                 }
               }
+
+              commands.push(deviceStatus);
             });
           });
         });
     });
-
-  const commands = [];
-
-  if (pendingDevices.length > 0) {
-    commands.push({
-      ids: pendingDevices,
-      status: 'PENDING',
-    });
-  }
-
-  if (errorneousDevices.length > 0) {
-    commands.push({
-      ids: errorneousDevices,
-      status: 'ERROR',
-    });
-  }
 
   return {
     requestId: body.requestId,

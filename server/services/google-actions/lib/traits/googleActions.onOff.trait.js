@@ -38,7 +38,7 @@ const onOffTrait = {
         });
       }
 
-      return events;
+      return { events };
     },
   },
 };

@@ -60,7 +60,7 @@ const openCloseTrait = {
         });
       }
 
-      return events;
+      return { events };
     },
   },
 };

@@ -101,7 +101,7 @@ const colorSettingTrait = {
         }
       }
 
-      return events;
+      return { events };
     },
   },
 };
