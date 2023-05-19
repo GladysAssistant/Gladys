@@ -117,6 +117,8 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       '25', // frames (rate) per second
       '-g',
       '25', // Set key frame placement. The GOP size sets the maximum distance between key frames;
+      '-b:v',
+      '1000k', // Bitrate
       '-maxrate',
       '2M', // maximum bitrate nevertheless of the quality factor crf
       '-bufsize',
