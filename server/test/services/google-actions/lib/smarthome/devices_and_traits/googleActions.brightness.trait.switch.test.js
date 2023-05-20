@@ -144,8 +144,8 @@ describe('GoogleActions Handler - onSync - brightness (switch)', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should emit Gladys event with new value - onExecute', () => {
-    const result = googleActionsHandler.onExecute(body);
+  it('should emit Gladys event with new value - onExecute', async () => {
+    const result = await googleActionsHandler.onExecute(body);
 
     const expectedResult = {
       requestId: 'request-id',

@@ -37,7 +37,7 @@ describe('GoogleActions Handler - onExecute', () => {
     sinon.reset();
   });
 
-  it('should do nothing - empty payload', () => {
+  it('should do nothing - empty payload', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -47,7 +47,7 @@ describe('GoogleActions Handler - onExecute', () => {
       inputs: [],
     };
 
-    const result = googleActionsHandler.onExecute(body);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -62,7 +62,7 @@ describe('GoogleActions Handler - onExecute', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should do nothing - empty commands', () => {
+  it('should do nothing - empty commands', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -79,7 +79,7 @@ describe('GoogleActions Handler - onExecute', () => {
       ],
     };
 
-    const result = googleActionsHandler.onExecute(body);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -93,7 +93,7 @@ describe('GoogleActions Handler - onExecute', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should do nothing - empty devices', () => {
+  it('should do nothing - empty devices', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -112,7 +112,7 @@ describe('GoogleActions Handler - onExecute', () => {
       ],
     };
 
-    const result = googleActionsHandler.onExecute(body);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -126,7 +126,7 @@ describe('GoogleActions Handler - onExecute', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should send errorneous device - unkonwn device', () => {
+  it('should send errorneous device - unkonwn device', async () => {
     gladys.stateManager.get = fake.returns(null);
 
     const body = {
@@ -148,7 +148,7 @@ describe('GoogleActions Handler - onExecute', () => {
       ],
     };
 
-    const result = googleActionsHandler.onExecute(body);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -167,7 +167,7 @@ describe('GoogleActions Handler - onExecute', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should send errorneous device - command not managed', () => {
+  it('should send errorneous device - command not managed', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -192,7 +192,7 @@ describe('GoogleActions Handler - onExecute', () => {
       ],
     };
 
-    const result = googleActionsHandler.onExecute(body);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -211,7 +211,7 @@ describe('GoogleActions Handler - onExecute', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should send errorneous device - no events generated', () => {
+  it('should send errorneous device - no events generated', async () => {
     gladys.stateManager.get = fake.returns({
       selector: 'device-1',
       features: [],
@@ -244,7 +244,7 @@ describe('GoogleActions Handler - onExecute', () => {
       ],
     };
 
-    const result = googleActionsHandler.onExecute(body);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -263,7 +263,7 @@ describe('GoogleActions Handler - onExecute', () => {
     assert.notCalled(gladys.event.emit);
   });
 
-  it('onExecute - success', () => {
+  it('should emit event - onExecute', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -291,7 +291,7 @@ describe('GoogleActions Handler - onExecute', () => {
       ],
     };
 
-    const result = googleActionsHandler.onExecute(body);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',

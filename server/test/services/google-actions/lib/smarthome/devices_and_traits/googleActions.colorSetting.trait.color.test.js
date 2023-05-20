@@ -146,7 +146,7 @@ describe('GoogleActions Handler - onSync - color', () => {
   });
 
   it('should emit Gladys event with new value - onExecute', async () => {
-    const result = googleActionsHandler.onExecute(body);
+    const result = await googleActionsHandler.onExecute(body);
 
     const expectedResult = {
       requestId: 'request-id',
