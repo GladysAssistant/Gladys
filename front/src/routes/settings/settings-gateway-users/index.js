@@ -6,25 +6,18 @@ import linkState from 'linkstate';
 import update from 'immutability-helper';
 
 class DashboardUsersPage extends Component {
-  state = {
-    users: [],
-    role: 'user'
+  getUsers = async () => {
+    const users = await this.props.session.gatewayClient.getUsersInAccount();
+    this.setState({ users });
   };
 
-  getUsers = () => {
-    this.props.session.gatewayClient.getUsersInAccount().then(users => {
-      this.setState({ users });
+  inviteUser = async () => {
+    const invitedUser = await this.props.session.gatewayClient.inviteUser(this.state.email, this.state.role);
+    let newState = update(this.state, {
+      users: { $push: [invitedUser] }
     });
-  };
 
-  inviteUser = () => {
-    this.props.session.gatewayClient.inviteUser(this.state.email, this.state.role).then(invitedUser => {
-      let newState = update(this.state, {
-        users: { $push: [invitedUser] }
-      });
-
-      this.setState(newState);
-    });
+    this.setState(newState);
   };
 
   revokeUser = async (user, index) => {
@@ -45,6 +38,15 @@ class DashboardUsersPage extends Component {
       this.setState({ revokeUserError: true });
     }
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      users: [],
+      role: 'user'
+    };
+  }
 
   componentDidMount() {
     this.getUsers();

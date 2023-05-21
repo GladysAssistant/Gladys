@@ -4,13 +4,6 @@ import ConfigureTwoFactorForm from './ConfigureTwoFactorForm';
 import QRCode from 'qrcode';
 
 class ConfigureTwoFactorPage extends Component {
-  state = {
-    dataUrl: null,
-    twoFactorCode: '',
-    step: 1,
-    errored: false
-  };
-
   getOtpAuthUrl = async () => {
     const accessToken = this.props.session.getTwoFactorAccessToken();
     const data = await this.props.session.gatewayClient.configureTwoFactor(accessToken);
@@ -55,19 +48,28 @@ class ConfigureTwoFactorPage extends Component {
 
     let twoFactorCode = this.state.twoFactorCode.replace(/\s/g, '');
 
-    this.props.session.gatewayClient
-      .enableTwoFactor(accessToken, twoFactorCode)
-      .then(() => {
+    try {
+      await this.props.session.gatewayClient.enableTwoFactor(accessToken, twoFactorCode);
+      window.location = '/login';
+    } catch (err) {
+      if (err && err.response && err.response.status === 401) {
         window.location = '/login';
-      })
-      .catch(err => {
-        if (err && err.response && err.response.status === 401) {
-          window.location = '/login';
-        } else {
-          this.setState({ errored: true });
-        }
-      });
+      } else {
+        this.setState({ errored: true });
+      }
+    }
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dataUrl: null,
+      twoFactorCode: '',
+      step: 1,
+      errored: false
+    };
+  }
 
   componentWillMount = () => {
     this.getOtpAuthUrl();

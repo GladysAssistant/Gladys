@@ -9,19 +9,6 @@ const ACCEPTED_LANGUAGES = ['en', 'fr'];
 const DEFAULT_LANGUAGE = 'en';
 
 class SignupPage extends Component {
-  state = {
-    name: '',
-    email: '',
-    password: '',
-    fieldsErrored: [],
-    currentStep: 1,
-    accountAlreadyExist: false,
-    signupCompleted: false,
-    unknownError: false,
-    tokenError: false,
-    browserCompatible: window.crypto && window.crypto.subtle
-  };
-
   validateEmail = email => {
     let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
     return re.test(String(email).toLowerCase());
@@ -45,7 +32,7 @@ class SignupPage extends Component {
     return fieldsErrored;
   };
 
-  validateForm = event => {
+  validateForm = async event => {
     event.preventDefault();
 
     this.setState({ currentStep: 2 });
@@ -74,43 +61,67 @@ class SignupPage extends Component {
       return this.setState({ tokenError: true, currentStep: 1 });
     }
 
-    this.props.session.gatewayClient
-      .signup(newUser.name, newUser.email, newUser.password, newUser.language, this.props.token)
-      .then(() => {
-        setTimeout(() => {
-          this.setState({
-            fieldsErrored: [],
-            currentStep: 2,
-            accountAlreadyExist: false,
-            unknownError: false,
-            tokenError: false,
-            signupCompleted: true
-          });
-        }, 1000);
-      })
-      .catch(error => {
-        this.setState({ currentStep: 1 });
-        if (error.response && error.response.status === 422 && error.response.data.details) {
-          let fieldsErrored = [];
-          error.response.data.details.forEach(err => {
-            fieldsErrored.push(err.context.key);
-          });
-          this.setState({ fieldsErrored });
-        } else if (error.response && error.response.status === 409) {
-          this.setState({ accountAlreadyExist: true });
-        } else {
-          console.error(error);
-          this.setState({ unknownError: true });
-        }
-      });
+    try {
+      await this.props.session.gatewayClient.signup(
+        newUser.name,
+        newUser.email,
+        newUser.password,
+        newUser.language,
+        this.props.token
+      );
+
+      setTimeout(() => {
+        this.setState({
+          fieldsErrored: [],
+          currentStep: 2,
+          accountAlreadyExist: false,
+          unknownError: false,
+          tokenError: false,
+          signupCompleted: true
+        });
+      }, 1000);
+    } catch (error) {
+      this.setState({ currentStep: 1 });
+      if (error.response && error.response.status === 422 && error.response.data.details) {
+        let fieldsErrored = [];
+        error.response.data.details.forEach(err => {
+          fieldsErrored.push(err.context.key);
+        });
+        this.setState({ fieldsErrored });
+      } else if (error.response && error.response.status === 409) {
+        this.setState({ accountAlreadyExist: true });
+      } else {
+        console.error(error);
+        this.setState({ unknownError: true });
+      }
+    }
   };
 
-  componentDidMount = () => {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      name: '',
+      email: '',
+      password: '',
+      fieldsErrored: [],
+      currentStep: 1,
+      accountAlreadyExist: false,
+      signupCompleted: false,
+      unknownError: false,
+      tokenError: false,
+      browserCompatible: window.crypto && window.crypto.subtle
+    };
+  }
+
+  componentWillMount = async () => {
     if (this.props.token) {
-      this.props.session.gatewayClient
-        .getInvitation(this.props.token)
-        .then(invitation => this.setState({ email: invitation.email }))
-        .catch(() => this.setState({ invitationError: true }));
+      try {
+        const invitation = await this.props.session.gatewayClient.getInvitation(this.props.token);
+        this.setState({ email: invitation.email });
+      } catch (e) {
+        this.setState({ invitationError: true });
+      }
     }
   };
 

@@ -4,22 +4,27 @@ import linkState from 'linkstate';
 import ForgotPassword from './ForgotPassword';
 
 class ForgotPasswordPage extends Component {
-  state = {
-    email: '',
-    forgotInProgress: false
-  };
-
-  sendResetPasswordLink = e => {
+  sendResetPasswordLink = async e => {
     e.preventDefault();
     this.setState({ forgotInProgress: true });
-    this.props.session.gatewayClient
-      .forgotPassword(this.state.email)
-      .then(() => this.setState({ success: true, forgotInProgress: false }))
-      .catch(e => {
-        console.error(e);
-        this.setState({ success: true, forgotInProgress: false });
-      });
+
+    try {
+      await this.props.session.gatewayClient.forgotPassword(this.state.email);
+      this.setState({ success: true, forgotInProgress: false });
+    } catch (e) {
+      console.error(e);
+      this.setState({ success: true, forgotInProgress: false });
+    }
   };
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      email: '',
+      forgotInProgress: false
+    };
+  }
 
   render({}, { email, success, forgotInProgress }) {
     return (
