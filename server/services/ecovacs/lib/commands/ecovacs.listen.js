@@ -1,8 +1,9 @@
-const logger = require('../../../../utils/logger');
 const { eventFunctionWrapper } = require('../../../../utils/functionsWrapper');
 
 /**
  * @description Listen to all gladys registered vacbots.
+ * @param {object} vacbot - Ecovacs vacbot object.
+ * @param {object} device - Gladys device.
  * @example
  * ecovacs.listen(vacbot, device);
  */

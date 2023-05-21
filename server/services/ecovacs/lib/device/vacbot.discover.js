@@ -29,7 +29,7 @@ addMapping('state', VACBOT_MODE.CHARGE, 'CHARGE');
 
 /**
  * @description Retrieve ecovacs devices from cloud.
- * @returns {Promise<Array<Object>>} Resolve with array of new devices.
+ * @returns {Promise<Array<object>>} Resolve with array of new devices.
  * @example
  * discover();
  */

@@ -477,7 +477,7 @@ const DEVICE_FEATURE_TYPES = {
     CLEAN: 'clean',
     PAUSE: 'pause',
     STOP: 'stop',
-    CHARGE: 'charge'
+    CHARGE: 'charge',
   },
   ENERGY_SENSOR: {
     BINARY: 'binary',

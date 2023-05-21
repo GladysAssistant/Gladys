@@ -5,7 +5,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../..
 /**
  *
  * @description Poll values of an ecovacs device.
- * @param {Object} device - The device to poll.
+ * @param {object} device - The device to poll.
  * @returns {Promise} Promise of nothing.
  * @example
  * poll(device);
@@ -38,7 +38,7 @@ async function poll(device) {
   vacbot.run('GetChargeState'); // retrieve the charging status
   vacbot.run('GetSleepStatus');
   logger.trace(`POLL vacbot : `, vacbot);
-  if (vacbot.errorCode != 0) {
+  if (vacbot.errorCode !== 0) {
     logger.error(`Error ${vacbot.errorCode} occured : ${vacbot.errorDescription}.`);
   }
 }

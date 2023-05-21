@@ -60,7 +60,6 @@ describe('EcovacsHandler setValue', () => {
     assert.notCalled(fakes.pause);
   });
 
-  
   it('should set the binary value to 2', async () => {
     await ecovacsService.device.setValue(
       devices[0],

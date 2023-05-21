@@ -6,7 +6,7 @@ const BATTERY_FEATURE_INDEX = 1;
 /**
  * @description Ecovacs onMessage callback.
  * @param {string} type - Type of event.
- * @param {Object} device - Concerned Gladys device.
+ * @param {object} device - Concerned Gladys device.
  * @param {any} value - Value from event.
  * @example
  * vacbot.onMessage('BatteryInfo', device, 100);

@@ -3,9 +3,9 @@ const { NotFoundError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
 
 /**
- * @description Change value of a Ecovacs Vacbot
- * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The binary deviceFeature to control.
+ * @description Change value of a Ecovacs Vacbot.
+ * @param {object} device - The device to control.
+ * @param {object} deviceFeature - The binary deviceFeature to control.
  * @param {number} value - The new value.
  * @example
  * setValue(device, deviceFeature, value);

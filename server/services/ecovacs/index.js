@@ -19,7 +19,7 @@ module.exports = function EcovacsService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the ecovacs service
+   * @description Stops the ecovacs service.
    * @example
    * gladys.services.ecovacs.stop();
    */

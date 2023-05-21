@@ -3,7 +3,7 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Get the vacbot status.
  * @param {string} deviceExternalId - The deviceExternalId to control.
- * @returns {Promise<Object>} Promise object representing the status of the vacbot.
+ * @returns {Promise<object>} Promise object representing the status of the vacbot.
  * @example
  * vacbot.getDeviceStatus();
  */

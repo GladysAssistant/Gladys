@@ -44,7 +44,6 @@ module.exports = function EcovacsController(ecovacsHandler) {
    * @apiName getStatus
    * @apiGroup Ecovacs
    */
-
   async function getStatus(req, res) {
     const status = ecovacsHandler.getStatus();
     res.json(status);
