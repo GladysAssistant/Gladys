@@ -28,11 +28,6 @@ const SetupRemoteModeCard = ({ selectSetupMode, disabled }) => (
             <Text id="integration.zigbee2mqtt.setup.modes.remote.mqttBrokerRequirementLabel" />
           </Requirement>
         </li>
-        <li>
-          <Requirement mandatory>
-            <Text id="integration.zigbee2mqtt.setup.modes.remote.commingSoonRequirementLabel" />
-          </Requirement>
-        </li>
       </ul>
     </small>
   </InstallationCard>

@@ -36,7 +36,7 @@ const SetupModePanel = ({
         disabled={disabled}
         selectSetupMode={selectSetupMode}
       />
-      <SetupRemoteModeCard resetSetupMode={resetSetupMode} disabled={true} selectSetupMode={selectSetupMode} />
+      <SetupRemoteModeCard disabled={disabled} selectSetupMode={selectSetupMode} />
     </div>
   );
 };

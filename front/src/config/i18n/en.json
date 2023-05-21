@@ -554,7 +554,19 @@
             "description": "Gladys will connect to a remote installation through MQTT.",
             "z2mInstallationRequirementLabel": "A self managed Zigbee2Mqtt application",
             "mqttBrokerRequirementLabel": "A MQTT broker connected to the Zigbee2Mqtt application",
-            "commingSoonRequirementLabel": "Ongoing development"
+            "detailsDescription": "With this configuration mode, you can connect to a remote a Zigbee2Mqtt and its MQTT broker installation.",
+            "mqttModeLabel": "Choose the MQTT broker",
+            "gladys": {
+              "modeLabel": "MQTT with Gladys",
+              "modeDescription": "MQTT broker configured by MQTT Gladys service will be used. Be sure it is well configured on <a href=\"/dashboard/integration/device/mqtt/setup\">its configuration page</a>."
+            },
+            "external": {
+              "modeLabel": "External MQTT"
+            },
+            "summary": {
+              "title": "Configuration",
+              "mqttMode": "MQTT broker"
+            }
           }
         },
         "requirementsLabel": "<u>Requirements</u>:",

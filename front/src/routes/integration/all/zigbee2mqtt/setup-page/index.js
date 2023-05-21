@@ -10,7 +10,8 @@ import SetupTab from './SetupTab';
 const VARIABLE_MAP = {
   ZIGBEE2MQTT_DRIVER_PATH: 'z2mDriverPath',
   ZIGBEE_DONGLE_NAME: 'z2mDongleName',
-  Z2M_TCP_PORT: 'z2mTcpPort'
+  Z2M_TCP_PORT: 'z2mTcpPort',
+  MQTT_MODE: 'mqttMode'
 };
 
 class Zigbee2mqttSetupPage extends Component {

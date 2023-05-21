@@ -5,6 +5,7 @@ import { RequestStatus } from '../../../../../utils/consts.js';
 import { SETUP_MODES } from './constants.js';
 import SetupModePanel from './SetupModePanel.jsx';
 import SetupLocalMode from './local/SetupLocalMode.jsx';
+import SetupRemoteMode from './remote/SetupRemoteMode.jsx';
 
 class SetupPanel extends Component {
   resetSetupMode = () => {
@@ -63,6 +64,18 @@ class SetupPanel extends Component {
         {setupMode === SETUP_MODES.LOCAL && (
           <li class="list-group-item">
             <SetupLocalMode
+              setupZigee2mqttStatus={setupZigee2mqttStatus}
+              configuration={configuration}
+              httpClient={httpClient}
+              saveConfiguration={this.saveConfiguration}
+              resetConfiguration={this.resetConfiguration}
+              disabled={disabled}
+            />
+          </li>
+        )}
+        {setupMode === SETUP_MODES.REMOTE && (
+          <li class="list-group-item">
+            <SetupRemoteMode
               setupZigee2mqttStatus={setupZigee2mqttStatus}
               configuration={configuration}
               httpClient={httpClient}
