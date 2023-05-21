@@ -471,6 +471,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   VACBOT: {
     STATE: 'state',
+    INTEGER: 'integer',
     BINARY: 'binary',
     MAP: 'map',
     CLEAN: 'clean',

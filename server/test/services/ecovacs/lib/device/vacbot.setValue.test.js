@@ -55,7 +55,20 @@ describe('EcovacsHandler setValue', () => {
       -1,
     );
     assert.calledOnce(fakes.stop);
+    assert.notCalled(fakes.charge);
+    assert.notCalled(fakes.clean);
+    assert.notCalled(fakes.pause);
+  });
+
+  
+  it('should set the binary value to 2', async () => {
+    await ecovacsService.device.setValue(
+      devices[0],
+      { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'vacbot', type: 'state' },
+      2,
+    );
     assert.calledOnce(fakes.charge);
+    assert.notCalled(fakes.stop);
     assert.notCalled(fakes.clean);
     assert.notCalled(fakes.pause);
   });
