@@ -10,6 +10,8 @@ import NumberDeviceFeature from './device-features/NumberDeviceFeature';
 import CoverDeviceFeature from './device-features/CoverDeviceFeature';
 import ThermostatDeviceFeature from './device-features/ThermostatDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
+import VacbotModeDeviceFeature from './device-features/VacbotModeDeviceFeature';
+
 
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
@@ -24,7 +26,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: CoverDeviceFeature,
   [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: MultiLevelDeviceFeature,
   [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: ThermostatDeviceFeature,
-  [DEVICE_FEATURE_TYPES.VACBOT.STATE]: CoverDeviceFeature,
+  [DEVICE_FEATURE_TYPES.VACBOT.STATE]: VacbotModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE]: AirConditioningModeDeviceFeature,
   [DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE]: ThermostatDeviceFeature
 };
@@ -32,7 +34,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
 const DeviceRow = ({ children, ...props }) => {
   // if device is a sensor, we display the sensor deviceFeature
   if (props.deviceFeature.read_only) {
-    return <SensorDeviceFeature user={props.user} deviceFeature={props.deviceFeature} />;
+    return <SensorDeviceFeature user={props.user} device={props.device} deviceFeature={props.deviceFeature} />;
   }
 
   const elementType = ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];

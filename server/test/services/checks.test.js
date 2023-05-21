@@ -13,7 +13,7 @@ const gladys = {
 };
 
 /**
- * Verify that all services follow the requirements
+ * Verify that all services follow the requirements.
  */
 describe('services', () => {
   const isDirectory = (source) => lstatSync(source).isDirectory();

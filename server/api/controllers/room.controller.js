@@ -51,7 +51,6 @@ module.exports = function RoomController(gladys) {
    * @api {delete} /api/v1/room/:room_selector delete
    * @apiName delete
    * @apiGroup Room
-   *
    */
   async function destroy(req, res) {
     await gladys.room.destroy(req.params.room_selector);
@@ -78,7 +77,6 @@ module.exports = function RoomController(gladys) {
    *     "unit": "celsius"
    *   }
    * }
-   *
    */
   async function getBySelector(req, res) {
     const room = await gladys.room.getBySelector(req.params.room_selector, req.query);
@@ -100,7 +98,6 @@ module.exports = function RoomController(gladys) {
    * @api {get} /api/v1/room get
    * @apiName get
    * @apiGroup Room
-   *
    * @apiSuccessExample {json} Success-Response:
    * [
    *   {

@@ -5,6 +5,26 @@ const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
 const event = { emit: fake.resolves(null) };
 
+const vacbotMock = {
+  did: '0ccdd884-b00f-4838-a50b-bf4fb3fc7a12',
+  getName: fake.returns('DEEBOT OZMO 920 Series'),
+  deviceName: 'DEEBOT OZMO 920 Series',
+  deviceNumber: 0,
+  deviceModel: 'Ecovacs',
+  deviceImageURL: 'http://image.url',
+  mainBrush: true,
+  chargeStatus: 'idle',
+  cleanReport: 'idle',
+  batteryLevel: 100,
+  hasMainBrush: fake.returns(true),
+  hasMappingCapabilities: fake.returns(true),
+  hasCustomAreaCleaningMode: fake.returns(true),
+  hasMoppingSystem: fake.returns(true),
+  connect: fake.resolves(true),
+  run: fake.resolves(true),
+  charge: fake.resolves(true),
+};
+
 const devices = [
   {
     service_id: serviceId,
@@ -12,7 +32,8 @@ const devices = [
     model: 'DX5G',
     external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:0',
     selector: 'ecovacs:5c19a8f3a1e6ee0001782247:0',
-    should_poll: false,
+    should_poll: true,
+    poll_frequency: 60000,
     features: [
       {
         name: 'power',
@@ -26,6 +47,19 @@ const devices = [
         min: 0,
         max: 1,
       },
+      {
+        name: 'battery',
+        selector: `ecovacs:5c19a8f3a1e6ee0001782247:battery:0`,
+        external_id: `ecovacs:5c19a8f3a1e6ee0001782247:battery:0`,
+        category: 'battery',
+        type: 'integer',
+        unit: 'percent',
+        read_only: true,
+        keep_history: true,
+        has_feedback: true,
+        min: 0,
+        max: 100,
+      },
     ],
     params: [],
   },
@@ -35,7 +69,8 @@ const devices = [
     model: 'DX6G',
     external_id: 'ecovacs:5c19a8f3a1e6ee0001782247-bis:1',
     selector: 'ecovacs:5c19a8f3a1e6ee0001782247-bis:1',
-    should_poll: false,
+    should_poll: true,
+    poll_frequency: 60000,
     features: [
       {
         name: 'power',
@@ -49,6 +84,19 @@ const devices = [
         min: 0,
         max: 1,
       },
+      {
+        name: 'battery',
+        selector: `ecovacs:5c19a8f3a1e6ee0001782247-bis:battery:1`,
+        external_id: `ecovacs:5c19a8f3a1e6ee0001782247-bis:battery:1`,
+        category: 'battery',
+        type: 'integer',
+        unit: 'percent',
+        read_only: true,
+        keep_history: true,
+        has_feedback: true,
+        min: 0,
+        max: 100,
+      },
     ],
     params: [],
   },
@@ -58,7 +106,8 @@ const devices = [
     model: 'DX7G',
     external_id: 'ecovacs:5c19a8f3a1e6ee0001782247-beta:2',
     selector: 'ecovacs:5c19a8f3a1e6ee0001782247-beta:2',
-    should_poll: false,
+    should_poll: true,
+    poll_frequency: 60000,
     features: [
       {
         name: 'power',
@@ -71,6 +120,19 @@ const devices = [
         has_feedback: true,
         min: 0,
         max: 1,
+      },
+      {
+        name: 'battery',
+        selector: `ecovacs:5c19a8f3a1e6ee0001782247-beta:battery:2`,
+        external_id: `ecovacs:5c19a8f3a1e6ee0001782247-beta:battery:2`,
+        category: 'battery',
+        type: 'integer',
+        unit: 'percent',
+        read_only: true,
+        keep_history: true,
+        has_feedback: true,
+        min: 0,
+        max: 100,
       },
     ],
     params: [],
@@ -186,6 +248,7 @@ module.exports = {
   serviceId,
   event,
   devices,
+  vacbotMock,
   variableNotConfigured,
   variableOk,
   variableOkNoRegion,

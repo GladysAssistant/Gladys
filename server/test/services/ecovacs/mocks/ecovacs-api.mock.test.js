@@ -12,16 +12,31 @@ const countries = {
 };
 
 const fakes = {
-  deviceImageURL: 'http://image.url',
+  // Attributes
+  did: '0ccdd884-b00f-4838-a50b-bf4fb3fc7a12',
+  deviceName: 'DEEBOT OZMO 920 Series',
+  deviceNumber: 0,
   deviceModel: 'Ecovacs',
-  getName: fake.returns('DEEBOT OZMO 920 Series'),
+  deviceImageURL: 'http://image.url',
+  mainBrush: true,
+  is_ready: true,
+  chargeStatus: 'idle',
+  cleanReport: 'idle',
+  batteryLevel: 100,
   hasMainBrush: fake.returns(true),
   hasMappingCapabilities: fake.returns(true),
   hasCustomAreaCleaningMode: fake.returns(true),
   hasMoppingSystem: fake.returns(true),
-  clean: fake.returns(true),
-  stop: fake.returns(true),
-  pause: fake.returns(true),
+  // Events
+  on: fake.resolves(true),
+  // Methods
+  getName: fake.returns('DEEBOT OZMO 920 Series'),
+  connect: fake.resolves(true),
+  run: fake.resolves(true),
+  clean: fake.resolves(true),
+  stop: fake.resolves(true),
+  pause: fake.resolves(true),
+  charge: fake.resolves(true),
 };
 
 class VacBotClass {}
@@ -35,6 +50,8 @@ VacBotClass.prototype.hasMoppingSystem = fakes.hasMoppingSystem;
 VacBotClass.prototype.clean = fakes.clean;
 VacBotClass.prototype.stop = fakes.stop;
 VacBotClass.prototype.pause = fakes.pause;
+VacBotClass.prototype.charge = fakes.charge;
+VacBotClass.prototype.run = fakes.run;
 
 class EcoVacsAPI {
   constructor(deviceId, country, continent = '') {

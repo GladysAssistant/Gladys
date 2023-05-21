@@ -27,8 +27,8 @@ const services = require('../services');
 const Weather = require('./weather');
 
 /**
- * @description Start a new Gladys instance
- * @param {Object} params - Params when starting Gladys.
+ * @description Start a new Gladys instance.
+ * @param {object} params - Params when starting Gladys.
  * @param {string} [params.jwtSecret] - A secret to generate jsonwebtoken.
  * @param {boolean} [params.disableService] - If true, disable the loading of services.
  * @param {boolean} [params.disableBrainLoading] - If true, disable the loading of the brain.
@@ -40,6 +40,7 @@ const Weather = require('./weather');
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
  * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
  * @param {boolean} [params.disableDeviceStateAggregation] - If true, disable the aggregation of device states.
+ * @returns {object} Return gladys object.
  * @example
  * const gladys = Gladys();
  */

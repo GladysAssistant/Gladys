@@ -3,7 +3,7 @@ const { PlatformNotCompatible } = require('../../utils/coreErrors');
 
 /**
  * @description Return list of containers.
- * @param {Object} [options] - List of filtering options.
+ * @param {object} [options] - List of filtering options.
  * @returns {Promise} Resolve with list of containers.
  * @example
  * const containers = await getContainers();

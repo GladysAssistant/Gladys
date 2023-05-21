@@ -4,11 +4,11 @@ const db = require('../../models');
 
 /**
  * @public
- * @description Stops one service by name
+ * @description Stops one service by name.
  * @param {string} name - The name of the service.
  * @param {string} podId - ID of Gladys instance.
  * @param {boolean} userAction - Manually stopped?
- * @returns {Promise<Object>} Requested service.
+ * @returns {Promise<object>} Requested service.
  * @example
  * service.stop('telegram');
  */

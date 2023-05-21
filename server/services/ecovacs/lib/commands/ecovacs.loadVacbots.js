@@ -1,4 +1,5 @@
 const logger = require('../../../../utils/logger');
+// const { eventFunctionWrapper } = require('../../../../utils/functionsWrapper');
 
 /**
  * @description Load vacbot device.
@@ -12,13 +13,14 @@ async function loadVacbots() {
   const registered = await this.gladys.device.get({
     service_id: this.serviceId,
   });
-  logger.debug(`Registered : `, registered);
-  registered.forEach(async (element) => {
-    const vacbot = await this.getVacbotObj(element.external_id);
-    this.vacbots.set(element, vacbot);
+  logger.trace(`Registered : `, registered);
+  registered.forEach(async (device) => {
+    const vacbot = await this.getVacbotObj(device.external_id);
+    this.listen(vacbot, device);
+    this.vacbots.set(device, vacbot);
     logger.debug(
-      `Loaded in memory and ready to be handled : ${element.external_id} (gladys device) ====> ${
-        this.vacbots.get(element).deviceName
+      `Loaded in memory and ready to be handled : ${device.external_id} (gladys device) ====> ${
+        this.vacbots.get(device).vacuum.deviceName
       } (vacbot object)`,
     );
   });

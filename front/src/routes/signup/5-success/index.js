@@ -7,7 +7,7 @@ class Success extends Component {
 
   render({}, {}) {
     return (
-      <SignupLayout>
+      <SignupLayout currentUrl="/signup/success">
         <SuccessTab />
       </SignupLayout>
     );

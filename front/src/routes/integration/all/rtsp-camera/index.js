@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import RtspCameraPage from './RtspCamera';
 
-@connect('user,rtspCameras,housesWithRooms,getRtspCameraStatus,rtspCameraSearch,getRtspCameraOrderDir', actions)
 class RtspCameraIntegration extends Component {
   componentWillMount() {
     this.props.getRtspCameraDevices();
@@ -16,4 +15,7 @@ class RtspCameraIntegration extends Component {
   }
 }
 
-export default RtspCameraIntegration;
+export default connect(
+  'user,rtspCameras,housesWithRooms,getRtspCameraStatus,rtspCameraSearch,getRtspCameraOrderDir',
+  actions
+)(RtspCameraIntegration);

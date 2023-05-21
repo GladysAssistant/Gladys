@@ -13,6 +13,7 @@ async function getConfiguration() {
 
   // Load z2m parameters
   const z2mDriverPath = await this.gladys.variable.getValue(CONFIGURATION.Z2M_DRIVER_PATH, this.serviceId);
+  const z2mDongleName = await this.gladys.variable.getValue(CONFIGURATION.ZIGBEE_DONGLE_NAME, this.serviceId);
   const z2mMqttUsername = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
   const z2mMqttPassword = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, this.serviceId);
 
@@ -29,6 +30,7 @@ async function getConfiguration() {
 
   return {
     z2mDriverPath,
+    z2mDongleName,
     z2mMqttUsername,
     z2mMqttPassword,
     mqttUrl,

@@ -7,7 +7,6 @@ import withIntlAsProp from '../../../../../utils/withIntlAsProp';
 
 import Condition from './Condition';
 
-@connect('httpClient', {})
 class OnlyContinueIf extends Component {
   handleConditionChange = (conditionIndex, condition) => {
     const { columnIndex, index } = this.props;
@@ -73,6 +72,9 @@ class OnlyContinueIf extends Component {
               addCondition={this.addCondition}
               deleteCondition={this.deleteCondition}
               lastOne={index + 1 === props.action.conditions.length}
+              triggersVariables={props.triggersVariables}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
             />
           ))}
       </div>
@@ -80,4 +82,4 @@ class OnlyContinueIf extends Component {
   }
 }
 
-export default withIntlAsProp(OnlyContinueIf);
+export default withIntlAsProp(connect('httpClient', {})(OnlyContinueIf));

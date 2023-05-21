@@ -29,4 +29,10 @@ describe('ecovacs.saveConfiguration config command', () => {
     await ecovacsService.device.saveConfiguration({ login: 'john@doe.com', password: '666', country: 'fr' });
     assert.calledThrice(gladys.variable.setValue);
   });
+
+  it('should save configuration of service without changing password', async () => {
+    const ecovacsService = EcovacsService(gladys, serviceId);
+    await ecovacsService.device.saveConfiguration({ login: 'john@doe.com', country: 'fr' });
+    assert.calledTwice(gladys.variable.setValue);
+  });
 });

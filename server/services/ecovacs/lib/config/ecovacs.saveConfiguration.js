@@ -3,7 +3,7 @@ const { CONFIGURATION } = require('../utils/ecovacs.constants');
 
 /**
  * @description Return Ecovacs status.
- * @param {Object} configuration - Ecovacs configuration.
+ * @param {object} configuration - Ecovacs configuration.
  * @param {string} [configuration.accountId] - Ecovacs username.
  * @param {string} [configuration.password] - Ecovacs password.
  * @param {string} [configuration.countryCode] - Ecovacs password.

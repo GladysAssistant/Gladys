@@ -51,7 +51,6 @@ module.exports = function CalendarController(gladys) {
    * @api {patch} /api/v1/calendar/:calendar_selector update
    * @apiName update
    * @apiGroup Calendar
-   *
    * @apiUse CalendarParam
    * @apiSuccessExample {json} Success-Example
    * {

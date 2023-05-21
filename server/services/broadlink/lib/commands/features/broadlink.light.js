@@ -72,9 +72,9 @@ function buildFeatures(deviceName, deviceExternalId) {
 
 /**
  * @description Send value to switch device.
- * @param {Object} broadlinkDevice - Broadlink device.
- * @param {Object} gladysDevice - Gladys device.
- * @param {Object} gladysFeature - Gladys feature.
+ * @param {object} broadlinkDevice - Broadlink device.
+ * @param {object} gladysDevice - Gladys device.
+ * @param {object} gladysFeature - Gladys feature.
  * @param {number} value - Value to send.
  * @example
  * await setValue({}, {}, {}, 3);

@@ -12,8 +12,8 @@ const EcovacsHandlerMock = function EcovacsHandlerMock(gladys, serviceId) {
 
 EcovacsHandlerMock.prototype.stop = fake.returns(null);
 EcovacsHandlerMock.prototype.start = fake.returns(null);
-EcovacsHandlerMock.prototype.pause = fake.returns(null);
 EcovacsHandlerMock.prototype.connect = fake.resolves(true);
+EcovacsHandlerMock.prototype.listen = fake.resolves(true);
 EcovacsHandlerMock.prototype.getStatus = fake.resolves(true);
 EcovacsHandlerMock.prototype.getConfiguration = fake.resolves({
   accountId: 'accountId',
@@ -24,6 +24,9 @@ EcovacsHandlerMock.prototype.discover = fake.returns(['device']);
 EcovacsHandlerMock.prototype.setValue = fake.resolves(true);
 EcovacsHandlerMock.prototype.poll = fake.resolves(true);
 EcovacsHandlerMock.prototype.getDeviceStatus = fake.resolves(vacbotStatus);
+EcovacsHandlerMock.prototype.onMessage = fake.resolves(true);
+EcovacsHandlerMock.prototype.loadVacbots = fake.resolves(true);
+EcovacsHandlerMock.prototype.getVacbotObj = fake.resolves(true);
 
 module.exports = {
   EcovacsHandlerMock,

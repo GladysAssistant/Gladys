@@ -3,8 +3,8 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
- * @description Connect and listen to all topics
- * @param {Object} configuration - MQTT configuration.
+ * @description Connect and listen to all topics.
+ * @param {object} configuration - MQTT configuration.
  * @param {string} [configuration.mqttUrl] - MQTT URL.
  * @param {string} [configuration.mqttUsername] - MQTT username.
  * @param {string} [configuration.mqttPassword] - MQTT password.

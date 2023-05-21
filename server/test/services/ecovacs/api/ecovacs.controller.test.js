@@ -10,6 +10,7 @@ const vacbotStatus = {
 };
 
 const ecovacsHandler = {
+  getVacbots: fake.resolves(true),
   start: fake.resolves(true),
   stop: fake.resolves(true),
   connect: fake.resolves(true),
@@ -23,9 +24,30 @@ const ecovacsHandler = {
   gladys: {
     device: {
       getBySelector: fake.returns({ external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:0' }),
+      get: fake.resolves(true),
     },
   },
 };
+
+let req = {};
+let res = {
+  json: fake.returns(null),
+};
+
+describe('GET /api/v1/service/ecovacs/vacbots', () => {
+  let controller;
+
+  beforeEach(() => {
+    sinon.reset();
+    controller = EcovacsController(ecovacsHandler);
+  });
+
+  it('should return vacbots', async () => {
+    await controller['get /api/v1/service/ecovacs/vacbots'].controller(req, res);
+    assert.calledWith(ecovacsHandler.gladys.device.get, { service: 'ecovacs' });
+    assert.calledOnce(res.json);
+  });
+});
 
 describe('GET /api/v1/service/ecovacs/connect', () => {
   let controller;
@@ -36,11 +58,6 @@ describe('GET /api/v1/service/ecovacs/connect', () => {
   });
 
   it('should connect', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
     await controller['get /api/v1/service/ecovacs/connect'].controller(req, res);
     assert.calledOnce(ecovacsHandler.connect);
     assert.calledOnce(res.json);
@@ -56,11 +73,6 @@ describe('GET /api/v1/service/ecovacs/discover', () => {
   });
 
   it('should connect', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
     await controller['get /api/v1/service/ecovacs/discover'].controller(req, res);
     assert.calledOnce(ecovacsHandler.discover);
     assert.calledOnce(res.json);
@@ -76,11 +88,6 @@ describe('GET /api/v1/service/ecovacs/status', () => {
   });
 
   it('should get ecovacs service status', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
     await controller['get /api/v1/service/ecovacs/status'].controller(req, res);
     assert.calledOnce(ecovacsHandler.getStatus);
     assert.calledOnce(res.json);
@@ -96,11 +103,6 @@ describe('GET /api/v1/service/ecovacs/config', () => {
   });
 
   it('should get ecovacs configuration', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(null),
-    };
-
     await controller['get /api/v1/service/ecovacs/config'].controller(req, res);
     assert.calledOnce(ecovacsHandler.getConfiguration);
     assert.calledOnce(res.json);
@@ -116,10 +118,10 @@ describe('POST /api/v1/service/ecovacs/config', () => {
   });
 
   it('should save ecovacs configuration', async () => {
-    const req = {
+    req = {
       body: [],
     };
-    const res = {
+    res = {
       json: fake.returns({ success: true }),
     };
 
@@ -131,7 +133,7 @@ describe('POST /api/v1/service/ecovacs/config', () => {
 
 describe('GET /api/v1/service/ecovacs/:device_selector/status', () => {
   let controller;
-  const res = {
+  res = {
     json: fake.returns(null),
   };
 
@@ -141,7 +143,7 @@ describe('GET /api/v1/service/ecovacs/:device_selector/status', () => {
   });
 
   it('should get vacbot (ecovacs device) status', async () => {
-    const req = {
+    req = {
       params: {
         device_selector: 'ecovacs:5c19a8f3a1e6ee0001782247:0',
       },
@@ -152,7 +154,7 @@ describe('GET /api/v1/service/ecovacs/:device_selector/status', () => {
   });
 
   it('should not get vacbot (ecovacs device) status without an external_id', async () => {
-    const req = {
+    req = {
       params: {
         device_selector: '',
       },

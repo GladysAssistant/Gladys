@@ -21,7 +21,6 @@ module.exports = function DashboardController(gladys) {
    * @api {post} /api/v1/dashboard create
    * @apiName createDashoard
    * @apiGroup Dashboard
-   *
    * @apiUse DashboardParam
    * @apiUse DashboardSuccess
    */
@@ -78,7 +77,6 @@ module.exports = function DashboardController(gladys) {
    * @api {delete} /api/v1/dashboard/:dashboard_selector delete
    * @apiName delete
    * @apiGroup Dashboard
-   *
    */
   async function destroy(req, res) {
     await gladys.dashboard.destroy(req.user.id, req.params.dashboard_selector);

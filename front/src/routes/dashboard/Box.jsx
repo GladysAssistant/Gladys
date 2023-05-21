@@ -7,6 +7,7 @@ import DevicesInRoomsBox from '../../components/boxs/device-in-room/DevicesInRoo
 import ChartBox from '../../components/boxs/chart/Chart';
 import EcowattBox from '../../components/boxs/ecowatt/Ecowatt';
 import ClockBox from '../../components/boxs/clock/Clock';
+import VacbotBox from '../../components/boxs/vacbot/Vacbot';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -28,6 +29,8 @@ const Box = ({ children, ...props }) => {
       return <EcowattBox {...props} />;
     case 'clock':
       return <ClockBox {...props} />;
+    case 'vacbot':
+      return <VacbotBox {...props} />;
   }
 };
 

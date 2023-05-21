@@ -12,7 +12,7 @@ const sleep = promisify(setTimeout);
 
 /**
  * @description Install and starts MQTT container.
- * @param {Object} config - Service configuration properties.
+ * @param {object} config - Service configuration properties.
  * @example
  * await z2m.installMqttContainer(config);
  */
@@ -37,6 +37,7 @@ async function installMqttContainer(config) {
 
       const mosquittoFolderPath = path.join(basePathOnContainer, '/zigbee2mqtt/mqtt');
       const mosquittoConfigFilePath = path.join(mosquittoFolderPath, 'mosquitto.conf');
+      const mosquittoPasswordFilePath = path.join(mosquittoFolderPath, 'mosquitto.passwd');
 
       logger.info(`Writing Mosquitto config file in ${mosquittoConfigFilePath}`);
 
@@ -44,6 +45,9 @@ async function installMqttContainer(config) {
       await fse.ensureDir(mosquittoFolderPath);
       const mosquittoConfContent = await fse.readFile(path.join(__dirname, '../docker/mosquitto.conf'));
       await fse.writeFile(mosquittoConfigFilePath, mosquittoConfContent, 'utf-8');
+      // create an empty password file so that the container can start
+      // it'll be filled later
+      await fse.writeFile(mosquittoPasswordFilePath, '', 'utf-8');
 
       await containerDescriptorToMutate.HostConfig.Binds.push(`${basePathOnHost}/zigbee2mqtt/mqtt:/mosquitto/config`);
 

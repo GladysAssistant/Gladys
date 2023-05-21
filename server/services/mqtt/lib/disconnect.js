@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 
 /**
- * @description Disconnect to all topics
+ * @description Disconnect to all topics.
  * @example
  * disconnect();
  */

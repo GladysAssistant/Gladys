@@ -5,9 +5,10 @@ const db = require('../../models');
 const UPDATABLE_FIELDS = ['value'];
 
 /**
- * @description Add a param to a device
+ * @description Add a param to a device.
  * @param {string} deviceSelector - The selector of the device.
- * @param {Object} param - The new device param.
+ * @param {object} param - The new device param.
+ * @returns {Promise<object>} Resolve with new device.
  * @example
  * device.addParam('test-device', {
  *    name: 'SENSIBILITY',

@@ -6,7 +6,7 @@ module.exports = function XiaomiService(gladys, serviceId) {
   const xiaomiManager = new XiaomiManager(gladys, serviceId);
   /**
    * @public
-   * @description This function listen event on Xiaomi service
+   * @description This function listen event on Xiaomi service.
    * @example
    * gladys.services.xiaomi.start();
    */
@@ -17,7 +17,7 @@ module.exports = function XiaomiService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    *  gladys.services.xiaomi.stop();
    */

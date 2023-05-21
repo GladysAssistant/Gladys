@@ -2,8 +2,8 @@ const { mergeDevices } = require('../../../utils/device');
 
 /**
  * @description Get all discovered devices, and if device already created, the Gladys device.
- * @param {Object} tasmotaDevice - Discovered device.
- * @returns {Object} Device merged with Gladys existing one.
+ * @param {object} tasmotaDevice - Discovered device.
+ * @returns {object} Device merged with Gladys existing one.
  * @example
  * mergeWithExistingDevice(discorveredDevice)
  */

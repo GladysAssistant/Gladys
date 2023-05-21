@@ -4,7 +4,6 @@ import BaseEditBox from '../baseEditBox';
 import { Text } from 'preact-i18n';
 import { CLOCK_TYPES_LIST } from './ClockTypes';
 
-@connect('', {})
 class EditClock extends Component {
   updateClockType = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { clock_type: e.target.value });
@@ -51,4 +50,4 @@ class EditClock extends Component {
   }
 }
 
-export default EditClock;
+export default connect('', {})(EditClock);

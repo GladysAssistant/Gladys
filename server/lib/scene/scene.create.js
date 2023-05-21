@@ -1,8 +1,8 @@
 const db = require('../../models');
 
 /**
- * @description Create a new scene
- * @param {Object} scene - A scene object.
+ * @description Create a new scene.
+ * @param {object} scene - A scene object.
  * @returns {Promise} - Resolve with the created scene.
  * @example
  * scene.create({

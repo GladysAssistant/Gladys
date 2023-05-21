@@ -9,7 +9,7 @@ const { subStatus } = require('./tasmota.mqtt.subStatus');
 
 /**
  * @description Add ability to connect to Tasmota MQTT devices.
- * @param {Object} tasmotaHandler - Tasmota instance.
+ * @param {object} tasmotaHandler - Tasmota instance.
  * @example
  * const tasmotaHandler = new TasmotaHandler(tasmotaHandler);
  */

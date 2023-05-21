@@ -9,10 +9,14 @@ const ecovacsGetVacbotObjMock = fake.resolves({
   name: 'E0001278919601690356',
   deviceName: 'DEEBOT OZMO 920 Series',
   deviceNumber: 0,
+  connect: fake.resolves(true),
+  on: fake.resolves(true),
 });
+const ecovacsListenMock = fake.returns(true);
 
 const EcovacsHandler = proxyquire('../../../../../services/ecovacs/lib', {
   './device/vacbot.getVacbotObj.js': { getVacbotObj: ecovacsGetVacbotObjMock },
+  './commands/ecovacs.listen.js': { listen: ecovacsListenMock },
 });
 const EcovacsService = proxyquire('../../../../../services/ecovacs', {
   './lib': EcovacsHandler,
@@ -28,6 +32,7 @@ describe('ecovacs.loadVacbots command', () => {
     const ecovacsService = EcovacsService(gladys, serviceId);
     await ecovacsService.device.loadVacbots();
     assert.calledThrice(ecovacsService.device.getVacbotObj);
+    assert.calledThrice(ecovacsService.device.listen);
     expect(ecovacsService.device.vacbots.size).to.equal(3);
   });
 });

@@ -59,6 +59,7 @@ function createActions(store) {
       });
     },
     async saveDashboard(state) {
+      console.log(state);
       store.setState({
         DashboardSavingStatus: RequestStatus.Getting
       });
