@@ -239,7 +239,6 @@
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration.",
         "addButton": "+",
         "substractButton": "-"
       },
@@ -340,8 +339,6 @@
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
-      "restartButton": "Redémarrer",
-      "stopButton": "Arrêter",
       "menu": {
         "all": "Toutes les intégrations",
         "device": "Appareils",
@@ -1591,7 +1588,6 @@
       "resetPassword": "Réinitialiser le mot de passe",
       "editPreferences": "Editer les préférences",
       "resetPasswordButton": "Réinitialiser",
-      "saveButton": "Enregistrer",
       "success": "Profil enregistré avec succès !"
     }
   },
