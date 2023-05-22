@@ -2187,7 +2187,15 @@
     },
     "soil-moisture-sensor": {
       "shortCategoryName": "Capteur d'humidité du sol",
-      "decimal": "Humidité du sol (decimal)"
+      "decimal": "Humidité du sol (Décimale)"
+    },
+    "pm25-sensor": {
+      "shortCategoryName": "Capteur de PM2.5",
+      "decimal": "PM2.5 (Décimale)"
+    },
+    "formaldehyd-sensor": {
+      "shortCategoryName": "Formaldehyd sensor",
+      "decimal": "Formaldehyd (Décimale)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",

@@ -2189,6 +2189,14 @@
       "shortCategoryName": "Soil moisture sensor",
       "decimal": "Soil moisture (decimal)"
     },
+    "pm25-sensor": {
+      "shortCategoryName": "PM2.5 sensor",
+      "decimal": "PM2.5 (decimal)"
+    },
+    "formaldehyd-sensor": {
+      "shortCategoryName": "Formaldehyd sensor",
+      "decimal": "Formaldehyd(decimal)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
       "binary": "Vibrate (yes/no)",
