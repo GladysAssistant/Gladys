@@ -2326,6 +2326,8 @@
       "play": "Lecture",
       "pause": "Pause",
       "stop": "Stop",
+      "previous": "Précédent",
+      "next": "Suivant",
       "record": "Enregistrer"
     },
     "energy-sensor": {
@@ -2404,6 +2406,10 @@
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
       "aqi": "Indice de qualité de l'air"
+    },
+    "text": {
+      "shortCategoryName": "Texte",
+      "text": "Texte"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

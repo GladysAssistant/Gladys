@@ -52,6 +52,18 @@ describe('Mqtt handle message', () => {
     });
   });
 
+  it('should update device string state', () => {
+    mqttHandler.handleNewMessage(
+      'gladys/master/device/my_device_external_id/feature/my_feature_external_id/text',
+      'my-text',
+    );
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'my_feature_external_id',
+      text: 'my-text',
+    });
+  });
+
   it('should fail to update device state, but not crash', () => {
     mqttHandler.handleNewMessage('gladys/master/device/my_device_external_id/', '19.8');
 
