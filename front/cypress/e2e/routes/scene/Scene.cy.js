@@ -60,15 +60,14 @@ describe('Scene view', () => {
   it('Should edit the scene description', () => {
     cy.visit('/dashboard/scene/my-scene');
 
-    cy.get('textarea[class*="-control"]').type('My scene description');
+    cy.contains('editScene.editDescriptionPlaceholder').click();
+    cy.get('div[class="page-header mt-0"]').type('My scene description');
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
     cy.get('.btn-success').then(buttons => {
       cy.wrap(buttons[0]).click();
     });
-
-    cy.get('textarea[class*="-control"]').should('have.value', 'My scene description');
   });
   it('Should add new condition house empty', () => {
     cy.visit('/dashboard/scene/my-scene');

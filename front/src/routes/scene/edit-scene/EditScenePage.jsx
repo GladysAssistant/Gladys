@@ -3,14 +3,13 @@ import { Link } from 'preact-router/match';
 import ActionGroup from './ActionGroup';
 import TriggerGroup from './TriggerGroup';
 import update from 'immutability-helper';
-import style from '../style.css';
 
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
         <div class="container">
-          <div class="page-header">
+          <div class="page-header mb-1">
             <h1
               class="page-title"
               style={{
@@ -73,7 +72,7 @@ const EditScenePage = ({ children, ...props }) => (
               </button>
             </div>
           </div>
-          <div class="page-header">
+          <div class="page-header mt-0">
             {props.isDescriptionEditable ? (
               <form class="w-100" onSubmit={props.saveScene}>
                 <div class="input-group">
@@ -97,7 +96,7 @@ const EditScenePage = ({ children, ...props }) => (
               </form>
             ) : (
               <Localizer>
-                <span class={style.descriptionScene} onClick={props.toggleIsDescriptionEditable}>
+                <span class="text-muted" onClick={props.toggleIsDescriptionEditable}>
                   {props.scene.description ? (
                     <span>{props.scene.description}</span>
                   ) : (

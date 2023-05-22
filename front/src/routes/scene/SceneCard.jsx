@@ -52,9 +52,7 @@ class SceneCard extends Component {
                   </label>
                 </div>
                 <h4>{props.scene.name}</h4>
-                <div class={`${style.descriptionScene} ${style.descriptionSceneEllipsis}`}>
-                  {props.scene.description}
-                </div>
+                <div class={`text-muted ${style.descriptionSceneEllipsis}`}>{props.scene.description}</div>
               </div>
               <div class="card-footer">
                 <div class="btn-list text-center">
