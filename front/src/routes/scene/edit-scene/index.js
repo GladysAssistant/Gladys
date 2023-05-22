@@ -2,6 +2,9 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { RequestStatus } from '../../../utils/consts';
 import EditScenePage from './EditScenePage';
@@ -318,6 +321,37 @@ class EditScene extends Component {
   duplicateScene = () => {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
+  moveCard = async (originalX, originalY, destX, destY) => {
+    // incorrect coordinates
+    if (destX < 0 || destY < 0) {
+      return null;
+    }
+
+    if (destY >= this.state.scene.actions.length || destX > this.state.scene.actions[destY].length) {
+      return null;
+    }
+    const element = this.state.scene.actions[originalY][originalX];
+
+    const newStateWithoutElement = update(this.state, {
+      scene: {
+        actions: {
+          [originalY]: {
+            $splice: [[originalX, 1]]
+          }
+        }
+      }
+    });
+    const newState = update(newStateWithoutElement, {
+      scene: {
+        actions: {
+          [destY]: {
+            $splice: [[destX, 0, element]]
+          }
+        }
+      }
+    });
+    await this.setState(newState);
+  };
 
   constructor(props) {
     super(props);
@@ -342,31 +376,34 @@ class EditScene extends Component {
   render(props, { saving, error, variables, scene, isNameEditable, triggersVariables }) {
     return (
       scene && (
-        <EditScenePage
-          {...props}
-          scene={scene}
-          startScene={this.startScene}
-          deleteScene={this.deleteScene}
-          saveScene={this.saveScene}
-          updateActionProperty={this.updateActionProperty}
-          updateTriggerProperty={this.updateTriggerProperty}
-          addAction={this.addAction}
-          deleteAction={this.deleteAction}
-          addTrigger={this.addTrigger}
-          deleteTrigger={this.deleteTrigger}
-          saving={saving}
-          error={error}
-          variables={variables}
-          triggersVariables={triggersVariables}
-          setVariables={this.setVariables}
-          setVariablesTrigger={this.setVariablesTrigger}
-          switchActiveScene={this.switchActiveScene}
-          toggleIsNameEditable={this.toggleIsNameEditable}
-          isNameEditable={isNameEditable}
-          updateSceneName={this.updateSceneName}
-          setNameInputRef={this.setNameInputRef}
-          duplicateScene={this.duplicateScene}
-        />
+        <DndProvider backend={this.isTouchDevice ? TouchBackend : HTML5Backend}>
+          <EditScenePage
+            {...props}
+            scene={scene}
+            startScene={this.startScene}
+            deleteScene={this.deleteScene}
+            saveScene={this.saveScene}
+            updateActionProperty={this.updateActionProperty}
+            updateTriggerProperty={this.updateTriggerProperty}
+            addAction={this.addAction}
+            deleteAction={this.deleteAction}
+            addTrigger={this.addTrigger}
+            deleteTrigger={this.deleteTrigger}
+            saving={saving}
+            error={error}
+            variables={variables}
+            triggersVariables={triggersVariables}
+            setVariables={this.setVariables}
+            setVariablesTrigger={this.setVariablesTrigger}
+            switchActiveScene={this.switchActiveScene}
+            toggleIsNameEditable={this.toggleIsNameEditable}
+            isNameEditable={isNameEditable}
+            updateSceneName={this.updateSceneName}
+            setNameInputRef={this.setNameInputRef}
+            duplicateScene={this.duplicateScene}
+            moveCard={this.moveCard}
+          />
+        </DndProvider>
       )
     );
   }

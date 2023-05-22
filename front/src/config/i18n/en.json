@@ -1191,6 +1191,7 @@
     "saveButton": "Save",
     "deleteButton": "Delete",
     "duplicateButton": "Duplicate",
+    "moreButton": "More",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
     "addTriggerButton": "Add trigger",

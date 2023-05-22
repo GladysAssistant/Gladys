@@ -3,6 +3,8 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import ActionCard from './ActionCard';
 
+import EmptyDropZone from './EmptyDropZone';
+
 const addActionToColumn = (columnIndex, addAction) => () => {
   addAction(columnIndex, 'new');
 };
@@ -34,18 +36,16 @@ const ActionGroup = ({ children, ...props }) => (
                 <Text id="editScene.actionsDescription" />
               </div>
             )}
-            {props.actions && props.actions.length === 0 && (
-              <div class="text-center">
-                <Text id="editScene.noActionsYet" />
-              </div>
-            )}
             <div class="row">
               {props.actions.map((action, index) => (
                 <ActionCard
+                  moveCard={props.moveCard}
                   sceneParamsData={props.sceneParamsData}
                   action={action}
                   columnIndex={props.index}
                   index={index}
+                  y={props.y}
+                  x={index}
                   updateActionProperty={props.updateActionProperty}
                   highLightedActions={props.highLightedActions}
                   deleteAction={props.deleteAction}
@@ -56,6 +56,11 @@ const ActionGroup = ({ children, ...props }) => (
                   scene={props.scene}
                 />
               ))}
+              {props.actions.length === 0 && (
+                <div class="col">
+                  <EmptyDropZone moveCard={props.moveCard} y={props.y} />
+                </div>
+              )}
             </div>
           </div>
         </div>
