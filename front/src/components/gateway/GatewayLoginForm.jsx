@@ -71,12 +71,6 @@ const GatewayLoginForm = ({ children, ...props }) => (
             <div class="form-group">
               <label class="form-label">
                 <Text id="gatewayLogin.passwordLabel" />
-                <a
-                  href={props.external_forgot_password ? EXTERNAL_FORGOT_PASSWORD_LINK : '/forgot-password'}
-                  class="float-right small"
-                >
-                  <Text id="gatewayLogin.forgotPasswordLabel" />
-                </a>
               </label>
               <Localizer>
                 <input
@@ -101,6 +95,7 @@ const GatewayLoginForm = ({ children, ...props }) => (
                   placeholder={<Text id="gatewayLogin.twoFactorCodePlaceholder" />}
                   value={props.gatewayLoginTwoFactorCode}
                   onInput={props.updateLoginTwoFactorCode}
+                  autofocus
                 />
               </Localizer>
               <div class="invalid-feedback">
@@ -129,6 +124,14 @@ const GatewayLoginForm = ({ children, ...props }) => (
               </button>
             )}
           </div>
+          {!props.gatewayLoginStep2 && (
+            <a
+              href={props.external_forgot_password ? EXTERNAL_FORGOT_PASSWORD_LINK : '/forgot-password'}
+              class="float-right small mt-2"
+            >
+              <Text id="gatewayLogin.forgotPasswordLabel" />
+            </a>
+          )}
         </div>
       </div>
     </div>

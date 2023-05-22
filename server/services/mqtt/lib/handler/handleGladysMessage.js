@@ -14,15 +14,26 @@ function handleGladysMessage(topic, message) {
   if (topic === 'gladys/master/device/create') {
     this.gladys.event.emit(EVENTS.DEVICE.NEW, JSON.parse(message));
   } else if (topic.startsWith('gladys/master/device/')) {
-    // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/state
     if (!parsedTopic[5]) {
       throw new BadParameters('Device feature external_id is required');
     }
-    const event = {
-      device_feature_external_id: parsedTopic[5],
-      state: parseFloat(message),
-    };
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
+    // if the message is a text
+    if (topic.endsWith('/text')) {
+      // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/text
+      const event = {
+        device_feature_external_id: parsedTopic[5],
+        text: message,
+      };
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
+    } else {
+      // Or a float state
+      // Topic = gladys/master/device/:device_external_id/feature/:device_feature_external_id/state
+      const event = {
+        device_feature_external_id: parsedTopic[5],
+        state: parseFloat(message),
+      };
+      this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
+    }
   } else {
     logger.warn(`MQTT : Gladys topic ${topic} not handled.`);
   }
