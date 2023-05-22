@@ -171,6 +171,46 @@ function createActions(store) {
           currentFeatureIndex = 0;
         }
       }
+    },
+    deviceFeatureStringStateWebsocketEvent(state, x, y, payload) {
+      const data = boxActions.getBoxData(state, BOX_KEY, x, y);
+      const devices = get(data, 'room.devices');
+      if (devices) {
+        let found = false;
+        let currentDeviceIndex = 0;
+        let currentFeatureIndex = 0;
+        while (!found && currentDeviceIndex < devices.length) {
+          while (!found && currentFeatureIndex < devices[currentDeviceIndex].features.length) {
+            if (devices[currentDeviceIndex].features[currentFeatureIndex].selector === payload.device_feature) {
+              found = true;
+              const newData = update(data, {
+                room: {
+                  devices: {
+                    [currentDeviceIndex]: {
+                      features: {
+                        [currentFeatureIndex]: {
+                          last_value_string: {
+                            $set: payload.last_value_string
+                          },
+                          last_value_changed: {
+                            $set: payload.last_value_changed
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              });
+              boxActions.mergeBoxData(state, BOX_KEY, x, y, {
+                room: newData.room
+              });
+            }
+            currentFeatureIndex += 1;
+          }
+          currentDeviceIndex += 1;
+          currentFeatureIndex = 0;
+        }
+      }
     }
   };
   actions.setValueDeviceDebounce = debounce(actions.setValueDevice, 500);

@@ -41,9 +41,13 @@ const actions = store => ({
 
     // Filter
     if (searchKeyword && searchKeyword.length > 0) {
+      const lowerCaseSearchKeyword = searchKeyword.toLowerCase();
       selectedIntegrations = selectedIntegrations.filter(integration => {
         const { name, description } = integration;
-        return name.toLowerCase().includes(searchKeyword) || description.toLowerCase().includes(searchKeyword);
+        return (
+          name.toLowerCase().includes(lowerCaseSearchKeyword) ||
+          description.toLowerCase().includes(lowerCaseSearchKeyword)
+        );
       });
     }
 
