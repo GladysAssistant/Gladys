@@ -2307,6 +2307,10 @@
       "shortCategoryName": "Qualité de l'air",
       "aqi": "Indice de qualité de l'air"
     },
+    "text": {
+      "shortCategoryName": "Texte",
+      "text": "Texte"
+    },
     "unknown": {
       "shortCategoryName": "Inconnu",
       "unknown": "Inconnu"

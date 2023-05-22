@@ -1,4 +1,7 @@
+const { Op } = require('sequelize');
 const db = require('../../models');
+const { DEVICE_FEATURE_CATEGORIES } = require('../../utils/constants');
+
 const { NotFoundError } = require('../../utils/coreErrors');
 
 const DEFAULT_OPTIONS = {
@@ -16,6 +19,7 @@ const DEVICE_FEATURES_ATTRIBUTES = [
   'min',
   'max',
   'last_value',
+  'last_value_string',
   'last_value_changed',
 ];
 const SERVICE_ATTRIBUTES = ['name'];
@@ -41,6 +45,11 @@ async function getBySelector(selector, options) {
           model: db.DeviceFeature,
           as: 'features',
           attributes: DEVICE_FEATURES_ATTRIBUTES,
+          where: {
+            category: {
+              [Op.not]: DEVICE_FEATURE_CATEGORIES.CAMERA,
+            },
+          },
         },
         {
           model: db.Service,
