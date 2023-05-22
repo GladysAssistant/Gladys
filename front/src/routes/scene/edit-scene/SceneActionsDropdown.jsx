@@ -30,20 +30,24 @@ class SceneActionsDropdown extends Component {
 
   render(props, { show }) {
     return (
-      <div class="dropdown">
+      <div class="dropdown ">
         <button onClick={this.toggleShow} class="btn btn-secondary ml-2 dropdown-toggle">
           <span class="d-none d-sm-inline-block">
             <Text id="editScene.moreButton" />
           </span>
         </button>
         <div
-          class={cx('dropdown-menu', {
+          class={cx('dropdown-menu dropdown-menu-right', {
             show
           })}
         >
           <a class="dropdown-item" href="#" onClick={props.duplicateScene}>
+            <Text id="editScene.editTitleButton" /> <i className="fe fe-edit-3" />
+          </a>
+          <a class="dropdown-item" href="#" onClick={props.duplicateScene}>
             <Text id="editScene.duplicateButton" /> <i className="fe fe-copy" />
           </a>
+
           <a class="dropdown-item" href="#" onClick={props.deleteScene}>
             <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
           </a>

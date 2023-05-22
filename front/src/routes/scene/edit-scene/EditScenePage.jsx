@@ -38,7 +38,12 @@ const EditScenePage = ({ children, ...props }) => (
                       </div>
                     </form>
                   ) : (
-                    <span onClick={props.toggleIsNameEditable}>{props.scene.name}</span>
+                    <span onClick={props.toggleIsNameEditable}>
+                      {props.scene.name}{' '}
+                      <small>
+                        <i class="fe fe-edit-3" />
+                      </small>
+                    </span>
                   )}
                   <label class="custom-switch m-0 ml-4">
                     <input
@@ -53,7 +58,9 @@ const EditScenePage = ({ children, ...props }) => (
                   </label>
                 </h1>
 
-                <span class="text-muted">Déclenchement de l'arossage le week-end</span>
+                <span class="text-muted">
+                  Déclenchement de l'arossage le week-end <i class="fe fe-edit-3" />
+                </span>
               </div>
               <div class="mt-2 mt-md-0">
                 <button onClick={props.startScene} class="btn btn-primary">
@@ -106,6 +113,7 @@ const EditScenePage = ({ children, ...props }) => (
                 <ActionGroup
                   moveCard={props.moveCard}
                   addAction={props.addAction}
+                  deleteActionGroup={props.deleteActionGroup}
                   actions={parallelActions}
                   deleteAction={props.deleteAction}
                   updateSelectedNewAction={props.updateSelectedNewAction}

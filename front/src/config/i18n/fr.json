@@ -1191,6 +1191,7 @@
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
     "duplicateButton": "Dupliquer",
+    "editTitleButton": "Editer titre",
     "moreButton": "Plus",
     "triggersTitle": "Déclencheurs",
     "newTrigger": "Nouveau déclencheur",

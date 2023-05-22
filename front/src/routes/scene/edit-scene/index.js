@@ -134,6 +134,20 @@ class EditScene extends Component {
       return newState;
     });
   };
+  deleteActionGroup = columnIndex => {
+    let newState = update(this.state, {
+      scene: {
+        actions: {
+          $splice: [[columnIndex, 1]]
+        }
+      },
+      variables: {
+        $splice: [[columnIndex, 1]]
+      }
+    });
+    this.setState(newState);
+  };
+
   deleteAction = (columnIndex, rowIndex) => {
     this.setState(prevState => {
       let newState = update(prevState, {
@@ -386,6 +400,7 @@ class EditScene extends Component {
             updateActionProperty={this.updateActionProperty}
             updateTriggerProperty={this.updateTriggerProperty}
             addAction={this.addAction}
+            deleteActionGroup={this.deleteActionGroup}
             deleteAction={this.deleteAction}
             addTrigger={this.addTrigger}
             deleteTrigger={this.deleteTrigger}
