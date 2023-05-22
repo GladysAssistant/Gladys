@@ -108,9 +108,9 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       '-i',
       cameraUrlParam.value,
       '-c:v',
-      'h264',
+      'h264', // Codec H264
       '-preset',
-      'veryfast',
+      'veryfast', // Encoding presets
       '-flags',
       '+cgop',
       '-vf',
