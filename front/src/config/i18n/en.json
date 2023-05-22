@@ -1188,6 +1188,7 @@
   "editScene": {
     "editNamePlaceholder": "Enter a scene name",
     "descriptionTitle": "Description",
+    "editDescriptionPlaceholder": "Enter a scene description",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",

@@ -89,7 +89,7 @@ class EditScene extends Component {
     this.setState({ saving: true, error: false });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
-      this.setState({ isNameEditable: false });
+      this.setState({ isNameEditable: false, isDescriptionEditable: false });
     } catch (e) {
       console.error(e);
       this.setState({ error: true });
@@ -303,6 +303,14 @@ class EditScene extends Component {
     this.nameInput = nameInput;
   };
 
+  toggleIsDescriptionEditable = async () => {
+    await this.setState(prevState => ({ isDescriptionEditable: !prevState.isDescriptionEditable }));
+    console.log(this.state.isDescriptionEditable);
+    if (this.state.isDescriptionEditable) {
+      this.descriptionInput.focus();
+    }
+  };
+
   setDescriptionInputRef = descriptionInput => {
     this.descriptionInput = descriptionInput;
   };
@@ -357,7 +365,7 @@ class EditScene extends Component {
     );
   }
 
-  render(props, { saving, error, variables, scene, isNameEditable, triggersVariables }) {
+  render(props, { saving, error, variables, scene, isNameEditable, isDescriptionEditable, triggersVariables }) {
     return (
       scene && (
         <EditScenePage
@@ -385,6 +393,8 @@ class EditScene extends Component {
           setNameInputRef={this.setNameInputRef}
           duplicateScene={this.duplicateScene}
           updateSceneDescription={this.updateSceneDescription}
+          toggleIsDescriptionEditable={this.toggleIsDescriptionEditable}
+          isDescriptionEditable={isDescriptionEditable}
           setDescriptionInputRef={this.setDescriptionInputRef}
         />
       )

@@ -3,6 +3,7 @@ import { Link } from 'preact-router/match';
 import ActionGroup from './ActionGroup';
 import TriggerGroup from './TriggerGroup';
 import update from 'immutability-helper';
+import style from '../style.css';
 
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
@@ -73,24 +74,38 @@ const EditScenePage = ({ children, ...props }) => (
             </div>
           </div>
           <div class="page-header">
-            <h5 class="font-weight-normal">
-              <Text id="editScene.descriptionTitle" />
-            </h5>
-            <form class="w-100" onSubmit={props.saveScene}>
-              <div class="input-group">
-                <Localizer>
-                  <textarea
-                    cols="40"
-                    rows="5"
-                    type="text"
-                    className="form-control form-control-sm "
-                    onChange={props.updateSceneDescription}
-                    value={props.scene.description}
-                    ref={props.setDescriptionInputRef}
-                  />
-                </Localizer>
-              </div>
-            </form>
+            {props.isDescriptionEditable ? (
+              <form class="w-100" onSubmit={props.saveScene}>
+                <div class="input-group">
+                  <Localizer>
+                    <input
+                      type="text"
+                      class="form-control form-control-sm "
+                      maxlength="100"
+                      onChange={props.updateSceneDescription}
+                      value={props.scene.description}
+                      ref={props.setDescriptionInputRef}
+                      placeholder={<Text id="editScene.editDescriptionPlaceholder" />}
+                    />
+                  </Localizer>
+                  <div class="input-group-append">
+                    <button class="btn btn-primary btn-sm" onClick={props.saveScene}>
+                      <Text id="global.save" />
+                    </button>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <Localizer>
+                <span class={style.descriptionScene} onClick={props.toggleIsDescriptionEditable}>
+                  {props.scene.description ? (
+                    <span>{props.scene.description}</span>
+                  ) : (
+                    <Text id="editScene.editDescriptionPlaceholder" />
+                  )}
+                </span>
+              </Localizer>
+            )}
           </div>
           <div>
             {props.error && (
