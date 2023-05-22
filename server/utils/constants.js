@@ -611,7 +611,7 @@ const DEVICE_FEATURE_UNITS = {
   // Airquality Index
   AQI: 'aqi',
   // For air quality (pm2.5, formaldehyd)
-  MICROGRAM_PER_CUBIC_METER: 'µg/m³',
+  MICROGRAM_PER_CUBIC_METER: 'microgram-per-cubic-meter',
 };
 
 const WEATHER_UNITS = {
