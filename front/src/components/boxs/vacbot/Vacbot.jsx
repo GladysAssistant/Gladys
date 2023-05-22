@@ -3,7 +3,7 @@ import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import actions from '../../../actions/dashboard/boxes/vacbot';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY, RequestStatus } from '../../../utils/consts';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+// TODO : import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import cx from 'classnames';
 
@@ -25,49 +25,41 @@ const VacbotBox = ({ children, ...props }) => (
     <div class="card-body ">
       <div class="card-header">
         <div class="d-flex bd-highlight mb-3">
-        
           <h2 class="card-title me-auto p-2 bd-highlight">{props.name}</h2>
 
           <div class="p-2 bd-highlight">
             {props.cleanReport == 'idle' && <i class={`list-separated-item fe fe-disc`} />}
             {props.chargeStatus == 'returning' && <i class={`list-separated-item fe fe-dowload`} />}
             {props.cleanReport == 'auto' && <i class={`list-separated-item fe fe-play-circle`} />}
-            
+
             {props.cleanReport}
-            
           </div>
 
-          
           <div class="p-2 bd-highlight align-items-right">
-            
-            {props.chargeStatus == 'charging' && (
-              <i class={`fe fe-battery-charging`} >
-                {props.batteryLevel}%{' '}
-              </i>
-            )}
+            {props.chargeStatus == 'charging' && <i class={`fe fe-battery-charging`}>{props.batteryLevel}% </i>}
             {props.chargeStatus != 'charging' && (
               <i class={`fe fe-battery`} style={{ fontSize: '20px' }}>
                 {props.batteryLevel}%
               </i>
             )}
           </div>
-        </div> 
+        </div>
       </div>
-      
-      <div class="bg-image d-flex flex-row-reverse"
-           style={{ 
-              backgroundImage: `url(${props.imageUrl})`,
-              backgroundPosition:'center',
-              backgroundSize:'cover',  
-              width:'100%',
-              height:'250px',
-              position:'relative'
-            }}
+
+      <div
+        class="bg-image d-flex flex-row-reverse"
+        style={{
+          backgroundImage: `url(${props.imageUrl})`,
+          backgroundPosition: 'center',
+          backgroundSize: 'cover',
+          width: '100%',
+          height: '250px',
+          position: 'relative'
+        }}
       >
-       
         <div class="p-2">
-            {props.hasMappingCapabilities && <button class={`btn btn-sm fe fe-map`} />}
-            {props.hasCustomAreaCleaningMode && <button class={`btn btn-sm fe fe-codepen`} />}
+          {props.hasMappingCapabilities && <button class={`btn btn-sm fe fe-map`} />}
+          {props.hasCustomAreaCleaningMode && <button class={`btn btn-sm fe fe-codepen`} />}
         </div>
         <div class="d-flex align-items-center justify-content-center">
           <div class="btn-group" role="group">
@@ -76,7 +68,7 @@ const VacbotBox = ({ children, ...props }) => (
                 active: 1
               })}
               onClick={props.clean}
-            ></button>
+            />
             <button
               class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
                 active: 1
@@ -88,20 +80,18 @@ const VacbotBox = ({ children, ...props }) => (
                 active: 1
               })}
               onClick={props.stop}
-            ></button>
+            />
             <button
               class={cx('btn btn-sm btn-secondary', 'fe', 'fe-home', {
                 active: 1
               })}
               onClick={props.home}
-            ></button>
+            />
           </div>
+        </div>
       </div>
-      </div>    
-      
     </div>
 
-    
     <div class="mt-3">
       hasMoppingSystem : {props.hasMoppingSystem}, chargeStatus : {props.chargeStatus}, cleanReport :{' '}
       {props.cleanReport}

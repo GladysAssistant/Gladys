@@ -2380,7 +2380,14 @@
     },
     "vacbot": {
       "shortCategoryName": "Aspirateur Robot",
-      "state": "Etat de l'aspirateur robot"
+      "state": "Etat de l'aspirateur robot",
+      "integer": "Niveau de charge de la batterie",
+      "binary": "Power",
+      "map": "Localisation",
+      "clean": "Nettoyer",
+      "pause": "Pause",
+      "stop": "Stop",
+      "charge": "Retour à la station de charge"
     },
     "data": {
       "shortCategoryName": "Donnée",

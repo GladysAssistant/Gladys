@@ -12,7 +12,6 @@ import ThermostatDeviceFeature from './device-features/ThermostatDeviceFeature';
 import AirConditioningModeDeviceFeature from './device-features/AirConditioningModeDeviceFeature';
 import VacbotModeDeviceFeature from './device-features/VacbotModeDeviceFeature';
 
-
 const ROW_TYPE_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: BinaryDeviceFeature,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: ColorDeviceFeature,

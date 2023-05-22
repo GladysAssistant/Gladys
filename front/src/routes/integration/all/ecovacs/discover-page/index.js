@@ -4,7 +4,6 @@ import actions from '../actions';
 import EcovacsPage from '../EcovacsPage';
 import DiscoverTab from './DiscoverTab';
 
-@connect('user,session,httpClient,houses,discoveredDevices,loading,errorLoading', actions)
 class EcovacsIntegration extends Component {
   async componentWillMount() {
     this.props.getDiscoveredEcovacsDevices();
@@ -21,4 +20,7 @@ class EcovacsIntegration extends Component {
   }
 }
 
-export default EcovacsIntegration;
+export default connect(
+  'user,session,httpClient,houses,discoveredDevices,loading,errorLoading',
+  actions
+)(EcovacsIntegration);

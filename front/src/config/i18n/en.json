@@ -2379,7 +2379,14 @@
     },
     "vacbot": {
       "shortCategoryName": "Vacbot",
-      "state": "Vacbot state"
+      "state": "Vacbot state",
+      "integer": "Battery level",
+      "binary": "Power",
+      "map": "Location",
+      "clean": "Clean",
+      "pause": "Pause",
+      "stop": "Stop",
+      "charge": "Return to the charging station"
     },
     "data": {
       "shortCategoryName": "Data",

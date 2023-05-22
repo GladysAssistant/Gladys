@@ -45,45 +45,44 @@ const VacbotModeDeviceFeature = ({ children, ...props }) => {
         <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'sliders' })}`} />
       </td>
       <td>{getDeviceName(device, deviceFeature)}</td>
-      
+
       <td class="py-0">
         <div class="d-flex justify-content-end">
           <div class="btn-group" role="group">
             <Localizer>
-            <button
-              class={cx('btn btn-sm btn-secondary', 'fe', 'fe-play', {
-                active: lastValue === VACBOT_MODE.CLEAN
-              })}
-              onClick={clean}
-              title={<Text id={`deviceFeatureAction.category.${category}.${type}.clean`} />}
+              <button
+                class={cx('btn btn-sm btn-secondary', 'fe', 'fe-play', {
+                  active: lastValue === VACBOT_MODE.CLEAN
+                })}
+                onClick={clean}
+                title={<Text id={`deviceFeatureAction.category.${category}.${type}.clean`} />}
               />
             </Localizer>
             <Localizer>
-            <button
-              class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
-                active: lastValue === VACBOT_MODE.PAUSE
-              })}
-              onClick={pause}
-              title={<Text id={`deviceFeatureAction.category.${category}.${type}.pause`} />}
+              <button
+                class={cx('btn btn-sm btn-secondary', 'fe', 'fe-pause', {
+                  active: lastValue === VACBOT_MODE.PAUSE
+                })}
+                onClick={pause}
+                title={<Text id={`deviceFeatureAction.category.${category}.${type}.pause`} />}
               />
             </Localizer>
             <Localizer>
-            <button
-              class={cx('btn btn-sm', 'btn-secondary', 'fe', 'fe-square', {
-                active: lastValue === VACBOT_MODE.STOP
-              })}
-              onClick={stop}
-              title={<Text id={`deviceFeatureAction.category.${category}.${type}.stop`} />}
-              
-            />
+              <button
+                class={cx('btn btn-sm', 'btn-secondary', 'fe', 'fe-square', {
+                  active: lastValue === VACBOT_MODE.STOP
+                })}
+                onClick={stop}
+                title={<Text id={`deviceFeatureAction.category.${category}.${type}.stop`} />}
+              />
             </Localizer>
             <Localizer>
-            <button
-              class={cx('btn btn-sm', 'btn-secondary', 'fe', 'fe-home', {
-                active: lastValue === VACBOT_MODE.CHARGE
-              })}
-              onClick={charge}
-              title={<Text id={`deviceFeatureAction.category.${category}.${type}.charge`} />}
+              <button
+                class={cx('btn btn-sm', 'btn-secondary', 'fe', 'fe-home', {
+                  active: lastValue === VACBOT_MODE.CHARGE
+                })}
+                onClick={charge}
+                title={<Text id={`deviceFeatureAction.category.${category}.${type}.charge`} />}
               />
             </Localizer>
           </div>
