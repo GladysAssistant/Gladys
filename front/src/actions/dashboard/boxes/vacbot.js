@@ -40,18 +40,17 @@ function createActions(store) {
       }
     },
     async clean(state, box, x, y) {
-      console.log(`clean`);
+      console.log(`clean ${state} - ${box} ${x} ${y}`);
     },
     async stop(state, box, x, y) {
-      console.log(`stop`);
+      console.log(`stop ${state} - ${box} ${x} ${y}`);
     },
     async pause(state, box, x, y) {
-      console.log(`pause`);
+      console.log(`pause ${state} - ${box} ${x} ${y}`);
     },
     async home(state, box, x, y) {
-      console.log(`home`);
-    }
-    /*,
+      console.log(`home ${state} - ${box} ${x} ${y}`);
+    },
     deviceFeatureWebsocketEvent(state, box, x, y, payload) {
       console.log(payload);
       if (box.vacbot === payload.device) {
@@ -59,7 +58,7 @@ function createActions(store) {
           vacbot: payload.last_value_string
         });
       }
-    }*/
+    }
   };
   return Object.assign({}, actions);
 }
