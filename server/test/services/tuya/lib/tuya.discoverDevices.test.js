@@ -30,7 +30,18 @@ describe('TuyaHandler.discoverDevices', () => {
         .onFirstCall()
         .resolves({ result: { list: [{ name: 'name', uuid: 'uuid', product_name: 'model' }] } })
         .onSecondCall()
-        .resolves({ result: { details: 'details', functions: [] } }),
+        .resolves({
+          result: {
+            details: 'details',
+            functions: [
+              {
+                name: 'name',
+                code: 'switch_1',
+                type: 'Boolean',
+              },
+            ],
+          },
+        }),
     };
   });
 
@@ -81,7 +92,19 @@ describe('TuyaHandler.discoverDevices', () => {
     expect(devices).to.deep.eq([
       {
         external_id: 'tuya:uuid',
-        features: [],
+        features: [
+          {
+            category: 'switch',
+            external_id: 'tuya:uuid:switch_1',
+            has_feedback: false,
+            max: 1,
+            min: 0,
+            name: 'name',
+            read_only: false,
+            selector: 'tuya:uuid:switch_1',
+            type: 'binary',
+          },
+        ],
         model: 'model',
         name: 'name',
         poll_frequency: 60000,

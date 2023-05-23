@@ -16,7 +16,6 @@ async function loadDeviceDetails(tuyaDevice) {
     method: 'GET',
     path: `${API.VERSION_1_2}/devices/${deviceId}/specification`,
   });
-  console.log(responsePage);
 
   const { result } = responsePage;
   return { ...tuyaDevice, specifications: result };
