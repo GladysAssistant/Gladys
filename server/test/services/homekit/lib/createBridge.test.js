@@ -25,9 +25,13 @@ describe('Create bridge', () => {
             },
           ]),
         },
+        event: {
+          on: stub().returns(),
+        },
       },
       newUsername: stub().resolves('C4:D0:AB:12:BC:51'),
       newPinCode: stub().resolves('123-45-678'),
+      notifyChange: stub().returns(),
       hap: {
         Categories: { BRIDGE: 'BRIDGE' },
         Bridge: stub().returns({

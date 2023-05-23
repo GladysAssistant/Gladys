@@ -21,6 +21,8 @@ describe('bluetooth.unsubscribeDevice', () => {
   let bluetooth;
   let bluetoothManager;
 
+  let clock;
+
   beforeEach(() => {
     throwError = false;
 
@@ -61,13 +63,12 @@ describe('bluetooth.unsubscribeDevice', () => {
       bluetooth.emit('discover', peripheral);
       bluetooth.emit('scanStop');
     };
+
+    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
-    if (bluetoothManager.scanPromise && bluetoothManager.scanPromise.isPending()) {
-      bluetoothManager.scanPromise.cancel();
-    }
-
+    clock.restore();
     sinon.reset();
   });
 

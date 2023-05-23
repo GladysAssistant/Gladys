@@ -32,25 +32,23 @@ async function scanDevice(peripheralUuid) {
       (serviceUuid) =>
         Promise.map(
           Object.keys(INFORMATION_SERVICES[serviceUuid]),
-          (characteristicUuid) => {
-            return this.getCharacteristic(peripheral, serviceUuid, characteristicUuid)
-              .then((characteristic) => {
-                const actionMapper = INFORMATION_SERVICES[serviceUuid][characteristicUuid];
+          async (characteristicUuid) => {
+            try {
+              const characteristic = await this.getCharacteristic(peripheral, serviceUuid, characteristicUuid);
+              const actionMapper = INFORMATION_SERVICES[serviceUuid][characteristicUuid];
+              if (actionMapper.discover) {
+                actionMapper.discover(serviceUuid, characteristic, device);
+              }
 
-                if (actionMapper.discover) {
-                  actionMapper.discover(serviceUuid, characteristic, device);
-                }
+              if (actionMapper.read) {
+                const value = await read(characteristic);
+                return actionMapper.read(device, value);
+              }
+            } catch (e) {
+              logger.warn(e.message);
+            }
 
-                if (actionMapper.read) {
-                  return read(characteristic).then((value) => actionMapper.read(device, value));
-                }
-
-                return Promise.resolve();
-              })
-              .catch((e) => {
-                logger.warn(e.message);
-                return Promise.resolve();
-              });
+            return null;
           },
           { concurrency: 1 },
         ),
@@ -58,16 +56,19 @@ async function scanDevice(peripheralUuid) {
     );
   };
 
-  return this.applyOnPeripheral(peripheralUuid, loop)
-    .catch((error) => logger.warn(`Bluetooth: unable to scan ${peripheralUuid} - ${error}`))
-    .finally(() => {
-      setDeviceParam(device, PARAMS.LOADED, true);
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER,
-        payload: device,
-      });
-      return device;
+  try {
+    await this.applyOnPeripheral(peripheralUuid, loop);
+  } catch (e) {
+    logger.warn(`Bluetooth: unable to scan ${peripheralUuid} - ${e}`);
+  } finally {
+    setDeviceParam(device, PARAMS.LOADED, true);
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER,
+      payload: device,
     });
+  }
+
+  return device;
 }
 
 module.exports = {

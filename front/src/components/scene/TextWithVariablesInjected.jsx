@@ -107,6 +107,8 @@ class TextWithVariablesInjected extends Component {
     this.state = {
       variableWhileList: []
     };
+
+    this.refreshVariables(this.props);
   }
 
   componentDidMount() {
@@ -123,9 +125,22 @@ class TextWithVariablesInjected extends Component {
 
   render({ singleLineInput = false, placeholder }, {}) {
     if (singleLineInput) {
-      return <input type="text" ref={this.setRef} placeholder={placeholder} class="form-control" />;
+      return (
+        <input
+          type="text"
+          ref={this.setRef}
+          placeholder={placeholder}
+          class={`form-control ${this.props.class ? this.props.class : ''}`}
+        />
+      );
     }
-    return <textarea ref={this.setRef} placeholder={placeholder} class="form-control" />;
+    return (
+      <textarea
+        ref={this.setRef}
+        placeholder={placeholder}
+        class={`form-control ${this.props.class ? this.props.class : ''}`}
+      />
+    );
   }
 }
 
