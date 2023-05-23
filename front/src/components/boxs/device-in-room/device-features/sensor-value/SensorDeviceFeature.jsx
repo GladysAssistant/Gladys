@@ -10,6 +10,8 @@ import BadgeNumberDeviceValue from './BadgeNumberDeviceValue';
 import IconBinaryDeviceValue from './IconBinaryDeviceValue';
 import SignalQualityDeviceValue from './SignalQualityDeviceValue';
 import ButtonClickDeviceValue from './ButtonClickDeviceValue';
+import TextDeviceValue from './TextDeviceValue';
+
 import { getDeviceName } from '../../../../../utils/device';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
@@ -17,7 +19,8 @@ const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: LastSeenDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: IconBinaryDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.SIGNAL]: SignalQualityDeviceValue,
-  [DEVICE_FEATURE_CATEGORIES.BUTTON]: ButtonClickDeviceValue
+  [DEVICE_FEATURE_CATEGORIES.BUTTON]: ButtonClickDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: TextDeviceValue
 };
 
 const DISPLAY_BY_FEATURE_TYPE = {
