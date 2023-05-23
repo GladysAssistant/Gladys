@@ -29,22 +29,30 @@ async function setValue(broadlinkDevice, gladysDevice, deviceFeature, value) {
   const { type } = deviceFeature;
   const valueStr = value.toString();
 
-  const nbExpectedCodes = valueStr.length;
+  // Check for valued code
+  const valuedParamName = `${PARAMS.IR_CODE}${type}-${valueStr}`;
+  const valuedParam = gladysDevice.params.find((p) => valuedParamName === p.name);
   const relatedParams = [];
 
-  // Get all related params with code first
-  for (let i = 0; i < nbExpectedCodes; i += 1) {
-    const subValue = valueStr[i];
-    const paramNames = [`${PARAMS.IR_CODE}${type}`, `${PARAMS.IR_CODE}${type}-${subValue}`];
-    const param = gladysDevice.params.find((p) => paramNames.includes(p.name));
+  if (valuedParam) {
+    relatedParams.push(valuedParam);
+  } else {
+    const nbExpectedCodes = valueStr.length;
 
-    if (param) {
-      relatedParams.push(param);
+    // Get all related params with code first
+    for (let i = 0; i < nbExpectedCodes; i += 1) {
+      const subValue = valueStr[i];
+      const paramNames = [`${PARAMS.IR_CODE}${type}`, `${PARAMS.IR_CODE}${type}-${subValue}`];
+      const param = gladysDevice.params.find((p) => paramNames.includes(p.name));
+
+      if (param) {
+        relatedParams.push(param);
+      }
     }
-  }
 
-  if (nbExpectedCodes !== relatedParams.length) {
-    throw new NoValuesFoundError(`No IR code found for ${type} feature and ${value} value`);
+    if (nbExpectedCodes !== relatedParams.length) {
+      throw new NoValuesFoundError(`No IR code found for ${type} feature and ${value} value`);
+    }
   }
 
   // Only if all exist, send them
