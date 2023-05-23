@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { TuyaContext, client } = require('../mock/tuya.mock.test');
+const { TuyaContext, client } = require('../tuya.mock.test');
 
 const { assert, fake } = sinon;
 
@@ -38,7 +38,7 @@ describe('TuyaHandler.init', () => {
 
   it('well initialized', async () => {
     gladys.variable.getValue
-      .withArgs(GLADYS_VARIABLES.BASE_URL, serviceId)
+      .withArgs(GLADYS_VARIABLES.ENDPOINT, serviceId)
       .returns('apiUrl')
       .withArgs(GLADYS_VARIABLES.ACCESS_KEY, serviceId)
       .returns('accessKey')
@@ -50,7 +50,7 @@ describe('TuyaHandler.init', () => {
     expect(tuyaHandler.status).to.eq(STATUS.CONNECTED);
 
     assert.callCount(gladys.variable.getValue, 3);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.BASE_URL, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ENDPOINT, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_KEY, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SECRET_KEY, serviceId);
 

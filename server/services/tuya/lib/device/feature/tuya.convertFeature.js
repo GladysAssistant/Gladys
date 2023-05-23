@@ -32,7 +32,6 @@ function convertFeature(tuyaFunctions, externalId) {
     logger.error(`Tuya function as unmappable "${valuesAsString}" values on "${type}" type with "${code}" code`);
   }
 
-  // TODO feature has only min/max/unit
   const featureAttributes = mappingType.getFeatureAttributes(values);
 
   return {

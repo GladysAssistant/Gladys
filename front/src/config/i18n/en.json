@@ -713,13 +713,67 @@
     },
     "tuya": {
       "title": "Tuya",
-      "description": "TODO",
-      "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
-      "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
-      "apiKeyLabel": "Then, enter your API key here:",
-      "apiKeyPlaceholder": "Enter OpenWeather API key",
+      "description": "Control your Tuya devices (works with the cloud)",
+      "deviceTab": "Devices",
+      "discoverTab": "Tuya discover",
+      "setupTab": "Setup",
+      "discoverDeviceDescr": "Automatically scan Tuya devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
       "saveButton": "Save",
-      "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed or available",
+      "status": {
+        "notConnected": "Gladys failed to connect to Tuya cloud account, please go to ",
+        "setupPageLink": "Tuya configuration page.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No Tuya device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your Tuya cloud account",
+        "description": "Tuya devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
+        "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No Tuya device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "Tuya configuration",
+        "description": "You can connect Gladys to your Tuya cloud account to command the associated devices.",
+        "endpoints": {
+          "china": "China",
+          "westernAmerica": "Western America",
+          "easternAmerica": "Eastern America",
+          "centralEurope": "Central Europe",
+          "westernEurope": "Western Europe",
+          "india": "India"
+        },
+        "endpoint": "Endpoint",
+        "accessKey": "Access Key",
+        "accessKeyPlaceholder": "Enter Tuya access key",
+        "secretKey": "Secret Key",
+        "secretKeyPlaceholder": "Enter Tuya secret key",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your Tuya cloud account...",
+        "connected": "Connected to the Tuya cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
     },
     "mqtt": {
       "title": "MQTT",

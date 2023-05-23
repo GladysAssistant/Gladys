@@ -92,10 +92,8 @@ See [Standard Instruction Set](https://developer.tuya.com/en/docs/iot/standardde
   - **DONE** Cloud discover
   - **IN PROGRESS** Feature mapping
   - **IN PROGRESS** Device mapping
-  - **TO DO** Device status notification (MQTT ?)
-  - **TO DO** Send device action to Tuya cloud (Gladys setValue)
-- **TO DO** Front part
-- **TO DO** Cypress automation tests
+  - **DONE** Send device action to Tuya cloud (Gladys setValue)
+- **DONE** Front part
 
 ## Known issues
 

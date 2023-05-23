@@ -12,7 +12,7 @@ const TUYA_ENDPOINTS = {
   easternAmerica: 'https://openapi-ueaz.tuyaus.com',
   centralEurope: 'https://openapi.tuyaeu.com',
   westernEurope: 'https://openapi-weaz.tuyaeu.com',
-  india: 'https://openapi.tuyain.com'
+  india: 'https://openapi.tuyain.com',
 };
 
 const STATUS = {
@@ -24,7 +24,10 @@ const STATUS = {
 };
 
 const API = {
-  VERSION: '/v1.3/iot-03',
+  VERSION_1_0: '/v1.0/iot-03',
+  VERSION_1_1: '/v1.1/iot-03',
+  VERSION_1_2: '/v1.2/iot-03',
+  VERSION_1_3: '/v1.3/iot-03',
 };
 
 module.exports = {

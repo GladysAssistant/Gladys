@@ -12,6 +12,9 @@ const gladys = {
   event: {
     emit: fake.resolves(null),
   },
+  stateManager: {
+    get: fake.returns(null),
+  },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -25,9 +28,9 @@ describe('TuyaHandler.discoverDevices', () => {
       request: sinon
         .stub()
         .onFirstCall()
-        .resolves({ result: { list: [{ id: 1 }] } })
+        .resolves({ result: { list: [{ name: 'name', uuid: 'uuid', product_name: 'model' }] } })
         .onSecondCall()
-        .resolves({ result: { details: 'details' } }),
+        .resolves({ result: { details: 'details', functions: [] } }),
     };
   });
 
@@ -75,7 +78,17 @@ describe('TuyaHandler.discoverDevices', () => {
 
   it('should load devices', async () => {
     const devices = await tuyaHandler.discoverDevices();
-    expect(devices).to.deep.eq([{ id: 1, specifications: { details: 'details' } }]);
+    expect(devices).to.deep.eq([
+      {
+        external_id: 'tuya:uuid',
+        features: [],
+        model: 'model',
+        name: 'name',
+        poll_frequency: 60000,
+        selector: 'tuya:uuid',
+        service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      },
+    ]);
 
     assert.callCount(gladys.event.emit, 2);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {

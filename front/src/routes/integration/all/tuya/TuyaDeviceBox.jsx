@@ -4,7 +4,6 @@ import cx from 'classnames';
 import { Link } from 'preact-router';
 import get from 'get-value';
 
-import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/ewelink/lib/utils/constants';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class TuyaDeviceBox extends Component {
@@ -24,9 +23,9 @@ class TuyaDeviceBox extends Component {
     try {
       await this.props.saveDevice(this.props.listName, this.props.deviceIndex);
     } catch (e) {
-      let errorMessage = 'integration.eWeLink.error.defaultError';
+      let errorMessage = 'integration.tuya.error.defaultError';
       if (e.response.status === 409) {
-        errorMessage = 'integration.eWeLink.error.conflictError';
+        errorMessage = 'integration.tuya.error.conflictError';
       }
       this.setState({
         errorMessage
@@ -54,7 +53,7 @@ class TuyaDeviceBox extends Component {
         this.setState({ tooMuchStatesError: true, statesNumber });
       } else {
         this.setState({
-          errorMessage: 'integration.eWeLink.error.defaultDeletionError'
+          errorMessage: 'integration.tuya.error.defaultDeletionError'
         });
       }
     }
@@ -101,7 +100,7 @@ class TuyaDeviceBox extends Component {
                 )}
                 <div class="form-group">
                   <label class="form-label" for={`name_${deviceIndex}`}>
-                    <Text id="integration.eWeLink.nameLabel" />
+                    <Text id="integration.tuya.nameLabel" />
                   </label>
                   <Localizer>
                     <input
@@ -110,7 +109,7 @@ class TuyaDeviceBox extends Component {
                       value={device.name}
                       onInput={this.updateName}
                       class="form-control"
-                      placeholder={<Text id="integration.eWeLink.namePlaceholder" />}
+                      placeholder={<Text id="integration.tuya.namePlaceholder" />}
                       disabled={!editable || !validModel}
                     />
                   </Localizer>
@@ -118,7 +117,7 @@ class TuyaDeviceBox extends Component {
 
                 <div class="form-group">
                   <label class="form-label" for={`model_${deviceIndex}`}>
-                    <Text id="integration.eWeLink.modelLabel" />
+                    <Text id="integration.tuya.modelLabel" />
                   </label>
                   <input
                     id={`model_${deviceIndex}`}
@@ -131,7 +130,7 @@ class TuyaDeviceBox extends Component {
 
                 <div class="form-group">
                   <label class="form-label" for={`room_${deviceIndex}`}>
-                    <Text id="integration.eWeLink.roomLabel" />
+                    <Text id="integration.tuya.roomLabel" />
                   </label>
                   <select
                     id={`room_${deviceIndex}`}
@@ -158,7 +157,7 @@ class TuyaDeviceBox extends Component {
                 {validModel && (
                   <div class="form-group">
                     <label class="form-label">
-                      <Text id="integration.eWeLink.device.featuresLabel" />
+                      <Text id="integration.tuya.device.featuresLabel" />
                     </label>
                     <DeviceFeatures features={device.features} />
                   </div>
@@ -167,38 +166,38 @@ class TuyaDeviceBox extends Component {
                 <div class="form-group">
                   {validModel && props.alreadyCreatedButton && (
                     <button class="btn btn-primary mr-2" disabled="true">
-                      <Text id="integration.eWeLink.alreadyCreatedButton" />
+                      <Text id="integration.tuya.alreadyCreatedButton" />
                     </button>
                   )}
 
                   {validModel && props.updateButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.eWeLink.updateButton" />
+                      <Text id="integration.tuya.updateButton" />
                     </button>
                   )}
 
                   {validModel && props.saveButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.eWeLink.saveButton" />
+                      <Text id="integration.tuya.saveButton" />
                     </button>
                   )}
 
                   {validModel && props.deleteButton && (
                     <button onClick={this.deleteDevice} class="btn btn-danger">
-                      <Text id="integration.eWeLink.deleteButton" />
+                      <Text id="integration.tuya.deleteButton" />
                     </button>
                   )}
 
                   {!validModel && (
                     <button class="btn btn-dark" disabled>
-                      <Text id="integration.eWeLink.unmanagedModelButton" />
+                      <Text id="integration.tuya.unmanagedModelButton" />
                     </button>
                   )}
 
                   {validModel && props.editButton && (
-                    <Link href={`/dashboard/integration/device/ewelink/edit/${device.selector}`}>
+                    <Link href={`/dashboard/integration/device/tuya/edit/${device.selector}`}>
                       <button class="btn btn-secondary float-right">
-                        <Text id="integration.eWeLink.device.editButton" />
+                        <Text id="integration.tuya.device.editButton" />
                       </button>
                     </Link>
                   )}

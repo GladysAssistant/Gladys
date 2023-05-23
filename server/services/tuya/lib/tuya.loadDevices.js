@@ -11,7 +11,7 @@ const { API } = require('./utils/tuya.constants');
 async function loadDevices(lastRowKey = null) {
   const responsePage = await this.connector.request({
     method: 'GET',
-    path: `${API.VERSION}/devices`,
+    path: `${API.VERSION_1_1}/devices`,
     query: { last_row_key: lastRowKey },
   });
 
@@ -23,7 +23,7 @@ async function loadDevices(lastRowKey = null) {
     nextResult.forEach((device) => list.push(device));
   }
 
-  logger.debug(`${list.length} / ${total} Tuay devices loaded`);
+  logger.debug(`${list.length} / ${total} Tuya devices loaded`);
 
   return list;
 }

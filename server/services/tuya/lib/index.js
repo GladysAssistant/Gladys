@@ -14,7 +14,6 @@ const { setValue } = require('./tuya.setValue');
 const { STATUS } = require('./utils/tuya.constants');
 
 const TuyaHandler = function TuyaHandler(gladys, serviceId) {
-  console.log('TuyaHandler', serviceId);
   this.gladys = gladys;
   this.serviceId = serviceId;
 

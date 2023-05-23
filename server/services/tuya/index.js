@@ -4,7 +4,6 @@ const tuyaController = require('./api/tuya.controller');
 const TuyaHandler = require('./lib');
 
 module.exports = function TuyaService(gladys, serviceId) {
-  console.log('TuyaService', serviceId);
   const tuyaHandler = new TuyaHandler(gladys, serviceId);
 
   /**

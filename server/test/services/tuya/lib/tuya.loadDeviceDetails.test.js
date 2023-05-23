@@ -31,7 +31,7 @@ describe('TuyaHandler.loadDeviceDetails', () => {
     assert.callCount(tuyaHandler.connector.request, 1);
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'GET',
-      path: `${API.VERSION}/devices/1/specification`,
+      path: `${API.VERSION_1_2}/devices/1/specification`,
     });
   });
 });

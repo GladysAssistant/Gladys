@@ -14,7 +14,7 @@ const SetupTab = ({ children, ...props }) => {
       <div class="card-body">
         <div
           class={cx('dimmer', {
-            active: props.connectEweLinkStatus === RequestStatus.Getting
+            active: props.tuyaSaveSettingsStatus === RequestStatus.Getting
           })}
         >
           <div class="loader" />
@@ -28,25 +28,29 @@ const SetupTab = ({ children, ...props }) => {
                 <label for="tuyaEndpoint" class="form-label">
                   <Text id={`integration.tuya.setup.endpoint`} />
                 </label>
-                <select className="form-control" name="tuyaEndpoint" value={props.tuyaEndpoint}
-                  onChange={props.updateConfiguration}>
+                <select
+                  className="form-control"
+                  name="tuyaEndpoint"
+                  value={props.tuyaEndpoint}
+                  onChange={props.updateConfiguration}
+                >
                   <option value="china">
-                    <Text id="integration.tuya.setup.endpoints.china"/>
+                    <Text id="integration.tuya.setup.endpoints.china" />
                   </option>
                   <option value="westernAmerica">
-                    <Text id="integration.tuya.setup.endpoints.westernAmerica"/>
+                    <Text id="integration.tuya.setup.endpoints.westernAmerica" />
                   </option>
                   <option value="easternAmerica">
-                    <Text id="integration.tuya.setup.endpoints.easternAmerica"/>
+                    <Text id="integration.tuya.setup.endpoints.easternAmerica" />
                   </option>
                   <option value="centralEurope">
-                    <Text id="integration.tuya.setup.endpoints.centralEurope"/>
+                    <Text id="integration.tuya.setup.endpoints.centralEurope" />
                   </option>
                   <option value="westernEurope">
-                    <Text id="integration.tuya.setup.endpoints.westernEurope"/>
+                    <Text id="integration.tuya.setup.endpoints.westernEurope" />
                   </option>
                   <option value="india">
-                    <Text id="integration.tuya.setup.endpoints.india"/>
+                    <Text id="integration.tuya.setup.endpoints.india" />
                   </option>
                 </select>
               </div>

@@ -5,6 +5,7 @@ const { assert, fake } = sinon;
 
 const TuyaHandlerMock = sinon.stub();
 TuyaHandlerMock.prototype.init = fake.returns(null);
+TuyaHandlerMock.prototype.loadDevices = fake.returns(null);
 TuyaHandlerMock.prototype.disconnect = fake.returns(null);
 
 const TuyaService = proxyquire('../../../services/tuya/index', { './lib': TuyaHandlerMock });
@@ -26,6 +27,7 @@ describe('TuyaService', () => {
   it('should start service', async () => {
     await tuyaService.start();
     assert.calledOnce(tuyaService.device.init);
+    assert.calledOnce(tuyaService.device.loadDevices);
     assert.notCalled(tuyaService.device.disconnect);
   });
 

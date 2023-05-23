@@ -48,9 +48,7 @@ async function discoverDevices() {
       service_id: this.serviceId,
     }))
     .filter((device) => {
-      console.log('device', device);
       const existInGladys = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
-      console.log('existInGladys', existInGladys);
       return existInGladys === null;
     });
 

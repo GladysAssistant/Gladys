@@ -26,7 +26,7 @@ describe('TuyaHandler.saveConfiguration', () => {
 
   it('should save configuration', async () => {
     const configuration = {
-      baseUrl: 'apiUrl',
+      endpoint: 'endpoint',
       accessKey: 'accessKey',
       secretKey: 'secretKey',
     };
@@ -36,7 +36,7 @@ describe('TuyaHandler.saveConfiguration', () => {
     expect(config).to.deep.eq(configuration);
 
     assert.callCount(gladys.variable.setValue, 3);
-    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.BASE_URL, 'apiUrl', serviceId);
+    assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.ENDPOINT, 'endpoint', serviceId);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.ACCESS_KEY, 'accessKey', serviceId);
     assert.calledWith(gladys.variable.setValue, GLADYS_VARIABLES.SECRET_KEY, 'secretKey', serviceId);
   });

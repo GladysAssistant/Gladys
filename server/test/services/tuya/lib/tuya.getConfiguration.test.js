@@ -26,8 +26,8 @@ describe('TuyaHandler.getConfiguration', () => {
 
   it('should load configuration', async () => {
     gladys.variable.getValue
-      .withArgs(GLADYS_VARIABLES.BASE_URL, serviceId)
-      .returns('apiUrl')
+      .withArgs(GLADYS_VARIABLES.ENDPOINT, serviceId)
+      .returns('easternAmerica')
       .withArgs(GLADYS_VARIABLES.ACCESS_KEY, serviceId)
       .returns('accessKey')
       .withArgs(GLADYS_VARIABLES.SECRET_KEY, serviceId)
@@ -36,13 +36,13 @@ describe('TuyaHandler.getConfiguration', () => {
     const config = await tuyaHandler.getConfiguration();
 
     expect(config).to.deep.eq({
-      baseUrl: 'apiUrl',
+      baseUrl: 'https://openapi-ueaz.tuyaus.com',
       accessKey: 'accessKey',
       secretKey: 'secretKey',
     });
 
     assert.callCount(gladys.variable.getValue, 3);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.BASE_URL, serviceId);
+    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ENDPOINT, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_KEY, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SECRET_KEY, serviceId);
   });

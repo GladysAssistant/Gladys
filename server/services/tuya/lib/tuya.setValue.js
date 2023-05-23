@@ -1,16 +1,11 @@
-const { TuyaContext } = require('@tuya/tuya-connector-nodejs');
-
 const logger = require('../../../utils/logger');
-const { ServiceNotConfiguredError, BadParameters } = require('../../../utils/coreErrors');
-const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
-
-const { STATUS, API } = require('./utils/tuya.constants');
+const { API } = require('./utils/tuya.constants');
+const { BadParameters } = require('../../../utils/coreErrors');
 
 /**
  * @description Send the new device value over device protocol.
  * @param {object} device - Updated Gladys device.
  * @param {object} deviceFeature - Updated Gladys device feature.
- * @param configuration
  * @param {string|number} value - The new device feature value.
  * @example
  * setValue(device, deviceFeature, 0);
@@ -26,12 +21,11 @@ async function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no network indicator`);
   }
 
-  console.log('setValue', device, deviceFeature, value);
-  console.log('setValue', prefix, topic, command);
+  logger.debug(`Change value for devices ${topic}/${command} to value ${value}...`);
 
   await this.connector.request({
     method: 'POST',
-    path: `/v1.0/iot-03/devices/${topic}/commands`,
+    path: `${API.VERSION_1_0}/devices/${topic}/commands`,
     body: {
       commands: [
         {

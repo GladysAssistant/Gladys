@@ -14,9 +14,8 @@ async function loadDeviceDetails(tuyaDevice) {
 
   const responsePage = await this.connector.request({
     method: 'GET',
-    path: `/v1.1/iot-03/devices/${deviceId}/specification`,
+    path: `${API.VERSION_1_2}/devices/${deviceId}/specification`,
   });
-
   console.log(responsePage);
 
   const { result } = responsePage;

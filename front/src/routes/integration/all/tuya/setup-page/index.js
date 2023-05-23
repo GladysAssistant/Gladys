@@ -8,24 +8,9 @@ class TuyaSetupPage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('tuya');
     this.props.getTuyaConfiguration();
-    /*
-    this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
-      this.props.displayConnectedMessage
-    );
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR, this.props.displayEweLinkError);
-     */
   }
 
-  componentWillUnmount() {
-    /*
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.EWELINK.CONNECTED,
-      this.props.displayConnectedMessage
-    );
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.EWELINK.ERROR, this.props.displayEweLinkError);
-     */
-  }
+  componentWillUnmount() {}
 
   render(props, {}) {
     return (

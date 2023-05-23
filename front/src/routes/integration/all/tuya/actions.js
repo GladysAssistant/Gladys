@@ -71,10 +71,8 @@ function createActions(store) {
     },
 
     updateConfiguration(state, e) {
-      console.log(e);
       const data = {};
       data[e.target.name] = e.target.value;
-      console.log(data);
       store.setState(data);
     },
 
