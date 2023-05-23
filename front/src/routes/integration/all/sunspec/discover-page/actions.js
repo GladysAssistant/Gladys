@@ -46,18 +46,11 @@ const createActions = store => {
       }
     },
     async scan(state) {
-      let action;
-      if (state.sunspecStatus.scanning) {
-        action = 'off';
-      } else {
-        action = 'on';
-      }
-
       try {
-        const sunspecStatus = await state.httpClient.post('/api/v1/service/sunspec/discover', { scan: action });
         store.setState({
-          sunspecStatus
+          sunspecStatus: { scanning: true }
         });
+        await state.httpClient.post('/api/v1/service/sunspec/discover');
       } catch (e) {
         console.error(e);
         store.setState({

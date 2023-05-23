@@ -1,6 +1,6 @@
 const { connect } = require('./sunspec.connect');
 const { disconnect } = require('./sunspec.disconnect');
-const { getStatus } = require('./getStatus');
+const { getStatus } = require('./sunspec.getStatus');
 const { getDevices } = require('./sunspec.getDevices');
 const { getConfiguration } = require('./sunspec.getConfiguration');
 const { updateConfiguration } = require('./sunspec.updateConfiguration');
@@ -14,7 +14,6 @@ const SunSpecManager = function SunSpecManager(gladys, ModbusTCP, serviceId) {
   this.devices = {};
   this.modbusClient = new ModbusTCP();
   this.connected = false;
-  this.scanInProgress = false;
 };
 
 SunSpecManager.prototype.connect = connect;

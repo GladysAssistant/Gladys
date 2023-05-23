@@ -1,13 +1,13 @@
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
-module.exports = function SunSpecController(gladys, sunspecManager, serviceId) {
+module.exports = function SunSpecController(sunspecManager) {
   /**
    * @api {get} /api/v1/service/sunspec/node Get SunSpec nodes
    * @apiName getDevices
    * @apiGroup SunSpec
    */
-  async function getDevices(req, res) {
-    const nodes = await sunspecManager.getDevices(req.query);
+  function getDevices(req, res) {
+    const nodes = sunspecManager.getDevices(req.query);
     res.json(nodes);
   }
 
@@ -16,8 +16,8 @@ module.exports = function SunSpecController(gladys, sunspecManager, serviceId) {
    * @apiName getStatus
    * @apiGroup SunSpec
    */
-  async function getStatus(req, res) {
-    const status = await sunspecManager.getStatus();
+  function getStatus(req, res) {
+    const status = sunspecManager.getStatus();
     res.json(status);
   }
 
@@ -26,8 +26,8 @@ module.exports = function SunSpecController(gladys, sunspecManager, serviceId) {
    * @apiName getConfiguration
    * @apiGroup SunSpec
    */
-  async function getConfiguration(req, res) {
-    const configuration = await sunspecManager.getConfiguration();
+  function getConfiguration(req, res) {
+    const configuration = sunspecManager.getConfiguration();
     res.json(configuration);
   }
 
@@ -37,12 +37,11 @@ module.exports = function SunSpecController(gladys, sunspecManager, serviceId) {
    * @apiGroup SunSpec
    */
   async function updateConfiguration(req, res) {
-    const result = await sunspecManager.updateConfiguration(req.body);
-    sunspecManager.disconnect();
-    sunspecManager.connect();
-    res.json({
-      success: result,
-    });
+    await sunspecManager.updateConfiguration(req.body);
+    await sunspecManager.disconnect();
+    await sunspecManager.connect();
+    const configuration = sunspecManager.getConfiguration();
+    res.json(configuration);
   }
 
   /**
@@ -86,7 +85,7 @@ module.exports = function SunSpecController(gladys, sunspecManager, serviceId) {
       authenticated: true,
       controller: asyncMiddleware(getDevices),
     },
-    'post /api/v1/service/sunspec/scan': {
+    'post /api/v1/service/sunspec/discover': {
       authenticated: true,
       controller: asyncMiddleware(scanNetwork),
     },

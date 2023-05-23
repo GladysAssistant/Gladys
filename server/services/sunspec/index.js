@@ -37,7 +37,7 @@ module.exports = function SunSpecService(gladys, serviceId) {
    * gladys.services.sunspec.isUsed();
    */
   async function isUsed() {
-    return sunspecManager.connected && sunspecManager.nodes && sunspecManager.nodes.length > 0;
+    return sunspecManager.connected && sunspecManager.devices && sunspecManager.devices.length > 0;
   }
 
   return Object.freeze({
@@ -45,6 +45,6 @@ module.exports = function SunSpecService(gladys, serviceId) {
     stop,
     isUsed,
     device: sunspecManager,
-    controllers: SunSpecController(gladys, sunspecManager, serviceId),
+    controllers: SunSpecController(sunspecManager),
   });
 };

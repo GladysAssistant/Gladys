@@ -18,6 +18,8 @@ async function connect() {
 
   const [sunspecHost, sunspecPort = DEFAULT.MODBUS_PORT] = sunspecUrl.split(':');
   await this.modbus.connect(sunspecHost, sunspecPort);
+  this.ready = true;
+  this.connected = true;
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
