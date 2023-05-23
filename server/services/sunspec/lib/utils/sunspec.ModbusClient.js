@@ -53,6 +53,15 @@ class ModbusClient {
     });
   }
 
+  close() {
+    return new Promise((resolve, reject) => {
+      this.modbusClient.close(() => {
+        logger.info(`SunSpec service disconnected`);
+        resolve();
+      });
+    });
+  }
+
   async readModel(modelId) {
     const { registerStart, registerLength } = this.models[modelId];
     return this.readRegister(registerStart, registerLength);

@@ -18,9 +18,9 @@ async function disconnect() {
       } else {
         logger.debug('SunSpec: Not connected, by-pass disconnecting');
       }
-      this.connected = false;
     });
   }
+  this.connected = false;
 }
 
 module.exports = {
