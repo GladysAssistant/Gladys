@@ -139,7 +139,6 @@ import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
 import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
 import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 
-
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
