@@ -268,6 +268,77 @@ describe('Device.saveHistoricalState', () => {
     expect(newDeviceFeatureInDB.last_hourly_aggregate).to.deep.equal(oldDeviceInDb.last_hourly_aggregate);
     expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
   });
+  it('should save many states at the same time and have the correct monthly_agregate date', async () => {
+    const event = {
+      emit: stub().returns(null),
+      on: stub().returns(null),
+    };
+    const stateManager = new StateManager(event);
+    const job = new Job(event);
+    const dateInThePast = new Date(2022, 9, 4, 3).getTime();
+    const dateInTheFuture = new Date(2022, 10, 4, 3);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('deviceFeature', 'test-device-feature', {
+      last_value: 5,
+      last_value_changed: dateInTheFuture,
+      last_monthly_aggregate: dateInTheFuture,
+      last_daily_aggregate: dateInTheFuture,
+      last_hourly_aggregate: dateInTheFuture,
+    });
+    const deviceFeature = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+    });
+    deviceFeature.set({
+      last_value: 5,
+      last_value_changed: dateInTheFuture,
+      last_monthly_aggregate: dateInTheFuture,
+      last_daily_aggregate: dateInTheFuture,
+      last_hourly_aggregate: dateInTheFuture,
+    });
+    await deviceFeature.save();
+    const saveOneState = async (value, date) => {
+      await device.saveHistoricalState(
+        {
+          id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
+          selector: 'test-device-feature',
+          has_feedback: false,
+          keep_history: true,
+        },
+        value,
+        new Date(date).toISOString(),
+      );
+    };
+
+    await Promise.all([
+      saveOneState(1, dateInThePast + 25 * 24 * 60 * 60 * 1000),
+      saveOneState(2, dateInThePast + 10 * 24 * 60 * 60 * 1000),
+      saveOneState(3, dateInThePast + 5 * 24 * 60 * 60 * 1000),
+      saveOneState(4, dateInThePast + 4 * 24 * 60 * 60 * 1000),
+      saveOneState(4, dateInThePast + 1 * 24 * 60 * 60 * 1000),
+      saveOneState(12, dateInThePast),
+    ]);
+
+    assert.notCalled(event.emit);
+    const newDeviceFeatureInDB = await db.DeviceFeature.findOne({
+      where: {
+        selector: 'test-device-feature',
+      },
+      attributes: [
+        'last_monthly_aggregate',
+        'last_daily_aggregate',
+        'last_hourly_aggregate',
+        'last_value',
+        'last_value_changed',
+      ],
+      raw: true,
+    });
+    expect(new Date(newDeviceFeatureInDB.last_monthly_aggregate).getTime()).to.be.lessThan(dateInThePast);
+    expect(new Date(newDeviceFeatureInDB.last_daily_aggregate).getTime()).to.be.lessThan(dateInThePast);
+    expect(new Date(newDeviceFeatureInDB.last_hourly_aggregate).getTime()).to.be.lessThan(dateInThePast);
+    expect(newDeviceFeatureInDB.last_value).to.deep.equal(5);
+  });
   it('should save old state and update recent aggregate', async () => {
     const event = {
       emit: stub().returns(null),

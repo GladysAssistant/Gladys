@@ -37,8 +37,9 @@ describe('zigbee2mqtt getConfiguration', () => {
     // EXECUTE
     const result = await zigbee2MqttManager.getConfiguration();
     // ASSERT
-    assert.callCount(gladys.variable.getValue, 9);
+    assert.callCount(gladys.variable.getValue, 10);
     assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE_DONGLE_NAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_USERNAME', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_PASSWORD', serviceId);
     assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_URL', serviceId);
@@ -50,6 +51,7 @@ describe('zigbee2mqtt getConfiguration', () => {
 
     expect(result).to.deep.equal({
       z2mDriverPath: 'fake',
+      z2mDongleName: 'fake',
       z2mMqttUsername: 'fake',
       z2mMqttPassword: 'fake',
       mqttUrl: 'fake',

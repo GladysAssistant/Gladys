@@ -72,6 +72,9 @@ class OnlyContinueIf extends Component {
               addCondition={this.addCondition}
               deleteCondition={this.deleteCondition}
               lastOne={index + 1 === props.action.conditions.length}
+              triggersVariables={props.triggersVariables}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
             />
           ))}
       </div>

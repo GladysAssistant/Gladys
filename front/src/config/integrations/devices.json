@@ -4,7 +4,8 @@
     "img": "/assets/integrations/cover/zwave.jpg"
   },
   {
-    "key": "zwave-js-ui",
+    "key": "zwavejsui",
+    "link": "zwave-js-ui",
     "img": "/assets/integrations/cover/zwave-js-ui.jpg"
   },
   {
