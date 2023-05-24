@@ -8,13 +8,13 @@ class ModbusTCPMock {
 
   readHoldingRegisters(registerId, length, callback) {
     let data;
-    if (registerId === (REGISTER.SID - 1)) {
+    if (registerId === REGISTER.SID - 1) {
       data = [21365, 28243];
-    } else if (registerId === (REGISTER.MODEL_ID - 1)) {
+    } else if (registerId === REGISTER.MODEL_ID - 1) {
       data = [1];
     } else if (registerId === REGISTER.MODEL_ID) {
       data = [0];
-    } else if (registerId === (REGISTER.MANUFACTURER - 1)) {
+    } else if (registerId === REGISTER.MANUFACTURER - 1) {
       data = [0xffff];
     }
     callback.call(this, null, { data });
@@ -23,7 +23,6 @@ class ModbusTCPMock {
   close(callback) {
     callback.call(this);
   }
-
 }
 
 ModbusTCPMock.prototype.sendPhoto = fake.resolves(null);
