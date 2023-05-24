@@ -7,7 +7,9 @@ const logger = require('../../../utils/logger');
  * sunspec.disconnect();
  */
 async function disconnect() {
-  logger.debug(`SunSpec : Disconnecting...`);
+  logger.debug(`SunSpec: Disconnecting...`);
+
+  clearInterval(this.scanDevicesInterval);
 
   if (this.modbusClient) {
     this.modbusClient.close(() => {
@@ -20,6 +22,7 @@ async function disconnect() {
       }
     });
   }
+
   this.connected = false;
 }
 

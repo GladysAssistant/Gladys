@@ -8,7 +8,7 @@ const { CONFIGURATION } = require('./sunspec.constants');
  * sunspec.getConfiguration();
  */
 async function getConfiguration() {
-  logger.debug(`SunSpec : Getting informations...`);
+  logger.debug(`SunSpec: Getting informations...`);
 
   const sunspecUrl = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_DEVICE_URL, this.serviceId);
 

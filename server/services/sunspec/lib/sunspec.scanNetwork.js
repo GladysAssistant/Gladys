@@ -8,17 +8,18 @@ const { ModelFactory } = require('./utils/sunspec.ModelFactory');
  * sunspec.scanNetwork();
  */
 async function scanNetwork() {
-  logger.debug(`SunSpec : Scanning network...`);
+  logger.debug(`SunSpec: Scanning network...`);
 
   const { manufacturer, product, swVersion, serialNumber } = ModelFactory.createModel(
-    await this.modbus.readModel(MODEL.COMMON),
+    await this.modbusClient.readModel(MODEL.COMMON),
   );
   logger.info(
-    `Found device ${manufacturer} ${product} with serial number ${serialNumber} and software version ${swVersion}`,
+    `SunSpec: Found device ${manufacturer} ${product} with serial number ${serialNumber} and software version ${swVersion}`,
   );
 
   // SMA = N <> Fronius = N - 2
-  const nbOfMPPT = (await this.modbus.readRegisterAsInt16(REGISTER.NB_OF_MPTT)) - (manufacturer === 'Fronius' ? 2 : 0);
+  const nbOfMPPT =
+    (await this.modbusClient.readRegisterAsInt16(REGISTER.NB_OF_MPTT)) - (manufacturer === 'Fronius' ? 2 : 0);
   logger.info(nbOfMPPT);
 
   this.devices = [];

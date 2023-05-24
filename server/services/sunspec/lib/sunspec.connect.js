@@ -2,6 +2,7 @@ const { CONFIGURATION, DEFAULT } = require('./sunspec.constants');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { ModbusClient } = require('./utils/sunspec.ModbusClient');
+const logger = require('../../../utils/logger');
 
 /**
  * @description Initialize service with dependencies and connect to devices.
@@ -9,6 +10,8 @@ const { ModbusClient } = require('./utils/sunspec.ModbusClient');
  * connect();
  */
 async function connect() {
+  logger.debug(`SunSpec: Connecting...`);
+
   const sunspecUrl = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_DEVICE_URL, this.serviceId);
   if (!sunspecUrl) {
     throw new ServiceNotConfiguredError();
@@ -25,9 +28,13 @@ async function connect() {
     type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
   });
 
-  this.scanNetwork();
+  logger.debug(`SunSpec: Searching devices...`);
 
-  this.scanDevices();
+  await this.scanNetwork();
+
+  logger.debug(`SunSpec: Starting devices scanning...`);
+
+  this.scanDevicesInterval = setInterval(this.scanDevices, DEFAULT.SCAN_DEVICE_TIMEOUT);
 }
 
 module.exports = {

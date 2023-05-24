@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const { fake } = sinon;
 
 const SunSpecManager = require('../../../../services/sunspec/lib');
-const ModbusTCPMock = require('./ModbusTCPMock.test');
+const ModbusTCPMock = require('./utils/ModbusTCPMock.test');
 
 const SERVICE_ID = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 

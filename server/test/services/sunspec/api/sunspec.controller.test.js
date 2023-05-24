@@ -15,7 +15,7 @@ const sunspecManager = {
   updateConfiguration: fake.resolves({ sunspecUrl: 'newSunspecUrl' }),
 };
 
-describe('GET /api/v1/service/sunspec/discover', () => {
+describe('Devices API', () => {
   let controller;
 
   beforeEach(() => {
@@ -71,6 +71,28 @@ describe('Status API', () => {
 
   afterEach(() => {
     sinon.reset();
+  });
+
+  it('connect', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/sunspec/connect'].controller(req, res);
+    assert.calledOnceWithExactly(sunspecManager.connect);
+    assert.calledOnceWithExactly(res.json, { success: true });
+  });
+
+  it('disconnect', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns(null),
+    };
+
+    await controller['post /api/v1/service/sunspec/disconnect'].controller(req, res);
+    assert.calledOnceWithExactly(sunspecManager.disconnect);
+    assert.calledOnceWithExactly(res.json, { success: true });
   });
 
   it('get status', async () => {

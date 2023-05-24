@@ -3,7 +3,7 @@ const sinon = require('sinon');
 
 const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
-const ModbusTCPMock = require('./lib/ModbusTCPMock.test');
+const ModbusTCPMock = require('./lib/utils/ModbusTCPMock.test');
 
 const SunSpecService = proxyquire('../../../services/sunspec', {
   'modbus-serial': ModbusTCPMock,
@@ -41,5 +41,17 @@ describe('SunSpecService', () => {
     await sunSpecService.stop();
     expect(sunSpecService.device.ready).eql(true);
     expect(sunSpecService.device.connected).eql(false);
+  });
+
+  it('should not be used service', async () => {
+    const isUsed = await sunSpecService.isUsed();
+    expect(isUsed).eql(false);
+  });
+
+  it('should be used service', async () => {
+    sunSpecService.device.connected = true;
+    sunSpecService.device.devices = [{}];
+    const isUsed = await sunSpecService.isUsed();
+    expect(isUsed).eql(true);
   });
 });

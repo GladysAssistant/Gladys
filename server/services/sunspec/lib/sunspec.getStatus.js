@@ -7,7 +7,7 @@ const logger = require('../../../utils/logger');
  * sunspec.getStatus();
  */
 function getStatus() {
-  logger.debug(`SunSpec : Getting status...`);
+  logger.debug(`SunSpec: Getting status...`);
 
   return {
     connected: this.connected,

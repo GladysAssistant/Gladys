@@ -56,7 +56,7 @@ class ModbusClient {
   close() {
     return new Promise((resolve, reject) => {
       this.modbusClient.close(() => {
-        logger.info(`SunSpec service disconnected`);
+        logger.info('SunSpec service disconnected');
         resolve();
       });
     });

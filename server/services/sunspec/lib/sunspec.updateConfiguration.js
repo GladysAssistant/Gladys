@@ -3,10 +3,10 @@ const { CONFIGURATION } = require('./sunspec.constants');
 
 /**
  * @description Update SunSpec configuration.
- * @param configuration.sunspecUrl
  * @param {object} configuration - The configuration data.
+ * @param {string} [configuration.sunspecUrl] - The host:port of the SunSpec device.
  * @example
- * sunspec.updateConfiguration({ sunspecUrl: '' });
+ * sunspec.updateConfiguration({ sunspecUrl: 'localhost:502' });
  */
 async function updateConfiguration({ sunspecUrl = undefined } = {}) {
   logger.debug(`SunSpec : Updating configuration...`);
