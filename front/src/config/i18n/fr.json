@@ -2280,6 +2280,8 @@
       "play": "Lecture",
       "pause": "Pause",
       "stop": "Stop",
+      "previous": "Précédent",
+      "next": "Suivant",
       "record": "Enregistrer"
     },
     "energy-sensor": {
@@ -2354,6 +2356,10 @@
       "current": "Intensité",
       "power": "Puissance",
       "energy": "Energie"
+    },
+    "text": {
+      "shortCategoryName": "Texte",
+      "text": "Texte"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

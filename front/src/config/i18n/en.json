@@ -2280,6 +2280,8 @@
       "play": "Play",
       "pause": "Pause",
       "stop": "Stop",
+      "previous": "Previous",
+      "next": "Next",
       "record": "Record"
     },
     "energy-sensor": {
@@ -2354,6 +2356,10 @@
       "current": "Current",
       "power": "Power",
       "energy": "Energy"
+    },
+    "text": {
+      "shortCategoryName": "Text",
+      "text": "Text"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

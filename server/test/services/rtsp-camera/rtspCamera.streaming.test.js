@@ -42,7 +42,10 @@ const gladys = {
 const childProcessMock = {
   spawn: (command, args, options) => {
     const writeFile = () => {
-      fse.writeFileSync(args[20], 'hello');
+      const filePath = args.find((arg) => arg.endsWith('index.m3u8'));
+      if (filePath) {
+        fse.writeFileSync(filePath, 'hello');
+      }
     };
     setTimeout(writeFile, 10);
     return {
@@ -318,8 +321,11 @@ describe('Camera.streaming', () => {
     const childProcessMockWithCrash = {
       spawn: (command, args, options) => {
         const writeFile = () => {
-          fse.writeFileSync(args[20], 'hello');
-          fse.writeFileSync(args[20], 'hello');
+          const filePath = args.find((arg) => arg.endsWith('index.m3u8'));
+          if (filePath) {
+            fse.writeFileSync(filePath, 'hello');
+            fse.writeFileSync(filePath, 'hello');
+          }
         };
         setTimeout(writeFile, 5);
         return {

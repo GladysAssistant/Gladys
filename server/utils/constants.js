@@ -367,6 +367,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VOC_SENSOR: 'voc-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   PV: 'pv',
+  TEXT: 'text',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -458,6 +459,8 @@ const DEVICE_FEATURE_TYPES = {
     PLAY: 'play',
     PAUSE: 'pause',
     STOP: 'stop',
+    PREVIOUS: 'previous',
+    NEXT: 'next',
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
@@ -522,6 +525,9 @@ const DEVICE_FEATURE_TYPES = {
     ENERGY: 'energy',
     VOLTAGE: 'voltage',
     CURRENT: 'current',
+  },
+  TEXT: {
+    TEXT: 'text',
   },
 };
 
