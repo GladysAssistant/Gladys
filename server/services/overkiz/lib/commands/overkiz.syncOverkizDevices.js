@@ -37,7 +37,7 @@ function updateDevicesState(devices, rootPlace) {
 
 /**
  * @description Synchronize Overkiz devices.
- * @returns {Promise<Object>} Overkiz devices.
+ * @returns {Promise<object>} Overkiz devices.
  * @example
  * overkiz.syncOverkizDevices();
  */

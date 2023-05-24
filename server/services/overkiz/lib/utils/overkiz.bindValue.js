@@ -2,7 +2,7 @@ const { DEVICE_STATES, HEATING_MODES } = require('./overkiz.constants');
 const { getNodeStateInfoByExternalId } = require('./overkiz.externalId');
 
 /**
- * @description Bind value
+ * @description Bind value.
  * @param {object} device - Device.
  * @param {object} deviceFeature - Device feature.
  * @param {object} value - Value to send.
@@ -25,7 +25,7 @@ function bindValue(device, deviceFeature, value) {
 }
 
 /**
- * @description Unbind value
+ * @description Unbind value.
  * @param {object} device - Device.
  * @param {string} stateName - Device state name.
  * @param {string} stateValue - Device state value.

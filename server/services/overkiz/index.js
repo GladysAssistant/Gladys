@@ -9,7 +9,7 @@ module.exports = function OverkizService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the Overkiz service
+   * @description This function starts the Overkiz service.
    * @example
    * gladys.services.overkiz.start();
    */
@@ -32,7 +32,7 @@ module.exports = function OverkizService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the Overkiz service
+   * @description This function stops the Overkiz service.
    * @example
    * gladys.services.overkiz.stop();
    */

@@ -28,7 +28,7 @@ async function getConfiguration() {
 
 /**
  * @description Update Overkiz configuration.
- * @param {Object} configuration - The Overkiz configuration.
+ * @param {object} configuration - The Overkiz configuration.
  * @example
  * overkiz.updateConfiguration();
  */
