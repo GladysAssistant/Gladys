@@ -10,9 +10,6 @@ const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
  * handleMqttMessage('zwave-js-ui/POWER', 'ON');
  */
 function handleMqttMessage(topic, message) {
-  this.mqttConnected = true;
-  this.zwaveJSUIConnected = true;
-
   switch (topic) {
     case `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/version`: {
       this.zwaveJSUIVersion = JSON.parse(message).value;

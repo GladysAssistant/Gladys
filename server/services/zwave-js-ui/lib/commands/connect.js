@@ -176,7 +176,7 @@ async function connect() {
     this.mqttClient.on('offline', () => {
       logger.warn(`Disconnected from MQTT server`);
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
+        type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.MQTT_ERROR,
         payload: 'DISCONNECTED',
       });
       this.mqttConnected = false;
@@ -185,6 +185,8 @@ async function connect() {
 
     this.mqttClient.on('message', (topic, message) => {
       try {
+        this.mqttConnected = true;
+        this.zwaveJSUIConnected = true;
         this.handleMqttMessage(topic, message.toString());
       } catch (e) {
         logger.error(`Unable to process message on topic ${topic}: ${e}`);
