@@ -18,17 +18,13 @@ const gladys = {
 const SERVICE_ID = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
 
 describe('SunSpecService', () => {
-  let clock;
-
   beforeEach(() => {
     gladys.event = {
       emit: fake.returns(true),
     };
-    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
-    clock.restore();
     sinon.reset();
   });
 
