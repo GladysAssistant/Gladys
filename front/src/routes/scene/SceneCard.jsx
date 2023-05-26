@@ -25,7 +25,7 @@ class SceneCard extends Component {
 
   render(props, { saving }) {
     return (
-      <div class="col-sm-6 col-lg-3 pt-3 pb-3">
+      <div class="col-lg-3 p-2">
         <div
           class={cx('dimmer h-100', {
             active: saving
@@ -33,8 +33,8 @@ class SceneCard extends Component {
         >
           <div class="loader" />
           <div class="dimmer-content h-100">
-            <div class="card h-100">
-              <div class="card-body p-3 text-center">
+            <div class="card h-100 d-flex flex-column justify-content-between">
+              <div class="card-body p-3 text-center h-100">
                 <div class={style.scene_icon}>
                   <i class={`fe fe-${props.scene.icon}`} />
                 </div>
@@ -54,16 +54,18 @@ class SceneCard extends Component {
                 <h4>{props.scene.name}</h4>
                 <div class={`text-muted ${style.descriptionSceneEllipsis}`}>{props.scene.description}</div>
               </div>
-              <div class="card-footer">
-                <div class="btn-list text-center">
-                  <Link href={`${props.currentUrl}/${props.scene.selector}`} class="btn btn-outline-primary btn-sm">
-                    <i class="fe fe-edit" />
-                    <Text id="scene.editButton" />
-                  </Link>
-                  <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
-                    <i class="fe fe-play" />
-                    <Text id="scene.startButton" />
-                  </button>
+              <div class="mt-auto">
+                <div class="card-footer">
+                  <div class="btn-list text-center">
+                    <Link href={`${props.currentUrl}/${props.scene.selector}`} class="btn btn-outline-primary btn-sm">
+                      <i class="fe fe-edit" />
+                      <Text id="scene.editButton" />
+                    </Link>
+                    <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
+                      <i class="fe fe-play" />
+                      <Text id="scene.startButton" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

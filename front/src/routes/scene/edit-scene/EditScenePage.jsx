@@ -16,12 +16,12 @@ const EditScenePage = ({ children, ...props }) => (
       <div class="my-3 my-md-5">
         <AutoScrollMobile position="top" box_type={ACTION_CARD_TYPE} />
         <div class="container">
-          <div class="mb-1">
-            <div class="d-flex justify-content-between flex-column flex-md-row align-items-md-center align-items-start">
+          <div class="mb-4">
+            <div class="d-flex justify-content-between flex-column flex-lg-row align-items-lg-center align-items-start">
               <div>
                 <h1 class="page-title">
                   {props.isNameEditable ? (
-                    <form onSubmit={props.saveScene}>
+                    <form onSubmit={props.saveScene} class="d-inline-block">
                       <div class="input-group">
                         <Localizer>
                           <input
@@ -42,8 +42,8 @@ const EditScenePage = ({ children, ...props }) => (
                     </form>
                   ) : (
                     <span onClick={props.toggleIsNameEditable}>
-                      {props.scene.name}{' '}
-                      <small>
+                      {props.scene.name}
+                      <small class="ml-2">
                         <i class="fe fe-edit-3" />
                       </small>
                     </span>
@@ -61,11 +61,39 @@ const EditScenePage = ({ children, ...props }) => (
                   </label>
                 </h1>
 
-                <span class="text-muted">
-                  Déclenchement de l'arossage le week-end <i class="fe fe-edit-3" />
-                </span>
+                {props.isDescriptionEditable ? (
+                  <form class={style.descriptionInputForm} onSubmit={props.saveScene}>
+                    <div class="input-group">
+                      <Localizer>
+                        <input
+                          type="text"
+                          class="form-control form-control-sm "
+                          maxlength="100"
+                          onChange={props.updateSceneDescription}
+                          value={props.scene.description}
+                          ref={props.setDescriptionInputRef}
+                          placeholder={<Text id="editScene.editDescriptionPlaceholder" />}
+                        />
+                      </Localizer>
+                      <div class="input-group-append">
+                        <button class="btn btn-primary btn-sm" onClick={props.saveScene}>
+                          <Text id="global.save" />
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                ) : (
+                  <span class="text-muted" onClick={props.toggleIsDescriptionEditable}>
+                    {props.scene.description ? (
+                      <span>{props.scene.description}</span>
+                    ) : (
+                      <Text id="editScene.editDescriptionPlaceholder" />
+                    )}
+                    <i class="ml-2 fe fe-edit-3" />
+                  </span>
+                )}
               </div>
-              <div class="mt-2 mt-md-0">
+              <div class="mt-2 mt-lg-0">
                 <button onClick={props.startScene} class="btn btn-primary">
                   <span class="d-none d-sm-inline-block">
                     <Text id="editScene.startButton" />
@@ -81,9 +109,6 @@ const EditScenePage = ({ children, ...props }) => (
                 <SceneActionsDropdown duplicateScene={props.duplicateScene} deleteScene={props.deleteScene} />
               </div>
             </div>
-          </div>
-          <div class="row mb-4">
-            <div class="col"></div>
           </div>
           <div>
             {props.error && (

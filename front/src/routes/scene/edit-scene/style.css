@@ -27,3 +27,8 @@
     left: auto;
   }
 }
+
+.descriptionInputForm {
+  width: 35rem;
+  max-width: 70%;
+}

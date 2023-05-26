@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -310,7 +310,7 @@ class EditScene extends Component {
   };
 
   toggleIsNameEditable = async () => {
-    await this.setState(prevState => ({ isNameEditable: !prevState.isNameEditable }));
+    await this.setState(prevState => ({ isNameEditable: !prevState.isNameEditable, isDescriptionEditable: false }));
     if (this.state.isNameEditable) {
       this.nameInput.focus();
     }
@@ -321,11 +321,17 @@ class EditScene extends Component {
   };
 
   toggleIsDescriptionEditable = async () => {
-    await this.setState(prevState => ({ isDescriptionEditable: !prevState.isDescriptionEditable }));
-    console.log(this.state.isDescriptionEditable);
+    await this.setState(prevState => ({
+      isDescriptionEditable: !prevState.isDescriptionEditable,
+      isNameEditable: false
+    }));
     if (this.state.isDescriptionEditable) {
       this.descriptionInput.focus();
     }
+  };
+
+  closeEdition = () => {
+    this.setState({ isNameEditable: false, isDescriptionEditable: false });
   };
 
   setDescriptionInputRef = descriptionInput => {
@@ -404,6 +410,7 @@ class EditScene extends Component {
   }
 
   componentDidMount() {
+    document.addEventListener('click', this.closeEdition, true);
     this.getSceneBySelector();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.highlighCurrentlyExecutedAction(payload)
@@ -411,6 +418,10 @@ class EditScene extends Component {
     this.props.session.dispatcher.addListener('scene.finished-executing-action', payload =>
       this.removeHighlighAction(payload)
     );
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.closeEdition, true);
   }
 
   render(props, { saving, error, variables, scene, isNameEditable, isDescriptionEditable, triggersVariables }) {
@@ -443,6 +454,10 @@ class EditScene extends Component {
             setNameInputRef={this.setNameInputRef}
             duplicateScene={this.duplicateScene}
             moveCard={this.moveCard}
+            updateSceneDescription={this.updateSceneDescription}
+            toggleIsDescriptionEditable={this.toggleIsDescriptionEditable}
+            isDescriptionEditable={isDescriptionEditable}
+            setDescriptionInputRef={this.setDescriptionInputRef}
           />
         </DndProvider>
       )
