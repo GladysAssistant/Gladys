@@ -20,3 +20,10 @@
 .dropZoneActive {
   background-color: #ecf0f1;
 }
+
+@media (min-width: 768px) {
+  .plusButton {
+    right: 0;
+    left: auto;
+  }
+}

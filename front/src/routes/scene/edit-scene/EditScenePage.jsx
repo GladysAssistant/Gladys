@@ -1,17 +1,20 @@
 import { Text, Localizer } from 'preact-i18n';
-import { Link } from 'preact-router/match';
 import update from 'immutability-helper';
 import cx from 'classnames';
 
+import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import ActionGroup from './ActionGroup';
 import SceneActionsDropdown from './SceneActionsDropdown';
 import TriggerGroup from './TriggerGroup';
 import style from './style.css';
 
+const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
+
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
+        <AutoScrollMobile position="top" box_type={ACTION_CARD_TYPE} />
         <div class="container">
           <div class="mb-1">
             <div class="d-flex justify-content-between flex-column flex-md-row align-items-md-center align-items-start">
@@ -144,6 +147,7 @@ const EditScenePage = ({ children, ...props }) => (
             </div>
           ))}
         </div>
+        <AutoScrollMobile position="bottom" box_type={ACTION_CARD_TYPE} />
       </div>
     </div>
   </div>

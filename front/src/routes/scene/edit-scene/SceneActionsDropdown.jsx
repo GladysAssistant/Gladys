@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
+import style from './style.css';
 
 class SceneActionsDropdown extends Component {
   constructor(props) {
@@ -37,7 +38,7 @@ class SceneActionsDropdown extends Component {
           </span>
         </button>
         <div
-          class={cx('dropdown-menu dropdown-menu-right', {
+          class={cx('dropdown-menu ', style.plusButton, {
             show
           })}
         >
