@@ -92,7 +92,7 @@ class EditScene extends Component {
     this.setState({ saving: true, error: false });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
-      this.setState({ isNameEditable: false });
+      this.setState({ isNameEditable: false, isDescriptionEditable: false });
     } catch (e) {
       console.error(e);
       this.setState({ error: true });
@@ -320,6 +320,18 @@ class EditScene extends Component {
     this.nameInput = nameInput;
   };
 
+  toggleIsDescriptionEditable = async () => {
+    await this.setState(prevState => ({ isDescriptionEditable: !prevState.isDescriptionEditable }));
+    console.log(this.state.isDescriptionEditable);
+    if (this.state.isDescriptionEditable) {
+      this.descriptionInput.focus();
+    }
+  };
+
+  setDescriptionInputRef = descriptionInput => {
+    this.descriptionInput = descriptionInput;
+  };
+
   updateSceneName = e => {
     this.setState(prevState => {
       const newState = update(prevState, {
@@ -332,6 +344,20 @@ class EditScene extends Component {
       return newState;
     });
   };
+
+  updateSceneDescription = e => {
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        scene: {
+          description: {
+            $set: e.target.value
+          }
+        }
+      });
+      return newState;
+    });
+  };
+
   duplicateScene = () => {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
@@ -387,7 +413,7 @@ class EditScene extends Component {
     );
   }
 
-  render(props, { saving, error, variables, scene, isNameEditable, triggersVariables }) {
+  render(props, { saving, error, variables, scene, isNameEditable, isDescriptionEditable, triggersVariables }) {
     return (
       scene && (
         <DndProvider backend={this.isTouchDevice ? TouchBackend : HTML5Backend}>

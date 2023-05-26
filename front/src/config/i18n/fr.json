@@ -1187,6 +1187,8 @@
   },
   "editScene": {
     "editNamePlaceholder": "Entrez un nom de scène",
+    "descriptionTitle": "Description",
+    "editDescriptionPlaceholder": "Entrez une description pour la scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",

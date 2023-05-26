@@ -25,15 +25,15 @@ class SceneCard extends Component {
 
   render(props, { saving }) {
     return (
-      <div class="col-sm-6 col-lg-3">
-        <div class="card h-100">
-          <div
-            class={cx('dimmer', {
-              active: saving
-            })}
-          >
-            <div class="loader" />
-            <div class="dimmer-content">
+      <div class="col-sm-6 col-lg-3 pt-3 pb-3">
+        <div
+          class={cx('dimmer h-100', {
+            active: saving
+          })}
+        >
+          <div class="loader" />
+          <div class="dimmer-content h-100">
+            <div class="card h-100">
               <div class="card-body p-3 text-center">
                 <div class={style.scene_icon}>
                   <i class={`fe fe-${props.scene.icon}`} />
@@ -52,7 +52,7 @@ class SceneCard extends Component {
                   </label>
                 </div>
                 <h4>{props.scene.name}</h4>
-                <div class="text-muted">{props.scene.description}</div>
+                <div class={`text-muted ${style.descriptionSceneEllipsis}`}>{props.scene.description}</div>
               </div>
               <div class="card-footer">
                 <div class="btn-list text-center">
