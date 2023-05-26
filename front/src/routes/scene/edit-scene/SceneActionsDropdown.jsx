@@ -11,13 +11,18 @@ class SceneActionsDropdown extends Component {
     };
   }
 
-  toggleShow = e => {
-    e.preventDefault();
-    console.log({ show: this.state.show });
+  setDropdownRef = dropdownRef => {
+    this.dropdownRef = dropdownRef;
+  };
+
+  toggleShow = () => {
     this.setState({ show: !this.state.show });
   };
 
-  closeDropdown = () => {
+  closeDropdown = e => {
+    if (this.dropdownRef && this.dropdownRef.contains(e.target)) {
+      return;
+    }
     this.setState({ show: false });
   };
 
@@ -32,7 +37,7 @@ class SceneActionsDropdown extends Component {
   render(props, { show }) {
     return (
       <div class="dropdown ">
-        <button onClick={this.toggleShow} class="btn btn-secondary ml-2 dropdown-toggle">
+        <button ref={this.setDropdownRef} onClick={this.toggleShow} class="btn btn-secondary ml-2 dropdown-toggle">
           <span class="d-none d-sm-inline-block">
             <Text id="editScene.moreButton" />
           </span>
