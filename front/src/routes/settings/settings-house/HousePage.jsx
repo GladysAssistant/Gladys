@@ -7,10 +7,6 @@ import EmptySearch from './EmptySearch';
 import { RequestStatus } from '../../../utils/consts';
 import CardFilter from '../../../components/layout/CardFilter';
 
-const loaderHeight = {
-  height: '20rem'
-};
-
 const HousePage = ({ children, ...props }) => (
   <SettingsLayout>
     <div class="page-header">
@@ -30,9 +26,8 @@ const HousePage = ({ children, ...props }) => (
       </div>
     </div>
     {props.housesGetStatus === RequestStatus.Getting && (
-      <div class="dimmer active">
+      <div class="dimmer active h-50">
         <div class="loader" />
-        <div style={loaderHeight} />
       </div>
     )}
     <div>
