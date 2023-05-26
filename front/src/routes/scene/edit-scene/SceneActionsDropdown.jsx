@@ -47,11 +47,11 @@ class SceneActionsDropdown extends Component {
             show
           })}
         >
-          <a class="dropdown-item" href="#" onClick={props.duplicateScene}>
+          <a class="dropdown-item" onClick={props.duplicateScene}>
             <Text id="editScene.duplicateButton" /> <i className="fe fe-copy" />
           </a>
 
-          <a class="dropdown-item" href="#" onClick={props.deleteScene}>
+          <a class="dropdown-item" onClick={props.deleteScene}>
             <Text id="editScene.deleteButton" /> <i class="fe fe-trash" />
           </a>
         </div>

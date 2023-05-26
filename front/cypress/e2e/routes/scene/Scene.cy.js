@@ -61,7 +61,11 @@ describe('Scene view', () => {
     cy.visit('/dashboard/scene/my-scene');
 
     cy.contains('editScene.editDescriptionPlaceholder').click();
-    cy.get('div[class="page-header mt-0"]').type('My scene description');
+
+    cy.get('input:visible').then(inputs => {
+      // Zone name
+      cy.wrap(inputs[0]).type('My scene description');
+    });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -178,9 +182,9 @@ describe('Scene view', () => {
     cy.login();
     cy.visit('/dashboard/scene/my-scene');
 
-    cy.contains('editScene.duplicateButton')
-      .should('have.class', 'btn-warning')
-      .click();
+    cy.contains('editScene.moreButton').click();
+
+    cy.contains('editScene.duplicateButton').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene/duplicate`);
 
@@ -202,17 +206,16 @@ describe('Scene view', () => {
     cy.login();
     cy.visit('/dashboard/scene/my-scene');
 
-    cy.contains('editScene.deleteButton')
-      .should('have.class', 'btn-danger')
-      .click();
+    cy.contains('editScene.moreButton').click();
+    cy.contains('editScene.deleteButton').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
 
     cy.visit('/dashboard/scene/my-duplicated-scene');
 
-    cy.contains('editScene.deleteButton')
-      .should('have.class', 'btn-danger')
-      .click();
+    cy.contains('editScene.moreButton').click();
+
+    cy.contains('editScene.deleteButton').click();
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene`);
   });
