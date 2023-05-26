@@ -1932,7 +1932,8 @@
     "kilobytes-per-second": "Kilooctets par seconde (Ko/s)",
     "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
     "gigabytes-per-second": "Gigaoctets par seconde (Go/s)",
-    "aqi": "Indice de Qualité de l'Air"
+    "aqi": "Indice de Qualité de l'Air",
+    "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2004,7 +2005,8 @@
     "kilobytes-per-second": "Ko/s",
     "megabytes-per-second": "Mo/s",
     "gigabytes-per-second": "Go/s",
-    "aqi": "AQI"
+    "aqi": "AQI",
+    "microgram-per-cubic-meter": "µg/m³"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2187,7 +2189,15 @@
     },
     "soil-moisture-sensor": {
       "shortCategoryName": "Capteur d'humidité du sol",
-      "decimal": "Humidité du sol (decimal)"
+      "decimal": "Humidité du sol (Décimale)"
+    },
+    "pm25-sensor": {
+      "shortCategoryName": "Capteur de PM2.5",
+      "decimal": "PM2.5 (Décimale)"
+    },
+    "formaldehyd-sensor": {
+      "shortCategoryName": "Formaldehyd sensor",
+      "decimal": "Formaldehyd (Décimale)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
