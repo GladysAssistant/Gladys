@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import actions from '../actions';
 import OverkizPage from '../OverkizPage';
 import DiscoverTab from './DiscoverTab';
 
@@ -21,5 +22,5 @@ class OverkizIntegration extends Component {
 
 export default connect(
   'user,session,httpClient,housesWithRooms,discoveredDevices,loading,errorLoading',
-  {}
+  actions
 )(OverkizIntegration);

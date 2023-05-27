@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import actions from '../actions';
 import OverkizPage from '../OverkizPage';
 import SettingsTab from './SettingsTab';
 import { SUPPORTED_SERVERS } from '../../../../../../../server/services/overkiz/lib/utils/overkiz.constants';
@@ -36,5 +37,5 @@ class OverkizSettingsTab extends Component {
 
 export default connect(
   'user,session,overkizType,overkizUsername,overkizPassword,overkizGetConfigurationStatus,saveConfigurationStatus',
-  {}
+  actions
 )(OverkizSettingsTab);
