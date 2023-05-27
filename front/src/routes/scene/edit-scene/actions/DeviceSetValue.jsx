@@ -147,9 +147,6 @@ class DeviceSetValue extends Component {
         </div>
 
         <input
-          style={{
-            minHeight: '30px'
-          }}
           type="range"
           value={this.props.action.value}
           onChange={this.handleNewValue}
