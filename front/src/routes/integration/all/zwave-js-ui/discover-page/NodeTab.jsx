@@ -18,7 +18,7 @@ const NodeTab = ({ children, ...props }) => {
     <div class="card">
       <div class="card-header">
         <h2 class="card-title">
-          <Text id="integration.zwave-js-ui.discover.title" />
+          <Text id="integration.zwavejsui.discover.title" />
         </h2>
         <div class="page-options d-flex">
           <Localizer>
@@ -42,7 +42,7 @@ const NodeTab = ({ children, ...props }) => {
           <div class="dimmer-content">
             {zwaveNotConfigured && (
               <div class="alert alert-warning">
-                <Text id="integration.zwave-js-ui.discover.zwaveNotConfiguredError" />
+                <Text id="integration.zwavejsui.discover.zwaveNotConfiguredError" />
               </div>
             )}
             <div
@@ -54,7 +54,7 @@ const NodeTab = ({ children, ...props }) => {
               {props.zwaveNodes && props.zwaveNodes.length > 0 && (
                 <div class="page-options d-flex">
                   <button class="btn btn-outline-primary" onClick={props.scanNetwork} disabled={zwaveActionsDisabled}>
-                    <Text id="integration.zwave-js-ui.discover.scanButton" /> <i class="fe fe-radio" />
+                    <Text id="integration.zwavejsui.discover.scanButton" /> <i class="fe fe-radio" />
                   </button>
                   <a
                     href={
@@ -62,7 +62,7 @@ const NodeTab = ({ children, ...props }) => {
                     }
                   >
                     <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-                      <Text id="integration.zwave-js-ui.discover.addNodeButton" /> <i class="fe fe-plus" />
+                      <Text id="integration.zwavejsui.discover.addNodeButton" /> <i class="fe fe-plus" />
                     </button>
                   </a>
                   <a
@@ -73,7 +73,7 @@ const NodeTab = ({ children, ...props }) => {
                     }
                   >
                     <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-                      <Text id="integration.zwave-js-ui.discover.addNodeSecureButton" /> <i class="fe fe-plus" />
+                      <Text id="integration.zwavejsui.discover.addNodeSecureButton" /> <i class="fe fe-plus" />
                     </button>
                   </a>
                   <a
@@ -84,7 +84,7 @@ const NodeTab = ({ children, ...props }) => {
                     }
                   >
                     <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
-                      <Text id="integration.zwave-js-ui.discover.removeNode" /> <i class="fe fe-trash" />
+                      <Text id="integration.zwavejsui.discover.removeNode" /> <i class="fe fe-trash" />
                     </button>
                   </a>
                 </div>

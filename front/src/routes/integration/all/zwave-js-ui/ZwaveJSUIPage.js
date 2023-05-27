@@ -10,7 +10,7 @@ const DashboardSettings = ({ children, user }) => (
           <div class="row">
             <div class="col-lg-3">
               <h2 class="page-title mb-5">
-                <Text id="integration.zwave-js-ui.title" />
+                <Text id="integration.zwavejsui.title" />
               </h2>
               <div>
                 <div class="list-group list-group-transparent mb-0">
@@ -22,7 +22,7 @@ const DashboardSettings = ({ children, user }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-radio" />
                     </span>
-                    <Text id="integration.zwave-js-ui.deviceTab" />
+                    <Text id="integration.zwavejsui.deviceTab" />
                   </Link>
 
                   <Link
@@ -33,7 +33,7 @@ const DashboardSettings = ({ children, user }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-sliders" />
                     </span>
-                    <Text id="integration.zwave-js-ui.discoverTab" />
+                    <Text id="integration.zwavejsui.discoverTab" />
                   </Link>
 
                   <Link
@@ -44,7 +44,7 @@ const DashboardSettings = ({ children, user }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-settings" />
                     </span>
-                    <Text id="integration.zwave-js-ui.settingsTab" />
+                    <Text id="integration.zwavejsui.settingsTab" />
                   </Link>
 
                   <DeviceConfigurationLink
@@ -55,7 +55,7 @@ const DashboardSettings = ({ children, user }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-book-open" />
                     </span>
-                    <Text id="integration.zwave-js-ui.documentation" />
+                    <Text id="integration.zwavejsui.documentation" />
                   </DeviceConfigurationLink>
                 </div>
               </div>

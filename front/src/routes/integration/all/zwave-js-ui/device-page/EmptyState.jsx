@@ -5,7 +5,7 @@ import style from './style.css';
 const EmptyState = () => (
   <div class="col-md-12">
     <div class={cx('text-center', style.emptyStateDivBox)}>
-      <Text id="integration.zwave-js-ui.device.noDevices" />
+      <Text id="integration.zwavejsui.device.noDevices" />
     </div>
   </div>
 );

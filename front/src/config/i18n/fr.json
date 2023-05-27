@@ -827,7 +827,7 @@
         "noValueReceived": "Aucune valeur reçue."
       }
     },
-    "zwave-js-ui": {
+    "zwavejsui": {
       "title": "Z-Wave",
       "description": "Contrôlez vos appareils Z-Wave.",
       "deviceTab": "Appareils",

@@ -55,12 +55,12 @@ class ZwaveNode extends Component {
               <h2 class="card-title">{props.node.name}</h2>
             ) : (
               <h2 class="card-title">
-                <Text id="integration.zwave-js-ui.discover.unknowNode" />
+                <Text id="integration.zwavejsui.discover.unknowNode" />
               </h2>
             )}
             <div class="card-options">
               <span class="tag">
-                <Text id="integration.zwave-js-ui.discover.nodeId" /> {props.node.rawZwaveNode.id}
+                <Text id="integration.zwavejsui.discover.nodeId" /> {props.node.rawZwaveNode.id}
               </span>
             </div>
           </div>
@@ -73,38 +73,38 @@ class ZwaveNode extends Component {
             <div class="dimmer-content">
               {error === RequestStatus.Error && (
                 <div class="alert alert-danger">
-                  <Text id="integration.zwave-js-ui.discover.createDeviceError" />
+                  <Text id="integration.zwavejsui.discover.createDeviceError" />
                 </div>
               )}
               {error === RequestStatus.ConflictError && (
                 <div class="alert alert-danger">
-                  <Text id="integration.zwave-js-ui.discover.conflictError" />
+                  <Text id="integration.zwavejsui.discover.conflictError" />
                 </div>
               )}
               {deviceCreated && (
                 <div class="alert alert-success">
-                  <Text id="integration.zwave-js-ui.discover.deviceCreatedSuccess" />
+                  <Text id="integration.zwavejsui.discover.deviceCreatedSuccess" />
                 </div>
               )}
               {props.node.ready ? (
                 <div class="card-body">
                   <div class="form-group">
                     <label>
-                      <Text id="integration.zwave-js-ui.discover.name" />
+                      <Text id="integration.zwavejsui.discover.name" />
                     </label>
                     <input type="text" class="form-control" value={props.node.name} onChange={this.editNodeName} />
                   </div>
                   {props.node.features.length > 0 && (
                     <div class="form-group">
                       <label>
-                        <Text id="integration.zwave-js-ui.discover.features" />
+                        <Text id="integration.zwavejsui.discover.features" />
                       </label>
                       <DeviceFeatures features={props.node.features} />
                     </div>
                   )}
                   <div class="form-group">
                     <button class="btn btn-success" onClick={this.createDevice}>
-                      <Text id="integration.zwave-js-ui.discover.createDeviceInGladys" />
+                      <Text id="integration.zwavejsui.discover.createDeviceInGladys" />
                     </button>
                   </div>
                   <div>
@@ -117,14 +117,14 @@ class ZwaveNode extends Component {
                       <span class="icon mr-3">
                         <i class="fe fe-external-link" />
                       </span>
-                      <Text id="integration.zwave-js-ui.discover.createGithubIssue" />
+                      <Text id="integration.zwavejsui.discover.createGithubIssue" />
                     </Link>
                   </div>
                 </div>
               ) : (
                 <div class="card-body">
                   <div class="alert alert-warning" role="alert">
-                    <Text id="integration.zwave-js-ui.discover.sleepingNodeMsg" />
+                    <Text id="integration.zwavejsui.discover.sleepingNodeMsg" />
                   </div>
                 </div>
               )}

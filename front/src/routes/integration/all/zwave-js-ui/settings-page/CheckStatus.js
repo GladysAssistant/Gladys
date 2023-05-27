@@ -14,19 +14,19 @@ class CheckStatus extends Component {
     let linkUrl = '';
     let linkText = '';
     if (!props.usbConfigured) {
-      messageKey = 'integration.zwave-js-ui.status.notConfigured';
+      messageKey = 'integration.zwavejsui.status.notConfigured';
       linkUrl = '/dashboard/integration/device/zwave-js-ui/settings';
-      linkText = 'integration.zwave-js-ui.status.settingsPageLink';
+      linkText = 'integration.zwavejsui.status.settingsPageLink';
     } else if (!props.mqttExist) {
-      messageKey = 'integration.zwave-js-ui.status.mqttNotInstalled';
+      messageKey = 'integration.zwavejsui.status.mqttNotInstalled';
     } else if (!props.mqttRunning) {
-      messageKey = 'integration.zwave-js-ui.status.mqttNotRunning';
+      messageKey = 'integration.zwavejsui.status.mqttNotRunning';
     } else if (!props.mqttConnected) {
-      messageKey = 'integration.zwave-js-ui.status.gladysNotConnected';
+      messageKey = 'integration.zwavejsui.status.gladysNotConnected';
     } else if (!props.zwaveJSUIExist) {
-      messageKey = 'integration.zwave-js-ui.status.zwave-js-uiNotInstalled';
+      messageKey = 'integration.zwavejsui.status.zwave-js-uiNotInstalled';
     } else if (!props.zwaveJSUIRunning) {
-      messageKey = 'integration.zwave-js-ui.status.zwave-js-uiNotRunning';
+      messageKey = 'integration.zwavejsui.status.zwave-js-uiNotRunning';
     }
 
     return (

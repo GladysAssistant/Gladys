@@ -64,12 +64,12 @@ class SettingsTab extends Component {
         <div class="card">
           <div class="card-header">
             <h2 class="card-title">
-              <Text id="integration.zwave-js-ui.settings.title" />
+              <Text id="integration.zwavejsui.settings.title" />
             </h2>
             {!props.externalZwaveJSUI && (
               <div class="page-options d-flex">
                 <button class="btn btn-info" onClick={props.getUsbPorts}>
-                  <Text id="integration.zwave-js-ui.settings.refreshButton" />
+                  <Text id="integration.zwavejsui.settings.refreshButton" />
                 </button>
               </div>
             )}
@@ -83,7 +83,7 @@ class SettingsTab extends Component {
               <div class="loader" />
               <div class="dimmer-content">
                 <p>
-                  <Text id="integration.zwave-js-ui.settings.description" />
+                  <Text id="integration.zwavejsui.settings.description" />
                   {!props.externalZwaveJSUI && (
                     <>
                       <br />
@@ -91,7 +91,7 @@ class SettingsTab extends Component {
                         <span class="icon mr-3">
                           <i class="fe fe-external-link" />
                         </span>
-                        <Text id="integration.zwave-js-ui.settings.zwave-js-ui" />
+                        <Text id="integration.zwavejsui.settings.zwave-js-ui" />
                       </Link>
                     </>
                   )}
@@ -99,25 +99,25 @@ class SettingsTab extends Component {
 
                 {!props.usbConfigured && (
                   <div class="alert alert-danger">
-                    <Text id="integration.zwave-js-ui.settings.zwaveNotConfiguredError" />
+                    <Text id="integration.zwavejsui.settings.zwaveNotConfiguredError" />
                   </div>
                 )}
 
                 {!props.mqttConnected && (
                   <div class="alert alert-warning">
-                    <Text id="integration.zwave-js-ui.settings.notConnected" />
+                    <Text id="integration.zwavejsui.settings.notConnected" />
                   </div>
                 )}
 
                 {props.mqttConnected && (
                   <div class="alert alert-info">
-                    <Text id="integration.zwave-js-ui.settings.connected" />
+                    <Text id="integration.zwavejsui.settings.connected" />
                   </div>
                 )}
 
                 <div class="form-group">
                   <label for="externalZwaveJSUI" class="form-label">
-                    <Text id={`integration.zwave-js-ui.settings.externalZwaveJSUI`} />
+                    <Text id={`integration.zwavejsui.settings.externalZwaveJSUI`} />
                   </label>
                   <label class="custom-switch">
                     <input
@@ -130,7 +130,7 @@ class SettingsTab extends Component {
                     />
                     <span class="custom-switch-indicator" />
                     <span class="custom-switch-description">
-                      <Text id="integration.zwave-js-ui.settings.externalZwaveJSUI" />
+                      <Text id="integration.zwavejsui.settings.externalZwaveJSUI" />
                     </span>
                   </label>
                 </div>
@@ -139,13 +139,13 @@ class SettingsTab extends Component {
                   <>
                     <div class="form-group">
                       <label for="mqttUrl" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.urlLabel`} />
+                        <Text id={`integration.zwavejsui.settings.urlLabel`} />
                       </label>
                       <Localizer>
                         <input
                           id="mqttUrl"
                           name="mqttUrl"
-                          placeholder={<Text id="integration.zwave-js-ui.settings.urlPlaceholder" />}
+                          placeholder={<Text id="integration.zwavejsui.settings.urlPlaceholder" />}
                           value={props.mqttUrl}
                           class="form-control"
                           onInput={this.updateUrl}
@@ -154,13 +154,13 @@ class SettingsTab extends Component {
                     </div>
                     <div class="form-group">
                       <label for="mqttUsername" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.userLabel`} />
+                        <Text id={`integration.zwavejsui.settings.userLabel`} />
                       </label>
                       <Localizer>
                         <input
                           id="mqttUsername"
                           name="mqttUsername"
-                          placeholder={<Text id="integration.zwave-js-ui.settings.userPlaceholder" />}
+                          placeholder={<Text id="integration.zwavejsui.settings.userPlaceholder" />}
                           value={props.mqttUsername}
                           class="form-control"
                           onInput={this.updateUsername}
@@ -170,7 +170,7 @@ class SettingsTab extends Component {
                     </div>
                     <div class="form-group">
                       <label for="mqttPassword" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.passwordLabel`} />
+                        <Text id={`integration.zwavejsui.settings.passwordLabel`} />
                       </label>
                       <div class="input-icon mb-3">
                         <Localizer>
@@ -178,7 +178,7 @@ class SettingsTab extends Component {
                             id="mqttPassword"
                             name="mqttPassword"
                             type={props.externalZwaveJSUI && showPassword ? 'text' : 'password'}
-                            placeholder={<Text id="integration.zwave-js-ui.settings.passwordPlaceholder" />}
+                            placeholder={<Text id="integration.zwavejsui.settings.passwordPlaceholder" />}
                             value={props.mqttPassword}
                             class="form-control"
                             onInput={this.updatePassword}
@@ -197,13 +197,13 @@ class SettingsTab extends Component {
                     </div>
                     <div class="form-group">
                       <label for="mqttTopicPrefix" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.mqttTopicPrefixLabel`} />
+                        <Text id={`integration.zwavejsui.settings.mqttTopicPrefixLabel`} />
                       </label>
                       <Localizer>
                         <input
                           id="mqttTopicPrefix"
                           name="mqttTopicPrefix"
-                          placeholder={<Text id="integration.zwave-js-ui.settings.mqttTopicPrefixPlaceholder" />}
+                          placeholder={<Text id="integration.zwavejsui.settings.mqttTopicPrefixPlaceholder" />}
                           value={props.mqttTopicPrefix}
                           class="form-control"
                           onInput={this.updateMqttTopicPrefix}
@@ -213,7 +213,7 @@ class SettingsTab extends Component {
                     </div>
                     <div class="form-group">
                       <label for="mqttTopicWithLocation" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.mqttTopicWithLocationLabel`} />
+                        <Text id={`integration.zwavejsui.settings.mqttTopicWithLocationLabel`} />
                       </label>
                       <label class="custom-switch">
                         <input
@@ -226,7 +226,7 @@ class SettingsTab extends Component {
                         />
                         <span class="custom-switch-indicator" />
                         <span class="custom-switch-description">
-                          <Text id="integration.zwave-js-ui.settings.mqttTopicWithLocationDescription" />
+                          <Text id="integration.zwavejsui.settings.mqttTopicWithLocationDescription" />
                         </span>
                       </label>
                     </div>
@@ -237,7 +237,7 @@ class SettingsTab extends Component {
                   <>
                     <div class="form-group">
                       <label class="form-label">
-                        <Text id="integration.zwave-js-ui.settings.zwaveUsbDriverPathLabel" />
+                        <Text id="integration.zwavejsui.settings.zwaveUsbDriverPathLabel" />
                       </label>
                       <select class="form-control" onChange={this.updateUsbDriverPath}>
                         <option>
@@ -257,17 +257,17 @@ class SettingsTab extends Component {
                       </select>
                     </div>
                     <p>
-                      <Text id={`integration.zwave-js-ui.settings.securityKeysDescription`} />
+                      <Text id={`integration.zwavejsui.settings.securityKeysDescription`} />
                     </p>
                     <div class="form-group">
                       <label for="s2UnauthenticatedKey" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.s2UnauthenticatedKeyLabel`} />
+                        <Text id={`integration.zwavejsui.settings.s2UnauthenticatedKeyLabel`} />
                       </label>
                       <Localizer>
                         <input
                           id="s2UnauthenticatedKey"
                           name="s2UnauthenticatedKey"
-                          placeholder={<Text id="integration.zwave-js-ui.settings.s2UnauthenticatedKeyPlaceholder" />}
+                          placeholder={<Text id="integration.zwavejsui.settings.s2UnauthenticatedKeyPlaceholder" />}
                           value={props.s2UnauthenticatedKey}
                           class="form-control"
                           onInput={this.updateS2UnauthenticatedKey}
@@ -277,13 +277,13 @@ class SettingsTab extends Component {
                     </div>
                     <div class="form-group">
                       <label for="s2AuthenticatedKey" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.s2AuthenticatedKeyLabel`} />
+                        <Text id={`integration.zwavejsui.settings.s2AuthenticatedKeyLabel`} />
                       </label>
                       <Localizer>
                         <input
                           id="s2AuthenticatedKey"
                           name="s2AuthenticatedKey"
-                          placeholder={<Text id="integration.zwave-js-ui.settings.s2AuthenticatedKeyPlaceholder" />}
+                          placeholder={<Text id="integration.zwavejsui.settings.s2AuthenticatedKeyPlaceholder" />}
                           value={props.s2AuthenticatedKey}
                           class="form-control"
                           onInput={this.updateS2AuthenticatedKey}
@@ -293,13 +293,13 @@ class SettingsTab extends Component {
                     </div>
                     <div class="form-group">
                       <label for="s2AccessControlKey" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.s2AccessControlKeyLabel`} />
+                        <Text id={`integration.zwavejsui.settings.s2AccessControlKeyLabel`} />
                       </label>
                       <Localizer>
                         <input
                           id="s2AccessControlKey"
                           name="s2AccessControlKey"
-                          placeholder={<Text id="integration.zwave-js-ui.settings.s2AccessControlKeyPlaceholder" />}
+                          placeholder={<Text id="integration.zwavejsui.settings.s2AccessControlKeyPlaceholder" />}
                           value={props.s2AccessControlKey}
                           class="form-control"
                           onInput={this.updateS2AccessControlKey}
@@ -309,13 +309,13 @@ class SettingsTab extends Component {
                     </div>
                     <div class="form-group">
                       <label for="s0LegacyKey" class="form-label">
-                        <Text id={`integration.zwave-js-ui.settings.s0LegacyKeyLabel`} />
+                        <Text id={`integration.zwavejsui.settings.s0LegacyKeyLabel`} />
                       </label>
                       <Localizer>
                         <input
                           id="s0LegacyKey"
                           name="s0LegacyKey"
-                          placeholder={<Text id="integration.zwave-js-ui.settings.s0LegacyKeyPlaceholder" />}
+                          placeholder={<Text id="integration.zwavejsui.settings.s0LegacyKeyPlaceholder" />}
                           value={props.s0LegacyKey}
                           class="form-control"
                           onInput={this.updateS0LegacyKey}
@@ -328,10 +328,10 @@ class SettingsTab extends Component {
 
                 <div class="form-group">
                   <button class="btn btn-success" onClick={props.connect}>
-                    <Text id="integration.zwave-js-ui.settings.connectButton" />
+                    <Text id="integration.zwavejsui.settings.connectButton" />
                   </button>
                   <button class="btn btn-danger ml-2" onClick={props.disconnect}>
-                    <Text id="integration.zwave-js-ui.settings.disconnectButton" />
+                    <Text id="integration.zwavejsui.settings.disconnectButton" />
                   </button>
                 </div>
               </div>
@@ -340,7 +340,7 @@ class SettingsTab extends Component {
         </div>
         <div class="card-header d-none d-sm-block">
           <h2 class="card-title">
-            <Text id="integration.zwave-js-ui.settings.serviceStatus" />
+            <Text id="integration.zwavejsui.settings.serviceStatus" />
           </h2>
         </div>
         <div class="row justify-content-center">
@@ -349,7 +349,7 @@ class SettingsTab extends Component {
               <thead class="text-center">
                 <tr>
                   <th class="text-center">
-                    <Text id="integration.zwave-js-ui.settings.gladys" />
+                    <Text id="integration.zwavejsui.settings.gladys" />
                   </th>
                   <th class="text-center" />
                   <th class="text-center">{props.mqttExist && 'MQTT'}</th>
@@ -442,7 +442,7 @@ class SettingsTab extends Component {
         </div>
         <div class="card-header d-sm-none">
           <h2 class="card-title">
-            <Text id="integration.zwave-js-ui.settings.containersStatus" />
+            <Text id="integration.zwavejsui.settings.containersStatus" />
           </h2>
         </div>
         <div class="row justify-content-center d-sm-none">
@@ -454,14 +454,14 @@ class SettingsTab extends Component {
                     <Text id="systemSettings.containers" />
                   </th>
                   <th>
-                    <Text id="integration.zwave-js-ui.settings.status" />
+                    <Text id="integration.zwavejsui.settings.status" />
                   </th>
                 </tr>
               </thead>
               <tbody class="text-center">
                 <tr>
                   <td>
-                    <Text id="integration.zwave-js-ui.settings.gladys" />
+                    <Text id="integration.zwavejsui.settings.gladys" />
                   </td>
                   <td>
                     <span class="tag tag-success">
@@ -471,7 +471,7 @@ class SettingsTab extends Component {
                 </tr>
                 <tr>
                   <td>
-                    <Text id="integration.zwave-js-ui.settings.mqtt" />
+                    <Text id="integration.zwavejsui.settings.mqtt" />
                   </td>
                   <td>
                     {props.mqttRunning && (
@@ -483,7 +483,7 @@ class SettingsTab extends Component {
                 </tr>
                 <tr>
                   <td>
-                    <Text id="integration.zwave-js-ui.settings.zwaveJSUI" />
+                    <Text id="integration.zwavejsui.settings.zwaveJSUI" />
                   </td>
                   <td>
                     {props.zwaveJSUIRunning && (
@@ -499,7 +499,7 @@ class SettingsTab extends Component {
         </div>
         <div class="card-header d-sm-none">
           <h2 class="card-title">
-            <Text id="integration.zwave-js-ui.settings.serviceStatus" />
+            <Text id="integration.zwavejsui.settings.serviceStatus" />
           </h2>
         </div>
         <div class="row justify-content-center d-sm-none">
@@ -508,17 +508,17 @@ class SettingsTab extends Component {
               <thead class="text-center">
                 <tr>
                   <th>
-                    <Text id="integration.zwave-js-ui.settings.link" />
+                    <Text id="integration.zwavejsui.settings.link" />
                   </th>
                   <th>
-                    <Text id="integration.zwave-js-ui.settings.status" />
+                    <Text id="integration.zwavejsui.settings.status" />
                   </th>
                 </tr>
               </thead>
               <tbody class="text-center">
                 <tr>
                   <td>
-                    <Text id="integration.zwave-js-ui.settings.gladysMqttLink" />
+                    <Text id="integration.zwavejsui.settings.gladysMqttLink" />
                   </td>
                   <td>
                     {props.mqttRunning && (
@@ -535,7 +535,7 @@ class SettingsTab extends Component {
                 </tr>
                 <tr>
                   <td>
-                    <Text id="integration.zwave-js-ui.settings.mqttZwavejsLink" />
+                    <Text id="integration.zwavejsui.settings.mqttZwavejsLink" />
                   </td>
                   <td>
                     {props.zwaveJSUIRunning && (

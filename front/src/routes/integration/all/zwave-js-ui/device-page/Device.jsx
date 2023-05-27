@@ -92,23 +92,23 @@ class ZWaveDeviceBox extends Component {
             <div class="dimmer-content">
               {error === RequestStatus.Error && (
                 <div class="alert alert-danger">
-                  <Text id="integration.zwave-js-ui.device.updateDeviceError" />
+                  <Text id="integration.zwavejsui.device.updateDeviceError" />
                 </div>
               )}
               {error === RequestStatus.ConflictError && (
                 <div class="alert alert-danger">
-                  <Text id="integration.zwave-js-ui.device.conflictError" />
+                  <Text id="integration.zwavejsui.device.conflictError" />
                 </div>
               )}
               {deviceUpdated && (
                 <div class="alert alert-success">
-                  <Text id="integration.zwave-js-ui.device.deviceUpdatedSuccess" />
+                  <Text id="integration.zwavejsui.device.deviceUpdatedSuccess" />
                 </div>
               )}
               <div class="card-body">
                 <div class="form-group">
                   <label>
-                    <Text id="integration.zwave-js-ui.device.nameLabel" />
+                    <Text id="integration.zwavejsui.device.nameLabel" />
                   </label>
                   <Localizer>
                     <input
@@ -116,13 +116,13 @@ class ZWaveDeviceBox extends Component {
                       value={props.device.name}
                       onInput={this.updateName}
                       class="form-control"
-                      placeholder={<Text id="integration.zwave-js-ui.device.nameLabel" />}
+                      placeholder={<Text id="integration.zwavejsui.device.nameLabel" />}
                     />
                   </Localizer>
                 </div>
                 <div class="form-group">
                   <label>
-                    <Text id="integration.zwave-js-ui.device.roomLabel" />
+                    <Text id="integration.zwavejsui.device.roomLabel" />
                   </label>
                   <select onChange={this.updateRoom} class="form-control">
                     <option value="">
@@ -143,13 +143,13 @@ class ZWaveDeviceBox extends Component {
                 </div>
                 <div class="form-group">
                   <label>
-                    <Text id="integration.zwave-js-ui.device.featuresLabel" />
+                    <Text id="integration.zwavejsui.device.featuresLabel" />
                   </label>
                   <DeviceFeatures features={props.device.features} />
                   <p class="mt-4">
                     {mostRecentValueAt ? (
                       <Text
-                        id="integration.zwave-js-ui.device.mostRecentValueAt"
+                        id="integration.zwavejsui.device.mostRecentValueAt"
                         fields={{
                           mostRecentValueAt: dayjs(mostRecentValueAt)
                             .locale(props.user.language)
@@ -157,20 +157,20 @@ class ZWaveDeviceBox extends Component {
                         }}
                       />
                     ) : (
-                      <Text id="integration.zwave-js-ui.device.noValueReceived" />
+                      <Text id="integration.zwavejsui.device.noValueReceived" />
                     )}
                   </p>
                 </div>
                 <div class="form-group">
                   <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                    <Text id="integration.zwave-js-ui.device.saveButton" />
+                    <Text id="integration.zwavejsui.device.saveButton" />
                   </button>
                   <button onClick={this.deleteDevice} class="btn btn-danger">
-                    <Text id="integration.zwave-js-ui.device.deleteButton" />
+                    <Text id="integration.zwavejsui.device.deleteButton" />
                   </button>
                   <Link href={`/dashboard/integration/device/zwave-js-ui/edit/${props.device.selector}`}>
                     <button class="btn btn-secondary float-right">
-                      <Text id="integration.zwave-js-ui.device.editButton" />
+                      <Text id="integration.zwavejsui.device.editButton" />
                     </button>
                   </Link>
                 </div>
