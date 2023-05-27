@@ -36,11 +36,7 @@ const HomKitPage = ({ children, ...props }) => (
                         <div class="form-group">
                           <Text id={`integration.homekit.qrCode`} />
                           {props.homekitSetupDataUrl && (
-                            <img
-                              class="mx-auto d-block"
-                              src={props.homekitSetupDataUrl}
-                              style={{ marginBottom: '10px' }}
-                            />
+                            <img class="mx-auto d-block mb-3" src={props.homekitSetupDataUrl} />
                           )}
                           <p>
                             <Text id={`integration.homekit.reload`} />

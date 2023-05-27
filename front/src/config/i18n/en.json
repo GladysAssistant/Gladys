@@ -392,7 +392,6 @@
         "scanButton": "Scan network",
         "bridgeButtonNotPressed": "Bridge button not pressed: Please press the button on your Philips Hue bridge and try again.",
         "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
-        "noBridgesConnected": "No bridges connected.",
         "noBridgesFound": "We didn't find any Philips Hue bridges on your network. Are you sure you are connected to the same network as your bridge and your bridge is turned on?"
       },
       "device": {
@@ -2050,7 +2049,8 @@
     "kilobytes-per-second": "kilobytes per second (kB/s)",
     "megabytes-per-second": "Megabytes per second (MB/s)",
     "gigabytes-per-second": "Gigabytes per second (GB/s)",
-    "aqi": "Air Quality Index"
+    "aqi": "Air Quality Index",
+    "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2122,7 +2122,8 @@
     "kilobytes-per-second": "kB/s",
     "megabytes-per-second": "MB/s",
     "gigabytes-per-second": "GB/s",
-    "aqi": "AQI"
+    "aqi": "AQI",
+    "microgram-per-cubic-meter": "µg/m³"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2306,6 +2307,14 @@
     "soil-moisture-sensor": {
       "shortCategoryName": "Soil moisture sensor",
       "decimal": "Soil moisture (decimal)"
+    },
+    "pm25-sensor": {
+      "shortCategoryName": "PM2.5 sensor",
+      "decimal": "PM2.5 (decimal)"
+    },
+    "formaldehyd-sensor": {
+      "shortCategoryName": "Formaldehyd sensor",
+      "decimal": "Formaldehyd(decimal)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
