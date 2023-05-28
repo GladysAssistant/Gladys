@@ -37,6 +37,13 @@ module.exports = {
           created_at: '2019-02-12 07:49:07.556 +00:00',
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
+        {
+          id: '0820c1ac-0f5d-4a65-8ef4-ea92ebdd36F0',
+          name: 'GLADYS_MUSIC_SERVICES_ENABLED',
+          value: '{"provider1":"ENABLED","provider2":"ENABLED"}',
+          created_at: '2019-02-12 07:49:07.556 +00:00',
+          updated_at: '2019-02-12 07:49:07.556 +00:00',
+        },
       ],
       {},
     ),

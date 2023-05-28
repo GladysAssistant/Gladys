@@ -12,6 +12,7 @@ const HttpController = require('./controllers/http.controller');
 const LightController = require('./controllers/light.controller');
 const LocationController = require('./controllers/location.controller');
 const MessageController = require('./controllers/message.controller');
+const MusicController = require('./controllers/music.controller');
 const RoomController = require('./controllers/room.controller');
 const SessionController = require('./controllers/session.controller');
 const ServiceController = require('./controllers/service.controller');
@@ -41,6 +42,7 @@ function getRoutes(gladys) {
   const houseController = HouseController(gladys);
   const httpController = HttpController(gladys);
   const messageController = MessageController(gladys);
+  const musicController = MusicController(gladys);
   const pingController = PingController();
   const gatewayController = GatewayController(gladys);
   const roomController = RoomController(gladys);
@@ -487,6 +489,35 @@ function getRoutes(gladys) {
     'get /api/v1/speaker/:speaker_output_name/status': {
       authenticated: true,
       controller: speakerController.status,
+    },
+    // music
+    'get /api/v1/music/providers': {
+      authenticated: true,
+      controller: musicController.getProviders,
+    },
+    'get /api/v1/music/:service_name': {
+      authenticated: true,
+      controller: musicController.getProviderStatus,
+    },
+    'post /api/v1/music/:service_name/:status': {
+      authenticated: true,
+      controller: musicController.changeProviderStatus,
+    },
+    'get /api/v1/music/stop/:provider/:speaker_output_name': {
+      authenticated: true,
+      controller: musicController.stop,
+    },
+    'get /api/v1/music/pause/:provider/:speaker_output_name': {
+      authenticated: true,
+      controller: musicController.pause,
+    },
+    'get /api/v1/music/mute/:provider/:speaker_output_name': {
+      authenticated: true,
+      controller: musicController.mute,
+    },
+    'get /api/v1/music/volume/:provider/:speaker_output_name/:volume': {
+      authenticated: true,
+      controller: musicController.volume,
     },
     // system
     'get /api/v1/system/info': {
