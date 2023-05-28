@@ -13,6 +13,7 @@ const Http = require('./http');
 const Job = require('./job');
 const Location = require('./location');
 const MessageHandler = require('./message');
+const SpeakerHandler = require('./speaker');
 const Service = require('./service');
 const Session = require('./session');
 const User = require('./user');
@@ -62,6 +63,7 @@ function Gladys(params = {}) {
   const room = new Room(brain);
   const service = new Service(services, stateManager);
   const message = new MessageHandler(event, brain, service, stateManager, variable);
+  const speaker = new SpeakerHandler(event, service);
   const session = new Session(params.jwtSecret, cache);
   const user = new User(session, stateManager, variable);
   const location = new Location(user, event);
@@ -110,6 +112,7 @@ function Gladys(params = {}) {
     gateway,
     location,
     message,
+    speaker,
     user,
     service,
     scene,

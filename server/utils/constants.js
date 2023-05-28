@@ -162,6 +162,20 @@ const EVENTS = {
     NEW: 'message.new',
     NEW_FOR_OPEN_AI: 'message.new-for-open-ai',
   },
+  MUSIC: {
+    PLAY: 'music.play',
+    PREVIOUS: 'music.previous',
+    NEXT: 'music.next',
+    RANDOM: 'music.random',
+    STOP: 'music.stop',
+    PAUSE: 'music.pause',
+    MUTE: 'music.mute',
+    VOLUME: 'music.volume',
+    STATUS: {
+      ENABLED: 'ENABLED',
+      DISABLED: 'DISABLED',
+    },
+  },
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
     CHECK_UPGRADE: 'system.check-upgrade',
@@ -784,6 +798,15 @@ const WEBSOCKET_MESSAGE_TYPES = {
   MESSAGE: {
     NEW: 'message.new',
     SENT: 'message.sent',
+  },
+  MUSIC: {
+    PLAY: 'music.play',
+    STOP: 'music.stop',
+    PAUSE: 'music.pause',
+    MUTE: 'music.mute',
+    VOLUME: 'music.volume',
+    FINISH: 'music.finish',
+    METADATA: 'music.metadata',
   },
   AUTHENTICATION: {
     REQUEST: 'authenticate.request',
