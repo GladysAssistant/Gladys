@@ -1,11 +1,7 @@
 import { Text } from 'preact-i18n';
 
-const margin = {
-  marginTop: '5rem'
-};
-
 const EmptySearch = ({}) => (
-  <div style={margin} class="text-center">
+  <div class="text-center mt-5 pt-5">
     <Text id="housesSettings.noHouseFound" />
   </div>
 );
