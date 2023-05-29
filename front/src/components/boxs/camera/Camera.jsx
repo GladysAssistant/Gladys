@@ -251,7 +251,7 @@ class CameraBoxComponent extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              <video style={{ width: '100%' }} ref={this.videoRef} controls autoPlay muted />
+              <video class="w-100" ref={this.videoRef} controls autoPlay muted />
             </div>
           </div>
           <div class="card-header">
@@ -280,7 +280,7 @@ class CameraBoxComponent extends Component {
         )}
         {!image && loading && (
           <div class="dimmer active">
-            <div class="dimmer-content" style={{ height: '100px' }} />
+            <div class="dimmer-content my-5 py-5" />
             <div class="loader" />
           </div>
         )}

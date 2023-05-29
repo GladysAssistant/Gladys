@@ -10,12 +10,7 @@ const EditScenePage = ({ children, ...props }) => (
       <div class="my-3 my-md-5">
         <div class="container">
           <div class="page-header">
-            <h1
-              class="page-title"
-              style={{
-                marginRight: '20px'
-              }}
-            >
+            <h1 class="page-title mr-5">
               <Link href="/dashboard/scene" class="btn btn-secondary btn-sm btn-block">
                 <Text id="global.backButton" />
               </Link>
@@ -88,7 +83,7 @@ const EditScenePage = ({ children, ...props }) => (
                 setVariablesTrigger={props.setVariablesTrigger}
               />
             </div>
-            <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
+            <div class="row h1">
               <div class="col-lg-12">
                 <div class="text-center">
                   <i class="fe fe-arrow-down" />
@@ -119,7 +114,7 @@ const EditScenePage = ({ children, ...props }) => (
                 />
               </div>
               {index + 1 < props.scene.actions.length && (
-                <div class="row" style={{ marginBottom: '1.5rem', fontSize: '35px' }}>
+                <div class="row h1">
                   <div class="col-lg-12">
                     <div class="text-center">
                       <i class="fe fe-arrow-down" />

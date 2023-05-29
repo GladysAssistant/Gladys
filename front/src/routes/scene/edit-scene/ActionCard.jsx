@@ -66,12 +66,7 @@ const ActionCard = ({ children, ...props }) => (
         {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
         {props.action.type === null && <i class="fe fe-plus-circle" />}
         <div class="card-title">
-          <i
-            class={props.action.icon}
-            style={{
-              marginRight: '10px'
-            }}
-          />{' '}
+          <i class={cx('mr-3', props.action.icon)} />
           <Text id={`editScene.actions.${props.action.type}`} />
           {props.action.type === null && <Text id="editScene.newAction" />}
         </div>
