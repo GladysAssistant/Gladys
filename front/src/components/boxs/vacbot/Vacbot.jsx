@@ -6,6 +6,7 @@ import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY, RequestStatus } from 
 // TODO : import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
 import cx from 'classnames';
+import VacbotModeDeviceFeature from '../device-in-room/device-features/VacbotModeDeviceFeature';
 
 const BOX_REFRESH_INTERVAL_MS = 3 * 6 * 1000;
 
@@ -88,10 +89,16 @@ const VacbotBox = ({ children, ...props }) => (
               onClick={props.home}
             />
           </div>
+          <div>
+          {props.deviceFeature}
+          </div>
+          
         </div>
       </div>
     </div>
-
+    <table>
+      <VacbotModeDeviceFeature  device={props.device} deviceFeature={props.deviceFeature} deviceIndex={0} deviceFeatureIndex={0} />
+    </table>
     <div class="mt-3">
       hasMoppingSystem : {props.hasMoppingSystem}, chargeStatus : {props.chargeStatus}, cleanReport :{' '}
       {props.cleanReport}
@@ -148,7 +155,99 @@ class VacbotBoxComponent extends Component {
     const chargeStatus = get(boxData, 'vacbot.chargeStatus');
     const cleanReport = get(boxData, 'vacbot.cleanReport');
     const batteryLevel = get(boxData, 'vacbot.batteryLevel');
+    // const device = get(boxData, 'device');
+    // const deviceFeature = get(boxData, 'deviceFeature');
+    const json = `
+    {
+      "id": "e91d470b-4293-4363-a7c3-721bedde2031",
+      "service_id": "e3d01cdf-ae4c-4a09-9cbf-8cf9741ee23b",
+      "room_id": "af7dc442-6dca-4b2f-b25b-ec2c4787731b",
+      "name": "DEEBOT OZMO 920 Series",
+      "selector": "ecovacs-5c19a8f3a1e6ee0001782247-0",
+      "model": "DX5G",
+      "external_id": "ecovacs:5c19a8f3a1e6ee0001782247:0",
+      "should_poll": true,
+      "poll_frequency": 60000,
+      "created_at": "2023-05-22T16:30:01.540Z",
+      "updated_at": "2023-05-22T16:30:01.540Z",
+      "features": [
+        {
+          "id": "b525e65b-9f41-4568-825c-86c6b8c4115d",
+          "device_id": "e91d470b-4293-4363-a7c3-721bedde2031",
+          "name": "power",
+          "selector": "ecovacs-5c19a8f3a1e6ee0001782247-state-0",
+          "external_id": "ecovacs:5c19a8f3a1e6ee0001782247:state:0",
+          "category": "vacbot",
+          "type": "state",
+          "read_only": false,
+          "keep_history": false,
+          "has_feedback": true,
+          "unit": null,
+          "min": 0,
+          "max": 1,
+          "last_value": null,
+          "last_value_string": null,
+          "last_value_changed": null,
+          "last_hourly_aggregate": "2023-05-23T19:00:00.000Z",
+          "last_daily_aggregate": "2023-05-22T22:00:00.000Z",
+          "last_monthly_aggregate": "2023-04-30T22:00:00.000Z",
+          "created_at": "2023-05-22T16:30:01.546Z",
+          "updated_at": "2023-05-23T19:00:03.700Z"
+        },
+        {
+          "id": "f2295db1-d9ab-4bd8-9fab-482c3637c336",
+          "device_id": "e91d470b-4293-4363-a7c3-721bedde2031",
+          "name": "battery",
+          "selector": "ecovacs-5c19a8f3a1e6ee0001782247-battery-0",
+          "external_id": "ecovacs:5c19a8f3a1e6ee0001782247:battery:0",
+          "category": "battery",
+          "type": "integer",
+          "read_only": true,
+          "keep_history": true,
+          "has_feedback": true,
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "last_value": 100,
+          "last_value_string": null,
+          "last_value_changed": "2023-05-24T17:00:38.811Z",
+          "last_hourly_aggregate": "2023-05-23T19:00:00.000Z",
+          "last_daily_aggregate": "2023-05-22T22:00:00.000Z",
+          "last_monthly_aggregate": "2023-04-30T22:00:00.000Z",
+          "created_at": "2023-05-22T16:30:01.546Z",
+          "updated_at": "2023-05-23T19:50:08.106Z"
+        }
+      ],
+      "params": [],
+      "room": {
+        "id": "af7dc442-6dca-4b2f-b25b-ec2c4787731b",
+        "house_id": "f0a7c1c3-0d3d-4fc7-9711-458aa65532f1",
+        "name": "salon",
+        "selector": "salon",
+        "created_at": "2022-12-31T19:31:32.876Z",
+        "updated_at": "2022-12-31T19:31:32.876Z"
+      },
+      "service": {
+        "id": "e3d01cdf-ae4c-4a09-9cbf-8cf9741ee23b",
+        "pod_id": null,
+        "name": "ecovacs",
+        "selector": "ecovacs",
+        "version": "0.1.0",
+        "has_message_feature": false,
+        "status": "RUNNING",
+        "created_at": "2022-12-31T19:29:29.109Z",
+        "updated_at": "2023-05-24T16:33:36.385Z"
+      }
+    }`;
+    
+    const device = JSON.parse(json);
+    console.log(device);
+    const deviceFeature = device.features[0];
+
+
+
     const error = boxStatus === RequestStatus.Error;
+    
     return (
       <VacbotBox
         {...props}
@@ -160,6 +259,8 @@ class VacbotBoxComponent extends Component {
         chargeStatus={chargeStatus}
         cleanReport={cleanReport}
         batteryLevel={batteryLevel}
+        device={device}
+        deviceFeature={deviceFeature}
         error={error}
       />
     );
@@ -167,3 +268,4 @@ class VacbotBoxComponent extends Component {
 }
 
 export default connect('session,DashboardBoxDataVacbot,DashboardBoxStatusVacbot', actions)(VacbotBoxComponent);
+

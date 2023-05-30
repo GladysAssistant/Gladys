@@ -27,9 +27,16 @@ function createActions(store) {
       boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Getting);
       try {
         const vacbotStatus = await state.httpClient.get(`/api/v1/service/ecovacs/${box.device_feature}/status`);
-        console.log(`status ${JSON.stringify(vacbotStatus)}`);
+        // api/v1/device/:device_selector
+        const vacbotDevice = await state.httpClient.get(`/api/v1/device/${box.device_feature}`);
+        
+        const vacbotDeviceFeature = vacbotDevice.features[0];
+        // console.log(`device ${JSON.stringify(vacbotDeviceFeature)}`);
+        
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          vacbot: vacbotStatus
+          vacbot: vacbotStatus,
+          device: vacbotDevice,
+          deviceFeature: vacbotDeviceFeature
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Success);
       } catch (e) {
