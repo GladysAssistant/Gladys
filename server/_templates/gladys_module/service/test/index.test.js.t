@@ -7,13 +7,14 @@ const sinon = require('sinon');
 const { assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const { <%= className %>HandlerMock } = require('./mocks/<%= module %>.mock.test');
+const { serviceId } = require('./mocks/consts.test');
 
 const <%= className %>Service = proxyquire('../../../services/<%= module %>', {
   './lib': <%= className %>HandlerMock,
 });
 
 describe('<%= className %>Service', () => {
-  const <%= attributeName %>Service = <%= className %>Service({}, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
+  const <%= attributeName %>Service = <%= className %>Service({}, serviceId);
 
   it('should have controllers', () => {
       expect(<%= attributeName %>Service)

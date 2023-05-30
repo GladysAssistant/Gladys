@@ -4,13 +4,14 @@ to: test/services/<%= module %>/api/<%= module %>.controller.test.js
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
 const { <%= className %>HandlerMock } = require('../mocks/<%= module %>.mock.test');
+const { serviceId } = require('../mocks/consts.test');
 
 const <%= className %>Service = proxyquire('../../../../services/<%= module %>', {
   './lib': <%= className %>HandlerMock,
 });
 
 const { assert, fake } = sinon;
-const <%= attributeName %>Service = <%= className %>Service({}, 'faea9c35-759a-44d5-bcc9-2af1de37b8b4');
+const <%= attributeName %>Service = <%= className %>Service({}, serviceId);
 
 describe('GET /api/v1/service/<%= module %>/status', () => {
   beforeEach(() => {
