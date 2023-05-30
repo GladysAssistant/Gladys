@@ -3,9 +3,9 @@ to: test/services/<%= module %>/api/<%= module %>.controller.test.js
 ---
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { <%= className %>HandlerMock } = require('../mocks/ecovacs.mock.test');
+const { <%= className %>HandlerMock } = require('../mocks/<%= module %>.mock.test');
 
-const <%= className %>Service = proxyquire('../../../../services/ecovacs', {
+const <%= className %>Service = proxyquire('../../../../services/<%= module %>', {
   './lib': <%= className %>HandlerMock,
 });
 
