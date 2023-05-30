@@ -14,8 +14,8 @@ const MAX_VOLT = 3300;
 
 /**
  * @description New value cube received.
- * @param {Object} message - Message received.
- * @param {Object} data - Data received.
+ * @param {object} message - Message received.
+ * @param {object} data - Data received.
  * @example
  * newValueCube(122324, {
  *    voltage: 3000,

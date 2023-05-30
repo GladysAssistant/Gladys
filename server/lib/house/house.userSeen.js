@@ -6,6 +6,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
  * @description User seen in house.
  * @param {string} houseSelector - The selector of the house.
  * @param {string} userSelector - The selector of the user.
+ * @returns {Promise} Resolve with updated user.
  * @example
  * gladys.house.userSeen('main-house', 'john');
  */

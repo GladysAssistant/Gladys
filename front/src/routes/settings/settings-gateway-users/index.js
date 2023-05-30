@@ -5,7 +5,6 @@ import SettingsLayout from '../SettingsLayout';
 import linkState from 'linkstate';
 import update from 'immutability-helper';
 
-@connect('session', {})
 class DashboardUsersPage extends Component {
   state = {
     users: [],
@@ -70,4 +69,4 @@ class DashboardUsersPage extends Component {
   }
 }
 
-export default DashboardUsersPage;
+export default connect('session', {})(DashboardUsersPage);

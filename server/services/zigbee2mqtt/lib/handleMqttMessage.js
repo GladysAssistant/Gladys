@@ -5,8 +5,8 @@ const { convertFeature } = require('../utils/convertFeature');
 /**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
- * @param {Object} message - The message sent.
- * @returns {Object} Null.
+ * @param {object} message - The message sent.
+ * @returns {object} Null.
  * @example
  * handleMqttMessage('stat/zigbee2mqtt/POWER', 'ON');
  */

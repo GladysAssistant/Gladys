@@ -7,11 +7,11 @@ const { parseExternalId } = require('../utils/parseExternalId');
 const { getDeviceFeature } = require('../../../../utils/device');
 
 /**
- * @description Poll value of a TP-Link Plug and emit event if necessary
- * @param {Object} self - This.
- * @param {Object} device - Device.
- * @param {Object} deviceSysInfo - Device Sys Info to get relay_state.
- * @param {Object} deviceId - Device Id to emit proper event.
+ * @description Poll value of a TP-Link Plug and emit event if necessary.
+ * @param {object} self - This.
+ * @param {object} device - Device.
+ * @param {object} deviceSysInfo - Device Sys Info to get relay_state.
+ * @param {object} deviceId - Device Id to emit proper event.
  * @example
  * pollAndCompareStateForPlug(this, device,deviceSysInfo, deviceId);
  */
@@ -28,11 +28,11 @@ function pollAndCompareStateForPlug(self, device, deviceSysInfo, deviceId) {
 }
 
 /**
- * @description Poll value of a TP-Link Bulb and emit event if necessary
- * @param {Object} self - This.
- * @param {Object} device - Device.
- * @param {Object} deviceSysInfo - Device Sys Info to get light_state.
- * @param {Object} deviceId - Device Id to emit proper event.
+ * @description Poll value of a TP-Link Bulb and emit event if necessary.
+ * @param {object} self - This.
+ * @param {object} device - Device.
+ * @param {object} deviceSysInfo - Device Sys Info to get light_state.
+ * @param {object} deviceId - Device Id to emit proper event.
  * @example
  * pollAndCompareStateForBulb(this, device,deviceSysInfo, deviceId);
  */
@@ -49,8 +49,8 @@ function pollAndCompareStateForBulb(self, device, deviceSysInfo, deviceId) {
 }
 
 /**
- * @description Poll value of a TP-Link Device
- * @param {Object} device - The device to control.
+ * @description Poll value of a TP-Link Device.
+ * @param {object} device - The device to control.
  * @returns {Promise} Promise.
  * @example
  * poll(device);

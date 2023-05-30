@@ -1,7 +1,7 @@
 /**
  * @private
  * @description Turn on the light.
- * @param {Object} deviceFeature - The deviceFeature we wants to control.
+ * @param {object} deviceFeature - The deviceFeature we wants to control.
  * @returns {Promise} Promise.
  * @example
  * turnOn(deviceFeature);

@@ -11,7 +11,7 @@ const saveOrDestroy = async (variableManager, key, value, serviceId) => {
 
 /**
  * @description Save Z2M configuration.
- * @param {Object} config - Z2M service configuration.
+ * @param {object} config - Z2M service configuration.
  * @returns {Promise} Current MQTT network configuration.
  * @example
  * await z2m.saveConfiguration(config);
@@ -21,6 +21,7 @@ async function saveConfiguration(config) {
 
   const keyValueMap = {
     [CONFIGURATION.Z2M_DRIVER_PATH]: config.z2mDriverPath,
+    [CONFIGURATION.ZIGBEE_DONGLE_NAME]: config.z2mDongleName,
     [CONFIGURATION.Z2M_MQTT_USERNAME_KEY]: config.z2mMqttUsername,
     [CONFIGURATION.Z2M_MQTT_PASSWORD_KEY]: config.z2mMqttPassword,
     [CONFIGURATION.MQTT_URL_KEY]: config.mqttUrl,

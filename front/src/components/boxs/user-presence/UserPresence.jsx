@@ -2,17 +2,15 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
 import { Text } from 'preact-i18n';
-import { RequestStatus } from '../../../utils/consts';
 import update from 'immutability-helper';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import cx from 'classnames';
+
+import { RequestStatus } from '../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 dayjs.extend(relativeTime);
-
-const zeroMarginBottom = {
-  marginBottom: '0rem'
-};
 
 const UserPresence = ({ children, ...props }) => (
   <div class="card">
@@ -29,28 +27,19 @@ const UserPresence = ({ children, ...props }) => (
         <Text id="dashboard.boxes.userPresence.error" />
       </div>
     )}
-    <div
-      class="card-body o-auto"
-      style={{
-        padding: '1rem'
-      }}
-    >
+    <div class="card-body o-auto p-4">
       <div
-        class={
-          props.dashboardUserPresenceGetUsersStatus === RequestStatus.Getting && !props.usersWithPresence
-            ? 'dimmer active'
-            : 'dimmer'
-        }
+        class={cx('dimmer', {
+          active: props.dashboardUserPresenceGetUsersStatus === RequestStatus.Getting && !props.usersWithPresence
+        })}
       >
         <div class="loader" />
-        <div class="dimmer-content">
-          {!props.usersWithPresence && (
-            <div
-              style={{
-                minHeight: '5rem'
-              }}
-            />
-          )}
+        <div
+          class={cx('dimmer-content', {
+            'py-4': !props.usersWithPresence,
+            'my-5': !props.usersWithPresence
+          })}
+        >
           {props.usersWithPresence && props.usersWithPresence.length === 0 && (
             <div>
               <div class="alert alert-icon alert-primary" role="alert">
@@ -58,7 +47,7 @@ const UserPresence = ({ children, ...props }) => (
               </div>
             </div>
           )}
-          <ul class="list-unstyled list-separated" style={zeroMarginBottom}>
+          <ul class="list-unstyled list-separated mb-0">
             {props.usersWithPresence &&
               props.usersWithPresence.map(user => (
                 <li class="list-separated-item">

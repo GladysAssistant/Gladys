@@ -25,26 +25,26 @@ async function getDevices() {
 
   const discovery = this.client.startDiscovery({ discoveryTimeout: 1900, discoveryInterval: 800 });
 
-  discovery.on('device-online', (device) => {
-    device.getSysInfo().then((deviceSysInfo) => {
-      const type = deviceSysInfo.type ? deviceSysInfo.type : deviceSysInfo.mic_type;
-      switch (type) {
-        case 'IOT.SMARTPLUGSWITCH':
-        case 'IOT.RANGEEXTENDER.SMARTPLUG':
-          devicesToReturn.push(getTpLinkPlug(device, deviceSysInfo, this.serviceId));
-          break;
-        case 'IOT.SMARTBULB':
-          devicesToReturn.push(getTpLinkBulb(device, deviceSysInfo, this.serviceId));
-          break;
-        default:
-          devicesToReturn.push(getTpLinkDevice(device, deviceSysInfo, this.serviceId));
-      }
-    });
+  discovery.on('device-online', async (device) => {
+    const deviceSysInfo = await device.getSysInfo();
+    const type = deviceSysInfo.type ? deviceSysInfo.type : deviceSysInfo.mic_type;
+    switch (type) {
+      case 'IOT.SMARTPLUGSWITCH':
+      case 'IOT.RANGEEXTENDER.SMARTPLUG':
+        devicesToReturn.push(getTpLinkPlug(device, deviceSysInfo, this.serviceId));
+        break;
+      case 'IOT.SMARTBULB':
+        devicesToReturn.push(getTpLinkBulb(device, deviceSysInfo, this.serviceId));
+        break;
+      default:
+        devicesToReturn.push(getTpLinkDevice(device, deviceSysInfo, this.serviceId));
+    }
   });
-  return Promise.delay(2000).then(() => {
-    discovery.removeAllListeners('device-online');
-    return uniqById(devicesToReturn);
-  });
+
+  await Promise.delay(this.discoverDevicesDelay);
+
+  discovery.removeAllListeners('device-online');
+  return uniqById(devicesToReturn);
 }
 
 module.exports = {

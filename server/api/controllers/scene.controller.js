@@ -40,7 +40,6 @@ module.exports = function SceneController(gladys) {
    * @api {get} /api/v1/scene get
    * @apiName get
    * @apiGroup Scene
-   *
    */
   async function get(req, res) {
     const scenes = await gladys.scene.get(req.query);
@@ -51,7 +50,6 @@ module.exports = function SceneController(gladys) {
    * @api {get} /api/v1/scene/:scene_selector get by selector
    * @apiName getBySelector
    * @apiGroup Scene
-   *
    */
   async function getBySelector(req, res) {
     const scene = await gladys.scene.getBySelector(req.params.scene_selector);
@@ -62,7 +60,6 @@ module.exports = function SceneController(gladys) {
    * @api {delete} /api/v1/scene/:scene_selector delete
    * @apiName delete
    * @apiGroup Scene
-   *
    */
   async function destroy(req, res) {
     await gladys.scene.destroy(req.params.scene_selector);
@@ -75,7 +72,6 @@ module.exports = function SceneController(gladys) {
    * @api {post} /api/v1/scene/:scene_selector/start start
    * @apiName start
    * @apiGroup Scene
-   *
    */
   async function start(req, res) {
     const action = {
@@ -91,7 +87,6 @@ module.exports = function SceneController(gladys) {
    * @api {post} /api/v1/scene/:scene_selector/duplicate duplicate
    * @apiName duplicate
    * @apiGroup Scene
-   *
    */
   async function duplicate(req, res) {
     const scene = await gladys.scene.duplicate(req.params.scene_selector, req.body.name, req.body.icon);

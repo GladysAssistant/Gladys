@@ -1,6 +1,8 @@
-const getApexChartStepLineOptions = ({ height, displayAxes, series, COLORS }) => {
+const getApexChartStepLineOptions = ({ height, displayAxes, series, COLORS, locales, defaultLocale }) => {
   const options = {
     chart: {
+      locales,
+      defaultLocale,
       type: 'line',
       fontFamily: 'inherit',
       height,

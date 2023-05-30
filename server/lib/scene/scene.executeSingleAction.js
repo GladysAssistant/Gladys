@@ -3,8 +3,8 @@ const { executeAction } = require('./scene.executeActions');
 
 /**
  * @description Execute an action coming from an event.
- * @param {Object} action - The action to execute.
- * @param {Object} scope - The scope of the action.
+ * @param {object} action - The action to execute.
+ * @param {object} scope - The scope of the action.
  * @example
  * scene.executeSingleAction({
  *    type: 'light.turn-on',

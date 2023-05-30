@@ -3,7 +3,6 @@ import { connect } from 'unistore/preact';
 import EweLinkPage from '../EweLinkPage';
 import UpdateDevice from '../../../../../components/device';
 
-@connect('user,session,httpClient,currentIntegration,houses', {})
 class EditEweLinkDevice extends Component {
   render(props, {}) {
     return (
@@ -19,4 +18,4 @@ class EditEweLinkDevice extends Component {
   }
 }
 
-export default EditEweLinkDevice;
+export default connect('user,session,httpClient,currentIntegration,houses', {})(EditEweLinkDevice);

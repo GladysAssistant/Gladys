@@ -260,10 +260,12 @@ const ACTIONS = {
   LIGHT: {
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
+    TOGGLE: 'light.toggle',
   },
   SWITCH: {
     TURN_ON: 'switch.turn-on',
     TURN_OFF: 'switch.turn-off',
+    TOGGLE: 'switch.toggle',
   },
   TIME: {
     DELAY: 'delay',
@@ -345,6 +347,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   LIGHT_SENSOR: 'light-sensor',
   MOTION_SENSOR: 'motion-sensor',
   OPENING_SENSOR: 'opening-sensor',
+  PM25_SENSOR: 'pm25-sensor',
+  FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
@@ -364,6 +368,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
   VOLUME_SENSOR: 'volume-sensor',
+  TEXT: 'text',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -455,6 +460,8 @@ const DEVICE_FEATURE_TYPES = {
     PLAY: 'play',
     PAUSE: 'pause',
     STOP: 'stop',
+    PREVIOUS: 'previous',
+    NEXT: 'next',
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
@@ -513,6 +520,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
+  },
+  TEXT: {
+    TEXT: 'text',
   },
 };
 
@@ -604,6 +614,8 @@ const DEVICE_FEATURE_UNITS = {
   GIGABYTES_PER_SECOND: 'gigabytes-per-second',
   // Airquality Index
   AQI: 'aqi',
+  // For air quality (pm2.5, formaldehyd)
+  MICROGRAM_PER_CUBIC_METER: 'microgram-per-cubic-meter',
 };
 
 const WEATHER_UNITS = {
@@ -718,6 +730,8 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   ],
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_UNITS.AQI],
+  [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
+  [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
 };
 
 const ACTIONS_STATUS = {

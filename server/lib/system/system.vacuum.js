@@ -2,7 +2,7 @@ const db = require('../../models');
 const logger = require('../../utils/logger');
 
 /**
- * @description Vacuum Gladys database
+ * @description Vacuum Gladys database.
  * @example
  * vacuum();
  */

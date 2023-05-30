@@ -7,7 +7,7 @@ module.exports = function EnedisService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the enedis service
+   * @description This function starts the enedis service.
    * @example
    * gladys.services.enedis.start();
    */
@@ -18,7 +18,7 @@ module.exports = function EnedisService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the enedis service
+   * @description This function stops the enedis service.
    * @example
    * gladys.services.enedis.stop();
    */

@@ -1,7 +1,7 @@
 const db = require('../../models');
 
 /**
- * @description Destroy a variable
+ * @description Destroy a variable.
  * @param {string} key - The unique key of the variable.
  * @param {string} [serviceId] - The unique ID of a service, or null.
  * @param {string} [userId] - The unique ID of a user, or null.

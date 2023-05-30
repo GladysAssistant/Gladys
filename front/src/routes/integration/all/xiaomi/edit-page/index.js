@@ -6,7 +6,6 @@ import EditPage from './EditPage';
 
 const XIAOMI_PAGE_PATH = '/dashboard/integration/device/xiaomi';
 
-@connect('user,session,httpClient,currentIntegration,houses', actions)
 class EditXiaomiDevice extends Component {
   render(props, {}) {
     return (
@@ -17,4 +16,4 @@ class EditXiaomiDevice extends Component {
   }
 }
 
-export default EditXiaomiDevice;
+export default connect('user,session,httpClient,currentIntegration,houses', actions)(EditXiaomiDevice);

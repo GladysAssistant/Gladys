@@ -18,6 +18,15 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: {
+    service: 'ContactSensor',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+        characteristics: ['ContactSensorState'],
+        notifDelay: 1000,
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     service: 'Switch',
     capabilities: {

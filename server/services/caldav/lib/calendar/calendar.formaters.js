@@ -1,8 +1,8 @@
 // From : https://github.com/peterbraden/ical.js/blob/master/example_rrule.js
 /**
  * @description Format recurring events.
- * @param {Object} event - Event to format.
- * @param {Object} gladysCalendar - Gladys calendar where event is saved.
+ * @param {object} event - Event to format.
+ * @param {object} gladysCalendar - Gladys calendar where event is saved.
  * @returns {Array} Formatted event.
  * @example
  * formatRecurringEvents(event, gladysCalendar)
@@ -130,7 +130,7 @@ function formatRecurringEvents(event, gladysCalendar) {
 /**
  * @description Format events for Gladys calendar compatibility.
  * @param {Array} caldavEvents - Events to format.
- * @param {Object} gladysCalendar - Gladys calendar where events are saved.
+ * @param {object} gladysCalendar - Gladys calendar where events are saved.
  * @returns {Array} All events formatted.
  * @example
  * formatEvents(caldavEvents, gladysCalendar)
@@ -202,7 +202,7 @@ function formatEvents(caldavEvents, gladysCalendar) {
 /**
  * @description Format calendar for Gladys compatibility.
  * @param {Array} caldavCalendars - Dav calendars to format.
- * @param {Object} userId - Gladys user, calendar owner.
+ * @param {object} userId - Gladys user, calendar owner.
  * @returns {Array} Formatted calendars.
  * @example
  * formatCalendars(calendars, userId)

@@ -15,11 +15,12 @@ const updateOrDestroyVariable = async (variable, key, value, serviceId) => {
 
 /**
  * @description Save MQTT configuration.
- * @param {Object} configuration - MQTT configuration.
+ * @param {object} configuration - MQTT configuration.
  * @param {string} [configuration.mqttUrl] - MQTT URL.
  * @param {string} [configuration.mqttUsername] - MQTT username.
  * @param {string} [configuration.mqttPassword] - MQTT password.
  * @param {boolean} [configuration.useEmbeddedBroker] - MQTT embedded broker.
+ * @returns {Promise} Resolve when configuration updated & connected.
  * @example
  * saveConfiguration(configuration);
  */

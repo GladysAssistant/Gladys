@@ -8,7 +8,7 @@ module.exports = function MqttService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts service
+   * @description This function starts service.
    * @example
    * gladys.services.mqtt.start();
    */
@@ -19,7 +19,7 @@ module.exports = function MqttService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    *  gladys.services.mqtt.stop();
    */

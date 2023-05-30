@@ -1,7 +1,7 @@
 /**
  * @description Force scanning for devices.
  * @param {string} protocol - Protocol to scan over.
- * @param {Object} options - Options used to scan.
+ * @param {object} options - Options used to scan.
  * @example
  * scan(['http'], options);
  */
