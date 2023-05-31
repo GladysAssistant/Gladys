@@ -1,14 +1,14 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
-import actions from '../../../actions/dashboard/boxes/devicesInRoom';
+import actions from '../../../actions/dashboard/boxes/devices';
 import { RequestStatus, DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import DeviceCard from './DeviceCard';
 
-class DevicesInRoomComponent extends Component {
+class DevicesComponent extends Component {
   refreshData = () => {
-    this.props.getDevicesInRoom(this.props.box, this.props.x, this.props.y);
+    this.props.getDevices(this.props.box, this.props.x, this.props.y);
   };
   updateDeviceStateWebsocket = payload => this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload);
   updateDeviceTextWebsocket = payload =>
@@ -27,9 +27,8 @@ class DevicesInRoomComponent extends Component {
   }
 
   componentDidUpdate(previousProps) {
-    const roomChanged = get(previousProps, 'box.room') !== get(this.props, 'box.room');
     const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
-    if (roomChanged || deviceFeaturesChanged) {
+    if (deviceFeaturesChanged) {
       this.refreshData();
     }
   }
@@ -47,17 +46,15 @@ class DevicesInRoomComponent extends Component {
 
   render(props, {}) {
     // safely get all data
-    const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}DevicesInRoom.${props.x}_${props.y}`);
-    const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}DevicesInRoom.${props.x}_${props.y}`);
-    const roomName = get(boxData, `room.name`);
-    const devices = get(boxData, `room.devices`);
+    const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Devices.${props.x}_${props.y}`);
+    const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Devices.${props.x}_${props.y}`);
+
+    const boxTitle = props.box.name;
+    const devices = get(boxData, `devices`);
     const loading = boxStatus === RequestStatus.Getting && !boxData;
 
-    return <DeviceCard {...props} boxData={boxData} loading={loading} boxTitle={roomName} devices={devices} />;
+    return <DeviceCard {...props} boxData={boxData} loading={loading} boxTitle={boxTitle} devices={devices} />;
   }
 }
 
-export default connect(
-  'session,user,DashboardBoxDataDevicesInRoom,DashboardBoxStatusDevicesInRoom',
-  actions
-)(DevicesInRoomComponent);
+export default connect('session,user,DashboardBoxDataDevices,DashboardBoxStatusDevices', actions)(DevicesComponent);

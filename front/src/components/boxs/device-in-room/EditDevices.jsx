@@ -1,18 +1,13 @@
 import { Component } from 'preact';
-import { Text } from 'preact-i18n';
+import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 import BaseEditBox from '../baseEditBox';
-import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import SUPPORTED_FEATURE_TYPES from './SupportedFeatureTypes';
 
-class EditDeviceInRoom extends Component {
-  updateBoxRoom = room => {
-    this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
-  };
-
+class EditDevices extends Component {
   updateDeviceFeatures = selectedDeviceFeaturesOptions => {
     selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions || [];
     const deviceFeatures = selectedDeviceFeaturesOptions.map(option => option.value);
@@ -22,16 +17,23 @@ class EditDeviceInRoom extends Component {
     this.setState({ selectedDeviceFeaturesOptions });
   };
 
+  updateName = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      name: e.target.value
+    });
+  };
+
   getDeviceFeatures = async () => {
     try {
       this.setState({ loading: true });
       // we get the rooms with the devices
-      const room = await this.props.httpClient.get(`/api/v1/room/${this.props.box.room}?expand=devices`);
+      const devices = await this.props.httpClient.get(`/api/v1/device`);
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
+      console.log(devices);
 
-      room.devices.forEach(device => {
-        const roomDeviceFeatures = [];
+      devices.forEach(device => {
+        const deviceFeatures = [];
         device.features.forEach(feature => {
           const featureOption = {
             value: feature.selector,
@@ -39,14 +41,14 @@ class EditDeviceInRoom extends Component {
           };
           // for now, we only supports binary on/off and sensors
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
-            roomDeviceFeatures.push(featureOption);
+            deviceFeatures.push(featureOption);
           }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);
           }
         });
-        if (roomDeviceFeatures.length > 0) {
-          roomDeviceFeatures.sort((a, b) => {
+        if (deviceFeatures.length > 0) {
+          deviceFeatures.sort((a, b) => {
             if (a.label < b.label) {
               return -1;
             } else if (a.label > b.label) {
@@ -56,11 +58,11 @@ class EditDeviceInRoom extends Component {
           });
           deviceOptions.push({
             label: device.name,
-            options: roomDeviceFeatures
+            options: deviceFeatures
           });
         }
       });
-      await this.setState({ room, deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -68,31 +70,30 @@ class EditDeviceInRoom extends Component {
   };
 
   componentDidMount() {
-    if (this.props.box.room) {
-      this.getDeviceFeatures();
-    }
+    this.getDeviceFeatures();
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room && this.props.box.room) {
-      this.getDeviceFeatures();
-    }
-  }
-
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, room }) {
-    const roomName = room && room.name;
+  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
     return (
-      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room" titleValue={roomName}>
+      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices">
         <div class={loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">
             <div class="form-group">
               <label>
-                <Text id="dashboard.boxes.devicesInRoom.editRoomLabel" />
+                <Text id="dashboard.boxes.devices.editDeviceFeaturesLabel" />
               </label>
-              <RoomSelector selectedRoom={props.box.room} updateRoomSelection={this.updateBoxRoom} />
+              <Localizer>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder={<Text id="dashboard.boxes.devices.editNameLabel" />}
+                  value={props.box.name}
+                  onInput={this.updateName}
+                />
+              </Localizer>
             </div>
-            {deviceOptions && props.box.room && (
+            {deviceOptions && (
               <div class="form-group">
                 <label>
                   <Text id="dashboard.boxes.devicesInRoom.editDeviceFeaturesLabel" />
@@ -114,4 +115,4 @@ class EditDeviceInRoom extends Component {
   }
 }
 
-export default withIntlAsProp(connect('httpClient', {})(EditDeviceInRoom));
+export default withIntlAsProp(connect('httpClient', {})(EditDevices));
