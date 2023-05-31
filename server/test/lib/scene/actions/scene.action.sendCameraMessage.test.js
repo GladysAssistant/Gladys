@@ -20,8 +20,7 @@ describe('scene.send-camera-message', () => {
     const device = {
       camera: {
         getImage: fake.resolves('image-content'),
-      }
-
+      },
     };
     const scope = {};
     await executeActions(
