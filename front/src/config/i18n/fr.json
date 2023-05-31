@@ -1218,6 +1218,13 @@
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
+      "messageCameraSend": {
+        "userLabel": "Utilisateur",
+        "cameraLabel": "Camera",
+        "textLabel": "Message",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
@@ -1338,7 +1345,8 @@
         "set-value": "Contrôler un appareil"
       },
       "message": {
-        "send": "Envoyer un message"
+        "send": "Envoyer un message",
+        "send-camera": "Envoyer une image de camera par message"
       },
       "delay": "Attendre",
       "light": {

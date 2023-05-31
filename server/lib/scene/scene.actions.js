@@ -189,6 +189,11 @@ const actionsFunc = {
     const textWithVariables = Handlebars.compile(action.text)(scope);
     await self.message.sendToUser(action.user, textWithVariables);
   },
+  [ACTIONS.MESSAGE.SEND_CAMERA]: async (self, action, scope) => {
+    const textWithVariables = Handlebars.compile(action.text)(scope);
+    const image = await self.device.camera.getImage(action.camera);
+    await self.message.sendToUser(action.user, textWithVariables, image);
+  },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {
     const deviceFeature = self.stateManager.get('deviceFeature', action.device_feature);
     set(

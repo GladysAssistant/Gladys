@@ -1218,6 +1218,13 @@
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
+      "messageCameraSend": {
+        "userLabel": "User",
+        "cameraLabel": "Camera",
+        "textLabel": "Message",
+        "textPlaceholder": "Message text",
+        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+      },
       "turnOnLights": {
         "label": "Select the lights you want to turn on"
       },
@@ -1338,7 +1345,8 @@
         "set-value": "Set device value"
       },
       "message": {
-        "send": "Send Message"
+        "send": "Send Message",
+        "send-camera": "Send a camera image by message"
       },
       "delay": "Wait",
       "light": {
