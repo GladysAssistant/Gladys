@@ -32,7 +32,7 @@ skip_if: "<%= module %>"
       },
       "discover": {
         "title": "Devices detected on your <%= module %> cloud account",
-        "description": "<%= module %> devices are automatically discovered. Your E<%= module %>covacs devices need to be added to your <%= module %> cloud account before.",
+        "description": "<%= module %> devices are automatically discovered. Your <%= module %> devices need to be added to your <%= module %> cloud account before.",
         "error": "Error discovering <%= module %> devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No <%= module %> device discovered.",
         "scan": "Scan"

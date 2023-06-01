@@ -8,10 +8,6 @@ import <%= className %>Page from '../<%= className %>Page';
 import SetupTab from './SetupTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,<%= attributeName %>Username,<%= attributeName %>Password,<%= attributeName %>ConnectionStatus,<%= attributeName %>Connected,<%= attributeName %>ConnectionError',
-  actions
-)
 class <%= className %>SetupPage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('<%= module %>');
@@ -40,4 +36,7 @@ class <%= className %>SetupPage extends Component {
   }
 }
 
-export default <%= className %>SetupPage;
+export default connect(
+  'user,session,<%= attributeName %>Username,<%= attributeName %>Password,<%= attributeName %>ConnectionStatus,<%= attributeName %>Connected,<%= attributeName %>ConnectionError',
+  actions
+)(<%= className %>SetupPage);

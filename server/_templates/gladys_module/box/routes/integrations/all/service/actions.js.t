@@ -61,6 +61,28 @@ function createActions(store) {
         });
       }
     },
+    async get<%= className %>Devices(state) {
+      store.setState({
+        get<%= className %>DevicesStatus: RequestStatus.Getting
+      });
+      try {
+        const options = {
+          order_dir: 'asc'
+        };
+        if (state.<%= attributeName %>Search && state.awesomeSearch.length) {
+          options.search = state.<%= attributeName %>Search;
+        }
+        const <%= attributeName %>Devices = await state.httpClient.get('/api/v1/service/<%= module %>/device', options);
+        store.setState({
+          <%= attributeName %>Devices,
+          get<%= className %>DevicesStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          get<%= className %>DevicesStatus: RequestStatus.Error
+        });
+      }
+    },
     displayConnectedMessage() {
       // display 3 seconds a message "<%= className %> connected"
       store.setState({
