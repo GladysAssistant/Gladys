@@ -938,6 +938,7 @@ const JOB_TYPES = {
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
+  SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
 };
 
 const JOB_STATUS = {
