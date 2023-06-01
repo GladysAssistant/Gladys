@@ -15,8 +15,11 @@ const { CONFIGURATION } = require('../utils/<%= module %>.constants');
  */
 async function saveConfiguration({ login, password }) {
   logger.debug(`<%= className %>: save config`);
+  logger.debug(
+    `<%= className %>: save config with ${CONFIGURATION.<%= constName %>_LOGIN_KEY}=${login},${CONFIGURATION.<%= constName %>_PASSWORD_KEY}=${password}`,
+  );
   await this.gladys.variable.setValue(CONFIGURATION.<%= constName %>_LOGIN_KEY, login, this.serviceId);
-  await this.gladys.variable.setValue(CONFIGURATION.<%= constName %>_COUNTRY_KEY, password, this.serviceId);
+  await this.gladys.variable.setValue(CONFIGURATION.<%= constName %>_PASSWORD_KEY, password, this.serviceId);
   return null;
 }
 

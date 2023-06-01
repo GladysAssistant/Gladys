@@ -44,7 +44,7 @@ function createActions(store) {
       try {
         const { <%= attributeName %>Username, <%= attributeName %>Password } = state;
         await state.httpClient.post('/api/v1/service/<%= module %>/config', {
-          accountId: <%= attributeName %>Username,
+          login: <%= attributeName %>Username,
           password: (state.passwordChanges && <%= attributeName %>Password) || undefined
         });
         await state.httpClient.get(`/api/v1/service/<%= module %>/connect`);
