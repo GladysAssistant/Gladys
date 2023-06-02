@@ -195,7 +195,7 @@ const actionsFunc = {
       scope,
       `${columnIndex}`,
       {
-        [rowIndex]: deviceFeature,
+        [rowIndex]: cloneDeep(deviceFeature),
       },
       { merge: true },
     );
