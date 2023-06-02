@@ -30,7 +30,6 @@ class EditDevices extends Component {
       const devices = await this.props.httpClient.get(`/api/v1/device`);
       const deviceOptions = [];
       const selectedDeviceFeaturesOptions = [];
-      console.log(devices);
 
       devices.forEach(device => {
         const deviceFeatures = [];
