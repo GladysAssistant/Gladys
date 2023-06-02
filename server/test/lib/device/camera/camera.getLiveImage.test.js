@@ -43,7 +43,7 @@ describe('Camera.getLiveImage', () => {
     const stateManager = new StateManager(event);
     const serviceManager = new ServiceManager({}, stateManager);
     serviceManager.getServiceById = fake.returns(null);
-    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
+    const deviceManager = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
     stateManager.setState('device', 'test-camera-2', {});
     const promise = deviceManager.camera.getLiveImage('test-camera-2');
     return assert.isRejected(promise, 'Service is not found or not configured.');
