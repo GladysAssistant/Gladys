@@ -1,5 +1,7 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
+
 import DeviceFeatureState from './triggers/DeviceFeatureState';
 import ScheduledTrigger from './triggers/ScheduledTrigger';
 import ChooseTriggerType from './triggers/ChooseTriggerTypeCard';
@@ -31,12 +33,7 @@ const TriggerCard = ({ children, ...props }) => (
       {props.trigger.type === EVENTS.CALENDAR.EVENT_IS_COMING && <i class="fe fe-calendar" />}
       {props.trigger.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
-        <i
-          class={props.trigger.icon}
-          style={{
-            marginRight: '10px'
-          }}
-        />{' '}
+        <i class={cx('mr-3', props.trigger.icon)} />
         <Text id={`editScene.triggers.${props.trigger.type}`} />
         {props.trigger.type === null && <Text id="editScene.newTrigger" />}
       </div>
