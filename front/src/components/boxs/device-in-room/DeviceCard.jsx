@@ -21,8 +21,7 @@ const changeAllLightsStatusRoom = (props, boxData) => () => {
 };
 
 const DeviceCard = ({ children, ...props }) => {
-  console.log(props);
-  const { boxTitle, boxData, loading, devices = [], box = {} } = props;
+  const { boxTitle, roomLightStatus, loading, devices = [], box = {} } = props;
   const { device_features: featureSelectors = [] } = box;
 
   const hasBinaryLightDeviceFeature = devices.find(device => hasSwitchFeature(device, featureSelectors)) !== undefined;
@@ -36,11 +35,11 @@ const DeviceCard = ({ children, ...props }) => {
             <label class="custom-switch m-0">
               <input
                 type="checkbox"
-                name={boxData.room.selector}
+                name={props.room.selector}
                 value="1"
                 class="custom-switch-input"
-                checked={boxData.roomLightStatus === 1}
-                onClick={changeAllLightsStatusRoom(props, boxData)}
+                checked={roomLightStatus === 1}
+                onClick={changeAllLightsStatusRoom(props, roomLightStatus)}
               />
               <span class="custom-switch-indicator" />
             </label>

@@ -1,18 +1,128 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import get from 'get-value';
-import actions from '../../../actions/dashboard/boxes/devices';
-import { RequestStatus, DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
+import { RequestStatus } from '../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import DeviceCard from './DeviceCard';
+import update from "immutability-helper";
+import debounce from "debounce";
+
+const updateDevices = (devices, deviceFeatureSelector, lastValue, lastValueChange) => {
+  return devices.map((device) => {
+    return {
+      ...device,
+      features: device.features.map((feature) => {
+        if (feature.selector === deviceFeatureSelector) {
+          return {
+            ...feature,
+            last_value: lastValue,
+            last_value_changed: lastValueChange
+          }
+        }
+        return feature;
+      })
+    }
+  })
+}
 
 class DevicesComponent extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      devices: [],
+      status: RequestStatus.Getting,
+    };
+  }
+
   refreshData = () => {
-    this.props.getDevices(this.props.box, this.props.x, this.props.y);
+    this.getDevices();
   };
-  updateDeviceStateWebsocket = payload => this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload);
-  updateDeviceTextWebsocket = payload =>
-    this.props.deviceFeatureStringStateWebsocketEvent(this.props.x, this.props.y, payload);
+
+  getDevices = async () => {
+    this.setState({ status: RequestStatus.Getting });
+    try {
+      //TODO Filter
+      const devices = await this.props.httpClient.get(`/api/v1/device`);
+      this.setState({
+        devices,
+        status: RequestStatus.Success
+      });
+    } catch (e) {
+      this.setState({
+        status: RequestStatus.Error
+      });
+    }
+  };
+
+  updateDeviceStateWebsocket = payload => {
+    let devices = this.state.devices;
+    if (devices) {
+      devices = updateDevices(
+        devices,
+        payload.device_feature_selector,
+        payload.last_value,
+        payload.last_value_changed
+      );
+      this.setState({
+        devices
+      })
+    }
+  }
+  updateDeviceTextWebsocket = payload => {
+    let devices = this.state.devices;
+    if (devices) {
+      devices = updateDevices(
+        devices,
+        payload.device_feature,
+        payload.last_value,
+        payload.last_value_changed
+      );
+      this.setState({
+        devices
+      })
+    }
+  }
+
+  setValueDevice = async (deviceFeature, value) => {
+    await this.props.httpClient.post(`/api/v1/device_feature/${deviceFeature.selector}/value`, {
+      value
+    });
+  }
+
+  //Remove x, y when DeviceInRoom is rewrite without action
+  updateValue = async (x, y, device, deviceFeature, deviceIndex, featureIndex, value) => {
+    const devices = updateDevices(
+      this.state.devices,
+      deviceFeature.selector,
+      value,
+      new Date()
+    );
+    this.setState({
+      devices
+    })
+    await this.setValueDevice(deviceFeature, value);
+  }
+
+  setValueDeviceDebounce = async (deviceFeature, value) => {
+    debounce(() => {
+      this.updateValue(deviceFeature, value);
+    }, 500);
+  }
+
+
+  //Remove x, y when DeviceInRoom is rewrite without action
+  updateValueWithDebounce = async (x, y, device, deviceFeature, deviceIndex, featureIndex, value) => {
+    const devices = updateDevices(
+      this.state.devices,
+      deviceFeature.selector,
+      value,
+      new Date()
+    );
+    this.setState({
+      devices
+    })
+    await this.setValueDeviceDebounce(deviceFeature, value);
+  }
 
   componentDidMount() {
     this.refreshData();
@@ -44,17 +154,19 @@ class DevicesComponent extends Component {
     );
   }
 
-  render(props, {}) {
-    // safely get all data
-    const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Devices.${props.x}_${props.y}`);
-    const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Devices.${props.x}_${props.y}`);
-
+  render(props, {devices, status}) {
     const boxTitle = props.box.name;
-    const devices = get(boxData, `devices`);
-    const loading = boxStatus === RequestStatus.Getting && !boxData;
+    const loading = status === RequestStatus.Getting && !status;
 
-    return <DeviceCard {...props} boxData={boxData} loading={loading} boxTitle={boxTitle} devices={devices} />;
+    return <DeviceCard
+      {...props}
+      loading={loading}
+      boxTitle={boxTitle}
+      devices={devices}
+      updateValue={this.updateValue}
+      updateValueWithDebounce={this.updateValueWithDebounce}
+    />;
   }
 }
 
-export default connect('session,user,DashboardBoxDataDevices,DashboardBoxStatusDevices', actions)(DevicesComponent);
+export default connect('session,httpClient', {})(DevicesComponent);
