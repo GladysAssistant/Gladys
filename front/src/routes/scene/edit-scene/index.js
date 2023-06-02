@@ -377,13 +377,18 @@ class EditScene extends Component {
       return null;
     }
     const element = this.state.scene.actions[originalY][originalX];
-
+    const variable = this.state.variables[originalY][originalX];
     const newStateWithoutElement = update(this.state, {
       scene: {
         actions: {
           [originalY]: {
             $splice: [[originalX, 1]]
           }
+        }
+      },
+      variables: {
+        [originalY]: {
+          $splice: [[originalX, 1]]
         }
       }
     });
@@ -394,6 +399,47 @@ class EditScene extends Component {
             $splice: [[destX, 0, element]]
           }
         }
+      },
+      variables: {
+        [destY]: {
+          $splice: [[destX, 0, variable]]
+        }
+      }
+    });
+    await this.setState(newState);
+  };
+
+  moveCardGroup = async (index, destIndex) => {
+    // incorrect coordinates
+    if (destIndex < 0) {
+      return null;
+    }
+
+    if (destIndex >= this.state.scene.actions.length) {
+      return null;
+    }
+
+    const element = this.state.scene.actions[index];
+    const variable = this.state.variables[index];
+
+    const newStateWithoutElement = update(this.state, {
+      scene: {
+        actions: {
+          $splice: [[index, 1]]
+        }
+      },
+      variables: {
+        $splice: [[index, 1]]
+      }
+    });
+    const newState = update(newStateWithoutElement, {
+      scene: {
+        actions: {
+          $splice: [[destIndex, 0, element]]
+        }
+      },
+      variables: {
+        $splice: [[destIndex, 0, variable]]
       }
     });
     await this.setState(newState);
@@ -454,6 +500,7 @@ class EditScene extends Component {
             setNameInputRef={this.setNameInputRef}
             duplicateScene={this.duplicateScene}
             moveCard={this.moveCard}
+            moveCardGroup={this.moveCardGroup}
             updateSceneDescription={this.updateSceneDescription}
             toggleIsDescriptionEditable={this.toggleIsDescriptionEditable}
             isDescriptionEditable={isDescriptionEditable}

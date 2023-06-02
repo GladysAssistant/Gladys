@@ -9,12 +9,13 @@ import TriggerGroup from './TriggerGroup';
 import style from './style.css';
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
+const ACTION_GROUP_TYPE = 'ACTION_GROUP_TYPE';
 
 const EditScenePage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
-        <AutoScrollMobile position="top" box_type={ACTION_CARD_TYPE} />
+        <AutoScrollMobile position="top" box_type={[ACTION_CARD_TYPE, ACTION_GROUP_TYPE]} />
         <div class="container">
           <div class="mb-4">
             <div class="d-flex justify-content-between flex-column flex-lg-row align-items-lg-center align-items-start">
@@ -140,6 +141,7 @@ const EditScenePage = ({ children, ...props }) => (
               <div class="row">
                 <ActionGroup
                   moveCard={props.moveCard}
+                  moveCardGroup={props.moveCardGroup}
                   addAction={props.addAction}
                   deleteActionGroup={props.deleteActionGroup}
                   actions={parallelActions}
@@ -172,7 +174,7 @@ const EditScenePage = ({ children, ...props }) => (
             </div>
           ))}
         </div>
-        <AutoScrollMobile position="bottom" box_type={ACTION_CARD_TYPE} />
+        <AutoScrollMobile position="bottom" box_type={[ACTION_CARD_TYPE, ACTION_GROUP_TYPE]} />
       </div>
     </div>
   </div>

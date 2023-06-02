@@ -4,6 +4,7 @@ import cx from 'classnames';
 import { useRef } from 'preact/hooks';
 import { useDrag, useDrop } from 'react-dnd';
 
+import style from './style.css';
 import { ACTIONS } from '../../../../../server/utils/constants';
 
 // Actions cards
@@ -93,13 +94,10 @@ const ActionCard = ({ children, ...props }) => {
     >
       <div
         ref={ref}
-        class="card"
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-          cursor: 'pointer',
-          backgroundColor: isActive ? '#ecf0f1' : undefined,
-          userSelect: 'none'
-        }}
+        class={cx('card cursor-pointer user-select-none', {
+          [style.dropZoneActive]: isActive,
+          [style.dropZoneDragging]: isDragging
+        })}
       >
         <div ref={drag} class="card-header">
           {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
@@ -113,7 +111,7 @@ const ActionCard = ({ children, ...props }) => {
           )}
           <div class="card-options">
             <a>
-              <i style={{ cursor: 'move' }} class="fe fe-move mr-4" />
+              <i class="fe fe-move mr-4" />
             </a>
             <a
               onClick={deleteActionFromColumn(props.columnIndex, props.index, props.deleteAction)}

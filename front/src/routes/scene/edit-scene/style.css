@@ -21,6 +21,10 @@
   background-color: #ecf0f1;
 }
 
+.dropZoneDragging {
+  opacity: 0.5;
+}
+
 @media (min-width: 768px) {
   .plusButton {
     right: 0;
