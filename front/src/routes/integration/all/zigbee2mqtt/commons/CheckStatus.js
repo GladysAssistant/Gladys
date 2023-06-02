@@ -4,7 +4,8 @@ import { connect } from 'unistore/preact';
 import actions from './actions';
 import { Text } from 'preact-i18n';
 
-class CheckStatus extends Component {
+class
+CheckStatus extends Component {
   componentWillMount() {
     this.props.checkStatus();
   }

@@ -890,6 +890,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS: 'melcloud.status',
     DISCOVER: 'melcloud.discover',
   },
+  NODERED: {
+    STATUS_CHANGE: 'nodered.status-change',
+    MQTT_ERROR: 'nodered.mqtt-error',
+  },
 };
 
 const DASHBOARD_TYPE = {

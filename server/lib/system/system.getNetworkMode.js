@@ -12,6 +12,7 @@ async function getNetworkMode() {
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
+  return 'host';
   if (!this.networkMode) {
     const containerId = await this.getGladysContainerId();
     const gladysContainer = this.dockerode.getContainer(containerId);

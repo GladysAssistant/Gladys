@@ -47,7 +47,7 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
    */
   async function installNodeRedContainer(req, res) {
     logger.debug('Install NodeRed container');
-    await nodeRedManager.installNodeRedContainer();
+    await nodeRedManager.installContainer();
     res.json({
       success: true,
     });
@@ -81,7 +81,7 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
     },
     'post /api/v1/service/node-red/start': {
       authenticated: true,
-      controller: asyncMiddleware(installNodeRedContainer()),
+      controller: asyncMiddleware(installNodeRedContainer),
     },
     'post /api/v1/service/node-red/disconnect': {
       authenticated: true,

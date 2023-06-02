@@ -27,12 +27,9 @@ async function init() {
 
   logger.debug('NodeRed: installing and starting required docker containers...');
   await this.checkForContainerUpdates(configuration);
-  await this.installMqttContainer(configuration);
-  await this.installZ2mContainer(configuration);
+  await this.installContainer(configuration);
 
   if (this.isEnabled()) {
-    await this.connect(configuration);
-
     // Schedule reccurent job if not already scheduled
     if (!this.backupScheduledJob) {
       this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());

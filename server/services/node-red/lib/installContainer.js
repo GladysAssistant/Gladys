@@ -5,6 +5,7 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const containerDescriptor = require('../docker/gladys-node-red-container.json');
+const {PlatformNotCompatible} = require('../../../utils/coreErrors');
 
 const sleep = promisify(setTimeout);
 
@@ -15,6 +16,18 @@ const sleep = promisify(setTimeout);
  * await nodeRed.installContainer(config);
  */
 async function installContainer(config) {
+  const dockerBased = await this.gladys.system.isDocker();
+  if (!dockerBased) {
+    this.dockerBased = false;
+    throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
+  }
+
+  const networkMode = await this.gladys.system.getNetworkMode();
+  if (networkMode !== 'host') {
+    this.networkModeValid = false;
+    throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
+  }
+
 
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
@@ -22,8 +35,9 @@ async function installContainer(config) {
   });
   let [container] = dockerContainers;
 
-  const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
-  const containerPath = `${basePathOnHost}/node-red`;
+  // const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
+  // const containerPath = `${basePathOnHost}/node-red`;
+  const basePathOnContainer = ``;// TODO CHange
   if (dockerContainers.length === 0) {
     // Restore backup only in case of new installation
     // await this.restoreZ2mBackup(containerPath);
@@ -35,17 +49,18 @@ async function installContainer(config) {
       await this.gladys.system.pull(containerDescriptor.Image);
 
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+      console.log(containerDescriptorToMutate);
 
       logger.info(`Creation of container...`);
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerLog);
       logger.info('NodeRed: successfully installed and configured as Docker container');
-      this.zigbee2mqttExist = true;
+      this.nodeRedExist = true;
     } catch (e) {
-      this.zigbee2mqttExist = false;
-      logger.error('Zigbee2mqtt failed to install as Docker container:', e);
+      this.nodeRedExist = false;
+      logger.error('NodeRed: failed to install as Docker container:', e);
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+        type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
       });
       throw e;
     }
@@ -62,23 +77,23 @@ async function installContainer(config) {
 
     // Check if we need to restart the container (container is not running / config changed)
     if (container.state !== 'running' || configChanged) {
-      logger.info('Zigbee2mqtt container is (re)starting...');
+      logger.info('NodeRed: container is (re)starting...');
       await this.gladys.system.restartContainer(container.id);
       // wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
     }
 
-    logger.info('Zigbee2mqtt container successfully started');
+    logger.info('NodeRed: container successfully started');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
     });
-    this.zigbee2mqttRunning = true;
-    this.zigbee2mqttExist = true;
+    this.nodeRedRunning = true;
+    this.nodeRedExist = true;
   } catch (e) {
-    logger.error('Zigbee2mqtt container failed to start:', e);
-    this.zigbee2mqttRunning = false;
+    logger.error('NodeRed: container failed to start:', e);
+    this.nodeRedRunning = false;
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
     });
     throw e;
   }

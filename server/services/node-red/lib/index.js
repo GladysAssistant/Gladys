@@ -2,18 +2,17 @@ const { init } = require('./init');
 const { getConfiguration } = require('./getConfiguration');
 const { saveConfiguration } = require('./saveConfiguration');
 const { installContainer } = require('./installContainer');
-
-const { connect } = require('./connect');
-const { disconnect } = require('./disconnect');
-const { status } = require('./status');
-const { isEnabled } = require('./isEnabled');
+const { backup } = require('./backup');
 const { checkForContainerUpdates } = require('./checkForContainerUpdates');
+const { disconnect } = require('./disconnect');
+const { isEnabled } = require('./isEnabled');
+const { status } = require('./status');
+
 
 const { configureContainer } = require('./configureContainer');
-const { setup } = require('./setup');
 const { saveZ2mBackup } = require('./saveZ2mBackup');
 const { restoreZ2mBackup } = require('./restoreZ2mBackup');
-const { backup } = require('./backup');
+
 const { JOB_TYPES } = require('../../../utils/constants');
 
 /**
@@ -42,20 +41,20 @@ const NodeRedManager = function NodeRedManager(gladys, serviceId) {
   this.backupScheduledJob = null;
 };
 
+
 NodeRedManager.prototype.init = init;
 NodeRedManager.prototype.getConfiguration = getConfiguration;
 NodeRedManager.prototype.saveConfiguration = saveConfiguration;
 NodeRedManager.prototype.installContainer = installContainer;
-
-NodeRedManager.prototype.connect = connect;
-NodeRedManager.prototype.disconnect = disconnect;
-NodeRedManager.prototype.status = status;
-NodeRedManager.prototype.isEnabled = isEnabled;
+NodeRedManager.prototype.backup = backup;
 NodeRedManager.prototype.checkForContainerUpdates = checkForContainerUpdates;
+NodeRedManager.prototype.disconnect = disconnect;
+NodeRedManager.prototype.isEnabled = isEnabled;
+NodeRedManager.prototype.status = status;
+
 NodeRedManager.prototype.configureContainer = configureContainer;
-NodeRedManager.prototype.setup = setup;
 NodeRedManager.prototype.saveZ2mBackup = saveZ2mBackup;
 NodeRedManager.prototype.restoreZ2mBackup = restoreZ2mBackup;
-NodeRedManager.prototype.backup = backup;
+
 
 module.exports = NodeRedManager;

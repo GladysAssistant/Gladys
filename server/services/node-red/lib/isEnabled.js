@@ -1,11 +1,11 @@
 /**
- * @description Checks if z2m is ready to use.
- * @returns {boolean} Is the z2m environment ready to use?
+ * @description Checks if Node-red is ready to use.
+ * @returns {boolean} Is the Node-red environment ready to use?
  * @example
- * z2m.isEnabled();
+ * nodeRed.isEnabled();
  */
 function isEnabled() {
-  return this.mqttRunning && this.zigbee2mqttRunning && this.usbConfigured;
+  return this.nodeRedRunning;
 }
 
 module.exports = {

@@ -7,6 +7,8 @@ const fs = require('fs');
  * isDocker();
  */
 function isDocker() {
+  return Promise.resolve(true);
+
   return new Promise((resolve) => {
     fs.access('/.dockerenv', fs.constants.F_OK, (err) => {
       if (err) {

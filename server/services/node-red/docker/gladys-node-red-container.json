@@ -1,7 +1,9 @@
 {
   "name": "gladys-node-red",
   "Image": "nodered/node-red:latest",
-  "ExposedPorts": {},
+  "ExposedPorts": {
+    "1880/tcp": {}
+  },
   "HostConfig": {
     "Binds": [
       "/var/lib/gladysassistant/node-red:/data"
@@ -12,7 +14,13 @@
         "max-size": "10m"
       }
     },
-    "PortBindings": {},
+    "PortBindings": {
+      "1880/tcp": [
+        {
+          "HostPort": "1880"
+        }
+      ]
+    },
     "RestartPolicy": {
       "Name": "always"
     },

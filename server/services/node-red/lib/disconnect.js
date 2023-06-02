@@ -1,8 +1,7 @@
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
-const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
-const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
+const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.json');
 
 /**
  * @description Disconnect service from dependent containers.
@@ -17,44 +16,24 @@ async function disconnect() {
     this.backupScheduledJob.cancel();
   }
 
-  // Disconnect from MQTT broker
-  if (this.mqttClient) {
-    logger.debug(`Disconnecting existing MQTT server...`);
-    this.mqttClient.end();
-    this.mqttClient.removeAllListeners();
-    this.mqttClient = null;
-  } else {
-    logger.debug('Not connected');
-  }
   this.gladysConnected = false;
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+    type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
   });
 
-  // Stop MQTT container
-  let dockerContainer = await this.gladys.system.getContainers({
+  // Stop NodeRed container
+  const dockerContainer = await this.gladys.system.getContainers({
     all: true,
-    filters: { name: [mqttContainerDescriptor.name] },
+    filters: { name: [nodeRedContainerDescriptor.name] },
   });
   [container] = dockerContainer;
   await this.gladys.system.stopContainer(container.id);
-  this.mqttRunning = false;
+  this.nodeRedRunning = false;
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+    type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
   });
 
-  // Stop zigbee2mqtt container
-  dockerContainer = await this.gladys.system.getContainers({
-    all: true,
-    filters: { name: [zigbee2mqttContainerDescriptor.name] },
-  });
-  [container] = dockerContainer;
-  await this.gladys.system.stopContainer(container.id);
-  this.zigbee2mqttRunning = false;
-  this.zigbee2mqttConnected = false;
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-  });
+
 }
 
 module.exports = {

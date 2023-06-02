@@ -733,6 +733,52 @@
       "saveError": "Une erreur s'est produite lors de la sauvegarde.",
       "documentation": "Documentation Zigbee2mqtt"
     },
+    "node-red": {
+      "title": "Node-red",
+      "description": "Contrôlez vos appareils via Node-red TODO.",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Node-red",
+      "status": {
+        "notInstalled": "Le server Node-red n'a pas pu être installé.",
+        "notRunning": "Le server Node-red n'a pas démarré.",
+        "running": "Node-red démarré avec succès.",
+
+        "zigbee2mqttNotInstalled": "Zigbee2mqtt n'a pas pu être installé.",
+        "zigbee2mqttNotRunning": "Zigbee2mqtt n'a pas démarré.",
+        "gladysNotConnected": "Gladys n'a pas réussi à se connecter au broker MQTT",
+        "zigbee2mqttNotConnected": "Zigbee2mqtt n'a pas réussi à se connecter au broker MQTT",
+        "settingsPageLink": "la page de paramétrage du dongle USB",
+        "setupPageLink": "la page de configuration de Zigbee2mqtt"
+      },
+      "setup": {
+        "title": "Configuration du service Node-red",
+        "description": "Ce service utilise un container Docker. Activer Node-red pour déployer ce container.\nPour en savoir plus, rendez-vous sur la page de documentation Node-red",
+        "error": "Une erreur s'est produite au démarrage du service Node-red.",
+        "enableLabel": "Activation du service Node-red",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Node-red depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Node-red depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
+        "enableNodeRed": "Activer Node-red",
+        "serviceStatus": "Etat du service Node-red",
+        "containersStatus": "Conteneurs liés à Node-red",
+        "status": "Status",
+        "node-red": "Node-red",
+        "gladys": "Gladys"
+      },
+
+      "noDeviceFound": "Auncun appareil zigbee2mqtt n'a encore été ajouté.",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Donner un nom à l'appareil",
+      "roomLabel": "Pièce",
+      "topicLabel": "Sujet MQTT",
+      "topicPlaceholder": "%topic% zigbee2mqtt MQTT value",
+      "featuresLabel": "Fonctionnalités",
+      "saveButton": "Sauvegarder",
+      "deleteButton": "Supprimer",
+      "updateButton": "Mettre à jour",
+      "alreadyExistsButton": "Déjà créé",
+      "saveError": "Une erreur s'est produite lors de la sauvegarde."
+    },
+
     "googleHome": {
       "title": "Google Home",
       "description": "Contrôlez vos appareils Gladys à la voix dans Google Home",

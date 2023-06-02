@@ -10,7 +10,7 @@ const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.
  * await nodeRed.checkForContainerUpdates(config);
  */
 async function checkForContainerUpdates(config) {
-  logger.info('Checking for current installed versions and required updates...');
+  logger.info('NodeRed: Checking for current installed versions and required updates...');
 
   // Check for MQTT container version
   if (config.dockerNodeRedVersion !== DEFAULT.DOCKER_NODE_RED_VERSION) {
@@ -22,7 +22,7 @@ async function checkForContainerUpdates(config) {
     });
 
     if (containers.length !== 0) {
-      logger.debug('Removing current installed NodeRed container...');
+      logger.debug('NodeRed: Removing current installed NodeRed container...');
       // If container is present, we remove it
       // The init process will create it again
       const [container] = containers;

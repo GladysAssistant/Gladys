@@ -2,13 +2,15 @@ const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
- * @description Create a Z2M backup.
+ * @description Create a Node-red backup.
  * @param {string} jobId - The job id.
  * @returns {Promise} - Resolve when backup is finished.
  * @example
  * backup('aaf45861-c7f5-47ac-bde1-cfe56c7789cf');
  */
 async function backup(jobId) {
+  // TODO Make backup
+
   // Backup is not possible when service is not running
   if (!this.isEnabled()) {
     throw new ServiceNotConfiguredError('SERVICE_NOT_CONFIGURED');
@@ -36,9 +38,9 @@ async function backup(jobId) {
   });
 
   // Request z2m to generate a new backup.
-  logger.info('Zigbee2MQTT request for backup');
+  logger.info('Node-red: request for backup');
   await this.gladys.job.updateProgress(jobId, 30);
-  this.mqttClient.publish('zigbee2mqtt/bridge/request/backup');
+
 
   return response;
 }
