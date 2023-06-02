@@ -191,7 +191,7 @@ const actionsFunc = {
   },
   [ACTIONS.MESSAGE.SEND_CAMERA]: async (self, action, scope) => {
     const textWithVariables = Handlebars.compile(action.text)(scope);
-    const image = await self.device.camera.getImage(action.camera);
+    const image = await self.device.camera.getLiveImage(action.camera);
     await self.message.sendToUser(action.user, textWithVariables, image);
   },
   [ACTIONS.DEVICE.GET_VALUE]: async (self, action, scope, columnIndex, rowIndex) => {

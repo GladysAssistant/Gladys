@@ -5,11 +5,6 @@ import { Text } from 'preact-i18n';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
-const helpTextStyle = {
-  fontSize: 12,
-  marginBottom: '.375rem'
-};
-
 class SendMessageParams extends Component {
   getOptions = async () => {
     try {
@@ -67,7 +62,7 @@ class SendMessageParams extends Component {
       <div>
         <div class="form-group">
           <label class="form-label">
-            <Text id="editScene.actionsCard.messageCameraSend.userLabel" />
+            <Text id="editScene.actionsCard.messageSend.userLabel" />
             <span class="form-required">
               <Text id="global.requiredField" />
             </span>
@@ -84,13 +79,13 @@ class SendMessageParams extends Component {
         </div>
         <div class="form-group">
           <label class="form-label">
-            <Text id="editScene.actionsCard.messageCameraSend.textLabel" />{' '}
+            <Text id="editScene.actionsCard.messageSend.textLabel" />{' '}
             <span class="form-required">
               <Text id="global.requiredField" />
             </span>
           </label>
-          <div style={helpTextStyle}>
-            <Text id="editScene.actionsCard.messageCameraSend.explanationText" />
+          <div class="mb-1 small">
+            <Text id="editScene.actionsCard.messageSend.explanationText" />
           </div>
           <div className="tags-input">
             <TextWithVariablesInjected

@@ -5,11 +5,6 @@ import { Text } from 'preact-i18n';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
-const helpTextStyle = {
-  fontSize: 12,
-  marginBottom: '.375rem'
-};
-
 class SendMessageCameraParams extends Component {
   getOptions = async () => {
     try {
@@ -23,7 +18,6 @@ class SendMessageCameraParams extends Component {
       });
 
       const cameras = await this.props.httpClient.get('/api/v1/camera');
-      console.log(cameras);
       const cameraOptions = cameras.map(camera => ({
         label: camera.name,
         value: camera.selector
@@ -130,7 +124,7 @@ class SendMessageCameraParams extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <div style={helpTextStyle}>
+          <div class="mb-1 small">
             <Text id="editScene.actionsCard.messageCameraSend.explanationText" />
           </div>
           <div className="tags-input">
