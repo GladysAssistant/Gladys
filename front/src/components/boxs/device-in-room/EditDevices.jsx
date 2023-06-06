@@ -95,7 +95,7 @@ class EditDevices extends Component {
             {deviceOptions && (
               <div class="form-group">
                 <label>
-                  <Text id="dashboard.boxes.devicesInRoom.editDeviceFeaturesLabel" />
+                  <Text id="dashboard.boxes.devices.editDeviceFeaturesLabel" />
                 </label>
                 <Select
                   defaultValue={[]}

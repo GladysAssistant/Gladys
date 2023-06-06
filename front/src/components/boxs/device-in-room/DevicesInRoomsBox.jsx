@@ -51,9 +51,19 @@ class DevicesInRoomComponent extends Component {
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}DevicesInRoom.${props.x}_${props.y}`);
     const roomName = get(boxData, `room.name`);
     const devices = get(boxData, `room.devices`);
+
+    const roomLightStatus = get(boxData, `roomLightStatus`);
     const loading = boxStatus === RequestStatus.Getting && !boxData;
 
-    return <DeviceCard {...props} boxData={boxData} loading={loading} boxTitle={roomName} devices={devices} />;
+    return (
+      <DeviceCard
+        {...props}
+        loading={loading}
+        boxTitle={roomName}
+        devices={devices}
+        roomLightStatus={roomLightStatus}
+      />
+    );
   }
 }
 
