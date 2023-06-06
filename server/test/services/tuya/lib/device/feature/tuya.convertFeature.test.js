@@ -15,7 +15,7 @@ describe('Tuya convert feature', () => {
         type: 'Boolean',
         name: 'name',
         readOnly: false,
-        valuesAsString: '{}',
+        valuesAsString: '{"min:":0,"max":1}',
       },
       'externalId',
     );

@@ -32,7 +32,7 @@ async function poll(device) {
     values[feature.code] = feature.value;
   });
 
-  device.features.each((deviceFeature) => {
+  device.features.forEach((deviceFeature) => {
     const [, , code] = deviceFeature.external_id.split(':');
 
     const value = values[code];
