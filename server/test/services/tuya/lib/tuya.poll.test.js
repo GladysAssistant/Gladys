@@ -1,7 +1,6 @@
-const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { TuyaContext, client } = require('../tuya.mock.test');
+const { TuyaContext } = require('../tuya.mock.test');
 
 const { assert, fake } = sinon;
 
@@ -11,8 +10,8 @@ const connect = proxyquire('../../../../services/tuya/lib/tuya.connect', {
 const TuyaHandler = proxyquire('../../../../services/tuya/lib/index', {
   './tuya.connect.js': connect,
 });
-const { STATUS, GLADYS_VARIABLES, API} = require('../../../../services/tuya/lib/utils/tuya.constants');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
+const { EVENTS } = require('../../../../utils/constants');
 
 const gladys = {
   variable: {
@@ -33,7 +32,7 @@ describe('TuyaHandler.poll', () => {
       request: sinon
         .stub()
         .onFirstCall()
-        .resolves({ result: [], total: 2, has_more: true, last_row_key: 'next' } )
+        .resolves({ result: [], total: 2, has_more: true, last_row_key: 'next' }),
     };
   });
 
@@ -42,14 +41,15 @@ describe('TuyaHandler.poll', () => {
   });
 
   it('change state of device feature', async () => {
-
     await tuyaHandler.poll({
       external_id: 'tuya:device',
-      features: [{
-        external_id: 'tuya:feature',
-        category: 'light',
-        type: 'binary',
-      }],
+      features: [
+        {
+          external_id: 'tuya:feature',
+          category: 'light',
+          type: 'binary',
+        },
+      ],
     });
 
     assert.callCount(tuyaHandler.connector.request, 1);
@@ -60,7 +60,8 @@ describe('TuyaHandler.poll', () => {
 
     assert.callCount(gladys.event.emit, 1);
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'tuya:feature', state: 0
+      device_feature_external_id: 'tuya:feature',
+      state: 0,
     });
   });
 });

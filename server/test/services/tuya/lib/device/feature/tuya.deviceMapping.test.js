@@ -1,8 +1,6 @@
 const { expect } = require('chai');
-
-const { convertUnit } = require('../../../../../../services/tuya/lib/device/tuya.convertUnit');
-const { DEVICE_FEATURE_UNITS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES} = require('../../../../../../utils/constants');
-const {writeValues, readValues} = require('../../../../../../services/tuya/lib/device/tuya.deviceMapping');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../../../utils/constants');
+const { writeValues, readValues } = require('../../../../../../services/tuya/lib/device/tuya.deviceMapping');
 
 describe('Tuya device mapping', () => {
   describe('write value', () => {
@@ -42,7 +40,9 @@ describe('Tuya device mapping', () => {
       expect(result).to.eq(950);
     });
     it('light color', () => {
-      const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.COLOR]('{ "h": 239, "s": 1000, "v": 173 }');
+      const result = readValues[DEVICE_FEATURE_CATEGORIES.LIGHT][DEVICE_FEATURE_TYPES.LIGHT.COLOR](
+        '{ "h": 239, "s": 1000, "v": 173 }',
+      );
       expect(result).to.eq(300);
     });
     it('switch binary', () => {
