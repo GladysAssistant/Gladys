@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { mappings, readValues } = require('./tuya.deviceMapping');
+const { mappings } = require('./tuya.deviceMapping');
 
 /**
  * @description Transforms Tuya feature as Gladys feature.
@@ -15,14 +15,6 @@ function convertFeature(tuyaFunctions, externalId) {
   const featuresCategoryAndType = mappings[code];
   if (!featuresCategoryAndType) {
     logger.warn(`Tuya function with "${code}" code is not managed`);
-    return undefined;
-  }
-
-  const mappingType = readValues[featuresCategoryAndType.category][featuresCategoryAndType.type];
-  if (!mappingType) {
-    logger.warn(
-      `Tuya function with "${featuresCategoryAndType.category}/${featuresCategoryAndType.type}" type is not managed on "${code}" code`,
-    );
     return undefined;
   }
 

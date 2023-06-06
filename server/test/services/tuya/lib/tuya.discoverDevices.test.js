@@ -15,6 +15,9 @@ const gladys = {
   stateManager: {
     get: fake.returns(null),
   },
+  variable: {
+    getValue: fake.resolves('APP_ACCOUNT_UID'),
+  },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -28,7 +31,7 @@ describe('TuyaHandler.discoverDevices', () => {
       request: sinon
         .stub()
         .onFirstCall()
-        .resolves({ result: { list: [{ name: 'name', uuid: 'uuid', product_name: 'model' }] } })
+        .resolves({ result: { list: [{ name: 'name', id: 'uuid', product_name: 'model' }] } })
         .onSecondCall()
         .resolves({
           result: {
@@ -107,9 +110,10 @@ describe('TuyaHandler.discoverDevices', () => {
         ],
         model: 'model',
         name: 'name',
-        poll_frequency: 60000,
+        poll_frequency: 30000,
         selector: 'tuya:uuid',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+        should_poll: true,
       },
     ]);
 

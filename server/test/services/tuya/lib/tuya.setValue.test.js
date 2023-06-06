@@ -4,6 +4,7 @@ const { assert, fake } = sinon;
 
 const TuyaHandler = require('../../../../services/tuya/lib/index');
 const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 const gladys = {
   variable: {
@@ -32,13 +33,21 @@ describe('TuyaHandler.setValue', () => {
   });
 
   it('should call tuya api', async () => {
-    await tuyaHandler.setValue({}, { external_id: 'tuya:uuid:switch_0' }, 'true');
+    await tuyaHandler.setValue(
+      {},
+      {
+        external_id: 'tuya:uuid:switch_0',
+        category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+        type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      },
+      1,
+    );
 
     assert.callCount(tuyaHandler.connector.request, 1);
     assert.calledWith(tuyaHandler.connector.request, {
       method: 'POST',
       path: `${API.VERSION_1_0}/devices/uuid/commands`,
-      body: { commands: [{ code: 'switch_0', value: 'true' }] },
+      body: { commands: [{ code: 'switch_0', value: true }] },
     });
   });
 });

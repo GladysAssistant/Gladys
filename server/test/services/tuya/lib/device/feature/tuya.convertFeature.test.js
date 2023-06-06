@@ -8,11 +8,6 @@ describe('Tuya convert feature', () => {
     expect(result).to.eq(undefined);
   });
 
-  it('should return undefined when type not exist', () => {
-    const result = convertFeature({ code: 'switch_1', type: 'NOT_EXIST' }, 'externalId');
-    expect(result).to.eq(undefined);
-  });
-
   it('should return converted feature', () => {
     const result = convertFeature(
       {
