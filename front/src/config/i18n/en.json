@@ -763,6 +763,8 @@
         "accessKeyPlaceholder": "Enter Tuya access key",
         "secretKey": "Secret Key",
         "secretKeyPlaceholder": "Enter Tuya secret key",
+        "appAccountId": "App account UID",
+        "appAccountIdPlaceholder": "Enter Tuya application UID",
         "saveLabel": "Save configuration",
         "error": "An error occured while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your Tuya cloud account...",

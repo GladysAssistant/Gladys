@@ -1,6 +1,7 @@
 const logger = require('../../../utils/logger');
 const { API } = require('./utils/tuya.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
+const { writeValues } = require('./device/tuya.deviceMapping');
 
 /**
  * @description Send the new device value over device protocol.
@@ -21,20 +22,22 @@ async function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Tuya device external_id is invalid: "${externalId}" have no network indicator`);
   }
 
-  logger.debug(`Change value for devices ${topic}/${command} to value ${value}...`);
+  const transformedValue = writeValues[deviceFeature.category][deviceFeature.type](value);
+  logger.debug(`Change value for devices ${topic}/${command} to value ${transformedValue}...`);
 
-  await this.connector.request({
+  const response = await this.connector.request({
     method: 'POST',
     path: `${API.VERSION_1_0}/devices/${topic}/commands`,
     body: {
       commands: [
         {
           code: command,
-          value,
+          value: transformedValue,
         },
       ],
     },
   });
+  logger.debug(`[Tuya][setValue] ${JSON.stringify(response)}`);
 }
 
 module.exports = {

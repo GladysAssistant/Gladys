@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const { convertUnit } = require('../../../../../../services/tuya/lib/device/feature/tuya.convertUnit');
+const { convertUnit } = require('../../../../../../services/tuya/lib/device/tuya.convertUnit');
 const { DEVICE_FEATURE_UNITS } = require('../../../../../../utils/constants');
 
 describe('Tuya convert unit', () => {

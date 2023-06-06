@@ -22,6 +22,6 @@ class TuyaSetupPage extends Component {
 }
 
 export default connect(
-  'user,session,currentIntegration,tuyaEndpoint,tuyaAccessKey,tuyaSecretKey,tuyaGetSettingsStatus,tuyaSaveSettingsStatus',
+  'user,session,currentIntegration,tuyaEndpoint,tuyaAccessKey,tuyaSecretKey,tuyaAppAccountId,tuyaGetSettingsStatus,tuyaSaveSettingsStatus',
   actions
 )(TuyaSetupPage);

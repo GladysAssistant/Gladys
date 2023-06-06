@@ -1,5 +1,5 @@
 const logger = require('../../../utils/logger');
-const { API } = require('./utils/tuya.constants');
+const { API, GLADYS_VARIABLES } = require('./utils/tuya.constants');
 
 /**
  * @description Discover Tuya cloud devices.
@@ -9,10 +9,16 @@ const { API } = require('./utils/tuya.constants');
  * await loadDevices();
  */
 async function loadDevices(lastRowKey = null) {
+  const sourceId = await this.gladys.variable.getValue(GLADYS_VARIABLES.APP_ACCOUNT_UID, this.serviceId);
+
   const responsePage = await this.connector.request({
     method: 'GET',
-    path: `${API.VERSION_1_1}/devices`,
-    query: { last_row_key: lastRowKey },
+    path: `${API.VERSION_1_3}/devices`,
+    query: {
+      last_row_key: lastRowKey,
+      source_type: 'tuyaUser',
+      source_id: sourceId,
+    },
   });
 
   const { result } = responsePage;

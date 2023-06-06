@@ -1,6 +1,6 @@
 const { expect } = require('chai');
 
-const { convertFeature } = require('../../../../../../services/tuya/lib/device/feature/tuya.convertFeature');
+const { convertFeature } = require('../../../../../../services/tuya/lib/device/tuya.convertFeature');
 
 describe('Tuya convert feature', () => {
   it('should return undefined when code not exist', () => {

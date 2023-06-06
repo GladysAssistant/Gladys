@@ -889,6 +889,8 @@
         "accessKeyPlaceholder": "Entrez l'access key de Tuya",
         "secretKey": "Secret Key",
         "secretKeyPlaceholder": "Entrez la secrete key de Tuya",
+        "appAccountId": "App account UID",
+        "appAccountIdPlaceholder": "Entrez le UID de l'app de Tuya",
         "saveLabel": "Enregistrer la configuration",
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud eWeLink...",

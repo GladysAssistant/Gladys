@@ -87,6 +87,22 @@ const SetupTab = ({ children, ...props }) => {
                 </Localizer>
               </div>
 
+              <div class="form-group">
+                <label htmlFor="tuyaAppAccountId" className="form-label">
+                  <Text id={`integration.tuya.setup.appAccountId`} />
+                </label>
+                <Localizer>
+                  <input
+                    name="tuyaAppAccountId"
+                    type="text"
+                    placeholder={<Text id="integration.tuya.setup.appAccountIdPlaceholder" />}
+                    value={props.tuyaAppAccountId}
+                    className="form-control"
+                    onInput={props.updateConfiguration}
+                  />
+                </Localizer>
+              </div>
+
               <div class="row mt-5">
                 <div class="col">
                   <button type="submit" class="btn btn-success" onClick={props.saveTuyaConfiguration}>
