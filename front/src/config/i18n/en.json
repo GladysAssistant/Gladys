@@ -1346,7 +1346,7 @@
       },
       "message": {
         "send": "Send Message",
-        "send-camera": "Send a camera image by message"
+        "send-camera": "Send a camera image"
       },
       "delay": "Wait",
       "light": {
