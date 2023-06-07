@@ -37,10 +37,10 @@ function convertFeature(tuyaFunctions, externalId) {
     max: 1,
     ...featuresCategoryAndType,
   };
-  if (valuesObject.min) {
+  if ('min' in valuesObject) {
     feature.min = valuesObject.min;
   }
-  if (valuesObject.max) {
+  if ('max' in valuesObject) {
     feature.max = valuesObject.max;
   }
 

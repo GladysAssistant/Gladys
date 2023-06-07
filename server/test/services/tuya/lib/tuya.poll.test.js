@@ -1,4 +1,5 @@
 const sinon = require('sinon');
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
 const { TuyaContext } = require('../tuya.mock.test');
 
@@ -12,6 +13,8 @@ const TuyaHandler = proxyquire('../../../../services/tuya/lib/index', {
 });
 const { API } = require('../../../../services/tuya/lib/utils/tuya.constants');
 const { EVENTS } = require('../../../../utils/constants');
+
+const { BadParameters } = require('../../../../utils/coreErrors');
 
 const gladys = {
   variable: {
@@ -32,12 +35,48 @@ describe('TuyaHandler.poll', () => {
       request: sinon
         .stub()
         .onFirstCall()
-        .resolves({ result: [], total: 2, has_more: true, last_row_key: 'next' }),
+        .resolves({ result: [{ code: 'code', value: true }], total: 1, has_more: true, last_row_key: 'next' }),
     };
   });
 
   afterEach(() => {
     sinon.reset();
+  });
+
+  it('should throw an error (should starts with "tuya:")', async () => {
+    try {
+      await tuyaHandler.poll({
+        external_id: 'test:device',
+        features: [
+          {
+            external_id: 'tuya:feature',
+            category: 'light',
+            type: 'binary',
+          },
+        ],
+      });
+    } catch (error) {
+      expect(error).to.be.an.instanceof(BadParameters);
+      expect(error.message).to.equal('Tuya device external_id is invalid: "test:device" should starts with "tuya:"');
+    }
+  });
+
+  it('should throw an error (have no network indicator)', async () => {
+    try {
+      await tuyaHandler.poll({
+        external_id: 'tuya',
+        features: [
+          {
+            external_id: 'tuya:feature',
+            category: 'light',
+            type: 'binary',
+          },
+        ],
+      });
+    } catch (error) {
+      expect(error).to.be.an.instanceof(BadParameters);
+      expect(error.message).to.equal('Tuya device external_id is invalid: "tuya" have no network indicator');
+    }
   });
 
   it('change state of device feature', async () => {

@@ -15,7 +15,7 @@ describe('Tuya convert feature', () => {
         type: 'Boolean',
         name: 'name',
         readOnly: false,
-        valuesAsString: '{"min:":0,"max":1}',
+        values: '{"min":100,"max":1000}',
       },
       'externalId',
     );
@@ -23,8 +23,8 @@ describe('Tuya convert feature', () => {
       category: 'switch',
       external_id: 'externalId:switch_1',
       has_feedback: false,
-      max: 1,
-      min: 0,
+      max: 1000,
+      min: 100,
       name: 'name',
       read_only: false,
       selector: 'externalId:switch_1',
@@ -39,7 +39,7 @@ describe('Tuya convert feature', () => {
         type: 'Boolean',
         name: 'name',
         readOnly: false,
-        valuesAsString: '{',
+        values: '{',
       },
       'externalId',
     );
