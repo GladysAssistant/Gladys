@@ -1,42 +1,74 @@
 import { Component } from 'preact';
-import { Link } from 'preact-router/match';
-import { connect } from 'unistore/preact';
-import actions from './actions';
 import { Text } from 'preact-i18n';
+import { RequestStatus } from '../../../../../utils/consts';
+import style from './style.css';
+import classNames from 'classnames/bind';
+
+let cx = classNames.bind(style);
 
 class CheckStatus extends Component {
-  componentWillMount() {
-    this.props.checkStatus();
-  }
-
-  renderError(messageKey) {
-    return (
-      <div class="alert alert-warning">
-        <Text id={messageKey} />
-      </div>
-    )
-  }
-
-  render(props, {}) {
-    console.log('CheckStatus', props);
-
-    if(props.nodeRedEnabled) {
-      if (!props.nodeRedExist) {
-        return this.renderError('integration.node-red.status.notInstalled');
-      } else if (!props.nodeRedRunning) {
-        return this.renderError('integration.node-red.status.notRunning');
+  render({ nodeRedEnabled, nodeRedExist, nodeRedRunning, toggle, dockerBased, networkModeValid, nodeRedStatus }, {}) {
+    /*
+    {props.nodeRedStatus === RequestStatus.Error && (
+      <p class="alert alert-danger">
+        <Text id="integration.nodeRed.setup.error" />
+      </p>
+    )}
+     */
+    let buttonLabel = '';
+    let textLabel = '';
+    if (nodeRedStatus === RequestStatus.Getting) {
+      buttonLabel = 'integration.nodeRed.setup.activationNodeRed';
+      textLabel = 'integration.nodeRed.setup.activationNodeRed';
+    } else if (!dockerBased) {
+      buttonLabel = 'integration.nodeRed.setup.nonDockerEnv';
+      textLabel = 'integration.nodeRed.status.nonDockerEnv';
+    } else if (!networkModeValid) {
+      buttonLabel = 'integration.nodeRed.setup.invalidDockerNetwork';
+      textLabel = 'integration.nodeRed.status.invalidDockerNetwork';
+    } else if (nodeRedEnabled) {
+      buttonLabel = 'integration.nodeRed.setup.disableNodeRed';
+      if (!nodeRedExist) {
+        textLabel = 'integration.nodeRed.status.notInstalled';
+      } else if (!nodeRedRunning) {
+        textLabel = 'integration.nodeRed.status.notRunning';
+      } else {
+        textLabel = 'integration.nodeRed.status.running';
       }
-        return (
-          <p class="alert alert-success">
-            <Text id="integration.node-red.status.running" />
-          </p>
-        )
+    } else {
+      buttonLabel = 'integration.nodeRed.setup.enableNodeRed';
+      textLabel = 'integration.nodeRed.status.notEnabled';
     }
-    return null;
+
+    return (
+      <div>
+        <div
+          class={cx('row', 'mr-0', 'ml-0', 'alert', {
+            'alert-success': nodeRedEnabled && nodeRedExist && nodeRedRunning,
+            'alert-warning': nodeRedEnabled && nodeRedExist && !nodeRedRunning,
+            'alert-danger': nodeRedEnabled && !nodeRedExist,
+            'alert-info': !nodeRedEnabled
+          })}
+        >
+          <div class={cx('col', style.textAlignMiddleContainer)}>
+            <span class={cx(style.textAlignMiddle)}>
+              <Text id={textLabel} />
+            </span>
+          </div>
+
+          <div class="col-3">
+            <button
+              onClick={toggle}
+              className="btn btn-primary btn-block"
+              disabled={!dockerBased || !networkModeValid || nodeRedStatus === RequestStatus.Getting}
+            >
+              <Text id={buttonLabel} />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 }
 
-export default connect(
-  'user,session,nodeRedExist,nodeRedRunning,nodeRedEnabled',
-  actions
-)(CheckStatus);
+export default CheckStatus;

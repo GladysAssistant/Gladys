@@ -29,13 +29,16 @@ async function init() {
   await this.checkForContainerUpdates(configuration);
   await this.installContainer(configuration);
 
-  if (this.isEnabled()) {
-    // Schedule reccurent job if not already scheduled
-    if (!this.backupScheduledJob) {
-      this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
-    }
+  if (!configuration.nodeRedPassword) {
+    configuration.nodeRedUsername = CONFIGURATION.NODE_RED_USERNAME_VALUE;
+    configuration.nodeRedPassword = generate(20, {
+      number: true,
+      lowercase: true,
+      uppercase: true,
+    });
   }
 
+  await this.saveConfiguration(configuration);
 
   return null;
 }

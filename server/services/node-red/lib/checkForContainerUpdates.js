@@ -12,7 +12,7 @@ const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.
 async function checkForContainerUpdates(config) {
   logger.info('NodeRed: Checking for current installed versions and required updates...');
 
-  // Check for MQTT container version
+  // Check for NodeRed container version
   if (config.dockerNodeRedVersion !== DEFAULT.DOCKER_NODE_RED_VERSION) {
     logger.info(`NodeRed: update #${DEFAULT.DOCKER_NODE_RED_VERSION} of the container required...`);
 
@@ -33,7 +33,6 @@ async function checkForContainerUpdates(config) {
     config.dockerNodeRedVersion = DEFAULT.DOCKER_NODE_RED_VERSION;
     logger.info(`NodeRed: update #${DEFAULT.DOCKER_NODE_RED_VERSION} of the container done`);
   }
-
 }
 
 module.exports = {

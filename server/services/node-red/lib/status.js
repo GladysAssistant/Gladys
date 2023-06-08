@@ -7,7 +7,6 @@
 function status() {
   const nodeRedEnabled = this.isEnabled();
   const zigbee2mqttStatus = {
-
     nodeRedExist: this.nodeRedExist,
     nodeRedRunning: this.nodeRedRunning,
     nodeRedEnabled,

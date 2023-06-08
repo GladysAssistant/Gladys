@@ -10,7 +10,7 @@ const NodeRedPage = ({ children, user }) => (
           <div class="row">
             <div class="col-lg-3">
               <h3 class="page-title mb-5">
-                <Text id="integration.node-red.title" />
+                <Text id="integration.nodeRed.title" />
               </h3>
               <div>
                 <div class="list-group list-group-transparent mb-0">
@@ -22,7 +22,7 @@ const NodeRedPage = ({ children, user }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-sliders" />
                     </span>
-                    <Text id="integration.node-red.setupTab" />
+                    <Text id="integration.nodeRed.setupTab" />
                   </Link>
 
                   <DeviceConfigurationLink
@@ -33,7 +33,7 @@ const NodeRedPage = ({ children, user }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-book-open" />
                     </span>
-                    <Text id="integration.node-red.documentation" />
+                    <Text id="integration.nodeRed.documentation" />
                   </DeviceConfigurationLink>
                 </div>
               </div>

@@ -5,9 +5,7 @@
     "1880/tcp": {}
   },
   "HostConfig": {
-    "Binds": [
-      "/var/lib/gladysassistant/node-red:/data"
-    ],
+    "Binds": ["/var/lib/gladysassistant/node-red:/data"],
     "LogConfig": {
       "Type": "json-file",
       "Config": {
@@ -24,7 +22,7 @@
     "RestartPolicy": {
       "Name": "always"
     },
-    "NetworkMode": "host",
+
     "Dns": [],
     "DnsOptions": [],
     "DnsSearch": [],

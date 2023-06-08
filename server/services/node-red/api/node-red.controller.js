@@ -2,7 +2,6 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 const logger = require('../../../utils/logger');
 
 module.exports = function NodeRedController(gladys, nodeRedManager) {
-
   /**
    * @api {get} /api/v1/service/node-red/status Get node-red connection status
    * @apiName status
@@ -12,19 +11,6 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
     logger.debug('Get status');
     const response = await nodeRedManager.status();
     res.json(response);
-  }
-
-  /**
-   * @api {post} /api/v1/service/node-red/setup Setup
-   * @apiName setup
-   * @apiGroup Node-red
-   */
-  async function setup(req, res) {
-    logger.debug('Entering setup step');
-    await nodeRedManager.setup(req.body);
-    res.json({
-      success: true,
-    });
   }
 
   /**
@@ -70,10 +56,6 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
     'get /api/v1/service/node-red/status': {
       authenticated: true,
       controller: asyncMiddleware(status),
-    },
-    'post /api/v1/service/node-red/setup': {
-      authenticated: true,
-      controller: asyncMiddleware(setup),
     },
     'post /api/v1/service/node-red/connect': {
       authenticated: true,

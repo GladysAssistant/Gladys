@@ -607,6 +607,39 @@
       "saveError": "There was an error saving the device.",
       "documentation": "Zigbee2mqtt documentation"
     },
+    "nodeRed": {
+      "title": "Node-red",
+      "description": "\"Control your devices with Node-red.",
+      "setupTab": "Setup",
+      "documentation": "Node-red documentation",
+
+      "status": {
+        "notInstalled": "Node-red server failed to install.",
+        "notRunning": "Node-red server failed to start.",
+        "running": "Node-red successfully started.",
+        "notEnabled": "Node-red is not activated.",
+        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a Node-red server from here.",
+        "invalidDockerNetwork": "Gladys is under custom installation, to install server from here, Gladys container should be configured with \"host\" network mode."
+      },
+      "setup": {
+        "title": "Node-red configuration",
+        "description": "This service uses docker container. Enable Node-red for deploying this container.\nLearn more on the node-red documentation page",
+        "error": "An error occured while starting  Node-red.",
+        "enableLabel": "Node-red activation",
+        "enableNodeRed": "Enable",
+        "disableNodeRed": "Disable",
+        "activationNodeRed": "Activating...",
+        "serviceStatus": "Node-red Service Status",
+        "containersStatus": "Containers related to Node-red",
+        "status": "Status",
+        "node-red": "Node-red",
+        "gladys": "Gladys",
+        "usernameLabel": "Username",
+        "passwordLabel": "Password",
+        "urlLabel": "Node-red interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a>"
+      }
+    },
+
     "googleHome": {
       "title": "Google Home",
       "description": "Control your Gladys device with your voice in Google Home",

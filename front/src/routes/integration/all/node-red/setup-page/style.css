@@ -4,6 +4,15 @@
   align-items: center;
 }
 
+.textAlignMiddleContainer {
+  display: table;
+}
+
+.textAlignMiddle {
+  display: table-cell;
+  vertical-align: middle;
+}
+
 .greenIcon {
   color: #5eba00;;
   font-size: 24px;

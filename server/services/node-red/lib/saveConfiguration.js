@@ -20,7 +20,10 @@ async function saveConfiguration(config) {
   logger.debug('NodeRed: storing configuration...');
 
   const keyValueMap = {
+    [CONFIGURATION.NODE_RED_USERNAME]: config.nodeRedUsername,
+    [CONFIGURATION.NODE_RED_PASSWORD]: config.nodeRedPassword,
     [CONFIGURATION.DOCKER_NODE_RED_VERSION]: config.dockerNodeRedVersion,
+    [CONFIGURATION.NODE_RED_URL]: CONFIGURATION.NODE_RED_URL_VALUE,
   };
 
   const variableKeys = Object.keys(keyValueMap);

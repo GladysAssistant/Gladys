@@ -5,7 +5,7 @@ const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const containerDescriptor = require('../docker/gladys-node-red-container.json');
-const {PlatformNotCompatible} = require('../../../utils/coreErrors');
+const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
 const sleep = promisify(setTimeout);
 
@@ -28,30 +28,24 @@ async function installContainer(config) {
     throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
   }
 
-
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
     filters: { name: [containerDescriptor.name] },
   });
   let [container] = dockerContainers;
 
-  // const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
-  // const containerPath = `${basePathOnHost}/node-red`;
-  const basePathOnContainer = ``;// TODO CHange
   if (dockerContainers.length === 0) {
-    // Restore backup only in case of new installation
-    // await this.restoreZ2mBackup(containerPath);
-    // TODO add restore Backup
-
     try {
       logger.info('Nodered: is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
       await this.gladys.system.pull(containerDescriptor.Image);
 
-      const containerDescriptorToMutate = cloneDeep(containerDescriptor);
-      console.log(containerDescriptorToMutate);
+      // Prepare broker env
+      logger.info(`Nodered: Preparing environment...`);
+      await this.configureContainer(config);
 
       logger.info(`Creation of container...`);
+      const containerDescriptorToMutate = cloneDeep(containerDescriptor);
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerLog);
       logger.info('NodeRed: successfully installed and configured as Docker container');
@@ -66,7 +60,7 @@ async function installContainer(config) {
     }
   }
 
-  const configChanged = await this.configureContainer(basePathOnContainer, config);
+  const configChanged = await this.configureContainer(config);
 
   try {
     dockerContainers = await this.gladys.system.getContainers({
