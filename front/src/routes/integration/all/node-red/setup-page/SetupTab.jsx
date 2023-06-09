@@ -214,13 +214,13 @@ class SetupTab extends Component {
                     />
                   </Localizer>
                   <span class="input-icon-addon cursor-pointer" onClick={this.togglePassword}>
-                <i
-                  class={cx('fe', {
-                    'fe-eye': !showPassword,
-                    'fe-eye-off': showPassword
-                  })}
-                />
-              </span>
+                    <i
+                      class={cx('fe', {
+                        'fe-eye': !showPassword,
+                        'fe-eye-off': showPassword
+                      })}
+                    />
+                  </span>
                 </div>
               </div>
 

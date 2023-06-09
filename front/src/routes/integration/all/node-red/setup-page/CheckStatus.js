@@ -8,7 +8,6 @@ let cx = classNames.bind(style);
 
 class CheckStatus extends Component {
   render({ nodeRedEnabled, nodeRedExist, nodeRedRunning, toggle, dockerBased, networkModeValid, nodeRedStatus }, {}) {
-
     let buttonLabel = null;
     let textLabel = null;
     if (nodeRedStatus === RequestStatus.Getting) {
