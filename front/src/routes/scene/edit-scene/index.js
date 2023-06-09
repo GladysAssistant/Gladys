@@ -447,6 +447,7 @@ class EditScene extends Component {
 
   constructor(props) {
     super(props);
+    this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     this.state = {
       scene: null,
       variables: {},
