@@ -63,7 +63,7 @@ const EditScenePage = ({ children, ...props }) => (
                 </h1>
 
                 {props.isDescriptionEditable ? (
-                  <form class={style.descriptionInputForm} onSubmit={props.saveScene}>
+                  <form onSubmit={props.saveScene}>
                     <div class="input-group">
                       <Localizer>
                         <input
