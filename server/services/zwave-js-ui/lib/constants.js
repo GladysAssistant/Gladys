@@ -367,8 +367,22 @@ const DEFAULT = {
   ZWAVEJSUI_MQTT_URL_VALUE: 'mqtt://localhost:1885',
   ZWAVEJSUI_MQTT_USERNAME_VALUE: 'gladys',
   MQTT_CLIENT_ID: 'gladys-main-instance',
-  ZWAVEJSUI_CLIENT_ID: 'ZWAVE_GATEWAY-Gladys',
+  ZWAVEJSUI_CLIENT_ID: process.env.NODE_ENV === 'production' ? 'ZWAVE_GATEWAY-Gladys' : 'ZWAVE_GATEWAY-Gladys-dev',
   ZWAVEJSUI_VERSION_EXPECTED: '8.14.1',
+  ADD_NODE_TIMEOUT: 60 * 1000,
+  REMOVE_NODE_TIMEOUT: 60 * 1000,
+  SCAN_NETWORK_TIMEOUT: 60 * 1000,
+};
+
+const PRODUCT = {
+  FIBARO_DIMMER2: '271-4096-258',
+};
+
+const PARAMS = {
+  NODE_ID: 'node-id',
+  NODE_PRODUCT: 'node-product',
+  NODE_ROOM: 'node-room',
+  NODE_CLASSES: 'node-classes',
 };
 
 module.exports = {
@@ -383,4 +397,6 @@ module.exports = {
   NODE_STATES,
   CONFIGURATION,
   DEFAULT,
+  PRODUCT,
+  PARAMS,
 };

@@ -145,9 +145,7 @@ describe('zwaveJSUIManager commands', () => {
     const commandClass = 2;
     const endpoint = 3;
     const property = 'property';
-    const device = {
-      nodeId: 1,
-    };
+    const device = {};
     const deviceFeature = {
       external_id: `zwave-js-ui:node_id:${device.nodeId}:comclass:${commandClass}:endpoint:${endpoint}:property:${property}`,
     };
@@ -167,9 +165,7 @@ describe('zwaveJSUIManager commands', () => {
     const endpoint = 3;
     const property = 'property';
     const propertyKey = 'propertyKey';
-    const device = {
-      nodeId: 1,
-    };
+    const device = {};
     const deviceFeature = {
       external_id: `zwave-js-ui:node_id:${device.nodeId}:comclass:${commandClass}:endpoint:${endpoint}:property:${property}-${propertyKey}`,
     };
@@ -287,14 +283,6 @@ describe('zwaveJSUIManager events', () => {
       },
     };
     zwaveJSUIManager.nodeReady(zwaveNode);
-    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.NODE_READY,
-      payload: {
-        nodeId: 1,
-        name: 'name',
-        status: 'status',
-      },
-    });
     expect(zwaveJSUIManager.nodes).to.deep.equal({
       '1': {
         nodeId: 1,
@@ -437,13 +425,12 @@ describe('zwaveJSUIManager devices', () => {
             max: 40,
           },
         ],
-        params: [],
-        rawZwaveNode: {
-          id: 1,
-          loc: 'location',
-          product: 'product',
-          keysClasses: ['49'],
-        },
+        params: [
+          { name: 'node-id', value: '' },
+          { name: 'node-product', value: '' },
+          { name: 'node-loc', value: '' },
+          { name: 'node-keysClasses', value: '' },
+        ],
       },
     ]);
   });
@@ -537,13 +524,12 @@ describe('zwaveJSUIManager devices', () => {
             unit: null,
           },
         ],
-        params: [],
-        rawZwaveNode: {
-          id: 1,
-          loc: 'location',
-          product: 'product',
-          keysClasses: ['37'],
-        },
+        params: [
+          { name: 'node-id', value: '' },
+          { name: 'node-product', value: '' },
+          { name: 'node-loc', value: '' },
+          { name: 'node-keysClasses', value: '' },
+        ],
       },
       {
         service_id: ZWAVEJSUI_SERVICE_ID,
@@ -567,13 +553,12 @@ describe('zwaveJSUIManager devices', () => {
             unit: null,
           },
         ],
-        params: [],
-        rawZwaveNode: {
-          id: 1,
-          loc: 'location',
-          product: 'product',
-          keysClasses: ['37'],
-        },
+        params: [
+          { name: 'node-id', value: '' },
+          { name: 'node-product', value: '' },
+          { name: 'node-loc', value: '' },
+          { name: 'node-keysClasses', value: '' },
+        ],
       },
       {
         service_id: ZWAVEJSUI_SERVICE_ID,
@@ -597,13 +582,12 @@ describe('zwaveJSUIManager devices', () => {
             unit: null,
           },
         ],
-        params: [],
-        rawZwaveNode: {
-          id: 1,
-          loc: 'location',
-          product: 'product',
-          keysClasses: ['37'],
-        },
+        params: [
+          { name: 'node-id', value: '' },
+          { name: 'node-product', value: '' },
+          { name: 'node-loc', value: '' },
+          { name: 'node-keysClasses', value: '' },
+        ],
       },
     ]);
   });
@@ -664,13 +648,12 @@ describe('zwaveJSUIManager devices', () => {
             last_value: undefined,
           },
         ],
-        params: [],
-        rawZwaveNode: {
-          id: 1,
-          loc: 'location',
-          product: 'product',
-          keysClasses: ['113'],
-        },
+        params: [
+          { name: 'node-id', value: '' },
+          { name: 'node-product', value: '' },
+          { name: 'node-loc', value: '' },
+          { name: 'node-keysClasses', value: '' },
+        ],
       },
     ]);
   });

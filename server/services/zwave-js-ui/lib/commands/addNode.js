@@ -1,8 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { DEFAULT } = require('../constants');
 
-const ADD_NODE_TIMEOUT = 60 * 1000;
-
 /**
  * @description Add node.
  * @param {boolean} secure - Secure node.
@@ -17,7 +15,7 @@ function addNode(secure = true) {
   setTimeout(() => {
     this.mqttClient.publish(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/stopInclusion/set`);
     this.scanNetwork();
-  }, ADD_NODE_TIMEOUT);
+  }, DEFAULT.ADD_NODE_TIMEOUT);
 }
 
 module.exports = {

@@ -50,45 +50,43 @@ const NodeTab = ({ children, ...props }) => {
                 [style.emptyDiv]: zwaveActionsDisabled
               })}
             >
-              {(!props.zwaveNodes || props.zwaveNodes.length === 0) && <EmptyState />}
-              {props.zwaveNodes && props.zwaveNodes.length > 0 && (
-                <div class="page-options d-flex">
-                  <button class="btn btn-outline-primary" onClick={props.scanNetwork} disabled={zwaveActionsDisabled}>
-                    <Text id="integration.zwavejsui.discover.scanButton" /> <i class="fe fe-radio" />
+              <div class="page-options d-flex">
+                <button class="btn btn-outline-primary" onClick={props.scanNetwork} disabled={zwaveActionsDisabled}>
+                  <Text id="integration.zwavejsui.discover.scanButton" /> <i class="fe fe-radio" />
+                </button>
+                <a
+                  href={
+                    zwaveActionsEnabled ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add' : '#'
+                  }
+                >
+                  <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
+                    <Text id="integration.zwavejsui.discover.addNodeButton" /> <i class="fe fe-plus" />
                   </button>
-                  <a
-                    href={
-                      zwaveActionsEnabled ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add' : '#'
-                    }
-                  >
-                    <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-                      <Text id="integration.zwavejsui.discover.addNodeButton" /> <i class="fe fe-plus" />
-                    </button>
-                  </a>
-                  <a
-                    href={
-                      zwaveActionsEnabled
-                        ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add-secure'
-                        : '#'
-                    }
-                  >
-                    <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
-                      <Text id="integration.zwavejsui.discover.addNodeSecureButton" /> <i class="fe fe-plus" />
-                    </button>
-                  </a>
-                  <a
-                    href={
-                      zwaveActionsEnabled
-                        ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=remove'
-                        : '#'
-                    }
-                  >
-                    <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
-                      <Text id="integration.zwavejsui.discover.removeNode" /> <i class="fe fe-trash" />
-                    </button>
-                  </a>
-                </div>
-              )}
+                </a>
+                <a
+                  href={
+                    zwaveActionsEnabled
+                      ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add-secure'
+                      : '#'
+                  }
+                >
+                  <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
+                    <Text id="integration.zwavejsui.discover.addNodeSecureButton" /> <i class="fe fe-plus" />
+                  </button>
+                </a>
+                <a
+                  href={
+                    zwaveActionsEnabled
+                      ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=remove'
+                      : '#'
+                  }
+                >
+                  <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
+                    <Text id="integration.zwavejsui.discover.removeNode" /> <i class="fe fe-trash" />
+                  </button>
+                </a>
+              </div>
+              {(!props.zwaveNodes || props.zwaveNodes.length === 0) && <EmptyState />}              
               {props.zwaveNodes &&
                 props.zwaveNodes.length > 0 &&
                 props.zwaveNodes.map((zwaveNode, index) => (

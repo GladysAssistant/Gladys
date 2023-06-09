@@ -6,16 +6,17 @@ import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
+import { PARAMS } from '../../../../../../../server/services/zwave-js-ui/lib/constants';
 
 const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 
 const createGithubUrl = node => {
-  const { rawZwaveNode } = node;
+  const { params } = node;
   const deviceToSend = {
-    product: rawZwaveNode.product,
-    classes: rawZwaveNode.keysClasses
+    product: params.find((param) => param.name === PARAMS.NODE_PRODUCT).value,
+    classes: params.find((param) => param.name === PARAMS.NODE_CLASSES).value,
   };
-  const title = encodeURIComponent(`Z-Wave: Handle device "${rawZwaveNode.product}"`);
+  const title = encodeURIComponent(`Z-Wave: Handle device "${params.product}"`);
   const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(deviceToSend, null, 2)}\n\`\`\``);
   return `${GITHUB_BASE_URL}?title=${title}&body=${body}`;
 };
@@ -60,7 +61,7 @@ class ZwaveNode extends Component {
             )}
             <div class="card-options">
               <span class="tag">
-                <Text id="integration.zwavejsui.discover.nodeId" /> {props.node.rawZwaveNode.id}
+                <Text id="integration.zwavejsui.discover.nodeId" /> {props.node.params.id}
               </span>
             </div>
           </div>

@@ -194,6 +194,9 @@ async function connect() {
     });
 
     this.scanNetwork();
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+    });
   } else {
     logger.warn("Can't connect Gladys cause MQTT not running !");
   }

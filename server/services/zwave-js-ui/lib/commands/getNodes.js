@@ -11,6 +11,7 @@ const logger = require('../../../../utils/logger');
 const { unbindValue } = require('../utils/bindValue');
 const { splitNode } = require('../utils/splitNode');
 const { transformClasses } = require('../utils/transformClasses');
+const { PARAMS } = require('../constants');
 
 /**
  * @description Check if keyword matches value.
@@ -58,14 +59,25 @@ function getNodes({ orderDir, search } = {}) {
         service_id: this.serviceId,
         external_id: getDeviceExternalId(node),
         ready: node.ready,
-        rawZwaveNode: {
-          id: node.nodeId,
-          product: node.product,
-          loc: node.loc,
-          keysClasses: Object.keys(node.classes),
-        },
         features: [],
-        params: [],
+        params: [
+          {
+            name: PARAMS.NODE_ID,
+            value: node.nodeId,
+          },
+          {
+            name: PARAMS.NODE_PRODUCT,
+            value: node.product,
+          },
+          {
+            name: PARAMS.NODE_ROOM,
+            value: node.loc,
+          },
+          {
+            name: PARAMS.NODE_CLASSES,
+            value: Object.keys(node.classes).join('-'),
+          },
+        ],
       };
 
       Object.entries(transformClasses(node)).forEach(([commandClassKey, commandClassValue]) => {
@@ -138,7 +150,9 @@ function getNodes({ orderDir, search } = {}) {
     })
     .filter((newDevice) => newDevice.features && newDevice.features.length > 0)
     .sort((a, b) => {
-      return orderDir === 'asc' ? a.rawZwaveNode.id - b.rawZwaveNode.id : b.rawZwaveNode.id - a.rawZwaveNode.id;
+      const aNodeId = a.params.find((param) => param.name === PARAMS.NODE_ID).value;
+      const bNodeId = b.params.find((param) => param.name === PARAMS.NODE_ID).value;
+      return orderDir === 'asc' ? aNodeId - bNodeId : bNodeId - aNodeId;
     });
 }
 
