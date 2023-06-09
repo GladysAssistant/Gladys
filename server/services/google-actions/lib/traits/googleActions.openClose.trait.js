@@ -44,26 +44,23 @@ const openCloseTrait = {
     },
   ],
   commands: {
-    'action.devices.commands.OpenClose': {
-      openPercent: {
-        writeValue: (paramValue) => {
-          return paramValue;
-        },
-        features: [
-          {
-            category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
-            type: DEVICE_FEATURE_TYPES.CURTAIN.POSITION,
-          },
-          {
-            category: DEVICE_FEATURE_CATEGORIES.SHUTTER,
-            type: DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
-          },
-        ],
-      },
-      followUpToken: {
-        writeValue: () => null,
-        features: [],
-      },
+    'action.devices.commands.OpenClose': (device, params) => {
+      const events = [];
+
+      const positionFeature = device.features.find(
+        ({ category, type }) =>
+          (category === DEVICE_FEATURE_CATEGORIES.CURTAIN && type === DEVICE_FEATURE_TYPES.CURTAIN.POSITION) ||
+          (category === DEVICE_FEATURE_CATEGORIES.SHUTTER && type === DEVICE_FEATURE_TYPES.SHUTTER.POSITION),
+      );
+
+      if (positionFeature) {
+        events.push({
+          device_feature: positionFeature.selector,
+          value: params.openPercent,
+        });
+      }
+
+      return { events };
     },
   },
 };
