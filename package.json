@@ -1,6 +1,6 @@
 {
   "name": "gladys",
-  "version": "4.23.4",
+  "version": "4.24.0",
   "description": "A privacy-first, open-source home assistant",
   "main": "index.js",
   "engines": {
@@ -23,6 +23,7 @@
     "copy-front": "shx cp -R front/build server/static",
     "build": "npm run build:clean && npm run build-front && npm run copy-front",
     "generate-changelog": "auto-changelog",
+    "generate-apidoc": "apidoc -i server/api/ -o apidoc",
     "clean-node-modules": "npx rimraf ./**/node_modules",
     "cypress:open": "cd front && npm run cypress:open",
     "cypress:run": "cd front && npm run cypress:run",
@@ -37,7 +38,13 @@
   },
   "author": "Pierre-Gilles Leymarie",
   "license": "Apache-2.0",
+  "apidoc": {
+    "name": "Gladys Assistant REST API documentation",
+    "description": "A documentation of all routes of Gladys API.",
+    "url": "http://YOUR_LOCAL_GLADYS_URL"
+  },
   "devDependencies": {
+    "apidoc": "^1.0.3",
     "all-contributors-cli": "^6.15.0",
     "npm-run-all": "^4.1.5",
     "shx": "^0.3.2"

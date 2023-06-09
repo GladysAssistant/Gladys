@@ -239,7 +239,6 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page.",
         "addButton": "+",
         "substractButton": "-"
       },
@@ -340,8 +339,6 @@
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
-      "restartButton": "Restart",
-      "stopButton": "Stop",
       "menu": {
         "all": "All integrations",
         "device": "Devices",
@@ -1221,6 +1218,13 @@
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
       },
+      "messageCameraSend": {
+        "userLabel": "User",
+        "cameraLabel": "Camera",
+        "textLabel": "Message",
+        "textPlaceholder": "Message text",
+        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+      },
       "turnOnLights": {
         "label": "Select the lights you want to turn on"
       },
@@ -1341,7 +1345,8 @@
         "set-value": "Set device value"
       },
       "message": {
-        "send": "Send Message"
+        "send": "Send Message",
+        "send-camera": "Send a camera image"
       },
       "delay": "Wait",
       "light": {
@@ -1594,7 +1599,6 @@
       "resetPassword": "Reset password",
       "editPreferences": "Edit preferences",
       "resetPasswordButton": "Reset password",
-      "saveButton": "Save",
       "success": "User saved with success !"
     }
   },

@@ -239,7 +239,6 @@
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration.",
         "addButton": "+",
         "substractButton": "-"
       },
@@ -340,8 +339,6 @@
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
-      "restartButton": "Redémarrer",
-      "stopButton": "Arrêter",
       "menu": {
         "all": "Toutes les intégrations",
         "device": "Appareils",
@@ -1221,6 +1218,13 @@
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       },
+      "messageCameraSend": {
+        "userLabel": "Utilisateur",
+        "cameraLabel": "Camera",
+        "textLabel": "Message",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
       "turnOnLights": {
         "label": "Sélectionnez les lumières que vous souhaitez allumer"
       },
@@ -1341,7 +1345,8 @@
         "set-value": "Contrôler un appareil"
       },
       "message": {
-        "send": "Envoyer un message"
+        "send": "Envoyer un message",
+        "send-camera": "Envoyer une image de caméra"
       },
       "delay": "Attendre",
       "light": {
@@ -1594,7 +1599,6 @@
       "resetPassword": "Réinitialiser le mot de passe",
       "editPreferences": "Editer les préférences",
       "resetPasswordButton": "Réinitialiser",
-      "saveButton": "Enregistrer",
       "success": "Profil enregistré avec succès !"
     }
   },
