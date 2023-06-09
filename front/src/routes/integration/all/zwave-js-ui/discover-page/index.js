@@ -11,7 +11,10 @@ class ZwaveJSUIDevicePage extends Component {
     this.props.getNodes();
   };
   componentWillMount() {
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE, this.scanCompleteListener);
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+      this.scanCompleteListener
+    );
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE,
       this.scanCompleteListener
@@ -22,7 +25,10 @@ class ZwaveJSUIDevicePage extends Component {
   }
 
   componentWillUnmount() {
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE, this.scanCompleteListener);
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+      this.scanCompleteListener
+    );
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE,
       this.scanCompleteListener

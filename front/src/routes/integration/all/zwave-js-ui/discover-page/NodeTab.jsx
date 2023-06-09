@@ -76,9 +76,7 @@ const NodeTab = ({ children, ...props }) => {
                 </a>
                 <a
                   href={
-                    zwaveActionsEnabled
-                      ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=remove'
-                      : '#'
+                    zwaveActionsEnabled ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=remove' : '#'
                   }
                 >
                   <button class="btn btn-outline-danger ml-2" disabled={zwaveActionsDisabled}>
@@ -86,7 +84,7 @@ const NodeTab = ({ children, ...props }) => {
                   </button>
                 </a>
               </div>
-              {(!props.zwaveNodes || props.zwaveNodes.length === 0) && <EmptyState />}              
+              {(!props.zwaveNodes || props.zwaveNodes.length === 0) && <EmptyState />}
               {props.zwaveNodes &&
                 props.zwaveNodes.length > 0 &&
                 props.zwaveNodes.map((zwaveNode, index) => (

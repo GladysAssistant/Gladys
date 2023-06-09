@@ -13,8 +13,8 @@ const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const createGithubUrl = node => {
   const { params } = node;
   const deviceToSend = {
-    product: params.find((param) => param.name === PARAMS.NODE_PRODUCT).value,
-    classes: params.find((param) => param.name === PARAMS.NODE_CLASSES).value,
+    product: params.find(param => param.name === PARAMS.NODE_PRODUCT).value,
+    classes: params.find(param => param.name === PARAMS.NODE_CLASSES).value
   };
   const title = encodeURIComponent(`Z-Wave: Handle device "${params.product}"`);
   const body = encodeURIComponent(`\`\`\`\n${JSON.stringify(deviceToSend, null, 2)}\n\`\`\``);
