@@ -40,6 +40,10 @@ class SetupTab extends Component {
 
   componentWillUnmount = () => {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE, this.checkStatus);
+    if (this.showPasswordTimer) {
+      clearTimeout(this.showPasswordTimer);
+      this.showPasswordTimer = null;
+    }
   };
 
   toggle = () => {
@@ -125,6 +129,21 @@ class SetupTab extends Component {
     }
   };
 
+  togglePassword = () => {
+    const { showPassword } = this.state;
+
+    if (this.showPasswordTimer) {
+      clearTimeout(this.showPasswordTimer);
+      this.showPasswordTimer = null;
+    }
+
+    this.setState({ showPassword: !showPassword });
+
+    if (!showPassword) {
+      this.showPasswordTimer = setTimeout(() => this.setState({ showPassword: false }), 5000);
+    }
+  };
+
   render(
     props,
     {
@@ -136,7 +155,8 @@ class SetupTab extends Component {
       nodeRedUsername,
       nodeRedPassword,
       nodeRedUrl,
-      nodeRedStatus
+      nodeRedStatus,
+      showPassword
     }
   ) {
     return (
@@ -161,46 +181,61 @@ class SetupTab extends Component {
             toggle={this.toggle}
           />
 
-          <div class="form-group">
-            <label htmlFor="nodeRedUsername" className="form-label">
-              <Text id={`integration.nodeRed.setup.usernameLabel`} />
-            </label>
-            <Localizer>
-              <input
-                id="nodeRedUsername"
-                name="nodeRedUsername"
-                value={nodeRedUsername}
-                className="form-control"
-                disabled={true}
-              />
-            </Localizer>
-          </div>
+          {nodeRedRunning && (
+            <div>
+              <div class="form-group">
+                <label htmlFor="nodeRedUsername" className="form-label">
+                  <Text id={`integration.nodeRed.setup.usernameLabel`} />
+                </label>
+                <Localizer>
+                  <input
+                    id="nodeRedUsername"
+                    name="nodeRedUsername"
+                    value={nodeRedUsername}
+                    className="form-control"
+                    disabled={true}
+                  />
+                </Localizer>
+              </div>
 
-          <div class="form-group">
-            <label htmlFor="nodeRedPassword" className="form-label">
-              <Text id={`integration.nodeRed.setup.passwordLabel`} />
-            </label>
-            <Localizer>
-              <input
-                id="nodeRedPassword"
-                name="nodeRedPassword"
-                value={nodeRedPassword}
-                className="form-control"
-                disabled={true}
-              />
-            </Localizer>
-          </div>
+              <div class="form-group">
+                <label htmlFor="nodeRedPassword" className="form-label">
+                  <Text id={`integration.nodeRed.setup.passwordLabel`} />
+                </label>
+                <div class="input-icon mb-3">
+                  <Localizer>
+                    <input
+                      id="nodeRedPassword"
+                      name="nodeRedPassword"
+                      type={showPassword ? 'text' : 'password'}
+                      value={nodeRedPassword}
+                      className="form-control"
+                      disabled={true}
+                    />
+                  </Localizer>
+                  <span class="input-icon-addon cursor-pointer" onClick={this.togglePassword}>
+                <i
+                  class={cx('fe', {
+                    'fe-eye': !showPassword,
+                    'fe-eye-off': showPassword
+                  })}
+                />
+              </span>
+                </div>
+              </div>
 
-          <div class="form-group">
-            <label htmlFor="nodeRedUrl" className="form-label">
-              <MarkupText
-                id={`integration.nodeRed.setup.urlLabel`}
-                fields={{
-                  nodeRedUrl
-                }}
-              />
-            </label>
-          </div>
+              <div class="form-group">
+                <label htmlFor="nodeRedUrl" className="form-label">
+                  <MarkupText
+                    id={`integration.nodeRed.setup.urlLabel`}
+                    fields={{
+                      nodeRedUrl
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+          )}
 
           <div class="card-header d-none d-sm-block">
             <h2 class="card-title">

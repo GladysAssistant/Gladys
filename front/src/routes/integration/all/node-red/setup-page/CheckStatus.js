@@ -8,23 +8,15 @@ let cx = classNames.bind(style);
 
 class CheckStatus extends Component {
   render({ nodeRedEnabled, nodeRedExist, nodeRedRunning, toggle, dockerBased, networkModeValid, nodeRedStatus }, {}) {
-    /*
-    {props.nodeRedStatus === RequestStatus.Error && (
-      <p class="alert alert-danger">
-        <Text id="integration.nodeRed.setup.error" />
-      </p>
-    )}
-     */
-    let buttonLabel = '';
-    let textLabel = '';
+
+    let buttonLabel = null;
+    let textLabel = null;
     if (nodeRedStatus === RequestStatus.Getting) {
       buttonLabel = 'integration.nodeRed.setup.activationNodeRed';
       textLabel = 'integration.nodeRed.setup.activationNodeRed';
     } else if (!dockerBased) {
-      buttonLabel = 'integration.nodeRed.setup.nonDockerEnv';
       textLabel = 'integration.nodeRed.status.nonDockerEnv';
     } else if (!networkModeValid) {
-      buttonLabel = 'integration.nodeRed.setup.invalidDockerNetwork';
       textLabel = 'integration.nodeRed.status.invalidDockerNetwork';
     } else if (nodeRedEnabled) {
       buttonLabel = 'integration.nodeRed.setup.disableNodeRed';
@@ -46,7 +38,7 @@ class CheckStatus extends Component {
           class={cx('row', 'mr-0', 'ml-0', 'alert', {
             'alert-success': nodeRedEnabled && nodeRedExist && nodeRedRunning,
             'alert-warning': nodeRedEnabled && nodeRedExist && !nodeRedRunning,
-            'alert-danger': nodeRedEnabled && !nodeRedExist,
+            'alert-danger': (nodeRedEnabled && !nodeRedExist) || !dockerBased || !networkModeValid,
             'alert-info': !nodeRedEnabled
           })}
         >
@@ -56,15 +48,17 @@ class CheckStatus extends Component {
             </span>
           </div>
 
-          <div class="col-3">
-            <button
-              onClick={toggle}
-              className="btn btn-primary btn-block"
-              disabled={!dockerBased || !networkModeValid || nodeRedStatus === RequestStatus.Getting}
-            >
-              <Text id={buttonLabel} />
-            </button>
-          </div>
+          {buttonLabel && (
+            <div class="col-3">
+              <button
+                onClick={toggle}
+                className="btn btn-primary btn-block"
+                disabled={!dockerBased || !networkModeValid || nodeRedStatus === RequestStatus.Getting}
+              >
+                <Text id={buttonLabel} />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
