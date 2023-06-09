@@ -11,6 +11,7 @@ const CONFIGURATION = {
 
 const DEFAULT = {
   DOCKER_NODE_RED_VERSION: '2', // Last version of NodeRed docker file,
+  CONFIGURATION_PATH: 'node-red/settings.js',
 };
 
 module.exports = {

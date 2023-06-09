@@ -1,8 +1,9 @@
 const fs = require('fs/promises');
 const { constants } = require('fs');
 const path = require('path');
-const bcrypt = require('bcrypt');
 const logger = require('../../../utils/logger');
+const passwordUtils = require('../../../utils/password');
+const { DEFAULT } = require('./constants');
 
 /**
  * @description Configure Node-red container.
@@ -17,7 +18,7 @@ async function configureContainer(config) {
   const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
 
   // Create configuration path (if not exists)
-  const configFilepath = path.join(basePathOnHost, 'node-red', 'settings.js');
+  const configFilepath = path.join(basePathOnHost, DEFAULT.CONFIGURATION_PATH);
   await fs.mkdir(path.dirname(configFilepath), { recursive: true });
   // Check if config file not already exists
   let configCreated = false;
@@ -31,19 +32,22 @@ async function configureContainer(config) {
     configCreated = true;
   }
 
-  // Check for changes
   const fileContent = await fs.readFile(configFilepath);
   let fileContentString = fileContent.toString();
 
-  const encodedPassword = bcrypt.hashSync(config.nodeRedPassword, 8);
-  const [, username] = fileContentString.match(/username: '(.+)'/);
-  const [, password] = fileContentString.match(/password: '(.+)'/);
-
   let configChanged = false;
-  if (username !== config.nodeRedUsername || password !== encodedPassword) {
-    fileContentString = fileContentString.replace(/username: '(.+)'/, `username: '${config.nodeRedUsername}'`);
-    fileContentString = fileContentString.replace(/password: '(.+)'/, `password: '${encodedPassword}'`);
-    configChanged = true;
+  if (config.nodeRedPassword && config.nodeRedUsername) {
+    // Check for changes
+
+    const encodedPassword = await passwordUtils.hash(config.nodeRedPassword);
+    const [, username] = fileContentString.match(/username: '(.+)'/);
+    const [, password] = fileContentString.match(/password: '(.+)'/);
+
+    if (username !== config.nodeRedUsername || (await passwordUtils.compare(password, encodedPassword)) === false) {
+      fileContentString = fileContentString.replace(/username: '(.+)'/, `username: '${config.nodeRedUsername}'`);
+      fileContentString = fileContentString.replace(/password: '(.+)'/, `password: '${encodedPassword}'`);
+      configChanged = true;
+    }
   }
 
   if (configChanged) {

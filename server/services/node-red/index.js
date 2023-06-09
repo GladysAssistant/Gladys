@@ -27,22 +27,9 @@ module.exports = function NodeRedService(gladys, serviceId) {
     nodeRedManager.disconnect();
   }
 
-  /**
-   * @public
-   * @description Test if Node-red is running.
-   * @returns {Promise<boolean>} Returns true if node-red is used.
-   * @example
-   *  const used = await gladys.services['node-red'].isUsed();
-   */
-  async function isUsed() {
-    return nodeRedManager.gladysConnected && nodeRedManager.zigbee2mqttConnected;
-    // TODO Check if needed
-  }
-
   return Object.freeze({
     start,
     stop,
-    isUsed,
     device: nodeRedManager,
     controllers: NodeRedController(gladys, nodeRedManager),
   });

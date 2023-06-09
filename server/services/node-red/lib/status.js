@@ -6,7 +6,7 @@
  */
 function status() {
   const nodeRedEnabled = this.isEnabled();
-  const zigbee2mqttStatus = {
+  const nodeRedStatus = {
     nodeRedExist: this.nodeRedExist,
     nodeRedRunning: this.nodeRedRunning,
     nodeRedEnabled,
@@ -14,7 +14,7 @@ function status() {
     dockerBased: this.dockerBased,
     networkModeValid: this.networkModeValid,
   };
-  return zigbee2mqttStatus;
+  return nodeRedStatus;
 }
 
 module.exports = {
