@@ -1936,7 +1936,10 @@
     "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
     "gigabytes-per-second": "Gigaoctets par seconde (Go/s)",
     "aqi": "Indice de Qualité de l'Air",
-    "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)"
+    "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)",
+    "square-centimeter": "Centimètre carré (cm2)",
+    "square-meter": "Mètre carré (m2)",
+    "square-kilometer": "Kilomètre carré (km2)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2009,7 +2012,10 @@
     "megabytes-per-second": "Mo/s",
     "gigabytes-per-second": "Go/s",
     "aqi": "AQI",
-    "microgram-per-cubic-meter": "µg/m³"
+    "microgram-per-cubic-meter": "µg/m³",
+    "square-centimeter": "cm2",
+    "square-meter": "m2",
+    "square-kilometer": "km2"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2323,6 +2329,10 @@
     "text": {
       "shortCategoryName": "Texte",
       "text": "Texte"
+    },
+    "surface": {
+      "shortCategoryName": "Surface",
+      "decimal": "Surface"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
