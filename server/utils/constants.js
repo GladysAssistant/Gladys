@@ -275,6 +275,7 @@ const ACTIONS = {
   },
   MESSAGE: {
     SEND: 'message.send',
+    SEND_CAMERA: 'message.send-camera',
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
