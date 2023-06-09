@@ -41,7 +41,7 @@ describe('NodeRed installContainer', () => {
         createContainer: fake.resolves(true),
         exec: fake.resolves(true),
         getGladysBasePath: fake.resolves({
-          basePathOnHost: '/var/lib/gladysassistant',
+          basePathOnHost: TEMP_GLADYS_FOLDER,
           basePathOnContainer: TEMP_GLADYS_FOLDER,
         }),
       },

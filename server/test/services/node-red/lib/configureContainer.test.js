@@ -24,7 +24,6 @@ const basePathOnContainer = path.join(__dirname, 'container');
 describe('NodeRed configureContainer', () => {
   let nodeRedManager;
   let gladys;
-  let mockHashSync;
 
   beforeEach(() => {
     gladys = {
@@ -44,7 +43,6 @@ describe('NodeRed configureContainer', () => {
   });
 
   afterEach(() => {
-    mockHashSync.restore();
     fs.rmSync(basePathOnContainer, { force: true, recursive: true });
   });
 
