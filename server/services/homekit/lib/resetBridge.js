@@ -9,6 +9,7 @@ const { EVENTS } = require('../../../utils/constants');
 async function resetBridge() {
   if (this.notifyCb) {
     this.gladys.event.removeListener(EVENTS.TRIGGERS.CHECK, this.notifyCb);
+    this.notifyCb = null;
   }
 
   if (this.bridge) {
