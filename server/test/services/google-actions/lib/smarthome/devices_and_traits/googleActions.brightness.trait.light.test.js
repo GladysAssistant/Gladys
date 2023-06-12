@@ -146,6 +146,65 @@ describe('GoogleActions Handler - onSync - brightness (light)', () => {
     assert.notCalled(gladys.event.emit);
   });
 
+  it('should get device value with custom scale - onQuery', async () => {
+    const device = {
+      name: 'Device 1',
+      selector: 'device-1',
+      external_id: 'device-1-external-id',
+      features: [
+        {
+          selector: 'feature-1',
+          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+          type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+          last_value: 127,
+          min: 0,
+          max: 254,
+        },
+      ],
+      model: 'device-model',
+      room: {
+        name: 'living-room',
+      },
+    };
+
+    gladys = {
+      event: {
+        emit: fake.resolves(null),
+      },
+      stateManager: {
+        get: fake.returns(device),
+        state: {
+          device: {
+            device_1: {
+              get: fake.returns(device),
+            },
+          },
+        },
+      },
+    };
+
+    googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
+    const result = await googleActionsHandler.onQuery(body);
+
+    const expectedResult = {
+      requestId: 'request-id',
+      payload: {
+        agentUserId: 'user-id',
+        devices: {
+          'device-1': {
+            online: true,
+            brightness: 50,
+          },
+        },
+      },
+    };
+    expect(result).to.deep.eq(expectedResult);
+
+    assert.notCalled(gladys.stateManager.state.device.device_1.get);
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
+    assert.notCalled(gladys.event.emit);
+  });
+
   it('should emit Gladys event with new value - onExecute', async () => {
     const result = await googleActionsHandler.onExecute(body);
 
