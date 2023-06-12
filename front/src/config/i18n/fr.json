@@ -246,7 +246,8 @@
       },
       "devices": {
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
-        "editNameLabel": "Entrez le nom de cette box"
+        "editNameLabel": "Nom du widget",
+        "editNamePlaceholder": "Enter le nom du widget"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",

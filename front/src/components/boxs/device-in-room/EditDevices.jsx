@@ -85,7 +85,7 @@ class EditDevices extends Component {
                 <input
                   type="text"
                   class="form-control"
-                  placeholder={<Text id="dashboard.boxes.devices.editNameLabel" />}
+                  placeholder={<Text id="dashboard.boxes.devices.editNamePlaceholder" />}
                   value={props.box.name}
                   onInput={this.updateName}
                 />
