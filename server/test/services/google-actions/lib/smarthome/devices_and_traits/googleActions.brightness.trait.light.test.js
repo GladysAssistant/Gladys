@@ -59,6 +59,8 @@ describe('GoogleActions Handler - onSync - brightness (light)', () => {
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
           type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
           last_value: 73,
+          min: 0,
+          max: 100,
         },
       ],
       model: 'device-model',
@@ -169,6 +171,70 @@ describe('GoogleActions Handler - onSync - brightness (light)', () => {
       status: 'pending',
       type: 'device.set-value',
       value: 20,
+    });
+  });
+  it('should emit Gladys event with new value on scale 0 - 254 - onExecute', async () => {
+    const device = {
+      name: 'Device 1',
+      selector: 'device-1',
+      external_id: 'device-1-external-id',
+      features: [
+        {
+          selector: 'feature-1',
+          category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+          type: DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
+          last_value: 73,
+          min: 0,
+          max: 254,
+        },
+      ],
+      model: 'device-model',
+      room: {
+        name: 'living-room',
+      },
+    };
+
+    gladys = {
+      event: {
+        emit: fake.resolves(null),
+      },
+      stateManager: {
+        get: fake.returns(device),
+        state: {
+          device: {
+            device_1: {
+              get: fake.returns(device),
+            },
+          },
+        },
+      },
+    };
+
+    googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
+    const result = await googleActionsHandler.onExecute(body);
+
+    const expectedResult = {
+      requestId: 'request-id',
+      payload: {
+        agentUserId: 'user-id',
+        commands: [
+          {
+            ids: ['device-1'],
+            status: 'PENDING',
+          },
+        ],
+      },
+    };
+    expect(result).to.deep.eq(expectedResult);
+
+    assert.notCalled(gladys.stateManager.state.device.device_1.get);
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device: 'device-1',
+      device_feature: 'feature-1',
+      status: 'pending',
+      type: 'device.set-value',
+      value: 51,
     });
   });
 });

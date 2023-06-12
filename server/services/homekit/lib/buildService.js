@@ -8,7 +8,7 @@ const {
   EVENTS,
   DEVICE_FEATURE_UNITS,
 } = require('../../../utils/constants');
-const { normalize } = require('./utils');
+const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
 
 const sleep = promisify(setTimeout);
