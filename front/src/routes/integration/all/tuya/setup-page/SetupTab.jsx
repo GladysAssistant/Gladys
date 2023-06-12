@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
@@ -20,7 +20,7 @@ const SetupTab = ({ children, ...props }) => {
           <div class="loader" />
           <div class="dimmer-content">
             <p>
-              <Text id="integration.tuya.setup.description" />
+              <MarkupText id="integration.tuya.setup.description" />
             </p>
 
             <form>
