@@ -245,7 +245,7 @@
         "substractButton": "-"
       },
       "devices": {
-        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
         "editNameLabel": "Entrez le nom de cette box"
       },
       "temperatureInRoom": {

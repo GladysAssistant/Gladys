@@ -103,11 +103,11 @@ describe('Device.get', () => {
     };
     const device = new Device(event, {}, stateManager, service, {}, {}, job);
     const devices = await device.get({
-      device_feature_selectors: 'feature-1,feature-2',
+      device_feature_selectors: 'test-device-feature,test-camera-image',
     });
     expect(devices)
       .to.be.instanceOf(Array)
-      .and.have.lengthOf(0);
+      .and.have.lengthOf(2);
   });
   it('should return 0 device (take=0)', async () => {
     const stateManager = new StateManager(event);

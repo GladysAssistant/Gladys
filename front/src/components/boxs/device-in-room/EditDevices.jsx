@@ -38,7 +38,6 @@ class EditDevices extends Component {
             value: feature.selector,
             label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
           };
-          // for now, we only supports binary on/off and sensors
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
             deviceFeatures.push(featureOption);
           }
@@ -80,7 +79,7 @@ class EditDevices extends Component {
           <div class="dimmer-content">
             <div class="form-group">
               <label>
-                <Text id="dashboard.boxes.devices.editDeviceFeaturesLabel" />
+                <Text id="dashboard.boxes.devices.editNameLabel" />
               </label>
               <Localizer>
                 <input

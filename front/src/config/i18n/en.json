@@ -245,7 +245,7 @@
         "substractButton": "-"
       },
       "devices": {
-        "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
+        "editDeviceFeaturesLabel": "Select the devices you want to display.",
         "editNameLabel": "Enter the name of this box"
       },
       "temperatureInRoom": {
