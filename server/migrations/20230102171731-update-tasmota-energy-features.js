@@ -60,7 +60,6 @@ module.exports = {
         if (type === 'voltage') {
           const currentFields = {
             category: 'energy-sensor',
-            unit: 'watt',
             last_value: value * 1000,
           };
 

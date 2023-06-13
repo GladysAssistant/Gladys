@@ -82,8 +82,19 @@ describe('Tasmota - MQTT - handle new state ENERGY', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
+  it('decode SENSOR Energy yesterday message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/SENSOR', JSON.stringify({ ENERGY: { Yesterday: 125 } }));
+
+    const expectedEvent = {
+      device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Yesterday`,
+      state: 125,
+    };
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
   it('decode SENSOR Energy today message', () => {
-    tasmotaHandler.handleMessage('stat/tasmota-device-topic/SENSOR', JSON.stringify({ ENERGY: { Today: 0.125 } }));
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/SENSOR', JSON.stringify({ ENERGY: { Today: 125 } }));
 
     const expectedEvent = {
       device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Today`,

@@ -15,6 +15,7 @@ const energyPower = require('./energy.power');
 const energyVoltage = require('./energy.voltage');
 const energyTotal = require('./energy.total');
 const energyToday = require('./energy.today');
+const energyYesterday = require('./energy.yesterday');
 const colorChannel = require('./colorChannel');
 const colorScheme = require('./colorScheme');
 const colorSpeed = require('./colorSpeed');
@@ -34,6 +35,7 @@ const FEATURE_TEMPLATES = [
   energyPower,
   energyVoltage,
   energyToday,
+  energyYesterday,
   energyTotal,
   colorChannel,
   colorScheme,

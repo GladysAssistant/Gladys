@@ -105,6 +105,23 @@ describe('Tasmota - MQTT - setValue - FAIL', () => {
     }
   });
 
+  it('Set value energy yesterday', () => {
+    const device = {
+      params: [],
+    };
+    const feature = {
+      external_id: 'tasmota:tasmota-device-topic:ENERGY:Yesterday',
+    };
+    const value = 1;
+
+    try {
+      tasmotaHandler.setValue(device, feature, value);
+      assert.fail('Should fail');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+    }
+  });
+
   it('Set value energy today', () => {
     const device = {
       params: [],

@@ -124,15 +124,29 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
         {
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
           type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          external_id: 'tasmota:tasmota-device-topic:ENERGY:Yesterday',
+          selector: 'tasmota-tasmota-device-topic-energy-yesterday',
+          name: 'Energy yesterday',
+          read_only: true,
+          has_feedback: false,
+          keep_history: false,
+          min: 0,
+          max: 999999,
+          last_value: 1.2,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+        {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
           external_id: 'tasmota:tasmota-device-topic:ENERGY:Today',
           selector: 'tasmota-tasmota-device-topic-energy-today',
           name: 'Energy today',
           read_only: true,
           has_feedback: false,
           min: 0,
-          max: 10000,
-          last_value: 1,
-          unit: DEVICE_FEATURE_UNITS.WATT_HOUR,
+          max: 999999,
+          last_value: 0.001,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
         },
         {
           category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
@@ -227,12 +241,16 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
       state: 20.0,
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Today',
-      state: 1,
-    });
-    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Total',
       state: 6.911,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Yesterday',
+      state: 1.2,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Today',
+      state: 0.001,
     });
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'tasmota:tasmota-device-topic');
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
