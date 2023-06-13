@@ -19,10 +19,11 @@ const SUPPORTED_FEATURE_TYPES = [
   DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
   DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
   DEVICE_FEATURE_TYPES.SHUTTER.STATE,
-  DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
+  DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+  DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
+  DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE
 ];
 
-@connect('httpClient', {})
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
@@ -75,7 +76,7 @@ class EditDeviceInRoom extends Component {
           });
         }
       });
-      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      await this.setState({ room, deviceOptions, selectedDeviceFeaturesOptions, loading: false });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -94,9 +95,10 @@ class EditDeviceInRoom extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
+  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, room }) {
+    const roomName = room && room.name;
     return (
-      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room">
+      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room" titleValue={roomName}>
         <div class={loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">
@@ -117,6 +119,7 @@ class EditDeviceInRoom extends Component {
                   isMulti
                   onChange={this.updateDeviceFeatures}
                   options={deviceOptions}
+                  maxMenuHeight={220}
                 />
               </div>
             )}
@@ -127,4 +130,4 @@ class EditDeviceInRoom extends Component {
   }
 }
 
-export default withIntlAsProp(EditDeviceInRoom);
+export default withIntlAsProp(connect('httpClient', {})(EditDeviceInRoom));

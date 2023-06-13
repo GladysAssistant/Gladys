@@ -9,6 +9,7 @@ const MAX_SIZE_IMAGE = 75 * 1024;
  * @description Set image of a camera.
  * @param {string} selector - Selector of the camera.
  * @param {string} image - Image in base64.
+ * @returns {Promise} Resolve when image has been set.
  * @example
  * camera.setImage('test-camera', 'sfdsf');
  */

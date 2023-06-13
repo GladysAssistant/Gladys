@@ -7,7 +7,7 @@ const DAYS_TO_KEEP = 7;
 
 /**
  * @public
- * @description purge
+ * @description Purge.
  * @returns {Promise} Resolve.
  * @example
  * gladys.job.purge(');

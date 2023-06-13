@@ -12,7 +12,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the service
+   * @description This function starts the service.
    * @example
    * gladys.services.openWeather.start();
    */
@@ -26,7 +26,7 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the service
+   * @description This function stops the service.
    * @example
    * gladys.services.openWeather.stop();
    */
@@ -36,12 +36,13 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
 
   /**
    * @description Get the weather.
-   * @param {Object} options - Options parameters.
+   * @param {object} options - Options parameters.
    * @param {number} options.latitude - The latitude to get the weather from.
    * @param {number} options.longitude - The longitude to get the weather from.
    * @param {number} options.offset - Get weather in the future, offset is in hour.
    * @param {string} [options.language] - The language of the report.
    * @param {string} [options.units] - Unit of the weather [metric, us].
+   * @returns {Promise<object>} Resolve with weather.
    * @example
    * gladys.services.openWeather.weather.get({
    *   latitude: 112,
@@ -67,11 +68,12 @@ module.exports = function OpenWeatherService(gladys, serviceId) {
     if (!openWeatherApiKey) {
       throw new ServiceNotConfiguredError('Open Weather API Key not found');
     }
-    const url = `http://api.openweathermap.org/data/2.5/onecall?lat=${latitude}&lon=${longitude}&lang=${language}&units=${units}&cnt=1&appid=${openWeatherApiKey}`;
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&lang=${language}&units=${units}&cnt=1&appid=${openWeatherApiKey}`;
+    const forecastUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&lang=${language}&units=${units}&appid=${openWeatherApiKey}`;
     try {
-      logger.log(`OpenWeather URL : ${url}`);
-      const { data } = await axios.get(url);
-      const weatherFormatted = formatResults(optionsMerged, data);
+      logger.log(`OpenWeather URL : ${url}, forecast URL = ${forecastUrl}`);
+      const [{ data }, { data: forecastData }] = await Promise.all([axios.get(url), axios.get(forecastUrl)]);
+      const weatherFormatted = formatResults(optionsMerged, data, forecastData);
       return weatherFormatted;
     } catch (e) {
       logger.error(e);

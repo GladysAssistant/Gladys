@@ -1,0 +1,35 @@
+name: Build and publish apidoc documentation
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Build and publish apidoc documentation
+    steps:
+      - uses: actions/checkout@v3
+      - name: 💽 Setup nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: './package.json'
+          cache: 'npm'
+          cache-dependency-path: './package-lock.json'
+      - name: 📦 Install dependencies
+        run: |
+          npm ci
+      - name: 🏗️ Build apidoc
+        run: |
+          npm run generate-apidoc
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_PUBLISH_TO_PAGES_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: gladysassistant-apidoc
+          directory: ./apidoc
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main

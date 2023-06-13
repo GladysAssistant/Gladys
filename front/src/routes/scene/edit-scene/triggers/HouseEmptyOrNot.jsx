@@ -6,7 +6,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { RequestStatus } from '../../../../utils/consts';
 import { EVENTS } from '../../../../../../server/utils/constants';
 
-@connect('httpClient,user', {})
 class HouseEmptyOrNot extends Component {
   getHouses = async () => {
     this.setState({
@@ -74,4 +73,4 @@ class HouseEmptyOrNot extends Component {
   }
 }
 
-export default HouseEmptyOrNot;
+export default connect('httpClient,user', {})(HouseEmptyOrNot);

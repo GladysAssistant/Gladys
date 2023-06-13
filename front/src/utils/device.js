@@ -21,6 +21,27 @@ const matchFeature = (feature, selector, category, type) => {
   return feature.selector !== selector && feature.type === type;
 };
 
+/**
+ * @description Get Device param by name.
+ * @param {Object} device - Device Object to parse.
+ * @param {string} paramName - The name of the param to get.
+ * @returns {string} Return param.
+ * @example
+ * const value = getDeviceParam({
+ *  params: [{ name: 'test', value: 1 }]
+ * }, 'test');
+ */
+function getDeviceParam(device, paramName) {
+  if (!get(device, 'params')) {
+    return null;
+  }
+  const param = device.params.find(oneParam => oneParam.name === paramName);
+  if (param) {
+    return param.value;
+  }
+  return null;
+}
+
 const shouldDisplayDeviceName = (device, deviceFeature) => {
   const deviceService = get(device, 'service.name');
 
@@ -56,4 +77,4 @@ const getDeviceName = (device, feature) => {
   return feature.name;
 };
 
-export { getDeviceFeatureName, getDeviceName, DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES };
+export { getDeviceFeatureName, getDeviceName, getDeviceParam, DISPLAY_FEATURE_NAME_FOR_THOSE_SERVICES };

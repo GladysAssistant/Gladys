@@ -100,12 +100,18 @@ class DevicesInRoomComponent extends Component {
     this.props.getDevicesInRoom(this.props.box, this.props.x, this.props.y);
   };
   updateDeviceStateWebsocket = payload => this.props.deviceFeatureWebsocketEvent(this.props.x, this.props.y, payload);
+  updateDeviceTextWebsocket = payload =>
+    this.props.deviceFeatureStringStateWebsocketEvent(this.props.x, this.props.y, payload);
 
   componentDidMount() {
     this.refreshData();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
+    );
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
+      this.updateDeviceTextWebsocket
     );
   }
 
@@ -121,6 +127,10 @@ class DevicesInRoomComponent extends Component {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
+    );
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
+      this.updateDeviceTextWebsocket
     );
   }
 

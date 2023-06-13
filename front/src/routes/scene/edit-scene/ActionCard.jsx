@@ -21,6 +21,7 @@ import CheckTime from './actions/CheckTime';
 import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
 import EcowattCondition from './actions/EcowattCondition';
+import SendMessageCameraParams from './actions/SendMessageCameraParams';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -29,10 +30,13 @@ const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
 const ACTION_ICON = {
   [ACTIONS.LIGHT.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.LIGHT.TURN_OFF]: 'fe fe-toggle-left',
+  [ACTIONS.LIGHT.TOGGLE]: 'fe fe-shuffle',
   [ACTIONS.SWITCH.TURN_ON]: 'fe fe-toggle-right',
   [ACTIONS.SWITCH.TURN_OFF]: 'fe fe-toggle-left',
+  [ACTIONS.SWITCH.TOGGLE]: 'fe fe-shuffle',
   [ACTIONS.TIME.DELAY]: 'fe fe-clock',
   [ACTIONS.MESSAGE.SEND]: 'fe fe-message-square',
+  [ACTIONS.MESSAGE.SEND_CAMERA]: 'fe fe-message-square',
   [ACTIONS.CONDITION.ONLY_CONTINUE_IF]: 'fe fe-shuffle',
   [ACTIONS.DEVICE.GET_VALUE]: 'fe fe-refresh-cw',
   [ACTIONS.USER.SET_SEEN_AT_HOME]: 'fe fe-home',
@@ -64,12 +68,7 @@ const ActionCard = ({ children, ...props }) => (
         {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
         {props.action.type === null && <i class="fe fe-plus-circle" />}
         <div class="card-title">
-          <i
-            class={props.action.icon}
-            style={{
-              marginRight: '10px'
-            }}
-          />{' '}
+          <i class={cx('mr-3', props.action.icon)} />
           <Text id={`editScene.actions.${props.action.type}`} />
           {props.action.type === null && <Text id="editScene.newAction" />}
         </div>
@@ -122,6 +121,14 @@ const ActionCard = ({ children, ...props }) => (
             updateActionProperty={props.updateActionProperty}
           />
         )}
+        {props.action.type === ACTIONS.LIGHT.TOGGLE && (
+          <TurnOnOffLightParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
         {props.action.type === ACTIONS.SWITCH.TURN_ON && (
           <TurnOnOffSwitchParams
             action={props.action}
@@ -131,6 +138,14 @@ const ActionCard = ({ children, ...props }) => (
           />
         )}
         {props.action.type === ACTIONS.SWITCH.TURN_OFF && (
+          <TurnOnOffSwitchParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+          />
+        )}
+        {props.action.type === ACTIONS.SWITCH.TOGGLE && (
           <TurnOnOffSwitchParams
             action={props.action}
             columnIndex={props.columnIndex}
@@ -149,6 +164,17 @@ const ActionCard = ({ children, ...props }) => (
             triggersVariables={props.triggersVariables}
           />
         )}
+        {props.action.type === ACTIONS.MESSAGE.SEND_CAMERA && (
+          <SendMessageCameraParams
+            action={props.action}
+            columnIndex={props.columnIndex}
+            index={props.index}
+            updateActionProperty={props.updateActionProperty}
+            actionsGroupsBefore={props.actionsGroupsBefore}
+            variables={props.variables}
+            triggersVariables={props.triggersVariables}
+          />
+        )}
         {props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF && (
           <OnlyContinueIfParams
             action={props.action}
@@ -156,6 +182,7 @@ const ActionCard = ({ children, ...props }) => (
             index={props.index}
             updateActionProperty={props.updateActionProperty}
             actionsGroupsBefore={props.actionsGroupsBefore}
+            triggersVariables={props.triggersVariables}
             variables={props.variables}
             setVariables={props.setVariables}
           />
@@ -248,6 +275,9 @@ const ActionCard = ({ children, ...props }) => (
             columnIndex={props.columnIndex}
             index={props.index}
             updateActionProperty={props.updateActionProperty}
+            actionsGroupsBefore={props.actionsGroupsBefore}
+            triggersVariables={props.triggersVariables}
+            variables={props.variables}
           />
         )}
         {props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING && (

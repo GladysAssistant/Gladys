@@ -3,6 +3,8 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 class SetupForm extends Component {
+  showPasswordTimer = null;
+
   updateUrl = e => {
     this.props.updateConfiguration({ mqttUrl: e.target.value });
   };
@@ -15,10 +17,27 @@ class SetupForm extends Component {
     this.props.updateConfiguration({ mqttPassword: e.target.value, passwordChanges: true });
   };
 
-  showPassword = () => {
-    this.setState({ showPassword: true });
-    setTimeout(() => this.setState({ showPassword: false }), 5000);
+  togglePassword = () => {
+    const { showPassword } = this.state;
+
+    if (this.showPasswordTimer) {
+      clearTimeout(this.showPasswordTimer);
+      this.showPasswordTimer = null;
+    }
+
+    this.setState({ showPassword: !showPassword });
+
+    if (!showPassword) {
+      this.showPasswordTimer = setTimeout(() => this.setState({ showPassword: false }), 5000);
+    }
   };
+
+  componentWillUnmount() {
+    if (this.showPasswordTimer) {
+      clearTimeout(this.showPasswordTimer);
+      this.showPasswordTimer = null;
+    }
+  }
 
   render(props, { showPassword }) {
     return (
@@ -66,7 +85,7 @@ class SetupForm extends Component {
               <input
                 id="mqttPassword"
                 name="mqttPassword"
-                type={props.useEmbeddedBroker && showPassword ? 'text' : 'password'}
+                type={showPassword ? 'text' : 'password'}
                 placeholder={<Text id="integration.mqtt.setup.passwordPlaceholder" />}
                 value={props.mqttPassword}
                 class="form-control"
@@ -74,16 +93,14 @@ class SetupForm extends Component {
                 autoComplete="new-password"
               />
             </Localizer>
-            {props.useEmbeddedBroker && (
-              <span class="input-icon-addon cursor-pointer" onClick={this.showPassword}>
-                <i
-                  class={cx('fe', {
-                    'fe-eye': !showPassword,
-                    'fe-eye-off': showPassword
-                  })}
-                />
-              </span>
-            )}
+            <span class="input-icon-addon cursor-pointer" onClick={this.togglePassword}>
+              <i
+                class={cx('fe', {
+                  'fe-eye': !showPassword,
+                  'fe-eye-off': showPassword
+                })}
+              />
+            </span>
           </div>
         </div>
 

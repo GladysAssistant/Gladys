@@ -138,7 +138,7 @@ jobs:
         id: buildx
         uses: docker/setup-buildx-action@v2
         with:
-          version: latest
+          version: v0.9.1
       - name: ↙️ Download build artifact
         uses: actions/download-artifact@v3
         with:

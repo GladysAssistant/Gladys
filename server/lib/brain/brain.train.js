@@ -1,7 +1,7 @@
 const { getConfiguration } = require('../../config/brain/index');
 const logger = require('../../utils/logger');
 /**
- * @description Train the brain
+ * @description Train the brain.
  * @example
  * brain.train();
  */

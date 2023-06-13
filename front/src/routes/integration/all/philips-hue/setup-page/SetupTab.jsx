@@ -52,13 +52,6 @@ const SetupTab = ({ children, ...props }) => {
                       </div>
                     ))}
                 </div>
-                {props.philipsHueBridgesDevices && props.philipsHueBridgesDevices.length === 0 && (
-                  <div>
-                    <div style={{ marginTop: '20px', marginBottom: '20px', textAlign: 'center' }}>
-                      <Text id="integration.philipsHue.setup.noBridgesConnected" />
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>

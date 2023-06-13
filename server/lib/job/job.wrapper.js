@@ -2,7 +2,7 @@ const { JOB_STATUS, JOB_ERROR_TYPES } = require('../../utils/constants');
 
 /**
  * @public
- * @description Start a job
+ * @description Start a job.
  * @param {string} type - Type of the job.
  * @param {Function} func - The function to wrap.
  * @returns {Function} Return function.

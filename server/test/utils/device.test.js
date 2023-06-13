@@ -1,33 +1,76 @@
 const { expect } = require('chai');
-const { getDeviceParam, setDeviceParam, getDeviceFeature, hasDeviceChanged } = require('../../utils/device');
+const {
+  getDeviceParam,
+  setDeviceParam,
+  getDeviceFeature,
+  hasDeviceChanged,
+  mergeFeatures,
+  mergeDevices,
+} = require('../../utils/device');
 
-const device = {
-  features: [
-    {
-      id: 1,
-      type: 'test',
-      category: 'test',
-      external_id: 'external_id',
-    },
-  ],
-  params: [
-    {
-      name: 'MY_PARAM_1',
-      value: 'MY_VALUE_1',
-    },
-    {
-      name: 'MY_PARAM_2',
-      value: 'MY_VALUE_2',
-    },
-  ],
+const buildObject = (prefix, attributes) => {
+  const feature = {};
+  attributes.forEach((attribute) => {
+    feature[attribute] = `${prefix}-${attribute}`;
+  });
+  return feature;
+};
+
+const buildFeature = (suffix) => {
+  const featurePrefix = `feature-${suffix}`;
+  const attributes = [
+    'id',
+    'device_id',
+    'name',
+    'selector',
+    'external_id',
+    'category',
+    'type',
+    'read_only',
+    'keep_history',
+    'has_feedback',
+    'unit',
+    'min',
+    'max',
+    'last_value',
+    'last_value_string',
+    'last_value_changed',
+    'last_hourly_aggregate',
+    'last_daily_aggregate',
+    'last_monthly_aggregate',
+  ];
+
+  return buildObject(featurePrefix, attributes);
+};
+
+const buildDevice = (suffix, features = [], params = []) => {
+  const devicePrefix = `device-${suffix}`;
+  const attributes = [
+    'id',
+    'service_id',
+    'room_id',
+    'name',
+    'selector',
+    'model',
+    'external_id',
+    'should_poll',
+    'poll_frequency',
+  ];
+
+  const device = buildObject(devicePrefix, attributes);
+  return { ...device, features, params };
 };
 
 describe('getDeviceParam', () => {
   it('should get a param', () => {
+    const param = { name: 'MY_PARAM_2', value: 'MY_VALUE_2' };
+    const device = buildDevice('current', [], [param]);
     const value = getDeviceParam(device, 'MY_PARAM_2');
     expect(value).to.equal('MY_VALUE_2');
   });
   it('should return null', () => {
+    const param = { name: 'MY_PARAM_2', value: 'MY_VALUE_2' };
+    const device = buildDevice('current', [], [param]);
     const value = getDeviceParam(device, 'DOES_NOT_EXIST');
     expect(value).to.equal(null);
   });
@@ -51,14 +94,8 @@ describe('setDeviceParam', () => {
     });
   });
   it('should update param', () => {
-    const newDevice = {
-      params: [
-        {
-          name: 'EXISTING',
-          value: 'OLD_VALUE',
-        },
-      ],
-    };
+    const newDevice = { params: [{ name: 'EXISTING', value: 'OLD_VALUE' }] };
+
     setDeviceParam(newDevice, 'EXISTING', 'NEW_VALUE');
     expect(newDevice).to.deep.equal({
       params: [
@@ -73,145 +110,155 @@ describe('setDeviceParam', () => {
 
 describe('getDeviceFeature', () => {
   it('should get a feature', () => {
-    const feature = getDeviceFeature(device, 'test', 'test');
-    expect(feature).to.deep.equal({
-      id: 1,
-      type: 'test',
-      category: 'test',
-      external_id: 'external_id',
-    });
+    const feature1 = buildFeature('test-1');
+    const feature2 = buildFeature('test-2');
+    const device = buildDevice('current', [feature1, feature2]);
+    const foundFeature = getDeviceFeature(device, 'feature-test-1-category', 'feature-test-1-type');
+    expect(foundFeature).to.deep.eq(feature1);
   });
-  it('should return null', () => {
-    const value = getDeviceFeature(device, 'test', 'not-found');
+  it('should return null on bad type', () => {
+    const feature = buildFeature('test');
+    const device = buildDevice('current', [feature]);
+    const value = getDeviceFeature(device, 'feature-test-category', 'unknown-type');
     expect(value).to.equal(null);
   });
-  it('should return null', () => {
-    const value = getDeviceFeature(device, 'not-found', 'not-found');
+  it('should return null on bad category', () => {
+    const feature = buildFeature('test');
+    const device = buildDevice('current', [feature]);
+    const value = getDeviceFeature(device, 'unknown-category', 'feature-test-type');
     expect(value).to.equal(null);
   });
-  it('should return null', () => {
-    const value = getDeviceFeature({}, 'not-found', 'not-found');
+  it('should return null on empty device', () => {
+    const value = getDeviceFeature({}, 'unknown-category', 'unknown-type');
     expect(value).to.equal(null);
   });
 });
 
 describe('hasDeviceChanged', () => {
   it('should be same device', () => {
+    const feature1 = buildFeature('test-1');
+    const feature2 = buildFeature('test-2');
+    const param1 = { name: 'PARAM_1', value: 'VALUE_1' };
+    const param2 = { name: 'PARAM_2', value: 'VALUE_2' };
+    const device = buildDevice('current', [feature1, feature2], [param1, param2]);
+
     const updatable = hasDeviceChanged(device, device);
     expect(updatable).to.equal(false);
   });
 
   it('should not be same device, one more feature', () => {
-    const newDevice = {
-      features: [
-        {
-          id: 1,
-          type: 'test',
-          category: 'test',
-          external_id: 'external_id',
-        },
-        {
-          id: 2,
-          type: 'test',
-          category: 'test',
-          external_id: 'external_id2',
-        },
-      ],
-      params: [
-        {
-          name: 'MY_PARAM_1',
-          value: 'MY_VALUE_1',
-        },
-        {
-          name: 'MY_PARAM_2',
-          value: 'MY_VALUE_2',
-        },
-      ],
-    };
-    const updatable = hasDeviceChanged(newDevice, device);
+    const feature1 = buildFeature('test-1');
+    const feature2 = buildFeature('test-2');
+
+    const newDevice = buildDevice('current', [feature1, feature2]);
+    const oldDevice = buildDevice('current', [feature1]);
+
+    const updatable = hasDeviceChanged(newDevice, oldDevice);
     expect(updatable).to.equal(true);
   });
 
   it('should not be same device, updated feature', () => {
-    const newDevice = {
-      features: [
-        {
-          id: 2,
-          type: 'test',
-          category: 'test',
-          external_id: 'external_id2',
-        },
-      ],
-      params: [
-        {
-          name: 'MY_PARAM_1',
-          value: 'MY_VALUE_1',
-        },
-        {
-          name: 'MY_PARAM_2',
-          value: 'MY_VALUE_2',
-        },
-      ],
-    };
-    const updatable = hasDeviceChanged(newDevice, device);
+    const feature1 = buildFeature('test-1');
+    const feature2 = buildFeature('test-2');
+
+    const newDevice = buildDevice('current', [feature1], []);
+    const oldDevice = buildDevice('current', [feature2], []);
+
+    const updatable = hasDeviceChanged(newDevice, oldDevice);
     expect(updatable).to.equal(true);
   });
 
   it('should not be same device, updated param', () => {
-    const newDevice = {
-      features: [
-        {
-          id: 1,
-          type: 'test',
-          category: 'test',
-          external_id: 'external_id',
-        },
-        {
-          id: 2,
-          type: 'test',
-          category: 'test',
-          external_id: 'external_id2',
-        },
-      ],
-      params: [
-        {
-          name: 'MY_PARAM_1',
-          value: 'MY_VALUE_1',
-        },
-        {
-          name: 'MY_PARAM_2',
-          value: 'MY_NEW_VALUE_2',
-        },
-      ],
-    };
-    const updatable = hasDeviceChanged(newDevice, device);
+    const newParam = { name: 'PARAM_1', value: 'NEW_VALUE_1' };
+    const newDevice = buildDevice('current', [], [newParam]);
+
+    const oldParam = { name: 'PARAM_1', value: 'OLD_VALUE_1' };
+    const oldDevice = buildDevice('current', [], [oldParam]);
+
+    const updatable = hasDeviceChanged(newDevice, oldDevice);
     expect(updatable).to.equal(true);
   });
 
   it('should not be same device, one param missing', () => {
-    const newDevice = {
-      features: [
-        {
-          id: 1,
-          type: 'test',
-          category: 'test',
-          external_id: 'external_id',
-        },
-        {
-          id: 2,
-          type: 'test',
-          category: 'test',
-          external_id: 'external_id2',
-        },
-      ],
-      params: [
-        {
-          name: 'MY_PARAM_1',
-          value: 'MY_VALUE_1',
-        },
-      ],
-    };
-    const updatable = hasDeviceChanged(newDevice, device);
+    const param1 = { name: 'PARAM_1', value: 'VALUE_1' };
+    const param2 = { name: 'PARAM_2', value: 'VALUE_2' };
+
+    const newDevice = buildDevice('current', [], [param1]);
+    const oldDevice = buildDevice('current', [], [param1, param2]);
+
+    const updatable = hasDeviceChanged(newDevice, oldDevice);
     expect(updatable).to.equal(true);
+  });
+});
+
+describe('mergeFeature', () => {
+  it('should keep new feature', () => {
+    const newFeature = buildFeature('test-1');
+    const mergedFeature = mergeFeatures(newFeature, null);
+    expect(mergedFeature).to.deep.equal(newFeature);
+  });
+
+  it('should keep merge with old feature', () => {
+    const newFeature = buildFeature('new');
+    const oldFeature = buildFeature('old');
+    const mergedFeature = mergeFeatures(newFeature, oldFeature);
+
+    const expectedFeature = { ...newFeature, name: 'feature-old-name' };
+    expect(mergedFeature).to.deep.equal(expectedFeature);
+  });
+});
+
+describe('mergeDevice', () => {
+  it('should keep new device', () => {
+    const newDevice = buildDevice('new');
+    const mergedDevice = mergeDevices(newDevice, null);
+    expect(mergedDevice).to.deep.equal(newDevice);
+  });
+
+  it('should keep new device without diff', () => {
+    const newDevice = buildDevice('new');
+    const mergedDevice = mergeDevices(newDevice, newDevice);
+    expect(mergedDevice).to.deep.equal({ ...newDevice, updatable: false });
+  });
+
+  it('should merge with old device', () => {
+    const newParam = { name: 'NEW_PARAM_1', value: 'NEW_VALUE_1' };
+    const newDevice = buildDevice('new', [], [newParam]);
+
+    const oldParam = { name: 'OLD_PARAM_1', value: 'OLD_VALUE_1' };
+    const oldDevice = buildDevice('old', [], [oldParam]);
+
+    const mergedDevice = mergeDevices(newDevice, oldDevice);
+
+    const expectedDevice = { ...newDevice, name: 'device-old-name', room_id: 'device-old-room_id', updatable: true };
+    expect(mergedDevice).to.deep.equal(expectedDevice);
+  });
+
+  it('should not merge with old feature', () => {
+    const newFeature = buildFeature('new');
+    const newDevice = buildDevice('same', [newFeature], []);
+    const oldFeature = buildFeature('old');
+    const oldDevice = buildDevice('same', [oldFeature], []);
+
+    const mergedDevice = mergeDevices(newDevice, oldDevice);
+
+    const expectedDevice = { ...newDevice, updatable: true };
+    expect(mergedDevice).to.deep.equal(expectedDevice);
+  });
+
+  it('should merge with old feature', () => {
+    const newFeature = buildFeature('new');
+    const newDevice = buildDevice('same', [newFeature], []);
+    const oldFeature1 = buildFeature('old1');
+    const oldFeature2 = buildFeature('old2');
+    // force feature external_id to enable merge action
+    oldFeature1.external_id = newFeature.external_id;
+    const oldDevice = buildDevice('same', [oldFeature1, oldFeature2], []);
+
+    const mergedDevice = mergeDevices(newDevice, oldDevice);
+
+    const expectedFeature = { ...newFeature, name: 'feature-old1-name' };
+    const expectedDevice = { ...newDevice, features: [expectedFeature], updatable: true };
+    expect(mergedDevice).to.deep.equal(expectedDevice);
   });
 });

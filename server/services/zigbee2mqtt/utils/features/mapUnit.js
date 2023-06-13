@@ -2,11 +2,9 @@ const { DEVICE_FEATURE_UNITS } = require('../../../../utils/constants');
 
 /**
  * @description Transform Zigbee unit to Gladys unit.
- *
  * @param {string} deviceUnit - Zigbee unit.
  * @param {string} featureUnit - Default unit.
  * @returns {string} Tranformed unit.
- *
  * @example mapUnit('°C', 'celsius');
  */
 function mapUnit(deviceUnit, featureUnit) {

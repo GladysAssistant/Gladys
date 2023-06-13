@@ -7,7 +7,7 @@ const BACKUP_KEY_LENGTH = 64;
 
 /**
  * @private
- * @description Generate a backup key
+ * @description Generate a backup key.
  * @example
  * const key = await generateBackupKey();
  * @returns {Promise} Resolving with the key.

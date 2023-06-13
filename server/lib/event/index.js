@@ -22,4 +22,12 @@ Event.prototype.on = function on(event, cb) {
   this.emitter.on(event, cb);
 };
 
+Event.prototype.removeListener = function removeListener(event, cb) {
+  this.emitter.removeListener(event, cb);
+};
+
+Event.prototype.listenerCount = function listenerCount(event) {
+  return this.emitter.listenerCount(event);
+};
+
 module.exports = Event;

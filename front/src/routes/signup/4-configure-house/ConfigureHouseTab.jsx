@@ -1,5 +1,6 @@
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import style from '../style.css';
 
 const removeRoomLocal = (index, removeRoom) => () => {
   removeRoom(index);
@@ -8,7 +9,7 @@ const removeRoomLocal = (index, removeRoom) => () => {
 const ConfigureHouseTab = ({ children, ...props }) => (
   <div class="row">
     <div class="col-md-8 mx-auto">
-      <h2>
+      <h2 class={style.signupTitle}>
         <Text id="signup.configureHouse.title" />
       </h2>
       <p>

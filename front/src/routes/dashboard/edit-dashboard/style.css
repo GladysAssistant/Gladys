@@ -1,0 +1,55 @@
+.dropZone {
+  height: 100%;
+  min-height: 10rem;
+  border-width: 1px;
+  border-radius: 2px;
+  padding: 1rem;
+  border-color: '#eeeeee';
+  border-style: dashed;
+  outline: none;
+  transition: border 0.24s ease-in-out;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  margin-bottom: 1.5rem;
+}
+
+.bottomDropZone {
+  min-height: 20rem;
+  border-width: 1px;
+  border-radius: 2px;
+  padding: 1rem;
+  border-color: '#eeeeee';
+  border-style: dashed;
+  outline: none;
+  transition: border 0.24s ease-in-out;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 992px) {
+  .bottomDropZone {
+    min-height: 5rem;
+    height: 5rem;
+  }
+}
+
+.scrollTopGuide {
+  position: fixed;
+  z-index: 1050;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20%;
+  width: 100%;
+}
+
+.scrollBottomGuide {
+  position: fixed;
+  z-index: 1050;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20%;
+  width: 100%;
+}

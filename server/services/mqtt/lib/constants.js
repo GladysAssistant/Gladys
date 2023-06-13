@@ -10,13 +10,13 @@ const DEFAULT = {
   TOPICS: [
     'gladys/master/#', // Default gladys topic
   ],
-  HIDDEN_PASSWORD: '*********',
   INSTALLATION_STATUS: {
     DONE: 'DONE',
     IN_PROGRESS: 'IN_PROGRESS',
     ERROR: 'ERROR',
   },
-  MOSQUITTO_VERSION: '2',
+  MOSQUITTO_VERSION: '3',
+  PASSWORD_FILE_PATH: '/mosquitto/config/mosquitto.passwd',
 };
 
 module.exports = {

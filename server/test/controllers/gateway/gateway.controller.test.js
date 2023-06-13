@@ -106,3 +106,18 @@ describe('GET /api/v1/gateway/backup/restore/status', () => {
       });
   });
 });
+
+describe('POST /api/v1/gateway/openai/ask', () => {
+  it('should return GPT-3 response', async () => {
+    nock(config.gladysGatewayServerUrl)
+      .post('/openai/ask')
+      .reply(200, {
+        answer: 'this is my answer',
+      });
+    const response = await authenticatedRequest
+      .post('/api/v1/gateway/openai/ask')
+      .expect('Content-Type', /json/)
+      .expect(200);
+    expect(response.body).to.have.property('answer', 'this is my answer');
+  });
+});

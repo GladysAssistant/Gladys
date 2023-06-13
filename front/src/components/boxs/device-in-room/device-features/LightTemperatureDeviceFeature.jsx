@@ -21,12 +21,9 @@ const LightTemperatureDeviceType = ({ children, ...props }) => {
       </td>
       <td>{getDeviceName(props.device, props.deviceFeature)}</td>
 
-      <td class="text-right" style="padding-top: 0px; padding-bottom: 0px">
+      <td class="text-right py-0">
         <div class="col">
           <input
-            style={{
-              minHeight: '30px'
-            }}
             type="range"
             value={props.deviceFeature.last_value}
             onChange={updateValue}

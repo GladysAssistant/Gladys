@@ -52,7 +52,8 @@
       }
     ],
     "model": "WXKG01LM",
-    "name": "0x00158d00033e88d5",
+    "name": "device-name",
+    "room_id": "room_id",
     "service_id": "f87b7af2-ca8e-44fc-b754-444354b42fee",
     "should_poll": false,
     "updatable": true

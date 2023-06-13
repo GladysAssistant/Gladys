@@ -2,7 +2,7 @@ const logger = require('../../utils/logger');
 
 /**
  * @description Restore a backup.
- * @param {Object} event - An event.
+ * @param {object} event - An event.
  * @example
  * restoreBackupEvent({
  *  file_url: 'https://backup-example'

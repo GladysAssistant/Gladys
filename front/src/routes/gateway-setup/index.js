@@ -2,10 +2,8 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import LinkGatewayUserPage from './LinkGatewayUser';
 import actions from '../../actions/gatewayLinkUser';
-import { route } from 'preact-router';
 import { RequestStatus } from '../../utils/consts';
 
-@connect('users,usersGetStatus,session', actions)
 class LinkGatewayUser extends Component {
   getSetupState = async () => {
     await this.setState({ loading: true });
@@ -28,13 +26,15 @@ class LinkGatewayUser extends Component {
   saveUser = async () => {
     this.setState({ savingUserLoading: true });
     try {
-      await this.props.saveUser(this.state.selectedUser);
-      this.setState({ savingUserLoading: false });
-      route('/dashboard');
+      await this.props.session.gatewayClient.updateUserIdInGladys(this.state.selectedUser);
+      await this.props.httpClient.get('/api/v1/me');
+      // hard redirect, to reload websocket connection
+      window.location = '/dashboard';
     } catch (e) {
       console.error(e);
-      this.setState({ savingUserLoading: false, error: true });
+      this.setState({ error: true });
     }
+    this.setState({ savingUserLoading: false });
   };
   componentWillMount() {
     this.props.getUsers();
@@ -55,4 +55,4 @@ class LinkGatewayUser extends Component {
   }
 }
 
-export default LinkGatewayUser;
+export default connect('users,usersGetStatus,session,httpClient', actions)(LinkGatewayUser);

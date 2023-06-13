@@ -1,17 +1,28 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import { connect } from 'unistore/preact';
-import { Link } from 'preact-router/match';
 import { route } from 'preact-router';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import { DASHBOARD_TYPE } from '../../../../../server/utils/constants';
 import style from './style.css';
 
 const NewDashboardPage = ({ children, ...props }) => (
   <div class={cx('container', style.containerWithMargin)}>
-    <Link href="/dashboard" class="btn btn-secondary btn-sm">
-      <Text id="global.backButton" />
-    </Link>
+    <div class="row">
+      <div class={cx('col', 'mx-auto', style.backButtonDiv)}>
+        {props.prev && (
+          <Link href={`/dashboard/${props.prev}/edit`} class="btn btn-secondary btn-sm">
+            <Text id="global.backButton" />
+          </Link>
+        )}
+        {!props.prev && (
+          <Link href="/dashboard" class="btn btn-secondary btn-sm">
+            <Text id="global.backButton" />
+          </Link>
+        )}
+      </div>
+    </div>
     <div class="row">
       <div class="col col-login mx-auto">
         <form onSubmit={props.createScene} class="card">
@@ -68,10 +79,12 @@ const NewDashboardPage = ({ children, ...props }) => (
   </div>
 );
 
-@connect('user,httpClient', {})
 class Dashboard extends Component {
   updateName = e => {
     this.setState({ name: e.target.value });
+  };
+  goBack = () => {
+    this.props.history.go(-1);
   };
   createDashboard = async e => {
     e.preventDefault();
@@ -88,7 +101,7 @@ class Dashboard extends Component {
       };
       const createDashboard = await this.props.httpClient.post('/api/v1/dashboard', newDashboard);
       this.setState({ loading: false, dashboardAlreadyExistError: false, unknownError: false });
-      route(`/dashboard/${createDashboard.selector}`);
+      route(`/dashboard/${createDashboard.selector}/edit`);
     } catch (e) {
       if (e.response && e.response.status === 409) {
         this.setState({ dashboardAlreadyExistError: true });
@@ -116,9 +129,11 @@ class Dashboard extends Component {
         unknownError={unknownError}
         updateName={this.updateName}
         createDashboard={this.createDashboard}
+        goBack={this.goBack}
+        prev={props.prev}
       />
     );
   }
 }
 
-export default Dashboard;
+export default connect('user,httpClient', {})(Dashboard);
