@@ -677,7 +677,10 @@
       "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
       "configurationError": "An error appears while getting settings.",
       "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
-      "reloadButton": "Reload"
+      "reloadButton": "Reload",
+      "reset": "If there are any connection problems between your Home app and HomeKit Gladys bridge you can try to reset it by clicking the button below. <b>WARNING</b>, you will need to remove and add the Gladys bridge again to your Home application on your Apple device.",
+      "resetButton": "Reset",
+      "resetError": "An error appears while resetting bridge."
     },
     "owntracks": {
       "title": "Owntracks",

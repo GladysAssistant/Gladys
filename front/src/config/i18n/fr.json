@@ -803,7 +803,10 @@
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
       "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
       "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparait pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
-      "reloadButton": "Relancer"
+      "reloadButton": "Relancer",
+      "reset": "En cas de problèmes de connexion entre votre application Maison et le pont Gladys HomeKit vous pouvez essayer de le réinitialiser en cliquant sur le bouton ci-dessous. <b>ATTENTION</b>, vous devrez supprimer et ajouter à nouveau le pont Gladys à votre application Maison sur votre appareil Apple.",
+      "resetButton": "Réinitialiser",
+      "resetError": "Une erreur est survenue pendant la réinitialisation du pont"
     },
     "owntracks": {
       "title": "Owntracks",
