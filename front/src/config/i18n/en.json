@@ -1189,10 +1189,13 @@
   },
   "editScene": {
     "editNamePlaceholder": "Enter a scene name",
+    "descriptionTitle": "Description",
+    "editDescriptionPlaceholder": "Enter a scene description",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
     "duplicateButton": "Duplicate",
+    "moreButton": "More",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
     "addTriggerButton": "Add trigger",

@@ -28,6 +28,7 @@ async function duplicate(selector, name, icon) {
   const newScene = {
     name,
     icon,
+    description: plainExistingScene.description,
     active: plainExistingScene.active,
     actions: plainExistingScene.actions,
     triggers: plainExistingScene.triggers,

@@ -1,7 +1,10 @@
 import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
+import { useRef } from 'preact/hooks';
+import { useDrag, useDrop } from 'react-dnd';
 
+import style from './style.css';
 import { ACTIONS } from '../../../../../server/utils/constants';
 
 // Actions cards
@@ -52,255 +55,287 @@ const ACTION_ICON = {
   [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap'
 };
 
-const ActionCard = ({ children, ...props }) => (
-  <div
-    class={cx({
-      'col-lg-12': props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF,
-      'col-lg-6': props.action.type === ACTIONS.MESSAGE.SEND || props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING,
-      'col-lg-4':
-        props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
-        props.action.type !== ACTIONS.MESSAGE.SEND &&
-        props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING
-    })}
-  >
-    <div class="card">
-      <div class="card-header">
-        {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
-        {props.action.type === null && <i class="fe fe-plus-circle" />}
-        <div class="card-title">
-          <i class={cx('mr-3', props.action.icon)} />
-          <Text id={`editScene.actions.${props.action.type}`} />
-          {props.action.type === null && <Text id="editScene.newAction" />}
-        </div>
-        {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
-          <div class="card-status bg-blue" />
-        )}
-        <div class="card-options">
-          {false && (
-            <a class="card-options-collapse">
-              <i class="fe fe-chevron-down" />
-            </a>
+const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
+
+const ActionCard = ({ children, ...props }) => {
+  const { x, y } = props;
+  const ref = useRef(null);
+  const [{ isDragging }, drag, preview] = useDrag(() => ({
+    type: ACTION_CARD_TYPE,
+    item: () => {
+      return { x, y };
+    },
+    collect: monitor => ({
+      isDragging: !!monitor.isDragging()
+    })
+  }));
+  const [{ isActive }, drop] = useDrop({
+    accept: ACTION_CARD_TYPE,
+    collect: monitor => ({
+      isActive: monitor.canDrop() && monitor.isOver()
+    }),
+    drop(item) {
+      if (!ref.current) {
+        return;
+      }
+      props.moveCard(item.x, item.y, x, y);
+    }
+  });
+  preview(drop(ref));
+  return (
+    <div
+      class={cx({
+        'col-lg-12': props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF,
+        'col-lg-6':
+          props.action.type === ACTIONS.MESSAGE.SEND || props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+        'col-lg-4':
+          props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
+          props.action.type !== ACTIONS.MESSAGE.SEND &&
+          props.action.type !== ACTIONS.CALENDAR.IS_EVENT_RUNNING
+      })}
+    >
+      <div
+        ref={ref}
+        class={cx('card cursor-pointer user-select-none', {
+          [style.dropZoneActive]: isActive,
+          [style.dropZoneDragging]: isDragging
+        })}
+      >
+        <div ref={drag} class="card-header">
+          {props.action.type !== null && <i class={ACTION_ICON[props.action.type]} />}
+          {props.action.type === null && <i class="fe fe-plus-circle" />}
+          <div class="card-title">
+            <i class={cx(props.action.icon, 'mr-4')} /> <Text id={`editScene.actions.${props.action.type}`} />
+            {props.action.type === null && <Text id="editScene.newAction" />}
+          </div>
+          {props.highLightedActions && props.highLightedActions[`${props.columnIndex}:${props.index}`] && (
+            <div class="card-status bg-blue" />
           )}
-          <a
-            onClick={deleteActionFromColumn(props.columnIndex, props.index, props.deleteAction)}
-            class="card-options-remove"
-          >
-            <i class="fe fe-x" />
-          </a>
+          <div class="card-options">
+            <a>
+              <i class="fe fe-move mr-4" />
+            </a>
+            <a
+              onClick={deleteActionFromColumn(props.columnIndex, props.index, props.deleteAction)}
+              class="card-options-remove"
+            >
+              <i class="fe fe-x" />
+            </a>
+          </div>
         </div>
-      </div>
-      <div class="card-body">
-        {props.action.type === ACTIONS.TIME.DELAY && (
-          <DelayActionParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === null && (
-          <ChooseActionTypeParams
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.LIGHT.TURN_ON && (
-          <TurnOnOffLightParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.LIGHT.TURN_OFF && (
-          <TurnOnOffLightParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.LIGHT.TOGGLE && (
-          <TurnOnOffLightParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.SWITCH.TURN_ON && (
-          <TurnOnOffSwitchParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.SWITCH.TURN_OFF && (
-          <TurnOnOffSwitchParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.SWITCH.TOGGLE && (
-          <TurnOnOffSwitchParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.MESSAGE.SEND && (
-          <SendMessageParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            actionsGroupsBefore={props.actionsGroupsBefore}
-            variables={props.variables}
-            triggersVariables={props.triggersVariables}
-          />
-        )}
-        {props.action.type === ACTIONS.MESSAGE.SEND_CAMERA && (
-          <SendMessageCameraParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            actionsGroupsBefore={props.actionsGroupsBefore}
-            variables={props.variables}
-            triggersVariables={props.triggersVariables}
-          />
-        )}
-        {props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF && (
-          <OnlyContinueIfParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            actionsGroupsBefore={props.actionsGroupsBefore}
-            triggersVariables={props.triggersVariables}
-            variables={props.variables}
-            setVariables={props.setVariables}
-          />
-        )}
-        {props.action.type === ACTIONS.DEVICE.GET_VALUE && (
-          <DeviceGetValueParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            variables={props.variables}
-            setVariables={props.setVariables}
-          />
-        )}
-        {props.action.type === ACTIONS.USER.SET_SEEN_AT_HOME && (
-          <UserPresence
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.USER.CHECK_PRESENCE && (
-          <CheckUserPresence
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.USER.SET_OUT_OF_HOME && (
-          <UserPresence
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.HTTP.REQUEST && (
-          <HttpRequest
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            setVariables={props.setVariables}
-            actionsGroupsBefore={props.actionsGroupsBefore}
-            variables={props.variables}
-            triggersVariables={props.triggersVariables}
-          />
-        )}
-        {props.action.type === ACTIONS.CONDITION.CHECK_TIME && (
-          <CheckTime
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            setVariables={props.setVariables}
-          />
-        )}
-        {props.action.type === ACTIONS.SCENE.START && (
-          <StartSceneParams
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            variables={props.variables}
-            setVariables={props.setVariables}
-            scene={props.scene}
-          />
-        )}
-        {props.action.type === ACTIONS.HOUSE.IS_EMPTY && (
-          <HouseEmptyOrNotCondition
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.HOUSE.IS_NOT_EMPTY && (
-          <HouseEmptyOrNotCondition
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
-        {props.action.type === ACTIONS.DEVICE.SET_VALUE && (
-          <DeviceSetValue
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            actionsGroupsBefore={props.actionsGroupsBefore}
-            triggersVariables={props.triggersVariables}
-            variables={props.variables}
-          />
-        )}
-        {props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING && (
-          <CalendarIsEventRunning
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-            variables={props.variables}
-            setVariables={props.setVariables}
-          />
-        )}
-        {props.action.type === ACTIONS.ECOWATT.CONDITION && (
-          <EcowattCondition
-            action={props.action}
-            columnIndex={props.columnIndex}
-            index={props.index}
-            updateActionProperty={props.updateActionProperty}
-          />
-        )}
+        <div class="card-body">
+          {props.action.type === ACTIONS.TIME.DELAY && (
+            <DelayActionParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === null && (
+            <ChooseActionTypeParams
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.LIGHT.TURN_ON && (
+            <TurnOnOffLightParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.LIGHT.TURN_OFF && (
+            <TurnOnOffLightParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.LIGHT.TOGGLE && (
+            <TurnOnOffLightParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.SWITCH.TURN_ON && (
+            <TurnOnOffSwitchParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.SWITCH.TURN_OFF && (
+            <TurnOnOffSwitchParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.SWITCH.TOGGLE && (
+            <TurnOnOffSwitchParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.MESSAGE.SEND && (
+            <SendMessageParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.MESSAGE.SEND_CAMERA && (
+            <SendMessageCameraParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF && (
+            <OnlyContinueIfParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              triggersVariables={props.triggersVariables}
+              variables={props.variables}
+              setVariables={props.setVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.DEVICE.GET_VALUE && (
+            <DeviceGetValueParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              variables={props.variables}
+              setVariables={props.setVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.USER.SET_SEEN_AT_HOME && (
+            <UserPresence
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.USER.CHECK_PRESENCE && (
+            <CheckUserPresence
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.USER.SET_OUT_OF_HOME && (
+            <UserPresence
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.HTTP.REQUEST && (
+            <HttpRequest
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              setVariables={props.setVariables}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.CONDITION.CHECK_TIME && (
+            <CheckTime
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              setVariables={props.setVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.SCENE.START && (
+            <StartSceneParams
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              variables={props.variables}
+              setVariables={props.setVariables}
+              scene={props.scene}
+            />
+          )}
+          {props.action.type === ACTIONS.HOUSE.IS_EMPTY && (
+            <HouseEmptyOrNotCondition
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.HOUSE.IS_NOT_EMPTY && (
+            <HouseEmptyOrNotCondition
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.DEVICE.SET_VALUE && (
+            <DeviceSetValue
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              triggersVariables={props.triggersVariables}
+              variables={props.variables}
+            />
+          )}
+          {props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING && (
+            <CalendarIsEventRunning
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              variables={props.variables}
+              setVariables={props.setVariables}
+            />
+          )}
+          {props.action.type === ACTIONS.ECOWATT.CONDITION && (
+            <EcowattCondition
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default ActionCard;

@@ -33,3 +33,15 @@
   top: 5%;
   right: 3%;
 }
+
+.descriptionScene {
+  color: #9aa0ac;
+}
+
+.descriptionSceneEllipsis {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
