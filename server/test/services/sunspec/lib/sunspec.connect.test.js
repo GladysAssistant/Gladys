@@ -24,6 +24,7 @@ describe('SunSpec connect', () => {
   // PREPARE
   let gladys;
   let sunSpecManager;
+  let clock;
 
   beforeEach(() => {
     gladys = {
@@ -36,6 +37,12 @@ describe('SunSpec connect', () => {
     };
 
     sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, SERVICE_ID);
+    clock = sinon.useFakeTimers();
+  });
+
+  afterEach(() => {
+    clock.restore();
+    sinon.reset();
   });
 
   it('should not connect - not configured', async () => {
@@ -55,6 +62,7 @@ describe('SunSpec connect', () => {
     gladys.variable.getValue = fake.resolves('sunspecUrl');
 
     await sunSpecManager.connect();
+    clock.next();
 
     expect(sunSpecManager.ready).eql(true);
     expect(sunSpecManager.connected).eql(true);
