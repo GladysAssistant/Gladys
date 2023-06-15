@@ -1,3 +1,4 @@
+const { normalize } = require('../../../../utils/device');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 /**
@@ -19,7 +20,7 @@ const brightnessTrait = {
     {
       key: 'brightness',
       readValue: (feature) => {
-        return feature.last_value;
+        return Math.round(normalize(feature.last_value, feature.min, feature.max, 0, 100));
       },
     },
   ],
@@ -34,7 +35,7 @@ const brightnessTrait = {
       if (relatedFeature) {
         events.push({
           device_feature: relatedFeature.selector,
-          value: brightness,
+          value: Math.round(normalize(brightness, 0, 100, relatedFeature.min, relatedFeature.max)),
         });
       }
 

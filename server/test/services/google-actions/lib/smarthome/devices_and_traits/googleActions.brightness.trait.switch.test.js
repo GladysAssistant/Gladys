@@ -58,6 +58,8 @@ describe('GoogleActions Handler - onSync - brightness (switch)', () => {
           selector: 'feature-1',
           category: DEVICE_FEATURE_CATEGORIES.SWITCH,
           type: DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
+          min: 0,
+          max: 100,
           last_value: 73,
         },
       ],
