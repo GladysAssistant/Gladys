@@ -212,6 +212,7 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
+      "devices": "Appareils",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
       "clock": "Horloge"
@@ -241,6 +242,11 @@
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-"
+      },
+      "devices": {
+        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
+        "editNameLabel": "Nom du widget",
+        "editNamePlaceholder": "Entrez le nom du widget"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
