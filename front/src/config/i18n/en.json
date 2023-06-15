@@ -1951,7 +1951,7 @@
     "degree": "Angular degree (°)",
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
-    "cubicmeter": "Cubic meter (m3)",
+    "cubicmeter": "Cubic meter (m³)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -1992,9 +1992,9 @@
     "gigabytes-per-second": "Gigabytes per second (GB/s)",
     "aqi": "Air Quality Index",
     "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)",
-    "square-centimeter": "Square centimer (cm2)",
-    "square-meter": "Square meter (m2)",
-    "square-kilometer": "Square kilometer (km2)"
+    "square-centimeter": "Square centimer (cm²)",
+    "square-meter": "Square meter (m²)",
+    "square-kilometer": "Square kilometer (km²)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2027,7 +2027,7 @@
     "degree": "°",
     "liter": "l",
     "milliliter": "ml",
-    "cubicmeter": "m3",
+    "cubicmeter": "m³",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -2068,9 +2068,9 @@
     "gigabytes-per-second": "GB/s",
     "aqi": "AQI",
     "microgram-per-cubic-meter": "µg/m³",
-    "square-centimeter": "cm2",
-    "square-meter": "m2",
-    "square-kilometer": "km2"
+    "square-centimeter": "cm²",
+    "square-meter": "m²",
+    "square-kilometer": "km²"
   },
   "deviceFeatureAction": {
     "category": {
