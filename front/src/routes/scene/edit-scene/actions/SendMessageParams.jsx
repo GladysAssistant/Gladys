@@ -5,11 +5,6 @@ import { Text } from 'preact-i18n';
 
 import TextWithVariablesInjected from '../../../../components/scene/TextWithVariablesInjected';
 
-const helpTextStyle = {
-  fontSize: 12,
-  marginBottom: '.375rem'
-};
-
 class SendMessageParams extends Component {
   getOptions = async () => {
     try {
@@ -89,7 +84,7 @@ class SendMessageParams extends Component {
               <Text id="global.requiredField" />
             </span>
           </label>
-          <div style={helpTextStyle}>
+          <div class="mb-1 small">
             <Text id="editScene.actionsCard.messageSend.explanationText" />
           </div>
           <div className="tags-input">

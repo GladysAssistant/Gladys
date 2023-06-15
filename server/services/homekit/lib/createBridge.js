@@ -7,7 +7,7 @@ const { mappings } = require('./deviceMappings');
  * @description Create HomeKit bridge.
  * @returns {Promise} HomeKit bridge to expose.
  * @example
- * createBridge(accessories)
+ * createBridge()
  */
 async function createBridge() {
   let bridgeUuid = await this.gladys.variable.getValue('HOMEKIT_GLADYS_UUID', this.serviceId);
