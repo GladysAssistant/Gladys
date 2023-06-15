@@ -2,21 +2,42 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 
 const { assert, fake } = sinon;
+
+const { EVENTS, ACTIONS_STATUS, ACTIONS } = require('../../../../../utils/constants');
 const GoogleActionsHandler = require('../../../../../services/google-actions/lib');
 
-const gladys = {
-  event: {
-    emit: fake.resolves(true),
-  },
-};
 const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
 
 describe('GoogleActions Handler - onExecute', () => {
+  let gladys;
+  let googleActionsHandler;
+
   beforeEach(() => {
+    gladys = {
+      event: {
+        emit: fake.returns(true),
+      },
+      stateManager: {
+        get: fake.returns({
+          selector: 'device-1',
+          features: [
+            {
+              selector: 'feature-1',
+              category: 'switch',
+              type: 'binary',
+            },
+          ],
+        }),
+      },
+    };
+    googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
+  });
+
+  afterEach(() => {
     sinon.reset();
   });
 
-  it('onExecute - empty payload', async () => {
+  it('should do nothing - empty payload', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -25,10 +46,8 @@ describe('GoogleActions Handler - onExecute', () => {
       },
       inputs: [],
     };
-    const headers = {};
 
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
-    const result = await googleActionsHandler.onExecute(body, headers);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -37,11 +56,13 @@ describe('GoogleActions Handler - onExecute', () => {
         commands: [],
       },
     };
+
     expect(result).to.deep.eq(exptectedResult);
+    assert.notCalled(gladys.stateManager.get);
     assert.notCalled(gladys.event.emit);
   });
 
-  it('onExecute - empty commands', async () => {
+  it('should do nothing - empty commands', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -57,10 +78,8 @@ describe('GoogleActions Handler - onExecute', () => {
         },
       ],
     };
-    const headers = {};
 
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
-    const result = await googleActionsHandler.onExecute(body, headers);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -70,10 +89,11 @@ describe('GoogleActions Handler - onExecute', () => {
       },
     };
     expect(result).to.deep.eq(exptectedResult);
+    assert.notCalled(gladys.stateManager.get);
     assert.notCalled(gladys.event.emit);
   });
 
-  it('onExecute - empty devices', async () => {
+  it('should do nothing - empty devices', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -91,10 +111,8 @@ describe('GoogleActions Handler - onExecute', () => {
         },
       ],
     };
-    const headers = {};
 
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
-    const result = await googleActionsHandler.onExecute(body, headers);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -104,10 +122,52 @@ describe('GoogleActions Handler - onExecute', () => {
       },
     };
     expect(result).to.deep.eq(exptectedResult);
+    assert.notCalled(gladys.stateManager.get);
     assert.notCalled(gladys.event.emit);
   });
 
-  it('onExecute - command not managed', async () => {
+  it('should send errorneous device - unkonwn device', async () => {
+    gladys.stateManager.get = fake.returns(null);
+
+    const body = {
+      requestId: 'request-id',
+      user: {
+        id: 'user-id',
+        selector: 'user-selector',
+      },
+      inputs: [
+        {
+          payload: {
+            commands: [
+              {
+                devices: [{ id: 'device-1' }],
+              },
+            ],
+          },
+        },
+      ],
+    };
+
+    const result = await googleActionsHandler.onExecute(body);
+
+    const exptectedResult = {
+      requestId: 'request-id',
+      payload: {
+        agentUserId: 'user-id',
+        commands: [
+          {
+            ids: ['device-1'],
+            status: 'ERROR',
+          },
+        ],
+      },
+    };
+    expect(result).to.deep.eq(exptectedResult);
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should send errorneous device - command not managed', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -131,10 +191,8 @@ describe('GoogleActions Handler - onExecute', () => {
         },
       ],
     };
-    const headers = {};
 
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
-    const result = await googleActionsHandler.onExecute(body, headers);
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -149,58 +207,16 @@ describe('GoogleActions Handler - onExecute', () => {
       },
     };
     expect(result).to.deep.eq(exptectedResult);
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
     assert.notCalled(gladys.event.emit);
   });
 
-  it('onExecute - value func not managed', async () => {
-    const body = {
-      requestId: 'request-id',
-      user: {
-        id: 'user-id',
-        selector: 'user-selector',
-      },
-      inputs: [
-        {
-          payload: {
-            commands: [
-              {
-                devices: [{ id: 'device-1' }],
-                execution: [
-                  {
-                    command: 'action.devices.commands.OnOff',
-                    params: {
-                      unknown: true,
-                    },
-                  },
-                ],
-              },
-            ],
-          },
-        },
-      ],
-    };
-    const headers = {};
+  it('should send errorneous device - no events generated', async () => {
+    gladys.stateManager.get = fake.returns({
+      selector: 'device-1',
+      features: [],
+    });
 
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
-    const result = await googleActionsHandler.onExecute(body, headers);
-
-    const exptectedResult = {
-      requestId: 'request-id',
-      payload: {
-        agentUserId: 'user-id',
-        commands: [
-          {
-            ids: ['device-1'],
-            status: 'ERROR',
-          },
-        ],
-      },
-    };
-    expect(result).to.deep.eq(exptectedResult);
-    assert.notCalled(gladys.event.emit);
-  });
-
-  it('onExecute - success', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -227,10 +243,55 @@ describe('GoogleActions Handler - onExecute', () => {
         },
       ],
     };
-    const headers = {};
 
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
-    const result = await googleActionsHandler.onExecute(body, headers);
+    const result = await googleActionsHandler.onExecute(body);
+
+    const exptectedResult = {
+      requestId: 'request-id',
+      payload: {
+        agentUserId: 'user-id',
+        commands: [
+          {
+            ids: ['device-1'],
+            status: 'ERROR',
+          },
+        ],
+      },
+    };
+    expect(result).to.deep.eq(exptectedResult);
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should emit event - onExecute', async () => {
+    const body = {
+      requestId: 'request-id',
+      user: {
+        id: 'user-id',
+        selector: 'user-selector',
+      },
+      inputs: [
+        {
+          payload: {
+            commands: [
+              {
+                devices: [{ id: 'device-1' }],
+                execution: [
+                  {
+                    command: 'action.devices.commands.OnOff',
+                    params: {
+                      on: true,
+                    },
+                  },
+                ],
+              },
+            ],
+          },
+        },
+      ],
+    };
+
+    const result = await googleActionsHandler.onExecute(body);
 
     const exptectedResult = {
       requestId: 'request-id',
@@ -245,6 +306,16 @@ describe('GoogleActions Handler - onExecute', () => {
       },
     };
     expect(result).to.deep.eq(exptectedResult);
-    assert.callCount(gladys.event.emit, 2);
+
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
+
+    const expectedAction = {
+      device_feature: 'feature-1',
+      value: 1,
+      type: ACTIONS.DEVICE.SET_VALUE,
+      status: ACTIONS_STATUS.PENDING,
+      device: 'device-1',
+    };
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.ACTION.TRIGGERED, expectedAction);
   });
 });

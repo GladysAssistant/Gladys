@@ -212,6 +212,7 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
+      "devices": "Devices",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
       "clock": "Clock"
@@ -239,12 +240,16 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page.",
         "addButton": "+",
         "substractButton": "-",
         "offMode": "Off",
         "ecoMode": "Eco",
         "comfortMode": "Comfort"
+      },
+      "devices": {
+        "editDeviceFeaturesLabel": "Select the devices you want to display.",
+        "editNameLabel": "Widget name",
+        "editNamePlaceholder": "Enter the name of the widget"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -343,8 +348,6 @@
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
-      "restartButton": "Restart",
-      "stopButton": "Stop",
       "menu": {
         "all": "All integrations",
         "device": "Devices",
@@ -677,7 +680,10 @@
       "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
       "configurationError": "An error appears while getting settings.",
       "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
-      "reloadButton": "Reload"
+      "reloadButton": "Reload",
+      "reset": "If there are any connection problems between your Home app and HomeKit Gladys bridge you can try to reset it by clicking the button below. <b>WARNING</b>, you will need to remove and add the Gladys bridge again to your Home application on your Apple device.",
+      "resetButton": "Reset",
+      "resetError": "An error appears while resetting bridge."
     },
     "owntracks": {
       "title": "Owntracks",
@@ -1242,10 +1248,13 @@
   },
   "editScene": {
     "editNamePlaceholder": "Enter a scene name",
+    "descriptionTitle": "Description",
+    "editDescriptionPlaceholder": "Enter a scene description",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
     "duplicateButton": "Duplicate",
+    "moreButton": "More",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
     "addTriggerButton": "Add trigger",
@@ -1270,6 +1279,13 @@
       },
       "messageSend": {
         "userLabel": "User",
+        "textLabel": "Message",
+        "textPlaceholder": "Message text",
+        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+      },
+      "messageCameraSend": {
+        "userLabel": "User",
+        "cameraLabel": "Camera",
         "textLabel": "Message",
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
@@ -1394,7 +1410,8 @@
         "set-value": "Set device value"
       },
       "message": {
-        "send": "Send Message"
+        "send": "Send Message",
+        "send-camera": "Send a camera image"
       },
       "delay": "Wait",
       "light": {
@@ -1647,7 +1664,6 @@
       "resetPassword": "Reset password",
       "editPreferences": "Edit preferences",
       "resetPasswordButton": "Reset password",
-      "saveButton": "Save",
       "success": "User saved with success !"
     }
   },
@@ -1988,7 +2004,10 @@
     "megabytes-per-second": "Megabytes per second (MB/s)",
     "gigabytes-per-second": "Gigabytes per second (GB/s)",
     "aqi": "Air Quality Index",
-    "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)"
+    "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)",
+    "square-centimeter": "Square centimer (cm2)",
+    "square-meter": "Square meter (m2)",
+    "square-kilometer": "Square kilometer (km2)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2061,7 +2080,10 @@
     "megabytes-per-second": "MB/s",
     "gigabytes-per-second": "GB/s",
     "aqi": "AQI",
-    "microgram-per-cubic-meter": "µg/m³"
+    "microgram-per-cubic-meter": "µg/m³",
+    "square-centimeter": "cm2",
+    "square-meter": "m2",
+    "square-kilometer": "km2"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2376,6 +2398,10 @@
     "text": {
       "shortCategoryName": "Text",
       "text": "Text"
+    },
+    "surface": {
+      "shortCategoryName": "Surface",
+      "decimal": "Surface"
     },
     "unknown": {
       "shortCategoryName": "Unknown",
