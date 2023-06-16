@@ -9,48 +9,45 @@ class ModbusClient {
   }
 
   async connect(sunspecHost, sunspecPort) {
-    return new Promise((resolve, reject) => {
-      this.modbusClient.connectTCP(sunspecHost, { port: sunspecPort }, async () => {
-        logger.info(`SunSpec service connected`);
-        // this.modbusClient.setID(UNIT_ID.SID);
-        const sid = await this.readRegisterAsInt32(REGISTER.SID);
-        if (sid !== DEFAULT.SUNSPEC_MODBUS_MAP) {
-          reject(new Error(`Invalid SID received. Expected ${DEFAULT.SUNSPEC_MODBUS_MAP} but got ${sid}`));
+    try {
+      await this.modbusClient.connectTCP(sunspecHost, { port: sunspecPort, timeout: 10000 });
+      logger.info(`SunSpec service connected`);
+      // this.modbusClient.setID(UNIT_ID.SID);
+      const sid = await this.readRegisterAsInt32(REGISTER.SID);
+      if (sid !== DEFAULT.SUNSPEC_MODBUS_MAP) {
+        logger.error(`Invalid SID received. Expected ${DEFAULT.SUNSPEC_MODBUS_MAP} but got ${sid}`);
+      }
+      const model = await this.readRegisterAsInt16(REGISTER.MODEL_ID);
+      if (model !== DEFAULT.SUNSPEC_COMMON_MODEL) {
+        logger.error(`Invalid SunSpec Model received. Expected ${DEFAULT.SUNSPEC_COMMON_MODEL} but got ${model}`);
+        return;
+      }
+      this.models[1] = {
+        registerStart: REGISTER.MODEL_ID,
+        registerLength: await this.readRegisterAsInt16(REGISTER.MODEL_ID + 1),
+      };
+      let nextModel;
+      let nextModelLength;
+      let registerId = REGISTER.MODEL_ID + 1;
+      registerId += (await this.readRegisterAsInt16(registerId)) + 1;
+      while (true) {
+        // eslint-disable-next-line no-await-in-loop
+        nextModel = await this.readRegisterAsInt16(registerId);
+        if (nextModel === 0xffff) {
+          break;
         }
-        const model = await this.readRegisterAsInt16(REGISTER.MODEL_ID);
-        if (model !== DEFAULT.SUNSPEC_COMMON_MODEL) {
-          reject(
-            new Error(`Invalid SunSpec Model received. Expected ${DEFAULT.SUNSPEC_COMMON_MODEL} but got ${model}`),
-          );
-        }
-        this.models[1] = {
-          registerStart: REGISTER.MODEL_ID,
-          registerLength: await this.readRegisterAsInt16(REGISTER.MODEL_ID + 1),
+        // eslint-disable-next-line no-await-in-loop
+        nextModelLength = await this.readRegisterAsInt16(registerId + 1);
+        // eslint-disable-next-line no-await-in-loop
+        this.models[nextModel] = {
+          registerStart: registerId,
+          registerLength: nextModelLength,
         };
-        let nextModel;
-        let nextModelLength;
-        let registerId = REGISTER.MODEL_ID + 1;
-        registerId += (await this.readRegisterAsInt16(registerId)) + 1;
-        while (true) {
-          // eslint-disable-next-line no-await-in-loop
-          nextModel = await this.readRegisterAsInt16(registerId);
-          if (nextModel === 0xffff) {
-            break;
-          }
-          // eslint-disable-next-line no-await-in-loop
-          nextModelLength = await this.readRegisterAsInt16(registerId + 1);
-          // eslint-disable-next-line no-await-in-loop
-          this.models[nextModel] = {
-            registerStart: registerId,
-            registerLength: nextModelLength,
-          };
-          registerId += nextModelLength + 2;
-        }
-
-        // TODO Got unit ID at register 40069
-        resolve();
-      });
-    });
+        registerId += nextModelLength + 2;
+      }
+    } catch (e) {
+      throw new Error(`Unable to connect Sunspec device ${sunspecHost}:${sunspecPort} - ${e}`);
+    }
   }
 
   close() {

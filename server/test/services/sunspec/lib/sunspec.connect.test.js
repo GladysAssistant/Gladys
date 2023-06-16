@@ -64,7 +64,6 @@ describe('SunSpec connect', () => {
     await sunSpecManager.connect();
     clock.next();
 
-    expect(sunSpecManager.ready).eql(true);
     expect(sunSpecManager.connected).eql(true);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,

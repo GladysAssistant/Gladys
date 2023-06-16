@@ -34,10 +34,10 @@ describe('SunSpec disconnect', () => {
   });
 
   it('should disconnect', async () => {
-    sunSpecManager.modbusClient.close = fake.returns(null);
+    sunSpecManager.modbus.close = fake.returns(null);
 
     await sunSpecManager.disconnect();
 
-    assert.calledOnce(sunSpecManager.modbusClient.close);
+    assert.calledOnce(sunSpecManager.modbus.close);
   });
 });

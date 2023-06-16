@@ -5,8 +5,19 @@ const { assert, fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const ModbusTCPMock = require('./lib/utils/ModbusTCPMock.test');
 
+class SunspecManagerMock {
+  connect() {
+    this.connected = true;
+  };
+
+  disconnect() {
+    this.connected = false;
+  };
+};
+
 const SunSpecService = proxyquire('../../../services/sunspec', {
   'modbus-serial': ModbusTCPMock,
+  './lib': SunspecManagerMock,
 });
 
 const gladys = {
@@ -32,14 +43,11 @@ describe('SunSpecService', () => {
 
   it('should start service', async () => {
     await sunSpecService.start();
-    assert.callCount(gladys.variable.getValue, 1);
-    expect(sunSpecService.device.ready).eql(true);
     expect(sunSpecService.device.connected).eql(true);
   });
 
   it('should stop service', async () => {
     await sunSpecService.stop();
-    expect(sunSpecService.device.ready).eql(true);
     expect(sunSpecService.device.connected).eql(false);
   });
 

@@ -1,5 +1,6 @@
 import { Component } from 'preact';
-import { Text, Localizer } from 'preact-i18n';
+import { Text, MarkupText, Localizer } from 'preact-i18n';
+import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import update from 'immutability-helper';
 
@@ -15,18 +16,6 @@ class SunSpecSettingsTab extends Component {
     }
   };
 
-  updateConfig = async (configGroup, configItem, value) => {
-    const updatedConfig = update(this.state.config, {
-      [configGroup]: {
-        [configItem]: {
-          $set: value
-        }
-      }
-    });
-
-    this.setState({ config: updatedConfig, updated: true });
-  };
-
   updateUrl = e => {
     const updatedConfig = update(this.state.config, {
       sunspecUrl: {
@@ -37,39 +26,7 @@ class SunSpecSettingsTab extends Component {
     this.setState({ config: updatedConfig, updated: true });
   };
 
-  updateMaskConfig = async (maskIndex, value) => {
-    const updatedConfig = update(this.state.config, {
-      ipMasks: {
-        [maskIndex]: {
-          $set: value
-        }
-      }
-    });
-
-    this.setState({ config: updatedConfig, updated: true });
-  };
-
-  addMaskConfig = async value => {
-    const updatedConfig = update(this.state.config, {
-      ipMasks: {
-        $push: [value]
-      }
-    });
-
-    this.setState({ config: updatedConfig, updated: true });
-  };
-
-  deleteMaskConfig = async maskIndex => {
-    const updatedConfig = update(this.state.config, {
-      ipMasks: {
-        $splice: [[maskIndex, 1]]
-      }
-    });
-
-    this.setState({ config: updatedConfig, updated: true });
-  };
-
-  saveConfig = async () => {
+  saveConfiguration = async () => {
     this.setState({ error: null });
     try {
       const config = await this.props.httpClient.post('/api/v1/service/sunspec/configuration', this.state.config);
@@ -114,6 +71,20 @@ class SunSpecSettingsTab extends Component {
                 </div>
               )}
 
+              <p>
+                <MarkupText id="integration.sunspec.setup.fronius.description" />
+                <Link href="https://www.fronius.com/en/solar-energy/installers-partners/technical-data/all-products/system-monitoring/open-interfaces/modbus-tcp">
+                  <i class="fe fe-book-open" /> <Text id="integration.sunspec.setup.fronius.documentation" />
+                </Link>
+              </p>
+
+              <p>
+                <MarkupText id="integration.sunspec.setup.sma.description" />
+                <Link href="https://manuals.sma.de/SBxx-1AV-41/fr-FR/1129302539.html">
+                  <i class="fe fe-book-open" /> <Text id="integration.sunspec.setup.sma.documentation" />
+                </Link>
+              </p>
+
               {config && (
                 <form>
                   <div class="form-group">
@@ -135,7 +106,7 @@ class SunSpecSettingsTab extends Component {
               )}
 
               <div class="d-flex justify-content-between mt-5">
-                <button class="btn btn-success" onClick={this.saveConfig} disabled={!updated}>
+                <button class="btn btn-success" onClick={this.saveConfiguration}>
                   <Text id="global.save" />
                 </button>
               </div>

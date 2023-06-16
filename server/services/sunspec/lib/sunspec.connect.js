@@ -20,8 +20,13 @@ async function connect() {
   this.modbus = new ModbusClient(this.modbusClient);
 
   const [sunspecHost, sunspecPort = DEFAULT.MODBUS_PORT] = sunspecUrl.split(':');
-  await this.modbus.connect(sunspecHost, sunspecPort);
-  this.ready = true;
+  try {
+    await this.modbus.connect(sunspecHost, sunspecPort);
+  } catch (e) {
+    logger.error(e);
+    return;
+  }
+
   this.connected = true;
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
@@ -34,7 +39,7 @@ async function connect() {
 
   logger.debug(`SunSpec: Starting devices scanning...`);
 
-  this.scanDevicesInterval = setInterval(this.scanDevices, DEFAULT.SCAN_DEVICE_TIMEOUT);
+  this.scanDevicesInterval = setInterval(this.scanDevices.bind(this), DEFAULT.SCAN_DEVICE_TIMEOUT);
 }
 
 module.exports = {

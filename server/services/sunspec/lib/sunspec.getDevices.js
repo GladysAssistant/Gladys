@@ -142,10 +142,7 @@ function getDevices({ orderDir, search } = {}) {
 
       return newDevice;
     })
-    .filter((newDevice) => newDevice.features && newDevice.features.length > 0)
-    .sort((a, b) => {
-      return orderDir === 'asc' ? a.ready - b.ready : b.ready - a.ready;
-    });
+    .filter((newDevice) => newDevice.features && newDevice.features.length > 0);
 }
 
 module.exports = {

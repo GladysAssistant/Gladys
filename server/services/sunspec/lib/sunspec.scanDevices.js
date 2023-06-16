@@ -13,7 +13,7 @@ async function scanDevices() {
   logger.debug(`SunSpec: Scanning devices...`);
 
   const { S1_DCA, S1_DCV, S1_DCW, S1_DCWH, S2_DCA, S2_DCV, S2_DCW, S2_DCWH } = ModelFactory.createModel(
-    await this.modbusClient.readModel(MODEL.MPPT_INVERTER_EXTENSION),
+    await this.modbus.readModel(MODEL.MPPT_INVERTER_EXTENSION),
   );
   this.devices.forEach((device) => {
     let DCA;

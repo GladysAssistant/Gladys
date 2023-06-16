@@ -11,8 +11,8 @@ async function disconnect() {
 
   clearInterval(this.scanDevicesInterval);
 
-  if (this.modbusClient) {
-    this.modbusClient.close(() => {
+  if (this.modbus) {
+    this.modbus.close(() => {
       if (this.connected) {
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
@@ -20,10 +20,10 @@ async function disconnect() {
       } else {
         logger.debug('SunSpec: Not connected, by-pass disconnecting');
       }
+
+      this.connected = false;
     });
   }
-
-  this.connected = false;
 }
 
 module.exports = {
