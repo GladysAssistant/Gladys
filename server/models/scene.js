@@ -114,6 +114,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.STRING,
       },
+      description: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
       icon: {
         allowNull: false,
         type: DataTypes.ENUM(iconList),
