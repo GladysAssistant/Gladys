@@ -275,6 +275,7 @@ const ACTIONS = {
   },
   MESSAGE: {
     SEND: 'message.send',
+    SEND_CAMERA: 'message.send-camera',
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
@@ -359,6 +360,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SISMIC_SENSOR: 'sismic-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
   SOIL_MOISTURE_SENSOR: 'soil-moisture-sensor',
+  SURFACE: 'surface',
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
   TELEVISION: 'television',
@@ -460,6 +462,9 @@ const DEVICE_FEATURE_TYPES = {
     BINARY: 'binary',
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
+  },
+  SURFACE: {
+    DECIMAL: 'decimal',
   },
   TELEVISION: {
     BINARY: 'binary',
@@ -592,6 +597,10 @@ const DEVICE_FEATURE_UNITS = {
   CM: 'cm',
   M: 'm',
   KM: 'km',
+  // surface units
+  SQUARE_CENTIMETER: 'square-centimeter',
+  SQUARE_METER: 'square-meter',
+  SQUARE_KILOMETER: 'square-kilometer',
   // Degree units
   DEGREE: 'degree',
   // Volume units
@@ -763,6 +772,11 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_UNITS.AQI],
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
+  [DEVICE_FEATURE_CATEGORIES.SURFACE]: [
+    DEVICE_FEATURE_UNITS.SQUARE_CENTIMETER,
+    DEVICE_FEATURE_UNITS.SQUARE_METER,
+    DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
+  ],
 };
 
 const ACTIONS_STATUS = {
@@ -868,6 +882,7 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  DEVICES: 'devices',
   CHART: 'chart',
   ECOWATT: 'ecowatt',
   CLOCK: 'clock',

@@ -10,8 +10,8 @@ module.exports = {
   // Gladys feature
   generateFeature: () => {
     return {
-      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
       name: 'Voltage',
       read_only: true,
       has_feedback: false,
@@ -25,6 +25,6 @@ module.exports = {
   },
   // Gladys vs Tasmota transformers
   readValue: (value) => {
-    return value / 1000;
+    return value;
   },
 };

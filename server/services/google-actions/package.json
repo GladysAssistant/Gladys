@@ -12,7 +12,7 @@
     "arm64"
   ],
   "dependencies": {
-    "set-value": "^4.0.1",
-    "uuid": "^9.0.0"
+    "bluebird": "^3.7.2",
+    "set-value": "^4.0.1"
   }
 }

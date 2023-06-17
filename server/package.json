@@ -26,7 +26,6 @@
     "jsdoc": "jsdoc lib/**/*.js -d jsdoc",
     "apidoc": "apidoc -i controllers/ -o apidoc/",
     "checkjs": "tsc --allowJs --resolveJsonModule --checkJs --noEmit --lib ES5,ES2018 lib/**/*.js api/**/*.js services/**/*.js",
-    "generate-apidoc": "apidoc -i api/ -o apidoc",
     "generate-jsdoc": "jsdoc lib/**/*.js services/**/*.js -d jsdoc",
     "cypress": "npm run cypress:clean && npm run cypress:start",
     "cypress:start": "cross-env SQLITE_FILE_PATH=./gladys-cypress.db node index.js",
@@ -47,7 +46,7 @@
     ]
   },
   "devDependencies": {
-    "apidoc": "^0.53.1",
+    "apidoc": "^1.0.3",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "dotenv": "^16.0.3",

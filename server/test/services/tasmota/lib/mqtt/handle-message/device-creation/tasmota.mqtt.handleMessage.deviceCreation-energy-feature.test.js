@@ -109,8 +109,48 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
       should_poll: false,
       features: [
         {
-          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          external_id: 'tasmota:tasmota-device-topic:ENERGY:Total',
+          selector: 'tasmota-tasmota-device-topic-energy-total',
+          name: 'Energy total',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 999999,
+          last_value: 6.911,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+        {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          external_id: 'tasmota:tasmota-device-topic:ENERGY:Yesterday',
+          selector: 'tasmota-tasmota-device-topic-energy-yesterday',
+          name: 'Energy yesterday',
+          read_only: true,
+          has_feedback: false,
+          keep_history: false,
+          min: 0,
+          max: 999999,
+          last_value: 1.2,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+        {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          external_id: 'tasmota:tasmota-device-topic:ENERGY:Today',
+          selector: 'tasmota-tasmota-device-topic-energy-today',
+          name: 'Energy today',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 999999,
+          last_value: 0.001,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+        },
+        {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
           external_id: 'tasmota:tasmota-device-topic:ENERGY:Power',
           selector: 'tasmota-tasmota-device-topic-energy-power',
           name: 'Power',
@@ -119,11 +159,37 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
           min: 0,
           max: 10000,
           last_value: 57,
-          unit: DEVICE_FEATURE_UNITS.KILOWATT,
+          unit: DEVICE_FEATURE_UNITS.WATT,
         },
         {
-          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+          external_id: 'tasmota:tasmota-device-topic:ENERGY:ApparentPower',
+          selector: 'tasmota-tasmota-device-topic-energy-apparentpower',
+          name: 'Apparent power',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 10000,
+          last_value: 60,
+          unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+        },
+        {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+          external_id: 'tasmota:tasmota-device-topic:ENERGY:ReactivePower',
+          selector: 'tasmota-tasmota-device-topic-energy-reactivepower',
+          name: 'Reactive power',
+          read_only: true,
+          has_feedback: false,
+          min: 0,
+          max: 10000,
+          last_value: 10,
+          unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE_REACTIVE,
+        },
+        {
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
           external_id: 'tasmota:tasmota-device-topic:ENERGY:Voltage',
           selector: 'tasmota-tasmota-device-topic-energy-voltage',
           name: 'Voltage',
@@ -135,16 +201,16 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
           unit: DEVICE_FEATURE_UNITS.VOLT,
         },
         {
-          category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-          type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+          category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
           external_id: 'tasmota:tasmota-device-topic:ENERGY:Current',
           selector: 'tasmota-tasmota-device-topic-energy-current',
-          name: 'Energy',
+          name: 'Intensity',
           read_only: true,
           has_feedback: false,
           min: 0,
           max: 10000,
-          last_value: 20,
+          last_value: 20.0,
           unit: DEVICE_FEATURE_UNITS.AMPERE,
         },
       ],
@@ -155,6 +221,14 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     expect(tasmotaHandler.pendingDevices).to.deep.eq({});
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:ApparentPower',
+      state: 60,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:ReactivePower',
+      state: 10,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Power',
       state: 57,
     });
@@ -164,7 +238,19 @@ describe('Tasmota - MQTT - create device with ENERGY features', () => {
     });
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Current',
-      state: 20,
+      state: 20.0,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Total',
+      state: 6.911,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Yesterday',
+      state: 1.2,
+    });
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'tasmota:tasmota-device-topic:ENERGY:Today',
+      state: 0.001,
     });
     assert.calledWith(gladys.stateManager.get, 'deviceByExternalId', 'tasmota:tasmota-device-topic');
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
