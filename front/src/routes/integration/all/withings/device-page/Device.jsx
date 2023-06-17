@@ -7,6 +7,7 @@ import { Link } from 'preact-router';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { WithingsDeviceImgByModel } from './withingsConsts';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
+import style from './style.css';
 
 dayjs.extend(relativeTime);
 
@@ -92,8 +93,7 @@ class WithingsDeviceBox extends Component {
                   {WithingsDeviceImgByModel && (
                     <Localizer>
                       <img
-                        class="card-img-top"
-                        style="aspect-ratio: 1 / 1;"
+                        class={cx('card-img-top', style.imgBox)}
                         src={`/assets/images/withings/${WithingsDeviceImgByModel[props.device.model]}`}
                         alt={<Text id="global.logoAlt" />}
                       />

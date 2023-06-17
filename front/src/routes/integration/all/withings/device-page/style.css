@@ -1,3 +1,7 @@
 .emptyDiv {
   min-height: 400px;
 }
+
+.imgBox {
+  aspect-ratio: 1 / 1;
+}
