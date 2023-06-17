@@ -791,6 +791,19 @@
         "conflictError": "Current device is already in Gladys."
       }
     },
+    "musicFile": {
+      "title": "Music File",
+      "documentation": "Documentation music file",
+      "settings": "Configuration",
+      "description": "Play music from local folder.",
+      "introduction": "This integration allows settings of music player from local hard drive in Gladys.<br/>This integration lists playlists in m3u format in the configured folder and expose them to playback.",
+      "defaultFolder": "Enter folder path with music files:",
+      "defaultFolderPlaceholder": "/home/pi/music",
+      "saveButton": "Save",
+      "instructionsToUse": "To use this integration, go to the dashboard and create a music box.",
+      "enableProvider": "Enable music file provider.",
+      "enableReadSubFolder": "Enable read sub folder."
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connect to a local or remote MQTT server",

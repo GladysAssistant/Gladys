@@ -918,6 +918,19 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "musicFile": {
+      "title": "Musique Fichier",
+      "documentation": "Documentation musique fichier",
+      "settings": "Configuration",
+      "description": "Lecture de la musique depuis un dossier local.",
+      "introduction": "Cette intégration permet de configurer la lecture de musique depuis le disque local dans Gladys.<br/>L'intégration liste les playlists au format m3u dans le dossier configuré et de les exposer à la lecture.",
+      "defaultFolder": "Veuillez saisir le chemin du dossier contenant vos fichiers de musiques:",
+      "defaultFolderPlaceholder": "/home/pi/music",
+      "saveButton": "Sauvegarder",
+      "instructionsToUse": "Pour utiliser cette intégration, ajouter une box musique au dashboard.",
+      "enableProvider": "Activer le provider de musique par fichier.",
+      "enableReadSubFolder": "Activer la lecture des sous dossiers."
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connexion à un serveur MQTT, en local ou en distant.",
