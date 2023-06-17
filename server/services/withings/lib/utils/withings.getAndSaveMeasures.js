@@ -12,7 +12,7 @@ async function getAndSaveMeasures(feature, withingsType, userId) {
   // Fix date to start poll in tmestamp
   let dateToPoll = 0;
   if (feature.last_value_changed) {
-    dateToPoll = feature.last_value_changed.getTime();
+    dateToPoll = new Date(feature.last_value_changed).getTime();
   }
 
   const measureResult = await this.getMeasures(

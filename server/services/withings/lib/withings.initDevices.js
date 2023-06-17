@@ -68,7 +68,8 @@ function buildNewDevice(withingsDevice, serviceId) {
     room_id: null,
     service_id: serviceId,
     should_poll: true,
-    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_DAY,
+    poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+    // TODO SM: poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_DAY,
     features: newFeatures,
   };
 
