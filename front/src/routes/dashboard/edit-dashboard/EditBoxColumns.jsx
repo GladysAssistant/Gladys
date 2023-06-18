@@ -7,8 +7,10 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import EditBox from './EditBox';
 import EmptyColumnDropZone from './EmptyColumnDropZone';
 import BottomDropZone from './BottomDropZone';
-import AutoScrollMobile from './AutoScrollMobile';
+import AutoScrollMobile from '../../../components/drag-and-drop/AutoScrollMobile';
 import style from '../style.css';
+
+const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
 
 const EditBoxColumns = ({ children, ...props }) => (
   <div class="pb-6">
@@ -69,7 +71,7 @@ const EditBoxColumns = ({ children, ...props }) => (
       </div>
     </div>
     <DndProvider backend={props.isTouchDevice ? TouchBackend : HTML5Backend}>
-      {props.isMobileReordering && <AutoScrollMobile position="top" />}
+      {props.isMobileReordering && <AutoScrollMobile position="top" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
       <div class="d-flex flex-row flex-wrap justify-content-center">
         {props.homeDashboard &&
           props.homeDashboard.boxes &&
@@ -102,7 +104,7 @@ const EditBoxColumns = ({ children, ...props }) => (
             </div>
           ))}
       </div>
-      {props.isMobileReordering && <AutoScrollMobile position="bottom" />}
+      {props.isMobileReordering && <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
       <div class="d-flex justify-content-center">
         <button class="btn btn-primary" onClick={props.addBox}>
           <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
