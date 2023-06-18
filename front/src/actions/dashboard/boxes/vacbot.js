@@ -29,9 +29,9 @@ function createActions(store) {
         const vacbotStatus = await state.httpClient.get(`/api/v1/service/ecovacs/${box.device_feature}/status`);
         // api/v1/device/:device_selector
         const vacbotDevice = await state.httpClient.get(`/api/v1/device/${box.device_feature}`);
-        
+        // console.log(`vacbotDevice ${JSON.stringify(vacbotDevice)}`);
         const vacbotDeviceFeature = vacbotDevice.features[0];
-        // console.log(`device ${JSON.stringify(vacbotDeviceFeature)}`);
+        // console.log(`vacbotDeviceFeature ${JSON.stringify(vacbotDeviceFeature)}`);
         
         boxActions.mergeBoxData(state, BOX_KEY, x, y, {
           vacbot: vacbotStatus,

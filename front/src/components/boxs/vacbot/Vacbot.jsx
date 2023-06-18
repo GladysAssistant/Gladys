@@ -109,6 +109,7 @@ const VacbotBox = ({ children, ...props }) => (
 class VacbotBoxComponent extends Component {
   refreshData = () => {
     this.props.getVacbot(this.props.box, this.props.x, this.props.y);
+    console.log(`PROPS `, this.props);
   };
   /*
   updateDeviceStateWebsocket = payload =>
@@ -241,7 +242,7 @@ class VacbotBoxComponent extends Component {
     }`;
     
     const device = JSON.parse(json);
-    console.log(device);
+    console.log(props.device);
     const deviceFeature = device.features[0];
 
 
