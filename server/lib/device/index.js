@@ -55,7 +55,7 @@ const DeviceManager = function DeviceManager(
   this.MAX_NUMBER_OF_STATES_ALLOWED_TO_DELETE_DEVICE = 5000;
 
   // initialize all types of device feature categories
-  this.camera = new CameraManager(this.stateManager, messageManager, eventManager, this);
+  this.camera = new CameraManager(this.stateManager, messageManager, eventManager, serviceManager, this);
   this.lightManager = new LightManager(eventManager, messageManager, this);
   this.temperatureSensorManager = new TemperatureSensorManager(eventManager, messageManager, this);
   this.humiditySensorManager = new HumiditySensorManager(eventManager, messageManager, this);

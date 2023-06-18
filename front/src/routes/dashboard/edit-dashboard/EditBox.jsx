@@ -4,6 +4,7 @@ import EditRoomHumidityBox from '../../../components/boxs/room-humidity/EditRoom
 import EditCameraBox from '../../../components/boxs/camera/EditCamera';
 import EditAtHomeBox from '../../../components/boxs/user-presence/EditUserPresenceBox';
 import EditDevicesInRoom from '../../../components/boxs/device-in-room/EditDeviceInRoom';
+import EditDevices from '../../../components/boxs/device-in-room/EditDevices';
 import EditChart from '../../../components/boxs/chart/EditChart';
 import EditEcowatt from '../../../components/boxs/ecowatt/EditEcowatt';
 import EditClock from '../../../components/boxs/clock/EditClock';
@@ -24,6 +25,8 @@ const Box = ({ children, ...props }) => {
       return <EditRoomHumidityBox {...props} />;
     case 'devices-in-room':
       return <EditDevicesInRoom {...props} />;
+    case 'devices':
+      return <EditDevices {...props} />;
     case 'chart':
       return <EditChart {...props} />;
     case 'ecowatt':

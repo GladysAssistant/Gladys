@@ -6,6 +6,7 @@ const {
   hasDeviceChanged,
   mergeFeatures,
   mergeDevices,
+  normalize,
 } = require('../../utils/device');
 
 const buildObject = (prefix, attributes) => {
@@ -260,5 +261,13 @@ describe('mergeDevice', () => {
     const expectedFeature = { ...newFeature, name: 'feature-old1-name' };
     const expectedDevice = { ...newDevice, features: [expectedFeature], updatable: true };
     expect(mergedDevice).to.deep.equal(expectedDevice);
+  });
+});
+
+describe('normalize', () => {
+  it('should normalize data to new range', async () => {
+    const newValue = normalize(50, 0, 100, 0, 360);
+
+    expect(newValue).to.equal(180);
   });
 });
