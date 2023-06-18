@@ -24,22 +24,21 @@ const onOffTrait = {
     },
   ],
   commands: {
-    'action.devices.commands.OnOff': {
-      on: {
-        writeValue: (paramValue) => {
-          return paramValue ? 1 : 0;
-        },
-        features: [
-          {
-            category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-            type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-          },
-          {
-            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-            type: DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-          },
-        ],
-      },
+    'action.devices.commands.OnOff': (device, params) => {
+      const events = [];
+
+      const relatedFeature = device.features.find((feature) =>
+        onOffTrait.features.find(({ category, type }) => feature.category === category && feature.type === type),
+      );
+
+      if (relatedFeature) {
+        events.push({
+          device_feature: relatedFeature.selector,
+          value: params.on ? 1 : 0,
+        });
+      }
+
+      return { events };
     },
   },
 };

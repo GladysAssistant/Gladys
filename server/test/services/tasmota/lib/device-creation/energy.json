@@ -25,13 +25,13 @@
       "ENERGY": {
         "TotalStartTime": "2019-01-19T12:29:20",
         "Total": 6.911,
-        "Yesterday": 0.0,
+        "Yesterday": 1.2,
         "Today": 0.001,
         "Power": 57,
-        "ApparentPower": 0,
-        "ReactivePower": 0,
-        "Factor": 0.0,
-        "Voltage": 12000,
+        "ApparentPower": 60,
+        "ReactivePower": 10,
+        "Factor": 0.95,
+        "Voltage": 12,
         "Current": 20.0
       }
     }
