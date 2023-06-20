@@ -16,6 +16,7 @@ const actionSchema = Joi.array().items(
       user: Joi.string(),
       house: Joi.string(),
       scene: Joi.string(),
+      camera: Joi.string(),
       text: Joi.string(),
       value: Joi.number(),
       evaluate_value: Joi.string(),
@@ -111,6 +112,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: {
         allowNull: false,
+        type: DataTypes.STRING,
+      },
+      description: {
+        allowNull: true,
         type: DataTypes.STRING,
       },
       icon: {

@@ -1,9 +1,11 @@
 import { useRef, useEffect } from 'preact/hooks';
 import { useDrop } from 'react-dnd';
+import cx from 'classnames';
+
 import style from './style.css';
 
-const DASHBOARD_EDIT_BOX_TYPE = 'DASHBOARD_EDIT_BOX';
-
+// We use Preact Hooks here because the library react-dnd needs that
+// We do not recommend using them in other places in Gladys front
 const ScrollBottomMobile = ({ children, ...props }) => {
   const scrollDown = () => {
     window.scrollBy(0, 10);
@@ -15,7 +17,7 @@ const ScrollBottomMobile = ({ children, ...props }) => {
 
   const autoScrollDropRef = useRef(null);
   const [{ isOver, canDrop }, drop] = useDrop({
-    accept: DASHBOARD_EDIT_BOX_TYPE,
+    accept: props.box_type,
     collect: monitor => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop()
@@ -41,9 +43,12 @@ const ScrollBottomMobile = ({ children, ...props }) => {
 
   return (
     <div
-      style={{ display: canDrop ? 'block' : 'none' }}
       ref={autoScrollDropRef}
-      class={props.position === 'top' ? style.scrollTopGuide : style.scrollBottomGuide}
+      class={cx({
+        'd-none': !canDrop,
+        [style.scrollTopGuide]: props.position === 'top',
+        [style.scrollBottomGuide]: props.position !== 'top'
+      })}
     />
   );
 };

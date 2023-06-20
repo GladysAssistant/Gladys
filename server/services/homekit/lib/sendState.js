@@ -1,6 +1,6 @@
 const { intToRgb, rgbToHsb } = require('../../../utils/colors');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, DEVICE_FEATURE_UNITS } = require('../../../utils/constants');
-const { normalize } = require('./utils');
+const { normalize } = require('../../../utils/device');
 const { fahrenheitToCelsius } = require('../../../utils/units');
 const { mappings } = require('./deviceMappings');
 

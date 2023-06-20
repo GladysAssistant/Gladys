@@ -11,12 +11,14 @@ class HomeKitIntegration extends Component {
 
   render(props, {}) {
     const loading =
-      props.homkitGetSettingsStatus === RequestStatus.Getting || props.homekitReloadStatus === RequestStatus.Getting;
+      props.homkitGetSettingsStatus === RequestStatus.Getting ||
+      props.homekitReloadStatus === RequestStatus.Getting ||
+      props.homekitResetStatus === RequestStatus.Getting;
     return <HomeKitPage {...props} loading={loading} />;
   }
 }
 
 export default connect(
-  'user,homekitSetupDataUrl,homkitGetSettingsStatus,homekitReloadStatus',
+  'user,homekitSetupDataUrl,homkitGetSettingsStatus,homekitReloadStatus,homekitResetStatus',
   actions
 )(HomeKitIntegration);

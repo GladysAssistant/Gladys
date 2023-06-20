@@ -36,6 +36,27 @@ const actions = store => ({
         homekitReloadStatus: RequestStatus.Error
       });
     }
+  },
+  async resetBridge(state, e) {
+    e.preventDefault();
+    store.setState({
+      homekitResetStatus: RequestStatus.Getting
+    });
+    try {
+      await state.httpClient.get('/api/v1/service/homekit/reset');
+
+      const { value: setupURI } = await state.httpClient.get('/api/v1/service/homekit/variable/HOMEKIT_SETUP_URI');
+      QRCode.toDataURL(setupURI, (err, dataUrl) => {
+        store.setState({
+          homekitSetupDataUrl: dataUrl,
+          homekitResetStatus: RequestStatus.Success
+        });
+      });
+    } catch (e) {
+      store.setState({
+        homekitResetStatus: RequestStatus.Error
+      });
+    }
   }
 });
 
