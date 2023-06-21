@@ -46,7 +46,8 @@ const SetupTab = ({ children, ...props }) => {
               </p>
             )}
 
-            <form>
+            <form id="<%= attributeName %>SetupForm">
+                       
               <div class="form-group">
                 <label for="<%= attributeName %>Username" class="form-label">
                   <Text id={`integration.<%= module %>.setup.userLabel`} />
