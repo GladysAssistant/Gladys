@@ -8,40 +8,40 @@ const SUPPORTED_SERVERS = {
   atlantic_cozytouch: {
     name: 'Atlantic Cozytouch',
     host: 'ha110-1.overkiz.com',
-    endpoint: 'https://ha110-1.overkiz.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://ha110-1.overkiz.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Atlantic',
     jwt: true,
     configuration: {
-      COZYTOUCH_ATLANTIC_API: 'https://api.groupe-atlantic.com',
-      COZYTOUCH_CLIENT_ID: 'czduc0RZZXdWbjVGbVV4UmlYN1pVSUM3ZFI4YTphSDEzOXZmbzA1ZGdqeDJkSFVSQkFTbmhCRW9h',
+      COZYTOUCH_ATLANTIC_API: 'https://apis.groupe-atlantic.com',
+      COZYTOUCH_CLIENT_ID: 'Q3RfMUpWeVRtSUxYOEllZkE3YVVOQmpGblpVYToyRWNORHpfZHkzNDJVSnFvMlo3cFNKTnZVdjBh',
     },
     configuration_url: undefined,
   },
   hi_kumo_asia: {
     name: 'Hitachi Hi Kumo (Asia)',
     host: 'ha203-1.overkiz.com',
-    endpoint: 'https://ha203-1.overkiz.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://ha203-1.overkiz.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Hitachi',
     configuration_url: undefined,
   },
   hi_kumo_europe: {
     name: 'Hitachi Hi Kumo (Europe)',
     host: 'ha117-1.overkiz.com',
-    endpoint: 'https://ha117-1.overkiz.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://ha117-1.overkiz.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Hitachi',
     configuration_url: undefined,
   },
   hi_kumo_oceania: {
     name: 'Hitachi Hi Kumo (Oceania)',
     host: 'ha203-1.overkiz.com',
-    endpoint: 'https://ha203-1.overkiz.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://ha203-1.overkiz.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Hitachi',
     configuration_url: undefined,
   },
   nexity: {
     name: 'Nexity Eugénie',
     host: 'ha106-1.overkiz.com',
-    endpoint: 'https://ha106-1.overkiz.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://ha106-1.overkiz.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Nexity',
     configuration: {
       NEXITY_API: 'https://api.egn.prd.aws-nexity.fr',
@@ -53,26 +53,26 @@ const SUPPORTED_SERVERS = {
   },
   rexel: {
     name: 'Rexel Energeasy Connect',
-    endpoint: 'https://ha112-1.overkiz.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://ha112-1.overkiz.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Rexel',
     configuration_url: 'https://utilisateur.energeasyconnect.com/user/#/zone/equipements',
   },
   somfy_europe: {
     // uses https://ha101-1.overkiz.com
     name: 'Somfy (Europe)',
-    endpoint: 'https://tahomalink.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://tahomalink.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Somfy',
     configuration_url: 'https://www.tahomalink.com',
   },
   somfy_america: {
     name: 'Somfy (North America)',
-    endpoint: 'https://ha401-1.overkiz.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://ha401-1.overkiz.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Somfy',
     configuration_url: undefined,
   },
   somfy_oceania: {
     name: 'Somfy (Oceania)',
-    endpoint: 'https://ha201-1.overkiz.com/enduser-mobile-web/enduserAPI/',
+    endpoint: 'https://ha201-1.overkiz.com/enduser-mobile-web/enduserAPI',
     manufacturer: 'Somfy',
     configuration_url: undefined,
   },
@@ -137,7 +137,7 @@ const DEVICE_COMMANDS = {
   REFRESH_COMFORT_TEMPERATURE: 'refreshComfortTemperature',
 };
 
-const HEATING_MODES = ['off', 'frost-protection', 'eco', 'comfort-2', 'comfort-1', 'comfort'];
+const HEATING_MODES = ['off', 'frostprotection', 'eco', 'comfort-2', 'comfort-1', 'comfort'];
 
 const HEATING_STATES = {
   STOPPED: 'standby',

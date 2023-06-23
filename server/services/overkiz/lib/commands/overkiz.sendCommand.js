@@ -91,22 +91,19 @@ async function sendCommand(command, deviceURL, data) {
 
   const payload = {
     label: `${command} to device ${deviceURL}`,
-    actions: [
-      {
-        deviceURL,
-        commands: [
-          {
-            name: command,
-            parameters: [data],
-          },
-        ],
-      },
-    ],
+    actions: [{
+      deviceURL,
+      commands: [
+        {
+          name: command,
+          parameters: [data],
+        },
+      ],
+    }],
   };
 
-  const response = await this.overkizServerAPI.exec(payload);
-  const status = await response.wait();
-  logger.debug(`Command sent: ${response.execId} - ${status}`);
+  const execId = await this.overkizServerAPI.exec(payload);
+  logger.debug(`Command ${payload.label} sent: ${execId}`);
 }
 
 module.exports = {

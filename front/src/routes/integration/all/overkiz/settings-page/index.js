@@ -3,14 +3,12 @@ import { connect } from 'unistore/preact';
 import actions from '../actions';
 import OverkizPage from '../OverkizPage';
 import SettingsTab from './SettingsTab';
-import { SUPPORTED_SERVERS } from '../../../../../../../server/services/overkiz/lib/utils/overkiz.constants';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
 class OverkizSettingsTab extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('overkiz');
     this.props.getConfiguration();
-    this.props.overkizTypes = SUPPORTED_SERVERS;
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.OVERKIZ.CONNECTED,
       this.props.displayConnectedMessage
@@ -36,6 +34,6 @@ class OverkizSettingsTab extends Component {
 }
 
 export default connect(
-  'user,session,overkizType,overkizUsername,overkizPassword,overkizGetConfigurationStatus,saveConfigurationStatus',
+  'user,session,overkizType,overkizUsername,overkizPassword,overkizGetConfigurationStatus,overkizSaveConfigurationStatus,overkizConnectStatus,overkizDisonnectStatus',
   actions
 )(OverkizSettingsTab);

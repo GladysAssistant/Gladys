@@ -11,7 +11,7 @@ const {
   DEVICE_TYPES,
   HEATING_MODES,
   HEATING_STATES,
-} = require('../utils/overkiz.constants');
+} = require('../overkiz.constants');
 const { getDeviceName, getDeviceFeatureExternalId, getDeviceExternalId } = require('../utils/overkiz.externalId');
 
 /**
@@ -72,9 +72,9 @@ async function getOverkizDevices() {
     })
     .reduce((map, obj) => {
       // Remove #<idx> to get all nodes from the same physical device
-      const deviceURL = obj.rawOverkizDevice.URL.includes('#')
-        ? obj.rawOverkizDevice.URL.substring(0, obj.rawOverkizDevice.URL.indexOf('#'))
-        : obj.rawOverkizDevice.URL;
+      const deviceURL = obj.rawOverkizDevice.deviceURL.includes('#')
+        ? obj.rawOverkizDevice.deviceURL.substring(0, obj.rawOverkizDevice.deviceURL.indexOf('#'))
+        : obj.rawOverkizDevice.deviceURL;
       map[deviceURL] = obj;
       return map;
     }, {});
@@ -83,11 +83,11 @@ async function getOverkizDevices() {
   deviceOids
     .map((deviceOid) => ({ id: deviceOid, ...this.devices[deviceOid] }))
     .filter((node) => {
-      const deviceURL = node.URL.includes('#') ? node.URL.substring(0, node.URL.indexOf('#')) : node.URL;
+      const deviceURL = node.deviceURL.includes('#') ? node.deviceURL.substring(0, node.deviceURL.indexOf('#')) : node.deviceURL;
       return newDevices[deviceURL] !== undefined;
     })
     .map((node) => {
-      const deviceURL = node.URL.includes('#') ? node.URL.substring(0, node.URL.indexOf('#')) : node.URL;
+      const deviceURL = node.deviceURL.includes('#') ? node.deviceURL.substring(0, node.deviceURL.indexOf('#')) : node.deviceURL;
       const newDevice = newDevices[deviceURL];
       const operatingModeState = newDevice.params.find((param) => param.name === DEVICE_PARAMS.STATE).value;
       const newFeature = {
@@ -98,7 +98,7 @@ async function getOverkizDevices() {
           newDevice.features.push({
             ...newFeature,
             name: `Mode`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.HEATING_LEVEL_STATE}`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.deviceURL}-state-${DEVICE_STATES.HEATING_LEVEL_STATE}`,
             external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.HEATING_LEVEL_STATE),
             category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
             type: DEVICE_FEATURE_TYPES.THERMOSTAT.MODE,
@@ -110,7 +110,7 @@ async function getOverkizDevices() {
           newDevice.features.push({
             ...newFeature,
             name: `Comfort mode temperature`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.COMFORT_TEMPERATURE_STATE}`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.deviceURL}-state-${DEVICE_STATES.COMFORT_TEMPERATURE_STATE}`,
             external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.COMFORT_TEMPERATURE_STATE),
             category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
             type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
@@ -123,7 +123,7 @@ async function getOverkizDevices() {
           newDevice.features.push({
             ...newFeature,
             name: `Eco mode temperature`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.ECO_TEMPERATURE_STATE}`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.deviceURL}-state-${DEVICE_STATES.ECO_TEMPERATURE_STATE}`,
             external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.ECO_TEMPERATURE_STATE),
             category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
             type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
@@ -137,7 +137,7 @@ async function getOverkizDevices() {
           newDevice.features.push({
             ...newFeature,
             name: `Temperature`,
-            selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.TARGET_TEMPERATURE_STATE}`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.deviceURL}-state-${DEVICE_STATES.TARGET_TEMPERATURE_STATE}`,
             external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.TARGET_TEMPERATURE_STATE),
             category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
             type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
@@ -152,7 +152,7 @@ async function getOverkizDevices() {
         newDevice.features.push({
           ...newFeature,
           name: `Temperature`,
-          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.TEMPERATURE_STATE}`,
+          selector: `overkiz-${newDevice.rawOverkizDevice.deviceURL}-state-${DEVICE_STATES.TEMPERATURE_STATE}`,
           external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.TEMPERATURE_STATE),
           category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
@@ -166,7 +166,7 @@ async function getOverkizDevices() {
         newDevice.features.push({
           ...newFeature,
           name: `Occupancy`,
-          selector: `overkiz-${newDevice.rawOverkizDevice.URL}-state-${DEVICE_STATES.OCCUPANCY_STATE}`,
+          selector: `overkiz-${newDevice.rawOverkizDevice.deviceURL}-state-${DEVICE_STATES.OCCUPANCY_STATE}`,
           external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.OCCUPANCY_STATE),
           category: DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR,
           type: DEVICE_FEATURE_TYPES.SENSOR.PUSH,

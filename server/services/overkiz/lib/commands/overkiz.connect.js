@@ -1,8 +1,10 @@
-const { API, CozytouchLoginHandler, DefaultLoginHandler } = require('overkiz-api');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const logger = require('../../../../utils/logger');
-const { OVERKIZ_SERVER_PARAM, SUPPORTED_SERVERS } = require('../utils/overkiz.constants');
+const { OVERKIZ_SERVER_PARAM, SUPPORTED_SERVERS } = require('../overkiz.constants');
+const { CozytouchLoginHandler } = require('../client/overkiz.cozytouch');
+const { DefaultLoginHandler } = require('../client/overkiz.default');
+const { API } = require('../client/overkiz.api');
 
 /**
  * @description Connect to OverKiz server.
@@ -38,13 +40,13 @@ async function connect() {
   let platformLoginHandler;
   switch (overkizType) {
     case 'atlantic_cozytouch':
-      platformLoginHandler = new CozytouchLoginHandler(overkizUsername, overkizUserpassword);
+      platformLoginHandler = new CozytouchLoginHandler(overkizServer, overkizUsername, overkizUserpassword);
       break;
     default:
-      platformLoginHandler = new DefaultLoginHandler(overkizUsername, overkizUserpassword);
+      platformLoginHandler = new DefaultLoginHandler(overkizServer, overkizUsername, overkizUserpassword);
   }
   this.overkizServerAPI = new API({
-    host: overkizServer.host,
+    host: overkizServer.endpoint,
     platformLoginHandler,
     polling: {
       always: false,

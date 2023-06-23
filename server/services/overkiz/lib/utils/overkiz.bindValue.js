@@ -1,4 +1,4 @@
-const { DEVICE_STATES, HEATING_MODES } = require('./overkiz.constants');
+const { DEVICE_STATES, HEATING_MODES } = require('../overkiz.constants');
 const { getNodeStateInfoByExternalId } = require('./overkiz.externalId');
 
 /**

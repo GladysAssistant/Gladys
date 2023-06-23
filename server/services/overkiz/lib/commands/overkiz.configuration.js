@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { OVERKIZ_SERVER_PARAM } = require('../utils/overkiz.constants');
+const { OVERKIZ_SERVER_PARAM } = require('../overkiz.constants');
 
 /**
  * @description Get Overkiz configuration.

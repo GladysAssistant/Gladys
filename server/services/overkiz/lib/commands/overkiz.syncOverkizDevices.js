@@ -28,7 +28,7 @@ function updateDevicesState(devices, rootPlace) {
   devices.forEach((device) => {
     const placeObj = rootPlace.subPlaces.find((place) => place.oid === device.placeOID);
     if (placeObj) {
-      device.place = placeObj.name;
+      device.place = placeObj.label;
     }
     this.devices[device.oid] = device;
     delete this.devices[device.oid].api;
@@ -50,10 +50,8 @@ async function syncOverkizDevices() {
   this.scanInProgress = true;
 
   const setup = await this.overkizServerAPI.getSetup();
-  updateGatewayState.call(this, setup.gateways[0]);
-
-  const devices = await this.overkizServerAPI.getObjects();
-  updateDevicesState.call(this, devices, setup.rootPlace);
+  updateGatewayState.call(this, [ setup.gateways ]);
+  updateDevicesState.call(this, setup.devices, setup.rootPlace);
 
   this.scanInProgress = false;
 }

@@ -26,17 +26,13 @@ function createActions(store) {
       store.setState(configuration);
     },
     async connect(state) {
-      await actions.disconnect(state);
-      await actions.saveConfiguration(state);
       store.setState({
         overkizConnectStatus: RequestStatus.Getting
       });
       try {
         await state.httpClient.post('/api/v1/service/overkiz/connect');
-        await actions.getStatus(store.getState());
         store.setState({
-          overkizConnectStatus: RequestStatus.Success,
-          overkizConnectionInProgress: true
+          overkizConnectStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
@@ -44,10 +40,25 @@ function createActions(store) {
         });
       }
     },
-    async saveConfiguration(state) {
-      event.preventDefault();
+    async disconnect(state) {
       store.setState({
-        saveConfigurationStatus: RequestStatus.Getting
+        overkizDisconnectStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/service/overkiz/disconnect');
+        store.setState({
+          overkizDisconnectStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          overkizDisconnectStatus: RequestStatus.Error
+        });
+      }
+    },
+    async saveConfiguration(state) {
+      await actions.disconnect(state);
+      store.setState({
+        overkizSaveConfigurationStatus: RequestStatus.Getting
       });
 
       const { overkizType, overkizUsername, overkizPassword } = state;
@@ -59,11 +70,12 @@ function createActions(store) {
         });
 
         store.setState({
-          saveConfigurationStatus: RequestStatus.Success
+          overkizSaveConfigurationStatus: RequestStatus.Success
         });
+        await actions.connect(state);
       } catch (e) {
         store.setState({
-          saveConfigurationStatus: RequestStatus.Error
+          overkizSaveConfigurationStatus: RequestStatus.Error
         });
       }
     },

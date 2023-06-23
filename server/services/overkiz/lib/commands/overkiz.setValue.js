@@ -1,6 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { bindValue } = require('../utils/overkiz.bindValue');
-const { DEVICE_COMMANDS, DEVICE_STATES } = require('../utils/overkiz.constants');
+const { DEVICE_COMMANDS, DEVICE_STATES } = require('../overkiz.constants');
 const { getNodeStateInfoByExternalId } = require('../utils/overkiz.externalId');
 const { sendCommand } = require('./overkiz.sendCommand');
 

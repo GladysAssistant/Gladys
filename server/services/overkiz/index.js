@@ -2,7 +2,7 @@ const logger = require('../../utils/logger');
 const OverkizHandler = require('./lib');
 const OverkizController = require('./api/overkiz.controller');
 const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
-const { OVERKIZ_SERVER_PARAM } = require('./lib/utils/overkiz.constants');
+const { OVERKIZ_SERVER_PARAM } = require('./lib/overkiz.constants');
 
 module.exports = function OverkizService(gladys, serviceId) {
   const overkizHandler = new OverkizHandler(gladys, serviceId);

@@ -18,7 +18,6 @@ module.exports = function OverkizController(overkizManager) {
    */
   async function updateConfiguration(req, res) {
     const result = await overkizManager.updateConfiguration(req.body);
-    overkizManager.connect();
     res.json({
       success: result,
     });
@@ -37,11 +36,23 @@ module.exports = function OverkizController(overkizManager) {
   }
 
   /**
+   * @api {post} /api/v1/service/overkiz/disconnect Disconnect from Overkiz cloud account.
+   * @apiName save
+   * @apiGroup Overkiz
+   */
+  async function disconnect(req, res) {
+    await overkizManager.disconnect();
+    res.json({
+      success: true,
+    });
+  }
+
+  /**
    * @api {get} /api/v1/service/overkiz/status Get Overkiz connection status.
    * @apiName status
    * @apiGroup Overkiz
    */
-  async function status(req, res) {
+  function status(req, res) {
     const response = overkizManager.status();
     res.json(response);
   }
@@ -80,6 +91,11 @@ module.exports = function OverkizController(overkizManager) {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(connect),
+    },
+    'post /api/v1/service/overkiz/disconnect': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(disconnect),
     },
     'get /api/v1/service/overkiz/status': {
       authenticated: true,

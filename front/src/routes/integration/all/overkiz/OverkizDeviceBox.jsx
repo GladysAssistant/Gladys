@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
-import { DEVICE_PARAMS } from '../../../../../../server/services/overkiz/lib/utils/overkiz.constants';
+import { DEVICE_PARAMS } from '../../../../../../server/services/overkiz/lib/overkiz.constants';
 import get from 'get-value';
 
 class OverkizDeviceBox extends Component {
@@ -55,6 +55,7 @@ class OverkizDeviceBox extends Component {
   render({ deviceIndex, device, housesWithRooms, editable, ...props }, { loading, errorMessage }) {
     const online = device.params.find(param => param.name === DEVICE_PARAMS.ONLINE).value === '1';
     const firmware = device.params.find(param => param.name === DEVICE_PARAMS.FIRMWARE).value;
+    const state = device.params.find(param => param.name === DEVICE_PARAMS.STATE).value;
 
     return (
       <div class="col-md-6">
@@ -108,6 +109,19 @@ class OverkizDeviceBox extends Component {
                     id={`model_${deviceIndex}`}
                     type="text"
                     value={device.model}
+                    class="form-control"
+                    disabled="true"
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for={`model_${deviceIndex}`}>
+                    <Text id="integration.overkiz.device.stateLabel" />
+                  </label>
+                  <input
+                    id={`state_${deviceIndex}`}
+                    type="text"
+                    value={state}
                     class="form-control"
                     disabled="true"
                   />

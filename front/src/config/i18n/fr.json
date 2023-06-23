@@ -1207,6 +1207,7 @@
         "nameLabel": "Nom de l'appareil",
         "namePlaceholder": "Entrez le nom de votre appareil",
         "modelLabel": "Modèle",
+        "stateLabel": "Programme",
         "roomLabel": "Pièce",
         "createButton": "Sauvegarder",
         "updateButton": "Mettre à jour",
@@ -1236,8 +1237,7 @@
         "userLabel": "Nom d'utilisateur",
         "userPlaceholder": "Entrez le nom d'utilisateur Overkiz",
         "passwordLabel": "Mot de passe",
-        "passwordPlaceholder": "Entrez le mot de passe utilisateur Overkiz",
-        "connectButton": "Connexion"
+        "passwordPlaceholder": "Entrez le mot de passe utilisateur Overkiz"
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",

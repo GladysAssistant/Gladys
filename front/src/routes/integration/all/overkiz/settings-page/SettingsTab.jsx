@@ -3,8 +3,9 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
+import { SUPPORTED_SERVERS } from '../../../../../../../server/services/overkiz/lib/overkiz.constants';
 
-class SetupTab extends Component {
+class SettingsTab extends Component {
   updateOverkizType = e => {
     this.props.updateConfiguration({ overkizType: e.target.value });
   };
@@ -22,7 +23,7 @@ class SetupTab extends Component {
     setTimeout(() => this.setState({ showPassword: false }), 5000);
   };
 
-  render(props, { overkizTypes, showPassword }) {
+  render(props, { showPassword }) {
     return (
       <div class="card">
         <div class="card-header">
@@ -67,14 +68,18 @@ class SetupTab extends Component {
                   <label class="form-label">
                     <Text id="integration.overkiz.settings.typeLabel" />
                   </label>
-                  <select class="form-control" onChange={this.updateOverkizType}>
-                    {overkizTypes &&
-                      overkizTypes.map(({ name, overkizType }) => (
-                        <option value={name} selected={props.overkizType === name}>
+                  <Localizer>
+                    <select class="form-control" onChange={this.updateOverkizType}>
+                      <option>
+                        <Text id="global.emptySelectOption" />
+                      </option>
+                      {Object.entries(SUPPORTED_SERVERS).map(([id, overkizType]) => (
+                        <option value={id} selected={props.overkizType === id}>
                           {overkizType.name}
                         </option>
                       ))}
-                  </select>
+                    </select>
+                  </Localizer>
                 </div>
 
                 <div class="form-group">
@@ -96,30 +101,34 @@ class SetupTab extends Component {
                   <label for="overkizPassword" class="form-label">
                     <Text id={`integration.overkiz.settings.passwordLabel`} />
                   </label>
-                  <Localizer>
-                    <input
-                      name="overkizPassword"
-                      type="password"
-                      placeholder={<Text id="integration.overkiz.settings.passwordPlaceholder" />}
-                      value={props.overkizPassword}
-                      class="form-control"
-                      onInput={this.updateOverkizPassword}
-                    />
-                  </Localizer>
-                  <span class="input-icon-addon cursor-pointer" onClick={this.showPassword}>
-                    <i
-                      class={cx('fe', {
-                        'fe-eye': !showPassword,
-                        'fe-eye-off': showPassword
-                      })}
-                    />
-                  </span>
+                  <div class="input-icon mb-3">
+                    <Localizer>
+                      <input
+                        id="overkizPassword"
+                        name="overkizPassword"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder={<Text id="integration.overkiz.settings.passwordPlaceholder" />}
+                        value={props.overkizPassword}
+                        class="form-control"
+                        onInput={this.updateOverkizPassword}
+                        autoComplete="new-password"
+                      />
+                    </Localizer>
+                    <span class="input-icon-addon cursor-pointer" onClick={this.showPassword}>
+                      <i
+                        class={cx('fe', {
+                          'fe-eye': !showPassword,
+                          'fe-eye-off': showPassword
+                        })}
+                      />
+                    </span>
+                  </div>
                 </div>
 
                 <div class="row mt-5">
                   <div class="col">
-                    <button type="submit" class="btn btn-success" onClick={props.connect}>
-                      <Text id="integration.overkiz.settings.connectButton" />
+                    <button class="btn btn-success" onClick={props.saveConfiguration}>
+                      <Text id="global.save" />
                     </button>
                   </div>
                 </div>
@@ -132,4 +141,4 @@ class SetupTab extends Component {
   }
 }
 
-export default SetupTab;
+export default SettingsTab;
