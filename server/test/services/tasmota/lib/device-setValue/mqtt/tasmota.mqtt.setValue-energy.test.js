@@ -70,4 +70,89 @@ describe('Tasmota - MQTT - setValue - FAIL', () => {
       assert.notCalled(mqttService.device.publish);
     }
   });
+
+  it('Set value apparent power', () => {
+    const device = {
+      params: [],
+    };
+    const feature = {
+      external_id: 'tasmota:tasmota-device-topic:ENERGY:ApparentPower',
+    };
+    const value = 1;
+
+    try {
+      tasmotaHandler.setValue(device, feature, value);
+      assert.fail('Should fail');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+    }
+  });
+
+  it('Set value reactive power', () => {
+    const device = {
+      params: [],
+    };
+    const feature = {
+      external_id: 'tasmota:tasmota-device-topic:ENERGY:ReactivePower',
+    };
+    const value = 1;
+
+    try {
+      tasmotaHandler.setValue(device, feature, value);
+      assert.fail('Should fail');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+    }
+  });
+
+  it('Set value energy yesterday', () => {
+    const device = {
+      params: [],
+    };
+    const feature = {
+      external_id: 'tasmota:tasmota-device-topic:ENERGY:Yesterday',
+    };
+    const value = 1;
+
+    try {
+      tasmotaHandler.setValue(device, feature, value);
+      assert.fail('Should fail');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+    }
+  });
+
+  it('Set value energy today', () => {
+    const device = {
+      params: [],
+    };
+    const feature = {
+      external_id: 'tasmota:tasmota-device-topic:ENERGY:Today',
+    };
+    const value = 1;
+
+    try {
+      tasmotaHandler.setValue(device, feature, value);
+      assert.fail('Should fail');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+    }
+  });
+
+  it('Set value energy total', () => {
+    const device = {
+      params: [],
+    };
+    const feature = {
+      external_id: 'tasmota:tasmota-device-topic:ENERGY:Total',
+    };
+    const value = 1;
+
+    try {
+      tasmotaHandler.setValue(device, feature, value);
+      assert.fail('Should fail');
+    } catch (e) {
+      assert.notCalled(mqttService.device.publish);
+    }
+  });
 });
