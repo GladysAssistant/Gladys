@@ -9,8 +9,6 @@ const logger = require('../../../utils/logger');
 async function disconnect() {
   logger.debug(`SunSpec: Disconnecting...`);
 
-  clearInterval(this.scanDevicesInterval);
-
   if (this.modbus) {
     this.modbus.close(() => {
       if (this.connected) {

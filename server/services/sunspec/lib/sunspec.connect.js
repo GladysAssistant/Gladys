@@ -36,10 +36,6 @@ async function connect() {
   logger.debug(`SunSpec: Searching devices...`);
 
   await this.scanNetwork();
-
-  logger.debug(`SunSpec: Starting devices scanning...`);
-
-  this.scanDevicesInterval = setInterval(this.scanDevices.bind(this), DEFAULT.SCAN_DEVICE_TIMEOUT);
 }
 
 module.exports = {
