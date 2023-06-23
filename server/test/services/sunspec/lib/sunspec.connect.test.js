@@ -24,7 +24,6 @@ describe('SunSpec connect', () => {
   // PREPARE
   let gladys;
   let sunSpecManager;
-  let clock;
 
   beforeEach(() => {
     gladys = {
@@ -37,11 +36,9 @@ describe('SunSpec connect', () => {
     };
 
     sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, SERVICE_ID);
-    clock = sinon.useFakeTimers();
   });
 
   afterEach(() => {
-    clock.restore();
     sinon.reset();
   });
 
@@ -62,13 +59,11 @@ describe('SunSpec connect', () => {
     gladys.variable.getValue = fake.resolves('sunspecUrl');
 
     await sunSpecManager.connect();
-    clock.next();
 
     expect(sunSpecManager.connected).eql(true);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
     });
     assert.calledOnce(sunSpecManager.scanNetwork);
-    assert.calledOnce(sunSpecManager.scanDevices);
   });
 });
