@@ -1,19 +1,19 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { assert, fake } = sinon;
+const { fake } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 const ModbusTCPMock = require('./lib/utils/ModbusTCPMock.test');
 
 class SunspecManagerMock {
   connect() {
     this.connected = true;
-  };
+  }
 
   disconnect() {
     this.connected = false;
-  };
-};
+  }
+}
 
 const SunSpecService = proxyquire('../../../services/sunspec', {
   'modbus-serial': ModbusTCPMock,

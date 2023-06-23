@@ -43,7 +43,7 @@ class SunSpecSettingsTab extends Component {
     await this.loadConfiguration();
   }
 
-  render({}, { config, loading, error, updated }) {
+  render({}, { config, loading, error }) {
     return (
       <div class="card">
         <div class="card-header">
