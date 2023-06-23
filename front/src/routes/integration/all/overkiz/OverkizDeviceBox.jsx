@@ -118,13 +118,7 @@ class OverkizDeviceBox extends Component {
                   <label class="form-label" for={`model_${deviceIndex}`}>
                     <Text id="integration.overkiz.device.stateLabel" />
                   </label>
-                  <input
-                    id={`state_${deviceIndex}`}
-                    type="text"
-                    value={state}
-                    class="form-control"
-                    disabled="true"
-                  />
+                  <input id={`state_${deviceIndex}`} type="text" value={state} class="form-control" disabled="true" />
                 </div>
 
                 {editable && (

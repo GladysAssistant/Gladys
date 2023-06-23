@@ -2,7 +2,7 @@ const axios = require('axios');
 const logger = require('../../../../utils/logger');
 
 class API {
-  constructor({host, platformLoginHandler, polling}) {
+  constructor({ host, platformLoginHandler, polling }) {
     this.platformLoginHandler = platformLoginHandler;
     this.polling = polling;
     this.client = axios.create({
@@ -14,7 +14,6 @@ class API {
       config.headers.common.Cookie = `${this.platformLoginHandler.cookie}`;
       return config;
     });
-
   }
 
   async getSetup() {
@@ -26,7 +25,7 @@ class API {
   }
 
   async getDevices() {
-    return this.get(`/setup/devices`);    
+    return this.get(`/setup/devices`);
   }
 
   async exec(payload) {

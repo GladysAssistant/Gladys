@@ -83,11 +83,15 @@ async function getOverkizDevices() {
   deviceOids
     .map((deviceOid) => ({ id: deviceOid, ...this.devices[deviceOid] }))
     .filter((node) => {
-      const deviceURL = node.deviceURL.includes('#') ? node.deviceURL.substring(0, node.deviceURL.indexOf('#')) : node.deviceURL;
+      const deviceURL = node.deviceURL.includes('#')
+        ? node.deviceURL.substring(0, node.deviceURL.indexOf('#'))
+        : node.deviceURL;
       return newDevices[deviceURL] !== undefined;
     })
     .map((node) => {
-      const deviceURL = node.deviceURL.includes('#') ? node.deviceURL.substring(0, node.deviceURL.indexOf('#')) : node.deviceURL;
+      const deviceURL = node.deviceURL.includes('#')
+        ? node.deviceURL.substring(0, node.deviceURL.indexOf('#'))
+        : node.deviceURL;
       const newDevice = newDevices[deviceURL];
       const operatingModeState = newDevice.params.find((param) => param.name === DEVICE_PARAMS.STATE).value;
       const newFeature = {

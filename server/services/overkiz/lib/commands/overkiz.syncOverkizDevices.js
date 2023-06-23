@@ -50,7 +50,7 @@ async function syncOverkizDevices() {
   this.scanInProgress = true;
 
   const setup = await this.overkizServerAPI.getSetup();
-  updateGatewayState.call(this, [ setup.gateways ]);
+  updateGatewayState.call(this, [setup.gateways]);
   updateDevicesState.call(this, setup.devices, setup.rootPlace);
 
   this.scanInProgress = false;

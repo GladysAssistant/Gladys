@@ -23,18 +23,18 @@ class CozytouchLoginHandler {
     let response = await client.post(`${this.server.configuration.COZYTOUCH_ATLANTIC_API}/token`, params.toString(), {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${this.server.configuration.COZYTOUCH_CLIENT_ID}`
+        Authorization: `Basic ${this.server.configuration.COZYTOUCH_CLIENT_ID}`,
       },
     });
     this.access_token = response.data.access_token;
 
     response = await client.get(`${this.server.configuration.COZYTOUCH_ATLANTIC_API}/magellan/accounts/jwt`, {
       headers: {
-        'Authorization': `Bearer ${this.access_token}`,
+        Authorization: `Bearer ${this.access_token}`,
       },
     });
     this.jwt = response.data;
-   
+
     params = new url.URLSearchParams({
       jwt: this.jwt,
     });
