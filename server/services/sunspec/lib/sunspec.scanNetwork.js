@@ -1,3 +1,4 @@
+const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 const logger = require('../../../utils/logger');
 const { MODEL, REGISTER } = require('./sunspec.constants');
 const { ModelFactory } = require('./utils/sunspec.ModelFactory');
@@ -30,6 +31,10 @@ async function scanNetwork() {
       mppt: i + 1,
     });
   }
+
+  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
+  });
 }
 
 module.exports = {

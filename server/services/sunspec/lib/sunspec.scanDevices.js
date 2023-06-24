@@ -12,27 +12,10 @@ const { ModelFactory } = require('./utils/sunspec.ModelFactory');
 async function scanDevices() {
   logger.debug(`SunSpec: Scanning devices...`);
 
-  const { S1_DCA, S1_DCV, S1_DCW, S1_DCWH, S2_DCA, S2_DCV, S2_DCW, S2_DCWH } = ModelFactory.createModel(
-    await this.modbus.readModel(MODEL.MPPT_INVERTER_EXTENSION),
-  );
+  // @ts-ignore
+  const { mppt } = ModelFactory.createModel(await this.modbus.readModel(MODEL.MPPT_INVERTER_EXTENSION));
   this.devices.forEach((device) => {
-    let DCA;
-    let DCV;
-    let DCW;
-    let DCWH;
-    if (device.mppt === 1) {
-      DCA = S1_DCA;
-      DCV = S1_DCV;
-      DCW = S1_DCW;
-      DCWH = S1_DCWH;
-    } else if (device.mppt === 2) {
-      DCA = S2_DCA;
-      DCV = S2_DCV;
-      DCW = S2_DCW;
-      DCWH = S2_DCWH;
-    } else {
-      return;
-    }
+    const { DCA, DCV, DCW, DCWH } = mppt[device.mppt - 1];
 
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: getDeviceFeatureExternalId({

@@ -5,7 +5,12 @@ const {
   getDeviceName,
   getDeviceFeatureName,
 } = require('./utils/sunspec.externalId');
-const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_UNITS, DEVICE_POLL_FREQUENCIES } = require('../../../utils/constants');
+const {
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_UNITS,
+  DEVICE_POLL_FREQUENCIES,
+} = require('../../../utils/constants');
 const { PROPERTY, PARAMS } = require('./sunspec.constants');
 
 /**
@@ -41,7 +46,7 @@ function getDevices({ orderDir, search } = {}) {
         external_id: getDeviceExternalId(device),
         features: [],
         should_poll: true,
-        poll_frequencey: DEVICE_POLL_FREQUENCIES.EVERY_30_MINUTS,
+        poll_frequencey: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         params: [
           {
             name: PARAMS.MANUFACTURER,

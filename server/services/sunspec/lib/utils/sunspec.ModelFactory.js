@@ -1,10 +1,44 @@
 const { trimString } = require('./sunspec.utils');
 
 class ModelFactory {
+  static readMPPT(data, res, mppt, dcaSf, dcvSf, dcwSf, dcwhSf) {
+    let localOffset = res.offset;
+
+    res.mppt.push({});
+
+    res.mppt[mppt].ID = data.readUInt16BE(localOffset);
+    localOffset += 2;
+    res.mppt[mppt].IDStr = trimString(data.subarray(localOffset, localOffset + 16).toString());
+    localOffset += 16;
+    res.mppt[mppt].DCA = (data.readUInt16BE(localOffset) * 10 ** dcaSf).toFixed(2);
+    localOffset += 2;
+    res.mppt[mppt].DCV = (data.readUInt16BE(localOffset) * 10 ** dcvSf).toFixed(0);
+    localOffset += 2;
+    res.mppt[mppt].DCW = (data.readUInt16BE(localOffset) * 10 ** dcwSf).toFixed(0);
+    localOffset += 2;
+    res.mppt[mppt].DCWH = (data.readUInt32BE(localOffset) * 10 ** dcwhSf).toFixed(0);
+    localOffset += 2;
+    res.mppt[mppt].Tms = data.readUInt32BE(localOffset);
+    localOffset += 4;
+    res.mppt[mppt].Tmp = data.readUInt16BE(localOffset);
+    localOffset += 2;
+    res.mppt[mppt].DCSt = data.readUInt16BE(localOffset);
+    localOffset += 2;
+    res.mppt[mppt].DCEvt = data.readUInt16BE(localOffset);
+    localOffset += 2;
+
+    localOffset += 4;
+
+    res.offset = localOffset;
+
+    return res;
+  }
+
   static createModel(data) {
     const type = data.readUInt16BE(0);
-    // Skip length
+
     // const length = data.readUInt16BE(2);
+
     let offset = 4;
 
     const res = {};
@@ -31,47 +65,13 @@ class ModelFactory {
         res.TmsPer = data.readUInt16BE(offset);
         offset += 2;
 
-        res.S1_ID = data.readUInt16BE(offset);
-        offset += 2;
-        res.S1_IDStr = trimString(data.subarray(offset, offset + 16).toString());
-        offset += 16;
-        res.S1_DCA = (data.readUInt16BE(offset) * 10 ** DCA_SF).toFixed(2);
-        offset += 2;
-        res.S1_DCV = (data.readUInt16BE(offset) * 10 ** DCV_SF).toFixed(0);
-        offset += 2;
-        res.S1_DCW = (data.readUInt16BE(offset) * 10 ** DCW_SF).toFixed(0);
-        offset += 2;
-        res.S1_DCWH = (data.readUInt32BE(offset) * 10 ** DCWH_SF).toFixed(0);
-        offset += 2;
-        res.S1_Tms = data.readUInt32BE(offset);
-        offset += 4;
-        res.S1_Tmp = data.readUInt16BE(offset);
-        offset += 2;
-        res.S1_DCSt = data.readUInt16BE(offset);
-        offset += 2;
-        res.S1_DCEvt = data.readUInt16BE(offset);
-        offset += 2;
+        res.offset = offset;
+        res.mppt = [];
 
-        res.S2_ID = data.readUInt16BE(offset);
-        offset += 2;
-        res.S2_IDStr = trimString(data.subarray(offset, offset + 16).toString());
-        offset += 16;
-        res.S2_DCA = (data.readUInt16BE(offset) * 10 ** DCA_SF).toFixed(2);
-        offset += 2;
-        res.S2_DCV = (data.readUInt16BE(offset) * 10 ** DCV_SF).toFixed(0);
-        offset += 2;
-        res.S2_DCW = (data.readUInt16BE(offset) * 10 ** DCW_SF).toFixed(0);
-        offset += 2;
-        res.S2_DCWH = (data.readUInt32BE(offset) * 10 ** DCWH_SF).toFixed(0);
-        offset += 4;
-        res.S2_Tms = data.readUInt32BE(offset);
-        offset += 4;
-        res.S2_Tmp = data.readUInt16BE(offset);
-        offset += 2;
-        res.S2_DCSt = data.readUInt16BE(offset);
-        offset += 2;
-        res.S2_DCEvt = data.readUInt16BE(offset);
-        offset += 2;
+        for (let i = 0; i < Math.min(res.N, 2); i += 1) {
+          this.readMPPT(data, res, i, DCA_SF, DCV_SF, DCW_SF, DCWH_SF);
+        }
+
         break;
       }
       default:

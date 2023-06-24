@@ -6,6 +6,7 @@ const { getConfiguration } = require('./sunspec.getConfiguration');
 const { updateConfiguration } = require('./sunspec.updateConfiguration');
 const { scanNetwork } = require('./sunspec.scanNetwork');
 const { scanDevices } = require('./sunspec.scanDevices');
+const { poll } = require('./sunspec.poll');
 
 const SunSpecManager = function SunSpecManager(gladys, ModbusTCP, serviceId) {
   this.gladys = gladys;
@@ -24,5 +25,6 @@ SunSpecManager.prototype.getDevices = getDevices;
 SunSpecManager.prototype.scanNetwork = scanNetwork;
 SunSpecManager.prototype.scanDevices = scanDevices;
 SunSpecManager.prototype.updateConfiguration = updateConfiguration;
+SunSpecManager.prototype.poll = poll;
 
 module.exports = SunSpecManager;
