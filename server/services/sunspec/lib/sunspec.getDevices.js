@@ -46,7 +46,7 @@ function getDevices({ orderDir, search } = {}) {
         external_id: getDeviceExternalId(device),
         features: [],
         should_poll: true,
-        poll_frequencey: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+        poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
         params: [
           {
             name: PARAMS.MANUFACTURER,
