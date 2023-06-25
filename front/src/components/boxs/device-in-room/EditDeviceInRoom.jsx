@@ -2,27 +2,11 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
-
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
-import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
-
-const SUPPORTED_FEATURE_TYPES = [
-  DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-  DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-  DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-  DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-  DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
-  DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
-  DEVICE_FEATURE_TYPES.SHUTTER.STATE,
-  DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
-  DEVICE_FEATURE_TYPES.AIR_CONDITIONING.MODE,
-  DEVICE_FEATURE_TYPES.AIR_CONDITIONING.TARGET_TEMPERATURE
-];
+import SUPPORTED_FEATURE_TYPES from './SupportedFeatureTypes';
 
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {

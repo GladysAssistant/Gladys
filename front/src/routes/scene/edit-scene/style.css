@@ -1,0 +1,33 @@
+.arrowDown {
+  font-size: 35px;
+}
+
+.dropZone {
+  height: 100%;
+  min-height: 10rem;
+  border-width: 1px;
+  border-radius: 2px;
+  padding: 2rem;
+  border-color: '#eeeeee';
+  border-style: dashed;
+  outline: none;
+  transition: border 0.24s ease-in-out;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  margin-bottom: 1.5rem;
+}
+
+.dropZoneActive {
+  background-color: #ecf0f1;
+}
+
+.dropZoneDragging {
+  opacity: 0.5;
+}
+
+@media (min-width: 768px) {
+  .plusButton {
+    right: 0;
+    left: auto;
+  }
+}

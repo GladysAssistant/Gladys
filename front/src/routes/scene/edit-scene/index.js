@@ -2,6 +2,9 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import update from 'immutability-helper';
 import { route } from 'preact-router';
+import { DndProvider } from 'react-dnd';
+import { TouchBackend } from 'react-dnd-touch-backend';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { RequestStatus } from '../../../utils/consts';
 import EditScenePage from './EditScenePage';
@@ -89,7 +92,7 @@ class EditScene extends Component {
     this.setState({ saving: true, error: false });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
-      this.setState({ isNameEditable: false });
+      this.setState({ isNameEditable: false, isDescriptionEditable: false });
     } catch (e) {
       console.error(e);
       this.setState({ error: true });
@@ -131,6 +134,20 @@ class EditScene extends Component {
       return newState;
     });
   };
+  deleteActionGroup = columnIndex => {
+    let newState = update(this.state, {
+      scene: {
+        actions: {
+          $splice: [[columnIndex, 1]]
+        }
+      },
+      variables: {
+        $splice: [[columnIndex, 1]]
+      }
+    });
+    this.setState(newState);
+  };
+
   deleteAction = (columnIndex, rowIndex) => {
     this.setState(prevState => {
       let newState = update(prevState, {
@@ -293,7 +310,7 @@ class EditScene extends Component {
   };
 
   toggleIsNameEditable = async () => {
-    await this.setState(prevState => ({ isNameEditable: !prevState.isNameEditable }));
+    await this.setState(prevState => ({ isNameEditable: !prevState.isNameEditable, isDescriptionEditable: false }));
     if (this.state.isNameEditable) {
       this.nameInput.focus();
     }
@@ -301,6 +318,24 @@ class EditScene extends Component {
 
   setNameInputRef = nameInput => {
     this.nameInput = nameInput;
+  };
+
+  toggleIsDescriptionEditable = async () => {
+    await this.setState(prevState => ({
+      isDescriptionEditable: !prevState.isDescriptionEditable,
+      isNameEditable: false
+    }));
+    if (this.state.isDescriptionEditable) {
+      this.descriptionInput.focus();
+    }
+  };
+
+  closeEdition = () => {
+    this.setState({ isNameEditable: false, isDescriptionEditable: false });
+  };
+
+  setDescriptionInputRef = descriptionInput => {
+    this.descriptionInput = descriptionInput;
   };
 
   updateSceneName = e => {
@@ -315,12 +350,104 @@ class EditScene extends Component {
       return newState;
     });
   };
+
+  updateSceneDescription = e => {
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        scene: {
+          description: {
+            $set: e.target.value
+          }
+        }
+      });
+      return newState;
+    });
+  };
+
   duplicateScene = () => {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
+  };
+  moveCard = async (originalX, originalY, destX, destY) => {
+    // incorrect coordinates
+    if (destX < 0 || destY < 0) {
+      return null;
+    }
+
+    if (destY >= this.state.scene.actions.length || destX > this.state.scene.actions[destY].length) {
+      return null;
+    }
+    const element = this.state.scene.actions[originalY][originalX];
+    const variable = this.state.variables[originalY][originalX];
+    const newStateWithoutElement = update(this.state, {
+      scene: {
+        actions: {
+          [originalY]: {
+            $splice: [[originalX, 1]]
+          }
+        }
+      },
+      variables: {
+        [originalY]: {
+          $splice: [[originalX, 1]]
+        }
+      }
+    });
+    const newState = update(newStateWithoutElement, {
+      scene: {
+        actions: {
+          [destY]: {
+            $splice: [[destX, 0, element]]
+          }
+        }
+      },
+      variables: {
+        [destY]: {
+          $splice: [[destX, 0, variable]]
+        }
+      }
+    });
+    await this.setState(newState);
+  };
+
+  moveCardGroup = async (index, destIndex) => {
+    // incorrect coordinates
+    if (destIndex < 0) {
+      return null;
+    }
+
+    if (destIndex >= this.state.scene.actions.length) {
+      return null;
+    }
+
+    const element = this.state.scene.actions[index];
+    const variable = this.state.variables[index];
+
+    const newStateWithoutElement = update(this.state, {
+      scene: {
+        actions: {
+          $splice: [[index, 1]]
+        }
+      },
+      variables: {
+        $splice: [[index, 1]]
+      }
+    });
+    const newState = update(newStateWithoutElement, {
+      scene: {
+        actions: {
+          $splice: [[destIndex, 0, element]]
+        }
+      },
+      variables: {
+        $splice: [[destIndex, 0, variable]]
+      }
+    });
+    await this.setState(newState);
   };
 
   constructor(props) {
     super(props);
+    this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     this.state = {
       scene: null,
       variables: {},
@@ -330,6 +457,7 @@ class EditScene extends Component {
   }
 
   componentDidMount() {
+    document.addEventListener('click', this.closeEdition, true);
     this.getSceneBySelector();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.highlighCurrentlyExecutedAction(payload)
@@ -339,34 +467,47 @@ class EditScene extends Component {
     );
   }
 
-  render(props, { saving, error, variables, scene, isNameEditable, triggersVariables }) {
+  componentWillUnmount() {
+    document.removeEventListener('click', this.closeEdition, true);
+  }
+
+  render(props, { saving, error, variables, scene, isNameEditable, isDescriptionEditable, triggersVariables }) {
     return (
       scene && (
-        <EditScenePage
-          {...props}
-          scene={scene}
-          startScene={this.startScene}
-          deleteScene={this.deleteScene}
-          saveScene={this.saveScene}
-          updateActionProperty={this.updateActionProperty}
-          updateTriggerProperty={this.updateTriggerProperty}
-          addAction={this.addAction}
-          deleteAction={this.deleteAction}
-          addTrigger={this.addTrigger}
-          deleteTrigger={this.deleteTrigger}
-          saving={saving}
-          error={error}
-          variables={variables}
-          triggersVariables={triggersVariables}
-          setVariables={this.setVariables}
-          setVariablesTrigger={this.setVariablesTrigger}
-          switchActiveScene={this.switchActiveScene}
-          toggleIsNameEditable={this.toggleIsNameEditable}
-          isNameEditable={isNameEditable}
-          updateSceneName={this.updateSceneName}
-          setNameInputRef={this.setNameInputRef}
-          duplicateScene={this.duplicateScene}
-        />
+        <DndProvider backend={this.isTouchDevice ? TouchBackend : HTML5Backend}>
+          <EditScenePage
+            {...props}
+            scene={scene}
+            startScene={this.startScene}
+            deleteScene={this.deleteScene}
+            saveScene={this.saveScene}
+            updateActionProperty={this.updateActionProperty}
+            updateTriggerProperty={this.updateTriggerProperty}
+            addAction={this.addAction}
+            deleteActionGroup={this.deleteActionGroup}
+            deleteAction={this.deleteAction}
+            addTrigger={this.addTrigger}
+            deleteTrigger={this.deleteTrigger}
+            saving={saving}
+            error={error}
+            variables={variables}
+            triggersVariables={triggersVariables}
+            setVariables={this.setVariables}
+            setVariablesTrigger={this.setVariablesTrigger}
+            switchActiveScene={this.switchActiveScene}
+            toggleIsNameEditable={this.toggleIsNameEditable}
+            isNameEditable={isNameEditable}
+            updateSceneName={this.updateSceneName}
+            setNameInputRef={this.setNameInputRef}
+            duplicateScene={this.duplicateScene}
+            moveCard={this.moveCard}
+            moveCardGroup={this.moveCardGroup}
+            updateSceneDescription={this.updateSceneDescription}
+            toggleIsDescriptionEditable={this.toggleIsDescriptionEditable}
+            isDescriptionEditable={isDescriptionEditable}
+            setDescriptionInputRef={this.setDescriptionInputRef}
+          />
+        </DndProvider>
       )
     );
   }

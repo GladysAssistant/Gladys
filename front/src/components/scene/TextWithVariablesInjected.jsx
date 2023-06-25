@@ -90,7 +90,7 @@ class TextWithVariablesInjected extends Component {
       this.initTagify();
     }
   };
-  parseText = textContent => {
+  parseText = async textContent => {
     let text = textContent ? textContent : '';
     const variableWhileListSorted = this.state.variableWhileList.sort((a, b) => b.id.length - a.id.length);
     variableWhileListSorted.forEach(variable => {
@@ -99,13 +99,15 @@ class TextWithVariablesInjected extends Component {
     text = text.replaceAll(`\n${OPENING_VARIABLE}`, OPENING_VARIABLE);
     text = text.replaceAll(`${CLOSING_VARIABLE}\n`, CLOSING_VARIABLE);
     text = text.trim();
+    await this.setState({ text });
     this.props.updateText(text);
   };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      variableWhileList: []
+      variableWhileList: [],
+      text: this.props.text
     };
 
     this.refreshVariables(this.props);
@@ -116,6 +118,11 @@ class TextWithVariablesInjected extends Component {
   }
   componentWillReceiveProps(nextProps) {
     this.refreshVariables(nextProps);
+    // If the text is refreshed from the outside
+    if (nextProps.text !== this.state.text) {
+      this.tagify.loadOriginalValues(nextProps.text);
+      this.setState({ text: nextProps.text });
+    }
   }
   componentWillUnmount() {
     if (this.tagify) {
