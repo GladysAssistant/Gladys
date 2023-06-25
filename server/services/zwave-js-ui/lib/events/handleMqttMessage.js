@@ -60,6 +60,7 @@ function handleMqttMessage(topic, message) {
 
           this.scanComplete();
         }
+        this.scanNetwork();
       }
       break;
     }
@@ -74,8 +75,6 @@ function handleMqttMessage(topic, message) {
         break;
       } else if (splittedTopic[2] === 'nodeinfo') {
         break;
-      } else if (this.scanInProgress) {
-        logger.info(`ZwaveJSUI scan in progress. Bypass message.`);
       } else if (splittedTopic.length >= 5) {
         splittedTopic.shift();
         if (this.mqttTopicWithLocation) {
