@@ -29,11 +29,11 @@ describe('Tasmota - MQTT - handle new state with array value', () => {
 
     const expectedEvent1 = {
       device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Voltage1`,
-      state: 0.125,
+      state: 125,
     };
     const expectedEvent2 = {
       device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Voltage2`,
-      state: 0.132,
+      state: 132,
     };
 
     assert.calledTwice(gladys.event.emit);
