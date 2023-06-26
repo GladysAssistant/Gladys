@@ -165,22 +165,22 @@ async function connect() {
         // Connection refused: Not authorized
         this.disconnect();
       }
+      this.mqttConnected = false;
+      this.scanInProgress = false;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.MQTT_ERROR,
         payload: err,
       });
-      this.mqttConnected = false;
-      this.scanInProgress = false;
     });
 
     this.mqttClient.on('offline', () => {
       logger.warn(`Disconnected from MQTT server`);
+      this.mqttConnected = false;
+      this.scanInProgress = false;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.MQTT_ERROR,
         payload: 'DISCONNECTED',
       });
-      this.mqttConnected = false;
-      this.scanInProgress = false;
     });
 
     this.mqttClient.on('message', (topic, message) => {
@@ -194,9 +194,6 @@ async function connect() {
     });
 
     this.scanNetwork();
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
-    });
   } else {
     logger.warn("Can't connect Gladys cause MQTT not running !");
   }

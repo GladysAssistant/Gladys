@@ -38,6 +38,7 @@ describe('zwave gladys node event', () => {
     zwaveJSUIManager.nodeReady = fake.returns(null);
     zwaveJSUIManager.valueAdded = fake.returns(null);
     zwaveJSUIManager.scanComplete = fake.resolves(null);
+    zwaveJSUIManager.scanNetwork = fake.resolves(null);
     // sinon.reset();
   });
 
@@ -176,7 +177,6 @@ describe('zwave gladys node event', () => {
   });
 
   it('should getNodes in scan mode success', () => {
-    zwaveJSUIManager.scanInProgress = true;
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
       success: true,
       result: [
@@ -203,7 +203,6 @@ describe('zwave gladys node event', () => {
         },
       ],
     });
-    zwaveJSUIManager.scanInProgress = false;
     assert.calledOnceWithExactly(zwaveJSUIManager.nodeReady, {
       nodeId: 1,
       classes: {},
@@ -244,17 +243,11 @@ describe('zwave gladys node event', () => {
   });
 
   it('should getNodes in scan mode error', () => {
-    zwaveJSUIManager.scanInProgress = true;
     zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
       success: false,
     });
-    zwaveJSUIManager.scanInProgress = false;
     assert.notCalled(zwaveJSUIManager.scanComplete);
-  });
-
-  it('should getNodes not in scan mode', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, 0);
-    assert.notCalled(zwaveJSUIManager.valueUpdated);
+    assert.calledOnce(zwaveJSUIManager.scanNetwork);
   });
 
   it('should send driver status event', () => {
