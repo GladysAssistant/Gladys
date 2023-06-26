@@ -94,7 +94,7 @@ function valueAdded(zwaveNode, args) {
       }
       // }
     } else if (deviceFeature) {
-      this.eventManager.emit(EVENTS.DEVICE.ADD_FEATURE, {
+      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: deviceFeatureExternalId,
       });
     }

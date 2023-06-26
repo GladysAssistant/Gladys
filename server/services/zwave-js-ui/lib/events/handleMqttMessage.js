@@ -16,50 +16,49 @@ function handleMqttMessage(topic, message) {
       break;
     }
     case `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {
-      if (this.scanInProgress) {
-        const { success, result } = message instanceof Object ? message : JSON.parse(message);
-        if (success) {
-          this.nodes = {};
-          result.forEach((data) => {
-            const node = {
-              nodeId: data.id,
-              classes: {},
-              values: {},
-              ...data,
-            };
+      const { success, result } = message instanceof Object ? message : JSON.parse(message);
+      if (success) {
+        this.nodes = {};
+        result.forEach((data) => {
+          const node = {
+            nodeId: data.id,
+            classes: {},
+            values: {},
+            ...data,
+          };
 
-            this.nodes[data.id] = node;
+          this.nodes[data.id] = node;
 
-            this.nodeReady(node);
-            Object.keys(node.values)
-              .filter((valueId) => !valueId.startsWith(COMMAND_CLASSES.COMMAND_CLASS_BASIC.toString()))
-              .forEach((valueId) => {
-                const value = node.values[valueId];
-                if (value.property) {
-                  value.property = value.property.toString().replace(/_/g, ' ');
-                } else {
-                  value.property = value.propertyName.replace(/_/g, ' ');
-                }
-                delete value.propertyName;
-                value.propertyKey = value.propertyKey ? `${value.propertyKey}`.replace(/_/g, ' ') : undefined;
+          this.nodeReady(node);
+          Object.keys(node.values)
+            .filter((valueId) => !valueId.startsWith(COMMAND_CLASSES.COMMAND_CLASS_BASIC.toString()))
+            .forEach((valueId) => {
+              const value = node.values[valueId];
+              if (value.property) {
+                value.property = value.property.toString().replace(/_/g, ' ');
+              } else {
+                value.property = value.propertyName.replace(/_/g, ' ');
+              }
+              delete value.propertyName;
+              value.propertyKey = value.propertyKey ? `${value.propertyKey}`.replace(/_/g, ' ') : undefined;
 
-                this.valueAdded(
-                  {
-                    id: data.id,
-                  },
-                  value,
-                );
-              });
+              this.valueAdded(
+                {
+                  id: data.id,
+                },
+                value,
+              );
+            });
 
-            // Clean node
-            delete node.id;
-            delete node.values;
-            delete node.groups;
-            delete node.deviceConfig;
-          });
+          // Clean node
+          delete node.id;
+          delete node.values;
+          delete node.groups;
+          delete node.deviceConfig;
+        });
 
-          this.scanComplete();
-        }
+        this.scanComplete();
+      } else {
         this.scanNetwork();
       }
       break;

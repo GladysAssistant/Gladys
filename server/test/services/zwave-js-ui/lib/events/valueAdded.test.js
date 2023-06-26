@@ -139,7 +139,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'switch',
@@ -208,7 +208,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'motion-sensor',
@@ -251,7 +251,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'motion-sensor',
@@ -316,7 +316,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'motion-sensor',
@@ -393,7 +393,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'light-sensor',
@@ -438,7 +438,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'humidity-sensor',
@@ -481,7 +481,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'uv-sensor',
@@ -526,7 +526,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'temperature-sensor',
@@ -569,7 +569,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'smoke-sensor',
@@ -681,7 +681,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'switch',
@@ -716,7 +716,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'switch',
@@ -789,7 +789,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'switch',
@@ -843,7 +843,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'switch',
@@ -878,7 +878,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(0);
+    expect(nodes[0].params).to.have.lengthOf(4);
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'switch',
