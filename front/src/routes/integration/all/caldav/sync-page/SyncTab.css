@@ -1,0 +1,12 @@
+.switchGroup {
+  margin-bottom: 10px;
+}
+
+.switchLabel {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.switchIndicator {
+  margin-right: 5px;
+}

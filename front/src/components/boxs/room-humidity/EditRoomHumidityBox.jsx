@@ -1,5 +1,4 @@
 import { Component } from 'preact';
-import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 
@@ -23,7 +22,6 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('', {})
 class EditRoomHumidityBoxComponent extends Component {
   updateBoxRoom = (x, y, selector) => {
     this.props.updateBoxConfig(x, y, {

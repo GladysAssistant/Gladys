@@ -26,7 +26,7 @@ describe('Tasmota - MQTT - handle new state ENERGY', () => {
 
     const expectedEvent = {
       device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Voltage`,
-      state: 0.125,
+      state: 125,
     };
 
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
@@ -43,11 +43,72 @@ describe('Tasmota - MQTT - handle new state ENERGY', () => {
     assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
   });
 
+  it('decode SENSOR Apparent power message', () => {
+    tasmotaHandler.handleMessage(
+      'stat/tasmota-device-topic/SENSOR',
+      JSON.stringify({ ENERGY: { ApparentPower: 125 } }),
+    );
+
+    const expectedEvent = {
+      device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:ApparentPower`,
+      state: 125,
+    };
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
+  it('decode SENSOR Reactive power message', () => {
+    tasmotaHandler.handleMessage(
+      'stat/tasmota-device-topic/SENSOR',
+      JSON.stringify({ ENERGY: { ReactivePower: 125 } }),
+    );
+
+    const expectedEvent = {
+      device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:ReactivePower`,
+      state: 125,
+    };
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
   it('decode SENSOR Power message', () => {
     tasmotaHandler.handleMessage('stat/tasmota-device-topic/SENSOR', JSON.stringify({ ENERGY: { Power: 125 } }));
 
     const expectedEvent = {
       device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Power`,
+      state: 125,
+    };
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
+  it('decode SENSOR Energy yesterday message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/SENSOR', JSON.stringify({ ENERGY: { Yesterday: 125 } }));
+
+    const expectedEvent = {
+      device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Yesterday`,
+      state: 125,
+    };
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
+  it('decode SENSOR Energy today message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/SENSOR', JSON.stringify({ ENERGY: { Today: 125 } }));
+
+    const expectedEvent = {
+      device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Today`,
+      state: 125,
+    };
+
+    assert.calledWith(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, expectedEvent);
+  });
+
+  it('decode SENSOR Energy total message', () => {
+    tasmotaHandler.handleMessage('stat/tasmota-device-topic/SENSOR', JSON.stringify({ ENERGY: { Total: 125 } }));
+
+    const expectedEvent = {
+      device_feature_external_id: `tasmota:tasmota-device-topic:ENERGY:Total`,
       state: 125,
     };
 

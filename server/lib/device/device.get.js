@@ -10,8 +10,9 @@ const DEFAULT_OPTIONS = {
 };
 
 /**
- * @description Get list of device
- * @param {Object} [options] - Options of the query.
+ * @description Get list of device.
+ * @param {object} [options] - Options of the query.
+ * @returns {Promise<Array>} Resolve with list of devices.
  * @example
  * const devices = await gladys.device.get({
  *  take: 20,
@@ -48,6 +49,15 @@ async function get(options) {
   if (optionsWithDefault.device_feature_category) {
     queryParams.include[0].where = {
       category: optionsWithDefault.device_feature_category,
+    };
+  }
+
+  // search by device feature selectors
+  if (optionsWithDefault.device_feature_selectors) {
+    queryParams.include[0].where = {
+      [Op.or]: optionsWithDefault.device_feature_selectors.split(',').map((selector) => ({
+        selector,
+      })),
     };
   }
 

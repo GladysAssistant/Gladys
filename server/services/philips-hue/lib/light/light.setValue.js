@@ -6,9 +6,9 @@ const { parseExternalId } = require('../utils/parseExternalId');
 const { NotFoundError } = require('../../../../utils/coreErrors');
 
 /**
- * @description Change value of a Philips hue
- * @param {Object} device - The device to control.
- * @param {Object} deviceFeature - The binary deviceFeature to control.
+ * @description Change value of a Philips hue.
+ * @param {object} device - The device to control.
+ * @param {object} deviceFeature - The binary deviceFeature to control.
  * @param {number} value - The new value.
  * @example
  * turnOff(device, deviceFeature, value);

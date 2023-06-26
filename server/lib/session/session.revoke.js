@@ -2,7 +2,7 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Revoke a session
+ * @description Revoke a session.
  * @param {string} userId - Id of the user.
  * @param {string} sessionId - Uuid of the session.
  * @returns {Promise} Return the revoked session.

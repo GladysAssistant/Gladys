@@ -13,9 +13,9 @@ const { CONFIGURATION } = require('../utils/<%= module %>.constants');
  * <%= module %>.getConfiguration();
  */
 async function getConfiguration() {
-  logger.debug(`<%= className %>: config`);
   const login = await this.gladys.variable.getValue(CONFIGURATION.<%= constName %>_LOGIN_KEY, this.serviceId);
   const password = await this.gladys.variable.getValue(CONFIGURATION.<%= constName %>_PASSWORD_KEY, this.serviceId);
+  logger.debug(`<%= className %> return config login=${login}, password=${password}`);
   return {
     login,
     password,

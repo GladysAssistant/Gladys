@@ -5,7 +5,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 /**
  * @description Save the location of the user.
  * @param {string} userSelector - The selector of the user.
- * @param {Object} location - The location object.
+ * @param {object} location - The location object.
  * @returns {Promise} Resolve with the created location.
  * @example
  * gladys.location.create('tony', {

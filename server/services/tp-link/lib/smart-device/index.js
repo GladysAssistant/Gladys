@@ -16,9 +16,9 @@ const setValueLimiter = new Bottleneck({
 });
 
 /**
- * @description Add ability to control a Philips Hue light
- * @param {Object} gladys - Gladys instance.
- * @param {Object} tpLinkClient - TP-LinkClient.
+ * @description Add ability to control a Philips Hue light.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} tpLinkClient - TP-LinkClient.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const exampleLightHandler = new ExampleLightHandler(gladys, client, serviceId);
@@ -28,6 +28,7 @@ const TPLinkSmartDeviceHandler = function TPLinkSmartDeviceHandler(gladys, tpLin
   this.client = tpLinkClient;
   this.serviceId = serviceId;
   this.tpLinkDevicesBySerialNumber = new Map();
+  this.discoverDevicesDelay = 2000;
 };
 
 TPLinkSmartDeviceHandler.prototype.getDevices = getDevices;

@@ -2,24 +2,39 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 
 const { assert, fake } = sinon;
+
 const GoogleActionsHandler = require('../../../../../services/google-actions/lib');
 
-const gladys = {
-  stateManager: {
-    state: {
-      device: {},
-    },
+const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
+const body = {
+  requestId: 'request-id',
+  user: {
+    id: 'user-id',
+    selector: 'user-selector',
   },
 };
-const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
 
 describe('GoogleActions Handler - onSync', () => {
+  let gladys;
+  let googleActionsHandler;
+
   beforeEach(() => {
-    sinon.reset();
-    gladys.stateManager.state.device = {};
+    gladys = {
+      stateManager: {
+        state: {
+          device: {},
+        },
+      },
+    };
+
+    googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
   });
 
-  it('onSync', async () => {
+  afterEach(() => {
+    sinon.reset();
+  });
+
+  it('should generate devices', async () => {
     gladys.stateManager.state.device = {
       device_1: {
         get: fake.returns({
@@ -40,15 +55,6 @@ describe('GoogleActions Handler - onSync', () => {
       },
     };
 
-    const body = {
-      requestId: 'request-id',
-      user: {
-        id: 'user-id',
-        selector: 'user-selector',
-      },
-    };
-
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
     const result = await googleActionsHandler.onSync(body);
 
     const exptectedResult = {
@@ -77,16 +83,7 @@ describe('GoogleActions Handler - onSync', () => {
     assert.calledOnce(gladys.stateManager.state.device.device_1.get);
   });
 
-  it('onSync - no device', async () => {
-    const body = {
-      requestId: 'request-id',
-      user: {
-        id: 'user-id',
-        selector: 'user-selector',
-      },
-    };
-
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
+  it('should get empty devices', async () => {
     const result = await googleActionsHandler.onSync(body);
 
     const exptectedResult = {
@@ -99,7 +96,7 @@ describe('GoogleActions Handler - onSync', () => {
     expect(result).to.deep.eq(exptectedResult);
   });
 
-  it('onSync - not matching device', async () => {
+  it('should not generate device - none matching', async () => {
     gladys.stateManager.state.device = {
       device_1: {
         get: fake.returns({
@@ -119,14 +116,6 @@ describe('GoogleActions Handler - onSync', () => {
       },
     };
 
-    const body = {
-      requestId: 'request-id',
-      user: {
-        id: 'user-id',
-        selector: 'user-selector',
-      },
-    };
-    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
     const result = await googleActionsHandler.onSync(body);
 
     const exptectedResult = {

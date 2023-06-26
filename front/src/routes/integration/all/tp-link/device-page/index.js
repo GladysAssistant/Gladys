@@ -5,10 +5,6 @@ import TpLinkPage from '../TpLinkPage';
 import DevicePage from './DevicePage';
 import FoundDevices from './FoundDevices';
 
-@connect(
-  'session,user,tpLinkDevices,houses,getTpLinkDevicesStatus,tpLinkNewDevices,getTpLinkCreateDeviceStatus,getTpLinkNewDevicesStatus,getTpLinkDeviceOrderDir,tpLinkDeviceSearch',
-  actions
-)
 class TpLinkDevicePage extends Component {
   componentWillMount() {
     this.props.getTpLinkDevices();
@@ -27,4 +23,7 @@ class TpLinkDevicePage extends Component {
   }
 }
 
-export default TpLinkDevicePage;
+export default connect(
+  'session,user,tpLinkDevices,houses,getTpLinkDevicesStatus,tpLinkNewDevices,getTpLinkCreateDeviceStatus,getTpLinkNewDevicesStatus,getTpLinkDeviceOrderDir,tpLinkDeviceSearch',
+  actions
+)(TpLinkDevicePage);

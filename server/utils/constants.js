@@ -260,10 +260,12 @@ const ACTIONS = {
   LIGHT: {
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
+    TOGGLE: 'light.toggle',
   },
   SWITCH: {
     TURN_ON: 'switch.turn-on',
     TURN_OFF: 'switch.turn-off',
+    TOGGLE: 'switch.toggle',
   },
   TIME: {
     DELAY: 'delay',
@@ -273,6 +275,7 @@ const ACTIONS = {
   },
   MESSAGE: {
     SEND: 'message.send',
+    SEND_CAMERA: 'message.send-camera',
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
@@ -345,6 +348,8 @@ const DEVICE_FEATURE_CATEGORIES = {
   LIGHT_SENSOR: 'light-sensor',
   MOTION_SENSOR: 'motion-sensor',
   OPENING_SENSOR: 'opening-sensor',
+  PM25_SENSOR: 'pm25-sensor',
+  FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
@@ -354,6 +359,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SISMIC_SENSOR: 'sismic-sensor',
   SMOKE_SENSOR: 'smoke-sensor',
   SOIL_MOISTURE_SENSOR: 'soil-moisture-sensor',
+  SURFACE: 'surface',
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
   TELEVISION: 'television',
@@ -364,6 +370,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
   VOLUME_SENSOR: 'volume-sensor',
+  TEXT: 'text',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -430,6 +437,9 @@ const DEVICE_FEATURE_TYPES = {
     MODE: 'mode',
     TARGET_TEMPERATURE: 'target-temperature',
   },
+  SURFACE: {
+    DECIMAL: 'decimal',
+  },
   TELEVISION: {
     BINARY: 'binary',
     SOURCE: 'source',
@@ -455,6 +465,8 @@ const DEVICE_FEATURE_TYPES = {
     PLAY: 'play',
     PAUSE: 'pause',
     STOP: 'stop',
+    PREVIOUS: 'previous',
+    NEXT: 'next',
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
@@ -466,6 +478,7 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',
+    DAILY_CONSUMPTION: 'daily-consumption',
   },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',
@@ -513,6 +526,9 @@ const DEVICE_FEATURE_TYPES = {
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
   },
+  TEXT: {
+    TEXT: 'text',
+  },
 };
 
 const DEVICE_FEATURE_UNITS = {
@@ -550,6 +566,10 @@ const DEVICE_FEATURE_UNITS = {
   CM: 'cm',
   M: 'm',
   KM: 'km',
+  // surface units
+  SQUARE_CENTIMETER: 'square-centimeter',
+  SQUARE_METER: 'square-meter',
+  SQUARE_KILOMETER: 'square-kilometer',
   // Degree units
   DEGREE: 'degree',
   // Volume units
@@ -603,6 +623,8 @@ const DEVICE_FEATURE_UNITS = {
   GIGABYTES_PER_SECOND: 'gigabytes-per-second',
   // Airquality Index
   AQI: 'aqi',
+  // For air quality (pm2.5, formaldehyd)
+  MICROGRAM_PER_CUBIC_METER: 'microgram-per-cubic-meter',
 };
 
 const WEATHER_UNITS = {
@@ -717,6 +739,13 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
   ],
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_UNITS.AQI],
+  [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
+  [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
+  [DEVICE_FEATURE_CATEGORIES.SURFACE]: [
+    DEVICE_FEATURE_UNITS.SQUARE_CENTIMETER,
+    DEVICE_FEATURE_UNITS.SQUARE_METER,
+    DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
+  ],
 };
 
 const ACTIONS_STATUS = {
@@ -773,6 +802,9 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
+  LAN: {
+    SCANNING: 'lan.scanning',
+  },
   MQTT: {
     CONNECTED: 'mqtt.connected',
     ERROR: 'mqtt.error',
@@ -817,6 +849,7 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  DEVICES: 'devices',
   CHART: 'chart',
   ECOWATT: 'ecowatt',
   CLOCK: 'clock',

@@ -4,8 +4,8 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
 /**
  * @description Save new device feature string state in DB.
- * @param {Object} device - A Device object.
- * @param {Object} deviceFeature - A DeviceFeature object.
+ * @param {object} device - A Device object.
+ * @param {object} deviceFeature - A DeviceFeature object.
  * @param {number} newValue - The new value of the deviceFeature to save.
  * @example
  * saveState({
@@ -40,6 +40,7 @@ async function saveStringState(device, deviceFeature, newValue) {
     type: WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
     payload: {
       device: device.selector,
+      device_feature: deviceFeature.selector,
       last_value_string: newValue,
       last_value_changed: now,
     },

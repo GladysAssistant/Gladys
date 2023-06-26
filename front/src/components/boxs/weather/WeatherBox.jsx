@@ -147,7 +147,7 @@ const WeatherBox = ({ children, ...props }) => (
           </div>
         </div>
         {props.display_mode[GetWeatherModes.AdvancedWeather] && (
-          <div className="col-9" style={{ padding: '0' }}>
+          <div className="col-9 p-0">
             <span>
               <i
                 class="fe fe-droplet"

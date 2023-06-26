@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
 
-@connect('httpClient', {})
 class RoomSelector extends Component {
   updateSelection = option => {
     this.props.updateRoomSelection(option.room);
@@ -71,8 +70,8 @@ class RoomSelector extends Component {
   }
 
   render({}, { selectedRoom, houseOptions }) {
-    return <Select value={selectedRoom} options={houseOptions} onChange={this.updateSelection} />;
+    return <Select value={selectedRoom} options={houseOptions} onChange={this.updateSelection} maxMenuHeight={220} />;
   }
 }
 
-export default RoomSelector;
+export default connect('httpClient', {})(RoomSelector);

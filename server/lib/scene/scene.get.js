@@ -3,15 +3,16 @@ const Sequelize = require('sequelize');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
-  fields: ['id', 'name', 'icon', 'selector', 'active', 'last_executed', 'updated_at'],
+  fields: ['id', 'name', 'description', 'icon', 'selector', 'active', 'last_executed', 'updated_at'],
   skip: 0,
   order_dir: 'ASC',
   order_by: 'name',
 };
 
 /**
- * @description Get list of scenes
- * @param {Object} [options] - Options of the query.
+ * @description Get list of scenes.
+ * @param {object} [options] - Options of the query.
+ * @returns {Promise<Array>} Resolve with list of scenes.
  * @example
  * const scenes = await gladys.scene.get({
  *  take: 20,
@@ -40,7 +41,6 @@ async function get(options) {
   const scenes = await db.Scene.findAll(queryParams);
 
   const scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
-
   return scenesPlain;
 }
 

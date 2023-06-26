@@ -4,7 +4,6 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
-@connect('currentUrl,httpClient', {})
 class SettingsUsers extends Component {
   deleteUser = async () => {
     try {
@@ -79,4 +78,4 @@ class SettingsUsers extends Component {
   }
 }
 
-export default SettingsUsers;
+export default connect('currentUrl,httpClient', {})(SettingsUsers);

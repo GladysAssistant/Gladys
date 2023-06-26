@@ -2,9 +2,9 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Update a scene
+ * @description Update a scene.
  * @param {string} selector - The selector of the scene.
- * @param {Object} scene - A scene object.
+ * @param {object} scene - A scene object.
  * @returns {Promise} - Resolve with the scene.
  * @example
  * scene.update('my-scene', {

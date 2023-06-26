@@ -4,6 +4,7 @@ const { ACTIONS } = require('../utils/broadlink.constants');
 /**
  * @description Entering peripheral in learn mode.
  * @param {string} peripheralIdentifier - The peripheral address.
+ * @returns {Promise} Resolve when learn mode is entered.
  * @example
  * await gladys.broadlink.learn('770f78b9401c');
  */

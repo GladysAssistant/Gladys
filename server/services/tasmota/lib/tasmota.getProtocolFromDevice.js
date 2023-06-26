@@ -2,7 +2,7 @@ const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('./tasmota.constants')
 
 /**
  * @description Get Tasmota protocol used by device, default is MQTT.
- * @param {Object} device - Gladys device.
+ * @param {object} device - Gladys device.
  * @returns {string} Device protocol.
  * @example
  * tasmota.getProtocolFromDevice({});

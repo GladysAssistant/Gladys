@@ -2,7 +2,7 @@ const db = require('../../models');
 const { EVENTS, SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
- * @description Set the value of a variable
+ * @description Set the value of a variable.
  * @param {string} key - The unique key of the variable.
  * @param {string} value - The value of the variable.
  * @param {string} [serviceId] - The unique ID of a service, or null.

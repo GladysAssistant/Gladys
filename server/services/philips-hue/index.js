@@ -10,7 +10,7 @@ module.exports = function PhilipsHueService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the PhilipsHueService service
+   * @description This function starts the PhilipsHueService service.
    * @example
    * gladys.services['philips-hue'].start();
    */
@@ -21,7 +21,7 @@ module.exports = function PhilipsHueService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the PhilipsHueService service
+   * @description This function stops the PhilipsHueService service.
    * @example
    *  gladys.services['philips-hue'].stop();
    */

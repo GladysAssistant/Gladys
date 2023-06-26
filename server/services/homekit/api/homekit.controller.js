@@ -13,11 +13,28 @@ module.exports = function HomeKitController(homekitHandler) {
     });
   }
 
+  /**
+   * @api {get} /api/v1/service/homekit/reset Reset HomeKit bridge
+   * @apiName reset
+   * @apiGroup HomeKit
+   */
+  async function reset(req, res) {
+    await homekitHandler.resetBridge();
+    res.json({
+      success: true,
+    });
+  }
+
   return {
     'get /api/v1/service/homekit/reload': {
       authenticated: true,
       admin: true,
       controller: asyncMiddleware(reload),
+    },
+    'get /api/v1/service/homekit/reset': {
+      authenticated: true,
+      admin: true,
+      controller: asyncMiddleware(reset),
     },
   };
 };

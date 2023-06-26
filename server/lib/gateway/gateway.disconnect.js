@@ -1,7 +1,7 @@
 const logger = require('../../utils/logger');
 
 /**
- * @description Disconnect Gladys Gateway
+ * @description Disconnect Gladys Gateway.
  * @example
  * disconnect();
  */

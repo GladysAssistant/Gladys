@@ -7,8 +7,8 @@ const { TIMERS } = require('../bluetooth.constants');
 
 /**
  * @description Try to connect to Noble peripheral.
- * @param {Object} peripheral - Noble peripheral.
- * @returns {Promise<Object>} Connected peripheral.
+ * @param {object} peripheral - Noble peripheral.
+ * @returns {Promise<object>} Connected peripheral.
  * @example
  * await connect(peripheral);
  */

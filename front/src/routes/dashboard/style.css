@@ -20,6 +20,7 @@
 
 .largeContainer {
   max-width: 1600px;
+  margin-bottom: 150px;
 }
 
 @media (min-width: 992px) {

@@ -101,7 +101,8 @@ class HttpRequestAction extends Component {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'url', e.target.value);
   };
   handleChangeBody = text => {
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', text);
+    const newBody = text && text.length > 0 ? text : undefined;
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'body', newBody);
   };
   addNewHeader = e => {
     e.preventDefault();
@@ -273,9 +274,6 @@ class HttpRequestAction extends Component {
                 <div class="form-group">
                   <label class="form-label">
                     <Text id="editScene.actionsCard.httpRequest.bodyLabel" />
-                    <span class="form-required">
-                      <Text id="global.requiredField" />
-                    </span>
                   </label>
                   <div style={helpTextStyle}>
                     <Text id="editScene.actionsCard.httpRequest.variablesExplanation" />

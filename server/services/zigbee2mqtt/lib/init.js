@@ -5,6 +5,7 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
 /**
  * @description Prepares service and starts connection with broker if needed.
+ * @returns {Promise} Resolve when init finished.
  * @example
  * await z2m.init();
  */

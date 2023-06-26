@@ -1,7 +1,7 @@
 /**
  * @description Parse the external id and return the lamp ID.
  * @param {string} externalId - External id of the device.
- * @returns {Object} Return the lamp ID and bridge serial number.
+ * @returns {object} Return the lamp ID and bridge serial number.
  * @example
  * parseExternalId('philips-hue:1');
  */

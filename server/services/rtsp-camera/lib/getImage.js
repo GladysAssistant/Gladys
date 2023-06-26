@@ -8,7 +8,7 @@ const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
 
 /**
  * @description Get camera image.
- * @param {Object} device - The camera to poll.
+ * @param {object} device - The camera to poll.
  * @returns {Promise} Resolve with camera image.
  * @example
  * getImage(device);

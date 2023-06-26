@@ -2,35 +2,41 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 
 const { assert, fake } = sinon;
+
 const GoogleActionsHandler = require('../../../../../services/google-actions/lib');
 
-const gladys = {
-  stateManager: {
-    get: fake.returns({
-      name: 'Device 1',
-      selector: 'device-1',
-      features: [
-        {
-          category: 'switch',
-          type: 'binary',
-        },
-      ],
-      model: 'device-model',
-      room: {
-        name: 'living-room',
-      },
-      last_value: 0,
-    }),
-  },
-};
 const serviceId = 'd1e45425-fe25-4968-ac0f-bc695d5202d9';
 
 describe('GoogleActions Handler - onQuery', () => {
+  let gladys;
+
   beforeEach(() => {
+    gladys = {
+      stateManager: {
+        get: fake.returns({
+          name: 'Device 1',
+          selector: 'device-1',
+          features: [
+            {
+              category: 'switch',
+              type: 'binary',
+            },
+          ],
+          model: 'device-model',
+          room: {
+            name: 'living-room',
+          },
+          last_value: 0,
+        }),
+      },
+    };
+  });
+
+  afterEach(() => {
     sinon.reset();
   });
 
-  it('onQuery', async () => {
+  it('should generate device payload', async () => {
     const body = {
       requestId: 'request-id',
       user: {
@@ -66,6 +72,6 @@ describe('GoogleActions Handler - onQuery', () => {
       },
     };
     expect(result).to.deep.eq(exptectedResult);
-    assert.calledWith(gladys.stateManager.get, 'device', 'device-1');
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
   });
 });

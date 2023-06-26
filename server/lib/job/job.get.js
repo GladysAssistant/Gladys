@@ -9,8 +9,8 @@ const DEFAULT_OPTIONS = {
 
 /**
  * @public
- * @description Get jobs
- * @param {Object} [options] - Options of the query.
+ * @description Get jobs.
+ * @param {object} [options] - Options of the query.
  * @param {number} [options.take] - Number of elements to return.
  * @param {number} [options.skip] - Number of elements to skip.
  * @param {string} [options.order_by] - Order by.

@@ -2,7 +2,7 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Get a service by name
+ * @description Get a service by name.
  * @param {string} name - Name of the service.
  * @param {string} [podId] - Id of the pod.
  * @returns {Promise} - Resolve with the service of null.

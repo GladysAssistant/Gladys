@@ -4,10 +4,6 @@ import actions from './actions';
 import BroadlinkPage from '../BroadlinkPage';
 import DeviceTab from './DeviceTab';
 
-@connect(
-  'session,user,broadlinkDevices,getBroadlinkDevicesStatus,getBroadlinkDeviceOrderDir,broadlinkDeviceSearch,housesWithRooms',
-  actions
-)
 class BroadlinkDevicePage extends Component {
   componentWillMount() {
     this.props.getBroadlinkRemotes();
@@ -24,4 +20,7 @@ class BroadlinkDevicePage extends Component {
   }
 }
 
-export default BroadlinkDevicePage;
+export default connect(
+  'session,user,broadlinkDevices,getBroadlinkDevicesStatus,getBroadlinkDeviceOrderDir,broadlinkDeviceSearch,housesWithRooms',
+  actions
+)(BroadlinkDevicePage);

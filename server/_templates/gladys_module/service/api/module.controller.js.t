@@ -20,7 +20,7 @@ module.exports = function <%= className %>Controller(<%= attributeName %>Handler
    * @apiGroup <%= className %>
    */
   async function getConfiguration(req, res) {
-    const config = <%= attributeName %>Handler.getConfiguration();
+    const config = await <%= attributeName %>Handler.getConfiguration();
     res.json(config);
   }
 

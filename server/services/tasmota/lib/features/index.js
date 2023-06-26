@@ -9,8 +9,13 @@ const power = require('./power');
 const dimmer = require('./dimmer');
 const distance = require('./distance');
 const energyCurrent = require('./energy.current');
+const energyApparentPower = require('./energy.apparentPower');
+const energyReactivePower = require('./energy.reactivePower');
 const energyPower = require('./energy.power');
 const energyVoltage = require('./energy.voltage');
+const energyTotal = require('./energy.total');
+const energyToday = require('./energy.today');
+const energyYesterday = require('./energy.yesterday');
 const colorChannel = require('./colorChannel');
 const colorScheme = require('./colorScheme');
 const colorSpeed = require('./colorSpeed');
@@ -25,8 +30,13 @@ const FEATURE_TEMPLATES = [
   dimmer,
   distance,
   energyCurrent,
+  energyApparentPower,
+  energyReactivePower,
   energyPower,
   energyVoltage,
+  energyToday,
+  energyYesterday,
+  energyTotal,
   colorChannel,
   colorScheme,
   colorSpeed,

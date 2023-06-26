@@ -7,7 +7,7 @@ const { BadParameters } = require('../../utils/coreErrors');
  * @public
  * @description This function create a user.
  * @name gladys.user.create
- * @param {Object} user - A new user.
+ * @param {object} user - A new user.
  * @param {string} user.firstname - The firstname of the user.
  * @param {string} user.lastname - The lastname of the user.
  * @param {string} user.email - The email of the user.
@@ -20,7 +20,6 @@ const { BadParameters } = require('../../utils/coreErrors');
  * await gladys.user.create({
  *  firstname: 'Tony'
  * });
- *
  */
 async function create(user) {
   if (!user.password || user.password.length < 8) {
