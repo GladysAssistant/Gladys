@@ -168,7 +168,7 @@ describe('zwaveJSUIManager commands', () => {
     const property = 'property';
     const propertyKey = 'propertyKey';
     const device = {
-      nodeId: 1,      
+      nodeId: 1,
     };
     const deviceFeature = {
       external_id: `zwave-js-ui:node_id:${device.nodeId}:comclass:${commandClass}:endpoint:${endpoint}:property:${property}-${propertyKey}`,
