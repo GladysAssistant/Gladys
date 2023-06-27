@@ -51,7 +51,7 @@ describe('NodeRed installContainer', () => {
     nodeRedManager.nodeRedRunning = false;
     nodeRedManager.nodeRedExist = false;
     nodeRedManager.containerRestartWaitTimeInMs = 0;
-    nodeRedManager.configureContainer = fake.resolves(true);
+    nodeRedManager.configureContainer = fake.resolves(false);
   });
 
   afterEach(() => {
@@ -59,6 +59,7 @@ describe('NodeRed installContainer', () => {
   });
 
   it('should create container', async function Test() {
+    nodeRedManager.configureContainer = fake.resolves(true);
     const getContainers = sinon.stub();
     getContainers.onCall(0).resolves([]);
     getContainers.onCall(1).resolves([container]);
