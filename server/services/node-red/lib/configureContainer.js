@@ -27,7 +27,7 @@ async function configureContainer(config) {
     await fs.access(configFilepath, constants.R_OK | constants.W_OK);
     logger.info('NodeRed:  configuration file already exists.');
   } catch (e) {
-    logger.info('NodeRed: Writting default configuration...');
+    logger.info('NodeRed: Writing default configuration...');
     await fs.copyFile(path.join(__dirname, '../docker/settings.txt'), configFilepath);
     configCreated = true;
   }
@@ -38,12 +38,14 @@ async function configureContainer(config) {
   let configChanged = false;
   if (config.nodeRedPassword && config.nodeRedUsername) {
     // Check for changes
-
-    const encodedPassword = await passwordUtils.hash(config.nodeRedPassword);
     const [, username] = fileContentString.match(/username: '(.+)'/);
     const [, password] = fileContentString.match(/password: '(.+)'/);
 
-    if (username !== config.nodeRedUsername || (await passwordUtils.compare(password, encodedPassword)) === false) {
+    if (
+      username !== config.nodeRedUsername ||
+      (await passwordUtils.compare(config.nodeRedPassword, password)) === false
+    ) {
+      const encodedPassword = await passwordUtils.hash(config.nodeRedPassword, 8);
       fileContentString = fileContentString.replace(/username: '(.+)'/, `username: '${config.nodeRedUsername}'`);
       fileContentString = fileContentString.replace(/password: '(.+)'/, `password: '${encodedPassword}'`);
       configChanged = true;

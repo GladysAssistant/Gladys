@@ -34,6 +34,9 @@ describe('NodeRed disconnect', () => {
     };
 
     nodeRedManager = new NodeRedManager(gladys, mqtt, serviceId);
+    nodeRedManager.gladysConnected = true;
+    nodeRedManager.nodeRedRunning = true;
+    nodeRedManager.nodeRedExist = true;
   });
 
   afterEach(() => {
@@ -46,11 +49,27 @@ describe('NodeRed disconnect', () => {
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
     });
-    assert.calledTwice(gladys.event.emit);
+    assert.called(gladys.event.emit);
     assert.called(gladys.system.stopContainer);
 
     expect(nodeRedManager.gladysConnected).to.equal(false);
     expect(nodeRedManager.nodeRedRunning).to.equal(false);
-    expect(nodeRedManager.nodeRedExist).to.equal(false);
+    expect(nodeRedManager.nodeRedExist).to.equal(true);
+  });
+
+  it('stop container failed', async () => {
+    gladys.system.stopContainer = fake.rejects('Error');
+
+    await nodeRedManager.disconnect();
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
+    assert.called(gladys.event.emit);
+    assert.called(gladys.system.stopContainer);
+
+    expect(nodeRedManager.gladysConnected).to.equal(true);
+    expect(nodeRedManager.nodeRedRunning).to.equal(true);
+    expect(nodeRedManager.nodeRedExist).to.equal(true);
   });
 });

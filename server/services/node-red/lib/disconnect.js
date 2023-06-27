@@ -11,11 +11,6 @@ const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.
 async function disconnect() {
   let container;
 
-  this.gladysConnected = false;
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
-  });
-
   // Stop NodeRed container
   try {
     const dockerContainer = await this.gladys.system.getContainers({
@@ -24,11 +19,13 @@ async function disconnect() {
     });
     [container] = dockerContainer;
     await this.gladys.system.stopContainer(container.id);
+
+    this.nodeRedRunning = false;
+    this.gladysConnected = false;
   } catch (e) {
     logger.warn(`NodeRed: failed to stop container ${container.id}:`, e);
   }
 
-  this.nodeRedRunning = false;
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
   });

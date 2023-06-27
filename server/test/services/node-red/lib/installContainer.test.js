@@ -51,10 +51,75 @@ describe('NodeRed installContainer', () => {
     nodeRedManager.nodeRedRunning = false;
     nodeRedManager.nodeRedExist = false;
     nodeRedManager.containerRestartWaitTimeInMs = 0;
+    nodeRedManager.configureContainer = fake.resolves(true);
   });
 
   afterEach(() => {
     sinon.reset();
+  });
+
+  it('should create container', async function Test() {
+    const getContainers = sinon.stub();
+    getContainers.onCall(0).resolves([]);
+    getContainers.onCall(1).resolves([container]);
+
+    gladys.system.getContainers = getContainers;
+    this.timeout(6000);
+
+    await nodeRedManager.installContainer(config);
+
+    assert.calledWith(gladys.system.pull, 'nodered/node-red:latest');
+    assert.calledWith(gladys.system.createContainer, {
+      AttachStderr: false,
+      AttachStdin: false,
+      AttachStdout: false,
+      ExposedPorts: { '1880/tcp': {} },
+      HostConfig: {
+        Binds: ['/var/lib/gladysassistant/node-red:/data'],
+        BlkioWeightDevice: [],
+        Devices: [],
+        Dns: [],
+        DnsOptions: [],
+        DnsSearch: [],
+        LogConfig: { Config: { 'max-size': '10m' }, Type: 'json-file' },
+        PortBindings: { '1880/tcp': [{ HostPort: '1881' }] },
+        RestartPolicy: { Name: 'always' },
+      },
+      Image: 'nodered/node-red:latest',
+      NetworkDisabled: false,
+      Tty: false,
+      name: 'gladys-node-red',
+    });
+
+    assert.calledWith(gladys.system.restartContainer, container.id);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
+    expect(nodeRedManager.nodeRedRunning).to.equal(true);
+    expect(nodeRedManager.nodeRedExist).to.equal(true);
+  });
+
+  it('should failed when create container failed', async function Test() {
+    const getContainers = sinon.stub();
+    getContainers.onCall(0).resolves([]);
+    getContainers.onCall(1).resolves([container]);
+    gladys.system.pull = fake.rejects('Error');
+
+    gladys.system.getContainers = getContainers;
+    this.timeout(6000);
+
+    try {
+      await nodeRedManager.installContainer();
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Error');
+    }
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
+    expect(nodeRedManager.nodeRedExist).to.equal(false);
   });
 
   it('should restart container', async function Test() {
@@ -68,6 +133,24 @@ describe('NodeRed installContainer', () => {
     });
     expect(nodeRedManager.nodeRedRunning).to.equal(true);
     expect(nodeRedManager.nodeRedExist).to.equal(true);
+  });
+
+  it('should failed when restart container failed', async function Test() {
+    this.timeout(6000);
+    gladys.system.restartContainer = fake.rejects('Error');
+
+    try {
+      await nodeRedManager.installContainer();
+      assert.fail();
+    } catch (e) {
+      expect(e.message).to.equal('Error');
+    }
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
+    expect(nodeRedManager.nodeRedExist).to.equal(false);
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
   });
 
   it('should do nothing', async () => {
