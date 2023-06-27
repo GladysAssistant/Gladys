@@ -71,6 +71,10 @@ class EditDevices extends Component {
     this.getDeviceFeatures();
   }
 
+  componentWillReceiveProps() {
+    this.getDeviceFeatures();
+  }
+
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices">
