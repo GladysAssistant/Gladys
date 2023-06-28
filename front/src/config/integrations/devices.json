@@ -58,5 +58,10 @@
     "key": "lanManager",
     "link": "lan-manager",
     "img": "/assets/integrations/cover/lan-manager.jpg"
+  },
+  {
+    "key": "androidTV",
+    "link": "android-tv",
+    "img": "/assets/integrations/cover/android-tv.jpg"
   }
 ]

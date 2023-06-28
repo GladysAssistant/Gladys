@@ -1,0 +1,19 @@
+{
+  "name": "gladys-android-tv",
+  "version": "1.0.0",
+  "author": "Bertrand d'Aure",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "dependencies": {
+    "androidtv-remote": "^1.0.10",
+    "bonjour": "^3.5.0"
+  }
+}
