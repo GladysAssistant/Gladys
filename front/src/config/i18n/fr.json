@@ -1541,6 +1541,22 @@
       "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
+    },
+    "androidTV": {
+      "title": "Android TV",
+      "description": "Contrôlez vos télévisions connectées sous Android TV.",
+      "search": "Chercher une Android TV",
+      "nameLabel": "Nom de l'Android TV",
+      "namePlaceholder": "Entrez un nom pour votre Android TV",
+      "roomLabel": "Pièce",
+      "ipLabel": "Adresse IP",
+      "ipPlaceholder": "L'adresse IP de votre Android TV",
+      "saveButton": "Sauvegarder",
+      "deleteButton": "Supprimer",
+      "noAndroidTVFound": "Aucun Android TV trouvé",
+      "saveError": "Impossible de sauvegarder cette configuration",
+      "saveSuccess": "Les identifiants de votre compte a été sauvegardé avec succès",
+      "codePlaceholder": "Code d'appairage"
     }
   },
   "editScene": {

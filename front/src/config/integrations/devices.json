@@ -83,5 +83,10 @@
     "key": "zwavejs-ui",
     "link": "zwavejs-ui",
     "img": "/assets/integrations/cover/zwave-js-ui.jpg"
+  },
+  {
+    "key": "androidTV",
+    "link": "android-tv",
+    "img": "/assets/integrations/cover/android-tv.jpg"
   }
 ]

@@ -25,3 +25,4 @@ module.exports.melcloud = require('./melcloud');
 module.exports['node-red'] = require('./node-red');
 module.exports.sonos = require('./sonos');
 module.exports['zwavejs-ui'] = require('./zwavejs-ui');
+module.exports['android-tv'] = require('./android-tv');
