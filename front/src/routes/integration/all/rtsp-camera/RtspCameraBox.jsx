@@ -3,7 +3,7 @@ import { Component } from 'preact';
 import get from 'get-value';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../utils/consts';
-import { DEVICE_POLL_FREQUENCIES } from '../../../../../../server/utils/constants';
+import { DEVICE_POLL_FREQUENCIES, DEVICE_ROTATION } from '../../../../../../server/utils/constants';
 
 class RtspCameraBox extends Component {
   saveCamera = async () => {
@@ -69,8 +69,7 @@ class RtspCameraBox extends Component {
     this.props.updateCameraUrl(this.props.cameraIndex, e.target.value);
   };
   updateCameraRotation = e => {
-    const newValue = e.target.checked ? '1' : '0';
-    this.props.updateCameraRotation(this.props.cameraIndex, newValue);
+    this.props.updateCameraRotation(this.props.cameraIndex, e.target.value);
   };
   updateCameraRoom = e => {
     const newRoom = e.target.value === '' ? null : e.target.value;
@@ -180,20 +179,21 @@ class RtspCameraBox extends Component {
                   </p>
                 </div>
                 <div class="form-group">
-                  <label class="custom-switch">
-                    <input
-                      type="checkbox"
-                      id="cameraRotate"
-                      name="cameraRotate"
-                      class="custom-switch-input"
-                      checked={get(props, 'camera.cameraRotation.value') === '1'}
-                      onClick={this.updateCameraRotation}
-                    />
-                    <span class="custom-switch-indicator" />
-                    <span class="custom-switch-description">
-                      <Text id="integration.rtspCamera.rotate180Label" />
-                    </span>
-                  </label>
+                  <select className="form-control" onChange={this.updateCameraRotation}
+                    value={get(props, 'camera.cameraRotation.value')}>
+                    <option value={DEVICE_ROTATION.DEGRES_0}>
+                      <Text id={`integration.rtspCamera.rotationO`}/>
+                    </option>
+                    <option value={DEVICE_ROTATION.DEGRES_90}>
+                      <Text id={`integration.rtspCamera.rotation90`}/>
+                    </option>
+                    <option value={DEVICE_ROTATION.DEGRES_180}>
+                      <Text id={`integration.rtspCamera.rotation18O`}/>
+                    </option>
+                    <option value={DEVICE_ROTATION.DEGRES_270}>
+                      <Text id={`integration.rtspCamera.rotation27O`}/>
+                    </option>
+                  </select>
                 </div>
                 <div class="form-group">
                   <button onClick={this.testConnection} class="btn btn-info mr-2">

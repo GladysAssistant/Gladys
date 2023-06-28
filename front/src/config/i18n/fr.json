@@ -555,9 +555,13 @@
       "testConnectionButton": "Tester",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
-      "rotate180Label": "Rotation 180°",
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
-      "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
+      "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?",
+      "rotationO": "Pas de rotation",
+      "rotation90": "90°",
+      "rotation18O": "180°",
+      "rotation27O": "270°"
+
     },
     "tasmota": {
       "title": "Tasmota",

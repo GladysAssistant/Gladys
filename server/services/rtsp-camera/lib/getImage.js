@@ -44,8 +44,19 @@ async function getImage(device) {
       '-vf scale=640:-1', // resize the image with max width = 640
       '-qscale:v 15', //  Effective range for JPEG is 2-31 with 31 being the worst quality.
     ];
-    if (cameraRotationParam.value === '1') {
-      outputOptions.push('-vf hflip,vflip'); // Rotate 180
+    switch (cameraRotationParam.value) {
+      case '90':
+        outputOptions.push('-vf transpose=1'); // Rotate 90
+        break;
+      case '1': // Retro compatibility
+      case '180':
+        outputOptions.push('-vf transpose=1,transpose=1'); // Rotate 180
+        break;
+      case '270':
+        outputOptions.push('-vf transpose=2'); // Rotate 270
+        break;
+      default:
+        break;
     }
     // and send a camera thumbnail to this stream
     this.ffmpeg(cameraUrlParam.value)

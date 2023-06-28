@@ -150,10 +150,25 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       indexFilePath,
     ];
 
-    if (cameraRotationParam.value === '1') {
-      args.push('-vf'); // Rotate 180
-      args.push('hflip,vflip');
+    switch (cameraRotationParam.value) {
+      case '90':
+        args.push('-vf'); // Rotate 90
+        args.push('transpose=1');
+        break;
+      case '1': // Retro compatibility
+      case '180':
+        args.push('-vf'); // Rotate 180
+        args.push('transpose=1,transpose=1');
+        break;
+      case '270':
+        args.push('-vf'); // Rotate 270
+        args.push('transpose=2');
+        break;
+      default:
+        break;
     }
+
+    console.log('args', args);
 
     const options = {
       timeout: 5 * 60 * 1000, // 5 minutes
