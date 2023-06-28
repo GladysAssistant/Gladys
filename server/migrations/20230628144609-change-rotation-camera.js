@@ -24,17 +24,19 @@ module.exports = {
         where: {
           device_id: enedisDevice.id,
           name: 'CAMERA_ROTATION',
-          value: '1',
         },
       });
+      console.log(deviceParam);
       if (deviceParam === null) {
         return;
       }
-      logger.info(`RstpCamera migration: Updating device_params ${deviceParam.id} with 180°`);
-      deviceParam.set({
-        value: '180',
-      });
-      await deviceParam.save();
+      if (deviceParam.value === '1') {
+        logger.info(`RstpCamera migration: Updating device_params ${deviceParam.id} with 180°`);
+        deviceParam.set({
+          value: '180',
+        });
+        await deviceParam.save();
+      }
     });
   },
   down: async (queryInterface, Sequelize) => {},

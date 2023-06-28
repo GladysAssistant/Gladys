@@ -2,6 +2,7 @@ const fse = require('fs-extra');
 const path = require('path');
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { DEVICE_ROTATION } = require('../../../utils/constants');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
@@ -45,14 +46,13 @@ async function getImage(device) {
       '-qscale:v 15', //  Effective range for JPEG is 2-31 with 31 being the worst quality.
     ];
     switch (cameraRotationParam.value) {
-      case '90':
+      case DEVICE_ROTATION.DEGRES_90:
         outputOptions.push('-vf transpose=1'); // Rotate 90
         break;
-      case '1': // Retro compatibility
-      case '180':
+      case DEVICE_ROTATION.DEGRES_180:
         outputOptions.push('-vf transpose=1,transpose=1'); // Rotate 180
         break;
-      case '270':
+      case DEVICE_ROTATION.DEGRES_270:
         outputOptions.push('-vf transpose=2'); // Rotate 270
         break;
       default:

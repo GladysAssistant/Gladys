@@ -179,19 +179,22 @@ class RtspCameraBox extends Component {
                   </p>
                 </div>
                 <div class="form-group">
-                  <select className="form-control" onChange={this.updateCameraRotation}
-                    value={get(props, 'camera.cameraRotation.value')}>
+                  <select
+                    className="form-control"
+                    onChange={this.updateCameraRotation}
+                    value={get(props, 'camera.cameraRotation.value')}
+                  >
                     <option value={DEVICE_ROTATION.DEGRES_0}>
-                      <Text id={`integration.rtspCamera.rotationO`}/>
+                      <Text id={`integration.rtspCamera.rotationO`} />
                     </option>
                     <option value={DEVICE_ROTATION.DEGRES_90}>
-                      <Text id={`integration.rtspCamera.rotation90`}/>
+                      <Text id={`integration.rtspCamera.rotation90`} />
                     </option>
                     <option value={DEVICE_ROTATION.DEGRES_180}>
-                      <Text id={`integration.rtspCamera.rotation18O`}/>
+                      <Text id={`integration.rtspCamera.rotation18O`} />
                     </option>
                     <option value={DEVICE_ROTATION.DEGRES_270}>
-                      <Text id={`integration.rtspCamera.rotation27O`}/>
+                      <Text id={`integration.rtspCamera.rotation27O`} />
                     </option>
                   </select>
                 </div>
@@ -202,7 +205,7 @@ class RtspCameraBox extends Component {
                   <button onClick={this.saveCamera} class="btn btn-success mr-2">
                     <Text id="integration.rtspCamera.saveButton" />
                   </button>
-                  <button onClick={this.deleteCamera} class="btn btn-danger mt-4 mt-lg-0">
+                  <button onClick={this.deleteCamera} class="btn btn-danger mt-sm-0 mt-lg-4">
                     <Text id="integration.rtspCamera.deleteButton" />
                   </button>
                 </div>

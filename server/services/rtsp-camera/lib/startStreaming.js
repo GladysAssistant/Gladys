@@ -8,6 +8,7 @@ const util = require('util');
 const randomBytes = util.promisify(require('crypto').randomBytes);
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { DEVICE_ROTATION } = require('../../../utils/constants');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
@@ -151,24 +152,21 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
     ];
 
     switch (cameraRotationParam.value) {
-      case '90':
+      case DEVICE_ROTATION.DEGRES_90:
         args.push('-vf'); // Rotate 90
         args.push('transpose=1');
         break;
-      case '1': // Retro compatibility
-      case '180':
+      case DEVICE_ROTATION.DEGRES_180:
         args.push('-vf'); // Rotate 180
         args.push('transpose=1,transpose=1');
         break;
-      case '270':
+      case DEVICE_ROTATION.DEGRES_270:
         args.push('-vf'); // Rotate 270
         args.push('transpose=2');
         break;
       default:
         break;
     }
-
-    console.log('args', args);
 
     const options = {
       timeout: 5 * 60 * 1000, // 5 minutes
