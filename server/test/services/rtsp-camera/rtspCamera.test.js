@@ -5,7 +5,7 @@ const { fake, assert } = require('sinon');
 const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const RtspCameraService = require('../../../services/rtsp-camera');
-const {DEVICE_ROTATION} = require('../../../utils/constants');
+const { DEVICE_ROTATION } = require('../../../utils/constants');
 
 const device = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
