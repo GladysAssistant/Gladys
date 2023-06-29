@@ -74,11 +74,11 @@ class EditDevices extends Component {
           if (props.box.device_features && props.box.device_features.indexOf(featureOption.value) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);
           }
-        })
-      })
+        });
+      });
     }
     await this.setState({ selectedDeviceFeaturesOptions });
-  }
+  };
 
   componentDidMount() {
     this.getDeviceFeatures();
