@@ -6,6 +6,7 @@ const { fake, assert: fakeAssert } = require('sinon');
 const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const {DEVICE_ROTATION} = require('../../../utils/constants');
 
 const device = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
@@ -149,7 +150,7 @@ describe('Camera.streaming', () => {
             },
             {
               name: 'CAMERA_ROTATION',
-              value: '90',
+              value: DEVICE_ROTATION.DEGRES_90,
             },
           ],
         }),
@@ -185,7 +186,7 @@ describe('Camera.streaming', () => {
             },
             {
               name: 'CAMERA_ROTATION',
-              value: '180',
+              value: DEVICE_ROTATION.DEGRES_180,
             },
           ],
         }),
@@ -221,7 +222,7 @@ describe('Camera.streaming', () => {
             },
             {
               name: 'CAMERA_ROTATION',
-              value: '270',
+              value: DEVICE_ROTATION.DEGRES_270,
             },
           ],
         }),
