@@ -29,7 +29,6 @@ class EditDevices extends Component {
       // we get the rooms with the devices
       const devices = await this.props.httpClient.get(`/api/v1/device`);
       const deviceOptions = [];
-      const selectedDeviceFeaturesOptions = [];
 
       devices.forEach(device => {
         const deviceFeatures = [];
@@ -41,9 +40,7 @@ class EditDevices extends Component {
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
             deviceFeatures.push(featureOption);
           }
-          if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
-            selectedDeviceFeaturesOptions.push(featureOption);
-          }
+
         });
         if (deviceFeatures.length > 0) {
           deviceFeatures.sort((a, b) => {
@@ -60,19 +57,35 @@ class EditDevices extends Component {
           });
         }
       });
-      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      await this.setState({ deviceOptions, loading: false });
+      await this.refreshSelectedOptions(this.props);
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
     }
   };
 
+  refreshSelectedOptions = async props => {
+    const selectedDeviceFeaturesOptions = [];
+    if (this.state.deviceOptions) {
+
+      this.state.deviceOptions.forEach((deviceOption) => {
+        deviceOption.options.forEach((featureOption) => {
+          if (props.box.device_features && props.box.device_features.indexOf(featureOption.value) !== -1) {
+            selectedDeviceFeaturesOptions.push(featureOption);
+          }
+        })
+      })
+    }
+    await this.setState({ selectedDeviceFeaturesOptions });
+  }
+
   componentDidMount() {
     this.getDeviceFeatures();
   }
 
-  componentWillReceiveProps() {
-    this.getDeviceFeatures();
+  componentWillReceiveProps(nextProps) {
+    this.refreshSelectedOptions(nextProps);
   }
 
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
