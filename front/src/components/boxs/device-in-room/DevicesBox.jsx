@@ -88,11 +88,7 @@ class DevicesComponent extends Component {
     await this.setValueDevice(deviceFeature, value);
   };
 
-  setValueDeviceDebounce = async (deviceFeature, value) => {
-    debounce(() => {
-      this.updateValue(deviceFeature, value);
-    }, 500);
-  };
+  setValueDeviceDebounce = debounce(this.updateValue.bind(this), 200);
 
   //Remove x, y when DeviceInRoom is rewrite without action
   updateValueWithDebounce = async (x, y, device, deviceFeature, deviceIndex, featureIndex, value) => {
@@ -100,7 +96,7 @@ class DevicesComponent extends Component {
     this.setState({
       devices
     });
-    await this.setValueDeviceDebounce(deviceFeature, value);
+    await this.setValueDeviceDebounce(x, y, device, deviceFeature, deviceIndex, featureIndex, value);
   };
 
   componentDidMount() {
