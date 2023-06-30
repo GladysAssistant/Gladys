@@ -47,8 +47,9 @@ async function getImage(device) {
     if (cameraRotationParam.value === '1') {
       outputOptions.push('-vf hflip,vflip'); // Rotate 180
     }
-    // and send a camera thumbnail to this stream
-    this.ffmpeg(cameraUrlParam.value)
+    // Send a camera thumbnail to this stream
+    // Add a timeout to prevent ffmpeg from running forever
+    this.ffmpeg(cameraUrlParam.value, { timeout: 10 })
       .format('image2')
       .outputOptions(outputOptions)
       .output(writeStream)
