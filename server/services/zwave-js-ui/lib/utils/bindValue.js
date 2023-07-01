@@ -7,7 +7,7 @@ const { COMMAND_CLASSES, SCENE_VALUES, SMOKE_ALARM_VALUES, PROPERTIES } = requir
  * @param {object} value - Value object to send.
  * @returns {object} Return the value adapted.
  * @example
- * const value = bindValue(6, 0x4501, 12, 1);
+ * const value = bindValue({}, '8');
  */
 function bindValue(valueId, value) {
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_BINARY) {
@@ -28,7 +28,7 @@ function bindValue(valueId, value) {
  * @param {object} value - Value object received.
  * @returns {object} Return the value adapted.
  * @example
- * const value = unbindValue(6, 0x4501, 12, 1);
+ * const value = unbindValue({}, true);
  */
 function unbindValue(valueId, value) {
   if (
@@ -39,7 +39,7 @@ function unbindValue(valueId, value) {
   }
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION) {
     if (valueId.fullProperty === PROPERTIES.MOTION_ALARM) {
-      return value ? 8 : 0;
+      return value === 8 ? 1 : 0;
     }
     if (valueId.fullProperty === PROPERTIES.SMOKE_ALARM) {
       return SMOKE_ALARM_VALUES[value];

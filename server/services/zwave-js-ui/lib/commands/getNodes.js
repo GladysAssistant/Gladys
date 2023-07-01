@@ -113,6 +113,7 @@ function getNodes({ orderDir, search } = {}) {
                     commandClass,
                     endpoint,
                     property,
+                    fullProperty: property,
                   },
                   value,
                 );

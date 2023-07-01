@@ -83,9 +83,9 @@ describe('zwave.unbindValue', () => {
       commandClass: COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION,
       fullProperty: PROPERTIES.MOTION_ALARM,
     };
-    const value = true;
+    const value = 8;
     const unbindedValue = unbindValue(valueId, value);
-    expect(unbindedValue).to.equal(8);
+    expect(unbindedValue).to.equal(1);
   });
 
   it('should unbindValue commandClass COMMAND_CLASS_NOTIFICATION - Motion OFF', () => {
