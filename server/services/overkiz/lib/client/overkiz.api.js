@@ -3,6 +3,8 @@ const logger = require('../../../../utils/logger');
 
 class API {
   constructor({ host, platformLoginHandler, polling }) {
+    logger.info(`Connecting to Overkiz ${host}`);
+    
     this.platformLoginHandler = platformLoginHandler;
     this.polling = polling;
     this.client = axios.create({

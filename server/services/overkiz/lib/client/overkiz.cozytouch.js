@@ -14,7 +14,9 @@ class CozytouchLoginHandler {
     this.password = password;
   }
 
-  async login(username, password) {
+  async login() {
+    logger.info(`Login to Cozytouch ${this.server}`);
+    
     let params = new url.URLSearchParams({
       username: `GA-PRIVATEPERSON/${this.username}`,
       password: this.password,

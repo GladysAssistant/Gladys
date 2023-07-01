@@ -148,6 +148,31 @@ async function getOverkizDevices() {
             min: 0,
             max: 40,
           });
+        } else if (operatingModeState === HEATING_STATES.AUTO) {
+          newDevice.features.push({
+            name: `Comfort mode temperature`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.deviceURL}-state-${DEVICE_STATES.COMFORT_TEMPERATURE_STATE}`,
+            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.COMFORT_TEMPERATURE_STATE),
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+            read_only: false,
+            unit: DEVICE_FEATURE_UNITS.CELSIUS,
+            has_feedback: true,
+            min: 0,
+            max: 40,
+          });
+          newDevice.features.push({
+            name: `Eco mode temperature`,
+            selector: `overkiz-${newDevice.rawOverkizDevice.deviceURL}-state-${DEVICE_STATES.ECO_TEMPERATURE_STATE}`,
+            external_id: getDeviceFeatureExternalId(node, DEVICE_STATES.ECO_TEMPERATURE_STATE),
+            category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
+            type: DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE,
+            read_only: false,
+            unit: DEVICE_FEATURE_UNITS.CELSIUS,
+            has_feedback: true,
+            min: 0,
+            max: 40,
+          });
         }
       } else if (node.uiClass === DEVICE_UID_CLASSES.TEMPERATURE) {
         newDevice.features.push({

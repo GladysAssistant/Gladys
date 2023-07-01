@@ -11,7 +11,9 @@ class DefaultLoginHandler {
     this.password = password;
   }
 
-  async login() {}
+  async login() {
+    logger.info(`Login to ${this.server}`);
+  }
 }
 
 module.exports = {
