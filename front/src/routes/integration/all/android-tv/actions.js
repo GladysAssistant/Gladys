@@ -14,6 +14,13 @@ function createActions(store) {
       if (androidTVIPParam) {
         androidTV.androidTVIP = androidTVIPParam;
       }
+      const androidTVPairedParam = androidTV.params.find(param => param.name === 'ANDROID_TV_PAIRED');
+      if (androidTVPairedParam) {
+        androidTV.androidTVPaired = {
+          name: 'ANDROID_TV_PAIRED',
+          value: androidTVPairedParam.value === true || androidTVPairedParam.value === '1'
+        };
+      }
       return androidTV;
     },
     async getAndroidTVDevices(state) {
@@ -60,18 +67,6 @@ function createActions(store) {
         });
       }
     },
-    async createOrUpdateAndroidTV(state, index) {
-      let androidTV = await state.httpClient.post(`/api/v1/device`, state.androidTVs[index]);
-      androidTV = actions.complete(androidTV);
-      const androidTVs = update(state.androidTVs, {
-        [index]: {
-          $set: androidTV
-        }
-      });
-      store.setState({
-        androidTVs
-      });
-    },
     async addAndroidTV(state, e, intl) {
       const uniqueId = uuid.v4()
       const deviceExternalId = `androidtv:${uniqueId}`
@@ -111,11 +106,19 @@ function createActions(store) {
               name: 'ANDROID_TV_IP',
               value: null
             },
+            androidTVPaired: {
+              name: 'ANDROID_TV_PAIRED',
+              value: false
+            },
             features: deviceFeatures,
             params: [
               {
                 name: 'ANDROID_TV_IP',
                 value: null
+              },
+              {
+                name: 'ANDROID_TV_PAIRED',
+                value: false
               }
             ]
           }
@@ -126,7 +129,6 @@ function createActions(store) {
       });
     },
     updateAndroidTVField(state, index, field, value) {
-      console.log(state.androidTVs)
       const androidTVs = update(state.androidTVs, {
         [index]: {
           [field]: {
@@ -166,6 +168,9 @@ function createActions(store) {
     async saveAndroidTV(state, index) {
       const androidTV = state.androidTVs[index];
       let newAndroidTV = await state.httpClient.post(`/api/v1/device`, androidTV);
+      if (!androidTV.created_at) {
+        await state.httpClient.post(`/api/v1/service/android-tv/reconnect`, { selector: newAndroidTV.selector });
+      }
       newAndroidTV = await actions.complete(newAndroidTV);
       const androidTVs = update(state.androidTVs, {
         [index]: {
@@ -188,8 +193,29 @@ function createActions(store) {
         androidTVs
       });
     },
-    async sendCode(state, deviceId, code) {
-      await state.httpClient.post(`/api/v1/service/android-tv/code`, { device: deviceId, code });
+    async sendCode(state, index, deviceId, code) {
+      const { success } = await state.httpClient.post(`/api/v1/service/android-tv/code`, { device: deviceId, code });
+      let androidTVPairedParamIndex = state.androidTVs[index].params.findIndex(
+        param => param.name === 'ANDROID_TV_PAIRED'
+      );
+      const androidTVs = update(state.androidTVs, {
+        [index]: {
+          params: {
+            [androidTVPairedParamIndex]: {
+              value: {
+                $set: success
+              }
+            }
+          }
+        }
+      });
+      actions.complete(androidTVs[index]);
+      store.setState({
+        androidTVs
+      });
+    },
+    async reconnect(state, selector) {
+      await state.httpClient.post(`/api/v1/service/android-tv/reconnect`, { selector });
     },
     async search(state, e) {
       store.setState({

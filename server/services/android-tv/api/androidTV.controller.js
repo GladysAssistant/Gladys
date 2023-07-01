@@ -7,7 +7,21 @@ module.exports = function AndroidTVController(androidTVHandler) {
    * @apiGroup Android TV
    */
   async function code(req, res) {
-    await androidTVHandler.sendCode(req.body.device, req.body.code);
+    const result = await androidTVHandler.sendCode(req.body.device, req.body.code);
+    res.json({
+      success: result,
+    });
+  }
+
+  /**
+   * @api {post} /api/v1/service/android-tv/reconnect Start/restart Android TV connection
+   * @apiName reconnect
+   * @apiGroup Android TV
+   */
+  async function reconnect(req, res) {
+    console.log('req.body.selector', req.body.selector)
+    const device = await androidTVHandler.gladys.device.getBySelector(req.body.selector);
+    await androidTVHandler.buildTV(device);
     res.json({
       success: true,
     });
@@ -16,8 +30,11 @@ module.exports = function AndroidTVController(androidTVHandler) {
   return {
     'post /api/v1/service/android-tv/code': {
       authenticated: true,
-      // admin: true,
       controller: asyncMiddleware(code),
+    },
+    'post /api/v1/service/android-tv/reconnect': {
+      authenticated: true,
+      controller: asyncMiddleware(reconnect),
     },
   };
 };
