@@ -64,6 +64,7 @@ const AndroidTVPage = ({ ...props }) => (
                               saveAndroidTV={props.saveAndroidTV}
                               deleteAndroidTV={props.deleteAndroidTV}
                               sendCode={props.sendCode}
+                              reconnect={props.reconnect}
                             />
                           ))}
                         {props.androidTVs && props.androidTVs.length === 0 && <EmptyState />}

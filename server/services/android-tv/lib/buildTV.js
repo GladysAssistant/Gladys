@@ -21,6 +21,15 @@ async function buildTV(device) {
     return;
   }
 
+  if (this.androidTVs[device.id]) {
+    try {
+      this.androidTVs[device.id].stop();
+    } catch (error) {
+      console.log('Android TV already stopped');
+    }
+    delete this.androidTVs[device.id];
+  }
+
   const port = 6466;
 
   let cert;

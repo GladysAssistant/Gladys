@@ -1556,7 +1556,9 @@
       "noAndroidTVFound": "Aucun Android TV trouvé",
       "saveError": "Impossible de sauvegarder cette configuration",
       "saveSuccess": "Les identifiants de votre compte a été sauvegardé avec succès",
-      "codePlaceholder": "Code d'appairage"
+      "codeDescription": "Entrez ci-dessous le code d'appairage qui apparait sur l'écran de l'Android TV. Si rien apparait cliquez sur le bouton pour tenter un nouvel appairage.",
+      "codePlaceholder": "Code d'appairage",
+      "retryButton": "Reconnecter"
     }
   },
   "editScene": {
