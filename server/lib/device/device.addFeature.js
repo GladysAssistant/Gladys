@@ -45,10 +45,13 @@ async function addFeature(deviceSelector, feature) {
     // we save again the device in RAM
     this.add(device);
   } else if (!areObjectsEqual(featureInStore, feature, UPDATABLE_FIELDS)) {
-    const updatedFeature = await db.DeviceFeature.update(pick(feature, UPDATABLE_FIELDS), {
+    await db.DeviceFeature.update(pick(feature, UPDATABLE_FIELDS), {
       where: { id: featureInStore.id },
     });
-    featureInStore = updatedFeature.get({ plain: true });
+    featureInStore = await db.DeviceFeature.findOne({
+      where: { id: featureInStore.id },
+      raw: true
+    });
     device.features[featureIndex] = featureInStore;
     // we save again the device in RAM
     this.add(device);

@@ -10,7 +10,7 @@ module.exports = {
           id: 'ca91dfdf-55b2-4cf8-a58b-99c0fbf6f5e4',
           name: 'Test device feature',
           selector: 'test-device-feature',
-          external_id: 'hue:binary:1',
+          external_id: 'philips-hue:1:binary',
           category: 'light',
           type: 'binary',
           read_only: false,
