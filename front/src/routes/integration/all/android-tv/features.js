@@ -9,9 +9,6 @@ export const MANAGED_FEATURES = {
       },
       values: [0, 1]
     },
-    [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL]: {
-      values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-    },
     [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_DOWN]: {},
     [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_UP]: {},
     [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_PREVIOUS]: {},
@@ -35,6 +32,9 @@ export const MANAGED_FEATURES = {
     [DEVICE_FEATURE_TYPES.TELEVISION.RECORD]: {}
   },
   [DEVICE_FEATURE_CATEGORIES.TEXT]: {
-    [DEVICE_FEATURE_TYPES.TEXT.TEXT]: {}
+    [DEVICE_FEATURE_TYPES.TEXT.TEXT]: {
+      read_only: true,
+      max: 0
+    }
   }
 };
