@@ -1555,9 +1555,9 @@
       "deleteButton": "Supprimer",
       "noAndroidTVFound": "Aucun Android TV trouvé",
       "saveError": "Impossible de sauvegarder cette configuration",
-      "saveSuccess": "Les identifiants de votre compte a été sauvegardé avec succès",
-      "codeDescription": "Entrez ci-dessous le code d'appairage qui apparait sur l'écran de l'Android TV. Si rien apparait cliquez sur le bouton pour tenter un nouvel appairage.",
+      "codeDescription": "Entrez ci-dessous le code d'appairage qui apparait sur l'écran de l'Android TV.",
       "codePlaceholder": "Code d'appairage",
+      "retryButtonDescription": "Si rien apparait cliquez sur le bouton pour tenter un nouvel appairage.",
       "retryButton": "Reconnecter"
     }
   },

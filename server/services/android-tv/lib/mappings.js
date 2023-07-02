@@ -7,6 +7,18 @@ const keyMappings = {
       KeyCode: RemoteKeyCode.KEYCODE_POWER,
       Direction: RemoteDirection.SHORT,
     },
+    [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_DOWN]: {
+      KeyCode: RemoteKeyCode.KEYCODE_CHANNEL_DOWN,
+      Direction: RemoteDirection.SHORT,
+    },
+    [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_UP]: {
+      KeyCode: RemoteKeyCode.KEYCODE_CHANNEL_UP,
+      Direction: RemoteDirection.SHORT,
+    },
+    [DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL_PREVIOUS]: {
+      KeyCode: RemoteKeyCode.KEYCODE_LAST_CHANNEL,
+      Direction: RemoteDirection.SHORT,
+    },
     [DEVICE_FEATURE_TYPES.TELEVISION.VOLUME_DOWN]: {
       KeyCode: RemoteKeyCode.KEYCODE_VOLUME_DOWN,
       Direction: RemoteDirection.SHORT,

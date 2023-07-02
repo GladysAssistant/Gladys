@@ -84,7 +84,7 @@ function createActions(store) {
             selector: featureExternalId,
             category: category,
             type,
-            read_only: false,
+            read_only: MANAGED_FEATURES[category][type].read_only || false,
             keep_history: false,
             has_feedback: true,
             min: MANAGED_FEATURES[category][type].min || 0,

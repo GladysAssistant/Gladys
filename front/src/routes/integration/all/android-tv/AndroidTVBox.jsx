@@ -182,9 +182,14 @@ class AndroidTVBox extends Component {
                       </button>
                     </div>
                   </div>
-                  <button onClick={this.reconnect} class="btn btn-info mr-2">
-                    <Text id="integration.androidTV.retryButton" />
-                  </button>
+                  <div class="input-group">
+                    <label>
+                      <Text id="integration.androidTV.retryButtonDescription" />
+                    </label>
+                    <button onClick={this.reconnect} class="btn btn-info mr-2">
+                      <Text id="integration.androidTV.retryButton" />
+                    </button>
+                  </div>
                 </div>}
               </div>
             </div>

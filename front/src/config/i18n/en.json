@@ -1539,6 +1539,24 @@
       "rateLimit": "As ChatGPT API is not free, this integration is limited to 1000 requests per month.",
       "notOnGladysPlus": "As ChatGPT API is not free, this integration is only available to Gladys Plus users.",
       "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Click here</a> to subscribe to Gladys Plus."
+    },
+    "androidTV": {
+      "title": "Android TV",
+      "description": "Control your Android smart TV.",
+      "search": "Search Android TV",
+      "nameLabel": "Name",
+      "namePlaceholder": "Enter the name of your Android TV",
+      "roomLabel": "Room",
+      "ipLabel": "IP address",
+      "ipPlaceholder": "Your Android TV's IP address",
+      "saveButton": "Save",
+      "deleteButton": "Delete",
+      "noAndroidTVFound": "No Android TV found",
+      "saveError": "Can't save this configuration",
+      "codeDescription": "Enter here pairing code that is displayed on you Android TV screen.",
+      "codePlaceholder": "Pairing code",
+      "retryButtonDescription": "If nothing appears on your screen, click here to try a new connection.",
+      "retryButton": "Reconnect"
     }
   },
   "editScene": {
