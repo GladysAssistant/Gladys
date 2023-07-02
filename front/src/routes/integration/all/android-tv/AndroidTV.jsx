@@ -38,8 +38,10 @@ const AndroidTVPage = ({ ...props }) => (
                         />
                       </Localizer>
                     </div>
-                    <button onClick={(state) => props.addAndroidTV(state, props.intl)}
-                      class="btn btn-outline-primary ml-2">
+                    <button
+                      onClick={state => props.addAndroidTV(state, props.intl)}
+                      class="btn btn-outline-primary ml-2"
+                    >
                       <Text id="scene.newButton" /> <i class="fe fe-plus" />
                     </button>
                   </div>

@@ -19,7 +19,7 @@ async function init() {
   const devices = await this.gladys.device.get({
     service: 'android-tv',
   });
-  await Promise.all(devices.map(device => this.buildTV(device)));
+  await Promise.all(devices.map((device) => this.buildTV(device)));
 }
 
 module.exports = {

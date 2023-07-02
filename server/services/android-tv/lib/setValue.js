@@ -1,5 +1,6 @@
 const { keyMappings } = require('./mappings');
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
+const logger = require('../../../utils/logger');
 
 /**
  * @description Send button key to TV.
@@ -10,7 +11,7 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../ut
  * setValue(device, deviceFeature, value);
  */
 async function setValue(device, deviceFeature, value) {
-  console.log(`Changing state ${device.external_id} with value = ${value}`);
+  logger.debug(`Changing state ${device.external_id} with value = ${value}`);
 
   const keyMapping = keyMappings[deviceFeature.category][deviceFeature.type];
   if (!keyMapping) {

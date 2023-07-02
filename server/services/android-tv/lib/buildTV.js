@@ -1,10 +1,6 @@
 // const { mappings } = require('./deviceMappings');
 const fs = require('fs/promises');
-const {
-  DEVICE_FEATURE_CATEGORIES,
-  DEVICE_FEATURE_TYPES,
-  EVENTS,
-} = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, EVENTS } = require('../../../utils/constants');
 const { appMappings } = require('./mappings');
 
 /**
@@ -15,7 +11,7 @@ const { appMappings } = require('./mappings');
  * buildTV(device)
  */
 async function buildTV(device) {
-  const address = device.params.find(param => param.name === 'ANDROID_TV_IP');
+  const address = device.params.find((param) => param.name === 'ANDROID_TV_IP');
 
   if (!address) {
     return;
@@ -38,7 +34,7 @@ async function buildTV(device) {
     cert = await fs.readFile(`${this.basePathAndroidTV}/${device.id}-cert.pem`);
     key = await fs.readFile(`${this.basePathAndroidTV}/${device.id}-key.pem`);
   } catch (error) {
-    console.log('Can\'t read file');
+    console.log("Can't read file");
   }
 
   const options = {
@@ -59,18 +55,19 @@ async function buildTV(device) {
 
   androidRemote.on('powered', (powered) => {
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: device.features.find((feat) => (
-        feat.category === DEVICE_FEATURE_CATEGORIES.TELEVISION &&
-        feat.type === DEVICE_FEATURE_TYPES.TELEVISION.BINARY)
+      device_feature_external_id: device.features.find(
+        (feat) =>
+          feat.category === DEVICE_FEATURE_CATEGORIES.TELEVISION &&
+          feat.type === DEVICE_FEATURE_TYPES.TELEVISION.BINARY,
       ).external_id,
       state: powered ? 1 : 0,
     });
   });
 
   androidRemote.on('volume', async (volume) => {
-    const feature = device.features.find((feat) => (
-      feat.category === DEVICE_FEATURE_CATEGORIES.TELEVISION &&
-      feat.type === DEVICE_FEATURE_TYPES.TELEVISION.VOLUME)
+    const feature = device.features.find(
+      (feat) =>
+        feat.category === DEVICE_FEATURE_CATEGORIES.TELEVISION && feat.type === DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
     );
     if (feature.max !== volume.maximum) {
       await this.gladys.device.addFeature(device.selector, {
@@ -85,9 +82,8 @@ async function buildTV(device) {
   });
 
   androidRemote.on('current_app', (currentApp) => {
-    const feature = device.features.find((feat) => (
-      feat.category === DEVICE_FEATURE_CATEGORIES.TEXT &&
-      feat.type === DEVICE_FEATURE_TYPES.TEXT.TEXT)
+    const feature = device.features.find(
+      (feat) => feat.category === DEVICE_FEATURE_CATEGORIES.TEXT && feat.type === DEVICE_FEATURE_TYPES.TEXT.TEXT,
     );
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: feature.external_id,
