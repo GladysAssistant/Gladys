@@ -50,7 +50,7 @@ async function addFeature(deviceSelector, feature) {
     });
     featureInStore = await db.DeviceFeature.findOne({
       where: { id: featureInStore.id },
-      raw: true
+      raw: true,
     });
     device.features[featureIndex] = featureInStore;
     // we save again the device in RAM

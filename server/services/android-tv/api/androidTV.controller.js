@@ -19,7 +19,6 @@ module.exports = function AndroidTVController(androidTVHandler) {
    * @apiGroup Android TV
    */
   async function reconnect(req, res) {
-    console.log('req.body.selector', req.body.selector)
     const device = await androidTVHandler.gladys.device.getBySelector(req.body.selector);
     await androidTVHandler.buildTV(device);
     res.json({

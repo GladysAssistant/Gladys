@@ -5,7 +5,6 @@ import debounce from 'debounce';
 import createActionsIntegration from '../../../../actions/integration';
 import { MANAGED_FEATURES } from './features';
 
-
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
@@ -68,8 +67,8 @@ function createActions(store) {
       }
     },
     async addAndroidTV(state, e, intl) {
-      const uniqueId = uuid.v4()
-      const deviceExternalId = `androidtv:${uniqueId}`
+      const uniqueId = uuid.v4();
+      const deviceExternalId = `androidtv:${uniqueId}`;
       await integrationActions.getIntegrationByName(state, 'android-tv');
 
       const deviceFeatures = [];
@@ -82,7 +81,7 @@ function createActions(store) {
             name,
             external_id: featureExternalId,
             selector: featureExternalId,
-            category: category,
+            category,
             type,
             read_only: MANAGED_FEATURES[category][type].read_only || false,
             keep_history: false,
@@ -91,7 +90,7 @@ function createActions(store) {
             max: MANAGED_FEATURES[category][type].max || 1,
             ...MANAGED_FEATURES[category][type]
           });
-        })
+        });
       });
 
       const androidTVs = update(state.androidTVs, {
@@ -142,9 +141,7 @@ function createActions(store) {
     },
     updateAndroidTVIP(state, index, value) {
       const trimmedValue = value && value.trim ? value.trim() : value;
-      let androidTVIPParamIndex = state.androidTVs[index].params.findIndex(
-        param => param.name === 'ANDROID_TV_IP'
-      );
+      let androidTVIPParamIndex = state.androidTVs[index].params.findIndex(param => param.name === 'ANDROID_TV_IP');
       const androidTVs = update(state.androidTVs, {
         [index]: {
           androidTVIP: {

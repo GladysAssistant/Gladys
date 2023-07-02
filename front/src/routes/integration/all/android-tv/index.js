@@ -11,16 +11,10 @@ class AndroidTVIntegration extends Component {
     this.props.getHouses();
   }
 
-  render(props, { }) {
+  render(props, {}) {
     const loading = props.getAndroidTVStatus === RequestStatus.Getting;
-    return (
-      <AndroidTVPage {...props} loading={loading} />
-    );
+    return <AndroidTVPage {...props} loading={loading} />;
   }
 }
 
-export default withIntlAsProp(connect(
-    'androidTVs,housesWithRooms,getAndroidTVStatus',
-    actions
-  )(AndroidTVIntegration)
-);
+export default withIntlAsProp(connect('androidTVs,housesWithRooms,getAndroidTVStatus', actions)(AndroidTVIntegration));

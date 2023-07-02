@@ -157,40 +157,42 @@ class AndroidTVBox extends Component {
                     <Text id="integration.androidTV.deleteButton" />
                   </button>
                 </div>
-                {(props.androidTV.created_at && !props.androidTV.androidTVPaired.value) && <div class="form-group">
-                  <div class="input-group">
-                    <label>
-                      <Text id="integration.androidTV.codeDescription" />
-                    </label>
-                    <Localizer>
-                      <input
-                        type="text"
-                        class="form-control"
-                        placeholder={<Text id="integration.androidTV.codePlaceholder" />}
-                        value={currentCodeTextInput}
-                        onInput={this.updateCodeTextInput}
-                      />
-                    </Localizer>
-                    <div class="input-group-append">
-                      <button
-                        type="button"
-                        class="btn btn-secondary"
-                        onClick={this.sendCode}
-                        disabled={!currentCodeTextInput || currentCodeTextInput.length === 0}
-                      >
-                        <i class="fe fe-link" />
+                {props.androidTV.created_at && !props.androidTV.androidTVPaired.value && (
+                  <div class="form-group">
+                    <div class="input-group">
+                      <label>
+                        <Text id="integration.androidTV.codeDescription" />
+                      </label>
+                      <Localizer>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder={<Text id="integration.androidTV.codePlaceholder" />}
+                          value={currentCodeTextInput}
+                          onInput={this.updateCodeTextInput}
+                        />
+                      </Localizer>
+                      <div class="input-group-append">
+                        <button
+                          type="button"
+                          class="btn btn-secondary"
+                          onClick={this.sendCode}
+                          disabled={!currentCodeTextInput || currentCodeTextInput.length === 0}
+                        >
+                          <i class="fe fe-link" />
+                        </button>
+                      </div>
+                    </div>
+                    <div class="input-group">
+                      <label>
+                        <Text id="integration.androidTV.retryButtonDescription" />
+                      </label>
+                      <button onClick={this.reconnect} class="btn btn-info mr-2">
+                        <Text id="integration.androidTV.retryButton" />
                       </button>
                     </div>
                   </div>
-                  <div class="input-group">
-                    <label>
-                      <Text id="integration.androidTV.retryButtonDescription" />
-                    </label>
-                    <button onClick={this.reconnect} class="btn btn-info mr-2">
-                      <Text id="integration.androidTV.retryButton" />
-                    </button>
-                  </div>
-                </div>}
+                )}
               </div>
             </div>
           </div>

@@ -91,14 +91,14 @@ const keyMappings = {
       KeyCode: RemoteKeyCode.KEYCODE_MEDIA_RECORD,
       Direction: RemoteDirection.SHORT,
     },
-  }
+  },
 };
 
 const appMappings = {
   'com.google.android.tvlauncher': 'Home',
   'com.google.android.youtube.tv': 'YouTube',
   'com.android.vending': 'Play Store',
-  'com.android.tv.settings': 'Settings'
+  'com.android.tv.settings': 'Settings',
 };
 
 module.exports = { keyMappings, appMappings };
