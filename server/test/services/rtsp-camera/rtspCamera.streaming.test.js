@@ -150,7 +150,7 @@ describe('Camera.streaming', () => {
             },
             {
               name: 'CAMERA_ROTATION',
-              value: DEVICE_ROTATION.DEGRES_90,
+              value: DEVICE_ROTATION.DEGREES_90,
             },
           ],
         }),
@@ -186,7 +186,7 @@ describe('Camera.streaming', () => {
             },
             {
               name: 'CAMERA_ROTATION',
-              value: DEVICE_ROTATION.DEGRES_180,
+              value: DEVICE_ROTATION.DEGREES_180,
             },
           ],
         }),
@@ -222,7 +222,7 @@ describe('Camera.streaming', () => {
             },
             {
               name: 'CAMERA_ROTATION',
-              value: DEVICE_ROTATION.DEGRES_270,
+              value: DEVICE_ROTATION.DEGREES_270,
             },
           ],
         }),

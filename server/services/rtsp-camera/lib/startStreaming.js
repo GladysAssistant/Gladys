@@ -152,15 +152,15 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
     ];
 
     switch (cameraRotationParam.value) {
-      case DEVICE_ROTATION.DEGRES_90:
+      case DEVICE_ROTATION.DEGREES_90:
         args.push('-vf'); // Rotate 90
         args.push('transpose=1');
         break;
-      case DEVICE_ROTATION.DEGRES_180:
+      case DEVICE_ROTATION.DEGREES_180:
         args.push('-vf'); // Rotate 180
         args.push('transpose=1,transpose=1');
         break;
-      case DEVICE_ROTATION.DEGRES_270:
+      case DEVICE_ROTATION.DEGREES_270:
         args.push('-vf'); // Rotate 270
         args.push('transpose=2');
         break;

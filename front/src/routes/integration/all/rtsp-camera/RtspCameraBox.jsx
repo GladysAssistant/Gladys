@@ -184,16 +184,16 @@ class RtspCameraBox extends Component {
                     onChange={this.updateCameraRotation}
                     value={get(props, 'camera.cameraRotation.value')}
                   >
-                    <option value={DEVICE_ROTATION.DEGRES_0}>
+                    <option value={DEVICE_ROTATION.DEGREES_0}>
                       <Text id={`integration.rtspCamera.rotationO`} />
                     </option>
-                    <option value={DEVICE_ROTATION.DEGRES_90}>
+                    <option value={DEVICE_ROTATION.DEGREES_90}>
                       <Text id={`integration.rtspCamera.rotation90`} />
                     </option>
-                    <option value={DEVICE_ROTATION.DEGRES_180}>
+                    <option value={DEVICE_ROTATION.DEGREES_180}>
                       <Text id={`integration.rtspCamera.rotation18O`} />
                     </option>
-                    <option value={DEVICE_ROTATION.DEGRES_270}>
+                    <option value={DEVICE_ROTATION.DEGREES_270}>
                       <Text id={`integration.rtspCamera.rotation27O`} />
                     </option>
                   </select>

@@ -46,13 +46,13 @@ async function getImage(device) {
       '-qscale:v 15', //  Effective range for JPEG is 2-31 with 31 being the worst quality.
     ];
     switch (cameraRotationParam.value) {
-      case DEVICE_ROTATION.DEGRES_90:
+      case DEVICE_ROTATION.DEGREES_90:
         outputOptions.push('-vf transpose=1'); // Rotate 90
         break;
-      case DEVICE_ROTATION.DEGRES_180:
+      case DEVICE_ROTATION.DEGREES_180:
         outputOptions.push('-vf transpose=1,transpose=1'); // Rotate 180
         break;
-      case DEVICE_ROTATION.DEGRES_270:
+      case DEVICE_ROTATION.DEGREES_270:
         outputOptions.push('-vf transpose=2'); // Rotate 270
         break;
       default:

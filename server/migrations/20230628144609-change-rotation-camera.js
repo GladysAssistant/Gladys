@@ -26,7 +26,6 @@ module.exports = {
           name: 'CAMERA_ROTATION',
         },
       });
-      console.log(deviceParam);
       if (deviceParam === null) {
         return;
       }

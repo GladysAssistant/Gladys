@@ -5,7 +5,6 @@ const { fake, assert } = require('sinon');
 const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const RtspCameraService = require('../../../services/rtsp-camera');
-const { DEVICE_ROTATION } = require('../../../utils/constants');
 
 const device = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
@@ -44,7 +43,7 @@ const deviceRotation90 = {
     },
     {
       name: 'CAMERA_ROTATION',
-      value: DEVICE_ROTATION.DEGRES_90,
+      value: '90',
     },
   ],
 };
@@ -59,7 +58,7 @@ const deviceRotation180 = {
     },
     {
       name: 'CAMERA_ROTATION',
-      value: DEVICE_ROTATION.DEGRES_180,
+      value: '180',
     },
   ],
 };
@@ -74,7 +73,7 @@ const deviceRotation270 = {
     },
     {
       name: 'CAMERA_ROTATION',
-      value: DEVICE_ROTATION.DEGRES_270,
+      value: '270',
     },
   ],
 };
@@ -146,7 +145,7 @@ describe('RtspCameraManager commands', () => {
     const image = await rtspCameraManager.getImage(deviceRotation180);
     expect(image).to.equal('image/png;base64,aW1hZ2U=');
   });
-  it('should getImage 2700°', async () => {
+  it('should getImage 270°', async () => {
     const image = await rtspCameraManager.getImage(deviceRotation270);
     expect(image).to.equal('image/png;base64,aW1hZ2U=');
   });
