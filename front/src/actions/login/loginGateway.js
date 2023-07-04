@@ -138,6 +138,10 @@ function createActions(store) {
       store.setState({
         gatewayLoginTwoFactorCode: e.target.value
       });
+      if (e.target.value.length === 6) {
+        const upToDateState = store.getState();
+        actions.loginTwoFactor(upToDateState, e);
+      }
     }
   };
   return actions;
