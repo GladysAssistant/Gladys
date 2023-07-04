@@ -205,7 +205,7 @@ class RtspCameraBox extends Component {
                   <button onClick={this.saveCamera} class="btn btn-success mr-2">
                     <Text id="integration.rtspCamera.saveButton" />
                   </button>
-                  <button onClick={this.deleteCamera} class="btn btn-danger mt-sm-0 mt-lg-4">
+                  <button onClick={this.deleteCamera} class="btn btn-danger mt-sm-0 mt-md-0 mt-lg-2 mt-xl-0">
                     <Text id="integration.rtspCamera.deleteButton" />
                   </button>
                 </div>
