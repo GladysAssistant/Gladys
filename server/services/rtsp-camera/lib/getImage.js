@@ -59,8 +59,9 @@ async function getImage(device) {
         break;
     }
 
-    // and send a camera thumbnail to this stream
-    this.ffmpeg(cameraUrlParam.value)
+    // Send a camera thumbnail to this stream
+    // Add a timeout to prevent ffmpeg from running forever
+    this.ffmpeg(cameraUrlParam.value, { timeout: 10 })
       .format('image2')
       .outputOptions(outputOptions)
       .output(writeStream)
