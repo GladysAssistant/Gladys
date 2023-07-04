@@ -42,22 +42,23 @@ async function getImage(device) {
     const writeStream = fse.createWriteStream(filePath);
     const outputOptions = [
       '-vframes 1',
-      '-vf scale=640:-1', // resize the image with max width = 640
       '-qscale:v 15', //  Effective range for JPEG is 2-31 with 31 being the worst quality.
     ];
     switch (cameraRotationParam.value) {
       case DEVICE_ROTATION.DEGREES_90:
-        outputOptions.push('-vf transpose=1'); // Rotate 90
+        outputOptions.push('-vf scale=640:-1,transpose=1'); // Rotate 90
         break;
       case DEVICE_ROTATION.DEGREES_180:
-        outputOptions.push('-vf transpose=1,transpose=1'); // Rotate 180
+        outputOptions.push('-vf scale=640:-1,transpose=1,transpose=1'); // Rotate 180
         break;
       case DEVICE_ROTATION.DEGREES_270:
-        outputOptions.push('-vf transpose=2'); // Rotate 270
+        outputOptions.push('-vf scale=640:-1,transpose=2'); // Rotate 270
         break;
       default:
+        outputOptions.push('-vf scale=640:-1'); // Rotate 0
         break;
     }
+
     // and send a camera thumbnail to this stream
     this.ffmpeg(cameraUrlParam.value)
       .format('image2')

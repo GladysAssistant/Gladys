@@ -114,8 +114,6 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       'veryfast', // Encoding presets
       '-flags',
       '+cgop',
-      '-vf',
-      'scale=1920:-1', // Full HD resolution
       '-r',
       '25', // Frames (rate) per second
       '-g',
@@ -151,22 +149,23 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       indexFilePath,
     ];
 
+    let cameraRotationArgs = '';
     switch (cameraRotationParam.value) {
       case DEVICE_ROTATION.DEGREES_90:
-        args.push('-vf'); // Rotate 90
-        args.push('transpose=1');
+        cameraRotationArgs = 'scale=1920:-1,transpose=1'; // Full HD resolution & Rotate 90
         break;
       case DEVICE_ROTATION.DEGREES_180:
-        args.push('-vf'); // Rotate 180
-        args.push('transpose=1,transpose=1');
+        cameraRotationArgs = 'scale=1920:-1,transpose=1,transpose=1'; // Full HD resolution & Rotate 180
         break;
       case DEVICE_ROTATION.DEGREES_270:
-        args.push('-vf'); // Rotate 270
-        args.push('transpose=2');
+        cameraRotationArgs = 'scale=1920:-1,transpose=2'; // Full HD resolution & Rotate 270
         break;
       default:
+        cameraRotationArgs = 'scale=1920:-1'; // Full HD resolution & Rotate 0
         break;
     }
+
+    args.splice(8, 0, '-vf', cameraRotationArgs);
 
     const options = {
       timeout: 5 * 60 * 1000, // 5 minutes
