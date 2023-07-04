@@ -85,7 +85,15 @@ class EditDevices extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.refreshSelectedOptions(nextProps);
+    if (nextProps.box && nextProps.box.device_features) {
+      if (
+        !this.props.box ||
+        !this.props.box.device_features ||
+        nextProps.box.device_features.length !== this.props.box.device_features.length
+      ) {
+        this.refreshSelectedOptions(nextProps);
+      }
+    }
   }
 
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
