@@ -3,16 +3,32 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { Link } from 'preact-router';
 import get from 'get-value';
-
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+import { connect } from 'unistore/preact';
 
 class TuyaDeviceBox extends Component {
+  componentWillMount() {
+    this.setState({
+      device: this.props.device
+    });
+  }
+
   updateName = e => {
-    this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'name', e.target.value);
+    this.setState({
+      device: {
+        ...this.state.device,
+        name: e.target.value
+      }
+    });
   };
 
   updateRoom = e => {
-    this.props.updateDeviceField(this.props.listName, this.props.deviceIndex, 'room_id', e.target.value);
+    this.setState({
+      device: {
+        ...this.state.device,
+        room_id: e.target.value
+      }
+    });
   };
 
   saveDevice = async () => {
@@ -21,7 +37,10 @@ class TuyaDeviceBox extends Component {
       errorMessage: null
     });
     try {
-      await this.props.saveDevice(this.props.listName, this.props.deviceIndex);
+      const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      this.setState({
+        device: savedDevice
+      });
     } catch (e) {
       let errorMessage = 'integration.tuya.error.defaultError';
       if (e.response.status === 409) {
@@ -44,7 +63,10 @@ class TuyaDeviceBox extends Component {
       statesNumber: undefined
     });
     try {
-      await this.props.deleteDevice(this.props.deviceIndex);
+      if (this.state.device.created_at) {
+        await this.props.httpClient.delete(`/api/v1/device/${this.state.device.selector}`);
+      }
+      this.props.deviceDeleted();
     } catch (e) {
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');
@@ -63,8 +85,17 @@ class TuyaDeviceBox extends Component {
   };
 
   render(
-    { deviceIndex, device, housesWithRooms, editable, ...props },
-    { loading, errorMessage, tooMuchStatesError, statesNumber }
+    {
+      deviceIndex,
+      editable,
+      editButton,
+      deleteButton,
+      saveButton,
+      updateButton,
+      alreadyCreatedButton,
+      housesWithRooms
+    },
+    { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
     const online = device.online;
@@ -164,25 +195,25 @@ class TuyaDeviceBox extends Component {
                 )}
 
                 <div class="form-group">
-                  {validModel && props.alreadyCreatedButton && (
+                  {validModel && alreadyCreatedButton && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.tuya.alreadyCreatedButton" />
                     </button>
                   )}
 
-                  {validModel && props.updateButton && (
+                  {validModel && updateButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.tuya.updateButton" />
                     </button>
                   )}
 
-                  {validModel && props.saveButton && (
+                  {validModel && saveButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.tuya.saveButton" />
                     </button>
                   )}
 
-                  {validModel && props.deleteButton && (
+                  {validModel && deleteButton && (
                     <button onClick={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.tuya.deleteButton" />
                     </button>
@@ -194,7 +225,7 @@ class TuyaDeviceBox extends Component {
                     </button>
                   )}
 
-                  {validModel && props.editButton && (
+                  {validModel && editButton && (
                     <Link href={`/dashboard/integration/device/tuya/edit/${device.selector}`}>
                       <button class="btn btn-secondary float-right">
                         <Text id="integration.tuya.device.editButton" />
@@ -211,4 +242,4 @@ class TuyaDeviceBox extends Component {
   }
 }
 
-export default TuyaDeviceBox;
+export default connect('httpClient', {})(TuyaDeviceBox);

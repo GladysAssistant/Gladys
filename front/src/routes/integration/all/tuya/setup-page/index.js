@@ -1,17 +1,9 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import actions from '../actions';
 import SetupTab from './SetupTab';
 import TuyaPage from '../TuyaPage';
 
 class TuyaSetupPage extends Component {
-  componentWillMount() {
-    this.props.getIntegrationByName('tuya');
-    this.props.getTuyaConfiguration();
-  }
-
-  componentWillUnmount() {}
-
   render(props, {}) {
     return (
       <TuyaPage>
@@ -21,7 +13,4 @@ class TuyaSetupPage extends Component {
   }
 }
 
-export default connect(
-  'user,session,currentIntegration,tuyaEndpoint,tuyaAccessKey,tuyaSecretKey,tuyaAppAccountId,tuyaGetSettingsStatus,tuyaSaveSettingsStatus',
-  actions
-)(TuyaSetupPage);
+export default connect('user', {})(TuyaSetupPage);
