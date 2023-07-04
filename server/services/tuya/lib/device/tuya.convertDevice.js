@@ -1,5 +1,6 @@
 const { DEVICE_POLL_FREQUENCIES } = require('../../../../utils/constants');
 const { convertFeature } = require('./tuya.convertFeature');
+const logger = require('../../../../utils/logger');
 
 /**
  * @description Transform Tuya device to Gladys device.
@@ -13,6 +14,8 @@ function convertDevice(tuyaDevice) {
   const externalId = `tuya:${id}`;
   const { functions = [] } = specifications;
 
+
+  logger.warn(`Tuya convert device"${name}, ${model}"`);
   // Groups functions and status on same code
   const groups = {};
   functions.forEach((func) => {

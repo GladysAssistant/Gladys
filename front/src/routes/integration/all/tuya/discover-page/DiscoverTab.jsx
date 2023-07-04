@@ -62,7 +62,7 @@ class DiscoverTab extends Component {
             <Text id="integration.tuya.discover.title" />
           </h1>
           <div class="page-options d-flex">
-            <button onClick={this.getDiscoveredDevices} class="btn btn-outline-primary ml-2" disabled={loading}>
+            <button onClick={this.getDiscoveredDevices.bind(this)} class="btn btn-outline-primary ml-2" disabled={loading}>
               <Text id="integration.tuya.discover.scan" /> <i class="fe fe-radio" />
             </button>
           </div>

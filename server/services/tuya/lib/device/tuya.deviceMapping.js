@@ -6,6 +6,8 @@ const BRIGHT_VALUE_V2 = 'bright_value_v2';
 const TEMP_VALUE_V2 = 'temp_value_v2';
 const COLOUR_DATA_V2 = 'colour_data_v2';
 
+const COLOUR_DATA = 'colour_data';
+
 const SWITCH_1 = 'switch_1';
 const SWITCH_2 = 'switch_2';
 const SWITCH_3 = 'switch_3';
@@ -25,6 +27,10 @@ const mappings = {
     type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
   },
   [COLOUR_DATA_V2]: {
+    category: DEVICE_FEATURE_CATEGORIES.LIGHT,
+    type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+  },
+  [COLOUR_DATA]: {
     category: DEVICE_FEATURE_CATEGORIES.LIGHT,
     type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
   },
