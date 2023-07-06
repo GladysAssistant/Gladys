@@ -6,7 +6,7 @@ import TuyaPage from '../TuyaPage';
 class TuyaSetupPage extends Component {
   render(props, {}) {
     return (
-      <TuyaPage>
+      <TuyaPage user={props.user}>
         <SetupTab {...props} />
       </TuyaPage>
     );
