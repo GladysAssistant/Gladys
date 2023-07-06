@@ -113,10 +113,9 @@ class DeviceTab extends Component {
                       editable
                       saveButton
                       deleteButton
-                      editButton
                       device={device}
                       deviceIndex={index}
-                      deviceDeleted={() => this.getTuyaDevices()}
+                      getTuyaDevices={this.getTuyaDevices.bind(this)}
                       housesWithRooms={housesWithRooms}
                     />
                   ))}

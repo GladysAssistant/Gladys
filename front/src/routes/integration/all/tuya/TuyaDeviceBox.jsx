@@ -13,6 +13,12 @@ class TuyaDeviceBox extends Component {
     });
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      device: nextProps.device
+    });
+  }
+
   updateName = e => {
     this.setState({
       device: {
@@ -66,7 +72,7 @@ class TuyaDeviceBox extends Component {
       if (this.state.device.created_at) {
         await this.props.httpClient.delete(`/api/v1/device/${this.state.device.selector}`);
       }
-      this.props.deviceDeleted();
+      this.props.getTuyaDevices();
     } catch (e) {
       const status = get(e, 'response.status');
       const dataMessage = get(e, 'response.data.message');

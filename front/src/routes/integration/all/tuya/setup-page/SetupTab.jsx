@@ -110,6 +110,11 @@ class SetupTab extends Component {
             <div class="dimmer-content">
               <p>
                 <MarkupText id="integration.tuya.setup.description" />
+                <MarkupText id="integration.tuya.setup.descriptionCreateAccount" />
+                <MarkupText id="integration.tuya.setup.descriptionCreateProject" />
+                <MarkupText id="integration.tuya.setup.descriptionGetKeys" />
+                <MarkupText id="integration.tuya.setup.descriptionGetAppAccountUid" />
+                <MarkupText id="integration.tuya.setup.descriptionGetAppAccountUid2" />
               </p>
 
               <form>

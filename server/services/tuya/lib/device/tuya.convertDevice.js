@@ -14,7 +14,7 @@ function convertDevice(tuyaDevice) {
   const externalId = `tuya:${id}`;
   const { functions = [] } = specifications;
 
-  logger.warn(`Tuya convert device"${name}, ${model}"`);
+  logger.debug(`Tuya convert device"${name}, ${model}"`);
   // Groups functions and status on same code
   const groups = {};
   functions.forEach((func) => {

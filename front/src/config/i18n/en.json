@@ -754,7 +754,12 @@
       },
       "setup": {
         "title": "Tuya configuration",
-        "description": "YYou can connect Gladys to your Tuya cloud account to control the related devices.<br/>You need to create an account at <a href=\"https://www.tuya.com/\" target=\"_blank\" rel= \"noopener noreferrer\">Tuya</a>.<br/>You must then create a \"Cloud Project\" in your Tuya account.<br/>You will have access to the Access Key and the Secret Key.<br/>To have your \"App account UID\", you must go to the \"Devices\" -> \"Link Tuya App Account\" section and add an application account.<br/>Once the addition is finalized, your \"App account UID\" will be in the UID column.",
+        "description": "You can connect Gladys to your Tuya cloud account to control the related devices.",
+        "descriptionCreateAccount": "You need to create an account at <a href=\"https://www.tuya.com/\" target=\"_blank\" rel= \"noopener noreferrer\">Tuya</a>.",
+        "descriptionCreateProject": "You must then create a \"Cloud Project\" in your Tuya account.",
+        "descriptionGetKeys": "You will have access to the Access Key and the Secret Key.",
+        "descriptionGetAppAccountUid": "To have your \"App account UID\", you must go to the \"Devices\" -> \"Link Tuya App Account\" section and add an application account.",
+        "descriptionGetAppAccountUid2": "Once the addition is finalized, your \"App account UID\" will be in the UID column.",
         "endpoints": {
           "china": "China",
           "westernAmerica": "Western America",
