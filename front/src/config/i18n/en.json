@@ -722,6 +722,7 @@
       "deviceTab": "Devices",
       "discoverTab": "Tuya discover",
       "setupTab": "Setup",
+      "documentation": "Tuya documentation",
       "discoverDeviceDescr": "Automatically scan Tuya devices",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",

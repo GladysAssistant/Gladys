@@ -848,6 +848,7 @@
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Tuya",
       "setupTab": "Configuration",
+      "documentation": "Tuya documentation",
       "discoverDeviceDescr": "Scanner automatiquement les appareils Tuya",
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
