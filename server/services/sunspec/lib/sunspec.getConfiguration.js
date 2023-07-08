@@ -12,8 +12,16 @@ async function getConfiguration() {
 
   const sunspecUrl = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_DEVICE_URL, this.serviceId);
 
+  const bdpvActiveStr = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_BDPV_ACTIVE, this.serviceId);
+  const bdpvActive = bdpvActiveStr !== undefined && bdpvActiveStr === '1';
+  const bdpvUsername = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_BDPV_USER_NAME, this.serviceId);
+  const bdpvApiKey = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_BDPV_API_KEY, this.serviceId);
+
   return {
     sunspecUrl,
+    bdpvActive,
+    bdpvUsername,
+    bdpvApiKey,
   };
 }
 

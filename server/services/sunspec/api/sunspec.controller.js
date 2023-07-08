@@ -26,8 +26,8 @@ module.exports = function SunSpecController(sunspecManager) {
    * @apiName getConfiguration
    * @apiGroup SunSpec
    */
-  function getConfiguration(req, res) {
-    const configuration = sunspecManager.getConfiguration();
+  async function getConfiguration(req, res) {
+    const configuration = await sunspecManager.getConfiguration();
     res.json(configuration);
   }
 
@@ -40,7 +40,8 @@ module.exports = function SunSpecController(sunspecManager) {
     await sunspecManager.updateConfiguration(req.body);
     await sunspecManager.disconnect();
     await sunspecManager.connect();
-    const configuration = sunspecManager.getConfiguration();
+    const configuration = await sunspecManager.getConfiguration();
+    sunspecManager.bdpvInit(configuration.bdpvActive);
     res.json(configuration);
   }
 

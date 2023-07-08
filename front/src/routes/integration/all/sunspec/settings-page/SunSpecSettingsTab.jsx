@@ -16,6 +16,10 @@ class SunSpecSettingsTab extends Component {
     }
   };
 
+  updateConfiguration(state, configuration) {
+    store.setState(configuration);
+  };
+
   updateUrl = e => {
     const updatedConfig = update(this.state.config, {
       sunspecUrl: {
@@ -26,6 +30,41 @@ class SunSpecSettingsTab extends Component {
     this.setState({ config: updatedConfig, updated: true });
   };
 
+  toggleBdpvActive = () => {
+    const updatedConfig = update(this.state.config, {
+      bdpvActive: {
+        $set: !this.state.config.bdpvActive
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
+  updateUsername = e => {
+    const updatedConfig = update(this.state.config, {
+      bdpvUsername: {
+        $set: e.target.value
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
+  updateApiKey = e => {
+    const updatedConfig = update(this.state.config, {
+      bdpvApiKey: {
+        $set: e.target.value
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
+  showApiKey = () => {
+    this.setState({ showApiKey: true });
+    setTimeout(() => this.setState({ showApiKey: false }), 5000);
+  };
+
   saveConfiguration = async () => {
     this.setState({ error: null });
     try {
@@ -34,7 +73,6 @@ class SunSpecSettingsTab extends Component {
       await this.props.httpClient.post('/api/v1/service/sunspec/disconnect');
       await this.props.httpClient.post('/api/v1/service/sunspec/connect');
     } catch (e) {
-      console.error(e);
       this.setState({ error: e });
     }
   };
@@ -43,12 +81,12 @@ class SunSpecSettingsTab extends Component {
     await this.loadConfiguration();
   }
 
-  render({}, { config, loading, error }) {
+  render({}, { config, showApiKey, loading, error }) {
     return (
       <div class="card">
         <div class="card-header">
           <h3 class="card-title">
-            <Text id="integration.sunspec.setup.title" />
+            <Text id="integration.sunspec.settings.title" />
           </h3>
         </div>
         <div class="card-body">
@@ -61,27 +99,27 @@ class SunSpecSettingsTab extends Component {
             <div class="dimmer-content">
               {error && (
                 <div class="alert alert-danger">
-                  <Text id="integration.sunspec.setup.errorLabel" />
+                  <Text id="integration.sunspec.settings.errorLabel" />
                 </div>
               )}
 
               {!error && !config && (
                 <div class="alert alert-warning">
-                  <Text id="integration.sunspec.setup.noConfigLabel" />
+                  <Text id="integration.sunspec.settings.noConfigLabel" />
                 </div>
               )}
 
               <p>
-                <MarkupText id="integration.sunspec.setup.fronius.description" />
+                <MarkupText id="integration.sunspec.settings.fronius.description" />
                 <Link href="https://www.fronius.com/en/solar-energy/installers-partners/technical-data/all-products/system-monitoring/open-interfaces/modbus-tcp">
-                  <i class="fe fe-book-open" /> <Text id="integration.sunspec.setup.fronius.documentation" />
+                  <i class="fe fe-book-open" /> <Text id="integration.sunspec.settings.fronius.documentation" />
                 </Link>
               </p>
 
               <p>
-                <MarkupText id="integration.sunspec.setup.sma.description" />
+                <MarkupText id="integration.sunspec.settings.sma.description" />
                 <Link href="https://manuals.sma.de/SBxx-1AV-41/fr-FR/1129302539.html">
-                  <i class="fe fe-book-open" /> <Text id="integration.sunspec.setup.sma.documentation" />
+                  <i class="fe fe-book-open" /> <Text id="integration.sunspec.settings.sma.documentation" />
                 </Link>
               </p>
 
@@ -89,20 +127,87 @@ class SunSpecSettingsTab extends Component {
                 <form>
                   <div class="form-group">
                     <label for="sunspecUrl" class="form-label">
-                      <Text id={`integration.sunspec.setup.sunspecUrl`} />
+                      <Text id={`integration.sunspec.settings.sunspecUrl`} />
                     </label>
                     <Localizer>
                       <input
                         id="sunspecUrl"
                         name="sunspecUrl"
-                        placeholder={<Text id="integration.sunspec.setup.sunspecUrlPlaceholder" />}
+                        placeholder={<Text id="integration.sunspec.settings.sunspecUrlPlaceholder" />}
                         value={config.sunspecUrl}
                         class="form-control"
                         onInput={this.updateUrl}
                       />
                     </Localizer>
                   </div>
+                  <div class="form-group">
+                    <label for="bdpvActive" class="form-label">
+                      <Text id={`integration.sunspec.settings.bdpvActiveLabel`} />
+                    </label>
+                    <label class="custom-switch">
+                      <input
+                        type="checkbox"
+                        id="bdpvActive"
+                        name="bdpvActive"
+                        class="custom-switch-input"
+                        checked={config.bdpvActive}
+                        onClick={this.toggleBdpvActive}
+                      />
+                      <span class="custom-switch-indicator" />
+                      <span class="custom-switch-description">
+                        <Text id="integration.sunspec.settings.bdpvActive" />
+                      </span>
+                    </label>
+                  </div>
                 </form>
+              )}
+
+              {config && config.bdpvActive && (
+                <>
+                  <div class="form-group">
+                    <label for="bdpvUsername" class="form-label">
+                      <Text id={`integration.sunspec.settings.userLabel`} />
+                    </label>
+                    <Localizer>
+                      <input
+                        id="bdpvUsername"
+                        name="bdpvUsername"
+                        placeholder={<Text id="integration.sunspec.settings.userPlaceholder" />}
+                        value={config.bdpvUsername}
+                        class="form-control"
+                        onInput={this.updateUsername}
+                        autoComplete="no"
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="form-group">
+                    <label for="bdpvApiKey" class="form-label">
+                      <Text id={`integration.sunspec.settings.apiKeyLabel`} />
+                    </label>
+                    <div class="input-icon mb-3">
+                      <Localizer>
+                        <input
+                          id="bdpvApiKey"
+                          name="bdpvApiKey"
+                          type={showApiKey ? 'text' : 'password'}
+                          placeholder={<Text id="integration.sunspec.settings.apiKeyPlaceholder" />}
+                          value={config.bdpvApiKey}
+                          class="form-control"
+                          onInput={this.updateApiKey}
+                          autoComplete="new-password"
+                        />
+                      </Localizer>
+                      <span class="input-icon-addon cursor-pointer" onClick={this.showApiKey}>
+                        <i
+                          class={cx('fe', {
+                            'fe-eye': !showApiKey,
+                            'fe-eye-off': showApiKey
+                          })}
+                        />
+                      </span>
+                    </div>
+                  </div>
+                </>
               )}
 
               <div class="d-flex justify-content-between mt-5">

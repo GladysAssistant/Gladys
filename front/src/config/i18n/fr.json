@@ -1194,7 +1194,7 @@
       "description": "Gérez les appareils SunSpec sur votre réseau local.",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte",
-      "setupTab": "Configuration",
+      "settingsTab": "Configuration",
       "device": {
         "title": "Appareils SunSpec",
         "search": "Chercher un appareil",
@@ -1214,12 +1214,17 @@
         "updateButton": "Mettre à jour",
         "discoveringError": "Une erreur est survenue lors de la recherche, vérifiez la configuration du scanner, sinon consultez les logs."
       },
-      "setup": {
+      "settings": {
         "title": "Configuration SunSpec",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
         "sunspecUrl": "SunSpec URL",
         "sunspecUrlPlaceholder": "Ex: [sunspec-address]:[port]",
+        "bdpvActiveLabel": "Activer la synchronisation BDPV",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur BDPV",
+        "apiKeyLabel": "Clé API",
+        "apiKeyPlaceholder": "Entrez la clé API",
         "fronius": {
           "description": "Activez l'interface Modbus TCP sur les onduleurs Fronius",
           "documentation": "Documentation Fronius"

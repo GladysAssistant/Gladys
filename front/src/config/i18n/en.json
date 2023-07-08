@@ -1194,7 +1194,7 @@
       "description": "Manage you SunSpec device through you local network.",
       "deviceTab": "Devices",
       "discoverTab": "Discover",
-      "setupTab": "Setup",
+      "settingsTab": "Settings",
       "device": {
         "title": "SunSpec Devices",
         "search": "Search devices",
@@ -1214,12 +1214,17 @@
         "updateButton": "Update",
         "discoveringError": "An error occurred, check scanner configuration, or check logs."
       },
-      "setup": {
+      "settings": {
         "title": "SunSpec settings",
         "errorLabel": "An error occurred while loading configuration.",
         "noConfigLabel": "Configuration not loaded, please retry.",
         "sunspecUrl": "SunSpec URL",
         "sunspecUrlPlaceholder": "Ex: [sunspec-address]:[port]",
+        "bdpvActiveLabel": "Activate BDPV Synchronisation",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur BDPV",
+        "apiKeyLabel": "Clé API",
+        "apiKeyPlaceholder": "Entrez la clé API",
         "fronius": {
           "description": "Activate Modbus TCP on Fronius inverters",
           "documentation": "Fronius Documentation"

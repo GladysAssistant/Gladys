@@ -7,6 +7,7 @@ const { updateConfiguration } = require('./sunspec.updateConfiguration');
 const { scanNetwork } = require('./sunspec.scanNetwork');
 const { scanDevices } = require('./sunspec.scanDevices');
 const { poll } = require('./sunspec.poll');
+const { bdpvInit } = require('./bdpv/sunspec.bdpv');
 
 const SunSpecManager = function SunSpecManager(gladys, ModbusTCP, serviceId) {
   this.gladys = gladys;
@@ -26,5 +27,6 @@ SunSpecManager.prototype.scanNetwork = scanNetwork;
 SunSpecManager.prototype.scanDevices = scanDevices;
 SunSpecManager.prototype.updateConfiguration = updateConfiguration;
 SunSpecManager.prototype.poll = poll;
+SunSpecManager.prototype.bdpvInit = bdpvInit;
 
 module.exports = SunSpecManager;

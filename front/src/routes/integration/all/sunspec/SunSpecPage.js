@@ -43,7 +43,7 @@ const SunSpecPage = ({ children }) => (
                     <span class="icon mr-3">
                       <i class="fe fe-settings" />
                     </span>
-                    <Text id="integration.sunspec.setupTab" />
+                    <Text id="integration.sunspec.settingsTab" />
                   </Link>
                 </div>
               </div>

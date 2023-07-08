@@ -16,6 +16,8 @@ module.exports = function SunSpecService(gladys, serviceId) {
   async function start() {
     logger.log('Starting SunSpec service');
     await sunspecManager.connect();
+    const configuration = await sunspecManager.getConfiguration();
+    await sunspecManager.bdpvInit(configuration.bdpvActive);
   }
 
   /**

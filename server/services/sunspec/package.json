@@ -15,6 +15,8 @@
   ],
   "scripts": {},
   "dependencies": {
-    "modbus-serial": "^8.0.11"
+    "axios": "^1.4.0",
+    "modbus-serial": "^8.0.11",
+    "node-cron": "^3.0.2"
   }
 }
