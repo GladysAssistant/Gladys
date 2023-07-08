@@ -61,7 +61,7 @@ class ZwaveNode extends Component {
             )}
             <div class="card-options">
               <span class="tag">
-                <Text id="integration.zwavejsui.discover.nodeId" /> {props.node.params.id}
+                <Text id="integration.zwavejsui.discover.nodeId" /> {props.node.params.find(param => param.name === PARAMS.NODE_ID).value}
               </span>
             </div>
           </div>
