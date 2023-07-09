@@ -20,7 +20,9 @@ const gladys = {
   http: {},
 };
 
-const axios = {};
+const axios = {
+  request: fake.resolves({}),
+};
 
 describe('NextcloudTalk.message', () => {
   const messageHandler = new MessageHandler(gladys, 'a03a5e92-236a-4465-9bd5-530247d76959', axios);
