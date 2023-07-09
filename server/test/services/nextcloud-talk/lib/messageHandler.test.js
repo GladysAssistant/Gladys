@@ -35,8 +35,7 @@ describe('NextcloudTalk.message', () => {
     gladys.variable.getValue.resolves('test-value');
     axios.request = stub()
       .onCall(0)
-      .resolves({ status: 404 });
-    axios.request = stub()
+      .resolves({ status: 404 })
       .onCall(1)
       .rejects();
     axios.request.resolves({});
