@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { fake, useFakeTimers, spy } = require('sinon');
+const { fake, useFakeTimers, spy, stub } = require('sinon');
 const MessageHandler = require('../../../../services/nextcloud-talk/lib');
 const { EVENTS } = require('../../../../utils/constants');
 
@@ -14,13 +14,13 @@ const gladys = {
     emit: fake.resolves(null),
   },
   variable: {
-    getValue: fake.resolves('test-value'),
+    getValue: stub().resolves('test-value'),
   },
   http: {},
 };
 
 const axios = {
-  request: fake.resolves({}),
+  request: stub().resolves({}),
 };
 
 describe('NextcloudTalk.message', () => {
@@ -29,14 +29,28 @@ describe('NextcloudTalk.message', () => {
     messageHandler.bots = {
       '30385cbf-b9ff-4239-a6bb-35477ca3eea6': {},
     };
+    gladys.variable.getValue = stub()
+      .onCall(0)
+      .resolves(null);
+    gladys.variable.getValue.resolves('test-value');
+    axios.request = stub()
+      .onCall(0)
+      .resolves({ status: 404 });
+    axios.request = stub()
+      .onCall(1)
+      .rejects();
+    axios.request.resolves({});
     await messageHandler.connect([
+      { value: 'testTokenNoURL', user_id: 'ecae21a5-76c5-4820-8a1e-31f567ab517f' },
+      { value: 'testTokenWrongStatus', user_id: 'de996034-ddcd-4058-9e6e-ff6839c2a1ec' },
+      { value: 'testTokenErrorRequest', user_id: 'ab477b0e-8426-433f-972d-4a29bc471043' },
       { value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' },
       { value: '', user_id: '44ea8fd1-c7c3-4e03-acff-3b102b23188d' },
     ]);
     expect(messageHandler.bots['30385cbf-b9ff-4239-a6bb-35477ca3eea6'].token).eq('testToken1');
   });
   it('should poll once', async () => {
-    axios.request = fake.resolves({
+    axios.request.resolves({
       headers: {
         'x-chat-last-given': 1,
       },
@@ -62,7 +76,7 @@ describe('NextcloudTalk.message', () => {
   it('should poll failed due to status', async () => {
     const clock = useFakeTimers();
     const setTimeoutSpy = spy(clock, 'setTimeout');
-    axios.request = fake.resolves({
+    axios.request.resolves({
       status: 404,
     });
     const emit = fake.resolves(null);
@@ -82,7 +96,7 @@ describe('NextcloudTalk.message', () => {
   it('should poll failed due to error on request', async () => {
     const clock = useFakeTimers();
     const setTimeoutSpy = spy(clock, 'setTimeout');
-    axios.request = fake.rejects({});
+    axios.request.rejects({});
     const emit = fake.resolves(null);
     messageHandler.bots.user2 = {
       token: 'testToken2',
@@ -139,5 +153,13 @@ describe('NextcloudTalk.message', () => {
       file: 'abase64fiulessdfdksjfksdljflskjfklsjflksjfldksjlkjfkjklj',
     });
     expect(gladys.http.request.callCount).eq(3);
+  });
+  it('should not send message if wrong configuration', async () => {
+    gladys.http.request = fake.resolves({});
+    gladys.variable.getValue.resolves(null);
+    await messageHandler.send('testToken1', {
+      text: 'Hey',
+    });
+    expect(gladys.http.request.callCount).eq(0);
   });
 });
