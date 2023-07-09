@@ -1,6 +1,5 @@
 const { expect } = require('chai');
-const { fake } = require('sinon');
-
+const { fake, useFakeTimers, spy } = require('sinon');
 const MessageHandler = require('../../../../services/nextcloud-talk/lib');
 const { EVENTS } = require('../../../../utils/constants');
 
@@ -30,7 +29,10 @@ describe('NextcloudTalk.message', () => {
     messageHandler.bots = {
       '30385cbf-b9ff-4239-a6bb-35477ca3eea6': {},
     };
-    await messageHandler.connect([{ value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' }]);
+    await messageHandler.connect([
+      { value: 'testToken1', user_id: '30385cbf-b9ff-4239-a6bb-35477ca3eea6' },
+      { value: '', user_id: '44ea8fd1-c7c3-4e03-acff-3b102b23188d' },
+    ]);
     expect(messageHandler.bots['30385cbf-b9ff-4239-a6bb-35477ca3eea6'].token).eq('testToken1');
   });
   it('should poll once', async () => {
@@ -56,6 +58,44 @@ describe('NextcloudTalk.message', () => {
     await messageHandler.poll('user2');
     expect(emit.args[0][0]).eq('message');
     expect(emit.args[0][1]).eql({ id: 2, actorId: 'userbot' });
+  });
+  it('should poll failed due to status', async () => {
+    const clock = useFakeTimers();
+    const setTimeoutSpy = spy(clock, 'setTimeout');
+    axios.request = fake.resolves({
+      status: 404,
+    });
+    const emit = fake.resolves(null);
+    messageHandler.bots.user2 = {
+      token: 'testToken2',
+      lastKnownMessageId: 2,
+      isPolling: true,
+      eventEmitter: {
+        emit,
+      },
+    };
+    await messageHandler.poll('user2');
+    expect(setTimeoutSpy.args[0][1]).eq(15000);
+    expect(emit.callCount).eq(0);
+    clock.restore();
+  });
+  it('should poll failed due to error on request', async () => {
+    const clock = useFakeTimers();
+    const setTimeoutSpy = spy(clock, 'setTimeout');
+    axios.request = fake.rejects({});
+    const emit = fake.resolves(null);
+    messageHandler.bots.user2 = {
+      token: 'testToken2',
+      lastKnownMessageId: 2,
+      isPolling: true,
+      eventEmitter: {
+        emit,
+      },
+    };
+    await messageHandler.poll('user2');
+    expect(setTimeoutSpy.args[0][1]).eq(15000);
+    expect(emit.callCount).eq(0);
+    clock.restore();
   });
   it('should stop polling', async () => {
     messageHandler.bots.user3 = {
