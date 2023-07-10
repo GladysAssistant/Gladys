@@ -40,7 +40,7 @@ function getNodes({ orderDir, search } = {}) {
   // transform object in array
   const nodes = nodeIds
     .map((nodeId) => this.nodes[nodeId])
-    .filter((node) => node.ready)
+    // .filter((node) => node.ready)
     .flatMap((node) => splitNode(node));
   return nodes
     .filter((node) =>

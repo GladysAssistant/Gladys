@@ -72,7 +72,7 @@ function valueAdded(zwaveNode, args) {
     property: fullProperty,
   });
 
-  if (node.ready) {
+  // if (node.ready) {
     const deviceFeatureExternalId = getDeviceFeatureExternalId({
       nodeId,
       commandClass,
@@ -98,7 +98,7 @@ function valueAdded(zwaveNode, args) {
         device_feature_external_id: deviceFeatureExternalId,
       });
     }
-  }
+  // }
 }
 
 module.exports = {

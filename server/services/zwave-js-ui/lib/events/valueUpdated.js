@@ -36,7 +36,7 @@ function valueUpdated(zwaveNode, args) {
     `Value Updated: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${node.classes[commandClass][endpoint][fullProperty].value} > ${newValueUnbind}`,
   );
 
-  if (node.ready) {
+  // if (node.ready) {
     node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
     const deviceFeatureExternalId = getDeviceFeatureExternalId({
       nodeId,
@@ -51,7 +51,7 @@ function valueUpdated(zwaveNode, args) {
         state: newValueUnbind,
       });
     }
-  }
+  // }
 }
 
 module.exports = {

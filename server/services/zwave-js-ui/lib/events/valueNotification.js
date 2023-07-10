@@ -36,7 +36,7 @@ function valueNotification(zwaveNode, args) {
     `Value Notification: nodeId = ${nodeId} (Ready: ${node.ready}), comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${valueUnbind}`,
   );
 
-  if (node.ready) {
+  // if (node.ready) {
     node.classes[commandClass][endpoint || 0][fullProperty].value = valueUnbind;
     let deviceFeatureExternalId;
     if (commandClass === COMMAND_CLASSES.COMMAND_CLASS_SCENE_ACTIVATION) {
@@ -61,7 +61,7 @@ function valueNotification(zwaveNode, args) {
         state: valueUnbind,
       });
     }
-  }
+  // }
 }
 
 module.exports = {
