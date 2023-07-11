@@ -145,7 +145,7 @@ import MELCloudSetupPage from '../routes/integration/all/melcloud/setup-page';
 import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-page';
 
 // NodeRed integration
-import NodeRedPage from "../routes/integration/all/node-red/setup-page";
+import NodeRedPage from '../routes/integration/all/node-red/setup-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);

@@ -44,8 +44,6 @@ async function init() {
   }
 
   await this.saveConfiguration(configuration);
-
-  return null;
 }
 
 module.exports = {
