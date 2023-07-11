@@ -20,6 +20,7 @@ async function configureContainer(config) {
   // Create configuration path (if not exists)
   const configFilepath = path.join(basePathOnHost, DEFAULT.CONFIGURATION_PATH);
   await fs.mkdir(path.dirname(configFilepath), { recursive: true });
+
   // Check if config file not already exists
   let configCreated = false;
   try {

@@ -16,6 +16,11 @@ const sleep = promisify(setTimeout);
  * await nodeRed.installContainer(config);
  */
 async function installContainer(config) {
+  if (!(await this.isEnabled())) {
+    logger.info('Nodered: is not enabled, skipping...');
+    return;
+  }
+
   const dockerBased = await this.gladys.system.isDocker();
   if (!dockerBased) {
     this.dockerBased = false;
@@ -48,6 +53,11 @@ async function installContainer(config) {
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerLog);
+
+      const plop = this.gladys.system.getContainers();
+      logger.info('COUCOUCOUCOU');
+      logger.info(plop);
+
       logger.info('NodeRed: successfully installed and configured as Docker container');
       this.nodeRedExist = true;
     } catch (e) {

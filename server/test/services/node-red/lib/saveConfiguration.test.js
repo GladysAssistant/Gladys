@@ -42,7 +42,7 @@ describe('NodeRed saveConfiguration', () => {
       config.dockerNodeRedVersion,
       serviceId,
     );
-    assert.calledWithExactly(gladys.variable.setValue, 'NODE_RED_URL', 'http://localhost:1881', serviceId);
+    assert.calledWithExactly(gladys.variable.setValue, 'NODE_RED_PORT', '1881', serviceId);
   });
 
   it('should destroy all variables', async () => {

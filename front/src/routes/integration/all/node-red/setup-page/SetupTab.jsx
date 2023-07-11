@@ -6,6 +6,7 @@ import classNames from 'classnames/bind';
 import style from './style.css';
 import get from 'get-value';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
+import config from '../../../../../config';
 
 let cx = classNames.bind(style);
 
@@ -23,11 +24,21 @@ class SetupTab extends Component {
       const nodeRedPasswordVariable = await this.props.httpClient.get(
         '/api/v1/service/node-red/variable/NODE_RED_PASSWORD'
       );
-      const nodeRedUrlVariable = await this.props.httpClient.get('/api/v1/service/node-red/variable/NODE_RED_URL');
+
+      const isGladysPlus = this.props.session.gatewayClient !== undefined;
+      let nodeRedUrl = null;
+
+      if (isGladysPlus === false) {
+        const nodeRedPortVariable = await this.props.httpClient.get('/api/v1/service/node-red/variable/NODE_RED_PORT');
+
+        const url = new URL(config.localApiUrl);
+        nodeRedUrl = `${url.protocol}//${url.hostname}:${nodeRedPortVariable.value}`;
+      }
+
       this.setState({
         nodeRedUsername: nodeRedUsernameVariable.value,
         nodeRedPassword: nodeRedPasswordVariable.value,
-        nodeRedUrl: nodeRedUrlVariable.value
+        nodeRedUrl
       });
     } catch (e) {
       // Variable is not set yet
@@ -88,6 +99,10 @@ class SetupTab extends Component {
   };
 
   stopContainer = async () => {
+    await this.props.httpClient.post('/api/v1/service/node-red/variable/NODERED_ENABLED', {
+      value: false
+    });
+
     let error = false;
     try {
       await this.props.httpClient.post('/api/v1/service/node-red/disconnect');
@@ -225,14 +240,16 @@ class SetupTab extends Component {
               </div>
 
               <div class="form-group">
-                <label htmlFor="nodeRedUrl" className="form-label">
-                  <MarkupText
-                    id={`integration.nodeRed.setup.urlLabel`}
-                    fields={{
-                      nodeRedUrl
-                    }}
-                  />
-                </label>
+                {nodeRedUrl && (
+                  <label htmlFor="nodeRedUrl" className="form-label">
+                    <MarkupText
+                      id={`integration.nodeRed.setup.urlLabel`}
+                      fields={{
+                        nodeRedUrl
+                      }}
+                    />
+                  </label>
+                )}
               </div>
             </div>
           )}

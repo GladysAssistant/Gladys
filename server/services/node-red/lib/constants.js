@@ -1,10 +1,10 @@
 const CONFIGURATION = {
   NODE_RED_USERNAME_VALUE: 'admin',
-  NODE_RED_URL_VALUE: 'http://localhost:1881',
+  NODE_RED_PORT_VALUE: '1881',
 
   NODE_RED_USERNAME: 'NODE_RED_USERNAME',
   NODE_RED_PASSWORD: 'NODE_RED_PASSWORD',
-  NODE_RED_URL: 'NODE_RED_URL',
+  NODE_RED_PORT: 'NODE_RED_PORT',
 
   DOCKER_NODE_RED_VERSION: 'DOCKER_NODE_RED_VERSION', // Variable to identify last version of NodeRed docker file is installed
 };

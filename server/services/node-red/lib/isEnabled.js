@@ -2,10 +2,14 @@
  * @description Checks if Node-red is ready to use.
  * @returns {boolean} Is the Node-red environment ready to use?
  * @example
- * nodeRed.isEnabled();
+ * await nodeRed.isEnabled();
  */
-function isEnabled() {
-  return this.nodeRedRunning;
+async function isEnabled() {
+  const nodeRedEnabled = await this.gladys.variable.getValue('NODERED_ENABLED', this.serviceId);
+  if (nodeRedEnabled === '1') {
+    return true;
+  }
+  return false;
 }
 
 module.exports = {

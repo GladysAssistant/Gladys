@@ -4,8 +4,8 @@
  * @example
  * status();
  */
-function status() {
-  const nodeRedEnabled = this.isEnabled();
+async function status() {
+  const nodeRedEnabled = await this.isEnabled();
   const nodeRedStatus = {
     nodeRedExist: this.nodeRedExist,
     nodeRedRunning: this.nodeRedRunning,
