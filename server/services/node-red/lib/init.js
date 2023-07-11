@@ -15,13 +15,13 @@ async function init() {
     return;
   }
 
-  const dockerBased = (await this.gladys.system.isDocker()) || true;
+  const dockerBased = await this.gladys.system.isDocker();
   if (!dockerBased) {
     this.dockerBased = false;
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
 
-  const networkMode = (await this.gladys.system.getNetworkMode()) || 'host';
+  const networkMode = await this.gladys.system.getNetworkMode();
   if (networkMode !== 'host') {
     this.networkModeValid = false;
     throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');

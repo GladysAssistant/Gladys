@@ -1,8 +1,13 @@
 const { expect } = require('chai');
+const { fake } = require('sinon');
 
 const NodeRedManager = require('../../../../services/node-red/lib');
 
-const gladys = {};
+const gladys = {
+  variable: {
+    getValue: fake.resolves('1'),
+  },
+};
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 describe('NodeRed status', () => {

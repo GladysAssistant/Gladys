@@ -33,6 +33,9 @@ describe('NodeRed init', () => {
         getNetworkMode: fake.resolves('host'),
         restartContainer: fake.resolves(true),
       },
+      variable: {
+        getValue: fake.resolves('1'),
+      },
     };
 
     nodeRedManager = new NodeRedManager(gladys, {}, serviceId);
@@ -116,5 +119,16 @@ describe('NodeRed init', () => {
     assert.calledWithMatch(nodeRedManager.checkForContainerUpdates, sinon.match(expectedNewConfig));
     assert.calledOnce(nodeRedManager.installContainer);
     assert.calledWithMatch(nodeRedManager.installContainer, sinon.match(expectedNewConfig));
+  });
+
+  it('should not init if the service is not enabled', async () => {
+    gladys.variable.getValue = fake.resolves('0');
+
+    await nodeRedManager.init();
+
+    assert.notCalled(nodeRedManager.getConfiguration);
+    assert.notCalled(nodeRedManager.saveConfiguration);
+    assert.notCalled(nodeRedManager.checkForContainerUpdates);
+    assert.notCalled(nodeRedManager.installContainer);
   });
 });

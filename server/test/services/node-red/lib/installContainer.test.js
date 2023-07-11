@@ -45,6 +45,9 @@ describe('NodeRed installContainer', () => {
           basePathOnContainer: TEMP_GLADYS_FOLDER,
         }),
       },
+      variable: {
+        getValue: fake.resolves('1'),
+      },
     };
 
     nodeRedManager = new NodeRedManager(gladys, serviceId);
@@ -193,6 +196,19 @@ describe('NodeRed installContainer', () => {
     }
 
     expect(nodeRedManager.networkModeValid).to.equal(false);
+    expect(nodeRedManager.nodeRedRunning).to.equal(false);
+    expect(nodeRedManager.nodeRedExist).to.equal(false);
+  });
+
+  it('should not create container if the service is not enabled', async () => {
+    gladys.variable.getValue = fake.resolves('0');
+
+    await nodeRedManager.installContainer(config);
+
+    assert.notCalled(gladys.system.pull);
+    assert.notCalled(gladys.system.createContainer);
+    assert.notCalled(gladys.system.restartContainer);
+
     expect(nodeRedManager.nodeRedRunning).to.equal(false);
     expect(nodeRedManager.nodeRedExist).to.equal(false);
   });

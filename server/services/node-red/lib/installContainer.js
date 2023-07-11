@@ -54,10 +54,6 @@ async function installContainer(config) {
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerLog);
 
-      const plop = this.gladys.system.getContainers();
-      logger.info('COUCOUCOUCOU');
-      logger.info(plop);
-
       logger.info('NodeRed: successfully installed and configured as Docker container');
       this.nodeRedExist = true;
     } catch (e) {
