@@ -1,7 +1,7 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
-const { STATUS } = require('../../../services/tuya/lib/utils/tuya.constants');
 const proxyquire = require('proxyquire').noCallThru();
+const { STATUS } = require('../../../services/tuya/lib/utils/tuya.constants');
 
 const { assert, fake } = sinon;
 
