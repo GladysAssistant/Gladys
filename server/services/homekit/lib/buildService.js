@@ -62,8 +62,8 @@ function buildService(device, features, categoryMapping) {
               updatedFeatures.find((feat) => feat.id === feature.id).last_value,
               feature.min,
               feature.max,
-              0,
-              100,
+              brightnessCharacteristic.props.minValue,
+              brightnessCharacteristic.props.maxValue,
             ),
           );
         });
@@ -71,7 +71,15 @@ function buildService(device, features, categoryMapping) {
           const action = {
             type: ACTIONS.DEVICE.SET_VALUE,
             status: ACTIONS_STATUS.PENDING,
-            value: normalize(value, 0, 100, feature.min, feature.max),
+            value: Math.round(
+              normalize(
+                value,
+                brightnessCharacteristic.props.minValue,
+                brightnessCharacteristic.props.maxValue,
+                feature.min,
+                feature.max,
+              ),
+            ),
             device: device.selector,
             feature_category: feature.category,
             feature_type: feature.type,
@@ -145,8 +153,8 @@ function buildService(device, features, categoryMapping) {
               updatedFeatures.find((feat) => feat.id === feature.id).last_value,
               feature.min,
               feature.max,
-              140,
-              500,
+              temperatureCharacteristic.props.minValue,
+              temperatureCharacteristic.props.maxValue,
             ),
           );
         });
@@ -154,7 +162,15 @@ function buildService(device, features, categoryMapping) {
           const action = {
             type: ACTIONS.DEVICE.SET_VALUE,
             status: ACTIONS_STATUS.PENDING,
-            value: normalize(value, 140, 500, feature.min, feature.max),
+            value: Math.round(
+              normalize(
+                value,
+                temperatureCharacteristic.props.minValue,
+                temperatureCharacteristic.props.maxValue,
+                feature.min,
+                feature.max,
+              ),
+            ),
             device: device.selector,
             feature_category: feature.category,
             feature_type: feature.type,
@@ -187,6 +203,33 @@ function buildService(device, features, categoryMapping) {
         contactCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
           callback(undefined, +!updatedFeatures.find((feat) => feat.id === feature.id).last_value);
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+        const leakCharacteristic = service.getCharacteristic(Characteristic.LeakDetected);
+
+        leakCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
+          callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
+        });
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
+        const humidityCharacteristic = service.getCharacteristic(Characteristic.CurrentRelativeHumidity);
+
+        humidityCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
+          callback(
+            undefined,
+            normalize(
+              updatedFeatures.find((feat) => feat.id === feature.id).last_value,
+              feature.min,
+              feature.max,
+              humidityCharacteristic.props.minValue,
+              humidityCharacteristic.props.maxValue,
+            ),
+          );
         });
         break;
       }
