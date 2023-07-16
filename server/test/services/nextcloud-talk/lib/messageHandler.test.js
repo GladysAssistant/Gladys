@@ -29,8 +29,8 @@ describe('NextcloudTalk.message', () => {
     messageHandler.bots = {
       '30385cbf-b9ff-4239-a6bb-35477ca3eea6': {
         eventEmitter: {
-          removeListener: stub().resolves()
-        }
+          removeListener: stub().resolves(),
+        },
       },
     };
     gladys.variable.getValue = stub()
@@ -119,8 +119,8 @@ describe('NextcloudTalk.message', () => {
       lastKnownMessageId: 2,
       isPolling: true,
       eventEmitter: {
-        removeListener: stub().resolves()
-      }
+        removeListener: stub().resolves(),
+      },
     };
     await messageHandler.stopPolling('user3');
     expect(messageHandler.bots.user3.isPolling).equal(false);
