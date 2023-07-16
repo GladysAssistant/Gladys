@@ -63,7 +63,7 @@ async function startPolling(userId) {
   }
 
   this.bots[userId].isPolling = true;
-  this.bots[userId].eventEmitter.on('message', this.newMessage.bind(this));
+  this.bots[userId].eventEmitter.on('message', this.newMessageCb);
   this.poll(userId);
 }
 

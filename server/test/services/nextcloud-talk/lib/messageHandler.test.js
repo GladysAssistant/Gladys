@@ -27,7 +27,11 @@ describe('NextcloudTalk.message', () => {
   const messageHandler = new MessageHandler(gladys, 'a03a5e92-236a-4465-9bd5-530247d76959', axios);
   it('should connect', async () => {
     messageHandler.bots = {
-      '30385cbf-b9ff-4239-a6bb-35477ca3eea6': {},
+      '30385cbf-b9ff-4239-a6bb-35477ca3eea6': {
+        eventEmitter: {
+          removeListener: stub().resolves()
+        }
+      },
     };
     gladys.variable.getValue = stub()
       .onCall(0)
@@ -114,6 +118,9 @@ describe('NextcloudTalk.message', () => {
     messageHandler.bots.user3 = {
       lastKnownMessageId: 2,
       isPolling: true,
+      eventEmitter: {
+        removeListener: stub().resolves()
+      }
     };
     await messageHandler.stopPolling('user3');
     expect(messageHandler.bots.user3.isPolling).equal(false);
