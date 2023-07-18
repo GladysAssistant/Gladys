@@ -23,70 +23,96 @@ const sleep = promisify(setTimeout);
  * buildService(device, features, categoryMapping)
  */
 function buildService(device, features, categoryMapping) {
-  const { Characteristic, CharacteristicEventTypes, Service } = this.hap;
+  const { Characteristic, CharacteristicEventTypes, Perms, Service } = this.hap;
 
   const service = new Service[categoryMapping.service](device.name);
 
   features.forEach((feature) => {
     switch (`${feature.category}:${feature.type}`) {
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
-      case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`: {
-        const onCharacteristic = service.getCharacteristic(Characteristic.On);
+      case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
+      case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+        const characteristic = service.getCharacteristic(
+          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
+        );
 
-        onCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+        if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
+          characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+            const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
+            callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
+          });
+        }
+
+        if (characteristic.props.perms.includes(Perms.PAIRED_WRITE)) {
+          characteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: value ? 1 : 0,
+              device: device.selector,
+              feature_category: feature.category,
+              feature_type: feature.type,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          });
+        }
+        break;
+      }
+      case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+        const contactCharacteristic = service.getCharacteristic(Characteristic.ContactSensorState);
+
+        contactCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-          callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
-        });
-        onCharacteristic.on(CharacteristicEventTypes.SET, async (value, callback) => {
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: value ? 1 : 0,
-            device: device.selector,
-            feature_category: feature.category,
-            feature_type: feature.type,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
+          callback(undefined, +!updatedFeatures.find((feat) => feat.id === feature.id).last_value);
         });
         break;
       }
-      case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`: {
-        const brightnessCharacteristic = service.getCharacteristic(Characteristic.Brightness);
+      case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`:
+      case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`:
+      case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
+        const characteristic = service.getCharacteristic(
+          Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
+        );
 
-        brightnessCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-          callback(
-            undefined,
-            normalize(
-              updatedFeatures.find((feat) => feat.id === feature.id).last_value,
-              feature.min,
-              feature.max,
-              brightnessCharacteristic.props.minValue,
-              brightnessCharacteristic.props.maxValue,
-            ),
-          );
-        });
-        brightnessCharacteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: Math.round(
+        if (characteristic.props.perms.includes(Perms.PAIRED_READ)) {
+          characteristic.on(CharacteristicEventTypes.GET, async (callback) => {
+            const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
+            callback(
+              undefined,
               normalize(
-                value,
-                brightnessCharacteristic.props.minValue,
-                brightnessCharacteristic.props.maxValue,
+                updatedFeatures.find((feat) => feat.id === feature.id).last_value,
                 feature.min,
                 feature.max,
+                characteristic.props.minValue,
+                characteristic.props.maxValue,
               ),
-            ),
-            device: device.selector,
-            feature_category: feature.category,
-            feature_type: feature.type,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
-        });
+            );
+          });
+        }
+
+        if (characteristic.props.perms.includes(Perms.PAIRED_WRITE)) {
+          characteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
+            const action = {
+              type: ACTIONS.DEVICE.SET_VALUE,
+              status: ACTIONS_STATUS.PENDING,
+              value: Math.round(
+                normalize(
+                  value,
+                  characteristic.props.minValue,
+                  characteristic.props.maxValue,
+                  feature.min,
+                  feature.max,
+                ),
+              ),
+              device: device.selector,
+              feature_category: feature.category,
+              feature_type: feature.type,
+            };
+            this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
+            callback();
+          });
+        }
         break;
       }
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`: {
@@ -142,44 +168,6 @@ function buildService(device, features, categoryMapping) {
         });
         break;
       }
-      case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`: {
-        const temperatureCharacteristic = service.getCharacteristic(Characteristic.ColorTemperature);
-
-        temperatureCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-          callback(
-            undefined,
-            normalize(
-              updatedFeatures.find((feat) => feat.id === feature.id).last_value,
-              feature.min,
-              feature.max,
-              temperatureCharacteristic.props.minValue,
-              temperatureCharacteristic.props.maxValue,
-            ),
-          );
-        });
-        temperatureCharacteristic.on(CharacteristicEventTypes.SET, (value, callback) => {
-          const action = {
-            type: ACTIONS.DEVICE.SET_VALUE,
-            status: ACTIONS_STATUS.PENDING,
-            value: Math.round(
-              normalize(
-                value,
-                temperatureCharacteristic.props.minValue,
-                temperatureCharacteristic.props.maxValue,
-                feature.min,
-                feature.max,
-              ),
-            ),
-            device: device.selector,
-            feature_category: feature.category,
-            feature_type: feature.type,
-          };
-          this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
-          callback();
-        });
-        break;
-      }
       case `${DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
         const currentTemperatureCharacteristic = service.getCharacteristic(Characteristic.CurrentTemperature);
 
@@ -194,42 +182,6 @@ function buildService(device, features, categoryMapping) {
           }
 
           callback(undefined, currentTemp);
-        });
-        break;
-      }
-      case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
-        const contactCharacteristic = service.getCharacteristic(Characteristic.ContactSensorState);
-
-        contactCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-          callback(undefined, +!updatedFeatures.find((feat) => feat.id === feature.id).last_value);
-        });
-        break;
-      }
-      case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
-        const leakCharacteristic = service.getCharacteristic(Characteristic.LeakDetected);
-
-        leakCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-          callback(undefined, updatedFeatures.find((feat) => feat.id === feature.id).last_value);
-        });
-        break;
-      }
-      case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
-        const humidityCharacteristic = service.getCharacteristic(Characteristic.CurrentRelativeHumidity);
-
-        humidityCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-          callback(
-            undefined,
-            normalize(
-              updatedFeatures.find((feat) => feat.id === feature.id).last_value,
-              feature.min,
-              feature.max,
-              humidityCharacteristic.props.minValue,
-              humidityCharacteristic.props.maxValue,
-            ),
-          );
         });
         break;
       }
