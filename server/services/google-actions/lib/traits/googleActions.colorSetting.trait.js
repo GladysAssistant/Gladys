@@ -22,8 +22,8 @@ const colorSettingTrait = {
     );
     if (hasColorTemp) {
       result.colorTemperatureRange = {
-        temperatureMinK: 2000,
-        temperatureMaxK: 9000,
+        temperatureMinK: Math.round(miredToKelvin(hasColorTemp.min)),
+        temperatureMaxK: Math.round(miredToKelvin(hasColorTemp.max)),
       };
     }
 
