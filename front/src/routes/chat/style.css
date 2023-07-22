@@ -167,7 +167,7 @@
 }
 
 .msg_history {
-  height: 356px;
+  height: 60vh;
   overflow-y: auto;
 }
 

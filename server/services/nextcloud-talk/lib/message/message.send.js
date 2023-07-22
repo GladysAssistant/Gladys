@@ -28,6 +28,11 @@ async function send(token, message) {
     userBot.userId,
   );
 
+  if (!NEXTCLOUD_URL || !NEXTCLOUD_BOT_USERNAME || !NEXTCLOUD_BOT_PASSWORD) {
+    logger.debug(`Missing correct config for Netxcloud Talk with token = ${token}.`);
+    return;
+  }
+
   const headers = {
     Authorization: `Basic ${Buffer.from(`${NEXTCLOUD_BOT_USERNAME}:${NEXTCLOUD_BOT_PASSWORD}`).toString('base64')}`,
     Accept: 'application/json',
