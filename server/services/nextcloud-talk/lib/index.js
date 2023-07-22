@@ -5,6 +5,7 @@ const { disconnect } = require('./message/message.disconnect');
 const { startPolling } = require('./bot/bot.startPolling');
 const { stopPolling } = require('./bot/bot.stopPolling');
 const { poll } = require('./bot/bot.poll');
+const { eventFunctionWrapper } = require('../../../utils/functionsWrapper');
 
 /**
  * @description Add ability to send/receive Nextcloud Talk message.
@@ -19,6 +20,7 @@ const MessageHandler = function MessageHandler(gladys, serviceId, axios) {
   this.serviceId = serviceId;
   this.axios = axios;
   this.bots = {};
+  this.newMessageCb = eventFunctionWrapper(newMessage.bind(this));
 };
 
 MessageHandler.prototype.connect = connect;
