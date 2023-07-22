@@ -161,6 +161,26 @@ function xyToInt(x, y) {
   return (red << 16) | (green << 8) | blue;
 }
 
+/**
+ * @description Convert mired to kelvin.
+ * @param {number} mired - Color temperature in mired.
+ * @returns {number} Returns color in kelvin.
+ * @example miredToKelvin(300);
+ */
+function miredToKelvin(mired) {
+  return 1e6 / mired;
+}
+
+/**
+ * @description Convert kelvin to mired.
+ * @param {number} kelvin - Color temperature in kelvin.
+ * @returns {number} Returns color in mired.
+ * @example kelvinToMired(5000);
+ */
+function kelvinToMired(kelvin) {
+  return 1e6 / kelvin;
+}
+
 module.exports = {
   intToRgb,
   rgbToInt,
@@ -169,4 +189,6 @@ module.exports = {
   xyToInt,
   hsbToRgb,
   rgbToHsb,
+  miredToKelvin,
+  kelvinToMired,
 };
