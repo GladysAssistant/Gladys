@@ -1,0 +1,20 @@
+{
+  "name": "radio",
+  "main": "index.js",
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm",
+    "arm64"
+  ],
+  "scripts": {},
+  "dependencies": {
+    "@flat/lame": "^1.2.6",
+    "node-internet-radio": "^0.2.1",
+    "radio-browser": "^2.2.3"
+  }
+}

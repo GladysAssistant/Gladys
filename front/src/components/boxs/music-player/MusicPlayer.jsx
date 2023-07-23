@@ -73,6 +73,7 @@ class MusicPlayerComponent extends Component {
   };
   play = async () => {
     if (!this.playing) {
+      console.log(this.state.selectedPlaylist);
       await this.props.httpClient.get(
         `/api/v1/service/${this.state.selectedProvider.value}/play/default/${this.state.selectedPlaylist.value}/${this.volumeRef.current.value}`
       );

@@ -85,6 +85,7 @@ import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
 import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
 import MusicFilePage from '../routes/integration/all/music-file';
+import RadioPage from '../routes/integration/all/radio';
 
 // Deprecated integration
 import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
@@ -257,6 +258,7 @@ const AppRouter = connect(
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
         <OpenAIPage path="/dashboard/integration/communication/openai" />
         <MusicFilePage path="/dashboard/integration/music/musicfile" />
+        <RadioPage path="/dashboard/integration/music/radio" />
 
         <TuyaPage path="/dashboard/integration/device/tuya" />
         <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />

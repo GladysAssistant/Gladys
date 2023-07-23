@@ -809,6 +809,19 @@
       "enableProvider": "Enable music file provider.",
       "enableReadSubFolder": "Enable read sub folder."
     },
+    "radio": {
+      "title": "Radio",
+      "documentation": "Radio documentation",
+      "radioBrowserOfficialWebSite": "RadioBrowser official website",
+      "settings": "Settings",
+      "description": "Play radio stream.",
+      "introduction": "This integration allows settings of radio stream in Gladys.<br/>This integration use <a href=\"https://www.radio-browser.info/\"> RadioBrowser </a> to list radio stations by country (only radio stream in mp3 formatare supported).",
+      "defaultCountry": "Choose country:",
+      "defaultStation": "Choose default ratio to use:",
+      "saveButton": "Save",
+      "instructionsToUse": "To use this integration, go to the dashboard and create a music box.",
+      "enableProvider": "Enable radio provider."
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connect to a local or remote MQTT server",

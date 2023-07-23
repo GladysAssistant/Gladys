@@ -936,6 +936,19 @@
       "enableProvider": "Activer le provider de musique par fichier.",
       "enableReadSubFolder": "Activer la lecture des sous dossiers."
     },
+    "radio": {
+      "title": "Radio",
+      "documentation": "Documentation radio",
+      "radioBrowserOfficialWebSite": "RadioBrowser site officiel",
+      "settings": "Configuration",
+      "description": "Lecture d'un flux radio.",
+      "introduction": "Cette intégration permet de configurer la lecture d'un flux radio dans Gladys.<br/>L'intégration utilise <a href=\"https://www.radio-browser.info/\"> RadioBrowser </a> pour lister les stations par pays (seul les flux radio au format mp3 sont supportées).",
+      "defaultCountry": "Veuillez saisir le pays:",
+      "defaultStation": "Veuillez choisir la radio utilisé par defaut:",
+      "saveButton": "Sauvegarder",
+      "instructionsToUse": "Pour utiliser cette intégration, ajouter une box musique au dashboard.",
+      "enableProvider": "Activer le provider radio."
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connexion à un serveur MQTT, en local ou en distant.",

@@ -2,5 +2,9 @@
   {
     "key": "musicFile",
     "img": "/assets/integrations/cover/music-file.jpg"
+  },
+  {
+    "key": "radio",
+    "img": "/assets/integrations/cover/radio.jpg"
   }
 ]
