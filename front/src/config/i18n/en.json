@@ -214,6 +214,7 @@
       "devices-in-room": "Devices in room",
       "devices": "Devices",
       "chart": "Chart",
+      "music-player": "Music player",
       "ecowatt": "Ecowatt (France)",
       "clock": "Clock"
     },
@@ -251,6 +252,10 @@
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
         "noTemperatureRecorded": "No temperature recorded recently."
+      },
+      "musicPlayer": {
+        "editProviderLabel": "Select the service you want for get sound.",
+        "editPlaylistLabel": "Choose the playlist to use."
       },
       "humidityInRoom": {
         "editRoomLabel": "Select the room you want to display here.",

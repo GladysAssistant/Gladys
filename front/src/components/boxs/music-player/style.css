@@ -1,0 +1,154 @@
+.dropdownProvider {
+  position: absolute;
+  cursor: pointer;
+  top: 100%;
+  z-index: 1000;
+  display: none;
+  min-width: 2rem;
+  padding: 0.25rem 0;
+  margin: 0;
+  font-size: 0.875rem;
+  color: #232e3c;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(101, 109, 119, 0.16);
+  border-radius: 4px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin: 0 !important;
+}
+
+.dropdownPlaylist {
+  position: absolute;
+  cursor: pointer;
+  top: 100%;
+  z-index: 1000;
+  display: none;
+  min-width: 10rem;
+  padding: 0.25rem 0;
+  margin: 0;
+  font-size: 0.875rem;
+  color: #232e3c;
+  text-align: left;
+  list-style: none;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(101, 109, 119, 0.16);
+  border-radius: 4px;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  margin: 0 !important;
+  overflow: auto;
+  max-height: 25rem;
+}
+
+.dropdownItemProvider {
+  min-width:2rem;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  line-height: 1.4285714;
+  display: block;
+  width: 100%;
+  padding: 0.25rem 0.25rem;
+  clear: both;
+  font-weight: 400;
+  color: inherit;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  text-decoration: none;
+}
+
+.dropdownItemPlaylist {
+  min-width:11rem;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  line-height: 1.4285714;
+  display: block;
+  width: 100%;
+  padding: 0.25rem 0.25rem;
+  clear: both;
+  font-weight: 400;
+  color: inherit;
+  text-align: inherit;
+  white-space: nowrap;
+  background-color: transparent;
+  border: 0;
+  text-decoration: none;
+}
+
+.dropdownItemProvider:focus,
+.dropdownItemProvider:hover {
+  color: inherit;
+  text-decoration: none;
+  background-color: rgba(101, 109, 119, 0.06);
+}
+
+.dropdownItemPlaylist:focus,
+.dropdownItemPlaylist:hover {
+  color: inherit;
+  text-decoration: none;
+  background-color: rgba(101, 109, 119, 0.06);
+}
+
+.show {
+  display: block;
+  position: absolute;
+  inset: 0px auto auto 0px;
+  margin: 0px;
+  transform: translate3d(0px, 25px, 0px);
+}
+
+.dropdownItemProvider.active,
+.dropdownItemProvider:active {
+  color: #206bc4;
+  text-decoration: none;
+  background-color: rgba(32, 107, 196, 0.06);
+}
+
+.dropdownItemPlaylist.active,
+.dropdownItemPlaylist:active {
+  color: #206bc4;
+  text-decoration: none;
+  background-color: rgba(32, 107, 196, 0.06);
+}
+
+.dropdownSelectPlaylist {
+  max-width: 60%; 
+  padding-left: 0.5rem;
+}
+
+.dropdownSelectProvider {
+  max-width: 15%
+}
+
+.metadataBox{
+  position: relative;
+}
+
+.imgMusic {
+  height: 20vh;
+}
+
+.metadataMusic{
+  position: absolute; 
+  bottom: 0; 
+  opacity: 0.70; 
+  background-color: grey; 
+  color: #83E7FF;
+}
+
+.buttonBar {
+  justify-content: space-between;
+}

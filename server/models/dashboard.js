@@ -23,6 +23,8 @@ const boxesSchema = Joi.array().items(
       display_variation: Joi.boolean(),
       chart_type: Joi.string(),
       users: Joi.array().items(Joi.string()),
+      provider: Joi.string(),
+      playlist: Joi.string(),
       clock_type: Joi.string(),
       clock_display_second: Joi.boolean(),
       camera_latency: Joi.string(),

@@ -214,6 +214,7 @@
       "devices-in-room": "Appareils de la pièce",
       "devices": "Appareils",
       "chart": "Graphique",
+      "music-player": "Lecteur musique",
       "ecowatt": "Ecowatt ( France )",
       "clock": "Horloge"
     },
@@ -251,6 +252,10 @@
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "noTemperatureRecorded": "Aucune température enregistrée récemment."
+      },
+      "musicPlayer": {
+        "editProviderLabel": "Sélectionnez le service que vous souhaitez utiliser.",
+        "editPlaylistLabel": "Choisissez une playlist."
       },
       "humidityInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",

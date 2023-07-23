@@ -6,6 +6,7 @@ import EditAtHomeBox from '../../../components/boxs/user-presence/EditUserPresen
 import EditDevicesInRoom from '../../../components/boxs/device-in-room/EditDeviceInRoom';
 import EditDevices from '../../../components/boxs/device-in-room/EditDevices';
 import EditChart from '../../../components/boxs/chart/EditChart';
+import EditMusicPlayer from '../../../components/boxs/music-player/EditMusicPlayer';
 import EditEcowatt from '../../../components/boxs/ecowatt/EditEcowatt';
 import EditClock from '../../../components/boxs/clock/EditClock';
 
@@ -29,6 +30,8 @@ const Box = ({ children, ...props }) => {
       return <EditDevices {...props} />;
     case 'chart':
       return <EditChart {...props} />;
+    case 'music-player':
+      return <EditMusicPlayer {...props} />;
     case 'ecowatt':
       return <EditEcowatt {...props} />;
     case 'clock':

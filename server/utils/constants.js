@@ -886,6 +886,7 @@ const DASHBOARD_BOX_TYPE = {
   DEVICES_IN_ROOM: 'devices-in-room',
   DEVICES: 'devices',
   CHART: 'chart',
+  MUSIC_PLAYER: 'music-player',
   ECOWATT: 'ecowatt',
   CLOCK: 'clock',
 };
