@@ -15,11 +15,6 @@ const isSwitchFeature = (feature, featureSelectors) => {
   );
 };
 
-const changeAllLightsStatusRoom = (props, roomLightStatus) => () => {
-  const newStatus = roomLightStatus === 1 ? 0 : 1;
-  props.changeAllLightsStatusRoom(props.x, props.y, newStatus);
-};
-
 const DeviceCard = ({ children, ...props }) => {
   const { boxTitle, roomLightStatus, loading, deviceFeatures = [], box = {} } = props;
   const { device_features: featureSelectors = [] } = box;
@@ -39,7 +34,7 @@ const DeviceCard = ({ children, ...props }) => {
                 value="1"
                 class="custom-switch-input"
                 checked={roomLightStatus === 1}
-                onClick={changeAllLightsStatusRoom(props, roomLightStatus)}
+                onClick={props.changeAllLightsStatusRoom}
               />
               <span class="custom-switch-indicator" />
             </label>

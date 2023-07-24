@@ -1,26 +1,39 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import Promise from 'bluebird';
 import get from 'get-value';
 import { RequestStatus } from '../../../utils/consts';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import {
+  WEBSOCKET_MESSAGE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES
+} from '../../../../../server/utils/constants';
 import DeviceCard from './DeviceCard';
 import debounce from 'debounce';
 
-const updateDevices = (devices, deviceFeatureSelector, lastValue, lastValueChange) => {
-  return devices.map(device => {
-    return {
-      ...device,
-      features: device.features.map(feature => {
-        if (feature.selector === deviceFeatureSelector) {
-          return {
-            ...feature,
-            last_value: lastValue,
-            last_value_changed: lastValueChange
-          };
-        }
-        return feature;
-      })
-    };
+const updateDevices = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
+  return deviceFeatures.map(feature => {
+    if (feature.selector === deviceFeatureSelector) {
+      return {
+        ...feature,
+        last_value: lastValue,
+        last_value_changed: lastValueChange
+      };
+    }
+    return feature;
+  });
+};
+
+const updateDevicesString = (deviceFeatures, deviceFeatureSelector, lastValueString, lastValueChange) => {
+  return deviceFeatures.map(feature => {
+    if (feature.selector === deviceFeatureSelector) {
+      return {
+        ...feature,
+        last_value_string: lastValueString,
+        last_value_changed: lastValueChange
+      };
+    }
+    return feature;
   });
 };
 
@@ -28,7 +41,7 @@ class DevicesComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      devices: [],
+      deviceFeatures: [],
       status: RequestStatus.Getting
     };
   }
@@ -71,20 +84,30 @@ class DevicesComponent extends Component {
   };
 
   updateDeviceStateWebsocket = payload => {
-    let devices = this.state.devices;
-    if (devices) {
-      devices = updateDevices(devices, payload.device_feature_selector, payload.last_value, payload.last_value_changed);
+    let { deviceFeatures } = this.state;
+    if (deviceFeatures) {
+      deviceFeatures = updateDevices(
+        deviceFeatures,
+        payload.device_feature_selector,
+        payload.last_value,
+        payload.last_value_changed
+      );
       this.setState({
-        devices
+        deviceFeatures
       });
     }
   };
   updateDeviceTextWebsocket = payload => {
-    let devices = this.state.devices;
-    if (devices) {
-      devices = updateDevices(devices, payload.device_feature, payload.last_value, payload.last_value_changed);
+    let { deviceFeatures } = this.state;
+    if (deviceFeatures) {
+      deviceFeatures = updateDevicesString(
+        deviceFeatures,
+        payload.device_feature,
+        payload.last_value_string,
+        payload.last_value_changed
+      );
       this.setState({
-        devices
+        deviceFeatures
       });
     }
   };
@@ -95,11 +118,24 @@ class DevicesComponent extends Component {
     });
   };
 
+  changeAllLightsStatusRoom = async () => {
+    const newValue = this.getLightStatus() === 0 ? 1 : 0;
+    // Foreach device features
+    await Promise.map(this.state.deviceFeatures, async feature => {
+      const isLightBinary =
+        feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT && feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY;
+      // if device feature is a light, we control it
+      if (isLightBinary) {
+        return this.updateValue(null, null, null, feature, null, null, newValue);
+      }
+    });
+  };
+
   //Remove x, y when DeviceInRoom is rewrite without action
   updateValue = async (x, y, device, deviceFeature, deviceIndex, featureIndex, value) => {
-    const devices = updateDevices(this.state.devices, deviceFeature.selector, value, new Date());
+    const deviceFeatures = updateDevices(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     this.setState({
-      devices
+      deviceFeatures
     });
     await this.setValueDevice(deviceFeature, value);
   };
@@ -108,11 +144,28 @@ class DevicesComponent extends Component {
 
   //Remove x, y when DeviceInRoom is rewrite without action
   updateValueWithDebounce = async (x, y, device, deviceFeature, deviceIndex, featureIndex, value) => {
-    const devices = updateDevices(this.state.devices, deviceFeature.selector, value, new Date());
+    const deviceFeatures = updateDevices(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     this.setState({
-      devices
+      deviceFeatures
     });
     await this.setValueDeviceDebounce(x, y, device, deviceFeature, deviceIndex, featureIndex, value);
+  };
+
+  getLightStatus = () => {
+    let roomLightStatus = 0;
+    this.state.deviceFeatures.forEach(feature => {
+      // if it's a light
+      const isLight =
+        feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT &&
+        feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY &&
+        feature.read_only === false;
+      // if it's a light and it's turned on, we consider that the light
+      // is on in the room
+      if (isLight && feature.last_value === 1) {
+        roomLightStatus = 1;
+      }
+    });
+    return roomLightStatus;
   };
 
   componentDidMount() {
@@ -148,6 +201,7 @@ class DevicesComponent extends Component {
   render(props, { deviceFeatures, status }) {
     const boxTitle = props.box.name;
     const loading = status === RequestStatus.Getting && !status;
+    const roomLightStatus = this.getLightStatus();
 
     return (
       <DeviceCard
@@ -155,8 +209,10 @@ class DevicesComponent extends Component {
         loading={loading}
         boxTitle={boxTitle}
         deviceFeatures={deviceFeatures}
+        roomLightStatus={roomLightStatus}
         updateValue={this.updateValue}
         updateValueWithDebounce={this.updateValueWithDebounce}
+        changeAllLightsStatusRoom={this.changeAllLightsStatusRoom}
       />
     );
   }

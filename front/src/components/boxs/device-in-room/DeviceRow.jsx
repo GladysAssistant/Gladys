@@ -33,8 +33,7 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
 const DeviceRow = ({ children, ...props }) => {
   const { device, deviceFeature } = props;
   const rowName = deviceFeature.new_label || getDeviceName(device, deviceFeature);
-  console.log(deviceFeature);
-  console.log(rowName);
+
   // if device is a sensor, we display the sensor deviceFeature
   if (props.deviceFeature.read_only) {
     return <SensorDeviceFeature user={props.user} device={device} deviceFeature={deviceFeature} rowName={rowName} />;
