@@ -40,7 +40,6 @@ class EditDevices extends Component {
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
             deviceFeatures.push(featureOption);
           }
-
         });
         if (deviceFeatures.length > 0) {
           deviceFeatures.sort((a, b) => {
@@ -68,9 +67,8 @@ class EditDevices extends Component {
   refreshSelectedOptions = async props => {
     const selectedDeviceFeaturesOptions = [];
     if (this.state.deviceOptions) {
-
-      this.state.deviceOptions.forEach((deviceOption) => {
-        deviceOption.options.forEach((featureOption) => {
+      this.state.deviceOptions.forEach(deviceOption => {
+        deviceOption.options.forEach(featureOption => {
           if (props.box.device_features && props.box.device_features.indexOf(featureOption.value) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);
           }
@@ -89,7 +87,7 @@ class EditDevices extends Component {
       if (
         !this.props.box ||
         !this.props.box.device_features ||
-        nextProps.box.device_features.length !== this.props.box.device_features.length
+        nextProps.box.device_features !== this.props.box.device_features
       ) {
         this.refreshSelectedOptions(nextProps);
       }
