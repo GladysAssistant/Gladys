@@ -40,11 +40,27 @@ class DevicesComponent extends Component {
   getDevices = async () => {
     this.setState({ status: RequestStatus.Getting });
     try {
+      const deviceFeatureSelectors = this.props.box.device_features;
       const devices = await this.props.httpClient.get(`/api/v1/device`, {
-        device_feature_selectors: this.props.box.device_features.join(',')
+        device_feature_selectors: deviceFeatureSelectors.join(',')
       });
+      const deviceFeaturesFlat = [];
+      devices.forEach(device => {
+        device.features.forEach(feature => {
+          deviceFeaturesFlat.push({ ...feature, device });
+        });
+      });
+      const deviceFeaturesSorted = deviceFeaturesFlat.sort(
+        (a, b) => deviceFeatureSelectors.indexOf(a.selector) - deviceFeatureSelectors.indexOf(b.selector)
+      );
+      const deviceFeaturesNewNames = this.props.box.device_feature_names;
+      if (deviceFeaturesNewNames) {
+        deviceFeaturesSorted.forEach((deviceFeature, index) => {
+          deviceFeature.new_label = deviceFeaturesNewNames[index];
+        });
+      }
       this.setState({
-        devices,
+        deviceFeatures: deviceFeaturesSorted,
         status: RequestStatus.Success
       });
     } catch (e) {
@@ -129,7 +145,7 @@ class DevicesComponent extends Component {
     );
   }
 
-  render(props, { devices, status }) {
+  render(props, { deviceFeatures, status }) {
     const boxTitle = props.box.name;
     const loading = status === RequestStatus.Getting && !status;
 
@@ -138,7 +154,7 @@ class DevicesComponent extends Component {
         {...props}
         loading={loading}
         boxTitle={boxTitle}
-        devices={devices}
+        deviceFeatures={deviceFeatures}
         updateValue={this.updateValue}
         updateValueWithDebounce={this.updateValueWithDebounce}
       />

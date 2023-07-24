@@ -12,8 +12,6 @@ import SignalQualityDeviceValue from './SignalQualityDeviceValue';
 import ButtonClickDeviceValue from './ButtonClickDeviceValue';
 import TextDeviceValue from './TextDeviceValue';
 
-import { getDeviceName } from '../../../../../utils/device';
-
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: LastSeenDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: LastSeenDeviceValue,
@@ -28,7 +26,7 @@ const DISPLAY_BY_FEATURE_TYPE = {
 };
 
 const SensorDeviceType = ({ children, ...props }) => {
-  const { deviceFeature: feature, device } = props;
+  const { deviceFeature: feature } = props;
   const { category, type } = feature;
 
   let elementType = DISPLAY_BY_FEATURE_CATEGORY[category];
@@ -46,7 +44,7 @@ const SensorDeviceType = ({ children, ...props }) => {
       <td>
         <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`)}`} />
       </td>
-      <td>{getDeviceName(device, feature)}</td>
+      <td>{props.rowName}</td>
       <td class="text-right">{createElement(elementType, props)}</td>
     </tr>
   );

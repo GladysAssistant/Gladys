@@ -1,5 +1,3 @@
-import { getDeviceName } from '../../../../utils/device';
-
 const BinaryDeviceType = ({ children, ...props }) => {
   function updateValue() {
     props.updateValue(
@@ -18,7 +16,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
       <td>
         <i class="fe fe-toggle-right" />
       </td>
-      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
+      <td>{props.rowName}</td>
       <td class="text-right">
         <label class="custom-switch">
           <input

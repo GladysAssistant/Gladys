@@ -2,7 +2,6 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { getDeviceName } from '../../../../utils/device';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { AC_MODE } from '../../../../../../server/utils/constants';
 
@@ -40,7 +39,7 @@ const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
       <td>
         <i class={`fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`, { default: 'sliders' })}`} />
       </td>
-      <td>{getDeviceName(device, deviceFeature)}</td>
+      <td>{props.rowName}</td>
 
       <td class="py-0">
         <div class="d-flex justify-content-end">

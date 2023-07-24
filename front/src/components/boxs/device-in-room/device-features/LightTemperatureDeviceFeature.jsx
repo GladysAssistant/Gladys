@@ -1,5 +1,3 @@
-import { getDeviceName } from '../../../../utils/device';
-
 const LightTemperatureDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
     props.updateValueWithDebounce(
@@ -19,7 +17,7 @@ const LightTemperatureDeviceType = ({ children, ...props }) => {
       <td>
         <i class="fe fe-thermometer" />
       </td>
-      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
+      <td>{props.rowName}</td>
 
       <td class="text-right py-0">
         <div class="col">

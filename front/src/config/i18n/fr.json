@@ -244,9 +244,10 @@
         "substractButton": "-"
       },
       "devices": {
-        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
+        "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
         "editNameLabel": "Nom du widget",
-        "editNamePlaceholder": "Entrez le nom du widget"
+        "editNamePlaceholder": "Entrez le nom du widget",
+        "addADeviceLabel": "Ajouter un appareil :"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",

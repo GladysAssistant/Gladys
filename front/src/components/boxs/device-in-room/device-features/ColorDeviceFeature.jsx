@@ -3,7 +3,6 @@ import cx from 'classnames';
 import iro from '@jaames/iro';
 
 import { intToHex, hexToInt } from '../../../../../../server/utils/colors';
-import { getDeviceName } from '../../../../utils/device';
 
 import style from './style.css';
 
@@ -76,7 +75,7 @@ class ColorDeviceType extends Component {
     document.removeEventListener('click', this.blur, true);
   }
 
-  render({ device, deviceFeature }, { open }) {
+  render({ rowName, deviceFeature }, { open }) {
     const deviceLastValue = deviceFeature.last_value;
     const color = !deviceLastValue ? undefined : `#${intToHex(deviceLastValue)}`;
 
@@ -86,7 +85,7 @@ class ColorDeviceType extends Component {
           <td>
             <i class="fe fe-circle" />
           </td>
-          <td>{getDeviceName(device, deviceFeature)}</td>
+          <td>{rowName}</td>
           <td class="text-right">
             <div class="m-0 float-right d-flex">
               <button

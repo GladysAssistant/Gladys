@@ -2,8 +2,8 @@ import cx from 'classnames';
 import DeviceRow from './DeviceRow';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
-const hasSwitchFeature = (device, featureSelectors) => {
-  return device.features.find(feature => isSwitchFeature(feature, featureSelectors));
+const hasSwitchFeature = (features, featureSelectors) => {
+  return features.find(feature => isSwitchFeature(feature, featureSelectors));
 };
 
 const isSwitchFeature = (feature, featureSelectors) => {
@@ -21,10 +21,10 @@ const changeAllLightsStatusRoom = (props, roomLightStatus) => () => {
 };
 
 const DeviceCard = ({ children, ...props }) => {
-  const { boxTitle, roomLightStatus, loading, devices = [], box = {} } = props;
+  const { boxTitle, roomLightStatus, loading, deviceFeatures = [], box = {} } = props;
   const { device_features: featureSelectors = [] } = box;
 
-  const hasBinaryLightDeviceFeature = devices.find(device => hasSwitchFeature(device, featureSelectors)) !== undefined;
+  const hasBinaryLightDeviceFeature = hasSwitchFeature(deviceFeatures, featureSelectors) !== undefined;
 
   return (
     <div class="card">
@@ -56,25 +56,19 @@ const DeviceCard = ({ children, ...props }) => {
           <div class="table-responsive">
             <table class="table card-table table-vcenter">
               <tbody>
-                {devices.map((device, deviceIndex) =>
-                  device.features.map(
-                    (deviceFeature, deviceFeatureIndex) =>
-                      featureSelectors.indexOf(deviceFeature.selector) !== -1 && (
-                        <DeviceRow
-                          user={props.user}
-                          x={props.x}
-                          y={props.y}
-                          device={device}
-                          deviceFeature={deviceFeature}
-                          roomIndex={props.roomIndex}
-                          deviceIndex={deviceIndex}
-                          deviceFeatureIndex={deviceFeatureIndex}
-                          updateValue={props.updateValue}
-                          updateValueWithDebounce={props.updateValueWithDebounce}
-                        />
-                      )
-                  )
-                )}
+                {deviceFeatures.map((deviceFeature, deviceFeatureIndex) => (
+                  <DeviceRow
+                    user={props.user}
+                    x={props.x}
+                    y={props.y}
+                    device={deviceFeature.device}
+                    deviceFeature={deviceFeature}
+                    roomIndex={props.roomIndex}
+                    deviceFeatureIndex={deviceFeatureIndex}
+                    updateValue={props.updateValue}
+                    updateValueWithDebounce={props.updateValueWithDebounce}
+                  />
+                ))}
               </tbody>
             </table>
           </div>

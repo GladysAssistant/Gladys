@@ -2,19 +2,18 @@ import { Component } from 'preact';
 import { Localizer, Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
+import update from 'immutability-helper';
 import BaseEditBox from '../baseEditBox';
 import { getDeviceFeatureName } from '../../../utils/device';
+import { DeviceListWithDragAndDrop } from './DeviceListWithDragAndDrop';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import SUPPORTED_FEATURE_TYPES from './SupportedFeatureTypes';
 
 class EditDevices extends Component {
-  updateDeviceFeatures = selectedDeviceFeaturesOptions => {
-    selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions || [];
-    const deviceFeatures = selectedDeviceFeaturesOptions.map(option => option.value);
-    this.props.updateBoxConfig(this.props.x, this.props.y, {
-      device_features: deviceFeatures
-    });
-    this.setState({ selectedDeviceFeaturesOptions });
+  addDeviceFeature = async selectedDeviceFeatureOption => {
+    const newSelectedDeviceFeaturesOptions = [...this.state.selectedDeviceFeaturesOptions, selectedDeviceFeatureOption];
+    await this.setState({ selectedDeviceFeaturesOptions: newSelectedDeviceFeaturesOptions });
+    this.refreshDeviceFeaturesNames();
   };
 
   updateName = e => {
@@ -23,13 +22,40 @@ class EditDevices extends Component {
     });
   };
 
+  refreshDeviceFeaturesNames = () => {
+    const newDeviceFeatureNames = this.state.selectedDeviceFeaturesOptions.map(o => {
+      return o.new_label !== undefined ? o.new_label : o.label;
+    });
+    const newDeviceFeature = this.state.selectedDeviceFeaturesOptions.map(o => {
+      return o.value;
+    });
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      device_feature_names: newDeviceFeatureNames,
+      device_features: newDeviceFeature
+    });
+  };
+
+  updateDeviceFeatureName = async (index, name) => {
+    const newState = update(this.state, {
+      selectedDeviceFeaturesOptions: {
+        [index]: {
+          new_label: {
+            $set: name
+          }
+        }
+      }
+    });
+    await this.setState(newState);
+    this.refreshDeviceFeaturesNames();
+  };
+
   getDeviceFeatures = async () => {
     try {
       this.setState({ loading: true });
       // we get the rooms with the devices
       const devices = await this.props.httpClient.get(`/api/v1/device`);
       const deviceOptions = [];
-      const selectedDeviceFeaturesOptions = [];
+      let selectedDeviceFeaturesOptions = [];
 
       devices.forEach(device => {
         const deviceFeatures = [];
@@ -41,7 +67,15 @@ class EditDevices extends Component {
           if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
             deviceFeatures.push(featureOption);
           }
-          if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
+          // If the feature is already selected
+          const featureIndex = this.props.box.device_features.indexOf(feature.selector);
+          if (this.props.box.device_features && featureIndex !== -1) {
+            // and there is a name associated to it
+            if (this.props.box.device_feature_names && this.props.box.device_feature_names[featureIndex]) {
+              // We set the new_label in the object
+              featureOption.new_label = this.props.box.device_feature_names[featureIndex];
+            }
+            // And we push this to the list of selected feature
             selectedDeviceFeaturesOptions.push(featureOption);
           }
         });
@@ -60,11 +94,45 @@ class EditDevices extends Component {
           });
         }
       });
+      if (this.props.box.device_features) {
+        selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions.sort(
+          (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value)
+        );
+      }
+
       await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      this.refreshDeviceFeaturesNames();
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
     }
+  };
+
+  moveDevice = async (currentIndex, newIndex) => {
+    const element = this.state.selectedDeviceFeaturesOptions[currentIndex];
+
+    const newStateWithoutElement = update(this.state, {
+      selectedDeviceFeaturesOptions: {
+        $splice: [[currentIndex, 1]]
+      }
+    });
+    const newState = update(newStateWithoutElement, {
+      selectedDeviceFeaturesOptions: {
+        $splice: [[newIndex, 0, element]]
+      }
+    });
+    await this.setState(newState);
+    this.refreshDeviceFeaturesNames();
+  };
+
+  removeDevice = async index => {
+    const newStateWithoutElement = update(this.state, {
+      selectedDeviceFeaturesOptions: {
+        $splice: [[index, 1]]
+      }
+    });
+    await this.setState(newStateWithoutElement);
+    this.refreshDeviceFeaturesNames();
   };
 
   componentDidMount() {
@@ -91,19 +159,26 @@ class EditDevices extends Component {
                 />
               </Localizer>
             </div>
+            <div class="form-group">
+              <label>
+                <Text id="dashboard.boxes.devices.editDeviceFeaturesLabel" />
+              </label>
+              {selectedDeviceFeaturesOptions && (
+                <DeviceListWithDragAndDrop
+                  selectedDeviceFeaturesOptions={selectedDeviceFeaturesOptions}
+                  moveDevice={this.moveDevice}
+                  removeDevice={this.removeDevice}
+                  updateDeviceFeatureName={this.updateDeviceFeatureName}
+                  isTouchDevice={false}
+                />
+              )}
+            </div>
             {deviceOptions && (
               <div class="form-group">
                 <label>
-                  <Text id="dashboard.boxes.devices.editDeviceFeaturesLabel" />
+                  <Text id="dashboard.boxes.devices.addADeviceLabel" />
                 </label>
-                <Select
-                  defaultValue={[]}
-                  value={selectedDeviceFeaturesOptions}
-                  isMulti
-                  onChange={this.updateDeviceFeatures}
-                  options={deviceOptions}
-                  maxMenuHeight={220}
-                />
+                <Select onChange={this.addDeviceFeature} value={[]} options={deviceOptions} maxMenuHeight={220} />
               </div>
             )}
           </div>

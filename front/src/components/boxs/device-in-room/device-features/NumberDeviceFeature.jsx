@@ -1,6 +1,5 @@
 import get from 'get-value';
 
-import { getDeviceName } from '../../../../utils/device';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
 const NumberDeviceFeature = ({ children, ...props }) => {
@@ -28,7 +27,7 @@ const NumberDeviceFeature = ({ children, ...props }) => {
           )}`}
         />
       </td>
-      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
+      <td>{props.rowName}</td>
 
       <td class="py-0">
         <div class="d-flex justify-content-end">

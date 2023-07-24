@@ -1,6 +1,5 @@
 import get from 'get-value';
 
-import { getDeviceName } from '../../../../utils/device';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 
 const MultiLevelDeviceType = ({ children, ...props }) => {
@@ -28,7 +27,7 @@ const MultiLevelDeviceType = ({ children, ...props }) => {
           )}`}
         />
       </td>
-      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
+      <td>{props.rowName}</td>
 
       <td class="text-right py-0">
         <div class="col">
