@@ -153,7 +153,6 @@ async function connect() {
       this.mqttClient.subscribe(`${this.mqttTopicPrefix}/#`);
       logger.info(`Listening to MQTT topics ${this.mqttTopicPrefix}/#`);
       this.mqttConnected = true;
-      this.zwaveJSUIConnected = true;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
       });
@@ -186,7 +185,6 @@ async function connect() {
     this.mqttClient.on('message', (topic, message) => {
       try {
         this.mqttConnected = true;
-        this.zwaveJSUIConnected = true;
         this.handleMqttMessage(topic, message.toString());
       } catch (e) {
         logger.error(`Unable to process message on topic ${topic}: ${e}`);

@@ -1,3 +1,4 @@
+const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
 const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
 
@@ -11,8 +12,22 @@ const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
  */
 function handleMqttMessage(topic, message) {
   switch (topic) {
+    case `${this.mqttTopicPrefix}/driver/status`: {
+      const newStatus = (message === 'true');
+      logger.debug(`Driver status ${newStatus}, was ${this.zwaveJSUIConnected}`);
+      if (newStatus !== this.zwaveJSUIConnected) {
+        this.zwaveJSUIConnected = newStatus;
+        this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+        });
+      }
+      break;
+    }
     case `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/version`: {
       this.zwaveJSUIVersion = JSON.parse(message).value;
+      this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+      });
       break;
     }
     case `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {
@@ -59,7 +74,7 @@ function handleMqttMessage(topic, message) {
 
         this.scanComplete();
       } else {
-        this.scanNetwork();
+        setInterval(this.scanNetwork.bind(this), DEFAULT.SCAN_NETWORK_RETRY_TIMEOUT);
       }
       break;
     }
