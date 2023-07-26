@@ -68,15 +68,17 @@ class EditDevices extends Component {
             deviceFeatures.push(featureOption);
           }
           // If the feature is already selected
-          const featureIndex = this.props.box.device_features.indexOf(feature.selector);
-          if (this.props.box.device_features && featureIndex !== -1) {
-            // and there is a name associated to it
-            if (this.props.box.device_feature_names && this.props.box.device_feature_names[featureIndex]) {
-              // We set the new_label in the object
-              featureOption.new_label = this.props.box.device_feature_names[featureIndex];
+          if (this.props.box.device_features) {
+            const featureIndex = this.props.box.device_features.indexOf(feature.selector);
+            if (this.props.box.device_features && featureIndex !== -1) {
+              // and there is a name associated to it
+              if (this.props.box.device_feature_names && this.props.box.device_feature_names[featureIndex]) {
+                // We set the new_label in the object
+                featureOption.new_label = this.props.box.device_feature_names[featureIndex];
+              }
+              // And we push this to the list of selected feature
+              selectedDeviceFeaturesOptions.push(featureOption);
             }
-            // And we push this to the list of selected feature
-            selectedDeviceFeaturesOptions.push(featureOption);
           }
         });
         if (deviceFeatures.length > 0) {
