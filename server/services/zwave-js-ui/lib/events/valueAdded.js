@@ -29,7 +29,7 @@ function getValueMetadata(zwaveNode, args) {
  * valueAdded({id: 0}, { commandClass: 0, endpoint: 0, property: '', propertyKey: '' });
  */
 function valueAdded(zwaveNode, args) {
-  const { commandClass, endpoint, property, propertyKey, newValue } = args;
+  const { commandClass, endpoint, property, propertyKey, value } = args;
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
   if (!node) {
@@ -54,7 +54,7 @@ function valueAdded(zwaveNode, args) {
   }
   const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
   logger.debug(
-    `Value Added: nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}, value = ${newValue}`,
+    `Value Added: nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}, value = ${value}`,
   );
 
   if ((GENRE[commandClass] || 'user') !== 'user') {
@@ -81,8 +81,8 @@ function valueAdded(zwaveNode, args) {
     });
     const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
 
-    if (newValue) {
-      const newValueUnbind = unbindValue(args, newValue);
+    if (value) {
+      const newValueUnbind = unbindValue(args, value);
       node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
 
       // if (prevValue !== newValue) {
