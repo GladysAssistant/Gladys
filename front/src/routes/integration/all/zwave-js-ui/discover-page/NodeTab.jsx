@@ -55,9 +55,7 @@ const NodeTab = ({ children, ...props }) => {
                 <Text id="integration.zwavejsui.discover.scanButton" /> <i class="fe fe-radio" />
               </button>
               <a
-                href={
-                  zwaveActionsEnabled ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add' : '#'
-                }
+                href={zwaveActionsEnabled ? '/dashboard/integration/device/zwave-js-ui/node-operation?action=add' : '#'}
               >
                 <button class="btn btn-outline-success ml-2" disabled={zwaveActionsDisabled}>
                   <Text id="integration.zwavejsui.discover.addNodeButton" /> <i class="fe fe-plus" />
@@ -84,7 +82,7 @@ const NodeTab = ({ children, ...props }) => {
                 </button>
               </a>
             </div>
-            <div class='row'>
+            <div class="row">
               {(!props.zwaveNodes || props.zwaveNodes.length === 0) && <EmptyState />}
               {props.zwaveNodes &&
                 props.zwaveNodes.length > 0 &&

@@ -13,7 +13,7 @@ const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
 function handleMqttMessage(topic, message) {
   switch (topic) {
     case `${this.mqttTopicPrefix}/driver/status`: {
-      const newStatus = (message === 'true');
+      const newStatus = message === 'true';
       logger.debug(`Driver status ${newStatus}, was ${this.zwaveJSUIConnected}`);
       if (newStatus !== this.zwaveJSUIConnected) {
         this.zwaveJSUIConnected = newStatus;

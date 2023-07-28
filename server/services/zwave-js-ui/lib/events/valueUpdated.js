@@ -37,20 +37,20 @@ function valueUpdated(zwaveNode, args) {
   );
 
   // if (node.ready) {
-    node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
-    const deviceFeatureExternalId = getDeviceFeatureExternalId({
-      nodeId,
-      commandClass,
-      endpoint: endpoint || 0,
-      property: fullProperty,
+  node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
+  const deviceFeatureExternalId = getDeviceFeatureExternalId({
+    nodeId,
+    commandClass,
+    endpoint: endpoint || 0,
+    property: fullProperty,
+  });
+  const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
+  if (deviceFeature && newValueUnbind !== undefined && newValueUnbind !== null) {
+    this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: deviceFeatureExternalId,
+      state: newValueUnbind,
     });
-    const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
-    if (deviceFeature && newValueUnbind !== undefined && newValueUnbind !== null) {
-      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: deviceFeatureExternalId,
-        state: newValueUnbind,
-      });
-    }
+  }
   // }
 }
 

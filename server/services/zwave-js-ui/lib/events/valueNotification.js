@@ -37,30 +37,30 @@ function valueNotification(zwaveNode, args) {
   );
 
   // if (node.ready) {
-    node.classes[commandClass][endpoint || 0][fullProperty].value = valueUnbind;
-    let deviceFeatureExternalId;
-    if (commandClass === COMMAND_CLASSES.COMMAND_CLASS_SCENE_ACTIVATION) {
-      deviceFeatureExternalId = getDeviceFeatureExternalId({
-        nodeId,
-        commandClass: COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE,
-        endpoint: Math.floor(value / 10),
-        property: `scene-00${Math.floor(value / 10)}`,
-      });
-    } else {
-      deviceFeatureExternalId = getDeviceFeatureExternalId({
-        nodeId,
-        commandClass,
-        endpoint: endpoint || 0,
-        property: fullProperty,
-      });
-    }
-    const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
-    if (deviceFeature) {
-      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: deviceFeatureExternalId,
-        state: valueUnbind,
-      });
-    }
+  node.classes[commandClass][endpoint || 0][fullProperty].value = valueUnbind;
+  let deviceFeatureExternalId;
+  if (commandClass === COMMAND_CLASSES.COMMAND_CLASS_SCENE_ACTIVATION) {
+    deviceFeatureExternalId = getDeviceFeatureExternalId({
+      nodeId,
+      commandClass: COMMAND_CLASSES.COMMAND_CLASS_CENTRAL_SCENE,
+      endpoint: Math.floor(value / 10),
+      property: `scene-00${Math.floor(value / 10)}`,
+    });
+  } else {
+    deviceFeatureExternalId = getDeviceFeatureExternalId({
+      nodeId,
+      commandClass,
+      endpoint: endpoint || 0,
+      property: fullProperty,
+    });
+  }
+  const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
+  if (deviceFeature) {
+    this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: deviceFeatureExternalId,
+      state: valueUnbind,
+    });
+  }
   // }
 }
 

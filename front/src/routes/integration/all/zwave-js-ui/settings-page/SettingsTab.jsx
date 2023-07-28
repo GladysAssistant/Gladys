@@ -105,15 +105,16 @@ class SettingsTab extends Component {
 
                 {props.usbConfigured && !props.zwaveJSUIConnected && (
                   <div class="alert alert-warning">
-                  <Text id="integration.zwavejsui.settings.zwaveNotConfigured" />
+                    <Text id="integration.zwavejsui.settings.zwaveNotConfigured" />
                   </div>
                 )}
 
-                {!props.mqttConnected || !props.zwaveJSUIConnected && (
-                  <div class="alert alert-warning">
-                    <Text id="integration.zwavejsui.settings.notConnected" />
-                  </div>
-                )}
+                {!props.mqttConnected ||
+                  (!props.zwaveJSUIConnected && (
+                    <div class="alert alert-warning">
+                      <Text id="integration.zwavejsui.settings.notConnected" />
+                    </div>
+                  ))}
 
                 {props.mqttConnected && props.zwaveJSUIConnected && (
                   <div class="alert alert-info">

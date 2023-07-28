@@ -73,31 +73,31 @@ function valueAdded(zwaveNode, args) {
   });
 
   // if (node.ready) {
-    const deviceFeatureExternalId = getDeviceFeatureExternalId({
-      nodeId,
-      commandClass,
-      endpoint: endpoint || 0,
-      property: fullProperty,
-    });
-    const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
+  const deviceFeatureExternalId = getDeviceFeatureExternalId({
+    nodeId,
+    commandClass,
+    endpoint: endpoint || 0,
+    property: fullProperty,
+  });
+  const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
 
-    if (value) {
-      const newValueUnbind = unbindValue(args, value);
-      node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
+  if (value) {
+    const newValueUnbind = unbindValue(args, value);
+    node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
 
-      // if (prevValue !== newValue) {
-      if (deviceFeature) {
-        this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: deviceFeatureExternalId,
-          state: newValueUnbind,
-        });
-      }
-      // }
-    } else if (deviceFeature) {
+    // if (prevValue !== newValue) {
+    if (deviceFeature) {
       this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: deviceFeatureExternalId,
+        state: newValueUnbind,
       });
     }
+    // }
+  } else if (deviceFeature) {
+    this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: deviceFeatureExternalId,
+    });
+  }
   // }
 }
 
