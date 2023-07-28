@@ -62,5 +62,10 @@
   {
     "key": "sunspec",
     "img": "/assets/integrations/cover/sunspec.png"
+  },
+  {
+    "key": "tuya",
+    "link": "tuya",
+    "img": "/assets/integrations/cover/tuya.jpg"
   }
 ]

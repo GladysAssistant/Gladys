@@ -8,6 +8,7 @@ const util = require('util');
 const randomBytes = util.promisify(require('crypto').randomBytes);
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { DEVICE_ROTATION } = require('../../../utils/constants');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
@@ -113,8 +114,6 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       'veryfast', // Encoding presets
       '-flags',
       '+cgop',
-      '-vf',
-      'scale=1920:-1', // Full HD resolution
       '-r',
       '25', // Frames (rate) per second
       '-g',
@@ -150,10 +149,23 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       indexFilePath,
     ];
 
-    if (cameraRotationParam.value === '1') {
-      args.push('-vf'); // Rotate 180
-      args.push('hflip,vflip');
+    let cameraRotationArgs = '';
+    switch (cameraRotationParam.value) {
+      case DEVICE_ROTATION.DEGREES_90:
+        cameraRotationArgs = 'scale=1920:-1,transpose=1'; // Full HD resolution & Rotate 90
+        break;
+      case DEVICE_ROTATION.DEGREES_180:
+        cameraRotationArgs = 'scale=1920:-1,transpose=1,transpose=1'; // Full HD resolution & Rotate 180
+        break;
+      case DEVICE_ROTATION.DEGREES_270:
+        cameraRotationArgs = 'scale=1920:-1,transpose=2'; // Full HD resolution & Rotate 270
+        break;
+      default:
+        cameraRotationArgs = 'scale=1920:-1'; // Full HD resolution & Rotate 0
+        break;
     }
+
+    args.splice(8, 0, '-vf', cameraRotationArgs);
 
     const options = {
       timeout: 5 * 60 * 1000, // 5 minutes
