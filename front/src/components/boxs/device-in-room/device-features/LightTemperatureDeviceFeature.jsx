@@ -1,15 +1,6 @@
 const LightTemperatureDeviceType = ({ children, ...props }) => {
   function updateValue(e) {
-    props.updateValueWithDebounce(
-      props.x,
-      props.y,
-      props.device,
-      props.deviceFeature,
-      props.deviceIndex,
-      props.deviceFeatureIndex,
-      e.target.value,
-      props.deviceFeature.last_value
-    );
+    props.updateValueWithDebounce(props.deviceFeature, e.target.value);
   }
 
   return (

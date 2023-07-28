@@ -11,7 +11,7 @@ import {
 import DeviceCard from './DeviceCard';
 import debounce from 'debounce';
 
-const updateDevices = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
+const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
       return {
@@ -24,7 +24,7 @@ const updateDevices = (deviceFeatures, deviceFeatureSelector, lastValue, lastVal
   });
 };
 
-const updateDevicesString = (deviceFeatures, deviceFeatureSelector, lastValueString, lastValueChange) => {
+const updateDeviceFeaturesString = (deviceFeatures, deviceFeatureSelector, lastValueString, lastValueChange) => {
   return deviceFeatures.map(feature => {
     if (feature.selector === deviceFeatureSelector) {
       return {
@@ -86,7 +86,7 @@ class DevicesComponent extends Component {
   updateDeviceStateWebsocket = payload => {
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
-      deviceFeatures = updateDevices(
+      deviceFeatures = updateDeviceFeatures(
         deviceFeatures,
         payload.device_feature_selector,
         payload.last_value,
@@ -100,7 +100,7 @@ class DevicesComponent extends Component {
   updateDeviceTextWebsocket = payload => {
     let { deviceFeatures } = this.state;
     if (deviceFeatures) {
-      deviceFeatures = updateDevicesString(
+      deviceFeatures = updateDeviceFeaturesString(
         deviceFeatures,
         payload.device_feature,
         payload.last_value_string,
@@ -126,29 +126,31 @@ class DevicesComponent extends Component {
         feature.category === DEVICE_FEATURE_CATEGORIES.LIGHT && feature.type === DEVICE_FEATURE_TYPES.LIGHT.BINARY;
       // if device feature is a light, we control it
       if (isLightBinary) {
-        return this.updateValue(null, null, null, feature, null, null, newValue);
+        return this.updateValue(feature, newValue);
       }
     });
   };
 
-  //Remove x, y when DeviceInRoom is rewrite without action
-  updateValue = async (x, y, device, deviceFeature, deviceIndex, featureIndex, value) => {
-    const deviceFeatures = updateDevices(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
-    this.setState({
+  updateValue = async (deviceFeature, value) => {
+    const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
+    await this.setState({
       deviceFeatures
     });
-    await this.setValueDevice(deviceFeature, value);
+    try {
+      await this.setValueDevice(deviceFeature, value);
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   setValueDeviceDebounce = debounce(this.updateValue.bind(this), 200);
 
-  //Remove x, y when DeviceInRoom is rewrite without action
-  updateValueWithDebounce = async (x, y, device, deviceFeature, deviceIndex, featureIndex, value) => {
-    const deviceFeatures = updateDevices(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
+  updateValueWithDebounce = async (deviceFeature, value) => {
+    const deviceFeatures = updateDeviceFeatures(this.state.deviceFeatures, deviceFeature.selector, value, new Date());
     this.setState({
       deviceFeatures
     });
-    await this.setValueDeviceDebounce(x, y, device, deviceFeature, deviceIndex, featureIndex, value);
+    await this.setValueDeviceDebounce(deviceFeature, value);
   };
 
   getLightStatus = () => {

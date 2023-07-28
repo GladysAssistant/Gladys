@@ -2,6 +2,8 @@ import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useRef } from 'preact/hooks';
+import cx from 'classnames';
+import style from './style.css';
 
 const DEVICE_TYPE = 'DEVICE_TYPE';
 
@@ -41,21 +43,20 @@ const DeviceRow = ({ selectedDeviceFeature, moveDevice, index, removeDevice, upd
     <div class="mb-1">
       <label class="form-label">{selectedDeviceFeature.label}</label>
       <div
-        class="input-group"
+        class={cx('input-group', style.deviceListDragAndDrop, {
+          [style.deviceListDragAndDropActive]: isActive,
+          [style.deviceListDragAndDropDragging]: isDragging
+        })}
         ref={ref}
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-          cursor: 'pointer',
-          backgroundColor: isActive ? '#ecf0f1' : undefined,
-          userSelect: 'none'
-        }}
       >
         <div class="input-group-prepend" ref={drag}>
           <span class="input-group-text fe fe-list" />
         </div>
         <input
           type="text"
-          class="form-control"
+          class={cx('form-control', {
+            [style.deviceListDragAndDropActive]: isActive
+          })}
           value={
             selectedDeviceFeature.new_label !== undefined
               ? selectedDeviceFeature.new_label

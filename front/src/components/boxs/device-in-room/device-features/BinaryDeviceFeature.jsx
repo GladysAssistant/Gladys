@@ -1,14 +1,6 @@
 const BinaryDeviceType = ({ children, ...props }) => {
   function updateValue() {
-    props.updateValue(
-      props.x,
-      props.y,
-      props.device,
-      props.deviceFeature,
-      props.deviceIndex,
-      props.deviceFeatureIndex,
-      props.deviceFeature.last_value === 0 ? 1 : 0
-    );
+    props.updateValue(props.deviceFeature, props.deviceFeature.last_value === 0 ? 1 : 0);
   }
 
   return (

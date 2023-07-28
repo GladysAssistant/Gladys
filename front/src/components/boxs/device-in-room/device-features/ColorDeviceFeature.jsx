@@ -37,15 +37,7 @@ class ColorDeviceType extends Component {
 
   updateValue = color => {
     const colorInt = hexToInt(color.hexString);
-    this.props.updateValue(
-      this.props.x,
-      this.props.y,
-      this.props.device,
-      this.props.deviceFeature,
-      this.props.deviceIndex,
-      this.props.deviceFeatureIndex,
-      colorInt
-    );
+    this.props.updateValue(this.props.deviceFeature, colorInt);
   };
 
   constructor(props) {

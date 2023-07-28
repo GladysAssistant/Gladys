@@ -14,16 +14,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
   const TEMPERATURE_STEP = props.deviceFeature.category == DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING ? 1 : 0.5;
 
   function updateValue(value) {
-    props.updateValueWithDebounce(
-      props.x,
-      props.y,
-      props.device,
-      props.deviceFeature,
-      props.deviceIndex,
-      props.deviceFeatureIndex,
-      value,
-      props.deviceFeature.last_value
-    );
+    props.updateValueWithDebounce(props.deviceFeature, value);
   }
 
   function updateValueEvent(e) {

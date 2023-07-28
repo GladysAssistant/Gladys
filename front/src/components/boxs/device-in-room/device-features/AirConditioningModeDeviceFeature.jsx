@@ -6,20 +6,11 @@ import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { AC_MODE } from '../../../../../../server/utils/constants';
 
 const AirConditioningModeDeviceFeature = ({ children, ...props }) => {
-  const { device, deviceFeature } = props;
+  const { deviceFeature } = props;
   const { category, type, last_value: lastValue } = deviceFeature;
 
   function updateValue(value) {
-    props.updateValueWithDebounce(
-      props.x,
-      props.y,
-      device,
-      deviceFeature,
-      props.deviceIndex,
-      props.deviceFeatureIndex,
-      value,
-      lastValue
-    );
+    props.updateValueWithDebounce(deviceFeature, value);
   }
 
   function auto() {
