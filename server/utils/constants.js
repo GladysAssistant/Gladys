@@ -780,6 +780,13 @@ const DEVICE_POLL_FREQUENCIES = {
   EVERY_SECONDS: 1 * 1000,
 };
 
+const DEVICE_ROTATION = {
+  DEGREES_0: '0',
+  DEGREES_90: '90',
+  DEGREES_180: '180',
+  DEGREES_270: '270',
+};
+
 const WEBSOCKET_MESSAGE_TYPES = {
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
@@ -858,6 +865,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     CONNECTED: 'ecovacs.connected',
     NEW_DEVICE: 'ecovacs.new-device',
     ERROR: 'ecovacs.error',
+  },
+  TUYA: {
+    STATUS: 'tuya.status',
+    DISCOVER: 'tuya.discover',
   },
 };
 
@@ -982,6 +993,8 @@ module.exports.SESSION_TOKEN_TYPE_LIST = SESSION_TOKEN_TYPE_LIST;
 
 module.exports.DEVICE_POLL_FREQUENCIES = DEVICE_POLL_FREQUENCIES;
 module.exports.DEVICE_POLL_FREQUENCIES_LIST = createList(DEVICE_POLL_FREQUENCIES);
+
+module.exports.DEVICE_ROTATION = DEVICE_ROTATION;
 
 module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 

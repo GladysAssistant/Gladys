@@ -33,8 +33,8 @@ const EditVacbotBox = ({ children, ...props }) => (
         <Localizer>
           <input
             type="text"
-            value={props.box.name}
-            onInput={props.updateBoxName}
+            value={props.box.title}
+            onInput={props.updateBoxTitle}
             class="form-control"
             placeholder={<Text id="dashboard.boxes.vacbot.editBoxNamePlaceholder" />}
           />
@@ -50,10 +50,8 @@ class EditVacbotBoxComponent extends Component {
       device_feature: e.target.value
     });
   };
-  updateBoxName = e => {
-    this.props.updateBoxConfig(this.props.x, this.props.y, {
-      name: e.target.value
-    });
+  updateBoxTitle = e => {
+    this.props.updateBoxConfig(this.props.x, this.props.y, { title: e.target.value });
   };
 
   getVacbots = async () => {
@@ -92,7 +90,7 @@ class EditVacbotBoxComponent extends Component {
         vacbots={vacbots}
         loading={loading}
         updateBoxVacbot={this.updateBoxVacbot}
-        updateBoxName={this.updateBoxName}
+        updateBoxTitle={this.updateBoxTitle}
       />
     );
   }
