@@ -47,10 +47,10 @@ class DevicesComponent extends Component {
   }
 
   refreshData = () => {
-    this.getDevices();
+    this.getDeviceFeatures();
   };
 
-  getDevices = async () => {
+  getDeviceFeatures = async () => {
     this.setState({ status: RequestStatus.Getting });
     try {
       const deviceFeatureSelectors = this.props.box.device_features;
