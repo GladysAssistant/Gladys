@@ -1,5 +1,7 @@
 const sinon = require('sinon');
+const { expect } = require('chai');
 const proxyquire = require('proxyquire').noCallThru();
+const { STATUS } = require('../../../services/tuya/lib/utils/tuya.constants');
 
 const { assert, fake } = sinon;
 
@@ -35,5 +37,17 @@ describe('TuyaService', () => {
     tuyaService.stop();
     assert.notCalled(tuyaService.device.init);
     assert.calledOnce(tuyaService.device.disconnect);
+  });
+
+  it('isUsed: should return false, service not used', async () => {
+    const used = await tuyaService.isUsed();
+    expect(used).to.equal(false);
+  });
+
+  it('isUsed: should return true, service is used', async () => {
+    tuyaService.device.status = STATUS.CONNECTED;
+    tuyaService.device.connector = {};
+    const used = await tuyaService.isUsed();
+    expect(used).to.equal(true);
   });
 });
