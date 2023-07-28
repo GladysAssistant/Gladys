@@ -62,5 +62,10 @@
   {
     "key": "overkiz",
     "img": "/assets/integrations/cover/overkiz.jpg"
+  },
+  {
+    "key": "tuya",
+    "link": "tuya",
+    "img": "/assets/integrations/cover/tuya.jpg"
   }
 ]

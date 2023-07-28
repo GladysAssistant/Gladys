@@ -6,6 +6,7 @@ const { fake, assert: fakeAssert } = require('sinon');
 const FfmpegMock = require('./FfmpegMock.test');
 const RtspCameraManager = require('../../../services/rtsp-camera/lib');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { DEVICE_ROTATION } = require('../../../utils/constants');
 
 const device = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
@@ -133,7 +134,7 @@ describe('Camera.streaming', () => {
     await rtspCameraManager.stopStreaming('my-camera');
     fakeAssert.called(rtspCameraManager.sendCameraFileToGatewayLimited);
   });
-  it('should star with rotation & stop streaming', async () => {
+  it('should star with 90 rotation & stop streaming', async () => {
     const gladysDeviceWithRotation = {
       config: {
         tempFolder: '/tmp/gladys',
@@ -149,7 +150,79 @@ describe('Camera.streaming', () => {
             },
             {
               name: 'CAMERA_ROTATION',
-              value: '1',
+              value: DEVICE_ROTATION.DEGREES_90,
+            },
+          ],
+        }),
+      },
+    };
+    rtspCameraManager = new RtspCameraManager(
+      gladysDeviceWithRotation,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
+    const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);
+    expect(liveStreamingProcess).to.have.property('camera_folder');
+    expect(liveStreamingProcess).to.have.property('encryption_key');
+    await rtspCameraManager.liveActivePing('my-camera');
+    await rtspCameraManager.stopStreaming('my-camera');
+    fakeAssert.called(rtspCameraManager.onNewCameraFile);
+  });
+  it('should star with 180 rotation & stop streaming', async () => {
+    const gladysDeviceWithRotation = {
+      config: {
+        tempFolder: '/tmp/gladys',
+      },
+      device: {
+        getBySelector: fake.resolves({
+          id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+          selector: 'my-camera',
+          params: [
+            {
+              name: 'CAMERA_URL',
+              value: 'test',
+            },
+            {
+              name: 'CAMERA_ROTATION',
+              value: DEVICE_ROTATION.DEGREES_180,
+            },
+          ],
+        }),
+      },
+    };
+    rtspCameraManager = new RtspCameraManager(
+      gladysDeviceWithRotation,
+      FfmpegMock,
+      childProcessMock,
+      'de051f90-f34a-4fd5-be2e-e502339ec9bc',
+    );
+    rtspCameraManager.onNewCameraFile = fake.resolves(null);
+    const liveStreamingProcess = await rtspCameraManager.startStreaming('my-camera', false, 1);
+    expect(liveStreamingProcess).to.have.property('camera_folder');
+    expect(liveStreamingProcess).to.have.property('encryption_key');
+    await rtspCameraManager.liveActivePing('my-camera');
+    await rtspCameraManager.stopStreaming('my-camera');
+    fakeAssert.called(rtspCameraManager.onNewCameraFile);
+  });
+  it('should star with 270 rotation & stop streaming', async () => {
+    const gladysDeviceWithRotation = {
+      config: {
+        tempFolder: '/tmp/gladys',
+      },
+      device: {
+        getBySelector: fake.resolves({
+          id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6b',
+          selector: 'my-camera',
+          params: [
+            {
+              name: 'CAMERA_URL',
+              value: 'test',
+            },
+            {
+              name: 'CAMERA_ROTATION',
+              value: DEVICE_ROTATION.DEGREES_270,
             },
           ],
         }),

@@ -138,6 +138,12 @@ import OverkizEditPage from '../routes/integration/all/overkiz/edit-page';
 import OverkizDiscoverPage from '../routes/integration/all/overkiz/discover-page';
 import OverkizSetupPage from '../routes/integration/all/overkiz/settings-page';
 
+// Tuya integration
+import TuyaPage from '../routes/integration/all/tuya/device-page';
+import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
+import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
+import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -260,6 +266,11 @@ const AppRouter = connect(
         <OverkizEditPage path="/dashboard/integration/device/overkiz/edit-page" />
         <OverkizDiscoverPage path="/dashboard/integration/device/overkiz/discover-page" />
         <OverkizSetupPage path="/dashboard/integration/device/overkiz/settings-page" />
+
+        <TuyaPage path="/dashboard/integration/device/tuya" />
+        <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
+        <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
+        <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

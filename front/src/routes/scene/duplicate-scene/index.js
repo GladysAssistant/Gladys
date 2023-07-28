@@ -14,6 +14,7 @@ class DuplicateScene extends Component {
     const scene = await this.props.httpClient.get(`/api/v1/scene/${this.props.scene_selector}`);
     this.setState({
       sourceScene: scene,
+      loading: false,
       scene: {
         name: '',
         icon: scene.icon
@@ -93,7 +94,6 @@ class DuplicateScene extends Component {
 
   constructor(props) {
     super(props);
-    this.getSourceScene();
     this.state = {
       scene: {
         name: '',
@@ -103,17 +103,23 @@ class DuplicateScene extends Component {
         name: '',
         icon: ''
       },
+      loading: true,
       duplicateSceneErrors: null,
       duplicateSceneStatus: null
     };
   }
 
-  render(props, { duplicateSceneErrors, scene, duplicateSceneStatus, sourceScene }) {
+  componentDidMount() {
+    this.getSourceScene();
+  }
+
+  render(props, { duplicateSceneErrors, scene, duplicateSceneStatus, sourceScene, loading }) {
     return (
       <DuplicateScenePage
         {...props}
         goBack={this.goBack}
         scene={scene}
+        loading={loading}
         sourceScene={sourceScene}
         updateDuplicateSceneName={this.updateDuplicateSceneName}
         updateDuplicateSceneIcon={this.updateDuplicateSceneIcon}
