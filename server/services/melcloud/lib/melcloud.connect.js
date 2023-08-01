@@ -2,7 +2,7 @@ const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 
-const { STATUS, MELCLOUD_ENDPOINT } = require('./utils/melcloud.constants');
+const { STATUS } = require('./utils/melcloud.constants');
 
 /**
  * @description Connect to MELCloud.
@@ -12,8 +12,6 @@ const { STATUS, MELCLOUD_ENDPOINT } = require('./utils/melcloud.constants');
  */
 async function connect(configuration) {
   const { username, password } = configuration;
-
-  console.log(username, password);
 
   if (!username || !password) {
     this.status = STATUS.NOT_INITIALIZED;

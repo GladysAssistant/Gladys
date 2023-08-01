@@ -1,16 +1,12 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, AC_MODE } = require('../../../../utils/constants');
 
 /**
- * @description MELCloud Air to Air device.
+ * @description Get Gladys device features from MELCloud device.
+ * @param {string} externalId - External ID of the Gladys device.
+ * @param {object} melCloudDevice - MELCloud device.
+ * @returns {Array} Array of Gladys device features.
  * @example
- * const airToAirDevice = new AirToAirDevice();
- */
-
-/**
- *
- * @param externalId
- * @param melCloudDevice
- * @example
+ * getGladysDeviceFeatures('melcloud:123456789:1', melCloudDevice);
  */
 function getGladysDeviceFeatures(externalId, melCloudDevice) {
   return [
@@ -67,10 +63,12 @@ const modesGaldysToMELCloud = {
 };
 
 /**
- *
- * @param deviceFeature
- * @param values
+ * @description Transform value from MELCloud to Gladys.
+ * @param {object} deviceFeature - Gladys device feature.
+ * @param {object} values - MELCloud values.
+ * @returns {number} Value.
  * @example
+ * transfromValueFromMELCloud(deviceFeature, values);
  */
 function transfromValueFromMELCloud(deviceFeature, values) {
   const [, , code] = deviceFeature.external_id.split(':');
@@ -88,10 +86,12 @@ function transfromValueFromMELCloud(deviceFeature, values) {
 }
 
 /**
- *
- * @param deviceFeature
- * @param value
+ * @description Transform value from Gladys to MELCloud.
+ * @param {object} deviceFeature - Gladys device feature.
+ * @param {number} value - Gladys Value.
+ * @returns {object} Value.
  * @example
+ * transfromValueFromGladys(deviceFeature, value);
  */
 function transfromValueFromGladys(deviceFeature, value) {
   const [, , code] = deviceFeature.external_id.split(':');

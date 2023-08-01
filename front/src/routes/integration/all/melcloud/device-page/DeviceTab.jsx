@@ -5,7 +5,6 @@ import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import CardFilter from '../../../../../components/layout/CardFilter';
-import TuyaDeviceBox from '../MELCloudDeviceBox';
 import debounce from 'debounce';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';

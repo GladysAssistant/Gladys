@@ -1,6 +1,6 @@
 const logger = require('../../../utils/logger');
 
-const { GLADYS_VARIABLES, TUYA_ENDPOINTS } = require('./utils/melcloud.constants');
+const { GLADYS_VARIABLES } = require('./utils/melcloud.constants');
 
 /**
  * @description Loads MELCloud stored configuration.

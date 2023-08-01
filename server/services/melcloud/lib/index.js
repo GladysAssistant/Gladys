@@ -5,7 +5,6 @@ const { getConfiguration } = require('./melcloud.getConfiguration');
 const { saveConfiguration } = require('./melcloud.saveConfiguration');
 const { discoverDevices } = require('./melcloud.discoverDevices');
 const { loadDevices } = require('./melcloud.loadDevices');
-const { loadDeviceDetails } = require('./melcloud.loadDeviceDetails');
 const { setValue } = require('./melcloud.setValue');
 const { poll } = require('./melcloud.poll');
 
@@ -27,7 +26,6 @@ MELCloudHandler.prototype.getConfiguration = getConfiguration;
 MELCloudHandler.prototype.saveConfiguration = saveConfiguration;
 MELCloudHandler.prototype.discoverDevices = discoverDevices;
 MELCloudHandler.prototype.loadDevices = loadDevices;
-MELCloudHandler.prototype.loadDeviceDetails = loadDeviceDetails;
 MELCloudHandler.prototype.setValue = setValue;
 MELCloudHandler.prototype.poll = poll;
 

@@ -1,8 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
-import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const MELCloudPage = ({ children, user }) => (
+const MELCloudPage = ({ children }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">

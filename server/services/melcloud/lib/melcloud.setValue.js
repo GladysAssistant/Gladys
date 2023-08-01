@@ -11,7 +11,7 @@ const { transfromValueFromGladys } = require('./device/air-to-air.device');
  */
 async function setValue(device, deviceFeature, value) {
   const externalId = deviceFeature.external_id;
-  const [prefix, topic, command] = deviceFeature.external_id.split(':');
+  const [prefix, topic] = deviceFeature.external_id.split(':');
   if (prefix !== 'melcloud') {
     throw new BadParameters(`MELCloud device external_id is invalid: "${externalId}" should starts with "melcloud:"`);
   }
