@@ -967,9 +967,8 @@
       "setup": {
         "title": "Configuration MELCloud",
         "description": "Vous pouvez connecter Gladys à votre compte cloud MELCloud pour commander les appareils associés.",
-        "username": "Nom d'utilistateur",
-        "usernamePlaceholder": "Entrez le nom d'utilisateur du compte MELCloud",
-
+        "username": "Email",
+        "usernamePlaceholder": "Entrez l'email du compte MELCloud",
         "password": "Mot de passe",
         "passwordPlaceholder": "Entrez le mot de passe utilisateur du compte MELCloud",
         "saveLabel": "Enregistrer la configuration",
