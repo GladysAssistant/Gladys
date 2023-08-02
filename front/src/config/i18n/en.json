@@ -215,7 +215,8 @@
       "devices": "Devices",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
-      "clock": "Clock"
+      "clock": "Clock",
+      "scene": "Scene"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -329,6 +330,11 @@
         "displaySecond": "Display seconds?",
         "yes": "Yes",
         "no": "No"
+      },
+      "scene": {
+        "editNameLabel": "Enter the name of this box",
+        "editNamePlaceholder": "Name displayed on the dashboard",
+        "editSceneLabel": "Select the scene you want to display here."
       }
     }
   },
