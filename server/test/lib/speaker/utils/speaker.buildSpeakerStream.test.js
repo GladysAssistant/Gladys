@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const { expect } = require('chai');
 const { PassThrough } = require('stream');
 const EventEmitter = require('events');
-const SpeakerStream = require('speaker');
+const SpeakerStream = require('@euguuu/speaker');
 const Speaker = require('../../../../lib/speaker');
 const { EVENTS } = require('../../../../utils/constants');
 

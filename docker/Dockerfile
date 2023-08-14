@@ -11,7 +11,9 @@ LABEL \
 COPY qemu-* /usr/bin/
 
 # System dependencies
-RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev
+RUN apk add --no-cache tzdata nmap ffmpeg sqlite openssl gzip eudev alsa-utils alsa-lib-dev
+
+COPY ./server/lib/speaker/config/.asoundrc /root/.asoundrc
 
 WORKDIR /tmp
 

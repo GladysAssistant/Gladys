@@ -13,7 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "@flat/lame": "^1.2.6",
+    "@euguuu/lame": "^1.2.7",
     "m3u-parser-generator": "^1.2.0",
     "music-metadata": "7.13.4",
     "wav": "^1.0.2"

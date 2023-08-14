@@ -13,7 +13,7 @@
   ],
   "scripts": {},
   "dependencies": {
-    "@flat/lame": "^1.2.6",
+    "@euguuu/lame": "^1.2.7",
     "node-internet-radio": "^0.2.1",
     "radio-browser": "^2.2.3"
   }

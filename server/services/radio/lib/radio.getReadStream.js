@@ -1,4 +1,4 @@
-const lame = require('@flat/lame');
+const lame = require('@euguuu/lame');
 const https = require('https');
 const http = require('http');
 const internetradio = require('node-internet-radio');

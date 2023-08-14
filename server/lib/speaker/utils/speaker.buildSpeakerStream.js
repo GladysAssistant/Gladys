@@ -1,4 +1,4 @@
-const Speaker = require('speaker');
+const Speaker = require('@euguuu/speaker');
 
 const logger = require('../../../utils/logger');
 const { EVENTS } = require('../../../utils/constants');

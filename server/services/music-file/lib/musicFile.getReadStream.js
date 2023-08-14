@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const lame = require('@flat/lame');
+const lame = require('@euguuu/lame');
 const wav = require('wav');
 const mm = require('music-metadata');
 const logger = require('../../../utils/logger');

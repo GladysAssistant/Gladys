@@ -21,7 +21,11 @@ RUN apk add --no-cache \
          openssl \
          gzip \
          eudev \
-         bluez
+         bluez \
+         alsa-utils \
+         alsa-lib-dev
+
+COPY ./server/lib/speaker/config/.asoundrc /root/.asoundrc
 
 COPY --from=json-files /json-files/server /src/server
 
