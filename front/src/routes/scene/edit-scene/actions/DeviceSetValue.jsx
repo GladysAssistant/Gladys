@@ -18,7 +18,7 @@ class DeviceSetValue extends Component {
     super(props);
     this.props = props;
     this.state = {
-      computed: props.action.evaluate_value || false
+      computed: props.action.evaluate_value !== undefined
     };
   }
 
@@ -80,7 +80,7 @@ class DeviceSetValue extends Component {
             <Localizer>
               <TextWithVariablesInjected
                 text={
-                  this.props.action.value
+                  this.props.action.value !== undefined
                     ? Number(this.props.action.value).toString()
                     : this.props.action.evaluate_value
                 }
@@ -147,9 +147,6 @@ class DeviceSetValue extends Component {
         </div>
 
         <input
-          style={{
-            minHeight: '30px'
-          }}
           type="range"
           value={this.props.action.value}
           onChange={this.handleNewValue}

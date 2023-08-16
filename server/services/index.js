@@ -20,3 +20,4 @@ module.exports.homekit = require('./homekit');
 module.exports.broadlink = require('./broadlink');
 module.exports['lan-manager'] = require('./lan-manager');
 module.exports['nextcloud-talk'] = require('./nextcloud-talk');
+module.exports.tuya = require('./tuya');

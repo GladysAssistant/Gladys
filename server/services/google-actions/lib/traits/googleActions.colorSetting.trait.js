@@ -1,4 +1,5 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { getDeviceFeature } = require('../../../../utils/device');
 
 /**
  * @see https://developers.google.com/assistant/smarthome/traits/colorsetting
@@ -8,15 +9,15 @@ const colorSettingTrait = {
   generateAttributes: (device) => {
     const result = {};
 
-    const hasColor = device.features.find(
-      (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-    );
+    const hasColor = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
     if (hasColor) {
       result.colorModel = 'rgb';
     }
 
-    const hasColorTemp = device.features.find(
-      (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+    const hasColorTemp = getDeviceFeature(
+      device,
+      DEVICE_FEATURE_CATEGORIES.LIGHT,
+      DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
     );
     if (hasColorTemp) {
       result.colorTemperatureRange = {
@@ -65,29 +66,42 @@ const colorSettingTrait = {
     },
   ],
   commands: {
-    'action.devices.commands.ColorAbsolute': {
-      'color.temperature': {
-        writeValue: (paramValue) => {
-          return (paramValue - 2000) / 70;
-        },
-        features: [
-          {
-            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-            type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-          },
-        ],
-      },
-      'color.spectrumRGB': {
-        writeValue: (paramValue) => {
-          return paramValue;
-        },
-        features: [
-          {
-            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-            type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-          },
-        ],
-      },
+    'action.devices.commands.ColorAbsolute': (device, params) => {
+      const events = [];
+      const { color = {} } = params;
+      const { temperature, spectrumRGB } = color;
+
+      if (temperature !== undefined) {
+        const relatedFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+        );
+
+        if (relatedFeature) {
+          events.push({
+            device_feature: relatedFeature.selector,
+            value: (temperature - 2000) / 70,
+          });
+        }
+      }
+
+      if (spectrumRGB !== undefined) {
+        const relatedFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+        );
+
+        if (relatedFeature) {
+          events.push({
+            device_feature: relatedFeature.selector,
+            value: spectrumRGB,
+          });
+        }
+      }
+
+      return { events };
     },
   },
 };

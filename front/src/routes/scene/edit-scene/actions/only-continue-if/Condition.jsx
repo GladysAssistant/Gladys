@@ -127,7 +127,9 @@ class Condition extends Component {
               <Localizer>
                 <TextWithVariablesInjected
                   text={
-                    props.condition.value ? Number(props.condition.value).toString() : props.condition.evaluate_value
+                    props.condition.value !== undefined
+                      ? Number(props.condition.value).toString()
+                      : props.condition.evaluate_value
                   }
                   triggersVariables={props.triggersVariables}
                   actionsGroupsBefore={props.actionsGroupsBefore}

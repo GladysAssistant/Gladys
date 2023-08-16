@@ -62,24 +62,30 @@ class CameraBoxComponent extends Component {
         ? SEGMENT_DURATIONS_PER_LATENCY[this.props.box.camera_latency]
         : SEGMENT_DURATIONS_PER_LATENCY.low;
 
-      const streamingParams = await this.props.httpClient.post(
-        `/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/start`,
-        {
+      const [streamingParams, gatewayStreaming] = await Promise.all([
+        this.props.httpClient.post(`/api/v1/service/rtsp-camera/camera/${this.props.box.camera}/streaming/start`, {
           origin: isGladysPlus ? config.gladysGatewayApiUrl : config.localApiUrl,
           is_gladys_gateway: isGladysPlus,
           segment_duration: segmentationDuration
-        }
-      );
+        }),
+        isGladysPlus ? this.props.session.gatewayClient.cameraStartStreaming() : null
+      ]);
       const { localApiUrl } = config;
       const cameraComponent = this;
 
       this.hls = new Hls({
+        liveMaxLatencyDurationCount: 3,
+        liveSyncDurationCount: 2,
+        maxLiveSyncPlaybackRate: 1.5,
+        liveDurationInfinity: true,
         xhrSetup: xhr => {
-          // We set the correct access token
-          const accessToken = isGladysPlus
-            ? this.props.session.gatewayClient.accessToken
-            : this.props.session.getAccessToken();
-          xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+          // We set the correct access token (locally only)
+          // On Gladys Plus, authentication is done with a temporary
+          // token in the URL to avoid preflight requests
+          if (!isGladysPlus) {
+            const accessToken = this.props.session.getAccessToken();
+            xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
+          }
         },
         loader: class CustomLoader extends Hls.DefaultConfig.loader {
           load(context, config, callbacks) {
@@ -108,6 +114,12 @@ class CameraBoxComponent extends Component {
                   // In the index.m3u8, we replace the backend URL with the local API file
                   // This is useful for local streaming only
                   response.data = response.data.replace('BACKEND_URL_TO_REPLACE', localApiUrl);
+                } else {
+                  // We add the stream access key to the URL for authentication
+                  response.data = response.data.replace(
+                    '/index.m3u8.key',
+                    `/${gatewayStreaming.stream_access_key}/index.m3u8.key`
+                  );
                 }
 
                 onSuccess(response, stats, context);
@@ -140,7 +152,9 @@ class CameraBoxComponent extends Component {
         }
       });
       if (isGladysPlus) {
-        this.hls.loadSource(`${config.gladysGatewayApiUrl}/cameras/${streamingParams.camera_folder}/index.m3u8`);
+        this.hls.loadSource(
+          `${config.gladysGatewayApiUrl}/cameras/${streamingParams.camera_folder}/${gatewayStreaming.stream_access_key}/index.m3u8`
+        );
       } else {
         this.hls.loadSource(
           `${config.localApiUrl}/api/v1/service/rtsp-camera/camera/streaming/${streamingParams.camera_folder}/index.m3u8`
@@ -237,7 +251,7 @@ class CameraBoxComponent extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              <video style={{ width: '100%' }} ref={this.videoRef} controls autoPlay muted />
+              <video class="w-100" ref={this.videoRef} controls autoPlay muted />
             </div>
           </div>
           <div class="card-header">
@@ -266,7 +280,7 @@ class CameraBoxComponent extends Component {
         )}
         {!image && loading && (
           <div class="dimmer active">
-            <div class="dimmer-content" style={{ height: '100px' }} />
+            <div class="dimmer-content my-5 py-5" />
             <div class="loader" />
           </div>
         )}

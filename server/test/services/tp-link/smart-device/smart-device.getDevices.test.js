@@ -1,38 +1,51 @@
-const { fake, stub, assert } = require('sinon');
-const proxyquire = require('proxyquire').noCallThru();
 const EventEmitter = require('events');
-const TpLinkApiClient = require('../mocks.test');
-const devices = require('../devices.json');
+const sinon = require('sinon');
+const { expect } = require('chai');
 
-const TpLinkService = proxyquire('../../../../services/tp-link/index', {
-  'tplink-smarthome-api': TpLinkApiClient,
-});
+const { fake, stub } = sinon;
+
+const devices = require('../devices.json');
+const { Client } = require('../mocks.test');
+const TPLinkSmartDevicetHandler = require('../../../../services/tp-link/lib/smart-device');
 
 const StateManager = require('../../../../lib/state');
 
-const event = new EventEmitter();
-const eventTpLink = new EventEmitter();
-const stateManager = new StateManager(event);
-const deviceManager = {
-  get: fake.resolves(devices),
-};
-
-const gladys = {
-  device: deviceManager,
-  stateManager,
-  event,
-};
-
-const tpLinkService = TpLinkService(gladys, 'a810b8db-6d04-4697-bed3-c4b72c996279');
+const serviceId = 'a810b8db-6d04-4697-bed3-c4b72c996279';
 
 describe('TpLinkService GetDevices', () => {
+  let tpLinkDeviceHandler;
+  let tpLinkClient;
+  let eventTpLink;
+
+  beforeEach(() => {
+    const event = new EventEmitter();
+    const stateManager = new StateManager(event);
+    eventTpLink = new EventEmitter();
+
+    const deviceManager = {
+      get: fake.resolves(devices),
+    };
+
+    const gladys = {
+      device: deviceManager,
+      stateManager,
+      event,
+    };
+
+    tpLinkClient = new Client();
+    tpLinkDeviceHandler = new TPLinkSmartDevicetHandler(gladys, tpLinkClient, serviceId);
+    tpLinkDeviceHandler.discoverDevicesDelay = 0;
+  });
+
+  afterEach(() => {
+    sinon.reset();
+  });
+
   it('should start discovery', async () => {
     // PREPARE
-    stub(tpLinkService.device.client, 'startDiscovery').callsFake(() => {
-      return eventTpLink;
-    });
+    stub(tpLinkClient, 'startDiscovery').callsFake(() => eventTpLink);
     // EXECUTE
-    const promise = tpLinkService.device.getDevices();
+    const promise = tpLinkDeviceHandler.getDevices();
     eventTpLink.emit('device-online', {
       getSysInfo: fake.resolves({
         deviceId: 1,
@@ -62,11 +75,10 @@ describe('TpLinkService GetDevices', () => {
       }),
     });
     // ASSERT
-    return promise.then((detectedDevices) => {
-      // Check event listeners have been removed
-      assert.match(eventTpLink.listenerCount(), 0);
-      // Only 3 devices must be returned because two have same id
-      assert.match(detectedDevices.length, 3);
-    });
-  }).timeout(3000);
+    const detectedDevices = await promise;
+    // Check event listeners have been removed
+    expect(eventTpLink.listenerCount()).eq(0);
+    // Only 3 devices must be returned because two have same id
+    expect(detectedDevices.length).eq(3);
+  });
 });

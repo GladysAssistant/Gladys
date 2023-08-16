@@ -8,7 +8,7 @@ import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
 
 class MqttDeviceSetupPage extends Component {
   selectFeature(selectedFeatureOption) {
@@ -28,6 +28,19 @@ class MqttDeviceSetupPage extends Component {
   addFeature() {
     const featureData = this.state.selectedFeature.split('|');
 
+    let defaultValues = {};
+
+    if (featureData[1] === DEVICE_FEATURE_TYPES.SWITCH.BINARY) {
+      defaultValues.min = 0;
+      defaultValues.max = 1;
+    }
+
+    if (featureData[1] === DEVICE_FEATURE_TYPES.TEXT.TEXT) {
+      defaultValues.min = 0;
+      defaultValues.max = 0;
+      defaultValues.keep_history = false;
+    }
+
     const device = update(this.state.device, {
       features: {
         $push: [
@@ -38,7 +51,8 @@ class MqttDeviceSetupPage extends Component {
             type: featureData[1],
             read_only: true,
             has_feedback: false,
-            keep_history: true
+            keep_history: true,
+            ...defaultValues
           }
         ]
       }
