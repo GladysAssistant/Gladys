@@ -18,6 +18,10 @@ async function connect(tokens) {
   this.abortController = new AbortController();
 
   tokens.forEach(async (token) => {
+    if (!token.value) {
+      return;
+    }
+
     this.bots[token.user_id] = {
       userId: token.user_id,
       token: token.value,
@@ -26,7 +30,6 @@ async function connect(tokens) {
       lastKnownMessageId: null,
     };
     this.startPolling(token.user_id);
-    this.bots[token.user_id].eventEmitter.on('message', this.newMessage.bind(this));
   });
 }
 
