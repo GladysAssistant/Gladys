@@ -35,6 +35,20 @@ class EditDevices extends Component {
     });
   };
 
+  refreshDisplayForNewProps = async () => {
+    if (!this.state.devices) {
+      return;
+    }
+    if (!this.props.box || !this.props.box.device_features) {
+      return;
+    }
+    if (!this.state.deviceOptions) {
+      return;
+    }
+    const { selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(this.state.devices);
+    await this.setState({ selectedDeviceFeaturesOptions });
+  };
+
   updateDeviceFeatureName = async (index, name) => {
     const newState = update(this.state, {
       selectedDeviceFeaturesOptions: {
@@ -49,60 +63,64 @@ class EditDevices extends Component {
     this.refreshDeviceFeaturesNames();
   };
 
+  getSelectedDeviceFeaturesAndOptions = devices => {
+    const deviceOptions = [];
+    let selectedDeviceFeaturesOptions = [];
+
+    devices.forEach(device => {
+      const deviceFeatures = [];
+      device.features.forEach(feature => {
+        const featureOption = {
+          value: feature.selector,
+          label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
+        };
+        if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
+          deviceFeatures.push(featureOption);
+        }
+        // If the feature is already selected
+        if (this.props.box.device_features) {
+          const featureIndex = this.props.box.device_features.indexOf(feature.selector);
+          if (this.props.box.device_features && featureIndex !== -1) {
+            // and there is a name associated to it
+            if (this.props.box.device_feature_names && this.props.box.device_feature_names[featureIndex]) {
+              // We set the new_label in the object
+              featureOption.new_label = this.props.box.device_feature_names[featureIndex];
+            }
+            // And we push this to the list of selected feature
+            selectedDeviceFeaturesOptions.push(featureOption);
+          }
+        }
+      });
+      if (deviceFeatures.length > 0) {
+        deviceFeatures.sort((a, b) => {
+          if (a.label < b.label) {
+            return -1;
+          } else if (a.label > b.label) {
+            return 1;
+          }
+          return 0;
+        });
+        deviceOptions.push({
+          label: device.name,
+          options: deviceFeatures
+        });
+      }
+    });
+    if (this.props.box.device_features) {
+      selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions.sort(
+        (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value)
+      );
+    }
+    return { deviceOptions, selectedDeviceFeaturesOptions };
+  };
+
   getDeviceFeatures = async () => {
     try {
       this.setState({ loading: true });
       // we get the rooms with the devices
       const devices = await this.props.httpClient.get(`/api/v1/device`);
-      const deviceOptions = [];
-      let selectedDeviceFeaturesOptions = [];
-
-      devices.forEach(device => {
-        const deviceFeatures = [];
-        device.features.forEach(feature => {
-          const featureOption = {
-            value: feature.selector,
-            label: getDeviceFeatureName(this.props.intl.dictionary, device, feature)
-          };
-          if (feature.read_only || SUPPORTED_FEATURE_TYPES.includes(feature.type)) {
-            deviceFeatures.push(featureOption);
-          }
-          // If the feature is already selected
-          if (this.props.box.device_features) {
-            const featureIndex = this.props.box.device_features.indexOf(feature.selector);
-            if (this.props.box.device_features && featureIndex !== -1) {
-              // and there is a name associated to it
-              if (this.props.box.device_feature_names && this.props.box.device_feature_names[featureIndex]) {
-                // We set the new_label in the object
-                featureOption.new_label = this.props.box.device_feature_names[featureIndex];
-              }
-              // And we push this to the list of selected feature
-              selectedDeviceFeaturesOptions.push(featureOption);
-            }
-          }
-        });
-        if (deviceFeatures.length > 0) {
-          deviceFeatures.sort((a, b) => {
-            if (a.label < b.label) {
-              return -1;
-            } else if (a.label > b.label) {
-              return 1;
-            }
-            return 0;
-          });
-          deviceOptions.push({
-            label: device.name,
-            options: deviceFeatures
-          });
-        }
-      });
-      if (this.props.box.device_features) {
-        selectedDeviceFeaturesOptions = selectedDeviceFeaturesOptions.sort(
-          (a, b) => this.props.box.device_features.indexOf(a.value) - this.props.box.device_features.indexOf(b.value)
-        );
-      }
-
-      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      const { deviceOptions, selectedDeviceFeaturesOptions } = this.getSelectedDeviceFeaturesAndOptions(devices);
+      await this.setState({ devices, deviceOptions, selectedDeviceFeaturesOptions, loading: false });
       this.refreshDeviceFeaturesNames();
     } catch (e) {
       console.error(e);
@@ -139,6 +157,12 @@ class EditDevices extends Component {
 
   componentDidMount() {
     this.getDeviceFeatures();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.box.device_features !== this.props.box.device_features) {
+      this.refreshDisplayForNewProps();
+    }
   }
 
   render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
