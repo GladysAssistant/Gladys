@@ -61,6 +61,8 @@ describe('GoogleActions Handler - onSync - color', () => {
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
           type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
           last_value: 73,
+          min: 153,
+          max: 454,
         },
       ],
       model: 'device-model',
@@ -106,8 +108,8 @@ describe('GoogleActions Handler - onSync - color', () => {
             traits: ['action.devices.traits.ColorSetting'],
             attributes: {
               colorTemperatureRange: {
-                temperatureMinK: 2000,
-                temperatureMaxK: 9000,
+                temperatureMinK: 2203,
+                temperatureMaxK: 6536,
               },
             },
             name: {
@@ -140,7 +142,7 @@ describe('GoogleActions Handler - onSync - color', () => {
           'device-1': {
             online: true,
             color: {
-              temperatureK: 7110,
+              temperatureK: 13699,
             },
           },
         },
@@ -177,7 +179,7 @@ describe('GoogleActions Handler - onSync - color', () => {
       device_feature: 'feature-1',
       status: 'pending',
       type: 'device.set-value',
-      value: 14.285714285714286,
+      value: 333,
     });
   });
 });
