@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const ZwaveJSUIManager = require('../../../../../services/zwave-js-ui/lib');
 const { DEFAULT } = require('../../../../../services/zwave-js-ui/lib/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
 const { assert, fake } = sinon;
 
@@ -15,6 +16,7 @@ describe('zwave gladys node event', () => {
   let gladys;
   let zwaveJSUIManager;
   let node;
+  let clock;
 
   before(() => {
     gladys = {
@@ -40,20 +42,26 @@ describe('zwave gladys node event', () => {
     zwaveJSUIManager.scanComplete = fake.resolves(null);
     zwaveJSUIManager.scanNetwork = fake.resolves(null);
     // sinon.reset();
+    clock = sinon.useFakeTimers();
+  });
+
+  afterEach(() => {
+    clock.restore();
+    sinon.reset();
   });
 
   it('should default _CLIENTS', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS`, null);
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/_CLIENTS`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
   it('should default status', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/???/status`, null);
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/???/status`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
   it('should default nodeinfo', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/???/nodeinfo`, null);
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/???/nodeinfo`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
@@ -62,7 +70,7 @@ describe('zwave gladys node event', () => {
       value: 'version',
     };
     zwaveJSUIManager.handleMqttMessage(
-      `${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/version`,
+      `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/version`,
       JSON.stringify(message),
     );
     assert.notCalled(zwaveJSUIManager.valueUpdated);
@@ -71,22 +79,22 @@ describe('zwave gladys node event', () => {
 
   it('should default scanInProgress', () => {
     zwaveJSUIManager.scanInProgress = true;
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/???`, null);
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/???`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
   it('should not managed set', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeId/commandClass/endpoint/propertyName/set`, null);
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeId/commandClass/endpoint/propertyName/set`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
   it('should not managed not supported commandClass', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeId/112/endpoint/propertyName`, null);
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeId/112/endpoint/propertyName`, null);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
   it('should update node empty message', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, '');
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeID_1/0/0/propertyName/propertyKey`, '');
     assert.calledOnceWithExactly(
       zwaveJSUIManager.valueUpdated,
       {
@@ -103,7 +111,7 @@ describe('zwave gladys node event', () => {
   });
 
   it('should default node true message', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, 'true');
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeID_1/0/0/propertyName/propertyKey`, 'true');
     assert.calledOnce(zwaveJSUIManager.valueUpdated);
     /* assert.calledOnceWithExactly(zwaveJSUIManager.valueUpdated, {
       id: 1,
@@ -118,7 +126,7 @@ describe('zwave gladys node event', () => {
   });
 
   it('should default node false message', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, 'false');
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeID_1/0/0/propertyName/propertyKey`, 'false');
     assert.calledOnce(zwaveJSUIManager.valueUpdated);
     /* assert.calledOnceWithExactly(zwaveJSUIManager.valueUpdated, {
       id: 1,
@@ -133,7 +141,7 @@ describe('zwave gladys node event', () => {
   });
 
   it('should default node number message', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, '1');
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeID_1/0/0/propertyName/propertyKey`, '1');
     assert.calledOnce(zwaveJSUIManager.valueUpdated);
     /* assert.calledOnceWithExactly(zwaveJSUIManager.valueUpdated, {
       id: 1,
@@ -148,13 +156,13 @@ describe('zwave gladys node event', () => {
   });
 
   it('should default node not a number message', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/nodeID_1/0/0/propertyName/propertyKey`, '???');
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeID_1/0/0/propertyName/propertyKey`, '???');
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
   it('should shift node location', () => {
     zwaveJSUIManager.mqttTopicWithLocation = true;
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/location/nodeId_1/48/0/propertyName`, 0);
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/location/nodeId_1/48/0/propertyName`, 0);
     zwaveJSUIManager.mqttTopicWithLocation = false;
     assert.calledOnceWithExactly(
       zwaveJSUIManager.valueUpdated,
@@ -172,12 +180,12 @@ describe('zwave gladys node event', () => {
   });
 
   it('should not managed message', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/0123456789`, 0);
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/0123456789`, 0);
     assert.notCalled(zwaveJSUIManager.valueUpdated);
   });
 
   it('should getNodes in scan mode success', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
       success: true,
       result: [
         {
@@ -243,16 +251,29 @@ describe('zwave gladys node event', () => {
   });
 
   it('should getNodes in scan mode error', () => {
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`, {
       success: false,
     });
+
+    clock.tick(DEFAULT.SCAN_NETWORK_RETRY_TIMEOUT);
+
     assert.notCalled(zwaveJSUIManager.scanComplete);
     assert.calledOnce(zwaveJSUIManager.scanNetwork);
   });
 
-  it('should send driver status event', () => {
-    const message = {};
-    zwaveJSUIManager.handleMqttMessage(`${DEFAULT.ROOT}/driver/status`, JSON.stringify(message));
+  it('should send driver new status event', () => {
+    const message = true;
+    zwaveJSUIManager.zwaveJSUIConnected = false;
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/driver/status`, JSON.stringify(message));
+    assert.calledOnceWithExactly(event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
+    });
+  });
+
+  it('should not send driver same status event', () => {
+    const message = true;
+    zwaveJSUIManager.zwaveJSUIConnected = true;
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/driver/status`, JSON.stringify(message));
     assert.notCalled(event.emit);
   });
 });
