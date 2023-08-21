@@ -502,7 +502,7 @@
       "usernameInfo": "Entrez le nom d'utilisateur du compte Nextcloud représentant le bot Gladys.",
       "password": "Mot de passe bot Nextcloud",
       "passwordInfo": "Entrez le mot de passe du compte Nextcloud représentant le bot.",
-      "token": "Token de la conversion avec le bot",
+      "token": "Token de la conversation avec le bot",
       "tokenInfo": "Entrez le token de la conversation entre votre compte Nextcloud et le compte du bot.",
       "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
       "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
