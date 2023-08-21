@@ -651,7 +651,7 @@ describe('zwaveJSUIManager devices', () => {
             unit: null,
             read_only: true,
             has_feedback: true,
-            last_value: undefined,
+            last_value: 0,
           },
         ],
         params: [

@@ -173,7 +173,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       commandClass: 38,
       endpoint: 0,
       property: 'Test',
-      newValue: 'newValue',
+      value: 'newValue',
     });
     assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:38:endpoint:0:property:Test',
