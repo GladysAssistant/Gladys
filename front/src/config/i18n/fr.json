@@ -847,7 +847,7 @@
     },
     "tuya": {
       "title": "Tuya",
-      "description": "Contrôler vos appareils Tuya",
+      "description": "Contrôler vos appareils Tuya (via le cloud).",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Tuya",
       "setupTab": "Configuration",
