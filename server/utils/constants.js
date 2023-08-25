@@ -25,6 +25,16 @@ const BUTTON_STATUS = {
   QUADRUPLE: 19,
   RELEASE: 20,
   MANY: 21,
+  SHAKE: 22,
+  THROW: 23,
+  WAKEUP: 24,
+  FALL: 25,
+  TAP: 26,
+  SLIDE: 27,
+  FLIP_180: 28,
+  FLIP_90: 29,
+  ROTATE_LEFT: 30,
+  ROTATE_RIGHT: 31,
 };
 
 const COVER_STATE = {

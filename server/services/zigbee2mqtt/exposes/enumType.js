@@ -41,6 +41,17 @@ addMapping('action', BUTTON_STATUS.QUADRUPLE, 'quadruple');
 addMapping('action', BUTTON_STATUS.RELEASE, 'release');
 addMapping('action', BUTTON_STATUS.MANY, 'many');
 
+addMapping('action', BUTTON_STATUS.SHAKE, 'shake');
+addMapping('action', BUTTON_STATUS.THROW, 'throw');
+addMapping('action', BUTTON_STATUS.WAKEUP, 'wakeup');
+addMapping('action', BUTTON_STATUS.FALL, 'fall');
+addMapping('action', BUTTON_STATUS.TAP, 'tap');
+addMapping('action', BUTTON_STATUS.SLIDE, 'slide');
+addMapping('action', BUTTON_STATUS.FLIP_180, 'flip180');
+addMapping('action', BUTTON_STATUS.FLIP_90, 'flip90');
+addMapping('action', BUTTON_STATUS.ROTATE_LEFT, 'rotate_left');
+addMapping('action', BUTTON_STATUS.ROTATE_RIGHT, 'rotate_right');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
