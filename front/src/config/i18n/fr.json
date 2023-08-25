@@ -2148,7 +2148,12 @@
           "3": "Pression clic long",
           "4": "Relâche clic long",
           "5": "Clic maintenu",
-          "6": "Clic long"
+          "6": "Clic long",
+          "7": "On",
+          "8": "Off",
+          "9": "Réduire luminosité",
+          "10": "Augmenter luminosité",
+          "11": "Stopper luminosité"
         }
       },
       "opening-sensor": {
