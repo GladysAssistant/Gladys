@@ -2,7 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const logger = require('../../../utils/logger');
-const { Error404 } = require('../../../utils/httpErrors');
+const { Error404, Error400 } = require('../../../utils/httpErrors');
+const { validateFilename, validateSessionId } = require('../utils/validateStreamParams');
 const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
@@ -57,6 +58,8 @@ module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
    */
   async function getStreamingFile(req, res) {
     try {
+      validateSessionId(req.params.folder);
+      validateFilename(req.params.file);
       const filePath = path.join(gladys.config.tempFolder, req.params.folder, req.params.file);
       const filestream = fs.createReadStream(filePath);
       filestream.on('error', (err) => {
@@ -64,6 +67,9 @@ module.exports = function RtspCameraController(gladys, rtspCameraHandler) {
       });
       filestream.pipe(res);
     } catch (e) {
+      if (e instanceof Error400) {
+        throw e;
+      }
       logger.warn(e);
       throw new Error404('FILE_NOT_FOUND');
     }
