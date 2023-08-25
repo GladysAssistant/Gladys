@@ -2158,7 +2158,11 @@
           "14": "Left arrow held",
           "15": "Right arrow held",
           "16": "Left arrow release",
-          "17": "Right arrow release"
+          "17": "Right arrow release",
+          "18": "Triple click",
+          "19": "Quadruple click",
+          "20": "Click released",
+          "21": "Many clicks"
         }
       },
       "opening-sensor": {
