@@ -2,6 +2,8 @@ import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { CalDAVStatus } from '../../../../../utils/consts';
 
+import style from './AccountTab.css';
+
 const AccountTab = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
@@ -89,7 +91,7 @@ const AccountTab = ({ children, ...props }) => (
                         props.caldavSaveSettingsStatus === CalDAVStatus.Error) && (
                         <div class="alert alert-danger">
                           <Text id="integration.caldav.configurationDefaultError" />
-                          <p style={{ marginBottom: '0', fontStyle: 'italic' }}>
+                          <p className={style.errorMessage}>
                             <Text id={`integration.caldav.configuration${props.caldavSaveSettingsStatus}`} />
                           </p>
                         </div>
@@ -116,7 +118,7 @@ const AccountTab = ({ children, ...props }) => (
                         props.caldavSyncStatus === CalDAVStatus.Error) && (
                         <div class="alert alert-danger">
                           <Text id="integration.caldav.synchronizationDefaultError" />
-                          <p style={{ marginBottom: '0', fontStyle: 'italic' }}>
+                          <p className={style.errorMessage}>
                             <Text id={`integration.caldav.synchronization${props.caldavSyncStatus}`} />
                           </p>
                         </div>
@@ -127,18 +129,14 @@ const AccountTab = ({ children, ...props }) => (
                         </p>
                       )}
                       <div class="form-group">
-                        <div style={{ marginBottom: '10px' }}>
+                        <div className={style.successMessage}>
                           <Text id={`integration.caldav.synchronizationInfo`} />
                         </div>
                         <span class="input-group-append">
-                          <button class="btn btn-primary" onClick={props.saveCaldavSettings}>
+                          <button className={cx('btn btn-primary', style.button)} onClick={props.saveCaldavSettings}>
                             <Text id={`integration.caldav.buttonSave`} />
                           </button>
-                          <button
-                            class="btn btn-danger"
-                            onClick={props.cleanUp}
-                            style={{ marginLeft: '10px', marginRight: '10px' }}
-                          >
+                          <button className={cx('btn btn-danger', style.button)} onClick={props.cleanUp}>
                             <Text id={`integration.caldav.buttonCleanUp`} />
                           </button>
                           <button class="btn btn-success" onClick={props.startSync}>

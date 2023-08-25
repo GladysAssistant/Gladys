@@ -31,7 +31,7 @@ class EditRoom extends Component {
             value={room.name}
             onInput={this.editRoomLocal}
           />
-          <div class="input-group-append" onClick={this.removeRoomLocal} style={{ cursor: 'pointer' }}>
+          <div class="input-group-append cursor-pointer" onClick={this.removeRoomLocal}>
             <div class="input-group-text">
               <i class="fe fe-x" />
             </div>

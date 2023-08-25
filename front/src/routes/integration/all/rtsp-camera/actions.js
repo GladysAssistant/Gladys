@@ -199,6 +199,7 @@ function createActions(store) {
     async saveCamera(state, index) {
       const camera = state.rtspCameras[index];
       camera.features[0].name = camera.name;
+      delete camera.features[0].last_value_string;
       let newCamera = await state.httpClient.post(`/api/v1/device`, camera);
       newCamera = await actions.complete(newCamera);
       const rtspCameras = update(state.rtspCameras, {

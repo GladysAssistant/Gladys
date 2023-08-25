@@ -25,16 +25,16 @@ class SceneCard extends Component {
 
   render(props, { saving }) {
     return (
-      <div class="col-sm-6 col-lg-3">
-        <div class="card h-100">
-          <div
-            class={cx('dimmer', {
-              active: saving
-            })}
-          >
-            <div class="loader" />
-            <div class="dimmer-content">
-              <div class="card-body p-3 text-center">
+      <div class="col-lg-3 p-2">
+        <div
+          class={cx('dimmer h-100', {
+            active: saving
+          })}
+        >
+          <div class="loader" />
+          <div class="dimmer-content h-100">
+            <div class="card h-100 d-flex flex-column justify-content-between">
+              <div class="card-body pb-0 pt-3 pl-3 pr-3 text-center h-100">
                 <div class={style.scene_icon}>
                   <i class={`fe fe-${props.scene.icon}`} />
                 </div>
@@ -52,18 +52,20 @@ class SceneCard extends Component {
                   </label>
                 </div>
                 <h4>{props.scene.name}</h4>
-                <div class="text-muted">{props.scene.description}</div>
+                <div class={`text-muted ${style.descriptionSceneEllipsis}`}>{props.scene.description}</div>
               </div>
-              <div class="card-footer">
-                <div class="btn-list text-center">
-                  <Link href={`${props.currentUrl}/${props.scene.selector}`} class="btn btn-outline-primary btn-sm">
-                    <i class="fe fe-edit" />
-                    <Text id="scene.editButton" />
-                  </Link>
-                  <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
-                    <i class="fe fe-play" />
-                    <Text id="scene.startButton" />
-                  </button>
+              <div class="mt-auto">
+                <div class="card-footer">
+                  <div class="btn-list text-center">
+                    <Link href={`${props.currentUrl}/${props.scene.selector}`} class="btn btn-outline-primary btn-sm">
+                      <i class="fe fe-edit" />
+                      <Text id="scene.editButton" />
+                    </Link>
+                    <button onClick={this.startScene} type="button" class="btn btn-outline-success btn-sm">
+                      <i class="fe fe-play" />
+                      <Text id="scene.startButton" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

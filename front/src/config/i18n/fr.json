@@ -212,6 +212,7 @@
       "user-presence": "Utilisateurs présent",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
+      "devices": "Appareils",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
       "vacbot": "Robot aspirateur",
@@ -240,9 +241,14 @@
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Vous n'avez pas d'appareil dans votre maison ! <br/> Définissez votre appareil dans la page de l'intégration.",
         "addButton": "+",
         "substractButton": "-"
+      },
+      "devices": {
+        "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
+        "editNameLabel": "Nom du widget",
+        "editNamePlaceholder": "Entrez le nom du widget",
+        "addADeviceLabel": "Ajouter un appareil :"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -356,8 +362,6 @@
       "title": "Intégrations",
       "subtitle": "{{length}} de {{total}} intégrations",
       "searchPlaceholder": "Chercher une intégration",
-      "restartButton": "Redémarrer",
-      "stopButton": "Arrêter",
       "menu": {
         "all": "Toutes les intégrations",
         "device": "Appareils",
@@ -453,7 +457,7 @@
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
         "externalIdLabel": "ID externe",
-        "manufacturerLabel": "Construteur",
+        "manufacturerLabel": "Constructeur",
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
@@ -508,14 +512,14 @@
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
       "description": "Parlez à Gladys grâce à Nextcloud Talk.",
-      "introduction": "Pour communiquer via Talk il vous créer un compte spécifique Nextcloud représentant votre bot.",
+      "introduction": "Pour communiquer via Talk, il faut créer un compte spécifique Nextcloud représentant votre bot.",
       "url": "URL de l'instance Nextcloud",
       "urlInfo": "Entrez l'url de base de votre instance Nextcloud.",
       "username": "Nom d'utilisateur bot Nextcloud",
       "usernameInfo": "Entrez le nom d'utilisateur du compte Nextcloud représentant le bot Gladys.",
       "password": "Mot de passe bot Nextcloud",
       "passwordInfo": "Entrez le mot de passe du compte Nextcloud représentant le bot.",
-      "token": "Token de la conversion avec le bot",
+      "token": "Token de la conversation avec le bot",
       "tokenInfo": "Entrez le token de la conversation entre votre compte Nextcloud et le compte du bot.",
       "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
       "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
@@ -534,7 +538,6 @@
         "scanButton": "Recherche sur le réseau",
         "bridgeButtonNotPressed": "Le bouton du pont n'a pas été appuyé : veuillez appuyer sur le bouton de votre pont Philips Hue et réessayer.",
         "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
-        "noBridgesConnected": "Aucun pont connecté",
         "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?"
       },
       "device": {
@@ -569,9 +572,12 @@
       "testConnectionButton": "Tester",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
-      "rotate180Label": "Rotation 180°",
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
-      "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
+      "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?",
+      "rotationO": "Pas de rotation",
+      "rotation90": "90°",
+      "rotation18O": "180°",
+      "rotation27O": "270°"
     },
     "tasmota": {
       "title": "Tasmota",
@@ -875,7 +881,10 @@
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
       "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
       "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparait pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
-      "reloadButton": "Relancer"
+      "reloadButton": "Relancer",
+      "reset": "En cas de problèmes de connexion entre votre application Maison et le pont Gladys HomeKit vous pouvez essayer de le réinitialiser en cliquant sur le bouton ci-dessous. <b>ATTENTION</b>, vous devrez supprimer et ajouter à nouveau le pont Gladys à votre application Maison sur votre appareil Apple.",
+      "resetButton": "Réinitialiser",
+      "resetError": "Une erreur est survenue pendant la réinitialisation du pont"
     },
     "owntracks": {
       "title": "Owntracks",
@@ -910,6 +919,79 @@
       "apiKeyPlaceholder": "Entrer la clé API OpenWeather",
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
+    },
+    "tuya": {
+      "title": "Tuya",
+      "description": "Contrôler vos appareils Tuya (via le cloud).",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Tuya",
+      "setupTab": "Configuration",
+      "documentation": "Tuya documentation",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Tuya",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Tuya, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Tuya.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "device": {
+        "title": "Appareils Tuya dans Gladys",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil Tuya trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud Tuya",
+        "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
+        "error": "Erreur de découverte des appareils Tuya. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil Tuya n'a été découvert.",
+        "scan": "Scanner"
+      },
+      "setup": {
+        "title": "Configuration Tuya",
+        "description": "Vous pouvez connecter Gladys à votre compte cloud Tuya pour commander les appareils associés.",
+        "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a>.",
+        "descriptionCreateProject": "Vous devez ensuite créer un \"Cloud Project\" dans votre compte Tuya.",
+        "descriptionGetKeys": "Vous aurez accès aux deux clés : Access Key et Secret Key.",
+        "descriptionGetAppAccountUid": "Pour avoir votre \"App account UID\", il faut vous rendre dans la section \"Devices\" -> \"Link Tuya App Account\" et ajouter un compte d'application.",
+        "descriptionGetAppAccountUid2": "Une fois que l'ajout est finalisé, votre \"App account UID\" sera dans la colonne UID.",
+        "endpoints": {
+          "china": "China",
+          "westernAmerica": "Western America",
+          "easternAmerica": "Eastern America",
+          "centralEurope": "Central Europe",
+          "westernEurope": "Western Europe",
+          "india": "India"
+        },
+        "endpoint": "Endpoint",
+        "accessKey": "Access Key",
+        "accessKeyPlaceholder": "Entrez l'Access Key de Tuya",
+        "secretKey": "Secret Key",
+        "secretKeyPlaceholder": "Entrez la Secret Key de Tuya",
+        "appAccountId": "App account UID",
+        "appAccountIdPlaceholder": "Entrez l'UID de l'app de Tuya",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",
+        "connected": "Connexion réussie au compte cloud Tuya !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
     },
     "mqtt": {
       "title": "MQTT",
@@ -1158,7 +1240,7 @@
         "title": "Appareils LAN",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
-        "manufacturerLabel": "Construteur",
+        "manufacturerLabel": "Constructeur",
         "ipAddressLabel": "Adresse IP",
         "macAddressLabel": "Adresse MAC",
         "originalNameLabel": "Nom sur le réseau"
@@ -1183,7 +1265,7 @@
         "presenceScannerFrequencyUnit": "minutes",
         "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
         "ipMasksLabel": "CIDR à scanner",
-        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
+        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vous correspondent le mieux.",
         "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne peuvent pas être supprimés.",
         "maskTableHeader": "CIDR",
         "nameTableHeader": "Nom",
@@ -1268,10 +1350,13 @@
   },
   "editScene": {
     "editNamePlaceholder": "Entrez un nom de scène",
+    "descriptionTitle": "Description",
+    "editDescriptionPlaceholder": "Entrez une description pour la scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
     "duplicateButton": "Dupliquer",
+    "moreButton": "Plus",
     "triggersTitle": "Déclencheurs",
     "newTrigger": "Nouveau déclencheur",
     "addTriggerButton": "Ajouter déclencheur",
@@ -1296,6 +1381,13 @@
       },
       "messageSend": {
         "userLabel": "Utilisateur",
+        "textLabel": "Message",
+        "textPlaceholder": "Texte du message",
+        "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
+      },
+      "messageCameraSend": {
+        "userLabel": "Utilisateur",
+        "cameraLabel": "Camera",
         "textLabel": "Message",
         "textPlaceholder": "Texte du message",
         "explanationText": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
@@ -1420,7 +1512,8 @@
         "set-value": "Contrôler un appareil"
       },
       "message": {
-        "send": "Envoyer un message"
+        "send": "Envoyer un message",
+        "send-camera": "Envoyer une image de caméra"
       },
       "delay": "Attendre",
       "light": {
@@ -1673,7 +1766,6 @@
       "resetPassword": "Réinitialiser le mot de passe",
       "editPreferences": "Editer les préférences",
       "resetPasswordButton": "Réinitialiser",
-      "saveButton": "Enregistrer",
       "success": "Profil enregistré avec succès !"
     }
   },
@@ -1954,9 +2046,9 @@
     "psi": "Livre-force par pouce carré (psi)",
     "lux": "Lux",
     "ppm": "Partie par million (ppm)",
+    "watt": "Watt (W)",
+    "kilowatt": "Kilowatt (kW)",
     "ppb": "Partie par millard (ppb)",
-    "watt": "Watt",
-    "kilowatt": "Kilowatt",
     "watt-hour": "Watt heure (Wh)",
     "kilowatt-hour": "Kilowatt heure (kWh)",
     "megawatt-hour": "Mégawatt heure (MWh)",
@@ -1974,7 +2066,7 @@
     "degree": "Degré d'angle (°)",
     "liter": "Litre (l)",
     "milliliter": "Millilitre (ml)",
-    "cubicmeter": "Mètre cube (m3)",
+    "cubicmeter": "Mètre cube (m³)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -2013,7 +2105,11 @@
     "kilobytes-per-second": "Kilooctets par seconde (Ko/s)",
     "megabytes-per-second": "Megaoctets par seconde (Mo/s)",
     "gigabytes-per-second": "Gigaoctets par seconde (Go/s)",
-    "aqi": "Indice de Qualité de l'Air"
+    "aqi": "Indice de Qualité de l'Air",
+    "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)",
+    "square-centimeter": "Centimètre carré (cm²)",
+    "square-meter": "Mètre carré (m²)",
+    "square-kilometer": "Kilomètre carré (km²)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2037,8 +2133,8 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
-    "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
@@ -2046,7 +2142,7 @@
     "degree": "°",
     "liter": "l",
     "milliliter": "ml",
-    "cubicmeter": "m3",
+    "cubicmeter": "m³",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -2085,7 +2181,11 @@
     "kilobytes-per-second": "Ko/s",
     "megabytes-per-second": "Mo/s",
     "gigabytes-per-second": "Go/s",
-    "aqi": "AQI"
+    "aqi": "AQI",
+    "microgram-per-cubic-meter": "µg/m³",
+    "square-centimeter": "cm²",
+    "square-meter": "m²",
+    "square-kilometer": "km²"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2137,7 +2237,12 @@
           "3": "Pression clic long",
           "4": "Relâche clic long",
           "5": "Clic maintenu",
-          "6": "Clic long"
+          "6": "Clic long",
+          "7": "On",
+          "8": "Off",
+          "9": "Réduire luminosité",
+          "10": "Augmenter luminosité",
+          "11": "Stopper luminosité"
         }
       },
       "opening-sensor": {
@@ -2276,7 +2381,15 @@
     },
     "soil-moisture-sensor": {
       "shortCategoryName": "Capteur d'humidité du sol",
-      "decimal": "Humidité du sol (decimal)"
+      "decimal": "Humidité du sol (Décimale)"
+    },
+    "pm25-sensor": {
+      "shortCategoryName": "Capteur de PM2.5",
+      "decimal": "PM2.5 (Décimale)"
+    },
+    "formaldehyd-sensor": {
+      "shortCategoryName": "Formaldehyd sensor",
+      "decimal": "Formaldehyd (Décimale)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",
@@ -2326,6 +2439,8 @@
       "play": "Lecture",
       "pause": "Pause",
       "stop": "Stop",
+      "previous": "Précédent",
+      "next": "Suivant",
       "record": "Enregistrer"
     },
     "energy-sensor": {
@@ -2397,6 +2512,14 @@
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
       "aqi": "Indice de qualité de l'air"
+    },
+    "text": {
+      "shortCategoryName": "Texte",
+      "text": "Texte"
+    },
+    "surface": {
+      "shortCategoryName": "Surface",
+      "decimal": "Surface"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

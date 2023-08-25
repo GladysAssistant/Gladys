@@ -1,6 +1,9 @@
 import { Text, Localizer, MarkupText } from 'preact-i18n';
 import { Component } from 'preact';
-import { DEVICE_FEATURE_UNITS_BY_CATEGORY } from '../../../../../../../../server/utils/constants';
+import {
+  DEVICE_FEATURE_UNITS_BY_CATEGORY,
+  DEVICE_FEATURE_CATEGORIES
+} from '../../../../../../../../server/utils/constants';
 import { DeviceFeatureCategoriesIcon, RequestStatus } from '../../../../../../utils/consts';
 import get from 'get-value';
 
@@ -71,61 +74,67 @@ const MqttFeatureBox = ({ children, feature, featureIndex, ...props }) => {
             </div>
           )}
 
-          <div class="form-group">
-            <label class="form-label" for={`min_${featureIndex}`}>
-              <Text id="integration.mqtt.feature.minLabel" />
-            </label>
-            <Localizer>
-              <input
-                id={`min_${featureIndex}`}
-                type="number"
-                value={feature.min}
-                onInput={props.updateMin}
-                class="form-control"
-                placeholder={<Text id="integration.mqtt.feature.minPlaceholder" />}
-              />
-            </Localizer>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for={`max_${featureIndex}`}>
-              <Text id="integration.mqtt.feature.maxLabel" />
-            </label>
-            <Localizer>
-              <input
-                id={`max_${featureIndex}`}
-                type="number"
-                value={feature.max}
-                onInput={props.updateMax}
-                class="form-control"
-                placeholder={<Text id="integration.mqtt.feature.maxPlaceholder" />}
-              />
-            </Localizer>
-          </div>
-          <div class="page-options d-flex">
+          {feature.category !== DEVICE_FEATURE_CATEGORIES.TEXT && (
             <div class="form-group">
-              <div class="form-label">
-                <Text id="editDeviceForm.keepHistoryLabel" />
-              </div>
-              <label class="custom-switch">
-                <input
-                  id={`keep_history_${featureIndex}`}
-                  type="checkbox"
-                  checked={feature.keep_history}
-                  onClick={props.updateKeepHistory}
-                  class="custom-switch-input"
-                />
-                <span class="custom-switch-indicator" />
-                <span class="custom-switch-description">
-                  <Text id="editDeviceForm.keepHistorySmallDescription" />
-                </span>
+              <label class="form-label" for={`min_${featureIndex}`}>
+                <Text id="integration.mqtt.feature.minLabel" />
               </label>
-              <p class="mt-2">
-                <small>
-                  <MarkupText id="editDeviceForm.keepHistoryDescription" />
-                </small>
-              </p>
+              <Localizer>
+                <input
+                  id={`min_${featureIndex}`}
+                  type="number"
+                  value={feature.min}
+                  onInput={props.updateMin}
+                  class="form-control"
+                  placeholder={<Text id="integration.mqtt.feature.minPlaceholder" />}
+                />
+              </Localizer>
             </div>
-          </div>
+          )}
+          {feature.category !== DEVICE_FEATURE_CATEGORIES.TEXT && (
+            <div class="form-group">
+              <label class="form-label" for={`max_${featureIndex}`}>
+                <Text id="integration.mqtt.feature.maxLabel" />
+              </label>
+              <Localizer>
+                <input
+                  id={`max_${featureIndex}`}
+                  type="number"
+                  value={feature.max}
+                  onInput={props.updateMax}
+                  class="form-control"
+                  placeholder={<Text id="integration.mqtt.feature.maxPlaceholder" />}
+                />
+              </Localizer>
+            </div>
+          )}
+          {feature.category !== DEVICE_FEATURE_CATEGORIES.TEXT && (
+            <div class="page-options d-flex">
+              <div class="form-group">
+                <div class="form-label">
+                  <Text id="editDeviceForm.keepHistoryLabel" />
+                </div>
+                <label class="custom-switch">
+                  <input
+                    id={`keep_history_${featureIndex}`}
+                    type="checkbox"
+                    checked={feature.keep_history}
+                    onClick={props.updateKeepHistory}
+                    class="custom-switch-input"
+                  />
+                  <span class="custom-switch-indicator" />
+                  <span class="custom-switch-description">
+                    <Text id="editDeviceForm.keepHistorySmallDescription" />
+                  </span>
+                </label>
+                <p class="mt-2">
+                  <small>
+                    <MarkupText id="editDeviceForm.keepHistoryDescription" />
+                  </small>
+                </p>
+              </div>
+            </div>
+          )}
           <div class="form-group">
             <div class="form-label">
               <Text id="integration.mqtt.feature.readOnlyLabel" />
@@ -222,7 +231,13 @@ class MqttFeatureBoxComponent extends Component {
     this.props.deleteFeature(this.props.featureIndex);
   };
   getMqttTopic = () => {
-    const publishMqttTopic = `gladys/master/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
+    let publishMqttTopic;
+    if (this.props.feature.category === DEVICE_FEATURE_CATEGORIES.TEXT) {
+      publishMqttTopic = `gladys/master/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/text`;
+    } else {
+      publishMqttTopic = `gladys/master/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
+    }
+
     const listenMqttTopic = `gladys/device/${this.props.device.external_id}/feature/${this.props.feature.external_id}/state`;
     return {
       publishMqttTopic,

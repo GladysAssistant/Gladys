@@ -212,6 +212,7 @@
       "user-presence": "User presence",
       "camera": "Camera",
       "devices-in-room": "Devices in room",
+      "devices": "Devices",
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
       "vacbot": "Vacuum Robot",
@@ -240,9 +241,14 @@
         "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
         "deviceTitle": "{{name}} - {{type}}",
-        "noDevices": "Looks you don't have any devices in your house!<br/>Define your device in the integration page.",
         "addButton": "+",
         "substractButton": "-"
+      },
+      "devices": {
+        "editDeviceFeaturesLabel": "Select the devices you want to display:",
+        "editNameLabel": "Widget name",
+        "editNamePlaceholder": "Enter the name of the widget",
+        "addADeviceLabel": "Add a device:"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -355,8 +361,6 @@
       "title": "Integrations",
       "subtitle": "{{length}} of {{total}} integrations",
       "searchPlaceholder": "Search integrations",
-      "restartButton": "Restart",
-      "stopButton": "Stop",
       "menu": {
         "all": "All integrations",
         "device": "Devices",
@@ -407,7 +411,6 @@
         "scanButton": "Scan network",
         "bridgeButtonNotPressed": "Bridge button not pressed: Please press the button on your Philips Hue bridge and try again.",
         "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
-        "noBridgesConnected": "No bridges connected.",
         "noBridgesFound": "We didn't find any Philips Hue bridges on your network. Are you sure you are connected to the same network as your bridge and your bridge is turned on?"
       },
       "device": {
@@ -442,9 +445,12 @@
       "testConnectionButton": "Test connection",
       "saveButton": "Save",
       "deleteButton": "Delete",
-      "rotate180Label": "180° Rotation",
       "saveError": "There was an error saving the camera.",
-      "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
+      "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?",
+      "rotationO": "No rotation",
+      "rotation90": "90°",
+      "rotation18O": "180°",
+      "rotation27O": "270°"
     },
     "tasmota": {
       "title": "Tasmota",
@@ -748,7 +754,10 @@
       "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
       "configurationError": "An error appears while getting settings.",
       "reload": "If you add a device recently on Gladys and it is not on Home app, try to reload the service with this button.",
-      "reloadButton": "Reload"
+      "reloadButton": "Reload",
+      "reset": "If there are any connection problems between your Home app and HomeKit Gladys bridge you can try to reset it by clicking the button below. <b>WARNING</b>, you will need to remove and add the Gladys bridge again to your Home application on your Apple device.",
+      "resetButton": "Reset",
+      "resetError": "An error appears while resetting bridge."
     },
     "owntracks": {
       "title": "Owntracks",
@@ -783,6 +792,78 @@
       "apiKeyPlaceholder": "Enter OpenWeather API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "tuya": {
+      "title": "Tuya",
+      "description": "Control your Tuya devices (works with the cloud)",
+      "deviceTab": "Devices",
+      "discoverTab": "Tuya discover",
+      "setupTab": "Setup",
+      "documentation": "Tuya documentation",
+      "discoverDeviceDescr": "Automatically scan Tuya devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed or available",
+      "status": {
+        "notConnected": "Gladys failed to connect to Tuya cloud account, please go to ",
+        "setupPageLink": "Tuya configuration page.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No Tuya device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your Tuya cloud account",
+        "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
+        "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No Tuya device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "Tuya configuration",
+        "description": "You can connect Gladys to your Tuya cloud account to control the related devices.",
+        "descriptionCreateAccount": "You need to create an account at <a href=\"https://www.tuya.com/\" target=\"_blank\" rel= \"noopener noreferrer\">Tuya</a>.",
+        "descriptionCreateProject": "You must then create a \"Cloud Project\" in your Tuya account.",
+        "descriptionGetKeys": "You will have access to the Access Key and the Secret Key.",
+        "descriptionGetAppAccountUid": "To have your \"App account UID\", you must go to the \"Devices\" -> \"Link Tuya App Account\" section and add an application account.",
+        "descriptionGetAppAccountUid2": "Once the addition is finalized, your \"App account UID\" will be in the UID column.",
+        "endpoints": {
+          "china": "China",
+          "westernAmerica": "Western America",
+          "easternAmerica": "Eastern America",
+          "centralEurope": "Central Europe",
+          "westernEurope": "Western Europe",
+          "india": "India"
+        },
+        "endpoint": "Endpoint",
+        "accessKey": "Access Key",
+        "accessKeyPlaceholder": "Enter Tuya access key",
+        "secretKey": "Secret Key",
+        "secretKeyPlaceholder": "Enter Tuya secret key",
+        "appAccountId": "App account UID",
+        "appAccountIdPlaceholder": "Enter Tuya application UID",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your Tuya cloud account...",
+        "connected": "Connected to the Tuya cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
     },
     "mqtt": {
       "title": "MQTT",
@@ -1267,10 +1348,13 @@
   },
   "editScene": {
     "editNamePlaceholder": "Enter a scene name",
+    "descriptionTitle": "Description",
+    "editDescriptionPlaceholder": "Enter a scene description",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
     "duplicateButton": "Duplicate",
+    "moreButton": "More",
     "triggersTitle": "Triggers",
     "newTrigger": "New trigger",
     "addTriggerButton": "Add trigger",
@@ -1295,6 +1379,13 @@
       },
       "messageSend": {
         "userLabel": "User",
+        "textLabel": "Message",
+        "textPlaceholder": "Message text",
+        "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
+      },
+      "messageCameraSend": {
+        "userLabel": "User",
+        "cameraLabel": "Camera",
         "textLabel": "Message",
         "textPlaceholder": "Message text",
         "explanationText": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one."
@@ -1419,7 +1510,8 @@
         "set-value": "Set device value"
       },
       "message": {
-        "send": "Send Message"
+        "send": "Send Message",
+        "send-camera": "Send a camera image"
       },
       "delay": "Wait",
       "light": {
@@ -1672,7 +1764,6 @@
       "resetPassword": "Reset password",
       "editPreferences": "Edit preferences",
       "resetPasswordButton": "Reset password",
-      "saveButton": "Save",
       "success": "User saved with success !"
     }
   },
@@ -1964,8 +2055,8 @@
     "millivolt": "Millivolt (mV)",
     "volt": "Volt (V)",
     "volt-ampere": "Voltampere (VA)",
+    "volt-ampere-reactive": "Voltampere reactive (VAr)",
     "kilovolt-ampere": "Kilovoltampere (kVA)",
-    "volt-ampere-reactive": "Voltampere reactive (var)",
     "mm": "Millimeter (mm)",
     "cm": "Centimeter (cm)",
     "m": "Meter (m)",
@@ -1973,7 +2064,7 @@
     "degree": "Angular degree (°)",
     "liter": "Liter (l)",
     "milliliter": "Milliliter (ml)",
-    "cubicmeter": "Cubic meter (m3)",
+    "cubicmeter": "Cubic meter (m³)",
     "euro": "Euro (€)",
     "dollar": "Dollar ($)",
     "bitcoin": "Bitcoin (₿)",
@@ -2012,7 +2103,11 @@
     "kilobytes-per-second": "kilobytes per second (kB/s)",
     "megabytes-per-second": "Megabytes per second (MB/s)",
     "gigabytes-per-second": "Gigabytes per second (GB/s)",
-    "aqi": "Air Quality Index"
+    "aqi": "Air Quality Index",
+    "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)",
+    "square-centimeter": "Square centimer (cm²)",
+    "square-meter": "Square meter (m²)",
+    "square-kilometer": "Square kilometer (km²)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2036,8 +2131,8 @@
     "millivolt": "mV",
     "volt": "V",
     "volt-ampere": "VA",
+    "volt-ampere-reactive": "VAr",
     "kilovolt-ampere": "kVA",
-    "volt-ampere-reactive": "var",
     "mm": "mm",
     "cm": "cm",
     "m": "m",
@@ -2045,7 +2140,7 @@
     "degree": "°",
     "liter": "l",
     "milliliter": "ml",
-    "cubicmeter": "m3",
+    "cubicmeter": "m³",
     "euro": "€",
     "dollar": "$",
     "bitcoin": "₿",
@@ -2084,7 +2179,11 @@
     "kilobytes-per-second": "kB/s",
     "megabytes-per-second": "MB/s",
     "gigabytes-per-second": "GB/s",
-    "aqi": "AQI"
+    "aqi": "AQI",
+    "microgram-per-cubic-meter": "µg/m³",
+    "square-centimeter": "cm²",
+    "square-meter": "m²",
+    "square-kilometer": "km²"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2136,7 +2235,12 @@
           "3": "Long click press",
           "4": "Long click release",
           "5": "Hold click",
-          "6": "Long click"
+          "6": "Long click",
+          "7": "On",
+          "8": "Off",
+          "9": "Brightness down",
+          "10": "Brightness up",
+          "11": "Brightness stop"
         }
       },
       "opening-sensor": {
@@ -2277,6 +2381,14 @@
       "shortCategoryName": "Soil moisture sensor",
       "decimal": "Soil moisture (decimal)"
     },
+    "pm25-sensor": {
+      "shortCategoryName": "PM2.5 sensor",
+      "decimal": "PM2.5 (decimal)"
+    },
+    "formaldehyd-sensor": {
+      "shortCategoryName": "Formaldehyd sensor",
+      "decimal": "Formaldehyd(decimal)"
+    },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
       "binary": "Vibrate (yes/no)",
@@ -2325,6 +2437,8 @@
       "play": "Play",
       "pause": "Pause",
       "stop": "Stop",
+      "previous": "Previous",
+      "next": "Next",
       "record": "Record"
     },
     "energy-sensor": {
@@ -2396,6 +2510,14 @@
     "airquality-sensor": {
       "shortCategoryName": "Air Quality",
       "aqi": "Air Quality Index"
+    },
+    "text": {
+      "shortCategoryName": "Text",
+      "text": "Text"
+    },
+    "surface": {
+      "shortCategoryName": "Surface",
+      "decimal": "Surface"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

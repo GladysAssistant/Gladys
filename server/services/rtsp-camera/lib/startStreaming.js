@@ -8,6 +8,7 @@ const util = require('util');
 const randomBytes = util.promisify(require('crypto').randomBytes);
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
+const { DEVICE_ROTATION } = require('../../../utils/constants');
 
 const DEVICE_PARAM_CAMERA_URL = 'CAMERA_URL';
 const DEVICE_PARAM_CAMERA_ROTATION = 'CAMERA_ROTATION';
@@ -108,13 +109,33 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       '-i',
       cameraUrlParam.value,
       '-c:v',
-      'h264',
+      'h264', // Codec H264
       '-preset',
-      'veryfast',
+      'veryfast', // Encoding presets
       '-flags',
       '+cgop',
+      '-r',
+      '25', // Frames (rate) per second
       '-g',
-      '25',
+      '25', // Set key frame placement. The GOP size sets the maximum distance between key frames;
+      '-b:v',
+      '1000k', // Bitrate
+      '-maxrate',
+      '1500k', // Maximum bitrate nevertheless of the quality factor crf
+      '-bufsize',
+      '3000k', // Based on the -bufsize option, ffmpeg will calculate and correct the average bit rate produced.
+      // If we specify a smaller -bufsize, ffmpeg will more frequently check for the output bit rate
+      // and constrain it to the specified average bit rate from the command line
+      '-crf',
+      '25', // Quality of the video Constant Rate Factor 17-18 visually lossless, 23 default, 0 lossless, 51 highest
+      '-sc_threshold',
+      '0', // Disable scene detection
+      '-c:a',
+      'aac', // Audio codec aac
+      '-b:a',
+      '128k', // Bitrate for the audio
+      '-ac',
+      '2', // Audio channels, 2 = stereo
       '-hls_time',
       segmentDuration.toString(),
       '-hls_list_size',
@@ -128,10 +149,23 @@ async function startStreaming(cameraSelector, isGladysGateway, segmentDuration =
       indexFilePath,
     ];
 
-    if (cameraRotationParam.value === '1') {
-      args.push('-vf'); // Rotate 180
-      args.push('hflip,vflip');
+    let cameraRotationArgs = '';
+    switch (cameraRotationParam.value) {
+      case DEVICE_ROTATION.DEGREES_90:
+        cameraRotationArgs = 'scale=1920:-1,transpose=1'; // Full HD resolution & Rotate 90
+        break;
+      case DEVICE_ROTATION.DEGREES_180:
+        cameraRotationArgs = 'scale=1920:-1,transpose=1,transpose=1'; // Full HD resolution & Rotate 180
+        break;
+      case DEVICE_ROTATION.DEGREES_270:
+        cameraRotationArgs = 'scale=1920:-1,transpose=2'; // Full HD resolution & Rotate 270
+        break;
+      default:
+        cameraRotationArgs = 'scale=1920:-1'; // Full HD resolution & Rotate 0
+        break;
     }
+
+    args.splice(8, 0, '-vf', cameraRotationArgs);
 
     const options = {
       timeout: 5 * 60 * 1000, // 5 minutes
