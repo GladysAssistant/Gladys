@@ -14,6 +14,7 @@ const boxesSchema = Joi.array().items(
       name: Joi.string(),
       modes: Joi.object(),
       device_features: Joi.array().items(Joi.string()),
+      device_feature_names: Joi.array().items(Joi.string()),
       device_feature: Joi.string(),
       unit: Joi.string(),
       units: Joi.array().items(Joi.string().allow(null)),

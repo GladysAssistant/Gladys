@@ -244,9 +244,10 @@
         "substractButton": "-"
       },
       "devices": {
-        "editDeviceFeaturesLabel": "Select the devices you want to display.",
+        "editDeviceFeaturesLabel": "Select the devices you want to display:",
         "editNameLabel": "Widget name",
-        "editNamePlaceholder": "Enter the name of the widget"
+        "editNamePlaceholder": "Enter the name of the widget",
+        "addADeviceLabel": "Add a device:"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
