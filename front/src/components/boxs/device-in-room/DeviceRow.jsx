@@ -1,6 +1,8 @@
 import { createElement } from 'preact';
 import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 
+import { getDeviceName } from '../../../utils/device';
+
 import BinaryDeviceFeature from './device-features/BinaryDeviceFeature';
 import ColorDeviceFeature from './device-features/ColorDeviceFeature';
 import SensorDeviceFeature from './device-features/sensor-value/SensorDeviceFeature';
@@ -29,9 +31,12 @@ const ROW_TYPE_BY_FEATURE_TYPE = {
 };
 
 const DeviceRow = ({ children, ...props }) => {
+  const { device, deviceFeature } = props;
+  const rowName = deviceFeature.new_label || getDeviceName(device, deviceFeature);
+
   // if device is a sensor, we display the sensor deviceFeature
   if (props.deviceFeature.read_only) {
-    return <SensorDeviceFeature user={props.user} device={props.device} deviceFeature={props.deviceFeature} />;
+    return <SensorDeviceFeature user={props.user} device={device} deviceFeature={deviceFeature} rowName={rowName} />;
   }
 
   const elementType = ROW_TYPE_BY_FEATURE_TYPE[props.deviceFeature.type];
@@ -41,7 +46,7 @@ const DeviceRow = ({ children, ...props }) => {
     return null;
   }
 
-  return createElement(elementType, props);
+  return createElement(elementType, { ...props, rowName });
 };
 
 export default DeviceRow;

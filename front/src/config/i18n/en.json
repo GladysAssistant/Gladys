@@ -244,9 +244,10 @@
         "substractButton": "-"
       },
       "devices": {
-        "editDeviceFeaturesLabel": "Select the devices you want to display.",
+        "editDeviceFeaturesLabel": "Select the devices you want to display:",
         "editNameLabel": "Widget name",
-        "editNamePlaceholder": "Enter the name of the widget"
+        "editNamePlaceholder": "Enter the name of the widget",
+        "addADeviceLabel": "Add a device:"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -508,9 +509,12 @@
       "testConnectionButton": "Test connection",
       "saveButton": "Save",
       "deleteButton": "Delete",
-      "rotate180Label": "180° Rotation",
       "saveError": "There was an error saving the camera.",
-      "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?"
+      "testConnectionError": "There was an error while getting the RTSP Flux. Are you sure the provided URL is right and accessible from Gladys instance?",
+      "rotationO": "No rotation",
+      "rotation90": "90°",
+      "rotation18O": "180°",
+      "rotation27O": "270°"
     },
     "tasmota": {
       "title": "Tasmota",
@@ -794,6 +798,78 @@
       "apiKeyPlaceholder": "Enter OpenWeather API key",
       "saveButton": "Save",
       "instructionsToUse": "To use this integration, go to the dashboard and create a weather box."
+    },
+    "tuya": {
+      "title": "Tuya",
+      "description": "Control your Tuya devices (works with the cloud)",
+      "deviceTab": "Devices",
+      "discoverTab": "Tuya discover",
+      "setupTab": "Setup",
+      "documentation": "Tuya documentation",
+      "discoverDeviceDescr": "Automatically scan Tuya devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed or available",
+      "status": {
+        "notConnected": "Gladys failed to connect to Tuya cloud account, please go to ",
+        "setupPageLink": "Tuya configuration page.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No Tuya device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your Tuya cloud account",
+        "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
+        "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No Tuya device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "Tuya configuration",
+        "description": "You can connect Gladys to your Tuya cloud account to control the related devices.",
+        "descriptionCreateAccount": "You need to create an account at <a href=\"https://www.tuya.com/\" target=\"_blank\" rel= \"noopener noreferrer\">Tuya</a>.",
+        "descriptionCreateProject": "You must then create a \"Cloud Project\" in your Tuya account.",
+        "descriptionGetKeys": "You will have access to the Access Key and the Secret Key.",
+        "descriptionGetAppAccountUid": "To have your \"App account UID\", you must go to the \"Devices\" -> \"Link Tuya App Account\" section and add an application account.",
+        "descriptionGetAppAccountUid2": "Once the addition is finalized, your \"App account UID\" will be in the UID column.",
+        "endpoints": {
+          "china": "China",
+          "westernAmerica": "Western America",
+          "easternAmerica": "Eastern America",
+          "centralEurope": "Central Europe",
+          "westernEurope": "Western Europe",
+          "india": "India"
+        },
+        "endpoint": "Endpoint",
+        "accessKey": "Access Key",
+        "accessKeyPlaceholder": "Enter Tuya access key",
+        "secretKey": "Secret Key",
+        "secretKeyPlaceholder": "Enter Tuya secret key",
+        "appAccountId": "App account UID",
+        "appAccountIdPlaceholder": "Enter Tuya application UID",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your Tuya cloud account...",
+        "connected": "Connected to the Tuya cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
     },
     "mqtt": {
       "title": "MQTT",
@@ -2150,7 +2226,12 @@
           "3": "Long click press",
           "4": "Long click release",
           "5": "Hold click",
-          "6": "Long click"
+          "6": "Long click",
+          "7": "On",
+          "8": "Off",
+          "9": "Brightness down",
+          "10": "Brightness up",
+          "11": "Brightness stop"
         }
       },
       "opening-sensor": {

@@ -168,9 +168,6 @@ jobs:
           cache-to: type=inline
       - name: 🐳 Legacy Tags
         run: |
-          echo '{"experimental": true}' | sudo tee -a /etc/docker/daemon.json
-          export DOCKER_CLI_EXPERIMENTAL=enabled
-          sudo systemctl restart docker
           export DIGESTARM=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm" and .value.platform.variant == "v6").value | .digest')
           docker pull ${{ env.DOCKERHUB_REPO }}@$DIGESTARM
           docker tag ${{ env.DOCKERHUB_REPO }}@$DIGESTARM ${{ env.DOCKERHUB_REPO }}:v4-arm
