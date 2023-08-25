@@ -266,7 +266,7 @@ const AppRouter = connect(
         <RflinkSettingsPage path="/dashboard/integration/device/rflink/settings" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/" />
         <RflinkEditPage path="/dashboard/integration/device/rflink/edit/:deviceSelector" />
-        
+
         <TuyaPage path="/dashboard/integration/device/tuya" />
         <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
         <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
