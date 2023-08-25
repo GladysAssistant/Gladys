@@ -2147,7 +2147,12 @@
           "3": "Long click press",
           "4": "Long click release",
           "5": "Hold click",
-          "6": "Long click"
+          "6": "Long click",
+          "7": "On",
+          "8": "Off",
+          "9": "Brightness down",
+          "10": "Brightness up",
+          "11": "Brightness stop"
         }
       },
       "opening-sensor": {
