@@ -14,6 +14,11 @@ jobs:
       DOCKERHUB_PASSWORD: ${{secrets.DOCKERHUB_PASSWORD}}
       DOCKERHUB_REPO: ${{secrets.DOCKERHUB_REPO}}
     steps:
+      - name: 🔑 Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: 🐳 Legacy Tags
         run: |
           export DIGESTARM=$(docker manifest inspect ${{ env.DOCKERHUB_REPO }}:latest | jq -r '.manifests | to_entries[] | select(.value.platform.architecture == "arm" and .value.platform.variant == "v6").value | .digest')
