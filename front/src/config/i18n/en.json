@@ -2152,7 +2152,13 @@
           "8": "Off",
           "9": "Brightness down",
           "10": "Brightness up",
-          "11": "Brightness stop"
+          "11": "Brightness stop",
+          "12": "Left arrow click",
+          "13": "Right arrow click",
+          "14": "Left arrow held",
+          "15": "Right arrow held",
+          "16": "Left arrow release",
+          "17": "Right arrow release"
         }
       },
       "opening-sensor": {
