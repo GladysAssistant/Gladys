@@ -752,7 +752,7 @@
       },
       "discover": {
         "title": "Devices detected on your Tuya cloud account",
-        "description": "Tuya devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
+        "description": "Tuya devices are automatically discovered. Your Tuya devices need to be added to your Tuya cloud account before.",
         "error": "Error discovering Tuya devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No Tuya device discovered.",
         "scan": "Scan"
