@@ -2,7 +2,6 @@ import get from 'get-value';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { getDeviceName } from '../../../../utils/device';
 import { DeviceFeatureCategoriesIcon } from '../../../../utils/consts';
 import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
 
@@ -15,16 +14,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
   const TEMPERATURE_STEP = props.deviceFeature.category == DEVICE_FEATURE_CATEGORIES.AIR_CONDITIONING ? 1 : 0.5;
 
   function updateValue(value) {
-    props.updateValueWithDebounce(
-      props.x,
-      props.y,
-      props.device,
-      props.deviceFeature,
-      props.deviceIndex,
-      props.deviceFeatureIndex,
-      value,
-      props.deviceFeature.last_value
-    );
+    props.updateValueWithDebounce(props.deviceFeature, value);
   }
 
   function updateValueEvent(e) {
@@ -56,7 +46,7 @@ const ThermostatDeviceFeature = ({ children, ...props }) => {
           )}`}
         />
       </td>
-      <td>{getDeviceName(props.device, props.deviceFeature)}</td>
+      <td>{props.rowName}</td>
 
       <td class="py-0">
         <div class="d-flex justify-content-end">
