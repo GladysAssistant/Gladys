@@ -1,4 +1,5 @@
 const sinon = require('sinon');
+const cloneDeep = require('lodash.clonedeep');
 const { expect } = require('chai');
 
 const { assert, fake } = sinon;
@@ -61,6 +62,8 @@ describe('GoogleActions Handler - onSync - color', () => {
           category: DEVICE_FEATURE_CATEGORIES.LIGHT,
           type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
           last_value: 73,
+          min: 153,
+          max: 454,
         },
       ],
       model: 'device-model',
@@ -106,8 +109,8 @@ describe('GoogleActions Handler - onSync - color', () => {
             traits: ['action.devices.traits.ColorSetting'],
             attributes: {
               colorTemperatureRange: {
-                temperatureMinK: 2000,
-                temperatureMaxK: 9000,
+                temperatureMinK: 2203,
+                temperatureMaxK: 6536,
               },
             },
             name: {
@@ -140,7 +143,7 @@ describe('GoogleActions Handler - onSync - color', () => {
           'device-1': {
             online: true,
             color: {
-              temperatureK: 7110,
+              temperatureK: 13699,
             },
           },
         },
@@ -177,7 +180,65 @@ describe('GoogleActions Handler - onSync - color', () => {
       device_feature: 'feature-1',
       status: 'pending',
       type: 'device.set-value',
-      value: 14.285714285714286,
+      value: 333,
+    });
+  });
+  it('should emit Gladys event with max kelvin value', async () => {
+    const maxBody = cloneDeep(body);
+    maxBody.inputs[1].payload.commands[0].execution[0].params.color.temperature = 7000;
+    const result = await googleActionsHandler.onExecute(maxBody);
+
+    const expectedResult = {
+      requestId: 'request-id',
+      payload: {
+        agentUserId: 'user-id',
+        commands: [
+          {
+            ids: ['device-1'],
+            status: 'PENDING',
+          },
+        ],
+      },
+    };
+    expect(result).to.deep.eq(expectedResult);
+
+    assert.notCalled(gladys.stateManager.state.device.device_1.get);
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device: 'device-1',
+      device_feature: 'feature-1',
+      status: 'pending',
+      type: 'device.set-value',
+      value: 153,
+    });
+  });
+  it('should emit Gladys event with min kelvin value', async () => {
+    const maxBody = cloneDeep(body);
+    maxBody.inputs[1].payload.commands[0].execution[0].params.color.temperature = 1000;
+    const result = await googleActionsHandler.onExecute(maxBody);
+
+    const expectedResult = {
+      requestId: 'request-id',
+      payload: {
+        agentUserId: 'user-id',
+        commands: [
+          {
+            ids: ['device-1'],
+            status: 'PENDING',
+          },
+        ],
+      },
+    };
+    expect(result).to.deep.eq(expectedResult);
+
+    assert.notCalled(gladys.stateManager.state.device.device_1.get);
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
+    assert.calledWith(gladys.event.emit, EVENTS.ACTION.TRIGGERED, {
+      device: 'device-1',
+      device_feature: 'feature-1',
+      status: 'pending',
+      type: 'device.set-value',
+      value: 454,
     });
   });
 });

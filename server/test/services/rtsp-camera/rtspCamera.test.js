@@ -33,7 +33,7 @@ const gladys = {
   },
 };
 
-const deviceFlipped = {
+const deviceRotation90 = {
   id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6c',
   selector: 'my-camera',
   params: [
@@ -43,7 +43,37 @@ const deviceFlipped = {
     },
     {
       name: 'CAMERA_ROTATION',
-      value: '1',
+      value: '90',
+    },
+  ],
+};
+
+const deviceRotation180 = {
+  id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6c',
+  selector: 'my-camera',
+  params: [
+    {
+      name: 'CAMERA_URL',
+      value: 'test',
+    },
+    {
+      name: 'CAMERA_ROTATION',
+      value: '180',
+    },
+  ],
+};
+
+const deviceRotation270 = {
+  id: 'a6fb4cb8-ccc2-4234-a752-b25d1eb5ab6c',
+  selector: 'my-camera',
+  params: [
+    {
+      name: 'CAMERA_URL',
+      value: 'test',
+    },
+    {
+      name: 'CAMERA_ROTATION',
+      value: '270',
     },
   ],
 };
@@ -107,8 +137,16 @@ describe('RtspCameraManager commands', () => {
     const image = await rtspCameraManager.getImage(device);
     expect(image).to.equal('image/png;base64,aW1hZ2U=');
   });
+  it('should getImage 90°', async () => {
+    const image = await rtspCameraManager.getImage(deviceRotation90);
+    expect(image).to.equal('image/png;base64,aW1hZ2U=');
+  });
   it('should getImage 180°', async () => {
-    const image = await rtspCameraManager.getImage(deviceFlipped);
+    const image = await rtspCameraManager.getImage(deviceRotation180);
+    expect(image).to.equal('image/png;base64,aW1hZ2U=');
+  });
+  it('should getImage 270°', async () => {
+    const image = await rtspCameraManager.getImage(deviceRotation270);
     expect(image).to.equal('image/png;base64,aW1hZ2U=');
   });
   it('should return error', async () => {

@@ -22,6 +22,12 @@ addMapping('action', BUTTON_STATUS.CLICK, 'single');
 addMapping('action', BUTTON_STATUS.DOUBLE_CLICK, 'double');
 addMapping('action', BUTTON_STATUS.HOLD_CLICK, 'hold');
 addMapping('action', BUTTON_STATUS.LONG_CLICK, 'long');
+addMapping('action', BUTTON_STATUS.ON, 'on');
+addMapping('action', BUTTON_STATUS.OFF, 'off');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_MOVE_DOWN, 'brightness_move_down');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_MOVE_UP, 'brightness_move_up');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_STOP, 'brightness_stop');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
