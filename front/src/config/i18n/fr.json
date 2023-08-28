@@ -992,6 +992,7 @@
         "connecting": "Configuration enregistrée. Connexion au broker MQTT en cours...",
         "connected": "Connecté au broker MQTT avec succès !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "networkError": "Impossible de contacter Gladys, est-ce que votre instance Gladys est bien connectée et accessible ?",
         "disconnected": "Déconnecté du broker MQTT."
       }
     },
