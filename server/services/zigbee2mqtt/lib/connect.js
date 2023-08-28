@@ -1,5 +1,4 @@
 const logger = require('../../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { DEFAULT } = require('./constants');
 
 /**
@@ -37,27 +36,21 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
         this.subscribe(topic, this.handleMqttMessage.bind(this));
       });
       this.gladysConnected = true;
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
-      });
+      this.emitStatusEvent();
     });
 
     this.mqttClient.on('error', (err) => {
       logger.warn(`Error while connecting to MQTT - ${err}`);
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.MQTT_ERROR,
-        payload: err,
-      });
       this.gladysConnected = false;
+      this.zigbee2mqttConnected = false;
+      this.emitStatusEvent();
     });
 
     this.mqttClient.on('offline', () => {
       logger.warn(`Disconnected from MQTT server`);
-      this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.MQTT.ERROR,
-        payload: 'DISCONNECTED',
-      });
       this.gladysConnected = false;
+      this.zigbee2mqttConnected = false;
+      this.emitStatusEvent();
     });
 
     this.mqttClient.on('message', (topic, message) => {

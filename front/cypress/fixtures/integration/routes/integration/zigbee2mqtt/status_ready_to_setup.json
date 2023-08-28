@@ -1,0 +1,12 @@
+{
+  "usbConfigured": false,
+  "mqttExist": false,
+  "mqttRunning": false,
+  "zigbee2mqttExist": false,
+  "zigbee2mqttRunning": false,
+  "gladysConnected": false,
+  "zigbee2mqttConnected": false,
+  "z2mEnabled": false,
+  "dockerBased": true,
+  "networkModeValid": true
+}

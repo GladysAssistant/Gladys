@@ -1718,13 +1718,15 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/service/zigbee2mqtt/variable/ZIGBEE2MQTT_DRIVER_PATH': {
-    name: 'ZIGBEE2MQTT_DRIVER_PATH',
-    value: '/dev/ttyUSB0'
+  'get /api/v1/service/zigbee2mqtt/setup': {
+    ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB0',
+    ZIGBEE_DONGLE_NAME: 'Electrolama zig-a-zig-ah! (zzh!)',
+    Z2M_TCP_PORT: '59801'
   },
-  'get /api/v1/service/zigbee2mqtt/variable/ZIGBEE_DONGLE_NAME': {
-    name: 'ZIGBEE_DONGLE_NAME',
-    value: 'Electrolama zig-a-zig-ah! (zzh!)'
+  'post /api/v1/service/zigbee2mqtt/setup': {
+    ZIGBEE2MQTT_DRIVER_PATH: '/dev/ttyUSB1',
+    ZIGBEE_DONGLE_NAME: 'RaspBee',
+    Z2M_TCP_PORT: '12000'
   },
   'get /api/v1/service/zigbee2mqtt/adapter': [
     'ConBee',
@@ -1745,7 +1747,6 @@ const data = {
     'ZigStar Stick v4',
     'ZigStar ZigiHAT PoE'
   ],
-  'post /api/v1/service/zigbee2mqtt/setup': {},
   'get /api/v1/service/zigbee2mqtt/status': {
     usbConfigured: true,
     mqttExist: true,

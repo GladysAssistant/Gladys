@@ -51,6 +51,7 @@ describe('zigbee2mqtt init', () => {
     zigbee2mqttManager.checkForContainerUpdates = sinon.stub();
     zigbee2mqttManager.installMqttContainer = sinon.stub();
     zigbee2mqttManager.installZ2mContainer = sinon.stub();
+    zigbee2mqttManager.emitStatusEvent = sinon.stub();
     zigbee2mqttManager.isEnabled = sinon.stub();
     zigbee2mqttManager.connect = sinon.stub();
 
@@ -85,6 +86,7 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
+    assert.notCalled(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('it should fail because not a host network', async () => {
@@ -106,6 +108,7 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
+    assert.calledOnceWithExactly(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('it should not install containers, usb is not configured', async () => {
@@ -123,6 +126,7 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
+    assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('it should not install containers, usb port not found', async () => {
@@ -140,6 +144,7 @@ describe('zigbee2mqtt init', () => {
     assert.notCalled(zigbee2mqttManager.installZ2mContainer);
     assert.notCalled(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
+    assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('it should install containers, usb port is found', async () => {
@@ -155,9 +160,10 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.checkForContainerUpdates, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
+    assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('it should save default mqtt params', async () => {
@@ -187,6 +193,7 @@ describe('zigbee2mqtt init', () => {
     assert.calledWithMatch(zigbee2mqttManager.installZ2mContainer, sinon.match(expectedNewConfig));
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
     assert.notCalled(zigbee2mqttManager.connect);
+    assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('it should connect', async () => {
@@ -205,10 +212,11 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.getConfiguration);
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
     assert.calledOnceWithExactly(zigbee2mqttManager.connect, config);
     assert.calledOnce(gladys.scheduler.scheduleJob);
+    assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 
   it('it should connect and scheduler already there', async () => {
@@ -225,8 +233,9 @@ describe('zigbee2mqtt init', () => {
     assert.calledOnceWithExactly(zigbee2mqttManager.saveConfiguration, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.checkForContainerUpdates, config);
     assert.calledOnceWithExactly(zigbee2mqttManager.installMqttContainer, config);
-    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config);
+    assert.calledOnceWithExactly(zigbee2mqttManager.installZ2mContainer, config, false);
     assert.calledOnceWithExactly(zigbee2mqttManager.isEnabled);
     assert.calledOnceWithExactly(zigbee2mqttManager.connect, config);
+    assert.calledThrice(zigbee2mqttManager.emitStatusEvent);
   });
 });

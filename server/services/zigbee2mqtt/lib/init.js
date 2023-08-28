@@ -5,22 +5,38 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
 /**
  * @description Prepares service and starts connection with broker if needed.
+ * @param {boolean} setupMode - In setup mode.
  * @returns {Promise} Resolve when init finished.
  * @example
  * await z2m.init();
  */
-async function init() {
+async function init(setupMode = false) {
+  // Reset status
+  this.usbConfigured = false;
+  this.mqttExist = false;
+  this.mqttRunning = false;
+  this.mqttContainerRunning = false;
+  this.zigbee2mqttExist = false;
+  this.zigbee2mqttRunning = false;
+  this.gladysConnected = false;
+  this.zigbee2mqttConnected = false;
+  this.z2mPermitJoin = false;
+  this.networkModeValid = false;
+  this.dockerBased = false;
+
   const dockerBased = await this.gladys.system.isDocker();
   if (!dockerBased) {
-    this.dockerBased = false;
     throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
   }
+  this.dockerBased = true;
+  this.emitStatusEvent();
 
   const networkMode = await this.gladys.system.getNetworkMode();
   if (networkMode !== 'host') {
-    this.networkModeValid = false;
     throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
   }
+  this.networkModeValid = true;
+  this.emitStatusEvent();
 
   // Load stored configuration
   const configuration = await this.getConfiguration();
@@ -44,6 +60,8 @@ async function init() {
     }
   }
 
+  this.emitStatusEvent();
+
   // Check for existing credentials for Gladys & Z2M for connection to broker
   if (!mqttPassword) {
     configuration.mqttUrl = CONFIGURATION.MQTT_URL_VALUE;
@@ -65,7 +83,7 @@ async function init() {
     logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
     await this.checkForContainerUpdates(configuration);
     await this.installMqttContainer(configuration);
-    await this.installZ2mContainer(configuration);
+    await this.installZ2mContainer(configuration, setupMode);
 
     if (this.isEnabled()) {
       await this.connect(configuration);
