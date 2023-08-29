@@ -12,6 +12,7 @@ async function disconnect() {
   if (this.updateDevicesJob) {
     this.updateDevicesJob.stop();
   }
+  this.connected = false;
 }
 
 module.exports = {
