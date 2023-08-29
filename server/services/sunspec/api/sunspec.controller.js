@@ -22,7 +22,7 @@ module.exports = function SunSpecController(sunspecManager) {
   }
 
   /**
-   * @api {get} /api/v1/service/sunspec/configuration Get SunSpec configuration
+   * @api {get} /api/v1/service/sunspec/config Get SunSpec configuration
    * @apiName getConfiguration
    * @apiGroup SunSpec
    */
@@ -32,7 +32,7 @@ module.exports = function SunSpecController(sunspecManager) {
   }
 
   /**
-   * @api {post} /api/v1/service/sunspec/configuration Update configuration
+   * @api {post} /api/v1/service/sunspec/config Update configuration
    * @apiName updateConfiguration
    * @apiGroup SunSpec
    */
@@ -94,11 +94,11 @@ module.exports = function SunSpecController(sunspecManager) {
       authenticated: false,
       controller: asyncMiddleware(getStatus),
     },
-    'get /api/v1/service/sunspec/configuration': {
+    'get /api/v1/service/sunspec/config': {
       authenticated: true,
       controller: asyncMiddleware(getConfiguration),
     },
-    'post /api/v1/service/sunspec/configuration': {
+    'post /api/v1/service/sunspec/config': {
       authenticated: true,
       controller: asyncMiddleware(updateConfiguration),
     },

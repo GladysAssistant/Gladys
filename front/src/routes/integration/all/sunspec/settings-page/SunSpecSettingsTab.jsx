@@ -8,7 +8,7 @@ class SunSpecSettingsTab extends Component {
   loadConfiguration = async () => {
     this.setState({ loading: true, error: null });
     try {
-      const config = await this.props.httpClient.get('/api/v1/service/sunspec/configuration');
+      const config = await this.props.httpClient.get('/api/v1/service/sunspec/config');
       this.setState({ loading: false, config });
     } catch (e) {
       console.error(e);
@@ -17,8 +17,8 @@ class SunSpecSettingsTab extends Component {
   };
 
   updateConfiguration(state, configuration) {
-    store.setState(configuration);
-  };
+    this.setState(configuration);
+  }
 
   updateUrl = e => {
     const updatedConfig = update(this.state.config, {
@@ -68,7 +68,7 @@ class SunSpecSettingsTab extends Component {
   saveConfiguration = async () => {
     this.setState({ error: null });
     try {
-      const config = await this.props.httpClient.post('/api/v1/service/sunspec/configuration', this.state.config);
+      const config = await this.props.httpClient.post('/api/v1/service/sunspec/config', this.state.config);
       this.setState({ config, updated: false });
       await this.props.httpClient.post('/api/v1/service/sunspec/disconnect');
       await this.props.httpClient.post('/api/v1/service/sunspec/connect');
