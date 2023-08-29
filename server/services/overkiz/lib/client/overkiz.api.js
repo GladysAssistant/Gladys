@@ -51,7 +51,7 @@ class API {
     try {
       return await callback.call();
     } catch (e) {
-      if (e.isAxiosError && e.response.status === 401) {
+      if (e.isAxiosError && e.response && e.response.status === 401) {
         await this.platformLoginHandler.login();
         return callback.call();
       }
