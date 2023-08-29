@@ -11,8 +11,8 @@ describe('OverkizService', () => {
 
   const values = {
     OVERKIZ_TYPE: 'atlantic_cozytouch',
-    OVERKIZ_SERVER_USERNAME: 'pochet.romuald@gmail.com',
-    OVERKIZ_SERVER_PASSWORD: '8Vyr7acpcozytouch',
+    OVERKIZ_SERVER_USERNAME: 'test.test@test.com',
+    OVERKIZ_SERVER_PASSWORD: 'test',
   };
 
   before(() => {

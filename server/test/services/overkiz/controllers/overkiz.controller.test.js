@@ -1,15 +1,20 @@
-const { assert, fake, stub } = require('sinon');
+const sinon = require('sinon');
+
+const { assert, fake, stub } = sinon;
+
 const OverkizController = require('../../../../services/overkiz/api/overkiz.controller');
 
-const userId = 'f2e704c9-4c79-41b3-a5bf-914dd1a16127';
-
 const overkizService = {
-  config: stub(),
-  cleanUp: stub(),
-  enableCalendar: stub(),
-  disableCalendar: stub(),
-  syncUserCalendars: stub(),
+  connect: stub(),
+  disconnect: stub(),
+  status: stub(),
+  getConfiguration: stub(),
+  getOverkizDevices: stub(),
+  updateConfiguration: stub(),
+  syncOverkizDevices: stub(),
 };
+
+const req = {};
 
 const res = {
   json: fake.returns(null),
@@ -18,68 +23,75 @@ const res = {
   }),
 };
 
-describe('get /api/v1/service/overkiz/config', () => {
-  it('should return new config', async () => {
-    const overkizController = OverkizController(overkizService);
-    const req = {
-      user: {
-        id: userId,
-      },
-    };
+describe('Overkiz configuration', () => {
+  let overkizController;
+
+  beforeEach(() => {
+    overkizController = OverkizController(overkizService);
+    sinon.reset();
+  });
+
+  it('should return configuration', async () => {
     await overkizController['get /api/v1/service/overkiz/config'].controller(req, res);
-    assert.calledWith(overkizService.config, userId);
+    assert.calledOnce(overkizService.getConfiguration);
+  });
+
+  it('should update configuration', async () => {
+    req.body = {};
+    await overkizController['post /api/v1/service/overkiz/config'].controller(req, res);
+    assert.calledOnceWithExactly(overkizService.updateConfiguration, req.body);
   });
 });
 
-describe('get /api/v1/service/overkiz/cleanup', () => {
-  it('should cleanup overkiz data', async () => {
-    const overkizController = OverkizController(overkizService);
-    const req = {
-      user: {
-        id: userId,
-      },
-    };
-    await overkizController['get /api/v1/service/overkiz/cleanup'].controller(req, res);
-    assert.calledWith(overkizService.cleanUp, userId);
+describe('Overkiz connect', () => {
+  let overkizController;
+
+  beforeEach(() => {
+    overkizController = OverkizController(overkizService);
+    sinon.reset();
+  });
+
+  it('should connect', async () => {
+    await overkizController['post /api/v1/service/overkiz/connect'].controller(req, res);
+    assert.calledOnce(overkizService.connect);
+  });
+
+  it('should disconnect', async () => {
+    await overkizController['post /api/v1/service/overkiz/disconnect'].controller(req, res);
+    assert.calledOnce(overkizService.disconnect);
   });
 });
 
-describe('get /api/v1/service/overkiz/sync', () => {
-  it('should sync', async () => {
-    overkizService.syncUserCalendars.resolves({});
-    const overkizController = OverkizController(overkizService);
-    const req = {
-      user: {
-        id: userId,
-      },
-    };
-    await overkizController['get /api/v1/service/overkiz/sync'].controller(req, res);
-    assert.calledWith(overkizService.syncUserCalendars, userId);
+describe('Overkiz status', () => {
+  let overkizController;
+
+  beforeEach(() => {
+    overkizController = OverkizController(overkizService);
+    sinon.reset();
+  });
+
+  it('should get status', async () => {
+    await overkizController['get /api/v1/service/overkiz/status'].controller(req, res);
+    assert.calledOnce(overkizService.status);
   });
 });
 
-describe('patch /api/v1/service/overkiz/enable', () => {
-  it('should enable overkiz calendar synchronization', async () => {
-    const overkizController = OverkizController(overkizService);
-    const req = {
-      body: {
-        selector: 'personnal',
-      },
-    };
-    await overkizController['patch /api/v1/service/overkiz/enable'].controller(req, res);
-    assert.calledWith(overkizService.enableCalendar, 'personnal');
-  });
-});
+describe('Overkiz devices', () => {
+  let overkizController;
 
-describe('patch /api/v1/service/overkiz/disable', () => {
-  it('should disable overkiz calendar synchronization', async () => {
-    const overkizController = OverkizController(overkizService);
-    const req = {
-      body: {
-        selector: 'personnal',
-      },
-    };
-    await overkizController['patch /api/v1/service/overkiz/disable'].controller(req, res);
-    assert.calledWith(overkizService.disableCalendar, 'personnal');
+  beforeEach(() => {
+    overkizController = OverkizController(overkizService);
+    sinon.reset();
+  });
+
+  it('should get discovered devices', async () => {
+    await overkizController['get /api/v1/service/overkiz/discover'].controller(req, res);
+    assert.calledOnce(overkizService.getOverkizDevices);
+  });
+
+  it('should synchronize discovered devices', async () => {
+    await overkizController['post /api/v1/service/overkiz/discover'].controller(req, res);
+    assert.calledOnce(overkizService.syncOverkizDevices);
+    assert.calledOnce(overkizService.getOverkizDevices);
   });
 });

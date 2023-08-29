@@ -2,7 +2,7 @@ const asyncMiddleware = require('../../../api/middlewares/asyncMiddleware');
 
 module.exports = function OverkizController(overkizManager) {
   /**
-   * @api {get} /api/v1/service/overkiz/configuration Get Overkiz configuration
+   * @api {get} /api/v1/service/overkiz/config Get Overkiz configuration
    * @apiName getConfiguration
    * @apiGroup Overkiz
    */
@@ -12,7 +12,7 @@ module.exports = function OverkizController(overkizManager) {
   }
 
   /**
-   * @api {post} /api/v1/service/overkiz/configuration Update Overkiz configuration
+   * @api {post} /api/v1/service/overkiz/config Update Overkiz configuration
    * @apiName updateConfiguration
    * @apiGroup Overkiz
    */
@@ -79,11 +79,11 @@ module.exports = function OverkizController(overkizManager) {
   }
 
   return {
-    'get /api/v1/service/overkiz/configuration': {
+    'get /api/v1/service/overkiz/config': {
       authenticated: true,
       controller: asyncMiddleware(getConfiguration),
     },
-    'post /api/v1/service/overkiz/configuration': {
+    'post /api/v1/service/overkiz/config': {
       authenticated: true,
       controller: asyncMiddleware(updateConfiguration),
     },
@@ -99,7 +99,7 @@ module.exports = function OverkizController(overkizManager) {
     },
     'get /api/v1/service/overkiz/status': {
       authenticated: true,
-      controller: status,
+      controller: asyncMiddleware(status),
     },
     'get /api/v1/service/overkiz/discover': {
       authenticated: true,

@@ -11,7 +11,7 @@ function createActions(store) {
         overkizGetConfigurationStatus: RequestStatus.Getting
       });
       try {
-        const configuration = await state.httpClient.get('/api/v1/service/overkiz/configuration');
+        const configuration = await state.httpClient.get('/api/v1/service/overkiz/config');
         store.setState({
           overkizGetConfigurationStatus: RequestStatus.Success,
           ...configuration
@@ -63,7 +63,7 @@ function createActions(store) {
 
       const { overkizType, overkizUsername, overkizPassword } = state;
       try {
-        await state.httpClient.post(`/api/v1/service/overkiz/configuration`, {
+        await state.httpClient.post(`/api/v1/service/overkiz/config`, {
           overkizType,
           overkizUsername,
           overkizPassword
