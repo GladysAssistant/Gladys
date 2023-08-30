@@ -13,6 +13,7 @@ const sunspecManager = {
   }),
   getConfiguration: fake.returns({ sunspecUrl: 'sunspecUrl' }),
   updateConfiguration: fake.resolves({ sunspecUrl: 'newSunspecUrl' }),
+  bdpvInit: fake.resolves(null),
 };
 
 describe('Devices API', () => {
@@ -124,8 +125,8 @@ describe('Configuration API', () => {
       json: fake.returns(null),
     };
 
-    controller['get /api/v1/service/sunspec/configuration'].controller(req, res);
-    assert.calledOnceWithExactly(sunspecManager.getConfiguration);
+    await controller['get /api/v1/service/sunspec/config'].controller(req, res);
+    assert.calledOnce(sunspecManager.getConfiguration);
     assert.calledOnceWithExactly(res.json, { sunspecUrl: 'sunspecUrl' });
   });
 
@@ -140,11 +141,11 @@ describe('Configuration API', () => {
     };
     sunspecManager.getConfiguration = fake.returns({ sunspecUrl: 'newSunspecUrl' });
 
-    await controller['post /api/v1/service/sunspec/configuration'].controller(req, res);
+    await controller['post /api/v1/service/sunspec/config'].controller(req, res);
     assert.calledOnceWithExactly(sunspecManager.updateConfiguration, { sunspecUrl: 'newSunspecUrl' });
-    assert.calledOnceWithExactly(sunspecManager.disconnect);
-    assert.calledOnceWithExactly(sunspecManager.connect);
-    assert.calledOnceWithExactly(sunspecManager.getConfiguration);
+    assert.calledOnce(sunspecManager.disconnect);
+    assert.calledOnce(sunspecManager.connect);
+    assert.calledOnce(sunspecManager.getConfiguration);
     assert.calledOnceWithExactly(res.json, { sunspecUrl: 'newSunspecUrl' });
   });
 });

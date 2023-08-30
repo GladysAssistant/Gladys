@@ -13,6 +13,17 @@ class SunspecManagerMock {
   disconnect() {
     this.connected = false;
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  bdpvInit() {
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  getConfiguration() {
+    return {
+      sunspecUrl: 'sunspecUrl',
+    };
+  }
 }
 
 const SunSpecService = proxyquire('../../../services/sunspec', {

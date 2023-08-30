@@ -39,7 +39,7 @@ module.exports = function SunSpecService(gladys, serviceId) {
    * gladys.services.sunspec.isUsed();
    */
   async function isUsed() {
-    return sunspecManager.connected && sunspecManager.devices && sunspecManager.devices.size > 0;
+    return sunspecManager.connected && sunspecManager.devices && sunspecManager.devices.length > 0;
   }
 
   return Object.freeze({
