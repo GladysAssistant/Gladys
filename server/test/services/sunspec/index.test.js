@@ -15,8 +15,7 @@ class SunspecManagerMock {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  bdpvInit() {
-  }
+  bdpvInit() {}
 
   // eslint-disable-next-line class-methods-use-this
   getConfiguration() {
