@@ -1,8 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { fake } = sinon;
-
 const SunSpecManager = require('../../../../services/sunspec/lib');
 const ModbusTCPMock = require('./utils/ModbusTCPMock.test');
 
@@ -15,19 +13,31 @@ describe('SunSpec getConfiguration', () => {
 
   beforeEach(() => {
     gladys = {
-      variable: {
-        getValue: fake.resolves('sunspecUrl'),
-      },
+      variable: {},
     };
 
     sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, SERVICE_ID);
   });
 
   it('get config from service', async () => {
+    gladys.variable.getValue = sinon
+      .stub()
+      .onFirstCall()
+      .returns('sunspecUrl')
+      .onSecondCall()
+      .returns('0')
+      .onThirdCall()
+      .returns('bdpvUsername')
+      .onCall(3)
+      .returns('bdpvApiKey');
+
     const configuration = await sunSpecManager.getConfiguration();
 
     expect(configuration).deep.eq({
       sunspecUrl: 'sunspecUrl',
+      bdpvActive: false,
+      bdpvUsername: 'bdpvUsername',
+      bdpvApiKey: 'bdpvApiKey',
     });
   });
 });

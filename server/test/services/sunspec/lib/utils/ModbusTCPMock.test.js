@@ -1,9 +1,8 @@
 const { REGISTER, MODEL } = require('../../../../../services/sunspec/lib/sunspec.constants');
 
 class ModbusTCPMock {
-  connectTCP(host, options, callback) {
-    callback.call(this);
-  }
+  // eslint-disable-next-line class-methods-use-this
+  connectTCP(host, options) {}
 
   readHoldingRegisters(registerId, length, callback) {
     let data;
@@ -50,9 +49,8 @@ class ModbusTCPMock {
     return 1;
   }
 
-  close(callback) {
-    callback.call(this);
-  }
+  // eslint-disable-next-line class-methods-use-this
+  close() {}
 }
 
 module.exports = ModbusTCPMock;
