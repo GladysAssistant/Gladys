@@ -24,23 +24,32 @@ async function init(setupMode = false) {
   this.networkModeValid = false;
   this.dockerBased = false;
 
-  const dockerBased = await this.gladys.system.isDocker();
-  if (!dockerBased) {
-    throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
-  }
-  this.dockerBased = true;
-  this.emitStatusEvent();
-
-  const networkMode = await this.gladys.system.getNetworkMode();
-  if (networkMode !== 'host') {
-    throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
-  }
-  this.networkModeValid = true;
-  this.emitStatusEvent();
-
   // Load stored configuration
   const configuration = await this.getConfiguration();
-  const { z2mDriverPath, mqttPassword } = configuration;
+  const { z2mDriverPath, mqttPassword, mqttMode, mqttUrl, mqttUsername } = configuration;
+  console.log({ mqttMode, mqttUrl, mqttPassword, mqttUsername });
+
+  try {
+    const dockerBased = await this.gladys.system.isDocker();
+    if (!dockerBased) {
+      throw new PlatformNotCompatible('SYSTEM_NOT_RUNNING_DOCKER');
+    }
+    this.dockerBased = true;
+    this.emitStatusEvent();
+
+    const networkMode = await this.gladys.system.getNetworkMode();
+    if (networkMode !== 'host') {
+      throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
+    }
+  } catch (e) {
+    logger.debug(e);
+    if (mqttMode !== 'external') {
+      throw e;
+    }
+  }
+
+  this.networkModeValid = true;
+  this.emitStatusEvent();
 
   // Test if dongle is present
   this.usbConfigured = false;

@@ -11,7 +11,10 @@ const VARIABLE_MAP = {
   ZIGBEE2MQTT_DRIVER_PATH: 'z2mDriverPath',
   ZIGBEE_DONGLE_NAME: 'z2mDongleName',
   Z2M_TCP_PORT: 'z2mTcpPort',
-  MQTT_MODE: 'mqttMode'
+  Z2M_MQTT_MODE: 'mqttMode',
+  Z2M_MQTT_URL: 'mqttUrl',
+  Z2M_MQTT_USERNAME: 'mqttUsername',
+  Z2M_MQTT_PASSWORD: 'mqttPassword'
 };
 
 class Zigbee2mqttSetupPage extends Component {
@@ -55,7 +58,7 @@ class Zigbee2mqttSetupPage extends Component {
       const mapping = {};
       Object.keys(VARIABLE_MAP).forEach(key => (mapping[key] = nextConfiguration[VARIABLE_MAP[key]]));
       const savedConfig = await this.props.httpClient.post('/api/v1/service/zigbee2mqtt/setup', mapping);
-
+      console.log(savedConfig);
       const configuration = {};
       Object.keys(VARIABLE_MAP).forEach(key => (configuration[VARIABLE_MAP[key]] = savedConfig[key]));
       this.setState({

@@ -1,5 +1,5 @@
 import { Component } from 'preact';
-import { MarkupText, Text } from 'preact-i18n';
+import { MarkupText, Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import SubmitConfiguration from '../components/SubmitConfiguration';
@@ -22,9 +22,26 @@ class SetupRemoteOptions extends Component {
     });
   };
 
+  updateMqttUrl = e => {
+    this.setState({ mqttUrl: e.target.value });
+  };
+
+  updateMqttUsername = e => {
+    this.setState({ mqttUsername: e.target.value });
+  };
+
+  updateMqttPassword = e => {
+    this.setState({ mqttPassword: e.target.value });
+  };
+
   saveConfiguration = () => {
-    const { mqttMode } = this.state;
-    this.props.saveConfiguration({ mqttMode });
+    const { mqttMode, mqttUrl, mqttUsername, mqttPassword } = this.state;
+    this.props.saveConfiguration({
+      mqttMode,
+      mqttUrl,
+      mqttUsername,
+      mqttPassword
+    });
   };
 
   resetConfiguration = () => {
@@ -42,11 +59,12 @@ class SetupRemoteOptions extends Component {
     const { mqttMode } = configuration;
 
     this.state = {
-      mqttMode
+      mqttMode,
+      showPassword: false
     };
   }
 
-  render({ disabled }, { mqttMode }) {
+  render({ disabled }, { mqttMode, mqttUrl, mqttUsername, mqttPassword, showPassword }) {
     return (
       <div>
         <p>
@@ -70,7 +88,7 @@ class SetupRemoteOptions extends Component {
             <button
               class={cx('btn', 'btn-light', { active: mqttMode === MQTT_MODE.EXTERNAL })}
               onClick={this.selectExternalMQTT}
-              disabled={true}
+              disabled={disabled}
               data-cy="z2m-setup-remote-external-mqtt-mode"
             >
               <Text id="integration.zigbee2mqtt.setup.modes.remote.external.modeLabel" />
@@ -85,6 +103,70 @@ class SetupRemoteOptions extends Component {
                 data-cy="z2m-setup-remote-gladys-mqtt-description"
               />
             </div>
+          )}
+          {mqttMode === MQTT_MODE.EXTERNAL && (
+            <form>
+              <div class="form-group">
+                <label for="mqttUrl" class="form-label">
+                  <Text id={`integration.mqtt.setup.urlLabel`} />
+                </label>
+                <Localizer>
+                  <input
+                    id="mqttUrl"
+                    name="mqttUrl"
+                    placeholder={<Text id="integration.mqtt.setup.urlPlaceholder" />}
+                    value={mqttUrl}
+                    class="form-control"
+                    onInput={this.updateMqttUrl}
+                  />
+                </Localizer>
+              </div>
+
+              <div class="form-group">
+                <label for="mqttUsername" class="form-label">
+                  <Text id={`integration.mqtt.setup.userLabel`} />
+                </label>
+                <Localizer>
+                  <input
+                    id="mqttUsername"
+                    name="mqttUsername"
+                    placeholder={<Text id="integration.mqtt.setup.userPlaceholder" />}
+                    value={mqttUsername}
+                    class="form-control"
+                    onInput={this.updateMqttUsername}
+                    autoComplete="no"
+                  />
+                </Localizer>
+              </div>
+
+              <div class="form-group">
+                <label for="mqttPassword" class="form-label">
+                  <Text id={`integration.mqtt.setup.passwordLabel`} />
+                </label>
+                <div class="input-icon mb-3">
+                  <Localizer>
+                    <input
+                      id="mqttPassword"
+                      name="mqttPassword"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder={<Text id="integration.mqtt.setup.passwordPlaceholder" />}
+                      value={mqttPassword}
+                      class="form-control"
+                      onInput={this.updateMqttPassword}
+                      autoComplete="new-password"
+                    />
+                  </Localizer>
+                  <span class="input-icon-addon cursor-pointer" onClick={this.togglePassword}>
+                    <i
+                      class={cx('fe', {
+                        'fe-eye': !showPassword,
+                        'fe-eye-off': showPassword
+                      })}
+                    />
+                  </span>
+                </div>
+              </div>
+            </form>
           )}
         </div>
         <SubmitConfiguration

@@ -17,6 +17,7 @@ async function getConfiguration() {
   const z2mTcpPort = await this.gladys.variable.getValue(CONFIGURATION.Z2M_TCP_PORT, this.serviceId);
   const z2mMqttUsername = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_USERNAME_KEY, this.serviceId);
   const z2mMqttPassword = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_PASSWORD_KEY, this.serviceId);
+  const mqttMode = await this.gladys.variable.getValue(CONFIGURATION.Z2M_MQTT_MODE, this.serviceId);
 
   // Load MQTT parameters
   const mqttUrl = await this.gladys.variable.getValue(CONFIGURATION.MQTT_URL_KEY, this.serviceId);
@@ -35,6 +36,7 @@ async function getConfiguration() {
     z2mTcpPort,
     z2mMqttUsername,
     z2mMqttPassword,
+    mqttMode,
     mqttUrl,
     mqttUsername,
     mqttPassword,
