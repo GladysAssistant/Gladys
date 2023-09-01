@@ -38,28 +38,7 @@ function createActions(store) {
         });
         boxActions.updateBoxStatus(state, BOX_KEY, x, y, RequestStatus.Error);
       }
-    },
-    async clean(state, box, x, y) {
-      console.log(`clean`);
-    },
-    async stop(state, box, x, y) {
-      console.log(`stop`);
-    },
-    async pause(state, box, x, y) {
-      console.log(`pause`);
-    },
-    async home(state, box, x, y) {
-      console.log(`home`);
     }
-    /*,
-    deviceFeatureWebsocketEvent(state, box, x, y, payload) {
-      console.log(payload);
-      if (box.vacbot === payload.device) {
-        boxActions.mergeBoxData(state, BOX_KEY, x, y, {
-          vacbot: payload.last_value_string
-        });
-      }
-    }*/
   };
   return Object.assign({}, actions);
 }
