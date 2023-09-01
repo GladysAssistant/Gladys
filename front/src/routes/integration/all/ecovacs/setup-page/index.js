@@ -5,10 +5,6 @@ import EcovacsPage from '../EcovacsPage';
 import SetupTab from './SetupTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-@connect(
-  'user,session,ecovacsUsername,ecovacsPassword,ecovacsCountryCode,connectEcovacsStatus,ecovacsConnected,ecovacsConnectionError',
-  actions
-)
 class EcovacsSetupPage extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('ecovacs');
@@ -37,4 +33,7 @@ class EcovacsSetupPage extends Component {
   }
 }
 
-export default EcovacsSetupPage;
+export default connect(
+  'user,session,ecovacsUsername,ecovacsPassword,ecovacsCountryCode,connectEcovacsStatus,ecovacsConnected,ecovacsConnectionError',
+  actions
+)(EcovacsSetupPage);

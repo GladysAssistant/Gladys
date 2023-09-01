@@ -4,7 +4,6 @@ import actions from '../actions';
 import EcovacsPage from '../EcovacsPage';
 import DeviceTab from './DeviceTab';
 
-@connect('session,user,ecovacsDevices,houses,status', actions)
 class EcovacsIntegration extends Component {
   componentWillMount() {
     this.props.getEcovacsDevices();
@@ -21,4 +20,4 @@ class EcovacsIntegration extends Component {
   }
 }
 
-export default EcovacsIntegration;
+export default connect('session,user,ecovacsDevices,houses,status', actions)(EcovacsIntegration);
