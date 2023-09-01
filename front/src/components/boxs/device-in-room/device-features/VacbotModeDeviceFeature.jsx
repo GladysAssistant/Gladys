@@ -11,16 +11,7 @@ const VacbotModeDeviceFeature = ({ children, ...props }) => {
   const { category, type, last_value: lastValue } = deviceFeature;
 
   function updateValue(value) {
-    props.updateValueWithDebounce(
-      props.x,
-      props.y,
-      device,
-      deviceFeature,
-      deviceIndex,
-      deviceFeatureIndex,
-      value,
-      lastValue
-    );
+    props.updateValueWithDebounce(deviceFeature, value);
   }
 
   function clean() {

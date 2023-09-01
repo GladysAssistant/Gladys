@@ -99,7 +99,7 @@ describe('camera controller test', () => {
     );
     assert.calledWith(rtspCameraService.liveActivePing, 'my-camera');
   });
-  it('should get streaming file', async () => {
+  it('should get index.m3u8 file', async () => {
     const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
     const req = {
       params: {
@@ -115,12 +115,28 @@ describe('camera controller test', () => {
       resWriteStream,
     );
   });
+  it('should get index1.ts file', async () => {
+    const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
+    const req = {
+      params: {
+        folder: 'camera-1',
+        file: 'index1.ts',
+      },
+    };
+    await fse.ensureDir(path.join(gladys.config.tempFolder, 'camera-1'));
+    await fse.writeFile(path.join(gladys.config.tempFolder, 'camera-1', 'index1.ts'), 'test-toto-content');
+    const resWriteStream = fse.createWriteStream(path.join(gladys.config.tempFolder, 'camera-1', 'result.txt'));
+    await rtspCameraController['get /api/v1/service/rtsp-camera/camera/streaming/:folder/:file'].controller(
+      req,
+      resWriteStream,
+    );
+  });
   it('should return 404, file not found (res.status) ', async () => {
     const rtspCameraController = RtspCameraControllerWithFsMocked(gladys, rtspCameraService);
     const req = {
       params: {
         folder: 'camera-1',
-        file: 'FILE_NOT_FOUND',
+        file: 'index12212.ts',
       },
     };
     const resWriteStream = fse.createWriteStream(path.join(gladys.config.tempFolder, 'camera-1', 'result.txt'));
@@ -146,5 +162,35 @@ describe('camera controller test', () => {
       resWriteStream,
     );
     await chaiAssert.isRejected(promise, 'FILE_NOT_FOUND');
+  });
+  it('should return 400, bad request, invalid filename', async () => {
+    const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
+    const req = {
+      params: {
+        folder: 'camera-1',
+        file: 'lalalalala',
+      },
+    };
+    const resWriteStream = {};
+    const promise = rtspCameraController['get /api/v1/service/rtsp-camera/camera/streaming/:folder/:file'].controller(
+      req,
+      resWriteStream,
+    );
+    await chaiAssert.isRejected(promise, 'Invalid filename');
+  });
+  it('should return 400, bad request, invalid session id', async () => {
+    const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
+    const req = {
+      params: {
+        folder: '.....',
+        file: 'lalalalala',
+      },
+    };
+    const resWriteStream = {};
+    const promise = rtspCameraController['get /api/v1/service/rtsp-camera/camera/streaming/:folder/:file'].controller(
+      req,
+      resWriteStream,
+    );
+    await chaiAssert.isRejected(promise, 'Invalid session id');
   });
 });
