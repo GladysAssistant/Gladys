@@ -41,8 +41,8 @@ async function getDevicesStates(device) {
 
     deviceStates.forEach((state) => {
       const deviceFeatureExternalId = getDeviceFeatureExternalId({ URL: deviceURL }, state.name);
-      const newValueUnbind = unbindValue(device, state.name, state.value);
       const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
+      const newValueUnbind = unbindValue(device, deviceFeature, state.value);
       if (deviceFeature) {
         if (deviceFeature.category !== DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR || newValueUnbind !== 0) {
           this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {

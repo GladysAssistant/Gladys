@@ -27,20 +27,21 @@ function bindValue(device, deviceFeature, value) {
 /**
  * @description Unbind value.
  * @param {object} device - Device.
- * @param {string} stateName - Device state name.
- * @param {string} stateValue - Device state value.
+ * @param {object} deviceFeature - Device feature.
+ * @param {string} value - Device value.
  * @returns {object} Return the value adapted.
  * @example
  * const value = unbindValue({}, 'name', 1);
  */
-function unbindValue(device, stateName, stateValue) {
-  if (stateName === DEVICE_STATES.OCCUPANCY_STATE) {
-    return stateValue === 'noPersonInside' ? 0 : 1;
+function unbindValue(device, deviceFeature, value) {
+  const { state } = getNodeStateInfoByExternalId(deviceFeature);
+  if (state === DEVICE_STATES.OCCUPANCY_STATE) {
+    return value === 'noPersonInside' ? 0 : 1;
   }
-  if (stateName === DEVICE_STATES.HEATING_LEVEL_STATE) {
-    return HEATING_MODES.indexOf(stateValue);
+  if (state === DEVICE_STATES.HEATING_LEVEL_STATE) {
+    return HEATING_MODES.indexOf(value);
   }
-  return stateValue;
+  return value;
 }
 
 module.exports = {
