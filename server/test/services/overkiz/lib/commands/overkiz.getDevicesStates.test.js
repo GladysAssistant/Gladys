@@ -27,11 +27,27 @@ describe('GetDevicesStates command', () => {
           name: DEVICE_STATES.HEATING_LEVEL_STATE,
           value: '0',
         },
+        {
+          name: DEVICE_STATES.COMFORT_TEMPERATURE_STATE,
+          value: '18',
+        },
+        {
+          name: DEVICE_STATES.ECO_TEMPERATURE_STATE,
+          value: '20',
+        },
+        {
+          name: DEVICE_STATES.TARGET_TEMPERATURE_STATE,
+          value: '20',
+        },
       ]),
     };
     getDevicesStates = proxyquire('../../../../../services/overkiz/lib/commands/overkiz.getDevicesStates', {
       overkizServerAPI: { overkizServerAPI },
     }).getDevicesStates;
+  });
+
+  beforeEach(() => {
+    sinon.reset();
   });
 
   it('should getDevicesStates', async () => {

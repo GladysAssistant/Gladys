@@ -1,7 +1,6 @@
 const logger = require('../../utils/logger');
 const OverkizHandler = require('./lib');
 const OverkizController = require('./api/overkiz.controller');
-const { ServiceNotConfiguredError } = require('../../utils/coreErrors');
 const { OVERKIZ_SERVER_PARAM } = require('./lib/overkiz.constants');
 
 module.exports = function OverkizService(gladys, serviceId) {
@@ -19,13 +18,6 @@ module.exports = function OverkizService(gladys, serviceId) {
     await gladys.variable.setValue(OVERKIZ_SERVER_PARAM.OVERKIZ_TYPE, 'atlantic_cozytouch', serviceId);
     await gladys.variable.setValue(OVERKIZ_SERVER_PARAM.OVERKIZ_SERVER_USERNAME, 'pochet.romuald@gmail.com', serviceId);
     await gladys.variable.setValue(OVERKIZ_SERVER_PARAM.OVERKIZ_SERVER_PASSWORD, '8Vyr7acpcozytouch', serviceId);
-
-    // Authorization server
-    const overkizType = await gladys.variable.getValue(OVERKIZ_SERVER_PARAM.OVERKIZ_TYPE, serviceId);
-    if (!overkizType) {
-      throw new ServiceNotConfiguredError(OVERKIZ_SERVER_PARAM.OVERKIZ_TYPE);
-    }
-    overkizHandler.overkizType = overkizType;
 
     await overkizHandler.connect();
   }

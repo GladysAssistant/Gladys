@@ -19,6 +19,7 @@ async function connect() {
   if (!overkizType) {
     throw new ServiceNotConfiguredError(OVERKIZ_SERVER_PARAM.OVERKIZ_TYPE);
   }
+  this.overkizType = overkizType;
 
   const overkizUsername = await this.gladys.variable.getValue(
     OVERKIZ_SERVER_PARAM.OVERKIZ_SERVER_USERNAME,
