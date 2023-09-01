@@ -2240,7 +2240,27 @@
           "8": "Off",
           "9": "Brightness down",
           "10": "Brightness up",
-          "11": "Brightness stop"
+          "11": "Brightness stop",
+          "12": "Left arrow click",
+          "13": "Right arrow click",
+          "14": "Left arrow held",
+          "15": "Right arrow held",
+          "16": "Left arrow release",
+          "17": "Right arrow release",
+          "18": "Triple click",
+          "19": "Quadruple click",
+          "20": "Click released",
+          "21": "Many clicks",
+          "22": "Cube shake",
+          "23": "Cube throw",
+          "24": "Cube wake up",
+          "25": "Cube fall",
+          "26": "Cube tap",
+          "27": "Cube slide",
+          "28": "Cube flip 180°",
+          "29": "Cube flip 90°",
+          "30": "Cube rotate left",
+          "31": "Cube rotate right"
         }
       },
       "opening-sensor": {

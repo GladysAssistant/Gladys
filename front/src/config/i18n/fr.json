@@ -2242,7 +2242,27 @@
           "8": "Off",
           "9": "Réduire luminosité",
           "10": "Augmenter luminosité",
-          "11": "Stopper luminosité"
+          "11": "Stopper luminosité",
+          "12": "Flèche gauche clic",
+          "13": "Flèche droite clic",
+          "14": "Flèche gauche maintenue",
+          "15": "Flèche droite maintenue",
+          "16": "Flèche gauche relâchée",
+          "17": "Flèche droite relâchée",
+          "18": "Clic triple",
+          "19": "Clic quadruple",
+          "20": "Clic relâché",
+          "21": "Plein de clics",
+          "22": "Cube secoué",
+          "23": "Cube lancé",
+          "24": "Cube réveillé",
+          "25": "Cube tombe",
+          "26": "Cube tapé",
+          "27": "Cube slide",
+          "28": "Cube flip 180°",
+          "29": "Cube flip 90°",
+          "30": "Cube rotation gauche",
+          "31": "Cube rotation droite"
         }
       },
       "opening-sensor": {
