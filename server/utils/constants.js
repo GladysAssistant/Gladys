@@ -37,7 +37,7 @@ const BUTTON_STATUS = {
   ROTATE_RIGHT: 31,
   VIBRATION: 32,
   TILT: 33,
-  DROP:34,
+  DROP: 34,
 };
 
 const COVER_STATE = {
