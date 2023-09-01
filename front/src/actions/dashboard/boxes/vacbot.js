@@ -32,7 +32,6 @@ function createActions(store) {
     }
   };
 
-    
   return Object.assign({}, actions);
 }
 
