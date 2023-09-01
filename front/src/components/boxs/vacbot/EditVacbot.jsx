@@ -44,7 +44,6 @@ const EditVacbotBox = ({ children, ...props }) => (
   </BaseEditBox>
 );
 
-@connect('httpClient', actions)
 class EditVacbotBoxComponent extends Component {
   updateBoxVacbot = e => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
@@ -99,4 +98,4 @@ class EditVacbotBoxComponent extends Component {
   }
 }
 
-export default EditVacbotBoxComponent;
+export default connect('httpClient', actions)(EditVacbotBoxComponent);
