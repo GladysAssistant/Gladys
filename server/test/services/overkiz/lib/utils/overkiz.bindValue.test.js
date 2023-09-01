@@ -5,7 +5,7 @@ describe('Overkiz bindValue', () => {
   it('should bindValue default', () => {
     const device = {};
     const deviceFeature = {
-      external_id: '0:1:2:3:4:5:6',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:5:6:7',
     };
     const stateValue = '0123456789';
     const bindStateValue = bindValue(device, deviceFeature, stateValue);
@@ -15,7 +15,7 @@ describe('Overkiz bindValue', () => {
   it('should bindValue core:OccupancyState', () => {
     const device = {};
     const deviceFeature = {
-      external_id: '0:1:2:3:4:core:OccupancyState',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:state:core:OccupancyState',
     };
     const stateValue = 0;
     const bindStateValue = bindValue(device, deviceFeature, stateValue);
@@ -25,7 +25,7 @@ describe('Overkiz bindValue', () => {
   it('should bindValue io:TargetHeatingLevelState', () => {
     const device = {};
     const deviceFeature = {
-      external_id: '0:1:2:3:4:io:TargetHeatingLevelState',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:state:io:TargetHeatingLevelState',
     };
     const stateValue = 0;
     const bindStateValue = bindValue(device, deviceFeature, stateValue);
@@ -35,7 +35,7 @@ describe('Overkiz bindValue', () => {
   it('should bindValue core:ComfortRoomTemperatureState', () => {
     const device = {};
     const deviceFeature = {
-      external_id: '0:1:2:3:4:core:ComfortRoomTemperatureState',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:state:core:ComfortRoomTemperatureState',
     };
     const stateValue = '1.0';
     const bindStateValue = bindValue(device, deviceFeature, stateValue);
@@ -45,7 +45,7 @@ describe('Overkiz bindValue', () => {
   it('should bindValue io:EffectiveTemperatureSetpointState', () => {
     const device = {};
     const deviceFeature = {
-      external_id: '0:1:2:3:4:io:EffectiveTemperatureSetpointState',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:state:io:EffectiveTemperatureSetpointState',
     };
     const stateValue = '1.0';
     const bindStateValue = bindValue(device, deviceFeature, stateValue);
@@ -55,7 +55,7 @@ describe('Overkiz bindValue', () => {
   it('should unbindValue default', () => {
     const device = {};
     const deviceFeature = {
-      external_id: '0:1:2:3:4:5:6',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:5:6:7',
     };
     const stateValue = '0123456789';
     const unbindStateValue = unbindValue(device, deviceFeature, stateValue);
@@ -65,7 +65,7 @@ describe('Overkiz bindValue', () => {
   it('should unbindValue core:OccupancyState', () => {
     const device = {};
     const deviceFeature = {
-      external_id: '0:1:2:3:4:core:OccupancyState',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:state:core:OccupancyState',
     };
     const stateValue = 'personInside';
     const unbindStateValue = unbindValue(device, deviceFeature, stateValue);
@@ -75,7 +75,7 @@ describe('Overkiz bindValue', () => {
   it('should unbindValue io:TargetHeatingLevelState', () => {
     const device = {};
     const deviceFeature = {
-      external_id: '0:1:2:3:4:io:TargetHeatingLevelState',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:state:io:TargetHeatingLevelState',
     };
     const stateValue = 'off';
     const unbindStateValue = unbindValue(device, deviceFeature, stateValue);

@@ -19,39 +19,39 @@ describe('Overkiz externalId', () => {
 
   it('should getDeviceExternalId', () => {
     const node = {
-      deviceURL: '_deviceURL',
+      deviceURL: '_deviceURLNs:_deviceURL',
     };
     const deviceExternalId = getDeviceExternalId(node);
-    expect(deviceExternalId).to.equals('overkiz:deviceURL:_deviceURL');
+    expect(deviceExternalId).to.equals('overkiz:deviceURL:_deviceURLNs:_deviceURL');
   });
 
   it('should getDeviceFeatureExternalId', () => {
     const node = {
-      deviceURL: '_deviceURL',
+      deviceURL: '_deviceURLNs:_deviceURL',
     };
-    const state = '_state';
+    const state = '_stateNs:_state';
     const deviceFeatureExternalId = getDeviceFeatureExternalId(node, state);
-    expect(deviceFeatureExternalId).to.equals('overkiz:deviceURL:_deviceURL:state:_state');
+    expect(deviceFeatureExternalId).to.equals('overkiz:deviceURL:_deviceURLNs:_deviceURL:state:_stateNs:_state');
   });
 
   it('should getNodeInfoByExternalId', () => {
     const device = {
-      external_id: '0:1:deviceURL:_deviceURL:4:5:6',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:4:5:6',
     };
     const nodeInfoByExternalId = getNodeInfoByExternalId(device);
     expect(nodeInfoByExternalId).to.deep.equals({
-      deviceURL: '_deviceURL',
+      deviceURL: '_deviceURLNs:_deviceURL',
     });
   });
 
   it('should getNodeStateInfoByExternalId', () => {
     const deviceFeature = {
-      external_id: '0:1:deviceURL:_deviceURL:4:state:_state',
+      external_id: 'overkiz:deviceURL:_deviceURLNs:_deviceURL:state:_stateNs:_state',
     };
     const nodeStateInfoByExternalId = getNodeStateInfoByExternalId(deviceFeature);
     expect(nodeStateInfoByExternalId).to.deep.equals({
-      deviceURL: '_deviceURL',
-      state: '_state',
+      deviceURL: '_deviceURLNs:_deviceURL',
+      state: '_stateNs:_state',
     });
   });
 });

@@ -1,6 +1,6 @@
 /**
  * @description Return name of device.
- * @param {object} node - The zwave value.
+ * @param {object} node - The Overkiz value.
  * @returns {string} Return name.
  * @example
  * getDeviceName(node);
@@ -11,7 +11,7 @@ function getDeviceName(node) {
 
 /**
  * @description Return external id of device.
- * @param {object} node - The zwave value.
+ * @param {object} node - The Overkiz value.
  * @returns {string} Return external id.
  * @example
  * getDeviceExternalId(node);
@@ -42,7 +42,7 @@ function getDeviceFeatureExternalId(node, state) {
 function getNodeInfoByExternalId(device) {
   const array = device.external_id.split(':');
   return {
-    deviceURL: `${array[3]}`,
+    deviceURL: `${array[2]}:${array[3]}`,
   };
 }
 
@@ -56,8 +56,8 @@ function getNodeInfoByExternalId(device) {
 function getNodeStateInfoByExternalId(deviceFeature) {
   const array = deviceFeature.external_id.split(':');
   return {
-    deviceURL: `${array[3]}`,
-    state: `${array[6]}`,
+    deviceURL: `${array[2]}:${array[3]}`,
+    state: `${array[5]}:${array[6]}`,
   };
 }
 
