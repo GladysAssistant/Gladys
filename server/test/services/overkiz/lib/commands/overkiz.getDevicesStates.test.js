@@ -3,9 +3,8 @@ const sinon = require('sinon');
 const { fake } = sinon;
 
 const proxyquire = require('proxyquire');
-const { DEVICE_STATES } = require('../../../../../services/overkiz/lib/overkiz.constants');
-const { assert } = require('joi');
 const { expect } = require('chai');
+const { DEVICE_STATES } = require('../../../../../services/overkiz/lib/overkiz.constants');
 
 describe('GetDevicesStates command', () => {
   let gladys;
