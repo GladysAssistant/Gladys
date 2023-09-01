@@ -279,7 +279,7 @@ class VacbotBoxComponent extends Component {
     console.log(`${device} features : ${deviceFeatures}`);
 
     return (
-      <VacbotCard
+      <VacbotBox
         {...props}
         loading={loading}
         boxTitle={boxTitle}
