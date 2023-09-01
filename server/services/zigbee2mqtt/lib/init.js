@@ -102,6 +102,9 @@ async function init(setupMode = false) {
         this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
       }
     }
+  } else if (configuration.mqttMode === 'external') {
+    console.log(configuration);
+    await this.connect(configuration);
   }
 
   await this.saveConfiguration(configuration);

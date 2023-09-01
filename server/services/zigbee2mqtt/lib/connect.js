@@ -11,7 +11,7 @@ const { DEFAULT } = require('./constants');
  * @example
  * connect();
  */
-async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
+async function connect({ mqttUrl, mqttUsername, mqttPassword, mqttMode }) {
   if (this.mqttClient) {
     logger.info(`Disconnecting existing MQTT client...`);
     this.mqttClient.end();
@@ -19,7 +19,7 @@ async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
     this.mqttClient = null;
   }
 
-  if (this.mqttRunning) {
+  if (this.mqttRunning || mqttMode === 'external') {
     // Loads MQTT service
     logger.info(`Connecting Gladys to ${mqttUrl} MQTT broker...`);
 
