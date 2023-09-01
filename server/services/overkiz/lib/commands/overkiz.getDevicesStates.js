@@ -30,7 +30,9 @@ async function getDevicesStates(device) {
           logger.info(`${state.name} has value ${state.value}`);
           break;
         case 'core:EcoRoomTemperatureState':
-          logger.warn(`${state.name} has value ${state.value} BUT SHOULD NOT IT BE io:EffectiveTemperatureSetpointState`);
+          logger.warn(
+            `${state.name} has value ${state.value} BUT SHOULD NOT IT BE io:EffectiveTemperatureSetpointState`,
+          );
           break;
         default:
         //
