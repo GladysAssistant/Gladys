@@ -128,4 +128,52 @@ describe('SunSpec getDevices', () => {
       ],
     });
   });
+
+  it('should found device by manufacturer', async () => {
+    sunSpecManager.devices = [
+      {
+        manufacturer: 'manufacturer',
+        product: 'product',
+        serialNumber: 'serialNumber',
+        swVersion: 'swVersion',
+        mppt: 1,
+      },
+    ];
+    const devices = await sunSpecManager.getDevices({
+      search: 'manu',
+    });
+    expect(devices.length).eql(1);
+  });
+
+  it('should found device by product', async () => {
+    sunSpecManager.devices = [
+      {
+        manufacturer: 'manufacturer',
+        product: 'product',
+        serialNumber: 'serialNumber',
+        swVersion: 'swVersion',
+        mppt: 1,
+      },
+    ];
+    const devices = await sunSpecManager.getDevices({
+      search: 'prod',
+    });
+    expect(devices.length).eql(1);
+  });
+
+  it('should not found device', async () => {
+    sunSpecManager.devices = [
+      {
+        manufacturer: 'manufacturer',
+        product: 'product',
+        serialNumber: 'serialNumber',
+        swVersion: 'swVersion',
+        mppt: 1,
+      },
+    ];
+    const devices = await sunSpecManager.getDevices({
+      search: 'serial',
+    });
+    expect(devices.length).eql(0);
+  });
 });
