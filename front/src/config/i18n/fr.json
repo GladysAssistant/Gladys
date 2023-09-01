@@ -2173,7 +2173,10 @@
           "28": "Cube flip 180°",
           "29": "Cube flip 90°",
           "30": "Cube rotation gauche",
-          "31": "Cube rotation droite"
+          "31": "Cube rotation droite",
+          "32": "Vibration",
+          "33": "Inclinaison",
+          "34": "Mouvements"
         }
       },
       "opening-sensor": {
@@ -2330,6 +2333,9 @@
       "acceleration-x": "Accélération X",
       "acceleration-y": "Accélération Y",
       "acceleration-z": "Accélération Z",
+      "angle-x": "Angle X",
+      "angle-y": "Angle Y",
+      "angle-z": "Angle Z",
       "bed-activity": "Activité Lit"
     },
     "signal": {
