@@ -220,4 +220,4 @@ class DevicesComponent extends Component {
   }
 }
 
-export default connect('session,httpClient', {})(DevicesComponent);
+export default connect('session,httpClient,user', {})(DevicesComponent);
