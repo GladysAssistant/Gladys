@@ -17,9 +17,9 @@ class DevicesInRoomComponent extends Component {
   componentDidMount() {
     this.getRoom();
   }
-  render({ box }, { room }) {
+  render({ box, x, y }, { room }) {
     const boxModified = { ...box, name: room && room.name };
-    return <DeviceBox box={boxModified} />;
+    return <DeviceBox box={boxModified} x={x} y={y} />;
   }
 }
 
