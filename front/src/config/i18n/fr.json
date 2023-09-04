@@ -215,7 +215,8 @@
       "devices": "Appareils",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
-      "clock": "Horloge"
+      "clock": "Horloge",
+      "scene": "Scène"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -332,6 +333,11 @@
         "displaySecond": "Afficher les secondes ?",
         "yes": "Oui",
         "no": "Non"
+      },
+      "scene": {
+        "editNameLabel": "Entrez le nom de cette box",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord",
+        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
       }
     }
   },
@@ -995,6 +1001,7 @@
         "connecting": "Configuration enregistrée. Connexion au broker MQTT en cours...",
         "connected": "Connecté au broker MQTT avec succès !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "networkError": "Impossible de contacter Gladys, est-ce que votre instance Gladys est bien connectée et accessible ?",
         "disconnected": "Déconnecté du broker MQTT."
       }
     },
@@ -1245,7 +1252,8 @@
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud eWeLink...",
         "connected": "Connexion réussie au compte cloud eWeLink !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "ewelinkIntegrationDeprecated": "Septembre 2023: Cette intégration ne semble malheureusement plus fonctionner suite à des changements côté API eWeLink. Discussion <a href=\"https://community.gladysassistant.com/t/service-ewelink-en-erreur/8323/17\" target=\"_blank\" rel=\"noopener noreferrer\">sur le forum ici</a>."
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
@@ -1256,13 +1264,12 @@
     "openai": {
       "title": "OpenAI ChatGPT",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
-      "firstExplanation": "Ceci est une alpha d'une intégration avec l'intelligence artificielle OpenAI ChatGPT. Vous pouvez demander ce que vous voulez à Gladys ici.",
-      "itDoesNothing": "Cet onglet est un bac à sable vous permettant de tester les capacités de ChatGPT. Pour tester des vrais commandes domotiques, activez ChatGPT dans le chat Gladys.",
+      "firstExplanation": "Gladys peut utiliser l'intelligence artificielle OpenAI ChatGPT pour vous permettre de communiquer avec votre maison connectée.",
       "aFewExamples": "Quelques exemples :",
       "turnOnTheLight": "Allume la lumière du salon !",
       "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
-      "whoIsJulesVerne": "Qui est Jules Verne ?",
       "eggDuration": "Comment cuire les oeufs durs ?",
+      "showMeTheCameraInTheKitchen": "Montre moi la caméra de la cuisine",
       "activateOpenAiChat": "Activer ChatGPT dans le chat Gladys",
       "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
@@ -2229,7 +2236,10 @@
           "28": "Cube flip 180°",
           "29": "Cube flip 90°",
           "30": "Cube rotation gauche",
-          "31": "Cube rotation droite"
+          "31": "Cube rotation droite",
+          "32": "Vibration",
+          "33": "Inclinaison",
+          "34": "Mouvements"
         }
       },
       "opening-sensor": {
@@ -2386,6 +2396,9 @@
       "acceleration-x": "Accélération X",
       "acceleration-y": "Accélération Y",
       "acceleration-z": "Accélération Z",
+      "angle-x": "Angle X",
+      "angle-y": "Angle Y",
+      "angle-z": "Angle Z",
       "bed-activity": "Activité Lit"
     },
     "signal": {
