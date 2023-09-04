@@ -74,8 +74,12 @@ class EditDeviceInRoom extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room && this.props.box.room) {
-      this.getDeviceFeatures();
+    if (prevProps.box && this.props.box && this.props.box.room) {
+      const deviceFeaturesChanged = prevProps.box.device_features !== this.props.box.device_features;
+      const roomChanged = prevProps.box.room !== this.props.box.room;
+      if (deviceFeaturesChanged || roomChanged) {
+        this.getDeviceFeatures();
+      }
     }
   }
 

@@ -22,6 +22,40 @@ addMapping('action', BUTTON_STATUS.CLICK, 'single');
 addMapping('action', BUTTON_STATUS.DOUBLE_CLICK, 'double');
 addMapping('action', BUTTON_STATUS.HOLD_CLICK, 'hold');
 addMapping('action', BUTTON_STATUS.LONG_CLICK, 'long');
+
+addMapping('action', BUTTON_STATUS.ON, 'on');
+addMapping('action', BUTTON_STATUS.OFF, 'off');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_MOVE_DOWN, 'brightness_move_down');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_MOVE_UP, 'brightness_move_up');
+addMapping('action', BUTTON_STATUS.BRIGHTNESS_STOP, 'brightness_stop');
+
+addMapping('action', BUTTON_STATUS.ARROW_LEFT_CLICK, 'arrow_left_click');
+addMapping('action', BUTTON_STATUS.ARROW_RIGHT_CLICK, 'arrow_right_click');
+addMapping('action', BUTTON_STATUS.ARROW_LEFT_HOLD, 'arrow_left_hold');
+addMapping('action', BUTTON_STATUS.ARROW_RIGHT_HOLD, 'arrow_right_hold');
+addMapping('action', BUTTON_STATUS.ARROW_LEFT_RELEASE, 'arrow_left_release');
+addMapping('action', BUTTON_STATUS.ARROW_RIGHT_RELEASE, 'arrow_right_release');
+
+addMapping('action', BUTTON_STATUS.TRIPLE, 'triple');
+addMapping('action', BUTTON_STATUS.QUADRUPLE, 'quadruple');
+addMapping('action', BUTTON_STATUS.RELEASE, 'release');
+addMapping('action', BUTTON_STATUS.MANY, 'many');
+
+addMapping('action', BUTTON_STATUS.SHAKE, 'shake');
+addMapping('action', BUTTON_STATUS.THROW, 'throw');
+addMapping('action', BUTTON_STATUS.WAKEUP, 'wakeup');
+addMapping('action', BUTTON_STATUS.FALL, 'fall');
+addMapping('action', BUTTON_STATUS.TAP, 'tap');
+addMapping('action', BUTTON_STATUS.SLIDE, 'slide');
+addMapping('action', BUTTON_STATUS.FLIP_180, 'flip180');
+addMapping('action', BUTTON_STATUS.FLIP_90, 'flip90');
+addMapping('action', BUTTON_STATUS.ROTATE_LEFT, 'rotate_left');
+addMapping('action', BUTTON_STATUS.ROTATE_RIGHT, 'rotate_right');
+
+addMapping('action', BUTTON_STATUS.VIBRATION, 'vibration');
+addMapping('action', BUTTON_STATUS.TILT, 'tilt');
+addMapping('action', BUTTON_STATUS.DROP, 'drop');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');

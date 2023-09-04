@@ -15,7 +15,7 @@ const DEFAULT = {
     IN_PROGRESS: 'IN_PROGRESS',
     ERROR: 'ERROR',
   },
-  MOSQUITTO_VERSION: '3',
+  MOSQUITTO_VERSION: '4',
   PASSWORD_FILE_PATH: '/mosquitto/config/mosquitto.passwd',
 };
 

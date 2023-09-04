@@ -1,0 +1,12 @@
+.deviceListDragAndDrop {
+  cursor: 'pointer';
+  userselect: 'none';
+}
+
+.deviceListDragAndDropDragging {
+  opacity: 0.5;
+}
+
+.deviceListDragAndDropActive {
+  background-color: #ecf0f1;
+}
