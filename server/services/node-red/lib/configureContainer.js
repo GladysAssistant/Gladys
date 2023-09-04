@@ -20,7 +20,11 @@ async function configureContainer(config) {
   // Create configuration path (if not exists)
   const configFilepath = path.join(basePathOnHost, DEFAULT.CONFIGURATION_PATH);
   await fs.mkdir(path.dirname(configFilepath), { recursive: true });
-  await fs.chown(path.dirname(configFilepath), 1000, 1000);
+  try {
+    await fs.chown(path.dirname(configFilepath), 1000, 1000);
+  } catch (e) {
+    logger.error('NodeRed: Unable to change write of the configuration');
+  }
 
   // Check if config file not already exists
   let configCreated = false;
