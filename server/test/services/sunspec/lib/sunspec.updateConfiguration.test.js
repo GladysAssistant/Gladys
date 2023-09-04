@@ -33,6 +33,17 @@ describe('SunSpec updateConfiguration', () => {
     assert.notCalled(gladys.variable.setValue);
   });
 
+  it('all config param', async () => {
+    const configuration = {
+      sunspecUrl: 'sunspecUrl',
+      bdpvActive: 'bdpvActive',
+      bdpvUsername: 'bdpvUsername',
+      bdpvApiKey: 'bdpvApiKey',
+    };
+    await sunSpecManager.updateConfiguration(configuration);
+    assert.callCount(gladys.variable.setValue, 4);
+  });
+
   it('empty sunspecUrl config param', async () => {
     const configuration = {};
     await sunSpecManager.updateConfiguration(configuration);

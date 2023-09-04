@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cron = require('node-cron');
 const logger = require('../../../../utils/logger');
-const { CONFIGURATION } = require('../sunspec.constants');
+const { CONFIGURATION, PROPERTY } = require('../sunspec.constants');
 
 const BDPV_HOST = 'https://www.bdpv.fr/webservice/majProd';
 
@@ -10,8 +10,13 @@ const BDPV_HOST = 'https://www.bdpv.fr/webservice/majProd';
  * @example sunspec.bdpvPush();
  */
 async function bdpvPush() {
-  const index = 0;
-
+  const index = this.getDevices()
+    .map((device) => device.features.filter((deviceFeature) => deviceFeature.property === PROPERTY.DCWH))
+    .map((deviceFeature) => {
+      const gladysFeature = this.gladys.stateManager.get('deviceFeature', deviceFeature.selector);
+      return gladysFeature.last_value;
+    })
+    .reduce((total, item) => total + item);
   try {
     this.bdpvParams.index = index;
     const response = await this.bdpvClient.get('expeditionProd_v3.php', {
@@ -53,6 +58,7 @@ async function bdpvInit(bdpvActive) {
       scheduled: false,
     });
   }
+
   if (bdpvActive) {
     this.bdpvTask.start();
   } else {
