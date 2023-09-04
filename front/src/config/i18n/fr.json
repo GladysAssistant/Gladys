@@ -215,7 +215,8 @@
       "devices": "Appareils",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
-      "clock": "Horloge"
+      "clock": "Horloge",
+      "scene": "Scène"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -329,6 +330,11 @@
         "displaySecond": "Afficher les secondes ?",
         "yes": "Oui",
         "no": "Non"
+      },
+      "scene": {
+        "editNameLabel": "Entrez le nom de cette box",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord",
+        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
       }
     }
   },

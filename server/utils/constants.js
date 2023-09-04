@@ -895,6 +895,7 @@ const DASHBOARD_BOX_TYPE = {
   CHART: 'chart',
   ECOWATT: 'ecowatt',
   CLOCK: 'clock',
+  SCENE: 'scene',
 };
 
 const ERROR_MESSAGES = {
