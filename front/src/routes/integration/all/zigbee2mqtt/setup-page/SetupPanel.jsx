@@ -2,7 +2,7 @@ import { Component, Fragment } from 'preact';
 
 import { RequestStatus } from '../../../../../utils/consts.js';
 
-import { SETUP_MODES } from './constants.js';
+import { MQTT_MODE, SETUP_MODES } from './constants.js';
 import SetupModePanel from './SetupModePanel.jsx';
 import SetupLocalMode from './local/SetupLocalMode.jsx';
 import SetupRemoteMode from './remote/SetupRemoteMode.jsx';
@@ -31,8 +31,18 @@ class SetupPanel extends Component {
 
     const { configuration, zigbee2mqttStatus = {} } = props;
 
+    let setupMode = null;
+
+    if (configuration.mqttMode === MQTT_MODE.LOCAL) {
+      setupMode = SETUP_MODES.LOCAL;
+    } else if (configuration.mqttMode === MQTT_MODE.GLADYS) {
+      setupMode = SETUP_MODES.REMOTE;
+    } else if (configuration.mqttMode === MQTT_MODE.EXTERNAL) {
+      setupMode = SETUP_MODES.REMOTE;
+    }
+    console.log({ configuration, setupMode });
     this.state = {
-      setupMode: zigbee2mqttStatus.usbConfigured ? SETUP_MODES.LOCAL : null,
+      setupMode,
       configuration
     };
   }

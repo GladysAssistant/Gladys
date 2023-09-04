@@ -103,7 +103,6 @@ async function init(setupMode = false) {
       }
     }
   } else if (configuration.mqttMode === 'external') {
-    console.log(configuration);
     await this.connect(configuration);
   }
 

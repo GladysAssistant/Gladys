@@ -1,13 +1,9 @@
 import { Component } from 'preact';
 import { MarkupText, Text, Localizer } from 'preact-i18n';
+import { MQTT_MODE } from '../constants';
 import cx from 'classnames';
 
 import SubmitConfiguration from '../components/SubmitConfiguration';
-
-const MQTT_MODE = {
-  GLADYS: 'gladys',
-  EXTERNAL: 'external'
-};
 
 class SetupRemoteOptions extends Component {
   selectGladysMQTT = () => {
@@ -56,10 +52,13 @@ class SetupRemoteOptions extends Component {
     super(props);
 
     const { configuration } = props;
-    const { mqttMode } = configuration;
+    const { mqttMode, mqttUrl, mqttPassword, mqttUsername } = configuration;
 
     this.state = {
       mqttMode,
+      mqttUrl,
+      mqttPassword,
+      mqttUsername,
       showPassword: false
     };
   }
