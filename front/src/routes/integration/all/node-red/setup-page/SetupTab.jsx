@@ -94,7 +94,7 @@ class SetupTab extends Component {
         nodeRedStatus: RequestStatus.Success
       });
     }
-
+    await this.getConfiguration();
     await this.checkStatus();
   };
 
@@ -119,7 +119,7 @@ class SetupTab extends Component {
         nodeRedStatus: RequestStatus.Success
       });
     }
-
+    await this.getConfiguration();
     await this.checkStatus();
   };
 

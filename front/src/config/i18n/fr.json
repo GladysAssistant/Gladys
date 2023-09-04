@@ -748,12 +748,12 @@
       },
       "setup": {
         "title": "Configuration du service Node-red",
-        "description": "Ce service utilise un container Docker. Activer Node-red pour déployer ce container.\nPour en savoir plus, rendez-vous sur la page de documentation Node-red",
+        "description": "Ce service utilise un container Docker. Activez Node-red pour déployer ce container.\nPour en savoir plus, rendez-vous sur la page de documentation Node-red.",
         "error": "Une erreur s'est produite au démarrage du service Node-red.",
         "enableLabel": "Activation du service Node-red",
 
         "enableNodeRed": "Activer",
-        "disableNodeRed": "Desactiver",
+        "disableNodeRed": "Désactiver",
         "activationNodeRed": "Activation...",
         "serviceStatus": "Etat du service Node-red",
         "containersStatus": "Conteneurs liés à Node-red",
