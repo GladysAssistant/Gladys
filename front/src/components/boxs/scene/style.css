@@ -1,0 +1,5 @@
+.btnLoading {
+  &::after {
+     border: 2px solid #5eba00;
+  }
+}

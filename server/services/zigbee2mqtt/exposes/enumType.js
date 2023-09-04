@@ -52,6 +52,10 @@ addMapping('action', BUTTON_STATUS.FLIP_90, 'flip90');
 addMapping('action', BUTTON_STATUS.ROTATE_LEFT, 'rotate_left');
 addMapping('action', BUTTON_STATUS.ROTATE_RIGHT, 'rotate_right');
 
+addMapping('action', BUTTON_STATUS.VIBRATION, 'vibration');
+addMapping('action', BUTTON_STATUS.TILT, 'tilt');
+addMapping('action', BUTTON_STATUS.DROP, 'drop');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');

@@ -38,6 +38,15 @@ async function get(options) {
     });
   }
 
+  // search by device feature selectors
+  if (optionsWithDefault.selectors) {
+    queryParams.where = {
+      [Op.or]: optionsWithDefault.selectors.split(',').map((selector) => ({
+        selector,
+      })),
+    };
+  }
+
   const scenes = await db.Scene.findAll(queryParams);
 
   const scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
