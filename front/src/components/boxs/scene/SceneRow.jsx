@@ -1,6 +1,8 @@
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
+import cx from 'classnames';
+import style from './style.css';
 
 class SceneRow extends Component {
   startScene = async () => {
@@ -21,7 +23,14 @@ class SceneRow extends Component {
         </td>
         <td>{props.name}</td>
         <td className="text-right">
-          <button onClick={this.startScene} type="button" className="btn btn-outline-success btn-sm" disabled={loading}>
+          <button
+            onClick={this.startScene}
+            type="button"
+            class={cx('btn', 'btn-outline-success', 'btn-sm', style.btnLoading, {
+              'btn-loading': loading
+            })}
+            disabled={loading}
+          >
             <i class="fe fe-play" />
             <Text id="scene.startButton" />
           </button>
