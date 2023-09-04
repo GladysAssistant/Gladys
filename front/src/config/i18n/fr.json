@@ -1253,18 +1253,16 @@
     "openai": {
       "title": "OpenAI ChatGPT",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
-      "firstExplanation": "Ceci est une alpha d'une intégration avec l'intelligence artificielle OpenAI ChatGPT. Vous pouvez demander ce que vous voulez à Gladys ici.",
-      "itDoesNothing": "Cet onglet est un bac à sable vous permettant de tester les capacités de ChatGPT. Pour tester des vrais commandes domotiques, activez ChatGPT dans le chat Gladys.",
+      "firstExplanation": "Gladys peut utiliser l'intelligence artificielle OpenAI ChatGPT pour vous permettre de communiquer avec votre maison connectée.",
       "aFewExamples": "Quelques exemples :",
       "turnOnTheLight": "Allume la lumière du salon !",
       "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
-      "whoIsJulesVerne": "Qui est Jules Verne ?",
       "eggDuration": "Comment cuire les oeufs durs ?",
+      "showMeTheCameraInTheKitchen": "Montre moi la caméra de la cuisine",
       "activateOpenAiChat": "Activer ChatGPT dans le chat Gladys",
       "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
-      "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
     }
   },
   "editScene": {
