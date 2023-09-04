@@ -18,7 +18,7 @@ async function bdpvPush() {
     })
     .reduce((total, item) => total + item);
   try {
-    this.bdpvParams.index = index;
+    this.bdpvParams.index = index * 1000;
     const response = await this.bdpvClient.get('expeditionProd_v3.php', {
       params: this.bdpvParams,
     });
