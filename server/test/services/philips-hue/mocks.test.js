@@ -28,7 +28,7 @@ const hueApi = {
     setLightState: fake.resolves(null),
     getLightState: fake.resolves({
       on: false,
-      bri: 0,
+      bri: 56,
       hue: 38191,
       sat: 94,
       effect: 'none',
@@ -61,6 +61,23 @@ const hueApi = {
   },
 };
 
+const hueApiHsColorMode = {
+  lights: {
+    getLightState: fake.resolves({
+      on: false,
+      bri: 100,
+      hue: 35000,
+      sat: 94,
+      effect: 'none',
+      hs_color: [0.4, 0.1],
+      alert: 'select',
+      colormode: 'hs',
+      mode: 'homeautomation',
+      reachable: true,
+    }),
+  }
+};
+
 const MockedPhilipsHueClient = {
   v3: {
     lightStates: {
@@ -91,4 +108,5 @@ module.exports = {
   STATE_ON,
   STATE_OFF,
   fakes,
+  hueApiHsColorMode,
 };

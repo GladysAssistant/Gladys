@@ -50,7 +50,7 @@ async function poll(device) {
   const colorFeature = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
 
   if (colorFeature && colorFeature.last_value !== currentColorState) {
-    logger.debug(`Polling Philips Hue ${lightId}, new color value = ${currentColorState}`);
+    logger.debug(`Polling Philips Hue ${lightId}, new color value = ${currentColorState} from color mode ${state.colormode}`);
     this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${lightId}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`,
       state: currentColorState,
