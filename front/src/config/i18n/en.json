@@ -2181,7 +2181,11 @@
           "31": "Cube rotate right",
           "32": "Vibration",
           "33": "Tilt",
-          "34": "Drop"
+          "34": "Drop",
+          "35": "Emergency",
+          "36": "Disarm",
+          "37": "Arm day zones",
+          "38": "Arm all zones"
         }
       },
       "opening-sensor": {
