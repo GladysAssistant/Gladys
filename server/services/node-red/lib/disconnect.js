@@ -19,6 +19,7 @@ async function disconnect() {
     });
     [container] = dockerContainer;
     await this.gladys.system.stopContainer(container.id);
+    await this.gladys.system.removeContainer(container.id);
 
     this.nodeRedRunning = false;
     this.gladysConnected = false;

@@ -34,21 +34,21 @@ class CheckStatus extends Component {
     return (
       <div>
         <div
-          class={cx('row', 'mr-0', 'ml-0', 'alert', {
+          class={cx('d-flex', 'flex-row', 'flex-wrap', 'justify-content-between', 'mr-0', 'ml-0', 'alert', {
             'alert-success': nodeRedEnabled && nodeRedExist && nodeRedRunning,
             'alert-warning': nodeRedEnabled && nodeRedExist && !nodeRedRunning,
             'alert-danger': (nodeRedEnabled && !nodeRedExist) || !dockerBased || !networkModeValid,
             'alert-info': !nodeRedEnabled
           })}
         >
-          <div class={cx('col', style.textAlignMiddleContainer)}>
+          <div class={cx(style.textAlignMiddleContainer)}>
             <span class={cx(style.textAlignMiddle)}>
               <Text id={textLabel} />
             </span>
           </div>
 
           {buttonLabel && (
-            <div class="col-3">
+            <div>
               <button
                 onClick={toggle}
                 className="btn btn-primary btn-block"

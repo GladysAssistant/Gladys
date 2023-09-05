@@ -30,6 +30,7 @@ describe('NodeRed disconnect', () => {
       system: {
         getContainers: fake.resolves([container]),
         stopContainer: fake.resolves(true),
+        removeContainer: fake.resolves(true),
       },
     };
 
@@ -51,6 +52,7 @@ describe('NodeRed disconnect', () => {
     });
     assert.called(gladys.event.emit);
     assert.called(gladys.system.stopContainer);
+    assert.called(gladys.system.removeContainer);
 
     expect(nodeRedManager.gladysConnected).to.equal(false);
     expect(nodeRedManager.nodeRedRunning).to.equal(false);
@@ -67,6 +69,23 @@ describe('NodeRed disconnect', () => {
     });
     assert.called(gladys.event.emit);
     assert.called(gladys.system.stopContainer);
+
+    expect(nodeRedManager.gladysConnected).to.equal(true);
+    expect(nodeRedManager.nodeRedRunning).to.equal(true);
+    expect(nodeRedManager.nodeRedExist).to.equal(true);
+  });
+
+  it('remove container failed', async () => {
+    gladys.system.removeContainer = fake.rejects('Error');
+
+    await nodeRedManager.disconnect();
+
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
+    });
+    assert.called(gladys.event.emit);
+    assert.called(gladys.system.stopContainer);
+    assert.called(gladys.system.removeContainer);
 
     expect(nodeRedManager.gladysConnected).to.equal(true);
     expect(nodeRedManager.nodeRedRunning).to.equal(true);
