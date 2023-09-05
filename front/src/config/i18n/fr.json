@@ -258,7 +258,7 @@
       "humidityInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment.",
-        "test": "test"
+        "thresholdsLabel": "Configurer des seuils personnalisés"
       },
       "userPresence": {
         "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes, et sélectionner ici quels utilisateurs afficher.",

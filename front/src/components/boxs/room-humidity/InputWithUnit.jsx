@@ -1,18 +1,28 @@
 import { Component } from 'preact';
 import cx from 'classnames';
+import styles from './styles.css';
+import { Text } from 'preact-i18n';
 
 class InputWithUnit extends Component {
-  render({ unit, value, classNames }) {
+  render({ unit, value, classNames, disabled, onChange }) {
     return (
-      <div style="height: 20px" class={cx('d-flex align-items-center', classNames)}>
+      <div
+        class={cx('input-group input-group-sm', styles.inputWithUnit, {
+          [styles.alpha]: disabled
+        })}
+      >
         <input
-          class="form-control p-1"
-          style="width: 25px; line-height: 1.14285714; font-size: 0.8rem;"
+          class={cx('form-control', 'p-1', 'text-right')}
+          style=""
           type="text"
           value={value}
+          disabled={disabled}
+          onChange={e => onChange(e.target.value)}
         />
-        <div style="background-color: #FF00FF; box-sizing: border-box; line-height: 1.14285714;font-size: 0.8rem;">
-          {unit}
+        <div class="input-group-append">
+          <span class="input-group-text">
+            <Text id={unit} />
+          </span>
         </div>
       </div>
     );

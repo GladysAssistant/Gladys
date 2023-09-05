@@ -1,5 +1,13 @@
-.stamp-sm {
-  min-width: 2.0rem;
-  height: 2.0rem;
-  line-height: 2.0rem;
+
+.gapThreshold {
+  gap: 0.3em
+}
+
+.alpha {
+  opacity: 60%;
+}
+
+
+.inputWithUnit{
+  width: 68px;
 }
