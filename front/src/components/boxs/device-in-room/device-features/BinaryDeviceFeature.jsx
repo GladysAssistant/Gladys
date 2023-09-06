@@ -13,7 +13,7 @@ const BinaryDeviceType = ({ children, ...props }) => {
         <label class="custom-switch">
           <input
             type="radio"
-            name={props.deviceFeature.id}
+            name={`box-${props.x}-${props.y}-${props.deviceFeature.id}`}
             value="1"
             class="custom-switch-input"
             checked={props.deviceFeature.last_value}
