@@ -174,6 +174,21 @@ class SetupTab extends Component {
       showPassword
     }
   ) {
+    let buttonLabel = null;
+    let buttonClassColor = null;
+    if (dockerBased && networkModeValid) {
+      if (nodeRedStatus === RequestStatus.Getting) {
+        buttonClassColor = 'btn-primary';
+        buttonLabel = 'integration.nodeRed.setup.activationNodeRed';
+      } else if (nodeRedEnabled) {
+        buttonClassColor = 'btn-danger';
+        buttonLabel = 'integration.nodeRed.setup.disableNodeRed';
+      } else {
+        buttonClassColor = 'btn-primary';
+        buttonLabel = 'integration.nodeRed.setup.enableNodeRed';
+      }
+    }
+
     return (
       <div class="card">
         <div class="card-header">
@@ -193,7 +208,6 @@ class SetupTab extends Component {
             dockerBased={dockerBased}
             networkModeValid={networkModeValid}
             nodeRedStatus={nodeRedStatus}
-            toggle={this.toggle}
           />
 
           {nodeRedRunning && (
@@ -251,6 +265,18 @@ class SetupTab extends Component {
                   </label>
                 )}
               </div>
+            </div>
+          )}
+
+          {buttonLabel && (
+            <div class="d-flex justify-content-end">
+              <button
+                onClick={this.toggle}
+                class={cx('btn', buttonClassColor)}
+                disabled={!dockerBased || !networkModeValid || nodeRedStatus === RequestStatus.Getting}
+              >
+                <Text id={buttonLabel} />
+              </button>
             </div>
           )}
 

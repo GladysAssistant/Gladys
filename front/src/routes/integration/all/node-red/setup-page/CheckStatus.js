@@ -7,18 +7,15 @@ import classNames from 'classnames/bind';
 let cx = classNames.bind(style);
 
 class CheckStatus extends Component {
-  render({ nodeRedEnabled, nodeRedExist, nodeRedRunning, toggle, dockerBased, networkModeValid, nodeRedStatus }, {}) {
-    let buttonLabel = null;
+  render({ nodeRedEnabled, nodeRedExist, nodeRedRunning, dockerBased, networkModeValid, nodeRedStatus }, {}) {
     let textLabel = null;
     if (nodeRedStatus === RequestStatus.Getting) {
-      buttonLabel = 'integration.nodeRed.setup.activationNodeRed';
       textLabel = 'integration.nodeRed.setup.activationNodeRed';
     } else if (!dockerBased) {
       textLabel = 'integration.nodeRed.status.nonDockerEnv';
     } else if (!networkModeValid) {
       textLabel = 'integration.nodeRed.status.invalidDockerNetwork';
     } else if (nodeRedEnabled) {
-      buttonLabel = 'integration.nodeRed.setup.disableNodeRed';
       if (!nodeRedExist) {
         textLabel = 'integration.nodeRed.status.notInstalled';
       } else if (!nodeRedRunning) {
@@ -27,7 +24,6 @@ class CheckStatus extends Component {
         textLabel = 'integration.nodeRed.status.running';
       }
     } else {
-      buttonLabel = 'integration.nodeRed.setup.enableNodeRed';
       textLabel = 'integration.nodeRed.status.notEnabled';
     }
 
@@ -46,18 +42,6 @@ class CheckStatus extends Component {
               <Text id={textLabel} />
             </span>
           </div>
-
-          {buttonLabel && (
-            <div>
-              <button
-                onClick={toggle}
-                className="btn btn-primary btn-block"
-                disabled={!dockerBased || !networkModeValid || nodeRedStatus === RequestStatus.Getting}
-              >
-                <Text id={buttonLabel} />
-              </button>
-            </div>
-          )}
         </div>
       </div>
     );
