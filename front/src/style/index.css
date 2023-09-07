@@ -307,3 +307,26 @@ body {
 .react-clock__second-hand {
   transition: transform cubic-bezier(0.68, 0, 0.27, 1.55) 0.2s;
 }
+
+
+.container-type-inline-size {
+  container-type: inline-size;
+}
+
+.threshold {
+  gap: 0.3em;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+
+.opacity-60 {
+  opacity: 60%;
+}
+
+@container (min-width: 250px) {
+  .threshold {
+    gap: 0.3em;
+    -ms-flex-direction: row;
+    flex-direction: row;
+  }
+}

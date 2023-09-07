@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
-import styles from './styles.css';
 
 import { DEFAULT_VALUE_HUMIDITY } from '../../../../../server/utils/constants';
 
@@ -36,20 +35,11 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
         <Text id="dashboard.boxes.humidityInRoom.thresholdsLabel" />
       </label>
     </div>
-    <div className="form-group d-flex justify-content-start">
-      <div
-        class={cx(
-          'd-flex',
-          'flex-row',
-          'flex-wrap',
-          'justify-content-between',
-          'align-items-center',
-          styles.gapThreshold
-        )}
-      >
+    <div class="form-group d-flex justify-content-start container-type-inline-size">
+      <div class={cx('d-flex', 'flex-nowrap', 'justify-content-between', 'align-items-center', 'threshold')}>
         <span
           class={cx('stamp', 'stamp-sm', 'bg-yellow', {
-            [styles.alpha]: (props.box.humidity_use_custom_value || false) === false
+            'opacity-60': (props.box.humidity_use_custom_value || false) === false
           })}
         >
           <i class="fe fe-droplet" />
@@ -63,7 +53,7 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
         />
         <span
           class={cx('stamp', 'stamp-sm', 'bg-green', {
-            [styles.alpha]: (props.box.humidity_use_custom_value || false) === false
+            'opacity-60': (props.box.humidity_use_custom_value || false) === false
           })}
         >
           <i class="fe fe-droplet" />
@@ -77,7 +67,7 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
         />
         <span
           class={cx('stamp', 'stamp-sm', 'bg-blue', {
-            [styles.alpha]: (props.box.humidity_use_custom_value || false) === false
+            'opacity-60': (props.box.humidity_use_custom_value || false) === false
           })}
         >
           <i class="fe fe-droplet" />
