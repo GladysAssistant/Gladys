@@ -2182,7 +2182,11 @@
           "31": "Cube rotation droite",
           "32": "Vibration",
           "33": "Inclinaison",
-          "34": "Mouvements"
+          "34": "Mouvements",
+          "35": "Urgence",
+          "36": "Désarmer alarme",
+          "37": "Armer zones jour",
+          "38": "Armer alarme"
         }
       },
       "opening-sensor": {
