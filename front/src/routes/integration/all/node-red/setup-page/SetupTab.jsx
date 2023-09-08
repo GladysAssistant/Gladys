@@ -159,6 +159,14 @@ class SetupTab extends Component {
     }
   };
 
+  showConfirmDelete = () => {
+    this.setState({ showConfirmDelete: true });
+  };
+
+  cancelDisable = () => {
+    this.setState({ showConfirmDelete: false });
+  };
+
   render(
     props,
     {
@@ -171,23 +179,11 @@ class SetupTab extends Component {
       nodeRedPassword,
       nodeRedUrl,
       nodeRedStatus,
-      showPassword
+      showPassword,
+      showConfirmDelete
     }
   ) {
-    let buttonLabel = null;
-    let buttonClassColor = null;
-    if (dockerBased && networkModeValid) {
-      if (nodeRedStatus === RequestStatus.Getting) {
-        buttonClassColor = 'btn-primary';
-        buttonLabel = 'integration.nodeRed.setup.activationNodeRed';
-      } else if (nodeRedEnabled) {
-        buttonClassColor = 'btn-danger';
-        buttonLabel = 'integration.nodeRed.setup.disableNodeRed';
-      } else {
-        buttonClassColor = 'btn-primary';
-        buttonLabel = 'integration.nodeRed.setup.enableNodeRed';
-      }
-    }
+    const confirmationDisableMode = true;
 
     return (
       <div class="card">
@@ -268,136 +264,170 @@ class SetupTab extends Component {
             </div>
           )}
 
-          {buttonLabel && (
-            <div class="d-flex justify-content-end">
-              <button
-                onClick={this.toggle}
-                class={cx('btn', buttonClassColor)}
-                disabled={!dockerBased || !networkModeValid || nodeRedStatus === RequestStatus.Getting}
-              >
-                <Text id={buttonLabel} />
-              </button>
+          {dockerBased && networkModeValid && nodeRedEnabled && !showConfirmDelete && (
+            <button
+              onClick={this.showConfirmDelete}
+              class="btn btn-danger"
+              disabled={nodeRedStatus === RequestStatus.Getting}
+            >
+              <Text id="integration.nodeRed.setup.disableNodeRed" />
+            </button>
+          )}
+          {dockerBased && networkModeValid && !nodeRedEnabled && !showConfirmDelete && (
+            <button
+              onClick={this.startContainer}
+              class="btn btn-primary"
+              disabled={nodeRedStatus === RequestStatus.Getting}
+            >
+              <Text id="integration.nodeRed.setup.enableNodeRed" />
+            </button>
+          )}
+          {dockerBased && networkModeValid && nodeRedEnabled && showConfirmDelete && (
+            <div
+              style="row-gap: 1em"
+              class="d-flex justify-content-between align-items-start align-items-md-center  flex-column flex-md-row "
+            >
+              <Text id="integration.nodeRed.setup.confirmDisableLabel" />
+              <div>
+                <button
+                  onClick={this.stopContainer}
+                  className="btn btn-danger"
+                  disabled={nodeRedStatus === RequestStatus.Getting}
+                >
+                  <Text id="integration.nodeRed.setup.disableNodeRed" />
+                </button>
+                <button
+                  onClick={this.cancelDisable}
+                  className="btn ml-2"
+                  disabled={nodeRedStatus === RequestStatus.Getting}
+                >
+                  <Text id="integration.nodeRed.setup.confirmDisableCancelButton" />
+                </button>
+              </div>
             </div>
           )}
-
-          <div class="card-header d-none d-sm-block">
-            <h2 class="card-title">
-              <Text id="integration.nodeRed.setup.serviceStatus" />
-            </h2>
-          </div>
-          <div class="row justify-content-center">
-            <div class="col-auto">
-              <table className="table table-responsive table-borderless table-sm d-none d-sm-block">
-                <thead class="text-center">
-                  <tr>
-                    <th className="text-center">
-                      <Text id="integration.nodeRed.setup.gladys" />
-                    </th>
-                    <th className="text-center" />
-                    <th className="text-center">{nodeRedEnabled && 'Node-red'}</th>
-                  </tr>
-                </thead>
-                <tbody class="text-center">
-                  <tr>
-                    <td className="text-center">
-                      <img
-                        src="/assets/icons/favicon-96x96.png"
-                        alt={`Gladys`}
-                        title={`Gladys`}
-                        width="80"
-                        height="80"
-                      />
-                    </td>
-                    {nodeRedEnabled && (
-                      <td className={style.tdCenter}>
-                        <hr className={style.line} />
-                        <i
-                          className={cx('fe', {
-                            'fe-check': nodeRedRunning,
-                            'fe-x': !nodeRedRunning,
-                            greenIcon: nodeRedRunning,
-                            redIcon: !nodeRedRunning
-                          })}
-                        />
-                        <hr className={style.line} />
-                      </td>
-                    )}
-                    <td className="text-center">
-                      {nodeRedEnabled && (
-                        <img
-                          src="/assets/integrations/logos/logo_node-red.png"
-                          alt={`Node-red`}
-                          title={`Node-red`}
-                          width="80"
-                          height="80"
-                        />
-                      )}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="text-center">
-                      <div class="tag tag-success">
-                        <Text id={`systemSettings.containerState.running`} />
-                      </div>
-                    </td>
-                    <td className="text-center" />
-                    <td className="text-center">
-                      {nodeRedRunning && (
-                        <span class="tag tag-success">
-                          <Text id={`systemSettings.containerState.running`} />
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          {nodeRedRunning && (
+            <div>
+              <div class="card-header d-none d-sm-block">
+                <h2 class="card-title">
+                  <Text id="integration.nodeRed.setup.serviceStatus" />
+                </h2>
+              </div>
+              <div class="row justify-content-center">
+                <div class="col-auto">
+                  <table className="table table-responsive table-borderless table-sm d-none d-sm-block">
+                    <thead class="text-center">
+                      <tr>
+                        <th className="text-center">
+                          <Text id="integration.nodeRed.setup.gladys" />
+                        </th>
+                        <th className="text-center" />
+                        <th className="text-center">{nodeRedEnabled && 'Node-red'}</th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-center">
+                      <tr>
+                        <td className="text-center">
+                          <img
+                            src="/assets/icons/favicon-96x96.png"
+                            alt={`Gladys`}
+                            title={`Gladys`}
+                            width="80"
+                            height="80"
+                          />
+                        </td>
+                        {nodeRedEnabled && (
+                          <td className={style.tdCenter}>
+                            <hr className={style.line} />
+                            <i
+                              className={cx('fe', {
+                                'fe-check': nodeRedRunning,
+                                'fe-x': !nodeRedRunning,
+                                greenIcon: nodeRedRunning,
+                                redIcon: !nodeRedRunning
+                              })}
+                            />
+                            <hr className={style.line} />
+                          </td>
+                        )}
+                        <td className="text-center">
+                          {nodeRedEnabled && (
+                            <img
+                              src="/assets/integrations/logos/logo_node-red.png"
+                              alt={`Node-red`}
+                              title={`Node-red`}
+                              width="80"
+                              height="80"
+                            />
+                          )}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="text-center">
+                          <div class="tag tag-success">
+                            <Text id={`systemSettings.containerState.running`} />
+                          </div>
+                        </td>
+                        <td className="text-center" />
+                        <td className="text-center">
+                          {nodeRedRunning && (
+                            <span class="tag tag-success">
+                              <Text id={`systemSettings.containerState.running`} />
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="card-header d-sm-none">
+                <h2 class="card-title">
+                  <Text id="integration.nodeRed.setup.containersStatus" />
+                </h2>
+              </div>
+              <div class="row justify-content-center d-sm-none">
+                <div class="col-auto">
+                  <table className="table table-responsive table-borderless table-sm">
+                    <thead class="text-center">
+                      <tr>
+                        <th>
+                          <Text id="systemSettings.containers" />
+                        </th>
+                        <th>
+                          <Text id="integration.nodeRed.setup.status" />
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody class="text-center">
+                      <tr>
+                        <td>
+                          <Text id="integration.nodeRed.setup.gladys" />
+                        </td>
+                        <td>
+                          <span class="tag tag-success">
+                            <Text id={`systemSettings.containerState.running`} />
+                          </span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <Text id="integration.nodeRed.setup.node-red" />
+                        </td>
+                        <td>
+                          {nodeRedRunning && (
+                            <span class="tag tag-success">
+                              <Text id={`systemSettings.containerState.running`} />
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="card-header d-sm-none">
-            <h2 class="card-title">
-              <Text id="integration.nodeRed.setup.containersStatus" />
-            </h2>
-          </div>
-          <div class="row justify-content-center d-sm-none">
-            <div class="col-auto">
-              <table className="table table-responsive table-borderless table-sm">
-                <thead class="text-center">
-                  <tr>
-                    <th>
-                      <Text id="systemSettings.containers" />
-                    </th>
-                    <th>
-                      <Text id="integration.nodeRed.setup.status" />
-                    </th>
-                  </tr>
-                </thead>
-                <tbody class="text-center">
-                  <tr>
-                    <td>
-                      <Text id="integration.nodeRed.setup.gladys" />
-                    </td>
-                    <td>
-                      <span class="tag tag-success">
-                        <Text id={`systemSettings.containerState.running`} />
-                      </span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <Text id="integration.nodeRed.setup.node-red" />
-                    </td>
-                    <td>
-                      {nodeRedRunning && (
-                        <span class="tag tag-success">
-                          <Text id={`systemSettings.containerState.running`} />
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+          )}
         </div>
       </div>
     );

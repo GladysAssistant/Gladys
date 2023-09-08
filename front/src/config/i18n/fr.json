@@ -754,6 +754,8 @@
 
         "enableNodeRed": "Activer",
         "disableNodeRed": "Désactiver",
+        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver NodeRed ?",
+        "confirmDisableCancelButton": "Annuler",
         "activationNodeRed": "Activation...",
         "serviceStatus": "Etat du service Node-red",
         "containersStatus": "Conteneurs liés à Node-red",
@@ -762,7 +764,7 @@
         "gladys": "Gladys",
         "usernameLabel": "Nom d'utilisateur",
         "passwordLabel": "Mot de passe",
-        "urlLabel": "Url de l'interface Node-red : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a>"
+        "urlLabel": "Url de l'interface Node-red : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
       }
     },
 
