@@ -183,8 +183,6 @@ class SetupTab extends Component {
       showConfirmDelete
     }
   ) {
-    const confirmationDisableMode = true;
-
     return (
       <div class="card">
         <div class="card-header">
