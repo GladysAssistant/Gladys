@@ -240,6 +240,7 @@
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
+        "noRecentValue": "Pas de valeur récente",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-"
