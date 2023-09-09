@@ -209,7 +209,7 @@ describe('zwaveJSUIManager connect', () => {
     expect(zwaveJSUIManager.zwaveJSUIExist).to.equal(true);
     expect(zwaveJSUIManager.zwaveJSUIRunning).to.equal(true);
   });
-  
+
   it('should connect to zwave-js-ui gladys topic prefix', async () => {
     gladys.variable.getValue = sinon.stub();
     gladys.variable.getValue
