@@ -165,11 +165,7 @@ describe('zwaveJSUIManager connect', () => {
       .resolves('0')
       .onCall(1) // MQTT_PASSWORD
       .resolves('MQTT_PASSWORD')
-      .onCall(2) // MQTT_URL
-      .resolves('MQTT_URL')
-      .onCall(3) // MQTT_USERNAME
-      .resolves('MQTT_USERNAME')
-      .onCall(4) // DRIVER_PATH
+      .onCall(2) // DRIVER_PATH
       .resolves(null);
 
     await zwaveJSUIManager.connect();
@@ -212,6 +208,29 @@ describe('zwaveJSUIManager connect', () => {
     expect(zwaveJSUIManager.mqttRunning).to.equal(true);
     expect(zwaveJSUIManager.zwaveJSUIExist).to.equal(true);
     expect(zwaveJSUIManager.zwaveJSUIRunning).to.equal(true);
+  });
+  
+  it('should connect to zwave-js-ui gladys topic prefix', async () => {
+    gladys.variable.getValue = sinon.stub();
+    gladys.variable.getValue
+      .onCall(0) // EXTERNAL_ZWAVEJSUI
+      .resolves('1')
+      .onCall(1) // MQTT_PASSWORD
+      .resolves('MQTT_PASSWORD')
+      .onCall(2) // ZWAVEJSUI_MQTT_TOPIC_PREFIX
+      .resolves('ZWAVEJSUI_MQTT_TOPIC_PREFIX')
+      .onCall(3) // ZWAVEJSUI_MQTT_TOPIC_WITH_LOCATION
+      .resolves('1');
+
+    await zwaveJSUIManager.connect();
+
+    expect(zwaveJSUIManager.mqttConnected).to.equal(false);
+    expect(zwaveJSUIManager.mqttExist).to.equal(true);
+    expect(zwaveJSUIManager.mqttRunning).to.equal(true);
+    expect(zwaveJSUIManager.zwaveJSUIExist).to.equal(true);
+    expect(zwaveJSUIManager.zwaveJSUIRunning).to.equal(true);
+    expect(zwaveJSUIManager.mqttTopicPrefix).to.equal('ZWAVEJSUI_MQTT_TOPIC_PREFIX');
+    expect(zwaveJSUIManager.mqttTopicWithLocation).to.equal(true);
   });
 });
 
