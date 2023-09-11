@@ -28,7 +28,7 @@ async function disconnect() {
 
     const configFilepath = path.join(basePathOnHost, DEFAULT.CONFIGURATION_PATH);
 
-    await fs.rmdir(path.dirname(configFilepath), { recursive: true });
+    await fs.rm(path.dirname(configFilepath), { recursive: true });
 
     this.nodeRedRunning = false;
     this.gladysConnected = false;

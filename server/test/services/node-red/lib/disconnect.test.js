@@ -1,11 +1,22 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const proxiquire = require('proxyquire').noCallThru();
 
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const NodeRedManager = require('../../../../services/node-red/lib');
+const fsMock = {
+  rm: fake.resolves(true),
+};
+
+const disconnect = proxiquire('../../../../services/node-red/lib/disconnect', {
+  'fs/promises': fsMock,
+});
+
+const NodeRedManager = proxiquire('../../../../services/node-red/lib', {
+  './disconnect': disconnect,
+});
 
 const container = {
   id: 'docker-test',

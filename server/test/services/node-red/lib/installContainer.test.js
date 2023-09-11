@@ -72,7 +72,7 @@ describe('NodeRed installContainer', () => {
 
     await nodeRedManager.installContainer(config);
 
-    assert.calledWith(gladys.system.pull, 'nodered/node-red:latest');
+    assert.calledWith(gladys.system.pull, 'nodered/node-red:3.1');
     assert.calledWith(gladys.system.createContainer, {
       AttachStderr: false,
       AttachStdin: false,
@@ -89,7 +89,7 @@ describe('NodeRed installContainer', () => {
         PortBindings: { '1880/tcp': [{ HostPort: '1881' }] },
         RestartPolicy: { Name: 'always' },
       },
-      Image: 'nodered/node-red:latest',
+      Image: 'nodered/node-red:3.1',
       NetworkDisabled: false,
       Tty: false,
       name: 'gladys-node-red',
