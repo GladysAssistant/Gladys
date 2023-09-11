@@ -6,7 +6,7 @@ class InputWithUnit extends Component {
   render({ unit, value, disabled, onChange }) {
     return (
       <div
-        style="width: 68px;"
+        style="max-width: 150px;"
         class={cx('input-group input-group-sm', {
           'opacity-60': disabled
         })}

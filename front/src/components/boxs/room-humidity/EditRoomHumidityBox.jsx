@@ -35,8 +35,9 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
         <Text id="dashboard.boxes.humidityInRoom.thresholdsLabel" />
       </label>
     </div>
-    <div class="form-group d-flex justify-content-start container-type-inline-size">
-      <div class={cx('d-flex', 'flex-nowrap', 'justify-content-between', 'align-items-center', 'threshold')}>
+
+    <div style="gap: 1em" class="form-group d-flex flex-column">
+      <div style="gap: 1em" class="d-flex flex-nowrap">
         <span
           class={cx('stamp', 'stamp-sm', 'bg-yellow', {
             'opacity-60': (props.box.humidity_use_custom_value || false) === false
@@ -51,8 +52,10 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
           classNames=""
           disabled={(props.box.humidity_use_custom_value || false) === false}
         />
+      </div>
+      <div style="gap: 1em" class="d-flex flex-nowrap">
         <span
-          class={cx('stamp', 'stamp-sm', 'bg-green', {
+          class={cx('stamp', 'stamp-sm', 'bg-red', {
             'opacity-60': (props.box.humidity_use_custom_value || false) === false
           })}
         >
@@ -65,13 +68,6 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
           classNames=""
           disabled={(props.box.humidity_use_custom_value || false) === false}
         />
-        <span
-          class={cx('stamp', 'stamp-sm', 'bg-blue', {
-            'opacity-60': (props.box.humidity_use_custom_value || false) === false
-          })}
-        >
-          <i class="fe fe-droplet" />
-        </span>
       </div>
     </div>
   </BaseEditBox>
