@@ -213,6 +213,7 @@ const SystemPage = ({ children, ...props }) => (
                 <input
                   class="form-control"
                   type="number"
+                  min="1"
                   disabled={props.savingNumberOfHourseBeforeStateIsOutdated}
                   value={props.numberOfHoursBeforeStateIsOutdated}
                   onChange={props.updateNumberOfHoursBeforeStateIsOutdated}
