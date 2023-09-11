@@ -41,6 +41,16 @@ describe('Device.get', () => {
       });
     });
   });
+  it('should get devices with last_value_is_too_old', async () => {
+    device.variable.getValue = fake.resolves(null);
+    const devices = await device.get();
+    expect(devices).to.be.instanceOf(Array);
+    devices.forEach((oneDevice) => {
+      oneDevice.features.forEach((feature) => {
+        expect(feature).to.have.property('last_value_is_too_old');
+      });
+    });
+  });
   it('should get devices filtered by service and name', async () => {
     const devices = await device.get({
       service: 'test-service',
