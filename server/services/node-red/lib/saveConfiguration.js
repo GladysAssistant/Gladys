@@ -10,14 +10,14 @@ const saveOrDestroy = async (variableManager, key, value, serviceId) => {
 };
 
 /**
- * @description Save Node-red configuration.
- * @param {object} config - Node-red service configuration.
- * @returns {Promise} Current Node-red configuration.
+ * @description Save Node-RED configuration.
+ * @param {object} config - Node-RED service configuration.
+ * @returns {Promise} Current Node-RED configuration.
  * @example
  * await nodeRed.saveConfiguration(config);
  */
 async function saveConfiguration(config) {
-  logger.debug('NodeRed: storing configuration...');
+  logger.debug('Node-RED: storing configuration...');
 
   const keyValueMap = {
     [CONFIGURATION.NODE_RED_USERNAME]: config.nodeRedUsername,
@@ -32,7 +32,7 @@ async function saveConfiguration(config) {
     variableKeys.map((key) => saveOrDestroy(this.gladys.variable, key, keyValueMap[key], this.serviceId)),
   );
 
-  logger.debug('NodeRed: configuration stored');
+  logger.debug('Node-RED: configuration stored');
 }
 
 module.exports = {

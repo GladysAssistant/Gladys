@@ -1,6 +1,6 @@
 /**
- * @description Checks if Node-red is ready to use.
- * @returns {boolean} Is the Node-red environment ready to use?
+ * @description Checks if Node-RED is ready to use.
+ * @returns {boolean} Is the Node-RED environment ready to use?
  * @example
  * await nodeRed.isEnabled();
  */

@@ -5,7 +5,7 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
   /**
    * @api {get} /api/v1/service/node-red/status Get node-red connection status
    * @apiName status
-   * @apiGroup Node-red
+   * @apiGroup Node-RED
    */
   async function status(req, res) {
     logger.debug('Get status');
@@ -16,7 +16,7 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
   /**
    * @api {post} /api/v1/service/node-red/connect Connect
    * @apiName connect
-   * @apiGroup Node-red
+   * @apiGroup Node-RED
    */
   async function connect(req, res) {
     logger.debug('Entering connect step');
@@ -27,12 +27,12 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
   }
 
   /**
-   * @api {post} /api/v1/service/node-red/start Install & start Node-red container.
+   * @api {post} /api/v1/service/node-red/start Install & start Node-RED container.
    * @apiName installNodeRedContainer
-   * @apiGroup Node-red
+   * @apiGroup Node-RED
    */
   async function installNodeRedContainer(req, res) {
-    logger.debug('Install NodeRed container');
+    logger.debug('Install Node-RED container');
     await nodeRedManager.installContainer();
     res.json({
       success: true,
@@ -42,7 +42,7 @@ module.exports = function NodeRedController(gladys, nodeRedManager) {
   /**
    * @api {post} /api/v1/service/node-red/disconnect Disconnect
    * @apiName disconnect
-   * @apiGroup Node-red
+   * @apiGroup Node-RED
    */
   async function disconnect(req, res) {
     logger.debug('Entering disconnect step');

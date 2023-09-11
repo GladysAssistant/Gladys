@@ -734,37 +734,37 @@
       "documentation": "Documentation Zigbee2mqtt"
     },
     "nodeRed": {
-      "title": "Node-red",
-      "description": "Contrôlez vos appareils via Node-red.",
+      "title": "Node-RED",
+      "description": "Contrôlez vos appareils via Node-RED.",
       "setupTab": "Configuration",
-      "documentation": "Documentation Node-red",
+      "documentation": "Documentation Node-RED",
       "status": {
-        "notInstalled": "Le server Node-red n'a pas pu être installé.",
-        "notRunning": "Le server Node-red n'a pas démarré.",
-        "running": "Node-red démarré avec succès.",
-        "notEnabled": "Node-red n'est pas activé.",
-        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Node-red depuis Gladys.",
-        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Node-red depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"."
+        "notInstalled": "Le serveur Node-RED n'a pas pu être installé.",
+        "notRunning": "Le serveur Node-RED n'a pas démarré.",
+        "running": "Node-RED démarré avec succès.",
+        "notEnabled": "Node-RED n'est pas activé.",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Node-RED depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Node-RED depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"."
       },
       "setup": {
-        "title": "Configuration du service Node-red",
-        "description": "Ce service utilise un container Docker. Activez Node-red pour déployer ce container.\nPour en savoir plus, rendez-vous sur la page de documentation Node-red.",
-        "error": "Une erreur s'est produite au démarrage du service Node-red.",
-        "enableLabel": "Activation du service Node-red",
+        "title": "Configuration du service Node-RED",
+        "description": "Ce service utilise un container Docker. Activez Node-RED pour déployer ce container.\nPour en savoir plus, rendez-vous sur la page de documentation Node-RED.",
+        "error": "Une erreur s'est produite au démarrage du service Node-RED.",
+        "enableLabel": "Activation du service Node-RED",
 
         "enableNodeRed": "Activer",
         "disableNodeRed": "Désactiver",
-        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver NodeRed ?",
+        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver Node-RED ?",
         "confirmDisableCancelButton": "Annuler",
         "activationNodeRed": "Activation...",
-        "serviceStatus": "Etat du service Node-red",
-        "containersStatus": "Conteneurs liés à Node-red",
+        "serviceStatus": "Etat du service Node-RED",
+        "containersStatus": "Conteneurs liés à Node-RED",
         "status": "Status",
-        "node-red": "Node-red",
+        "node-red": "Node-RED",
         "gladys": "Gladys",
         "usernameLabel": "Nom d'utilisateur",
         "passwordLabel": "Mot de passe",
-        "urlLabel": "Url de l'interface Node-red : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
+        "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
       }
     },
 

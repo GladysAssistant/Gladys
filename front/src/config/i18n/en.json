@@ -608,37 +608,37 @@
       "documentation": "Zigbee2mqtt documentation"
     },
     "nodeRed": {
-      "title": "Node-red",
-      "description": "\"Control your devices with Node-red.",
+      "title": "Node-RED",
+      "description": "\"Control your devices with Node-RED.",
       "setupTab": "Setup",
-      "documentation": "Node-red documentation",
+      "documentation": "Node-RED documentation",
 
       "status": {
-        "notInstalled": "Node-red server failed to install.",
-        "notRunning": "Node-red server failed to start.",
-        "running": "Node-red successfully started.",
-        "notEnabled": "Node-red is not activated.",
-        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a Node-red server from here.",
+        "notInstalled": "Node-RED server failed to install.",
+        "notRunning": "Node-RED server failed to start.",
+        "running": "Node-RED successfully started.",
+        "notEnabled": "Node-RED is not activated.",
+        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a Node-RED server from here.",
         "invalidDockerNetwork": "Gladys is under custom installation, to install server from here, Gladys container should be configured with \"host\" network mode."
       },
       "setup": {
-        "title": "Node-red configuration",
-        "description": "This service uses docker container. Enable Node-red for deploying this container.\nLearn more on the node-red documentation page",
-        "error": "An error occured while starting  Node-red.",
-        "enableLabel": "Node-red activation",
+        "title": "Node-RED configuration",
+        "description": "This service uses docker container. Enable Node-RED for deploying this container.\nLearn more on the node-red documentation page",
+        "error": "An error occured while starting  Node-RED.",
+        "enableLabel": "Node-RED activation",
         "enableNodeRed": "Enable",
         "disableNodeRed": "Disable",
-        "confirmDisableLabel": "Are you sur you to disable NodeRed ?",
+        "confirmDisableLabel": "Are you sur you to disable Node-RED ?",
         "confirmDisableCancelButton": "Cancel",
         "activationNodeRed": "Activating...",
-        "serviceStatus": "Node-red Service Status",
-        "containersStatus": "Containers related to Node-red",
+        "serviceStatus": "Node-RED Service Status",
+        "containersStatus": "Containers related to Node-RED",
         "status": "Status",
-        "node-red": "Node-red",
+        "node-red": "Node-RED",
         "gladys": "Gladys",
         "usernameLabel": "Username",
         "passwordLabel": "Password",
-        "urlLabel": "Node-red interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
+        "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
       }
     },
 

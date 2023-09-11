@@ -9,7 +9,7 @@ const { status } = require('./status');
 const { configureContainer } = require('./configureContainer');
 
 /**
- * @description Add ability to connect to Node-red.
+ * @description Add ability to connect to Node-RED.
  * @param {object} gladys - Gladys instance.
  * @param {string} serviceId - UUID of the service in DB.
  * @example

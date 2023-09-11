@@ -320,7 +320,7 @@ class SetupTab extends Component {
                           <Text id="integration.nodeRed.setup.gladys" />
                         </th>
                         <th className="text-center" />
-                        <th className="text-center">{nodeRedEnabled && 'Node-red'}</th>
+                        <th className="text-center">{nodeRedEnabled && 'Node-RED'}</th>
                       </tr>
                     </thead>
                     <tbody class="text-center">
@@ -352,8 +352,8 @@ class SetupTab extends Component {
                           {nodeRedEnabled && (
                             <img
                               src="/assets/integrations/logos/logo_node-red.png"
-                              alt={`Node-red`}
-                              title={`Node-red`}
+                              alt={`Node-RED`}
+                              title={`Node-RED`}
                               width="80"
                               height="80"
                             />

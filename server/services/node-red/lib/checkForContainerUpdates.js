@@ -10,11 +10,11 @@ const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.
  * await nodeRed.checkForContainerUpdates(config);
  */
 async function checkForContainerUpdates(config) {
-  logger.info('NodeRed: Checking for current installed versions and required updates...');
+  logger.info('Node-RED: Checking for current installed versions and required updates...');
 
   // Check for NodeRed container version
   if (config.dockerNodeRedVersion !== DEFAULT.DOCKER_NODE_RED_VERSION) {
-    logger.info(`NodeRed: update #${DEFAULT.DOCKER_NODE_RED_VERSION} of the container required...`);
+    logger.info(`Node-RED: update #${DEFAULT.DOCKER_NODE_RED_VERSION} of the container required...`);
 
     const containers = await this.gladys.system.getContainers({
       all: true,
@@ -22,7 +22,7 @@ async function checkForContainerUpdates(config) {
     });
 
     if (containers.length !== 0) {
-      logger.debug('NodeRed: Removing current installed NodeRed container...');
+      logger.debug('Node-RED: Removing current installed Node-RED container...');
       // If container is present, we remove it
       // The init process will create it again
       const [container] = containers;
@@ -31,7 +31,7 @@ async function checkForContainerUpdates(config) {
 
     // Update to last version
     config.dockerNodeRedVersion = DEFAULT.DOCKER_NODE_RED_VERSION;
-    logger.info(`NodeRed: update #${DEFAULT.DOCKER_NODE_RED_VERSION} of the container done`);
+    logger.info(`Node-RED: update #${DEFAULT.DOCKER_NODE_RED_VERSION} of the container done`);
   }
 }
 

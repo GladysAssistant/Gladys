@@ -12,7 +12,7 @@ module.exports = function NodeRedService(gladys, serviceId) {
    * gladys.services['node-red'].start();
    */
   async function start() {
-    logger.log('Starting Node-red service');
+    logger.log('Starting Node-RED service');
     await nodeRedManager.init();
   }
 
@@ -23,7 +23,7 @@ module.exports = function NodeRedService(gladys, serviceId) {
    *  gladys.services['node-red'].stop();
    */
   function stop() {
-    logger.log('Stopping Node-red service');
+    logger.log('Stopping Node-RED service');
     nodeRedManager.disconnect();
   }
 

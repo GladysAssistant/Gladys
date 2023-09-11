@@ -6,14 +6,14 @@ const passwordUtils = require('../../../utils/password');
 const { DEFAULT } = require('./constants');
 
 /**
- * @description Configure Node-red container.
- * @param {object} config - Gladys Node-red stored configuration.
+ * @description Configure Node-RED container.
+ * @param {object} config - Gladys Node-RED stored configuration.
  * @returns {Promise} Indicates if the configuration file has been created or modified.
  * @example
  * await this.configureContainer({});
  */
 async function configureContainer(config) {
-  logger.info('NodeRed: Docker container is being configured...');
+  logger.info('Node-RED: Docker container is being configured...');
 
   const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
 
@@ -23,7 +23,7 @@ async function configureContainer(config) {
   try {
     await fs.chown(path.dirname(configFilepath), 1000, 1000);
   } catch (e) {
-    logger.error('NodeRed: Unable to change write of the configuration');
+    logger.error('Node-RED: Unable to change write of the configuration');
   }
 
   // Check if config file not already exists
@@ -31,9 +31,9 @@ async function configureContainer(config) {
   try {
     // eslint-disable-next-line no-bitwise
     await fs.access(configFilepath, constants.R_OK | constants.W_OK);
-    logger.info('NodeRed:  configuration file already exists.');
+    logger.info('Node-RED:  configuration file already exists.');
   } catch (e) {
-    logger.info('NodeRed: Writing default configuration...');
+    logger.info('Node-RED: Writing default configuration...');
     await fs.copyFile(path.join(__dirname, '../docker/settings.txt'), configFilepath);
     configCreated = true;
   }
@@ -59,7 +59,7 @@ async function configureContainer(config) {
   }
 
   if (configChanged) {
-    logger.info('NodeRed: Writting configuration...');
+    logger.info('Node-RED: Writting configuration...');
     await fs.writeFile(configFilepath, fileContentString);
   }
 

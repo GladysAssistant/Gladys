@@ -3,13 +3,13 @@ const logger = require('../../../utils/logger');
 const { CONFIGURATION } = require('./constants');
 
 /**
- * @description Get Node-red configuration.
- * @returns {Promise} Current Node-red network configuration.
+ * @description Get Node-RED configuration.
+ * @returns {Promise} Current Node-RED network configuration.
  * @example
  * const config = await nodeRed.getConfiguration();
  */
 async function getConfiguration() {
-  logger.debug('NodeRed: loading stored configuration...');
+  logger.debug('Node-RED: loading stored configuration...');
 
   const nodeRedUsername = await this.gladys.variable.getValue(CONFIGURATION.NODE_RED_USERNAME, this.serviceId);
   const nodeRedPassword = await this.gladys.variable.getValue(CONFIGURATION.NODE_RED_PASSWORD, this.serviceId);

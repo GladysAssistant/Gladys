@@ -18,6 +18,8 @@ const mqtt = {
   removeAllListeners: fake.resolves(true),
 };
 
+const TEMP_GLADYS_FOLDER = process.env.TEMP_FOLDER || '../.tmp';
+
 describe('NodeRed disconnect', () => {
   let nodeRedManager;
   let gladys;
@@ -31,6 +33,10 @@ describe('NodeRed disconnect', () => {
         getContainers: fake.resolves([container]),
         stopContainer: fake.resolves(true),
         removeContainer: fake.resolves(true),
+        getGladysBasePath: fake.resolves({
+          basePathOnHost: TEMP_GLADYS_FOLDER,
+          basePathOnContainer: TEMP_GLADYS_FOLDER,
+        }),
       },
     };
 

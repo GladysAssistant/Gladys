@@ -1,6 +1,6 @@
 /**
- * @description Get Node-red status.
- * @returns {object} Current Node-red containers and configuration status.
+ * @description Get Node-RED status.
+ * @returns {object} Current Node-RED containers and configuration status.
  * @example
  * status();
  */

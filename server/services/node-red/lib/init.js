@@ -30,7 +30,7 @@ async function init() {
   // Load stored configuration
   const configuration = await this.getConfiguration();
 
-  logger.debug('NodeRed: installing and starting required docker containers...');
+  logger.debug('Node-RED: installing and starting required docker containers...');
   await this.checkForContainerUpdates(configuration);
   await this.installContainer(configuration);
 

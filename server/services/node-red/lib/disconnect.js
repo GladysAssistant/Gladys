@@ -1,7 +1,10 @@
+const path = require('path');
+const fs = require('fs/promises');
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const nodeRedContainerDescriptor = require('../docker/gladys-node-red-container.json');
+const { DEFAULT } = require('./constants');
 
 /**
  * @description Disconnect service from dependent containers.
@@ -21,10 +24,16 @@ async function disconnect() {
     await this.gladys.system.stopContainer(container.id);
     await this.gladys.system.removeContainer(container.id);
 
+    const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
+
+    const configFilepath = path.join(basePathOnHost, DEFAULT.CONFIGURATION_PATH);
+
+    await fs.rmdir(path.dirname(configFilepath), { recursive: true });
+
     this.nodeRedRunning = false;
     this.gladysConnected = false;
   } catch (e) {
-    logger.warn(`NodeRed: failed to stop container ${container.id}:`, e);
+    logger.warn(`Node-RED: failed to stop container ${container.id}:`, e);
   }
 
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {

@@ -10,7 +10,7 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 const sleep = promisify(setTimeout);
 
 /**
- * @description Install and starts Node-red container.
+ * @description Install and starts Node-RED container.
  * @param {object} config - Service configuration properties.
  * @example
  * await nodeRed.installContainer(config);
@@ -54,11 +54,11 @@ async function installContainer(config) {
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerLog);
 
-      logger.info('NodeRed: successfully installed and configured as Docker container');
+      logger.info('Node-RED: successfully installed and configured as Docker container');
       this.nodeRedExist = true;
     } catch (e) {
       this.nodeRedExist = false;
-      logger.error('NodeRed: failed to install as Docker container:', e);
+      logger.error('Node-RED: failed to install as Docker container:', e);
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
       });
@@ -77,20 +77,20 @@ async function installContainer(config) {
 
     // Check if we need to restart the container (container is not running / config changed)
     if (container.state !== 'running' || configChanged) {
-      logger.info('NodeRed: container is (re)starting...');
+      logger.info('Node-RED: container is (re)starting...');
       await this.gladys.system.restartContainer(container.id);
       // wait a few seconds for the container to restart
       await sleep(this.containerRestartWaitTimeInMs);
     }
 
-    logger.info('NodeRed: container successfully started');
+    logger.info('Node-RED: container successfully started');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,
     });
     this.nodeRedRunning = true;
     this.nodeRedExist = true;
   } catch (e) {
-    logger.error('NodeRed: container failed to start:', e);
+    logger.error('Node-RED: container failed to start:', e);
     this.nodeRedRunning = false;
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NODERED.STATUS_CHANGE,

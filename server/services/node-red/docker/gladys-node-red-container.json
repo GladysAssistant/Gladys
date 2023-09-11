@@ -1,6 +1,6 @@
 {
   "name": "gladys-node-red",
-  "Image": "nodered/node-red:latest",
+  "Image": "nodered/node-red:3.1",
   "ExposedPorts": {
     "1880/tcp": {}
   },
