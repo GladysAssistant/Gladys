@@ -3,19 +3,19 @@ import { connect } from 'unistore/preact';
 import MELCloudPage from '../MELCloudPage';
 import UpdateDevice from '../../../../../components/device';
 
-class EditTuyaDevice extends Component {
+class EditMELCloudDevice extends Component {
   render(props, {}) {
     return (
       <MELCloudPage user={props.user}>
         <UpdateDevice
           {...props}
-          integrationName="tuya"
+          integrationName="melcloud"
           allowModifyFeatures={false}
-          previousPage="/dashboard/integration/device/tuya"
+          previousPage="/dashboard/integration/device/melcloud"
         />
       </MELCloudPage>
     );
   }
 }
 
-export default connect('user,session,httpClient,currentIntegration,houses', {})(EditTuyaDevice);
+export default connect('user,session,httpClient,currentIntegration,houses', {})(EditMELCloudDevice);

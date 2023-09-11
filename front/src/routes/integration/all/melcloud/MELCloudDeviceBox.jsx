@@ -232,7 +232,7 @@ class MELCloudDeviceBox extends Component {
                   )}
 
                   {validModel && editButton && (
-                    <Link href={`/dashboard/integration/device/tuya/edit/${device.selector}`}>
+                    <Link href={`/dashboard/integration/device/melcloud/edit/${device.selector}`}>
                       <button class="btn btn-secondary float-right">
                         <Text id="integration.melcloud.device.editButton" />
                       </button>

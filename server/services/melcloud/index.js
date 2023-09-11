@@ -9,7 +9,7 @@ module.exports = function MELCloudService(gladys, serviceId) {
 
   const client = axios.create({
     baseURL: MELCLOUD_ENDPOINT,
-    timeout: 1000,
+    timeout: 5000,
     headers: {
       'Content-Type': 'application/json',
     },

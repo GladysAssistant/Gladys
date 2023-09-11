@@ -4,7 +4,7 @@ import cx from 'classnames';
 
 import EmptyState from './EmptyState';
 import style from './style.css';
-import TuyaDeviceBox from '../MELCloudDeviceBox';
+import MELCloudDeviceBox from '../MELCloudDeviceBox';
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { RequestStatus } from '../../../../../utils/consts';
@@ -81,7 +81,7 @@ class DiscoverTab extends Component {
             })}
           >
             <div class="loader" />
-            <div class={cx('dimmer-content', style.tuyaListBody)}>
+            <div class={cx('dimmer-content', style.melcloudListBody)}>
               {errorLoading && (
                 <p class="alert alert-warning">
                   <Text id="integration.melcloud.status.notConnected" />
@@ -93,7 +93,7 @@ class DiscoverTab extends Component {
               <div class="row">
                 {discoveredDevices &&
                   discoveredDevices.map((device, index) => (
-                    <TuyaDeviceBox
+                    <MELCloudDeviceBox
                       editable={!device.created_at || device.updatable}
                       alreadyCreatedButton={device.created_at && !device.updatable}
                       updateButton={device.updatable}

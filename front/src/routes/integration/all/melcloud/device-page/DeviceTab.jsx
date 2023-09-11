@@ -33,9 +33,9 @@ class DeviceTab extends Component {
         options.search = this.state.search;
       }
 
-      const tuyaDevices = await this.props.httpClient.get('/api/v1/service/melcloud/device', options);
+      const melcloudDevices = await this.props.httpClient.get('/api/v1/service/melcloud/device', options);
       this.setState({
-        tuyaDevices,
+        melcloudDevices,
         getMelCloudStatus: RequestStatus.Success
       });
     } catch (e) {
@@ -78,7 +78,7 @@ class DeviceTab extends Component {
     this.getDevices();
   }
 
-  render({}, { orderDir, search, getTuyaStatus, tuyaDevices, housesWithRooms }) {
+  render({}, { orderDir, search, getMELCloudStatus, melcloudDevices, housesWithRooms }) {
     return (
       <div class="card">
         <div class="card-header">
@@ -100,15 +100,15 @@ class DeviceTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: getTuyaStatus === RequestStatus.Getting
+              active: getMELCloudStatus === RequestStatus.Getting
             })}
           >
             <div class="loader" />
-            <div class={cx('dimmer-content', style.tuyaListBody)}>
+            <div class={cx('dimmer-content', style.melcloudListBody)}>
               <div class="row">
-                {tuyaDevices &&
-                  tuyaDevices.length > 0 &&
-                  tuyaDevices.map((device, index) => (
+                {melcloudDevices &&
+                  melcloudDevices.length > 0 &&
+                  melcloudDevices.map((device, index) => (
                     <MELCloudDeviceBox
                       editable
                       saveButton
@@ -119,7 +119,7 @@ class DeviceTab extends Component {
                       housesWithRooms={housesWithRooms}
                     />
                   ))}
-                {!tuyaDevices || (tuyaDevices.length === 0 && <EmptyState />)}
+                {!melcloudDevices || (melcloudDevices.length === 0 && <EmptyState />)}
               </div>
             </div>
           </div>
