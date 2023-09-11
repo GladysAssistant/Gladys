@@ -281,10 +281,7 @@ class SetupTab extends Component {
             </button>
           )}
           {dockerBased && networkModeValid && nodeRedEnabled && showConfirmDelete && (
-            <div
-              style="row-gap: 1em"
-              class="d-flex justify-content-between align-items-start align-items-md-center  flex-column flex-md-row "
-            >
+            <div style="row-gap: 1em" class="d-flex justify-content-between align-items-start flex-column">
               <Text id="integration.nodeRed.setup.confirmDisableLabel" />
               <div>
                 <button
@@ -305,7 +302,7 @@ class SetupTab extends Component {
             </div>
           )}
           {nodeRedRunning && (
-            <div>
+            <div class="mt-4">
               <div class="card-header d-none d-sm-block">
                 <h2 class="card-title">
                   <Text id="integration.nodeRed.setup.serviceStatus" />

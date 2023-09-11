@@ -27,7 +27,7 @@ const NodeRedPage = ({ children, user }) => (
 
                   <DeviceConfigurationLink
                     user={user}
-                    documentKey="noder-red"
+                    documentKey="node-red"
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
