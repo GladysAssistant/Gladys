@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
+import ReactSlider from 'react-slider';
 
 import { DEFAULT_VALUE_HUMIDITY } from '../../../../../server/utils/constants';
 
@@ -36,10 +37,26 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
       </label>
     </div>
 
+    <div class="form-group">
+      <ReactSlider
+        className="horizontal-slider"
+        thumbClassName="example-thumb"
+        trackClassName="example-track"
+        defaultValue={[props.humidityMin, props.humidityMax]}
+        ariaLabel={['Lower thumb', 'Upper thumb']}
+        ariaValuetext={state => `Thumb value ${state.valueNow}`}
+        renderThumb={(props, state) => <div {...props}>{state.valueNow}%</div>}
+        pearling
+        minDistance={10}
+        onAfterChange={props.updateBoxValue}
+        value={[props.humidityMin, props.humidityMax]}
+      />
+    </div>
+
     <div style="gap: 1em" class="form-group d-flex flex-column">
       <div style="gap: 1em" class="d-flex flex-nowrap">
         <span
-          class={cx('stamp', 'stamp-sm', 'bg-yellow', {
+          class={cx('stamp', 'stamp-sm', 'bg-green', {
             'opacity-60': (props.box.humidity_use_custom_value || false) === false
           })}
         >
@@ -98,6 +115,14 @@ class EditRoomHumidityBoxComponent extends Component {
     });
   };
 
+  updateBoxValue = (values, index) => {
+    console.log(values, index);
+    this.props.updateBoxConfig(this.props.x, this.props.y, {
+      humidity_min: values[0],
+      humidity_max: values[1]
+    });
+  };
+
   render(props, {}) {
     let humidity_min = this.props.box.humidity_min;
     let humidity_max = this.props.box.humidity_max;
@@ -114,6 +139,7 @@ class EditRoomHumidityBoxComponent extends Component {
         updateBoxUseCustomValue={this.updateBoxUseCustomValue}
         updateBoxMinValue={this.updateBoxMinValue}
         updateBoxMaxValue={this.updateBoxMaxValue}
+        updateBoxValue={this.updateBoxValue}
         humidityMin={humidity_min}
         humidityMax={humidity_max}
       />
