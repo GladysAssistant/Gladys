@@ -65,6 +65,26 @@ class SettingsSystem extends Component {
     });
   };
 
+  updateNumberOfHoursBeforeStateIsOutdated = async e => {
+    await this.setState({
+      numberOfHoursBeforeStateIsOutdated: e.target.value,
+      savingNumberOfHourseBeforeStateIsOutdated: true
+    });
+    try {
+      await this.props.httpClient.post(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED}`,
+        {
+          value: e.target.value
+        }
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    await this.setState({
+      savingNumberOfHourseBeforeStateIsOutdated: false
+    });
+  };
+
   getDeviceStateHistoryPreference = async () => {
     try {
       const { value } = await this.props.httpClient.get(
@@ -78,12 +98,30 @@ class SettingsSystem extends Component {
     }
   };
 
+  getNumberOfHoursBeforeStateIsOutdated = async () => {
+    try {
+      const { value } = await this.props.httpClient.get(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED}`
+      );
+      this.setState({
+        numberOfHoursBeforeStateIsOutdated: value
+      });
+    } catch (e) {
+      console.error(e);
+      // if variable doesn't exist, value is 48
+      this.setState({
+        numberOfHoursBeforeStateIsOutdated: 48
+      });
+    }
+  };
+
   componentDidMount() {
     this.props.getInfos();
     this.props.getDiskSpace();
     this.props.getContainers();
     this.getTimezone();
     this.getDeviceStateHistoryPreference();
+    this.getNumberOfHoursBeforeStateIsOutdated();
     // we start the ping a little bit after to give it some time to breathe
     this.refreshPingIntervalId = setInterval(() => {
       this.props.ping();
@@ -101,7 +139,16 @@ class SettingsSystem extends Component {
     };
   }
 
-  render(props, { selectedTimezone, deviceStateHistoryInDays, vacuumStarted }) {
+  render(
+    props,
+    {
+      selectedTimezone,
+      deviceStateHistoryInDays,
+      vacuumStarted,
+      numberOfHoursBeforeStateIsOutdated,
+      savingNumberOfHourseBeforeStateIsOutdated
+    }
+  ) {
     const isDocker = get(props, 'systemInfos.is_docker');
     const upgradeDownloadInProgress = props.downloadUpgradeStatus === RequestStatus.Getting;
     const upgradeDownloadFinished = props.downloadUpgradeStatus === RequestStatus.Success;
@@ -118,7 +165,10 @@ class SettingsSystem extends Component {
         updateTimezone={this.updateTimezone}
         selectedTimezone={selectedTimezone}
         deviceStateHistoryInDays={deviceStateHistoryInDays}
+        numberOfHoursBeforeStateIsOutdated={numberOfHoursBeforeStateIsOutdated}
+        savingNumberOfHourseBeforeStateIsOutdated={savingNumberOfHourseBeforeStateIsOutdated}
         updateDeviceStateHistory={this.updateDeviceStateHistory}
+        updateNumberOfHoursBeforeStateIsOutdated={this.updateNumberOfHoursBeforeStateIsOutdated}
         vacuumDatabase={this.vacuumDatabase}
         vacuumStarted={vacuumStarted}
       />
