@@ -43,8 +43,6 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
         thumbClassName="humidity-slider-thumb"
         trackClassName="humidity-slider-track"
         defaultValue={[props.humidityMin, props.humidityMax]}
-        ariaLabel={['Lower thumb', 'Upper thumb']}
-        ariaValuetext={state => `Thumb value ${state.valueNow}`}
         renderThumb={(props, state) => <div {...props}>{state.valueNow}%</div>}
         pearling
         minDistance={10}

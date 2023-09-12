@@ -82,7 +82,6 @@ class RoomHumidityBoxComponent extends Component {
     const humidity = 81; //get(boxData, 'room.humidity.humidity');
     const unit = get(boxData, 'room.humidity.unit');
 
-    console.log(props);
     const humidity_use_custom_value = get(props, 'box.humidity_use_custom_value');
     let humidity_min = get(props, 'box.humidity_min');
     let humidity_max = get(props, 'box.humidity_max');
@@ -92,7 +91,12 @@ class RoomHumidityBoxComponent extends Component {
       humidity_max = DEFAULT_VALUE_HUMIDITY.MAXIMUM;
     }
 
-    console.log(humidity_use_custom_value, humidity_min, humidity_max);
+    if (isNaN(humidity_min)) {
+      humidity_min = DEFAULT_VALUE_HUMIDITY.MINIMUM;
+    }
+    if (isNaN(humidity_min)) {
+      humidity_max = DEFAULT_VALUE_HUMIDITY.MAXIMUM;
+    }
 
     const roomName = get(boxData, 'room.name');
     return (
