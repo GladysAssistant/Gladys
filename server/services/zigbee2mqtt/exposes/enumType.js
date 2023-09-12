@@ -56,6 +56,11 @@ addMapping('action', BUTTON_STATUS.VIBRATION, 'vibration');
 addMapping('action', BUTTON_STATUS.TILT, 'tilt');
 addMapping('action', BUTTON_STATUS.DROP, 'drop');
 
+addMapping('action', BUTTON_STATUS.EMERGENCY, 'emergency');
+addMapping('action', BUTTON_STATUS.DISARM, 'disarm');
+addMapping('action', BUTTON_STATUS.ARM_DAY_ZONES, 'arm_day_zones');
+addMapping('action', BUTTON_STATUS.ARM_ALL_ZONES, 'arm_all_zones');
+
 addMapping('state', COVER_STATE.OPEN, 'OPEN');
 addMapping('state', COVER_STATE.CLOSE, 'CLOSE');
 addMapping('state', COVER_STATE.STOP, 'STOP');
