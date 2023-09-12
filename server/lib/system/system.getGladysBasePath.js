@@ -26,7 +26,7 @@ async function getGladysBasePath() {
       }
     }
   } catch (e) {
-    logger.warn(`Node-RED: Error while fetching container mounts: ${e.message}`);
+    logger.warn(`Error while fetching container mounts: ${e.message}`);
   }
   return { basePathOnContainer, basePathOnHost: '/var/lib/gladysassistant' };
 }

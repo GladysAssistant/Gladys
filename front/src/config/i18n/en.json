@@ -609,7 +609,7 @@
     },
     "nodeRed": {
       "title": "Node-RED",
-      "description": "\"Control your devices with Node-RED.",
+      "description": "Control your devices with Node-RED.",
       "setupTab": "Setup",
       "documentation": "Node-RED documentation",
 
