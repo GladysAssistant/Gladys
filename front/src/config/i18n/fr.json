@@ -240,6 +240,7 @@
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
+        "noRecentValue": "Pas de valeur récente",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-"
@@ -1948,6 +1949,9 @@
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
     "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
+    "numberOfHoursBeforeStateIsOutdated": "Délai avant expiration d'un état",
+    "numberOfHoursBeforeStateIsOutdatedDescription": "Ce délai correspond au nombre d'heures avant qu'un état de capteur soit considéré comme \"périmé\" et ainsi plus affiché sur le tableau de bord.",
+    "hours": "heures",
     "vacuumDatabaseTitle": "Nettoyer la base de donnée",
     "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de donnée, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle re-arrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
     "vacuumDatabaseButton": "Lancer le nettoyage",

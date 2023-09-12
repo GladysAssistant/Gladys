@@ -240,6 +240,7 @@
         "editRoomLabel": "Select the room you want to display here.",
         "editDeviceFeaturesLabel": "Select the devices you want to display. Only lights / sensors are showed here.",
         "noValue": "No value recorded",
+        "noRecentValue": "No recent value",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-"
@@ -1947,6 +1948,9 @@
     "timezoneText": "The timezone is used in scheduled scene.",
     "deviceStateRetentionTime": "Keep Device State History",
     "deviceStateRetentionTimeDescription": "How long Gladys will keep your device states in database.",
+    "numberOfHoursBeforeStateIsOutdated": "Time to expiry of a state",
+    "numberOfHoursBeforeStateIsOutdatedDescription": "This delay corresponds to the number of hours before a sensor status is considered \"expired\" and therefore no longer displayed on the dashboard.",
+    "hours": "hours",
     "vacuumDatabaseTitle": "Database cleaning",
     "vacuumDatabaseDescription": "By clicking on this button, Gladys will start cleaning the database to free up space. This does not delete any data, it just physically remove old deleted data. Be careful, this task can take some time to run, and during that time Gladys will not be available.",
     "vacuumDatabaseButton": "Start database cleaning",
