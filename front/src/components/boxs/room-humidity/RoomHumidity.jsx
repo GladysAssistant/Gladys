@@ -79,7 +79,7 @@ class RoomHumidityBoxComponent extends Component {
   render(props, {}) {
     const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}HumidityInRoom.${props.x}_${props.y}`);
     const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}HumidityInRoom.${props.x}_${props.y}`);
-    const humidity = 81; //get(boxData, 'room.humidity.humidity');
+    const humidity = get(boxData, 'room.humidity.humidity');
     const unit = get(boxData, 'room.humidity.unit');
 
     const humidity_use_custom_value = get(props, 'box.humidity_use_custom_value');
