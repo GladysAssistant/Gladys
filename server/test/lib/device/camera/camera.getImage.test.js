@@ -46,7 +46,7 @@ describe('Camera.getImage', () => {
     const promise = deviceManager.camera.getImage('camera-not-found');
     return assert.isRejected(promise, 'Camera not found');
   });
-  it('should return camera image is too old', async () => {
+  it('should return camera image is too old (old date)', async () => {
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
     stateManager.setState('device', 'test-camera', {
@@ -64,7 +64,7 @@ describe('Camera.getImage', () => {
     const promise = deviceManager.camera.getImage('test-camera');
     return assert.isRejected(promise, 'Camera image is too old');
   });
-  it('should return camera image is too old', async () => {
+  it('should return camera image is too old (null date)', async () => {
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
     stateManager.setState('device', 'test-camera', {
@@ -75,6 +75,24 @@ describe('Camera.getImage', () => {
           category: 'camera',
           type: 'image',
           last_value_changed: null,
+          last_value_string: null,
+        },
+      ],
+    });
+    const promise = deviceManager.camera.getImage('test-camera');
+    return assert.isRejected(promise, 'Camera image is too old');
+  });
+  it('should return camera image is too old (wrong date)', async () => {
+    const stateManager = new StateManager(event);
+    const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
+    stateManager.setState('device', 'test-camera', {
+      features: [
+        {
+          id: '565d05fc-1736-4b76-99ca-581232901d96',
+          selector: 'test-camera',
+          category: 'camera',
+          type: 'image',
+          last_value_changed: 'lalala',
           last_value_string: null,
         },
       ],

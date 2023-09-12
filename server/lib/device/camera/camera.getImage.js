@@ -22,7 +22,6 @@ async function getImage(selector) {
   if (!deviceFeature) {
     throw new NotFoundError('Camera image feature not found');
   }
-  console.log(deviceFeature.last_value_changed);
   let lastValueInTimestamp = new Date(deviceFeature.last_value_changed).getTime();
   if (!isNumeric(lastValueInTimestamp)) {
     lastValueInTimestamp = 0;
