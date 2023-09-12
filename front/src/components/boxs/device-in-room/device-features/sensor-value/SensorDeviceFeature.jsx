@@ -11,8 +11,7 @@ import IconBinaryDeviceValue from './IconBinaryDeviceValue';
 import SignalQualityDeviceValue from './SignalQualityDeviceValue';
 import ButtonClickDeviceValue from './ButtonClickDeviceValue';
 import TextDeviceValue from './TextDeviceValue';
-
-import { getDeviceName } from '../../../../../utils/device';
+import NoRecentValueBadge from './NoRecentValueBadge';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: LastSeenDeviceValue,
@@ -28,7 +27,7 @@ const DISPLAY_BY_FEATURE_TYPE = {
 };
 
 const SensorDeviceType = ({ children, ...props }) => {
-  const { deviceFeature: feature, device } = props;
+  const { deviceFeature: feature } = props;
   const { category, type } = feature;
 
   let elementType = DISPLAY_BY_FEATURE_CATEGORY[category];
@@ -41,12 +40,17 @@ const SensorDeviceType = ({ children, ...props }) => {
     elementType = BadgeNumberDeviceValue;
   }
 
+  // If the device feature has no recent value, we display a message to the user
+  if (feature.last_value_is_too_old) {
+    elementType = NoRecentValueBadge;
+  }
+
   return (
     <tr>
       <td>
         <i class={`mr-2 fe fe-${get(DeviceFeatureCategoriesIcon, `${category}.${type}`)}`} />
       </td>
-      <td>{getDeviceName(device, feature)}</td>
+      <td>{props.rowName}</td>
       <td class="text-right">{createElement(elementType, props)}</td>
     </tr>
   );

@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
+import { RequestStatus } from '../../../../../utils/consts';
 import cx from 'classnames';
 
 class SetupForm extends Component {
@@ -40,6 +41,7 @@ class SetupForm extends Component {
   }
 
   render(props, { showPassword }) {
+    const gladysNotAvailable = props.mqttConnectionError === RequestStatus.NetworkError;
     return (
       <form>
         <div class="form-group">
@@ -54,7 +56,7 @@ class SetupForm extends Component {
               value={props.mqttUrl}
               class="form-control"
               onInput={this.updateUrl}
-              disabled={props.useEmbeddedBroker}
+              disabled={props.useEmbeddedBroker || gladysNotAvailable}
             />
           </Localizer>
         </div>
@@ -72,6 +74,7 @@ class SetupForm extends Component {
               class="form-control"
               onInput={this.updateUsername}
               autoComplete="no"
+              disabled={gladysNotAvailable}
             />
           </Localizer>
         </div>
@@ -91,6 +94,7 @@ class SetupForm extends Component {
                 class="form-control"
                 onInput={this.updatePassword}
                 autoComplete="new-password"
+                disabled={gladysNotAvailable}
               />
             </Localizer>
             <span class="input-icon-addon cursor-pointer" onClick={this.togglePassword}>
@@ -105,7 +109,7 @@ class SetupForm extends Component {
         </div>
 
         <div class="form-group">
-          <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
+          <button type="submit" class="btn btn-success" onClick={props.saveConfiguration} disabled={gladysNotAvailable}>
             <Text id="integration.mqtt.setup.saveLabel" />
           </button>
         </div>

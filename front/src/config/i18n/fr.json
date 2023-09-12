@@ -215,7 +215,8 @@
       "devices": "Appareils",
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
-      "clock": "Horloge"
+      "clock": "Horloge",
+      "scene": "Scène"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -239,14 +240,16 @@
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
+        "noRecentValue": "Pas de valeur récente",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-"
       },
       "devices": {
-        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
+        "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
         "editNameLabel": "Nom du widget",
-        "editNamePlaceholder": "Entrez le nom du widget"
+        "editNamePlaceholder": "Entrez le nom du widget",
+        "addADeviceLabel": "Ajouter un appareil :"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -328,6 +331,11 @@
         "displaySecond": "Afficher les secondes ?",
         "yes": "Oui",
         "no": "Non"
+      },
+      "scene": {
+        "editNameLabel": "Entrez le nom de cette box",
+        "editNamePlaceholder": "Nom affiché sur le tableau de bord",
+        "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
       }
     }
   },
@@ -440,7 +448,7 @@
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
         "externalIdLabel": "ID externe",
-        "manufacturerLabel": "Construteur",
+        "manufacturerLabel": "Constructeur",
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
@@ -495,14 +503,14 @@
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
       "description": "Parlez à Gladys grâce à Nextcloud Talk.",
-      "introduction": "Pour communiquer via Talk il vous créer un compte spécifique Nextcloud représentant votre bot.",
+      "introduction": "Pour communiquer via Talk, il faut créer un compte spécifique Nextcloud représentant votre bot.",
       "url": "URL de l'instance Nextcloud",
       "urlInfo": "Entrez l'url de base de votre instance Nextcloud.",
       "username": "Nom d'utilisateur bot Nextcloud",
       "usernameInfo": "Entrez le nom d'utilisateur du compte Nextcloud représentant le bot Gladys.",
       "password": "Mot de passe bot Nextcloud",
       "passwordInfo": "Entrez le mot de passe du compte Nextcloud représentant le bot.",
-      "token": "Token de la conversion avec le bot",
+      "token": "Token de la conversation avec le bot",
       "tokenInfo": "Entrez le token de la conversation entre votre compte Nextcloud et le compte du bot.",
       "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
       "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
@@ -847,7 +855,7 @@
     },
     "tuya": {
       "title": "Tuya",
-      "description": "Contrôler vos appareils Tuya",
+      "description": "Contrôler vos appareils Tuya (via le cloud).",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Tuya",
       "setupTab": "Configuration",
@@ -887,9 +895,9 @@
         "description": "Vous pouvez connecter Gladys à votre compte cloud Tuya pour commander les appareils associés.",
         "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a>.",
         "descriptionCreateProject": "Vous devez ensuite créer un \"Cloud Project\" dans votre compte Tuya.",
-        "descriptionGetKeys": "Vous aurez accès au Access Key et au Secret Key.",
+        "descriptionGetKeys": "Vous aurez accès aux deux clés : Access Key et Secret Key.",
         "descriptionGetAppAccountUid": "Pour avoir votre \"App account UID\", il faut vous rendre dans la section \"Devices\" -> \"Link Tuya App Account\" et ajouter un compte d'application.",
-        "descriptionGetAppAccountUid2": "Une fois que l'ajout est finalizé, votre \"App account UID\" sera dans la colonne UID.",
+        "descriptionGetAppAccountUid2": "Une fois que l'ajout est finalisé, votre \"App account UID\" sera dans la colonne UID.",
         "endpoints": {
           "china": "China",
           "westernAmerica": "Western America",
@@ -900,15 +908,15 @@
         },
         "endpoint": "Endpoint",
         "accessKey": "Access Key",
-        "accessKeyPlaceholder": "Entrez l'access key de Tuya",
+        "accessKeyPlaceholder": "Entrez l'Access Key de Tuya",
         "secretKey": "Secret Key",
-        "secretKeyPlaceholder": "Entrez la secrete key de Tuya",
+        "secretKeyPlaceholder": "Entrez la Secret Key de Tuya",
         "appAccountId": "App account UID",
-        "appAccountIdPlaceholder": "Entrez le UID de l'app de Tuya",
+        "appAccountIdPlaceholder": "Entrez l'UID de l'app de Tuya",
         "saveLabel": "Enregistrer la configuration",
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
-        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud eWeLink...",
-        "connected": "Connexion réussie au compte cloud eWeLink !",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",
+        "connected": "Connexion réussie au compte cloud Tuya !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
       },
 
@@ -991,6 +999,7 @@
         "connecting": "Configuration enregistrée. Connexion au broker MQTT en cours...",
         "connected": "Connecté au broker MQTT avec succès !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "networkError": "Impossible de contacter Gladys, est-ce que votre instance Gladys est bien connectée et accessible ?",
         "disconnected": "Déconnecté du broker MQTT."
       }
     },
@@ -1158,7 +1167,7 @@
         "title": "Appareils LAN",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
-        "manufacturerLabel": "Construteur",
+        "manufacturerLabel": "Constructeur",
         "ipAddressLabel": "Adresse IP",
         "macAddressLabel": "Adresse MAC",
         "originalNameLabel": "Nom sur le réseau"
@@ -1183,7 +1192,7 @@
         "presenceScannerFrequencyUnit": "minutes",
         "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
         "ipMasksLabel": "CIDR à scanner",
-        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
+        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vous correspondent le mieux.",
         "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne peuvent pas être supprimés.",
         "maskTableHeader": "CIDR",
         "nameTableHeader": "Nom",
@@ -1241,7 +1250,8 @@
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud eWeLink...",
         "connected": "Connexion réussie au compte cloud eWeLink !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
+        "ewelinkIntegrationDeprecated": "Septembre 2023: Cette intégration ne semble malheureusement plus fonctionner suite à des changements côté API eWeLink. Discussion <a href=\"https://community.gladysassistant.com/t/service-ewelink-en-erreur/8323/17\" target=\"_blank\" rel=\"noopener noreferrer\">sur le forum ici</a>."
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
@@ -1252,18 +1262,16 @@
     "openai": {
       "title": "OpenAI ChatGPT",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
-      "firstExplanation": "Ceci est une alpha d'une intégration avec l'intelligence artificielle OpenAI ChatGPT. Vous pouvez demander ce que vous voulez à Gladys ici.",
-      "itDoesNothing": "Cet onglet est un bac à sable vous permettant de tester les capacités de ChatGPT. Pour tester des vrais commandes domotiques, activez ChatGPT dans le chat Gladys.",
+      "firstExplanation": "Gladys peut utiliser l'intelligence artificielle OpenAI ChatGPT pour vous permettre de communiquer avec votre maison connectée.",
       "aFewExamples": "Quelques exemples :",
       "turnOnTheLight": "Allume la lumière du salon !",
       "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
-      "whoIsJulesVerne": "Qui est Jules Verne ?",
       "eggDuration": "Comment cuire les oeufs durs ?",
+      "showMeTheCameraInTheKitchen": "Montre moi la caméra de la cuisine",
       "activateOpenAiChat": "Activer ChatGPT dans le chat Gladys",
       "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
-      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus.",
-      "licenseShouldBeActive": "Cette intégration n'est disponible qu'aux utilisateurs Gladys Plus dont l'abonnement est actuellement actif avec au moins un paiement. Pour les utilisateurs en périodes d'essai, merci de me contacter sur le forum ou par email !"
+      "subscribeToGladysPlus": "<a href=\"https://gladysassistant.com/fr/plus/\"  target=\"_blank\" rel=\"noopener noreferrer\">Cliquez-ici</a> pour souscrire à Gladys Plus."
     }
   },
   "editScene": {
@@ -1822,6 +1830,9 @@
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
     "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
+    "numberOfHoursBeforeStateIsOutdated": "Délai avant expiration d'un état",
+    "numberOfHoursBeforeStateIsOutdatedDescription": "Ce délai correspond au nombre d'heures avant qu'un état de capteur soit considéré comme \"périmé\" et ainsi plus affiché sur le tableau de bord.",
+    "hours": "heures",
     "vacuumDatabaseTitle": "Nettoyer la base de donnée",
     "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de donnée, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle re-arrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
     "vacuumDatabaseButton": "Lancer le nettoyage",
@@ -2147,7 +2158,39 @@
           "3": "Pression clic long",
           "4": "Relâche clic long",
           "5": "Clic maintenu",
-          "6": "Clic long"
+          "6": "Clic long",
+          "7": "On",
+          "8": "Off",
+          "9": "Réduire luminosité",
+          "10": "Augmenter luminosité",
+          "11": "Stopper luminosité",
+          "12": "Flèche gauche clic",
+          "13": "Flèche droite clic",
+          "14": "Flèche gauche maintenue",
+          "15": "Flèche droite maintenue",
+          "16": "Flèche gauche relâchée",
+          "17": "Flèche droite relâchée",
+          "18": "Clic triple",
+          "19": "Clic quadruple",
+          "20": "Clic relâché",
+          "21": "Plein de clics",
+          "22": "Cube secoué",
+          "23": "Cube lancé",
+          "24": "Cube réveillé",
+          "25": "Cube tombe",
+          "26": "Cube tapé",
+          "27": "Cube slide",
+          "28": "Cube flip 180°",
+          "29": "Cube flip 90°",
+          "30": "Cube rotation gauche",
+          "31": "Cube rotation droite",
+          "32": "Vibration",
+          "33": "Inclinaison",
+          "34": "Mouvements",
+          "35": "Urgence",
+          "36": "Désarmer alarme",
+          "37": "Armer zones jour",
+          "38": "Armer alarme"
         }
       },
       "opening-sensor": {
@@ -2304,6 +2347,9 @@
       "acceleration-x": "Accélération X",
       "acceleration-y": "Accélération Y",
       "acceleration-z": "Accélération Z",
+      "angle-x": "Angle X",
+      "angle-y": "Angle Y",
+      "angle-z": "Angle Z",
       "bed-activity": "Activité Lit"
     },
     "signal": {

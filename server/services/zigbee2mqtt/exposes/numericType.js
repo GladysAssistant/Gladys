@@ -729,5 +729,32 @@ module.exports = {
         max: 1000000,
       },
     },
+    angle_x: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VIBRATION_SENSOR.ANGLE_X,
+        unit: DEVICE_FEATURE_UNITS.DEGREE,
+        min: -90,
+        max: 90,
+      },
+    },
+    angle_y: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VIBRATION_SENSOR.ANGLE_Y,
+        unit: DEVICE_FEATURE_UNITS.DEGREE,
+        min: -90,
+        max: 90,
+      },
+    },
+    angle_z: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VIBRATION_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VIBRATION_SENSOR.ANGLE_Z,
+        unit: DEVICE_FEATURE_UNITS.DEGREE,
+        min: -90,
+        max: 90,
+      },
+    },
   },
 };
