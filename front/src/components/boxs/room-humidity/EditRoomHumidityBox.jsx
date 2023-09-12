@@ -4,9 +4,7 @@ import BaseEditBox from '../baseEditBox';
 import ReactSlider from 'react-slider';
 
 import { DEFAULT_VALUE_HUMIDITY } from '../../../../../server/utils/constants';
-
 import RoomSelector from '../../house/RoomSelector';
-import InputWithUnit from './InputWithUnit';
 import cx from 'classnames';
 
 const updateBoxRoom = (updateBoxRoomFunc, x, y) => room => {
@@ -39,9 +37,11 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
 
     <div class="form-group">
       <ReactSlider
-        className="horizontal-slider"
-        thumbClassName="example-thumb"
-        trackClassName="example-track"
+        className={cx('humidity-slider', {
+          'opacity-60': !(props.box.humidity_use_custom_value || false)
+        })}
+        thumbClassName="humidity-slider-thumb"
+        trackClassName="humidity-slider-track"
         defaultValue={[props.humidityMin, props.humidityMax]}
         ariaLabel={['Lower thumb', 'Upper thumb']}
         ariaValuetext={state => `Thumb value ${state.valueNow}`}
@@ -50,42 +50,8 @@ const EditRoomHumidityBox = ({ children, ...props }) => (
         minDistance={10}
         onAfterChange={props.updateBoxValue}
         value={[props.humidityMin, props.humidityMax]}
+        disabled={!(props.box.humidity_use_custom_value || false)}
       />
-    </div>
-
-    <div style="gap: 1em" class="form-group d-flex flex-column">
-      <div style="gap: 1em" class="d-flex flex-nowrap">
-        <span
-          class={cx('stamp', 'stamp-sm', 'bg-green', {
-            'opacity-60': (props.box.humidity_use_custom_value || false) === false
-          })}
-        >
-          <i class="fe fe-droplet" />
-        </span>
-        <InputWithUnit
-          unit="global.percent"
-          value={props.humidityMin}
-          onChange={props.updateBoxMinValue}
-          classNames=""
-          disabled={(props.box.humidity_use_custom_value || false) === false}
-        />
-      </div>
-      <div style="gap: 1em" class="d-flex flex-nowrap">
-        <span
-          class={cx('stamp', 'stamp-sm', 'bg-red', {
-            'opacity-60': (props.box.humidity_use_custom_value || false) === false
-          })}
-        >
-          <i class="fe fe-droplet" />
-        </span>
-        <InputWithUnit
-          unit="global.percent"
-          value={props.humidityMax}
-          onChange={props.updateBoxMaxValue}
-          classNames=""
-          disabled={(props.box.humidity_use_custom_value || false) === false}
-        />
-      </div>
     </div>
   </BaseEditBox>
 );
@@ -103,20 +69,7 @@ class EditRoomHumidityBoxComponent extends Component {
     });
   };
 
-  updateBoxMinValue = minValue => {
-    this.props.updateBoxConfig(this.props.x, this.props.y, {
-      humidity_min: parseInt(minValue, 10)
-    });
-  };
-
-  updateBoxMaxValue = maxValue => {
-    this.props.updateBoxConfig(this.props.x, this.props.y, {
-      humidity_max: parseInt(maxValue, 10)
-    });
-  };
-
-  updateBoxValue = (values, index) => {
-    console.log(values, index);
+  updateBoxValue = values => {
     this.props.updateBoxConfig(this.props.x, this.props.y, {
       humidity_min: values[0],
       humidity_max: values[1]
@@ -137,8 +90,6 @@ class EditRoomHumidityBoxComponent extends Component {
         {...props}
         updateBoxRoom={this.updateBoxRoom}
         updateBoxUseCustomValue={this.updateBoxUseCustomValue}
-        updateBoxMinValue={this.updateBoxMinValue}
-        updateBoxMaxValue={this.updateBoxMaxValue}
         updateBoxValue={this.updateBoxValue}
         humidityMin={humidity_min}
         humidityMax={humidity_max}

@@ -308,40 +308,18 @@ body {
   transition: transform cubic-bezier(0.68, 0, 0.27, 1.55) 0.2s;
 }
 
-
-.container-type-inline-size {
-  container-type: inline-size;
-}
-
-.threshold {
-  gap: 0.3em;
-  -ms-flex-direction: column;
-  flex-direction: column;
-}
-
 .opacity-60 {
   opacity: 60%;
 }
 
-@container (min-width: 250px) {
-  .threshold {
-    gap: 0.3em;
-    -ms-flex-direction: row;
-    flex-direction: row;
-  }
-}
 
-
-/** ReactSlider **/
-
-.horizontal-slider {
+.humidity-slider {
   width: 100%;
   max-width: 500px;
   height: 30px;
-  #border: 1px solid grey;
 }
 
-.example-thumb {
+.humidity-slider-thumb {
   font-size: 0.9em;
   text-align: center;
   background-color: #fafafa;
@@ -352,34 +330,31 @@ body {
   box-sizing: border-box;
 }
 
-.example-thumb.active {
-  #background-color: grey;
+.humidity-slider-thumb.active {
   border: 1px solid #467fcf;
-
 }
 
-.example-track {
+.humidity-slider-track {
   position: relative;
   background: #f1c40f;
 }
 
-.example-track.example-track-1 {
+.humidity-slider-track-1 {
   background: #5eba00;
 }
 
-.example-track.example-track-2 {
-  background: #cd201f;
+.humidity-slider-track-2 {
+  background: #467fcf ;
 }
 
-.horizontal-slider .example-track {
+.humidity-slider .humidity-slider-track {
   top: 10px;
   height: 10px;
 }
 
-.horizontal-slider .example-thumb {
-  top: 1px;
-  width: 50px;
-  height: 28px;
-  line-height: 24px;
+.humidity-slider .humidity-slider-thumb {
+  top: 3px;
+  width: 35px;
+  height: 24px;
+  line-height: 22px;
 }
-
