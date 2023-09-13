@@ -202,6 +202,31 @@ const SystemPage = ({ children, ...props }) => (
             </form>
             <form class="mt-4">
               <label>
+                <Text id="systemSettings.numberOfHoursBeforeStateIsOutdated" />
+              </label>
+              <p>
+                <small>
+                  <Text id="systemSettings.numberOfHoursBeforeStateIsOutdatedDescription" />
+                </small>
+              </p>
+              <div class="input-group">
+                <input
+                  class="form-control"
+                  type="number"
+                  min="1"
+                  disabled={props.savingNumberOfHourseBeforeStateIsOutdated}
+                  value={props.numberOfHoursBeforeStateIsOutdated}
+                  onChange={props.updateNumberOfHoursBeforeStateIsOutdated}
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <Text id="systemSettings.hours" />
+                  </span>
+                </div>
+              </div>
+            </form>
+            <form class="mt-4">
+              <label>
                 <Text id="systemSettings.vacuumDatabaseTitle" />
               </label>
               <p>
