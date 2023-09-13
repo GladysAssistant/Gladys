@@ -9,6 +9,7 @@ import ChartBox from '../../components/boxs/chart/Chart';
 import EcowattBox from '../../components/boxs/ecowatt/Ecowatt';
 import ClockBox from '../../components/boxs/clock/Clock';
 import VacbotBox from '../../components/boxs/vacbot/Vacbot';
+import SceneBox from '../../components/boxs/scene/SceneBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -34,6 +35,8 @@ const Box = ({ children, ...props }) => {
       return <ClockBox {...props} />;
     case 'vacbot':
       return <VacbotBox {...props} />;
+    case 'scene':
+      return <SceneBox {...props} />;
   }
 };
 
