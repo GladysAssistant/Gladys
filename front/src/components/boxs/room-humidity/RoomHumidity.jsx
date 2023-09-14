@@ -94,7 +94,7 @@ class RoomHumidityBoxComponent extends Component {
     if (isNaN(humidity_min)) {
       humidity_min = DEFAULT_VALUE_HUMIDITY.MINIMUM;
     }
-    if (isNaN(humidity_min)) {
+    if (isNaN(humidity_max)) {
       humidity_max = DEFAULT_VALUE_HUMIDITY.MAXIMUM;
     }
 
