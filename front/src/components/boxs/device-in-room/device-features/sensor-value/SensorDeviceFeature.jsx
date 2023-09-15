@@ -11,6 +11,7 @@ import IconBinaryDeviceValue from './IconBinaryDeviceValue';
 import SignalQualityDeviceValue from './SignalQualityDeviceValue';
 import ButtonClickDeviceValue from './ButtonClickDeviceValue';
 import TextDeviceValue from './TextDeviceValue';
+import NoRecentValueBadge from './NoRecentValueBadge';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: LastSeenDeviceValue,
@@ -37,6 +38,11 @@ const SensorDeviceType = ({ children, ...props }) => {
 
   if (!elementType) {
     elementType = BadgeNumberDeviceValue;
+  }
+
+  // If the device feature has no recent value, we display a message to the user
+  if (feature.last_value_is_too_old) {
+    elementType = NoRecentValueBadge;
   }
 
   return (
