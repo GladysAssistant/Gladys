@@ -46,4 +46,11 @@ describe('OverkizService', () => {
       .to.have.property('stop')
       .and.be.instanceOf(Function);
   });
+
+  it('should isUsed service', async () => {
+    await overkizService.isUsed();
+    expect(overkizService)
+      .to.have.property('isUsed')
+      .and.be.instanceOf(Function);
+  });
 });

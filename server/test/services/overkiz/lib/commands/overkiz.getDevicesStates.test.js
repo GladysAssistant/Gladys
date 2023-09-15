@@ -46,7 +46,7 @@ describe('GetDevicesStates command', () => {
     }).getDevicesStates;
   });
 
-  beforeEach(() => {
+  afterEach(() => {
     sinon.reset();
   });
 

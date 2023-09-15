@@ -1,7 +1,8 @@
 const sinon = require('sinon');
 const { expect } = require('chai');
+const { AxiosError } = require('axios');
 
-const { stub } = sinon;
+const { stub, assert } = sinon;
 const proxyquire = require('proxyquire').noCallThru();
 
 const MockedClient = {
@@ -31,11 +32,30 @@ const MockedClient = {
           data,
         };
       },
-      post: (url) => {
+      post: (url, body) => {
         let data;
         switch (url) {
           case '/exec/apply':
-            data = { execId: '0123456789' };
+            if (body && body.error && body.error === '401') {
+              delete body.error;
+              throw new AxiosError(
+                'ERROR',
+                'ERROR',
+                null,
+                null,
+                {
+                  data: '',
+                  status: 401,
+                  statusText: 'Not authorized',
+                  headers: undefined,
+                  config: undefined,
+                },
+              );
+            } else if (body && body.error) {
+              throw new Error(body.error);
+            } else {
+              data = { execId: '0123456789' };
+            }
             break;
           default:
             data = {};
@@ -67,6 +87,10 @@ describe('Overkiz API', () => {
     });
   });
 
+  afterEach(() => {
+    sinon.reset();
+  });
+
   it('should API getSetup', async () => {
     const setup = await overkizAPI.getSetup();
     expect(setup).to.deep.equals({ action: 'setup' });
@@ -84,6 +108,29 @@ describe('Overkiz API', () => {
 
   it('should API exec', async () => {
     const execId = await overkizAPI.exec({});
+    expect(execId).to.equals('0123456789');
+  });
+
+  it('should API not logged', async () => {
+    overkizAPI.platformLoginHandler.cookie = undefined;
+    const setup = await overkizAPI.getSetup({});
+    assert.calledOnce(overkizAPI.platformLoginHandler.login);
+    expect(setup).to.deep.equals({ action: 'setup' });
+  });
+
+  it('should API error', async () => {
+    try {
+      await overkizAPI.exec({ error: 'ERROR'});
+      // eslint-disable-next-line no-unused-expressions
+      expect(true).to.be.false;
+    } catch(e) {
+      expect(e).to.be.instanceOf(Error);
+    }
+  });
+
+  it('should API error 401', async () => {
+    const execId = await overkizAPI.exec({ error: '401'});
+    assert.calledOnce(overkizAPI.platformLoginHandler.login);
     expect(execId).to.equals('0123456789');
   });
 });
