@@ -62,19 +62,19 @@ class ModelFactory {
         res.ACW = (readInt16(data, 14) * 10 ** acwSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
-        const acfSf = readInt16(data, 17);
+        // const acfSf = readInt16(data, 17);
         // res.ACF = (readUInt16(data, 16) * 10 ** acfSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
-        const acvaSf = readInt16(data, 19);
+        // const acvaSf = readInt16(data, 19);
         // res.ACVA = (readInt16(data, 18) * 10 ** acvaSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
-        const acvarSf = readInt16(data, 21);
+        // const acvarSf = readInt16(data, 21);
         // res.ACVAR = (readInt16(data, 20) * 10 ** acvarSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
-        const acpfSf = readInt16(data, 13);
+        // const acpfSf = readInt16(data, 13);
         // res.ACPF = (readInt16(data, 22) * 10 ** acpfSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
@@ -99,26 +99,29 @@ class ModelFactory {
         // res.ACV_AN = (readUInt16(data, 10) * 10 ** acvSf).toFixed(2);
         // res.ACV_BN = (readUInt16(data, 11) * 10 ** acvSf).toFixed(2);
         // res.ACV_CN = (readUInt16(data, 12) * 10 ** acvSf).toFixed(2);
-        res.ACV = (((readUInt16(data, 10) + readUInt16(data, 11) + readUInt16(data, 12)) / 3) * 10 ** acvSf).toFixed(2);
+        const acvA = readUInt16(data, 10) * 10 ** acvSf;
+        const acvB = readUInt16(data, 11) * 10 ** acvSf;
+        const acvC = readUInt16(data, 12) * 10 ** acvSf;
+        res.ACV = ((acvA + acvB + acvC) / 3).toFixed(2);
 
         // eslint-disable-next-line no-case-declarations
         const acwSf = readInt16(data, 15);
         res.ACW = (readInt16(data, 14) * 10 ** acwSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
-        const acfSf = readInt16(data, 17);
+        // const acfSf = readInt16(data, 17);
         // res.ACF = (readUInt16(data, 16) * 10 ** acfSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
-        const acvaSf = readInt16(data, 19);
+        // const acvaSf = readInt16(data, 19);
         // res.ACVA = (readInt16(data, 18) * 10 ** acvaSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
-        const acvarSf = readInt16(data, 21);
+        // const acvarSf = readInt16(data, 21);
         // res.ACVAR = (readInt16(data, 20) * 10 ** acvarSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
-        const acpfSf = readInt16(data, 13);
+        // const acpfSf = readInt16(data, 13);
         // res.ACPF = (readInt16(data, 22) * 10 ** acpfSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
