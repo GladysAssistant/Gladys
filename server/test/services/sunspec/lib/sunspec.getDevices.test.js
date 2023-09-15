@@ -34,7 +34,7 @@ describe('SunSpec getDevices', () => {
     expect(devices.length).eql(0);
   });
 
-  it('should device', async () => {
+  it('should device DC', async () => {
     sunSpecManager.devices = [
       {
         manufacturer: 'manufacturer',
@@ -47,63 +47,63 @@ describe('SunSpec getDevices', () => {
     const devices = await sunSpecManager.getDevices();
     expect(devices.length).eql(1);
     expect(devices[0]).to.deep.equals({
-      model: 'manufacturer product [1]',
-      name: 'manufacturer product [1]',
-      external_id: 'sunspec:serialnumber:serialNumber:mptt:1',
+      model: 'manufacturer product [DC 1]',
+      name: 'manufacturer product [DC 1]',
+      external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1',
       poll_frequency: 60000,
-      selector: 'sunspec-manufacturer-manufacturer-product-1',
+      selector: 'sunspec-serialnumber-serialnumber-mppt-dc1',
       service_id: 'faea9c35-759a-44d5-bcc9-2af1de37b8b4',
       should_poll: true,
       features: [
         {
           category: 'pv',
-          external_id: 'sunspec:serialnumber:serialNumber:mptt:1:property:DCA',
+          external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCA',
           has_feedback: false,
           last_value: 0,
           max: 400,
           min: 0,
-          name: 'manufacturer product [1] - DCA',
+          name: 'manufacturer product [DC 1] - DCA',
           read_only: true,
-          selector: 'sunspec-device-serialnumber-1-dca',
+          selector: 'sunspec-serialnumber-serialnumber-mppt-dc1-property-dca',
           type: 'current',
           unit: 'ampere',
         },
         {
           category: 'pv',
-          external_id: 'sunspec:serialnumber:serialNumber:mptt:1:property:DCV',
+          external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCV',
           has_feedback: false,
           last_value: 0,
           max: 400,
           min: 0,
-          name: 'manufacturer product [1] - DCV',
+          name: 'manufacturer product [DC 1] - DCV',
           read_only: true,
-          selector: 'sunspec-device-serialnumber-1-dcv',
+          selector: 'sunspec-serialnumber-serialnumber-mppt-dc1-property-dcv',
           type: 'voltage',
           unit: 'volt',
         },
         {
           category: 'pv',
-          external_id: 'sunspec:serialnumber:serialNumber:mptt:1:property:DCW',
+          external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCW',
           has_feedback: false,
           last_value: 0,
           max: 10000,
           min: 0,
-          name: 'manufacturer product [1] - DCW',
+          name: 'manufacturer product [DC 1] - DCW',
           read_only: true,
-          selector: 'sunspec-device-serialnumber-1-dcw',
+          selector: 'sunspec-serialnumber-serialnumber-mppt-dc1-property-dcw',
           type: 'power',
           unit: 'watt',
         },
         {
           category: 'pv',
-          external_id: 'sunspec:serialnumber:serialNumber:mptt:1:property:DCWH',
+          external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCWH',
           has_feedback: false,
           last_value: 0,
           max: 1000000,
           min: 0,
-          name: 'manufacturer product [1] - DCWH',
+          name: 'manufacturer product [DC 1] - DCWH',
           read_only: true,
-          selector: 'sunspec-device-serialnumber-1-dcwh',
+          selector: 'sunspec-serialnumber-serialnumber-mppt-dc1-property-dcwh',
           type: 'energy',
           unit: 'kilowatt-hour',
         },

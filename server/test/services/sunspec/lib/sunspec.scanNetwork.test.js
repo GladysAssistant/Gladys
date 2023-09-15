@@ -40,11 +40,14 @@ describe('SunSpec scanNetwork', () => {
               .onSecondCall()
               .returns('product')
               .onThirdCall()
-              .returns('swVersion')
+              .returns('options')
               .onCall(3)
+              .returns('swVersion')
+              .onCall(4)
               .returns('serialNumber'),
           }),
         readRegisterAsInt16: fake.returns(1),
+        getValueModel: fake.returns(201),
       },
       devices: [
         {
@@ -62,10 +65,17 @@ describe('SunSpec scanNetwork', () => {
     sinon.reset();
   });
 
-  it('should find one device', async () => {
+  it('should find a AC and a DC device', async () => {
     await ScanNetwork.call(sunspecManager);
-    expect(sunspecManager.devices.length).eql(1);
+    expect(sunspecManager.devices.length).eql(2);
     expect(sunspecManager.devices[0]).to.deep.eq({
+      manufacturer: 'manufacturer',
+      product: 'product',
+      serialNumber: 'serialNumber',
+      swVersion: 'swVersion',
+      valueModel: 201,
+    });
+    expect(sunspecManager.devices[1]).to.deep.eq({
       manufacturer: 'manufacturer',
       product: 'product',
       serialNumber: 'serialNumber',

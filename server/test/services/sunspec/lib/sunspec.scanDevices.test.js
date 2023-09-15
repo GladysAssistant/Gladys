@@ -85,20 +85,20 @@ describe('SunSpec updateConfiguration', () => {
     await ScanDevices.call(sunspecManager);
     assert.callCount(gladys.event.emit, 4);
     assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:1:property:DCA',
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:dc1:property:DCA',
       state: '10.00',
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:1:property:DCV',
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:dc1:property:DCV',
       state: '100',
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:1:property:DCW',
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:dc1:property:DCW',
       state: '1000',
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:1:property:DCWH',
-      state: '20000',
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:dc1:property:DCWH',
+      state: '20',
     });
   });
 });

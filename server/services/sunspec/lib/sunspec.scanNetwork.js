@@ -22,6 +22,17 @@ async function scanNetwork() {
   const nbOfMPPT = (await this.modbus.readRegisterAsInt16(REGISTER.NB_OF_MPTT)) - (manufacturer === 'Fronius' ? 2 : 0);
 
   this.devices = [];
+
+  // AC device
+  this.devices.push({
+    manufacturer,
+    product,
+    serialNumber,
+    swVersion,
+    valueModel: this.modbus.getValueModel(),
+  });
+
+  // One par DC (MPPT) device
   for (let i = 0; i < nbOfMPPT; i += 1) {
     this.devices.push({
       manufacturer,

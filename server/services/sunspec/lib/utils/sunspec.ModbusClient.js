@@ -1,5 +1,5 @@
 const logger = require('../../../../utils/logger');
-const { REGISTER, DEFAULT } = require('../sunspec.constants');
+const { REGISTER, DEFAULT, MODEL } = require('../sunspec.constants');
 const { trimString } = require('./sunspec.utils');
 
 class ModbusClient {
@@ -57,6 +57,16 @@ class ModbusClient {
         resolve();
       });
     });
+  }
+
+  getValueModel() {
+    if (this.models[MODEL.INVERTER_1_PHASE] !== null) {
+      return MODEL.INVERTER_1_PHASE;
+    }
+    if (this.models[MODEL.INVERTER_3_PHASE] !== null) {
+      return MODEL.INVERTER_3_PHASE;
+    }
+    return MODEL.INVERTER_SPLIT_PHASE;
   }
 
   async readModel(modelId) {

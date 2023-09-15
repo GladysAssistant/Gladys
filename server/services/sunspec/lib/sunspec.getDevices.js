@@ -40,7 +40,7 @@ function getDevices({ orderDir, search } = {}) {
     .map((device) => {
       const newDevice = {
         name: getDeviceName(device),
-        selector: slugify(`sunspec-${device.manufacturer}-${getDeviceName(device)}`),
+        selector: slugify(getDeviceExternalId(device)),
         model: `${getDeviceName(device)}`,
         service_id: this.serviceId,
         external_id: getDeviceExternalId(device),
@@ -67,86 +67,207 @@ function getDevices({ orderDir, search } = {}) {
         ],
       };
 
-      newDevice.features.push({
-        name: getDeviceFeatureName({
-          ...device,
-          property: PROPERTY.DCA,
-        }),
-        selector: slugify(`sunspec-device-${device.serialNumber}-${device.mppt}-${PROPERTY.DCA}`),
-        category: DEVICE_FEATURE_CATEGORIES.PV,
-        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
-        external_id: getDeviceFeatureExternalId({
-          ...device,
-          property: PROPERTY.DCA,
-        }),
-        read_only: true,
-        unit: DEVICE_FEATURE_UNITS.AMPERE,
-        has_feedback: false,
-        min: 0,
-        max: 400,
-        last_value: 0,
-      });
+      if (device.mppt) {
+        newDevice.features.push({
+          name: getDeviceFeatureName({
+            ...device,
+            property: PROPERTY.DCA,
+          }),
+          selector: slugify(
+            getDeviceFeatureExternalId({
+              ...device,
+              property: PROPERTY.DCA,
+            }),
+          ),
+          category: DEVICE_FEATURE_CATEGORIES.PV,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+          external_id: getDeviceFeatureExternalId({
+            ...device,
+            property: PROPERTY.DCA,
+          }),
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.AMPERE,
+          has_feedback: false,
+          min: 0,
+          max: 400,
+          last_value: 0,
+        });
 
-      newDevice.features.push({
-        name: getDeviceFeatureName({
-          ...device,
-          property: PROPERTY.DCV,
-        }),
-        selector: slugify(`sunspec-device-${device.serialNumber}-${device.mppt}-${PROPERTY.DCV}`),
-        category: DEVICE_FEATURE_CATEGORIES.PV,
-        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
-        external_id: getDeviceFeatureExternalId({
-          ...device,
-          property: PROPERTY.DCV,
-        }),
-        read_only: true,
-        unit: DEVICE_FEATURE_UNITS.VOLT,
-        has_feedback: false,
-        min: 0,
-        max: 400,
-        last_value: 0,
-      });
+        newDevice.features.push({
+          name: getDeviceFeatureName({
+            ...device,
+            property: PROPERTY.DCV,
+          }),
+          selector: slugify(
+            getDeviceFeatureExternalId({
+              ...device,
+              property: PROPERTY.DCV,
+            }),
+          ),
+          category: DEVICE_FEATURE_CATEGORIES.PV,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
+          external_id: getDeviceFeatureExternalId({
+            ...device,
+            property: PROPERTY.DCV,
+          }),
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.VOLT,
+          has_feedback: false,
+          min: 0,
+          max: 400,
+          last_value: 0,
+        });
 
-      newDevice.features.push({
-        name: getDeviceFeatureName({
-          ...device,
-          property: PROPERTY.DCW,
-        }),
-        selector: slugify(`sunspec-device-${device.serialNumber}-${device.mppt}-${PROPERTY.DCW}`),
-        category: DEVICE_FEATURE_CATEGORIES.PV,
-        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
-        external_id: getDeviceFeatureExternalId({
-          ...device,
-          property: PROPERTY.DCW,
-        }),
-        read_only: true,
-        unit: DEVICE_FEATURE_UNITS.WATT,
-        has_feedback: false,
-        min: 0,
-        max: 10000,
-        last_value: 0,
-      });
+        newDevice.features.push({
+          name: getDeviceFeatureName({
+            ...device,
+            property: PROPERTY.DCW,
+          }),
+          selector: slugify(
+            getDeviceFeatureExternalId({
+              ...device,
+              property: PROPERTY.DCW,
+            }),
+          ),
+          category: DEVICE_FEATURE_CATEGORIES.PV,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+          external_id: getDeviceFeatureExternalId({
+            ...device,
+            property: PROPERTY.DCW,
+          }),
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.WATT,
+          has_feedback: false,
+          min: 0,
+          max: 10000,
+          last_value: 0,
+        });
 
-      newDevice.features.push({
-        name: getDeviceFeatureName({
-          ...device,
-          property: PROPERTY.DCWH,
-        }),
-        selector: slugify(`sunspec-device-${device.serialNumber}-${device.mppt}-${PROPERTY.DCWH}`),
-        category: DEVICE_FEATURE_CATEGORIES.PV,
-        type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
-        external_id: getDeviceFeatureExternalId({
-          ...device,
-          property: PROPERTY.DCWH,
-        }),
-        read_only: true,
-        unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
-        has_feedback: false,
-        min: 0,
-        max: 1000000,
-        last_value: 0,
-      });
+        newDevice.features.push({
+          name: getDeviceFeatureName({
+            ...device,
+            property: PROPERTY.DCWH,
+          }),
+          selector: slugify(
+            getDeviceFeatureExternalId({
+              ...device,
+              property: PROPERTY.DCWH,
+            }),
+          ),
+          category: DEVICE_FEATURE_CATEGORIES.PV,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          external_id: getDeviceFeatureExternalId({
+            ...device,
+            property: PROPERTY.DCWH,
+          }),
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          has_feedback: false,
+          min: 0,
+          max: 1000000,
+          last_value: 0,
+        });
+      } else {
+        newDevice.features.push({
+          name: getDeviceFeatureName({
+            ...device,
+            property: PROPERTY.ACA,
+          }),
+          selector: slugify(
+            getDeviceFeatureExternalId({
+              ...device,
+              property: PROPERTY.ACA,
+            }),
+          ),
+          category: DEVICE_FEATURE_CATEGORIES.PV,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+          external_id: getDeviceFeatureExternalId({
+            ...device,
+            property: PROPERTY.ACA,
+          }),
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.AMPERE,
+          has_feedback: false,
+          min: 0,
+          max: 400,
+          last_value: 0,
+        });
 
+        newDevice.features.push({
+          name: getDeviceFeatureName({
+            ...device,
+            property: PROPERTY.ACV,
+          }),
+          selector: slugify(
+            getDeviceFeatureExternalId({
+              ...device,
+              property: PROPERTY.ACV,
+            }),
+          ),
+          category: DEVICE_FEATURE_CATEGORIES.PV,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.VOLTAGE,
+          external_id: getDeviceFeatureExternalId({
+            ...device,
+            property: PROPERTY.ACV,
+          }),
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.VOLT,
+          has_feedback: false,
+          min: 0,
+          max: 400,
+          last_value: 0,
+        });
+
+        newDevice.features.push({
+          name: getDeviceFeatureName({
+            ...device,
+            property: PROPERTY.ACW,
+          }),
+          selector: slugify(
+            getDeviceFeatureExternalId({
+              ...device,
+              property: PROPERTY.ACW,
+            }),
+          ),
+          category: DEVICE_FEATURE_CATEGORIES.PV,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.POWER,
+          external_id: getDeviceFeatureExternalId({
+            ...device,
+            property: PROPERTY.ACW,
+          }),
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.VOLT_AMPERE,
+          has_feedback: false,
+          min: 0,
+          max: 10000,
+          last_value: 0,
+        });
+
+        newDevice.features.push({
+          name: getDeviceFeatureName({
+            ...device,
+            property: PROPERTY.ACWH,
+          }),
+          selector: slugify(
+            getDeviceFeatureExternalId({
+              ...device,
+              property: PROPERTY.ACWH,
+            }),
+          ),
+          category: DEVICE_FEATURE_CATEGORIES.PV,
+          type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY,
+          external_id: getDeviceFeatureExternalId({
+            ...device,
+            property: PROPERTY.ACWH,
+          }),
+          read_only: true,
+          unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+          has_feedback: false,
+          min: 0,
+          max: 1000000,
+          last_value: 0,
+        });
+      }
       return newDevice;
     })
     .filter((newDevice) => newDevice.features && newDevice.features.length > 0);

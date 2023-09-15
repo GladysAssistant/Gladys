@@ -6,7 +6,8 @@
  * getDeviceName(device);
  */
 function getDeviceName(device) {
-  return `${device.manufacturer} ${device.product} [${device.mppt}]`;
+  const type = device.mppt !== undefined ? `DC ${device.mppt}` : `AC`;
+  return `${device.manufacturer} ${device.product} [${type}]`;
 }
 
 /**
@@ -17,7 +18,8 @@ function getDeviceName(device) {
  * getDeviceExternalId(device);
  */
 function getDeviceExternalId(device) {
-  return `sunspec:serialnumber:${device.serialNumber}:mptt:${device.mppt}`;
+  const type = device.mppt !== undefined ? `dc${device.mppt}` : `ac`;
+  return `sunspec:serialnumber:${device.serialNumber}:mppt:${type}`;
 }
 
 /**
@@ -28,7 +30,8 @@ function getDeviceExternalId(device) {
  * getDeviceFeatureName(feature);
  */
 function getDeviceFeatureName(feature) {
-  return `${feature.manufacturer} ${feature.product} [${feature.mppt}] - ${feature.property}`;
+  const type = feature.mppt !== undefined ? `DC ${feature.mppt}` : `AC`;
+  return `${feature.manufacturer} ${feature.product} [${type}] - ${feature.property}`;
 }
 
 /**
@@ -39,7 +42,8 @@ function getDeviceFeatureName(feature) {
  * getDeviceFeatureExternalId({});
  */
 function getDeviceFeatureExternalId(device) {
-  return `sunspec:serialnumber:${device.serialNumber}:mptt:${device.mppt}:property:${device.property}`;
+  const type = device.mppt !== undefined ? `dc${device.mppt}` : `ac`;
+  return `sunspec:serialnumber:${device.serialNumber}:mppt:${type}:property:${device.property}`;
 }
 
 /**
@@ -52,7 +56,13 @@ function getDeviceFeatureExternalId(device) {
 function getDeviceInfoByExternalId(externalId) {
   const array = externalId.split(':');
   const serialNumber = array[2];
-  const mppt = parseInt(array[4], 10);
+  const type = array[4];
+  let mppt;
+  if (type === 'AC') {
+    mppt = undefined;
+  } else {
+    mppt = parseInt(type.split(' ')[1], 10);
+  }
   const property = array[6];
   return {
     serialNumber,

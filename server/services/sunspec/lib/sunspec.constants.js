@@ -18,6 +18,12 @@ const UNIT_ID = {
   SID: 126,
 };
 
+const TYPE = {
+  INVERTER_1_PHASE: 0,
+  INVERTER_3_PHASE: 1,
+  INVERTER_SPLIT_PHASE: 2,
+};
+
 const REGISTER = {
   SID: 40001,
   MODEL_ID: 40003,
@@ -31,6 +37,14 @@ const REGISTER = {
 
 const MODEL = {
   COMMON: 1,
+  INVERTER_1_PHASE: 101,
+  INVERTER_SPLIT_PHASE: 102,
+  INVERTER_3_PHASE: 103,
+  NAMEPLATE: 120,
+  BASIC_SETTINGS: 121,
+  MEASUREMENTS_STATUS: 122,
+  IMMEDIATE_CONTROLS: 123,
+  STORAGE: 124,
   MPPT_INVERTER_EXTENSION: 160,
 };
 
@@ -46,6 +60,7 @@ const PARAMS = {
   PRODUCT: 'PRODUCT',
   SERIAL_NUMBER: 'SERIAL_NUMBER',
   SW_VERSION: 'SW_VERSION',
+  TYPE: 'TYPE',
 };
 
 const PROPERTY = {
@@ -53,6 +68,10 @@ const PROPERTY = {
   DCV: 'DCV',
   DCW: 'DCW',
   DCWH: 'DCWH',
+  ACA: 'ACA',
+  ACV: 'ACV',
+  ACW: 'ACW',
+  ACWH: 'ACWH',
 };
 
 module.exports = {
@@ -63,6 +82,7 @@ module.exports = {
   REGISTER,
   MODEL,
   DEFAULT,
+  TYPE,
   PARAMS,
   PROPERTY,
 };
