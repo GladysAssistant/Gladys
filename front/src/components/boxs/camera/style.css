@@ -7,4 +7,6 @@
   margin-bottom: 0px;
   display: table-cell;
   vertical-align: middle;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
 }
