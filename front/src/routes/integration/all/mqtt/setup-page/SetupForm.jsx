@@ -73,7 +73,7 @@ class SetupForm extends Component {
               value={props.mqttUsername}
               class="form-control"
               onInput={this.updateUsername}
-              autoComplete="no"
+              autocomplete="off"
               disabled={gladysNotAvailable}
             />
           </Localizer>
@@ -93,7 +93,7 @@ class SetupForm extends Component {
                 value={props.mqttPassword}
                 class="form-control"
                 onInput={this.updatePassword}
-                autoComplete="new-password"
+                autocomplete="off"
                 disabled={gladysNotAvailable}
               />
             </Localizer>
