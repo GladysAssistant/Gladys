@@ -17,7 +17,7 @@ class ModelFactory {
     localOffset += 1;
     res.mppt[mppt].DCW = (readUInt16(data, localOffset) * 10 ** dcwSf).toFixed(0);
     localOffset += 1;
-     // Sunspec = Wh, Gladys kWh
+    // Sunspec = Wh, Gladys kWh
     res.mppt[mppt].DCWH = ((readUInt32(data, localOffset) * 10 ** dcwhSf) / 1000).toFixed(0);
     localOffset += 2;
     res.mppt[mppt].Tms = readUInt32(data, localOffset);
