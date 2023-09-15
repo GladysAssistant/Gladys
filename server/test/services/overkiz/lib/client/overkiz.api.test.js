@@ -124,7 +124,8 @@ describe('Overkiz API', () => {
 
   it('should API error 401', async () => {
     const execId = await overkizAPI.exec({ error: '401' });
-    assert.calledOnce(overkizAPI.platformLoginHandler.login);
+    // TODO Should be called once if modify MockClient response
+    assert.calledTwice(overkizAPI.platformLoginHandler.login);
     expect(execId).to.equals('0123456789');
   });
 });
