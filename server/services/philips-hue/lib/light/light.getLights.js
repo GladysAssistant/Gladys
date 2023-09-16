@@ -54,7 +54,7 @@ async function getLights() {
             selector: `${LIGHT_EXTERNAL_ID_BASE}:${serialNumber}:${philipsHueLight.id}`,
             should_poll: true,
             model: philipsHueLight.modelid,
-            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+            poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_15_SECONDS,
             features: [],
             not_handled: true,
             raw_philips_hue_device: philipsHueLight,

@@ -13,7 +13,7 @@ const getPhilipsHueWhiteTemperatureLight = (philipsHueLight, bridgeSerialNumber,
   selector: `${LIGHT_EXTERNAL_ID_BASE}:${bridgeSerialNumber}:${philipsHueLight.id}`,
   should_poll: true,
   model: philipsHueLight.modelid,
-  poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
+  poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_15_SECONDS,
   features: [
     {
       name: `${philipsHueLight.name} On/Off`,
