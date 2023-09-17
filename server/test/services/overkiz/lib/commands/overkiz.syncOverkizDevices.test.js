@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-expressions */
 const sinon = require('sinon');
 
-const { fake } = sinon;
+const { fake, assert } = sinon;
 const { expect } = require('chai');
 
 const OverkizHandler = require('../../../../../services/overkiz/lib/index');
@@ -56,7 +56,7 @@ describe('SyncOverkizDevices command', () => {
     overkizHandler.connected = false;
     try {
       await overkizHandler.syncOverkizDevices();
-      expect(true).to.be.false;
+      assert.fail();
     } catch (e) {
       expect(e).to.be.instanceof(ServiceNotConfiguredError);
       expect(e.message).to.be.equal('OVERKIZ_NOT_CONNECTED');

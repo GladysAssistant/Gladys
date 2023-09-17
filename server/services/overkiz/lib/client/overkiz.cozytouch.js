@@ -1,7 +1,7 @@
 const axios = require('axios');
 const url = require('url');
 const logger = require('../../../../utils/logger');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { PasswordNotMatchingError } = require('../../../../utils/coreErrors');
 
 const client = axios.create({
   timeout: 10000,
@@ -47,7 +47,7 @@ class CozytouchLoginHandler {
     });
 
     if (response.success === false) {
-      throw new ServiceNotConfiguredError('Unable to login');
+      throw new PasswordNotMatchingError();
     }
 
     this.cookie = response.headers['set-cookie'][0].split(' ')[0].slice(0, -1);

@@ -2,7 +2,6 @@ const logger = require('../../../../utils/logger');
 const { getDeviceFeatureExternalId, getNodeStateInfoByExternalId } = require('../utils/overkiz.externalId');
 const { unbindValue } = require('../utils/overkiz.bindValue');
 const { EVENTS, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
-const { DEVICE_STATES } = require('../overkiz.constants');
 
 /**
  * @description Update device states.
@@ -16,31 +15,11 @@ async function getDevicesStates(device) {
 
   device.features.map(async (feature) => {
     const { deviceURL } = getNodeStateInfoByExternalId(feature);
-
     const deviceStates = await this.overkizServerAPI.get(`setup/devices/${encodeURIComponent(deviceURL)}/states`);
 
     logger.info(`Overkiz : Get new device states: ${deviceURL}`);
-
-    deviceStates.forEach((state) => {
-      switch (state.name) {
-        case DEVICE_STATES.COMFORT_TEMPERATURE_STATE:
-        case DEVICE_STATES.TARGET_TEMPERATURE_STATE: // Consigne
-        case DEVICE_STATES.ECO_TEMPERATURE_STATE:
-        case DEVICE_STATES.HEATING_LEVEL_STATE: // Mode
-          logger.info(`${state.name} has value ${state.value}`);
-          break;
-        case 'core:EcoRoomTemperatureState':
-          logger.warn(
-            `${state.name} has value ${state.value} BUT SHOULD NOT IT BE io:EffectiveTemperatureSetpointState`,
-          );
-          break;
-        default:
-        //
-      }
-    });
-
-    deviceStates.forEach((state) => {
-      const deviceFeatureExternalId = getDeviceFeatureExternalId({ URL: deviceURL }, state.name);
+    deviceStates.forEach(async (state) => {
+      const deviceFeatureExternalId = getDeviceFeatureExternalId({ deviceURL }, state.name);
       const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
       const newValueUnbind = unbindValue(device, deviceFeature, state.value);
       if (deviceFeature) {

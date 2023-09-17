@@ -115,8 +115,7 @@ describe('Overkiz API', () => {
   it('should API error', async () => {
     try {
       await overkizAPI.exec({ error: 'ERROR' });
-      // eslint-disable-next-line no-unused-expressions
-      expect(true).to.be.false;
+      assert.fail();
     } catch (e) {
       expect(e).to.be.instanceOf(Error);
     }

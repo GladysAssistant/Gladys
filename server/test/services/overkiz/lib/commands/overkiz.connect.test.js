@@ -59,7 +59,7 @@ describe('Connect command', () => {
     overkizHandler.gladys.variable = variable;
     try {
       await overkizHandler.connect();
-      expect(true).to.be.false;
+      assert.fail();
     } catch (e) {
       expect(e).to.be.instanceof(ServiceNotConfiguredError);
       expect(e.message).to.be.equal('OVERKIZ_TYPE');
@@ -78,7 +78,7 @@ describe('Connect command', () => {
     overkizHandler.gladys.variable = variable;
     try {
       await overkizHandler.connect();
-      expect(true).to.be.false;
+      assert.fail();
     } catch (e) {
       expect(e).to.be.instanceof(ServiceNotConfiguredError);
       expect(e.message).to.be.equal('OVERKIZ_SERVER_USERNAME');
@@ -99,7 +99,7 @@ describe('Connect command', () => {
     overkizHandler.gladys.variable = variable;
     try {
       await overkizHandler.connect();
-      expect(true).to.be.false;
+      assert.fail();
     } catch (e) {
       expect(e).to.be.instanceof(ServiceNotConfiguredError);
       expect(e.message).to.be.equal('OVERKIZ_SERVER_PASSWORD');

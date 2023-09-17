@@ -1,10 +1,11 @@
 const sinon = require('sinon');
 
-const { fake } = sinon;
+const { fake, assert, stub } = sinon;
 
 const proxyquire = require('proxyquire');
 const { expect } = require('chai');
 const { DEVICE_STATES } = require('../../../../../services/overkiz/lib/overkiz.constants');
+const { EVENTS } = require('../../../../../utils/constants');
 
 describe('GetDevicesStates command', () => {
   let gladys;
@@ -15,7 +16,15 @@ describe('GetDevicesStates command', () => {
   beforeEach(() => {
     gladys = {
       stateManager: {
-        get: fake.returns({}),
+        get: stub()
+          .onFirstCall()
+          .returns({ external_id: `overkiz:deviceURL:deviceURL:state:core:TargetTemperatureState` })
+          .onSecondCall()
+          .returns({ external_id: `overkiz:deviceURL:deviceURL:state:io:TargetHeatingLevelState` })
+          .onThirdCall()
+          .returns({ external_id: `overkiz:deviceURL:deviceURL:state:core:ComfortRoomTemperatureState` })
+          .onCall(3)
+          .returns({ external_id: `overkiz:deviceURL:deviceURL:state:io:EffectiveTemperatureSetpointState` }),
       },
     };
     eventManager = {
@@ -52,7 +61,7 @@ describe('GetDevicesStates command', () => {
 
   it('should getDevicesStates', async () => {
     const device = {
-      external_id: 'overkiz:',
+      external_id: 'overkiz:deviceURL:io://0814-0291-7832/11410052',
       features: [
         {
           external_id: 'overkiz:deviceURL:io://0814-0291-7832/11410052#1:state:core:TargetTemperatureState',
@@ -69,5 +78,24 @@ describe('GetDevicesStates command', () => {
         external_id: 'overkiz:deviceURL:io://0814-0291-7832/11410052#1:state:core:TargetTemperatureState',
       },
     ]);
+    assert.callCount(eventManager.emit, 4);
+    assert.calledWithExactly(eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'overkiz:deviceURL:io://0814-0291-7832/11410052#1:state:io:TargetHeatingLevelState',
+      state: '0',
+    });
+    assert.calledWithExactly(eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id:
+        'overkiz:deviceURL:io://0814-0291-7832/11410052#1:state:core:ComfortRoomTemperatureState',
+      state: '18',
+    });
+    assert.calledWithExactly(eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id:
+        'overkiz:deviceURL:io://0814-0291-7832/11410052#1:state:io:EffectiveTemperatureSetpointState',
+      state: '20',
+    });
+    assert.calledWithExactly(eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'overkiz:deviceURL:io://0814-0291-7832/11410052#1:state:core:TargetTemperatureState',
+      state: '20',
+    });
   });
 });
