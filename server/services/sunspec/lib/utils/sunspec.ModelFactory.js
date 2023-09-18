@@ -88,9 +88,9 @@ class ModelFactory {
         // eslint-disable-next-line no-case-declarations
         const acaSf = readInt16(data, 6);
         res.ACA = (readUInt16(data, 2) * 10 ** acaSf).toFixed(2);
-        res.ACA_A = (readUInt16(data, 3) * 10 ** acaSf).toFixed(2);
-        res.ACA_B = (readUInt16(data, 4) * 10 ** acaSf).toFixed(2);
-        res.ACA_C = (readUInt16(data, 5) * 10 ** acaSf).toFixed(2);
+        // res.ACA_A = (readUInt16(data, 3) * 10 ** acaSf).toFixed(2);
+        // res.ACA_B = (readUInt16(data, 4) * 10 ** acaSf).toFixed(2);
+        // res.ACA_C = (readUInt16(data, 5) * 10 ** acaSf).toFixed(2);
 
         // eslint-disable-next-line no-case-declarations
         const acvSf = readInt16(data, 13);

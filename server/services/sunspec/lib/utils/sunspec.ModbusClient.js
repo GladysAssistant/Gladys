@@ -16,6 +16,7 @@ class ModbusClient {
       const sid = await this.readRegisterAsInt32(REGISTER.SID);
       if (sid !== DEFAULT.SUNSPEC_MODBUS_MAP) {
         logger.error(`Invalid SID received. Expected ${DEFAULT.SUNSPEC_MODBUS_MAP} but got ${sid}`);
+        return;
       }
       const model = await this.readRegisterAsInt16(REGISTER.MODEL_ID);
       if (model !== DEFAULT.SUNSPEC_COMMON_MODEL) {

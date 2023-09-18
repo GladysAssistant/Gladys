@@ -88,6 +88,64 @@ describe('SunSpec scanDevices', () => {
     });
   });
 
+  it('should find device 3-AC', async () => {
+    sunspecManager.devices.push({
+      manufacturer: 'manufacturer',
+      product: 'product',
+      serialNumber: 'serialNumber',
+      swVersion: 'swVersion',
+    });
+    sunspecManager.modbus.readModel = stub()
+      .onFirstCall()
+      .returns({
+        readUInt16BE: stub()
+          .onFirstCall()
+          .returns(103)
+          .onSecondCall() // ACA
+          .returns(1)
+          .onThirdCall() // acvA
+          .returns(2)
+          .onCall(3) // acvB
+          .returns(3)
+          .onCall(4) // acvC
+          .returns(4),
+        readInt16BE: stub()
+          .onFirstCall() // acaSf
+          .returns(1)
+          .onSecondCall() // acvSf
+          .returns(2)
+          .onThirdCall() // acwSf
+          .returns(3)
+          .onCall(3) // ACW
+          .returns(4)
+          .onCall(4) // acwhSf
+          .returns(5),
+        readUInt32BE: stub()
+          .onFirstCall()
+          .returns(1)
+          .onSecondCall() // ACWH
+          .returns(2),
+      });
+    await ScanDevices.call(sunspecManager);
+    assert.callCount(gladys.event.emit, 4);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACA',
+      state: '10.00',
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACV',
+      state: '300',
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACW',
+      state: '4000',
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACWH',
+      state: '100',
+    });
+  });
+
   it('should find device DC', async () => {
     sunspecManager.devices.push({
       manufacturer: 'manufacturer',

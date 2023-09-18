@@ -46,35 +46,9 @@ function getDeviceFeatureExternalId(device) {
   return `sunspec:serialnumber:${device.serialNumber}:mppt:${type}:property:${device.property}`;
 }
 
-/**
- * @description Return device info of devicefeature.
- * @param {object} externalId - The externalId.
- * @returns {object} Return all informations.
- * @example
- * getDeviceInfoByExternalId(externalId);
- */
-function getDeviceInfoByExternalId(externalId) {
-  const array = externalId.split(':');
-  const serialNumber = array[2];
-  const type = array[4];
-  let mppt;
-  if (type === 'AC') {
-    mppt = undefined;
-  } else {
-    mppt = parseInt(type.split(' ')[1], 10);
-  }
-  const property = array[6];
-  return {
-    serialNumber,
-    mppt,
-    property,
-  };
-}
-
 module.exports = {
   getDeviceName,
   getDeviceExternalId,
   getDeviceFeatureName,
   getDeviceFeatureExternalId,
-  getDeviceInfoByExternalId,
 };
