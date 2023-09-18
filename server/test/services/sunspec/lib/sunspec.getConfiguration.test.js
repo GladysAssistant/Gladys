@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
+const { stub } = sinon;
+
 const SunSpecManager = require('../../../../services/sunspec/lib');
 const ModbusTCPMock = require('./utils/ModbusTCPMock.test');
 
@@ -20,8 +22,7 @@ describe('SunSpec getConfiguration', () => {
   });
 
   it('get config from service', async () => {
-    gladys.variable.getValue = sinon
-      .stub()
+    gladys.variable.getValue = stub()
       .onFirstCall()
       .returns('sunspecUrl')
       .onSecondCall()

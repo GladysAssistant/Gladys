@@ -52,11 +52,11 @@ class ModelFactory {
       case MODEL.INVERTER_1_PHASE: {
         // eslint-disable-next-line no-case-declarations
         const acaSf = readInt16(data, 6);
-        res.ACA = (readUInt16(data, 2) * 10 ** acaSf).toFixed(0);
+        res.ACA = (readUInt16(data, 2) * 10 ** acaSf).toFixed(2);
 
         // eslint-disable-next-line no-case-declarations
         const acvSf = readInt16(data, 13);
-        res.ACV = (readUInt16(data, 10) * 10 ** acvSf).toFixed(2);
+        res.ACV = (readUInt16(data, 10) * 10 ** acvSf).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
         const acwSf = readInt16(data, 15);
@@ -87,23 +87,23 @@ class ModelFactory {
       case MODEL.INVERTER_3_PHASE: {
         // eslint-disable-next-line no-case-declarations
         const acaSf = readInt16(data, 6);
-        res.ACA = (readUInt16(data, 2) * 10 ** acaSf).toFixed(0);
-        res.ACA_A = (readUInt16(data, 3) * 10 ** acaSf).toFixed(0);
-        res.ACA_B = (readUInt16(data, 4) * 10 ** acaSf).toFixed(0);
-        res.ACA_C = (readUInt16(data, 5) * 10 ** acaSf).toFixed(0);
+        res.ACA = (readUInt16(data, 2) * 10 ** acaSf).toFixed(2);
+        res.ACA_A = (readUInt16(data, 3) * 10 ** acaSf).toFixed(2);
+        res.ACA_B = (readUInt16(data, 4) * 10 ** acaSf).toFixed(2);
+        res.ACA_C = (readUInt16(data, 5) * 10 ** acaSf).toFixed(2);
 
         // eslint-disable-next-line no-case-declarations
         const acvSf = readInt16(data, 13);
-        // res.ACV_AB = (readUInt16(data, 7) * 10 ** acvSf).toFixed(2);
-        // res.ACV_BC = (readUInt16(data, 8) * 10 ** acvSf).toFixed(2);
-        // res.ACV_CA = (readUInt16(data, 9) * 10 ** acvSf).toFixed(2);
-        // res.ACV_AN = (readUInt16(data, 10) * 10 ** acvSf).toFixed(2);
-        // res.ACV_BN = (readUInt16(data, 11) * 10 ** acvSf).toFixed(2);
-        // res.ACV_CN = (readUInt16(data, 12) * 10 ** acvSf).toFixed(2);
+        // res.ACV_AB = (readUInt16(data, 7) * 10 ** acvSf).toFixed(0);
+        // res.ACV_BC = (readUInt16(data, 8) * 10 ** acvSf).toFixed(0);
+        // res.ACV_CA = (readUInt16(data, 9) * 10 ** acvSf).toFixed(0);
+        // res.ACV_AN = (readUInt16(data, 10) * 10 ** acvSf).toFixed(0);
+        // res.ACV_BN = (readUInt16(data, 11) * 10 ** acvSf).toFixed(0);
+        // res.ACV_CN = (readUInt16(data, 12) * 10 ** acvSf).toFixed(0);
         const acvA = readUInt16(data, 10) * 10 ** acvSf;
         const acvB = readUInt16(data, 11) * 10 ** acvSf;
         const acvC = readUInt16(data, 12) * 10 ** acvSf;
-        res.ACV = ((acvA + acvB + acvC) / 3).toFixed(2);
+        res.ACV = ((acvA + acvB + acvC) / 3).toFixed(0);
 
         // eslint-disable-next-line no-case-declarations
         const acwSf = readInt16(data, 15);

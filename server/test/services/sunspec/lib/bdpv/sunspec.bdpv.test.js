@@ -3,7 +3,7 @@ const proxyquire = require('proxyquire');
 const sinon = require('sinon');
 const { PROPERTY } = require('../../../../../services/sunspec/lib/sunspec.constants');
 
-const { fake, assert } = sinon;
+const { fake, assert, stub } = sinon;
 
 describe('SunSpec BDPV', () => {
   let gladys;
@@ -24,8 +24,7 @@ describe('SunSpec BDPV', () => {
         }),
       },
       variable: {
-        getValue: sinon
-          .stub()
+        getValue: stub()
           .onFirstCall()
           .returns('SUNSPEC_BDPV_USER_NAME')
           .onSecondCall()

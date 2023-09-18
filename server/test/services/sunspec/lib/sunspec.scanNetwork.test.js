@@ -4,7 +4,7 @@ const { expect } = require('chai');
 const proxyquire = require('proxyquire');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const { fake, assert } = sinon;
+const { fake, assert, stub } = sinon;
 
 const ScanNetwork = proxyquire('../../../../services/sunspec/lib/sunspec.scanNetwork', {
   './utils/sunspec.ModelFactory': {},
@@ -25,16 +25,13 @@ describe('SunSpec scanNetwork', () => {
     sunspecManager = {
       gladys,
       modbus: {
-        readModel: sinon
-          .stub()
+        readModel: stub()
           .onFirstCall()
           .returns({
-            readUInt16BE: sinon
-              .stub()
+            readUInt16BE: stub()
               .onFirstCall()
               .returns(1),
-            subarray: sinon
-              .stub()
+            subarray: stub()
               .onFirstCall()
               .returns('manufacturer')
               .onSecondCall()

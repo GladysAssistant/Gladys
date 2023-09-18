@@ -3,13 +3,13 @@ const sinon = require('sinon');
 const proxyquire = require('proxyquire');
 const { EVENTS } = require('../../../../utils/constants');
 
-const { fake, assert } = sinon;
+const { fake, assert, stub } = sinon;
 
 const ScanDevices = proxyquire('../../../../services/sunspec/lib/sunspec.scanDevices', {
   './utils/sunspec.ModelFactory': {},
 }).scanDevices;
 
-describe('SunSpec updateConfiguration', () => {
+describe('SunSpec scanDevices', () => {
   // PREPARE
   let gladys;
   let sunspecManager;
@@ -24,56 +24,9 @@ describe('SunSpec updateConfiguration', () => {
     sunspecManager = {
       gladys,
       modbus: {
-        readModel: sinon
-          .stub()
-          .onFirstCall()
-          .returns({
-            readUInt16BE: sinon
-              .stub()
-              .onFirstCall()
-              .returns(160)
-              .onSecondCall() // MPTT
-              .returns(1)
-              .onCall(3) // ID
-              .returns(1)
-              .onCall(4) // DCA
-              .returns(1)
-              .onCall(5) // DCV
-              .returns(1)
-              .onCall(6) // DCW
-              .returns(1),
-            readInt16BE: sinon
-              .stub()
-              .onFirstCall()
-              .returns(1)
-              .onSecondCall()
-              .returns(2)
-              .onThirdCall()
-              .returns(3)
-              .onCall(3)
-              .returns(4)
-              .onCall(4)
-              .returns(0)
-              .onCall(5)
-              .returns(0),
-            readUInt32BE: sinon
-              .stub()
-              .onFirstCall()
-              .returns(1)
-              .onSecondCall() // DCWH
-              .returns(2),
-            subarray: fake.returns('IDStr'),
-          }),
+        readModel: fake.throws(new Error('Model must be defined')),
       },
-      devices: [
-        {
-          manufacturer: 'manufacturer',
-          product: 'product',
-          serialNumber: 'serialNumber',
-          swVersion: 'swVersion',
-          mppt: 1,
-        },
-      ],
+      devices: [],
     };
   });
 
@@ -81,23 +34,120 @@ describe('SunSpec updateConfiguration', () => {
     sinon.reset();
   });
 
-  it('should find device', async () => {
+  it('should find device AC', async () => {
+    sunspecManager.devices.push({
+      manufacturer: 'manufacturer',
+      product: 'product',
+      serialNumber: 'serialNumber',
+      swVersion: 'swVersion',
+    });
+    sunspecManager.modbus.readModel = stub()
+      .onFirstCall()
+      .returns({
+        readUInt16BE: stub()
+          .onFirstCall()
+          .returns(101)
+          .onSecondCall() // ACA
+          .returns(1)
+          .onThirdCall() // ACV
+          .returns(2),
+        readInt16BE: stub()
+          .onFirstCall() // acaSf
+          .returns(1)
+          .onSecondCall() // acvSf
+          .returns(2)
+          .onThirdCall() // acwSf
+          .returns(3)
+          .onCall(3) // ACW
+          .returns(4)
+          .onCall(4) // acwhSf
+          .returns(5),
+        readUInt32BE: stub()
+          .onFirstCall()
+          .returns(1)
+          .onSecondCall() // ACWH
+          .returns(2),
+      });
     await ScanDevices.call(sunspecManager);
     assert.callCount(gladys.event.emit, 4);
     assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:dc1:property:DCA',
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACA',
       state: '10.00',
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:dc1:property:DCV',
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACV',
+      state: '200',
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACW',
+      state: '4000',
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACWH',
+      state: '100',
+    });
+  });
+
+  it('should find device DC', async () => {
+    sunspecManager.devices.push({
+      manufacturer: 'manufacturer',
+      product: 'product',
+      serialNumber: 'serialNumber',
+      swVersion: 'swVersion',
+      mppt: 1,
+    });
+    sunspecManager.modbus.readModel = stub()
+      .onFirstCall()
+      .returns({
+        readUInt16BE: stub()
+          .onFirstCall()
+          .returns(160)
+          .onSecondCall() // MPPT
+          .returns(1)
+          .onCall(3) // ID
+          .returns(1)
+          .onCall(4) // DCA
+          .returns(1)
+          .onCall(5) // DCV
+          .returns(1)
+          .onCall(6) // DCW
+          .returns(1),
+        readInt16BE: stub()
+          .onFirstCall()
+          .returns(1)
+          .onSecondCall()
+          .returns(2)
+          .onThirdCall()
+          .returns(3)
+          .onCall(3)
+          .returns(4)
+          .onCall(4)
+          .returns(0)
+          .onCall(5)
+          .returns(0),
+        readUInt32BE: stub()
+          .onFirstCall()
+          .returns(1)
+          .onSecondCall() // DCWH
+          .returns(2),
+        subarray: fake.returns('IDStr'),
+      });
+    await ScanDevices.call(sunspecManager);
+    assert.callCount(gladys.event.emit, 4);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCA',
+      state: '10.00',
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCV',
       state: '100',
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:dc1:property:DCW',
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCW',
       state: '1000',
     });
     assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mptt:dc1:property:DCWH',
+      device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCWH',
       state: '20',
     });
   });
