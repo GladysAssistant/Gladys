@@ -1,11 +1,13 @@
 const cloneDeep = require('lodash.clonedeep');
 const { promisify } = require('util');
 
+const path = require('path');
 const logger = require('../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 
 const containerDescriptor = require('../docker/gladys-node-red-container.json');
 const { PlatformNotCompatible } = require('../../../utils/coreErrors');
+const { DEFAULT } = require('./constants');
 
 const sleep = promisify(setTimeout);
 
@@ -33,6 +35,8 @@ async function installContainer(config) {
     throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
   }
 
+  const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
+
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,
     filters: { name: [containerDescriptor.name] },
@@ -51,6 +55,11 @@ async function installContainer(config) {
 
       logger.info(`Creation of container...`);
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
+
+      const configFilepath = path.join(basePathOnHost, path.dirname(DEFAULT.CONFIGURATION_PATH));
+
+      containerDescriptorToMutate.HostConfig.Binds = [`${configFilepath}:/data`];
+
       const containerLog = await this.gladys.system.createContainer(containerDescriptorToMutate);
       logger.trace(containerLog);
 

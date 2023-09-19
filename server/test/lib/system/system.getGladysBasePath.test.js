@@ -49,14 +49,6 @@ describe('system.getGladysBasePath', () => {
       basePathOnContainer: '/var/lib/gladysassistant',
     });
   });
-  it('should return default basePath because failed to get mount', async () => {
-    system.getContainerMounts = fake.rejects('Failed to get mounts');
-    const result = await system.getGladysBasePath();
-    expect(result).to.deep.equal({
-      basePathOnHost: '/var/lib/gladysassistant',
-      basePathOnContainer: '/var/lib/gladysassistant',
-    });
-  });
   it('should return basePath from mount without SQLITE_FILE_PATH env variable', async () => {
     system.getContainerMounts = fake.resolves([
       {

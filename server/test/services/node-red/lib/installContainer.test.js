@@ -79,7 +79,7 @@ describe('NodeRed installContainer', () => {
       AttachStdout: false,
       ExposedPorts: { '1880/tcp': {} },
       HostConfig: {
-        Binds: ['/var/lib/gladysassistant/node-red:/data'],
+        Binds: ['../.tmp/node-red:/data'],
         BlkioWeightDevice: [],
         Devices: [],
         Dns: [],
