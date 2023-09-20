@@ -257,7 +257,8 @@
       },
       "humidityInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
-        "noHumidityRecorded": "No humidity recorded recently."
+        "noHumidityRecorded": "No humidity recorded recently.",
+        "thresholdsLabel": "Configure custom thresholds"
       },
       "userPresence": {
         "description": "Display who's at home and who is not. You can change the user presence in scenes, and select here the users displayed.",
@@ -269,7 +270,7 @@
       },
       "camera": {
         "editCameraLabel": "Select the camera you want to display here.",
-        "noImageToShow": "No image to show",
+        "noImageToShow": "No image to show. Are you sure you camera is connected and accessible to Gladys?",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box",
         "latencyBoxName": "Latency",
