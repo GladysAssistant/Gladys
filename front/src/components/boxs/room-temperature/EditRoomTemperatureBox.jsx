@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Localizer, Text } from 'preact-i18n';
+import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 import ReactSlider from 'react-slider';
 

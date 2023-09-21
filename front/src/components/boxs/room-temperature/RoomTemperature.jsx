@@ -5,11 +5,7 @@ import get from 'get-value';
 
 import actions from '../../../actions/dashboard/boxes/temperatureInRoom';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
-import {
-  DEFAULT_VALUE_HUMIDITY,
-  DEFAULT_VALUE_TEMPERATURE,
-  WEBSOCKET_MESSAGE_TYPES
-} from '../../../../../server/utils/constants';
+import { DEFAULT_VALUE_TEMPERATURE, WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 
 const isNotNullOrUndefined = value => value !== undefined && value !== null;
 
@@ -34,7 +30,7 @@ const RoomTemperatureBox = ({ children, ...props }) => (
         </span>
       )}
       {!isNotNullOrUndefined(props.temperature) && (
-        <span class="stamp stamp-md bg-red-dark mr-3">
+        <span class="stamp stamp-md bg-warning mr-3">
           <i class="fe fe-thermometer" />
         </span>
       )}
