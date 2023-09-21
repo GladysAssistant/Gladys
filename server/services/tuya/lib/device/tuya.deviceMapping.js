@@ -14,6 +14,7 @@ const SWITCH_3 = 'switch_3';
 const SWITCH_4 = 'switch_4';
 
 const CONTROL = 'control';
+const PERCENT_CONTROL = 'percent_control';
 
 const OPEN = 'open';
 const CLOSE = 'close';
@@ -61,6 +62,10 @@ const mappings = {
     category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
     type: DEVICE_FEATURE_TYPES.CURTAIN.STATE,
   },
+  [PERCENT_CONTROL]: {
+    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
+    type: DEVICE_FEATURE_TYPES.CURTAIN.POSITION,
+  },
 };
 
 const writeValues = {
@@ -101,6 +106,9 @@ const writeValues = {
       }
       return STOP;
     },
+    [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: (valueFromGladys) => {
+      return parseInt(valueFromGladys, 10);
+    },
   },
 };
 
@@ -137,6 +145,9 @@ const readValues = {
         return COVER_STATE.CLOSE;
       }
       return COVER_STATE.STOP;
+    },
+    [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: (valueFromDevice) => {
+      return valueFromDevice;
     },
   },
 };

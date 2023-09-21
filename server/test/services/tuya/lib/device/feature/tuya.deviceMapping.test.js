@@ -44,6 +44,10 @@ describe('Tuya device mapping', () => {
         expect(result).to.eq('stop');
       });
     });
+    it('custain position', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.POSITION]('30');
+      expect(result).to.eq(30);
+    });
   });
 
   describe('read value', () => {
@@ -81,6 +85,10 @@ describe('Tuya device mapping', () => {
       it('stop', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE]('STOP');
         expect(result).to.eq(COVER_STATE.STOP);
+      });
+      it('curtain position', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.POSITION](30);
+        expect(result).to.eq(30);
       });
     });
   });
