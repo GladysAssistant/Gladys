@@ -253,7 +253,8 @@
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
-        "noTemperatureRecorded": "No temperature recorded recently."
+        "noTemperatureRecorded": "No temperature recorded recently.",
+        "thresholdsLabel": "Configure custom thresholds"
       },
       "humidityInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
