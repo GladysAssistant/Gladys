@@ -354,14 +354,18 @@ const actionsFunc = {
         deviceSeenRecently = true;
       }
     });
+
+    const user = self.stateManager.get('user', action.user);
     if (deviceSeenRecently) {
-      // if at least one device was seen, the user is at home
-      logger.info(
-        `CheckUserPresence action: At least one device of the user "${action.user}" were seen in the last ${action.minutes} minutes.`,
-      );
-      logger.info(`CheckUserPresence action: Set "${action.user}" to seen in house "${action.house}"`);
-      await self.house.userSeen(action.house, action.user);
-    } else {
+      if (user.current_house_id === null) {
+        // if at least one device was seen, the user is at home
+        logger.info(
+          `CheckUserPresence action: At least one device of the user "${action.user}" were seen in the last ${action.minutes} minutes.`,
+        );
+        logger.info(`CheckUserPresence action: Set "${action.user}" to seen in house "${action.house}"`);
+        await self.house.userSeen(action.house, action.user);
+      }
+    } else if (user.current_house_id !== null) {
       // if no device was seen, the user has left home
       logger.info(
         `CheckUserPresence action: No devices of the user "${action.user}" were seen in the last ${action.minutes} minutes.`,
