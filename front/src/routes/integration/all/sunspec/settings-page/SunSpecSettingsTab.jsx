@@ -4,6 +4,8 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import update from 'immutability-helper';
 
+import SunSpecIPRange from './SunSpecIPRange';
+
 class SunSpecSettingsTab extends Component {
   loadConfiguration = async () => {
     this.setState({ loading: true, error: null });
@@ -65,6 +67,38 @@ class SunSpecSettingsTab extends Component {
     setTimeout(() => this.setState({ showApiKey: false }), 5000);
   };
 
+  updateMaskConfig = async (maskIndex, value) => {
+    const updatedConfig = update(this.state.config, {
+      ipMasks: {
+        [maskIndex]: {
+          $set: value
+        }
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
+  addMaskConfig = async value => {
+    const updatedConfig = update(this.state.config, {
+      ipMasks: {
+        $push: [value]
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
+  deleteMaskConfig = async maskIndex => {
+    const updatedConfig = update(this.state.config, {
+      ipMasks: {
+        $splice: [[maskIndex, 1]]
+      }
+    });
+
+    this.setState({ config: updatedConfig, updated: true });
+  };
+
   saveConfiguration = async () => {
     this.setState({ error: null });
     try {
@@ -81,7 +115,7 @@ class SunSpecSettingsTab extends Component {
     await this.loadConfiguration();
   }
 
-  render({}, { config, showApiKey, loading, error }) {
+  render({}, { config, showApiKey, loading, error, saving, updated }) {
     return (
       <div class="card">
         <div class="card-header">
@@ -124,22 +158,17 @@ class SunSpecSettingsTab extends Component {
               </p>
 
               {config && (
+                <SunSpecIPRange
+                  ipMasks={config.ipMasks}
+                  disabled={saving}
+                  updateMaskConfig={this.updateMaskConfig}
+                  addMaskConfig={this.addMaskConfig}
+                  deleteMaskConfig={this.deleteMaskConfig}
+                />
+              )}
+
+              {config && (
                 <form>
-                  <div class="form-group">
-                    <label for="sunspecUrl" class="form-label">
-                      <Text id={`integration.sunspec.settings.sunspecUrl`} />
-                    </label>
-                    <Localizer>
-                      <input
-                        id="sunspecUrl"
-                        name="sunspecUrl"
-                        placeholder={<Text id="integration.sunspec.settings.sunspecUrlPlaceholder" />}
-                        value={config.sunspecUrl}
-                        class="form-control"
-                        onInput={this.updateUrl}
-                      />
-                    </Localizer>
-                  </div>
                   <div class="form-group">
                     <label for="bdpvActive" class="form-label">
                       <Text id={`integration.sunspec.settings.bdpvActiveLabel`} />

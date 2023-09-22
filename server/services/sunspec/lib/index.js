@@ -8,13 +8,17 @@ const { scanNetwork } = require('./sunspec.scanNetwork');
 const { scanDevices } = require('./sunspec.scanDevices');
 const { poll } = require('./sunspec.poll');
 const { bdpvInit } = require('./bdpv/sunspec.bdpv');
+const { scan } = require('./sunspec.scan');
 
-const SunSpecManager = function SunSpecManager(gladys, ModbusTCP, serviceId) {
+const SunSpecManager = function SunSpecManager(gladys, ModbusTCP, ScannerClass, serviceId) {
   this.gladys = gladys;
   this.eventManager = gladys.event;
   this.serviceId = serviceId;
   this.devices = {};
+  this.ScannerClass = ScannerClass;
+  this.ipMasks = [];
   this.modbusClient = new ModbusTCP();
+  this.modbuses = new Map();
   this.connected = false;
 };
 
@@ -23,6 +27,7 @@ SunSpecManager.prototype.disconnect = disconnect;
 SunSpecManager.prototype.getStatus = getStatus;
 SunSpecManager.prototype.getConfiguration = getConfiguration;
 SunSpecManager.prototype.getDevices = getDevices;
+SunSpecManager.prototype.scan = scan;
 SunSpecManager.prototype.scanNetwork = scanNetwork;
 SunSpecManager.prototype.scanDevices = scanDevices;
 SunSpecManager.prototype.updateConfiguration = updateConfiguration;

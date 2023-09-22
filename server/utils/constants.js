@@ -892,6 +892,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
   SUNSPEC: {
     CONNECTED: 'sunspec.connected',
     STATUS_CHANGE: 'sunspec.status-change',
+    SCANNING: 'sunspec.scanning',
   },
   TUYA: {
     STATUS: 'tuya.status',

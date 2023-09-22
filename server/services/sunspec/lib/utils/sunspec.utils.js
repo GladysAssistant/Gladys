@@ -58,4 +58,5 @@ module.exports = {
   readInt16,
   readUInt16,
   readUInt32,
+  trimString,
 };

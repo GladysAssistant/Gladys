@@ -17,6 +17,7 @@
   "dependencies": {
     "axios": "^1.4.0",
     "modbus-serial": "^8.0.11",
-    "node-cron": "^3.0.2"
+    "node-cron": "^3.0.2",
+    "node-sudo-nmap": "^4.0.4"
   }
 }

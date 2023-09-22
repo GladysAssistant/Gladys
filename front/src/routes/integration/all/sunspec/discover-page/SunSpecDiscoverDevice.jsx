@@ -18,9 +18,6 @@ class SunSpecDiscoverDevice extends Component {
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
-  updateRoom = e => {
-    this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
-  };
 
   render({ device, houses }, { loading }) {
     return (
@@ -50,26 +47,6 @@ class SunSpecDiscoverDevice extends Component {
                       placeholder={<Text id="editDeviceForm.namePlaceholder" />}
                     />
                   </Localizer>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">
-                    <Text id="editDeviceForm.roomLabel" />
-                  </label>
-                  <select onChange={this.updateRoom} class="form-control">
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {houses &&
-                      houses.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
                 </div>
                 <div class="form-group">
                   <label class="form-label">

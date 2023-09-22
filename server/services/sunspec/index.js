@@ -4,8 +4,9 @@ const SunSpecController = require('./api/sunspec.controller');
 
 module.exports = function SunSpecService(gladys, serviceId) {
   const modbusTCP = require('modbus-serial');
+  const { NmapScan } = require('node-sudo-nmap');
 
-  const sunspecManager = new SunSpecManager(gladys, modbusTCP, serviceId);
+  const sunspecManager = new SunSpecManager(gladys, modbusTCP, NmapScan, serviceId);
 
   /**
    * @public

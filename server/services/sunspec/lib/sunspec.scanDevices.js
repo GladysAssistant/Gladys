@@ -12,10 +12,10 @@ const { ModelFactory } = require('./utils/sunspec.ModelFactory');
 async function scanDevices() {
   logger.debug(`SunSpec: Scanning devices...`);
 
-  this.devices
+  Object.values(this.devices)
     .filter((device) => device.mppt === undefined)
     .forEach(async (device) => {
-      const values = ModelFactory.createModel(await this.modbus.readModel(device.valueModel));
+      const values = ModelFactory.createModel(await device.modbus.readModel(device.valueModel));
       Object.entries(values).forEach((entry) => {
         const [name, value] = entry;
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
@@ -28,11 +28,11 @@ async function scanDevices() {
       });
     });
 
-  this.devices
+  Object.values(this.devices)
     .filter((device) => device.mppt !== undefined)
     .forEach(async (device) => {
       // @ts-ignore
-      const { mppt } = ModelFactory.createModel(await this.modbus.readModel(MODEL.MPPT_INVERTER_EXTENSION));
+      const { mppt } = ModelFactory.createModel(await device.modbus.readModel(MODEL.MPPT_INVERTER_EXTENSION));
       const { DCA, DCV, DCW, DCWH } = mppt[device.mppt - 1];
 
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {

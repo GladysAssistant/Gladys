@@ -11,7 +11,8 @@ const BDPV_HOST = 'https://www.bdpv.fr/webservice/majProd';
  */
 async function bdpvPush() {
   const index = this.getDevices()
-    .map((device) => device.features.filter((deviceFeature) => deviceFeature.property === PROPERTY.DCWH))
+    .map((device) => device.mppt === undefined)
+    .map((device) => device.features.filter((deviceFeature) => deviceFeature.property === PROPERTY.ACWH))
     .map((deviceFeature) => {
       const gladysFeature = this.gladys.stateManager.get('deviceFeature', deviceFeature.selector);
       return gladysFeature.last_value;
@@ -54,7 +55,7 @@ async function bdpvInit(bdpvActive) {
   }
 
   if (this.bdpvTask === undefined) {
-    this.bdpvTask = cron.schedule('0 3 1 * *', bdpvPush.bind(this), {
+    this.bdpvTask = cron.schedule('10 23 * * *', bdpvPush.bind(this), {
       scheduled: false,
     });
   }
