@@ -121,4 +121,13 @@ describe('Device.newStateEvent', () => {
     expect(newDeviceFeature).to.have.property('last_value_changed');
     expect(newDeviceFeature.last_value_changed).to.deep.equal(dateInTheFuture);
   });
+  it('should not save state missing device feature', async () => {
+    const stateManager = new StateManager(event);
+    const device = new Device(event, {}, stateManager, {}, {}, {}, job);
+    await device.newStateEvent({
+      device_feature_external_id: 'hue:binary:1',
+      state: 12,
+      created_at: '2019-02-12 07:49:07.556 +00:00',
+    });
+  });
 });
