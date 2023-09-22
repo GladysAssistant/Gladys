@@ -20,7 +20,7 @@ describe('SunSpec updateConfiguration', () => {
       },
     };
 
-    sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, SERVICE_ID);
+    sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, null, SERVICE_ID);
   });
 
   afterEach(() => {
@@ -35,7 +35,11 @@ describe('SunSpec updateConfiguration', () => {
 
   it('all config param', async () => {
     const configuration = {
-      sunspecUrl: 'sunspecUrl',
+      ipMasks: [
+        {
+          ip: '192.168.1.0/24',
+        },
+      ],
       bdpvActive: 'bdpvActive',
       bdpvUsername: 'bdpvUsername',
       bdpvApiKey: 'bdpvApiKey',
@@ -44,19 +48,25 @@ describe('SunSpec updateConfiguration', () => {
     assert.callCount(gladys.variable.setValue, 4);
   });
 
-  it('empty sunspecUrl config param', async () => {
+  it('empty ipMasks config param', async () => {
     const configuration = {};
     await sunSpecManager.updateConfiguration(configuration);
     assert.notCalled(gladys.variable.setValue);
   });
 
-  it('only sunspecUrl config param', async () => {
-    const configuration = { sunspecUrl: 'newSunspecUrl' };
+  it('only ipMasks config param', async () => {
+    const configuration = {
+      ipMasks: [
+        {
+          ip: '192.168.1.0/24',
+        },
+      ],
+    };
     await sunSpecManager.updateConfiguration(configuration);
     assert.calledOnceWithExactly(
       gladys.variable.setValue,
-      CONFIGURATION.SUNSPEC_DEVICE_URL,
-      'newSunspecUrl',
+      CONFIGURATION.SUNSPEC_IP_MASKS,
+      '[{"ip":"192.168.1.0/24"}]',
       SERVICE_ID,
     );
   });

@@ -11,7 +11,9 @@ const { ModelFactory } = require('./utils/sunspec.ModelFactory');
 async function scanNetwork() {
   logger.debug(`SunSpec: Scanning network...`);
 
-  this.modbuses.forEach(async (modbus) => {
+  this.devices = [];
+
+  const promises = this.modbuses.map(async (modbus) => {
     const { manufacturer, product, swVersion, serialNumber } = ModelFactory.createModel(
       await modbus.readModel(MODEL.COMMON),
     );
@@ -21,8 +23,6 @@ async function scanNetwork() {
 
     // SMA = N <> Fronius = N - 2
     const nbOfMPPT = (await modbus.readRegisterAsInt16(REGISTER.NB_OF_MPPT)) - (manufacturer === 'Fronius' ? 2 : 0);
-
-    this.devices = [];
 
     // AC device
     this.devices.push({
@@ -46,8 +46,9 @@ async function scanNetwork() {
       });
     }
   });
+  await Promise.all(promises);
 
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
   });
 }

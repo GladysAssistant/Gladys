@@ -11,21 +11,19 @@ const ScanDevices = proxyquire('../../../../services/sunspec/lib/sunspec.scanDev
 
 describe('SunSpec scanDevices', () => {
   // PREPARE
-  let gladys;
+  let modbus;
   let sunspecManager;
 
   beforeEach(() => {
-    gladys = {
-      event: {
-        emit: fake.resolves(null),
-      },
+    modbus = {
+      readModel: fake.throws(new Error('Model must be defined')),
     };
 
     sunspecManager = {
-      gladys,
-      modbus: {
-        readModel: fake.throws(new Error('Model must be defined')),
+      eventManager: {
+        emit: fake.resolves(null),
       },
+      modbuses: [modbus],
       devices: [],
     };
   });
@@ -40,8 +38,9 @@ describe('SunSpec scanDevices', () => {
       product: 'product',
       serialNumber: 'serialNumber',
       swVersion: 'swVersion',
+      modbus,
     });
-    sunspecManager.modbus.readModel = stub()
+    sunspecManager.modbuses[0].readModel = stub()
       .onFirstCall()
       .returns({
         readUInt16BE: stub()
@@ -69,20 +68,20 @@ describe('SunSpec scanDevices', () => {
           .returns(2),
       });
     await ScanDevices.call(sunspecManager);
-    assert.callCount(gladys.event.emit, 4);
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.callCount(sunspecManager.eventManager.emit, 4);
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACA',
       state: '10.00',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACV',
       state: '200',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACW',
       state: '4000',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACWH',
       state: '100',
     });
@@ -94,8 +93,9 @@ describe('SunSpec scanDevices', () => {
       product: 'product',
       serialNumber: 'serialNumber',
       swVersion: 'swVersion',
+      modbus,
     });
-    sunspecManager.modbus.readModel = stub()
+    sunspecManager.modbuses[0].readModel = stub()
       .onFirstCall()
       .returns({
         readUInt16BE: stub()
@@ -127,20 +127,20 @@ describe('SunSpec scanDevices', () => {
           .returns(2),
       });
     await ScanDevices.call(sunspecManager);
-    assert.callCount(gladys.event.emit, 4);
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.callCount(sunspecManager.eventManager.emit, 4);
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACA',
       state: '10.00',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACV',
       state: '300',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACW',
       state: '4000',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACWH',
       state: '100',
     });
@@ -153,8 +153,9 @@ describe('SunSpec scanDevices', () => {
       serialNumber: 'serialNumber',
       swVersion: 'swVersion',
       mppt: 1,
+      modbus,
     });
-    sunspecManager.modbus.readModel = stub()
+    sunspecManager.modbuses[0].readModel = stub()
       .onFirstCall()
       .returns({
         readUInt16BE: stub()
@@ -191,20 +192,20 @@ describe('SunSpec scanDevices', () => {
         subarray: fake.returns('IDStr'),
       });
     await ScanDevices.call(sunspecManager);
-    assert.callCount(gladys.event.emit, 4);
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.callCount(sunspecManager.eventManager.emit, 4);
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCA',
       state: '10.00',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCV',
       state: '100',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCW',
       state: '1000',
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.DEVICE.NEW_STATE, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'sunspec:serialnumber:serialNumber:mppt:dc1:property:DCWH',
       state: '20',
     });

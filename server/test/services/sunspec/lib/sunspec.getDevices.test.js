@@ -25,7 +25,7 @@ describe('SunSpec getDevices', () => {
       },
     };
 
-    sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, SERVICE_ID);
+    sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, null, SERVICE_ID);
   });
 
   it('should no device', async () => {

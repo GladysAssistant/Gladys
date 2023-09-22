@@ -20,23 +20,25 @@ describe('SunSpec disconnect', () => {
 
   beforeEach(() => {
     gladys = {
-      variable: {
-        getValue: fake.resolves('sunspecUrl'),
-      },
       event: {
         emit: fake.returns(null),
       },
     };
 
-    sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, SERVICE_ID);
+    sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, null, SERVICE_ID);
     sunSpecManager.modbus = {
       close: fake.returns(null),
     };
   });
 
+  afterEach(() => {
+    sinon.reset();
+  });
+
   it('should disconnect - not connected', async () => {
     await sunSpecManager.disconnect();
 
+    assert.calledOnce(sunSpecManager.modbus.close);
     expect(sunSpecManager.connected).eql(false);
   });
 
@@ -44,5 +46,6 @@ describe('SunSpec disconnect', () => {
     await sunSpecManager.disconnect();
 
     assert.calledOnce(sunSpecManager.modbus.close);
+    expect(sunSpecManager.connected).eql(false);
   });
 });

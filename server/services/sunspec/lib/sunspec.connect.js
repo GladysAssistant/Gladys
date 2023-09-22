@@ -3,6 +3,7 @@ const { CONFIGURATION, DEFAULT, SCAN_OPTIONS } = require('./sunspec.constants');
 const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 const { ModbusClient } = require('./utils/sunspec.ModbusClient');
 const logger = require('../../../utils/logger');
+const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
 /**
  * @description Initialize service with dependencies and connect to devices.
@@ -20,6 +21,8 @@ async function connect() {
       const mask = { ...option, networkInterface: false };
       this.ipMasks.push(mask);
     });
+  } else {
+    throw new ServiceNotConfiguredError();
   }
 
   // Complete masks with network interfaces
@@ -71,7 +74,7 @@ async function connect() {
 
   this.connected = true;
 
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
   });
 

@@ -5,12 +5,14 @@ const { fake, assert } = sinon;
 
 const proxyquire = require('proxyquire');
 
+const scanMock = fake.returns(['192.168.1.x']);
 const scanNetworkMock = fake.returns(null);
 const scanDevicesMock = fake.returns(null);
 const ModbusTCPMock = require('./utils/ModbusTCPMock.test');
 
 const SunSpecManager = proxyquire('../../../../services/sunspec/lib', {
   ModbusTCP: { ModbusTCP: ModbusTCPMock },
+  './sunspec.scan': { scan: scanMock },
   './sunspec.scanNetwork': { scanNetwork: scanNetworkMock },
   './sunspec.scanDevices': { scanDevices: scanDevicesMock },
 });
@@ -35,7 +37,7 @@ describe('SunSpec connect', () => {
       },
     };
 
-    sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, SERVICE_ID);
+    sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, null, SERVICE_ID);
   });
 
   afterEach(() => {
@@ -56,11 +58,12 @@ describe('SunSpec connect', () => {
   });
 
   it('should connect', async () => {
-    gladys.variable.getValue = fake.resolves('sunspecUrl');
+    gladys.variable.getValue = fake.resolves('[{"ip":"192.168.1.0/24"}]');
 
     await sunSpecManager.connect();
 
     expect(sunSpecManager.connected).eql(true);
+    assert.calledOnce(sunSpecManager.scan);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
     });
