@@ -685,36 +685,13 @@ describe('scene.executeActions', () => {
     );
     assert.calledWith(house.userLeft, 'my-house', 'john');
   });
-  it('should execute action user.checkPresence and not call userLeft because user was seen', async () => {
-    stateManager.setState('deviceFeature', 'my-device', {
-      last_value_changed: Date.now(),
-    });
-    const house = {
-      userSeen: fake.resolves(null),
-      userLeft: fake.resolves(null),
-    };
-    const scope = {};
-    await executeActions(
-      { stateManager, event, house },
-      [
-        [
-          {
-            type: ACTIONS.USER.CHECK_PRESENCE,
-            user: 'john',
-            house: 'my-house',
-            minutes: 10,
-            device_features: ['my-device'],
-          },
-        ],
-      ],
-      scope,
-    );
-    assert.called(house.userSeen, 'my-house', 'john');
-    assert.notCalled(house.userLeft);
-  });
-  it('should execute action user.checkPresence and call userLeft because user was not seen', async () => {
+
+  it('should execute action user.checkPresence and user left home', async () => {
     stateManager.setState('deviceFeature', 'my-device', {
       last_value_changed: Date.now() - 15 * 60 * 1000,
+    });
+    stateManager.setState('user', 'john', {
+      current_house_id: 'house-id',
     });
     const house = {
       userSeen: fake.resolves(null),
@@ -738,6 +715,96 @@ describe('scene.executeActions', () => {
     );
     assert.notCalled(house.userSeen);
     assert.calledWith(house.userLeft, 'my-house', 'john');
+  });
+  it('should execute action user.checkPresence and user still out home', async () => {
+    stateManager.setState('deviceFeature', 'my-device', {
+      last_value_changed: Date.now() - 15 * 60 * 1000,
+    });
+    stateManager.setState('user', 'john', {
+      current_house_id: null,
+    });
+    const house = {
+      userSeen: fake.resolves(null),
+      userLeft: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.CHECK_PRESENCE,
+            user: 'john',
+            house: 'my-house',
+            minutes: 10,
+            device_features: ['my-device'],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.notCalled(house.userSeen);
+    assert.notCalled(house.userLeft);
+  });
+  it('should execute action user.checkPresence and user back home', async () => {
+    stateManager.setState('deviceFeature', 'my-device', {
+      last_value_changed: Date.now(),
+    });
+    stateManager.setState('user', 'john', {
+      current_house_id: null,
+    });
+    const house = {
+      userSeen: fake.resolves(null),
+      userLeft: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.CHECK_PRESENCE,
+            user: 'john',
+            house: 'my-house',
+            minutes: 10,
+            device_features: ['my-device'],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.calledWith(house.userSeen, 'my-house', 'john');
+    assert.notCalled(house.userLeft);
+  });
+  it('should execute action user.checkPresence and user still at home', async () => {
+    stateManager.setState('deviceFeature', 'my-device', {
+      last_value_changed: Date.now(),
+    });
+    stateManager.setState('user', 'john', {
+      current_house_id: 'house-id',
+    });
+    const house = {
+      userSeen: fake.resolves(null),
+      userLeft: fake.resolves(null),
+    };
+    const scope = {};
+    await executeActions(
+      { stateManager, event, house },
+      [
+        [
+          {
+            type: ACTIONS.USER.CHECK_PRESENCE,
+            user: 'john',
+            house: 'my-house',
+            minutes: 10,
+            device_features: ['my-device'],
+          },
+        ],
+      ],
+      scope,
+    );
+    assert.notCalled(house.userSeen);
+    assert.notCalled(house.userLeft);
   });
 
   it('should abort scene, house empty is not verified', async () => {
