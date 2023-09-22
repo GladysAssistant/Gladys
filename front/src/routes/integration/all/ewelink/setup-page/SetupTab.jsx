@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
@@ -21,6 +21,9 @@ const SetupTab = ({ children, ...props }) => {
           <div class="dimmer-content">
             <p>
               <Text id="integration.eWeLink.setup.eweLinkDescription" />
+            </p>
+            <p class="alert alert-danger">
+              <MarkupText id="integration.eWeLink.setup.ewelinkIntegrationDeprecated" />
             </p>
             {props.connectEweLinkStatus === RequestStatus.Error && !props.eweLinkConnectionError && (
               <p class="alert alert-danger">

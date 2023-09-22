@@ -28,6 +28,10 @@ const boxesSchema = Joi.array().items(
       clock_display_second: Joi.boolean(),
       camera_latency: Joi.string(),
       camera_live_auto_start: Joi.boolean(),
+      scenes: Joi.array().items(Joi.string()),
+      humidity_use_custom_value: Joi.boolean(),
+      humidity_min: Joi.number(),
+      humidity_max: Joi.number(),
     }),
   ),
 );
