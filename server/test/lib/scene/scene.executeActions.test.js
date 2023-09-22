@@ -709,6 +709,7 @@ describe('scene.executeActions', () => {
       ],
       scope,
     );
+    assert.called(house.userSeen, 'my-house', 'john');
     assert.notCalled(house.userLeft);
   });
   it('should execute action user.checkPresence and call userLeft because user was not seen', async () => {
@@ -735,6 +736,7 @@ describe('scene.executeActions', () => {
       ],
       scope,
     );
+    assert.notCalled(house.userSeen);
     assert.calledWith(house.userLeft, 'my-house', 'john');
   });
 

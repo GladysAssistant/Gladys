@@ -354,8 +354,15 @@ const actionsFunc = {
         deviceSeenRecently = true;
       }
     });
-    // if no device was seen, the user has left home
-    if (deviceSeenRecently === false) {
+    if (deviceSeenRecently) {
+      // if at least one device was seen, the user is at home
+      logger.info(
+        `CheckUserPresence action: At least one device of the user "${action.user}" were seen in the last ${action.minutes} minutes.`,
+      );
+      logger.info(`CheckUserPresence action: Set "${action.user}" to seen in house "${action.house}"`);
+      await self.house.userSeen(action.house, action.user);
+    } else {
+      // if no device was seen, the user has left home
       logger.info(
         `CheckUserPresence action: No devices of the user "${action.user}" were seen in the last ${action.minutes} minutes.`,
       );
