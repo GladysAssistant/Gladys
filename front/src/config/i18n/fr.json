@@ -257,7 +257,8 @@
       },
       "humidityInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
-        "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment."
+        "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment.",
+        "thresholdsLabel": "Configurer des seuils personnalisés"
       },
       "userPresence": {
         "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes, et sélectionner ici quels utilisateurs afficher.",
@@ -269,7 +270,7 @@
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
-        "noImageToShow": "Aucune image à afficher",
+        "noImageToShow": "Aucune image à afficher. Êtes-vous sûr que votre caméra est connectée et accessible par Gladys ?",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box",
         "latencyBoxName": "Latence",
