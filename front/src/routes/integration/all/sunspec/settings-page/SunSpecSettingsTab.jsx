@@ -115,7 +115,7 @@ class SunSpecSettingsTab extends Component {
     await this.loadConfiguration();
   }
 
-  render({}, { config, showApiKey, loading, error, saving, updated }) {
+  render({}, { config, showApiKey, loading, error, saving }) {
     return (
       <div class="card">
         <div class="card-header">

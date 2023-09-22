@@ -19,7 +19,7 @@ class SunSpecDiscoverDevice extends Component {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
 
-  render({ device, houses }, { loading }) {
+  render({ device }, { loading }) {
     return (
       <div class="col-md-6">
         <div class="card">
