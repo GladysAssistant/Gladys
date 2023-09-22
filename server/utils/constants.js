@@ -959,6 +959,11 @@ const JOB_ERROR_TYPES = {
   UNKNOWN_ERROR: 'unknown-error',
 };
 
+const DEFAULT_VALUE_HUMIDITY = {
+  MINIMUM: 45,
+  MAXIMUM: 60,
+};
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -1054,3 +1059,5 @@ module.exports.JOB_STATUS = JOB_STATUS;
 module.exports.JOB_STATUS_LIST = JOB_STATUS_LIST;
 module.exports.JOB_ERROR_TYPES = JOB_ERROR_TYPES;
 module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;
+
+module.exports.DEFAULT_VALUE_HUMIDITY = DEFAULT_VALUE_HUMIDITY;
