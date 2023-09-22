@@ -260,7 +260,8 @@
       },
       "humidityInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
-        "noHumidityRecorded": "No humidity recorded recently."
+        "noHumidityRecorded": "No humidity recorded recently.",
+        "thresholdsLabel": "Configure custom thresholds"
       },
       "userPresence": {
         "description": "Display who's at home and who is not. You can change the user presence in scenes, and select here the users displayed.",
