@@ -12,7 +12,7 @@ describe('SunSpec ModbusClient', () => {
   beforeEach(() => {
     modbusClientApi = {
       connectTCP: fake.returns(true),
-      close: fake.returns(true),
+      close: stub().yields(),
       readHoldingRegisters: fake.returns(true),
     };
   });
@@ -76,11 +76,8 @@ describe('SunSpec ModbusClient', () => {
     });
   });
 
-  it('should not close', async () => {
+  it('should close', async () => {
     const client = new ModbusClient(modbusClientApi);
-    client.readRegisterAsInt32 = stub()
-      .onFirstCall()
-      .returns(0x00);
     await client.close();
     assert.calledOnce(modbusClientApi.close);
   });

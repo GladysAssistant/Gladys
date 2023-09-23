@@ -27,7 +27,7 @@ describe('SunSpec scan', () => {
         emit: fake.resolves(null),
       },
       variable: {
-        getValue: fake.resolves('[{"ip":"192.168.1.0/24"}]'),
+        getValue: fake.resolves(null),
       },
     };
     sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, ScannerClassMock, SERVICE_ID);
@@ -53,6 +53,7 @@ describe('SunSpec scan', () => {
   });
 
   it('should find Sunspec device', async () => {
+    gladys.variable.getValue = fake.resolves('[{"ip":"192.168.1.0/24"}]');
     await sunSpecManager.scan();
     assert.callCount(sunSpecManager.eventManager.emit, 3);
     assert.calledWithExactly(sunSpecManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
