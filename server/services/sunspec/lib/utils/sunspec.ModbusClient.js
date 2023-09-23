@@ -3,16 +3,16 @@ const { REGISTER, DEFAULT, MODEL } = require('../sunspec.constants');
 const { trimString } = require('./sunspec.utils');
 
 class ModbusClient {
-  constructor(modbusClient) {
-    this.modbusClient = modbusClient;
+  constructor(modbusClientApi) {
+    this.modbusClientApi = modbusClientApi;
     this.models = {};
   }
 
   async connect(sunspecHost, sunspecPort) {
     try {
-      await this.modbusClient.connectTCP(sunspecHost, { port: sunspecPort, timeout: 10000 });
+      await this.modbusClientApi.connectTCP(sunspecHost, { port: sunspecPort, timeout: 10000 });
       logger.info(`SunSpec service connected`);
-      // this.modbusClient.setID(UNIT_ID.SID);
+      // this.modbusClientApi.setID(UNIT_ID.SID);
       const sid = await this.readRegisterAsInt32(REGISTER.SID);
       if (sid !== DEFAULT.SUNSPEC_MODBUS_MAP) {
         logger.error(`Invalid SID received. Expected ${DEFAULT.SUNSPEC_MODBUS_MAP} but got ${sid}`);
@@ -31,6 +31,7 @@ class ModbusClient {
       let nextModelLength;
       let registerId = REGISTER.MODEL_ID + 1;
       registerId += (await this.readRegisterAsInt16(registerId)) + 1;
+      // eslint-disable-next-line no-constant-condition
       while (true) {
         // eslint-disable-next-line no-await-in-loop
         nextModel = await this.readRegisterAsInt16(registerId);
@@ -53,7 +54,7 @@ class ModbusClient {
 
   close() {
     return new Promise((resolve, reject) => {
-      this.modbusClient.close(() => {
+      this.modbusClientApi.close(() => {
         logger.info('SunSpec service disconnected');
         resolve();
       });
@@ -61,10 +62,10 @@ class ModbusClient {
   }
 
   getValueModel() {
-    if (this.models[MODEL.INVERTER_1_PHASE] !== null) {
+    if (this.models[MODEL.INVERTER_1_PHASE]) {
       return MODEL.INVERTER_1_PHASE;
     }
-    if (this.models[MODEL.INVERTER_3_PHASE] !== null) {
+    if (this.models[MODEL.INVERTER_3_PHASE]) {
       return MODEL.INVERTER_3_PHASE;
     }
     return MODEL.INVERTER_SPLIT_PHASE;
@@ -77,7 +78,7 @@ class ModbusClient {
 
   async readRegister(registerId, registerLength) {
     return new Promise((resolve, reject) => {
-      this.modbusClient.readHoldingRegisters(registerId - 1, registerLength, (err, data) => {
+      this.modbusClientApi.readHoldingRegisters(registerId - 1, registerLength, (err, data) => {
         if (err) {
           reject(err);
         } else {
@@ -89,7 +90,7 @@ class ModbusClient {
 
   async readRegisterAsString(registerId, registerLength) {
     return new Promise((resolve, reject) => {
-      this.modbusClient.readHoldingRegisters(registerId - 1, registerLength, (err, data) => {
+      this.modbusClientApi.readHoldingRegisters(registerId - 1, registerLength, (err, data) => {
         if (err) {
           reject(err);
         } else {
@@ -102,7 +103,7 @@ class ModbusClient {
 
   async readRegisterAsInt16(registerId) {
     return new Promise((resolve, reject) => {
-      this.modbusClient.readHoldingRegisters(registerId - 1, 1, (err, data) => {
+      this.modbusClientApi.readHoldingRegisters(registerId - 1, 1, (err, data) => {
         if (err) {
           reject(err);
         } else {
@@ -115,7 +116,7 @@ class ModbusClient {
 
   async readRegisterAsInt32(registerId) {
     return new Promise((resolve, reject) => {
-      this.modbusClient.readHoldingRegisters(registerId - 1, 2, (err, data) => {
+      this.modbusClientApi.readHoldingRegisters(registerId - 1, 2, (err, data) => {
         if (err) {
           reject(err);
         } else {

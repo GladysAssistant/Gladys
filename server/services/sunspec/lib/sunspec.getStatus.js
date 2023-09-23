@@ -11,6 +11,7 @@ function getStatus() {
 
   return {
     connected: this.connected,
+    sunspecIps: this.sunspecIps,
   };
 }
 

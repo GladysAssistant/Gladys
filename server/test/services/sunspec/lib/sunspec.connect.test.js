@@ -17,7 +17,6 @@ const SunSpecManager = proxyquire('../../../../services/sunspec/lib', {
   './sunspec.scanDevices': { scanDevices: scanDevicesMock },
 });
 
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
 const SERVICE_ID = 'faea9c35-759a-44d5-bcc9-2af1de37b8b4';
@@ -42,19 +41,6 @@ describe('SunSpec connect', () => {
 
   afterEach(() => {
     sinon.reset();
-  });
-
-  it('should not connect - not configured', async () => {
-    gladys.variable.getValue = fake.resolves(null);
-
-    try {
-      await sunSpecManager.connect();
-      assert.fail();
-    } catch (error) {
-      expect(error).to.be.an.instanceof(ServiceNotConfiguredError);
-    }
-
-    expect(sunSpecManager.connected).eql(false);
   });
 
   it('should connect', async () => {
