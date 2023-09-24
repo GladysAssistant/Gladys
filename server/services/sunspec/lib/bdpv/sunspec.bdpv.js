@@ -11,7 +11,7 @@ const BDPV_HOST = 'https://www.bdpv.fr/webservice/majProd';
  */
 async function bdpvPush() {
   const index = this.getDevices()
-    .map((device) => device.mppt === undefined)
+    .filter((device) => device.mppt === undefined)
     .map((device) => device.features.filter((deviceFeature) => deviceFeature.property === PROPERTY.ACWH))
     .map((deviceFeature) => {
       const gladysFeature = this.gladys.stateManager.get('deviceFeature', deviceFeature.selector);
@@ -19,7 +19,7 @@ async function bdpvPush() {
     })
     .reduce((total, item) => total + item);
   try {
-    this.bdpvParams.index = index * 1000;
+    this.bdpvParams.index = index * 1000; // must be in Wh
     const response = await this.bdpvClient.get('expeditionProd_v3.php', {
       params: this.bdpvParams,
     });
@@ -35,38 +35,39 @@ async function bdpvPush() {
  * @example sunspec.bdpvInit(true);
  */
 async function bdpvInit(bdpvActive) {
-  if (this.bdpvClient === undefined) {
-    const bdpvUsername = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_BDPV_USER_NAME, this.serviceId);
-    const bdpvApiKey = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_BDPV_API_KEY, this.serviceId);
-    if (bdpvUsername === null || bdpvApiKey === null) {
-      return;
+  if (bdpvActive) {
+    if (this.bdpvClient === undefined) {
+      const bdpvUsername = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_BDPV_USER_NAME, this.serviceId);
+      const bdpvApiKey = await this.gladys.variable.getValue(CONFIGURATION.SUNSPEC_BDPV_API_KEY, this.serviceId);
+      if (bdpvUsername === null || bdpvApiKey === null) {
+        return;
+      }
+
+      this.bdpvClient = axios.create({
+        baseURL: BDPV_HOST,
+        timeout: 10000,
+      });
+      this.bdpvParams = {
+        util: bdpvUsername,
+        apiKey: bdpvApiKey,
+        typeReleve: 'onduleur',
+        source: 'Gladys',
+      };
     }
 
-    this.bdpvClient = axios.create({
-      baseURL: BDPV_HOST,
-      timeout: 10000,
-    });
-    this.bdpvParams = {
-      util: bdpvUsername,
-      apiKey: bdpvApiKey,
-      typeReleve: 'onduleur',
-      source: 'Gladys',
-    };
-  }
+    if (this.bdpvTask === undefined) {
+      this.bdpvTask = cron.schedule('10 23 * * *', bdpvPush.bind(this), {
+        scheduled: false,
+      });
+    }
 
-  if (this.bdpvTask === undefined) {
-    this.bdpvTask = cron.schedule('10 23 * * *', bdpvPush.bind(this), {
-      scheduled: false,
-    });
-  }
-
-  if (bdpvActive) {
     this.bdpvTask.start();
-  } else {
+  } else if (this.bdpvTask) {
     this.bdpvTask.stop();
   }
 }
 
 module.exports = {
   bdpvInit,
+  bdpvPush,
 };
