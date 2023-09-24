@@ -1,10 +1,11 @@
 /**
  * @description Get Zigbee2mqtt status.
- * @returns {Object} Current Zigbee2mqtt containers and configuration status.
+ * @returns {object} Current Zigbee2mqtt containers and configuration status.
  * @example
  * status();
  */
 function status() {
+  const z2mEnabled = this.isEnabled();
   const zigbee2mqttStatus = {
     usbConfigured: this.usbConfigured,
     mqttExist: this.mqttExist,
@@ -13,7 +14,7 @@ function status() {
     zigbee2mqttRunning: this.zigbee2mqttRunning,
     gladysConnected: this.gladysConnected,
     zigbee2mqttConnected: this.zigbee2mqttConnected,
-    z2mEnabled: this.z2mEnabled,
+    z2mEnabled,
     dockerBased: this.dockerBased,
     networkModeValid: this.networkModeValid,
   };

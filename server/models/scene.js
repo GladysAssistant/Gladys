@@ -16,8 +16,10 @@ const actionSchema = Joi.array().items(
       user: Joi.string(),
       house: Joi.string(),
       scene: Joi.string(),
+      camera: Joi.string(),
       text: Joi.string(),
       value: Joi.number(),
+      evaluate_value: Joi.string(),
       minutes: Joi.number(),
       unit: Joi.string(),
       url: Joi.string().uri(),
@@ -40,6 +42,7 @@ const actionSchema = Joi.array().items(
       stop_scene_if_event_found: Joi.boolean(),
       stop_scene_if_event_not_found: Joi.boolean(),
       request_response_keys: Joi.array().items(Joi.string()),
+      ecowatt_network_status: Joi.string().valid('ok', 'warning', 'critical'),
       headers: Joi.array().items(
         Joi.object().keys({
           key: Joi.string(),
@@ -52,6 +55,7 @@ const actionSchema = Joi.array().items(
           .valid('=', '!=', '>', '>=', '<', '<=')
           .required(),
         value: Joi.number(),
+        evaluate_value: Joi.string(),
       }),
     }),
   ),
@@ -108,6 +112,10 @@ module.exports = (sequelize, DataTypes) => {
       },
       name: {
         allowNull: false,
+        type: DataTypes.STRING,
+      },
+      description: {
+        allowNull: true,
         type: DataTypes.STRING,
       },
       icon: {

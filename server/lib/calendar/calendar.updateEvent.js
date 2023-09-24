@@ -4,7 +4,8 @@ const { NotFoundError } = require('../../utils/coreErrors');
 /**
  * @description Update a calendar event.
  * @param {string} selector - CalendarEvent selector.
- * @param {Object} calendarEvent - The new event.
+ * @param {object} calendarEvent - The new event.
+ * @returns {Promise<object>} Resolve with updated event.
  * @example
  * gladys.calendar.updateEvent('my-event', {
  *    name: 'New name',

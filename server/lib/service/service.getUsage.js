@@ -4,17 +4,17 @@ const db = require('../../models');
 
 /**
  * @public
- * @description Get usage
- * @param {string} [pod_id] - Id of the pod.
- * @returns {Promise<Object>} Get all services used.
+ * @description Get usage.
+ * @param {string} [podId] - Id of the pod.
+ * @returns {Promise<object>} Get all services used.
  * @example
  * const usage = await service.getUsage();
  * // {zigbee: true, xiaomi: false}
  */
-async function getUsage(pod_id = null) {
+async function getUsage(podId = null) {
   const services = await db.Service.findAll({
     where: {
-      pod_id,
+      pod_id: podId,
     },
   });
 

@@ -1,0 +1,50 @@
+.padding {
+  padding: 10px 20px 10px 20px;
+}
+
+.analogRow {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  padding: 16px;
+}
+
+.analogCol {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 50%;
+}
+
+.analogSmallText {
+  font-size: 1rem;
+  text-align: left;
+}
+
+.analogBigText {
+  font-size: 1.3rem;
+  text-align: left;
+}
+
+.analogClock {
+  display: flex;
+  margin-left: auto;
+  margin-right: 15%;
+  width: 100px;
+}
+
+.digitalTime {
+  font-size: 40px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.digitalDate {
+  padding-top: 10px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.reactClock {
+  width: inherit !important;
+  padding-top: 100%;
+}

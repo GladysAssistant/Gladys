@@ -11,7 +11,7 @@ const DEFAULT_PARAMETERS = {
 /**
  * @description Return the average value of the temperature in a room.
  * @param {string} roomId - The uuid of the room.
- * @param {Object} [options] - Options of the query (units).
+ * @param {object} [options] - Options of the query (units).
  * @returns {Promise} - Resolve with the temperature and the unit.
  * @example
  * getTemperatureInRoom('d65deccf-d8fc-4674-ac50-3d98d1d87aba', {
@@ -20,7 +20,7 @@ const DEFAULT_PARAMETERS = {
  */
 async function getTemperatureInRoom(roomId, options) {
   logger.debug(`Getting average temperature in room ${roomId}`);
-  const optionsWithDefault = Object.assign({}, DEFAULT_PARAMETERS, options);
+  const optionsWithDefault = { ...DEFAULT_PARAMETERS, ...options };
 
   const oneHourAgo = new Date(new Date().getTime() - 1 * 60 * 60 * 1000);
   const deviceFeatures = await db.DeviceFeature.findAll({

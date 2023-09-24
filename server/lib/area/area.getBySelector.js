@@ -4,6 +4,7 @@ const { NotFoundError } = require('../../utils/coreErrors');
 /**
  * @description Get an area by selector.
  * @param {string} selector - Area selector.
+ * @returns {Promise<object>} Return area.
  * @example
  * area.getBySelector('test-area');
  */

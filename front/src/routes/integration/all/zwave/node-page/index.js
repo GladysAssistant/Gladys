@@ -4,7 +4,6 @@ import actions from './actions';
 import ZwavePage from '../ZwavePage';
 import NodeTab from './NodeTab';
 
-@connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)
 class ZwaveNodePage extends Component {
   componentWillMount() {
     this.props.getZWaveDevices();
@@ -20,4 +19,7 @@ class ZwaveNodePage extends Component {
   }
 }
 
-export default ZwaveNodePage;
+export default connect(
+  'session,user,zwaveDevices,houses,getZwaveDevicesStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch',
+  actions
+)(ZwaveNodePage);

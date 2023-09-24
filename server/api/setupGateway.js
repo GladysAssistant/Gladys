@@ -1,4 +1,4 @@
-const pathToRegexp = require('path-to-regexp');
+const { pathToRegexp } = require('path-to-regexp');
 
 const nodeUrl = require('url');
 const errorMiddleware = require('./middlewares/errorMiddleware');
@@ -6,9 +6,9 @@ const { EVENTS } = require('../utils/constants');
 const { NotFoundError } = require('../utils/coreErrors');
 
 /**
- * @description Setup Gateway API calls
- * @param {Object} gladys - Gladys object.
- * @param {Object} routes - List of routes.
+ * @description Setup Gateway API calls.
+ * @param {object} gladys - Gladys object.
+ * @param {object} routes - List of routes.
  * @example
  * setupGateway(gladys, app);
  */
@@ -34,7 +34,7 @@ function setupGateway(gladys, routes) {
       user,
       method: method.toLowerCase(),
       url: urlParsed.pathname, // get only the path, without get params
-      query: Object.assign({}, query, urlParsed.query), // merge query/get params
+      query: { ...query, ...urlParsed.query }, // merge query/get params
       body,
       params: {},
     };

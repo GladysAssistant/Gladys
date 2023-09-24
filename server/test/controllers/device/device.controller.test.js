@@ -74,7 +74,7 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
     await device.calculateAggregate('daily');
     await device.calculateAggregate('monthly');
   });
-  it('should get device aggregated state by selector', async function Test() {
+  it('should get device aggregated state by selector', async () => {
     await authenticatedRequest
       .get('/api/v1/device_feature/aggregated_states')
       .query({
@@ -89,7 +89,7 @@ describe('GET /api/v1/device_feature/aggregated_states', () => {
         expect(res.body[0].values).to.have.lengthOf(100);
       });
   });
-  it('should get device aggregated state', async function Test() {
+  it('should get device aggregated state', async () => {
     await authenticatedRequest
       .get('/api/v1/device_feature/aggregated_states')
       .query({

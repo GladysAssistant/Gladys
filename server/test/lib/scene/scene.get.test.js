@@ -30,6 +30,7 @@ describe('SceneManager.get', () => {
         name: 'Test scene',
         icon: 'fe fe-bell',
         active: true,
+        description: null,
         selector: 'test-scene',
         last_executed: null,
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
@@ -51,5 +52,25 @@ describe('SceneManager.get', () => {
     });
     expect(scenes).to.be.instanceOf(Array);
     expect(scenes).to.deep.equal([]);
+  });
+
+  it('should filter by selector', async () => {
+    const sceneManager = new SceneManager({}, event);
+    const scenes = await sceneManager.get({
+      selectors: 'test-scene',
+    });
+    expect(scenes).to.be.instanceOf(Array);
+    expect(scenes).to.deep.equal([
+      {
+        id: '3a30636c-b3f0-4251-a347-90787f0fe940',
+        name: 'Test scene',
+        icon: 'fe fe-bell',
+        active: true,
+        description: null,
+        selector: 'test-scene',
+        last_executed: null,
+        updated_at: new Date('2019-02-12T07:49:07.556Z'),
+      },
+    ]);
   });
 });

@@ -1,7 +1,7 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 
-const server = require('../api/');
+const server = require('../api');
 const Gladys = require('../lib');
 const db = require('../models');
 const logger = require('../utils/logger');

@@ -1,11 +1,17 @@
 {
   "name": "gladys-z2m-mqtt",
-  "Image": "eclipse-mosquitto:2",
+  "Image": "eclipse-mosquitto:2.0.15",
   "ExposedPorts": {
     "1884/tcp": {}
   },
   "HostConfig": {
     "Binds": [],
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {
+        "max-size": "10m"
+      }
+    },
     "PortBindings": {
       "1884/tcp": [
         {

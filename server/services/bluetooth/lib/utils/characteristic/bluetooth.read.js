@@ -7,8 +7,8 @@ const { TIMERS } = require('../bluetooth.constants');
 
 /**
  * @description Try to read Noble characteristic.
- * @param {Object} characteristic - Noble characteristic.
- * @returns {Promise<Object>} Read value.
+ * @param {object} characteristic - Noble characteristic.
+ * @returns {Promise<object>} Read value.
  * @example
  * await read(characteristic);
  */

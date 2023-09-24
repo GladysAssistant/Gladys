@@ -3,9 +3,23 @@ const { fake } = require('sinon');
 
 const GladysGatewayClientMock = function GladysGatewayClientMock() {
   return {
-    login: fake.resolves({
-      two_factor_token: 'token',
-    }),
+    login: async (email, password) => {
+      return new Promise((resolve, reject) => {
+        if (password === 'pass403') {
+          const error = new Error();
+          error.response = { status: 403 };
+          reject(error);
+          return;
+        }
+        if (password === 'pass500') {
+          reject(new Error());
+          return;
+        }
+        resolve({
+          two_factor_token: 'token',
+        });
+      });
+    },
     loginInstance: fake.resolves({}),
     createInstance: fake.resolves({
       instance: {
@@ -76,6 +90,13 @@ const GladysGatewayClientMock = function GladysGatewayClientMock() {
         connected: false,
       },
     ]),
+    enedisGetConsumptionLoadCurve: fake.resolves({ enedisFunction: 'enedisGetConsumptionLoadCurve' }),
+    enedisGetDailyConsumption: fake.resolves({ enedisFunction: 'enedisGetDailyConsumption' }),
+    enedisGetDailyConsumptionMaxPower: fake.resolves({
+      enedisFunction: 'enedisGetDailyConsumptionMaxPower',
+    }),
+    getEcowattSignals: fake.resolves({ signals: [] }),
+    openAIAsk: fake.resolves({ answer: 'this is the answer' }),
   };
 };
 

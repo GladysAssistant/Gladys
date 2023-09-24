@@ -15,6 +15,7 @@ async function get(userId) {
     where: {
       user_id: userId,
     },
+    order: [['position', 'ASC']],
     raw: true,
   });
   return dashboards;

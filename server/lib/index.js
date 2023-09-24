@@ -27,8 +27,8 @@ const services = require('../services');
 const Weather = require('./weather');
 
 /**
- * @description Start a new Gladys instance
- * @param {Object} params - Params when starting Gladys.
+ * @description Start a new Gladys instance.
+ * @param {object} params - Params when starting Gladys.
  * @param {string} [params.jwtSecret] - A secret to generate jsonwebtoken.
  * @param {boolean} [params.disableService] - If true, disable the loading of services.
  * @param {boolean} [params.disableBrainLoading] - If true, disable the loading of the brain.
@@ -40,6 +40,7 @@ const Weather = require('./weather');
  * @param {boolean} [params.disableAreaLoading] - If true, disable the loading of the areas.
  * @param {boolean} [params.disableJobInit] - If true, disable the pruning of background jobs.
  * @param {boolean} [params.disableDeviceStateAggregation] - If true, disable the aggregation of device states.
+ * @returns {object} Return gladys object.
  * @example
  * const gladys = Gladys();
  */
@@ -60,16 +61,41 @@ function Gladys(params = {}) {
   const house = new House(event, stateManager);
   const room = new Room(brain);
   const service = new Service(services, stateManager);
-  const message = new MessageHandler(event, brain, service, stateManager);
+  const message = new MessageHandler(event, brain, service, stateManager, variable);
   const session = new Session(params.jwtSecret, cache);
   const user = new User(session, stateManager, variable);
   const location = new Location(user, event);
   const device = new Device(event, message, stateManager, service, room, variable, job);
   const calendar = new Calendar(service);
-  const scene = new Scene(stateManager, event, device, message, variable, house, calendar, http);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
-  const gateway = new Gateway(variable, event, system, db.sequelize, config, user, stateManager, service, job);
+  const gateway = new Gateway(
+    variable,
+    event,
+    system,
+    db.sequelize,
+    config,
+    user,
+    stateManager,
+    service,
+    job,
+    scheduler,
+    message,
+    brain,
+  );
+  const scene = new Scene(
+    stateManager,
+    event,
+    device,
+    message,
+    variable,
+    house,
+    calendar,
+    http,
+    gateway,
+    scheduler,
+    brain,
+  );
 
   const gladys = {
     version: '0.1.0', // todo, read package.json

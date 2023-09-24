@@ -11,7 +11,7 @@ module.exports = function TelegramService(gladys, serviceId) {
   const messageHandler = new MessageHandler(gladys, TelegramBot, serviceId);
   /**
    * @public
-   * @description This function starts the TelegramService
+   * @description This function starts the TelegramService.
    * @example
    * gladys.services.telegram.start();
    */
@@ -26,7 +26,7 @@ module.exports = function TelegramService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the TelegramService
+   * @description This function stops the TelegramService.
    * @example
    * gladys.services.telegram.stop();
    */

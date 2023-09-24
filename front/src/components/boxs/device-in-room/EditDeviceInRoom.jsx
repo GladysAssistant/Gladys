@@ -2,27 +2,12 @@ import { Component } from 'preact';
 import { Text } from 'preact-i18n';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
-
 import BaseEditBox from '../baseEditBox';
 import RoomSelector from '../../house/RoomSelector';
 import { getDeviceFeatureName } from '../../../utils/device';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
-import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
+import SUPPORTED_FEATURE_TYPES from './SupportedFeatureTypes';
 
-const SUPPORTED_FEATURE_TYPES = [
-  DEVICE_FEATURE_TYPES.LIGHT.BINARY,
-  DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-  DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS,
-  DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-  DEVICE_FEATURE_TYPES.SWITCH.DIMMER,
-  DEVICE_FEATURE_TYPES.TELEVISION.CHANNEL,
-  DEVICE_FEATURE_TYPES.TELEVISION.VOLUME,
-  DEVICE_FEATURE_TYPES.SHUTTER.POSITION,
-  DEVICE_FEATURE_TYPES.SHUTTER.STATE,
-  DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE
-];
-
-@connect('httpClient', {})
 class EditDeviceInRoom extends Component {
   updateBoxRoom = room => {
     this.props.updateBoxConfig(this.props.x, this.props.y, { room: room.selector, device_features: [] });
@@ -75,7 +60,7 @@ class EditDeviceInRoom extends Component {
           });
         }
       });
-      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+      await this.setState({ room, deviceOptions, selectedDeviceFeaturesOptions, loading: false });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -89,14 +74,19 @@ class EditDeviceInRoom extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.box.room !== this.props.box.room && this.props.box.room) {
-      this.getDeviceFeatures();
+    if (prevProps.box && this.props.box && this.props.box.room) {
+      const deviceFeaturesChanged = prevProps.box.device_features !== this.props.box.device_features;
+      const roomChanged = prevProps.box.room !== this.props.box.room;
+      if (deviceFeaturesChanged || roomChanged) {
+        this.getDeviceFeatures();
+      }
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading }) {
+  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, room }) {
+    const roomName = room && room.name;
     return (
-      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room">
+      <BaseEditBox {...props} titleKey="dashboard.boxTitle.devices-in-room" titleValue={roomName}>
         <div class={loading ? 'dimmer active' : 'dimmer'}>
           <div class="loader" />
           <div class="dimmer-content">
@@ -117,6 +107,7 @@ class EditDeviceInRoom extends Component {
                   isMulti
                   onChange={this.updateDeviceFeatures}
                   options={deviceOptions}
+                  maxMenuHeight={220}
                 />
               </div>
             )}
@@ -127,4 +118,4 @@ class EditDeviceInRoom extends Component {
   }
 }
 
-export default withIntlAsProp(EditDeviceInRoom);
+export default withIntlAsProp(connect('httpClient', {})(EditDeviceInRoom));

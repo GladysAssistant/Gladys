@@ -14,8 +14,33 @@ const colorLowAsGreen = (value, safeLimit, warnLimit) => {
   return 'danger';
 };
 
+const getAqiColor = value => {
+  if (value < 50) {
+    // Safe
+    return 'success';
+  } else if (value < 100) {
+    // Moderate
+    return 'warning';
+  } else if (value < 150) {
+    // Unhealthy for Sensitive Groups
+    return 'orange';
+  } else if (value < 200) {
+    // Unhealthy
+    return 'pink';
+  } else if (value < 300) {
+    // Very Unhealthy
+    return 'purple';
+  }
+  // Hazardous
+  return 'danger';
+};
+
 const BADGE_CATEGORIES = {
-  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200)
+  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
+  [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000),
+  [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 12, 35),
+  [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value)
 };
 
 const BadgeNumberDeviceValue = props => {

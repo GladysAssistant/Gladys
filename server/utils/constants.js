@@ -10,12 +10,50 @@ const BUTTON_STATUS = {
   LONG_CLICK_RELEASE: 4,
   HOLD_CLICK: 5,
   LONG_CLICK: 6,
+  ON: 7,
+  OFF: 8,
+  BRIGHTNESS_MOVE_DOWN: 9,
+  BRIGHTNESS_MOVE_UP: 10,
+  BRIGHTNESS_STOP: 11,
+  ARROW_LEFT_CLICK: 12,
+  ARROW_RIGHT_CLICK: 13,
+  ARROW_LEFT_HOLD: 14,
+  ARROW_RIGHT_HOLD: 15,
+  ARROW_LEFT_RELEASE: 16,
+  ARROW_RIGHT_RELEASE: 17,
+  TRIPLE: 18,
+  QUADRUPLE: 19,
+  RELEASE: 20,
+  MANY: 21,
+  SHAKE: 22,
+  THROW: 23,
+  WAKEUP: 24,
+  FALL: 25,
+  TAP: 26,
+  SLIDE: 27,
+  FLIP_180: 28,
+  FLIP_90: 29,
+  ROTATE_LEFT: 30,
+  ROTATE_RIGHT: 31,
+  VIBRATION: 32,
+  TILT: 33,
+  DROP: 34,
+  EMERGENCY: 35,
+  DISARM: 36,
+  ARM_DAY_ZONES: 37,
+  ARM_ALL_ZONES: 38,
 };
 
 const COVER_STATE = {
   STOP: 0,
   OPEN: 1,
   CLOSE: -1,
+};
+
+const AC_MODE = {
+  AUTO: 0,
+  COOLING: 1,
+  HEATING: 2,
 };
 
 const USER_ROLE = {
@@ -50,11 +88,13 @@ const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_MONTHLY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_MONTHLY_AGGREGATES_RETENTION_IN_DAYS',
   DEVICE_STATE_DAILY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_DAILY_AGGREGATES_RETENTION_IN_DAYS',
   DEVICE_STATE_HOURLY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_HOURLY_AGGREGATES_RETENTION_IN_DAYS',
+  DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED: 'DEVICE_STATE_NUMBER_OF_HOURS_BEFORE_STATE_IS_OUTDATED',
   GLADYS_GATEWAY_BACKUP_KEY: 'GLADYS_GATEWAY_BACKUP_KEY',
   GLADYS_GATEWAY_USERS_KEYS: 'GLADYS_GATEWAY_USERS_KEYS',
   GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY:
     'GLADYS_GATEWAY_GOOGLE_HOME_USER_IS_CONNECTED_WITH_GATEWAY',
   GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY: 'GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY',
+  GLADYS_GATEWAY_OPEN_AI_ENABLED: 'GLADYS_GATEWAY_OPEN_AI_ENABLED',
   TIMEZONE: 'TIMEZONE',
 };
 
@@ -153,6 +193,7 @@ const EVENTS = {
   },
   MESSAGE: {
     NEW: 'message.new',
+    NEW_FOR_OPEN_AI: 'message.new-for-open-ai',
   },
   SYSTEM: {
     DOWNLOAD_UPGRADE: 'system.download-upgrade',
@@ -252,10 +293,12 @@ const ACTIONS = {
   LIGHT: {
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
+    TOGGLE: 'light.toggle',
   },
   SWITCH: {
     TURN_ON: 'switch.turn-on',
     TURN_OFF: 'switch.turn-off',
+    TOGGLE: 'switch.toggle',
   },
   TIME: {
     DELAY: 'delay',
@@ -265,6 +308,7 @@ const ACTIONS = {
   },
   MESSAGE: {
     SEND: 'message.send',
+    SEND_CAMERA: 'message.send-camera',
   },
   CONDITION: {
     ONLY_CONTINUE_IF: 'condition.only-continue-if',
@@ -281,6 +325,9 @@ const ACTIONS = {
   },
   HTTP: {
     REQUEST: 'http.request',
+  },
+  ECOWATT: {
+    CONDITION: 'ecowatt.condition',
   },
 };
 
@@ -304,49 +351,59 @@ const INTENTS = {
   CAMERA: {
     GET_IMAGE_ROOM: 'intent.camera.get-image-room',
   },
+  SCENE: {
+    START: 'intent.scene.start',
+  },
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
-  LIGHT: 'light',
+  ACCESS_CONTROL: 'access-control',
+  AIRQUALITY_SENSOR: 'airquality-sensor',
+  AIR_CONDITIONING: 'air-conditioning',
   BATTERY: 'battery',
-  TEMPERATURE_SENSOR: 'temperature-sensor',
-  MOTION_SENSOR: 'motion-sensor',
-  LIGHT_SENSOR: 'light-sensor',
-  SMOKE_SENSOR: 'smoke-sensor',
-  SISMIC_SENSOR: 'sismic-sensor',
-  PRESSURE_SENSOR: 'pressure-sensor',
-  OPENING_SENSOR: 'opening-sensor',
-  HUMIDITY_SENSOR: 'humidity-sensor',
-  VIBRATION_SENSOR: 'vibration-sensor',
+  BUTTON: 'button',
+  CAMERA: 'camera',
+  CUBE: 'cube',
+  CURRENCY: 'currency',
   CO_SENSOR: 'co-sensor',
   CO2_SENSOR: 'co2-sensor',
   COUNTER_SENSOR: 'counter-sensor',
-  LEAK_SENSOR: 'leak-sensor',
-  PRESENCE_SENSOR: 'presence-sensor',
-  DISTANCE_SENSOR: 'distance-sensor',
-  CAMERA: 'camera',
-  SWITCH: 'switch',
-  SIREN: 'siren',
-  ACCESS_CONTROL: 'access-control',
-  CUBE: 'cube',
-  BUTTON: 'button',
-  SIGNAL: 'signal',
-  DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
-  TELEVISION: 'television',
-  ENERGY_SENSOR: 'energy-sensor',
-  VOLUME_SENSOR: 'volume-sensor',
-  CURRENCY: 'currency',
-  SPEED_SENSOR: 'speed-sensor',
-  PRECIPITATION_SENSOR: 'precipitation-sensor',
-  UV_SENSOR: 'uv-sensor',
-  DURATION: 'duration',
-  VOC_SENSOR: 'voc-sensor',
-  SHUTTER: 'shutter',
   CURTAIN: 'curtain',
   DATA: 'data',
   DATARATE: 'datarate',
-  UNKNOWN: 'unknown',
+  DEVICE_TEMPERATURE_SENSOR: 'device-temperature-sensor',
+  DISTANCE_SENSOR: 'distance-sensor',
+  DURATION: 'duration',
+  ENERGY_SENSOR: 'energy-sensor',
+  HUMIDITY_SENSOR: 'humidity-sensor',
+  LEAK_SENSOR: 'leak-sensor',
+  LIGHT: 'light',
+  LIGHT_SENSOR: 'light-sensor',
+  MOTION_SENSOR: 'motion-sensor',
+  OPENING_SENSOR: 'opening-sensor',
+  PM25_SENSOR: 'pm25-sensor',
+  FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
+  PRECIPITATION_SENSOR: 'precipitation-sensor',
+  PRESENCE_SENSOR: 'presence-sensor',
+  PRESSURE_SENSOR: 'pressure-sensor',
+  SHUTTER: 'shutter',
+  SIGNAL: 'signal',
+  SIREN: 'siren',
+  SISMIC_SENSOR: 'sismic-sensor',
+  SMOKE_SENSOR: 'smoke-sensor',
+  SOIL_MOISTURE_SENSOR: 'soil-moisture-sensor',
+  SURFACE: 'surface',
+  SWITCH: 'switch',
+  SPEED_SENSOR: 'speed-sensor',
+  TELEVISION: 'television',
+  TEMPERATURE_SENSOR: 'temperature-sensor',
   THERMOSTAT: 'thermostat',
+  UNKNOWN: 'unknown',
+  UV_SENSOR: 'uv-sensor',
+  VIBRATION_SENSOR: 'vibration-sensor',
+  VOC_SENSOR: 'voc-sensor',
+  VOLUME_SENSOR: 'volume-sensor',
+  TEXT: 'text',
 };
 
 const DEVICE_FEATURE_TYPES = {
@@ -400,6 +457,9 @@ const DEVICE_FEATURE_TYPES = {
     ACCELERATION_X: 'acceleration-x',
     ACCELERATION_Y: 'acceleration-y',
     ACCELERATION_Z: 'acceleration-z',
+    ANGLE_X: 'angle-x',
+    ANGLE_Y: 'angle-y',
+    ANGLE_Z: 'angle-z',
     BED_ACTIVITY: 'bed-activity',
   },
   BUTTON: {
@@ -407,6 +467,14 @@ const DEVICE_FEATURE_TYPES = {
   },
   SIGNAL: {
     QUALITY: 'integer',
+  },
+  AIR_CONDITIONING: {
+    BINARY: 'binary',
+    MODE: 'mode',
+    TARGET_TEMPERATURE: 'target-temperature',
+  },
+  SURFACE: {
+    DECIMAL: 'decimal',
   },
   TELEVISION: {
     BINARY: 'binary',
@@ -433,6 +501,8 @@ const DEVICE_FEATURE_TYPES = {
     PLAY: 'play',
     PAUSE: 'pause',
     STOP: 'stop',
+    PREVIOUS: 'previous',
+    NEXT: 'next',
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
@@ -444,6 +514,7 @@ const DEVICE_FEATURE_TYPES = {
     VOLTAGE: 'voltage',
     CURRENT: 'current',
     INDEX: 'index',
+    DAILY_CONSUMPTION: 'daily-consumption',
   },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',
@@ -488,6 +559,12 @@ const DEVICE_FEATURE_TYPES = {
   THERMOSTAT: {
     TARGET_TEMPERATURE: 'target-temperature',
   },
+  AIRQUALITY_SENSOR: {
+    AQI: 'aqi',
+  },
+  TEXT: {
+    TEXT: 'text',
+  },
 };
 
 const DEVICE_FEATURE_UNITS = {
@@ -525,6 +602,10 @@ const DEVICE_FEATURE_UNITS = {
   CM: 'cm',
   M: 'm',
   KM: 'km',
+  // surface units
+  SQUARE_CENTIMETER: 'square-centimeter',
+  SQUARE_METER: 'square-meter',
+  SQUARE_KILOMETER: 'square-kilometer',
   // Degree units
   DEGREE: 'degree',
   // Volume units
@@ -576,6 +657,10 @@ const DEVICE_FEATURE_UNITS = {
   KILOBYTES_PER_SECOND: 'kilobytes-per-second',
   MEGABYTES_PER_SECOND: 'megabytes-per-second',
   GIGABYTES_PER_SECOND: 'gigabytes-per-second',
+  // Airquality Index
+  AQI: 'aqi',
+  // For air quality (pm2.5, formaldehyd)
+  MICROGRAM_PER_CUBIC_METER: 'microgram-per-cubic-meter',
 };
 
 const WEATHER_UNITS = {
@@ -601,6 +686,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.KM,
   ],
   [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
+  [DEVICE_FEATURE_CATEGORIES.SOIL_MOISTURE_SENSOR]: [DEVICE_FEATURE_UNITS.PERCENT],
   [DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR]: [DEVICE_FEATURE_UNITS.LUX],
   [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: [
     DEVICE_FEATURE_UNITS.PASCAL,
@@ -688,6 +774,14 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.GIGABYTES_PER_SECOND,
   ],
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: [DEVICE_FEATURE_UNITS.CELSIUS, DEVICE_FEATURE_UNITS.FAHRENHEIT],
+  [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: [DEVICE_FEATURE_UNITS.AQI],
+  [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
+  [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: [DEVICE_FEATURE_UNITS.MICROGRAM_PER_CUBIC_METER],
+  [DEVICE_FEATURE_CATEGORIES.SURFACE]: [
+    DEVICE_FEATURE_UNITS.SQUARE_CENTIMETER,
+    DEVICE_FEATURE_UNITS.SQUARE_METER,
+    DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
+  ],
 };
 
 const ACTIONS_STATUS = {
@@ -702,6 +796,13 @@ const DEVICE_POLL_FREQUENCIES = {
   EVERY_10_SECONDS: 10 * 1000,
   EVERY_2_SECONDS: 2 * 1000,
   EVERY_SECONDS: 1 * 1000,
+};
+
+const DEVICE_ROTATION = {
+  DEGREES_0: '0',
+  DEGREES_90: '90',
+  DEGREES_180: '180',
+  DEGREES_270: '270',
 };
 
 const WEBSOCKET_MESSAGE_TYPES = {
@@ -744,13 +845,8 @@ const WEBSOCKET_MESSAGE_TYPES = {
     DOWNLOAD_FINISHED: 'upgrade.download-finished',
     DOWNLOAD_FAILED: 'upgrade.download-failed',
   },
-  ZWAVE: {
-    DRIVER_READY: 'zwave.driver-ready',
-    DRIVER_FAILED: 'zwave.driver-failed',
-    NODE_READY: 'zwave.node-ready',
-    SCAN_COMPLETE: 'zwave.scan-complete',
-    NODE_ADDED: 'zwave.node-added',
-    NODE_REMOVED: 'zwave.node-removed',
+  LAN: {
+    SCANNING: 'lan.scanning',
   },
   MQTT: {
     CONNECTED: 'mqtt.connected',
@@ -783,6 +879,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     LEARN_MODE: 'broadlink.learn',
     SEND_MODE: 'broadlink.send',
   },
+  TUYA: {
+    STATUS: 'tuya.status',
+    DISCOVER: 'tuya.discover',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -796,7 +896,11 @@ const DASHBOARD_BOX_TYPE = {
   USER_PRESENCE: 'user-presence',
   CAMERA: 'camera',
   DEVICES_IN_ROOM: 'devices-in-room',
+  DEVICES: 'devices',
   CHART: 'chart',
+  ECOWATT: 'ecowatt',
+  CLOCK: 'clock',
+  SCENE: 'scene',
 };
 
 const ERROR_MESSAGES = {
@@ -826,6 +930,7 @@ const JOB_TYPES = {
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   VACUUM: 'vacuum',
+  SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
 };
 
 const JOB_STATUS = {
@@ -837,6 +942,11 @@ const JOB_STATUS = {
 const JOB_ERROR_TYPES = {
   PURGED_WHEN_RESTARTED: 'purged-when-restarted',
   UNKNOWN_ERROR: 'unknown-error',
+};
+
+const DEFAULT_VALUE_HUMIDITY = {
+  MINIMUM: 45,
+  MAXIMUM: 60,
 };
 
 const createList = (obj) => {
@@ -874,6 +984,7 @@ const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
 module.exports.COVER_STATE = COVER_STATE;
+module.exports.AC_MODE = AC_MODE;
 module.exports.EVENTS = EVENTS;
 module.exports.LIFE_EVENTS = LIFE_EVENTS;
 module.exports.STATES = STATES;
@@ -899,6 +1010,8 @@ module.exports.SESSION_TOKEN_TYPE_LIST = SESSION_TOKEN_TYPE_LIST;
 
 module.exports.DEVICE_POLL_FREQUENCIES = DEVICE_POLL_FREQUENCIES;
 module.exports.DEVICE_POLL_FREQUENCIES_LIST = createList(DEVICE_POLL_FREQUENCIES);
+
+module.exports.DEVICE_ROTATION = DEVICE_ROTATION;
 
 module.exports.WEBSOCKET_MESSAGE_TYPES = WEBSOCKET_MESSAGE_TYPES;
 
@@ -931,3 +1044,5 @@ module.exports.JOB_STATUS = JOB_STATUS;
 module.exports.JOB_STATUS_LIST = JOB_STATUS_LIST;
 module.exports.JOB_ERROR_TYPES = JOB_ERROR_TYPES;
 module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;
+
+module.exports.DEFAULT_VALUE_HUMIDITY = DEFAULT_VALUE_HUMIDITY;

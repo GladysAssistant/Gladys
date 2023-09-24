@@ -5,9 +5,10 @@ const db = require('../../models');
 const UPDATABLE_FIELDS = ['value'];
 
 /**
- * @description Add a param to a device
+ * @description Add a param to a device.
  * @param {string} deviceSelector - The selector of the device.
- * @param {Object} param - The new device param.
+ * @param {object} param - The new device param.
+ * @returns {Promise<object>} Resolve with new device.
  * @example
  * device.addParam('test-device', {
  *    name: 'SENSIBILITY',
@@ -27,7 +28,7 @@ async function addParam(deviceSelector, param) {
 
   // if the param does not already exist, we create it.
   if (paramIndex === -1) {
-    const createdParam = await db.DeviceParam.create(Object.assign({}, param, { device_id: device.id }));
+    const createdParam = await db.DeviceParam.create({ ...param, device_id: device.id });
     paramInStore = createdParam.get({ plain: true });
     device.params.push(paramInStore);
     // we save again the device in RAM

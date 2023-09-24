@@ -43,6 +43,7 @@ describe('GET /api/v1/scene', () => {
             name: 'Test scene',
             icon: 'fe fe-bell',
             active: true,
+            description: null,
             selector: 'test-scene',
             last_executed: null,
             updated_at: '2019-02-12T07:49:07.556Z',
@@ -70,11 +71,13 @@ describe('PATCH /api/v1/scene/:scene_selector', () => {
       .patch('/api/v1/scene/test-scene')
       .send({
         name: 'New name',
+        description: 'New description',
       })
       .expect('Content-Type', /json/)
       .expect(200)
       .then((res) => {
         expect(res.body).to.have.property('name', 'New name');
+        expect(res.body).to.have.property('description', 'New description');
       });
   });
 });
@@ -117,6 +120,24 @@ describe('POST /api/v1/scene/:scene_selector/start', () => {
           scene: 'test-scene',
           status: ACTIONS_STATUS.PENDING,
         });
+      });
+  });
+});
+
+describe('POST /api/v1/scene/:scene_selector/duplicate', () => {
+  it('should duplicate a scene', async () => {
+    await authenticatedRequest
+      .post('/api/v1/scene/to-duplicate-scene/duplicate')
+      .send({
+        name: 'Duplicated Scene',
+        icon: 'anchor',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('icon', 'anchor');
+        expect(res.body).to.have.property('name', 'Duplicated Scene');
+        expect(res.body).to.have.property('selector', 'duplicated-scene');
       });
   });
 });

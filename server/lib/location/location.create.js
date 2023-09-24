@@ -5,7 +5,7 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 /**
  * @description Save the location of the user.
  * @param {string} userSelector - The selector of the user.
- * @param {Object} location - The location object.
+ * @param {object} location - The location object.
  * @returns {Promise} Resolve with the created location.
  * @example
  * gladys.location.create('tony', {
@@ -26,9 +26,7 @@ async function create(userSelector, location) {
     latitude: user.last_latitude,
     longitude: user.last_longitude,
   };
-  const locationWithUserId = Object.assign({}, location, {
-    user_id: user.id,
-  });
+  const locationWithUserId = { ...location, user_id: user.id };
   const createdLocation = await db.Location.create(locationWithUserId);
   const newLocation = {
     latitude: createdLocation.latitude,

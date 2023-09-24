@@ -4,7 +4,11 @@ import RoomHumidityBox from '../../components/boxs/room-humidity/RoomHumidity';
 import CameraBox from '../../components/boxs/camera/Camera';
 import AtHomeBox from '../../components/boxs/user-presence/UserPresence';
 import DevicesInRoomsBox from '../../components/boxs/device-in-room/DevicesInRoomsBox';
+import DevicesBox from '../../components/boxs/device-in-room/DevicesBox';
 import ChartBox from '../../components/boxs/chart/Chart';
+import EcowattBox from '../../components/boxs/ecowatt/Ecowatt';
+import ClockBox from '../../components/boxs/clock/Clock';
+import SceneBox from '../../components/boxs/scene/SceneBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -20,8 +24,16 @@ const Box = ({ children, ...props }) => {
       return <RoomHumidityBox {...props} />;
     case 'devices-in-room':
       return <DevicesInRoomsBox {...props} />;
+    case 'devices':
+      return <DevicesBox {...props} />;
     case 'chart':
       return <ChartBox {...props} />;
+    case 'ecowatt':
+      return <EcowattBox {...props} />;
+    case 'clock':
+      return <ClockBox {...props} />;
+    case 'scene':
+      return <SceneBox {...props} />;
   }
 };
 

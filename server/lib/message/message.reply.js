@@ -4,9 +4,9 @@ const db = require('../../models');
 
 /**
  * @description Reply to a question from the user.
- * @param {Object} originalMessage - The message sent by the user.
+ * @param {object} originalMessage - The message sent by the user.
  * @param {string} text - The answer to send.
- * @param {Object} context - Contain the context, and sometimes additionnal data.
+ * @param {object} context - Contain the context, and sometimes additionnal data.
  * @param {string} [file] - An optional file sent with the message.
  * @example
  * reply(originalMessage, 'thanks!');

@@ -25,13 +25,14 @@ const DEVICE_FEATURES_ATTRIBUTES = [
 const SERVICE_ATTRIBUTES = ['id', 'name'];
 
 /**
- * @description Get all rooms
- * @param {Object} [options] - Options.
+ * @description Get all rooms.
+ * @param {object} [options] - Options.
+ * @returns {Promise<Array>} Resolve with list of rooms.
  * @example
  * const rooms = await room.get();
  */
 async function get(options) {
-  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
+  const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
   const include = [];
   if (optionsWithDefault.expand.includes('devices')) {
     include.push({

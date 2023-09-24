@@ -10,15 +10,15 @@ const DEFAULT_OPTIONS = {
 
 /**
  * @public
- * @description Get house
- * @param {Object} [options] - Options of the query.
+ * @description Get house.
+ * @param {object} [options] - Options of the query.
  * @param {Array} options.expand - Array of fields to expand.
  * @returns {Promise} Resolve with array of houses.
  * @example
  * const houses = await gladys.house.get();
  */
 async function get(options) {
-  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
+  const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
   const queryParams = {
     include: [],
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],

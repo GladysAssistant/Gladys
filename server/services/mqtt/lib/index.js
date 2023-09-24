@@ -1,4 +1,4 @@
-const { init } = require('./init.js');
+const { init } = require('./init');
 const { connect } = require('./connect');
 const { disconnect } = require('./disconnect');
 const { handleNewMessage } = require('./handleNewMessage');
@@ -10,14 +10,15 @@ const { status } = require('./status');
 const { getConfiguration } = require('./getConfiguration');
 const { saveConfiguration } = require('./saveConfiguration');
 const { installContainer } = require('./installContainer');
+const { configureContainer } = require('./configureContainer');
 const { updateContainer } = require('./updateContainer');
 const { checkDockerNetwork } = require('./checkDockerNetwork');
 const { setValue } = require('./setValue');
 
 /**
  * @description Add ability to connect to a MQTT broker.
- * @param {Object} gladys - Gladys instance.
- * @param {Object} mqttLibrary - MQTT lib.
+ * @param {object} gladys - Gladys instance.
+ * @param {object} mqttLibrary - MQTT lib.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
  * const mqttHandler = new MqttHandler(gladys, client, serviceId);
@@ -45,6 +46,7 @@ MqttHandler.prototype.status = status;
 MqttHandler.prototype.getConfiguration = getConfiguration;
 MqttHandler.prototype.saveConfiguration = saveConfiguration;
 MqttHandler.prototype.installContainer = installContainer;
+MqttHandler.prototype.configureContainer = configureContainer;
 MqttHandler.prototype.updateContainer = updateContainer;
 MqttHandler.prototype.checkDockerNetwork = checkDockerNetwork;
 MqttHandler.prototype.setValue = setValue;

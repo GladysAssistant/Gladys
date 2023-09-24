@@ -1,75 +1,65 @@
-const { assert: assertC } = require('chai');
+const { expect } = require('chai');
 const sinon = require('sinon');
 const { fake, assert } = require('sinon');
-const proxyquire = require('proxyquire').noCallThru();
 
-const Zigbee2MqttService = proxyquire('../../../../services/zigbee2mqtt', {});
+const Zigbee2MqttManager = require('../../../../services/zigbee2mqtt/lib');
 
-const gladys = {
-  variable: {
-    getValue: fake.resolves('fake'),
-    setValue: fake.resolves(true),
-  },
-};
-
+const mqttLibrary = {};
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 describe('zigbee2mqtt getConfiguration', () => {
   // PREPARE
-  let zigbee2MqttService;
+  let zigbee2MqttManager;
+  let gladys;
+
   beforeEach(() => {
-    zigbee2MqttService = Zigbee2MqttService(gladys, serviceId);
+    gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
+      variable: {
+        getValue: fake.resolves('fake'),
+      },
+    };
+
+    zigbee2MqttManager = new Zigbee2MqttManager(gladys, mqttLibrary, serviceId);
+  });
+
+  afterEach(() => {
     sinon.reset();
   });
 
-  it('get configuration z2m disabled', async () => {
-    zigbee2MqttService.device.z2mEnabled = false;
+  it('should load stored z2m configuration', async () => {
     // EXECUTE
-    const result = await zigbee2MqttService.device.getConfiguration();
+    const result = await zigbee2MqttManager.getConfiguration();
     // ASSERT
-    assert.calledThrice(gladys.variable.getValue);
-    assertC.deepEqual(result, {
-      mqttUrl: 'fake',
-      mqttUsername: 'fake',
-      mqttPassword: 'fake',
-    });
-  });
+    assert.callCount(gladys.variable.getValue, 10);
+    assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE2MQTT_DRIVER_PATH', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'ZIGBEE_DONGLE_NAME', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_USERNAME', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_PASSWORD', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'Z2M_MQTT_URL', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'GLADYS_MQTT_USERNAME', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'GLADYS_MQTT_PASSWORD', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'DOCKER_MQTT_VERSION', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'DOCKER_Z2M_VERSION', serviceId);
+    assert.calledWithExactly(gladys.variable.getValue, 'TIMEZONE');
 
-  it('get configuration z2m enabled running', async () => {
-    zigbee2MqttService.device.z2mEnabled = true;
-    zigbee2MqttService.device.installMqttContainer = fake.resolves(true);
-    zigbee2MqttService.device.installZ2mContainer = fake.resolves(true);
-    zigbee2MqttService.device.mqttRunning = true;
-    zigbee2MqttService.device.zigbee2mqttRunning = true;
-    // EXECUTE
-    const result = await zigbee2MqttService.device.getConfiguration();
-    // ASSERT
-    assert.calledOnceWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_ENABLED', true, serviceId);
-    assertC.equal(zigbee2MqttService.device.z2mEnabled, true);
-    assert.calledThrice(gladys.variable.getValue);
-    assertC.deepEqual(result, {
+    expect(result).to.deep.equal({
+      z2mDriverPath: 'fake',
+      z2mDongleName: 'fake',
+      z2mMqttUsername: 'fake',
+      z2mMqttPassword: 'fake',
       mqttUrl: 'fake',
       mqttUsername: 'fake',
       mqttPassword: 'fake',
-    });
-  });
-
-  it('get configuration z2m enabled not running', async () => {
-    zigbee2MqttService.device.z2mEnabled = true;
-    zigbee2MqttService.device.installMqttContainer = fake.resolves(true);
-    zigbee2MqttService.device.installZ2mContainer = fake.resolves(true);
-    zigbee2MqttService.device.mqttRunning = false;
-    zigbee2MqttService.device.zigbee2mqttRunning = false;
-    // EXECUTE
-    const result = await zigbee2MqttService.device.getConfiguration();
-    // ASSERT
-    assert.calledOnceWithExactly(gladys.variable.setValue, 'ZIGBEE2MQTT_ENABLED', false, serviceId);
-    assertC.equal(zigbee2MqttService.device.z2mEnabled, false);
-    assert.calledThrice(gladys.variable.getValue);
-    assertC.deepEqual(result, {
-      mqttUrl: 'fake',
-      mqttUsername: 'fake',
-      mqttPassword: 'fake',
+      dockerMqttVersion: 'fake',
+      dockerZ2mVersion: 'fake',
+      timezone: 'fake',
     });
   });
 });

@@ -9,7 +9,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the eWeLink service
+   * @description This function starts the eWeLink service.
    * @example
    * gladys.services.ewelink.start();
    */
@@ -20,7 +20,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the eWeLink service
+   * @description This function stops the eWeLink service.
    * @example
    * gladys.services.ewelink.stop();
    */

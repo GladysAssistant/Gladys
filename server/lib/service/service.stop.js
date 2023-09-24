@@ -4,19 +4,19 @@ const db = require('../../models');
 
 /**
  * @public
- * @description Stops one service by name
+ * @description Stops one service by name.
  * @param {string} name - The name of the service.
- * @param {string} pod_id - ID of Gladys instance.
+ * @param {string} podId - ID of Gladys instance.
  * @param {boolean} userAction - Manually stopped?
- * @returns {Promise<Object>} Requested service.
+ * @returns {Promise<object>} Requested service.
  * @example
  * service.stop('telegram');
  */
-async function stop(name, pod_id = null, userAction = false) {
+async function stop(name, podId = null, userAction = false) {
   // Load service from DB
   const serviceInDb = await db.Service.findOne({
     where: {
-      pod_id,
+      pod_id: podId,
       name,
     },
   });

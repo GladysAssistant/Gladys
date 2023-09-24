@@ -3,13 +3,13 @@ const Promise = require('bluebird');
 const logger = require('../../../../../utils/logger');
 const { NotFoundError } = require('../../../../../utils/coreErrors');
 
-const { TIMERS } = require('./../bluetooth.constants');
+const { TIMERS } = require('../bluetooth.constants');
 
 /**
  * @description Try to discover Noble peripheral services.
- * @param {Object} service - Noble service.
+ * @param {object} service - Noble service.
  * @param {string[]} characteristicUuids - Requested characteristic uuids.
- * @returns {Promise<Object>} The map of characteristics by UUID.
+ * @returns {Promise<object>} The map of characteristics by UUID.
  * @example
  * await discover({}, []);
  */

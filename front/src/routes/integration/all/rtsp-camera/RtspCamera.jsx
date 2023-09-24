@@ -5,6 +5,8 @@ import RtspCameraBox from './RtspCameraBox';
 import EmptyState from './EmptyState';
 import { RequestStatus } from '../../../../utils/consts';
 import style from './style.css';
+import CardFilter from '../../../../components/layout/CardFilter';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
 const RtspCameraPage = ({ children, ...props }) => (
   <div class="page">
@@ -15,33 +17,34 @@ const RtspCameraPage = ({ children, ...props }) => (
             <div class="col-lg-12">
               <div class="card">
                 <div class="card-header">
-                  <h1 class="card-title">
+                  <h1 class="card-title d-none d-lg-inline-block">
                     <Text id="integration.rtspCamera.title" />
                   </h1>
                   <div class="page-options d-flex">
-                    <select onChange={props.changeOrderDir} class="form-control custom-select w-auto">
-                      <option value="asc">
-                        <Text id="global.orderDirAsc" />
-                      </option>
-                      <option value="desc">
-                        <Text id="global.orderDirDesc" />
-                      </option>
-                    </select>
-                    <div class="input-icon ml-2">
-                      <span class="input-icon-addon">
-                        <i class="fe fe-search" />
+                    <DeviceConfigurationLink
+                      documentKey="camera"
+                      user={props.user}
+                      linkClass="btn btn-outline-secondary mr-2"
+                    >
+                      <span class="d-none d-lg-inline-block mr-2">
+                        <Text id="integration.rtspCamera.documentationButton" />{' '}
                       </span>
-                      <Localizer>
-                        <input
-                          type="text"
-                          class="form-control w-10"
-                          placeholder={<Text id="integration.rtspCamera.search" />}
-                          onInput={props.debouncedSearch}
-                        />
-                      </Localizer>
-                    </div>
+                      <i class="fe fe-book-open" />
+                    </DeviceConfigurationLink>
+                    <Localizer>
+                      <CardFilter
+                        changeOrderDir={props.changeOrderDir}
+                        orderValue={props.getRtspCameraOrderDir}
+                        search={props.debouncedSearch}
+                        searchValue={props.rtspCameraSearch}
+                        searchPlaceHolder={<Text id="integration.rtspCamera.search" />}
+                      />
+                    </Localizer>
                     <button onClick={props.addCamera} class="btn btn-outline-primary ml-2">
-                      <Text id="scene.newButton" /> <i class="fe fe-plus" />
+                      <span class="d-none d-lg-inline-block mr-2">
+                        <Text id="scene.newButton" />
+                      </span>
+                      <i class="fe fe-plus" />
                     </button>
                   </div>
                 </div>

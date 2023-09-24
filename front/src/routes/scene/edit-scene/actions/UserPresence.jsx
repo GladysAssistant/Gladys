@@ -5,7 +5,6 @@ import { Text } from 'preact-i18n';
 
 import { ACTIONS } from '../../../../../../server/utils/constants';
 
-@connect('httpClient', {})
 class UserSeenAtHome extends Component {
   getOptions = async () => {
     try {
@@ -115,4 +114,4 @@ class UserSeenAtHome extends Component {
   }
 }
 
-export default UserSeenAtHome;
+export default connect('httpClient', {})(UserSeenAtHome);

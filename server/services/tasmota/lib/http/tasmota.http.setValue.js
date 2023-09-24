@@ -3,7 +3,7 @@ const { request, buildUrl } = require('./tasmota.http.request');
 
 /**
  * @description Try to discover HTTP device.
- * @param {Object} device - Device.
+ * @param {object} device - Device.
  * @param {string} networkAddress - Device network address.
  * @param {string} command - Command to send.
  * @param {string} value - Value to send.

@@ -3,7 +3,8 @@ const logger = require('../../../../utils/logger');
 const TIMEOUT = 10000;
 
 /**
- * @description Return Philips hue bridges
+ * @description Return Philips hue bridges.
+ * @returns {Promise<Array>} Resolve with list of bridges.
  * @example
  * getBridges();
  */

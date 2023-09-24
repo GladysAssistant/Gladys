@@ -7,8 +7,8 @@ const { NotFoundError } = require('../../../../utils/coreErrors');
 const { getDeviceFeature } = require('../../../../utils/device');
 
 /**
- * @description Poll value of a Philips hue
- * @param {Object} device - The device to control.
+ * @description Poll value of a Philips hue.
+ * @param {object} device - The device to control.
  * @example
  * poll(device);
  */

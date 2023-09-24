@@ -9,7 +9,6 @@ const { NotFoundError } = require('../../utils/coreErrors');
  * @returns {Promise} Promise.
  * @example
  * await gladys.user.destroy('tony');
- *
  */
 async function destroy(selector) {
   const user = await db.User.findOne({

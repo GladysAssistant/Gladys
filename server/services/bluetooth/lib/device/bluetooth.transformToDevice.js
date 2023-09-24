@@ -6,8 +6,8 @@ const { encodeParamValue } = require('./bluetooth.information');
 
 /**
  * @description Transform Noble peripheral to Gladys Bluetooth peripheral.
- * @param {Object} peripheral - Bluetooth peripheral.
- * @returns {Object} Peripheral transformed for Gladys.
+ * @param {object} peripheral - Bluetooth peripheral.
+ * @returns {object} Peripheral transformed for Gladys.
  * @example
  * transformToDevice({});
  */

@@ -1,5 +1,5 @@
 {
-  "plugins": ["jsdoc", "require-jsdoc", "no-call", "mocha"],
+  "plugins": ["jsdoc", "require-jsdoc", "no-call", "mocha", "promise"],
   "extends": ["airbnb-base", "plugin:jsdoc/recommended", "prettier"],
   "parserOptions": {
     "ecmaVersion": 2018
@@ -106,10 +106,9 @@
     "jsdoc/check-param-names": 2,
     "jsdoc/check-tag-names": 2,
     "jsdoc/check-types": 2,
-    "jsdoc/newline-after-description": 2,
     "jsdoc/no-undefined-types": 2,
-    "jsdoc/require-description": 2,
-    "jsdoc/require-description-complete-sentence": 2,
+    "jsdoc/require-description": ["error", { "descriptionStyle": "tag" }],
+    "jsdoc/require-description-complete-sentence": "warn",
     "jsdoc/require-example": 2,
     "jsdoc/require-hyphen-before-param-description": 2,
     "jsdoc/require-param": 2,
@@ -125,7 +124,13 @@
     "no-call/no-call": [2, ["queryInterface.removeColumn", "queryInterface.changeColumn"]],
     "no-useless-concat": "error",
     "prefer-template": "error",
-    "mocha/no-exclusive-tests": "error"
+    "mocha/no-exclusive-tests": "error",
+    "arrow-body-style": "off",
+    "max-classes-per-file": "off",
+    "import/no-import-module-exports": "off",
+    "import/no-relative-packages": "off",
+    "default-param-last": "warn",
+    "promise/prefer-await-to-then": "warn"
   },
   "overrides": [
     {

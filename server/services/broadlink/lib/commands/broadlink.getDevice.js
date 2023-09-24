@@ -3,6 +3,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 /**
  * @description Get Broadlink device from cache or try to discover it.
  * @param {string} peripheralId - Broadlink device identifier.
+ * @returns {Promise<object>} Resolve with device.
  * @example
  * await getDevice('deviceIdentifier');
  */

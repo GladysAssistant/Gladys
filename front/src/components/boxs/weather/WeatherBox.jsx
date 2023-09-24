@@ -147,7 +147,7 @@ const WeatherBox = ({ children, ...props }) => (
           </div>
         </div>
         {props.display_mode[GetWeatherModes.AdvancedWeather] && (
-          <div className="col-9" style={{ padding: '0' }}>
+          <div className="col-9 p-0">
             <span>
               <i
                 class="fe fe-droplet"
@@ -219,7 +219,7 @@ class WeatherBoxComponent extends Component {
   componentDidMount() {
     this.refreshData();
     // refresh weather every interval
-    this.interval = setInterval(() => this.refreshData, BOX_REFRESH_INTERVAL_MS);
+    this.interval = setInterval(() => this.refreshData(), BOX_REFRESH_INTERVAL_MS);
   }
 
   componentDidUpdate(previousProps) {

@@ -1,6 +1,6 @@
 /**
  * @description Cancel a trigger.
- * @param {Object} sceneSelector - The selector of the scene to clean.
+ * @param {object} sceneSelector - The selector of the scene to clean.
  * @example
  * this.cancelTriggers('test-scene');
  */

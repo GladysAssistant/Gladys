@@ -15,26 +15,21 @@ const { connect } = require('../utils/peripheral/bluetooth.connect');
 async function applyOnPeripheral(peripheralUuid, applyFunc, keepConnected = false) {
   this.peripheralLookup = true;
 
-  return this.scan(true, peripheralUuid)
-    .then((peripheral) =>
-      connect(peripheral).then((connectedPerpheral) =>
-        new Promise((resolve) => {
-          try {
-            return resolve(applyFunc(connectedPerpheral));
-          } catch (e) {
-            throw e;
-          }
-        }).finally(() => {
-          if (!keepConnected) {
-            connectedPerpheral.disconnect();
-          }
-        }),
-      ),
-    )
-    .finally(() => {
-      this.peripheralLookup = false;
-      this.broadcastStatus();
-    });
+  try {
+    const peripheral = await this.scan(true, peripheralUuid);
+    const connectedPeripheral = await connect(peripheral);
+
+    try {
+      return applyFunc(connectedPeripheral);
+    } finally {
+      if (!keepConnected) {
+        connectedPeripheral.disconnect();
+      }
+    }
+  } finally {
+    this.peripheralLookup = false;
+    this.broadcastStatus();
+  }
 }
 
 module.exports = {

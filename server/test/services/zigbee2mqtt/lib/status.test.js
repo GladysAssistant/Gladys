@@ -1,39 +1,50 @@
-const { assert } = require('chai');
-const proxyquire = require('proxyquire').noCallThru();
+const { expect } = require('chai');
 
-const Zigbee2MqttService = proxyquire('../../../../services/zigbee2mqtt', {});
+const Zigbee2MqttManager = require('../../../../services/zigbee2mqtt/lib');
 
-const gladys = {};
-
+const gladys = {
+  job: {
+    wrapper: (type, func) => {
+      return async () => {
+        return func();
+      };
+    },
+  },
+};
+const mqtt = {};
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 
 describe('zigbee2mqtt status', () => {
   // PREPARE
-  const zigbee2MqttService = Zigbee2MqttService(gladys, serviceId);
-  zigbee2MqttService.device.usbConfigured = 1;
-  zigbee2MqttService.device.mqttExist = 2;
-  zigbee2MqttService.device.mqttRunning = 3;
-  zigbee2MqttService.device.zigbee2mqttExist = 4;
-  zigbee2MqttService.device.zigbee2mqttRunning = 5;
-  zigbee2MqttService.device.gladysConnected = 6;
-  zigbee2MqttService.device.zigbee2mqttConnected = 7;
-  zigbee2MqttService.device.z2mEnabled = 8;
-  zigbee2MqttService.device.dockerBased = 9;
-  zigbee2MqttService.device.networkModeValid = 10;
+  let zigbee2MqttManager;
+
+  beforeEach(() => {
+    zigbee2MqttManager = new Zigbee2MqttManager(gladys, mqtt, serviceId);
+    zigbee2MqttManager.usbConfigured = true;
+    zigbee2MqttManager.mqttExist = true;
+    zigbee2MqttManager.mqttRunning = true;
+    zigbee2MqttManager.zigbee2mqttExist = true;
+    zigbee2MqttManager.zigbee2mqttRunning = true;
+    zigbee2MqttManager.gladysConnected = false;
+    zigbee2MqttManager.zigbee2mqttConnected = false;
+    zigbee2MqttManager.dockerBased = false;
+    zigbee2MqttManager.networkModeValid = false;
+  });
 
   it('get status', async () => {
     // EXECUTE
-    const result = await zigbee2MqttService.device.status();
+    const result = await zigbee2MqttManager.status();
     // ASSERT
-    assert.equal(result.usbConfigured, 1);
-    assert.equal(result.mqttExist, 2);
-    assert.equal(result.mqttRunning, 3);
-    assert.equal(result.zigbee2mqttExist, 4);
-    assert.equal(result.zigbee2mqttRunning, 5);
-    assert.equal(result.gladysConnected, 6);
-    assert.equal(result.zigbee2mqttConnected, 7);
-    assert.equal(result.z2mEnabled, 8);
-    assert.equal(result.dockerBased, 9);
-    assert.equal(result.networkModeValid, 10);
+    expect(result.usbConfigured).that.equal(true);
+    expect(result.mqttExist).that.equal(true);
+    expect(result.mqttRunning).that.equal(true);
+    expect(result.zigbee2mqttExist).that.equal(true);
+    expect(result.zigbee2mqttRunning).that.equal(true);
+    expect(result.gladysConnected).that.equal(false);
+    expect(result.zigbee2mqttConnected).that.equal(false);
+    expect(result.dockerBased).that.equal(false);
+    expect(result.networkModeValid).that.equal(false);
+
+    expect(result.z2mEnabled).that.equal(true);
   });
 });

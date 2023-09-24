@@ -6,7 +6,7 @@ const boxesSchema = Joi.array().items(
   Joi.array().items(
     Joi.object().keys({
       type: Joi.string()
-        .valid(DASHBOARD_BOX_TYPE_LIST)
+        .valid(...DASHBOARD_BOX_TYPE_LIST)
         .required(),
       house: Joi.string(),
       room: Joi.string(),
@@ -14,6 +14,7 @@ const boxesSchema = Joi.array().items(
       name: Joi.string(),
       modes: Joi.object(),
       device_features: Joi.array().items(Joi.string()),
+      device_feature_names: Joi.array().items(Joi.string()),
       device_feature: Joi.string(),
       unit: Joi.string(),
       units: Joi.array().items(Joi.string().allow(null)),
@@ -23,6 +24,14 @@ const boxesSchema = Joi.array().items(
       display_variation: Joi.boolean(),
       chart_type: Joi.string(),
       users: Joi.array().items(Joi.string()),
+      clock_type: Joi.string(),
+      clock_display_second: Joi.boolean(),
+      camera_latency: Joi.string(),
+      camera_live_auto_start: Joi.boolean(),
+      scenes: Joi.array().items(Joi.string()),
+      humidity_use_custom_value: Joi.boolean(),
+      humidity_min: Joi.number(),
+      humidity_max: Joi.number(),
     }),
   ),
 );
@@ -53,6 +62,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.ENUM(DASHBOARD_TYPE_LIST),
       },
+      position: {
+        allowNull: false,
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       selector: {
         allowNull: false,
         unique: true,
@@ -63,7 +77,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         validate: {
           isEven(value) {
-            const result = Joi.validate(value, boxesSchema);
+            const result = boxesSchema.validate(value);
             if (result.error) {
               throw new Error(result.error.details[0].message);
             }

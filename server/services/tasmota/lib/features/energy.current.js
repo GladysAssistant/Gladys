@@ -10,9 +10,9 @@ module.exports = {
   // Gladys feature
   generateFeature: () => {
     return {
-      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
-      name: 'Energy',
+      category: DEVICE_FEATURE_CATEGORIES.ENERGY_SENSOR,
+      type: DEVICE_FEATURE_TYPES.ENERGY_SENSOR.CURRENT,
+      name: 'Intensity',
       read_only: true,
       has_feedback: false,
       min: 0,

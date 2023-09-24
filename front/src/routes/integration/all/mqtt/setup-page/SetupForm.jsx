@@ -1,8 +1,11 @@
 import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
+import { RequestStatus } from '../../../../../utils/consts';
 import cx from 'classnames';
 
 class SetupForm extends Component {
+  showPasswordTimer = null;
+
   updateUrl = e => {
     this.props.updateConfiguration({ mqttUrl: e.target.value });
   };
@@ -15,12 +18,30 @@ class SetupForm extends Component {
     this.props.updateConfiguration({ mqttPassword: e.target.value, passwordChanges: true });
   };
 
-  showPassword = () => {
-    this.setState({ showPassword: true });
-    setTimeout(() => this.setState({ showPassword: false }), 5000);
+  togglePassword = () => {
+    const { showPassword } = this.state;
+
+    if (this.showPasswordTimer) {
+      clearTimeout(this.showPasswordTimer);
+      this.showPasswordTimer = null;
+    }
+
+    this.setState({ showPassword: !showPassword });
+
+    if (!showPassword) {
+      this.showPasswordTimer = setTimeout(() => this.setState({ showPassword: false }), 5000);
+    }
   };
 
+  componentWillUnmount() {
+    if (this.showPasswordTimer) {
+      clearTimeout(this.showPasswordTimer);
+      this.showPasswordTimer = null;
+    }
+  }
+
   render(props, { showPassword }) {
+    const gladysNotAvailable = props.mqttConnectionError === RequestStatus.NetworkError;
     return (
       <form>
         <div class="form-group">
@@ -35,7 +56,7 @@ class SetupForm extends Component {
               value={props.mqttUrl}
               class="form-control"
               onInput={this.updateUrl}
-              disabled={props.useEmbeddedBroker}
+              disabled={props.useEmbeddedBroker || gladysNotAvailable}
             />
           </Localizer>
         </div>
@@ -52,7 +73,8 @@ class SetupForm extends Component {
               value={props.mqttUsername}
               class="form-control"
               onInput={this.updateUsername}
-              autoComplete="no"
+              autocomplete="off"
+              disabled={gladysNotAvailable}
             />
           </Localizer>
         </div>
@@ -66,29 +88,28 @@ class SetupForm extends Component {
               <input
                 id="mqttPassword"
                 name="mqttPassword"
-                type={props.useEmbeddedBroker && showPassword ? 'text' : 'password'}
+                type={showPassword ? 'text' : 'password'}
                 placeholder={<Text id="integration.mqtt.setup.passwordPlaceholder" />}
                 value={props.mqttPassword}
                 class="form-control"
                 onInput={this.updatePassword}
-                autoComplete="new-password"
+                autocomplete="off"
+                disabled={gladysNotAvailable}
               />
             </Localizer>
-            {props.useEmbeddedBroker && (
-              <span class="input-icon-addon cursor-pointer" onClick={this.showPassword}>
-                <i
-                  class={cx('fe', {
-                    'fe-eye': !showPassword,
-                    'fe-eye-off': showPassword
-                  })}
-                />
-              </span>
-            )}
+            <span class="input-icon-addon cursor-pointer" onClick={this.togglePassword}>
+              <i
+                class={cx('fe', {
+                  'fe-eye': !showPassword,
+                  'fe-eye-off': showPassword
+                })}
+              />
+            </span>
           </div>
         </div>
 
         <div class="form-group">
-          <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
+          <button type="submit" class="btn btn-success" onClick={props.saveConfiguration} disabled={gladysNotAvailable}>
             <Text id="integration.mqtt.setup.saveLabel" />
           </button>
         </div>

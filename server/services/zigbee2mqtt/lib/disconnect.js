@@ -1,7 +1,8 @@
+const logger = require('../../../utils/logger');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
+
 const mqttContainerDescriptor = require('../docker/gladys-z2m-mqtt-container.json');
 const zigbee2mqttContainerDescriptor = require('../docker/gladys-z2m-zigbee2mqtt-container.json');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
-const logger = require('../../../utils/logger');
 
 /**
  * @description Disconnect service from dependent containers.
@@ -11,8 +12,10 @@ const logger = require('../../../utils/logger');
 async function disconnect() {
   let container;
 
-  await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
-  this.z2mEnabled = false;
+  // Stop backup reccurent job
+  if (this.backupScheduledJob) {
+    this.backupScheduledJob.cancel();
+  }
 
   // Disconnect from MQTT broker
   if (this.mqttClient) {

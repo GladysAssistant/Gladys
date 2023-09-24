@@ -28,9 +28,10 @@ module.exports = function DeviceController(gladys) {
    * @apiGroup Device
    */
   async function getDevicesByService(req, res) {
-    const params = Object.assign({}, req.query, {
+    const params = {
+      ...req.query,
       service: req.params.service_name,
-    });
+    };
     const devices = await gladys.device.get(params);
     res.json(devices);
   }

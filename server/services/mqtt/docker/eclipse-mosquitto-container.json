@@ -1,9 +1,15 @@
 {
   "name": "eclipse-mosquitto",
-  "Image": "eclipse-mosquitto:2",
+  "Image": "eclipse-mosquitto:2.0.15",
   "ExposedPorts": { "1883/tcp": {} },
   "HostConfig": {
     "Binds": ["/var/lib/gladysassistant/mosquitto:/mosquitto/config"],
+    "LogConfig": {
+      "Type": "json-file",
+      "Config": {
+        "max-size": "10m"
+      }
+    },
     "PortBindings": {
       "1883/tcp": [
         {

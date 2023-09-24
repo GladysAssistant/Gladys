@@ -58,11 +58,12 @@ const FeatureTab = ({ children, ...props }) => (
               <MqttDeviceForm {...props} />
 
               <div class="d-flex mb-4">
-                <div style={{ minWidth: '50%' }}>
+                <div class="w-50">
                   <Select
                     onChange={props.selectFeature}
                     value={props.selectedFeatureOption}
                     options={props.deviceFeaturesOptions}
+                    placeholder={<Text id="global.selectPlaceholder" />}
                   />
                 </div>
                 <div>

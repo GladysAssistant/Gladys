@@ -28,6 +28,8 @@ import GatewayResetPassword from '../routes/gateway-reset-password';
 import GatewayConfirmEmail from '../routes/gateway-confirm-email';
 import GoogleHomeGateway from '../routes/integration/all/google-home-gateway';
 import AlexaGateway from '../routes/integration/all/alexa-gateway';
+import EnedisGateway from '../routes/integration/all/enedis-gateway/Welcome';
+import EnedisGatewayUsagePoints from '../routes/integration/all/enedis-gateway/UsagePoints';
 
 import SignupWelcomePage from '../routes/signup/1-welcome';
 import SignupCreateAccountLocal from '../routes/signup/2-create-account-local';
@@ -36,9 +38,11 @@ import SignupPreferences from '../routes/signup/3-preferences';
 import SignupConfigureHouse from '../routes/signup/4-configure-house';
 import SignupSuccess from '../routes/signup/5-success';
 
+// Dashboard
 import Dashboard from '../routes/dashboard';
 import NewDashboard from '../routes/dashboard/new-dashboard';
-import Device from '../routes/device';
+import EditDashboard from '../routes/dashboard/edit-dashboard';
+
 import IntegrationPage from '../routes/integration';
 import ChatPage from '../routes/chat';
 import MapPage from '../routes/map';
@@ -46,6 +50,7 @@ import MapNewAreaPage from '../routes/map/NewArea';
 import CalendarPage from '../routes/calendar';
 import ScenePage from '../routes/scene';
 import NewScenePage from '../routes/scene/new-scene';
+import DuplicateScenePage from '../routes/scene/duplicate-scene';
 import EditScenePage from '../routes/scene/edit-scene';
 import ProfilePage from '../routes/profile';
 import SettingsSessionPage from '../routes/settings/settings-session';
@@ -75,20 +80,23 @@ import OpenWeatherPage from '../routes/integration/all/openweather';
 import PhilipsHueSetupPage from '../routes/integration/all/philips-hue/setup-page';
 import PhilipsHueDevicePage from '../routes/integration/all/philips-hue/device-page';
 import TPLinkDevicePage from '../routes/integration/all/tp-link/device-page';
-import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
-import ZwaveNetworkPage from '../routes/integration/all/zwave/network-page';
-import ZwaveSettingsPage from '../routes/integration/all/zwave/settings-page';
-import ZwaveSetupPage from '../routes/integration/all/zwave/setup-page';
-import ZwaveNodeOperationPage from '../routes/integration/all/zwave/node-operation-page';
-import ZwaveEditPage from '../routes/integration/all/zwave/edit-page';
 import RtspCameraPage from '../routes/integration/all/rtsp-camera';
 import XiaomiPage from '../routes/integration/all/xiaomi';
 import EditXiaomiPage from '../routes/integration/all/xiaomi/edit-page';
+import NextcloudTalkPage from '../routes/integration/all/nextcloud-talk';
+
+// Deprecated integration
+import ZwaveNodePage from '../routes/integration/all/zwave/node-page';
 
 // Broadlink integration
 import BroadlinkDevicePage from '../routes/integration/all/broadlink/device-page';
 import BroadlinkRemoteSetupPage from '../routes/integration/all/broadlink/remote-page';
 import BroadlinkPeripheralPage from '../routes/integration/all/broadlink/peripheral-page';
+
+// LAN-Manager integration
+import LANManagerDevicePage from '../routes/integration/all/lan-manager/device-page';
+import LANManagerDiscoverPage from '../routes/integration/all/lan-manager/discover-page';
+import LANManagerSettingsPage from '../routes/integration/all/lan-manager/settings-page';
 
 // MQTT integration
 import MqttDevicePage from '../routes/integration/all/mqtt/device-page';
@@ -120,6 +128,15 @@ import EweLinkPage from '../routes/integration/all/ewelink/device-page';
 import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
+
+// OpenAI integration
+import OpenAIPage from '../routes/integration/all/openai/index';
+
+// Tuya integration
+import TuyaPage from '../routes/integration/all/tuya/device-page';
+import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
+import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
+import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -183,8 +200,8 @@ const AppRouter = connect(
         <SignupSuccess path="/signup/success" />
         <Dashboard path="/dashboard" />
         <Dashboard path="/dashboard/:dashboardSelector" />
+        <EditDashboard path="/dashboard/:dashboardSelector/edit" />
         <NewDashboard path="/dashboard/create/new" />
-        <Device path="/dashboard/device" />
         <IntegrationPage path="/dashboard/integration" />
 
         <IntegrationPage path="/dashboard/integration/device" category="device" />
@@ -196,6 +213,11 @@ const AppRouter = connect(
         <IntegrationPage path="/dashboard/integration/navigation" category="navigation" />
 
         <TelegramPage path="/dashboard/integration/communication/telegram" />
+        <Redirect
+          path="/dashboard/integration/communication/nextcloudtalk"
+          to="/dashboard/integration/communication/nextcloud-talk"
+        />
+        <NextcloudTalkPage path="/dashboard/integration/communication/nextcloud-talk" />
         <Redirect path="/dashboard/integration/calendar/caldav" to="/dashboard/integration/calendar/caldav/account" />
         <CalDAVAccountPage path="/dashboard/integration/calendar/caldav/account" />
         <CalDAVSyncPage path="/dashboard/integration/calendar/caldav/sync" />
@@ -211,11 +233,6 @@ const AppRouter = connect(
         <TPLinkDevicePage path="/dashboard/integration/device/tp-link/device" />
         <Redirect path="/dashboard/integration/device/zwave" to="/dashboard/integration/device/zwave/node" />
         <ZwaveNodePage path="/dashboard/integration/device/zwave/node" />
-        <ZwaveNetworkPage path="/dashboard/integration/device/zwave/network" />
-        <ZwaveSettingsPage path="/dashboard/integration/device/zwave/settings" />
-        <ZwaveSetupPage path="/dashboard/integration/device/zwave/setup" />
-        <ZwaveNodeOperationPage path="/dashboard/integration/device/zwave/node-operation" />
-        <ZwaveEditPage path="/dashboard/integration/device/zwave/edit/:deviceSelector" />
         <RtspCameraPage path="/dashboard/integration/device/rtsp-camera" />
         <MqttDevicePage path="/dashboard/integration/device/mqtt" />
         <MqttDeviceSetupPage path="/dashboard/integration/device/mqtt/edit" />
@@ -237,6 +254,12 @@ const AppRouter = connect(
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
+        <OpenAIPage path="/dashboard/integration/communication/openai" />
+
+        <TuyaPage path="/dashboard/integration/device/tuya" />
+        <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
+        <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
+        <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
@@ -249,11 +272,18 @@ const AppRouter = connect(
         <BroadlinkRemoteSetupPage path="/dashboard/integration/device/broadlink/edit/:deviceSelector" />
         <BroadlinkPeripheralPage path="/dashboard/integration/device/broadlink/peripheral" />
 
+        <LANManagerDevicePage path="/dashboard/integration/device/lan-manager" />
+        <LANManagerDiscoverPage path="/dashboard/integration/device/lan-manager/discover" />
+        <LANManagerSettingsPage path="/dashboard/integration/device/lan-manager/config" />
+
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
         <AlexaWelcomePage path="/dashboard/integration/communication/alexa" />
         <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
+        <EnedisGateway path="/dashboard/integration/device/enedis" />
+        <EnedisGatewayUsagePoints path="/dashboard/integration/device/enedis/usage-points" />
+        <EnedisGateway path="/dashboard/integration/device/enedis/redirect" />
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
@@ -262,6 +292,7 @@ const AppRouter = connect(
         <CalendarPage path="/dashboard/calendar" />
         <ScenePage path="/dashboard/scene" />
         <NewScenePage path="/dashboard/scene/new" />
+        <DuplicateScenePage path="/dashboard/scene/:scene_selector/duplicate" />
         <EditScenePage path="/dashboard/scene/:scene_selector" />
         <ProfilePage path="/dashboard/profile" />
         <SettingsSessionPage path="/dashboard/settings/session" />
@@ -280,7 +311,6 @@ const AppRouter = connect(
   </div>
 ));
 
-@connect('user', actions)
 class MainApp extends Component {
   componentWillMount() {
     this.props.checkSession();
@@ -296,9 +326,11 @@ class MainApp extends Component {
   }
 }
 
+const MainAppConnected = connect('user', actions)(MainApp);
+
 const App = () => (
   <Provider store={store}>
-    <MainApp />
+    <MainAppConnected />
   </Provider>
 );
 

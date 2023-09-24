@@ -4,14 +4,25 @@ const { DEFAULT } = require('./constants');
 
 /**
  * @description Initialize service with dependencies and connect to devices.
- * @param {Object} MqttParam - MQTT broker URL, Client MQTT username, Client MQTT password.
+ * @param {object} MqttParam - MQTT broker URL, Client MQTT username, Client MQTT password.
+ * @param {string} MqttParam.mqttUrl - MQTT URL.
+ * @param {string} MqttParam.mqttUsername - MQTT Username.
+ * @param {string} MqttParam.mqttPassword - MQTT Password.
+ * @returns {Promise} Resolve when connected.
  * @example
  * connect();
  */
 async function connect({ mqttUrl, mqttUsername, mqttPassword }) {
+  if (this.mqttClient) {
+    logger.info(`Disconnecting existing MQTT client...`);
+    this.mqttClient.end();
+    this.mqttClient.removeAllListeners();
+    this.mqttClient = null;
+  }
+
   if (this.mqttRunning) {
     // Loads MQTT service
-    logger.log('Connecting Gladys to ', mqttUrl);
+    logger.info(`Connecting Gladys to ${mqttUrl} MQTT broker...`);
 
     this.mqttClient = this.mqttLibrary.connect(mqttUrl, {
       username: mqttUsername,

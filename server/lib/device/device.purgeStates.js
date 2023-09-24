@@ -4,7 +4,7 @@ const logger = require('../../utils/logger');
 const { SYSTEM_VARIABLE_NAMES } = require('../../utils/constants');
 
 /**
- * @description Purge device states
+ * @description Purge device states.
  * @returns {Promise} Resolve when finished.
  * @example
  * device.purgeStates();

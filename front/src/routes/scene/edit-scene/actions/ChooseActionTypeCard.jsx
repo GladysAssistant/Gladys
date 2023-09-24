@@ -8,10 +8,13 @@ import { ACTIONS } from '../../../../../../server/utils/constants';
 const ACTION_LIST = [
   ACTIONS.LIGHT.TURN_ON,
   ACTIONS.LIGHT.TURN_OFF,
+  ACTIONS.LIGHT.TOGGLE,
   ACTIONS.SWITCH.TURN_ON,
   ACTIONS.SWITCH.TURN_OFF,
+  ACTIONS.SWITCH.TOGGLE,
   ACTIONS.TIME.DELAY,
   ACTIONS.MESSAGE.SEND,
+  ACTIONS.MESSAGE.SEND_CAMERA,
   ACTIONS.DEVICE.GET_VALUE,
   ACTIONS.CONDITION.ONLY_CONTINUE_IF,
   ACTIONS.USER.SET_SEEN_AT_HOME,
@@ -23,15 +26,15 @@ const ACTION_LIST = [
   ACTIONS.HOUSE.IS_EMPTY,
   ACTIONS.HOUSE.IS_NOT_EMPTY,
   ACTIONS.DEVICE.SET_VALUE,
-  ACTIONS.CALENDAR.IS_EVENT_RUNNING
+  ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+  ACTIONS.ECOWATT.CONDITION
 ];
 
 const TRANSLATIONS = ACTION_LIST.reduce((acc, action) => {
   acc[`editScene.actions.${action}`] = `editScene.actions.${action}`;
   return acc;
 }, {});
-@withText(TRANSLATIONS)
-@connect('httpClient', {})
+
 class ChooseActionType extends Component {
   state = {
     currentAction: null
@@ -75,4 +78,4 @@ class ChooseActionType extends Component {
   }
 }
 
-export default ChooseActionType;
+export default withText(TRANSLATIONS)(connect('httpClient', {})(ChooseActionType));

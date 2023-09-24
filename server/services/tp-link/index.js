@@ -10,7 +10,7 @@ module.exports = function TpLinkService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function starts the TpLinkService service
+   * @description This function starts the TpLinkService service.
    * @example
    * gladys.services['tplink'].start();
    */
@@ -20,7 +20,7 @@ module.exports = function TpLinkService(gladys, serviceId) {
 
   /**
    * @public
-   * @description This function stops the TpLinkService service
+   * @description This function stops the TpLinkService service.
    * @example
    *  gladys.services['tplink'].stop();
    */

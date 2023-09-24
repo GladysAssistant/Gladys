@@ -1,21 +1,16 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
-
-const { assert, fake } = sinon;
+const path = require('path');
 const proxyquire = require('proxyquire').noCallThru();
 
-const { stub } = require('sinon');
+const { assert, fake, stub } = sinon;
+
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const { installZ2mContainer } = proxyquire('../../../../services/zigbee2mqtt/lib/installZ2mContainer', {
-  '../../../utils/childProcess': { exec: fake.resolves(true) },
-});
+const configureContainer = fake.resolves(false);
 const Zigbee2mqttManager = proxyquire('../../../../services/zigbee2mqtt/lib', {
-  './installZ2mContainer': { installZ2mContainer },
+  './configureContainer': { configureContainer },
 });
-
-const event = {
-  emit: fake.resolves(null),
-};
 
 const container = {
   id: 'docker-test',
@@ -27,106 +22,146 @@ const containerStopped = {
   state: 'stopped',
 };
 
-const gladys = {
-  event,
-  variable: {
-    setValue: fake.resolves(true),
-    getValue: fake.resolves(true),
-  },
-  system: {
-    getContainers: fake.resolves([containerStopped]),
-    stopContainer: fake.resolves(true),
-    pull: fake.resolves(true),
-    restartContainer: fake.resolves(true),
-    createContainer: fake.resolves(true),
-    getGladysBasePath: fake.resolves({
-      basePathOnHost: '/var/lib/gladysassistant',
-      basePathOnContainer: '/var/lib/gladysassistant',
-    }),
-  },
-};
-
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
+const basePathOnContainer = path.join(__dirname, 'container');
 
 describe('zigbee2mqtt installz2mContainer', () => {
   // PREPARE
-  const zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
+  let zigbee2mqttManager;
+  let gladys;
 
   beforeEach(() => {
-    sinon.reset();
+    gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
+      event: {
+        emit: fake.resolves(null),
+      },
+      variable: {
+        getValue: fake.resolves(null),
+      },
+      system: {
+        getContainers: fake.resolves([containerStopped]),
+        stopContainer: fake.resolves(true),
+        pull: fake.resolves(true),
+        restartContainer: fake.resolves(true),
+        createContainer: fake.resolves(true),
+        getGladysBasePath: fake.resolves({
+          basePathOnHost: path.join(__dirname, 'host'),
+          basePathOnContainer,
+        }),
+      },
+    };
+
+    zigbee2mqttManager = new Zigbee2mqttManager(gladys, null, serviceId);
     zigbee2mqttManager.zigbee2mqttRunning = false;
     zigbee2mqttManager.zigbee2mqttExist = false;
+    zigbee2mqttManager.containerRestartWaitTimeInMs = 0;
   });
 
-  it('it should restart z2m container', async function Test() {
+  afterEach(() => {
+    sinon.reset();
+  });
+
+  it('it should restart z2m container (container stopped)', async () => {
     // PREPARE
-    this.timeout(6000);
+    const config = {};
     // EXECUTE
-    await zigbee2mqttManager.installZ2mContainer();
+    await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
-    assert.calledWith(gladys.system.restartContainer, container.id);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config);
+    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
     });
-    assert.match(zigbee2mqttManager.zigbee2mqttRunning, true);
-    assert.match(zigbee2mqttManager.zigbee2mqttExist, true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+  });
+
+  it('it should restart z2m container (container running but config changed)', async () => {
+    // PREPARE
+    const config = {};
+    gladys.system.getContainers = fake.resolves([container]);
+    zigbee2mqttManager.configureContainer = fake.resolves(true);
+    // EXECUTE
+    await zigbee2mqttManager.installZ2mContainer(config);
+    // ASSERT
+    assert.calledOnceWithExactly(zigbee2mqttManager.configureContainer, basePathOnContainer, config);
+    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
+    });
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
   it('it should do nothing', async () => {
     // PREPARE
+    const config = {};
     gladys.system.getContainers = fake.resolves([container]);
     // EXECUTE
-    await zigbee2mqttManager.installZ2mContainer();
+    await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
     assert.notCalled(gladys.system.restartContainer);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
     });
-    assert.match(zigbee2mqttManager.zigbee2mqttRunning, true);
-    assert.match(zigbee2mqttManager.zigbee2mqttExist, true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
   });
 
   it('it should fail to start z2m container', async () => {
     // PREPARE
+    const config = {};
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.restartContainer = fake.throws(new Error('docker fail'));
     // EXECUTE
     try {
-      await zigbee2mqttManager.installZ2mContainer();
+      await zigbee2mqttManager.installZ2mContainer(config);
       assert.fail();
     } catch (e) {
-      assert.match(e.message, 'docker fail');
+      expect(e.message).to.equal('docker fail');
     }
     // ASSERT
-    assert.calledWith(gladys.system.restartContainer, container.id);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config);
+    assert.calledOnceWithExactly(gladys.system.restartContainer, container.id);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
     });
-    assert.match(zigbee2mqttManager.zigbee2mqttRunning, false);
-    assert.match(zigbee2mqttManager.zigbee2mqttExist, false);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(false);
   });
 
   it('it should fail to install z2m container', async () => {
     // PREPARE
+    const config = {};
     gladys.system.getContainers = fake.resolves([]);
     gladys.system.pull = fake.throws(new Error('docker fail pull'));
     // EXECUTE
     try {
-      await zigbee2mqttManager.installZ2mContainer();
+      await zigbee2mqttManager.installZ2mContainer(config);
       assert.fail();
     } catch (e) {
-      assert.match(e.message, 'docker fail pull');
+      expect(e.message).to.equal('docker fail pull');
     }
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.notCalled(configureContainer);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
     });
-    assert.match(zigbee2mqttManager.zigbee2mqttRunning, false);
-    assert.match(zigbee2mqttManager.zigbee2mqttExist, false);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(false);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(false);
   });
 
-  it('it should install z2m container', async function Test() {
+  it('it should install z2m container and error reading configuration', async () => {
     // PREPARE
+    const config = {};
     const getContainersStub = stub();
     getContainersStub
       .onFirstCall()
@@ -137,14 +172,15 @@ describe('zigbee2mqtt installz2mContainer', () => {
     gladys.system.pull = fake.resolves(true);
 
     // EXECUTE
-    await zigbee2mqttManager.installZ2mContainer();
+    await zigbee2mqttManager.installZ2mContainer(config);
     // ASSERT
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
     });
-    assert.calledThrice(gladys.variable.getValue);
+    assert.calledOnceWithExactly(configureContainer, basePathOnContainer, config);
     assert.calledOnce(gladys.system.createContainer);
-    assert.match(zigbee2mqttManager.zigbee2mqttRunning, true);
-    assert.match(zigbee2mqttManager.zigbee2mqttExist, true);
+    expect(zigbee2mqttManager.zigbee2mqttRunning).to.equal(true);
+    expect(zigbee2mqttManager.zigbee2mqttExist).to.equal(true);
+    expect(config).to.deep.equal({});
   });
 });

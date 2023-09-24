@@ -2,6 +2,8 @@ import { Text } from 'preact-i18n';
 import cx from 'classnames';
 import { CalDAVStatus } from '../../../../../utils/consts';
 
+import style from './ShareTab.css';
+
 const ShareTab = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
@@ -31,11 +33,11 @@ const ShareTab = ({ children, ...props }) => (
                       )}
                       {props.caldavCalendars && props.caldavCalendars.length > 0 && (
                         <div class="form-group">
-                          <div style={{ marginBottom: '10px' }}>
+                          <div className={style.switchGroup}>
                             {props.caldavCalendars &&
                               props.caldavCalendars.map(calendar => {
                                 return (
-                                  <label class="custom-switch" style={{ display: 'block', marginBottom: '5px' }}>
+                                  <label class={cx('custom-switch', style.switchLabel)}>
                                     <input
                                       type="checkbox"
                                       name={calendar.selector}
@@ -47,7 +49,7 @@ const ShareTab = ({ children, ...props }) => (
                                       }
                                       onClick={props.updateCalendarSharing}
                                     />
-                                    <span class="custom-switch-indicator" style={{ marginRight: '5px' }} />
+                                    <span class={cx('custom-switch-indicator', style.switchIndicator)} />
                                     {calendar.name}
                                   </label>
                                 );

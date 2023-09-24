@@ -2,18 +2,18 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Get a service by name
+ * @description Get a service by name.
  * @param {string} name - Name of the service.
- * @param {string} [pod_id] - Id of the pod.
+ * @param {string} [podId] - Id of the pod.
  * @returns {Promise} - Resolve with the service of null.
  * @example
  * service.getByName('telegram', null);
  */
-async function getByName(name, pod_id = null) {
+async function getByName(name, podId = null) {
   const service = await db.Service.findOne({
     where: {
       name,
-      pod_id,
+      pod_id: podId,
     },
   });
   if (service === null) {

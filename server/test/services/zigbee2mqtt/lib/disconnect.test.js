@@ -1,30 +1,14 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
-const { assert: assertC } = require('chai');
-const proxyquire = require('proxyquire').noCallThru();
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 
-const Zigbee2MqttService = proxyquire('../../../../services/zigbee2mqtt', {});
-
-const event = {
-  emit: fake.resolves(null),
-};
+const Zigbee2mqttManager = require('../../../../services/zigbee2mqtt/lib');
 
 const container = {
   id: 'docker-test',
-};
-
-const gladys = {
-  event,
-  variable: {
-    setValue: fake.resolves(true),
-  },
-  system: {
-    getContainers: fake.resolves([container]),
-    stopContainer: fake.resolves(true),
-  },
 };
 
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
@@ -36,49 +20,80 @@ const mqtt = {
 
 describe('zigbee2mqtt disconnect', () => {
   // PREPARE
-  const zigbee2MqttService = Zigbee2MqttService(gladys, serviceId);
+  let zigbee2MqttManager;
+  let gladys;
 
   beforeEach(() => {
+    gladys = {
+      job: {
+        wrapper: (type, func) => {
+          return async () => {
+            return func();
+          };
+        },
+      },
+      event: {
+        emit: fake.resolves(null),
+      },
+      system: {
+        getContainers: fake.resolves([container]),
+        stopContainer: fake.resolves(true),
+      },
+    };
+
+    zigbee2MqttManager = new Zigbee2mqttManager(gladys, mqtt, serviceId);
+  });
+
+  afterEach(() => {
     sinon.reset();
   });
 
   it('mqtt not connected', async () => {
     // EXECUTE
-    await zigbee2MqttService.device.disconnect();
+    await zigbee2MqttManager.disconnect();
     // ASSERT
-    assert.calledWith(gladys.variable.setValue, 'ZIGBEE2MQTT_ENABLED', false, serviceId);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
     });
     assert.calledThrice(gladys.event.emit);
     assert.calledTwice(gladys.system.stopContainer);
-    assertC.isFalse(zigbee2MqttService.device.gladysConnected);
-    assertC.isFalse(zigbee2MqttService.device.z2mEnabled);
-    assertC.isFalse(zigbee2MqttService.device.mqttRunning);
-    assertC.isFalse(zigbee2MqttService.device.zigbee2mqttRunning);
-    assertC.isFalse(zigbee2MqttService.device.zigbee2mqttConnected);
+
+    expect(zigbee2MqttManager.gladysConnected).to.equal(false);
+    expect(zigbee2MqttManager.mqttRunning).to.equal(false);
+    expect(zigbee2MqttManager.zigbee2mqttRunning).to.equal(false);
+    expect(zigbee2MqttManager.zigbee2mqttConnected).to.equal(false);
   });
 
   it('mqtt connected', async () => {
     // PREPARE
-    zigbee2MqttService.device.mqttClient = mqtt;
+    zigbee2MqttManager.mqttClient = mqtt;
     // EXECUTE
-    await zigbee2MqttService.device.disconnect();
+    await zigbee2MqttManager.disconnect();
     // ASSERT
-    assert.calledWith(gladys.variable.setValue, 'ZIGBEE2MQTT_ENABLED', false, serviceId);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZIGBEE2MQTT.STATUS_CHANGE,
     });
     assert.calledThrice(gladys.event.emit);
     assert.calledTwice(gladys.system.stopContainer);
-    assertC.isFalse(zigbee2MqttService.device.gladysConnected);
-    assertC.isFalse(zigbee2MqttService.device.z2mEnabled);
-    assertC.isFalse(zigbee2MqttService.device.mqttRunning);
-    assertC.isFalse(zigbee2MqttService.device.zigbee2mqttRunning);
-    assertC.isFalse(zigbee2MqttService.device.zigbee2mqttConnected);
+    expect(zigbee2MqttManager.gladysConnected).to.equal(false);
 
-    assertC.isNull(zigbee2MqttService.device.mqttClient);
+    expect(zigbee2MqttManager.mqttRunning).to.equal(false);
+    expect(zigbee2MqttManager.zigbee2mqttRunning).to.equal(false);
+    expect(zigbee2MqttManager.zigbee2mqttConnected).to.equal(false);
+
+    expect(zigbee2MqttManager.mqttClient).to.equal(null);
     assert.calledOnce(mqtt.end);
     assert.calledOnce(mqtt.removeAllListeners);
+  });
+
+  it('clear backup interval', async () => {
+    // PREPARE
+    zigbee2MqttManager.backupScheduledJob = {
+      cancel: fake.returns(true),
+    };
+    // EXECUTE
+    await zigbee2MqttManager.disconnect();
+    // ASSERT
+    assert.calledOnceWithExactly(zigbee2MqttManager.backupScheduledJob.cancel);
   });
 });

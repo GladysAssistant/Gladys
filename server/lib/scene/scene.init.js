@@ -20,21 +20,17 @@ async function init() {
   const plainScenes = scenes.map((scene) => {
     const plainScene = scene.get({ plain: true });
     this.addScene(plainScene);
+    this.brain.addNamedEntity('scene', plainScene.selector, plainScene.name);
     return plainScene;
   });
 
   // Recurrence rule (00:00 every day) to update sunrise/sunset time.
-  const rule = new this.schedule.RecurrenceRule();
-  rule.tz = this.timezone;
-  rule.hour = 0;
-  rule.minute = 0;
-  rule.second = 0;
-
-  this.schedule.scheduleJob(rule, this.dailyUpdate.bind(this));
+  const rule = { tz: this.timezone, hour: 0, minute: 0, second: 0 };
+  this.scheduler.scheduleJob(rule, this.dailyUpdate.bind(this));
   await this.dailyUpdate();
 
   //  At every minute, check if calendar event is coming
-  this.schedule.scheduleJob('* * * * *', () => this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING));
+  this.scheduler.scheduleJob('* * * * *', () => this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING));
 
   return plainScenes;
 }

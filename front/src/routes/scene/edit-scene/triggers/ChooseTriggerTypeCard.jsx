@@ -4,6 +4,8 @@ import { Text } from 'preact-i18n';
 import Select from 'react-select';
 
 import { EVENTS } from '../../../../../../server/utils/constants';
+import withIntlAsProp from '../../../../utils/withIntlAsProp';
+import get from 'get-value';
 
 const TRIGGER_LIST = [
   EVENTS.DEVICE.NEW_STATE,
@@ -19,11 +21,7 @@ const TRIGGER_LIST = [
   EVENTS.CALENDAR.EVENT_IS_COMING
 ];
 
-@connect('httpClient', {})
 class ChooseTriggerType extends Component {
-  state = {
-    currentTrigger: null
-  };
   handleChange = selectedOption => {
     if (selectedOption) {
       this.setState({
@@ -40,7 +38,24 @@ class ChooseTriggerType extends Component {
       this.props.updateTriggerProperty(this.props.index, 'type', this.state.currentTrigger.value);
     }
   };
-  render(props, { currentTrigger }) {
+
+  constructor(props) {
+    super(props);
+
+    const options = TRIGGER_LIST.map(trigger => {
+      return {
+        value: trigger,
+        label: get(props.intl.dictionary, `editScene.triggers.${trigger}`, { default: trigger })
+      };
+    });
+
+    this.state = {
+      options,
+      currentTrigger: null
+    };
+  }
+
+  render(props, { currentTrigger, options }) {
     return (
       <div>
         <div class="form-group">
@@ -50,10 +65,7 @@ class ChooseTriggerType extends Component {
           <Select
             class="choose-scene-trigger-type"
             value={currentTrigger}
-            options={TRIGGER_LIST.map(trigger => ({
-              value: trigger,
-              label: <Text id={`editScene.triggers.${trigger}`} />
-            }))}
+            options={options}
             onChange={this.handleChange}
           />
         </div>
@@ -67,4 +79,4 @@ class ChooseTriggerType extends Component {
   }
 }
 
-export default ChooseTriggerType;
+export default withIntlAsProp(connect('httpClient', {})(ChooseTriggerType));

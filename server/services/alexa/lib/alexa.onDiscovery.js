@@ -4,6 +4,7 @@ const { syncDeviceConverter } = require('./syncDeviceConverter');
 /**
  * @public
  * @description Returns devices formatted the Amazon Alexa way.
+ * @returns {object} Resolve discovery response.
  * @example
  * onDiscovery();
  */

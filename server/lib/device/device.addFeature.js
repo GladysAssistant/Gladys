@@ -5,9 +5,10 @@ const db = require('../../models');
 const UPDATABLE_FIELDS = ['category', 'type', 'unit', 'min', 'max'];
 
 /**
- * @description Add a feature to a device
+ * @description Add a feature to a device.
  * @param {string} deviceSelector - The selector of the device.
- * @param {Object} feature - The new device feature.
+ * @param {object} feature - The new device feature.
+ * @returns {Promise<object>} Resolve with new device.
  * @example
  * device.addFeature('device', {
  *    name: 'On/Off',
@@ -38,7 +39,7 @@ async function addFeature(deviceSelector, feature) {
 
   // if the feature does not already exist, we create it.
   if (featureIndex === -1) {
-    const createdFeature = await db.DeviceFeature.create(Object.assign({}, feature, { device_id: device.id }));
+    const createdFeature = await db.DeviceFeature.create({ ...feature, device_id: device.id });
     featureInStore = createdFeature.get({ plain: true });
     device.features.push(featureInStore);
     // we save again the device in RAM

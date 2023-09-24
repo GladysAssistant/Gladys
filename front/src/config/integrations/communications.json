@@ -4,6 +4,10 @@
     "img": "/assets/integrations/cover/telegram.jpg"
   },
   {
+    "key": "nextcloudTalk",
+    "img": "/assets/integrations/cover/nextcloud-talk.jpg"
+  },
+  {
     "key": "alexa",
     "img": "/assets/integrations/cover/alexa.jpg"
   },
@@ -14,5 +18,9 @@
   {
     "key": "homekit",
     "img": "/assets/integrations/cover/homekit.jpg"
+  },
+  {
+    "key": "openai",
+    "img": "/assets/integrations/cover/openai.jpg"
   }
 ]

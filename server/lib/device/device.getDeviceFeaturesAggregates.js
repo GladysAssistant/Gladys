@@ -13,7 +13,7 @@ dayjs.extend(utc);
  * @param {string} selector - Device selector.
  * @param {number} intervalInMinutes - Interval.
  * @param {number} maxStates - Number of elements to return max.
- * @returns {Promise<Object>} - Resolve with an array of data.
+ * @returns {Promise<object>} - Resolve with an array of data.
  * @example
  * device.getDeviceFeaturesAggregates('test-devivce');
  */
@@ -68,7 +68,10 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   } else {
     rows = await db.DeviceFeatureStateAggregate.findAll({
       raw: true,
-      attributes: [[groupByFunction, 'created_at'], [fn('round', fn('avg', col('value')), 2), 'value']],
+      attributes: [
+        [groupByFunction, 'created_at'],
+        [fn('round', fn('avg', col('value')), 2), 'value'],
+      ],
       group: [groupByFunction],
       where: {
         device_feature_id: deviceFeature.id,

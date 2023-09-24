@@ -31,9 +31,6 @@ module.exports = function MqttController(mqttManager) {
    */
   async function getConfiguration(req, res) {
     const configuration = await mqttManager.getConfiguration();
-    if (!configuration.useEmbeddedBroker && configuration.mqttPassword) {
-      configuration.mqttPassword = DEFAULT.HIDDEN_PASSWORD; // Hide password from external broker
-    }
     res.json(configuration);
   }
 

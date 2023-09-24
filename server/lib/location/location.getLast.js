@@ -2,8 +2,9 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Get last location By User
+ * @description Get last location By User.
  * @param {string} userSelector - The selector of the user to get location from.
+ * @returns {Promise<object>} Returns user last location.
  * @example
  * gladys.location.getLast('tony');
  */

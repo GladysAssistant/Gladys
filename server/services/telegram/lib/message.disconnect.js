@@ -1,7 +1,7 @@
 const logger = require('../../../utils/logger');
 
 /**
- * @description Disconnect telegram API
+ * @description Disconnect telegram API.
  * @example
  * disconnect();
  */

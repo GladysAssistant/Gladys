@@ -5,17 +5,17 @@ const db = require('../../models');
 
 /**
  * @public
- * @description Start one service by name
+ * @description Start one service by name.
  * @param {string} name - The name of the service.
- * @param {string} pod_id - ID of Gladys instance.
- * @returns {Promise<Object>} Requested service.
+ * @param {string} podId - ID of Gladys instance.
+ * @returns {Promise<object>} Requested service.
  * @example
  * service.start('telegram');
  */
-async function start(name, pod_id = null) {
+async function start(name, podId = null) {
   const serviceInDb = await db.Service.findOne({
     where: {
-      pod_id,
+      pod_id: podId,
       name,
     },
   });

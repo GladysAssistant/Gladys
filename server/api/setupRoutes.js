@@ -15,8 +15,8 @@ const { setupGateway } = require('./setupGateway');
 
 /**
  * @description Setup the routes.
- * @param {Object} gladys - Gladys library.
- * @returns {Object} Express router.
+ * @param {object} gladys - Gladys library.
+ * @returns {object} Express router.
  * @example
  * setupRoutes(gladys);
  */

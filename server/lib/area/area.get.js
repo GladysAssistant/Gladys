@@ -1,7 +1,8 @@
 const db = require('../../models');
 
 /**
- * @description Get areas
+ * @description Get areas.
+ * @returns {Promise<object>} Return area.
  * @example
  * gladys.area.get();
  */

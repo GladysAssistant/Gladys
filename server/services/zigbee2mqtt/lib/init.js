@@ -5,8 +5,9 @@ const { PlatformNotCompatible } = require('../../../utils/coreErrors');
 
 /**
  * @description Prepares service and starts connection with broker if needed.
+ * @returns {Promise} Resolve when init finished.
  * @example
- * init();
+ * await z2m.init();
  */
 async function init() {
   const dockerBased = await this.gladys.system.isDocker();
@@ -21,73 +22,64 @@ async function init() {
     throw new PlatformNotCompatible('DOCKER_BAD_NETWORK');
   }
 
-  const z2mEnabled = await this.gladys.variable.getValue('ZIGBEE2MQTT_ENABLED', this.serviceId);
-  this.z2mEnabled = z2mEnabled !== '0';
-  logger.log('Reading z2mEnabled state :', this.z2mEnabled);
-  if (z2mEnabled == null) {
-    await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
-    this.z2mEnabled = false;
-  }
+  // Load stored configuration
+  const configuration = await this.getConfiguration();
+  const { z2mDriverPath, mqttPassword } = configuration;
 
   // Test if dongle is present
   this.usbConfigured = false;
-  const zigbee2mqttDriverPath = await this.gladys.variable.getValue('ZIGBEE2MQTT_DRIVER_PATH', this.serviceId);
-  if (!zigbee2mqttDriverPath) {
+  if (!z2mDriverPath) {
     logger.info(`Zigbee2mqtt USB dongle not attached`);
-    if (this.z2mEnabled) {
-      await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
-      this.z2mEnabled = false;
-    }
   } else {
     const usb = this.gladys.service.getService('usb');
     const usbList = await usb.list();
-    usbList.forEach((usbPort) => {
-      if (zigbee2mqttDriverPath === usbPort.path) {
-        this.usbConfigured = true;
-        logger.info(`Zigbee2mqtt USB dongle attached to ${zigbee2mqttDriverPath}`);
-      }
-    });
-    if (!this.usbConfigured) {
-      logger.info(`Zigbee2mqtt USB dongle detached to ${zigbee2mqttDriverPath}`);
-      await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
-      this.z2mEnabled = false;
+    const usbPort = usbList.find((usbDriver) => usbDriver.path === z2mDriverPath);
+
+    if (usbPort) {
+      logger.info(`Zigbee2mqtt USB dongle attached to ${z2mDriverPath}`);
+      this.usbConfigured = true;
+    } else {
+      logger.warn(`Zigbee2mqtt USB dongle detached to ${z2mDriverPath}`);
+      this.usbConfigured = false;
     }
   }
 
-  // Generate credentials for Gladys & Z2M for connection to broker
-  const mqttPw = await this.gladys.variable.getValue(CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY, this.serviceId);
-  if (!mqttPw) {
-    await this.gladys.variable.setValue(CONFIGURATION.MQTT_URL_KEY, CONFIGURATION.MQTT_URL_VALUE, this.serviceId);
-    await this.gladys.variable.setValue(
-      CONFIGURATION.Z2M_MQTT_USERNAME_KEY,
-      CONFIGURATION.Z2M_MQTT_USERNAME_VALUE,
-      this.serviceId,
-    );
-    await this.gladys.variable.setValue(
-      CONFIGURATION.Z2M_MQTT_PASSWORD_KEY,
-      generate(20, { number: true, lowercase: true, uppercase: true }),
-      this.serviceId,
-    );
-    await this.gladys.variable.setValue(
-      CONFIGURATION.GLADYS_MQTT_USERNAME_KEY,
-      CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE,
-      this.serviceId,
-    );
-    await this.gladys.variable.setValue(
-      CONFIGURATION.GLADYS_MQTT_PASSWORD_KEY,
-      generate(20, { number: true, lowercase: true, uppercase: true }),
-      this.serviceId,
-    );
-    await this.gladys.variable.setValue('ZIGBEE2MQTT_ENABLED', false, this.serviceId);
-    this.z2mEnabled = false;
+  // Check for existing credentials for Gladys & Z2M for connection to broker
+  if (!mqttPassword) {
+    configuration.mqttUrl = CONFIGURATION.MQTT_URL_VALUE;
+    configuration.z2mMqttUsername = CONFIGURATION.Z2M_MQTT_USERNAME_VALUE;
+    configuration.z2mMqttPassword = generate(20, {
+      number: true,
+      lowercase: true,
+      uppercase: true,
+    });
+    configuration.mqttUsername = CONFIGURATION.GLADYS_MQTT_USERNAME_VALUE;
+    configuration.mqttPassword = generate(20, {
+      number: true,
+      lowercase: true,
+      uppercase: true,
+    });
   }
 
   if (this.usbConfigured) {
-    const configuration = await this.getConfiguration();
-    if (this.z2mEnabled) {
+    logger.debug('Zibgee2mqtt: installing and starting required docker containers...');
+    await this.checkForContainerUpdates(configuration);
+    await this.installMqttContainer(configuration);
+    await this.installZ2mContainer(configuration);
+
+    if (this.isEnabled()) {
       await this.connect(configuration);
+
+      // Schedule reccurent job if not already scheduled
+      if (!this.backupScheduledJob) {
+        this.backupScheduledJob = this.gladys.scheduler.scheduleJob('0 0 23 * * *', () => this.backup());
+      }
     }
   }
+
+  await this.saveConfiguration(configuration);
+
+  return null;
 }
 
 module.exports = {

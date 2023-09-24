@@ -1,4 +1,6 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
+const { getDeviceFeature } = require('../../../../utils/device');
+const { kelvinToMired, miredToKelvin } = require('../../../../utils/colors');
 
 /**
  * @see https://developers.google.com/assistant/smarthome/traits/colorsetting
@@ -8,20 +10,20 @@ const colorSettingTrait = {
   generateAttributes: (device) => {
     const result = {};
 
-    const hasColor = device.features.find(
-      (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-    );
+    const hasColor = getDeviceFeature(device, DEVICE_FEATURE_CATEGORIES.LIGHT, DEVICE_FEATURE_TYPES.LIGHT.COLOR);
     if (hasColor) {
       result.colorModel = 'rgb';
     }
 
-    const hasColorTemp = device.features.find(
-      (f) => f.category === DEVICE_FEATURE_CATEGORIES.LIGHT && f.type === DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+    const hasColorTemp = getDeviceFeature(
+      device,
+      DEVICE_FEATURE_CATEGORIES.LIGHT,
+      DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
     );
     if (hasColorTemp) {
       result.colorTemperatureRange = {
-        temperatureMinK: 2000,
-        temperatureMaxK: 9000,
+        temperatureMinK: Math.round(miredToKelvin(hasColorTemp.max)),
+        temperatureMaxK: Math.round(miredToKelvin(hasColorTemp.min)),
       };
     }
 
@@ -54,7 +56,7 @@ const colorSettingTrait = {
     {
       key: 'color.temperatureK',
       readValue: (feature) => {
-        return feature.last_value * 70 + 2000;
+        return Math.round(miredToKelvin(feature.last_value));
       },
       features: [
         {
@@ -65,29 +67,49 @@ const colorSettingTrait = {
     },
   ],
   commands: {
-    'action.devices.commands.ColorAbsolute': {
-      'color.temperature': {
-        writeValue: (paramValue) => {
-          return (paramValue - 2000) / 70;
-        },
-        features: [
-          {
-            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-            type: DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
-          },
-        ],
-      },
-      'color.spectrumRGB': {
-        writeValue: (paramValue) => {
-          return paramValue;
-        },
-        features: [
-          {
-            category: DEVICE_FEATURE_CATEGORIES.LIGHT,
-            type: DEVICE_FEATURE_TYPES.LIGHT.COLOR,
-          },
-        ],
-      },
+    'action.devices.commands.ColorAbsolute': (device, params) => {
+      const events = [];
+      const { color = {} } = params;
+      const { temperature, spectrumRGB } = color;
+
+      if (temperature !== undefined) {
+        const relatedFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE,
+        );
+
+        if (relatedFeature) {
+          let newValue = Math.round(kelvinToMired(temperature));
+          if (newValue > relatedFeature.max) {
+            newValue = relatedFeature.max;
+          }
+          if (newValue < relatedFeature.min) {
+            newValue = relatedFeature.min;
+          }
+          events.push({
+            device_feature: relatedFeature.selector,
+            value: newValue,
+          });
+        }
+      }
+
+      if (spectrumRGB !== undefined) {
+        const relatedFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.COLOR,
+        );
+
+        if (relatedFeature) {
+          events.push({
+            device_feature: relatedFeature.selector,
+            value: spectrumRGB,
+          });
+        }
+      }
+
+      return { events };
     },
   },
 };

@@ -4,7 +4,6 @@ import actions from './actions';
 import OpenWeatherPage from './OpenWeather';
 import { RequestStatus } from '../../../../utils/consts';
 
-@connect('user,openWeatherApiKey,openWeatherSaveApiKeyStatus,openWeatherGetApiKeyStatus', actions)
 class OpenWeatherIntegration extends Component {
   componentWillMount() {
     this.props.getApiKey();
@@ -18,4 +17,7 @@ class OpenWeatherIntegration extends Component {
   }
 }
 
-export default OpenWeatherIntegration;
+export default connect(
+  'user,openWeatherApiKey,openWeatherSaveApiKeyStatus,openWeatherGetApiKeyStatus',
+  actions
+)(OpenWeatherIntegration);

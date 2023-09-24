@@ -6,8 +6,9 @@ const { NotFoundError } = require('../../../utils/coreErrors');
 
 /**
  * @public
- * @param {Object} body - The body of the request.
+ * @param {object} body - The body of the request.
  * @description Returns response.
+ * @returns {object} Return report state response.
  * @example
  * onReportState();
  */
