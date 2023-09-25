@@ -46,10 +46,13 @@ const EditRoomTemperatureBox = ({ children, ...props }) => (
         renderThumb={(props, state) => (
           <div {...props}>
             <Text id="global.degreeValue" fields={{ value: state.valueNow }} />
+            <Text id="global.celsius" />
           </div>
         )}
         pearling
         minDistance={10}
+        max={50}
+        min={-20}
         onAfterChange={props.updateBoxValue}
         value={[props.temperatureMin, props.temperatureMax]}
         disabled={!(props.box.temperature_use_custom_value || false)}
