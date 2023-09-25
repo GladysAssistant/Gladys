@@ -81,24 +81,21 @@ function valueAdded(zwaveNode, args) {
   });
   const deviceFeature = this.gladys.stateManager.get('deviceFeatureByExternalId', deviceFeatureExternalId);
 
-  if (value) {
+  if (value !== undefined && value !== null) {
     const newValueUnbind = unbindValue(args, value);
     node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
 
-    // if (prevValue !== newValue) {
     if (deviceFeature) {
       this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: deviceFeatureExternalId,
         state: newValueUnbind,
       });
     }
-    // }
   } else if (deviceFeature) {
     this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: deviceFeatureExternalId,
     });
   }
-  // }
 }
 
 module.exports = {
