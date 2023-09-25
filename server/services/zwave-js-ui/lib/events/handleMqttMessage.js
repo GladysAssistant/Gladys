@@ -74,7 +74,8 @@ function handleMqttMessage(topic, message) {
 
         this.scanComplete();
       } else {
-        setInterval(this.scanNetwork.bind(this), DEFAULT.SCAN_NETWORK_RETRY_TIMEOUT);
+        logger.warn(`Error getting nodes, retry in ${DEFAULT.SCAN_NETWORK_RETRY_TIMEOUT}ms`);
+        setTimeout(this.scanNetwork.bind(this), DEFAULT.SCAN_NETWORK_RETRY_TIMEOUT);
       }
       break;
     }
