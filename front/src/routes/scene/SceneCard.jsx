@@ -4,6 +4,8 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
 
+const MAX_LENGTH_TAG = 30;
+
 class SceneCard extends Component {
   startScene = async () => {
     try {
@@ -53,6 +55,14 @@ class SceneCard extends Component {
                 </div>
                 <h4>{props.scene.name}</h4>
                 <div class={`text-muted ${style.descriptionSceneEllipsis}`}>{props.scene.description}</div>
+                <div>
+                  {props.scene.tags &&
+                    props.scene.tags.map(tag => (
+                      <span class="badge badge-secondary mr-1">
+                        {tag.length > MAX_LENGTH_TAG ? `${tag.substring(0, MAX_LENGTH_TAG - 3)}...` : tag}
+                      </span>
+                    ))}
+                </div>
               </div>
               <div class="mt-auto">
                 <div class="card-footer">

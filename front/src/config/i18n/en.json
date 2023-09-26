@@ -1422,9 +1422,13 @@
     }
   },
   "editScene": {
+    "settings": "Settings",
+    "nameTitle": "Scene name",
     "editNamePlaceholder": "Enter a scene name",
     "descriptionTitle": "Description",
     "editDescriptionPlaceholder": "Enter a scene description",
+    "tagsTitle": "Tags",
+    "editTagsPlaceholder": "Enter a scene tags",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",

@@ -1423,9 +1423,13 @@
     }
   },
   "editScene": {
+    "settings": "Configuration",
+    "nameTitle": "Nom de scène",
     "editNamePlaceholder": "Entrez un nom de scène",
     "descriptionTitle": "Description",
     "editDescriptionPlaceholder": "Entrez une description pour la scène",
+    "tagsTitle": "Tags",
+    "editTagsPlaceholder": "Entrez un tag pour la scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",

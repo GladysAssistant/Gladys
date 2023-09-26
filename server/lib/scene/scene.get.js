@@ -3,7 +3,7 @@ const Sequelize = require('sequelize');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
-  fields: ['id', 'name', 'description', 'icon', 'selector', 'active', 'last_executed', 'updated_at'],
+  fields: ['id', 'name', 'description', 'icon', 'selector', 'active', 'last_executed', 'updated_at', 'tags'],
   skip: 0,
   order_dir: 'ASC',
   order_by: 'name',
@@ -32,12 +32,6 @@ async function get(options) {
     queryParams.limit = optionsWithDefault.take;
   }
 
-  if (optionsWithDefault.search) {
-    queryParams.where = Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), {
-      [Op.like]: `%${optionsWithDefault.search}%`,
-    });
-  }
-
   // search by device feature selectors
   if (optionsWithDefault.selectors) {
     queryParams.where = {
@@ -49,7 +43,24 @@ async function get(options) {
 
   const scenes = await db.Scene.findAll(queryParams);
 
-  const scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
+  let scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
+
+  if (optionsWithDefault.search) {
+    scenesPlain = scenesPlain.filter((scene) => {
+      if (scene.name.toLowerCase().includes(optionsWithDefault.search.toLowerCase())) {
+        return scene;
+      }
+      const tagsFound = scene.tags.find((tag) => {
+        if (tag.toLowerCase().includes(optionsWithDefault.search.toLowerCase())) {
+          return true;
+        }
+      });
+      if (tagsFound) {
+        return scene;
+      }
+    });
+  }
+
   return scenesPlain;
 }
 

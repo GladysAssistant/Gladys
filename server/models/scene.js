@@ -164,6 +164,11 @@ module.exports = (sequelize, DataTypes) => {
       last_executed: {
         type: DataTypes.DATE,
       },
+      tags: {
+        allowNull: false,
+        unique: false,
+        type: DataTypes.JSON,
+      },
     },
     {},
   );
