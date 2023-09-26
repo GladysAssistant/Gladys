@@ -257,7 +257,8 @@
       },
       "humidityInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
-        "noHumidityRecorded": "No humidity recorded recently."
+        "noHumidityRecorded": "No humidity recorded recently.",
+        "thresholdsLabel": "Configure custom thresholds"
       },
       "userPresence": {
         "description": "Display who's at home and who is not. You can change the user presence in scenes, and select here the users displayed.",
@@ -838,7 +839,7 @@
     },
     "openWeather": {
       "title": "OpenWeather API",
-      "description": "Display the weather in your town on your dasboard.",
+      "description": "Display the weather in your town on your dashboard.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
       "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
