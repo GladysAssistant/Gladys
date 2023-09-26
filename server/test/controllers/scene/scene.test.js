@@ -10,6 +10,7 @@ describe('POST /api/v1/scene', () => {
         name: 'New Scene',
         icon: 'bell',
         triggers: [],
+        tags: [],
         actions: [
           [
             {
@@ -45,6 +46,7 @@ describe('GET /api/v1/scene', () => {
             active: true,
             description: null,
             selector: 'test-scene',
+            tags: [],
             last_executed: null,
             updated_at: '2019-02-12T07:49:07.556Z',
           },

@@ -15,6 +15,7 @@ describe('SceneManager.get', () => {
       expect(oneScene).to.have.property('active');
       expect(oneScene).not.to.have.property('actions');
       expect(oneScene).to.have.property('updated_at');
+      expect(oneScene).to.have.property('tags');
       expect(oneScene).to.have.property('last_executed');
     });
   });
@@ -32,6 +33,7 @@ describe('SceneManager.get', () => {
         active: true,
         description: null,
         selector: 'test-scene',
+        tags: [],
         last_executed: null,
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
       },
@@ -68,6 +70,7 @@ describe('SceneManager.get', () => {
         active: true,
         description: null,
         selector: 'test-scene',
+        tags: [],
         last_executed: null,
         updated_at: new Date('2019-02-12T07:49:07.556Z'),
       },

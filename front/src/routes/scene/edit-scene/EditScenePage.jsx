@@ -7,6 +7,7 @@ import SceneActionsDropdown from './SceneActionsDropdown';
 import TriggerGroup from './TriggerGroup';
 import style from './style.css';
 import Settings from './Settings';
+import { Text } from 'preact-i18n';
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
 const ACTION_GROUP_TYPE = 'ACTION_GROUP_TYPE';
