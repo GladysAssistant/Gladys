@@ -60,6 +60,10 @@ describe('Scene view', () => {
   it('Should edit the scene description', () => {
     cy.visit('/dashboard/scene/my-scene');
 
+    cy.contains('editScene.settings')
+      .should('have.class', 'card-title')
+      .click();
+
     cy.contains('editScene.editDescriptionPlaceholder').click();
 
     cy.get('input:visible').then(inputs => {
