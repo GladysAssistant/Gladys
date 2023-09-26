@@ -4,15 +4,16 @@ import { Text } from 'preact-i18n';
 import BaseEditBox from '../baseEditBox';
 import ReactSlider from 'react-slider';
 
-import { DEFAULT_VALUE_TEMPERATURE } from '../../../../../server/utils/constants';
+import { DEFAULT_VALUE_TEMPERATURE, DEVICE_FEATURE_UNITS } from '../../../../../server/utils/constants';
 import RoomSelector from '../../house/RoomSelector';
 import cx from 'classnames';
+import { celsiusToFahrenheit, fahrenheitToCelsius } from '../../../../../server/utils/units';
 
 const updateBoxRoom = (updateBoxRoomFunc, x, y) => room => {
   updateBoxRoomFunc(x, y, room.selector);
 };
 
-const EditRoomTemperatureBox = ({ children, ...props }) => (
+const EditRoomTemperatureBox = ({ children, unit, ...props }) => (
   <BaseEditBox {...props} titleKey="dashboard.boxTitle.temperature-in-room">
     <div class="form-group">
       <label>
@@ -46,13 +47,13 @@ const EditRoomTemperatureBox = ({ children, ...props }) => (
         renderThumb={(props, state) => (
           <div {...props}>
             <Text id="global.degreeValue" fields={{ value: state.valueNow }} />
-            <Text id="global.celsius" />
+            <Text id={`global.${unit}`} />
           </div>
         )}
         pearling
         minDistance={10}
-        max={50}
-        min={-20}
+        max={unit === DEVICE_FEATURE_UNITS.CELSIUS ? 50 : 122}
+        min={unit === DEVICE_FEATURE_UNITS.CELSIUS ? -20 : -4}
         onAfterChange={props.updateBoxValue}
         value={[props.temperatureMin, props.temperatureMax]}
         disabled={!(props.box.temperature_use_custom_value || false)}
@@ -75,15 +76,25 @@ class EditRoomTemperatureBoxComponent extends Component {
   };
 
   updateBoxValue = values => {
+    let temperature_min = values[0];
+    let temperature_max = values[1];
+
+    if (this.props.user.temperature_unit_preference === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+      temperature_min = fahrenheitToCelsius(temperature_min);
+      temperature_max = fahrenheitToCelsius(temperature_max);
+    }
+
     this.props.updateBoxConfig(this.props.x, this.props.y, {
-      temperature_min: values[0],
-      temperature_max: values[1]
+      temperature_min,
+      temperature_max
     });
   };
 
   render(props, {}) {
     let temperature_min = this.props.box.temperature_min;
     let temperature_max = this.props.box.temperature_max;
+
+    const unit = this.props.user.temperature_unit_preference;
 
     if (!this.props.box.temperature_use_custom_value) {
       temperature_min = DEFAULT_VALUE_TEMPERATURE.MINIMUM;
@@ -97,6 +108,11 @@ class EditRoomTemperatureBoxComponent extends Component {
       temperature_max = DEFAULT_VALUE_TEMPERATURE.MAXIMUM;
     }
 
+    if (this.props.user.temperature_unit_preference === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+      temperature_min = celsiusToFahrenheit(temperature_min);
+      temperature_max = celsiusToFahrenheit(temperature_max);
+    }
+
     return (
       <EditRoomTemperatureBox
         {...props}
@@ -105,9 +121,10 @@ class EditRoomTemperatureBoxComponent extends Component {
         updateBoxValue={this.updateBoxValue}
         temperatureMin={temperature_min}
         temperatureMax={temperature_max}
+        unit={unit}
       />
     );
   }
 }
 
-export default connect('', {})(EditRoomTemperatureBoxComponent);
+export default connect('user', {})(EditRoomTemperatureBoxComponent);
