@@ -1,4 +1,3 @@
-import { Text, Localizer } from 'preact-i18n';
 import update from 'immutability-helper';
 import cx from 'classnames';
 

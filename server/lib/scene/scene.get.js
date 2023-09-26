@@ -1,5 +1,4 @@
 const { Op } = require('sequelize');
-const Sequelize = require('sequelize');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
@@ -54,10 +53,12 @@ async function get(options) {
         if (tag.toLowerCase().includes(optionsWithDefault.search.toLowerCase())) {
           return true;
         }
+        return false;
       });
       if (tagsFound) {
         return scene;
       }
+      return null;
     });
   }
 
