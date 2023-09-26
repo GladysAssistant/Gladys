@@ -48,7 +48,7 @@ describe('zwaveJSUIManager connect', () => {
   let gladys;
   let zwaveJSUIManager;
 
-  before(() => {
+  beforeEach(() => {
     gladys = {
       event,
       service: {
@@ -74,7 +74,7 @@ describe('zwaveJSUIManager connect', () => {
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, mqtt, ZWAVEJSUI_SERVICE_ID);
   });
 
-  beforeEach(() => {
+  afterEach(() => {
     sinon.reset();
     zwaveJSUIManager.mqttExist = false;
     zwaveJSUIManager.mqttRunning = false;
@@ -201,6 +201,40 @@ describe('zwaveJSUIManager connect', () => {
     assert.calledOnce(zwaveJSUIManager.installZwaveJSUIContainer);
 
     assert.calledTwice(zwaveJSUIManager.eventManager.emit);
+    assert.calledOnce(mqtt.connect);
+    assert.calledWith(mqttClient.subscribe, 'zwave-js-ui/#');
+    expect(zwaveJSUIManager.mqttConnected).to.equal(true);
+    expect(zwaveJSUIManager.mqttExist).to.equal(true);
+    expect(zwaveJSUIManager.mqttRunning).to.equal(true);
+    expect(zwaveJSUIManager.zwaveJSUIExist).to.equal(true);
+    expect(zwaveJSUIManager.zwaveJSUIRunning).to.equal(true);
+  });
+
+  it('should connect to zwave-js-ui gladys instance not docker', async () => {
+    zwaveJSUIManager.mqttExist = true;
+    zwaveJSUIManager.mqttRunning = true;
+    zwaveJSUIManager.zwaveJSUIExist = true;
+    zwaveJSUIManager.zwaveJSUIRunning = true;
+    gladys.system.isDocker = fake.resolves(false);
+    gladys.variable.getValue = sinon.stub();
+    gladys.variable.getValue
+      .onFirstCall() // EXTERNAL_ZWAVEJSUI
+      .resolves('0')
+      .onSecondCall() // MQTT_PASSWORD
+      .resolves('MQTT_PASSWORD')
+      .onThirdCall() // DRIVER_PATH
+      .resolves('DRIVER_PATH')
+      .onCall(7) // MQTT_URL
+      .resolves('MQTT_URL')
+      .onCall(8) // MQTT_USERNAME
+      .resolves('MQTT_USERNAME');
+
+    await zwaveJSUIManager.connect();
+    zwaveJSUIManager.mqttClient.emit('connect');
+    assert.notCalled(zwaveJSUIManager.installMqttContainer);
+    assert.notCalled(zwaveJSUIManager.installZwaveJSUIContainer);
+
+    assert.calledThrice(zwaveJSUIManager.eventManager.emit);
     assert.calledOnce(mqtt.connect);
     assert.calledWith(mqttClient.subscribe, 'zwave-js-ui/#');
     expect(zwaveJSUIManager.mqttConnected).to.equal(true);
