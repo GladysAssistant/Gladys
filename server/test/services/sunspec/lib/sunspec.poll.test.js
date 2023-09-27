@@ -4,8 +4,7 @@ const proxyquire = require('proxyquire');
 
 const { fake, assert } = sinon;
 
-const Poll = proxyquire('../../../../services/sunspec/lib/sunspec.poll', {
-}).poll;
+const Poll = proxyquire('../../../../services/sunspec/lib/sunspec.poll', {}).poll;
 
 describe('SunSpec poll', () => {
   // PREPARE
