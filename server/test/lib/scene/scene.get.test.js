@@ -39,6 +39,27 @@ describe('SceneManager.get', () => {
       },
     ]);
   });
+  it('should search scene by tag', async () => {
+    const sceneManager = new SceneManager({}, event);
+    const scenes = await sceneManager.get({
+      search: 'tag',
+    });
+    expect(scenes).to.be.instanceOf(Array);
+    expect(scenes).to.deep.equal([
+      {
+        id: '956794d8-a9cb-49bf-a677-57e820288b5a',
+        name: 'Scene with tags',
+        icon: 'fe fe-bell',
+        active: true,
+        description: null,
+        selector: 'scene-with-tag',
+        tags: ['tag 1', 'tag 2'],
+        last_executed: null,
+        updated_at: new Date('2022-04-15T07:49:07.556Z'),
+      },
+    ]);
+  });
+
   it('should return 0 result in search', async () => {
     const sceneManager = new SceneManager({}, event);
     const scenes = await sceneManager.get({
