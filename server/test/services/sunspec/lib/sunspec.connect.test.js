@@ -44,8 +44,18 @@ describe('SunSpec connect', () => {
   });
 
   it('should connect', async () => {
-    gladys.variable.getValue = fake.resolves('[{"ip":"192.168.1.0/24"}]');
+    await sunSpecManager.connect();
 
+    expect(sunSpecManager.connected).eql(true);
+    assert.calledOnce(sunSpecManager.scan);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
+    });
+    assert.calledOnce(sunSpecManager.scanNetwork);
+  });
+
+  it('should connect - error', async () => {
+    ModbusTCPMock.connectTCP = fake.throws('Error');
     await sunSpecManager.connect();
 
     expect(sunSpecManager.connected).eql(true);
