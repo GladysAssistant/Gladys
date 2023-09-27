@@ -35,7 +35,7 @@ describe('NodeRed configureContainer', () => {
         },
       },
       system: {
-        getGladysBasePath: fake.resolves({ basePathOnHost: basePathOnContainer }),
+        getGladysBasePath: fake.resolves({ basePathOnContainer }),
       },
     };
 
