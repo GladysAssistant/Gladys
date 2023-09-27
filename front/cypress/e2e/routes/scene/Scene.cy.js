@@ -57,18 +57,25 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene`);
   });
-  it('Should edit the scene description', () => {
+  it('Should edit the scene settings', () => {
     cy.visit('/dashboard/scene/my-scene');
 
-    cy.contains('editScene.settings')
+    cy.get('div[class*="card-header"]')
+      .contains('editScene.settings')
       .should('have.class', 'card-title')
       .click();
 
-    cy.contains('editScene.editDescriptionPlaceholder').click();
+    cy.get('input[class*="form-control"]').then(inputs => {
+      cy.wrap(inputs[0])
+        .clear()
+        .type('My scene name');
+      cy.wrap(inputs[1]).type('My scene description');
+    });
 
-    cy.get('input:visible').then(inputs => {
-      // Zone name
-      cy.wrap(inputs[0]).type('My scene description');
+    cy.get('input[class*="rti--input"]').then(inputs => {
+      cy.wrap(inputs[0])
+        .type('My tag 1')
+        .type('{enter}');
     });
 
     // I don't know why, but I'm unable to get this button with
