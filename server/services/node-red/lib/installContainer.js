@@ -36,7 +36,6 @@ async function installContainer(config) {
   }
 
   const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
-  logger.info('Nodered: basePathOnHost', basePathOnHost);
 
   let dockerContainers = await this.gladys.system.getContainers({
     all: true,

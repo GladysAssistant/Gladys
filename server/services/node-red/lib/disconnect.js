@@ -26,8 +26,6 @@ async function disconnect() {
 
     const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
 
-    logger.info('Nodered: basePathOnContainer', basePathOnContainer);
-
     const configFilepath = path.join(basePathOnContainer, DEFAULT.CONFIGURATION_PATH);
 
     await fs.rm(path.dirname(configFilepath), { recursive: true });

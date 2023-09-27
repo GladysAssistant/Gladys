@@ -17,11 +17,8 @@ async function configureContainer(config) {
 
   const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
 
-  logger.info('Nodered: basePathOnContainer', basePathOnContainer);
-
   // Create configuration path (if not exists)
   const configFilepath = path.join(basePathOnContainer, DEFAULT.CONFIGURATION_PATH);
-  logger.info('Node-RED: configFilepath', configFilepath);
   await fs.mkdir(path.dirname(configFilepath), { recursive: true });
   try {
     await fs.chown(path.dirname(configFilepath), 1000, 1000);
@@ -45,13 +42,10 @@ async function configureContainer(config) {
   let fileContentString = fileContent.toString();
 
   let configChanged = false;
-  logger.info('Node-RED: Config', config.nodeRedUsername, config.nodeRedPassword);
   if (config.nodeRedPassword && config.nodeRedUsername) {
     // Check for changes
     const [, username] = fileContentString.match(/username: '(.+)'/);
     const [, password] = fileContentString.match(/password: '(.+)'/);
-
-    logger.info('Node-RED: extracted ', username, password);
 
     if (
       username !== config.nodeRedUsername ||
@@ -60,8 +54,6 @@ async function configureContainer(config) {
       const encodedPassword = await passwordUtils.hash(config.nodeRedPassword, 8);
       fileContentString = fileContentString.replace(/username: '(.+)'/, `username: '${config.nodeRedUsername}'`);
       fileContentString = fileContentString.replace(/password: '(.+)'/, `password: '${encodedPassword}'`);
-
-      logger.info('Node-RED: writed ', username, encodedPassword);
 
       configChanged = true;
     }
