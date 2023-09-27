@@ -90,47 +90,39 @@ describe('SunSpec ModbusClient', () => {
     }
   });
 
+  it('should connect - error readRegister', async () => {
+    modbusClientApi.readHoldingRegisters = stub().yields(new Error('readRegister'));
+    const client = new ModbusClient(modbusClientApi);
+    try {
+      await client.readRegister(0, 0);
+      assert.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error);
+      expect(e.message).to.be.equals('readRegister');
+    }
+  });
+
+  it('should connect - error readRegisterAsInt16', async () => {
+    modbusClientApi.readHoldingRegisters = stub().yields(new Error('readRegisterAsInt16'));
+    const client = new ModbusClient(modbusClientApi);
+    try {
+      await client.readRegisterAsInt16(0);
+      assert.fail();
+    } catch (e) {
+      expect(e).to.be.instanceOf(Error);
+      expect(e.message).to.be.equals('readRegisterAsInt16');
+    }
+  });
+
   it('should connect - error readRegisterAsInt32', async () => {
-    modbusClientApi.readHoldingRegisters = stub().yields('Error: readRegisterAsInt32');
+    modbusClientApi.readHoldingRegisters = stub().yields(new Error('readRegisterAsInt32'));
     const client = new ModbusClient(modbusClientApi);
     try {
-      await client.connect('host', 502);
+      await client.readRegisterAsInt32(0);
       assert.fail();
     } catch (e) {
       expect(e).to.be.instanceOf(Error);
-      expect(e.message).to.be.equals('Unable to connect Sunspec device host:502 - Error: readRegisterAsInt32');
-    }
-  });
-
-  it('should connect - error readRegisterAsInt16', async () => {
-    modbusClientApi.readHoldingRegisters = stub().yields('Error: readRegisterAsInt16');
-    const client = new ModbusClient(modbusClientApi);
-    client.readRegisterAsInt32 = stub()
-      .onFirstCall()
-      .returns(0x53756e53);
-    try {
-      await client.connect('host', 502);
-      assert.fail();
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error);
-      expect(e.message).to.be.equals('Unable to connect Sunspec device host:502 - Error: readRegisterAsInt16');
-    }
-  });
-
-  it('should connect - error readRegisterAsInt16', async () => {
-    const client = new ModbusClient(modbusClientApi);
-    client.readRegisterAsInt32 = stub()
-      .onFirstCall()
-      .returns(0x53756e53);
-    client.readRegisterAsInt16 = stub()
-      .onFirstCall()
-      .throws(new Error('Error readRegisterAsInt16'));
-    try {
-      await client.connect('host', 502);
-      assert.fail();
-    } catch (e) {
-      expect(e).to.be.instanceOf(Error);
-      expect(e.message).to.be.equals('Unable to connect Sunspec device host:502 - Error: Error readRegisterAsInt16');
+      expect(e.message).to.be.equals('readRegisterAsInt32');
     }
   });
 
