@@ -34,6 +34,100 @@ describe('SunSpec getDevices', () => {
     expect(devices.length).eql(0);
   });
 
+  it('should device AC', async () => {
+    sunSpecManager.devices = [
+      {
+        manufacturer: 'manufacturer',
+        product: 'product',
+        serialNumber: 'serialNumber',
+        swVersion: 'swVersion',
+      },
+    ];
+    const devices = await sunSpecManager.getDevices();
+    expect(devices.length).eql(1);
+    expect(devices[0]).to.deep.equals({
+      model: 'manufacturer product [AC]',
+      name: 'manufacturer product [AC]',
+      external_id: 'sunspec:serialnumber:serialNumber:mppt:ac',
+      poll_frequency: 60000,
+      selector: 'sunspec-serialnumber-serialnumber-mppt-ac',
+      service_id: 'faea9c35-759a-44d5-bcc9-2af1de37b8b4',
+      should_poll: true,
+      features: [
+        {
+          category: 'pv',
+          external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACA',
+          has_feedback: false,
+          last_value: 0,
+          max: 400,
+          min: 0,
+          name: 'manufacturer product [AC] - ACA',
+          read_only: true,
+          selector: 'sunspec-serialnumber-serialnumber-mppt-ac-property-aca',
+          type: 'current',
+          unit: 'ampere',
+        },
+        {
+          category: 'pv',
+          external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACV',
+          has_feedback: false,
+          last_value: 0,
+          max: 400,
+          min: 0,
+          name: 'manufacturer product [AC] - ACV',
+          read_only: true,
+          selector: 'sunspec-serialnumber-serialnumber-mppt-ac-property-acv',
+          type: 'voltage',
+          unit: 'volt',
+        },
+        {
+          category: 'pv',
+          external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACW',
+          has_feedback: false,
+          last_value: 0,
+          max: 10000,
+          min: 0,
+          name: 'manufacturer product [AC] - ACW',
+          read_only: true,
+          selector: 'sunspec-serialnumber-serialnumber-mppt-ac-property-acw',
+          type: 'power',
+          unit: 'volt-ampere',
+        },
+        {
+          category: 'pv',
+          external_id: 'sunspec:serialnumber:serialNumber:mppt:ac:property:ACWH',
+          has_feedback: false,
+          last_value: 0,
+          max: 1000000,
+          min: 0,
+          name: 'manufacturer product [AC] - ACWH',
+          read_only: true,
+          selector: 'sunspec-serialnumber-serialnumber-mppt-ac-property-acwh',
+          type: 'energy',
+          unit: 'kilowatt-hour',
+        },
+      ],
+      params: [
+        {
+          name: 'MANUFACTURER',
+          value: 'manufacturer',
+        },
+        {
+          name: 'PRODUCT',
+          value: 'product',
+        },
+        {
+          name: 'SERIAL_NUMBER',
+          value: 'serialNumber',
+        },
+        {
+          name: 'SW_VERSION',
+          value: 'swVersion',
+        },
+      ],
+    });
+  });
+
   it('should device DC', async () => {
     sunSpecManager.devices = [
       {

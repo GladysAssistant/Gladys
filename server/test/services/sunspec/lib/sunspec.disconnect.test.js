@@ -5,6 +5,7 @@ const { fake, assert } = sinon;
 
 const proxyquire = require('proxyquire');
 const ModbusTCPMock = require('./utils/ModbusTCPMock.test');
+const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../../utils/constants');
 
 const SunSpecManager = proxyquire('../../../../services/sunspec/lib', {
   ModbusTCP: { ModbusTCP: ModbusTCPMock },
@@ -27,7 +28,7 @@ describe('SunSpec disconnect', () => {
 
     sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, null, SERVICE_ID);
     sunSpecManager.modbus = {
-      close: fake.returns(null),
+      close: fake.yields(null),
     };
   });
 
@@ -36,6 +37,7 @@ describe('SunSpec disconnect', () => {
   });
 
   it('should disconnect - not connected', async () => {
+    sunSpecManager.connected = false;
     await sunSpecManager.disconnect();
 
     assert.calledOnce(sunSpecManager.modbus.close);
@@ -43,9 +45,13 @@ describe('SunSpec disconnect', () => {
   });
 
   it('should disconnect', async () => {
+    sunSpecManager.connected = true;
     await sunSpecManager.disconnect();
 
     assert.calledOnce(sunSpecManager.modbus.close);
+    assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
+    });
     expect(sunSpecManager.connected).eql(false);
   });
 });
