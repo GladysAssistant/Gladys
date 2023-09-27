@@ -24,9 +24,11 @@ async function disconnect() {
     await this.gladys.system.stopContainer(container.id);
     await this.gladys.system.removeContainer(container.id);
 
-    const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
+    const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
 
-    const configFilepath = path.join(basePathOnHost, DEFAULT.CONFIGURATION_PATH);
+    logger.info('Nodered: basePathOnContainer', basePathOnContainer);
+
+    const configFilepath = path.join(basePathOnContainer, DEFAULT.CONFIGURATION_PATH);
 
     await fs.rm(path.dirname(configFilepath), { recursive: true });
 

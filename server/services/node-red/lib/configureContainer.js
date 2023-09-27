@@ -15,10 +15,13 @@ const { DEFAULT } = require('./constants');
 async function configureContainer(config) {
   logger.info('Node-RED: Docker container is being configured...');
 
-  const { basePathOnHost } = await this.gladys.system.getGladysBasePath();
+  const { basePathOnContainer } = await this.gladys.system.getGladysBasePath();
+
+  logger.info('Nodered: basePathOnContainer', basePathOnContainer);
 
   // Create configuration path (if not exists)
-  const configFilepath = path.join(basePathOnHost, DEFAULT.CONFIGURATION_PATH);
+  const configFilepath = path.join(basePathOnContainer, DEFAULT.CONFIGURATION_PATH);
+  logger.info('Node-RED: configFilepath', configFilepath);
   await fs.mkdir(path.dirname(configFilepath), { recursive: true });
   try {
     await fs.chown(path.dirname(configFilepath), 1000, 1000);
