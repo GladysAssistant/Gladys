@@ -42,10 +42,13 @@ async function configureContainer(config) {
   let fileContentString = fileContent.toString();
 
   let configChanged = false;
+  logger.info('Node-RED: Config', config.nodeRedUsername, config.nodeRedPassword);
   if (config.nodeRedPassword && config.nodeRedUsername) {
     // Check for changes
     const [, username] = fileContentString.match(/username: '(.+)'/);
     const [, password] = fileContentString.match(/password: '(.+)'/);
+
+    logger.info('Node-RED: extracted ', username, password);
 
     if (
       username !== config.nodeRedUsername ||
@@ -54,6 +57,9 @@ async function configureContainer(config) {
       const encodedPassword = await passwordUtils.hash(config.nodeRedPassword, 8);
       fileContentString = fileContentString.replace(/username: '(.+)'/, `username: '${config.nodeRedUsername}'`);
       fileContentString = fileContentString.replace(/password: '(.+)'/, `password: '${encodedPassword}'`);
+
+      logger.info('Node-RED: writed ', username, encodedPassword);
+
       configChanged = true;
     }
   }
