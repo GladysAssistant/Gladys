@@ -65,6 +65,7 @@ describe('system.getContainers', () => {
       expect(container).to.have.property('name');
       expect(container).to.have.property('state');
       expect(container).to.have.property('id');
+      expect(container).to.have.property('devices');
       expect(container).to.have.property('created_at');
     });
 
