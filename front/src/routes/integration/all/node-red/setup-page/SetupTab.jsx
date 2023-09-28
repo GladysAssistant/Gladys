@@ -119,6 +119,7 @@ class SetupTab extends Component {
         nodeRedStatus: RequestStatus.Success
       });
     }
+    this.setState({ showConfirmDelete: false });
     await this.getConfiguration();
     await this.checkStatus();
   };
