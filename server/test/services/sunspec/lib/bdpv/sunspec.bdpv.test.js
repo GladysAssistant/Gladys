@@ -13,16 +13,24 @@ describe('SunSpec BDPV', () => {
   let Bdpv;
 
   beforeEach(() => {
-    const feature = {
+    const feature1 = {
       property: PROPERTY.ACWH,
       last_value: 1234,
+    };
+    const feature2 = {
+      property: PROPERTY.ACWH,
+      last_value: 5678,
     };
     gladys = {
       event: {
         emit: fake.resolves(null),
       },
       stateManager: {
-        get: fake.returns(feature),
+        get: stub()
+          .onFirstCall()
+          .returns(feature1)
+          .onSecondCall()
+          .returns(feature2),
       },
       variable: {
         getValue: stub()
@@ -38,7 +46,10 @@ describe('SunSpec BDPV', () => {
       getDevices: () => {
         return [
           {
-            features: [feature],
+            features: [feature1],
+          },
+          {
+            features: [feature2],
           },
         ];
       },
@@ -104,8 +115,16 @@ describe('SunSpec BDPV', () => {
     await Bdpv.bdpvPush.call(sunspecManager);
     assert.calledOnceWithExactly(sunspecManager.bdpvClient.get, 'expeditionProd_v3.php', {
       params: {
-        index: 1234000,
+        index: 6912000,
       },
     });
+  });
+
+  it('should bdpvPush error', async () => {
+    sunspecManager.bdpvParams = {};
+    sunspecManager.bdpvClient = {
+      get: fake.throws(new Error('error')),
+    };
+    await Bdpv.bdpvPush.call(sunspecManager);
   });
 });
