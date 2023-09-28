@@ -30,10 +30,6 @@ async function init() {
   // Load stored configuration
   const configuration = await this.getConfiguration();
 
-  logger.debug('Node-RED: installing and starting required docker containers...');
-  await this.checkForContainerUpdates(configuration);
-  await this.installContainer(configuration);
-
   if (!configuration.nodeRedPassword) {
     configuration.nodeRedUsername = CONFIGURATION.NODE_RED_USERNAME_VALUE;
     configuration.nodeRedPassword = generate(20, {
@@ -42,8 +38,11 @@ async function init() {
       uppercase: true,
     });
   }
-
   await this.saveConfiguration(configuration);
+
+  logger.debug('Node-RED: installing and starting required docker containers...');
+  await this.checkForContainerUpdates(configuration);
+  await this.installContainer(configuration);
 }
 
 module.exports = {
