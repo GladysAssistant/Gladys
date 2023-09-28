@@ -323,7 +323,6 @@ body {
   font-size: 0.9em;
   text-align: center;
   background-color: #fafafa;
-  #color: white;
   cursor: pointer;
   border: 1px solid gray;
   border-radius: 10px;
@@ -353,6 +352,52 @@ body {
 }
 
 .humidity-slider .humidity-slider-thumb {
+  top: 3px;
+  width: 41px;
+  height: 24px;
+  line-height: 22px;
+}
+
+
+.temperature-slider {
+  width: 100%;
+  max-width: 500px;
+  height: 30px;
+}
+
+.temperature-slider-thumb {
+  font-size: 0.9em;
+  text-align: center;
+  background-color: #fafafa;
+  cursor: pointer;
+  border: 1px solid gray;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+.temperature-slider-thumb.active {
+  border: 1px solid #467fcf;
+}
+
+.temperature-slider-track {
+  position: relative;
+  background: #467fcf;
+}
+
+.temperature-slider-track-1 {
+  background: #5eba00;
+}
+
+.temperature-slider-track-2 {
+  background: #cd201f;
+}
+
+.temperature-slider .temperature-slider-track {
+  top: 10px;
+  height: 10px;
+}
+
+.temperature-slider .temperature-slider-thumb {
   top: 3px;
   width: 41px;
   height: 24px;
