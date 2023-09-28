@@ -78,7 +78,7 @@ class Dashboard extends Component {
   };
 
   checkIfFullScreenParameterIsHere = () => {
-    if (this.props.fullscreen === '1') {
+    if (this.props.fullscreen === 'force') {
       try {
         this.switchToFullScreen();
       } catch (e) {
@@ -224,6 +224,7 @@ class Dashboard extends Component {
         editDashboard={this.editDashboard}
         toggleFullScreen={this.toggleFullScreen}
         fullScreen={props.fullScreen}
+        hideExitFullScreenButton={props.fullscreen === 'force'}
       />
     );
   }
