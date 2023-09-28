@@ -365,7 +365,7 @@ const INTENTS = {
     DAY: 'intent.weather.day',
   },
   CAMERA: {
-    GET_IMAGE_ROOM: 'intent.camera.get-image-room',
+    GET_IMAGE: 'intent.camera.get-image',
   },
   SCENE: {
     START: 'intent.scene.start',

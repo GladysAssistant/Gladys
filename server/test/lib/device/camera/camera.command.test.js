@@ -27,7 +27,7 @@ describe('Camera.command', () => {
     await deviceManager.camera.command(
       message,
       {
-        intent: 'camera.get-image-room',
+        intent: 'camera.get-image',
         entities: [
           {
             start: 25,
@@ -45,7 +45,7 @@ describe('Camera.command', () => {
       },
       context,
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'camera.get-image-room.success', context, RANDOM_IMAGE);
+    assert.calledWith(messageManager.replyByIntent, message, 'camera.get-image.success', context, RANDOM_IMAGE);
   });
   it('should respond camera not found', async () => {
     const stateManager = new StateManager(event);
@@ -54,7 +54,7 @@ describe('Camera.command', () => {
     await deviceManager.camera.command(
       message,
       {
-        intent: 'camera.get-image-room',
+        intent: 'camera.get-image',
         entities: [
           {
             start: 25,
@@ -72,7 +72,7 @@ describe('Camera.command', () => {
       },
       context,
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'camera.get-image-room.no-image-found', context);
+    assert.calledWith(messageManager.replyByIntent, message, 'camera.get-image.no-image-found', context);
   });
   it('should respond camera not found', async () => {
     const stateManager = new StateManager(event);
@@ -81,11 +81,11 @@ describe('Camera.command', () => {
     await deviceManager.camera.command(
       message,
       {
-        intent: 'camera.get-image-room',
+        intent: 'camera.get-image',
         entities: [],
       },
       context,
     );
-    assert.calledWith(messageManager.replyByIntent, message, 'camera.get-image-room.no-image-found', context);
+    assert.calledWith(messageManager.replyByIntent, message, 'camera.get-image.no-image-found', context);
   });
 });
