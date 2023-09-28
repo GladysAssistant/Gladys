@@ -231,8 +231,8 @@
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
           "advancedWeather": "Humidité et vitesse du vent",
-          "hourlyForecast": "Prévisions pour les 8 prochaines heures",
-          "dailyForecast": "Prévisions pour les 7 prochains jours"
+          "hourlyForecast": "Prévisions pour les 24 prochaines heures",
+          "dailyForecast": "Prévisions pour les 5 prochains jours"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },

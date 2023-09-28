@@ -231,8 +231,8 @@
         "editModeLabel": "Select display mode:",
         "displayModes": {
           "advancedWeather": "Humidity and wind speed",
-          "hourlyForecast": "Forecast for the next 8 hours",
-          "dailyForecast": "Forecast for the next 7 days"
+          "hourlyForecast": "Forecast for the next 24 hours",
+          "dailyForecast": "Forecast for the next 5 days"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
