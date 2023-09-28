@@ -31,8 +31,6 @@ class SetupTab extends Component {
         '/api/v1/service/melcloud/variable/MELCLOUD_PASSWORD'
       );
       melCloudPassword = password;
-      console.log('melCloudUsername', melCloudUsername);
-      console.log('melCloudPassword', melCloudPassword);
 
       this.setState({
         melcloudGetSettingsStatus: RequestStatus.Success,
