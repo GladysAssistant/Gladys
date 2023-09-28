@@ -253,7 +253,8 @@
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
-        "noTemperatureRecorded": "Aucune température enregistrée récemment."
+        "noTemperatureRecorded": "Aucune température enregistrée récemment.",
+        "thresholdsLabel": "Configurer des seuils personnalisés"
       },
       "humidityInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
