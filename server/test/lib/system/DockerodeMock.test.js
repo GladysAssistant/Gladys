@@ -29,6 +29,7 @@ Docker.prototype.getContainer = fake.returns({
         },
       ],
     },
+    SizeRw: 152635,
   }),
   restart: fake.resolves(true),
   remove: fake.resolves(true),
