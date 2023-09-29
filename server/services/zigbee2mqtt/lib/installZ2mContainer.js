@@ -25,12 +25,17 @@ async function installZ2mContainer(config) {
   let [container] = dockerContainers;
 
   // Manage case where Zigbee USB Dongle Path has changed by removing the container. It will be created with good config later
-  if (dockerContainers.length > 0 && container.devices[0].PathOnHost !== z2mDriverPath) {
-    logger.info('Zigbee2mqtt container should be removed (new USB dongle path configured)...');
-    await this.gladys.system.stopContainer(container.id);
-    await this.gladys.system.removeContainer(container.id);
+  if (dockerContainers.length > 0) {
+    const containerDescription = await this.gladys.system.inspectContainer(container);
+    if (containerDescription.devices[0].PathOnHost !== z2mDriverPath) {
+      logger.info(
+        `Zigbee2mqtt container with USB dongle path ${containerDescription.devices[0].PathOnHost} should be removed (new USB dongle path ${z2mDriverPath} configured)...`,
+      );
+      await this.gladys.system.stopContainer(container.id);
+      await this.gladys.system.removeContainer(container.id);
 
-    creationNeeded = true;
+      creationNeeded = true;
+    }
   }
 
   const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
