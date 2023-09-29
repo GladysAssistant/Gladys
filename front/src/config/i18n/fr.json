@@ -67,6 +67,11 @@
     "invalidEmail": "E-mail invalide",
     "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
   },
+  "locked": {
+    "cardTitle": "Maison verrouillée",
+    "description": "Merci de taper votre code afin de déverrouiller l'alarme.",
+    "codePlaceholder": "Tapez votre code"
+  },
   "signup": {
     "welcome": {
       "title": "Bienvenue dans Gladys !",

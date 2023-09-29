@@ -1,9 +1,14 @@
+const { arm } = require('./house.arm');
 const { create } = require('./house.create');
 const { destroy } = require('./house.destroy');
+const { disarm } = require('./house.disarm');
+const { disarmWithCode } = require('./house.disarmWithCode');
 const { get } = require('./house.get');
 const { getRooms } = require('./house.getRooms');
 const { getUsersAtHome } = require('./house.getUsersAtHome');
 const { isEmpty } = require('./house.isEmpty');
+const { panic } = require('./house.panic');
+const { partialArm } = require('./house.partialArm');
 const { update } = require('./house.update');
 const { userLeft } = require('./house.userLeft');
 const { userSeen } = require('./house.userSeen');
@@ -14,11 +19,16 @@ const House = function House(event, stateManager) {
   this.stateManager = stateManager;
 };
 
+House.prototype.arm = arm;
 House.prototype.create = create;
 House.prototype.destroy = destroy;
+House.prototype.disarm = disarm;
+House.prototype.disarmWithCode = disarmWithCode;
 House.prototype.get = get;
 House.prototype.getRooms = getRooms;
 House.prototype.getUsersAtHome = getUsersAtHome;
+House.prototype.panic = panic;
+House.prototype.partialArm = partialArm;
 House.prototype.isEmpty = isEmpty;
 House.prototype.update = update;
 House.prototype.userLeft = userLeft;

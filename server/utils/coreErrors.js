@@ -40,6 +40,20 @@ class BadParameters extends Error {
   }
 }
 
+class ConflictError extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
+class ForbiddenError extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
 class AbortScene extends Error {
   constructor(message) {
     super();
@@ -55,4 +69,6 @@ module.exports = {
   NoValuesFoundError,
   PlatformNotCompatible,
   AbortScene,
+  ConflictError,
+  ForbiddenError,
 };

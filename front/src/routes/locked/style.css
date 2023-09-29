@@ -1,0 +1,7 @@
+.lockedContainer {
+  margin-top: 5rem;
+}
+
+.lockedContainer .cardTitle {
+  font-weight: 700;
+}
