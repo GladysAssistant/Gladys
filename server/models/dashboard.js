@@ -29,6 +29,12 @@ const boxesSchema = Joi.array().items(
       camera_latency: Joi.string(),
       camera_live_auto_start: Joi.boolean(),
       scenes: Joi.array().items(Joi.string()),
+      humidity_use_custom_value: Joi.boolean(),
+      humidity_min: Joi.number(),
+      humidity_max: Joi.number(),
+      temperature_use_custom_value: Joi.boolean(),
+      temperature_min: Joi.number(),
+      temperature_max: Joi.number(),
     }),
   ),
 );
