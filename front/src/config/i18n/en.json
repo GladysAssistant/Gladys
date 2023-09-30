@@ -232,8 +232,8 @@
         "editModeLabel": "Select display mode:",
         "displayModes": {
           "advancedWeather": "Humidity and wind speed",
-          "hourlyForecast": "Forecast for the next 8 hours",
-          "dailyForecast": "Forecast for the next 7 days"
+          "hourlyForecast": "Forecast for the next 24 hours",
+          "dailyForecast": "Forecast for the next 5 days"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
@@ -254,11 +254,13 @@
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
-        "noTemperatureRecorded": "No temperature recorded recently."
+        "noTemperatureRecorded": "No temperature recorded recently.",
+        "thresholdsLabel": "Configure custom thresholds"
       },
       "humidityInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
-        "noHumidityRecorded": "No humidity recorded recently."
+        "noHumidityRecorded": "No humidity recorded recently.",
+        "thresholdsLabel": "Configure custom thresholds"
       },
       "userPresence": {
         "description": "Display who's at home and who is not. You can change the user presence in scenes, and select here the users displayed.",
@@ -270,7 +272,7 @@
       },
       "camera": {
         "editCameraLabel": "Select the camera you want to display here.",
-        "noImageToShow": "No image to show",
+        "noImageToShow": "No image to show. Are you sure you camera is connected and accessible to Gladys?",
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box",
         "latencyBoxName": "Latency",
@@ -792,7 +794,7 @@
     },
     "openWeather": {
       "title": "OpenWeather API",
-      "description": "Display the weather in your town on your dasboard.",
+      "description": "Display the weather in your town on your dashboard.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
       "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
@@ -872,6 +874,61 @@
         "conflictError": "Current device is already in Gladys."
       }
     },
+    "melcloud": {
+      "title": "MELCloud",
+      "description": "Control your MELCloud devices (works with the cloud)",
+      "deviceTab": "Devices",
+      "discoverTab": "MELCloud discover",
+      "setupTab": "Setup",
+      "discoverDeviceDescr": "Automatically scan MELCloud devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter the name of your device",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Already created",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Model not managed or available",
+      "status": {
+        "notConnected": "Gladys failed to connect to MELCloud cloud account, please go to ",
+        "setupPageLink": "MELCloud configuration page.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "device": {
+        "title": "Devices in Gladys",
+        "updates": "Check updates",
+        "editButton": "Edit",
+        "noDeviceFound": "No MELCloud device found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your MELCloud cloud account",
+        "description": "MELCloud devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
+        "error": "Error discovering MELCloud devices. Please verify your credentials on Setup.",
+        "noDeviceFound": "No MELCloud device discovered.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "MELCloud configuration",
+        "description": "You can connect Gladys to your MELCloud account to control the related devices.",
+        "username": "Email",
+        "usernamePlaceholder": "Enter your MELCloud account email address",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your MELCloud account password",
+        "saveLabel": "Save configuration",
+        "error": "An error occured while saving configuration.",
+        "connecting": "Configuration saved. Now connecting to your MELCloud cloud account...",
+        "connected": "Connected to the MELCloud cloud account with success !",
+        "connectionError": "Error while connecting, please check your configuration."
+      },
+      "error": {
+        "defaultError": "There was an error saving the device.",
+        "defaultDeletionError": "There was an error deleting the device.",
+        "conflictError": "Current device is already in Gladys."
+      }
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connect to a local or remote MQTT server",
@@ -897,7 +954,7 @@
         "notFound": "Requested device not found.",
         "backToList": "Back to device list",
         "saveError": "Error saving or deleting device",
-        "saveConflictError": "Conflict: Are you sure all device feature external IDs are unique?",
+        "saveConflictError": "Conflict: Are you sure all external IDs are unique?",
         "mostRecentValueAt": "Last value received {{mostRecentValueAt}}.",
         "noValueReceived": "No value received."
       },

@@ -41,17 +41,19 @@ const DashboardPage = ({ children, ...props }) => (
                 </div>
 
                 <div class="page-options d-flex align-content-between flex-wrap">
-                  {!props.dashboardNotConfigured && props.browserFullScreenCompatible && (
-                    <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
-                      <span>
-                        {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
-                        {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
-                        {!props.fullScreen && <i class="fe fe-maximize-2" />}
-                        {props.fullScreen && <i class="fe fe-minimize-2" />}
-                      </span>
-                    </button>
-                  )}
-                  {props.currentDashboard && (
+                  {!props.dashboardNotConfigured &&
+                    props.browserFullScreenCompatible &&
+                    !props.hideExitFullScreenButton && (
+                      <button onClick={props.toggleFullScreen} class={cx('btn btn-outline-secondary ml-2 btn-sm')}>
+                        <span>
+                          {!props.fullScreen && <Text id="dashboard.enableFullScreen" />}
+                          {props.fullScreen && <Text id="dashboard.disableFullScreen" />}{' '}
+                          {!props.fullScreen && <i class="fe fe-maximize-2" />}
+                          {props.fullScreen && <i class="fe fe-minimize-2" />}
+                        </span>
+                      </button>
+                    )}
+                  {props.currentDashboard && !props.hideExitFullScreenButton && (
                     <button onClick={props.editDashboard} class={cx('btn btn-outline-primary ml-2')}>
                       <span class={style.editDashboardText}>
                         <Text id="dashboard.editDashboardButton" />
