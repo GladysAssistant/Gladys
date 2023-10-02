@@ -49,8 +49,6 @@ async function get(options) {
 
   const scenes = await db.Scene.findAll(queryParams);
 
-  console.log('scenes', scenes);
-
   let scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
 
   if (optionsWithDefault.search) {
@@ -70,8 +68,6 @@ async function get(options) {
       return null;
     });
   }
-
-  console.log('PLOPLPO', scenesPlain);
 
   return scenesPlain;
 }

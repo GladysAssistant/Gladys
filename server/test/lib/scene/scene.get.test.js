@@ -53,7 +53,14 @@ describe('SceneManager.get', () => {
         active: true,
         description: null,
         selector: 'scene-with-tag',
-        tags: ['tag 1', 'tag 2'],
+        tags: [
+          {
+            name: 'tag 1',
+          },
+          {
+            name: 'tag 2',
+          },
+        ],
         last_executed: null,
         updated_at: new Date('2022-04-15T07:49:07.556Z'),
       },
