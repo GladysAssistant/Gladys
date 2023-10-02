@@ -167,7 +167,7 @@ const readValues = {
       return valueFromDevice === true ? 1 : 0;
     },
     [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: (valueFromDevice) => {
-      return parseInt(valueFromDevice, 10);
+      return parseInt(valueFromDevice, 10) / 100;
     },
     [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: (valueFromDevice) => {
       return parseInt(valueFromDevice, 10);

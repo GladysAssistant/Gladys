@@ -76,7 +76,7 @@ describe('Tuya device mapping', () => {
       });
       it('energy', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.ENERGY]('30');
-        expect(result).to.eq(30);
+        expect(result).to.eq(0.3);
       });
       it('current', () => {
         const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.CURRENT]('20');
