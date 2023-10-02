@@ -114,7 +114,7 @@ describe('GET /api/v1/device_feature/:device_feature_selector/states', () => {
     this.timeout(1000);
     await insertStates(1);
   });
-  it('should get device feature states by selector', async function Test() {
+  it('should get device feature states by selector', async () => {
     const now = new Date();
     const dateState = `${now.getUTCFullYear()}-${`0${now.getUTCMonth() + 1}`.slice(-2)}-${`0${now.getUTCDate()}`.slice(
       -2,

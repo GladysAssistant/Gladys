@@ -110,7 +110,6 @@ module.exports = function DeviceController(gladys) {
    * @api {get} /api/v1/device_feature/:device_feature_selector/states getDeviceFeaturesStates
    * @apiName getDeviceFeatureStates
    * @apiGroup Device
-   *
    * @apiParam {string} from - Start date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
    * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time).
    * @apiParam {string} [to="now"] - End date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"

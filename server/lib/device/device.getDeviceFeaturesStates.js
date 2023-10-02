@@ -12,7 +12,7 @@ const DEFAULT_OPTIONS = {
 /**
  * @description Get all features states aggregates.
  * @param {string} selector - Device selector.
- * @param {Object} options - Options of the query.
+ * @param {object} options - Options of the query.
  * @param {string} options.from - Start date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
  * or "yyyy-mm-dd hh:mm:ss:sss" (GMT time).
  * @param {string} [options.to] - End date in UTC format "yyyy-mm-ddThh:mm:ss:sssZ"
@@ -38,7 +38,7 @@ async function getDeviceFeaturesStates(selector, options) {
   // Default end date is now
   const toDate = options.to ? new Date(options.to) : new Date();
 
-  const optionsWithDefault = Object.assign({}, DEFAULT_OPTIONS, options);
+  const optionsWithDefault = { ...DEFAULT_OPTIONS, ...options };
 
   const queryParams = {
     raw: true,
