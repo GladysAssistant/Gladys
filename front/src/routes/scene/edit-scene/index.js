@@ -430,6 +430,17 @@ class EditScene extends Component {
     });
   };
 
+  getTags = async () => {
+    try {
+      const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
+      this.setState({
+        tags
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   constructor(props) {
     super(props);
     this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
@@ -442,6 +453,7 @@ class EditScene extends Component {
 
   componentDidMount() {
     this.getSceneBySelector();
+    this.getTags();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.highlighCurrentlyExecutedAction(payload)
     );
@@ -454,7 +466,7 @@ class EditScene extends Component {
     document.removeEventListener('click', this.closeEdition, true);
   }
 
-  render(props, { saving, error, variables, scene, triggersVariables }) {
+  render(props, { saving, error, variables, scene, triggersVariables, tags }) {
     return (
       scene && (
         <div>
@@ -462,6 +474,7 @@ class EditScene extends Component {
             <EditScenePage
               {...props}
               scene={scene}
+              tags={tags}
               updateActionProperty={this.updateActionProperty}
               updateTriggerProperty={this.updateTriggerProperty}
               addAction={this.addAction}

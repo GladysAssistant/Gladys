@@ -4,19 +4,6 @@ import CreatableSelect from 'react-select/creatable';
 import { Component } from 'preact';
 import styles from './style.css';
 
-const options = [
-  { value: 'ocean', label: 'Ocean' },
-  { value: 'blue', label: 'Blue' },
-  { value: 'purple', label: 'Purple' },
-  { value: 'red', label: 'Red' },
-  { value: 'orange', label: 'Orange' },
-  { value: 'yellow', label: 'Yellow' },
-  { value: 'green', label: 'Green' },
-  { value: 'forest', label: 'Forest' },
-  { value: 'slate', label: 'Slate' },
-  { value: 'silver', label: 'Silver' }
-];
-
 class Settings extends Component {
   constructor(props) {
     super(props);
@@ -29,10 +16,6 @@ class Settings extends Component {
     this.setState({
       cardOpened: !this.state.cardOpened
     });
-  };
-
-  onChangeTags = temp => {
-    console.log(temp);
   };
 
   render(props, { cardOpened }) {
@@ -98,7 +81,13 @@ class Settings extends Component {
                     <Text id="editScene.tagsTitle" />
                   </div>
                   <Localizer>
-                    <CreatableSelect closeMenuOnSelect={false} isMulti options={options} onChange={this.onChangeTags} />
+                    <CreatableSelect
+                      defaultValue={props.scene.tags.map(tag => ({ value: tag.name, label: tag.name }))}
+                      closeMenuOnSelect={false}
+                      isMulti
+                      options={props.tags && props.tags.map(tag => ({ value: tag.name, label: tag.name }))}
+                      onChange={tags => props.setTags(tags.map(tag => tag.value))}
+                    />
                   </Localizer>
                 </div>
               </div>
