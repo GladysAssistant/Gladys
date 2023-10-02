@@ -143,3 +143,23 @@ describe('POST /api/v1/scene/:scene_selector/duplicate', () => {
       });
   });
 });
+
+describe('GET /api/v1/tag_scene', () => {
+  it('should get tags', async () => {
+    await authenticatedRequest
+      .get('/api/v1/tag_scene')
+      .send()
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal([
+          {
+            name: 'tag 1',
+          },
+          {
+            name: 'tag 2',
+          },
+        ]);
+      });
+  });
+});
