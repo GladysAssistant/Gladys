@@ -1,5 +1,3 @@
-const { ACTIONS, EVENTS } = require('../utils/constants');
-
 module.exports = {
   up: (queryInterface, Sequelize) =>
     queryInterface.bulkInsert(
