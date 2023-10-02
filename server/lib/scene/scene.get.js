@@ -2,7 +2,7 @@ const { Op } = require('sequelize');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
-  fields: ['id', 'name', 'description', 'icon', 'selector', 'active', 'last_executed', 'updated_at', 'tags'],
+  fields: ['id', 'name', 'description', 'icon', 'selector', 'active', 'last_executed', 'updated_at'],
   skip: 0,
   order_dir: 'ASC',
   order_by: 'name',
@@ -25,6 +25,13 @@ async function get(options) {
     attributes: optionsWithDefault.fields,
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
+    include: [
+      {
+        model: db.TagScene,
+        as: 'tags',
+        attributes: ['name'],
+      },
+    ],
   };
 
   if (optionsWithDefault.take !== undefined) {
@@ -42,6 +49,8 @@ async function get(options) {
 
   const scenes = await db.Scene.findAll(queryParams);
 
+  console.log('scenes', scenes);
+
   let scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
 
   if (optionsWithDefault.search) {
@@ -50,7 +59,7 @@ async function get(options) {
         return scene;
       }
       const tagsFound = scene.tags.find((tag) => {
-        if (tag.toLowerCase().includes(optionsWithDefault.search.toLowerCase())) {
+        if (tag.name.toLowerCase().includes(optionsWithDefault.search.toLowerCase())) {
           return true;
         }
         return false;
@@ -61,6 +70,8 @@ async function get(options) {
       return null;
     });
   }
+
+  console.log('PLOPLPO', scenesPlain);
 
   return scenesPlain;
 }

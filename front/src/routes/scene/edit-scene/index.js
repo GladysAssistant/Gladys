@@ -422,7 +422,7 @@ class EditScene extends Component {
       const newState = update(prevState, {
         scene: {
           tags: {
-            $set: tags
+            $set: tags.map(tag => ({ name: tag }))
           }
         }
       });

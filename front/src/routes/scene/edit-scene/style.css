@@ -31,3 +31,20 @@
     left: auto;
   }
 }
+
+
+.settings {
+  opacity: 0;
+  max-height: 0;
+  visibility: hidden;
+  overflow: hidden;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  padding: 0rem
+}
+
+.settingsOpen {
+  visibility: visible;
+  opacity: 1;
+  max-height: 1000px;
+  padding: 1.5rem 1.5rem;
+}

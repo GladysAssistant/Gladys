@@ -59,7 +59,9 @@ class SceneCard extends Component {
                   {props.scene.tags &&
                     props.scene.tags.map(tag => (
                       <span class="badge badge-secondary mr-1">
-                        {tag.length > MAX_LENGTH_TAG ? `${tag.substring(0, MAX_LENGTH_TAG - 3)}...` : tag}
+                        {tag.name.length > MAX_LENGTH_TAG
+                          ? `${tag.name.substring(0, MAX_LENGTH_TAG - 3)}...`
+                          : tag.name}
                       </span>
                     ))}
                 </div>

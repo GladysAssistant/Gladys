@@ -13,11 +13,20 @@ async function getBySelector(selector) {
     where: {
       selector,
     },
+    include: [
+      {
+        model: db.TagScene,
+        as: 'tags',
+        attributes: ['name'],
+      },
+    ],
   });
 
   if (scene === null) {
     throw new NotFoundError('Scene not found');
   }
+
+  console.log('OCICICICI', scene.get({ plain: true }));
 
   return scene.get({ plain: true });
 }

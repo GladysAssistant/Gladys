@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
@@ -17,6 +18,13 @@ async function duplicate(selector, name, icon) {
     where: {
       selector,
     },
+    include: [
+      {
+        model: db.TagScene,
+        as: 'tags',
+        attributes: ['name'],
+      },
+    ],
   });
 
   if (existingScene === null) {

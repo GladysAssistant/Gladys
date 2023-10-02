@@ -164,17 +164,20 @@ module.exports = (sequelize, DataTypes) => {
       last_executed: {
         type: DataTypes.DATE,
       },
-      tags: {
-        allowNull: false,
-        unique: false,
-        type: DataTypes.JSON,
-      },
     },
     {},
   );
 
   // add slug if needed
   scene.beforeValidate(addSelector);
+
+  scene.associate = (models) => {
+    scene.hasMany(models.TagScene, {
+      foreignKey: 'scene_id',
+      sourceKey: 'id',
+      as: 'tags',
+    });
+  };
 
   return scene;
 };
