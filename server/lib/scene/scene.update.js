@@ -32,24 +32,7 @@ async function update(selector, scene) {
 
   const oldName = existingScene.name;
 
-  /*
-  const existingTags = db.TagScene.findAll({
-    where: {
-      scene_id: existingScene.id,
-    },
-  });
-
-   */
-
-  console.log('ICIC');
-
-  console.log('scene', scene.tags);
-
-  console.log('existingScene', existingScene.tags);
-
   await existingScene.update(scene);
-
-  console.log('existingScene', existingScene.tags);
 
   await db.TagScene.destroy({
     where: {

@@ -26,8 +26,6 @@ async function getBySelector(selector) {
     throw new NotFoundError('Scene not found');
   }
 
-  console.log('OCICICICI', scene.get({ plain: true }));
-
   return scene.get({ plain: true });
 }
 

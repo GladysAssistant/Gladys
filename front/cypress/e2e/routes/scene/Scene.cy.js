@@ -4,7 +4,7 @@ describe('Scene view', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.request({
       method: 'GET',
-      url: `${serverUrl}/api/v1/room`
+      url: `${serverUrl}/api/v1/room?expand=devices`
     }).then(res => {
       const device = {
         name: 'One device',
@@ -65,17 +65,15 @@ describe('Scene view', () => {
       .should('have.class', 'card-title')
       .click();
 
-    cy.get('input[class*="form-control"]').then(inputs => {
+    cy.get('div[class*="form-group"]').then(inputs => {
       cy.wrap(inputs[0])
+        .find('input')
         .clear()
         .type('My scene name');
-      cy.wrap(inputs[1]).type('My scene description');
-    });
-
-    cy.get('input[class*="rti--input"]').then(inputs => {
-      cy.wrap(inputs[0])
-        .type('My tag 1')
-        .type('{enter}');
+      cy.wrap(inputs[1])
+        .find('input')
+        .type('My scene description');
+      cy.wrap(inputs[2]).type('My tag 1{enter}{enter}');
     });
 
     // I don't know why, but I'm unable to get this button with
@@ -84,6 +82,7 @@ describe('Scene view', () => {
       cy.wrap(buttons[0]).click();
     });
   });
+
   it('Should add new condition house empty', () => {
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addActionButton')
@@ -92,12 +91,14 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
-      .click(0, 0, { force: true });
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
+        .click(0, 0, { force: true });
+    });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -105,27 +106,38 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("My House")`)
-      .click(0, 0, { force: true });
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("My House")`)
+        .click(0, 0, { force: true });
+    });
   });
+
   it('Should add new condition device set value', () => {
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addActionButton')
       .should('have.class', 'btn-outline-primary')
       .click();
 
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept({
+      method: 'GET',
+      url: `${serverUrl}/api/v1/room?expand=devices`
+    }).as('loadDevices');
+
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
-      .click(0, 0, { force: true });
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
+        .click(0, 0, { force: true });
+    });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -133,13 +145,18 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("Multilevel")`)
-      .click(0, 0, { force: true });
+    cy.wait('@loadDevices');
+
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("Multilevel")`)
+        .click(0, 0, { force: true });
+    });
   });
+
   it('Should add new calendar event trigger', () => {
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addNewTriggerButton')
@@ -148,12 +165,14 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
-      .click(0, 0, { force: true });
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
+        .click(0, 0, { force: true });
+    });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -167,6 +186,7 @@ describe('Scene view', () => {
       cy.wrap(selects[2]).select('minute');
     });
   });
+
   it('Should disable scene', () => {
     cy.visit('/dashboard/scene');
 
@@ -213,6 +233,7 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-duplicated-scene`);
   });
+
   it('Should delete existing scene', () => {
     cy.login();
     cy.visit('/dashboard/scene/my-scene');
