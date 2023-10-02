@@ -1,5 +1,5 @@
 const { expect } = require('chai');
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, COVER_STATE } = require('../../../../../../utils/constants');
 const { writeValues, readValues } = require('../../../../../../services/tuya/lib/device/tuya.deviceMapping');
 
 describe('Tuya device mapping', () => {
@@ -23,6 +23,30 @@ describe('Tuya device mapping', () => {
     it('switch binary', () => {
       const result = writeValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](1);
       expect(result).to.eq(true);
+    });
+    describe('curtain state', () => {
+      it('open', () => {
+        const result = writeValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE](
+          COVER_STATE.OPEN,
+        );
+        expect(result).to.eq('open');
+      });
+      it('close', () => {
+        const result = writeValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE](
+          COVER_STATE.CLOSE,
+        );
+        expect(result).to.eq('close');
+      });
+      it('stop', () => {
+        const result = writeValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE](
+          COVER_STATE.STOP,
+        );
+        expect(result).to.eq('stop');
+      });
+    });
+    it('custain position', () => {
+      const result = writeValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.POSITION]('30');
+      expect(result).to.eq(30);
     });
   });
 
@@ -48,6 +72,24 @@ describe('Tuya device mapping', () => {
     it('switch binary', () => {
       const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](true);
       expect(result).to.eq(1);
+    });
+    describe('curtain state', () => {
+      it('open', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE]('open');
+        expect(result).to.eq(COVER_STATE.OPEN);
+      });
+      it('close', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE]('close');
+        expect(result).to.eq(COVER_STATE.CLOSE);
+      });
+      it('stop', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.STATE]('STOP');
+        expect(result).to.eq(COVER_STATE.STOP);
+      });
+      it('curtain position', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.CURTAIN][DEVICE_FEATURE_TYPES.CURTAIN.POSITION](30);
+        expect(result).to.eq(30);
+      });
     });
   });
 });
