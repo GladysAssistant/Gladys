@@ -1,41 +1,11 @@
 describe('Scene view', () => {
   before(() => {
     cy.login();
-    const serverUrl = Cypress.env('serverUrl');
-    cy.request({
-      method: 'GET',
-      url: `${serverUrl}/api/v1/room`
-    }).then(res => {
-      const device = {
-        name: 'One device',
-        external_id: 'one-device',
-        selector: 'one-device',
-        room_id: res.body[0].id,
-        features: [
-          {
-            name: 'Multilevel',
-            category: 'light',
-            type: 'temperature',
-            external_id: 'light-temperature',
-            selector: 'light-temperature',
-            read_only: false,
-            keep_history: true,
-            has_feedback: true,
-            min: 0,
-            max: 1
-          }
-        ]
-      };
-      cy.createDevice(device, 'mqtt');
-    });
   });
   beforeEach(() => {
     cy.login();
   });
-  after(() => {
-    // Delete all Bluetooth devices
-    cy.deleteDevices('mqtt');
-  });
+  after(() => {});
   it('Should create new scene', () => {
     cy.visit('/dashboard/scene');
     cy.contains('scene.newButton')
@@ -92,6 +62,7 @@ describe('Scene view', () => {
     const i18n = Cypress.env('i18n');
 
     cy.get('div[class*="-control"]').then(inputs => {
+      cy.log('ICICICIIC', inputs);
       cy.wrap(inputs[1])
         .click(0, 0, { force: true })
         .get('[class*="-menu"]')
@@ -118,10 +89,43 @@ describe('Scene view', () => {
 
   it('Should add new condition device set value', () => {
     const serverUrl = Cypress.env('serverUrl');
-    cy.intercept({
-      method: 'GET',
-      url: `${serverUrl}/api/v1/room?expand=devices`
-    }).as('loadDevices');
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/room?expand=devices`
+      },
+      [
+        {
+          id: 'd63ce677-f5f8-47e1-816d-7aa227c863e4',
+          house_id: '6c1c78f0-1c26-4944-9149-77188e25d00d',
+          name: 'Living Room',
+          selector: 'living-room',
+          created_at: '2023-10-03T12:21:39.551Z',
+          updated_at: '2023-10-03T12:21:39.551Z',
+          devices: [
+            {
+              name: 'One device',
+              selector: 'one-device',
+              features: [
+                {
+                  name: 'Multilevel',
+                  selector: 'light-temperature',
+                  category: 'light',
+                  type: 'temperature',
+                  read_only: false,
+                  unit: null,
+                  min: 0,
+                  max: 1,
+                  last_value: null,
+                  last_value_changed: null
+                }
+              ],
+              service: { id: '123d4d56-6cbd-4020-991f-2a0a8e0ac3e0', name: 'mqtt' }
+            }
+          ]
+        }
+      ]
+    ).as('loadDevices');
 
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addActionButton')
