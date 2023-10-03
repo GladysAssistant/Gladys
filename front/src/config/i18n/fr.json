@@ -244,9 +244,10 @@
         "substractButton": "-"
       },
       "devices": {
-        "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici.",
+        "editDeviceFeaturesLabel": "Vous pouvez modifier le nom affiché ici :",
         "editNameLabel": "Nom du widget",
-        "editNamePlaceholder": "Entrez le nom du widget"
+        "editNamePlaceholder": "Entrez le nom du widget",
+        "addADeviceLabel": "Ajouter un appareil :"
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
@@ -440,7 +441,7 @@
         "namePlaceholder": "Entrez le nom de votre appareil",
         "roomLabel": "Pièce",
         "externalIdLabel": "ID externe",
-        "manufacturerLabel": "Construteur",
+        "manufacturerLabel": "Constructeur",
         "modelLabel": "Modèle",
         "presenceSensorLabel": "Utiliser cet appareil comme un détecteur de présence",
         "featuresLabel": "Fonctionnalités",
@@ -495,14 +496,14 @@
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
       "description": "Parlez à Gladys grâce à Nextcloud Talk.",
-      "introduction": "Pour communiquer via Talk il vous créer un compte spécifique Nextcloud représentant votre bot.",
+      "introduction": "Pour communiquer via Talk, il faut créer un compte spécifique Nextcloud représentant votre bot.",
       "url": "URL de l'instance Nextcloud",
       "urlInfo": "Entrez l'url de base de votre instance Nextcloud.",
       "username": "Nom d'utilisateur bot Nextcloud",
       "usernameInfo": "Entrez le nom d'utilisateur du compte Nextcloud représentant le bot Gladys.",
       "password": "Mot de passe bot Nextcloud",
       "passwordInfo": "Entrez le mot de passe du compte Nextcloud représentant le bot.",
-      "token": "Token de la conversion avec le bot",
+      "token": "Token de la conversation avec le bot",
       "tokenInfo": "Entrez le token de la conversation entre votre compte Nextcloud et le compte du bot.",
       "configurationError": "Nous n'avons pas pu sauvegarder cette configuration.",
       "configurationSuccess": "Sauvegarde de la configuration du compte terminée.",
@@ -555,9 +556,12 @@
       "testConnectionButton": "Tester",
       "saveButton": "Sauvegarder",
       "deleteButton": "Supprimer",
-      "rotate180Label": "Rotation 180°",
       "saveError": "Une erreur s'est produite lors de l'enregistrement de la caméra.",
-      "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?"
+      "testConnectionError": "Une erreur s'est produite lors de l'obtention du flux RTSP. Êtes-vous sûr que l'URL fournie est correcte et accessible à partir de l'instance Gladys ?",
+      "rotationO": "Pas de rotation",
+      "rotation90": "90°",
+      "rotation18O": "180°",
+      "rotation27O": "270°"
     },
     "tasmota": {
       "title": "Tasmota",
@@ -842,6 +846,79 @@
       "saveButton": "Sauvegarder",
       "instructionsToUse": "Pour utiliser cette intégration, accédez au tableau de bord et créez une box météo."
     },
+    "tuya": {
+      "title": "Tuya",
+      "description": "Contrôler vos appareils Tuya (via le cloud).",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Tuya",
+      "setupTab": "Configuration",
+      "documentation": "Tuya documentation",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Tuya",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud Tuya, plus d'informations sur la ",
+        "setupPageLink": "page de configuration Tuya.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "device": {
+        "title": "Appareils Tuya dans Gladys",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil Tuya trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud Tuya",
+        "description": "Les appareils Tuya sont automatiquement découverts. Vos appareils Tuya doivent être ajoutés à votre compte cloud Tuya avant.",
+        "error": "Erreur de découverte des appareils Tuya. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil Tuya n'a été découvert.",
+        "scan": "Scanner"
+      },
+      "setup": {
+        "title": "Configuration Tuya",
+        "description": "Vous pouvez connecter Gladys à votre compte cloud Tuya pour commander les appareils associés.",
+        "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://www.tuya.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Tuya</a>.",
+        "descriptionCreateProject": "Vous devez ensuite créer un \"Cloud Project\" dans votre compte Tuya.",
+        "descriptionGetKeys": "Vous aurez accès aux deux clés : Access Key et Secret Key.",
+        "descriptionGetAppAccountUid": "Pour avoir votre \"App account UID\", il faut vous rendre dans la section \"Devices\" -> \"Link Tuya App Account\" et ajouter un compte d'application.",
+        "descriptionGetAppAccountUid2": "Une fois que l'ajout est finalisé, votre \"App account UID\" sera dans la colonne UID.",
+        "endpoints": {
+          "china": "China",
+          "westernAmerica": "Western America",
+          "easternAmerica": "Eastern America",
+          "centralEurope": "Central Europe",
+          "westernEurope": "Western Europe",
+          "india": "India"
+        },
+        "endpoint": "Endpoint",
+        "accessKey": "Access Key",
+        "accessKeyPlaceholder": "Entrez l'Access Key de Tuya",
+        "secretKey": "Secret Key",
+        "secretKeyPlaceholder": "Entrez la Secret Key de Tuya",
+        "appAccountId": "App account UID",
+        "appAccountIdPlaceholder": "Entrez l'UID de l'app de Tuya",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",
+        "connected": "Connexion réussie au compte cloud Tuya !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connexion à un serveur MQTT, en local ou en distant.",
@@ -1082,7 +1159,7 @@
         "title": "Appareils LAN",
         "search": "Chercher un appareil",
         "noDevices": "Aucun appareil LAN n'a encore été ajouté.",
-        "manufacturerLabel": "Construteur",
+        "manufacturerLabel": "Constructeur",
         "ipAddressLabel": "Adresse IP",
         "macAddressLabel": "Adresse MAC",
         "originalNameLabel": "Nom sur le réseau"
@@ -1107,7 +1184,7 @@
         "presenceScannerFrequencyUnit": "minutes",
         "presenceScannerFrequencyError": "Seul un nombre entier est autorisé.",
         "ipMasksLabel": "CIDR à scanner",
-        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vont correspondent le mieux.",
+        "masksDescription": "La notation CIDR (Classless Inter-Domain Routing) permet de définir un masque de sous-réseau, c'est à dire une plage d'IP. Sa syntaxe correspond à une adresse IP du réseau, suivi d'un nombre, le masque, séparés par une barre oblique (exemple : 192.168.1.1/10). Il existe de multiples calculateurs d'adresse CIDR sur Internet qui vous aideront à composer celles qui vous correspondent le mieux.",
         "networkInterfaceDescription": "Les masques enregistrés par votre ordinateur, selon les interfaces réseaux, ne peuvent pas être supprimés.",
         "maskTableHeader": "CIDR",
         "nameTableHeader": "Nom",
@@ -2071,7 +2148,32 @@
           "3": "Pression clic long",
           "4": "Relâche clic long",
           "5": "Clic maintenu",
-          "6": "Clic long"
+          "6": "Clic long",
+          "7": "On",
+          "8": "Off",
+          "9": "Réduire luminosité",
+          "10": "Augmenter luminosité",
+          "11": "Stopper luminosité",
+          "12": "Flèche gauche clic",
+          "13": "Flèche droite clic",
+          "14": "Flèche gauche maintenue",
+          "15": "Flèche droite maintenue",
+          "16": "Flèche gauche relâchée",
+          "17": "Flèche droite relâchée",
+          "18": "Clic triple",
+          "19": "Clic quadruple",
+          "20": "Clic relâché",
+          "21": "Plein de clics",
+          "22": "Cube secoué",
+          "23": "Cube lancé",
+          "24": "Cube réveillé",
+          "25": "Cube tombe",
+          "26": "Cube tapé",
+          "27": "Cube slide",
+          "28": "Cube flip 180°",
+          "29": "Cube flip 90°",
+          "30": "Cube rotation gauche",
+          "31": "Cube rotation droite"
         }
       },
       "opening-sensor": {

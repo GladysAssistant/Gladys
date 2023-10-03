@@ -6,7 +6,7 @@ const LastSeenDeviceValue = ({ deviceFeature, user }) => {
   const { last_value_changed: lastValueChanged } = deviceFeature;
 
   if (lastValueChanged) {
-    return <RelativeTime datetime={lastValueChanged} language={user.language} futureDisabled />;
+    return <RelativeTime datetime={lastValueChanged} language={user ? user.language : null} futureDisabled />;
   }
 
   return <Text id="dashboard.boxes.devicesInRoom.noValue" />;

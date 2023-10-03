@@ -58,5 +58,10 @@
     "key": "lanManager",
     "link": "lan-manager",
     "img": "/assets/integrations/cover/lan-manager.jpg"
+  },
+  {
+    "key": "tuya",
+    "link": "tuya",
+    "img": "/assets/integrations/cover/tuya.jpg"
   }
 ]

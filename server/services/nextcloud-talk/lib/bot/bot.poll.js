@@ -11,6 +11,7 @@ const logger = require('../../../../utils/logger');
 async function poll(userId) {
   const bot = this.bots[userId];
   let result = {};
+  let interval = 50;
 
   try {
     const params = {
@@ -32,9 +33,14 @@ async function poll(userId) {
       validateStatus: null,
     };
     result = await this.axios.request(params);
+    if (result && result.status >= 400) {
+      logger.info(`Fail to request new Nextcloud Talk messages status: ${result.status}, retry in 15 seconds`);
+      interval = 15 * 1000;
+    }
   } catch (e) {
-    logger.info('Fail to request new Nextcloud Talk messages, retry');
+    logger.info('Fail to request new Nextcloud Talk messages, retry in 15 seconds');
     logger.warn(e);
+    interval = 15 * 1000;
   }
 
   const newMessages = get(result, 'data.ocs.data');
@@ -49,7 +55,7 @@ async function poll(userId) {
 
   if (bot.isPolling) {
     this.bots[userId].lastKnownMessageId = get(result, 'headers.x-chat-last-given') || bot.lastKnownMessageId;
-    setTimeout(() => this.poll(userId), 50);
+    setTimeout(() => this.poll(userId), interval);
   }
 }
 
