@@ -95,6 +95,7 @@ function Gladys(params = {}) {
     gateway,
     scheduler,
     brain,
+    service,
   );
 
   const gladys = {

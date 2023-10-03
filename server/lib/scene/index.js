@@ -19,6 +19,7 @@ const { command } = require('./scene.command');
 
 const { EVENTS, INTENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
+const { handleMessage } = require('./scene.handleMessage');
 
 const DEFAULT_TIMEZONE = 'Europe/Paris';
 
@@ -34,6 +35,7 @@ const SceneManager = function SceneManager(
   gateway,
   scheduler,
   brain,
+  service,
 ) {
   this.stateManager = stateManager;
   this.event = event;
@@ -45,6 +47,7 @@ const SceneManager = function SceneManager(
   this.http = http;
   this.gateway = gateway;
   this.brain = brain;
+  this.service = service;
   this.scenes = {};
   this.timezone = DEFAULT_TIMEZONE;
   // @ts-ignore
@@ -81,5 +84,6 @@ SceneManager.prototype.executeSingleAction = executeSingleAction;
 SceneManager.prototype.update = update;
 SceneManager.prototype.duplicate = duplicate;
 SceneManager.prototype.command = command;
+SceneManager.prototype.handleMessage = handleMessage;
 
 module.exports = SceneManager;
