@@ -4,7 +4,7 @@ describe('Scene view', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.request({
       method: 'GET',
-      url: `${serverUrl}/api/v1/room?expand=devices`
+      url: `${serverUrl}/api/v1/room`
     }).then(res => {
       const device = {
         name: 'One device',
@@ -120,7 +120,7 @@ describe('Scene view', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept({
       method: 'GET',
-      url: `${serverUrl}/api/v1/room?expand=devices`
+      url: `${serverUrl}/api/v1/room`
     }).as('loadDevices');
 
     cy.visit('/dashboard/scene/my-scene');
@@ -145,7 +145,10 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.wait('@loadDevices');
+    cy.wait('@loadDevices').then(interception => {
+      console.log(interception);
+    });
+    cy.wait(500);
 
     cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1])
