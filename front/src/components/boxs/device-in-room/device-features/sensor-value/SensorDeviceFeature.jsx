@@ -11,6 +11,7 @@ import IconBinaryDeviceValue from './IconBinaryDeviceValue';
 import SignalQualityDeviceValue from './SignalQualityDeviceValue';
 import ButtonClickDeviceValue from './ButtonClickDeviceValue';
 import TextDeviceValue from './TextDeviceValue';
+import NoRecentValueBadge from './NoRecentValueBadge';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: LastSeenDeviceValue,
@@ -25,6 +26,13 @@ const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue
 };
 
+const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
+  DEVICE_FEATURE_CATEGORIES.SMOKE_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR,
+  DEVICE_FEATURE_CATEGORIES.BUTTON,
+  DEVICE_FEATURE_CATEGORIES.TEXT
+];
+
 const SensorDeviceType = ({ children, ...props }) => {
   const { deviceFeature: feature } = props;
   const { category, type } = feature;
@@ -37,6 +45,12 @@ const SensorDeviceType = ({ children, ...props }) => {
 
   if (!elementType) {
     elementType = BadgeNumberDeviceValue;
+  }
+
+  // If the device feature has no recent value, and the feature is not in the blacklist
+  // we display a message to the user
+  if (feature.last_value_is_too_old && DEVICE_FEATURES_WITHOUT_EXPIRATION.indexOf(feature.category) === -1) {
+    elementType = NoRecentValueBadge;
   }
 
   return (

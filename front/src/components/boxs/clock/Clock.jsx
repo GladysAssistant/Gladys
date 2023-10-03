@@ -22,8 +22,10 @@ const Clock = ({ children, ...props }) => (
           </div>
           <div class={style.analogSmallText}>{props.year}</div>
         </div>
-        <div class={style.analogClock}>
-          <ReactClock className="react-clock" value={props.time} renderSecondHand={props.displaySecond} />
+        <div class={style.analogCol}>
+          <div class={style.analogClock}>
+            <ReactClock className={style.reactClock} value={props.time} renderSecondHand={props.displaySecond} />
+          </div>
         </div>
       </div>
     )}
