@@ -51,6 +51,7 @@
         "unit": null
       }
     ],
+    "id": "gladys-id",
     "model": "WXKG01LM",
     "name": "device-name",
     "room_id": "room_id",

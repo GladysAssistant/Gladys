@@ -48,7 +48,7 @@ describe('zigbee2mqtt handleMqttMessage', () => {
     stateManagerGetStub = sinon.stub();
     stateManagerGetStub
       .onFirstCall()
-      .returns({ room_id: 'room_id', name: 'device-name' })
+      .returns({ id: 'gladys-id', room_id: 'room_id', name: 'device-name' })
       .onSecondCall()
       .returns(null)
       .onThirdCall()

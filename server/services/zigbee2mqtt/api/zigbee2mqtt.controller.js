@@ -9,7 +9,8 @@ module.exports = function Zigbee2mqttController(gladys, zigbee2mqttManager) {
    */
   async function getDiscoveredDevices(req, res) {
     logger.debug('Get discovered devices');
-    const devices = zigbee2mqttManager.getDiscoveredDevices();
+    const { query = {} } = req;
+    const devices = zigbee2mqttManager.getDiscoveredDevices(query);
     res.json(devices);
   }
 
