@@ -587,6 +587,7 @@
       "discover": {
         "title": "Zigbee2mqtt discover",
         "permitJoin": "Permit joining",
+        "hideExistingDevices": "Hide already added devices",
         "noDeviceDiscovered": "No new device discovered, please click on scan button.",
         "serverNoResponse": "Gladys server is not available.",
         "serverNoResponseWebSocker": "Gladys server is not available. Pleash refresh the page.",

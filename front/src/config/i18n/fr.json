@@ -713,6 +713,7 @@
       "discover": {
         "title": "Découverte du réseau Zigbee",
         "permitJoin": "Autoriser l'association",
+        "hideExistingDevices": "Cacher les appareils déjà ajoutés",
         "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "serverNoResponse": "Gladys n'est pas accessible.",
         "serverNoResponseWebSocker": "Gladys n'est pas accessible. Veuillez actualiser la page.",

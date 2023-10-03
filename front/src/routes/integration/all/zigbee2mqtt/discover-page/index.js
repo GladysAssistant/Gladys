@@ -47,7 +47,7 @@ class Zigbee2mqttIntegration extends Component {
 
 export default withIntlAsProp(
   connect(
-    'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled',
+    'user,session,houses,zigbee2mqttDevices,discoverZigbee2mqtt,discoverZigbee2mqttError,permitJoin,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mEnabled,filterExisting',
     actions
   )(Zigbee2mqttIntegration)
 );
