@@ -38,7 +38,7 @@ function createActions(store) {
       const { filterExisting = true } = state;
 
       let zigbee2mqttDevices = incomingDevices;
-      if (filterExisting) {
+      if (incomingDevices && filterExisting) {
         zigbee2mqttDevices = zigbee2mqttDevices.filter(device => device.id === undefined || device.updatable);
       }
 
