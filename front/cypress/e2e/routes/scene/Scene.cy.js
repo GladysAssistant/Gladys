@@ -117,16 +117,16 @@ describe('Scene view', () => {
   });
 
   it('Should add new condition device set value', () => {
-    cy.visit('/dashboard/scene/my-scene');
-    cy.contains('editScene.addActionButton')
-      .should('have.class', 'btn-outline-primary')
-      .click();
-
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept({
       method: 'GET',
       url: `${serverUrl}/api/v1/room?expand=devices`
     }).as('loadDevices');
+
+    cy.visit('/dashboard/scene/my-scene');
+    cy.contains('editScene.addActionButton')
+      .should('have.class', 'btn-outline-primary')
+      .click();
 
     const i18n = Cypress.env('i18n');
 
