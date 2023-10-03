@@ -145,17 +145,9 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.log('1');
-
-    cy.wait('@loadDevices').then(interception => {
-      console.log(interception);
-    });
-    cy.wait(500);
-
-    cy.log('2');
+    cy.wait('@loadDevices');
 
     cy.get('div[class*="-control"]').then(inputs => {
-      cy.log('3', inputs);
       cy.wrap(inputs[1])
         .click(0, 0, { force: true })
         .get('[class*="-menu"]')

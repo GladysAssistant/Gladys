@@ -39,7 +39,6 @@ module.exports = defineConfig({
     screenshotOnRunFailure: false,
     defaultCommandTimeout: 30000,
     pageLoadTimeout: 120000,
-    printLogsToConsole: 'always',
     baseUrl: 'http://localhost:1444',
     env: {
       house: {
