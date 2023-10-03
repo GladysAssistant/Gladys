@@ -120,7 +120,7 @@ describe('Scene view', () => {
     const serverUrl = Cypress.env('serverUrl');
     cy.intercept({
       method: 'GET',
-      url: `${serverUrl}/api/v1/room`
+      url: `${serverUrl}/api/v1/room?expand=devices`
     }).as('loadDevices');
 
     cy.visit('/dashboard/scene/my-scene');
@@ -145,18 +145,24 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
+    cy.log('1');
+
     cy.wait('@loadDevices').then(interception => {
       console.log(interception);
     });
     cy.wait(500);
 
+    cy.log('2');
+
     cy.get('div[class*="-control"]').then(inputs => {
+      cy.log('3', inputs);
       cy.wrap(inputs[1])
         .click(0, 0, { force: true })
         .get('[class*="-menu"]')
         .find('[class*="-option"]')
         .filter(`:contains("Multilevel")`)
         .click(0, 0, { force: true });
+      cy.log('4');
     });
   });
 
