@@ -20,7 +20,7 @@ function getDiscoveredDevices(filters = {}) {
 
   const { filterExisting } = filters;
   if (`${filterExisting}` === 'true') {
-    devices = devices.filter((device) => device.id === undefined);
+    devices = devices.filter((device) => device.id === undefined || device.updatable);
   }
 
   return devices;

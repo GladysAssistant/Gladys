@@ -41,7 +41,7 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
       .onFirstCall()
       .returns({ id: 'gladys-id', room_id: 'room_id', name: 'device-name' })
       .onSecondCall()
-      .returns(false)
+      .returns(expectedDevicesPayload[1])
       .onThirdCall()
       .returns(false);
 
@@ -63,7 +63,7 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
       .onFirstCall()
       .returns({ id: 'gladys-id', room_id: 'room_id', name: 'device-name' })
       .onSecondCall()
-      .returns(false)
+      .returns(expectedDevicesPayload[1])
       .onThirdCall()
       .returns(false);
 
@@ -78,7 +78,7 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     // ASSERT
     // Expected devices but first
     const filteredExpectedDevices = [...expectedDevicesPayload];
-    filteredExpectedDevices.shift();
+    filteredExpectedDevices.splice(1, 1);
     expect(devices).deep.eq(filteredExpectedDevices);
   });
 });
