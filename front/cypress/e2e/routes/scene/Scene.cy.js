@@ -181,6 +181,8 @@ describe('Scene view', () => {
     });
 
     cy.wait('@loadDevices');
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(500);
 
     cy.get('div[class*="-control"]').then(inputs => {
       cy.wrap(inputs[1])
