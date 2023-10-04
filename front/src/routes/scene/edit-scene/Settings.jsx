@@ -3,12 +3,13 @@ import { Localizer, Text } from 'preact-i18n';
 import CreatableSelect from 'react-select/creatable';
 import { Component } from 'preact';
 import styles from './style.css';
+import iconList from '../../../../../server/config/icons.json';
 
 class Settings extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      cardOpened: false
+      cardOpened: true
     };
   }
 
@@ -46,49 +47,81 @@ class Settings extends Component {
               })}
             >
               <div class="loader" />
-              <div class="dimmer-content">
-                <div class="form-group">
-                  <div class="form-label">
-                    <Text id="editScene.nameTitle" />
+              <div class="dimmer-content row">
+                <div class="col-sm-12 col-md-6">
+                  <div class="form-group">
+                    <div class="form-label">
+                      <Text id="editScene.nameTitle" />
+                    </div>
+                    <Localizer>
+                      <input
+                        type="text"
+                        className="form-control"
+                        onChange={props.updateSceneName}
+                        value={props.scene.name}
+                        placeholder={<Text id="editScene.editNamePlaceholder" />}
+                      />
+                    </Localizer>
                   </div>
-                  <Localizer>
-                    <input
-                      type="text"
-                      className="form-control"
-                      onChange={props.updateSceneName}
-                      value={props.scene.name}
-                      placeholder={<Text id="editScene.editNamePlaceholder" />}
-                    />
-                  </Localizer>
+                  <div class="form-group">
+                    <div class="form-label">
+                      <Text id="editScene.descriptionTitle" />
+                    </div>
+                    <Localizer>
+                      <input
+                        type="text"
+                        class="form-control"
+                        maxlength="100"
+                        onChange={props.updateSceneDescription}
+                        value={props.scene.description}
+                        placeholder={<Text id="editScene.editDescriptionPlaceholder" />}
+                      />
+                    </Localizer>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-label">
+                      <Text id="editScene.tagsTitle" />
+                    </div>
+                    <Localizer>
+                      <CreatableSelect
+                        defaultValue={props.scene.tags.map(tag => ({ value: tag.name, label: tag.name }))}
+                        closeMenuOnSelect={false}
+                        isMulti
+                        options={props.tags && props.tags.map(tag => ({ value: tag.name, label: tag.name }))}
+                        onChange={tags => props.setTags(tags.map(tag => tag.value))}
+                      />
+                    </Localizer>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <div class="form-label">
-                    <Text id="editScene.descriptionTitle" />
+                <div class="col">
+                  <div class="form-group">
+                    <label className="form-label">
+                      <Text id="editScene.iconLabel" />
+                    </label>
+                    <div class={cx('row', styles.iconContainer)}>
+                      {iconList.map(icon => (
+                        <div class="col-2">
+                          <div
+                            class={cx('text-center', styles.iconDiv, {
+                              [styles.iconDivChecked]: props.scene.icon === icon
+                            })}
+                          >
+                            <label className={styles.iconLabel}>
+                              <input
+                                name="icon"
+                                type="radio"
+                                onChange={props.updateSceneIcon}
+                                checked={props.scene.icon === icon}
+                                value={icon}
+                                className={styles.iconInput}
+                              />
+                              <i class={`fe fe-${icon}`} />
+                            </label>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <Localizer>
-                    <input
-                      type="text"
-                      class="form-control"
-                      maxlength="100"
-                      onChange={props.updateSceneDescription}
-                      value={props.scene.description}
-                      placeholder={<Text id="editScene.editDescriptionPlaceholder" />}
-                    />
-                  </Localizer>
-                </div>
-                <div class="form-group">
-                  <div class="form-label">
-                    <Text id="editScene.tagsTitle" />
-                  </div>
-                  <Localizer>
-                    <CreatableSelect
-                      defaultValue={props.scene.tags.map(tag => ({ value: tag.name, label: tag.name }))}
-                      closeMenuOnSelect={false}
-                      isMulti
-                      options={props.tags && props.tags.map(tag => ({ value: tag.name, label: tag.name }))}
-                      onChange={tags => props.setTags(tags.map(tag => tag.value))}
-                    />
-                  </Localizer>
                 </div>
               </div>
             </div>

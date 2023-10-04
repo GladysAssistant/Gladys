@@ -335,6 +335,20 @@ class EditScene extends Component {
     });
   };
 
+  updateSceneIcon = e => {
+    console.log('updateSceneIcon', e.target.value);
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        scene: {
+          icon: {
+            $set: e.target.value
+          }
+        }
+      });
+      return newState;
+    });
+  };
+
   duplicateScene = () => {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
@@ -498,6 +512,7 @@ class EditScene extends Component {
               saveScene={this.saveScene}
               duplicateScene={this.duplicateScene}
               setTags={this.setTags}
+              updateSceneIcon={this.updateSceneIcon}
             />
           </DndProvider>
         </div>

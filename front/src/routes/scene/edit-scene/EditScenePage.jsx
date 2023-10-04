@@ -67,6 +67,7 @@ const EditScenePage = ({ children, ...props }) => (
                 scene={props.scene}
                 updateSceneName={props.updateSceneName}
                 updateSceneDescription={props.updateSceneDescription}
+                updateSceneIcon={props.updateSceneIcon}
                 setTags={props.setTags}
                 tags={props.tags}
                 saving={props.saving}

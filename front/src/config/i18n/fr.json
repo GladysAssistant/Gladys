@@ -1427,6 +1427,7 @@
     "nameTitle": "Nom de scène",
     "editNamePlaceholder": "Entrez un nom de scène",
     "descriptionTitle": "Description",
+    "iconLabel": "Icône",
     "editDescriptionPlaceholder": "Entrez une description pour la scène",
     "tagsTitle": "Tags",
     "editTagsPlaceholder": "Entrez un tag pour la scène",
