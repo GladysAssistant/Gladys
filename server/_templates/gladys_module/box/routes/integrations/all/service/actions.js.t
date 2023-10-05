@@ -21,6 +21,8 @@ function createActions(store) {
         store.setState({
           <%= attributeName %>Username: configuration.login,
           <%= attributeName %>Password: configuration.login && HIDDEN_PASSWORD,
+          // HYGEN : createActions field placeholder
+          // HYGEN : end of placeholder
           passwordChanges: false,
           connected: false
         });
