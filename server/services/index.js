@@ -22,3 +22,4 @@ module.exports['lan-manager'] = require('./lan-manager');
 module.exports.overkiz = require('./overkiz');
 module.exports['nextcloud-talk'] = require('./nextcloud-talk');
 module.exports.tuya = require('./tuya');
+module.exports.melcloud = require('./melcloud');

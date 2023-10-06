@@ -67,5 +67,10 @@
     "key": "tuya",
     "link": "tuya",
     "img": "/assets/integrations/cover/tuya.jpg"
+  },
+  {
+    "key": "melcloud",
+    "link": "melcloud",
+    "img": "/assets/integrations/cover/melcloud.jpg"
   }
 ]
