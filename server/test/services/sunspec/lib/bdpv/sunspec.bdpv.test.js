@@ -1,7 +1,6 @@
 const { expect } = require('chai');
 const proxyquire = require('proxyquire');
 const sinon = require('sinon');
-const { PROPERTY } = require('../../../../../services/sunspec/lib/sunspec.constants');
 
 const { fake, assert, stub } = sinon;
 
