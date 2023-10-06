@@ -32,6 +32,9 @@ const boxesSchema = Joi.array().items(
       humidity_use_custom_value: Joi.boolean(),
       humidity_min: Joi.number(),
       humidity_max: Joi.number(),
+      temperature_use_custom_value: Joi.boolean(),
+      temperature_min: Joi.number(),
+      temperature_max: Joi.number(),
     }),
   ),
 );

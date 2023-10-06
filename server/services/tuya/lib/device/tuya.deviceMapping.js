@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
+const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES, COVER_STATE } = require('../../../../utils/constants');
 const { intToRgb, rgbToHsb, rgbToInt, hsbToRgb } = require('../../../../utils/colors');
 
 const SWITCH_LED = 'switch_led';
@@ -12,6 +12,13 @@ const SWITCH_1 = 'switch_1';
 const SWITCH_2 = 'switch_2';
 const SWITCH_3 = 'switch_3';
 const SWITCH_4 = 'switch_4';
+
+const CONTROL = 'control';
+const PERCENT_CONTROL = 'percent_control';
+
+const OPEN = 'open';
+const CLOSE = 'close';
+const STOP = 'stop';
 
 const mappings = {
   [SWITCH_LED]: {
@@ -51,6 +58,14 @@ const mappings = {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
   },
+  [CONTROL]: {
+    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
+    type: DEVICE_FEATURE_TYPES.CURTAIN.STATE,
+  },
+  [PERCENT_CONTROL]: {
+    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
+    type: DEVICE_FEATURE_TYPES.CURTAIN.POSITION,
+  },
 };
 
 const writeValues = {
@@ -80,6 +95,21 @@ const writeValues = {
       return valueFromGladys === 1;
     },
   },
+
+  [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
+    [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: (valueFromGladys) => {
+      if (valueFromGladys === COVER_STATE.OPEN) {
+        return OPEN;
+      }
+      if (valueFromGladys === COVER_STATE.CLOSE) {
+        return CLOSE;
+      }
+      return STOP;
+    },
+    [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: (valueFromGladys) => {
+      return parseInt(valueFromGladys, 10);
+    },
+  },
 };
 
 const readValues = {
@@ -104,6 +134,20 @@ const readValues = {
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {
       return valueFromDevice === true ? 1 : 0;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
+    [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: (valueFromDevice) => {
+      if (valueFromDevice === OPEN) {
+        return COVER_STATE.OPEN;
+      }
+      if (valueFromDevice === CLOSE) {
+        return COVER_STATE.CLOSE;
+      }
+      return COVER_STATE.STOP;
+    },
+    [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: (valueFromDevice) => {
+      return valueFromDevice;
     },
   },
 };

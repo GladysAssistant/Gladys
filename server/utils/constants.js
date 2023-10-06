@@ -964,6 +964,11 @@ const DEFAULT_VALUE_HUMIDITY = {
   MAXIMUM: 60,
 };
 
+const DEFAULT_VALUE_TEMPERATURE = {
+  MINIMUM: 17,
+  MAXIMUM: 24,
+};
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -1061,3 +1066,4 @@ module.exports.JOB_ERROR_TYPES = JOB_ERROR_TYPES;
 module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;
 
 module.exports.DEFAULT_VALUE_HUMIDITY = DEFAULT_VALUE_HUMIDITY;
+module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;

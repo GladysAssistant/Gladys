@@ -231,8 +231,8 @@
         "editModeLabel": "Select display mode:",
         "displayModes": {
           "advancedWeather": "Humidity and wind speed",
-          "hourlyForecast": "Forecast for the next 8 hours",
-          "dailyForecast": "Forecast for the next 7 days"
+          "hourlyForecast": "Forecast for the next 24 hours",
+          "dailyForecast": "Forecast for the next 5 days"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
@@ -253,7 +253,8 @@
       },
       "temperatureInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
-        "noTemperatureRecorded": "No temperature recorded recently."
+        "noTemperatureRecorded": "No temperature recorded recently.",
+        "thresholdsLabel": "Configure custom thresholds"
       },
       "humidityInRoom": {
         "editRoomLabel": "Select the room you want to display here.",
@@ -720,7 +721,7 @@
     },
     "openWeather": {
       "title": "OpenWeather API",
-      "description": "Display the weather in your town on your dasboard.",
+      "description": "Display the weather in your town on your dashboard.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
       "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
       "apiKeyLabel": "Then, enter your API key here:",
