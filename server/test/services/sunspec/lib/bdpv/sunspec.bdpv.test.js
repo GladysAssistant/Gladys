@@ -115,11 +115,15 @@ describe('SunSpec BDPV', () => {
       }),
     };
     await Bdpv.bdpvPush.call(sunspecManager);
-    assert.calledOnceWithExactly(sunspecManager.bdpvClient.get, 'expeditionProd_v3.php', {
-      params: {
-        index: 6912000,
+    assert.calledOnceWithExactly(
+      sunspecManager.bdpvClient.get,
+      'https://www.bdpv.fr/webservice/majProd/expeditionProd_v3.php',
+      {
+        params: {
+          index: 6912000,
+        },
       },
-    });
+    );
   });
 
   it('should bdpvPush error', async () => {

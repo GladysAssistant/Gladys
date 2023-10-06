@@ -64,8 +64,6 @@ async function bdpvInit(bdpvActive) {
     }
 
     this.bdpvTask.start();
-
-    // setTimeout(await bdpvPush.bind(this), 15000);
   } else if (this.bdpvTask) {
     this.bdpvTask.stop();
   }
