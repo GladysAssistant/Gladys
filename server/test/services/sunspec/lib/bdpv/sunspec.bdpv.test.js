@@ -14,11 +14,11 @@ describe('SunSpec BDPV', () => {
 
   beforeEach(() => {
     const feature1 = {
-      property: PROPERTY.ACWH,
+      type: 'energy',
       last_value: 1234,
     };
     const feature2 = {
-      property: PROPERTY.ACWH,
+      type: 'energy',
       last_value: 5678,
     };
     gladys = {
@@ -46,9 +46,11 @@ describe('SunSpec BDPV', () => {
       getDevices: () => {
         return [
           {
+            external_id: 'sunspec:1:mppt:ac',
             features: [feature1],
           },
           {
+            external_id: 'sunspec:2:mppt:ac',
             features: [feature2],
           },
         ];
