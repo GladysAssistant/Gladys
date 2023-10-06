@@ -1,9 +1,8 @@
 const axios = require('axios');
 const cron = require('node-cron');
 const logger = require('../../../../utils/logger');
-const { CONFIGURATION, PROPERTY } = require('../sunspec.constants');
-
-const BDPV_HOST = 'https://www.bdpv.fr/webservice/majProd';
+const { CONFIGURATION, BDPV } = require('../sunspec.constants');
+const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 /**
  * @description SunSpec push device to BDPV.
@@ -11,8 +10,12 @@ const BDPV_HOST = 'https://www.bdpv.fr/webservice/majProd';
  */
 async function bdpvPush() {
   const index = this.getDevices()
-    .filter((device) => device.mppt === undefined)
-    .map((device) => device.features.filter((deviceFeature) => deviceFeature.property === PROPERTY.ACWH))
+    .filter((device) => device.external_id.indexOf('mppt:ac') > 0)
+    .map((device) =>
+      device.features.filter((deviceFeature) => deviceFeature.type === DEVICE_FEATURE_TYPES.ENERGY_SENSOR.ENERGY),
+    )
+    .filter((deviceFeatures) => deviceFeatures.length > 0)
+    .map((deviceFeatures) => deviceFeatures[0])
     .map((deviceFeature) => {
       const gladysFeature = this.gladys.stateManager.get('deviceFeature', deviceFeature.selector);
       return gladysFeature.last_value;
@@ -20,7 +23,7 @@ async function bdpvPush() {
     .reduce((total, item) => total + item);
   try {
     this.bdpvParams.index = index * 1000; // must be in Wh
-    const response = await this.bdpvClient.get('expeditionProd_v3.php', {
+    const response = await this.bdpvClient.get(BDPV.URL, {
       params: this.bdpvParams,
     });
     logger.info(`BDPV push ${response.status}`);
@@ -44,24 +47,25 @@ async function bdpvInit(bdpvActive) {
       }
 
       this.bdpvClient = axios.create({
-        baseURL: BDPV_HOST,
         timeout: 10000,
       });
       this.bdpvParams = {
         util: bdpvUsername,
         apiKey: bdpvApiKey,
-        typeReleve: 'onduleur',
-        source: 'Gladys',
+        typeReleve: BDPV.TYPE_RELEVE,
+        source: BDPV.SOURCE,
       };
     }
 
     if (this.bdpvTask === undefined) {
-      this.bdpvTask = cron.schedule('10 23 * * *', bdpvPush.bind(this), {
+      this.bdpvTask = cron.schedule(BDPV.CRON, await bdpvPush.bind(this), {
         scheduled: false,
       });
     }
 
     this.bdpvTask.start();
+
+    // setTimeout(await bdpvPush.bind(this), 15000);
   } else if (this.bdpvTask) {
     this.bdpvTask.stop();
   }

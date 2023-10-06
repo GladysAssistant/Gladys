@@ -72,6 +72,13 @@ const PROPERTY = {
   ACWH: 'ACWH',
 };
 
+const BDPV = {
+  URL: 'https://www.bdpv.fr/webservice/majProd/expeditionProd_v3.php',
+  CRON: '0 23 * * *',
+  TYPE_RELEVE: 'onduleur',
+  SOURCE: 'Gladys',
+};
+
 module.exports = {
   SCAN_OPTIONS,
   CONFIGURATION,
@@ -82,4 +89,5 @@ module.exports = {
   TYPE,
   PARAMS,
   PROPERTY,
+  BDPV,
 };
