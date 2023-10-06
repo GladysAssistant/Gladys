@@ -17,6 +17,13 @@ async function saveStringState(device, deviceFeature, newValue) {
   logger.debug(`device.saveStringState of deviceFeature ${deviceFeature.selector}`);
 
   const now = new Date();
+
+  deviceFeature.last_value_string = newValue;
+  deviceFeature.last_value_changed = now;
+
+  // save local state in RAM
+  this.stateManager.setState('deviceFeature', deviceFeature.selector, deviceFeature);
+
   await db.DeviceFeature.update(
     {
       last_value_string: newValue,
@@ -28,12 +35,6 @@ async function saveStringState(device, deviceFeature, newValue) {
       },
     },
   );
-
-  deviceFeature.last_value_string = newValue;
-  deviceFeature.last_value_changed = new Date();
-
-  // save local state in RAM
-  this.stateManager.setState('deviceFeature', deviceFeature.selector, deviceFeature);
 
   // send websocket event
   this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {

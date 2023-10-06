@@ -54,6 +54,8 @@ const AC_MODE = {
   AUTO: 0,
   COOLING: 1,
   HEATING: 2,
+  DRYING: 3,
+  FAN: 4,
 };
 
 const USER_ROLE = {
@@ -897,6 +899,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
   TUYA: {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
+  },
+  MELCLOUD: {
+    STATUS: 'melcloud.status',
+    DISCOVER: 'melcloud.discover',
   },
 };
 
