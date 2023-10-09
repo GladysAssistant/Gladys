@@ -26,7 +26,7 @@ async function bdpvPush() {
     const response = await this.bdpvClient.get(BDPV.URL, {
       params: this.bdpvParams,
     });
-    logger.info(`BDPV push ${response.status}`);
+    logger.info(`BDPV push ${this.bdpvParams.index} (status: ${response.status})`);
   } catch (e) {
     logger.error(`Fail to push to BDPV: ${e}`);
   }
@@ -61,6 +61,7 @@ async function bdpvInit(bdpvActive) {
       this.bdpvTask = cron.schedule(BDPV.CRON, await bdpvPush.bind(this), {
         scheduled: false,
       });
+      logger.info(`Starting BDPV push ${BDPV.CRON}`);
     }
 
     this.bdpvTask.start();
