@@ -18,13 +18,16 @@ async function scanDevices() {
       const values = ModelFactory.createModel(await device.modbus.readModel(device.valueModel));
       Object.entries(values).forEach(async (entry) => {
         const [name, value] = entry;
-        this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: getDeviceFeatureExternalId({
-            ...device,
-            property: name,
-          }),
-          state: value,
+        const externalId = getDeviceFeatureExternalId({
+          ...device,
+          property: name,
         });
+        if (this.stateManager.get('deviceFeatureByExternalId', externalId)) {
+          this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+            device_feature_external_id: externalId,
+            state: value,
+          });
+        }
       }, this);
     }, this);
 
@@ -35,34 +38,46 @@ async function scanDevices() {
       const { mppt } = ModelFactory.createModel(await device.modbus.readModel(MODEL.MPPT_INVERTER_EXTENSION));
       const { DCA, DCV, DCW, DCWH } = mppt[device.mppt - 1];
 
-      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: getDeviceFeatureExternalId({
-          ...device,
-          property: PROPERTY.DCA,
-        }),
-        state: DCA,
+      let externalId = getDeviceFeatureExternalId({
+        ...device,
+        property: PROPERTY.DCA,
       });
-      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: getDeviceFeatureExternalId({
-          ...device,
-          property: PROPERTY.DCV,
-        }),
-        state: DCV,
+      if (this.stateManager.get('deviceFeatureByExternalId', externalId)) {
+        this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: externalId,
+          state: DCA,
+        });
+      }
+      externalId = getDeviceFeatureExternalId({
+        ...device,
+        property: PROPERTY.DCV,
       });
-      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: getDeviceFeatureExternalId({
-          ...device,
-          property: PROPERTY.DCW,
-        }),
-        state: DCW,
+      if (this.stateManager.get('deviceFeatureByExternalId', externalId)) {
+        this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: externalId,
+          state: DCV,
+        });
+      }
+      externalId = getDeviceFeatureExternalId({
+        ...device,
+        property: PROPERTY.DCW,
       });
-      this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: getDeviceFeatureExternalId({
-          ...device,
-          property: PROPERTY.DCWH,
-        }),
-        state: DCWH,
+      if (this.stateManager.get('deviceFeatureByExternalId', externalId)) {
+        this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: externalId,
+          state: DCW,
+        });
+      }
+      externalId = getDeviceFeatureExternalId({
+        ...device,
+        property: PROPERTY.DCWH,
       });
+      if (this.stateManager.get('deviceFeatureByExternalId', externalId)) {
+        this.eventManager.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: externalId,
+          state: DCWH,
+        });
+      }
     }, this);
 
   logger.debug(`SunSpec: Scanning devices done`);

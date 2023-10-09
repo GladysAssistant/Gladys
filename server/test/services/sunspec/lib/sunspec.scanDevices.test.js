@@ -23,6 +23,9 @@ describe('SunSpec scanDevices', () => {
       eventManager: {
         emit: fake.resolves(null),
       },
+      stateManager: {
+        get: fake.resolves({}),
+      },
       modbuses: [modbus],
       devices: [],
     };
