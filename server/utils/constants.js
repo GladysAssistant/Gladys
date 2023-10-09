@@ -54,6 +54,8 @@ const AC_MODE = {
   AUTO: 0,
   COOLING: 1,
   HEATING: 2,
+  DRYING: 3,
+  FAN: 4,
 };
 
 const USER_ROLE = {
@@ -883,6 +885,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
   },
+  MELCLOUD: {
+    STATUS: 'melcloud.status',
+    DISCOVER: 'melcloud.discover',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -947,6 +953,11 @@ const JOB_ERROR_TYPES = {
 const DEFAULT_VALUE_HUMIDITY = {
   MINIMUM: 45,
   MAXIMUM: 60,
+};
+
+const DEFAULT_VALUE_TEMPERATURE = {
+  MINIMUM: 17,
+  MAXIMUM: 24,
 };
 
 const createList = (obj) => {
@@ -1046,3 +1057,4 @@ module.exports.JOB_ERROR_TYPES = JOB_ERROR_TYPES;
 module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;
 
 module.exports.DEFAULT_VALUE_HUMIDITY = DEFAULT_VALUE_HUMIDITY;
+module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;

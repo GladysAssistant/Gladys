@@ -30,7 +30,7 @@ const RoomHumidityBox = ({ children, ...props }) => (
         </span>
       )}
       {!isNotNullOrUndefined(props.humidity) && (
-        <span class="stamp stamp-md bg-red mr-3">
+        <span class="stamp stamp-md bg-warning mr-3">
           <i class="fe fe-droplet" />
         </span>
       )}

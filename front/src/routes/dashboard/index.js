@@ -4,6 +4,7 @@ import { route } from 'preact-router';
 
 import DashboardPage from './DashboardPage';
 import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
+import actions from '../../actions/dashboard';
 import get from 'get-value';
 
 class Dashboard extends Component {
@@ -76,6 +77,16 @@ class Dashboard extends Component {
     }
   };
 
+  checkIfFullScreenParameterIsHere = () => {
+    if (this.props.fullscreen === 'force') {
+      try {
+        this.switchToFullScreen();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  };
+
   init = async () => {
     await this.getDashboards();
     if (this.state.currentDashboardSelector) {
@@ -101,26 +112,34 @@ class Dashboard extends Component {
     return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
   };
 
+  switchToFullScreen = () => {
+    if (document.documentElement.requestFullscreen) {
+      // chrome & firefox
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.webkitRequestFullscreen) {
+      // safari
+      document.documentElement.webkitRequestFullscreen();
+    }
+    this.props.setFullScreen(true);
+  };
+
+  exitFullScreen = () => {
+    if (document.exitFullscreen) {
+      // chrome & firefox
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      // safari
+      document.webkitExitFullscreen();
+    }
+    this.props.setFullScreen(false);
+  };
+
   toggleFullScreen = () => {
     const isFullScreen = this.isFullScreen();
     if (!isFullScreen) {
-      if (document.documentElement.requestFullscreen) {
-        // chrome & firefox
-        document.documentElement.requestFullscreen();
-      } else if (document.documentElement.webkitRequestFullscreen) {
-        // safari
-        document.documentElement.webkitRequestFullscreen();
-      }
-      this.props.setFullScreen(true);
+      this.switchToFullScreen();
     } else {
-      if (document.exitFullscreen) {
-        // chrome & firefox
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        // safari
-        document.webkitExitFullscreen();
-      }
-      this.props.setFullScreen(false);
+      this.exitFullScreen();
     }
   };
 
@@ -149,6 +168,7 @@ class Dashboard extends Component {
     document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('click', this.closeDashboardDropdown, true);
+    this.checkIfFullScreenParameterIsHere();
   }
 
   componentDidUpdate(prevProps) {
@@ -204,9 +224,10 @@ class Dashboard extends Component {
         editDashboard={this.editDashboard}
         toggleFullScreen={this.toggleFullScreen}
         fullScreen={props.fullScreen}
+        hideExitFullScreenButton={props.fullscreen === 'force'}
       />
     );
   }
 }
 
-export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', {})(Dashboard);
+export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', actions)(Dashboard);
