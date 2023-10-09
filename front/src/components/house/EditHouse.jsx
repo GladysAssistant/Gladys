@@ -93,6 +93,70 @@ const EditHouse = ({ children, ...props }) => (
             </button>
           </span>
         </div>
+        <div class="mt-4">
+          <h4>
+            <Text id="signup.configureHouse.alarmTitle" />
+          </h4>
+          <p>
+            <Text id="signup.configureHouse.alarmDescription" />
+          </p>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="signup.configureHouse.alarmCodeLabel" />
+          </label>
+          <div class="input-icon mb-3">
+            <Localizer>
+              <input
+                type={props.showAlarmCode ? 'text' : 'password'}
+                placeholder={<Text id="signup.configureHouse.alarmCodePlaceholder" />}
+                value={props.house.alarm_code}
+                className="form-control"
+                onInput={props.updateHouseAlarmCode}
+              />
+            </Localizer>
+            <span class="input-icon-addon cursor-pointer" onClick={props.togglePassword}>
+              <i
+                class={cx('fe', {
+                  'fe-eye': !props.showPassword,
+                  'fe-eye-off': props.showPassword
+                })}
+              />
+            </span>
+          </div>
+          <div class="invalid-feedback">
+            <Text id="signup.configureHouse.alarmCodeError" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">
+            <Text id="signup.configureHouse.alarmDelayBeforeArmingLabel" />
+          </label>
+          <select
+            class="form-control"
+            value={props.house.alarm_delay_before_arming}
+            onChange={props.updateHouseDelayBeforeArming}
+          >
+            <option value="5">
+              <Text id="signup.configureHouse.alarmDelays.5" />
+            </option>
+            <option value="10">
+              <Text id="signup.configureHouse.alarmDelays.10" />
+            </option>
+            <option value="15">
+              <Text id="signup.configureHouse.alarmDelays.15" />
+            </option>
+            <option value="30">
+              <Text id="signup.configureHouse.alarmDelays.30" />
+            </option>
+            <option value="60">
+              <Text id="signup.configureHouse.alarmDelays.60" />
+            </option>
+          </select>
+          <div class="invalid-feedback">
+            <Text id="signup.configureHouse.alarmDelayBeforeArmingError" />
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <button onClick={props.saveHouse} class="btn btn-success">

@@ -177,7 +177,19 @@
       "conflictError": "Une maison avec le même non existe déjà.",
       "roomConflictError": "Une pièce avec le même non existe déjà.",
       "validationError": "Erreur de validation : Le nom d'une maison doit-être compris entre 1 et 40 caractères.",
-      "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères."
+      "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères.",
+      "alarmTitle": "Alarme",
+      "alarmDescription": "Si vous utilisez le mode alarme dans Gladys, vous pouvez configurer ici le code de désactivation de l'alarme, ainsi que délai avant le déclenchement de l'alarme. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
+      "alarmCodeLabel": "Code de l'alarme",
+      "alarmCodePlaceholder": "Entrez un code à 6 chiffres",
+      "alarmDelayBeforeArmingLabel": "Délai avant armement de l'alarme",
+      "alarmDelays": {
+        "5": "5 secondes",
+        "10": "10 secondes",
+        "15": "15 secondes",
+        "30": "30 secondes",
+        "60": "1 minute"
+      }
     },
     "success": {
       "title": "Merci !",
