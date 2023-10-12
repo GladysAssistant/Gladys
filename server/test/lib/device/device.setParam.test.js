@@ -13,7 +13,7 @@ describe('Device', () => {
     const stateManager = new StateManager(event);
 
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, { getValue: () => undefined }, job);
     let testDevice = await device.get({ search: 'test' });
     await device.setParam(testDevice[0], 'testParamName', 'testParamValue');
     await device.setParam(testDevice[0], 'testParamName2', 'testParamValue2');

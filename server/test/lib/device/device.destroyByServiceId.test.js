@@ -44,7 +44,7 @@ describe('Device', () => {
 
   it('should destroy device', async () => {
     const serviceManager = new ServiceManager({}, stateManager);
-    const device = new Device(event, {}, stateManager, serviceManager, {}, {}, job);
+    const device = new Device(event, {}, stateManager, serviceManager, {}, { getValue: () => undefined }, job);
     await device.create({
       name: 'test-device-destroyByServiceId',
       external_id: 'test-device-new-destroyByServiceId',
