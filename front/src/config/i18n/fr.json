@@ -231,8 +231,8 @@
         "editModeLabel": "Mode d'affichage :",
         "displayModes": {
           "advancedWeather": "Humidité et vitesse du vent",
-          "hourlyForecast": "Prévisions pour les 8 prochaines heures",
-          "dailyForecast": "Prévisions pour les 7 prochains jours"
+          "hourlyForecast": "Prévisions pour les 24 prochaines heures",
+          "dailyForecast": "Prévisions pour les 5 prochains jours"
         },
         "minMaxDegreeValue": "{{min}}°/{{max}}°"
       },
@@ -240,6 +240,7 @@
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
         "editDeviceFeaturesLabel": "Sélectionnez les appareils que vous voulez afficher ici. Seuls les capteurs / et interrupteurs on/off sont supportés.",
         "noValue": "Aucune valeur enregistrée.",
+        "noRecentValue": "Pas de valeur récente",
         "deviceTitle": "{{name}} - {{type}}",
         "addButton": "+",
         "substractButton": "-"
@@ -252,11 +253,13 @@
       },
       "temperatureInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
-        "noTemperatureRecorded": "Aucune température enregistrée récemment."
+        "noTemperatureRecorded": "Aucune température enregistrée récemment.",
+        "thresholdsLabel": "Configurer des seuils personnalisés"
       },
       "humidityInRoom": {
         "editRoomLabel": "Sélectionnez la pièce que vous souhaitez afficher ici.",
-        "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment."
+        "noHumidityRecorded": "Aucune mesure d'humidité enregistrée récemment.",
+        "thresholdsLabel": "Configurer des seuils personnalisés"
       },
       "userPresence": {
         "description": "Cette box affiche qui est à la maison et qui ne l'est pas. Vous pouvez changer la présence d'un utilisateur dans les scènes, et sélectionner ici quels utilisateurs afficher.",
@@ -268,7 +271,7 @@
       },
       "camera": {
         "editCameraLabel": "Sélectionnez la caméra que vous souhaitez afficher ici.",
-        "noImageToShow": "Aucune image à afficher",
+        "noImageToShow": "Aucune image à afficher. Êtes-vous sûr que votre caméra est connectée et accessible par Gladys ?",
         "editBoxNameLabel": "Entrez le nom que vous souhaitez donner à la box :",
         "editBoxNamePlaceholder": "Nom de la box",
         "latencyBoxName": "Latence",
@@ -925,6 +928,62 @@
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
+    "melcloud": {
+      "title": "MELCloud",
+      "description": "Contrôler vos appareils MELCloud",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte MELCloud",
+      "setupTab": "Configuration",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils MELCloud",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
+      "status": {
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte MELCloud, plus d'informations sur la ",
+        "setupPageLink": "page de configuration MELCloud.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
+      },
+      "device": {
+        "title": "Appareils MELCloud dans Gladys",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil MELCloud trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre compte cloud MELCloud",
+        "description": "Les appareils MELCloud sont automatiquement découverts. Vos appareils MELCloud doivent être ajoutés à votre compte cloud MELCloud avant.",
+        "error": "Erreur de découverte des appareils MELCloud. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil MELCloud n'a été découvert.",
+        "scan": "Scanner"
+      },
+      "setup": {
+        "title": "Configuration MELCloud",
+        "description": "Vous pouvez connecter Gladys à votre compte cloud MELCloud pour commander les appareils associés.",
+        "username": "Email",
+        "usernamePlaceholder": "Entrez l'email du compte MELCloud",
+        "password": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe utilisateur du compte MELCloud",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud MELCloud...",
+        "connected": "Connexion réussie au compte cloud MELCloud !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "mqtt": {
       "title": "MQTT",
       "description": "Connexion à un serveur MQTT, en local ou en distant.",
@@ -950,7 +1009,7 @@
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
-        "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes des fonctionnalités de l'appareil sont uniques ?",
+        "saveConflictError": "Conflit : êtes-vous sûr que tous les IDs externes sont uniques ?",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
       },
@@ -1870,6 +1929,9 @@
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
     "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
+    "numberOfHoursBeforeStateIsOutdated": "Délai avant expiration d'un état",
+    "numberOfHoursBeforeStateIsOutdatedDescription": "Ce délai correspond au nombre d'heures avant qu'un état de capteur soit considéré comme \"périmé\" et ainsi plus affiché sur le tableau de bord.",
+    "hours": "heures",
     "vacuumDatabaseTitle": "Nettoyer la base de donnée",
     "vacuumDatabaseDescription": "En cliquant sur ce bouton, Gladys lancera un nettoyage de la base de donnée, ce qui libère de l'espace disque. Cette tâche ne supprime pas de données, elle re-arrange juste la donnée existante sur le disque et vide des vieilles lignes qui ne sont plus utilisées. Attention, cette opération peut prendre un certain temps sur les grosses bases de données, et pendant ce temps Gladys sera indisponible. Ne lancez pas cette commande si vous avez besoin de Gladys dans la prochaine heure.",
     "vacuumDatabaseButton": "Lancer le nettoyage",
@@ -2231,7 +2293,11 @@
           "31": "Cube rotation droite",
           "32": "Vibration",
           "33": "Inclinaison",
-          "34": "Mouvements"
+          "34": "Mouvements",
+          "35": "Urgence",
+          "36": "Désarmer alarme",
+          "37": "Armer zones jour",
+          "38": "Armer alarme"
         }
       },
       "opening-sensor": {

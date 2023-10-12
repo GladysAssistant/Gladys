@@ -48,9 +48,46 @@ describe('Build service', () => {
     });
     homekitHandler.gladys.event.emit = stub();
     const on = stub();
-    const getCharacteristic = stub().returns({
-      on,
-    });
+    const getCharacteristic = stub()
+      .onCall(0)
+      .returns({
+        on,
+        props: {
+          perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+        },
+      })
+      .onCall(1)
+      .returns({
+        on,
+        props: {
+          minValue: 0,
+          maxValue: 100,
+          perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+        },
+      })
+      .onCall(2)
+      .returns({
+        on,
+        props: {
+          perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+        },
+      })
+      .onCall(3)
+      .returns({
+        on,
+        props: {
+          perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+        },
+      })
+      .onCall(4)
+      .returns({
+        on,
+        props: {
+          minValue: 140,
+          maxValue: 500,
+          perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+        },
+      });
     const Lightbulb = stub().returns({
       getCharacteristic,
     });
@@ -64,6 +101,10 @@ describe('Build service', () => {
         ColorTemperature: 'COLORTEMPERATURE',
       },
       CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
       Service: {
         Lightbulb,
       },
@@ -173,6 +214,9 @@ describe('Build service', () => {
     const on = stub();
     const getCharacteristic = stub().returns({
       on,
+      props: {
+        perms: ['PAIRED_READ', 'PAIRED_WRITE'],
+      },
     });
     const Switch = stub().returns({
       getCharacteristic,
@@ -183,6 +227,10 @@ describe('Build service', () => {
         On: 'ON',
       },
       CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
       Service: {
         Switch,
       },
