@@ -1574,6 +1574,9 @@
       },
       "calendar": {
         "event-is-coming": "Un évènement dans le calendrier arrive"
+      },
+      "system": {
+        "start": "Gladys démarre"
       }
     },
     "triggersCard": {

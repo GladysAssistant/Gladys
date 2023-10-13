@@ -1572,6 +1572,9 @@
       },
       "calendar": {
         "event-is-coming": "Calendar event is coming"
+      },
+      "system": {
+        "start": "Gladys starting"
       }
     },
     "triggersCard": {
