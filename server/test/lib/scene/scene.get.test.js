@@ -42,7 +42,7 @@ describe('SceneManager.get', () => {
   it('should search scene by tag', async () => {
     const sceneManager = new SceneManager({}, event);
     const scenes = await sceneManager.get({
-      search: 'tag 1',
+      searchTags: 'tag 1',
     });
     expect(scenes).to.be.instanceOf(Array);
     expect(scenes).to.deep.equal([
