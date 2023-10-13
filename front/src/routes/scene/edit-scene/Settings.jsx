@@ -89,6 +89,9 @@ class Settings extends Component {
                         isMulti
                         options={props.tags && props.tags.map(tag => ({ value: tag.name, label: tag.name }))}
                         onChange={tags => props.setTags(tags.map(tag => tag.value))}
+                        formatCreateLabel={inputValue => (
+                          <Text id="editScene.createTag" fields={{ tagName: inputValue }} />
+                        )}
                       />
                     </Localizer>
                   </div>

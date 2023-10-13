@@ -1,4 +1,5 @@
 const { Op } = require('sequelize');
+const Sequelize = require('sequelize');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
@@ -46,30 +47,27 @@ async function get(options) {
       })),
     };
   }
-
-  const scenes = await db.Scene.findAll(queryParams);
-
-  let scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
-
   if (optionsWithDefault.search) {
-    scenesPlain = scenesPlain.filter((scene) => {
-      if (scene.name.toLowerCase().includes(optionsWithDefault.search.toLowerCase())) {
-        return scene;
-      }
-      const tagsFound = scene.tags.find((tag) => {
-        if (tag.name.toLowerCase().includes(optionsWithDefault.search.toLowerCase())) {
-          return true;
-        }
-        return false;
-      });
-      if (tagsFound) {
-        return scene;
-      }
-      return null;
+    queryParams.where = Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_scene.name')), {
+      [Op.like]: `%${optionsWithDefault.search}%`,
     });
   }
 
-  return scenesPlain;
+  if (optionsWithDefault.searchTags) {
+    const tags = await db.TagScene.findAll({
+      fields: 'scene_id',
+      where: {
+        [Op.or]: optionsWithDefault.searchTags.split(',').map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
+      },
+    });
+    queryParams.where = {
+      [Op.or]: tags.map((tag) => tag.get({ plain: true })).map((tag) => ({ id: tag.scene_id })),
+    };
+  }
+
+  const scenes = await db.Scene.findAll(queryParams);
+
+  return scenes.map((scene) => scene.get({ plain: true }));
 }
 
 module.exports = {

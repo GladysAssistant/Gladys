@@ -1429,6 +1429,7 @@
     "descriptionTitle": "Description",
     "iconLabel": "Icône",
     "editDescriptionPlaceholder": "Entrez une description pour la scène",
+    "createTag": "Créer le tag : '{{tagName}}'",
     "tagsTitle": "Tags",
     "editTagsPlaceholder": "Entrez un tag pour la scène",
     "startButton": "Démarrer",

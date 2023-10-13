@@ -1430,6 +1430,7 @@
     "editDescriptionPlaceholder": "Enter a scene description",
     "tagsTitle": "Tags",
     "editTagsPlaceholder": "Enter a scene tags",
+    "createTag": "Create tag: '{{tagName}}'",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",

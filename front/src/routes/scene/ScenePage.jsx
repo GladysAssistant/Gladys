@@ -24,9 +24,11 @@ const ScenePage = ({ children, ...props }) => (
                   search={props.debouncedSearch}
                   searchValue={props.sceneSearch}
                   searchPlaceHolder={<Text id="scene.searchPlaceholder" />}
+                  tags={props.tags}
+                  searchTags={props.searchTags}
                 />
               </Localizer>
-              <Link href="/dashboard/scene/new" class="btn btn-outline-primary ml-2">
+              <Link href="/dashboard/scene/new" class={cx('btn', 'btn-outline-primary', 'ml-2', style.newButton)}>
                 <Text id="scene.newButton" /> <i class="fe fe-plus" />
               </Link>
             </div>
