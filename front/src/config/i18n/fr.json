@@ -1594,8 +1594,7 @@
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud eWeLink...",
         "connected": "Connexion réussie au compte cloud eWeLink !",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
-        "ewelinkIntegrationDeprecated": "Septembre 2023: Cette intégration ne semble malheureusement plus fonctionner suite à des changements côté API eWeLink. Discussion <a href=\"https://community.gladysassistant.com/t/service-ewelink-en-erreur/8323/17\" target=\"_blank\" rel=\"noopener noreferrer\">sur le forum ici</a>."
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",

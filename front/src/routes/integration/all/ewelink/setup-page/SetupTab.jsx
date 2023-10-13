@@ -22,9 +22,6 @@ const SetupTab = ({ children, ...props }) => {
             <p>
               <Text id="integration.eWeLink.setup.eweLinkDescription" />
             </p>
-            <p class="alert alert-danger">
-              <MarkupText id="integration.eWeLink.setup.ewelinkIntegrationDeprecated" />
-            </p>
             {props.connectEweLinkStatus === RequestStatus.Error && !props.eweLinkConnectionError && (
               <p class="alert alert-danger">
                 <Text id="integration.eWeLink.setup.error" />

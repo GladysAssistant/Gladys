@@ -1592,8 +1592,7 @@
         "error": "An error occured while saving configuration.",
         "connecting": "Configuration saved. Now connecting to your eWeLink cloud account...",
         "connected": "Connected to the eWeLink cloud account with success !",
-        "connectionError": "Error while connecting, please check your configuration.",
-        "ewelinkIntegrationDeprecated": "September 2023: Unfortunately, this integration no longer seems to work due to changes in the eWeLink API."
+        "connectionError": "Error while connecting, please check your configuration."
       },
       "error": {
         "defaultError": "There was an error saving the device.",
