@@ -2,8 +2,8 @@ const logger = require('../../utils/logger');
 // const { NotFoundError } = require('../../utils/coreErrors');
 /**
  * @description Command a scene.
- * @param {object} message - Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
+ * @param {object} message - Handle a new message receive in MQTT.
  * @example
  * handleMessage('gladys/scene/selector', 'ON');
  */
