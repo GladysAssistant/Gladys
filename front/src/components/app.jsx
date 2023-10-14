@@ -129,6 +129,7 @@ import EweLinkPage from '../routes/integration/all/ewelink/device-page';
 import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
+import EweLinkSetupLoginPage from '../routes/integration/all/ewelink/setup-page/login';
 
 // OpenAI integration
 import OpenAIPage from '../routes/integration/all/openai/index';
@@ -281,6 +282,7 @@ const AppRouter = connect(
         <EweLinkEditPage path="/dashboard/integration/device/ewelink/edit/:deviceSelector" />
         <EweLinkDiscoverPage path="/dashboard/integration/device/ewelink/discover" />
         <EweLinkSetupPage path="/dashboard/integration/device/ewelink/setup" />
+        <EweLinkSetupLoginPage path="/dashboard/integration/device/ewelink/setup/login" />
         <HomeKitPage path="/dashboard/integration/communication/homekit" />
         <OpenAIPage path="/dashboard/integration/communication/openai" />
 
