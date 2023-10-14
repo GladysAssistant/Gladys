@@ -6,83 +6,6 @@ import createActionsIntegration from '../../../../actions/integration';
 function createActions(store) {
   const integrationActions = createActionsIntegration(store);
   const actions = {
-    async loadProps(state) {
-      let eweLinkUsername;
-      let eweLinkPassword;
-      try {
-        eweLinkUsername = await state.httpClient.get('/api/v1/service/ewelink/variable/EWELINK_EMAIL');
-        if (eweLinkUsername.value) {
-          eweLinkPassword = '*********'; // this is just used so that the field is filled
-        }
-      } finally {
-        store.setState({
-          eweLinkUsername: (eweLinkUsername || { value: '' }).value,
-          eweLinkPassword,
-          passwordChanges: false,
-          connected: false
-        });
-      }
-    },
-    updateConfigration(state, e) {
-      const data = {};
-      data[e.target.name] = e.target.value;
-      if (e.target.name === 'eweLinkPassword') {
-        data.passwordChanges = true;
-      }
-      store.setState(data);
-    },
-    async saveConfiguration(state) {
-      event.preventDefault();
-      store.setState({
-        connectEweLinkStatus: RequestStatus.Getting,
-        eweLinkConnected: false,
-        eweLinkConnectionError: undefined
-      });
-      try {
-        await state.httpClient.post('/api/v1/service/ewelink/variable/EWELINK_EMAIL', {
-          value: state.eweLinkUsername
-        });
-        if (state.passwordChanges) {
-          await state.httpClient.post('/api/v1/service/ewelink/variable/EWELINK_PASSWORD', {
-            value: state.eweLinkPassword
-          });
-        }
-        await state.httpClient.post(`/api/v1/service/ewelink/connect`);
-
-        store.setState({
-          connectEweLinkStatus: RequestStatus.Success
-        });
-
-        setTimeout(() => store.setState({ connectEweLinkStatus: undefined }), 3000);
-      } catch (e) {
-        store.setState({
-          connectEweLinkStatus: RequestStatus.Error,
-          passwordChanges: false
-        });
-      }
-    },
-    displayConnectedMessage() {
-      // display 3 seconds a message "EweLink connected"
-      store.setState({
-        eweLinkConnected: true,
-        eweLinkConnectionError: undefined
-      });
-      setTimeout(
-        () =>
-          store.setState({
-            eweLinkConnected: false,
-            connectEweLinkStatus: undefined
-          }),
-        3000
-      );
-    },
-    displayEweLinkError(state, error) {
-      store.setState({
-        eweLinkConnected: false,
-        connectEweLinkStatus: undefined,
-        eweLinkConnectionError: error
-      });
-    },
     async getEweLinkDevices(state) {
       store.setState({
         getEweLinkStatus: RequestStatus.Getting
@@ -151,23 +74,6 @@ function createActions(store) {
           }
         }
       });
-      store.setState({
-        [listName]: devices
-      });
-    },
-    updateFeatureProperty(state, listName, deviceIndex, featureIndex, property, value) {
-      const devices = update(state[listName], {
-        [deviceIndex]: {
-          features: {
-            [featureIndex]: {
-              [property]: {
-                $set: value
-              }
-            }
-          }
-        }
-      });
-
       store.setState({
         [listName]: devices
       });

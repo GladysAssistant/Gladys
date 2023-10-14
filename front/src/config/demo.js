@@ -3132,6 +3132,21 @@ const data = {
       ]
     }
   ],
+  'get /api/v1/service/ewelink/status': {
+    configured: true,
+    connected: true
+  },
+  'get /api/v1/service/ewelink/config': {
+    application_id: 'ewelink_APPID',
+    application_secret: 'ewelink_APP_SECRET',
+    application_region: 'eu'
+  },
+  'post /api/v1/service/ewelink/config': {
+    application_id: 'ewelink_APPID',
+    application_secret: 'ewelink_APP_SECRET',
+    application_region: 'eu'
+  },
+  'post /api/v1/service/ewelink/token': {},
   'get /api/v1/service/tp-link': {
     id: 'c9fe2705-35dc-417b-b6fc-c4bbb9c69886',
     pod_id: null,
