@@ -52,7 +52,10 @@ async function refreshTokenAccess(
     const client = new ClientCredentials(credentials);
     let authResult = await client.createToken(accessToken);
 
-    if (authResult.expired()) {
+    const tokenExpiredByExpiresAtValue =
+      authResult.token && authResult.token.expires_at && new Date(authResult.token.expires_at) < new Date();
+
+    if (authResult.expired() || tokenExpiredByExpiresAtValue) {
       logger.trace('Refresh token is required');
       // Refresh token
       try {
