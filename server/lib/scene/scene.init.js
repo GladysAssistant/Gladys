@@ -32,12 +32,6 @@ async function init() {
   //  At every minute, check if calendar event is coming
   this.scheduler.scheduleJob('* * * * *', () => this.event.emit(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING));
 
-  const mqtt = this.service.getService('mqtt');
-
-  if (mqtt) {
-    mqtt.device.subscribe('gladys/scene/+', this.handleMessage.bind(this));
-  }
-
   return plainScenes;
 }
 
