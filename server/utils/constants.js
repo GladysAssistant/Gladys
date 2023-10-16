@@ -909,6 +909,7 @@ const DASHBOARD_TYPE = {
 };
 
 const DASHBOARD_BOX_TYPE = {
+  ALARM: 'alarm',
   WEATHER: 'weather',
   TEMPERATURE_IN_ROOM: 'temperature-in-room',
   HUMIDITY_IN_ROOM: 'humidity-in-room',

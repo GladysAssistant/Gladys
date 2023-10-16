@@ -4,6 +4,7 @@ const {
   NotFoundError,
   ServiceNotConfiguredError,
   BadParameters,
+  ConflictError,
 } = require('../../utils/coreErrors');
 const { ERROR_MESSAGES } = require('../../utils/constants');
 const logger = require('../../utils/logger');
@@ -45,6 +46,8 @@ module.exports = function errorMiddleware(error, req, res, next) {
     responseError = new Error404(error.message);
   } else if (error instanceof HttpError) {
     responseError = error;
+  } else if (error instanceof ConflictError) {
+    responseError = new Error409(error.message);
   } else {
     logger.trace(error);
     responseError = new Error500(error);

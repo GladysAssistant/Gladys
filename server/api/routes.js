@@ -251,6 +251,23 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: houseController.userSeen,
     },
+    // House Alarm
+    'post /api/v1/house/:house_selector/arm': {
+      authenticated: true,
+      controller: houseController.arm,
+    },
+    'post /api/v1/house/:house_selector/disarm': {
+      authenticated: true,
+      controller: houseController.disarm,
+    },
+    'post /api/v1/house/:house_selector/partial_arm': {
+      authenticated: true,
+      controller: houseController.partialArm,
+    },
+    'post /api/v1/house/:house_selector/panic': {
+      authenticated: true,
+      controller: houseController.panic,
+    },
     // job
     'get /api/v1/job': {
       authenticated: true,

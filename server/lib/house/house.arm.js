@@ -34,22 +34,22 @@ async function arm(selector) {
     },
   });
   // Wait the delay before arming
-  await Promise.delay(house.alarm_delay_before_arming * 1000);
-  // Update database
-  await house.update({ alarm_mode: ALARM_MODES.ARMED });
-  // Check scene triggers
-  this.event.emit(EVENTS.TRIGGERS.CHECK, {
-    type: EVENTS.ALARM.ARM,
-    house: selector,
-  });
-  // Emit websocket event to update UI
-  this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED,
-    payload: {
+  setTimeout(async () => {
+    // Update database
+    await house.update({ alarm_mode: ALARM_MODES.ARMED });
+    // Check scene triggers
+    this.event.emit(EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.ALARM.ARM,
       house: selector,
-    },
-  });
-  return house.get({ plain: true });
+    });
+    // Emit websocket event to update UI
+    this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED,
+      payload: {
+        house: selector,
+      },
+    });
+  }, house.alarm_delay_before_arming * 1000);
 }
 
 module.exports = {
