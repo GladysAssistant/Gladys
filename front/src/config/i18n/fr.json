@@ -223,6 +223,7 @@
     "selectBoxType": "Sélectionner un type",
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
     "boxTitle": {
+      "alarm": "Alarme",
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
       "humidity-in-room": "Humidité de la pièce",
@@ -355,6 +356,16 @@
         "editNameLabel": "Entrez le nom de cette box",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
+      },
+      "alarm": {
+        "armButton": "Armer",
+        "disarmButton": "Désarmer",
+        "partiallyArmedButton": "Armement",
+        "partiallyArmedButtonSecondLine": "partiel",
+        "panicButton": "Panique",
+        "editBoxNameLabel": "Nom du widget",
+        "editBoxNamePlaceholder": "Entrez le nom du widget",
+        "editHouseLabel": "Sélectionnez la maison qui est concernée pour l'activation/désactivation de l'alarme."
       }
     }
   },

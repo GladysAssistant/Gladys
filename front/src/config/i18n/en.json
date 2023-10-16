@@ -206,6 +206,7 @@
     "selectBoxType": "Select a type",
     "selectBoxTypeLabel": "Choose which widget to display here",
     "boxTitle": {
+      "alarm": "Alarm",
       "weather": "Weather",
       "temperature-in-room": "Temperature in room",
       "humidity-in-room": "Humidity in room",
