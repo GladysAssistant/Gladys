@@ -196,6 +196,14 @@ class SetupTab extends Component {
             <MarkupText id="integration.nodeRed.setup.description" />
           </p>
 
+          <div class="d-flex flex-row flex-wrap justify-content-between mr-0 ml-0 alert alert-warning">
+            <div class={cx(style.textAlignMiddleContainer)}>
+              <span class={cx(style.textAlignMiddle)}>
+                <MarkupText id="integration.nodeRed.setup.descriptionBackup" />
+              </span>
+            </div>
+          </div>
+
           <CheckStatus
             nodeRedEnabled={nodeRedEnabled}
             nodeRedExist={nodeRedExist}

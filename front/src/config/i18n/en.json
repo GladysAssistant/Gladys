@@ -624,6 +624,7 @@
       "setup": {
         "title": "Node-RED configuration",
         "description": "This service uses docker container. Enable Node-RED for deploying this container.\nLearn more on the node-red documentation page",
+        "descriptionBackup": "For the moment, Node-RED is not backup into Gladys Plus.\nIf you want a backup for Node-RED, please follow this <a href=\"https://community.gladysassistant.com/t/mini-tuto-backup-par-email-des-flows-node-red/8402\" target=\"_blank\" rel=\"noopener noreferrer\">docs</a>",
         "error": "An error occured while starting  Node-RED.",
         "enableLabel": "Node-RED activation",
         "enableNodeRed": "Enable",
