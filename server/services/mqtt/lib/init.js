@@ -9,6 +9,7 @@ async function init() {
   DEFAULT.TOPICS.forEach((topic) => {
     this.subscribe(topic, this.handleGladysMessage.bind(this));
   });
+  this.subscribe('#', () => {});
 
   const configuration = await this.getConfiguration();
 

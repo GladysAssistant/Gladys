@@ -1683,6 +1683,9 @@
       },
       "system": {
         "start": "Gladys starting"
+      },
+      "message-queue": {
+        "received": "Receive message from queue"
       }
     },
     "triggersCard": {
@@ -1781,6 +1784,10 @@
       },
       "gladysStart": {
         "description": "This scene will be executed each time Gladys starts"
+      },
+      "messageQueueReceived": {
+        "topicLabel": "Topic",
+        "topicPlaceholder": "Enter your topic"
       }
     }
   },

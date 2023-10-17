@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
@@ -11,6 +10,7 @@ import HouseEmptyOrNot from './triggers/HouseEmptyOrNot';
 import UserEnteredOrLeftArea from './triggers/UserEnteredOrLeftArea';
 import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 import AlarmModeTrigger from './triggers/AlarmModeTrigger';
+import MessageQueueReceivedTrigger from './triggers/MessageQueueReceivedTrigger';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 import GladysStartTrigger from './triggers/GladysStartTrigger';
@@ -161,6 +161,13 @@ const TriggerCard = ({ children, ...props }) => (
       )}
       {props.trigger.type === EVENTS.SYSTEM.START && (
         <GladysStartTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.MESSAGE_QUEUE.RECEIVED && (
+        <MessageQueueReceivedTrigger
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}

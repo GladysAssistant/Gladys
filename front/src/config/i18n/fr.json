@@ -1684,6 +1684,9 @@
       },
       "system": {
         "start": "Gladys démarre"
+      },
+      "message-queue": {
+        "received": "Recevoir un message de la file d'attente"
       }
     },
     "triggersCard": {
@@ -1782,6 +1785,10 @@
       },
       "gladysStart": {
         "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
+      },
+      "messageQueueReceived": {
+        "topicLabel": "Topic",
+        "topicPlaceholder": "Entrez votre topic"
       }
     }
   },

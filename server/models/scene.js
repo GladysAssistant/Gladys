@@ -99,6 +99,7 @@ const triggersSchema = Joi.array().items(
       .min(1)
       .max(31),
     threshold_only: Joi.boolean(),
+    topic: Joi.string(),
   }),
 );
 

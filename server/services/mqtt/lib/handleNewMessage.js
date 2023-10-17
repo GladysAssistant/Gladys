@@ -1,4 +1,5 @@
 const logger = require('../../../utils/logger');
+const { EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Handle a new message receive in MQTT.
@@ -21,6 +22,12 @@ function handleNewMessage(topic, message) {
         this.topicBinds[key](topic, message);
       }
     }, this);
+
+    this.gladys.event.emit(EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+      topic,
+      message,
+    });
 
     if (!forwardedMessage) {
       logger.warn(`No subscription found for MQTT topic ${topic}`);
