@@ -7,7 +7,7 @@ const logger = require('../../../../utils/logger');
  * @param {string} topic - MQTT topic.
  * @param {object} message - The message sent.
  * @example
- * handleGladysMessage('gladys/device/create', '{ message: "content" }');
+ * handleGladysMessage('gladys/master/device/create', '{ message: "content" }');
  */
 function handleGladysMessage(topic, message) {
   const parsedTopic = topic.split('/');
@@ -33,6 +33,10 @@ function handleGladysMessage(topic, message) {
         state: parseFloat(message),
       };
       this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, event);
+    }
+  } else if (topic.startsWith('gladys/master/scene/')) {
+    if (topic.endsWith('/start')) {
+      this.gladys.event.emit(EVENTS.SCENE.TRIGGERED, parsedTopic[3]);
     }
   } else {
     logger.warn(`MQTT : Gladys topic ${topic} not handled.`);

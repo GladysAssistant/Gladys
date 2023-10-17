@@ -1202,7 +1202,7 @@
         "discoveringError": "An error occurred, check scanner configuration, or check logs."
       },
       "setup": {
-        "title": "LANManager settings",
+        "title": "LAN Settings",
         "errorLabel": "An error occurred while loading configuration.",
         "noConfigLabel": "Configuration not loaded, please retry.",
         "presenceScannerDescription": "The presence scanner feature is doing a network scan at a defined interval. When a device is detected, the device will be flagged as \"seen\" in Gladys. In scene, you can create a trigger on this state change to set you home when a device is detected at home for example.",
@@ -2153,7 +2153,7 @@
     "ppb": "Parts per billion (ppb)",
     "watt": "Watt (W)",
     "kilowatt": "Kilowatt (kW)",
-    "watt-hour": "Watt heure (Wh)",
+    "watt-hour": "Watt hour (Wh)",
     "kilowatt-hour": "Kilowatt hour (kWh)",
     "megawatt-hour": "Megawatt hour (MWh)",
     "ampere": "Ampere (A)",
@@ -2512,7 +2512,7 @@
     },
     "formaldehyd-sensor": {
       "shortCategoryName": "Formaldehyd sensor",
-      "decimal": "Formaldehyd(decimal)"
+      "decimal": "Formaldehyd (decimal)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Vibration sensor",
@@ -2617,7 +2617,7 @@
     "curtain": {
       "shortCategoryName": "Curtain",
       "state": "Curtain state",
-      "position": "curtain position"
+      "position": "Curtain position"
     },
     "data": {
       "shortCategoryName": "Data",

@@ -83,10 +83,18 @@ describe('Notify change to HomeKit', () => {
   });
 
   it('should notify light brightness', async () => {
-    const updateCharacteristic = stub().returns();
+    const updateValue = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        getCharacteristic: stub().returns({
+          props: {
+            minValue: 0,
+            maxValue: 100,
+          },
+          updateValue,
+        }),
+      }),
     };
 
     const event = {
@@ -106,7 +114,7 @@ describe('Notify change to HomeKit', () => {
 
     await homekitHandler.sendState(accessory, feature, event);
 
-    expect(updateCharacteristic.args[0]).eql(['BRIGHTNESS', 50]);
+    expect(updateValue.args[0]).eql([50]);
   });
 
   it('should notify light color', async () => {
@@ -139,10 +147,18 @@ describe('Notify change to HomeKit', () => {
   });
 
   it('should notify light temperature', async () => {
-    const updateCharacteristic = stub().returns();
+    const updateValue = stub().returns();
     const accessory = {
       UUID: '4756151c-369e-4772-8bf7-943a6ac70583',
-      getService: stub().returns({ updateCharacteristic }),
+      getService: stub().returns({
+        getCharacteristic: stub().returns({
+          props: {
+            minValue: 140,
+            maxValue: 500,
+          },
+          updateValue,
+        }),
+      }),
     };
 
     const event = {
@@ -162,7 +178,7 @@ describe('Notify change to HomeKit', () => {
 
     await homekitHandler.sendState(accessory, feature, event);
 
-    expect(updateCharacteristic.args[0]).eql(['COLORTEMPERATURE', 320]);
+    expect(updateValue.args[0]).eql([320]);
   });
 
   it('should notify sensor temperature Kelvin', async () => {
