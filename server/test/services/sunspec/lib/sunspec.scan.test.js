@@ -23,7 +23,7 @@ describe('SunSpec scan', () => {
 
   beforeEach(() => {
     gladys = {
-      event: {
+      eventManager: {
         emit: fake.resolves(null),
       },
       variable: {

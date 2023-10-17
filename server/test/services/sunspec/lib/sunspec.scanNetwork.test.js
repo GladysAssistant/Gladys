@@ -18,7 +18,7 @@ describe('SunSpec scanNetwork', () => {
 
   beforeEach(() => {
     gladys = {
-      event: {
+      eventManager: {
         emit: fake.resolves(null),
       },
     };
@@ -75,7 +75,7 @@ describe('SunSpec scanNetwork', () => {
       swVersion: 'swVersion',
       mppt: 1,
     });
-    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
     });
   });
