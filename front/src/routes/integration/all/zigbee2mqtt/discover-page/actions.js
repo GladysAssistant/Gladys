@@ -15,7 +15,7 @@ function createActions(store) {
       try {
         const { filterExisting = true } = state;
         const zigbee2mqttDevices = await state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered', {
-          filterExisting
+          filter_existing: filterExisting
         });
         store.setState({ zigbee2mqttDevices, discoverZigbee2mqtt: false });
       } catch (e) {

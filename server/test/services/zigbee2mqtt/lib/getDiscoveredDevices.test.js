@@ -74,7 +74,7 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
       });
 
     // EXECUTE
-    const devices = zigbee2MqttService.device.getDiscoveredDevices({ filterExisting: true });
+    const devices = zigbee2MqttService.device.getDiscoveredDevices({ filter_existing: true });
     // ASSERT
     // Expected devices but first
     const filteredExpectedDevices = [...expectedDevicesPayload];

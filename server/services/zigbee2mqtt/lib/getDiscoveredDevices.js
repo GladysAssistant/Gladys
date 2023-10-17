@@ -18,7 +18,7 @@ function getDiscoveredDevices(filters = {}) {
       return mergeDevices(d, existingDevice);
     });
 
-  const { filterExisting } = filters;
+  const { filter_existing: filterExisting } = filters;
   if (`${filterExisting}` === 'true') {
     devices = devices.filter((device) => device.id === undefined || device.updatable);
   }
