@@ -41,13 +41,14 @@ async function onExecute(body) {
             // Command key not found
             logger.error(`GoogleActions "${exec.command}" command is not managed.`);
             // All devices are failure
-            commands.push({ ids: [selector], status: 'ERROR' });
+            commands.push({ ids: [selector], status: 'ERROR', errorCode: 'functionNotSupported' });
           } else {
             const commandExecutor = trait.commands[exec.command];
 
-            const deviceStatus = { ids: [selector], status: 'ERROR' };
+            const deviceStatus = { ids: [selector] };
             // Build related feature events according incomping attributes
-            const { events = [] } = await commandExecutor(gladysDevice, exec.params, this.gladys);
+            // errorCodes : see https://developers.home.google.com/cloud-to-cloud/intents/errors-exceptions
+            const { events = [], errorCode } = await commandExecutor(gladysDevice, exec.params, this.gladys);
 
             if (events.length > 0) {
               events.forEach((eventMessage) => {
@@ -60,6 +61,9 @@ async function onExecute(body) {
                 this.gladys.event.emit(EVENTS.ACTION.TRIGGERED, action);
               });
               deviceStatus.status = 'PENDING';
+            } else {
+              deviceStatus.status = 'ERROR';
+              deviceStatus.errorCode = errorCode || 'functionNotSupported';
             }
 
             commands.push(deviceStatus);

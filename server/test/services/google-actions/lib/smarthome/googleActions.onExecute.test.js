@@ -202,6 +202,7 @@ describe('GoogleActions Handler - onExecute', () => {
           {
             ids: ['device-1'],
             status: 'ERROR',
+            errorCode: 'functionNotSupported',
           },
         ],
       },
@@ -254,6 +255,7 @@ describe('GoogleActions Handler - onExecute', () => {
           {
             ids: ['device-1'],
             status: 'ERROR',
+            errorCode: 'functionNotSupported',
           },
         ],
       },
