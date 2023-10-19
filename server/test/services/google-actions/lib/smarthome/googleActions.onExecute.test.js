@@ -158,6 +158,7 @@ describe('GoogleActions Handler - onExecute', () => {
           {
             ids: ['device-1'],
             status: 'ERROR',
+            errorCode: 'deviceNotFound',
           },
         ],
       },

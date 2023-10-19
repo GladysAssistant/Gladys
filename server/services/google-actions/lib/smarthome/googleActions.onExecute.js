@@ -31,7 +31,7 @@ async function onExecute(body) {
       const gladysDevice = this.gladys.stateManager.get('device', selector);
 
       if (!gladysDevice) {
-        commands.push({ ids: [selector], status: 'ERROR' });
+        commands.push({ ids: [selector], status: 'ERROR', errorCode: 'deviceNotFound' });
       } else {
         // Each execution triggered
         await Promise.each(execution, async (exec) => {

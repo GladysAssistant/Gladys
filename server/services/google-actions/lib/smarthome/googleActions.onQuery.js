@@ -20,9 +20,14 @@ async function onQuery(body, headers) {
         const gladysDevice = this.gladys.stateManager.get('device', requestedDevice.id);
 
         // Convert it to managed Google devices
-        const device = queryDeviceConverter(gladysDevice);
-        if (device) {
+        if (gladysDevice) {
+          const device = queryDeviceConverter(gladysDevice);
           devices[gladysDevice.selector] = device;
+        } else {
+          devices[requestedDevice.id] = {
+            errorCode: 'deviceNotFound',
+            status: 'ERROR',
+          };
         }
       });
     });

@@ -13,21 +13,7 @@ describe('GoogleActions Handler - onQuery', () => {
   beforeEach(() => {
     gladys = {
       stateManager: {
-        get: fake.returns({
-          name: 'Device 1',
-          selector: 'device-1',
-          features: [
-            {
-              category: 'switch',
-              type: 'binary',
-            },
-          ],
-          model: 'device-model',
-          room: {
-            name: 'living-room',
-          },
-          last_value: 0,
-        }),
+        get: fake.returns(null),
       },
     };
   });
@@ -37,6 +23,22 @@ describe('GoogleActions Handler - onQuery', () => {
   });
 
   it('should generate device payload', async () => {
+    gladys.stateManager.get = fake.returns({
+      name: 'Device 1',
+      selector: 'device-1',
+      features: [
+        {
+          category: 'switch',
+          type: 'binary',
+        },
+      ],
+      model: 'device-model',
+      room: {
+        name: 'living-room',
+      },
+      last_value: 0,
+    });
+
     const body = {
       requestId: 'request-id',
       user: {
@@ -73,5 +75,44 @@ describe('GoogleActions Handler - onQuery', () => {
     };
     expect(result).to.deep.eq(exptectedResult);
     assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-1');
+  });
+
+  it('should generate errorneous device payload', async () => {
+    const body = {
+      requestId: 'request-id',
+      user: {
+        id: 'user-id',
+        selector: 'user-selector',
+      },
+      inputs: [
+        {
+          payload: {
+            devices: [
+              {
+                id: 'device-unknown',
+              },
+            ],
+          },
+        },
+      ],
+    };
+
+    const googleActionsHandler = new GoogleActionsHandler(gladys, serviceId);
+    const result = await googleActionsHandler.onQuery(body);
+
+    const exptectedResult = {
+      requestId: 'request-id',
+      payload: {
+        agentUserId: 'user-id',
+        devices: {
+          'device-unknown': {
+            errorCode: 'deviceNotFound',
+            status: 'ERROR',
+          },
+        },
+      },
+    };
+    expect(result).to.deep.eq(exptectedResult);
+    assert.calledOnceWithExactly(gladys.stateManager.get, 'device', 'device-unknown');
   });
 });
