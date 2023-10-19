@@ -461,8 +461,6 @@ describe('scene.checkTrigger', () => {
       triggers: [
         {
           type: EVENTS.SYSTEM.START,
-          area: 'area-1',
-          user: 'tony',
         },
       ],
     });

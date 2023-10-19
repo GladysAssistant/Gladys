@@ -1661,6 +1661,9 @@
         "minute": "minutes",
         "hour": "heures",
         "day": "jours"
+      },
+      "gladysStart": {
+        "description": "Cette scène sera executé a chaque démarage de Gladys"
       }
     }
   },
