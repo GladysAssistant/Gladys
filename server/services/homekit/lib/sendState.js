@@ -26,6 +26,15 @@ function sendState(hkAccessory, feature, event) {
         );
       break;
     }
+    case `${DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
+      hkAccessory
+        .getService(Service[mappings[feature.category].service])
+        .updateCharacteristic(
+          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
+          event.last_value,
+        );
+      break;
+    }
     case `${DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
       hkAccessory
         .getService(Service[mappings[feature.category].service])
