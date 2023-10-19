@@ -19,11 +19,11 @@ const exploreTrait = (trait, feature) => {
 };
 
 /**
- * @description Determine Google Actions device type from Galdys device.
+ * @description Determine Google Actions device trait from Galdys device.
  * @param {object} feature - Gladys device feature.
- * @returns {object} GoogleActions device type and traits.
+ * @returns {object} GoogleActions trait.
  * @example
- * determineTypeAndTraits(device);
+ * determineTrait(feature);
  */
 function determineTrait(feature) {
   // Matching feature trait

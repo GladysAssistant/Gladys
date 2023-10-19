@@ -29,7 +29,6 @@ const colorSettingTrait = {
 
     return result;
   },
-  attributes: {},
   features: [
     {
       category: DEVICE_FEATURE_CATEGORIES.LIGHT,
