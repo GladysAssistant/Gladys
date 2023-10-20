@@ -4,7 +4,6 @@ import { Text } from 'preact-i18n';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import { RequestStatus } from '../../../../utils/consts';
-import { EVENTS } from '../../../../../../server/utils/constants';
 
 class AlarmModeTrigger extends Component {
   getHouses = async () => {
