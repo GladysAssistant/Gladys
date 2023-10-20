@@ -88,7 +88,7 @@ class AlarmComponent extends Component {
                   <p>
                     <Text id="dashboard.boxes.alarm.alarmStatusText" />
                     <b>
-                      <Text id={`dashboard.boxes.alarm.alarmModes.${house.alarm_mode}`} />
+                      <Text id={`alarmModes.${house.alarm_mode}`} />
                     </b>
                     .
                   </p>
