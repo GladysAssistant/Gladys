@@ -5,12 +5,19 @@ import { route } from 'preact-router';
 import DashboardPage from './DashboardPage';
 import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
 import actions from '../../actions/dashboard';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
 
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
     this.setState(prevState => {
       return { ...prevState, dashboardDropdownOpened: !this.state.dashboardDropdownOpened };
+    });
+  };
+
+  toggleDefineTabletMode = () => {
+    this.setState(prevState => {
+      return { ...prevState, defineTabletModeOpened: !this.state.defineTabletModeOpened };
     });
   };
 
@@ -148,11 +155,20 @@ class Dashboard extends Component {
     this.props.setFullScreen(isFullScreen);
   };
 
+  alarmArmed = () => {
+    if (this.props.tabletMode) {
+      route('/locked');
+    }
+  };
+
+  alarmArming = () => {};
+
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
       dashboardDropdownOpened: false,
+      defineTabletModeOpened: false,
       dashboardEditMode: false,
       showReorderDashboard: false,
       browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
@@ -168,6 +184,8 @@ class Dashboard extends Component {
     document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('click', this.closeDashboardDropdown, true);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmed);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.checkIfFullScreenParameterIsHere();
   }
 
@@ -182,12 +200,15 @@ class Dashboard extends Component {
     document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('click', this.closeDashboardDropdown, true);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmed);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
   }
 
   render(
     props,
     {
       dashboardDropdownOpened,
+      defineTabletModeOpened,
       dashboards,
       currentDashboard,
       dashboardEditMode,
@@ -211,6 +232,7 @@ class Dashboard extends Component {
       <DashboardPage
         {...props}
         dashboardDropdownOpened={dashboardDropdownOpened}
+        defineTabletModeOpened={defineTabletModeOpened}
         dashboardEditMode={dashboardEditMode}
         dashboards={dashboards}
         dashboardListEmpty={dashboardListEmpty}
@@ -223,6 +245,7 @@ class Dashboard extends Component {
         redirectToDashboard={this.redirectToDashboard}
         editDashboard={this.editDashboard}
         toggleFullScreen={this.toggleFullScreen}
+        toggleDefineTabletMode={this.toggleDefineTabletMode}
         fullScreen={props.fullScreen}
         hideExitFullScreenButton={props.fullscreen === 'force'}
       />
@@ -230,4 +253,7 @@ class Dashboard extends Component {
   }
 }
 
-export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', actions)(Dashboard);
+export default connect(
+  'user,session,fullScreen,currentUrl,httpClient,gatewayAccountExpired,tabletMode',
+  actions
+)(Dashboard);

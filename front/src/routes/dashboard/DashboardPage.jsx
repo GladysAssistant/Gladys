@@ -3,6 +3,7 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
 import EmptyState from './EmptyState';
+import SetTabletMode from './SetTabletMode';
 
 import style from './style.css';
 
@@ -41,6 +42,12 @@ const DashboardPage = ({ children, ...props }) => (
                 </div>
 
                 <div class="page-options d-flex align-content-between flex-wrap">
+                  <button onClick={props.toggleDefineTabletMode} class={cx('btn btn-outline-secondary ml-2')}>
+                    <span class={style.editDashboardText}>
+                      <Text id="dashboard.toggleDefineTabletMode" />
+                    </span>{' '}
+                    <i class="fe fe-tablet" />
+                  </button>
                   {!props.dashboardNotConfigured &&
                     props.browserFullScreenCompatible &&
                     !props.hideExitFullScreenButton && (
@@ -63,12 +70,15 @@ const DashboardPage = ({ children, ...props }) => (
                   )}
                 </div>
               </div>
-
               {props.gatewayInstanceNotFound && (
                 <div class="alert alert-warning">
                   <Text id="dashboard.gatewayInstanceNotFoundError" />
                 </div>
               )}
+              <SetTabletMode
+                toggleDefineTabletMode={props.toggleDefineTabletMode}
+                defineTabletModeOpened={props.defineTabletModeOpened}
+              />
               {props.dashboardNotConfigured && <EmptyState dashboardListEmpty={props.dashboardListEmpty} />}
               {!props.dashboardNotConfigured && <BoxColumns homeDashboard={props.currentDashboard} />}
             </div>

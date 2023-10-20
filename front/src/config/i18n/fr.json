@@ -207,6 +207,12 @@
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
     "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
+    "toggleDefineTabletMode": "Mode tablette",
+    "tabletMode": {
+      "description": "Le mode tablette sert à la fonctionnalité alarme. Si vous armez l'alarme, toutes les tablettes de la maison seront verrouillées et afficherons un clavier virtuel pour désactiver l'alarme.",
+      "houseLabel": "Maison",
+      "tabletModeDisabled": "Mode tablette désactivé"
+    },
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Editer le tableau de bord",
