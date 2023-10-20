@@ -365,7 +365,15 @@
         "panicButton": "Panique",
         "editBoxNameLabel": "Nom du widget",
         "editBoxNamePlaceholder": "Entrez le nom du widget",
-        "editHouseLabel": "Sélectionnez la maison qui est concernée pour l'activation/désactivation de l'alarme."
+        "editHouseLabel": "Sélectionnez la maison qui est concernée pour l'activation/désactivation de l'alarme.",
+        "alarmStatusText": "Votre maison est ",
+        "alarmModes": {
+          "armed": "armée",
+          "disarmed": "désarmée",
+          "partially-armed": "armée partiellement",
+          "panic": "en mode panique"
+        },
+        "alarmArming": "Votre maison est entrain d'être armée... Vous avez {{count}} secondes pour quitter la maison."
       }
     }
   },
