@@ -1,5 +1,5 @@
 const { addSelector } = require('../utils/addSelector');
-const { ALARM_MODES_LIST } = require('../utils/constants');
+const { ALARM_MODES_LIST, ALARM_MODES } = require('../utils/constants');
 
 module.exports = (sequelize, DataTypes) => {
   const house = sequelize.define(
@@ -34,6 +34,7 @@ module.exports = (sequelize, DataTypes) => {
       alarm_mode: {
         allowNull: false,
         type: DataTypes.ENUM(ALARM_MODES_LIST),
+        defaultValue: ALARM_MODES.DISARMED,
       },
       alarm_code: {
         allowNull: true,

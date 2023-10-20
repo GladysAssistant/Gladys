@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const Promise = require('bluebird');
 const assertChai = require('chai').assert;
 const sinon = require('sinon');
 
@@ -25,6 +26,7 @@ describe('house.arm', () => {
   });
   it('should arm a house', async () => {
     await house.arm('test-house');
+    await Promise.delay(5);
     assert.calledThrice(event.emit);
     expect(event.emit.firstCall.args).to.deep.equal([
       EVENTS.WEBSOCKET.SEND_ALL,
@@ -58,6 +60,7 @@ describe('house.arm', () => {
   });
   it('should return house is already armed error', async () => {
     await house.arm('test-house');
+    await Promise.delay(5);
     const promise = house.arm('test-house');
     return assertChai.isRejected(promise, 'House is already armed');
   });
