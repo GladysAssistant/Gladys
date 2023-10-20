@@ -95,3 +95,16 @@ describe('POST /api/v1/session/tablet_mode', () => {
       });
   });
 });
+
+describe('GET /api/v1/session/tablet_mode', () => {
+  it('should get tablet mode', async () => {
+    await authenticatedRequest
+      .get('/api/v1/session/tablet_mode')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('tablet_mode', false);
+        expect(res.body).to.have.property('current_house_id', null);
+      });
+  });
+});

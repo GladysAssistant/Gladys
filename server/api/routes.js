@@ -465,6 +465,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sessionController.setTabletMode,
     },
+    'get /api/v1/session/tablet_mode': {
+      authenticated: true,
+      controller: sessionController.getTabletMode,
+    },
     'post /api/v1/session/api_key': {
       authenticated: true,
       controller: sessionController.createApiKey,

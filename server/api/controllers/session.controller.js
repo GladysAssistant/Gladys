@@ -27,6 +27,16 @@ module.exports = function SessionController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/session/tablet_mode getTabletMode
+   * @apiName getTabletMode
+   * @apiGroup Session
+   */
+  async function getTabletMode(req, res) {
+    const session = await gladys.session.getTabletMode(req.user.id, req.session_id);
+    res.json(session);
+  }
+
+  /**
    * @api {post} /api/v1/session/api_key createApiKey
    * @apiName createApiKey
    * @apiGroup Session
@@ -52,5 +62,6 @@ module.exports = function SessionController(gladys) {
     createApiKey: asyncMiddleware(createApiKey),
     get: asyncMiddleware(get),
     setTabletMode: asyncMiddleware(setTabletMode),
+    getTabletMode: asyncMiddleware(getTabletMode),
   });
 };
