@@ -13,7 +13,10 @@ const event = {
 };
 
 describe('house.disarm', () => {
-  const house = new House(event);
+  const session = {
+    unlockTabletMode: fake.resolves(null),
+  };
+  const house = new House(event, {}, session);
   beforeEach(async () => {
     await house.update('test-house', {
       alarm_delay_before_arming: 0,
@@ -27,6 +30,7 @@ describe('house.disarm', () => {
   it('should disarm a house', async () => {
     await house.disarm('test-house');
     assert.calledTwice(event.emit);
+    assert.calledOnce(session.unlockTabletMode);
     expect(event.emit.firstCall.args).to.deep.equal([
       EVENTS.TRIGGERS.CHECK,
       {

@@ -13,7 +13,10 @@ const event = {
 };
 
 describe('house.disarmWithCode', () => {
-  const house = new House(event);
+  const session = {
+    unlockTabletMode: fake.resolves(null),
+  };
+  const house = new House(event, {}, session);
   beforeEach(async () => {
     await house.update('test-house', {
       alarm_code: '123456',
