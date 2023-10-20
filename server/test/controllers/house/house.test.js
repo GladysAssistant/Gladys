@@ -116,6 +116,19 @@ describe('PATCH /api/v1/house/test-house', () => {
   });
 });
 
+describe('GET /api/v1/house/test-house', () => {
+  it('should get a house by selector', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/test-house')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('selector', 'test-house');
+        expect(res.body).to.have.property('alarm_mode', 'disarmed');
+      });
+  });
+});
+
 describe('DELETE /api/v1/house/test-house', () => {
   it('should delete a house', async () => {
     await authenticatedRequest

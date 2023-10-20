@@ -47,6 +47,25 @@ module.exports = function HouseController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/house/:house_selector getBySelector
+   * @apiName getBySelector
+   * @apiGroup House
+   * @apiUse HouseParam
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "id": "7932e6b3-b944-49a9-8d63-b98b8ecb2509",
+   *   "name": "My house",
+   *   "selector": "my-house"
+   *   "updated_at": "2019-05-09T03:43:54.247Z",
+   *   "created_at": "2019-05-09T03:43:54.247Z"
+   * }
+   */
+  async function getBySelector(req, res) {
+    const house = await gladys.house.getBySelector(req.params.house_selector);
+    res.json(house);
+  }
+
+  /**
    * @api {patch} /api/v1/house/:house_selector update
    * @apiName update
    * @apiGroup House
@@ -152,6 +171,7 @@ module.exports = function HouseController(gladys) {
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
     get: asyncMiddleware(get),
+    getBySelector: asyncMiddleware(getBySelector),
     update: asyncMiddleware(update),
     userSeen: asyncMiddleware(userSeen),
     getRooms: asyncMiddleware(getRooms),

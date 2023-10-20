@@ -229,6 +229,10 @@ function getRoutes(gladys) {
       admin: true,
       controller: houseController.create,
     },
+    'get /api/v1/house/:house_selector': {
+      authenticated: true,
+      controller: houseController.getBySelector,
+    },
     'patch /api/v1/house/:house_selector': {
       authenticated: true,
       admin: true,
