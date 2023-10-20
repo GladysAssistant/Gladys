@@ -148,6 +148,16 @@ module.exports = function HouseController(gladys) {
   }
 
   /**
+   * @api {post} /api/v1/house/:house_selector/disarm_with_code DisarmWithCode
+   * @apiName DisarmWithCode
+   * @apiGroup Alarm
+   */
+  async function disarmWithCode(req, res) {
+    const house = await gladys.house.disarmWithCode(req.params.house_selector, req.body.code);
+    res.json(house);
+  }
+
+  /**
    * @api {post} /api/v1/house/:house_selector/partial_arm Partial Arm
    * @apiName Partial Arm
    * @apiGroup Alarm
@@ -177,6 +187,7 @@ module.exports = function HouseController(gladys) {
     getRooms: asyncMiddleware(getRooms),
     arm: asyncMiddleware(arm),
     disarm: asyncMiddleware(disarm),
+    disarmWithCode: asyncMiddleware(disarmWithCode),
     partialArm: asyncMiddleware(partialArm),
     panic: asyncMiddleware(panic),
   });

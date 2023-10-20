@@ -14,9 +14,10 @@ const { userLeft } = require('./house.userLeft');
 const { userSeen } = require('./house.userSeen');
 const { getBySelector } = require('./house.getBySelector');
 
-const House = function House(event, stateManager) {
+const House = function House(event, stateManager, session) {
   this.event = event;
   this.stateManager = stateManager;
+  this.session = session;
 };
 
 House.prototype.arm = arm;

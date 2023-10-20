@@ -26,6 +26,7 @@ function setupRoutes(gladys) {
   const authMiddleware = AuthMiddleware('dashboard:write', gladys);
   const isInstanceConfiguredMiddleware = IsInstanceConfiguredMiddleware(gladys);
   const resetPasswordAuthMiddleware = AuthMiddleware('reset-password:write', gladys);
+  const alarmMiddleware = AuthMiddleware('alarm:write', gladys);
 
   // enable cross origin requests
   router.use(CorsMiddleware);
@@ -56,6 +57,10 @@ function setupRoutes(gladys) {
     // if the route need authentication for reset password
     if (routes[routeKey].resetPasswordAuth) {
       routerParams.push(resetPasswordAuthMiddleware);
+    }
+    // if the route need authentication for alarm
+    if (routes[routeKey].alarmAuth) {
+      routerParams.push(alarmMiddleware);
     }
     // add the controller at the end of the array
     routerParams.push(routes[routeKey].controller);

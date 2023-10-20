@@ -49,6 +49,8 @@ async function arm(selector) {
         house: selector,
       },
     });
+    // Lock all tablets in this house
+    await this.session.setTabletModeLocked(house.id);
   }, house.alarm_delay_before_arming * 1000);
 }
 

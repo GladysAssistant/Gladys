@@ -22,6 +22,11 @@ module.exports = {
       type: Sequelize.BOOLEAN,
       defaultValue: false,
     });
+    await queryInterface.addColumn('t_session', 'tablet_mode_locked', {
+      allowNull: false,
+      type: Sequelize.BOOLEAN,
+      defaultValue: false,
+    });
     await queryInterface.addColumn('t_session', 'current_house_id', {
       allowNull: true,
       type: Sequelize.UUID,

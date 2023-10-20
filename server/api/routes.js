@@ -264,6 +264,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: houseController.disarm,
     },
+    'post /api/v1/house/:house_selector/disarm_with_code': {
+      alarmAuth: true,
+      controller: houseController.disarmWithCode,
+    },
     'post /api/v1/house/:house_selector/partial_arm': {
       authenticated: true,
       controller: houseController.partialArm,

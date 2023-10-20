@@ -9,6 +9,13 @@ const token = generateAccessToken(
 );
 const header = `Bearer ${token}`;
 
+const alarmModeToken = generateAccessToken(
+  '0cd30aef-9c4e-4a23-88e3-3547971296e5',
+  ['alarm:write'],
+  'baf1fa89-153b-4f2e-adf3-787e410ec291',
+  'secret',
+);
+
 const authenticatedRequest = {
   // @ts-ignore
   get: (url) =>
@@ -62,4 +69,5 @@ const unAuthenticatedRequest = {
 module.exports = {
   authenticatedRequest,
   request: unAuthenticatedRequest,
+  alarmModeToken,
 };

@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 const db = require('../../models');
 const { ALARM_MODES } = require('../../utils/constants');
-const { NotFoundError, ConflictError, ForbiddenError } = require('../../utils/coreErrors');
+const { NotFoundError, ForbiddenError } = require('../../utils/coreErrors');
 
 /**
  * @public
@@ -23,16 +23,17 @@ async function disarmWithCode(selector, code) {
     throw new NotFoundError('House not found');
   }
 
-  if (house.alarm_mode === ALARM_MODES.DISARMED) {
-    throw new ConflictError('House is already disarmed');
-  }
-
   if (house.alarm_code !== code) {
     throw new ForbiddenError('Invalid code');
   }
 
+  // In this case, we don't throw an error if the house is already disarmed
+  if (house.alarm_mode === ALARM_MODES.DISARMED) {
+    return house.get({ plain: true });
+  }
+
   // Disarm house
-  await this.disarm(selector);
+  return this.disarm(selector);
 }
 
 module.exports = {

@@ -43,6 +43,24 @@ module.exports = (sequelize, DataTypes) => {
       useragent: {
         type: DataTypes.TEXT,
       },
+      tablet_mode: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      tablet_mode_locked: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      current_house_id: {
+        allowNull: true,
+        type: DataTypes.UUID,
+        references: {
+          model: 't_house',
+          key: 'id',
+        },
+      },
     },
     {},
   );
@@ -52,6 +70,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'user_id',
       targetKey: 'id',
       as: 'user',
+    });
+    session.belongsTo(models.House, {
+      foreignKey: 'current_house_id',
+      sourceKey: 'id',
+      as: 'current_house',
     });
   };
 

@@ -39,6 +39,8 @@ async function disarm(selector) {
       house: selector,
     },
   });
+  // Unlock all tablets in this house
+  await this.session.unlockTabletMode(house.id);
   return house.get({ plain: true });
 }
 

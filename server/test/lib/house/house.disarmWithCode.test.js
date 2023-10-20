@@ -53,9 +53,8 @@ describe('house.disarmWithCode', () => {
     const promise = house.disarmWithCode('test-house', '12');
     return assertChai.isRejected(promise, 'Invalid code');
   });
-  it('should return house is already disarmed error', async () => {
+  it('should just resolve if house is already disarmed', async () => {
     await house.disarmWithCode('test-house', '123456');
-    const promise = house.disarmWithCode('test-house', '123456');
-    return assertChai.isRejected(promise, 'House is already disarmed');
+    await house.disarmWithCode('test-house', '123456');
   });
 });
