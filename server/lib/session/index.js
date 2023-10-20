@@ -7,6 +7,7 @@ const { validateApiKey } = require('./session.validateApiKey');
 const { revoke } = require('./session.revoke');
 const { setTabletModeLocked } = require('./session.setTabletModeLocked');
 const { unlockTabletMode } = require('./session.unlockTabletMode');
+const { setTabletMode } = require('./session.setTabletMode');
 
 const Session = function Session(jwtSecret, cache) {
   this.jwtSecret = jwtSecret;
@@ -22,5 +23,6 @@ Session.prototype.validateApiKey = validateApiKey;
 Session.prototype.revoke = revoke;
 Session.prototype.setTabletModeLocked = setTabletModeLocked;
 Session.prototype.unlockTabletMode = unlockTabletMode;
+Session.prototype.setTabletMode = setTabletMode;
 
 module.exports = Session;
