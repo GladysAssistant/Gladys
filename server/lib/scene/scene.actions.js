@@ -437,6 +437,12 @@ const actionsFunc = {
       throw new AbortScene(e.message);
     }
   },
+  [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
+    const house = await self.house.getBySelector(action.house);
+    if (house.alarm_mode !== action.alarm_mode) {
+      throw new AbortScene(`House "${house.name}" is not in mode ${action.alarm_mode}`);
+    }
+  },
 };
 
 module.exports = {
