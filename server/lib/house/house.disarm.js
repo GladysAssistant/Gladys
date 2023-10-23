@@ -27,6 +27,8 @@ async function disarm(selector) {
   }
   // Update database
   await house.update({ alarm_mode: ALARM_MODES.DISARMED });
+  // Unlock all tablets in this house
+  await this.session.unlockTabletMode(house.id);
   // Check scene triggers
   this.event.emit(EVENTS.TRIGGERS.CHECK, {
     type: EVENTS.ALARM.DISARM,
@@ -39,8 +41,6 @@ async function disarm(selector) {
       house: selector,
     },
   });
-  // Unlock all tablets in this house
-  await this.session.unlockTabletMode(house.id);
   return house.get({ plain: true });
 }
 

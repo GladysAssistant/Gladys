@@ -37,6 +37,8 @@ async function arm(selector) {
   setTimeout(async () => {
     // Update database
     await house.update({ alarm_mode: ALARM_MODES.ARMED });
+    // Lock all tablets in this house
+    await this.session.setTabletModeLocked(house.id);
     // Check scene triggers
     this.event.emit(EVENTS.TRIGGERS.CHECK, {
       type: EVENTS.ALARM.ARM,
@@ -49,8 +51,6 @@ async function arm(selector) {
         house: selector,
       },
     });
-    // Lock all tablets in this house
-    await this.session.setTabletModeLocked(house.id);
   }, house.alarm_delay_before_arming * 1000);
 }
 
