@@ -26,9 +26,10 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
 
   const now = new Date();
   const intervalDate = new Date(now.getTime() - intervalInMinutes * 60 * 1000);
-  const fiveDaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
   const thirthyHoursAgo = new Date(now.getTime() - 30 * 60 * 60 * 1000);
   const tenHoursAgo = new Date(now.getTime() - 10 * 60 * 60 * 1000);
+  const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
   const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
 
   let type;
@@ -37,14 +38,17 @@ async function getDeviceFeaturesAggregates(selector, intervalInMinutes, maxState
   if (intervalDate < sixMonthsAgo) {
     type = 'monthly';
     groupByFunction = fn('date', col('created_at'));
-  } else if (intervalDate < fiveDaysAgo) {
+  } else if (intervalDate < oneMonthAgo) {
     type = 'daily';
+    groupByFunction = fn('date', col('created_at')); 
+  } else if (intervalDate < sevenDaysAgo) {
+    type = 'hourly';
     groupByFunction = fn('date', col('created_at'));
   } else if (intervalDate < thirthyHoursAgo) {
-    type = 'hourly';
+    type = 'live';
     groupByFunction = fn('strftime', '%Y-%m-%d %H:00:00', col('created_at'));
   } else if (intervalDate < tenHoursAgo) {
-    type = 'hourly';
+    type = 'live';
     // this will extract date rounded to the 5 minutes
     // So if the user queries 24h, he'll get 24 * 12 = 288 items
     groupByFunction = literal(`datetime(strftime('%s', created_at) - strftime('%s', created_at) % 300, 'unixepoch')`);
