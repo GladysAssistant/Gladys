@@ -21,24 +21,14 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
   });
 };
 
-const updateDeviceFeaturesString = (deviceFeatures, deviceFeatureSelector, lastValueString, lastValueChange) => {
-  return deviceFeatures.map(feature => {
-    if (feature.selector === deviceFeatureSelector) {
-      return {
-        ...feature,
-        last_value_string: lastValueString,
-        last_value_changed: lastValueChange
-      };
-    }
-    return feature;
-  });
-};
 
 const VacbotBox = ({ children, ...props }) => {
   const { boxTitle, deviceFeatures = [], device = {} } = props;
-
-  console.log(`${device.name} features : ${deviceFeatures.map(deviceFeature => deviceFeature.name)}`);
+  
   const debug = false;
+  if (debug) {
+    console.log(`${device.name} features : ${deviceFeatures.map(deviceFeature => deviceFeature.name)}`);
+  };
 
   return (
     <div class="card">
@@ -52,11 +42,12 @@ const VacbotBox = ({ children, ...props }) => {
           </p>
         </div>
       )}
+      {!props.error && (
       <div class="card-body ">
-        <div class="card-header">
+        <div class="card-header" >
           <div class="d-flex bd-highlight mb-3">
             <h2 class="card-title me-auto p-2 bd-highlight">
-              {boxTitle} - {props.vacbotStatus.name}
+              {boxTitle}
             </h2>
 
             <div class="p-2 bd-highlight">
@@ -81,6 +72,7 @@ const VacbotBox = ({ children, ...props }) => {
         </div>
 
         <div
+          title={`${props.vacbotStatus.name}`}
           class="bg-image d-flex flex-row-reverse"
           style={{
             backgroundImage: `url("https://site-static.ecovacs.com/upload/de/image/product/2022/10/18/074346_9998-DEEBOT-OZMO920-1280x1280.jpg.webp")`,
@@ -115,6 +107,7 @@ const VacbotBox = ({ children, ...props }) => {
           </div>
         </div>
       </div>
+      )}
       {debug && (
         <div class="mt-3">
           DEBUG Vacbot features :
@@ -142,7 +135,6 @@ class VacbotBoxComponent extends Component {
 
   refreshData = () => {
     console.log('Call refreshData');
-    // this.props.getVacbot(this.props.box, this.props.x, this.props.y);
     this.getDeviceData();
   };
 
@@ -167,36 +159,9 @@ class VacbotBoxComponent extends Component {
     }
   };
 
-  updateDeviceStateWebsocket = payload => {
+  updateDeviceStateWebsocket = () => {
     console.log('Call updateDeviceStateWebsocket');
-    let { deviceFeatures } = this.state;
-    if (deviceFeatures) {
-      deviceFeatures = updateDeviceFeatures(
-        deviceFeatures,
-        payload.device_feature_selector,
-        payload.last_value,
-        payload.last_value_changed
-      );
-      this.setState({
-        deviceFeatures
-      });
-    }
-  };
-
-  updateDeviceTextWebsocket = payload => {
-    console.log('Call updateDeviceTextWebsocket');
-    let { deviceFeatures } = this.state;
-    if (deviceFeatures) {
-      deviceFeatures = updateDeviceFeaturesString(
-        deviceFeatures,
-        payload.device_feature,
-        payload.last_value_string,
-        payload.last_value_changed
-      );
-      this.setState({
-        deviceFeatures
-      });
-    }
+    this.refreshData();
   };
 
   componentDidMount() {
@@ -206,30 +171,24 @@ class VacbotBoxComponent extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
-    this.props.session.dispatcher.addListener(
-      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
-      this.updateDeviceTextWebsocket
-    );
-  }
-
+  };
+  
   componentDidUpdate(previousProps) {
     console.log('Call componentDidUpdate');
-    const vacbotChanged = get(previousProps, 'box.vacbot') !== get(this.props, 'box.vacbot');
+    const vacbotDeviceChanged = get(previousProps, 'box.vacbot') !== get(this.props, 'box.vacbot');
     const nameChanged = get(previousProps, 'box.name') !== get(this.props, 'box.name');
-    const deviceFeaturesChanged = get(previousProps, 'box.device_features') !== get(this.props, 'box.device_features');
-    if (deviceFeaturesChanged || vacbotChanged || nameChanged) {
+    
+    console.log(`componentDidUpdate vacbotDeviceChanged ${get(previousProps, 'box.vacbot')}`);
+    console.log(`componentDidUpdate vacbotDeviceChanged ${vacbotDeviceChanged} nameChanged ${nameChanged}`);
+    if (vacbotDeviceChanged || nameChanged) {
       this.refreshData();
     }
-  }
+  };
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
-    );
-    this.props.session.dispatcher.removeListener(
-      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STRING_STATE,
-      this.updateDeviceTextWebsocket
     );
   }
 
@@ -263,18 +222,18 @@ class VacbotBoxComponent extends Component {
 
   render(props, { device, deviceFeatures, vacbotStatus, status }) {
     const loading = status === RequestStatus.Getting && !status;
-    console.log(`box status : `, status);
-    const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Vacbot.${props.x}_${props.y}`);
-    console.log(`box data : `, boxData);
-    const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Vacbot.${props.x}_${props.y}`);
-    const boxTitle = get(props.box, 'name');
-    console.log(`${boxTitle} - ${boxStatus}`);
+    console.log(`render box status : `, status);
+    // const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Vacbot.${props.x}_${props.y}`);
+    console.log(`render box data : `, props);
+    // const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Vacbot.${props.x}_${props.y}`);
+    const boxTitle = get(this.props.box, 'title');
+    console.log(`${boxTitle} - ${status}`);
 
     console.log(
-      `vacbotStatus : ${vacbotStatus.name}, ${vacbotStatus.hasMappingCapabilities}, ${vacbotStatus.hasMoppingSystem}, ${vacbotStatus.chargeStatus}, ${vacbotStatus.cleanReport}, ${vacbotStatus.batteryLevel}`
+      `render vacbotStatus : ${vacbotStatus.name}, ${vacbotStatus.hasMappingCapabilities}, ${vacbotStatus.hasMoppingSystem}, ${vacbotStatus.chargeStatus}, ${vacbotStatus.cleanReport}, ${vacbotStatus.batteryLevel}`
     );
 
-    const error = boxStatus === RequestStatus.Error;
+    const error = status === RequestStatus.Error;
 
     console.log(`${device} features : ${deviceFeatures}`);
 
