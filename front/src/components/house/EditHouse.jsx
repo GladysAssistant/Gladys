@@ -115,11 +115,11 @@ const EditHouse = ({ children, ...props }) => (
                 onInput={props.updateHouseAlarmCode}
               />
             </Localizer>
-            <span class="input-icon-addon cursor-pointer" onClick={props.togglePassword}>
+            <span class="input-icon-addon cursor-pointer" onClick={props.toggleAlarmCodePassword}>
               <i
                 class={cx('fe', {
-                  'fe-eye': !props.showPassword,
-                  'fe-eye-off': props.showPassword
+                  'fe-eye': !props.showAlarmCode,
+                  'fe-eye-off': props.showAlarmCode
                 })}
               />
             </span>

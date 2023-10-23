@@ -63,15 +63,21 @@ class EditHouseComponent extends Component {
       this.addRoom();
     }
   };
+  toggleAlarmCodePassword = () => {
+    this.setState(prevState => {
+      return { ...prevState, showAlarmCode: !this.state.showAlarmCode };
+    });
+  };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      newRoomName: ''
+      newRoomName: '',
+      showAlarmCode: false
     };
   }
 
-  render(props, { newRoomName, wantToDeleteHouse, loading }) {
+  render(props, { newRoomName, wantToDeleteHouse, loading, showAlarmCode }) {
     return (
       <EditHouse
         {...props}
@@ -90,6 +96,8 @@ class EditHouseComponent extends Component {
         deleteHouse={this.deleteHouse}
         confirmDeleteHouse={this.confirmDeleteHouse}
         cancelDeleteHouse={this.cancelDeleteHouse}
+        toggleAlarmCodePassword={this.toggleAlarmCodePassword}
+        showAlarmCode={showAlarmCode}
         loading={loading}
       />
     );
