@@ -3,6 +3,8 @@ import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { route } from 'preact-router';
+import get from 'get-value';
+
 import style from './style.css';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 
@@ -48,28 +50,26 @@ class Locked extends Component {
     e.preventDefault();
     if (this.state.currentCode.length > 0) {
       this.setState(prevState => {
-        return { ...prevState, currentCode: prevState.currentCode.slice(0, -1) };
+        return { ...prevState, currentCode: prevState.currentCode.slice(0, -1), wrongCode: false };
       });
     }
   };
   typeLetter = (e, letter) => {
     e.preventDefault();
     this.setState(prevState => {
-      return { ...prevState, currentCode: prevState.currentCode + letter };
+      return { ...prevState, currentCode: prevState.currentCode + letter, wrongCode: false };
     });
   };
   init = async () => {
     try {
       // We make a dumb request just to verify if our token is valid
-      const result = await this.props.httpClient.post('/api/v1/access_token', {
+      await this.props.httpClient.post('/api/v1/access_token', {
         refresh_token: this.props.session.getRefreshToken(),
         scope: ['dashboard:write']
       });
-      console.log(result);
       // if this resolves, we redirect to dashboard
       route('/dashboard');
     } catch (e) {
-      console.log(e);
       this.props.httpClient.setApiScopes(['alarm:write']);
       this.props.httpClient.refreshAccessToken();
     }
@@ -97,12 +97,19 @@ class Locked extends Component {
   validateCode = async e => {
     e.preventDefault();
     try {
+      await this.setState({ error: false, wrongCode: false });
       const houseSelector = this.props.session.getTabletModeCurrentHouseSelector();
       await this.props.httpClient.post(`/api/v1/house/${houseSelector}/disarm_with_code`, {
         code: this.state.currentCode
       });
     } catch (e) {
       console.error(e);
+      const message = get(e, 'response.data.message');
+      if (message === 'INVALID_CODE') {
+        this.setState({ wrongCode: true });
+      } else {
+        this.setState({ error: true });
+      }
     }
   };
   componentDidMount() {
@@ -112,7 +119,7 @@ class Locked extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.disarmed);
   }
-  render({}, { currentCode }) {
+  render({}, { currentCode, error, wrongCode }) {
     return (
       <div class={cx('container', style.lockedContainer)}>
         <div class="row">
@@ -138,6 +145,16 @@ class Locked extends Component {
                 <p>
                   <Text id="locked.description" />
                 </p>
+                {error && (
+                  <div class="alert alert-error">
+                    <Text id="locked.error" />
+                  </div>
+                )}
+                {wrongCode && (
+                  <div class="alert alert-warning">
+                    <Text id="locked.wrongCodeError" />
+                  </div>
+                )}
                 <div>
                   <KeyPadComponent
                     currentCode={currentCode}
