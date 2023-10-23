@@ -30,7 +30,7 @@ describe('house.arm', () => {
   it('should arm a house', async () => {
     await house.arm('test-house');
     await Promise.delay(5);
-    assert.calledThrice(event.emit);
+    assert.callCount(event.emit, 4);
     expect(event.emit.firstCall.args).to.deep.equal([
       EVENTS.WEBSOCKET.SEND_ALL,
       {
@@ -43,11 +43,18 @@ describe('house.arm', () => {
     expect(event.emit.secondCall.args).to.deep.equal([
       EVENTS.TRIGGERS.CHECK,
       {
-        type: EVENTS.ALARM.ARM,
+        type: EVENTS.ALARM.ARMING,
         house: 'test-house',
       },
     ]);
     expect(event.emit.thirdCall.args).to.deep.equal([
+      EVENTS.TRIGGERS.CHECK,
+      {
+        type: EVENTS.ALARM.ARM,
+        house: 'test-house',
+      },
+    ]);
+    expect(event.emit.args[3]).to.deep.equal([
       EVENTS.WEBSOCKET.SEND_ALL,
       {
         type: WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED,

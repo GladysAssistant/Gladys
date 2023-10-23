@@ -33,6 +33,11 @@ async function arm(selector) {
       house: selector,
     },
   });
+  // Check trigger scene is arming
+  this.event.emit(EVENTS.TRIGGERS.CHECK, {
+    type: EVENTS.ALARM.ARMING,
+    house: selector,
+  });
   // Wait the delay before arming
   const currentTimeout = setTimeout(async () => {
     // Update database

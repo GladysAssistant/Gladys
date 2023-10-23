@@ -103,6 +103,7 @@ const SYSTEM_VARIABLE_NAMES = {
 const EVENTS = {
   ALARM: {
     ARM: 'alarm.arm',
+    ARMING: 'alarm.arming',
     DISARM: 'alarm.disarm',
     PARTIAL_ARM: 'alarm.partial-arm',
     PANIC: 'alarm.panic',

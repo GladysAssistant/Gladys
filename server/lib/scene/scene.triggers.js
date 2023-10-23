@@ -26,6 +26,7 @@ const triggersFunc = {
   [EVENTS.AREA.USER_ENTERED]: (event, trigger) => event.user === trigger.user && event.area === trigger.area,
   [EVENTS.AREA.USER_LEFT]: (event, trigger) => event.user === trigger.user && event.area === trigger.area,
   [EVENTS.ALARM.ARM]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.ARMING]: (event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.DISARM]: (event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.PARTIAL_ARM]: (event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.PANIC]: (event, trigger) => event.house === trigger.house,
