@@ -209,6 +209,7 @@ const EVENTS = {
     CHECK_UPGRADE: 'system.check-upgrade',
     TIMEZONE_CHANGED: 'system.timezone-changed',
     VACUUM: 'system.vacuum',
+    START: 'system.start',
   },
   WEBSOCKET: {
     SEND: 'websocket.send',
