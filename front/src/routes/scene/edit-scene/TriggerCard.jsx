@@ -12,6 +12,7 @@ import UserEnteredOrLeftArea from './triggers/UserEnteredOrLeftArea';
 import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 
 import { EVENTS } from '../../../../../server/utils/constants';
+import GladysStartTrigger from './triggers/GladysStartTrigger';
 
 const deleteTriggerFromList = (deleteTrigger, index) => () => {
   deleteTrigger(index);
@@ -20,6 +21,7 @@ const deleteTriggerFromList = (deleteTrigger, index) => () => {
 const TriggerCard = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
+      {props.trigger.type === EVENTS.SYSTEM.START && <i class="fe fe-activity" />}
       {props.trigger.type === EVENTS.DEVICE.NEW_STATE && <i class="fe fe-activity" />}
       {props.trigger.type === EVENTS.TIME.CHANGED && <i class="fe fe-watch" />}
       {props.trigger.type === EVENTS.TIME.SUNSET && <i class="fe fe-sunset" />}
@@ -129,6 +131,13 @@ const TriggerCard = ({ children, ...props }) => (
           trigger={props.trigger}
           variables={props.variables}
           setVariablesTrigger={props.setVariablesTrigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.SYSTEM.START && (
+        <GladysStartTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
         />
       )}
     </div>
