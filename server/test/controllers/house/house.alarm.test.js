@@ -49,6 +49,24 @@ describe('House.alarm', () => {
       .expect(200);
     expect(resSecondCall.body).to.have.property('alarm_mode', 'disarmed');
   });
+  it('should not disarm with code, invalid code', async () => {
+    const testHouse = await db.House.findOne({
+      where: {
+        selector: 'test-house',
+      },
+    });
+    await testHouse.update({ alarm_mode: 'armed', alarm_code: '123456' });
+    const res = await request
+      .post('/api/v1/house/test-house/disarm_with_code')
+      .set('Authorization', `Bearer ${alarmModeToken}`)
+      .send({
+        code: '12',
+        refresh_token: 'refresh-token-test',
+      })
+      .expect('Content-Type', /json/)
+      .expect(403);
+    expect(res.body).to.deep.equal({ code: 'FORBIDDEN', message: 'INVALID_CODE', status: 403 });
+  });
   it('should partially arm house', async () => {
     await authenticatedRequest
       .post('/api/v1/house/test-house/partial_arm')

@@ -24,7 +24,7 @@ async function disarmWithCode(selector, code) {
   }
 
   if (house.alarm_code !== code) {
-    throw new ForbiddenError('Invalid code');
+    throw new ForbiddenError('INVALID_CODE');
   }
 
   // In this case, we don't throw an error if the house is already disarmed
