@@ -1663,7 +1663,7 @@
         "day": "jours"
       },
       "gladysStart": {
-        "description": "Cette scène sera executé a chaque démarage de Gladys"
+        "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
       }
     }
   },
