@@ -34,7 +34,7 @@ async function arm(selector) {
     },
   });
   // Wait the delay before arming
-  setTimeout(async () => {
+  const currentTimeout = setTimeout(async () => {
     // Update database
     await house.update({ alarm_mode: ALARM_MODES.ARMED });
     // Lock all tablets in this house
@@ -52,6 +52,9 @@ async function arm(selector) {
       },
     });
   }, house.alarm_delay_before_arming * 1000);
+
+  // store the timeout so we can cancel it if needed
+  this.armingHouseTimeout.set(selector, currentTimeout);
 }
 
 module.exports = {

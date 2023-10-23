@@ -48,6 +48,17 @@ describe('house.disarm', () => {
       },
     ]);
   });
+  it('should arm with timer then disarm a house and have no timeout left', async () => {
+    await house.update('test-house', {
+      alarm_delay_before_arming: 5,
+      alarm_mode: ALARM_MODES.DISARMED,
+    });
+    await house.arm('test-house');
+    const promise = house.disarm('test-house');
+    await assertChai.isRejected(promise);
+    // Timeout should be deleted
+    expect(house.armingHouseTimeout.size).to.equal(0);
+  });
   it('should return house not found', async () => {
     const promise = house.disarm('house-not-found');
     return assertChai.isRejected(promise, 'House not found');

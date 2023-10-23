@@ -18,6 +18,7 @@ const House = function House(event, stateManager, session) {
   this.event = event;
   this.stateManager = stateManager;
   this.session = session;
+  this.armingHouseTimeout = new Map();
 };
 
 House.prototype.arm = arm;

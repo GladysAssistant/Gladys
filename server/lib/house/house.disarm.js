@@ -12,6 +12,12 @@ const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
  * const mainHouse = await gladys.house.disarm('main-house');
  */
 async function disarm(selector) {
+  // In case there is a timeout to arm this house, we clear it
+  clearTimeout(this.armingHouseTimeout.get(selector));
+  if (this.armingHouseTimeout.get(selector)) {
+    this.armingHouseTimeout.delete(selector);
+  }
+  // Get the house from DB
   const house = await db.House.findOne({
     where: {
       selector,
