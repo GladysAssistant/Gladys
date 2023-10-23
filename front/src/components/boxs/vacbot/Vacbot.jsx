@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
 import actions from '../../../actions/dashboard/boxes/vacbot';
-import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY, RequestStatus } from '../../../utils/consts';
+import { RequestStatus } from '../../../utils/consts';
 import get from 'get-value';
 import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import debounce from 'debounce';
@@ -43,10 +43,10 @@ const VacbotBox = ({ children, ...props }) => {
         </div>
       )}
       {!props.error && (
-      <div class="card-body ">
-        <div class="card-header" >
-          <div class="d-flex bd-highlight mb-3">
-            <h2 class="card-title me-auto p-2 bd-highlight">
+      <div class="card-body">
+        
+          <div class="d-flex bd-highlight">
+            <h2 class="card-title bd-highlight mr-auto ">
               {boxTitle}
             </h2>
 
@@ -58,7 +58,7 @@ const VacbotBox = ({ children, ...props }) => {
               {props.vacbotStatus.cleanReport}
             </div>
 
-            <div class="p-2 bd-highlight align-items-right">
+            <div class="p-2 bd-highlight">
               {props.vacbotStatus.chargeStatus == 'charging' && (
                 <i class={`fe fe-battery-charging`}>{props.vacbotStatus.batteryLevel}% </i>
               )}
@@ -69,11 +69,11 @@ const VacbotBox = ({ children, ...props }) => {
               )}
             </div>
           </div>
-        </div>
+        
 
         <div
           title={`${props.vacbotStatus.name}`}
-          class="bg-image d-flex flex-row-reverse"
+          class="bg-image"
           style={{
             backgroundImage: `url("https://site-static.ecovacs.com/upload/de/image/product/2022/10/18/074346_9998-DEEBOT-OZMO920-1280x1280.jpg.webp")`,
             backgroundPosition: 'center',
@@ -83,15 +83,12 @@ const VacbotBox = ({ children, ...props }) => {
             position: 'relative'
           }}
         >
-          <div class="p-2">
-            <button class={`btn btn-sm fe fe-map`} />
-            <button class={`btn btn-sm fe fe-codepen`} />
-          </div>
+      
           <div class="d-flex align-items-center justify-content-center">
             <div>
               {deviceFeatures.map((deviceFeature, deviceFeatureIndex) => (
                 <div class="card-body ">
-                  <div class="d-flex bd-highlight mb-3">
+                  <div class="d-flex bd-highlight mt-9">
                     {deviceFeature.type === DEVICE_FEATURE_TYPES.VACBOT.STATE && (
                       <VacbotModeControls
                         deviceFeature={deviceFeature}
@@ -134,7 +131,6 @@ class VacbotBoxComponent extends Component {
   }
 
   refreshData = () => {
-    console.log('Call refreshData');
     this.getDeviceData();
   };
 
@@ -160,12 +156,10 @@ class VacbotBoxComponent extends Component {
   };
 
   updateDeviceStateWebsocket = () => {
-    console.log('Call updateDeviceStateWebsocket');
     this.refreshData();
   };
 
   componentDidMount() {
-    console.log('Call componentDidMount');
     this.refreshData();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
@@ -174,12 +168,8 @@ class VacbotBoxComponent extends Component {
   };
   
   componentDidUpdate(previousProps) {
-    console.log('Call componentDidUpdate');
     const vacbotDeviceChanged = get(previousProps, 'box.vacbot') !== get(this.props, 'box.vacbot');
     const nameChanged = get(previousProps, 'box.name') !== get(this.props, 'box.name');
-    
-    console.log(`componentDidUpdate vacbotDeviceChanged ${get(previousProps, 'box.vacbot')}`);
-    console.log(`componentDidUpdate vacbotDeviceChanged ${vacbotDeviceChanged} nameChanged ${nameChanged}`);
     if (vacbotDeviceChanged || nameChanged) {
       this.refreshData();
     }
@@ -222,20 +212,8 @@ class VacbotBoxComponent extends Component {
 
   render(props, { device, deviceFeatures, vacbotStatus, status }) {
     const loading = status === RequestStatus.Getting && !status;
-    console.log(`render box status : `, status);
-    // const boxData = get(props, `${DASHBOARD_BOX_DATA_KEY}Vacbot.${props.x}_${props.y}`);
-    console.log(`render box data : `, props);
-    // const boxStatus = get(props, `${DASHBOARD_BOX_STATUS_KEY}Vacbot.${props.x}_${props.y}`);
     const boxTitle = get(this.props.box, 'title');
-    console.log(`${boxTitle} - ${status}`);
-
-    console.log(
-      `render vacbotStatus : ${vacbotStatus.name}, ${vacbotStatus.hasMappingCapabilities}, ${vacbotStatus.hasMoppingSystem}, ${vacbotStatus.chargeStatus}, ${vacbotStatus.cleanReport}, ${vacbotStatus.batteryLevel}`
-    );
-
     const error = status === RequestStatus.Error;
-
-    console.log(`${device} features : ${deviceFeatures}`);
 
     return (
       <VacbotBox
