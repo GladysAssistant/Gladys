@@ -167,6 +167,7 @@ class Dashboard extends Component {
     super(props);
     this.props = props;
     this.state = {
+      isGladysPlus: this.props.session.gatewayClient !== undefined,
       dashboardDropdownOpened: false,
       defineTabletModeOpened: false,
       dashboardEditMode: false,

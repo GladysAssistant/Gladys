@@ -42,12 +42,14 @@ const DashboardPage = ({ children, ...props }) => (
                 </div>
 
                 <div class="page-options d-flex align-content-between flex-wrap">
-                  <button onClick={props.toggleDefineTabletMode} class={cx('btn btn-outline-secondary ml-2')}>
-                    <span class={style.editDashboardText}>
-                      <Text id="dashboard.toggleDefineTabletMode" />
-                    </span>{' '}
-                    <i class="fe fe-tablet" />
-                  </button>
+                  {!props.isGladysPlus && (
+                    <button onClick={props.toggleDefineTabletMode} class={cx('btn btn-outline-secondary ml-2')}>
+                      <span class={style.editDashboardText}>
+                        <Text id="dashboard.toggleDefineTabletMode" />
+                      </span>{' '}
+                      <i class="fe fe-tablet" />
+                    </button>
+                  )}
                   {!props.dashboardNotConfigured &&
                     props.browserFullScreenCompatible &&
                     !props.hideExitFullScreenButton && (

@@ -1,6 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import mainActions from '../../actions/main';
 import style from './style.css';
@@ -110,6 +110,9 @@ class SetTabletMode extends Component {
                   ))}
               </select>
             </div>
+            <p>
+              <MarkupText id="dashboard.tabletMode.fullScreenForce" />
+            </p>
             <div className="form-group">
               <button class="btn btn-success" onClick={this.saveTabletMode}>
                 <Text id="global.save" />

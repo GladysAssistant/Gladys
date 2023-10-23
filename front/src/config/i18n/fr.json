@@ -211,6 +211,7 @@
     "toggleDefineTabletMode": "Mode tablette",
     "tabletMode": {
       "description": "Le mode tablette sert à la fonctionnalité alarme. Si vous armez l'alarme, toutes les tablettes de la maison seront verrouillées et afficherons un clavier virtuel pour désactiver l'alarme.",
+      "fullScreenForce": "Si vous voulez forcer une tablette à rester en mode plein écran, vous pouvez ajouter <code>?fullscreen=force</code> à l'URL.",
       "houseLabel": "Maison",
       "tabletModeDisabled": "Mode tablette désactivé"
     },
