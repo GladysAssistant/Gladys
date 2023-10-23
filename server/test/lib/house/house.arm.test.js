@@ -14,7 +14,10 @@ const event = {
 };
 
 describe('house.arm', () => {
-  const house = new House(event);
+  const session = {
+    setTabletModeLocked: fake.resolves(null),
+  };
+  const house = new House(event, {}, session);
   beforeEach(async () => {
     await house.update('test-house', {
       alarm_delay_before_arming: 0,
