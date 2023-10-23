@@ -12,11 +12,15 @@ const logger = require('../../../../utils/logger');
 function convertDevice(tuyaDevice) {
   const { name, product_name: model, id, specifications = {} } = tuyaDevice;
   const externalId = `tuya:${id}`;
-  const { functions = [] } = specifications;
+  const { functions = [], status = [] } = specifications;
 
   logger.debug(`Tuya convert device"${name}, ${model}"`);
   // Groups functions and status on same code
   const groups = {};
+  status.forEach((stat) => {
+    const { code } = stat;
+    groups[code] = { ...stat, readOnly: true };
+  });
   functions.forEach((func) => {
     const { code } = func;
     groups[code] = { ...func, readOnly: false };

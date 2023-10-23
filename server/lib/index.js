@@ -25,6 +25,7 @@ const System = require('./system');
 const Variable = require('./variable');
 const services = require('../services');
 const Weather = require('./weather');
+const { EVENTS } = require('../utils/constants');
 
 /**
  * @description Start a new Gladys instance.
@@ -163,6 +164,10 @@ function Gladys(params = {}) {
         scheduler.init();
       }
       gateway.init();
+
+      event.emit(EVENTS.TRIGGERS.CHECK, {
+        type: EVENTS.SYSTEM.START,
+      });
     },
   };
 

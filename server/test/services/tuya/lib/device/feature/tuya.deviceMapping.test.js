@@ -69,9 +69,27 @@ describe('Tuya device mapping', () => {
       );
       expect(result).to.eq(300);
     });
-    it('switch binary', () => {
-      const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](true);
-      expect(result).to.eq(1);
+    describe('binary', () => {
+      it('switch', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.BINARY](true);
+        expect(result).to.eq(1);
+      });
+      it('energy', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.ENERGY]('30');
+        expect(result).to.eq(0.3);
+      });
+      it('current', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.CURRENT]('20');
+        expect(result).to.eq(20);
+      });
+      it('power', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.POWER]('2245');
+        expect(result).to.eq(224.5);
+      });
+      it('voltage', () => {
+        const result = readValues[DEVICE_FEATURE_CATEGORIES.SWITCH][DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]('120');
+        expect(result).to.eq(12.0);
+      });
     });
     describe('curtain state', () => {
       it('open', () => {

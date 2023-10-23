@@ -27,6 +27,14 @@ const mappings = {
       },
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR]: {
+    service: 'LeakSensor',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: {
+        characteristics: ['LeakDetected'],
+      },
+    },
+  },
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     service: 'Switch',
     capabilities: {
@@ -40,6 +48,14 @@ const mappings = {
     capabilities: {
       [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: {
         characteristics: ['CurrentTemperature'],
+      },
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: {
+    service: 'HumiditySensor',
+    capabilities: {
+      [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: {
+        characteristics: ['CurrentRelativeHumidity'],
       },
     },
   },
