@@ -27,11 +27,20 @@ const TRIGGER_ICON = {
   [EVENTS.AREA.USER_LEFT]: 'fe-compass',
   [EVENTS.CALENDAR.EVENT_IS_COMING]: 'fe-calendar',
   [EVENTS.ALARM.ARM]: 'fe-bell',
+  [EVENTS.ALARM.ARMING]: 'fe-clock',
   [EVENTS.ALARM.PARTIAL_ARM]: 'fe-bell',
   [EVENTS.ALARM.DISARM]: 'fe-bell-off',
   [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
   [EVENTS.SYSTEM.START]: 'fe-activity'
 };
+
+const ALARM_TRIGGERS = [
+  EVENTS.ALARM.ARM,
+  EVENTS.ALARM.ARMING,
+  EVENTS.ALARM.DISARM,
+  EVENTS.ALARM.PARTIAL_ARM,
+  EVENTS.ALARM.PANIC
+];
 
 const deleteTriggerFromList = (deleteTrigger, index) => () => {
   deleteTrigger(index);
@@ -141,9 +150,7 @@ const TriggerCard = ({ children, ...props }) => (
           setVariablesTrigger={props.setVariablesTrigger}
         />
       )}
-      {[EVENTS.ALARM.ARM, EVENTS.ALARM.DISARM, EVENTS.ALARM.PARTIAL_ARM, EVENTS.ALARM.PANIC].includes(
-        props.trigger.type
-      ) && (
+      {ALARM_TRIGGERS.includes(props.trigger.type) && (
         <AlarmModeTrigger
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
