@@ -12,10 +12,10 @@ function createActions(store) {
       });
       try {
         const options = {
-          order_dir: state.getZwaveDeviceOrderDir || 'asc'
+          order_dir: state.orderDir || 'asc'
         };
-        if (state.zwaveDeviceSearch && state.zwaveDeviceSearch.length) {
-          options.search = state.zwaveDeviceSearch;
+        if (state.searchKeyword && state.searchKeyword.length) {
+          options.search = state.searchKeyword;
         }
         const zwaveDevices = await state.httpClient.get('/api/v1/service/zwave-js-ui/device', options);
         store.setState({
@@ -54,7 +54,7 @@ function createActions(store) {
     },
     async search(state, e) {
       store.setState({
-        zwaveDeviceSearch: e.target.value
+        searchKeyword: e.target.value
       });
       await actions.getZWaveDevices(store.getState());
     },

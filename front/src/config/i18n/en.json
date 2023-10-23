@@ -760,6 +760,7 @@
       "discover": {
         "title": "Z-Wave Devices",
         "noDeviceDiscovered": "No Z-Wave devices found. Have you correctly configured Zwavejs UI in Settings?",
+        "hideExistingDevices": "Hide already added devices",
         "addNodeButton": "Add",
         "addNodeSecureButton": "Add Secure",
         "removeNode": "Remove",

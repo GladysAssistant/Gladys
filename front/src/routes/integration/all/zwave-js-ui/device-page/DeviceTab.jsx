@@ -7,7 +7,7 @@ import Device from './Device';
 import style from './style.css';
 import CardFilter from '../../../../../components/layout/CardFilter';
 
-const NodeTab = ({ children, ...props }) => (
+const DeviceTab = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
       <h2 class="card-title">
@@ -17,9 +17,9 @@ const NodeTab = ({ children, ...props }) => (
         <Localizer>
           <CardFilter
             changeOrderDir={props.changeOrderDir}
-            orderValue={props.getZwaveDeviceOrderDir}
+            orderValue={props.orderDir}
             search={props.debouncedSearch}
-            searchValue={props.zwaveDeviceSearch}
+            searchValue={props.searchKeyword}
             searchPlaceHolder={<Text id="device.searchPlaceHolder" />}
           />
         </Localizer>
@@ -55,4 +55,4 @@ const NodeTab = ({ children, ...props }) => (
   </div>
 );
 
-export default NodeTab;
+export default DeviceTab;

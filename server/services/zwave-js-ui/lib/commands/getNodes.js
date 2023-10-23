@@ -12,6 +12,7 @@ const { unbindValue } = require('../utils/bindValue');
 const { splitNode } = require('../utils/splitNode');
 const { transformClasses } = require('../utils/transformClasses');
 const { PARAMS } = require('../constants');
+const { mergeDevices } = require('../../../../utils/device');
 
 /**
  * @description Check if keyword matches value.
@@ -27,15 +28,15 @@ function match(value, keyword) {
 
 /**
  * @description Return array of Nodes.
- * @param {object} pagination - Filtering and ordering.
- * @param {string} pagination.orderDir - Ordering.
- * @param {string} pagination.search - Keyword to filter nodes.
+ * @param {object} filters - Filtering and ordering.
  * @returns {Array} Return list of nodes.
  * @example
  * const nodes = zwaveManager.getNodes();
  */
-function getNodes({ orderDir, search } = {}) {
+function getNodes(filters) {
   const nodeIds = Object.keys(this.nodes);
+  const { order_dir: orderDir, search, filter_existing } = filters;
+  const filterExisting = `${filter_existing}` === 'true';
 
   // transform object in array
   const nodes = nodeIds
@@ -149,7 +150,13 @@ function getNodes({ orderDir, search } = {}) {
 
       return newDevice;
     })
+    .map((device) => {
+      const existingDevice = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
+      // Merge with existing device.
+      return mergeDevices(device, existingDevice);
+    })
     .filter((newDevice) => newDevice.features && newDevice.features.length > 0)
+    .filter((newDevice) => !filterExisting || newDevice.id === undefined)
     .sort((a, b) => {
       const aNodeId = a.params.find((param) => param.name === PARAMS.NODE_ID).value;
       const bNodeId = b.params.find((param) => param.name === PARAMS.NODE_ID).value;

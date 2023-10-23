@@ -5,11 +5,12 @@ import ZwaveJSUIPage from '../ZwaveJSUIPage';
 import NodeTab from './NodeTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 
-class ZwaveJSUIDevicePage extends Component {
+class ZwaveJSUINodePage extends Component {
   scanCompleteListener = () => {
     this.props.getStatus();
     this.props.getNodes();
   };
+
   componentWillMount() {
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
@@ -45,6 +46,6 @@ class ZwaveJSUIDevicePage extends Component {
 }
 
 export default connect(
-  'user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus,zwaveScanNetworkStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch',
+  'user,session,zwaveNodes,zwaveStatus,zwaveGetNodesStatus,zwaveScanNetworkStatus,zwaveSaveNodeStatus,orderDir,searchKeyword,filterExisting',
   actions
-)(ZwaveJSUIDevicePage);
+)(ZwaveJSUINodePage);

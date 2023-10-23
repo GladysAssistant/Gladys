@@ -20,6 +20,6 @@ class ZwaveJSUIDevicePage extends Component {
 }
 
 export default connect(
-  'session,user,zwaveDevices,houses,getZwaveDevicesStatus,getZwaveDeviceOrderDir,zwaveDeviceSearch',
+  'session,user,zwaveDevices,houses,getZwaveDevicesStatus,orderDir,searchKeyword',
   actions
 )(ZwaveJSUIDevicePage);

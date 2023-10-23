@@ -16,10 +16,11 @@ const createActions = store => {
       });
       try {
         const options = {
-          order_dir: state.getZwaveDeviceOrderDir || 'asc'
+          order_dir: state.orderDir || 'asc', // Default value assumed by CardFilter
+          filter_existing: state.filterExisting || true // Default value assumed by NodeTab
         };
-        if (state.zwaveDeviceSearch && state.zwaveDeviceSearch.length) {
-          options.search = state.zwaveDeviceSearch;
+        if (state.searchKeyword && state.searchKeyword.length) {
+          options.search = state.searchKeyword;
         }
         const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave-js-ui/node', options);
 
@@ -111,7 +112,27 @@ const createActions = store => {
       }
     },
     async createDevice(state, newDevice) {
-      await state.httpClient.post('/api/v1/device', newDevice);
+      store.setState({
+        zwaveSaveNodeStatus: RequestStatus.Getting
+      });
+      try {
+        await state.httpClient.post('/api/v1/device', newDevice);
+        store.setState({
+          zwaveSaveNodeStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        const status = get(e, 'response.status');
+        if (status === 409) {
+          store.setState({
+            zwaveSaveNodeStatus: RequestStatus.ConflictError
+          });
+        } else {
+          store.setState({
+            zwaveSaveNodeStatus: RequestStatus.Error
+          });
+        }
+      }
+      await actions.getNodes(store.getState());
     },
     editNodeName(state, index, name) {
       const newState = update(state, {
@@ -128,15 +149,23 @@ const createActions = store => {
       });
       store.setState(newState);
     },
+    async toggleFilterOnExisting(state = {}) {
+      const { filterExisting = true } = state;
+      store.setState({
+        filterExisting: !filterExisting
+      });
+
+      await actions.getNodes(store.getState());
+    },
     async search(state, e) {
       store.setState({
-        zwaveDeviceSearch: e.target.value
+        searchKeyword: e.target.value
       });
       await actions.getNodes(store.getState());
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getZwaveDeviceOrderDir: e.target.value
+        orderDir: e.target.value
       });
       await actions.getNodes(store.getState());
     }

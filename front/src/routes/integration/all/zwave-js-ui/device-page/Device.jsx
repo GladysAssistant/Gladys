@@ -13,7 +13,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
 
-class ZWaveDeviceBox extends Component {
+class Device extends Component {
   refreshDeviceProperty = () => {
     if (!this.props.device.features) {
       return null;
@@ -33,6 +33,7 @@ class ZWaveDeviceBox extends Component {
       mostRecentValueAt
     });
   };
+
   saveDevice = async () => {
     this.setState({ loading: true, error: undefined });
     try {
@@ -48,6 +49,7 @@ class ZWaveDeviceBox extends Component {
     }
     this.setState({ loading: false });
   };
+
   deleteDevice = async () => {
     this.setState({ loading: true, error: undefined });
     try {
@@ -57,12 +59,15 @@ class ZWaveDeviceBox extends Component {
     }
     this.setState({ loading: false });
   };
+
   updateName = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'name', e.target.value);
   };
+
   updateRoom = e => {
     this.props.updateDeviceProperty(this.props.deviceIndex, 'room_id', e.target.value);
   };
+
   componentWillMount() {
     this.refreshDeviceProperty();
   }
@@ -183,4 +188,4 @@ class ZWaveDeviceBox extends Component {
   }
 }
 
-export default ZWaveDeviceBox;
+export default Device;

@@ -2,7 +2,6 @@ import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
-import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import DeviceFeatures from '../../../../../components/device/view/DeviceFeatures';
@@ -28,26 +27,15 @@ const displayRawNode = node => () => {
 
 class ZwaveNode extends Component {
   createDevice = async () => {
-    this.setState({ loading: true, error: undefined });
-    try {
-      await this.props.createDevice(this.props.node);
-      this.setState({ deviceCreated: true });
-    } catch (e) {
-      const status = get(e, 'response.status');
-      if (status === 409) {
-        this.setState({ error: RequestStatus.ConflictError });
-      } else {
-        this.setState({ error: RequestStatus.Error });
-      }
-    }
-    this.setState({ loading: false });
+    await this.props.createDevice(this.props.node);
   };
 
   editNodeName = e => {
     this.props.editNodeName(this.props.nodeIndex, e.target.value);
   };
 
-  render(props, { loading, error, deviceCreated }) {
+  render(props, { zwaveSaveNodeStatus }) {
+    const loading = zwaveSaveNodeStatus === RequestStatus.Getting;
     return (
       <div index={props.node.id} class="col-md-6">
         <div class="card">
@@ -73,17 +61,17 @@ class ZwaveNode extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {error === RequestStatus.Error && (
+              {zwaveSaveNodeStatus === RequestStatus.Error && (
                 <div class="alert alert-danger">
                   <Text id="integration.zwavejsui.discover.createDeviceError" />
                 </div>
               )}
-              {error === RequestStatus.ConflictError && (
+              {zwaveSaveNodeStatus === RequestStatus.ConflictError && (
                 <div class="alert alert-danger">
                   <Text id="integration.zwavejsui.discover.conflictError" />
                 </div>
               )}
-              {deviceCreated && (
+              {zwaveSaveNodeStatus === RequestStatus.Success && (
                 <div class="alert alert-success">
                   <Text id="integration.zwavejsui.discover.deviceCreatedSuccess" />
                 </div>
