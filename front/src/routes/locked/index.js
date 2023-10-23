@@ -2,7 +2,9 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import { route } from 'preact-router';
 import style from './style.css';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 
 const BUTTON_ARRAY = [
   [1, 2, 3],
@@ -56,6 +58,22 @@ class Locked extends Component {
       return { ...prevState, currentCode: prevState.currentCode + letter };
     });
   };
+  init = async () => {
+    try {
+      // We make a dumb request just to verify if our token is valid
+      const result = await this.props.httpClient.post('/api/v1/access_token', {
+        refresh_token: this.props.session.getRefreshToken(),
+        scope: ['dashboard:write']
+      });
+      console.log(result);
+      // if this resolves, we redirect to dashboard
+      route('/dashboard');
+    } catch (e) {
+      console.log(e);
+      this.props.httpClient.setApiScopes(['alarm:write']);
+      this.props.httpClient.refreshAccessToken();
+    }
+  };
   constructor(props) {
     super(props);
     this.props = props;
@@ -63,7 +81,37 @@ class Locked extends Component {
       currentCode: ''
     };
   }
-  componentDidMount() {}
+  disarmed = async event => {
+    try {
+      const houseSelector = this.props.session.getTabletModeCurrentHouseSelector();
+      // If the same house was disarmed, redirect to dashboard
+      if (event.house === houseSelector) {
+        this.props.httpClient.resetApiScopes();
+        await this.props.httpClient.refreshAccessToken();
+        route('/dashboard');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  validateCode = async e => {
+    e.preventDefault();
+    try {
+      const houseSelector = this.props.session.getTabletModeCurrentHouseSelector();
+      await this.props.httpClient.post(`/api/v1/house/${houseSelector}/disarm_with_code`, {
+        code: this.state.currentCode
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  componentDidMount() {
+    this.init();
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.disarmed);
+  }
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.disarmed);
+  }
   render({}, { currentCode }) {
     return (
       <div class={cx('container', style.lockedContainer)}>
@@ -96,6 +144,9 @@ class Locked extends Component {
                     typeLetter={this.typeLetter}
                     clearPreviousLetter={this.clearPreviousLetter}
                   />
+                  <button class="mt-4 btn btn-block btn-outline-success" onClick={this.validateCode}>
+                    Valider
+                  </button>
                 </div>
               </div>
             </form>
@@ -106,4 +157,4 @@ class Locked extends Component {
   }
 }
 
-export default connect('', {})(Locked);
+export default connect('httpClient,session', {})(Locked);

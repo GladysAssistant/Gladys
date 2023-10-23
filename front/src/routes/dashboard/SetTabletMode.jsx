@@ -45,6 +45,7 @@ class SetTabletMode extends Component {
         house: this.state.selectedHouse
       });
       await this.props.refreshTabletMode();
+      this.props.session.setTabletModeCurrentHouseSelector(this.state.selectedHouse);
       this.props.toggleDefineTabletMode();
     } catch (e) {
       console.error(e);
@@ -121,4 +122,4 @@ class SetTabletMode extends Component {
   }
 }
 
-export default connect('httpClient,user', mainActions)(SetTabletMode);
+export default connect('httpClient,user,session', mainActions)(SetTabletMode);

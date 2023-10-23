@@ -2,11 +2,13 @@ import axios from 'axios';
 import config from '../config';
 
 const MAX_RETRY = 3;
+const DEFAULT_API_SCOPES = ['dashboard:read', 'dashboard:write'];
 
 export class HttpClient {
-  constructor(session) {
+  constructor(session, apiScopes = DEFAULT_API_SCOPES) {
     this.session = session;
     this.localApiUrl = config.localApiUrl || window.location.origin;
+    this.apiScopes = apiScopes;
   }
 
   getAxiosHeaders() {
@@ -17,13 +19,22 @@ export class HttpClient {
     return headers;
   }
 
+  setApiScopes(scopes) {
+    this.apiScopes = scopes;
+  }
+
+  resetApiScopes() {
+    this.apiScopes = DEFAULT_API_SCOPES;
+  }
+
   async refreshAccessToken() {
     const { data } = await axios({
       baseURL: this.localApiUrl,
       url: '/api/v1/access_token',
       method: 'post',
       data: {
-        refresh_token: this.session.getRefreshToken()
+        refresh_token: this.session.getRefreshToken(),
+        scope: this.apiScopes
       }
     });
     this.session.setAccessToken(data.access_token);
@@ -47,7 +58,7 @@ export class HttpClient {
       });
       return data;
     } catch (e) {
-      if (e.response && e.response.status === 401) {
+      if (e.response && e.response.status === 401 && e.response.data.message !== 'TABLET_IS_LOCKED') {
         await this.refreshAccessToken();
         return this.executeQuery(method, url, query, body, retryCount + 1);
       }
