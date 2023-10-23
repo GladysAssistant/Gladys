@@ -446,6 +446,39 @@ describe('scene.checkTrigger', () => {
     });
   });
 
+  it('should execute scene with system start trigger', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.SYSTEM.START,
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.SYSTEM.START,
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
   it('should not execute scene, condition not verified', async () => {
     sceneManager.addScene({
       selector: 'my-scene',
