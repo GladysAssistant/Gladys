@@ -717,7 +717,7 @@
         "zigbee2mqttUsbDriverPathPlaceholder": "Port USB",
         "zigbee2mqttUsbDongleNameLabel": "Sélectionner le modèle du dongle Zigbee utilisé",
         "zigbee2mqttUsbDongleNamePlaceholder": "Modèle du dongle Zigbee",
-        "saveButton": "Sauvegarde",
+        "saveButton": "Sauvegarder",
         "refreshButton": "Rafraîchir la liste des appareils USB",
         "notAttached": "Aucun dongle USB Zigbee2mqtt n'est attaché à Gladys.",
         "attached": "Le dongle USB Zigbee2mqtt est configuré.",
@@ -1624,6 +1624,9 @@
         "disarm": "L'alarme est désarmée",
         "partial-arm": "L'alarme est armée partiellement",
         "panic": "L'alarme est en mode panique"
+      },
+      "system": {
+        "start": "Gladys démarre"
       }
     },
     "triggersCard": {
@@ -1717,6 +1720,9 @@
           "panic": "Ce déclencheur se lancera quand la maison sélectionnée est en mode panique."
         },
         "houseLabel": "Maison"
+      },
+      "gladysStart": {
+        "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
       }
     }
   },
@@ -1771,7 +1777,7 @@
     "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community."
   },
   "settings": {
-    "title": "Réglages",
+    "title": "Paramètres",
     "housesTab": "Maisons",
     "usersTab": "Utilisateurs",
     "sessionsTab": "Sessions",
@@ -2459,8 +2465,8 @@
       "decimal": "PM2.5 (Décimale)"
     },
     "formaldehyd-sensor": {
-      "shortCategoryName": "Formaldehyd sensor",
-      "decimal": "Formaldehyd (Décimale)"
+      "shortCategoryName": "Capteur Formaldéhyde",
+      "decimal": "Formaldéhyde (Décimale)"
     },
     "vibration-sensor": {
       "shortCategoryName": "Capteur de vibration",

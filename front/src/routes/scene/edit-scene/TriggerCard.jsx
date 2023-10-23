@@ -13,6 +13,7 @@ import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 import AlarmModeTrigger from './triggers/AlarmModeTrigger';
 
 import { EVENTS } from '../../../../../server/utils/constants';
+import GladysStartTrigger from './triggers/GladysStartTrigger';
 
 const TRIGGER_ICON = {
   [EVENTS.DEVICE.NEW_STATE]: 'fe-activity',
@@ -28,7 +29,8 @@ const TRIGGER_ICON = {
   [EVENTS.ALARM.ARM]: 'fe-bell',
   [EVENTS.ALARM.PARTIAL_ARM]: 'fe-bell',
   [EVENTS.ALARM.DISARM]: 'fe-bell-off',
-  [EVENTS.ALARM.PANIC]: 'fe-alert-triangle'
+  [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
+  [EVENTS.SYSTEM.START]: 'fe-activity'
 };
 
 const deleteTriggerFromList = (deleteTrigger, index) => () => {
@@ -143,6 +145,13 @@ const TriggerCard = ({ children, ...props }) => (
         props.trigger.type
       ) && (
         <AlarmModeTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.SYSTEM.START && (
+        <GladysStartTrigger
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}

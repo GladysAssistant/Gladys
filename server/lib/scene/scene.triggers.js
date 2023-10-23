@@ -29,6 +29,7 @@ const triggersFunc = {
   [EVENTS.ALARM.DISARM]: (event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.PARTIAL_ARM]: (event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.PANIC]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.SYSTEM.START]: () => true,
 };
 
 module.exports = {

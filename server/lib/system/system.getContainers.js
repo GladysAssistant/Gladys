@@ -20,6 +20,7 @@ async function getContainers(options = { all: true }) {
       state: container.State,
       id: container.Id,
       networkMode: get(container, 'HostConfig.NetworkMode'),
+      devices: get(container, 'HostConfig.Devices'),
       created_at: container.Created,
     };
   });

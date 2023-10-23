@@ -12,12 +12,15 @@ const logger = require('../../utils/logger');
  * newStateEvent({ device_feature_external_id: 'xx', state: 12 });
  */
 async function newStateEvent(event) {
+  const deviceFeature = this.stateManager.get('deviceFeatureByExternalId', event.device_feature_external_id);
+  if (deviceFeature === null) {
+    throw new NotFoundError(`DeviceFeature ${event.device_feature_external_id} not found`);
+  }
+  const device = this.stateManager.get('deviceById', deviceFeature.device_id);
+  if (device === null) {
+    throw new NotFoundError(`Device ${deviceFeature.device_id} not found`);
+  }
   try {
-    const deviceFeature = this.stateManager.get('deviceFeatureByExternalId', event.device_feature_external_id);
-    const device = this.stateManager.get('deviceById', deviceFeature.device_id);
-    if (deviceFeature === null) {
-      throw new NotFoundError('DeviceFeature not found');
-    }
     if (event.text) {
       await this.saveStringState(device, deviceFeature, event.text);
     } else if (event.created_at) {

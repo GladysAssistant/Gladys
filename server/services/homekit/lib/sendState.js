@@ -16,7 +16,8 @@ function sendState(hkAccessory, feature, event) {
   const { Characteristic, Service } = this.hap;
   switch (`${feature.category}:${feature.type}`) {
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
-    case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`: {
+    case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
+    case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
       hkAccessory
         .getService(Service[mappings[feature.category].service])
         .updateCharacteristic(
@@ -34,13 +35,21 @@ function sendState(hkAccessory, feature, event) {
         );
       break;
     }
-    case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`: {
-      hkAccessory
+    case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BRIGHTNESS}`:
+    case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`:
+    case `${DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.DECIMAL}`: {
+      const characteristic = hkAccessory
         .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          normalize(event.last_value, feature.min, feature.max, 0, 100),
-        );
+        .getCharacteristic(Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]]);
+      characteristic.updateValue(
+        normalize(
+          event.last_value,
+          feature.min,
+          feature.max,
+          characteristic.props.minValue,
+          characteristic.props.maxValue,
+        ),
+      );
       break;
     }
     case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.COLOR}`: {
@@ -56,15 +65,6 @@ function sendState(hkAccessory, feature, event) {
         .updateCharacteristic(
           Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[1]],
           s,
-        );
-      break;
-    }
-    case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE}`: {
-      hkAccessory
-        .getService(Service[mappings[feature.category].service])
-        .updateCharacteristic(
-          Characteristic[mappings[feature.category].capabilities[feature.type].characteristics[0]],
-          normalize(event.last_value, feature.min, feature.max, 140, 500),
         );
       break;
     }

@@ -19,6 +19,13 @@ const containers = [
     Status: 'Up 16 hours',
     HostConfig: {
       NetworkMode: 'host',
+      Devices: [
+        {
+          PathOnHost: '/dev/ttyUSB0',
+          PathInContainer: '/dev/ttyACM0',
+          CgroupPermissions: 'rwm',
+        },
+      ],
     },
     Mounts: [
       {
@@ -45,6 +52,7 @@ const containers = [
         },
       },
     },
+    SizeRw: 152635,
   },
   {
     Id: 'b594e692-e6d3-4531-bdcc-f0afcf515113',
