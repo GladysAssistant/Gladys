@@ -1,4 +1,8 @@
 .alarmActionButton {
-  height: 5rem;
+  height: 6rem;
   line-height: 16px;
+}
+
+.alarmActionIcon {
+  font-size: 30px !important;
 }

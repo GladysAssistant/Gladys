@@ -137,6 +137,9 @@ const EditHouse = ({ children, ...props }) => (
             value={props.house.alarm_delay_before_arming}
             onChange={props.updateHouseDelayBeforeArming}
           >
+            <option value="0">
+              <Text id="signup.configureHouse.alarmDelays.0" />
+            </option>
             <option value="5">
               <Text id="signup.configureHouse.alarmDelays.5" />
             </option>
