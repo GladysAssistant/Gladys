@@ -118,10 +118,13 @@ function init() {
         case WEBSOCKET_MESSAGE_TYPES.AUTHENTICATION.REQUEST:
           try {
             // we validate the token
-            const payload = this.gladys.session.validateAccessToken(
-              parsedMessage.payload.accessToken,
-              'dashboard:write',
-            );
+            let payload;
+            try {
+              payload = this.gladys.session.validateAccessToken(parsedMessage.payload.accessToken, 'dashboard:write');
+            } catch (e) {
+              logger.debug(`Cannot validate websocket token with dashboard:write (${e}), trying with alarm:write`);
+              payload = this.gladys.session.validateAccessToken(parsedMessage.payload.accessToken, 'alarm:write');
+            }
             user = await this.gladys.user.getById(payload.user_id);
             authenticated = true;
             this.userConnected(user, ws);
