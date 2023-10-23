@@ -1694,6 +1694,9 @@
       },
       "calendar": {
         "event-is-coming": "Un évènement dans le calendrier arrive"
+      },
+      "system": {
+        "start": "Gladys démarre"
       }
     },
     "triggersCard": {
@@ -1778,6 +1781,9 @@
         "minute": "minutes",
         "hour": "heures",
         "day": "jours"
+      },
+      "gladysStart": {
+        "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
       }
     }
   },

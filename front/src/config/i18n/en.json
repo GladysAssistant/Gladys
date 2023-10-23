@@ -1692,6 +1692,9 @@
       },
       "calendar": {
         "event-is-coming": "Calendar event is coming"
+      },
+      "system": {
+        "start": "Gladys starting"
       }
     },
     "triggersCard": {
@@ -1776,6 +1779,9 @@
         "minute": "minutes",
         "hour": "hours",
         "day": "days"
+      },
+      "gladysStart": {
+        "description": "This scene will be executed each time Gladys starts"
       }
     }
   },

@@ -23,10 +23,13 @@ Docker.prototype.getContainer = fake.returns({
       NetworkMode: 'host',
       Devices: [
         {
-          PathOnHost: 'device_path',
+          PathOnHost: '/dev/ttyUSB0',
+          PathInContainer: '/dev/ttyACM0',
+          CgroupPermissions: 'rwm',
         },
       ],
     },
+    SizeRw: 152635,
   }),
   restart: fake.resolves(true),
   remove: fake.resolves(true),
