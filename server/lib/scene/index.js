@@ -63,7 +63,10 @@ const SceneManager = function SceneManager(
   this.event.on(EVENTS.HOUSE.UPDATED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
   this.event.on(EVENTS.HOUSE.DELETED, eventFunctionWrapper(this.dailyUpdate.bind(this)));
   this.event.on(EVENTS.CALENDAR.CHECK_IF_EVENT_IS_COMING, eventFunctionWrapper(this.checkCalendarTriggers.bind(this)));
+
   this.event.on(INTENTS.SCENE.START, this.command.bind(this));
+
+  this.event.on(EVENTS.SCENE.TRIGGERED, eventFunctionWrapper(this.execute.bind(this)));
 };
 
 SceneManager.prototype.addScene = addScene;
