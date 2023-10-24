@@ -28,7 +28,7 @@ const config = {
   tempFolder: '/tmp/gladys',
 };
 
-describe('system.getContainers', () => {
+describe('system.inspectContainer', () => {
   let system;
 
   beforeEach(async () => {
@@ -46,7 +46,7 @@ describe('system.getContainers', () => {
     system.dockerode = undefined;
 
     try {
-      await system.getContainers();
+      await system.inspectContainer('e90e34656806');
       assert.fail('should have fail');
     } catch (e) {
       expect(e).be.instanceOf(PlatformNotCompatible);
@@ -56,42 +56,23 @@ describe('system.getContainers', () => {
     }
   });
 
-  it('should list containers', async () => {
-    const containers = await system.getContainers();
-    expect(containers).be.instanceOf(Array);
-    expect(containers).be.lengthOf(2);
+  it('should inspect container', async () => {
+    const containerDescriptor = await system.inspectContainer('e90e34656806');
 
-    containers.forEach((container) => {
-      expect(container).to.have.property('name');
-      expect(container).to.have.property('state');
-      expect(container).to.have.property('id');
-      expect(container).to.have.property('devices');
-      expect(container).to.have.property('created_at');
-    });
-
-    assert.calledOnce(system.dockerode.listContainers);
-    assert.calledWith(system.dockerode.listContainers, { all: true });
+    expect(containerDescriptor).be.instanceOf(Object);
+    expect(containerDescriptor).to.have.property('HostConfig');
 
     assert.notCalled(sequelize.close);
     assert.notCalled(event.on);
   });
 
-  it('should list containers with options', async () => {
-    const options = { all: true, filters: 'any' };
+  it('should inspect container with options', async () => {
+    const options = { size: true };
 
-    const containers = await system.getContainers(options);
-    expect(containers).be.instanceOf(Array);
-    expect(containers).be.lengthOf(2);
-
-    containers.forEach((container) => {
-      expect(container).to.have.property('name');
-      expect(container).to.have.property('state');
-      expect(container).to.have.property('id');
-      expect(container).to.have.property('created_at');
-    });
-
-    assert.calledOnce(system.dockerode.listContainers);
-    assert.calledWith(system.dockerode.listContainers, options);
+    const containerDescriptor = await system.inspectContainer('e90e34656806', options);
+    expect(containerDescriptor).be.instanceOf(Object);
+    expect(containerDescriptor).to.have.property('HostConfig');
+    expect(containerDescriptor).to.have.property('SizeRw');
 
     assert.notCalled(sequelize.close);
     assert.notCalled(event.on);

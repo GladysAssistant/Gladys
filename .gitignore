@@ -2,6 +2,8 @@ node_modules
 *.db
 *.db-shm
 *.db-wal
+*.dbfile-shm
+*.dbfile-wal
 apidoc
 jsdoc
 *.lcov

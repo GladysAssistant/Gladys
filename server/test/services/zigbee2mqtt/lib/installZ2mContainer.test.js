@@ -22,6 +22,20 @@ const containerStopped = {
   state: 'stopped',
 };
 
+const containerDescription = {
+  Id: 'a8293feec54547a797aa2e52cc14b93f89a007d6c5608c587e30491feec8ee61',
+  HostConfig: {
+    NetworkMode: 'host',
+    Devices: [
+      {
+        PathOnHost: '/dev/ttyUSB0',
+        PathInContainer: '/dev/ttyACM0',
+        CgroupPermissions: 'rwm',
+      },
+    ],
+  },
+};
+
 const serviceId = 'f87b7af2-ca8e-44fc-b754-444354b42fee';
 const basePathOnContainer = path.join(__dirname, 'container');
 
@@ -47,9 +61,11 @@ describe('zigbee2mqtt installz2mContainer', () => {
       },
       system: {
         getContainers: fake.resolves([containerStopped]),
+        inspectContainer: fake.resolves(containerDescription),
         stopContainer: fake.resolves(true),
         pull: fake.resolves(true),
         restartContainer: fake.resolves(true),
+        removeContainer: fake.resolves(true),
         createContainer: fake.resolves(true),
         getGladysBasePath: fake.resolves({
           basePathOnHost: path.join(__dirname, 'host'),
@@ -118,7 +134,7 @@ describe('zigbee2mqtt installz2mContainer', () => {
 
   it('it should fail to start z2m container', async () => {
     // PREPARE
-    const config = {};
+    const config = { z2mDriverPath: '/dev/ttyUSB0' };
     gladys.system.getContainers = fake.resolves([containerStopped]);
     gladys.system.restartContainer = fake.throws(new Error('docker fail'));
     // EXECUTE
