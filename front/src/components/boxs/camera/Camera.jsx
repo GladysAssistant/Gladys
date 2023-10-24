@@ -7,6 +7,7 @@ import Hls from 'hls.js';
 import config from '../../../config';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
 import get from 'get-value';
+import style from './style.css';
 
 const SEGMENT_DURATIONS_PER_LATENCY = {
   'ultra-low': 1,
@@ -270,8 +271,7 @@ class CameraBoxComponent extends Component {
         {image && <img class="card-img-top" src={`data:${image}`} alt={props.roomName} />}
         {error && (
           <div>
-            <p class="alert alert-danger">
-              <i class="fe fe-bell" />
+            <p class={style.noImageToShowError}>
               <span class="pl-2">
                 <Text id="dashboard.boxes.camera.noImageToShow" />
               </span>

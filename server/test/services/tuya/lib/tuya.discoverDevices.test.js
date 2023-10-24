@@ -43,6 +43,13 @@ describe('TuyaHandler.discoverDevices', () => {
                 type: 'Boolean',
               },
             ],
+            status: [
+              {
+                name: 'cur_power',
+                code: 'cur_power',
+                type: 'Integer',
+              },
+            ],
           },
         }),
     };
@@ -96,6 +103,18 @@ describe('TuyaHandler.discoverDevices', () => {
       {
         external_id: 'tuya:uuid',
         features: [
+          {
+            category: 'switch',
+            external_id: 'tuya:uuid:cur_power',
+            has_feedback: false,
+            max: 1,
+            min: 0,
+            name: 'cur_power',
+            read_only: true,
+            selector: 'tuya:uuid:cur_power',
+            type: 'power',
+            unit: 'watt',
+          },
           {
             category: 'switch',
             external_id: 'tuya:uuid:switch_1',

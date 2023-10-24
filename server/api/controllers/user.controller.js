@@ -2,7 +2,7 @@ const asyncMiddleware = require('../middlewares/asyncMiddleware');
 const logger = require('../../utils/logger');
 const { BadParameters } = require('../../utils/coreErrors');
 
-const LOGIN_SESSION_VALIDITY_IN_SECONDS = 30 * 24 * 60 * 60;
+const LOGIN_SESSION_VALIDITY_IN_SECONDS = 365 * 24 * 60 * 60;
 
 module.exports = function UserController(gladys) {
   /**

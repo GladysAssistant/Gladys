@@ -138,6 +138,12 @@ import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
 import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
 import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 
+// MELCloud integration
+import MELCloudPage from '../routes/integration/all/melcloud/device-page';
+import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
+import MELCloudSetupPage from '../routes/integration/all/melcloud/setup-page';
+import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -260,6 +266,11 @@ const AppRouter = connect(
         <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
         <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
         <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
+
+        <MELCloudPage path="/dashboard/integration/device/melcloud" />
+        <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />
+        <MELCloudDiscoverPage path="/dashboard/integration/device/melcloud/discover" />
+        <MELCloudSetupPage path="/dashboard/integration/device/melcloud/setup" />
 
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />

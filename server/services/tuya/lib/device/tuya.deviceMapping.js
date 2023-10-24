@@ -1,4 +1,10 @@
-const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
+const {
+  DEVICE_FEATURE_TYPES,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_UNITS,
+  COVER_STATE,
+} = require('../../../../utils/constants');
+
 const { intToRgb, rgbToHsb, rgbToInt, hsbToRgb } = require('../../../../utils/colors');
 
 const SWITCH_LED = 'switch_led';
@@ -8,10 +14,22 @@ const COLOUR_DATA_V2 = 'colour_data_v2';
 
 const COLOUR_DATA = 'colour_data';
 
+const ADD_ELE = 'add_ele';
+const CUR_CURRENT = 'cur_current';
+const CUR_POWER = 'cur_power';
+const CUR_VOLTAGE = 'cur_voltage';
+
 const SWITCH_1 = 'switch_1';
 const SWITCH_2 = 'switch_2';
 const SWITCH_3 = 'switch_3';
 const SWITCH_4 = 'switch_4';
+
+const CONTROL = 'control';
+const PERCENT_CONTROL = 'percent_control';
+
+const OPEN = 'open';
+const CLOSE = 'close';
+const STOP = 'stop';
 
 const mappings = {
   [SWITCH_LED]: {
@@ -51,6 +69,34 @@ const mappings = {
     category: DEVICE_FEATURE_CATEGORIES.SWITCH,
     type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
   },
+  [CONTROL]: {
+    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
+    type: DEVICE_FEATURE_TYPES.CURTAIN.STATE,
+  },
+  [PERCENT_CONTROL]: {
+    category: DEVICE_FEATURE_CATEGORIES.CURTAIN,
+    type: DEVICE_FEATURE_TYPES.CURTAIN.POSITION,
+  },
+  [ADD_ELE]: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.ENERGY,
+    unit: DEVICE_FEATURE_UNITS.KILOWATT_HOUR,
+  },
+  [CUR_CURRENT]: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.CURRENT,
+    unit: DEVICE_FEATURE_UNITS.MILLI_AMPERE,
+  },
+  [CUR_POWER]: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.POWER,
+    unit: DEVICE_FEATURE_UNITS.WATT,
+  },
+  [CUR_VOLTAGE]: {
+    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+    type: DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE,
+    unit: DEVICE_FEATURE_UNITS.VOLT,
+  },
 };
 
 const writeValues = {
@@ -80,6 +126,21 @@ const writeValues = {
       return valueFromGladys === 1;
     },
   },
+
+  [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
+    [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: (valueFromGladys) => {
+      if (valueFromGladys === COVER_STATE.OPEN) {
+        return OPEN;
+      }
+      if (valueFromGladys === COVER_STATE.CLOSE) {
+        return CLOSE;
+      }
+      return STOP;
+    },
+    [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: (valueFromGladys) => {
+      return parseInt(valueFromGladys, 10);
+    },
+  },
 };
 
 const readValues = {
@@ -104,6 +165,32 @@ const readValues = {
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {
       return valueFromDevice === true ? 1 : 0;
+    },
+    [DEVICE_FEATURE_TYPES.SWITCH.ENERGY]: (valueFromDevice) => {
+      return parseInt(valueFromDevice, 10) / 100;
+    },
+    [DEVICE_FEATURE_TYPES.SWITCH.CURRENT]: (valueFromDevice) => {
+      return parseInt(valueFromDevice, 10);
+    },
+    [DEVICE_FEATURE_TYPES.SWITCH.POWER]: (valueFromDevice) => {
+      return parseInt(valueFromDevice, 10) / 10;
+    },
+    [DEVICE_FEATURE_TYPES.SWITCH.VOLTAGE]: (valueFromDevice) => {
+      return parseInt(valueFromDevice, 10) / 10;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.CURTAIN]: {
+    [DEVICE_FEATURE_TYPES.CURTAIN.STATE]: (valueFromDevice) => {
+      if (valueFromDevice === OPEN) {
+        return COVER_STATE.OPEN;
+      }
+      if (valueFromDevice === CLOSE) {
+        return COVER_STATE.CLOSE;
+      }
+      return COVER_STATE.STOP;
+    },
+    [DEVICE_FEATURE_TYPES.CURTAIN.POSITION]: (valueFromDevice) => {
+      return valueFromDevice;
     },
   },
 };

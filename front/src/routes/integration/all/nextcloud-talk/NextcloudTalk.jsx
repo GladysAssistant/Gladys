@@ -48,6 +48,7 @@ const NextcloudTalkPage = ({ children, ...props }) => (
                           <input
                             type="text"
                             class="form-control"
+                            autocomplete="off"
                             placeholder={<Text id={`integration.nextcloudTalk.username`} />}
                             onInput={props.updateNextcloudBotUsername}
                             value={props.nextcloudBotUsername}
@@ -62,6 +63,7 @@ const NextcloudTalkPage = ({ children, ...props }) => (
                         <Localizer>
                           <input
                             type="password"
+                            autocomplete="off"
                             class="form-control"
                             placeholder={<Text id={`integration.nextcloudTalk.password`} />}
                             onInput={props.updateNextcloudBotPassword}

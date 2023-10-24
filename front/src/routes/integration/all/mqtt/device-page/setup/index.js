@@ -7,6 +7,7 @@ import uuid from 'uuid';
 import get from 'get-value';
 import update from 'immutability-helper';
 import { RequestStatus } from '../../../../../../utils/consts';
+import { slugify } from '../../../../../../../../server/utils/slugify';
 import withIntlAsProp from '../../../../../../utils/withIntlAsProp';
 import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../../server/utils/constants';
 
@@ -147,6 +148,20 @@ class MqttDeviceSetupPage extends Component {
       loading: true
     });
     try {
+      // If we are creating a device, we check that the device doesn't already exist
+      if (!this.state.device.id) {
+        try {
+          await this.props.httpClient.get(`/api/v1/device/${slugify(this.state.device.selector)}`);
+          // if we are here, it means the device already exist
+          this.setState({
+            saveStatus: RequestStatus.ConflictError,
+            loading: false
+          });
+          return;
+        } catch (e) {
+          // If we are here, it's ok, it means the device does not exist yet
+        }
+      }
       const device = await this.props.httpClient.post('/api/v1/device', this.state.device);
       this.setState({
         saveStatus: RequestStatus.Success,
@@ -223,10 +238,8 @@ class MqttDeviceSetupPage extends Component {
     let device;
 
     if (!deviceSelector) {
-      const uniqueId = uuid.v4();
       device = {
-        id: uniqueId,
-        name: null,
+        name: '',
         should_poll: false,
         external_id: 'mqtt:',
         service_id: this.props.currentIntegration.id,

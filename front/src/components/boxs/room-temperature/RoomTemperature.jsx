@@ -5,24 +5,49 @@ import get from 'get-value';
 
 import actions from '../../../actions/dashboard/boxes/temperatureInRoom';
 import { DASHBOARD_BOX_STATUS_KEY, DASHBOARD_BOX_DATA_KEY } from '../../../utils/consts';
-import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../server/utils/constants';
+import {
+  DEFAULT_VALUE_TEMPERATURE,
+  DEVICE_FEATURE_UNITS,
+  WEBSOCKET_MESSAGE_TYPES
+} from '../../../../../server/utils/constants';
+import { celsiusToFahrenheit } from '../../../../../server/utils/units';
 
 const isNotNullOrUndefined = value => value !== undefined && value !== null;
 
 const RoomTemperatureBox = ({ children, ...props }) => (
   <div class="card p-3">
     <div class="d-flex align-items-center">
-      <span class="stamp stamp-md bg-blue mr-3">
-        <i class="fe fe-thermometer" />
-      </span>
+      {isNotNullOrUndefined(props.temperature) &&
+        props.temperature >= props.temperatureMin &&
+        props.temperature <= props.temperatureMax && (
+          <span class="stamp stamp-md bg-green mr-3">
+            <i class="fe fe-thermometer" />
+          </span>
+        )}
+      {isNotNullOrUndefined(props.temperature) && props.temperature < props.temperatureMin && (
+        <span class="stamp stamp-md bg-blue mr-3">
+          <i class="fe fe-thermometer" />
+        </span>
+      )}
+      {isNotNullOrUndefined(props.temperature) && props.temperature > props.temperatureMax && (
+        <span class="stamp stamp-md bg-red mr-3">
+          <i class="fe fe-thermometer" />
+        </span>
+      )}
+      {!isNotNullOrUndefined(props.temperature) && (
+        <span class="stamp stamp-md bg-warning mr-3">
+          <i class="fe fe-thermometer" />
+        </span>
+      )}
+
       <div>
-        {props.valued && (
+        {isNotNullOrUndefined(props.temperature) && (
           <h4 class="m-0">
             <Text id="global.degreeValue" fields={{ value: Number(props.temperature).toFixed(1) }} />
             <Text id={`global.${props.unit}`} />
           </h4>
         )}
-        {!props.valued && (
+        {!isNotNullOrUndefined(props.temperature) && (
           <p class="m-0">
             <Text id="dashboard.boxes.temperatureInRoom.noTemperatureRecorded" />
           </p>
@@ -64,7 +89,29 @@ class RoomTemperatureBoxComponent extends Component {
     const temperature = get(boxData, 'room.temperature.temperature');
     const unit = get(boxData, 'room.temperature.unit');
     const roomName = get(boxData, 'room.name');
-    const valued = isNotNullOrUndefined(temperature);
+
+    const temperature_use_custom_value = get(props, 'box.temperature_use_custom_value');
+    let temperature_min = get(props, 'box.temperature_min');
+    let temperature_max = get(props, 'box.temperature_max');
+
+    if (!temperature_use_custom_value) {
+      temperature_min = DEFAULT_VALUE_TEMPERATURE.MINIMUM;
+      temperature_max = DEFAULT_VALUE_TEMPERATURE.MAXIMUM;
+    }
+
+    if (isNaN(temperature_min)) {
+      temperature_min = DEFAULT_VALUE_TEMPERATURE.MINIMUM;
+    }
+    if (isNaN(temperature_max)) {
+      temperature_max = DEFAULT_VALUE_TEMPERATURE.MAXIMUM;
+    }
+
+    console.log('unit', unit);
+
+    if (unit === DEVICE_FEATURE_UNITS.FAHRENHEIT) {
+      temperature_min = celsiusToFahrenheit(temperature_min);
+      temperature_max = celsiusToFahrenheit(temperature_min);
+    }
 
     return (
       <RoomTemperatureBox
@@ -73,7 +120,9 @@ class RoomTemperatureBoxComponent extends Component {
         unit={unit}
         boxStatus={boxStatus}
         roomName={roomName}
-        valued={valued}
+        useCustomValue={temperature_use_custom_value}
+        temperatureMin={temperature_min}
+        temperatureMax={temperature_max}
       />
     );
   }

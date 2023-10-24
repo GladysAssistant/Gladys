@@ -70,7 +70,18 @@ class RoomSelector extends Component {
   }
 
   render({}, { selectedRoom, houseOptions }) {
-    return <Select value={selectedRoom} options={houseOptions} onChange={this.updateSelection} maxMenuHeight={220} />;
+    return (
+      <Select
+        value={selectedRoom}
+        options={houseOptions}
+        onChange={this.updateSelection}
+        maxMenuHeight={220}
+        styles={{
+          // Fixes the overlapping problem
+          menu: provided => ({ ...provided, zIndex: 100 })
+        }}
+      />
+    );
   }
 }
 

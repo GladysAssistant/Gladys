@@ -1,0 +1,12 @@
+.noImageToShowError {
+  background-color: #34495e;
+  color: white;
+  height: 244px;
+  padding: 12px;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+  display: table-cell;
+  vertical-align: middle;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
