@@ -21,14 +21,13 @@ const updateDeviceFeatures = (deviceFeatures, deviceFeatureSelector, lastValue, 
   });
 };
 
-
 const VacbotBox = ({ children, ...props }) => {
   const { boxTitle, deviceFeatures = [], device = {} } = props;
-  
+
   const debug = false;
   if (debug) {
     console.log(`${device.name} features : ${deviceFeatures.map(deviceFeature => deviceFeature.name)}`);
-  };
+  }
 
   return (
     <div class="card">
@@ -43,12 +42,9 @@ const VacbotBox = ({ children, ...props }) => {
         </div>
       )}
       {!props.error && (
-      <div class="card-body">
-        
+        <div class="card-body">
           <div class="d-flex bd-highlight">
-            <h2 class="card-title bd-highlight mr-auto ">
-              {boxTitle}
-            </h2>
+            <h2 class="card-title bd-highlight mr-auto ">{boxTitle}</h2>
 
             <div class="p-2 bd-highlight">
               {props.vacbotStatus.cleanReport == 'idle' && <i class={`list-separated-item fe fe-disc`} />}
@@ -69,41 +65,39 @@ const VacbotBox = ({ children, ...props }) => {
               )}
             </div>
           </div>
-        
 
-        <div
-          title={`${props.vacbotStatus.name}`}
-          class="bg-image"
-          style={{
-            backgroundImage: `url("https://site-static.ecovacs.com/upload/de/image/product/2022/10/18/074346_9998-DEEBOT-OZMO920-1280x1280.jpg.webp")`,
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-            width: '100%',
-            height: '250px',
-            position: 'relative'
-          }}
-        >
-      
-          <div class="d-flex align-items-center justify-content-center">
-            <div>
-              {deviceFeatures.map((deviceFeature, deviceFeatureIndex) => (
-                <div class="card-body ">
-                  <div class="d-flex bd-highlight mt-9">
-                    {deviceFeature.type === DEVICE_FEATURE_TYPES.VACBOT.STATE && (
-                      <VacbotModeControls
-                        deviceFeature={deviceFeature}
-                        deviceFeatureIndex={deviceFeatureIndex}
-                        updateValue={props.updateValue}
-                        updateValueWithDebounce={props.updateValueWithDebounce}
-                      />
-                    )}
+          <div
+            title={`${props.vacbotStatus.name}`}
+            class="bg-image"
+            style={{
+              backgroundImage: `url("https://site-static.ecovacs.com/upload/de/image/product/2022/10/18/074346_9998-DEEBOT-OZMO920-1280x1280.jpg.webp")`,
+              backgroundPosition: 'center',
+              backgroundSize: 'cover',
+              width: '100%',
+              height: '250px',
+              position: 'relative'
+            }}
+          >
+            <div class="d-flex align-items-center justify-content-center">
+              <div>
+                {deviceFeatures.map((deviceFeature, deviceFeatureIndex) => (
+                  <div class="card-body ">
+                    <div class="d-flex bd-highlight mt-9">
+                      {deviceFeature.type === DEVICE_FEATURE_TYPES.VACBOT.STATE && (
+                        <VacbotModeControls
+                          deviceFeature={deviceFeature}
+                          deviceFeatureIndex={deviceFeatureIndex}
+                          updateValue={props.updateValue}
+                          updateValueWithDebounce={props.updateValueWithDebounce}
+                        />
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
       )}
       {debug && (
         <div class="mt-3">
@@ -165,15 +159,15 @@ class VacbotBoxComponent extends Component {
       WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
       this.updateDeviceStateWebsocket
     );
-  };
-  
+  }
+
   componentDidUpdate(previousProps) {
     const vacbotDeviceChanged = get(previousProps, 'box.vacbot') !== get(this.props, 'box.vacbot');
     const nameChanged = get(previousProps, 'box.name') !== get(this.props, 'box.name');
     if (vacbotDeviceChanged || nameChanged) {
       this.refreshData();
     }
-  };
+  }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(
