@@ -1,0 +1,8 @@
+.goTo {
+    display: block;
+    position: fixed;
+    bottom: 30px;
+    left: 50px;
+    animation: fadeOut 0.5s;
+    opacity: 100;
+}

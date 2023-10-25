@@ -3,12 +3,14 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
 import EmptyState from './EmptyState';
+import NavigationButton from '../../components/navigation/NavigationButton';
 
 import style from './style.css';
 
 const DashboardPage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
+      <NavigationButton />
       <div class={props.loading ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
         <div class="dimmer-content">
