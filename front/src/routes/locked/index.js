@@ -42,6 +42,16 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
         ))}
       </div>
     ))}
+
+    <div class="row">
+      <div class="col mt-4"></div>
+      <div class="col mt-4">
+        <button onClick={e => typeLetter(e, 0)} class={cx('btn btn-secondary btn-block')}>
+          0
+        </button>
+      </div>
+      <div class="col mt-4"></div>
+    </div>
   </div>
 );
 
@@ -162,7 +172,7 @@ class Locked extends Component {
                     clearPreviousLetter={this.clearPreviousLetter}
                   />
                   <button class="mt-4 btn btn-block btn-outline-success" onClick={this.validateCode}>
-                    Valider
+                    <Text id="locked.validateButton" />
                   </button>
                 </div>
               </div>

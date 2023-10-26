@@ -72,7 +72,8 @@
     "description": "Merci de taper votre code afin de déverrouiller l'alarme.",
     "codePlaceholder": "Tapez votre code",
     "error": "Une erreur est survenue, merci de réessayer",
-    "wrongCodeError": "Code invalide, merci de réessayer"
+    "wrongCodeError": "Code invalide, merci de réessayer",
+    "validateButton": "Valider"
   },
   "signup": {
     "welcome": {

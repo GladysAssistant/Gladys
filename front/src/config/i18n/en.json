@@ -72,7 +72,8 @@
     "description": "Please enter your code to unlock the alarm.",
     "codePlaceholder": "Enter your code",
     "error": "An error occurred, please try again",
-    "wrongCodeError": "Invalid code, please try again"
+    "wrongCodeError": "Invalid code, please try again",
+    "validateButton": "Validate"
   },
   "signup": {
     "welcome": {
