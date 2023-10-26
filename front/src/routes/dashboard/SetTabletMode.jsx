@@ -88,35 +88,39 @@ class SetTabletMode extends Component {
           [style.tabletModeDivOpen]: defineTabletModeOpened
         })}
       >
-        <div class={loading ? 'dimmer active' : 'dimmer'}>
-          <div class="loader" />
-          <div class="dimmer-content">
-            <p>
-              <Text id="dashboard.tabletMode.description" />
-            </p>
-            <div className="form-group">
-              <div className="form-label">
-                <Text id="dashboard.tabletMode.houseLabel" />
-              </div>
-              <select onChange={this.onHouseChange} className="form-control">
-                <option value="">
-                  <Text id="dashboard.tabletMode.tabletModeDisabled" />
-                </option>
-                {houses &&
-                  houses.map(house => (
-                    <option selected={house.selector === selectedHouse} value={house.selector}>
-                      {house.name}
+        <div class="card">
+          <div class="card-body">
+            <div class={loading ? 'dimmer active' : 'dimmer'}>
+              <div class="loader" />
+              <div class="dimmer-content">
+                <p>
+                  <Text id="dashboard.tabletMode.description" />
+                </p>
+                <div className="form-group">
+                  <div className="form-label">
+                    <Text id="dashboard.tabletMode.houseLabel" />
+                  </div>
+                  <select onChange={this.onHouseChange} className="form-control">
+                    <option value="">
+                      <Text id="dashboard.tabletMode.tabletModeDisabled" />
                     </option>
-                  ))}
-              </select>
-            </div>
-            <p>
-              <MarkupText id="dashboard.tabletMode.fullScreenForce" />
-            </p>
-            <div className="form-group">
-              <button class="btn btn-success" onClick={this.saveTabletMode}>
-                <Text id="global.save" />
-              </button>
+                    {houses &&
+                      houses.map(house => (
+                        <option selected={house.selector === selectedHouse} value={house.selector}>
+                          {house.name}
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <p>
+                  <MarkupText id="dashboard.tabletMode.fullScreenForce" />
+                </p>
+                <div className="form-group">
+                  <button class="btn btn-success" onClick={this.saveTabletMode}>
+                    <Text id="global.save" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -213,6 +213,7 @@
     "editDashboardCancelButton": "Cancel",
     "editDashboardDeleteText": "Are you sure you want to delete this dashboard?",
     "toggleDefineTabletMode": "Tablet Mode",
+    "closeDefineTabletMode": "Close",
     "tabletMode": {
       "description": "Tablet mode is used for the alarm functionality. If you arm the alarm, all house tablets will be locked and display a virtual keyboard to deactivate the alarm.",
       "fullScreenForce": "If you want to force a tablet to stay in full-screen mode, you can add <code>?fullscreen=force</code> to the URL.",

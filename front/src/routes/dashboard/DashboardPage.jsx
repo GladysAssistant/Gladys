@@ -45,7 +45,11 @@ const DashboardPage = ({ children, ...props }) => (
                   {!props.isGladysPlus && (
                     <button onClick={props.toggleDefineTabletMode} class={cx('btn btn-outline-secondary ml-2')}>
                       <span class={style.editDashboardText}>
-                        <Text id="dashboard.toggleDefineTabletMode" />
+                        {props.defineTabletModeOpened ? (
+                          <Text id="dashboard.closeDefineTabletMode" />
+                        ) : (
+                          <Text id="dashboard.toggleDefineTabletMode" />
+                        )}
                       </span>{' '}
                       <i class="fe fe-tablet" />
                     </button>
