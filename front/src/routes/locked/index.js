@@ -44,13 +44,13 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
     ))}
 
     <div class="row">
-      <div class="col mt-4"></div>
+      <div class="col mt-4" />
       <div class="col mt-4">
         <button onClick={e => typeLetter(e, 0)} class={cx('btn btn-secondary btn-block')}>
           0
         </button>
       </div>
-      <div class="col mt-4"></div>
+      <div class="col mt-4" />
     </div>
   </div>
 );
