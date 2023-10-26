@@ -295,6 +295,7 @@ const CONDITIONS = {
 const ACTIONS = {
   ALARM: {
     CHECK_ALARM_MODE: 'alarm.check-alarm-mode',
+    SET_ALARM_MODE: 'alarm.set-alarm-mode',
   },
   CALENDAR: {
     IS_EVENT_RUNNING: 'calendar.is-event-running',

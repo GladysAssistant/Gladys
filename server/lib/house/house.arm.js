@@ -6,12 +6,13 @@ const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
 /**
  * @public
  * @description Arm house Alarm.
- * @param {object} selector - Selector of the house.
+ * @param {string} selector - Selector of the house.
+ * @param {boolean} disableWaitTime - Should not wait to arm.
  * @returns {Promise} Resolve with house object.
  * @example
  * const mainHouse = await gladys.house.arm('main-house');
  */
-async function arm(selector) {
+async function arm(selector, disableWaitTime = false) {
   const house = await db.House.findOne({
     where: {
       selector,
@@ -38,8 +39,10 @@ async function arm(selector) {
     type: EVENTS.ALARM.ARMING,
     house: selector,
   });
-  // Wait the delay before arming
-  const currentTimeout = setTimeout(async () => {
+
+  const waitTimeInMs = disableWaitTime ? 0 : house.alarm_delay_before_arming * 1000;
+
+  const armHouse = async () => {
     // Update database
     await house.update({ alarm_mode: ALARM_MODES.ARMED });
     // Lock all tablets in this house
@@ -56,10 +59,18 @@ async function arm(selector) {
         house: selector,
       },
     });
-  }, house.alarm_delay_before_arming * 1000);
+  };
 
-  // store the timeout so we can cancel it if needed
-  this.armingHouseTimeout.set(selector, currentTimeout);
+  // if the wait time is 0, just arm now
+  if (waitTimeInMs === 0) {
+    await armHouse();
+  } else {
+    // Wait the delay before arming
+    const currentTimeout = setTimeout(armHouse, waitTimeInMs);
+
+    // store the timeout so we can cancel it if needed
+    this.armingHouseTimeout.set(selector, currentTimeout);
+  }
 }
 
 module.exports = {

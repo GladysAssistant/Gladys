@@ -1533,6 +1533,11 @@
         "description": "La scène continuera si l'alarme est dans le mode sélectionné.",
         "houseLabel": "Maison",
         "alarmModeLabel": "Mode de l'alarme"
+      },
+      "alarmSetMode": {
+        "description": "Cette action passera la maison sélectionnée dans le mode d'alarme sélectionné.",
+        "houseLabel": "Maison",
+        "alarmModeLabel": "Mode de l'alarme"
       }
     },
     "actions": {
@@ -1585,7 +1590,8 @@
         "condition": "Condition sur Ecowatt ( France )"
       },
       "alarm": {
-        "check-alarm-mode": "Si l'alarme est en mode"
+        "check-alarm-mode": "Si l'alarme est en mode",
+        "set-alarm-mode": "Passer l'alarme en mode"
       }
     },
     "variables": {

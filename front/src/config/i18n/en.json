@@ -1531,6 +1531,11 @@
         "description": "The scene will continue if the alarm is in the selected mode.",
         "houseLabel": "House",
         "alarmModeLabel": "Alarm Mode"
+      },
+      "alarmSetMode": {
+        "description": "This action will set the selected house to the selected alarm mode.",
+        "houseLabel": "House",
+        "alarmModeLabel": "Alarm Mode"
       }
     },
     "actions": {
@@ -1583,7 +1588,8 @@
         "condition": "Condition on Ecowatt (France)"
       },
       "alarm": {
-        "check-alarm-mode": "If the alarm is in mode"
+        "check-alarm-mode": "If the alarm is in mode",
+        "set-alarm-mode": "Set alarm mode to"
       }
     },
     "variables": {
