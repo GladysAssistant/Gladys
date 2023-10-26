@@ -369,6 +369,9 @@ describe('Build service', () => {
     const on = stub();
     const getCharacteristic = stub().returns({
       on,
+      props: {
+        perms: ['PAIRED_READ'],
+      },
     });
     const MotionSensor = stub().returns({
       getCharacteristic,
@@ -379,6 +382,10 @@ describe('Build service', () => {
         MotionDetected: 'MOTIONDETECTED',
       },
       CharacteristicEventTypes: stub(),
+      Perms: {
+        PAIRED_READ: 'PAIRED_READ',
+        PAIRED_WRITE: 'PAIRED_WRITE',
+      },
       Service: {
         MotionSensor,
       },
@@ -403,7 +410,7 @@ describe('Build service', () => {
     expect(MotionSensor.args[0][0]).to.equal('Détecteur garage');
     expect(on.callCount).to.equal(1);
     expect(getCharacteristic.args[0][0]).to.equal('MOTIONDETECTED');
-    expect(cb.args[0][1]).to.equal(1);
+    expect(cb.args[0][1]).to.equal(0);
   });
 
   it('should build contact sensor service', async () => {

@@ -31,6 +31,7 @@ function buildService(device, features, categoryMapping) {
     switch (`${feature.category}:${feature.type}`) {
       case `${DEVICE_FEATURE_CATEGORIES.LIGHT}:${DEVICE_FEATURE_TYPES.LIGHT.BINARY}`:
       case `${DEVICE_FEATURE_CATEGORIES.SWITCH}:${DEVICE_FEATURE_TYPES.SWITCH.BINARY}`:
+      case `${DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`:
       case `${DEVICE_FEATURE_CATEGORIES.LEAK_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
         const characteristic = service.getCharacteristic(
           Characteristic[categoryMapping.capabilities[feature.type].characteristics[0]],
@@ -63,15 +64,6 @@ function buildService(device, features, categoryMapping) {
         const contactCharacteristic = service.getCharacteristic(Characteristic.ContactSensorState);
 
         contactCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
-          const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
-          callback(undefined, +!updatedFeatures.find((feat) => feat.id === feature.id).last_value);
-        });
-        break;
-      }
-      case `${DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR}:${DEVICE_FEATURE_TYPES.SENSOR.BINARY}`: {
-        const motionCharacteristic = service.getCharacteristic(Characteristic.MotionDetected);
-
-        motionCharacteristic.on(CharacteristicEventTypes.GET, async (callback) => {
           const { features: updatedFeatures } = await this.gladys.device.getBySelector(device.selector);
           callback(undefined, +!updatedFeatures.find((feat) => feat.id === feature.id).last_value);
         });
