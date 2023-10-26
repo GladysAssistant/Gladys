@@ -182,7 +182,7 @@
       "validationError": "Erreur de validation : Le nom d'une maison doit-être compris entre 1 et 40 caractères.",
       "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères.",
       "alarmTitle": "Alarme",
-      "alarmDescription": "Si vous utilisez le mode alarme dans Gladys, vous pouvez configurer ici le code de désactivation de l'alarme, ainsi que délai avant le déclenchement de l'alarme. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
+      "alarmDescription": "Si vous utilisez le mode alarme dans Gladys, vous pouvez configurer ici le code de désactivation de l'alarme, ainsi que le délai avant le déclenchement de l'alarme. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
       "alarmCodeLabel": "Code de l'alarme",
       "alarmCodePlaceholder": "Entrez un code à 6 chiffres",
       "alarmDelayBeforeArmingLabel": "Délai avant armement de l'alarme",
@@ -214,7 +214,7 @@
     "toggleDefineTabletMode": "Mode tablette",
     "closeDefineTabletMode": "Fermer",
     "tabletMode": {
-      "description": "Le mode tablette sert à la fonctionnalité alarme. Si vous armez l'alarme, toutes les tablettes de la maison seront verrouillées et afficherons un clavier virtuel pour désactiver l'alarme.",
+      "description": "Le mode tablette sert à la fonctionnalité alarme. Si vous armez l'alarme, toutes les tablettes de la maison seront verrouillées et afficheront un clavier virtuel pour désactiver l'alarme.",
       "fullScreenForce": "Si vous voulez forcer une tablette à rester en mode plein écran, vous pouvez ajouter <code>?fullscreen=force</code> à l'URL.",
       "houseLabel": "Maison",
       "tabletModeDisabled": "Mode tablette désactivé"
@@ -379,7 +379,7 @@
         "editBoxNamePlaceholder": "Entrez le nom du widget",
         "editHouseLabel": "Sélectionnez la maison qui est concernée pour l'activation/désactivation de l'alarme.",
         "alarmStatusText": "Votre maison est ",
-        "alarmArming": "Votre maison est entrain d'être armée...",
+        "alarmArming": "Votre maison est en train d'être armée...",
         "cancelAlarmArming": "Annuler"
       }
     }
