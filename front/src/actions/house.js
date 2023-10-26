@@ -77,7 +77,6 @@ function createActions(store) {
       store.setState(newState);
     },
     updateHouseDelayBeforeArming(state, delayBeforeArming, houseIndex) {
-      console.log(delayBeforeArming);
       const newState = update(state, {
         houses: {
           [houseIndex]: {
