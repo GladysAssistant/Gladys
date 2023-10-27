@@ -73,6 +73,7 @@
     "codePlaceholder": "Tapez votre code",
     "error": "Une erreur est survenue, merci de réessayer",
     "wrongCodeError": "Code invalide, merci de réessayer",
+    "tooManyRequests": "Veuillez attendre {{count}} minutes avant de re-essayer.",
     "validateButton": "Valider"
   },
   "signup": {
@@ -1638,7 +1639,8 @@
         "arming": "L'alarme est en cours d'armement",
         "disarm": "L'alarme est désarmée",
         "partial-arm": "L'alarme est armée partiellement",
-        "panic": "L'alarme est en mode panique"
+        "panic": "L'alarme est en mode panique",
+        "too-many-codes-tests": "Alarme : Trop de codes invalides"
       },
       "system": {
         "start": "Gladys démarre"
@@ -1733,7 +1735,8 @@
           "arming": "Ce déclencheur se lancera quand la maison sélectionnée va être armée.",
           "disarm": "Ce déclencheur se lancera quand la maison sélectionnée est désarmée.",
           "partial-arm": "Ce déclencheur se lancera quand la maison sélectionnée est armée partiellement.",
-          "panic": "Ce déclencheur se lancera quand la maison sélectionnée est en mode panique."
+          "panic": "Ce déclencheur se lancera quand la maison sélectionnée est en mode panique.",
+          "too-many-codes-tests": "Ce déclencheur se lancera à chaque échec de saisie du code de l'alarme à partir de 3 essais ratés."
         },
         "houseLabel": "Maison"
       },

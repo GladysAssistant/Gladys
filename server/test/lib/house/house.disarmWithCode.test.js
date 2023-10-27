@@ -24,6 +24,7 @@ describe('house.disarmWithCode', () => {
       alarm_mode: ALARM_MODES.ARMED,
     });
     sinon.reset();
+    house.alarmCodeRateLimit.delete('test-house');
   });
   afterEach(() => {
     sinon.reset();
@@ -45,6 +46,19 @@ describe('house.disarmWithCode', () => {
         payload: {
           house: 'test-house',
         },
+      },
+    ]);
+  });
+  it('should disarm 4 times with fail code', async () => {
+    await assertChai.isRejected(house.disarmWithCode('test-house', '12'), 'INVALID_CODE');
+    await assertChai.isRejected(house.disarmWithCode('test-house', '12'), 'INVALID_CODE');
+    await assertChai.isRejected(house.disarmWithCode('test-house', '12'), 'INVALID_CODE');
+    await assertChai.isRejected(house.disarmWithCode('test-house', '12'), 'TOO_MANY_CODES_TESTS');
+    expect(event.emit.firstCall.args).to.deep.equal([
+      EVENTS.TRIGGERS.CHECK,
+      {
+        type: EVENTS.ALARM.TOO_MANY_CODES_TESTS,
+        house: 'test-house',
       },
     ]);
   });

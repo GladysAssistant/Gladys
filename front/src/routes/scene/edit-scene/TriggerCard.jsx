@@ -31,6 +31,7 @@ const TRIGGER_ICON = {
   [EVENTS.ALARM.PARTIAL_ARM]: 'fe-bell',
   [EVENTS.ALARM.DISARM]: 'fe-bell-off',
   [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
+  [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'fe-alert-triangle',
   [EVENTS.SYSTEM.START]: 'fe-activity'
 };
 
@@ -39,7 +40,8 @@ const ALARM_TRIGGERS = [
   EVENTS.ALARM.ARMING,
   EVENTS.ALARM.DISARM,
   EVENTS.ALARM.PARTIAL_ARM,
-  EVENTS.ALARM.PANIC
+  EVENTS.ALARM.PANIC,
+  EVENTS.ALARM.TOO_MANY_CODES_TESTS
 ];
 
 const deleteTriggerFromList = (deleteTrigger, index) => () => {

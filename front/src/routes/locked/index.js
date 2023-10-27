@@ -110,7 +110,7 @@ class Locked extends Component {
   validateCode = async e => {
     e.preventDefault();
     try {
-      await this.setState({ error: false, wrongCode: false });
+      await this.setState({ error: false, wrongCode: false, tooManyRequests: false });
       const houseSelector = this.props.session.getTabletModeCurrentHouseSelector();
       await this.props.httpClient.post(`/api/v1/house/${houseSelector}/disarm_with_code`, {
         code: this.state.currentCode
@@ -118,7 +118,13 @@ class Locked extends Component {
     } catch (e) {
       console.error(e);
       const message = get(e, 'response.data.message');
-      if (message === 'INVALID_CODE') {
+      const status = get(e, 'response.status');
+      if (status === 429) {
+        this.setState({
+          tooManyRequests: true,
+          waitTimeInMinute: Math.round(get(e, 'response.data.properties.time_before_next', 5 * 60 * 1000) / 1000 / 60)
+        });
+      } else if (message === 'INVALID_CODE') {
         this.setState({ wrongCode: true });
       } else {
         this.setState({ error: true });
@@ -132,7 +138,7 @@ class Locked extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.disarmed);
   }
-  render({}, { currentCode, error, wrongCode }) {
+  render({}, { currentCode, error, wrongCode, tooManyRequests, waitTimeInMinute }) {
     return (
       <div class={cx('container', style.lockedContainer)}>
         <div class="row">
@@ -166,6 +172,11 @@ class Locked extends Component {
                 {wrongCode && (
                   <div class="alert alert-warning">
                     <Text id="locked.wrongCodeError" />
+                  </div>
+                )}
+                {tooManyRequests && (
+                  <div class="alert alert-danger">
+                    <Text id="locked.tooManyRequests" fields={{ count: waitTimeInMinute }} />
                   </div>
                 )}
                 <div class="form" autocomplete="off">

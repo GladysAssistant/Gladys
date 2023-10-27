@@ -1,3 +1,5 @@
+const { RateLimiterMemory } = require('rate-limiter-flexible');
+
 const { arm } = require('./house.arm');
 const { create } = require('./house.create');
 const { destroy } = require('./house.destroy');
@@ -19,6 +21,10 @@ const House = function House(event, stateManager, session) {
   this.stateManager = stateManager;
   this.session = session;
   this.armingHouseTimeout = new Map();
+  this.alarmCodeRateLimit = new RateLimiterMemory({
+    points: 3, // 3 tries
+    duration: 5 * 60, // Per 5 minutes
+  });
 };
 
 House.prototype.arm = arm;

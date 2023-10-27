@@ -47,6 +47,14 @@ class ConflictError extends Error {
   }
 }
 
+class TooManyRequests extends Error {
+  constructor(message, timeBeforeNext) {
+    super();
+    this.message = message;
+    this.timeBeforeNext = timeBeforeNext;
+  }
+}
+
 class ForbiddenError extends Error {
   constructor(message) {
     super();
@@ -71,4 +79,5 @@ module.exports = {
   AbortScene,
   ConflictError,
   ForbiddenError,
+  TooManyRequests,
 };

@@ -17,6 +17,8 @@ async function disarm(selector) {
   if (this.armingHouseTimeout.get(selector)) {
     this.armingHouseTimeout.delete(selector);
   }
+  // Delete all rate limit associated to this house
+  await this.alarmCodeRateLimit.delete(selector);
   // Get the house from DB
   const house = await db.House.findOne({
     where: {

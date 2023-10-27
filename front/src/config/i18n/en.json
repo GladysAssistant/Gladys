@@ -73,7 +73,8 @@
     "codePlaceholder": "Enter your code",
     "error": "An error occurred, please try again",
     "wrongCodeError": "Invalid code, please try again",
-    "validateButton": "Validate"
+    "validateButton": "Validate",
+    "tooManyRequests": "Please wait {{count}} minutes before trying again."
   },
   "signup": {
     "welcome": {
@@ -186,6 +187,7 @@
       "alarmCodeLabel": "Alarm Code",
       "alarmCodePlaceholder": "Enter a numeric code between 4 and 8 digits",
       "alarmDelayBeforeArmingLabel": "Delay before arming the alarm",
+      "alarmCodeError": "The code must be numeric and between 4 and 8 digits.",
       "alarmDelays": {
         "0": "No delay",
         "5": "5 seconds",
@@ -1635,7 +1637,8 @@
         "arming": "The alarm is arming",
         "disarm": "The alarm is disarmed",
         "partial-arm": "The alarm is partially armed",
-        "panic": "The alarm is in panic mode"
+        "panic": "The alarm is in panic mode",
+        "too-many-codes-tests": "Alarm: Too many invalid codes"
       },
       "system": {
         "start": "Gladys starting"
@@ -1730,7 +1733,8 @@
           "arming": "This trigger will activate when the selected house is in the process of arming.",
           "disarm": "This trigger will activate when the selected house is disarmed.",
           "partial-arm": "This trigger will activate when the selected house is partially armed.",
-          "panic": "This trigger will activate when the selected house is in panic mode."
+          "panic": "This trigger will activate when the selected house is in panic mode.",
+          "too-many-codes-tests": "This trigger will activate on every alarm code entry failure after 3 unsuccessful attempts."
         },
         "houseLabel": "House"
       },

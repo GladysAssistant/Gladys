@@ -107,6 +107,7 @@ const EVENTS = {
     DISARM: 'alarm.disarm',
     PARTIAL_ARM: 'alarm.partial-arm',
     PANIC: 'alarm.panic',
+    TOO_MANY_CODES_TESTS: 'alarm.too-many-codes-tests',
   },
   CALENDAR: {
     EVENT_IS_COMING: 'calendar.event-is-coming',
