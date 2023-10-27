@@ -27,7 +27,7 @@ class SceneCard extends Component {
 
   render(props, { saving }) {
     return (
-      <div class="col-lg-3 p-2">
+      <div class="col-lg-4 p-2">
         <div
           class={cx('dimmer h-100', {
             active: saving

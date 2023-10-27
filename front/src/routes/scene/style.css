@@ -50,3 +50,10 @@
 .newButton {
   min-width: min-content;
 }
+
+.menuScroll {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  max-height: 200px;
+
+}

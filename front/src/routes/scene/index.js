@@ -120,7 +120,7 @@ class Scene extends Component {
     this.getTags();
   }
 
-  render(props, { scenes, loading, getError, tags }) {
+  render(props, { scenes, loading, getError, tags, sceneTagSearch }) {
     return (
       <ScenePage
         httpClient={props.httpClient}
@@ -133,6 +133,7 @@ class Scene extends Component {
         switchActiveScene={this.switchActiveScene}
         tags={tags}
         searchTags={this.searchTags}
+        sceneTagSearch={sceneTagSearch}
       />
     );
   }
