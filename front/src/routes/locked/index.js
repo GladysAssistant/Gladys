@@ -21,14 +21,15 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
       <Localizer>
         <input
           type="password"
-          class="form-control"
+          class={cx('form-control', style.lockedInput)}
           value={currentCode}
           autocomplete="off"
+          readonly="readonly"
           placeholder={<Text id="locked.codePlaceholder" />}
         />
       </Localizer>
       <div class="input-group-append">
-        <button class="btn btn-outline-secondary" onClick={clearPreviousLetter}>
+        <button class={cx('btn btn-outline-secondary', style.lockedDeleteButton)} onClick={clearPreviousLetter}>
           <i class="fe fe-delete" />
         </button>
       </div>
@@ -37,7 +38,7 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
       <div class="row">
         {row.map(cell => (
           <div class="col mt-4">
-            <button onClick={e => typeLetter(e, cell)} class={cx('btn btn-secondary btn-block')}>
+            <button onClick={e => typeLetter(e, cell)} class={cx('btn btn-secondary btn-block', style.lockedButton)}>
               {cell}
             </button>
           </div>
@@ -48,7 +49,7 @@ const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
     <div class="row">
       <div class="col mt-4" />
       <div class="col mt-4">
-        <button onClick={e => typeLetter(e, 0)} class={cx('btn btn-secondary btn-block')}>
+        <button onClick={e => typeLetter(e, 0)} class={cx('btn btn-secondary btn-block', style.lockedButton)}>
           0
         </button>
       </div>
@@ -83,7 +84,7 @@ class Locked extends Component {
       route('/dashboard');
     } catch (e) {
       this.props.httpClient.setApiScopes(['alarm:write']);
-      this.props.httpClient.refreshAccessToken();
+      await this.props.httpClient.refreshAccessToken();
     }
   };
   constructor(props) {
@@ -135,7 +136,7 @@ class Locked extends Component {
     return (
       <div class={cx('container', style.lockedContainer)}>
         <div class="row">
-          <div class="col col-login mx-auto">
+          <div class={cx('col col-login mx-auto', style.lockedMainCol)}>
             <div class="text-center mb-6">
               <h2>
                 <Localizer>
@@ -173,7 +174,10 @@ class Locked extends Component {
                     typeLetter={this.typeLetter}
                     clearPreviousLetter={this.clearPreviousLetter}
                   />
-                  <button class="mt-4 btn btn-block btn-outline-success" onClick={this.validateCode}>
+                  <button
+                    class={cx('mt-4 btn btn-block btn-outline-success', style.lockedButton)}
+                    onClick={this.validateCode}
+                  >
                     <Text id="locked.validateButton" />
                   </button>
                 </div>

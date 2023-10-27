@@ -155,9 +155,20 @@ class Dashboard extends Component {
     this.props.setFullScreen(isFullScreen);
   };
 
-  alarmArmed = () => {
-    if (this.props.tabletMode) {
-      route('/locked');
+  alarmArmed = async () => {
+    // Check server side if we are in tablet mode
+    try {
+      const currentSession = await this.props.httpClient.get('/api/v1/session/tablet_mode');
+      if (currentSession.tablet_mode) {
+        route('/locked');
+      }
+    } catch (e) {
+      console.error(e);
+      const status = get(e, 'response.status');
+      const errorMessageOtherFormat = get(e, 'response.data.message');
+      if (status === 401 && errorMessageOtherFormat === 'TABLET_IS_LOCKED') {
+        route('/locked');
+      }
     }
   };
 
