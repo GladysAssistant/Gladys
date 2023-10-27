@@ -151,6 +151,9 @@ import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
 import MELCloudSetupPage from '../routes/integration/all/melcloud/setup-page';
 import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-page';
 
+// NodeRed integration
+import NodeRedPage from '../routes/integration/all/node-red/setup-page';
+
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
 
@@ -256,6 +259,9 @@ const AppRouter = connect(
         <Zigbee2mqttSettingsPage path="/dashboard/integration/device/zigbee2mqtt/settings" />
         <Zigbee2mqttSetupPage path="/dashboard/integration/device/zigbee2mqtt/setup" />
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
+
+        <NodeRedPage path="/dashboard/integration/device/node-red" />
+
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
