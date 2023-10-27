@@ -184,8 +184,9 @@
       "alarmTitle": "Alarme",
       "alarmDescription": "Si vous utilisez le mode alarme dans Gladys, vous pouvez configurer ici le code de désactivation de l'alarme, ainsi que le délai avant le déclenchement de l'alarme. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
       "alarmCodeLabel": "Code de l'alarme",
-      "alarmCodePlaceholder": "Entrez un code à 6 chiffres",
+      "alarmCodePlaceholder": "Entrez un code numériques entre 4 et 8 chiffres",
       "alarmDelayBeforeArmingLabel": "Délai avant armement de l'alarme",
+      "alarmCodeError": "Le code doit être numérique et entre 4 et 8 chiffres.",
       "alarmDelays": {
         "0": "Pas de délai",
         "5": "5 secondes",

@@ -111,7 +111,9 @@ const EditHouse = ({ children, ...props }) => (
                 type={props.showAlarmCode ? 'text' : 'password'}
                 placeholder={<Text id="signup.configureHouse.alarmCodePlaceholder" />}
                 value={props.house.alarm_code}
-                className="form-control"
+                class={cx('form-control', {
+                  'is-invalid': get(props, 'errors.alarm_code')
+                })}
                 onInput={props.updateHouseAlarmCode}
               />
             </Localizer>
@@ -124,7 +126,11 @@ const EditHouse = ({ children, ...props }) => (
               />
             </span>
           </div>
-          <div class="invalid-feedback">
+          <div
+            class={cx('invalid-feedback', {
+              'd-block': get(props, 'errors.alarm_code')
+            })}
+          >
             <Text id="signup.configureHouse.alarmCodeError" />
           </div>
         </div>
@@ -162,7 +168,7 @@ const EditHouse = ({ children, ...props }) => (
         </div>
       </div>
       <div class="form-group">
-        <button onClick={props.saveHouse} class="btn btn-success">
+        <button onClick={props.saveHouse} class="btn btn-success" disabled={Object.keys(props.errors).length > 0}>
           <Text id="signup.configureHouse.saveHouse" />
         </button>
         {!props.wantToDeleteHouse && (

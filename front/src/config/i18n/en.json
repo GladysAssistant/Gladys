@@ -184,7 +184,7 @@
       "alarmTitle": "Alarm",
       "alarmDescription": "If you are using the alarm mode in Gladys, you can configure the alarm deactivation code and the delay before the alarm triggers here. This delay will only apply in the case of manual triggering and not in scenes.",
       "alarmCodeLabel": "Alarm Code",
-      "alarmCodePlaceholder": "Enter a 6-digit code",
+      "alarmCodePlaceholder": "Enter a numeric code between 4 and 8 digits",
       "alarmDelayBeforeArmingLabel": "Delay before arming the alarm",
       "alarmDelays": {
         "0": "No delay",
