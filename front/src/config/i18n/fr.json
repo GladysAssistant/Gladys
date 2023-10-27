@@ -692,10 +692,10 @@
         "description": "Ce service utilise deux containers Docker (MQTT broker and Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
         "enableLabel": "Activation du service Zigbee2mqtt",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",
-        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personnalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "enableZigbee2mqtt": "Activer Zigbee2mqtt",
         "containersStatus": "Conteneurs liés à Zigbee2mqtt",
-        "serviceStatus": "Etat du service Zigbee2mqtt",
+        "serviceStatus": "État du service Zigbee2mqtt",
         "link": "Lien",
         "connected": "Zigbee2mqtt démarré avec succès.",
         "error": "Une erreur s'est produite au démarrage du service Zigbee2mqtt.",
@@ -704,7 +704,8 @@
         "zigbee2Mqtt": "Zigbee2mqtt",
         "gladys": "Gladys",
         "mqtt": "MQTT",
-        "status": "Status"
+        "status": "Status",
+        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
       },
       "device": {
         "title": "Appareils Zigbee",
