@@ -1,5 +1,3 @@
-const { EVENTS } = require('../../utils/constants');
-
 /**
  * @description Cancel a trigger.
  * @param {object} sceneSelector - The selector of the scene to clean.
