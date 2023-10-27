@@ -63,14 +63,14 @@ class Locked extends Component {
     e.preventDefault();
     if (this.state.currentCode.length > 0) {
       this.setState(prevState => {
-        return { ...prevState, currentCode: prevState.currentCode.slice(0, -1), wrongCode: false };
+        return { ...prevState, currentCode: prevState.currentCode.slice(0, -1) };
       });
     }
   };
   typeLetter = (e, letter) => {
     e.preventDefault();
     this.setState(prevState => {
-      return { ...prevState, currentCode: prevState.currentCode + letter, wrongCode: false };
+      return { ...prevState, currentCode: prevState.currentCode + letter };
     });
   };
   init = async () => {
@@ -119,6 +119,7 @@ class Locked extends Component {
       console.error(e);
       const message = get(e, 'response.data.message');
       const status = get(e, 'response.status');
+      this.setState({ currentCode: '' });
       if (status === 429) {
         this.setState({
           tooManyRequests: true,
