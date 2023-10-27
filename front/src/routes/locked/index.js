@@ -17,11 +17,13 @@ const BUTTON_ARRAY = [
 const KeyPadComponent = ({ currentCode, typeLetter, clearPreviousLetter }) => (
   <div>
     <div class="input-group mb-3">
+      <input id="fakepasswordfield" class="d-none" type="password" name="fakepasswordfield" />
       <Localizer>
         <input
           type="password"
           class="form-control"
           value={currentCode}
+          autocomplete="off"
           placeholder={<Text id="locked.codePlaceholder" />}
         />
       </Localizer>
@@ -165,7 +167,7 @@ class Locked extends Component {
                     <Text id="locked.wrongCodeError" />
                   </div>
                 )}
-                <div>
+                <div class="form" autocomplete="off">
                   <KeyPadComponent
                     currentCode={currentCode}
                     typeLetter={this.typeLetter}
