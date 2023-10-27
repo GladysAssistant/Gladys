@@ -2,6 +2,8 @@ const sinon = require('sinon');
 
 const { expect } = require('chai');
 
+const { fake } = sinon;
+
 const ZwaveJSUIManager = require('../../../../../services/zwave-js-ui/lib');
 
 const ZWAVEJSUI_SERVICE_ID = 'ZWAVEJSUI_SERVICE_ID';
@@ -11,7 +13,11 @@ describe('zwaveJSUIManager getNodes', () => {
   let zwaveJSUIManager;
 
   before(() => {
-    gladys = {};
+    gladys = {
+      stateManager: {
+        get: fake.returns(null),
+      }
+    };
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, null, ZWAVEJSUI_SERVICE_ID);
   });
 

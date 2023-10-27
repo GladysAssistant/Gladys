@@ -12,7 +12,7 @@ function createActions(store) {
       });
       try {
         const options = {
-          order_dir: state.orderDir || 'asc'
+          orderDir: state.orderDir || 'asc'
         };
         if (state.searchKeyword && state.searchKeyword.length) {
           options.search = state.searchKeyword;

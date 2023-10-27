@@ -16,8 +16,8 @@ const createActions = store => {
       });
       try {
         const options = {
-          order_dir: state.orderDir || 'asc', // Default value assumed by CardFilter
-          filter_existing: state.filterExisting || true // Default value assumed by NodeTab
+          orderDir: state.orderDir || 'asc', // Default value assumed by CardFilter
+          filterExisting: state.filterExisting || true // Default value assumed by NodeTab
         };
         if (state.searchKeyword && state.searchKeyword.length) {
           options.search = state.searchKeyword;

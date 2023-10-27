@@ -29,14 +29,15 @@ function match(value, keyword) {
 /**
  * @description Return array of Nodes.
  * @param {object} filters - Filtering and ordering.
+ * @param {string} filters.orderDir - Filtering and ordering.
+ * @param {string} filters.search - Filtering and ordering.
+ * @param {boolean} filters.filterExisting - Filtering and ordering.
  * @returns {Array} Return list of nodes.
  * @example
  * const nodes = zwaveManager.getNodes();
  */
-function getNodes(filters) {
+function getNodes({ orderDir, search, filterExisting } = { orderDir: 'asc', search: null, filterExisting: true }) {
   const nodeIds = Object.keys(this.nodes);
-  const { order_dir: orderDir, search } = filters;
-  const filterExisting = `${filters.filter_existing}` === 'true';
 
   // transform object in array
   const nodes = nodeIds
