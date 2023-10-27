@@ -632,6 +632,7 @@
       "discover": {
         "title": "Zigbee2mqtt discover",
         "permitJoin": "Permit joining",
+        "hideExistingDevices": "Hide already added devices",
         "noDeviceDiscovered": "No new device discovered, please click on scan button.",
         "serverNoResponse": "Gladys server is not available.",
         "serverNoResponseWebSocker": "Gladys server is not available. Pleash refresh the page.",
@@ -652,6 +653,42 @@
       "saveError": "There was an error saving the device.",
       "documentation": "Zigbee2mqtt documentation"
     },
+    "nodeRed": {
+      "title": "Node-RED",
+      "description": "Control your devices with Node-RED.",
+      "setupTab": "Setup",
+      "documentation": "Node-RED documentation",
+
+      "status": {
+        "notInstalled": "Node-RED server failed to install.",
+        "notRunning": "Node-RED server failed to start.",
+        "running": "Node-RED successfully started.",
+        "notEnabled": "Node-RED is not activated.",
+        "nonDockerEnv": "Gladys is not running on Docker, you cannot install a Node-RED server from here.",
+        "invalidDockerNetwork": "Gladys is under custom installation, to install server from here, Gladys container should be configured with \"host\" network mode."
+      },
+      "setup": {
+        "title": "Node-RED configuration",
+        "description": "This service uses docker container. Enable Node-RED for deploying this container.\nLearn more on the node-red documentation page",
+        "descriptionBackup": "For the moment, Node-RED is not backup into Gladys Plus.\nIf you want a backup for Node-RED, please follow this <a href=\"https://community.gladysassistant.com/t/mini-tuto-backup-par-email-des-flows-node-red/8402\" target=\"_blank\" rel=\"noopener noreferrer\">docs</a>",
+        "error": "An error occured while starting  Node-RED.",
+        "enableLabel": "Node-RED activation",
+        "enableNodeRed": "Enable",
+        "disableNodeRed": "Disable",
+        "confirmDisableLabel": "Are you sur you to disable Node-RED ?",
+        "confirmDisableCancelButton": "Cancel",
+        "activationNodeRed": "Activating...",
+        "serviceStatus": "Node-RED Service Status",
+        "containersStatus": "Containers related to Node-RED",
+        "status": "Status",
+        "node-red": "Node-RED",
+        "gladys": "Gladys",
+        "usernameLabel": "Username",
+        "passwordLabel": "Password",
+        "urlLabel": "Node-RED interface url: <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Not accessible from Gladys Plus)"
+      }
+    },
+
     "googleHome": {
       "title": "Google Home",
       "description": "Control your Gladys device with your voice in Google Home",

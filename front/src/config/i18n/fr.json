@@ -758,6 +758,7 @@
       "discover": {
         "title": "Découverte du réseau Zigbee",
         "permitJoin": "Autoriser l'association",
+        "hideExistingDevices": "Cacher les appareils déjà ajoutés",
         "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "serverNoResponse": "Gladys n'est pas accessible.",
         "serverNoResponseWebSocker": "Gladys n'est pas accessible. Veuillez actualiser la page.",
@@ -778,6 +779,41 @@
       "saveError": "Une erreur s'est produite lors de la sauvegarde.",
       "documentation": "Documentation Zigbee2mqtt"
     },
+    "nodeRed": {
+      "title": "Node-RED",
+      "description": "Contrôlez vos appareils via Node-RED.",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Node-RED",
+      "status": {
+        "notInstalled": "Le serveur Node-RED n'a pas pu être installé.",
+        "notRunning": "Le serveur Node-RED n'a pas démarré.",
+        "running": "Node-RED démarré avec succès.",
+        "notEnabled": "Node-RED n'est pas activé.",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Node-RED depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Node-RED depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"."
+      },
+      "setup": {
+        "title": "Configuration du service Node-RED",
+        "description": "Ce service utilise un container Docker. Activez Node-RED pour déployer ce container.\nPour en savoir plus, rendez-vous sur la page de documentation Node-RED.",
+        "descriptionBackup": "Pour le moment, Node-RED n'est pas sauvegardé dans Gladys Plus.\nSi vous souhaitez une sauvegarde pour Node-RED, veuillez suivre cette <a href=\"https://community.gladysassistant.com/t/mini-tuto-backup-par-email-des-flows-node-red/8402\" target=\"_blank\" rel=\"noopener noreferrer\">documentation</a>",
+        "error": "Une erreur s'est produite au démarrage du service Node-RED.",
+        "enableLabel": "Activation du service Node-RED",
+        "enableNodeRed": "Activer",
+        "disableNodeRed": "Désactiver",
+        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver Node-RED ?",
+        "confirmDisableCancelButton": "Annuler",
+        "activationNodeRed": "Activation...",
+        "serviceStatus": "Etat du service Node-RED",
+        "containersStatus": "Conteneurs liés à Node-RED",
+        "status": "Status",
+        "node-red": "Node-RED",
+        "gladys": "Gladys",
+        "usernameLabel": "Nom d'utilisateur",
+        "passwordLabel": "Mot de passe",
+        "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
+      }
+    },
+
     "googleHome": {
       "title": "Google Home",
       "description": "Contrôlez vos appareils Gladys à la voix dans Google Home",
