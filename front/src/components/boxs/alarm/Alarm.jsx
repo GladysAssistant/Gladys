@@ -117,8 +117,8 @@ class AlarmComponent extends Component {
                           onClick={this.arm}
                           disabled={armingDisabled}
                           class={cx('btn btn-block', style.alarmActionButton, {
-                            'btn-outline-primary': armingDisabled,
-                            'btn-primary': !armingDisabled
+                            'btn-outline-primary': house.alarm_mode !== ALARM_MODES.ARMED,
+                            'btn-primary': house.alarm_mode === ALARM_MODES.ARMED
                           })}
                         >
                           <div class="pb-2">
@@ -134,8 +134,8 @@ class AlarmComponent extends Component {
                           onClick={this.disarm}
                           disabled={house.alarm_mode === ALARM_MODES.DISARMED}
                           class={cx('btn btn-block', style.alarmActionButton, {
-                            'btn-outline-success': house.alarm_mode === ALARM_MODES.DISARMED,
-                            'btn-success': house.alarm_mode !== ALARM_MODES.DISARMED
+                            'btn-outline-success': house.alarm_mode !== ALARM_MODES.DISARMED,
+                            'btn-success': house.alarm_mode === ALARM_MODES.DISARMED
                           })}
                         >
                           <div class="pb-2">
@@ -152,7 +152,10 @@ class AlarmComponent extends Component {
                         <button
                           onClick={this.partialArm}
                           disabled={partialArmDisabled}
-                          class={cx('btn btn-secondary btn-block', style.alarmActionButton, {})}
+                          class={cx('btn btn-block', style.alarmActionButton, {
+                            'btn-outline-dark': house.alarm_mode !== ALARM_MODES.PARTIALLY_ARMED,
+                            'btn-dark': house.alarm_mode === ALARM_MODES.PARTIALLY_ARMED
+                          })}
                         >
                           <div class="pb-2">
                             <i class={cx('fe fe-shield', style.alarmActionIcon)} />
@@ -168,7 +171,10 @@ class AlarmComponent extends Component {
                         <button
                           onClick={this.panic}
                           disabled={house.alarm_mode === ALARM_MODES.PANIC}
-                          class={cx('btn btn-outline-danger btn-block', style.alarmActionButton)}
+                          class={cx('btn btn-block', style.alarmActionButton, {
+                            'btn-outline-danger': house.alarm_mode !== ALARM_MODES.PANIC,
+                            'btn-danger': house.alarm_mode === ALARM_MODES.PANIC
+                          })}
                         >
                           <div class="pb-2">
                             <i class={cx('fe fe-alert-circle', style.alarmActionIcon)} />
