@@ -35,8 +35,8 @@ function match(value, keyword) {
  */
 function getNodes(filters) {
   const nodeIds = Object.keys(this.nodes);
-  const { order_dir: orderDir, search, filter_existing } = filters;
-  const filterExisting = `${filter_existing}` === 'true';
+  const { order_dir: orderDir, search } = filters;
+  const filterExisting = `${filters.filter_existing}` === 'true';
 
   // transform object in array
   const nodes = nodeIds
