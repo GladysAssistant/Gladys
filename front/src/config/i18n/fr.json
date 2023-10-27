@@ -1788,7 +1788,10 @@
       },
       "messageQueueReceived": {
         "topicLabel": "Topic",
-        "topicPlaceholder": "Entrez votre topic"
+        "topicPlaceholder": "Entrez votre topic",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Entrez le message attendu",
+        "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
       }
     }
   },

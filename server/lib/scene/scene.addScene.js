@@ -91,6 +91,20 @@ function addScene(sceneRaw) {
         }
         trigger.jsInterval = setInterval(() => this.event.emit(EVENTS.TRIGGERS.CHECK, trigger), intervalMilliseconds);
       }
+
+      if (trigger.type === EVENTS.MESSAGE_QUEUE.RECEIVED) {
+        const mqttService = this.service.getService('mqtt');
+
+        if (mqttService) {
+          mqttService.device.subscribe(trigger.topic, (topic, message) => {
+            this.event.emit(EVENTS.TRIGGERS.CHECK, {
+              type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+              topic,
+              message,
+            });
+          });
+        }
+      }
     });
   }
 

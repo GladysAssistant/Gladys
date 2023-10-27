@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { fake, assert } = sinon;
+
 const { EVENTS } = require('../../../utils/constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const SceneManager = require('../../../lib/scene');
@@ -228,5 +229,24 @@ describe('SceneManager.addScene', () => {
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+  });
+  it('should add a scene with a message received trigger', async () => {
+    const scene = sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+          topic: 'my/topic',
+        },
+      ],
+      actions: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('jsInterval');
+    assert.calledOnceWithExactly(event.emit, EVENTS.MESSAGE_QUEUE.SUBSCRIBE, {
+      topic: 'my/topic',
+    });
   });
 });

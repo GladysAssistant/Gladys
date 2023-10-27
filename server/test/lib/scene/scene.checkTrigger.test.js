@@ -482,6 +482,80 @@ describe('scene.checkTrigger', () => {
     });
   });
 
+  it('should execute scene with message received trigger', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+          topic: 'my/topic',
+          message: '',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+      topic: 'my/topic',
+      message: 'ON',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
+  it('should execute scene with message received trigger whit message', async () => {
+    sceneManager.addScene({
+      selector: 'my-scene',
+      active: true,
+      actions: [
+        [
+          {
+            type: ACTIONS.LIGHT.TURN_OFF,
+            devices: ['light-1'],
+          },
+        ],
+      ],
+      triggers: [
+        {
+          type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+          topic: 'my/topic',
+          message: 'ON',
+        },
+      ],
+    });
+    sceneManager.checkTrigger({
+      type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+      topic: 'my/topic',
+      message: 'ON',
+    });
+    return new Promise((resolve, reject) => {
+      sceneManager.queue.start(() => {
+        try {
+          assert.calledOnce(device.setValue);
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+  });
+
   it('should not execute scene, condition not verified', async () => {
     sceneManager.addScene({
       selector: 'my-scene',

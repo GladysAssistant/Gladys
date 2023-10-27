@@ -1,3 +1,5 @@
+const { EVENTS } = require('../../utils/constants');
+
 /**
  * @description Cancel a trigger.
  * @param {object} sceneSelector - The selector of the scene to clean.
@@ -14,6 +16,13 @@ function cancelTriggers(sceneSelector) {
       if (trigger.jsInterval) {
         clearInterval(trigger.jsInterval);
         delete trigger.jsInterval;
+      }
+      if (trigger.topic) {
+        const mqttService = this.service.getService('mqtt');
+
+        if (mqttService) {
+          mqttService.device.unsubscribe(trigger.topic);
+        }
       }
     });
   }

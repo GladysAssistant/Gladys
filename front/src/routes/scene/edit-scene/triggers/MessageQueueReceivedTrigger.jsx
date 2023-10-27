@@ -7,6 +7,10 @@ class MessageQueueReceived extends Component {
     this.props.updateTriggerProperty(this.props.index, 'topic', e.target.value);
   };
 
+  updateMessage = e => {
+    this.props.updateTriggerProperty(this.props.index, 'message', e.target.value);
+  };
+
   render({}, {}) {
     return (
       <div>
@@ -21,6 +25,23 @@ class MessageQueueReceived extends Component {
               onInput={this.updateTopicName}
               className="form-control"
               placeholder={<Text id="editScene.triggersCard.messageQueueReceived.topicPlaceholder" />}
+            />
+          </Localizer>
+        </div>
+        <div class="form-group">
+          <label className="form-label">
+            <Text id="editScene.triggersCard.messageQueueReceived.messageLabel" />
+          </label>
+          <div class="mb-1 small">
+            <Text id="editScene.triggersCard.messageQueueReceived.messageDescription" />
+          </div>
+          <Localizer>
+            <input
+              type="text"
+              value={this.props.trigger.message}
+              onInput={this.updateMessage}
+              className="form-control"
+              placeholder={<Text id="editScene.triggersCard.messageQueueReceived.messagePlaceholder" />}
             />
           </Localizer>
         </div>

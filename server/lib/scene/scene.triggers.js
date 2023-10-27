@@ -32,7 +32,8 @@ const triggersFunc = {
   [EVENTS.ALARM.PANIC]: (event, trigger) => event.house === trigger.house,
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: (event, trigger) => event.house === trigger.house,
   [EVENTS.SYSTEM.START]: () => true,
-  [EVENTS.MESSAGE_QUEUE.RECEIVED]: (event, trigger) => event.topic === trigger.topic,
+  [EVENTS.MESSAGE_QUEUE.RECEIVED]: (event, trigger) =>
+    event.topic === trigger.topic && (trigger.message === '' || trigger.message === event.message),
 };
 
 module.exports = {
