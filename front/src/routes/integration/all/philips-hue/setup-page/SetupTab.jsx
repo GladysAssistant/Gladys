@@ -1,4 +1,4 @@
-import { MarkupText, Text } from 'preact-i18n';
+import { MarkupText, Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
@@ -12,6 +12,7 @@ const connectBridge = (props, device) => () => {
 };
 
 const SetupTab = ({ children, ...props }) => {
+  const bridge = { ipaddress: null };
   return (
     <div>
       {props.philipsHueBridgesDevices && props.philipsHueBridgesDevices.length > 0 && (
@@ -87,6 +88,25 @@ const SetupTab = ({ children, ...props }) => {
                 <div class="col-md-12">
                   <div class="alert alert-info">
                     <Text id="integration.philipsHue.setup.noBridgesFound" />
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-group">
+                      <label class="form-label" for="manualConfiguration">
+                        <Text id="integration.philipsHue.setup.manualConfiguration.text" />
+                      </label>
+                      <Localizer>
+                        <input
+                          id="manualConfiguration"
+                          type="text"
+                          value={bridge.ipaddress}
+                          class="form-control"
+                          placeholder={<Text id="integration.philipsHue.setup.manualConfiguration.input" />}
+                        />
+                      </Localizer>
+                      <button class="btn btn-success" onClick={connectBridge(props, bridge)}>
+                        <Text id="integration.philipsHue.setup.connectButton" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}

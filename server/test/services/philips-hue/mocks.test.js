@@ -59,6 +59,12 @@ const hueApi = {
     ]),
     activateScene: fake.resolves(null),
   },
+  configuration: {
+    get: () =>
+      Promise.resolve({
+        bridgeid: '1234',
+      }),
+  },
 };
 
 const MockedPhilipsHueClient = {
@@ -80,6 +86,13 @@ const MockedPhilipsHueClient = {
             model: {
               serial: '1234',
             },
+          },
+        ]),
+      nupnpSearch: () =>
+        Promise.resolve([
+          {
+            name: 'Philips Hue Bridge',
+            ipaddress: '192.168.1.10',
           },
         ]),
     },

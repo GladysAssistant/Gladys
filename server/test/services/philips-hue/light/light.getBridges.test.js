@@ -7,17 +7,27 @@ const PhilipsHueService = proxyquire('../../../../services/philips-hue/index', {
 });
 
 describe('PhilipsHueService', () => {
-  it('getBridges should return bridges', async () => {
+  it('getBridges should return bridges with nupnp Search', async () => {
     const philipsHueService = PhilipsHueService();
     const bridges = await philipsHueService.device.getBridges();
     expect(bridges).to.deep.equal([
       {
         name: 'Philips Hue Bridge',
-        ipaddress: '192.168.2.245',
-        model: {
-          serial: '1234',
-        },
+        ipaddress: '192.168.1.10',
       },
     ]);
   });
+  // it('getBridges should return bridges with upnp Search', async () => {
+  //   const philipsHueService = PhilipsHueService();
+  //   const bridges = await philipsHueService.device.getBridges();
+  //   expect(bridges).to.deep.equal([
+  //     {
+  //       name: 'Philips Hue Bridge',
+  //       ipaddress: '192.168.2.245',
+  //       "model": {
+  //         "serial": "1234"
+  //       }
+  //     },
+  //   ]);
+  // });
 });
