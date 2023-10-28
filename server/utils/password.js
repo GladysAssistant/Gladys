@@ -29,7 +29,7 @@ const generate = (length = 20, options = undefined) => {
 };
 
 module.exports = {
-  hash: (password) => bcrypt.hash(password, SALT_ROUNDS),
+  hash: (password, hashRound = SALT_ROUNDS) => bcrypt.hash(password, hashRound),
   compare: (password, hash) => bcrypt.compare(password, hash),
   generate,
 };

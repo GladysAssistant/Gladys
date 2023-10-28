@@ -931,6 +931,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS: 'melcloud.status',
     DISCOVER: 'melcloud.discover',
   },
+  NODERED: {
+    STATUS_CHANGE: 'nodered.status-change',
+    MQTT_ERROR: 'nodered.mqtt-error',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -979,6 +983,7 @@ const JOB_TYPES = {
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
+  SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
 };
 
 const JOB_STATUS = {
