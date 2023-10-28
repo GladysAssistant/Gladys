@@ -808,6 +808,14 @@ const DEVICE_FEATURE_MINMAX_BY_TYPE = {
     MIN: 0,
     MAX: 400,
   },
+  [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: {
+    MIN: 0,
+    MAX: 0xffffff,
+  },
+  [DEVICE_FEATURE_TYPES.LIGHT.TEMPERATURE]: {
+    MIN: 0,
+    MAX: 100,
+  },
 };
 
 const ACTIONS_STATUS = {

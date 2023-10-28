@@ -36,6 +36,7 @@ function getCategory(node, value) {
         prefLabel: category.LABEL,
         min: category.MIN,
         max: category.MAX,
+        unit: category.UNIT,
         hasFeedback: true, // TODO
         should_poll: false,
         poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_MINUTES,
