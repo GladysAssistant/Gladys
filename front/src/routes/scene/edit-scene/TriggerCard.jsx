@@ -10,9 +10,39 @@ import UserPresenceTrigger from './triggers/UserPresenceTrigger';
 import HouseEmptyOrNot from './triggers/HouseEmptyOrNot';
 import UserEnteredOrLeftArea from './triggers/UserEnteredOrLeftArea';
 import CalendarEventIsComing from './triggers/CalendarEventIsComing';
+import AlarmModeTrigger from './triggers/AlarmModeTrigger';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 import GladysStartTrigger from './triggers/GladysStartTrigger';
+
+const TRIGGER_ICON = {
+  [EVENTS.DEVICE.NEW_STATE]: 'fe-activity',
+  [EVENTS.TIME.CHANGED]: 'fe-watch',
+  [EVENTS.TIME.SUNSET]: 'fe-sunset',
+  [EVENTS.TIME.SUNRISE]: 'fe-sunrise',
+  [EVENTS.USER_PRESENCE.BACK_HOME]: 'fe-home',
+  [EVENTS.USER_PRESENCE.LEFT_HOME]: 'fe-home',
+  [EVENTS.HOUSE.NO_LONGER_EMPTY]: 'fe-home',
+  [EVENTS.AREA.USER_ENTERED]: 'fe-compass',
+  [EVENTS.AREA.USER_LEFT]: 'fe-compass',
+  [EVENTS.CALENDAR.EVENT_IS_COMING]: 'fe-calendar',
+  [EVENTS.ALARM.ARM]: 'fe-bell',
+  [EVENTS.ALARM.ARMING]: 'fe-clock',
+  [EVENTS.ALARM.PARTIAL_ARM]: 'fe-bell',
+  [EVENTS.ALARM.DISARM]: 'fe-bell-off',
+  [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
+  [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'fe-alert-triangle',
+  [EVENTS.SYSTEM.START]: 'fe-activity'
+};
+
+const ALARM_TRIGGERS = [
+  EVENTS.ALARM.ARM,
+  EVENTS.ALARM.ARMING,
+  EVENTS.ALARM.DISARM,
+  EVENTS.ALARM.PARTIAL_ARM,
+  EVENTS.ALARM.PANIC,
+  EVENTS.ALARM.TOO_MANY_CODES_TESTS
+];
 
 const deleteTriggerFromList = (deleteTrigger, index) => () => {
   deleteTrigger(index);
@@ -21,18 +51,7 @@ const deleteTriggerFromList = (deleteTrigger, index) => () => {
 const TriggerCard = ({ children, ...props }) => (
   <div class="card">
     <div class="card-header">
-      {props.trigger.type === EVENTS.SYSTEM.START && <i class="fe fe-activity" />}
-      {props.trigger.type === EVENTS.DEVICE.NEW_STATE && <i class="fe fe-activity" />}
-      {props.trigger.type === EVENTS.TIME.CHANGED && <i class="fe fe-watch" />}
-      {props.trigger.type === EVENTS.TIME.SUNSET && <i class="fe fe-sunset" />}
-      {props.trigger.type === EVENTS.TIME.SUNRISE && <i class="fe fe-sunrise" />}
-      {props.trigger.type === EVENTS.USER_PRESENCE.BACK_HOME && <i class="fe fe-home" />}
-      {props.trigger.type === EVENTS.USER_PRESENCE.LEFT_HOME && <i class="fe fe-home" />}
-      {props.trigger.type === EVENTS.HOUSE.EMPTY && <i class="fe fe-home" />}
-      {props.trigger.type === EVENTS.HOUSE.NO_LONGER_EMPTY && <i class="fe fe-home" />}
-      {props.trigger.type === EVENTS.AREA.USER_ENTERED && <i class="fe fe-compass" />}
-      {props.trigger.type === EVENTS.AREA.USER_LEFT && <i class="fe fe-compass" />}
-      {props.trigger.type === EVENTS.CALENDAR.EVENT_IS_COMING && <i class="fe fe-calendar" />}
+      {TRIGGER_ICON[props.trigger.type] && <i class={`fe ${TRIGGER_ICON[props.trigger.type]}`} />}
       {props.trigger.type === null && <i class="fe fe-plus-circle" />}
       <div class="card-title">
         <i class={cx('mr-3', props.trigger.icon)} />
@@ -131,6 +150,13 @@ const TriggerCard = ({ children, ...props }) => (
           trigger={props.trigger}
           variables={props.variables}
           setVariablesTrigger={props.setVariablesTrigger}
+        />
+      )}
+      {ALARM_TRIGGERS.includes(props.trigger.type) && (
+        <AlarmModeTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
         />
       )}
       {props.trigger.type === EVENTS.SYSTEM.START && (

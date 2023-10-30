@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { Error401 } = require('../../utils/httpErrors');
+const { Error401, Error403 } = require('../../utils/httpErrors');
 
 /**
  * @description Validate an access token.
@@ -26,6 +26,15 @@ function validateAccessToken(accessToken, scope) {
   // we verify that the session is not revoked
   if (this.cache.get(`revoked_session:${decoded.session_id}`) === true) {
     throw new Error401('AuthMiddleware: Session was revoked');
+  }
+
+  // We verify that the session is not a tablet mode currently locked
+  if (this.cache.get(`tablet_mode_locked:${decoded.session_id}`) === true) {
+    // if the scope currently asked is the alarm scope, it's ok
+    const scopeIsAlarmWrite = scope === 'alarm:write';
+    if (!scopeIsAlarmWrite) {
+      throw new Error403('TABLET_IS_LOCKED');
+    }
   }
 
   return decoded;

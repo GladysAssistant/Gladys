@@ -40,6 +40,28 @@ class BadParameters extends Error {
   }
 }
 
+class ConflictError extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
+class TooManyRequests extends Error {
+  constructor(message, timeBeforeNext) {
+    super();
+    this.message = message;
+    this.timeBeforeNext = timeBeforeNext;
+  }
+}
+
+class ForbiddenError extends Error {
+  constructor(message) {
+    super();
+    this.message = message;
+  }
+}
+
 class AbortScene extends Error {
   constructor(message) {
     super();
@@ -55,4 +77,7 @@ module.exports = {
   NoValuesFoundError,
   PlatformNotCompatible,
   AbortScene,
+  ConflictError,
+  ForbiddenError,
+  TooManyRequests,
 };
