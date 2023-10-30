@@ -219,6 +219,7 @@ class Dashboard extends Component {
   render(
     props,
     {
+      isGladysPlus,
       dashboardDropdownOpened,
       defineTabletModeOpened,
       dashboards,
@@ -260,6 +261,7 @@ class Dashboard extends Component {
         toggleDefineTabletMode={this.toggleDefineTabletMode}
         fullScreen={props.fullScreen}
         hideExitFullScreenButton={props.fullscreen === 'force'}
+        isGladysPlus={isGladysPlus}
       />
     );
   }
