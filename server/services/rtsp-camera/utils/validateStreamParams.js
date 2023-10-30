@@ -10,7 +10,7 @@ const validateSessionId = (sessionId) => {
 };
 
 const AUTHORIZED_FILENAMES = ['index.m3u8', 'index.m3u8.key', 'key_info_file.txt'];
-const HLS_CHUNK_REGEX = /index[0-9]+.ts/;
+const HLS_CHUNK_REGEX = /^index[0-9]+.ts$/;
 
 const validateFilename = (filename) => {
   if (AUTHORIZED_FILENAMES.includes(filename)) {
