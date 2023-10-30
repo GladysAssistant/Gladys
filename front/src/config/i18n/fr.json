@@ -534,7 +534,7 @@
         "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?",
         "manualConfiguration": {
           "title": "Configuration manuelle",
-          "text": "Si vous connaissez l'adresse IP de votre Pont, vous pouvez la saisir et lancer une configuration manuelle.",
+          "text": "Si vous connaissez l'adresse IP de votre pont Philips Hue, vous pouvez la saisir et lancer une configuration manuelle.",
           "input": "Adresse IP"
         }
       },
