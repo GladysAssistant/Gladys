@@ -16,7 +16,7 @@ describe('zwaveJSUIManager getNodes', () => {
     gladys = {
       stateManager: {
         get: fake.returns(null),
-      }
+      },
     };
     zwaveJSUIManager = new ZwaveJSUIManager(gladys, null, ZWAVEJSUI_SERVICE_ID);
   });
