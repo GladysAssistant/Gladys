@@ -20,19 +20,19 @@ const {
 async function configureBridge(ipAddress) {
   const bridge = this.bridgesByIP.get(ipAddress);
   if (!bridge) {
-    logger.info(`Connecting to hue bridge ip = ${bridge.ipaddress} manually (not from discovered bridges)...`);
+    logger.info(`Connecting to hue bridge ip = ${ipAddress} manually (not from discovered bridges)...`);
   } else {
-    logger.info(`Connecting to hue bridge "${bridge.name}", ip = ${bridge.ipaddress} (from discovered bridges)...`);
+    logger.info(`Connecting to hue bridge "${bridge.name}", ip = ${ipAddress} (from discovered bridges)...`);
   }
   try {
     const hueApi = this.hueClient.api;
-    const unauthenticatedApi = await hueApi.createLocal(bridge.ipaddress).connect();
+    const unauthenticatedApi = await hueApi.createLocal(ipAddress).connect();
     const user = await unauthenticatedApi.users.createUser(HUE_APP_NAME, HUE_DEVICE_NAME);
-    const authenticatedApi = await hueApi.createLocal(bridge.ipaddress).connect(user.username);
+    const authenticatedApi = await hueApi.createLocal(ipAddress).connect(user.username);
     // Get configuration to fetch serialNumber
     const bridgeConfig = await authenticatedApi.configuration.get();
     const bridgeSerialNumber = bridgeConfig.bridgeid;
-    const bridgeName = bridge.name ? bridge.name : bridgeConfig.name;
+    const bridgeName = bridge ? bridge.name : bridgeConfig.name;
     this.hueApisBySerialNumber.set(bridgeSerialNumber, authenticatedApi);
     const deviceCreated = await this.gladys.device.create({
       name: bridgeName,
@@ -44,7 +44,7 @@ async function configureBridge(ipAddress) {
       params: [
         {
           name: BRIDGE_IP_ADDRESS,
-          value: bridge.ipaddress,
+          value: ipAddress,
         },
         {
           name: BRIDGE_USERNAME,
