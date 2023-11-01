@@ -67,6 +67,15 @@
     "invalidEmail": "E-mail invalide",
     "needHelpText": "Besoin d'aide ? Rejoignez-nous sur <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>."
   },
+  "locked": {
+    "cardTitle": "Maison verrouillée",
+    "description": "Merci de taper votre code afin de déverrouiller l'alarme.",
+    "codePlaceholder": "Tapez votre code",
+    "error": "Une erreur est survenue, merci de réessayer",
+    "wrongCodeError": "Code invalide, merci de réessayer",
+    "tooManyRequests": "Veuillez attendre {{count}} minutes avant de re-essayer.",
+    "validateButton": "Valider"
+  },
   "signup": {
     "welcome": {
       "title": "Bienvenue dans Gladys !",
@@ -172,7 +181,21 @@
       "conflictError": "Une maison avec le même non existe déjà.",
       "roomConflictError": "Une pièce avec le même non existe déjà.",
       "validationError": "Erreur de validation : Le nom d'une maison doit-être compris entre 1 et 40 caractères.",
-      "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères."
+      "validationErrorRoom": "Erreur de validation : le nom d'une pièce doit être entre 1 et 40 caractères.",
+      "alarmTitle": "Alarme",
+      "alarmDescription": "Si vous utilisez le mode alarme dans Gladys, vous pouvez configurer ici le code de désactivation de l'alarme, ainsi que le délai avant le déclenchement de l'alarme. Ce délai sera appliqué lors d'un déclenchement manuel uniquement, pas dans les scènes.",
+      "alarmCodeLabel": "Code de l'alarme",
+      "alarmCodePlaceholder": "Entrez un code numériques entre 4 et 8 chiffres",
+      "alarmDelayBeforeArmingLabel": "Délai avant armement de l'alarme",
+      "alarmCodeError": "Le code doit être numérique et entre 4 et 8 chiffres.",
+      "alarmDelays": {
+        "0": "Pas de délai",
+        "5": "5 secondes",
+        "10": "10 secondes",
+        "15": "15 secondes",
+        "30": "30 secondes",
+        "60": "1 minute"
+      }
     },
     "success": {
       "title": "Merci !",
@@ -190,6 +213,14 @@
     "editDashboardDeleteButton": "Supprimer",
     "editDashboardSaveButton": "Sauvegarder",
     "editDashboardDeleteText": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
+    "toggleDefineTabletMode": "Mode tablette",
+    "closeDefineTabletMode": "Fermer",
+    "tabletMode": {
+      "description": "Le mode tablette sert à la fonctionnalité alarme. Si vous armez l'alarme, toutes les tablettes de la maison seront verrouillées et afficheront un clavier virtuel pour désactiver l'alarme.",
+      "fullScreenForce": "Si vous voulez forcer une tablette à rester en mode plein écran, vous pouvez ajouter <code>?fullscreen=force</code> à l'URL.",
+      "houseLabel": "Maison",
+      "tabletModeDisabled": "Mode tablette désactivé"
+    },
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
     "editDashboardTitle": "Editer le tableau de bord",
@@ -206,6 +237,7 @@
     "selectBoxType": "Sélectionner un type",
     "selectBoxTypeLabel": "Choisissez quel widget afficher ici",
     "boxTitle": {
+      "alarm": "Alarme",
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
       "humidity-in-room": "Humidité de la pièce",
@@ -338,6 +370,19 @@
         "editNameLabel": "Entrez le nom de cette box",
         "editNamePlaceholder": "Nom affiché sur le tableau de bord",
         "editSceneLabel": "Sélectionnez la scène que vous souhaitez afficher ici."
+      },
+      "alarm": {
+        "armButton": "Armer",
+        "disarmButton": "Désarmer",
+        "partiallyArmedButton": "Armement",
+        "partiallyArmedButtonSecondLine": "partiel",
+        "panicButton": "Panique",
+        "editBoxNameLabel": "Nom du widget",
+        "editBoxNamePlaceholder": "Entrez le nom du widget",
+        "editHouseLabel": "Sélectionnez la maison qui est concernée pour l'activation/désactivation de l'alarme.",
+        "alarmStatusText": "Votre maison est ",
+        "alarmArming": "Votre maison est en train d'être armée...",
+        "cancelAlarmArming": "Annuler"
       }
     }
   },
@@ -692,10 +737,10 @@
         "description": "Ce service utilise deux containers Docker (MQTT broker and Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
         "enableLabel": "Activation du service Zigbee2mqtt",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",
-        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personnalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
         "enableZigbee2mqtt": "Activer Zigbee2mqtt",
         "containersStatus": "Conteneurs liés à Zigbee2mqtt",
-        "serviceStatus": "Etat du service Zigbee2mqtt",
+        "serviceStatus": "État du service Zigbee2mqtt",
         "link": "Lien",
         "connected": "Zigbee2mqtt démarré avec succès.",
         "error": "Une erreur s'est produite au démarrage du service Zigbee2mqtt.",
@@ -704,7 +749,8 @@
         "zigbee2Mqtt": "Zigbee2mqtt",
         "gladys": "Gladys",
         "mqtt": "MQTT",
-        "status": "Status"
+        "status": "Status",
+        "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
       },
       "device": {
         "title": "Appareils Zigbee",
@@ -713,6 +759,7 @@
       "discover": {
         "title": "Découverte du réseau Zigbee",
         "permitJoin": "Autoriser l'association",
+        "hideExistingDevices": "Cacher les appareils déjà ajoutés",
         "noDeviceDiscovered": "Aucun nouvel appareil trouvé. Veuillez autoriser l'association des appareils et les appairer.\nATTENTION : Pour la sécurité de votre installation, n'oubliez pas d'interdire l'association après appairage.",
         "serverNoResponse": "Gladys n'est pas accessible.",
         "serverNoResponseWebSocker": "Gladys n'est pas accessible. Veuillez actualiser la page.",
@@ -733,6 +780,41 @@
       "saveError": "Une erreur s'est produite lors de la sauvegarde.",
       "documentation": "Documentation Zigbee2mqtt"
     },
+    "nodeRed": {
+      "title": "Node-RED",
+      "description": "Contrôlez vos appareils via Node-RED.",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Node-RED",
+      "status": {
+        "notInstalled": "Le serveur Node-RED n'a pas pu être installé.",
+        "notRunning": "Le serveur Node-RED n'a pas démarré.",
+        "running": "Node-RED démarré avec succès.",
+        "notEnabled": "Node-RED n'est pas activé.",
+        "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Node-RED depuis Gladys.",
+        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Node-RED depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"."
+      },
+      "setup": {
+        "title": "Configuration du service Node-RED",
+        "description": "Ce service utilise un container Docker. Activez Node-RED pour déployer ce container.\nPour en savoir plus, rendez-vous sur la page de documentation Node-RED.",
+        "descriptionBackup": "Pour le moment, Node-RED n'est pas sauvegardé dans Gladys Plus.\nSi vous souhaitez une sauvegarde pour Node-RED, veuillez suivre cette <a href=\"https://community.gladysassistant.com/t/mini-tuto-backup-par-email-des-flows-node-red/8402\" target=\"_blank\" rel=\"noopener noreferrer\">documentation</a>",
+        "error": "Une erreur s'est produite au démarrage du service Node-RED.",
+        "enableLabel": "Activation du service Node-RED",
+        "enableNodeRed": "Activer",
+        "disableNodeRed": "Désactiver",
+        "confirmDisableLabel": "Etes-vous sûr de vouloir désactiver Node-RED ?",
+        "confirmDisableCancelButton": "Annuler",
+        "activationNodeRed": "Activation...",
+        "serviceStatus": "Etat du service Node-RED",
+        "containersStatus": "Conteneurs liés à Node-RED",
+        "status": "Status",
+        "node-red": "Node-RED",
+        "gladys": "Gladys",
+        "usernameLabel": "Nom d'utilisateur",
+        "passwordLabel": "Mot de passe",
+        "urlLabel": "Url de l'interface Node-RED : <a href=\"{{nodeRedUrl}}\" target=\"_blank\">{{nodeRedUrl}}</a> (Pas accessible depuis Gladys Plus)"
+      }
+    },
+
     "googleHome": {
       "title": "Google Home",
       "description": "Contrôlez vos appareils Gladys à la voix dans Google Home",
@@ -1485,6 +1567,16 @@
         "ok": "Réseau ok",
         "warning": "Réseau tendu",
         "critical": "Réseau très tendu"
+      },
+      "alarmCheckMode": {
+        "description": "La scène continuera si l'alarme est dans le mode sélectionné.",
+        "houseLabel": "Maison",
+        "alarmModeLabel": "Mode de l'alarme"
+      },
+      "alarmSetMode": {
+        "description": "Cette action passera la maison sélectionnée dans le mode d'alarme sélectionné.",
+        "houseLabel": "Maison",
+        "alarmModeLabel": "Mode de l'alarme"
       }
     },
     "actions": {
@@ -1535,6 +1627,10 @@
       },
       "ecowatt": {
         "condition": "Condition sur Ecowatt ( France )"
+      },
+      "alarm": {
+        "check-alarm-mode": "Si l'alarme est en mode",
+        "set-alarm-mode": "Passer l'alarme en mode"
       }
     },
     "variables": {
@@ -1574,6 +1670,14 @@
       },
       "calendar": {
         "event-is-coming": "Un évènement dans le calendrier arrive"
+      },
+      "alarm": {
+        "arm": "L'alarme est armée",
+        "arming": "L'alarme est en cours d'armement",
+        "disarm": "L'alarme est désarmée",
+        "partial-arm": "L'alarme est armée partiellement",
+        "panic": "L'alarme est en mode panique",
+        "too-many-codes-tests": "Alarme : Trop de codes invalides"
       },
       "system": {
         "start": "Gladys démarre"
@@ -1661,6 +1765,17 @@
         "minute": "minutes",
         "hour": "heures",
         "day": "jours"
+      },
+      "alarmMode": {
+        "alarm": {
+          "arm": "Ce déclencheur se lancera quand la maison sélectionnée est armée.",
+          "arming": "Ce déclencheur se lancera quand la maison sélectionnée va être armée.",
+          "disarm": "Ce déclencheur se lancera quand la maison sélectionnée est désarmée.",
+          "partial-arm": "Ce déclencheur se lancera quand la maison sélectionnée est armée partiellement.",
+          "panic": "Ce déclencheur se lancera quand la maison sélectionnée est en mode panique.",
+          "too-many-codes-tests": "Ce déclencheur se lancera à chaque échec de saisie du code de l'alarme à partir de 3 essais ratés."
+        },
+        "houseLabel": "Maison"
       },
       "gladysStart": {
         "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
@@ -2027,6 +2142,12 @@
     "backupStarted": "Début de la sauvegarde...",
     "notConfigured": "Gladys Plus doit être configuré pour activer les sauvegardes. Accédez à l'onglet Gladys Plus pour le configurer.",
     "restoreFailed": "La restauration de votre backup a échoué. Êtes-vous sûr que votre clé de sauvegarde est la même que celle utilisée par Gladys lorsque le backup a été créé ? Vous pouvez modifier la clé de sauvegarde dans l'onglet Gladys Plus des paramètres."
+  },
+  "alarmModes": {
+    "armed": "armée",
+    "disarmed": "désarmée",
+    "partially-armed": "armée partiellement",
+    "panic": "en mode panique"
   },
   "deviceFeatureUnit": {
     "celsius": "Celsius (°C)",

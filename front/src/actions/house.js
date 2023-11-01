@@ -64,6 +64,30 @@ function createActions(store) {
       });
       store.setState(newState);
     },
+    updateHouseAlarmCode(state, code, houseIndex) {
+      const newState = update(state, {
+        houses: {
+          [houseIndex]: {
+            alarm_code: {
+              $set: code
+            }
+          }
+        }
+      });
+      store.setState(newState);
+    },
+    updateHouseDelayBeforeArming(state, delayBeforeArming, houseIndex) {
+      const newState = update(state, {
+        houses: {
+          [houseIndex]: {
+            alarm_delay_before_arming: {
+              $set: parseInt(delayBeforeArming, 10)
+            }
+          }
+        }
+      });
+      store.setState(newState);
+    },
     updateHouseLocation(state, latitude, longitude, houseIndex) {
       const newState = update(state, {
         houses: {

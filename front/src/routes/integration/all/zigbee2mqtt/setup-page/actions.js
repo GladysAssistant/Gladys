@@ -3,6 +3,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import get from 'get-value';
+import config from '../../../../../config';
 
 dayjs.extend(relativeTime);
 
@@ -38,6 +39,16 @@ const createActions = store => {
           networkModeValid: zigbee2mqttStatus.networkModeValid
         });
       }
+
+      // Compute Zigbee2Mqtt interface URL if connected locally (not through Gladys Plus Gateway)
+      let z2mUrl = null;
+      if (state.session.gatewayClient === undefined) {
+        const url = new URL(config.localApiUrl);
+        z2mUrl = `${url.protocol}//${url.hostname}:8080`;
+      }
+      store.setState({
+        z2mUrl
+      });
     },
 
     async startContainer(state) {
