@@ -4,7 +4,6 @@ to: ../front/src/components/boxs/<%= module %>/<%= className %>Box.jsx
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text } from 'preact-i18n';
-import { RequestStatus } from '../../../utils/consts';
 import get from 'get-value';
 
 const <%= className %>Box = ({ children, loading, error, ...props }) => {
@@ -67,6 +66,7 @@ class <%= className %> extends Component {
 
   componentDidUpdate(previousProps) {
     // todo : do something when box config has changed (ie: box name, device configured,...)
+    console.log(`Previous props : ${previousProps}`);
   };
 
   componentWillUnmount() {
