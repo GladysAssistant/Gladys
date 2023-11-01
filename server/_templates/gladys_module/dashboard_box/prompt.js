@@ -6,7 +6,6 @@ module.exports = {
     return {
       module: args.module,
       className: args.className,
-      attributeName: args.attributeName,
       constName: args.constName,
     };
   },
@@ -21,11 +20,6 @@ module.exports = {
         type: 'input',
         name: 'className',
         message: 'Used in Service, Handler and Controller name as prefix (ie: AndroidTv => AndroidTvService):',
-      },
-      {
-        type: 'input',
-        name: 'attributeName',
-        message: 'Used as prefix for attributes (ie: androidtv => androidtvManager):',
       },
       {
         type: 'input',
