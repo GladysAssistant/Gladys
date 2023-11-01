@@ -12,8 +12,6 @@ const Edit<%= className %>Box = ({ children, ...props }) => (
     <div class={props.loading ? 'dimmer active' : 'dimmer'}>
       <div class="loader" />
 
-      
-
       <div class="form-group">
         <label>
           <Text id="dashboard.boxes.<%= module %>.editBoxNameLabel" />

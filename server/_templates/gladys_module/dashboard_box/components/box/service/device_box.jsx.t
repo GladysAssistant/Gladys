@@ -62,7 +62,7 @@ class <%= className %> extends Component {
   };
 
   componentDidMount() {
-    await this.refreshData();
+    this.refreshData();
   };
 
   componentDidUpdate(previousProps) {

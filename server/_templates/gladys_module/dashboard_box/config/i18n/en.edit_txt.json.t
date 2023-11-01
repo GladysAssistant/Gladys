@@ -9,4 +9,3 @@ skip_if: "\"error\": \"Error in service <%= module %>, reboot !\""
         "editBoxNameLabel": "Enter the name you want to give to the box:",
         "editBoxNamePlaceholder": "Name of the box",
         "error": "Error in service <%= module %>, reboot !"
-        
