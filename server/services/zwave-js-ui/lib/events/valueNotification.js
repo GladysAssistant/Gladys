@@ -1,6 +1,6 @@
 const { EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { PROPERTIES, COMMAND_CLASSES } = require('../constants');
+const { PROPERTIES, COMMAND_CLASSES, ENDPOINTS } = require('../constants');
 const { unbindValue } = require('../utils/bindValue');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
@@ -28,8 +28,18 @@ function valueNotification(zwaveNode, args) {
     valueNotification.bind(this)(zwaveNode, args);
     return;
   }
+  if (property === PROPERTIES.CURRENT_COLOR) {
+    args.property = PROPERTIES.TARGET_COLOR;
+    args.propertyName = PROPERTIES.TARGET_COLOR;
+    args.writeable = true;
+    valueNotification.bind(this)(zwaveNode, args);
+    return;
+  }
 
-  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  let fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  if (fullProperty === PROPERTIES.TARGET_COLOR) {
+    fullProperty = `${fullProperty}-${ENDPOINTS.TARGET_COLOR}`;
+  }
   args.fullProperty = fullProperty;
   const valueUnbind = unbindValue(args, value);
   logger.debug(

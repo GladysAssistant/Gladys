@@ -1,6 +1,6 @@
 const { EVENTS } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { GENRE, PROPERTIES } = require('../constants');
+const { GENRE, PROPERTIES, ENDPOINTS } = require('../constants');
 const { unbindValue } = require('../utils/bindValue');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
@@ -29,7 +29,7 @@ function getValueMetadata(zwaveNode, args) {
  * valueAdded({id: 0}, { commandClass: 0, endpoint: 0, property: '', propertyKey: '' });
  */
 function valueAdded(zwaveNode, args) {
-  const { commandClass, endpoint, property, propertyKey, value } = args;
+  const { commandClass, endpoint, property, propertyKey, value, label } = args;
   const nodeId = zwaveNode.id;
   const node = this.nodes[nodeId];
   if (!node) {
@@ -45,6 +45,13 @@ function valueAdded(zwaveNode, args) {
     valueAdded.bind(this)(zwaveNode, args);
     return;
   }
+  if (property === PROPERTIES.CURRENT_COLOR) {
+    args.property = PROPERTIES.TARGET_COLOR;
+    args.propertyName = PROPERTIES.TARGET_COLOR;
+    args.writeable = true;
+    valueAdded.bind(this)(zwaveNode, args);
+    return;
+  }
 
   if (!node.classes[commandClass]) {
     node.classes[commandClass] = {};
@@ -52,7 +59,10 @@ function valueAdded(zwaveNode, args) {
   if (!node.classes[commandClass][endpoint]) {
     node.classes[commandClass][endpoint] = {};
   }
-  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  let fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  if (fullProperty === PROPERTIES.TARGET_COLOR) {
+    fullProperty = `${fullProperty}-${ENDPOINTS.TARGET_COLOR}`;
+  }
   logger.debug(
     `Value Added: nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}, value = ${value}`,
   );
@@ -70,6 +80,7 @@ function valueAdded(zwaveNode, args) {
     commandClass,
     endpoint,
     property: fullProperty,
+    label,
   });
 
   // if (node.ready) {

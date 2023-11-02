@@ -115,7 +115,13 @@ function handleMqttMessage(topic, message) {
           newValue = false;
         } else if (message === 'true') {
           newValue = true;
+        } else if (message.charAt(0) === '{') {
+          // new Value is a object...
+          break;
+        } else if (message.charAt(0) === '"') {
+          // new Value is a string...
         } else {
+          // assume message is an integer
           try {
             newValue = Number(message);
           } catch (e) {

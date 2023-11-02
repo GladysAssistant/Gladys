@@ -2,7 +2,7 @@ const logger = require('../../../../utils/logger');
 const { EVENTS } = require('../../../../utils/constants');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 const { unbindValue } = require('../utils/bindValue');
-const { PROPERTIES } = require('../constants');
+const { PROPERTIES, ENDPOINTS } = require('../constants');
 
 /**
  * @description When a value changed.
@@ -28,8 +28,18 @@ function valueUpdated(zwaveNode, args) {
     valueUpdated.bind(this)(zwaveNode, args);
     return;
   }
+  if (property === PROPERTIES.CURRENT_COLOR) {
+    args.property = PROPERTIES.TARGET_COLOR;
+    args.propertyName = PROPERTIES.TARGET_COLOR;
+    args.writeable = true;
+    valueUpdated.bind(this)(zwaveNode, args);
+    return;
+  }
 
-  const fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  let fullProperty = property + (propertyKey ? `-${propertyKey}` : '');
+  if (fullProperty === PROPERTIES.TARGET_COLOR) {
+    fullProperty = `${fullProperty}-${ENDPOINTS.TARGET_COLOR}`;
+  }
   args.fullProperty = fullProperty;
   const newValueUnbind = unbindValue(args, newValue);
   logger.debug(

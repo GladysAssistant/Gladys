@@ -1,5 +1,5 @@
 const { STATE } = require('../../../../utils/constants');
-const { COMMAND_CLASSES, SCENE_VALUES, SMOKE_ALARM_VALUES, PROPERTIES } = require('../constants');
+const { COMMAND_CLASSES, SCENE_VALUES, SMOKE_ALARM_VALUES, PROPERTIES, ENDPOINTS } = require('../constants');
 
 /**
  * @description Bind value.
@@ -18,6 +18,19 @@ function bindValue(valueId, value) {
   }
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_NOTIFICATION) {
     return value === '8';
+  }
+  if (
+    valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR &&
+    valueId.property === PROPERTIES.HEX_COLOR
+  ) {
+    return `"${value.toString(16).padStart(6, '0')}"`;
+  }
+  if (
+    valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR &&
+    valueId.property === PROPERTIES.TARGET_COLOR &&
+    valueId.endpoint === ENDPOINTS.TARGET_COLOR
+  ) {
+    return Math.round((value / 100) * 255);
   }
   return value;
 }
@@ -50,6 +63,27 @@ function unbindValue(valueId, value) {
   }
   if (valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SCENE_ACTIVATION) {
     return SCENE_VALUES[value % 10];
+  }
+  if (
+    valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR &&
+    valueId.property === PROPERTIES.HEX_COLOR
+  ) {
+    if (value.substring) {
+      if (value.charAt(0) === '"') {
+        // Case value updated message
+        return parseInt(value.substring(1, value.length - 1), 16);
+      }
+      // Case getNodes message
+      return parseInt(value, 16);
+    }
+    return value;
+  }
+  if (
+    valueId.commandClass === COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR &&
+    valueId.property === PROPERTIES.TARGET_COLOR &&
+    valueId.endpoint === ENDPOINTS.TARGET_COLOR
+  ) {
+    return Math.round((value / 255) * 100);
   }
   return value;
 }

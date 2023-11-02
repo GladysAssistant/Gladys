@@ -85,16 +85,7 @@ function getNodes({ orderDir, search, filterExisting } = { orderDir: 'asc', sear
       Object.entries(transformClasses(node)).forEach(([commandClassKey, commandClassValue]) => {
         Object.entries(commandClassValue).forEach(([endpointKey, endpointValue]) => {
           Object.entries(endpointValue).forEach(([propertyKey, propertyValue]) => {
-            const {
-              property,
-              genre,
-              label,
-              type: propertyType,
-              unit,
-              commandClass,
-              endpoint,
-              writeable,
-            } = propertyValue;
+            const { property, genre, label, unit, commandClass, endpoint, writeable } = propertyValue;
             let { min, max } = propertyValue;
             const { value } = propertyValue;
             if (genre === 'user') {
@@ -104,11 +95,11 @@ function getNodes({ orderDir, search, filterExisting } = { orderDir: 'asc', sear
                 property,
               });
               if (category !== 'unknown') {
-                if (min === undefined) {
-                  min = propertyType === 'boolean' ? 0 : categoryMin;
+                if (categoryMin !== undefined) {
+                  min = categoryMin;
                 }
-                if (max === undefined) {
-                  max = propertyType === 'boolean' ? 1 : categoryMax;
+                if (categoryMax !== undefined) {
+                  max = categoryMax;
                 }
                 const valueUnbind = unbindValue(
                   {
