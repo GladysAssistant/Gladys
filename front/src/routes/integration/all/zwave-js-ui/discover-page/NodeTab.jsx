@@ -10,9 +10,9 @@ import { RequestStatus } from '../../../../../utils/consts';
 import CardFilter from '../../../../../components/layout/CardFilter';
 
 class NodeTab extends Component {
-  render(props, { zwaveStatus, zwaveGetNodesStatus }) {
-    const zwaveNotConfigured = zwaveGetNodesStatus === RequestStatus.ServiceNotConfigured;
-    const scanInProgress = get(zwaveStatus, 'scanInProgress');
+  render(props) {
+    const zwaveNotConfigured = props.zwaveGetNodesStatus === RequestStatus.ServiceNotConfigured;
+    const scanInProgress = get(props.zwaveStatus, 'scanInProgress');
     const gettingNodesInProgress = props.zwaveGetNodesStatus === RequestStatus.Getting;
     const zwaveActionsDisabled = scanInProgress || gettingNodesInProgress;
     const zwaveActionsEnabled = !zwaveActionsDisabled;
@@ -30,7 +30,7 @@ class NodeTab extends Component {
                 checked={props.filterExisting | true}
                 onClick={props.toggleFilterOnExisting}
               />
-              <span class={cx('custom-switch-indicator', 'mr-1', { 'bg-light': props.gettingNodesInProgress })} />
+              <span class={cx('custom-switch-indicator', 'mr-1', { 'bg-light': gettingNodesInProgress })} />
               <span class="custom-switch-description">
                 <Text id="integration.zwavejsui.discover.hideExistingDevices" />
               </span>
@@ -46,6 +46,11 @@ class NodeTab extends Component {
             </Localizer>
           </div>
         </div>
+        {zwaveActionsDisabled && (
+          <div class="progress progress-xs">
+            <div class="progress-bar progress-bar-indeterminate" />
+          </div>
+        )}
         <div class="card-body">
           <div
             class={cx('dimmer', {

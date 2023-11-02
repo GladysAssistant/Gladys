@@ -110,4 +110,4 @@ class ZwaveJSUIDeviceOperationPage extends Component {
   }
 }
 
-export default connect('session,user,zwaveDevices,houses,getZwaveDevicesStatus', actions)(ZwaveJSUIDeviceOperationPage);
+export default connect('session,user,zwaveDevices,houses,zwaveGetDevicesStatus', actions)(ZwaveJSUIDeviceOperationPage);

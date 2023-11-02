@@ -8,7 +8,7 @@ function createActions(store) {
   const actions = {
     async getZWaveDevices(state) {
       store.setState({
-        getZwaveDevicesStatus: RequestStatus.Getting
+        zwaveGetDevicesStatus: RequestStatus.Getting
       });
       try {
         const options = {
@@ -20,11 +20,11 @@ function createActions(store) {
         const zwaveDevices = await state.httpClient.get('/api/v1/service/zwave-js-ui/device', options);
         store.setState({
           zwaveDevices,
-          getZwaveDevicesStatus: RequestStatus.Success
+          zwaveGetDevicesStatus: RequestStatus.Success
         });
       } catch (e) {
         store.setState({
-          getZwaveDevicesStatus: RequestStatus.Error
+          zwaveGetDevicesStatus: RequestStatus.Error
         });
       }
     },
@@ -60,7 +60,7 @@ function createActions(store) {
     },
     async changeOrderDir(state, e) {
       store.setState({
-        getZwaveDeviceOrderDir: e.target.value
+        orderDir: e.target.value
       });
       await actions.getZWaveDevices(store.getState());
     }

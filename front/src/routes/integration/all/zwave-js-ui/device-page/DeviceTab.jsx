@@ -28,13 +28,13 @@ const DeviceTab = ({ children, ...props }) => (
     <div class="card-body">
       <div
         class={cx('dimmer', {
-          active: props.getZwaveDevicesStatus === RequestStatus.Getting
+          active: props.zwaveGetDevicesStatus === RequestStatus.Getting
         })}
       >
         <div class="loader" />
         <div class="dimmer-content">
           {props.zwaveDevices && props.zwaveDevices.length === 0 && <EmptyState />}
-          {props.getZwaveDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
+          {props.zwaveGetDevicesStatus === RequestStatus.Getting && <div class={style.emptyDiv} />}
           <div class="row">
             {props.zwaveDevices &&
               props.zwaveDevices.map((zwaveDevice, index) => (

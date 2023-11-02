@@ -26,6 +26,13 @@ const displayRawNode = node => () => {
 };
 
 class ZwaveNode extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      zwaveSaveNodeStatus: null
+    };
+  }
+
   createDevice = async () => {
     await this.props.createDevice(this.props.node);
   };
