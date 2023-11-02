@@ -2,7 +2,7 @@
 inject: true
 to: ../front/src/config/i18n/en.json
 before: "\"openai\": {"
-skip_if: "<%= module %>"
+skip_if: "\"title\": \"<%= module %> configuration\","
 ---
     "<%= module %>": {
       "title": "<%= module %>",

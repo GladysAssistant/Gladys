@@ -2,57 +2,63 @@
 inject: true
 to: ../front/src/config/i18n/fr.json
 before: "\"openai\": {"
-skip_if: "<%= module %>"
+skip_if: "\"title\": \"<%= module %> configuration\","
 ---
     "<%= module %>": {
       "title": "<%= module %>",
-      "description": "Control your <%= module %> devices.",
-      "deviceTab": "Devices",
-      "discoverTab": "Discover <%= module %>",
-      "setupTab": "Setup",
-      "discoverDeviceDescr": "Automatically scan <%= module %> devices",
-      "nameLabel": "Device Name",
-      "namePlaceholder": "Enter the name of your device",
-      "roomLabel": "Room",
-      "saveButton": "Save",
-      "updateButton": "Update",
-      "alreadyCreatedButton": "Already created",
-      "deleteButton": "Delete",
+      "description": "Contrôlez vos apareils <%= module %>.",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte <%= module %>",
+      "setupTab": "Configuration",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils <%= module %>",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "modelLabel": "Modèle",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "updateButton": "Mettre à jour",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
       "status": {
-        "notConnected": "Gladys failed to connect to <%= module %> cloud account, please go to ",
-        "setupPageLink": "<%= module %> configuration page."
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte cloud <%= module %>, plus d'informations sur la ",
+        "setupPageLink": "page de configuration <%= module %>.",
+        "online": "En ligne",
+        "offline": "Hors ligne"
       },
       "device": {
-        "title": "Devices in Gladys",
-        "search": "Search devices",
-        "updates": "Check updates",
-        "editButton": "Edit",
-        "noDeviceFound": "No <%= module %> device found.",
-        "featuresLabel": "Features"
+        "title": "Appareils <%= module %> dans Gladys",
+        "search": "Rechercher les appareils",
+        "updates": "Vérifier les mises à jour",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil <%= module %> trouvé.",
+        "featuresLabel": "Fonctionnalités"
       },
       "discover": {
-        "title": "Devices detected on your <%= module %> cloud account",
-        "description": "<%= module %> devices are automatically discovered. Your <%= module %> devices need to be added to your <%= module %> cloud account before.",
-        "error": "Error discovering <%= module %> devices. Please verify your credentials on Setup.",
-        "noDeviceFound": "No <%= module %> device discovered.",
-        "scan": "Scan"
+        "title": "Appareils détectés sur votre compte cloud <%= module %>",
+        "description": "Les appareils <%= module %> sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils <%= module %>. Veuillez vérifier vos informations d'identification lors de l'installation.",
+        "noDeviceFound": "Aucun appareil <%= module %> n'a été découvert.",
+        "scan": "Scanner"
       },
       "setup": {
-        "title": "<%= module %> configuration",
-        "<%= attributeName %>Description": "You can connect Gladys to your <%= module %> cloud account to command the associated devices.",
-        "userLabel": "Username",
-        "userPlaceholder": "Enter <%= module %> username",
-        "passwordLabel": "Password",
-        "passwordPlaceholder": "Enter <%= module %> password",
-        "saveLabel": "Save configuration",
-        "error": "An error occured while saving configuration.",
-        "connecting": "Configuration saved. Now connecting to your <%= module %> cloud account...",
-        "connected": "Connected to the <%= module %> cloud account with success !",
-        "connectionError": "Error while connecting, please check your configuration."
+        "title": "Configuration <%= module %>",
+        "<%= attributeName %>Description": "Vous pouvez connecter Gladys à votre compte cloud <%= module %> pour commander les appareils associés.",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur <%= module %>",
+        "countryCodeLabel": "Code pays",
+        "countryPlaceholder": "Entrez le code de votre pays (ex: fr)",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe utilisateur <%= module %>",
+        "saveLabel": "Enregistrer la configuration",
+        "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte cloud <%= module %>...",
+        "connected": "Connexion réussie au compte cloud <%= module %> !",
+        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
       },
       "error": {
-        "defaultError": "There was an error saving the device.",
-        "defaultDeletionError": "There was an error deleting the device.",
-        "conflictError": "Current device is already in Gladys."
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
       }
     },
