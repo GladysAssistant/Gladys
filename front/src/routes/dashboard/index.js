@@ -5,12 +5,19 @@ import { route } from 'preact-router';
 import DashboardPage from './DashboardPage';
 import GatewayAccountExpired from '../../components/gateway/GatewayAccountExpired';
 import actions from '../../actions/dashboard';
+import { WEBSOCKET_MESSAGE_TYPES } from '../../../../server/utils/constants';
 import get from 'get-value';
 
 class Dashboard extends Component {
   toggleDashboardDropdown = () => {
     this.setState(prevState => {
       return { ...prevState, dashboardDropdownOpened: !this.state.dashboardDropdownOpened };
+    });
+  };
+
+  toggleDefineTabletMode = () => {
+    this.setState(prevState => {
+      return { ...prevState, defineTabletModeOpened: !this.state.defineTabletModeOpened };
     });
   };
 
@@ -148,11 +155,32 @@ class Dashboard extends Component {
     this.props.setFullScreen(isFullScreen);
   };
 
+  alarmArmed = async () => {
+    // Check server side if we are in tablet mode
+    try {
+      const currentSession = await this.props.httpClient.get('/api/v1/session/tablet_mode');
+      if (currentSession.tablet_mode) {
+        route('/locked');
+      }
+    } catch (e) {
+      console.error(e);
+      const status = get(e, 'response.status');
+      const errorMessageOtherFormat = get(e, 'response.data.message');
+      if (status === 401 && errorMessageOtherFormat === 'TABLET_IS_LOCKED') {
+        route('/locked');
+      }
+    }
+  };
+
+  alarmArming = () => {};
+
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
+      isGladysPlus: this.props.session.gatewayClient !== undefined,
       dashboardDropdownOpened: false,
+      defineTabletModeOpened: false,
       dashboardEditMode: false,
       showReorderDashboard: false,
       browserFullScreenCompatible: this.isBrowserFullScreenCompatible(),
@@ -168,6 +196,8 @@ class Dashboard extends Component {
     document.addEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('mozfullscreenchange', this.onFullScreenChange, false);
     document.addEventListener('click', this.closeDashboardDropdown, true);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmed);
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
     this.checkIfFullScreenParameterIsHere();
   }
 
@@ -182,12 +212,16 @@ class Dashboard extends Component {
     document.removeEventListener('webkitfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('mozfullscreenchange', this.onFullScreenChange, false);
     document.removeEventListener('click', this.closeDashboardDropdown, true);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMED, this.alarmArmed);
+    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.ARMING, this.alarmArming);
   }
 
   render(
     props,
     {
+      isGladysPlus,
       dashboardDropdownOpened,
+      defineTabletModeOpened,
       dashboards,
       currentDashboard,
       dashboardEditMode,
@@ -211,6 +245,7 @@ class Dashboard extends Component {
       <DashboardPage
         {...props}
         dashboardDropdownOpened={dashboardDropdownOpened}
+        defineTabletModeOpened={defineTabletModeOpened}
         dashboardEditMode={dashboardEditMode}
         dashboards={dashboards}
         dashboardListEmpty={dashboardListEmpty}
@@ -223,11 +258,16 @@ class Dashboard extends Component {
         redirectToDashboard={this.redirectToDashboard}
         editDashboard={this.editDashboard}
         toggleFullScreen={this.toggleFullScreen}
+        toggleDefineTabletMode={this.toggleDefineTabletMode}
         fullScreen={props.fullScreen}
         hideExitFullScreenButton={props.fullscreen === 'force'}
+        isGladysPlus={isGladysPlus}
       />
     );
   }
 }
 
-export default connect('user,fullScreen,currentUrl,httpClient,gatewayAccountExpired', actions)(Dashboard);
+export default connect(
+  'user,session,fullScreen,currentUrl,httpClient,gatewayAccountExpired,tabletMode',
+  actions
+)(Dashboard);

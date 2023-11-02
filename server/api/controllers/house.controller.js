@@ -47,6 +47,25 @@ module.exports = function HouseController(gladys) {
   }
 
   /**
+   * @api {get} /api/v1/house/:house_selector getBySelector
+   * @apiName getBySelector
+   * @apiGroup House
+   * @apiUse HouseParam
+   * @apiSuccessExample {json} Success-Example
+   * {
+   *   "id": "7932e6b3-b944-49a9-8d63-b98b8ecb2509",
+   *   "name": "My house",
+   *   "selector": "my-house"
+   *   "updated_at": "2019-05-09T03:43:54.247Z",
+   *   "created_at": "2019-05-09T03:43:54.247Z"
+   * }
+   */
+  async function getBySelector(req, res) {
+    const house = await gladys.house.getBySelector(req.params.house_selector);
+    res.json(house);
+  }
+
+  /**
    * @api {patch} /api/v1/house/:house_selector update
    * @apiName update
    * @apiGroup House
@@ -108,12 +127,68 @@ module.exports = function HouseController(gladys) {
     res.json(rooms);
   }
 
+  /**
+   * @api {post} /api/v1/house/:house_selector/arm arm
+   * @apiName arm
+   * @apiGroup Alarm
+   */
+  async function arm(req, res) {
+    await gladys.house.arm(req.params.house_selector);
+    res.json({ success: true });
+  }
+
+  /**
+   * @api {post} /api/v1/house/:house_selector/disarm Disarm
+   * @apiName Disarm
+   * @apiGroup Alarm
+   */
+  async function disarm(req, res) {
+    const house = await gladys.house.disarm(req.params.house_selector);
+    res.json(house);
+  }
+
+  /**
+   * @api {post} /api/v1/house/:house_selector/disarm_with_code DisarmWithCode
+   * @apiName DisarmWithCode
+   * @apiGroup Alarm
+   */
+  async function disarmWithCode(req, res) {
+    const house = await gladys.house.disarmWithCode(req.params.house_selector, req.body.code);
+    res.json(house);
+  }
+
+  /**
+   * @api {post} /api/v1/house/:house_selector/partial_arm Partial Arm
+   * @apiName Partial Arm
+   * @apiGroup Alarm
+   */
+  async function partialArm(req, res) {
+    const house = await gladys.house.partialArm(req.params.house_selector);
+    res.json(house);
+  }
+
+  /**
+   * @api {post} /api/v1/house/:house_selector/disarm Disarm
+   * @apiName Disarm
+   * @apiGroup Alarm
+   */
+  async function panic(req, res) {
+    const house = await gladys.house.panic(req.params.house_selector);
+    res.json(house);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
     get: asyncMiddleware(get),
+    getBySelector: asyncMiddleware(getBySelector),
     update: asyncMiddleware(update),
     userSeen: asyncMiddleware(userSeen),
     getRooms: asyncMiddleware(getRooms),
+    arm: asyncMiddleware(arm),
+    disarm: asyncMiddleware(disarm),
+    disarmWithCode: asyncMiddleware(disarmWithCode),
+    partialArm: asyncMiddleware(partialArm),
+    panic: asyncMiddleware(panic),
   });
 };

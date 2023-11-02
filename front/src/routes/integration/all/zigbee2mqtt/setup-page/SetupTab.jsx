@@ -46,6 +46,17 @@ class SetupTab extends Component {
             </p>
           )}
 
+          {props.zigbee2mqttConnected && props.z2mUrl && (
+            <div class="form-group">
+              <MarkupText
+                id="integration.zigbee2mqtt.setup.connectionUrl"
+                fields={{
+                  url: props.z2mUrl
+                }}
+              />
+            </div>
+          )}
+
           <div class="form-group">
             <label for="enableZigbee2mqtt" class="form-label">
               <Text id={`integration.zigbee2mqtt.setup.enableLabel`} />

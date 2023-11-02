@@ -64,3 +64,47 @@ describe('GET /api/v1/session', () => {
       });
   });
 });
+
+describe('POST /api/v1/session/tablet_mode', () => {
+  it('should set tablet mode to true', async () => {
+    await authenticatedRequest
+      .post('/api/v1/session/tablet_mode')
+      .send({
+        tablet_mode: true,
+        house: 'test-house',
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('tablet_mode', true);
+        expect(res.body).to.have.property('current_house_id', 'a741dfa6-24de-4b46-afc7-370772f068d5');
+      });
+  });
+  it('should set tablet mode to false', async () => {
+    await authenticatedRequest
+      .post('/api/v1/session/tablet_mode')
+      .send({
+        tablet_mode: false,
+        house: null,
+      })
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('tablet_mode', false);
+        expect(res.body).to.have.property('current_house_id', null);
+      });
+  });
+});
+
+describe('GET /api/v1/session/tablet_mode', () => {
+  it('should get tablet mode', async () => {
+    await authenticatedRequest
+      .get('/api/v1/session/tablet_mode')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('tablet_mode', false);
+        expect(res.body).to.have.property('current_house_id', null);
+      });
+  });
+});
