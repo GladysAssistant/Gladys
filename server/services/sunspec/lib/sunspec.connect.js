@@ -27,7 +27,7 @@ async function connect() {
 
   this.connected = true;
 
-  this.gladys.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
   });
 
