@@ -12,6 +12,7 @@ import EditClock from '../../../components/boxs/clock/EditClock';
 
 import SelectBoxType from '../../../components/boxs/SelectBoxType';
 import EditSceneBox from '../../../components/boxs/scene/EditSceneBox';
+import EditAlarmBox from '../../../components/boxs/alarm/EditAlarm';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -39,6 +40,8 @@ const Box = ({ children, ...props }) => {
       return <EditClock {...props} />;
     case 'scene':
       return <EditSceneBox {...props} />;
+    case 'alarm':
+      return <EditAlarmBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }

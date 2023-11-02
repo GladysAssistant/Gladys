@@ -10,6 +10,9 @@ const StateManager = require('../../../lib/state');
 
 const event = new EventEmitter();
 
+// We are slowly moving this file to
+// the "triggers" folder to have smaller test files
+
 describe('scene.checkTrigger', () => {
   let sceneManager;
 

@@ -108,6 +108,14 @@ const SYSTEM_VARIABLE_NAMES = {
 };
 
 const EVENTS = {
+  ALARM: {
+    ARM: 'alarm.arm',
+    ARMING: 'alarm.arming',
+    DISARM: 'alarm.disarm',
+    PARTIAL_ARM: 'alarm.partial-arm',
+    PANIC: 'alarm.panic',
+    TOO_MANY_CODES_TESTS: 'alarm.too-many-codes-tests',
+  },
   CALENDAR: {
     EVENT_IS_COMING: 'calendar.event-is-coming',
     CHECK_IF_EVENT_IS_COMING: 'calendar.check-if-event-is-coming',
@@ -293,6 +301,10 @@ const CONDITIONS = {
 };
 
 const ACTIONS = {
+  ALARM: {
+    CHECK_ALARM_MODE: 'alarm.check-alarm-mode',
+    SET_ALARM_MODE: 'alarm.set-alarm-mode',
+  },
   CALENDAR: {
     IS_EVENT_RUNNING: 'calendar.is-event-running',
   },
@@ -827,6 +839,13 @@ const DEVICE_ROTATION = {
 };
 
 const WEBSOCKET_MESSAGE_TYPES = {
+  ALARM: {
+    ARMING: 'alarm.arming',
+    ARMED: 'alarm.armed',
+    DISARMED: 'alarm.disarmed',
+    PARTIALLY_ARMED: 'alarm.partial-arm',
+    PANIC: 'alarm.panic',
+  },
   BACKUP: {
     DOWNLOADED: 'backup.downloaded',
   },
@@ -913,6 +932,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS: 'melcloud.status',
     DISCOVER: 'melcloud.discover',
   },
+  NODERED: {
+    STATUS_CHANGE: 'nodered.status-change',
+    MQTT_ERROR: 'nodered.mqtt-error',
+  },
 };
 
 const DASHBOARD_TYPE = {
@@ -920,6 +943,7 @@ const DASHBOARD_TYPE = {
 };
 
 const DASHBOARD_BOX_TYPE = {
+  ALARM: 'alarm',
   WEATHER: 'weather',
   TEMPERATURE_IN_ROOM: 'temperature-in-room',
   HUMIDITY_IN_ROOM: 'humidity-in-room',
@@ -962,6 +986,7 @@ const JOB_TYPES = {
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
+  SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
 };
 
 const JOB_STATUS = {
@@ -983,6 +1008,13 @@ const DEFAULT_VALUE_HUMIDITY = {
 const DEFAULT_VALUE_TEMPERATURE = {
   MINIMUM: 17,
   MAXIMUM: 24,
+};
+
+const ALARM_MODES = {
+  DISARMED: 'disarmed',
+  ARMED: 'armed',
+  PARTIALLY_ARMED: 'partially-armed',
+  PANIC: 'panic',
 };
 
 const createList = (obj) => {
@@ -1016,6 +1048,7 @@ const DEVICE_FEATURE_STATE_AGGREGATE_TYPES_LIST = createList(DEVICE_FEATURE_STAT
 const JOB_TYPES_LIST = createList(JOB_TYPES);
 const JOB_STATUS_LIST = createList(JOB_STATUS);
 const JOB_ERROR_TYPES_LIST = createList(JOB_ERROR_TYPES);
+const ALARM_MODES_LIST = createList(ALARM_MODES);
 
 module.exports.STATE = STATE;
 module.exports.BUTTON_STATUS = BUTTON_STATUS;
@@ -1084,3 +1117,6 @@ module.exports.JOB_ERROR_TYPES_LIST = JOB_ERROR_TYPES_LIST;
 
 module.exports.DEFAULT_VALUE_HUMIDITY = DEFAULT_VALUE_HUMIDITY;
 module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;
+
+module.exports.ALARM_MODES = ALARM_MODES;
+module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;

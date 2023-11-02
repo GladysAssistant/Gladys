@@ -10,6 +10,7 @@ import EcowattBox from '../../components/boxs/ecowatt/Ecowatt';
 import ClockBox from '../../components/boxs/clock/Clock';
 import VacbotBox from '../../components/boxs/vacbot/Vacbot';
 import SceneBox from '../../components/boxs/scene/SceneBox';
+import AlarmBox from '../../components/boxs/alarm/Alarm';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -37,6 +38,8 @@ const Box = ({ children, ...props }) => {
       return <VacbotBox {...props} />;
     case 'scene':
       return <SceneBox {...props} />;
+    case 'alarm':
+      return <AlarmBox {...props} />;
   }
 };
 
