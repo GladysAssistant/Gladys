@@ -15,6 +15,9 @@ describe('SunSpec updateConfiguration', () => {
 
   beforeEach(() => {
     gladys = {
+      stateManager: {
+        event: {},
+      },
       variable: {
         setValue: fake.resolves('setValue'),
       },

@@ -15,6 +15,9 @@ describe('SunSpec getConfiguration', () => {
 
   beforeEach(() => {
     gladys = {
+      stateManager: {
+        event: {},
+      },
       variable: {},
     };
 

@@ -21,8 +21,10 @@ describe('SunSpec disconnect', () => {
 
   beforeEach(() => {
     gladys = {
-      eventManager: {
-        emit: fake.returns(null),
+      stateManager: {
+        event: {
+          emit: fake.returns(null),
+        },
       },
     };
 
@@ -49,7 +51,7 @@ describe('SunSpec disconnect', () => {
     await sunSpecManager.disconnect();
 
     assert.calledOnce(sunSpecManager.modbus.close);
-    assert.calledOnceWithExactly(gladys.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(sunSpecManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
     });
     expect(sunSpecManager.connected).eql(false);

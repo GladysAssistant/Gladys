@@ -18,8 +18,10 @@ describe('SunSpec scanNetwork', () => {
 
   beforeEach(() => {
     gladys = {
-      eventManager: {
-        emit: fake.resolves(null),
+      stateManager: {
+        event: {
+          emit: fake.returns(null),
+        },
       },
     };
 
@@ -47,7 +49,7 @@ describe('SunSpec scanNetwork', () => {
     };
 
     sunspecManager = {
-      eventManager: gladys.event,
+      eventManager: gladys.stateManager.event,
       modbuses: [modbus],
     };
   });
@@ -75,7 +77,7 @@ describe('SunSpec scanNetwork', () => {
       swVersion: 'swVersion',
       mppt: 1,
     });
-    assert.calledWithExactly(gladys.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
     });
   });

@@ -31,8 +31,10 @@ describe('SunSpec connect', () => {
       variable: {
         getValue: fake.resolves('sunspecUrl'),
       },
-      eventManager: {
-        emit: fake.returns(null),
+      stateManager: {
+        event: {
+          emit: fake.returns(null),
+        },
       },
     };
 
@@ -48,7 +50,7 @@ describe('SunSpec connect', () => {
 
     expect(sunSpecManager.connected).eql(true);
     assert.calledOnce(sunSpecManager.scan);
-    assert.calledOnceWithExactly(gladys.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(sunSpecManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
     });
     assert.calledOnce(sunSpecManager.scanNetwork);
@@ -60,7 +62,7 @@ describe('SunSpec connect', () => {
 
     expect(sunSpecManager.connected).eql(true);
     assert.calledOnce(sunSpecManager.scan);
-    assert.calledOnceWithExactly(gladys.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledOnceWithExactly(sunSpecManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
     });
     assert.calledOnce(sunSpecManager.scanNetwork);

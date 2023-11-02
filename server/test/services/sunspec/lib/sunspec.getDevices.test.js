@@ -23,6 +23,9 @@ describe('SunSpec getDevices', () => {
       variable: {
         getValue: fake.resolves('sunspecUrl'),
       },
+      stateManager: {
+        event: {},
+      },
     };
 
     sunSpecManager = new SunSpecManager(gladys, ModbusTCPMock, null, SERVICE_ID);

@@ -20,11 +20,13 @@ describe('SunSpec scanDevices', () => {
     };
 
     sunspecManager = {
-      eventManager: {
-        emit: fake.resolves(null),
+      gladys: {
+        stateManager: {
+          get: fake.resolves({}),
+        },
       },
-      stateManager: {
-        get: fake.resolves({}),
+      eventManager: {
+        emit: fake.returns(null),
       },
       modbuses: [modbus],
       devices: [],
