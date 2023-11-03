@@ -10,10 +10,10 @@ import { RequestStatus } from '../../../../../utils/consts';
 import CardFilter from '../../../../../components/layout/CardFilter';
 
 class NodeTab extends Component {
-  render(props) {
-    const zwaveNotConfigured = props.zwaveGetNodesStatus === RequestStatus.ServiceNotConfigured;
-    const scanInProgress = get(props.zwaveStatus, 'scanInProgress');
-    const gettingNodesInProgress = props.zwaveGetNodesStatus === RequestStatus.Getting;
+  render({ zwaveGetNodesStatus, zwaveStatus, filterExisting = true, ...props }) {
+    const zwaveNotConfigured = zwaveGetNodesStatus === RequestStatus.ServiceNotConfigured;
+    const scanInProgress = get(zwaveStatus, 'scanInProgress');
+    const gettingNodesInProgress = zwaveGetNodesStatus === RequestStatus.Getting;
     const zwaveActionsDisabled = scanInProgress || gettingNodesInProgress;
     const zwaveActionsEnabled = !zwaveActionsDisabled;
     return (
@@ -27,7 +27,7 @@ class NodeTab extends Component {
               <input
                 type="checkbox"
                 class="custom-switch-input"
-                checked={props.filterExisting | true}
+                checked={filterExisting}
                 onClick={props.toggleFilterOnExisting}
               />
               <span class={cx('custom-switch-indicator', 'mr-1', { 'bg-light': gettingNodesInProgress })} />

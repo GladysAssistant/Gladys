@@ -15,14 +15,12 @@ const createActions = store => {
         zwaveGetNodesStatus: RequestStatus.Getting
       });
       try {
-        const options = {
-          orderDir: state.orderDir || 'asc', // Default value assumed by CardFilter
-          filterExisting: state.filterExisting || true // Default value assumed by NodeTab
-        };
-        if (state.searchKeyword && state.searchKeyword.length) {
-          options.search = state.searchKeyword;
-        }
-        const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave-js-ui/node', options);
+        const { orderDir = 'asc', filterExisting = true, searchKeyword = null } = state;
+        const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave-js-ui/node', {
+          orderDir,
+          filterExisting,
+          search: searchKeyword
+        });
 
         store.setState({
           zwaveNodes,
