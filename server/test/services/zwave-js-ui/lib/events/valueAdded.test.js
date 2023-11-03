@@ -482,7 +482,7 @@ describe('zwaveJSUIManager valueAdded', () => {
         read_only: true,
         selector: 'zwave-js-ui-node-1-air-temperature-49-0-air-temperature',
         unit: 'celsius',
-        min: -20,
+        min: -30,
         max: 50,
       },
     ]);
