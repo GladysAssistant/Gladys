@@ -93,36 +93,16 @@ describe('zwaveJSUIManager valueAdded', () => {
     assert.notCalled(zwaveJSUIManager.eventManager.emit);
   });
 
-  it('should handle no metadata', () => {
-    delete zwaveNode.getValueMetadata;
-    zwaveJSUIManager.valueAdded(zwaveNode, {
-      commandClass: 20,
-      endpoint: 0,
-      property: 'property',
-    });
-    expect(zwaveJSUIManager.nodes[1].classes[20][0].property).to.deep.equal({
-      commandClass: 20,
-      endpoint: 0,
-      genre: 'user',
-      nodeId: 1,
-      property: 'property',
-    });
-  });
-
   it('should handle value added 37-0-currentValue', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'boolean',
-        label: 'Current value',
-        min: 0,
-        max: 99,
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 37,
       endpoint: 0,
       property: 'currentValue',
+      type: 'boolean',
+      label: 'Current value',
+      min: 0,
+      max: 99,
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[37][0].targetValue).to.deep.equal({
       commandClass: 37,
@@ -135,7 +115,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       nodeId: 1,
       property: 'targetValue',
       propertyName: 'targetValue',
-      writeable: false,
+      writeable: true,
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
@@ -147,11 +127,11 @@ describe('zwaveJSUIManager valueAdded', () => {
         has_feedback: true,
         last_value: 0,
         name: 'Current value',
-        read_only: true,
+        read_only: false,
         selector: 'zwave-js-ui-node-1-targetvalue-37-0-current-value',
         type: 'binary',
         unit: null,
-        max: 99,
+        max: 1,
         min: 0,
       },
     ]);
@@ -182,18 +162,14 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should handle value added 48-0-Any', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Any',
-        unit: 'W',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 48,
       endpoint: 0,
       property: 'Any',
+      type: 'number',
+      label: 'Any',
+      unit: 'W',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[48][0].Any).to.deep.equal({
       commandClass: 48,
@@ -227,17 +203,13 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should handle value added 48-0-Motion', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'binary',
-        label: 'Motion',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 48,
       endpoint: 0,
       property: 'Motion',
+      type: 'binary',
+      label: 'Motion',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[48][0].Motion).to.deep.equal({
       commandClass: 48,
@@ -270,29 +242,21 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should handle value added 48-0-Any and 48-0-Motion', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'binary',
-        label: 'Any',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 48,
       endpoint: 0,
       property: 'Any',
+      type: 'binary',
+      label: 'Any',
+      writeable: false,
     });
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'binary',
-        label: 'Motion',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 48,
       endpoint: 0,
       property: 'Motion',
+      type: 'binary',
+      label: 'Motion',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[48][0].Any).to.deep.equal({
       commandClass: 48,
@@ -338,18 +302,14 @@ describe('zwaveJSUIManager valueAdded', () => {
    * Power should be handled by Meter command class.
    */
   it('should handle value added 49-0-Power', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Power',
-        unit: 'W',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 49,
       endpoint: 0,
       property: 'Power',
+      type: 'number',
+      label: 'Power',
+      unit: 'W',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[49][0].Power).to.deep.equal({
       commandClass: 49,
@@ -367,18 +327,14 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should handle value added 49-0-Illuminance', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Illuminance',
-        unit: 'Lux',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 49,
       endpoint: 0,
       property: 'Illuminance',
+      type: 'number',
+      label: 'Illuminance',
+      unit: 'Lux',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[49][0].Illuminance).to.deep.equal({
       commandClass: 49,
@@ -412,18 +368,14 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should handle value added 49-0-Humidity', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Humidity',
-        unit: '%',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 49,
       endpoint: 0,
       property: 'Humidity',
+      type: 'number',
+      label: 'Humidity',
+      unit: '%',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[49][0].Humidity).to.deep.equal({
       commandClass: 49,
@@ -457,17 +409,13 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should handle value added 49-0-Ultraviolet', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Ultraviolet',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 49,
       endpoint: 0,
       property: 'Ultraviolet',
+      type: 'number',
+      label: 'Ultraviolet',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[49][0].Ultraviolet).to.deep.equal({
       commandClass: 49,
@@ -500,18 +448,14 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should handle value added 49-0-Air temperature', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Air temperature',
-        unit: '°C',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 49,
       endpoint: 0,
       property: 'Air temperature',
+      type: 'number',
+      label: 'Air temperature',
+      unit: '°C',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[49][0]['Air temperature']).to.deep.equal({
       commandClass: 49,
@@ -545,17 +489,13 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should handle value added 113-0-Smoke Alarm-Sensor status', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Motion sensor status',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 113,
       endpoint: 0,
       property: 'Smoke Alarm-Sensor status',
+      type: 'number',
+      label: 'Motion sensor status',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[113][0]['Smoke Alarm-Sensor status']).to.deep.equal({
       commandClass: 113,
@@ -588,19 +528,15 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 132-0-wakeUpInterval', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Wake Up interval',
-        min: 300,
-        max: 16777200,
-        writeable: true,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 132,
       endpoint: 0,
       property: 'wakeUpInterval',
+      type: 'number',
+      label: 'Wake Up interval',
+      min: 300,
+      max: 16777200,
+      writeable: true,
     });
     expect(zwaveJSUIManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
@@ -608,17 +544,13 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 132-0-controllerNodeId', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'any',
-        label: 'Node ID of the controller',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 132,
       endpoint: 0,
       property: 'controllerNodeId',
+      type: 'any',
+      label: 'Node ID of the controller',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
@@ -626,20 +558,16 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 132-0-level', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Battery level',
-        min: 0,
-        max: 100,
-        unit: '%',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 132,
       endpoint: 0,
       property: 'level',
+      type: 'number',
+      label: 'Battery level',
+      min: 0,
+      max: 100,
+      unit: '%',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
@@ -647,17 +575,13 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 132-0-isLow', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'boolean',
-        label: 'Low battery level',
-        writeable: false,
-      };
-    };
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 132,
       endpoint: 0,
       property: 'isLow',
+      type: 'boolean',
+      label: 'Low battery level',
+      writeable: false,
     });
     expect(zwaveJSUIManager.nodes[1].classes[132][0]).to.deep.equal({});
     const nodes = zwaveJSUIManager.getNodes();
@@ -665,19 +589,14 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 50-0-value-66048', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric [W]',
-        writeable: false,
-        unit: 'kWh',
-      };
-    };
-
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 50,
       endpoint: 0,
       property: 'value-66048',
+      type: 'number',
+      label: 'Electric [W]',
+      writeable: false,
+      unit: 'kWh',
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
@@ -700,19 +619,14 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 50-0-value-66049', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric Consumption [kWh]',
-        writeable: false,
-        unit: 'kWh',
-      };
-    };
-
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 50,
       endpoint: 0,
       property: 'value-66049',
+      type: 'number',
+      label: 'Electric Consumption [kWh]',
+      writeable: false,
+      unit: 'kWh',
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
@@ -735,57 +649,42 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 50-0-value-66051', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric [W]',
-        writeable: false,
-        unit: 'W',
-      };
-    };
-
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 50,
       endpoint: 0,
       property: 'value-66051',
+      type: 'number',
+      label: 'Electric [W]',
+      writeable: false,
+      unit: 'W',
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 50-0-value-65536', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric [kWh]',
-        writeable: false,
-        unit: 'kWh',
-      };
-    };
-
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 50,
       endpoint: 0,
       property: 'value-65536',
+      type: 'number',
+      label: 'Electric [kWh]',
+      writeable: false,
+      unit: 'kWh',
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 50-0-value-65537', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric Consumption [W]',
-        writeable: false,
-        unit: 'W',
-      };
-    };
-
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 50,
       endpoint: 0,
       property: 'value-65537',
+      type: 'number',
+      label: 'Electric Consumption [W]',
+      writeable: false,
+      unit: 'W',
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
@@ -808,38 +707,28 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 50-0-value-65539', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric [kWh]',
-        writeable: false,
-        unit: 'kWh',
-      };
-    };
-
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 50,
       endpoint: 0,
       property: 'value-65539',
+      type: 'number',
+      label: 'Electric [kWh]',
+      writeable: false,
+      unit: 'kWh',
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(0);
   });
 
   it('should not handle value added 50-0-value-66561', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric Consumption [V]',
-        writeable: false,
-        unit: 'V',
-      };
-    };
-
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 50,
       endpoint: 0,
       property: 'value-66561',
+      type: 'number',
+      label: 'Electric Consumption [V]',
+      writeable: false,
+      unit: 'V',
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);
@@ -862,19 +751,14 @@ describe('zwaveJSUIManager valueAdded', () => {
   });
 
   it('should not handle value added 50-0-value-66817', () => {
-    zwaveNode.getValueMetadata = (args) => {
-      return {
-        type: 'number',
-        label: 'Electric Consumption [A]',
-        writeable: false,
-        unit: 'A',
-      };
-    };
-
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 50,
       endpoint: 0,
       property: 'value-66817',
+      type: 'number',
+      label: 'Electric Consumption [A]',
+      writeable: false,
+      unit: 'A',
     });
     const nodes = zwaveJSUIManager.getNodes();
     expect(nodes).to.have.lengthOf(1);

@@ -5,22 +5,6 @@ const { unbindValue } = require('../utils/bindValue');
 const { getDeviceFeatureExternalId } = require('../utils/externalId');
 
 /**
- *
- * @description Get value metadata.
- * @param {object} zwaveNode - Node.
- * @param {object} args - ZWaveNodeValueAddedArgs.
- * @returns {object} ZWaveNode value metadata.
- * @example
- * getValueMetadata(9, {});
- */
-function getValueMetadata(zwaveNode, args) {
-  if (zwaveNode.getValueMetadata) {
-    return zwaveNode.getValueMetadata(args);
-  }
-  return {};
-}
-
-/**
  * ValueAddedArgs.
  * @description When a value is added.
  * @param {object} zwaveNode - ZWave Node.
@@ -72,8 +56,7 @@ function valueAdded(zwaveNode, args) {
     return;
   }
 
-  const metadata = getValueMetadata(zwaveNode, args);
-  node.classes[commandClass][endpoint][fullProperty] = Object.assign(args, metadata, {
+  node.classes[commandClass][endpoint][fullProperty] = Object.assign(args, {
     genre: GENRE[commandClass] || 'user',
     // For technical use: number as key > string
     nodeId,
