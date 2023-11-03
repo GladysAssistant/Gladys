@@ -59,7 +59,9 @@ describe('system.getContainerDevices', () => {
     );
     assert.match(devices, [
       {
-        PathOnHost: 'device_path',
+        PathOnHost: '/dev/ttyUSB0',
+        PathInContainer: '/dev/ttyACM0',
+        CgroupPermissions: 'rwm',
       },
     ]);
   });

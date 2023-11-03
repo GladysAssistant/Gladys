@@ -146,8 +146,8 @@ describe('zwaveJSUIManager getNodes', () => {
             unit: 'celsius',
             has_feedback: true,
             last_value: undefined,
-            min: -20,
-            max: 40,
+            min: -30,
+            max: 50,
           },
         ],
         params: [
