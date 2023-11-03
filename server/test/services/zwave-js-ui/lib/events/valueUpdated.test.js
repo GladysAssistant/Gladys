@@ -84,6 +84,11 @@ describe('zwaveJSUIManager valueUpdated', () => {
               property: {},
             },
           },
+          '51': {
+            0: {
+              'targetColor-0': {},
+            },
+          },
         },
       },
     };
@@ -119,6 +124,23 @@ describe('zwaveJSUIManager valueUpdated', () => {
     assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:20:endpoint:0:property:targetValue',
       state: 'newValue',
+    });
+  });
+
+  it('should handle property currentColor', () => {
+    zwaveJSUIManager.valueUpdated(zwaveNode, {
+      commandClass: 51,
+      endpoint: 0,
+      property: 'currentColor',
+      newValue: 180,
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[51][0].currentColor).to.be.undefined; // eslint-disable-line
+    expect(zwaveJSUIManager.nodes[1].classes[51][0]['targetColor-0']).to.deep.equal({
+      value: 71,
+    });
+    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
+      device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:51:endpoint:0:property:targetColor-0',
+      state: 71,
     });
   });
 

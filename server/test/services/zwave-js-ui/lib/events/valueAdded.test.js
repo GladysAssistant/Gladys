@@ -137,6 +137,50 @@ describe('zwaveJSUIManager valueAdded', () => {
     ]);
   });
 
+  it('should handle value added 51-0-currentColor', () => {
+    zwaveJSUIManager.valueAdded(zwaveNode, {
+      commandClass: 51,
+      endpoint: 0,
+      property: 'currentColor',
+      type: 'number',
+      label: 'Current color',
+      min: 0,
+      max: 255,
+      writeable: false,
+    });
+    expect(zwaveJSUIManager.nodes[1].classes[51][0]['targetColor-0']).to.deep.equal({
+      commandClass: 51,
+      endpoint: 0,
+      genre: 'user',
+      label: 'Current color',
+      type: 'number',
+      max: 255,
+      min: 0,
+      nodeId: 1,
+      property: 'targetColor-0',
+      propertyName: 'targetColor',
+      writeable: true,
+    });
+    const nodes = zwaveJSUIManager.getNodes();
+    expect(nodes).to.have.lengthOf(1);
+    expect(nodes[0].params).to.have.lengthOf(4);
+    expect(nodes[0].features).to.deep.equal([
+      {
+        category: 'light',
+        external_id: 'zwave-js-ui:node_id:1:comclass:51:endpoint:0:property:targetColor-0',
+        has_feedback: true,
+        last_value: undefined,
+        name: 'Température',
+        read_only: false,
+        selector: 'zwave-js-ui-node-1-targetcolor-0-51-0-current-color',
+        type: 'temperature',
+        unit: null,
+        max: 100,
+        min: 0,
+      },
+    ]);
+  });
+
   it('should handle value added unsupported command class', () => {
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 112,

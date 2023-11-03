@@ -155,9 +155,31 @@ describe('zwave gladys node event', () => {
     }); */
   });
 
-  it('should default node not a number message', () => {
+  it('should not managed message - object message', () => {
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeID_1/0/0/propertyName/propertyKey`, '{}');
+    assert.notCalled(zwaveJSUIManager.valueUpdated);
+  });
+
+  it('should not managed message - not a number message', () => {
     zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeID_1/0/0/propertyName/propertyKey`, '???');
     assert.notCalled(zwaveJSUIManager.valueUpdated);
+  });
+
+  it('should managed string message', () => {
+    zwaveJSUIManager.handleMqttMessage(`${this.mqttTopicPrefix}/nodeID_1/38/0/propertyName/propertyKey`, '"???"');
+    assert.calledWithExactly(
+      zwaveJSUIManager.valueUpdated,
+      {
+        id: 1,
+      },
+      {
+        commandClass: 38,
+        endpoint: 0,
+        property: 'propertyName',
+        propertyKey: 'propertyKey',
+        newValue: '"???"',
+      },
+    );
   });
 
   it('should shift node location', () => {

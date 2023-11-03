@@ -40,6 +40,27 @@ describe('zwave.bindValue', () => {
     expect(bindedValue).to.equal(false);
   });
 
+  it('should bindValue commandClass COMMAND_CLASS_SWITCH_COLOR - HEX_COLOR', () => {
+    const valueId = {
+      commandClass: COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR,
+      property: PROPERTIES.HEX_COLOR,
+    };
+    const value = 0xff00ff;
+    const bindedValue = bindValue(valueId, value);
+    expect(bindedValue).to.equal('"ff00ff"');
+  });
+
+  it('should bindValue commandClass COMMAND_CLASS_SWITCH_COLOR - TARGET_COLOR', () => {
+    const valueId = {
+      commandClass: COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR,
+      property: PROPERTIES.TARGET_COLOR,
+      endpoint: 0,
+    };
+    const value = 100;
+    const bindedValue = bindValue(valueId, value);
+    expect(bindedValue).to.equal(255);
+  });
+
   it('should bindValue commandClass other', () => {
     const valueId = {
       commandClass: COMMAND_CLASSES.COMMAND_CLASS_BASIC,
@@ -143,5 +164,26 @@ describe('zwave.unbindValue', () => {
     const value = 20;
     const unbindedValue = unbindValue(valueId, value);
     expect(unbindedValue).to.equal(BUTTON_STATUS.CLICK);
+  });
+
+  it('should unbindValue commandClass COMMAND_CLASS_SWITCH_COLOR - HEX_COLOR', () => {
+    const valueId = {
+      commandClass: COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR,
+      property: PROPERTIES.HEX_COLOR,
+    };
+    const value = '"ff00ff"';
+    const bindedValue = unbindValue(valueId, value);
+    expect(bindedValue).to.equal(0xff00ff);
+  });
+
+  it('should unbindValue commandClass COMMAND_CLASS_SWITCH_COLOR - TARGET_COLOR', () => {
+    const valueId = {
+      commandClass: COMMAND_CLASSES.COMMAND_CLASS_SWITCH_COLOR,
+      property: PROPERTIES.TARGET_COLOR,
+      endpoint: 0,
+    };
+    const value = 255;
+    const bindedValue = unbindValue(valueId, value);
+    expect(bindedValue).to.equal(100);
   });
 });

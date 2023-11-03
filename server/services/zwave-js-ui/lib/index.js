@@ -10,7 +10,6 @@ const { valueUpdated } = require('./events/valueUpdated');
 const { nodeReady } = require('./events/nodeReady');
 const { notification } = require('./events/notification');
 const { scanComplete } = require('./events/scanComplete');
-const { valueNotification } = require('./events/valueNotification');
 const { installMqttContainer } = require('./commands/installMqttContainer');
 const { installZwaveJSUIContainer } = require('./commands/installZwaveJSUIContainer');
 const { getConfiguration } = require('./commands/getConfiguration');
@@ -43,7 +42,6 @@ const ZwaveJSUIManager = function ZwaveJSUIManager(gladys, mqtt, serviceId) {
 // EVENTS
 ZwaveJSUIManager.prototype.valueAdded = valueAdded;
 ZwaveJSUIManager.prototype.valueUpdated = valueUpdated;
-ZwaveJSUIManager.prototype.valueNotification = valueNotification;
 ZwaveJSUIManager.prototype.nodeReady = nodeReady;
 ZwaveJSUIManager.prototype.notification = notification;
 ZwaveJSUIManager.prototype.scanComplete = scanComplete;
