@@ -6,7 +6,7 @@ import CardFilter from '../../components/layout/CardFilter';
 import SceneCards from './SceneCards';
 import EmptyState from './EmptyState';
 import style from './style.css';
-import SceneMenu from './SceneMenu';
+import SceneTagFilter from './SceneTagFilter';
 
 const ScenePage = ({ children, ...props }) => (
   <div class="page">
@@ -27,6 +27,7 @@ const ScenePage = ({ children, ...props }) => (
                   searchPlaceHolder={<Text id="scene.searchPlaceholder" />}
                 />
               </Localizer>
+              <SceneTagFilter tags={props.tags} searchTags={props.searchTags} sceneTagSearch={props.sceneTagSearch} />
               <Link href="/dashboard/scene/new" class={cx('btn', 'btn-outline-primary', 'ml-2', style.newButton)}>
                 <Text id="scene.newButton" /> <i class="fe fe-plus" />
               </Link>
@@ -40,10 +41,7 @@ const ScenePage = ({ children, ...props }) => (
             <div class="loader" />
             <div class={cx('dimmer-content', style.sceneListContainer)}>
               <div class="row">
-                <div class="col-lg-3">
-                  <SceneMenu {...props} />
-                </div>
-                <div class="col-lg-9">
+                <div class="col-lg-12">
                   {props.scenes && <SceneCards {...props} />}
                   {props.scenes && props.scenes.length === 0 && <EmptyState />}
                 </div>

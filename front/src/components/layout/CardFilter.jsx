@@ -1,5 +1,6 @@
 import { Fragment } from 'preact';
 import { Text } from 'preact-i18n';
+import cx from 'classnames';
 
 const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, searchPlaceHolder }) => (
   <Fragment>
@@ -11,6 +12,7 @@ const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, s
         <Text id="global.orderDirDesc" />
       </option>
     </select>
+
     <div class="input-icon ml-2">
       <span class="input-icon-addon">
         <i class="fe fe-search" />
