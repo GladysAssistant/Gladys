@@ -22,6 +22,14 @@ describe('scene.checkTrigger', () => {
 
   const brain = {};
 
+  const service = {
+    getService: fake.returns({
+      device: {
+        subscribe: fake.returns(null),
+      },
+    }),
+  };
+
   beforeEach(() => {
     const house = {
       get: fake.resolves([]),
@@ -42,7 +50,7 @@ describe('scene.checkTrigger', () => {
 
     const stateManager = new StateManager();
 
-    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain);
+    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain, service);
   });
 
   afterEach(() => {
@@ -496,14 +504,14 @@ describe('scene.checkTrigger', () => {
       ],
       triggers: [
         {
-          type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+          type: EVENTS.MQTT.RECEIVED,
           topic: 'my/topic',
           message: '',
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+      type: EVENTS.MQTT.RECEIVED,
       topic: 'my/topic',
       message: 'ON',
     });
@@ -533,14 +541,14 @@ describe('scene.checkTrigger', () => {
       ],
       triggers: [
         {
-          type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+          type: EVENTS.MQTT.RECEIVED,
           topic: 'my/topic',
           message: 'ON',
         },
       ],
     });
     sceneManager.checkTrigger({
-      type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+      type: EVENTS.MQTT.RECEIVED,
       topic: 'my/topic',
       message: 'ON',
     });
