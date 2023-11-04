@@ -1684,8 +1684,8 @@
       "system": {
         "start": "Gladys starting"
       },
-      "message-queue": {
-        "received": "Receive message from queue"
+      "mqtt": {
+        "received": "Receive message from MQTT"
       }
     },
     "triggersCard": {

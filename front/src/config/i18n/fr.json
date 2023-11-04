@@ -1685,8 +1685,8 @@
       "system": {
         "start": "Gladys démarre"
       },
-      "message-queue": {
-        "received": "Recevoir un message de la file d'attente"
+      "mqtt": {
+        "received": "Recevoir un message MQTT"
       }
     },
     "triggersCard": {

@@ -166,7 +166,7 @@ const TriggerCard = ({ children, ...props }) => (
           trigger={props.trigger}
         />
       )}
-      {props.trigger.type === EVENTS.MESSAGE_QUEUE.RECEIVED && (
+      {props.trigger.type === EVENTS.MQTT.RECEIVED && (
         <MessageQueueReceivedTrigger
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}

@@ -17,7 +17,6 @@ function cancelTriggers(sceneSelector) {
       }
       if (trigger.topic) {
         const mqttService = this.service.getService('mqtt');
-
         if (mqttService) {
           mqttService.device.unsubscribe(trigger.topic);
         }

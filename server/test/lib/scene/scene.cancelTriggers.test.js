@@ -9,15 +9,20 @@ describe('SceneManager.cancelTriggers', () => {
   let sceneManager;
 
   const brain = {};
+  const service = {};
   const event = {};
+  const mqttService = {
+    device: {},
+  };
 
   beforeEach(() => {
+    mqttService.device.unsubscribe = fake.returns(null);
+    mqttService.device.subscribe = fake.returns(null);
+    service.getService = fake.returns(mqttService);
+
     const house = {
       get: fake.resolves([]),
     };
-
-    event.on = fake.returns(null);
-    event.emit = fake.returns(null);
 
     const scheduler = {
       scheduleJob: (date, callback) => {
@@ -32,7 +37,9 @@ describe('SceneManager.cancelTriggers', () => {
     brain.addNamedEntity = fake.returns(null);
     brain.removeNamedEntity = fake.returns(null);
 
-    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler, brain);
+    event.on = fake.returns(null);
+
+    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler, brain, service);
   });
 
   afterEach(() => {
@@ -82,7 +89,7 @@ describe('SceneManager.cancelTriggers', () => {
       icon: 'bell',
       triggers: [
         {
-          type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+          type: EVENTS.MQTT.RECEIVED,
           topic: 'my/topic',
         },
       ],
@@ -90,12 +97,8 @@ describe('SceneManager.cancelTriggers', () => {
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).not.to.have.property('nodeScheduleJob');
     expect(sceneManager.scenes[scene.selector].triggers[0]).not.to.have.property('jsInterval');
-    assert.calledWithExactly(event.emit, EVENTS.MESSAGE_QUEUE.SUBSCRIBE, {
-      topic: 'my/topic',
-    });
     sceneManager.cancelTriggers(scene.selector);
-    assert.calledWithExactly(event.emit, EVENTS.MESSAGE_QUEUE.UNSUBSCRIBE, {
-      topic: 'my/topic',
-    });
+    assert.calledWithExactly(service.getService, 'mqtt');
+    assert.calledWithExactly(mqttService.device.unsubscribe, 'my/topic');
   });
 });

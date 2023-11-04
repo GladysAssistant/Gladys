@@ -11,6 +11,10 @@ describe('SceneManager.addScene', () => {
   const house = {};
   const event = {};
   const brain = {};
+  const service = {};
+  const mqttService = {
+    device: {},
+  };
 
   let sceneManager;
 
@@ -20,6 +24,8 @@ describe('SceneManager.addScene', () => {
     event.emit = fake.returns(null);
     brain.addNamedEntity = fake.returns(null);
     brain.removeNamedEntity = fake.returns(null);
+    mqttService.device.subscribe = fake.returns(null);
+    service.getService = fake.returns(mqttService);
 
     const scheduler = {
       scheduleJob: (date, callback) => {
@@ -31,7 +37,7 @@ describe('SceneManager.addScene', () => {
       },
     };
 
-    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler, brain);
+    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler, brain, service);
   });
 
   afterEach(() => {
@@ -237,7 +243,7 @@ describe('SceneManager.addScene', () => {
       active: true,
       triggers: [
         {
-          type: EVENTS.MESSAGE_QUEUE.RECEIVED,
+          type: EVENTS.MQTT.RECEIVED,
           topic: 'my/topic',
         },
       ],
@@ -245,8 +251,7 @@ describe('SceneManager.addScene', () => {
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('jsInterval');
-    assert.calledOnceWithExactly(event.emit, EVENTS.MESSAGE_QUEUE.SUBSCRIBE, {
-      topic: 'my/topic',
-    });
+    assert.calledWithExactly(service.getService, 'mqtt');
+    assert.calledOnce(mqttService.device.subscribe);
   });
 });
