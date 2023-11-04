@@ -7,9 +7,8 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants
  * this.scanComplete();
  */
 function scanComplete() {
-  logger.debug(`Zwave : Scan Complete!`);
-
   if (this.scanInProgress) {
+    logger.info(`Zwave : Scan Complete!`);
     this.scanInProgress = false;
     this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.SCAN_COMPLETE,

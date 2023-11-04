@@ -33,6 +33,7 @@ function handleMqttMessage(topic, message) {
     case `${this.mqttTopicPrefix}/_CLIENTS/${DEFAULT.ZWAVEJSUI_CLIENT_ID}/api/getNodes`: {
       const { success, result } = message instanceof Object ? message : JSON.parse(message);
       if (success) {
+        logger.info(`Receive nodes [${result.length}]...`);
         this.nodes = {};
         result.forEach((data) => {
           const node = {
