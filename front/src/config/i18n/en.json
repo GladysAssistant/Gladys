@@ -868,7 +868,7 @@
         "description": "This service uses two independent docker containers (MQTT broker and ZwaveJS UI). The administration of ZwaveJS UI is available at following address, user = admin, password = zwave.",
         "zwave-js-ui": "Zwavejs UI interface",
         "zwaveJSUIVersionError": "Zwavejs UI version not supported: expected version {{expectedVersion}} but current version is {{currentVersion}}",
-        "securityKeysDescription": "If you are migrating from an existing ZWave network, please enter the 4 security keys of the network. If you are using  ZwaveJS UI, you can found these keys in the administration interface: Section Settings > Z-Wave.",
+        "securityKeysDescription": "If you are migrating from an existing ZWave network, please enter the 4 security keys of the network. If you are using ZwaveJS UI, you can found these keys in the administration interface: Section Settings > Z-Wave. Itherwise, feel free to keep these fields empty, security keys will be generated for you.",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",
