@@ -251,7 +251,15 @@ describe('SceneManager.addScene', () => {
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('jsInterval');
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('mqttCallback');
     assert.calledWithExactly(service.getService, 'mqtt');
     assert.calledOnce(mqttService.device.subscribe);
+
+    sceneManager.scenes[scene.selector].triggers[0].mqttCallback('my/topic', 'message');
+    assert.calledOnceWithExactly(event.emit, EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'my/topic',
+      message: 'message',
+    });
   });
 });
