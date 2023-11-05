@@ -11,12 +11,16 @@ const StateManager = require('../../../../lib/state');
 const ServiceManager = require('../../../../lib/service');
 const DeviceManager = require('../../../../lib/device');
 const Job = require('../../../../lib/job');
+const { fake } = require('sinon');
 
 const event = new EventEmitter();
 const stateManager = new StateManager(event);
 const job = new Job(event);
 const serviceManager = new ServiceManager({}, stateManager);
-const deviceManager = new DeviceManager(event, {}, stateManager, serviceManager, {}, {}, job);
+const brain = {
+  addNamedEntity: fake.returns(null),
+};
+const deviceManager = new DeviceManager(event, {}, stateManager, serviceManager, {}, {}, job, brain);
 
 const gladys = {
   device: deviceManager,
