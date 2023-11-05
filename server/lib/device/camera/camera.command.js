@@ -1,6 +1,5 @@
 const logger = require('../../../utils/logger');
 const { NotFoundError } = require('../../../utils/coreErrors');
-const { INTENTS } = require('../../../utils/constants');
 /**
  * @description Command a light.
  * @param {object} message - The message sent by the user.
@@ -16,20 +15,12 @@ async function command(message, classification, context) {
   const roomEntity = classification.entities.find((entity) => entity.entity === 'room');
   const deviceEntity = classification.entities.find((entity) => entity.entity === 'device');
 
-  console.log('roomEntity', roomEntity);
-  console.log('deviceEntity', deviceEntity);
-
-  console.log('classification.intent', classification.intent, INTENTS.CAMERA.GET_IMAGE);
-
   try {
     switch (classification.intent) {
       case 'camera.get-image':
-        console.log('1 ----------');
         if (roomEntity) {
           cameraImages.push(...(await this.getImagesInRoom(roomEntity.option)));
         } else if (deviceEntity) {
-          console.log('3 ----------');
-          console.log('deviceEntity', deviceEntity);
           cameraImages.push(await this.getImage(deviceEntity.option));
         } else {
           throw new NotFoundError('Room not found');

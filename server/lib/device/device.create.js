@@ -82,7 +82,6 @@ async function create(device) {
     if (deviceInDb === null) {
       deviceInDb = await db.Device.create(device, { transaction });
     } else {
-      console.log('removeNamedEntity', deviceInDb.name);
       this.brain.removeNamedEntity('device', deviceInDb.identifier, deviceInDb.name);
 
       actionEvent = EVENTS.DEVICE.UPDATE;
