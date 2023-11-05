@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
+const intersection = require('lodash.intersection');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
@@ -54,14 +55,23 @@ async function get(options) {
   }
 
   if (optionsWithDefault.searchTags) {
-    const tags = await db.TagScene.findAll({
-      fields: 'scene_id',
-      where: {
-        [Op.or]: optionsWithDefault.searchTags.split(',').map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
-      },
-    });
+    const databaseTags = await Promise.all(
+      optionsWithDefault.searchTags.split(',').map((tag) => {
+        return db.TagScene.findAll({
+          attributes: ['scene_id'],
+          where: {
+            name: tag,
+          },
+        });
+      }),
+    );
+    const sceneIds = databaseTags.map((tags) => tags.map((tag) => tag.get({ plain: true }).scene_id));
+    const intersec = intersection(...sceneIds);
+
     queryParams.where = {
-      [Op.or]: tags.map((tag) => tag.get({ plain: true })).map((tag) => ({ id: tag.scene_id })),
+      [Op.or]: intersec.map((sceneId) => ({
+        id: sceneId,
+      })),
     };
   }
 
