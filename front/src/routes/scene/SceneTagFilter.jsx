@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import cx from 'classnames';
+import { Text } from 'preact-i18n';
 
 class SceneTagFilter extends Component {
   constructor(props) {
@@ -60,7 +61,7 @@ class SceneTagFilter extends Component {
         })}
       >
         <button className="btn btn-secondary btn-sm dropdown-toggle ml-2" onClick={this.toggleTagFilterDropdown}>
-          Filtrer par tags
+          <Text id="scene.filterTagsName" />
         </button>
         <div
           class={cx('dropdown-menu', {

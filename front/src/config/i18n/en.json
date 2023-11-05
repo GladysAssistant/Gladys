@@ -2098,7 +2098,7 @@
     "editButton": "Edit",
     "startButton": "Start",
     "searchPlaceholder": "Search scenes",
-    "filterTagsName": "Tags"
+    "filterTagsName": "Filter by tags"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
