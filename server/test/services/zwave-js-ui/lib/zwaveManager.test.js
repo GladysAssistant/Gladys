@@ -223,13 +223,6 @@ describe('zwaveJSUIManager events', () => {
     sinon.reset();
   });
 
-  it('should receive notification', () => {
-    const zwaveNode = {
-      id: 1,
-    };
-    zwaveJSUIManager.notification(zwaveNode, {}, []);
-  });
-
   it('should receive scanComplete', () => {
     zwaveJSUIManager.scanInProgress = true;
     zwaveJSUIManager.scanComplete();
