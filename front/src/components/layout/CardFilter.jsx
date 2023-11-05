@@ -1,6 +1,5 @@
 import { Fragment } from 'preact';
 import { Text } from 'preact-i18n';
-import cx from 'classnames';
 
 const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, searchPlaceHolder }) => (
   <Fragment>
