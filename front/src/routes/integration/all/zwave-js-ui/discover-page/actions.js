@@ -3,6 +3,7 @@ import update from 'immutability-helper';
 
 import { RequestStatus } from '../../../../../utils/consts';
 import { ERROR_MESSAGES } from '../../../../../../../server/utils/constants';
+import { DEFAULT } from '../../../../../../../server/services/zwave-js-ui/lib/constants';
 import { slugify } from '../../../../../../../server/utils/slugify';
 import createActionsIntegration from '../../../../../actions/integration';
 import debounce from 'debounce';
@@ -15,7 +16,11 @@ const createActions = store => {
         zwaveGetNodesStatus: RequestStatus.Getting
       });
       try {
-        const { orderDir = 'asc', filterExisting = true, searchKeyword = null } = state;
+        const {
+          orderDir = DEFAULT.NODES_ORDER_DIR,
+          filterExisting = DEFAULT.NODES_FILTER_EXISTING,
+          searchKeyword = null
+        } = state;
         const zwaveNodes = await state.httpClient.get('/api/v1/service/zwave-js-ui/node', {
           orderDir,
           filterExisting,

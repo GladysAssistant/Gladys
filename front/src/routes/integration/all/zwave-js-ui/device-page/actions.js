@@ -1,4 +1,5 @@
 import { RequestStatus } from '../../../../../utils/consts';
+import { DEFAULT } from '../../../../../../../server/services/zwave-js-ui/lib/constants';
 import update from 'immutability-helper';
 import createActionsHouse from '../../../../../actions/house';
 import debounce from 'debounce';
@@ -12,7 +13,7 @@ function createActions(store) {
       });
       try {
         const options = {
-          orderDir: state.orderDir || 'asc'
+          orderDir: state.orderDir || DEFAULT.NODES_ORDER_DIR
         };
         if (state.searchKeyword && state.searchKeyword.length) {
           options.search = state.searchKeyword;

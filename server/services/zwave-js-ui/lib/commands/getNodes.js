@@ -11,7 +11,7 @@ const logger = require('../../../../utils/logger');
 const { unbindValue } = require('../utils/bindValue');
 const { splitNode } = require('../utils/splitNode');
 const { transformClasses } = require('../utils/transformClasses');
-const { PARAMS } = require('../constants');
+const { PARAMS, DEFAULT } = require('../constants');
 const { mergeDevices } = require('../../../../utils/device');
 
 /**
@@ -31,12 +31,18 @@ function match(value, keyword) {
  * @param {object} filters - Filtering and ordering.
  * @param {string} filters.orderDir - Filtering and ordering.
  * @param {string} filters.search - Filtering and ordering.
- * @param {boolean} filters.filterExisting - Filtering and ordering.
+ * @param {string} filters.filterExisting - Filtering and ordering.
  * @returns {Array} Return list of nodes.
  * @example
  * const nodes = zwaveManager.getNodes();
  */
-function getNodes({ orderDir, search, filterExisting } = { orderDir: 'asc', search: null, filterExisting: true }) {
+function getNodes(
+  { orderDir, search, filterExisting } = {
+    orderDir: DEFAULT.NODES_ORDER_DIR,
+    search: null,
+    filterExisting: DEFAULT.NODES_FILTER_EXISTING,
+  },
+) {
   const nodeIds = Object.keys(this.nodes);
 
   // transform object in array
@@ -148,11 +154,11 @@ function getNodes({ orderDir, search, filterExisting } = { orderDir: 'asc', sear
       return mergeDevices(device, existingDevice);
     })
     .filter((newDevice) => newDevice.features && newDevice.features.length > 0)
-    .filter((newDevice) => !filterExisting || newDevice.id === undefined)
+    .filter((newDevice) => filterExisting === 'false' || newDevice.id === undefined)
     .sort((a, b) => {
       const aNodeId = a.params.find((param) => param.name === PARAMS.NODE_ID).value;
       const bNodeId = b.params.find((param) => param.name === PARAMS.NODE_ID).value;
-      return orderDir === 'asc' ? aNodeId - bNodeId : bNodeId - aNodeId;
+      return orderDir === DEFAULT.NODES_ORDER_DIR ? aNodeId - bNodeId : bNodeId - aNodeId;
     });
 }
 
