@@ -377,7 +377,7 @@
         "partiallyArmedButton": "Partial",
         "partiallyArmedButtonSecondLine": "Arm",
         "panicButton": "Panic",
-        "editBoxNameLabel": "Widget Name",
+        "editBoxNameLabel": "Widget Name (optional)",
         "editBoxNamePlaceholder": "Enter the widget name",
         "editHouseLabel": "Select the house for alarm activation/disarmament.",
         "alarmStatusText": "Your house is ",
