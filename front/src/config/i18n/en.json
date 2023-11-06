@@ -2380,8 +2380,8 @@
       "opening-sensor": {
         "binary": {
           "other": "No value received",
-          "zero": "Closed",
-          "one": "Opened"
+          "zero": "Opened",
+          "one": "Closed"
         }
       },
       "co-sensor": {
