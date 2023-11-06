@@ -145,60 +145,70 @@ const SystemPage = ({ children, ...props }) => (
                   <Text id="systemSettings.deviceStateRetentionTimeDescription" />
                 </small>
               </p>
-              <div class="custom-controls-stacked">
-                <label class="custom-control custom-radio">
-                  <input
-                    type="radio"
-                    class="custom-control-input"
-                    name="device-state-history-radio"
-                    onChange={props.updateDeviceStateHistory}
-                    value="7"
-                    checked={props.deviceStateHistoryInDays === '7'}
-                  />
-                  <div class="custom-control-label">
-                    <Text id="signup.preferences.deviceStateHistoryDuration.durationOneWeek" />
-                  </div>
-                </label>
-                <label class="custom-control custom-radio">
-                  <input
-                    type="radio"
-                    class="custom-control-input"
-                    name="device-state-history-radio"
-                    onChange={props.updateDeviceStateHistory}
-                    value="30"
-                    checked={props.deviceStateHistoryInDays === '30'}
-                  />
-                  <div class="custom-control-label">
-                    <Text id="signup.preferences.deviceStateHistoryDuration.durationOneMonth" />
-                  </div>
-                </label>
-                <label class="custom-control custom-radio">
-                  <input
-                    type="radio"
-                    class="custom-control-input"
-                    name="device-state-history-radio"
-                    onChange={props.updateDeviceStateHistory}
-                    value="90"
-                    checked={props.deviceStateHistoryInDays === '90'}
-                  />
-                  <div class="custom-control-label">
-                    <Text id="signup.preferences.deviceStateHistoryDuration.durationThreeMonth" />
-                  </div>
-                </label>
-                <label class="custom-control custom-radio">
-                  <input
-                    type="radio"
-                    class="custom-control-input"
-                    name="device-state-history-radio"
-                    onChange={props.updateDeviceStateHistory}
-                    value="-1"
-                    checked={props.deviceStateHistoryInDays === '-1'}
-                  />
-                  <div class="custom-control-label">
-                    <Text id="signup.preferences.deviceStateHistoryDuration.unlimited" />
-                  </div>
-                </label>
-              </div>
+              <select
+                class="form-control"
+                value={props.deviceStateHistoryInDays}
+                onChange={props.updateDeviceStateHistory}
+              >
+                <option value="7">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationOneWeek" />
+                </option>
+                <option value="30">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationOneMonth" />
+                </option>
+                <option value="90">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationThreeMonth" />
+                </option>
+                <option value="180">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationSixMonths" />
+                </option>
+                <option value="365">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationOneYear" />
+                </option>
+                <option value="730">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationTwoYears" />
+                </option>
+                <option value="-1">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.unlimited" />
+                </option>
+              </select>
+            </form>
+            <form class="mt-4">
+              <label>
+                <Text id="systemSettings.deviceAggregatesStateRetentionTime" />
+              </label>
+              <p>
+                <small>
+                  <Text id="systemSettings.deviceAggregatesStateRetentionTimeDescription" />
+                </small>
+              </p>
+              <select
+                class="form-control"
+                value={props.deviceAggregateStateHistoryInDays}
+                onChange={props.updateDeviceAggregateStateHistory}
+              >
+                <option value="7">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationOneWeek" />
+                </option>
+                <option value="30">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationOneMonth" />
+                </option>
+                <option value="90">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationThreeMonth" />
+                </option>
+                <option value="180">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationSixMonths" />
+                </option>
+                <option value="365">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationOneYear" />
+                </option>
+                <option value="730">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.durationTwoYears" />
+                </option>
+                <option value="-1">
+                  <Text id="signup.preferences.deviceStateHistoryDuration.unlimited" />
+                </option>
+              </select>
             </form>
             <form class="mt-4">
               <label>
