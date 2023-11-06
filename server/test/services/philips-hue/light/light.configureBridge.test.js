@@ -1,4 +1,5 @@
 const { assert, expect } = require('chai');
+const { fake } = require('sinon');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 const { MockedPhilipsHueClient } = require('../mocks.test');
@@ -11,7 +12,6 @@ const StateManager = require('../../../../lib/state');
 const ServiceManager = require('../../../../lib/service');
 const DeviceManager = require('../../../../lib/device');
 const Job = require('../../../../lib/job');
-const { fake } = require('sinon');
 
 const event = new EventEmitter();
 const stateManager = new StateManager(event);
