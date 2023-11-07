@@ -5,6 +5,9 @@ import { Link } from 'preact-router/match';
 import { isUrlInArray } from '../../utils/url';
 import { USER_ROLE } from '../../../../server/utils/constants';
 
+// Navigation
+import NavigationButton from '../navigation/NavigationButton';
+
 const PAGES_WITHOUT_HEADER = [
   '/login',
   '/signup',
@@ -39,6 +42,7 @@ const Header = ({ ...props }) => {
   return (
     <div>
       <div class="header py-4">
+        <NavigationButton />
         <div class="container">
           <div class="d-flex">
             <a class="header-brand" href="/dashboard">
