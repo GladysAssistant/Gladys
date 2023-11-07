@@ -3,9 +3,17 @@ import style from './style.css';
 
 class NavigationButton extends Component{
     render(){
-        return <div className={style.goTo}>
-            <button className="btn btn-primary rounded-circle border-0 p-3">Test</button>
-        </div>
+        return( 
+                <div className={style.goTo}>
+                <div>
+                <button className={`btn btn-dark btn-sm ${style.halfCircleUp}`}disabled>Ʌ</button>
+                </div> 
+                <div>
+                <button className={`btn btn-primary btn-sm ${style.halfCircleDown}`}>V</button>
+                </div>
+                </div>
+        
+      )
     }
 }
 

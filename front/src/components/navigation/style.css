@@ -6,3 +6,16 @@
     animation: fadeOut 0.5s;
     opacity: 100;
 }
+
+.halfCircleUp {
+    border-radius: 50% 50% 0 0;
+    width : 10px;
+    opacity : 30%;
+  }
+
+.halfCircleDown {
+    border-radius: 0 0 50% 50%;
+    width : 10px;
+    opacity : 60%;
+  }
+  
