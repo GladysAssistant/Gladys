@@ -1787,6 +1787,7 @@
         "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
       },
       "mqttReceived": {
+        "description": "Cette scène s'exécutera lorsque un message sera reçu dans le topic MQTT sélectionné",
         "topicLabel": "Topic",
         "topicPlaceholder": "Entrez votre topic",
         "messageLabel": "Message",

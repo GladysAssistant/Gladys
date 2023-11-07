@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
+import { EVENTS } from '../../../../../../server/utils/constants';
 
 class MQTTReceived extends Component {
   updateTopicName = e => {
@@ -14,6 +15,9 @@ class MQTTReceived extends Component {
   render({}, {}) {
     return (
       <div>
+        <p>
+          <Text id="editScene.triggersCard.mqttReceived.description" />
+        </p>
         <div class="form-group">
           <label className="form-label">
             <Text id="editScene.triggersCard.mqttReceived.topicLabel" />
