@@ -50,24 +50,13 @@ class NavigationButton extends Component{
 
     render(){
 
-    //     return( 
-    //             <div className={style.goTo}>
-    //             <div>
-    //             <button className={`btn btn-dark btn-sm ${style.halfCircleUp}`}disabled>Ʌ</button>
-    //             </div> 
-    //             <div>
-    //             <button className={`btn btn-primary btn-sm ${style.halfCircleDown}`}>V</button>
-    //             </div>
-    //             </div>
-        
-    //   )
 
         return <div className={style.goTo}>
             <div>
-            { !this.state.hide && <button className={`btn btn-primary btn-sm ${style.halfCircleUp}`} onClick={this.scrollTop}>Ʌ</button>}
+                <button className={`btn btn-primary btn-sm ${style.halfCircleUp}`} onClick={this.scrollTop} disabled={this.state.hideUp}>Ʌ</button>
             </div>
             <div>
-            { !this.state.hideDown && <button className={`btn btn-primary btn-sm ${style.halfCircleDown}`} onClick={this.scrollBot}>V</button>}
+                <button className={`btn btn-primary btn-sm ${style.halfCircleDown}`} onClick={this.scrollBot} disabled={this.state.hideDown}>V</button>
             </div>
         </div>
 
