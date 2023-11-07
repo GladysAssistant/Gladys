@@ -1785,7 +1785,7 @@
       "gladysStart": {
         "description": "This scene will be executed each time Gladys starts"
       },
-      "messageQueueReceived": {
+      "mqttReceived": {
         "topicLabel": "Topic",
         "topicPlaceholder": "Enter your topic",
         "messageLabel": "Message",

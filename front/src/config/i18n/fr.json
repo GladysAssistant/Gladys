@@ -1786,7 +1786,7 @@
       "gladysStart": {
         "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
       },
-      "messageQueueReceived": {
+      "mqttReceived": {
         "topicLabel": "Topic",
         "topicPlaceholder": "Entrez votre topic",
         "messageLabel": "Message",

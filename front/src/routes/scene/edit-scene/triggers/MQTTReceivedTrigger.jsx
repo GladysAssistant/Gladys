@@ -2,7 +2,7 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
 
-class MessageQueueReceived extends Component {
+class MQTTReceived extends Component {
   updateTopicName = e => {
     this.props.updateTriggerProperty(this.props.index, 'topic', e.target.value);
   };
@@ -16,7 +16,7 @@ class MessageQueueReceived extends Component {
       <div>
         <div class="form-group">
           <label className="form-label">
-            <Text id="editScene.triggersCard.messageQueueReceived.topicLabel" />
+            <Text id="editScene.triggersCard.mqttReceived.topicLabel" />
           </label>
           <Localizer>
             <input
@@ -24,16 +24,16 @@ class MessageQueueReceived extends Component {
               value={this.props.trigger.topic}
               onInput={this.updateTopicName}
               className="form-control"
-              placeholder={<Text id="editScene.triggersCard.messageQueueReceived.topicPlaceholder" />}
+              placeholder={<Text id="editScene.triggersCard.mqttReceived.topicPlaceholder" />}
             />
           </Localizer>
         </div>
         <div class="form-group">
           <label className="form-label">
-            <Text id="editScene.triggersCard.messageQueueReceived.messageLabel" />
+            <Text id="editScene.triggersCard.mqttReceived.messageLabel" />
           </label>
           <div class="mb-1 small">
-            <Text id="editScene.triggersCard.messageQueueReceived.messageDescription" />
+            <Text id="editScene.triggersCard.mqttReceived.messageDescription" />
           </div>
           <Localizer>
             <input
@@ -41,7 +41,7 @@ class MessageQueueReceived extends Component {
               value={this.props.trigger.message}
               onInput={this.updateMessage}
               className="form-control"
-              placeholder={<Text id="editScene.triggersCard.messageQueueReceived.messagePlaceholder" />}
+              placeholder={<Text id="editScene.triggersCard.mqttReceived.messagePlaceholder" />}
             />
           </Localizer>
         </div>
@@ -50,4 +50,4 @@ class MessageQueueReceived extends Component {
   }
 }
 
-export default connect('httpClient,user', {})(MessageQueueReceived);
+export default connect('httpClient,user', {})(MQTTReceived);
