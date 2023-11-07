@@ -48,7 +48,7 @@ class NavigationButton extends Component{
     //   )
 
         return <div className={style.goTo}>
-            { !this.state.hide && <button className={`btn btn-dark btn-sm ${style.halfCircleUp}`} onClick={this.scrollTop}>Up</button>}
+            { !this.state.hide && <button className={`btn btn-primary btn-sm ${style.halfCircleUp}`} onClick={this.scrollTop}>Ʌ</button>}
         </div>
 
     }
