@@ -53,10 +53,10 @@ class NavigationButton extends Component{
 
         return <div className={style.goTo}>
             <div>
-                <button className={`btn btn-primary btn-sm ${style.halfCircleUp}`} onClick={this.scrollTop} disabled={this.state.hideUp}>Ʌ</button>
+                <button id="scrollButton" className={`btn btn-primary btn-sm ${style.halfCircleUp}`} onClick={this.scrollTop} disabled={this.state.hideUp}>Ʌ</button>
             </div>
             <div>
-                <button className={`btn btn-primary btn-sm ${style.halfCircleDown}`} onClick={this.scrollBot} disabled={this.state.hideDown}>V</button>
+                <button id="scrollButton"  className={`btn btn-primary btn-sm ${style.halfCircleDown}`} onClick={this.scrollBot} disabled={this.state.hideDown}>V</button>
             </div>
         </div>
 

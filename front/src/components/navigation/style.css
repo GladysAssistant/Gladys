@@ -4,18 +4,26 @@
     bottom: 30px;
     left: 50px;
     animation: fadeOut 0.5s;
-    opacity: 100;
+
 }
 
-.halfCircleUp {
+.halfCircleUp{
     border-radius: 50% 50% 0 0;
-    width : 10px;
-    opacity : 30%;
+    width : 10px;  
+}
+
+.halfCircleUp:disabled, .halfCircleDown:disabled{
+    
+    opacity:20%; 
+}
+
+
+.halfCircleUp:enabled ,.halfCircleDown:enabled {
+    opacity:50%;
   }
 
 .halfCircleDown {
     border-radius: 0 0 50% 50%;
     width : 10px;
-    opacity : 60%;
   }
-  
+
