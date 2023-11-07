@@ -1,7 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import { Text, Localizer } from 'preact-i18n';
-import { EVENTS } from '../../../../../../server/utils/constants';
 
 class MQTTReceived extends Component {
   updateTopicName = e => {
