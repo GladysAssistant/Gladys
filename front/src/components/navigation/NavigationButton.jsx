@@ -3,7 +3,8 @@ import style from './style.css';
 
 class NavigationButton extends Component{
     state = {
-        hide : true
+        hideUp : true,
+        hideDown : true
     }
 
     componentDidMount()
@@ -17,15 +18,21 @@ class NavigationButton extends Component{
     }
 
     handleScroll = () => {
+        let state = this.state
         if (window.scrollY === 0 || window.scrollY <= 400 ) {
-            this.setState({hide: true});
+            state.hideUp = true
         } else {
-            this.setState({hide: false});
+            state.hideUp = false
         }
+        if (window.scrollY >= document.body.scrollHeight - 1200 ) {
+            state.hideDown = true
+        } else {
+            state.hideDown = false
+        }
+        this.setState(state)
     }
 
     scrollTop(){
-        console.log("Test")
         window.scroll({
             top: 0,
             left: 0,
@@ -33,9 +40,18 @@ class NavigationButton extends Component{
           });
     }
 
+    scrollBot(){
+        window.scroll({
+            top: document.body.scrollHeight,
+            left: 0,
+            behavior: "smooth",
+          });
+    }
+
     render(){
         return <div className={style.goTo}>
-            { !this.state.hide && <button className="btn btn-secondary rounded-circle border-0 p-3" onClick={this.scrollTop}>Up</button>}
+            { !this.state.hideUp && <button className="btn btn-secondary rounded-circle border-0 p-3" onClick={this.scrollTop}>Up</button>}
+            { !this.state.hideDown && <button className="btn btn-secondary rounded-circle border-0 p-3" onClick={this.scrollBot}>Down</button>}
         </div>
     }
 }
