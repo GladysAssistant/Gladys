@@ -10,13 +10,13 @@ import style from './style.css';
 const DashboardPage = ({ children, ...props }) => (
   <div class="page">
     <div class="page-main">
-      <NavigationButton />
       <div class={props.loading ? 'dimmer active' : 'dimmer'}>
         <div class="loader" />
         <div class="dimmer-content">
           <div class="my-3 my-md-5">
             <div class={cx('container')}>
               <div class="page-header">
+              <NavigationButton />
                 <div>
                   {!props.dashboardListEmpty && (
                     <div class="dropdown">
