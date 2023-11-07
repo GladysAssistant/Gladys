@@ -51,7 +51,6 @@ class Scene extends Component {
     await this.getScenes();
   };
   searchTags = async tags => {
-    console.log(tags);
     await this.setState({
       sceneTagSearch: tags
     });

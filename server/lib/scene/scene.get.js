@@ -1,6 +1,5 @@
 const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
-const intersection = require('lodash.intersection');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
@@ -40,7 +39,7 @@ async function get(options) {
     queryParams.limit = optionsWithDefault.take;
   }
 
-  // search by device feature selectors
+  // search by scene selectors
   if (optionsWithDefault.selectors) {
     queryParams.where = {
       [Op.or]: optionsWithDefault.selectors.split(',').map((selector) => ({
@@ -48,30 +47,31 @@ async function get(options) {
       })),
     };
   }
+
+  const where = [];
   if (optionsWithDefault.search) {
-    queryParams.where = Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_scene.name')), {
-      [Op.like]: `%${optionsWithDefault.search}%`,
-    });
+    where.push(
+      Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_scene.name')), {
+        [Op.like]: `%${optionsWithDefault.search}%`,
+      }),
+    );
   }
 
   if (optionsWithDefault.searchTags) {
-    const databaseTags = await Promise.all(
-      optionsWithDefault.searchTags.split(',').map((tag) => {
-        return db.TagScene.findAll({
-          attributes: ['scene_id'],
-          where: {
-            name: tag,
-          },
-        });
-      }),
-    );
-    const sceneIds = databaseTags.map((tags) => tags.map((tag) => tag.get({ plain: true }).scene_id));
-    const intersec = intersection(...sceneIds);
+    const tags = await db.TagScene.findAll({
+      fields: 'scene_id',
+      where: {
+        [Op.or]: optionsWithDefault.searchTags.split(',').map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
+      },
+    });
+    where.push({
+      [Op.or]: tags.map((tag) => tag.get({ plain: true })).map((tag) => ({ id: tag.scene_id })),
+    });
+  }
 
+  if (where.length > 0) {
     queryParams.where = {
-      [Op.or]: intersec.map((sceneId) => ({
-        id: sceneId,
-      })),
+      [Op.and]: where,
     };
   }
 

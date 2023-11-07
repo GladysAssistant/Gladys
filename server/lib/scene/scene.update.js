@@ -41,12 +41,12 @@ async function update(selector, scene) {
   });
 
   if (scene.tags) {
-    await Promise.each(scene.tags, (tag) => {
-      db.TagScene.create({
+    await db.TagScene.bulkCreate(
+      scene.tags.map((tag) => ({
         scene_id: existingScene.id,
         name: tag.name,
-      });
-    });
+      })),
+    );
   }
 
   const plainScene = existingScene.get({ plain: true });

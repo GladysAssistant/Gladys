@@ -3,8 +3,7 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
-
-const MAX_LENGTH_TAG = 30;
+import { MAX_LENGTH_TAG } from './constant';
 
 class SceneCard extends Component {
   startScene = async () => {

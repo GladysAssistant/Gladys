@@ -1,6 +1,7 @@
 import { Component } from 'preact';
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
+import { MAX_LENGTH_TAG } from './constant';
 
 class SceneTagFilter extends Component {
   constructor(props) {
@@ -11,8 +12,11 @@ class SceneTagFilter extends Component {
     };
   }
 
+  setDropdownRef = dropdownRef => {
+    this.dropdownRef = dropdownRef;
+  };
+
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
     let tagsStatus = {};
     if (nextProps.tags) {
       tagsStatus = nextProps.tags.reduce(
@@ -23,7 +27,6 @@ class SceneTagFilter extends Component {
         {}
       );
     }
-    console.log(nextProps.sceneTagSearch);
     if (nextProps.sceneTagSearch) {
       nextProps.sceneTagSearch.forEach(tagName => {
         tagsStatus[tagName] = true;
@@ -32,13 +35,19 @@ class SceneTagFilter extends Component {
     this.setState({
       tagsStatus
     });
-    console.log('tags state', this.state.tagsStatus);
   }
 
   toggleTagFilterDropdown = () => {
     this.setState({
       tagFilterDropdownOpened: !this.state.tagFilterDropdownOpened
     });
+  };
+
+  closeTagFilterDropdown = e => {
+    if (this.dropdownRef && this.dropdownRef.contains(e.target)) {
+      return;
+    }
+    this.setState({ tagFilterDropdownOpened: false });
   };
 
   selectedTags = async (tagName, checked) => {
@@ -49,13 +58,21 @@ class SceneTagFilter extends Component {
       }
     });
     const selectedTags = Object.keys(this.state.tagsStatus).filter(tagName => this.state.tagsStatus[tagName]);
-    console.log(selectedTags);
     this.props.searchTags(selectedTags);
   };
+
+  componentDidMount() {
+    document.addEventListener('click', this.closeTagFilterDropdown, true);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.closeTagFilterDropdown, true);
+  }
 
   render(props, { tagFilterDropdownOpened, tagsStatus }) {
     return (
       <div
+        ref={this.setDropdownRef}
         class={cx('btn-group', {
           show: tagFilterDropdownOpened
         })}
@@ -81,7 +98,7 @@ class SceneTagFilter extends Component {
                       checked={tagsStatus[tag.name]}
                     />
                     <label className="custom-control-label" htmlFor={`tags-filter-${tag.name}`}>
-                      {tag.name}
+                      {tag.name.length > MAX_LENGTH_TAG ? `${tag.name.substring(0, MAX_LENGTH_TAG - 3)}...` : tag.name}
                     </label>
                   </div>
                 </li>

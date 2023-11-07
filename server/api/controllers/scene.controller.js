@@ -99,8 +99,8 @@ module.exports = function SceneController(gladys) {
    * @apiGroup TagScene
    */
   async function getTag(req, res) {
-    const scenes = await gladys.scene.getTag();
-    res.json(scenes);
+    const tags = await gladys.scene.getTag();
+    res.json(tags);
   }
 
   return Object.freeze({
