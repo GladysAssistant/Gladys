@@ -78,16 +78,6 @@ const MockedPhilipsHueClient = {
       }),
     },
     discovery: {
-      upnpSearch: () =>
-        Promise.resolve([
-          {
-            name: 'Philips Hue Bridge',
-            ipaddress: '192.168.2.245',
-            model: {
-              serial: '1234',
-            },
-          },
-        ]),
       nupnpSearch: () =>
         Promise.resolve([
           {
@@ -99,8 +89,35 @@ const MockedPhilipsHueClient = {
   },
 };
 
+const MockedPhilipsHueClientUpnp = {
+  v3: {
+    lightStates: {
+      LightState,
+    },
+    api: {
+      createLocal: () => ({
+        connect: () => hueApi,
+      }),
+    },
+    discovery: {
+      nupnpSearch: () => Promise.resolve([]),
+      upnpSearch: () =>
+        Promise.resolve([
+          {
+            name: 'Philips Hue Bridge',
+            ipaddress: '192.168.2.245',
+            model: {
+              serial: '1234',
+            },
+          },
+        ]),
+    },
+  },
+};
+
 module.exports = {
   MockedPhilipsHueClient,
+  MockedPhilipsHueClientUpnp,
   STATE_ON,
   STATE_OFF,
   fakes,
