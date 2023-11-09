@@ -21,19 +21,11 @@ function valueAdded(zwaveNode, args) {
     return;
   }
 
-  // Current value is the final state of target value
+  // Current value is the final state of target value, so drop it
   if (property === PROPERTIES.CURRENT_VALUE) {
-    args.property = PROPERTIES.TARGET_VALUE;
-    args.propertyName = PROPERTIES.TARGET_VALUE;
-    args.writeable = true;
-    valueAdded.bind(this)(zwaveNode, args);
     return;
   }
   if (property === PROPERTIES.CURRENT_COLOR) {
-    args.property = PROPERTIES.TARGET_COLOR;
-    args.propertyName = PROPERTIES.TARGET_COLOR;
-    args.writeable = true;
-    valueAdded.bind(this)(zwaveNode, args);
     return;
   }
 
