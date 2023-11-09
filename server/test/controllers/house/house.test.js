@@ -29,6 +29,9 @@ describe('GET /api/v1/house', () => {
             id: '6295ad8b-b655-4422-9e6d-b4612da5d55f',
             name: 'Peppers house',
             selector: 'pepper-house',
+            alarm_code: null,
+            alarm_delay_before_arming: 10,
+            alarm_mode: 'disarmed',
             latitude: null,
             longitude: null,
             created_at: '2019-02-12T07:49:07.556Z',
@@ -38,6 +41,9 @@ describe('GET /api/v1/house', () => {
             id: 'a741dfa6-24de-4b46-afc7-370772f068d5',
             name: 'Test house',
             selector: 'test-house',
+            alarm_code: null,
+            alarm_delay_before_arming: 10,
+            alarm_mode: 'disarmed',
             latitude: 12,
             longitude: 12,
             created_at: '2019-02-12T07:49:07.556Z',
@@ -60,6 +66,9 @@ describe('GET /api/v1/house', () => {
             id: 'a741dfa6-24de-4b46-afc7-370772f068d5',
             name: 'Test house',
             selector: 'test-house',
+            alarm_code: null,
+            alarm_delay_before_arming: 10,
+            alarm_mode: 'disarmed',
             latitude: 12,
             longitude: 12,
             created_at: '2019-02-12T07:49:07.556Z',
@@ -69,6 +78,9 @@ describe('GET /api/v1/house', () => {
             id: '6295ad8b-b655-4422-9e6d-b4612da5d55f',
             name: 'Peppers house',
             selector: 'pepper-house',
+            alarm_code: null,
+            alarm_delay_before_arming: 10,
+            alarm_mode: 'disarmed',
             latitude: null,
             longitude: null,
             created_at: '2019-02-12T07:49:07.556Z',
@@ -91,6 +103,9 @@ describe('GET /api/v1/house', () => {
             id: 'a741dfa6-24de-4b46-afc7-370772f068d5',
             name: 'Test house',
             selector: 'test-house',
+            alarm_code: null,
+            alarm_delay_before_arming: 10,
+            alarm_mode: 'disarmed',
             latitude: 12,
             longitude: 12,
             created_at: '2019-02-12T07:49:07.556Z',
@@ -112,6 +127,19 @@ describe('PATCH /api/v1/house/test-house', () => {
       .expect(200)
       .then((res) => {
         expect(res.body).to.have.property('name', 'NEW NAME');
+      });
+  });
+});
+
+describe('GET /api/v1/house/test-house', () => {
+  it('should get a house by selector', async () => {
+    await authenticatedRequest
+      .get('/api/v1/house/test-house')
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.have.property('selector', 'test-house');
+        expect(res.body).to.have.property('alarm_mode', 'disarmed');
       });
   });
 });

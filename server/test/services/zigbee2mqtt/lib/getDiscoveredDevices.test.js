@@ -39,9 +39,9 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     // PREPARE
     gladys.stateManager.get
       .onFirstCall()
-      .returns({ room_id: 'room_id', name: 'device-name' })
+      .returns({ id: 'gladys-id', room_id: 'room_id', name: 'device-name' })
       .onSecondCall()
-      .returns(false)
+      .returns(expectedDevicesPayload[1])
       .onThirdCall()
       .returns(false);
 
@@ -55,5 +55,30 @@ describe('zigbee2mqtt getDiscoveredDevices', () => {
     const devices = zigbee2MqttService.device.getDiscoveredDevices();
     // ASSERT
     expect(devices).deep.eq(expectedDevicesPayload);
+  });
+
+  it('filter discovered devices', async () => {
+    // PREPARE
+    gladys.stateManager.get
+      .onFirstCall()
+      .returns({ id: 'gladys-id', room_id: 'room_id', name: 'device-name' })
+      .onSecondCall()
+      .returns(expectedDevicesPayload[1])
+      .onThirdCall()
+      .returns(false);
+
+    discoveredDevices
+      .filter((d) => d.supported)
+      .forEach((device) => {
+        zigbee2MqttService.device.discoveredDevices[device.friendly_name] = device;
+      });
+
+    // EXECUTE
+    const devices = zigbee2MqttService.device.getDiscoveredDevices({ filter_existing: true });
+    // ASSERT
+    // Expected devices but first
+    const filteredExpectedDevices = [...expectedDevicesPayload];
+    filteredExpectedDevices.splice(1, 1);
+    expect(devices).deep.eq(filteredExpectedDevices);
   });
 });
