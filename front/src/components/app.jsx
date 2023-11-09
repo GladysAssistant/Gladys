@@ -14,6 +14,7 @@ import Header from './header';
 import Layout from './layout';
 import Redirect from './router/Redirect';
 import Login from '../routes/login';
+import Locked from '../routes/locked';
 import Error from '../routes/error';
 import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
@@ -181,6 +182,7 @@ const AppRouter = connect(
         ) : (
           <ResetPassword path="/reset-password" />
         )}
+        <Locked path="/locked" />
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
         {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
         {config.gatewayMode ? (

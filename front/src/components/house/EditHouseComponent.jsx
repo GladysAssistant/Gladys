@@ -3,6 +3,20 @@ import { Component } from 'preact';
 import EditHouse from './EditHouse';
 
 class EditHouseComponent extends Component {
+  getErrors = () => {
+    const errors = {};
+    if (this.props.house.alarm_code) {
+      const code = this.props.house.alarm_code;
+      const isNum = /^\d+$/.test(code);
+      if (!isNum) {
+        errors.alarm_code = true;
+      }
+      if (code.length < 4 || code.length > 8) {
+        errors.alarm_code = true;
+      }
+    }
+    return errors;
+  };
   updateNewRoomName = e => {
     this.setState({
       newRoomName: e.target.value
@@ -10,6 +24,13 @@ class EditHouseComponent extends Component {
   };
   updateHouseName = e => {
     this.props.updateHouseName(e.target.value, this.props.houseIndex);
+  };
+  updateHouseAlarmCode = e => {
+    const alarmCode = e.target.value && e.target.value.length ? e.target.value : null;
+    this.props.updateHouseAlarmCode(alarmCode, this.props.houseIndex);
+  };
+  updateHouseDelayBeforeArming = e => {
+    this.props.updateHouseDelayBeforeArming(e.target.value, this.props.houseIndex);
   };
   addRoom = () => {
     this.props.addRoom(this.state.newRoomName, this.props.houseIndex);
@@ -57,21 +78,30 @@ class EditHouseComponent extends Component {
       this.addRoom();
     }
   };
+  toggleAlarmCodePassword = () => {
+    this.setState(prevState => {
+      return { ...prevState, showAlarmCode: !this.state.showAlarmCode };
+    });
+  };
   constructor(props) {
     super(props);
     this.props = props;
     this.state = {
-      newRoomName: ''
+      newRoomName: '',
+      showAlarmCode: false
     };
   }
 
-  render(props, { newRoomName, wantToDeleteHouse, loading }) {
+  render(props, { newRoomName, wantToDeleteHouse, loading, showAlarmCode }) {
+    const errors = this.getErrors();
     return (
       <EditHouse
         {...props}
         setMapRef={this.setMapRef}
         updateHouseName={this.updateHouseName}
         updateNewRoomName={this.updateNewRoomName}
+        updateHouseAlarmCode={this.updateHouseAlarmCode}
+        updateHouseDelayBeforeArming={this.updateHouseDelayBeforeArming}
         newRoomName={newRoomName}
         addRoom={this.addRoom}
         removeRoom={this.removeRoom}
@@ -82,7 +112,10 @@ class EditHouseComponent extends Component {
         deleteHouse={this.deleteHouse}
         confirmDeleteHouse={this.confirmDeleteHouse}
         cancelDeleteHouse={this.cancelDeleteHouse}
+        toggleAlarmCodePassword={this.toggleAlarmCodePassword}
+        showAlarmCode={showAlarmCode}
         loading={loading}
+        errors={errors}
       />
     );
   }

@@ -178,6 +178,21 @@ describe('camera controller test', () => {
     );
     await chaiAssert.isRejected(promise, 'Invalid filename');
   });
+  it('should return 400, bad request, invalid filename', async () => {
+    const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
+    const req = {
+      params: {
+        folder: 'camera-1',
+        file: '`index1.tslala',
+      },
+    };
+    const resWriteStream = {};
+    const promise = rtspCameraController['get /api/v1/service/rtsp-camera/camera/streaming/:folder/:file'].controller(
+      req,
+      resWriteStream,
+    );
+    await chaiAssert.isRejected(promise, 'Invalid filename');
+  });
   it('should return 400, bad request, invalid session id', async () => {
     const rtspCameraController = RtspCameraController(gladys, rtspCameraService);
     const req = {
