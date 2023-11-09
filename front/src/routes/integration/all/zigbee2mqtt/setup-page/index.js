@@ -32,6 +32,6 @@ class Zigbee2mqttSetupPage extends Component {
 }
 
 export default connect(
-  'user,session,z2mEnabled,usbConfigured,mqttExist,mqttRunning,dockerBased,networkModeValid,zigbee2mqttExist,zigbee2mqttRunning,gladysConnected,zigbee2mqttConnected,usbConfigured',
+  'user,session,z2mEnabled,usbConfigured,mqttExist,mqttRunning,dockerBased,networkModeValid,zigbee2mqttExist,zigbee2mqttRunning,gladysConnected,zigbee2mqttConnected,usbConfigured,z2mUrl',
   actions
 )(Zigbee2mqttSetupPage);

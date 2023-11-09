@@ -13,7 +13,10 @@ function createActions(store) {
       });
 
       try {
-        const zigbee2mqttDevices = await state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered');
+        const { filterExisting = true } = state;
+        const zigbee2mqttDevices = await state.httpClient.get('/api/v1/service/zigbee2mqtt/discovered', {
+          filter_existing: filterExisting
+        });
         store.setState({ zigbee2mqttDevices, discoverZigbee2mqtt: false });
       } catch (e) {
         store.setState({
@@ -23,7 +26,22 @@ function createActions(store) {
         });
       }
     },
-    setDiscoveredDevices(state, zigbee2mqttDevices) {
+    async toggleFilterOnExisting(state = {}) {
+      const { filterExisting = true } = state;
+      store.setState({
+        filterExisting: !filterExisting
+      });
+
+      await actions.getDiscoveredDevices(store.getState());
+    },
+    setDiscoveredDevices(state = {}, incomingDevices) {
+      const { filterExisting = true } = state;
+
+      let zigbee2mqttDevices = incomingDevices;
+      if (incomingDevices && filterExisting) {
+        zigbee2mqttDevices = zigbee2mqttDevices.filter(device => device.id === undefined || device.updatable);
+      }
+
       store.setState({
         zigbee2mqttDevices,
         discoverZigbee2mqtt: false,

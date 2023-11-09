@@ -1,0 +1,17 @@
+.countdown {
+  font-size: 5em;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+}
+
+.countdownTimer {
+  display: inline-block;
+  padding: 10px;
+  transition: transform 0.5s, opacity 0.5s;
+}
+
+.countdownTimer.updated {
+  transform: scale(0.9);
+  opacity: 0.7;
+}

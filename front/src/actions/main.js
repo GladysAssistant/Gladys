@@ -41,6 +41,16 @@ function createActions(store) {
       const returnUrl = window.location.pathname + window.location.search;
       route(`/login?return_url=${encodeURIComponent(returnUrl)}`);
     },
+    async refreshTabletMode(state) {
+      try {
+        const currentSession = await state.httpClient.get('/api/v1/session/tablet_mode');
+        store.setState({
+          tabletMode: currentSession.tablet_mode
+        });
+      } catch (e) {
+        console.error(e);
+      }
+    },
     async checkSession(state) {
       if (isUrlInArray(state.currentUrl, OPEN_PAGES)) {
         return null;
@@ -50,7 +60,11 @@ function createActions(store) {
         if (!state.session.isConnected()) {
           actions.redirectToLogin();
         }
-        const tasks = [state.httpClient.get('/api/v1/me'), actionsProfilePicture.loadProfilePicture(state)];
+        const tasks = [
+          state.httpClient.get('/api/v1/me'),
+          actionsProfilePicture.loadProfilePicture(state),
+          actions.refreshTabletMode(state)
+        ];
         const [user] = await Promise.all(tasks);
         store.setState({
           user
@@ -69,7 +83,9 @@ function createActions(store) {
         const error = get(e, 'response.data.error');
         const gatewayErrorMessage = get(e, 'response.data.error_message');
         const errorMessageOtherFormat = get(e, 'response.data.message');
-        if (status === 401) {
+        if (status === 401 && errorMessageOtherFormat === 'TABLET_IS_LOCKED') {
+          route(`/locked${window.location.search}`);
+        } else if (status === 401) {
           state.session.reset();
           actions.redirectToLogin();
         } else if (error === 'GATEWAY_USER_NOT_LINKED') {
