@@ -137,6 +137,28 @@ describe('gateway.forwardMessageToOpenAI', () => {
       intent: 'scene.start',
     });
   });
+
+  it('should display camera from OpenAI', async () => {
+    gateway.gladysGatewayClient.openAIAsk = fake.resolves({
+      type: 'SHOW_CAMERA',
+      answer: 'Voilà ce que je vois:',
+      room: null,
+      scene: null,
+      device: 'camera-1',
+    });
+    const classification = await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });
+    expect(classification).to.deep.equal({
+      entities: [
+        {
+          entity: 'device',
+          option: '14a8ad23-78fa-45e4-8583-f5452792818d',
+          sourceText: 'camera-1',
+        },
+      ],
+      intent: 'camera.get-image',
+    });
+  });
+
   it('should send too many requests message', async () => {
     gateway.gladysGatewayClient.openAIAsk = fake.rejects(new Error429());
     await gateway.forwardMessageToOpenAI({ message, previousQuestions, context });

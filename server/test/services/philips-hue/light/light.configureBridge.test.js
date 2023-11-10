@@ -1,4 +1,5 @@
 const { assert, expect } = require('chai');
+const { fake } = require('sinon');
 const EventEmitter = require('events');
 const proxyquire = require('proxyquire').noCallThru();
 const { MockedPhilipsHueClient } = require('../mocks.test');
@@ -16,7 +17,10 @@ const event = new EventEmitter();
 const stateManager = new StateManager(event);
 const job = new Job(event);
 const serviceManager = new ServiceManager({}, stateManager);
-const deviceManager = new DeviceManager(event, {}, stateManager, serviceManager, {}, {}, job);
+const brain = {
+  addNamedEntity: fake.returns(null),
+};
+const deviceManager = new DeviceManager(event, {}, stateManager, serviceManager, {}, {}, job, brain);
 
 const gladys = {
   device: deviceManager,
