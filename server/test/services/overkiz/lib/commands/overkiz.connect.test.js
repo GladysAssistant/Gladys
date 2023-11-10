@@ -8,7 +8,7 @@ const { expect } = chai;
 const { stub } = require('sinon');
 const OverkizHandler = require('../../../../../services/overkiz/lib/index');
 const { EVENTS } = require('../../../../../utils/constants');
-const { ServiceNotConfiguredError } = require('../../../../../utils/coreErrors');
+const { ServiceNotConfiguredError, BadParameters } = require('../../../../../utils/coreErrors');
 
 const OVERKIZ_SERVICE_ID = 'OVERKIZ_SERVICE_ID';
 
@@ -62,6 +62,27 @@ describe('Connect command', () => {
       assert.fail();
     } catch (e) {
       expect(e).to.be.instanceof(ServiceNotConfiguredError);
+      expect(e.message).to.be.equal('OVERKIZ_TYPE');
+    }
+    expect(overkizHandler.connected).to.be.false;
+  });
+
+  it.only('should not connect default OVERKIZ_TYPE', async () => {
+    const variable = {
+      getValue: stub()
+        .onFirstCall()
+        .returns('default')
+        .onSecondCall()
+        .returns('guest')
+        .onThirdCall()
+        .returns('guest'),
+    };
+    overkizHandler.gladys.variable = variable;
+    try {
+      await overkizHandler.connect();
+      assert.fail();
+    } catch (e) {
+      expect(e).to.be.instanceof(BadParameters);
       expect(e.message).to.be.equal('OVERKIZ_TYPE');
     }
     expect(overkizHandler.connected).to.be.false;

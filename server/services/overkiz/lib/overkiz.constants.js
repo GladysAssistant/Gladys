@@ -1,4 +1,6 @@
 const DEVICE_PARAMS = {
+  ID: 'ID',
+  URL: 'URL',
   FIRMWARE: 'FIRMWARE',
   ONLINE: 'ONLINE',
   STATE: 'STATE',

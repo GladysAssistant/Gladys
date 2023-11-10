@@ -49,14 +49,18 @@ async function getOverkizDevices() {
         external_id: getDeviceExternalId(node),
         updatable: true,
         ready: node.available && node.enabled,
-        rawOverkizDevice: {
-          id: node.id,
-          deviceURL: node.deviceURL,
-        },
         should_poll: true,
         poll_frequency: DEVICE_POLL_FREQUENCIES.EVERY_5_MINUTES,
         features: [],
         params: [
+          {
+            name: DEVICE_PARAMS.ID,
+            value: node.id,
+          },
+          {
+            name: DEVICE_PARAMS.URL,
+            value: node.deviceURL,
+          },
           {
             name: DEVICE_PARAMS.ONLINE,
             value: states[DEVICE_STATES.STATUS_STATE],
@@ -76,10 +80,11 @@ async function getOverkizDevices() {
     })
     .reduce((map, obj) => {
       // Remove #<idx> to get all nodes from the same physical device
-      const deviceURL = obj.rawOverkizDevice.deviceURL.includes('#')
-        ? obj.rawOverkizDevice.deviceURL.substring(0, obj.rawOverkizDevice.deviceURL.indexOf('#'))
-        : obj.rawOverkizDevice.deviceURL;
-      map[deviceURL] = obj;
+      const deviceURL = obj.params.find(param => param.name === DEVICE_PARAMS.URL).value;
+      const deviceSameURL = deviceURL.includes('#')
+        ? deviceURL.substring(0, deviceURL.indexOf('#'))
+        : deviceURL;
+      map[deviceSameURL] = obj;
       return map;
     }, {});
 
@@ -213,7 +218,7 @@ async function getOverkizDevices() {
   return newDevicesOids
     .map((newDevicesOid) => ({ ...newDevices[newDevicesOid] }))
     .sort((a, b) => {
-      return b.ready - a.ready || a.rawOverkizDevice.id - b.rawOverkizDevice.id;
+      return b.ready - a.ready || a.name - b.name;
     });
 }
 
