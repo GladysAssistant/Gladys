@@ -234,6 +234,9 @@ const EVENTS = {
   JOB: {
     PURGE_OLD_JOBS: 'job.purge-old-jobs',
   },
+  MQTT: {
+    RECEIVED: 'mqtt.received',
+  },
 };
 
 const LIFE_EVENTS = {

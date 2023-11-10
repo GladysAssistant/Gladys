@@ -1688,6 +1688,9 @@
       },
       "system": {
         "start": "Gladys starting"
+      },
+      "mqtt": {
+        "received": "Receive message from MQTT"
       }
     },
     "triggersCard": {
@@ -1786,6 +1789,14 @@
       },
       "gladysStart": {
         "description": "This scene will be executed each time Gladys starts"
+      },
+      "mqttReceived": {
+        "description": "This scene will run when a message is received in the selected MQTT topic",
+        "topicLabel": "Topic",
+        "topicPlaceholder": "Enter your topic",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Enter the expected message",
+        "messageDescription": "Enter the expected message or leave blank to run the scene regardless of the message"
       }
     }
   },

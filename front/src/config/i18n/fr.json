@@ -1689,6 +1689,9 @@
       },
       "system": {
         "start": "Gladys démarre"
+      },
+      "mqtt": {
+        "received": "Recevoir un message MQTT"
       }
     },
     "triggersCard": {
@@ -1787,6 +1790,14 @@
       },
       "gladysStart": {
         "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
+      },
+      "mqttReceived": {
+        "description": "Cette scène s'exécutera lorsque un message sera reçu dans le topic MQTT sélectionné",
+        "topicLabel": "Topic",
+        "topicPlaceholder": "Entrez votre topic",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Entrez le message attendu",
+        "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
       }
     }
   },
