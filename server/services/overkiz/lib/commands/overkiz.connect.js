@@ -38,7 +38,7 @@ async function connect() {
 
   const overkizServer = SUPPORTED_SERVERS[overkizType];
   if (!overkizServer) {
-    throw new BadParameters(OVERKIZ_SERVER_PARAM.OVERKIZ_TYPE);    
+    throw new BadParameters(OVERKIZ_SERVER_PARAM.OVERKIZ_TYPE);
   }
   let platformLoginHandler;
   switch (overkizType) {

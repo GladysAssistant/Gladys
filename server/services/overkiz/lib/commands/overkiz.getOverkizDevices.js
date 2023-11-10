@@ -80,10 +80,8 @@ async function getOverkizDevices() {
     })
     .reduce((map, obj) => {
       // Remove #<idx> to get all nodes from the same physical device
-      const deviceURL = obj.params.find(param => param.name === DEVICE_PARAMS.URL).value;
-      const deviceSameURL = deviceURL.includes('#')
-        ? deviceURL.substring(0, deviceURL.indexOf('#'))
-        : deviceURL;
+      const deviceURL = obj.params.find((param) => param.name === DEVICE_PARAMS.URL).value;
+      const deviceSameURL = deviceURL.includes('#') ? deviceURL.substring(0, deviceURL.indexOf('#')) : deviceURL;
       map[deviceSameURL] = obj;
       return map;
     }, {});
