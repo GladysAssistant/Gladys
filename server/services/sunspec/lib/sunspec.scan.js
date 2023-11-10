@@ -63,7 +63,7 @@ async function scan() {
   });
 
   this.scanning = true;
-  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.SCANNING,
     payload: {
       scanning: true,
@@ -76,7 +76,7 @@ async function scan() {
 
   const scanDone = (discoveredDevices, success) => {
     this.scanning = false;
-    this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.SCANNING,
       payload: {
         scanning: false,

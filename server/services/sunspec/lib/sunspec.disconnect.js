@@ -12,7 +12,7 @@ async function disconnect() {
   if (this.modbus) {
     this.modbus.close(() => {
       if (this.connected) {
-        this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
         });
       } else {

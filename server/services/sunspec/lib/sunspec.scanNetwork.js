@@ -48,7 +48,7 @@ async function scanNetwork() {
   });
   await Promise.all(promises);
 
-  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
   });
 }

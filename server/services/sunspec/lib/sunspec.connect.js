@@ -9,7 +9,7 @@ const logger = require('../../../utils/logger');
  * connect();
  */
 async function connect() {
-  logger.debug(`SunSpec: Connecting...`);
+  logger.info(`SunSpec: Connecting...`);
 
   this.sunspecIps = await this.scan();
 
@@ -27,11 +27,11 @@ async function connect() {
 
   this.connected = true;
 
-  this.eventManager.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.CONNECTED,
   });
 
-  logger.debug(`SunSpec: Searching devices...`);
+  logger.info(`SunSpec: Searching devices...`);
 
   await this.scanNetwork();
 }

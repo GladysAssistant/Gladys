@@ -12,7 +12,6 @@ const { scan } = require('./sunspec.scan');
 
 const SunSpecManager = function SunSpecManager(gladys, ModbusTCP, ScannerClass, serviceId) {
   this.gladys = gladys;
-  this.eventManager = gladys.stateManager.event;
   this.serviceId = serviceId;
   this.devices = {};
   this.ScannerClass = ScannerClass;
