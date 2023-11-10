@@ -1,4 +1,3 @@
-import { h } from 'preact';
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
@@ -11,6 +10,7 @@ import HouseEmptyOrNot from './triggers/HouseEmptyOrNot';
 import UserEnteredOrLeftArea from './triggers/UserEnteredOrLeftArea';
 import CalendarEventIsComing from './triggers/CalendarEventIsComing';
 import AlarmModeTrigger from './triggers/AlarmModeTrigger';
+import MQTTReceivedTrigger from './triggers/MQTTReceivedTrigger';
 
 import { EVENTS } from '../../../../../server/utils/constants';
 import GladysStartTrigger from './triggers/GladysStartTrigger';
@@ -32,7 +32,8 @@ const TRIGGER_ICON = {
   [EVENTS.ALARM.DISARM]: 'fe-bell-off',
   [EVENTS.ALARM.PANIC]: 'fe-alert-triangle',
   [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: 'fe-alert-triangle',
-  [EVENTS.SYSTEM.START]: 'fe-activity'
+  [EVENTS.SYSTEM.START]: 'fe-activity',
+  [EVENTS.MQTT.RECEIVED]: 'fe-hash'
 };
 
 const ALARM_TRIGGERS = [
@@ -161,6 +162,13 @@ const TriggerCard = ({ children, ...props }) => (
       )}
       {props.trigger.type === EVENTS.SYSTEM.START && (
         <GladysStartTrigger
+          updateTriggerProperty={props.updateTriggerProperty}
+          index={props.index}
+          trigger={props.trigger}
+        />
+      )}
+      {props.trigger.type === EVENTS.MQTT.RECEIVED && (
+        <MQTTReceivedTrigger
           updateTriggerProperty={props.updateTriggerProperty}
           index={props.index}
           trigger={props.trigger}

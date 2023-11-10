@@ -1,7 +1,7 @@
 const { Error429 } = require('../../utils/httpErrors');
 
 const intentTranslation = {
-  SHOW_CAMERA: 'camera.get-image-room',
+  SHOW_CAMERA: 'camera.get-image',
   TURN_ON: 'light.turn-on',
   TURN_OFF: 'light.turn-off',
   GET_TEMPERATURE: 'temperature-sensor.get-in-room',
@@ -42,6 +42,12 @@ async function forwardMessageToOpenAI({ message, previousQuestions, context }) {
     if (response.scene) {
       const sceneSelector = this.brain.getEntityIdByName('scene', response.scene);
       classification.entities = [{ entity: 'scene', option: sceneSelector, sourceText: response.scene }];
+    }
+
+    // add device entity
+    if (response.device) {
+      const deviceSelector = this.brain.getEntityIdByName('device', response.device);
+      classification.entities = [{ entity: 'device', option: deviceSelector, sourceText: response.device }];
     }
 
     classification.intent = intentTranslation[response.type];

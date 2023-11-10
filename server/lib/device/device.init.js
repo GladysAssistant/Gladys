@@ -35,6 +35,7 @@ async function init(startDeviceStateAggregate = true) {
   const plainDevices = devices.map((device) => {
     const plainDevice = device.get({ plain: true });
     this.add(plainDevice);
+    this.brain.addNamedEntity('device', plainDevice.selector, plainDevice.name);
     return plainDevice;
   });
   if (startDeviceStateAggregate) {
