@@ -14,10 +14,10 @@ describe('POST /service/philips-hue/bridge/configure', () => {
     const philipsHueController = PhilipsHueControllers(philipsHueLightService);
     const req = {
       body: {
-        serial: '12345',
+        ipAddress: '192.168.1.10',
       },
     };
     await philipsHueController['post /api/v1/service/philips-hue/bridge/configure'].controller(req, res);
-    assert.calledWith(philipsHueLightService.configureBridge, '12345');
+    assert.calledWith(philipsHueLightService.configureBridge, '192.168.1.10');
   });
 });

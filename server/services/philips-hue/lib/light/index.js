@@ -35,7 +35,7 @@ const PhilipsHueLightHandler = function PhilipsHueLightHandler(gladys, hueClient
   this.serviceId = serviceId;
   this.bridges = [];
   this.connnectedBridges = [];
-  this.bridgesBySerialNumber = new Map();
+  this.bridgesByIP = new Map();
   this.hueApisBySerialNumber = new Map();
   this.lights = [];
 };

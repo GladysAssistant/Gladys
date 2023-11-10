@@ -66,7 +66,7 @@ const actions = store => ({
     });
     try {
       const createdDevice = await state.httpClient.post('/api/v1/service/philips-hue/bridge/configure', {
-        serial: bridge.model.serial
+        ipAddress: bridge.ipaddress
       });
       const newState = update(state, {
         philipsHueBridgesDevices: {
