@@ -73,6 +73,9 @@ class Locked extends Component {
       return { ...prevState, currentCode: prevState.currentCode + letter };
     });
   };
+  redirectToDashboard = () => {
+    route(`/dashboard${window.location.search}`);
+  };
   init = async () => {
     try {
       // We make a dumb request just to verify if our token is valid
@@ -80,8 +83,9 @@ class Locked extends Component {
         refresh_token: this.props.session.getRefreshToken(),
         scope: ['dashboard:write']
       });
+
       // if this resolves, we redirect to dashboard
-      route('/dashboard');
+      this.redirectToDashboard();
     } catch (e) {
       this.props.httpClient.setApiScopes(['alarm:write']);
       await this.props.httpClient.refreshAccessToken();
@@ -101,7 +105,7 @@ class Locked extends Component {
       if (event.house === houseSelector) {
         this.props.httpClient.resetApiScopes();
         await this.props.httpClient.refreshAccessToken();
-        route('/dashboard');
+        this.redirectToDashboard();
       }
     } catch (e) {
       console.error(e);

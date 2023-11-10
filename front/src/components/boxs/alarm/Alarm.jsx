@@ -83,9 +83,11 @@ class AlarmComponent extends Component {
     const isCurrentlyArmingWithCoutdown = arming && house.alarm_delay_before_arming > 0;
     return (
       <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">{props.box.name}</h3>
-        </div>
+        {props.box.name && (
+          <div class="card-header">
+            <h3 class="card-title">{props.box.name}</h3>
+          </div>
+        )}
         {house && (
           <div class="card-body">
             <div class={loading ? 'dimmer active' : 'dimmer'}>
