@@ -110,7 +110,7 @@ describe('zwaveJSUIManager valueUpdated', () => {
     assert.notCalled(zwaveJSUIManager.eventManager.emit);
   });
 
-  it('should handle property currentValue', () => {
+  it('should not handle property currentValue', () => {
     zwaveJSUIManager.valueUpdated(zwaveNode, {
       commandClass: 20,
       endpoint: 0,
@@ -118,16 +118,11 @@ describe('zwaveJSUIManager valueUpdated', () => {
       newValue: 'newValue',
     });
     expect(zwaveJSUIManager.nodes[1].classes[20][0].currentValue).to.be.undefined; // eslint-disable-line
-    expect(zwaveJSUIManager.nodes[1].classes[20][0].targetValue).to.deep.equal({
-      value: 'newValue',
-    });
-    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:20:endpoint:0:property:targetValue',
-      state: 'newValue',
-    });
+    expect(zwaveJSUIManager.nodes[1].classes[20][0].targetValue).to.deep.equal({});
+    assert.notCalled(zwaveJSUIManager.eventManager.emit);
   });
 
-  it('should handle property currentColor', () => {
+  it('should not handle property currentColor', () => {
     zwaveJSUIManager.valueUpdated(zwaveNode, {
       commandClass: 51,
       endpoint: 0,
@@ -135,13 +130,8 @@ describe('zwaveJSUIManager valueUpdated', () => {
       newValue: 180,
     });
     expect(zwaveJSUIManager.nodes[1].classes[51][0].currentColor).to.be.undefined; // eslint-disable-line
-    expect(zwaveJSUIManager.nodes[1].classes[51][0]['targetColor-0']).to.deep.equal({
-      value: 71,
-    });
-    assert.calledOnceWithExactly(zwaveJSUIManager.eventManager.emit, EVENTS.DEVICE.NEW_STATE, {
-      device_feature_external_id: 'zwave-js-ui:node_id:1:comclass:51:endpoint:0:property:targetColor-0',
-      state: 71,
-    });
+    expect(zwaveJSUIManager.nodes[1].classes[51][0]['targetColor-0']).to.deep.equal({});
+    assert.notCalled(zwaveJSUIManager.eventManager.emit);
   });
 
   it('should handle value valueUpdated 20-0-property', () => {

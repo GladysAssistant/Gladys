@@ -104,37 +104,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       max: 99,
       writeable: false,
     });
-    expect(zwaveJSUIManager.nodes[1].classes[37][0].targetValue).to.deep.equal({
-      commandClass: 37,
-      endpoint: 0,
-      genre: 'user',
-      label: 'Current value',
-      type: 'boolean',
-      max: 99,
-      min: 0,
-      nodeId: 1,
-      property: 'targetValue',
-      propertyName: 'targetValue',
-      writeable: true,
-    });
-    const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(4);
-    expect(nodes[0].features).to.deep.equal([
-      {
-        category: 'switch',
-        external_id: 'zwave-js-ui:node_id:1:comclass:37:endpoint:0:property:targetValue',
-        has_feedback: true,
-        last_value: 0,
-        name: 'Current value',
-        read_only: false,
-        selector: 'zwave-js-ui-node-1-targetvalue-37-0-current-value',
-        type: 'binary',
-        unit: null,
-        max: 1,
-        min: 0,
-      },
-    ]);
+    expect(zwaveJSUIManager.nodes[1].classes).to.deep.equal({});
   });
 
   it('should handle value added 51-0-currentColor', () => {
@@ -148,37 +118,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       max: 255,
       writeable: false,
     });
-    expect(zwaveJSUIManager.nodes[1].classes[51][0]['targetColor-0']).to.deep.equal({
-      commandClass: 51,
-      endpoint: 0,
-      genre: 'user',
-      label: 'Current color',
-      type: 'number',
-      max: 255,
-      min: 0,
-      nodeId: 1,
-      property: 'targetColor-0',
-      propertyName: 'targetColor',
-      writeable: true,
-    });
-    const nodes = zwaveJSUIManager.getNodes();
-    expect(nodes).to.have.lengthOf(1);
-    expect(nodes[0].params).to.have.lengthOf(4);
-    expect(nodes[0].features).to.deep.equal([
-      {
-        category: 'light',
-        external_id: 'zwave-js-ui:node_id:1:comclass:51:endpoint:0:property:targetColor-0',
-        has_feedback: true,
-        last_value: undefined,
-        name: 'Température',
-        read_only: false,
-        selector: 'zwave-js-ui-node-1-targetcolor-0-51-0-current-color',
-        type: 'temperature',
-        unit: null,
-        max: 100,
-        min: 0,
-      },
-    ]);
+    expect(zwaveJSUIManager.nodes[1].classes).to.deep.equal({});
   });
 
   it('should handle value added unsupported command class', () => {
