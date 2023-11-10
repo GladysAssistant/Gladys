@@ -66,7 +66,7 @@ function Gladys(params = {}) {
   const message = new MessageHandler(event, brain, service, stateManager, variable);
   const user = new User(session, stateManager, variable);
   const location = new Location(user, event);
-  const device = new Device(event, message, stateManager, service, room, variable, job);
+  const device = new Device(event, message, stateManager, service, room, variable, job, brain);
   const calendar = new Calendar(service);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
@@ -96,6 +96,7 @@ function Gladys(params = {}) {
     gateway,
     scheduler,
     brain,
+    service,
   );
 
   const gladys = {

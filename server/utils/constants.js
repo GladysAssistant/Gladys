@@ -243,6 +243,9 @@ const EVENTS = {
   JOB: {
     PURGE_OLD_JOBS: 'job.purge-old-jobs',
   },
+  MQTT: {
+    RECEIVED: 'mqtt.received',
+  },
 };
 
 const LIFE_EVENTS = {
@@ -374,7 +377,7 @@ const INTENTS = {
     DAY: 'intent.weather.day',
   },
   CAMERA: {
-    GET_IMAGE_ROOM: 'intent.camera.get-image-room',
+    GET_IMAGE: 'intent.camera.get-image',
   },
   SCENE: {
     START: 'intent.scene.start',

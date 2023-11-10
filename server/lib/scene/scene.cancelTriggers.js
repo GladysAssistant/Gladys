@@ -15,6 +15,12 @@ function cancelTriggers(sceneSelector) {
         clearInterval(trigger.jsInterval);
         delete trigger.jsInterval;
       }
+      if (trigger.topic) {
+        const mqttService = this.service.getService('mqtt');
+        if (mqttService) {
+          mqttService.device.unsubscribe(trigger.topic);
+        }
+      }
     });
   }
 }
