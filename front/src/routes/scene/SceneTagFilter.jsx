@@ -51,11 +51,11 @@ class SceneTagFilter extends Component {
     this.setState({ tagFilterDropdownOpened: false });
   };
 
-  selectedTags = async (tagName, checked) => {
+  selectedTags = async tagName => {
     await this.setState({
       tagsStatus: {
         ...this.state.tagsStatus,
-        [tagName]: checked
+        [tagName]: !this.state.tagsStatus[tagName]
       }
     });
     const selectedTags = Object.keys(this.state.tagsStatus).filter(tagName => this.state.tagsStatus[tagName]);
@@ -89,13 +89,13 @@ class SceneTagFilter extends Component {
           {props.tags &&
             props.tags.map(tag => (
               <div>
-                <li class={style.dropDownTags}>
+                <li className="dropdown-item" onClick={() => this.selectedTags(tag.name)}>
                   <div class="custom-checkbox custom-control">
                     <input
                       id={`tags-filter-${tag.name}`}
                       type="checkbox"
                       className="custom-control-input"
-                      onChange={e => this.selectedTags(tag.name, e.target.checked)}
+                      onChange={e => this.selectedTags(tag.name)}
                       checked={tagsStatus[tag.name]}
                     />
                     <label className="custom-control-label" htmlFor={`tags-filter-${tag.name}`}>
