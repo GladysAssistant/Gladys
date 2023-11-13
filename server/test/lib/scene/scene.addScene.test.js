@@ -2,6 +2,7 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 
 const { fake, assert } = sinon;
+
 const { EVENTS } = require('../../../utils/constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const SceneManager = require('../../../lib/scene');
@@ -10,6 +11,10 @@ describe('SceneManager.addScene', () => {
   const house = {};
   const event = {};
   const brain = {};
+  const service = {};
+  const mqttService = {
+    device: {},
+  };
 
   let sceneManager;
 
@@ -19,6 +24,8 @@ describe('SceneManager.addScene', () => {
     event.emit = fake.returns(null);
     brain.addNamedEntity = fake.returns(null);
     brain.removeNamedEntity = fake.returns(null);
+    mqttService.device.subscribe = fake.returns(null);
+    service.getService = fake.returns(mqttService);
 
     const scheduler = {
       scheduleJob: (date, callback) => {
@@ -30,7 +37,7 @@ describe('SceneManager.addScene', () => {
       },
     };
 
-    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler, brain);
+    sceneManager = new SceneManager({}, event, {}, {}, {}, house, {}, {}, {}, scheduler, brain, service);
   });
 
   afterEach(() => {
@@ -228,5 +235,31 @@ describe('SceneManager.addScene', () => {
       actions: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+  });
+  it('should add a scene with a message received trigger', async () => {
+    const scene = sceneManager.addScene({
+      name: 'a-test-scene',
+      icon: 'bell',
+      active: true,
+      triggers: [
+        {
+          type: EVENTS.MQTT.RECEIVED,
+          topic: 'my/topic',
+        },
+      ],
+      actions: [],
+    });
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('nodeScheduleJob');
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.not.have.property('jsInterval');
+    expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('mqttCallback');
+    assert.calledWithExactly(service.getService, 'mqtt');
+    assert.calledOnce(mqttService.device.subscribe);
+
+    sceneManager.scenes[scene.selector].triggers[0].mqttCallback('my/topic', 'message');
+    assert.calledOnceWithExactly(event.emit, EVENTS.TRIGGERS.CHECK, {
+      type: EVENTS.MQTT.RECEIVED,
+      topic: 'my/topic',
+      message: 'message',
+    });
   });
 });

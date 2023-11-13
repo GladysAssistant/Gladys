@@ -160,6 +160,9 @@
         "durationOneWeek": "1 semaine",
         "durationOneMonth": "1 mois",
         "durationThreeMonth": "3 mois",
+        "durationSixMonths": "6 mois",
+        "durationOneYear": "1 an",
+        "durationTwoYears": "2 ans",
         "unlimited": "Illimité"
       },
       "saveSettingsButton": "Sauvegarder les paramètres"
@@ -393,7 +396,7 @@
         "partiallyArmedButton": "Armement",
         "partiallyArmedButtonSecondLine": "partiel",
         "panicButton": "Panique",
-        "editBoxNameLabel": "Nom du widget",
+        "editBoxNameLabel": "Nom du widget (optionnel)",
         "editBoxNamePlaceholder": "Entrez le nom du widget",
         "editHouseLabel": "Sélectionnez la maison qui est concernée pour l'activation/désactivation de l'alarme.",
         "alarmStatusText": "Votre maison est ",
@@ -592,7 +595,12 @@
         "scanButton": "Recherche sur le réseau",
         "bridgeButtonNotPressed": "Le bouton du pont n'a pas été appuyé : veuillez appuyer sur le bouton de votre pont Philips Hue et réessayer.",
         "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
-        "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?"
+        "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?",
+        "manualConfiguration": {
+          "title": "Configuration manuelle",
+          "text": "Si vous connaissez l'adresse IP de votre pont Philips Hue, vous pouvez la saisir et lancer une configuration manuelle.",
+          "input": "Adresse IP"
+        }
       },
       "device": {
         "title": "Appareils dans Gladys",
@@ -1762,6 +1770,9 @@
       },
       "system": {
         "start": "Gladys démarre"
+      },
+      "mqtt": {
+        "received": "Recevoir un message MQTT"
       }
     },
     "triggersCard": {
@@ -1860,6 +1871,14 @@
       },
       "gladysStart": {
         "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
+      },
+      "mqttReceived": {
+        "description": "Cette scène s'exécutera lorsque un message sera reçu dans le topic MQTT sélectionné",
+        "topicLabel": "Topic",
+        "topicPlaceholder": "Entrez votre topic",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Entrez le message attendu",
+        "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
       }
     }
   },
@@ -2055,6 +2074,7 @@
       "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",
       "gladys-gateway-backup": "Sauvegarde Gladys Plus",
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
+      "device-state-purge": "Nettoyage des vieux états d'appareils",
       "vacuum": "Nettoyage de la base de donnée",
       "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
     },
@@ -2089,7 +2109,9 @@
     "timezone": "Fuseau horaire",
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
-    "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
+    "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états bruts des appareils.",
+    "deviceAggregatesStateRetentionTime": "Conserver les états agrégées",
+    "deviceAggregatesStateRetentionTimeDescription": "Gladys calcule des historiques d'états pré-calculés afin d'avoir des données plus légère à afficher sur le tableau de bord. Vous pouvez sélectionner ici combien de temps ces données doivent être gardée.",
     "numberOfHoursBeforeStateIsOutdated": "Délai avant expiration d'un état",
     "numberOfHoursBeforeStateIsOutdatedDescription": "Ce délai correspond au nombre d'heures avant qu'un état de capteur soit considéré comme \"périmé\" et ainsi plus affiché sur le tableau de bord.",
     "hours": "heures",
@@ -2470,8 +2492,8 @@
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
-          "zero": "Fermé",
-          "one": "Ouvert"
+          "zero": "Ouvert",
+          "one": "Fermé"
         }
       },
       "co-sensor": {
