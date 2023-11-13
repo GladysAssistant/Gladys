@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
 import { MAX_LENGTH_TAG } from './constant';
+import style from './style.css';
 
 class SceneTagFilter extends Component {
   constructor(props) {
@@ -88,7 +89,7 @@ class SceneTagFilter extends Component {
           {props.tags &&
             props.tags.map(tag => (
               <div>
-                <li className="dropdown-item">
+                <li class={style.dropDownTags}>
                   <div class="custom-checkbox custom-control">
                     <input
                       id={`tags-filter-${tag.name}`}

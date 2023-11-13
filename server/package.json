@@ -96,7 +96,6 @@
     "joi": "^17.7.0",
     "jsonwebtoken": "^8.5.1",
     "lodash.clonedeep": "^4.5.0",
-    "lodash.intersection": "^4.4.0",
     "mathjs": "^11.8.0",
     "node-nlp": "^4.26.1",
     "node-schedule": "^2.1.0",
