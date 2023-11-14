@@ -34,6 +34,7 @@ const { setValue } = require('./device.setValue');
 const { setupPoll } = require('./device.setupPoll');
 const { newStateEvent } = require('./device.newStateEvent');
 const { notify } = require('./device.notify');
+const { checkBatteries } = require('./device.checkBatteries');
 
 const DeviceManager = function DeviceManager(
   eventManager,
@@ -44,6 +45,7 @@ const DeviceManager = function DeviceManager(
   variable,
   job,
   brain,
+  user,
 ) {
   this.eventManager = eventManager;
   this.messageManager = messageManager;
@@ -53,6 +55,7 @@ const DeviceManager = function DeviceManager(
   this.variable = variable;
   this.job = job;
   this.brain = brain;
+  this.user = user;
 
   this.STATES_TO_PURGE_PER_DEVICE_FEATURE_CLEAN_BATCH = 1000;
   this.WAIT_TIME_BETWEEN_DEVICE_FEATURE_CLEAN_BATCH = 100;
@@ -84,6 +87,7 @@ const DeviceManager = function DeviceManager(
     EVENTS.DEVICE.PURGE_STATES_SINGLE_FEATURE,
     eventFunctionWrapper(this.purgeStatesByFeatureId.bind(this)),
   );
+  this.eventManager.on(EVENTS.DEVICE.CHECK_BATTERIES, eventFunctionWrapper(this.checkBatteries.bind(this)));
 };
 
 DeviceManager.prototype.add = add;
@@ -112,5 +116,6 @@ DeviceManager.prototype.setParam = setParam;
 DeviceManager.prototype.setupPoll = setupPoll;
 DeviceManager.prototype.setValue = setValue;
 DeviceManager.prototype.notify = notify;
+DeviceManager.prototype.checkBatteries = checkBatteries;
 
 module.exports = DeviceManager;

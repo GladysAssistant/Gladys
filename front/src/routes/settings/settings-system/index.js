@@ -6,6 +6,7 @@ import SettingsSystemPage from './SettingsSystemPage';
 import actions from '../../../actions/system';
 import { SYSTEM_VARIABLE_NAMES } from '../../../../../server/utils/constants';
 import { RequestStatus } from '../../../utils/consts';
+import debounce from 'debounce';
 
 class SettingsSystem extends Component {
   updateTimezone = async option => {
@@ -47,6 +48,38 @@ class SettingsSystem extends Component {
       console.error(e);
     }
   };
+
+  getBatteryLevelUnderWarning = async () => {
+    try {
+      const { value } = await this.props.httpClient.get(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING}`
+      );
+      this.setState({
+        batteryLevelUnderWarning: value
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  updateBatteryLevelUnderWarning = async e => {
+    await this.setState({
+      batteryLevelUnderWarning: e.target.value,
+      savingBatteryLevelUnderWarning: true
+    });
+    try {
+      await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING}`, {
+        value: e.target.value
+      });
+    } catch (e) {
+      console.error(e);
+    }
+    await this.setState({
+      savingBatteryLevelUnderWarning: false
+    });
+  };
+
+  debouncedUpdateBatteryLevelUnderWarning = debounce(this.updateBatteryLevelUnderWarning, 200);
 
   updateDeviceStateHistory = async e => {
     await this.setState({
@@ -163,6 +196,7 @@ class SettingsSystem extends Component {
     this.getDeviceStateHistoryPreference();
     this.getDeviceAggregateStateHistoryPreference();
     this.getNumberOfHoursBeforeStateIsOutdated();
+    this.getBatteryLevelUnderWarning();
     // we start the ping a little bit after to give it some time to breathe
     this.refreshPingIntervalId = setInterval(() => {
       this.props.ping();
@@ -188,7 +222,9 @@ class SettingsSystem extends Component {
       deviceAggregateStateHistoryInDays,
       vacuumStarted,
       numberOfHoursBeforeStateIsOutdated,
-      savingNumberOfHourseBeforeStateIsOutdated
+      savingNumberOfHourseBeforeStateIsOutdated,
+      batteryLevelUnderWarning,
+      savingBatteryLevelUnderWarning
     }
   ) {
     const isDocker = get(props, 'systemInfos.is_docker');
@@ -215,6 +251,9 @@ class SettingsSystem extends Component {
         updateNumberOfHoursBeforeStateIsOutdated={this.updateNumberOfHoursBeforeStateIsOutdated}
         vacuumDatabase={this.vacuumDatabase}
         vacuumStarted={vacuumStarted}
+        batteryLevelUnderWarning={batteryLevelUnderWarning}
+        savingBatteryLevelUnderWarning={savingBatteryLevelUnderWarning}
+        updateBatteryLevelUnderWarning={this.debouncedUpdateBatteryLevelUnderWarning}
       />
     );
   }
