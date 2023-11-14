@@ -21,6 +21,11 @@ const jobs = [
     rule: '0 0 22 * * *', // every day at 22:00
     event: EVENTS.JOB.PURGE_OLD_JOBS,
   },
+  {
+    name: 'hourly-device-check-batteries',
+    rule: '0 0 * * * *', // every hour
+    event: EVENTS.DEVICE.CHECK_BATTERIES,
+  },
 ];
 
 module.exports = jobs;

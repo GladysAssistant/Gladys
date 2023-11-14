@@ -255,6 +255,32 @@ const SystemPage = ({ children, ...props }) => (
                 </button>
               </p>
             </form>
+            <form className="mt-4">
+              <label>
+                <Text id="systemSettings.batteryLevel" />
+              </label>
+              <p>
+                <small>
+                  <Text id="systemSettings.batteryLevelDescription" />
+                </small>
+              </p>
+              <div class="input-group">
+                <input
+                  className="form-control"
+                  type="number"
+                  min="1"
+                  max="100"
+                  disabled={props.savingBatteryLevelUnderWarning}
+                  value={props.batteryLevelUnderWarning}
+                  onChange={props.updateBatteryLevelUnderWarning}
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text">
+                    <Text id="global.percent" />
+                  </span>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>
