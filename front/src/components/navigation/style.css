@@ -1,29 +1,28 @@
 .goTo {
-    display: block;
-    position: fixed;
-    bottom: 30px;
-    left: 50px;
-    animation: fadeOut 0.5s;
-
+  display: block;
+  position: fixed;
+  bottom: 30px;
+  left: 50px;
+  animation: fadeOut 0.5s;
+  z-index: 10;
 }
 
-.halfCircleUp{
-    border-radius: 50% 50% 0 0;
-    width : 10px;  
+.halfCircleUp {
+  border-radius: 50% 50% 0 0;
+  width: 10px;
 }
 
-.halfCircleUp:disabled, .halfCircleDown:disabled{
-    
-    opacity:20%; 
+.halfCircleUp:disabled,
+.halfCircleDown:disabled {
+  opacity: 20%;
 }
 
-
-.halfCircleUp:enabled ,.halfCircleDown:enabled {
-    opacity:50%;
-  }
+.halfCircleUp:enabled,
+.halfCircleDown:enabled {
+  opacity: 100%;
+}
 
 .halfCircleDown {
-    border-radius: 0 0 50% 50%;
-    width : 10px;
-  }
-
+  border-radius: 0 0 50% 50%;
+  width: 10px;
+}
