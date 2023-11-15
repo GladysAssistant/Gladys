@@ -36,7 +36,7 @@ class SceneCard extends Component {
             <div class="card h-100 d-flex flex-column justify-content-between">
               <div class="card-body pb-0 pt-3 pl-3 pr-3 text-center h-100">
                 <div class={style.scene_icon}>
-                  <i class={`fe fe-${props.scene.icon}`} />
+                  <i class={`${props.scene.icon}`} />
                 </div>
                 <div class={style.disableSceneButton}>
                   <label class="custom-switch m-0">

@@ -68,7 +68,7 @@ const NewScenePage = ({ children, ...props }) => (
                           value={icon}
                           class={style.iconInput}
                         />
-                        <i class={`fe fe-${icon}`} />
+                        <i class={`${icon}`} />
                       </label>
                     </div>
                   </div>
