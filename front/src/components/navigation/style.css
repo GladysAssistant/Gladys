@@ -19,7 +19,7 @@
 
 .halfCircleUp:enabled,
 .halfCircleDown:enabled {
-  opacity: 100%;
+  opacity: 50%;
 }
 
 .halfCircleDown {
