@@ -1,5 +1,3 @@
-const { Op } = require('sequelize');
-const db = require('../../models');
 const logger = require('../../utils/logger');
 const {
   SYSTEM_VARIABLE_NAMES,
@@ -15,9 +13,13 @@ const {
  * device.purgeStates();
  */
 async function checkBatteries() {
+  const enabled = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED);
+  if (!enabled) {
+    return;
+  }
   logger.debug('Checking batteries ...');
 
-  const minPercentBattery = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING);
+  const minPercentBattery = await this.variable.getValue(SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD);
 
   const admins = await this.user.getByRole(USER_ROLE.ADMIN);
 

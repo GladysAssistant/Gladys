@@ -51,26 +51,37 @@ class SettingsSystem extends Component {
 
   getBatteryLevelUnderWarning = async () => {
     try {
-      const { value } = await this.props.httpClient.get(
-        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING}`
+      const { value: batteryLevelUnderWarningThreshold } = await this.props.httpClient.get(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD}`
       );
+
+      const { value: batteryLevelUnderWarningEnabled } = await this.props.httpClient.get(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED}`
+      );
+
+      console.log(batteryLevelUnderWarningThreshold, batteryLevelUnderWarningEnabled);
+
       this.setState({
-        batteryLevelUnderWarning: value
+        batteryLevelUnderWarningThreshold,
+        batteryLevelUnderWarningEnabled: batteryLevelUnderWarningEnabled === '1'
       });
     } catch (e) {
       console.error(e);
     }
   };
 
-  updateBatteryLevelUnderWarning = async e => {
+  updateBatteryLevelUnderWarningThreshold = async e => {
     await this.setState({
-      batteryLevelUnderWarning: e.target.value,
+      batteryLevelUnderWarningThreshold: e.target.value,
       savingBatteryLevelUnderWarning: true
     });
     try {
-      await this.props.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING}`, {
-        value: e.target.value
-      });
+      await this.props.httpClient.post(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD}`,
+        {
+          value: e.target.value
+        }
+      );
     } catch (e) {
       console.error(e);
     }
@@ -79,7 +90,30 @@ class SettingsSystem extends Component {
     });
   };
 
-  debouncedUpdateBatteryLevelUnderWarning = debounce(this.updateBatteryLevelUnderWarning, 200);
+  debouncedUpdateBatteryLevelUnderWarningThreshold = debounce(this.updateBatteryLevelUnderWarningThreshold, 200);
+
+  updateBatteryLevelUnderWarningEnabled = async () => {
+    console.log(this.state.batteryLevelUnderWarningEnabled);
+    const value = !this.state.batteryLevelUnderWarningEnabled;
+    console.log(value);
+    await this.setState({
+      batteryLevelUnderWarningEnabled: value,
+      savingBatteryLevelUnderWarning: true
+    });
+    try {
+      await this.props.httpClient.post(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED}`,
+        {
+          value
+        }
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    await this.setState({
+      savingBatteryLevelUnderWarning: false
+    });
+  };
 
   updateDeviceStateHistory = async e => {
     await this.setState({
@@ -223,7 +257,8 @@ class SettingsSystem extends Component {
       vacuumStarted,
       numberOfHoursBeforeStateIsOutdated,
       savingNumberOfHourseBeforeStateIsOutdated,
-      batteryLevelUnderWarning,
+      batteryLevelUnderWarningThreshold,
+      batteryLevelUnderWarningEnabled,
       savingBatteryLevelUnderWarning
     }
   ) {
@@ -251,9 +286,11 @@ class SettingsSystem extends Component {
         updateNumberOfHoursBeforeStateIsOutdated={this.updateNumberOfHoursBeforeStateIsOutdated}
         vacuumDatabase={this.vacuumDatabase}
         vacuumStarted={vacuumStarted}
-        batteryLevelUnderWarning={batteryLevelUnderWarning}
+        batteryLevelUnderWarningThreshold={batteryLevelUnderWarningThreshold}
+        batteryLevelUnderWarningEnabled={batteryLevelUnderWarningEnabled}
         savingBatteryLevelUnderWarning={savingBatteryLevelUnderWarning}
-        updateBatteryLevelUnderWarning={this.debouncedUpdateBatteryLevelUnderWarning}
+        updateBatteryLevelUnderWarningThreshold={this.debouncedUpdateBatteryLevelUnderWarningThreshold}
+        updateBatteryLevelUnderWarningEnabled={this.updateBatteryLevelUnderWarningEnabled}
       />
     );
   }
