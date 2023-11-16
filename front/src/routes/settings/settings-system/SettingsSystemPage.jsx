@@ -255,14 +255,37 @@ const SystemPage = ({ children, ...props }) => (
                 </button>
               </p>
             </form>
-            <form className="mt-4">
-              <label>
-                <Text id="systemSettings.batteryLevel" />
-              </label>
-              <p>
-                <small>
-                  <Text id="systemSettings.batteryLevelDescription" />
-                </small>
+          </div>
+        </div>
+        <div class="card">
+          <h3 class="card-header d-flex flex-row justify-content-between">
+            <label
+              class={cx('mb-0', {
+                'text-muted': !props.batteryLevelUnderWarningEnabled
+              })}
+            >
+              <Text id="systemSettings.batteryLevel" />
+            </label>
+            <label className="custom-switch">
+              <input
+                type="checkbox"
+                name="active"
+                value="1"
+                className="custom-switch-input"
+                checked={props.batteryLevelUnderWarningEnabled}
+                onClick={props.updateBatteryLevelUnderWarningEnabled}
+              />
+              <span class="custom-switch-indicator" />
+            </label>
+          </h3>
+          <div class="card-body">
+            <form className="">
+              <p
+                class={cx({
+                  'text-muted': !props.batteryLevelUnderWarningEnabled
+                })}
+              >
+                <Text id="systemSettings.batteryLevelDescription" />
               </p>
               <div class="input-group">
                 <input
@@ -270,9 +293,9 @@ const SystemPage = ({ children, ...props }) => (
                   type="number"
                   min="1"
                   max="100"
-                  disabled={props.savingBatteryLevelUnderWarning}
-                  value={props.batteryLevelUnderWarning}
-                  onChange={props.updateBatteryLevelUnderWarning}
+                  disabled={props.savingBatteryLevelUnderWarning || !props.batteryLevelUnderWarningEnabled}
+                  value={props.batteryLevelUnderWarningThreshold}
+                  onChange={props.updateBatteryLevelUnderWarningThreshold}
                 />
                 <div class="input-group-append">
                   <span class="input-group-text">
