@@ -311,6 +311,7 @@
         "editBoxNamePlaceholder": "Nom de la box",
         "latencyBoxName": "Latence",
         "latencyBoxDescription": "Plus vous sélectionnez une latence basse, et plus vite le live démarrera. Néanmoins, pour avoir une latence basse, il faut une connexion internet très rapide et avec un minimum de ping sinon la vidéo sera saccadée. Nous conseillons une latence moyenne ou basse.",
+        "upgradeGladysPlusPlanError": "Le streaming de caméra n'est pas compris dans votre plan Gladys Plus. Vous devez le mettre à jour dans Paramètres -> Facturation.",
         "liveStartError": "Une erreur est survenue en démarrant le streaming. Est-ce que l'URL de votre caméra est bien une URL d'un flux vidéo et pas une image ?",
         "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est malheureusement pas disponible sur Safari iPhone. Etrangement, cette fonctionnalité est disponible sur Safari iPad et MacOS... Il faudra s'armer de patience, espérons que l'API arrive vite sur iPhone !",
         "tooManyRequests": "Vous avez atteint votre limite mensuelle de bande passante vidéo. Contactez-nous par email ou sur le forum pour avoir plus de bande passante !",
@@ -2151,6 +2152,7 @@
   },
   "gatewayBackup": {
     "title": "Sauvegardes",
+    "youNeedToUpgrade": "Cette fonctionnalité n'est pas disponible sur votre plan Gladys Plus. Vous devez passer à un plan supérieur pour accéder aux sauvegardes. ",
     "description": "Si vous êtes abonné à Gladys Plus, Gladys crée une sauvegarde chiffrée de votre instance toutes les 24 heures. Vous seul pouvez déchiffrer les sauvegardes. Vous pouvez restaurer ces sauvegardes en un seul clic dans cette installation, ou toute nouvelle configuration.",
     "createdAtColumn": "Date",
     "sizeColumn": "Taille",
