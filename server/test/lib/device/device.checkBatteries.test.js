@@ -32,6 +32,26 @@ describe('Device check batteries', () => {
     await device.checkBatteries();
 
     assert.notCalled(user.getByRole);
+    assert.notCalled(messageManager.sendToUser);
+  });
+  it('should do nothing if the threshold is not set', async () => {
+    const stateManager = new StateManager(event);
+    const service = {
+      getService: () => null,
+    };
+    const variables = {
+      getValue: (key) => {
+        if (key === SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED) {
+          return true;
+        }
+        return undefined;
+      },
+    };
+    const device = new Device(event, messageManager, stateManager, service, {}, variables, job, {}, user);
+
+    await device.checkBatteries();
+
+    assert.notCalled(messageManager.sendToUser);
   });
   it('should send a message if battery is low', async () => {
     const stateManager = new StateManager(event);
