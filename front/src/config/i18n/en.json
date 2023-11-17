@@ -2054,7 +2054,7 @@
       "dead": "Dead"
     },
     "batteryLevel": "Battery level alert",
-    "batteryLevelDescription": "A message will be sent to all admins as soon as the battery level drops below the chosen percentage"
+    "batteryLevelDescription": "At 09:00 AM, only on Saturday, a message will be sent to all admins as soon as the battery level drops below the chosen percentage"
   },
   "newArea": {
     "createNewZoneButton": "Create new zone",
