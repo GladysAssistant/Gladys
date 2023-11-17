@@ -23,7 +23,7 @@ const jobs = [
   },
   {
     name: 'hourly-device-check-batteries',
-    rule: '0 0 * * * *', // every hour
+    rule: '0 0 9 * * 6', // At 09:00 AM, only on Saturday
     event: EVENTS.DEVICE.CHECK_BATTERIES,
   },
 ];
