@@ -42,15 +42,6 @@ const NewScenePage = ({ children, ...props }) => (
                 <Text id="newScene.invalidName" />
               </div>
             </div>
-            <div class="form-footer">
-              <button
-                onClick={props.createScene}
-                class="btn btn-primary btn-block"
-                disabled={props.createSceneStatus === RequestStatus.Getting}
-              >
-                <Text id="newScene.createSceneButton" />
-              </button>
-            </div>
 
             <div class="form-group">
               <label class="form-label">
@@ -84,6 +75,16 @@ const NewScenePage = ({ children, ...props }) => (
                   </div>
                 ))}
               </div>
+            </div>
+
+            <div class="form-footer">
+              <button
+                onClick={props.createScene}
+                className="btn btn-primary btn-block"
+                disabled={props.createSceneStatus === RequestStatus.Getting}
+              >
+                <Text id="newScene.createSceneButton" />
+              </button>
             </div>
           </div>
         </form>

@@ -1,42 +1,6 @@
 describe('Scene view', () => {
-  before(() => {
-    cy.login();
-    /*
-    const serverUrl = Cypress.env('serverUrl');
-    cy.request({
-      method: 'GET',
-      url: `${serverUrl}/api/v1/room`
-    }).then(res => {
-      const device = {
-        name: 'One device',
-        external_id: 'one-device',
-        selector: 'one-device',
-        room_id: res.body[0].id,
-        features: [
-          {
-            name: 'Multilevel',
-            category: 'light',
-            type: 'temperature',
-            external_id: 'light-temperature',
-            selector: 'light-temperature',
-            read_only: false,
-            keep_history: true,
-            has_feedback: true,
-            min: 0,
-            max: 1
-          }
-        ]
-      };
-      cy.createDevice(device, 'mqtt');
-    });
-     */
-  });
   beforeEach(() => {
     cy.login();
-  });
-  after(() => {
-    // Delete all Bluetooth devices
-    //cy.deleteDevices('mqtt');
   });
   it('Should create new scene', () => {
     cy.visit('/dashboard/scene');

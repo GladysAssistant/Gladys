@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
 import { MAX_LENGTH_TAG } from './constant';
-import style from './style.css';
 
 class SceneTagFilter extends Component {
   constructor(props) {
@@ -95,7 +94,7 @@ class SceneTagFilter extends Component {
                       id={`tags-filter-${tag.name}`}
                       type="checkbox"
                       className="custom-control-input"
-                      onChange={e => this.selectedTags(tag.name)}
+                      onChange={() => this.selectedTags(tag.name)}
                       checked={tagsStatus[tag.name]}
                     />
                     <label className="custom-control-label" htmlFor={`tags-filter-${tag.name}`}>
