@@ -7,6 +7,9 @@ Changelog
 =========
 MAJOR 10-2023 v1 Deals with the ecovacs api, handle a vacbot, basic control & battery features handled, a new box to control your bot 
 
+MINOR (WIP) 11-2023 Handle unreachable vacbot (ie : when battery is empty or device off or out of network for any reason): 
+-> 2023-11-10T18:31:26+0100 <error> vacbot.poll.js:42 (EcovacsHandler.poll) Error 4200 occured : Robot not reachable.
+
 Todos
 =====
 
@@ -32,6 +35,11 @@ Improvments
     * Error / Loading have to be correctly managed in VacbotBox (if error display only the title, loading class ... like in ecowattbox)
 * Deal with more features : map
 * Deal with recognized device or less recognized (check lib documentation)
+* Use lib disconnectAsync when deleting a vacbot or stoping service (analysis required)
+    *  Test results using vacbot.disconnect() or vacbot.asyncDisconnect() :   error disconnecting: Cannot read properties of undefined (reading 'unsubscribe')
+
+* Use isKnownDevice / isSupportedDevice from lib tools to give details on which vacbot and features are handled in integration UI
+
 
 Devices compliance
 ==================
