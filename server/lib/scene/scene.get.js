@@ -26,19 +26,20 @@ async function get(options) {
     attributes: optionsWithDefault.fields,
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
+    include: [
+      {
+        model: db.TagScene,
+        as: 'tags',
+        attributes: ['name'],
+      },
+    ],
   };
 
   if (optionsWithDefault.take !== undefined) {
     queryParams.limit = optionsWithDefault.take;
   }
 
-  if (optionsWithDefault.search) {
-    queryParams.where = Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), {
-      [Op.like]: `%${optionsWithDefault.search}%`,
-    });
-  }
-
-  // search by device feature selectors
+  // search by scene selectors
   if (optionsWithDefault.selectors) {
     queryParams.where = {
       [Op.or]: optionsWithDefault.selectors.split(',').map((selector) => ({
@@ -47,10 +48,36 @@ async function get(options) {
     };
   }
 
+  const where = [];
+  if (optionsWithDefault.search) {
+    where.push(
+      Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_scene.name')), {
+        [Op.like]: `%${optionsWithDefault.search}%`,
+      }),
+    );
+  }
+
+  if (optionsWithDefault.searchTags) {
+    const tags = await db.TagScene.findAll({
+      fields: 'scene_id',
+      where: {
+        [Op.or]: optionsWithDefault.searchTags.split(',').map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
+      },
+    });
+    where.push({
+      [Op.or]: tags.map((tag) => tag.get({ plain: true })).map((tag) => ({ id: tag.scene_id })),
+    });
+  }
+
+  if (where.length > 0) {
+    queryParams.where = {
+      [Op.and]: where,
+    };
+  }
+
   const scenes = await db.Scene.findAll(queryParams);
 
-  const scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
-  return scenesPlain;
+  return scenes.map((scene) => scene.get({ plain: true }));
 }
 
 module.exports = {
