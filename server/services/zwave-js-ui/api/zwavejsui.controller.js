@@ -38,7 +38,6 @@ module.exports = function ZwaveController(gladys, zwaveJSUIManager, serviceId) {
    */
   async function updateConfiguration(req, res) {
     const result = await zwaveJSUIManager.updateConfiguration(req.body);
-    zwaveJSUIManager.connect();
     res.json({
       success: result,
     });
