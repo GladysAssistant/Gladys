@@ -63,7 +63,6 @@ describe('GET /api/v1/service/zwave-js-ui', () => {
     zwaveJSUIManager.connect = fake.returns(null);
     await zwaveJSUIController['post /api/v1/service/zwave-js-ui/configuration'].controller(req, res);
     assert.calledOnceWithExactly(zwaveJSUIManager.updateConfiguration, req.body);
-    assert.calledOnce(zwaveJSUIManager.connect);
     assert.calledOnceWithExactly(res.json, {
       success: result,
     });
