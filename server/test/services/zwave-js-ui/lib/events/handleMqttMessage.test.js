@@ -251,7 +251,7 @@ describe('zwave gladys node event', () => {
       {
         commandClass: 38,
         endpoint: 0,
-        property: 'property property',
+        property: 'property_property',
         propertyKey: undefined,
       },
     );
@@ -263,7 +263,7 @@ describe('zwave gladys node event', () => {
       {
         commandClass: 48,
         endpoint: 0,
-        property: 'propertyName propertyName',
+        property: 'propertyName_propertyName',
         propertyKey: undefined,
       },
     );

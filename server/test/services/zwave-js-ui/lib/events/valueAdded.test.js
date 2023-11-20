@@ -179,8 +179,8 @@ describe('zwaveJSUIManager valueAdded', () => {
         name: 'Détecteur de présence',
         read_only: true,
         unit: 'watt',
-        min: undefined,
-        max: undefined,
+        min: 0,
+        max: 1,
         selector: 'zwave-js-ui-node-1-any-48-0-any',
       },
     ]);
@@ -218,8 +218,8 @@ describe('zwaveJSUIManager valueAdded', () => {
         name: 'Détecteur de présence',
         read_only: true,
         unit: null,
-        min: undefined,
-        max: undefined,
+        min: 0,
+        max: 1,
         selector: 'zwave-js-ui-node-1-motion-48-0-motion',
       },
     ]);
@@ -275,8 +275,8 @@ describe('zwaveJSUIManager valueAdded', () => {
         name: 'Détecteur de présence',
         read_only: true,
         unit: null,
-        min: undefined,
-        max: undefined,
+        min: 0,
+        max: 1,
         selector: 'zwave-js-ui-node-1-motion-48-0-motion',
       },
     ]);
