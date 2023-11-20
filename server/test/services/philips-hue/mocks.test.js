@@ -59,6 +59,12 @@ const hueApi = {
     ]),
     activateScene: fake.resolves(null),
   },
+  configuration: {
+    get: () =>
+      Promise.resolve({
+        bridgeid: '1234',
+      }),
+  },
 };
 
 const MockedPhilipsHueClient = {
@@ -72,6 +78,29 @@ const MockedPhilipsHueClient = {
       }),
     },
     discovery: {
+      nupnpSearch: () =>
+        Promise.resolve([
+          {
+            name: 'Philips Hue Bridge',
+            ipaddress: '192.168.1.10',
+          },
+        ]),
+    },
+  },
+};
+
+const MockedPhilipsHueClientUpnp = {
+  v3: {
+    lightStates: {
+      LightState,
+    },
+    api: {
+      createLocal: () => ({
+        connect: () => hueApi,
+      }),
+    },
+    discovery: {
+      nupnpSearch: () => Promise.resolve([]),
       upnpSearch: () =>
         Promise.resolve([
           {
@@ -88,6 +117,7 @@ const MockedPhilipsHueClient = {
 
 module.exports = {
   MockedPhilipsHueClient,
+  MockedPhilipsHueClientUpnp,
   STATE_ON,
   STATE_OFF,
   fakes,

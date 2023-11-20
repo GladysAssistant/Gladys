@@ -1,6 +1,11 @@
 [
   {
-    "label": "camera.get-image-room",
-    "questions": ["Show me a view of the camera in %room%", "Display camera image in %room%"]
+    "label": "camera.get-image",
+    "questions": [
+      "Show me a view of the camera in %room%",
+      "Display camera image in %room%",
+      "Show me a view of the camera %device%",
+      "Display camera image of %device%"
+    ]
   }
 ]
