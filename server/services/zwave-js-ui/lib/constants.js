@@ -319,6 +319,8 @@ const CATEGORIES = [
     PROPERTIES: [PROPERTIES.MOTION, PROPERTIES.ANY],
     LABEL: PREF_LABELS.MOTION_SENSOR.fr,
     TYPE: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    MIN: 0,
+    MAX: 1,
   },
   // motion sensor - notification
   {

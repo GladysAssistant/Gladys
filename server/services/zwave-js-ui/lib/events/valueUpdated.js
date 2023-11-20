@@ -38,7 +38,9 @@ function valueUpdated(zwaveNode, args) {
   // if (node.ready) {
   node.classes[commandClass][endpoint][fullProperty].value = newValueUnbind;
   logger.debug(
-    `Value Updated: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${node.classes[commandClass][endpoint][fullProperty].value} > ${newValueUnbind}`,
+    `Value Updated: nodeId = ${nodeId}, comClass = ${commandClass}, endpoint = ${endpoint}, property = ${fullProperty}: ${
+      node.classes[commandClass][endpoint][fullProperty].value
+    } > ${JSON.stringify(newValueUnbind)}`,
   );
 
   const deviceFeatureExternalId = getDeviceFeatureExternalId({

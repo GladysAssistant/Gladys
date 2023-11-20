@@ -116,6 +116,11 @@ function getNodes(
                   },
                   value,
                 );
+                if (min === undefined || max === undefined) {
+                  logger.warn(
+                    `Missing min/max for property ${property} of node ${node.nodeId}, product ${node.product}`,
+                  );
+                }
                 newDevice.features.push({
                   name: getDeviceFeatureName({ label, prefLabel, endpoint }),
                   selector: slugify(`zwave-js-ui-node-${node.nodeId}-${property}-${commandClass}-${endpoint}-${label}`),

@@ -39,8 +39,10 @@ function valueAdded(zwaveNode, args) {
   if (fullProperty === PROPERTIES.TARGET_COLOR) {
     fullProperty = `${fullProperty}-${ENDPOINTS.TARGET_COLOR}`;
   }
-  logger.info(
-    `Value Added: nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}, value = ${value}`,
+  logger.debug(
+    `Value Added: nodeId = ${nodeId}, comClass = ${commandClass}[${endpoint}], property = ${fullProperty}, value = ${JSON.stringify(
+      value,
+    )}`,
   );
 
   if ((GENRE[commandClass] || 'user') !== 'user') {

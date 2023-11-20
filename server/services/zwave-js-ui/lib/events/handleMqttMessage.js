@@ -3,6 +3,20 @@ const logger = require('../../../../utils/logger');
 const { DEFAULT, COMMAND_CLASSES, GENRE } = require('../constants');
 
 /**
+ * @description Escape a property name receive in MQTT.
+ * @param {string} property - Property name.
+ * @returns {object} Escaped property name.
+ * @example
+ * escapeProperty('unknwon (0x1c)');
+ */
+function escapeProperty(property) {
+  return property
+    .replace(/ /g, '_')
+    .replace(/\(/g, '')
+    .replace(/\)/g, '');
+}
+
+/**
  * @description Handle a new message receive in MQTT.
  * @param {string} topic - MQTT topic.
  * @param {object} message - The message sent.
@@ -51,12 +65,12 @@ function handleMqttMessage(topic, message) {
             .forEach((valueId) => {
               const value = node.values[valueId];
               if (value.property) {
-                value.property = value.property.toString().replace(/_/g, ' ');
+                value.property = escapeProperty(value.property.toString());
               } else {
-                value.property = value.propertyName.replace(/_/g, ' ');
+                value.property = escapeProperty(value.propertyName);
               }
               delete value.propertyName;
-              value.propertyKey = value.propertyKey ? `${value.propertyKey}`.replace(/_/g, ' ') : undefined;
+              value.propertyKey = value.propertyKey ? escapeProperty(`${value.propertyKey}`) : undefined;
 
               this.valueAdded(
                 {
@@ -140,8 +154,8 @@ function handleMqttMessage(topic, message) {
           {
             commandClass: commandClass * 1,
             endpoint: endpoint * 1 || 0,
-            property: propertyName.replace(/_/g, ' '),
-            propertyKey: propertyKey ? `${propertyKey}`.replace(/_/g, ' ') : undefined,
+            property: propertyName,
+            propertyKey: propertyKey ? `${propertyKey}` : undefined,
             newValue,
           },
         );
