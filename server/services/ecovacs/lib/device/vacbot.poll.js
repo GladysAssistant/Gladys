@@ -26,7 +26,8 @@ async function poll(device) {
     switch (feature.category) {
       case DEVICE_FEATURE_CATEGORIES.BATTERY: // Integer
         if (feature.type === DEVICE_FEATURE_TYPES.VACBOT.INTEGER) {
-          vacbot.run('GetBatteryState');
+          vacbot.run('GetBatteryState'); // retrieve the battery status. Answer : { value: 100, isLow: 0 }
+
         }
         break;
       default:
@@ -34,13 +35,18 @@ async function poll(device) {
     }
   });
   // Retrieve states
-  vacbot.run('GetCleanState'); // retrieve the cleaning status
-  vacbot.run('GetChargeState'); // retrieve the charging status
-  vacbot.run('GetSleepStatus');
+  vacbot.run('GetCleanState'); // retrieve the cleaning status. Answer : { trigger: 'alert', state: 'idle' }
+  vacbot.run('GetChargeState'); // retrieve the charging status. Answer : { isCharging: 1, mode: 'slot' }
+  vacbot.run('GetSleepStatus'); // retrieve the sleep status. Answer : { enable: 1 }
   logger.trace(`POLL vacbot : `, vacbot);
-  if (vacbot.errorCode !== 0) {
-    logger.error(`Error ${vacbot.errorCode} occured : ${vacbot.errorDescription}.`);
-  }
+  switch (vacbot.errorCode) {
+    case "3": // String (see ecovacs-deebot.js/library/errorCodes.json)
+      logger.error(`Error "${vacbot.errorCode}" occured : ${vacbot.errorDescription}.`);
+      break;
+    default:
+      logger.debug(`Error code "${vacbot.errorCode}" : ${vacbot.errorDescription}.`);
+      break;
+  };
 }
 
 module.exports = {
