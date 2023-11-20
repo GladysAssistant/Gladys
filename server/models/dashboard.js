@@ -11,7 +11,7 @@ const boxesSchema = Joi.array().items(
       house: Joi.string(),
       room: Joi.string(),
       camera: Joi.string(),
-      name: Joi.string(),
+      name: Joi.string().allow(''),
       modes: Joi.object(),
       device_features: Joi.array().items(Joi.string()),
       device_feature_names: Joi.array().items(Joi.string()),

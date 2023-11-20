@@ -1,40 +1,6 @@
 describe('Scene view', () => {
-  before(() => {
-    cy.login();
-    const serverUrl = Cypress.env('serverUrl');
-    cy.request({
-      method: 'GET',
-      url: `${serverUrl}/api/v1/room`
-    }).then(res => {
-      const device = {
-        name: 'One device',
-        external_id: 'one-device',
-        selector: 'one-device',
-        room_id: res.body[0].id,
-        features: [
-          {
-            name: 'Multilevel',
-            category: 'light',
-            type: 'temperature',
-            external_id: 'light-temperature',
-            selector: 'light-temperature',
-            read_only: false,
-            keep_history: true,
-            has_feedback: true,
-            min: 0,
-            max: 1
-          }
-        ]
-      };
-      cy.createDevice(device, 'mqtt');
-    });
-  });
   beforeEach(() => {
     cy.login();
-  });
-  after(() => {
-    // Delete all Bluetooth devices
-    cy.deleteDevices('mqtt');
   });
   it('Should create new scene', () => {
     cy.visit('/dashboard/scene');
@@ -57,14 +23,23 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-scene`);
   });
-  it('Should edit the scene description', () => {
+  it('Should edit the scene settings', () => {
     cy.visit('/dashboard/scene/my-scene');
 
-    cy.contains('editScene.editDescriptionPlaceholder').click();
+    cy.get('div[class*="card-header"]')
+      .contains('editScene.settings')
+      .should('have.class', 'card-title')
+      .click();
 
-    cy.get('input:visible').then(inputs => {
-      // Zone name
-      cy.wrap(inputs[0]).type('My scene description');
+    cy.get('div[class*="form-group"]').then(inputs => {
+      cy.wrap(inputs[0])
+        .find('input')
+        .clear()
+        .type('My scene name');
+      cy.wrap(inputs[1])
+        .find('input')
+        .type('My scene description');
+      cy.wrap(inputs[2]).type('My tag 1{enter}{enter}');
     });
 
     // I don't know why, but I'm unable to get this button with
@@ -73,6 +48,7 @@ describe('Scene view', () => {
       cy.wrap(buttons[0]).click();
     });
   });
+
   it('Should add new condition house empty', () => {
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addActionButton')
@@ -81,12 +57,14 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
-      .click(0, 0, { force: true });
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("${i18n.editScene.actions.house['is-empty']}")`)
+        .click(0, 0, { force: true });
+    });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -94,14 +72,56 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("My House")`)
-      .click(0, 0, { force: true });
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("My House")`)
+        .click(0, 0, { force: true });
+    });
   });
+
   it('Should add new condition device set value', () => {
+    const serverUrl = Cypress.env('serverUrl');
+    cy.intercept(
+      {
+        method: 'GET',
+        url: `${serverUrl}/api/v1/room?expand=devices`
+      },
+      [
+        {
+          id: 'd63ce677-f5f8-47e1-816d-7aa227c863e4',
+          house_id: '6c1c78f0-1c26-4944-9149-77188e25d00d',
+          name: 'Living Room',
+          selector: 'living-room',
+          created_at: '2023-10-03T12:21:39.551Z',
+          updated_at: '2023-10-03T12:21:39.551Z',
+          devices: [
+            {
+              name: 'One device',
+              selector: 'one-device',
+              features: [
+                {
+                  name: 'Multilevel',
+                  selector: 'light-temperature',
+                  category: 'light',
+                  type: 'temperature',
+                  read_only: false,
+                  unit: null,
+                  min: 0,
+                  max: 1,
+                  last_value: null,
+                  last_value_changed: null
+                }
+              ],
+              service: { id: '123d4d56-6cbd-4020-991f-2a0a8e0ac3e0', name: 'mqtt' }
+            }
+          ]
+        }
+      ]
+    ).as('loadDevices');
+
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addActionButton')
       .should('have.class', 'btn-outline-primary')
@@ -109,12 +129,14 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
-      .click(0, 0, { force: true });
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("${i18n.editScene.actions.device['set-value']}")`)
+        .click(0, 0, { force: true });
+    });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -122,13 +144,21 @@ describe('Scene view', () => {
       cy.wrap(buttons[1]).click();
     });
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("Multilevel")`)
-      .click(0, 0, { force: true });
+    cy.wait('@loadDevices');
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
+    cy.wait(100);
+
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("Multilevel")`)
+        .click(0, 0, { force: true });
+      cy.log('4');
+    });
   });
+
   it('Should add new calendar event trigger', () => {
     cy.visit('/dashboard/scene/my-scene');
     cy.contains('editScene.addNewTriggerButton')
@@ -137,12 +167,14 @@ describe('Scene view', () => {
 
     const i18n = Cypress.env('i18n');
 
-    cy.get('div[class*="-control"]')
-      .click(0, 0, { force: true })
-      .get('[class*="-menu"]')
-      .find('[class*="-option"]')
-      .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
-      .click(0, 0, { force: true });
+    cy.get('div[class*="-control"]').then(inputs => {
+      cy.wrap(inputs[1])
+        .click(0, 0, { force: true })
+        .get('[class*="-menu"]')
+        .find('[class*="-option"]')
+        .filter(`:contains("${i18n.editScene.triggers.calendar['event-is-coming']}")`)
+        .click(0, 0, { force: true });
+    });
 
     // I don't know why, but I'm unable to get this button with
     // the text. Using the class but it's not recommended otherwise!!
@@ -156,6 +188,7 @@ describe('Scene view', () => {
       cy.wrap(selects[2]).select('minute');
     });
   });
+
   it('Should disable scene', () => {
     cy.visit('/dashboard/scene');
 
@@ -202,6 +235,7 @@ describe('Scene view', () => {
 
     cy.url().should('eq', `${Cypress.config().baseUrl}/dashboard/scene/my-duplicated-scene`);
   });
+
   it('Should delete existing scene', () => {
     cy.login();
     cy.visit('/dashboard/scene/my-scene');

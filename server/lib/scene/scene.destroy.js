@@ -12,6 +12,13 @@ async function destroy(selector) {
     where: {
       selector,
     },
+    include: [
+      {
+        model: db.TagScene,
+        as: 'tags',
+        attributes: ['name'],
+      },
+    ],
   });
 
   if (existingScene === null) {
@@ -20,6 +27,12 @@ async function destroy(selector) {
 
   // Remove scene from brain
   this.brain.removeNamedEntity('scene', existingScene.selector, existingScene.name);
+
+  await db.TagScene.destroy({
+    where: {
+      scene_id: existingScene.id,
+    },
+  });
 
   await existingScene.destroy();
   // we cancel triggers linked to the scene

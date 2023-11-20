@@ -160,6 +160,9 @@
         "durationOneWeek": "1 week",
         "durationOneMonth": "1 month",
         "durationThreeMonth": "3 months",
+        "durationSixMonths": "6 months",
+        "durationOneYear": "1 year",
+        "durationTwoYears": "2 years",
         "unlimited": "Forever"
       },
       "saveSettingsButton": "Save settings"
@@ -377,7 +380,7 @@
         "partiallyArmedButton": "Partial",
         "partiallyArmedButtonSecondLine": "Arm",
         "panicButton": "Panic",
-        "editBoxNameLabel": "Widget Name",
+        "editBoxNameLabel": "Widget Name (optional)",
         "editBoxNamePlaceholder": "Enter the widget name",
         "editHouseLabel": "Select the house for alarm activation/disarmament.",
         "alarmStatusText": "Your house is ",
@@ -528,8 +531,13 @@
         "connectButton": "Connect/Reconnect",
         "scanButton": "Scan network",
         "bridgeButtonNotPressed": "Bridge button not pressed: Please press the button on your Philips Hue bridge and try again.",
-        "unknownError": "An unknown error occured. Please try again or contact Gladys community.",
-        "noBridgesFound": "We didn't find any Philips Hue bridges on your network. Are you sure you are connected to the same network as your bridge and your bridge is turned on?"
+        "unknownError": "An unknown error occurred. Please try again or contact Gladys community.",
+        "noBridgesFound": "We didn't find any Philips Hue bridges on your network. Are you sure you are connected to the same network as your bridge and your bridge is turned on?",
+        "manualConfiguration": {
+          "title": "Manual configuration",
+          "text": "If you know the IP address of your Philips Hue bridge, you can fill it and launch a manual connection.",
+          "input": "IP address"
+        }
       },
       "device": {
         "title": "Devices in Gladys",
@@ -1493,9 +1501,15 @@
     }
   },
   "editScene": {
+    "settings": "Settings",
+    "nameTitle": "Scene name",
     "editNamePlaceholder": "Enter a scene name",
     "descriptionTitle": "Description",
+    "iconLabel": "Icon",
     "editDescriptionPlaceholder": "Enter a scene description",
+    "tagsTitle": "Tags",
+    "editTagsPlaceholder": "Enter a scene tags",
+    "createTag": "Create tag: '{{tagName}}'",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
@@ -1759,6 +1773,9 @@
       },
       "system": {
         "start": "Gladys starting"
+      },
+      "mqtt": {
+        "received": "Receive message from MQTT"
       }
     },
     "triggersCard": {
@@ -1857,6 +1874,14 @@
       },
       "gladysStart": {
         "description": "This scene will be executed each time Gladys starts"
+      },
+      "mqttReceived": {
+        "description": "This scene will run when a message is received in the selected MQTT topic",
+        "topicLabel": "Topic",
+        "topicPlaceholder": "Enter your topic",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Enter the expected message",
+        "messageDescription": "Enter the expected message or leave blank to run the scene regardless of the message"
       }
     }
   },
@@ -2050,6 +2075,7 @@
       "monthly-device-state-aggregate": "Monthly sensors aggregation",
       "daily-device-state-aggregate": "Daily sensors aggregation",
       "hourly-device-state-aggregate": "Hourly sensors aggregation",
+      "device-state-purge": "Cleaning old device states",
       "gladys-gateway-backup": "Gladys Plus backup",
       "device-state-purge-single-feature": "Single device feature states clean",
       "vacuum": "Database cleaning",
@@ -2087,6 +2113,8 @@
     "timezoneText": "The timezone is used in scheduled scene.",
     "deviceStateRetentionTime": "Keep Device State History",
     "deviceStateRetentionTimeDescription": "How long Gladys will keep your device states in database.",
+    "deviceAggregatesStateRetentionTime": "Keep Aggregated States",
+    "deviceAggregatesStateRetentionTimeDescription": "Gladys calculates pre-calculated state histories to have lighter data to display on the dashboard. You can select here how long this data should be kept.",
     "numberOfHoursBeforeStateIsOutdated": "Time to expiry of a state",
     "numberOfHoursBeforeStateIsOutdatedDescription": "This delay corresponds to the number of hours before a sensor status is considered \"expired\" and therefore no longer displayed on the dashboard.",
     "hours": "hours",
@@ -2148,7 +2176,8 @@
     "newButton": "New",
     "editButton": "Edit",
     "startButton": "Start",
-    "searchPlaceholder": "Search scenes"
+    "searchPlaceholder": "Search scenes",
+    "filterTagsName": "Filter by tags"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -2459,8 +2488,8 @@
       "opening-sensor": {
         "binary": {
           "other": "No value received",
-          "zero": "Closed",
-          "one": "Opened"
+          "zero": "Opened",
+          "one": "Closed"
         }
       },
       "co-sensor": {

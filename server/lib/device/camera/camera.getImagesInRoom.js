@@ -5,11 +5,11 @@ const { DEVICE_FEATURE_CATEGORIES } = require('../../../utils/constants');
 /**
  * @description Get image in room.
  * @param {string} roomId - Id of the room.
- * @returns {Promise} Resolve with the image.
+ * @returns {Promise} Resolve array with images.
  * @example
- * getImageInRoom('f0dea887-d14f-4344-a57b-795c16e0abda');
+ * getImagesInRoom('f0dea887-d14f-4344-a57b-795c16e0abda');
  */
-async function getImageInRoom(roomId) {
+async function getImagesInRoom(roomId) {
   const oneHourAgo = new Date(new Date().getTime() - 1 * 60 * 60 * 1000);
   const deviceFeatures = await db.DeviceFeature.findAll({
     attributes: ['last_value_string'],
@@ -34,13 +34,9 @@ async function getImageInRoom(roomId) {
     },
   });
 
-  if (deviceFeatures.length === 0) {
-    return null;
-  }
-
-  return deviceFeatures[0].last_value_string;
+  return deviceFeatures.map((deviceFeature) => deviceFeature.last_value_string);
 }
 
 module.exports = {
-  getImageInRoom,
+  getImagesInRoom,
 };

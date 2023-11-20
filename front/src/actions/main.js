@@ -84,7 +84,7 @@ function createActions(store) {
         const gatewayErrorMessage = get(e, 'response.data.error_message');
         const errorMessageOtherFormat = get(e, 'response.data.message');
         if (status === 401 && errorMessageOtherFormat === 'TABLET_IS_LOCKED') {
-          route('/locked');
+          route(`/locked${window.location.search}`);
         } else if (status === 401) {
           state.session.reset();
           actions.redirectToLogin();

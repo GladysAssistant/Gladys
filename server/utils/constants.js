@@ -87,6 +87,7 @@ const SERVICE_STATUS = {
 
 const SYSTEM_VARIABLE_NAMES = {
   DEVICE_STATE_HISTORY_IN_DAYS: 'DEVICE_STATE_HISTORY_IN_DAYS',
+  DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS: 'DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS',
   DEVICE_STATE_MONTHLY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_MONTHLY_AGGREGATES_RETENTION_IN_DAYS',
   DEVICE_STATE_DAILY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_DAILY_AGGREGATES_RETENTION_IN_DAYS',
   DEVICE_STATE_HOURLY_AGGREGATES_RETENTION_IN_DAYS: 'DEVICE_STATE_HOURLY_AGGREGATES_RETENTION_IN_DAYS',
@@ -233,6 +234,9 @@ const EVENTS = {
   JOB: {
     PURGE_OLD_JOBS: 'job.purge-old-jobs',
   },
+  MQTT: {
+    RECEIVED: 'mqtt.received',
+  },
 };
 
 const LIFE_EVENTS = {
@@ -364,7 +368,7 @@ const INTENTS = {
     DAY: 'intent.weather.day',
   },
   CAMERA: {
-    GET_IMAGE_ROOM: 'intent.camera.get-image-room',
+    GET_IMAGE: 'intent.camera.get-image',
   },
   SCENE: {
     START: 'intent.scene.start',
@@ -1029,6 +1033,7 @@ const JOB_TYPES = {
   MONTHLY_DEVICE_STATE_AGGREGATE: 'monthly-device-state-aggregate',
   GLADYS_GATEWAY_BACKUP: 'gladys-gateway-backup',
   DEVICE_STATES_PURGE_SINGLE_FEATURE: 'device-state-purge-single-feature',
+  DEVICE_STATES_PURGE: 'device-state-purge',
   VACUUM: 'vacuum',
   SERVICE_ZIGBEE2MQTT_BACKUP: 'service-zigbee2mqtt-backup',
   SERVICE_NODE_RED_BACKUP: 'service-node-red-backup',
