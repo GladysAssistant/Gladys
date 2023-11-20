@@ -92,7 +92,6 @@ class EditScene extends Component {
     this.setState({ saving: true, error: false });
     try {
       await this.props.httpClient.patch(`/api/v1/scene/${this.props.scene_selector}`, this.state.scene);
-      this.setState({ isNameEditable: false, isDescriptionEditable: false });
     } catch (e) {
       console.error(e);
       this.setState({ error: true });
@@ -220,6 +219,7 @@ class EditScene extends Component {
       });
     }, 500);
   };
+
   deleteScene = async () => {
     this.setState({ saving: true });
     try {
@@ -309,35 +309,6 @@ class EditScene extends Component {
     });
   };
 
-  toggleIsNameEditable = async () => {
-    await this.setState(prevState => ({ isNameEditable: !prevState.isNameEditable, isDescriptionEditable: false }));
-    if (this.state.isNameEditable) {
-      this.nameInput.focus();
-    }
-  };
-
-  setNameInputRef = nameInput => {
-    this.nameInput = nameInput;
-  };
-
-  toggleIsDescriptionEditable = async () => {
-    await this.setState(prevState => ({
-      isDescriptionEditable: !prevState.isDescriptionEditable,
-      isNameEditable: false
-    }));
-    if (this.state.isDescriptionEditable) {
-      this.descriptionInput.focus();
-    }
-  };
-
-  closeEdition = () => {
-    this.setState({ isNameEditable: false, isDescriptionEditable: false });
-  };
-
-  setDescriptionInputRef = descriptionInput => {
-    this.descriptionInput = descriptionInput;
-  };
-
   updateSceneName = e => {
     this.setState(prevState => {
       const newState = update(prevState, {
@@ -364,9 +335,24 @@ class EditScene extends Component {
     });
   };
 
+  updateSceneIcon = e => {
+    console.log('updateSceneIcon', e.target.value);
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        scene: {
+          icon: {
+            $set: e.target.value
+          }
+        }
+      });
+      return newState;
+    });
+  };
+
   duplicateScene = () => {
     route(`/dashboard/scene/${this.props.scene_selector}/duplicate`);
   };
+
   moveCard = async (originalX, originalY, destX, destY) => {
     // incorrect coordinates
     if (destX < 0 || destY < 0) {
@@ -445,20 +431,43 @@ class EditScene extends Component {
     await this.setState(newState);
   };
 
+  setTags = tags => {
+    this.setState(prevState => {
+      const newState = update(prevState, {
+        scene: {
+          tags: {
+            $set: tags.map(tag => ({ name: tag }))
+          }
+        }
+      });
+      return newState;
+    });
+  };
+
+  getTags = async () => {
+    try {
+      const tags = await this.props.httpClient.get(`/api/v1/tag_scene`);
+      this.setState({
+        tags
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   constructor(props) {
     super(props);
     this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0 || navigator.msMaxTouchPoints > 0;
     this.state = {
       scene: null,
       variables: {},
-      triggersVariables: [],
-      isNameEditable: false
+      triggersVariables: []
     };
   }
 
   componentDidMount() {
-    document.addEventListener('click', this.closeEdition, true);
     this.getSceneBySelector();
+    this.getTags();
     this.props.session.dispatcher.addListener('scene.executing-action', payload =>
       this.highlighCurrentlyExecutedAction(payload)
     );
@@ -471,43 +480,42 @@ class EditScene extends Component {
     document.removeEventListener('click', this.closeEdition, true);
   }
 
-  render(props, { saving, error, variables, scene, isNameEditable, isDescriptionEditable, triggersVariables }) {
+  render(props, { saving, error, variables, scene, triggersVariables, tags }) {
     return (
       scene && (
-        <DndProvider backend={this.isTouchDevice ? TouchBackend : HTML5Backend}>
-          <EditScenePage
-            {...props}
-            scene={scene}
-            startScene={this.startScene}
-            deleteScene={this.deleteScene}
-            saveScene={this.saveScene}
-            updateActionProperty={this.updateActionProperty}
-            updateTriggerProperty={this.updateTriggerProperty}
-            addAction={this.addAction}
-            deleteActionGroup={this.deleteActionGroup}
-            deleteAction={this.deleteAction}
-            addTrigger={this.addTrigger}
-            deleteTrigger={this.deleteTrigger}
-            saving={saving}
-            error={error}
-            variables={variables}
-            triggersVariables={triggersVariables}
-            setVariables={this.setVariables}
-            setVariablesTrigger={this.setVariablesTrigger}
-            switchActiveScene={this.switchActiveScene}
-            toggleIsNameEditable={this.toggleIsNameEditable}
-            isNameEditable={isNameEditable}
-            updateSceneName={this.updateSceneName}
-            setNameInputRef={this.setNameInputRef}
-            duplicateScene={this.duplicateScene}
-            moveCard={this.moveCard}
-            moveCardGroup={this.moveCardGroup}
-            updateSceneDescription={this.updateSceneDescription}
-            toggleIsDescriptionEditable={this.toggleIsDescriptionEditable}
-            isDescriptionEditable={isDescriptionEditable}
-            setDescriptionInputRef={this.setDescriptionInputRef}
-          />
-        </DndProvider>
+        <div>
+          <DndProvider backend={this.isTouchDevice ? TouchBackend : HTML5Backend}>
+            <EditScenePage
+              {...props}
+              scene={scene}
+              tags={tags}
+              updateActionProperty={this.updateActionProperty}
+              updateTriggerProperty={this.updateTriggerProperty}
+              addAction={this.addAction}
+              deleteActionGroup={this.deleteActionGroup}
+              deleteAction={this.deleteAction}
+              addTrigger={this.addTrigger}
+              deleteTrigger={this.deleteTrigger}
+              saving={saving}
+              error={error}
+              variables={variables}
+              triggersVariables={triggersVariables}
+              setVariables={this.setVariables}
+              setVariablesTrigger={this.setVariablesTrigger}
+              switchActiveScene={this.switchActiveScene}
+              updateSceneName={this.updateSceneName}
+              moveCard={this.moveCard}
+              moveCardGroup={this.moveCardGroup}
+              updateSceneDescription={this.updateSceneDescription}
+              startScene={this.startScene}
+              deleteScene={this.deleteScene}
+              saveScene={this.saveScene}
+              duplicateScene={this.duplicateScene}
+              setTags={this.setTags}
+              updateSceneIcon={this.updateSceneIcon}
+            />
+          </DndProvider>
+        </div>
       )
     );
   }

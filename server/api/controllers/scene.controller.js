@@ -93,6 +93,16 @@ module.exports = function SceneController(gladys) {
     res.json(scene);
   }
 
+  /**
+   * @api {get} /api/v1/tag_scene get
+   * @apiName get
+   * @apiGroup TagScene
+   */
+  async function getTag(req, res) {
+    const tags = await gladys.scene.getTag();
+    res.json(tags);
+  }
+
   return Object.freeze({
     create: asyncMiddleware(create),
     destroy: asyncMiddleware(destroy),
@@ -101,5 +111,6 @@ module.exports = function SceneController(gladys) {
     update: asyncMiddleware(update),
     start: asyncMiddleware(start),
     duplicate: asyncMiddleware(duplicate),
+    getTag: asyncMiddleware(getTag),
   });
 };

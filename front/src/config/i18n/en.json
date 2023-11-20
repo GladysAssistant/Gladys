@@ -1422,9 +1422,15 @@
     }
   },
   "editScene": {
+    "settings": "Settings",
+    "nameTitle": "Scene name",
     "editNamePlaceholder": "Enter a scene name",
     "descriptionTitle": "Description",
+    "iconLabel": "Icon",
     "editDescriptionPlaceholder": "Enter a scene description",
+    "tagsTitle": "Tags",
+    "editTagsPlaceholder": "Enter a scene tags",
+    "createTag": "Create tag: '{{tagName}}'",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
@@ -2091,7 +2097,8 @@
     "newButton": "New",
     "editButton": "Edit",
     "startButton": "Start",
-    "searchPlaceholder": "Search scenes"
+    "searchPlaceholder": "Search scenes",
+    "filterTagsName": "Filter by tags"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
