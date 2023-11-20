@@ -32,29 +32,29 @@ async function installMqttContainer() {
   if (dockerContainers.length === 0) {
     let containerMqtt;
     try {
-      logger.info('MQTT broker is being installed as Docker container...');
+      logger.info('ZwaveJSUI MQTT is being installed as Docker container...');
       logger.info(`Pulling ${containerDescriptor.Image} image...`);
       await this.gladys.system.pull(containerDescriptor.Image);
 
       const containerDescriptorToMutate = cloneDeep(containerDescriptor);
 
       // Prepare broker env
-      logger.info(`Preparing broker environment...`);
+      logger.info(`Preparing ZwaveJSUI MQTT environment...`);
       const { basePathOnContainer, basePathOnHost } = await this.gladys.system.getGladysBasePath();
       const brokerEnv = await exec(
         `sh ./services/zwave-js-ui/docker/gladys-zwavejsui-mqtt-env.sh ${basePathOnContainer}/zwave-js-ui`,
       );
-      logger.info(brokerEnv);
+      logger.info(`ZwaveJSUI MQTT configuration updated: ${brokerEnv}`);
       containerDescriptorToMutate.HostConfig.Binds.push(
         `${basePathOnHost}/zwave-js-ui/mosquitto/config:/mosquitto/config`,
       );
 
-      logger.info(`Creating container...`);
+      logger.info(`Creating ZwaveJSUI MQTT container...`);
       containerMqtt = await this.gladys.system.createContainer(containerDescriptorToMutate);
-      logger.info(containerMqtt);
+      logger.info(`ZwaveJSUI MQTT successfully installed and configured as Docker container: ${containerLog}`);
       this.mqttExist = true;
     } catch (e) {
-      logger.error('MQTT broker failed to install as Docker container:', e);
+      logger.error('ZwaveJSUI MQTT failed to install as Docker container:', e);
       this.mqttExist = false;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
@@ -63,12 +63,13 @@ async function installMqttContainer() {
     }
 
     try {
-      // Container restart to inintialize users configuration
-      logger.info('MQTT broker is starting...');
+      // Container restart to initialize configuration
+      logger.info('ZwaveJSUI MQTT is starting...');
       await this.gladys.system.restartContainer(containerMqtt.id);
+
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
-      logger.info('MQTT broker container successfully started');
+      logger.info('ZwaveJSUI MQTT container successfully started');
 
       // Copy password in broker container
       logger.info(`Creating user/pass...`);
@@ -77,18 +78,18 @@ async function installMqttContainer() {
       });
 
       // Container restart to inintialize users configuration
-      logger.info('MQTT broker is restarting...');
+      logger.info('ZwaveJSUI MQTT is restarting...');
       await this.gladys.system.restartContainer(containerMqtt.id);
       // wait 5 seconds for the container to restart
       await sleep(5 * 1000);
-      logger.info('MQTT broker container successfully started and configured');
+      logger.info('ZwaveJSUI MQTT container successfully started and configured');
 
       this.mqttRunning = true;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
       });
     } catch (e) {
-      logger.error('MQTT broker container failed to start:', e);
+      logger.error('ZwaveJSUI MQTT container failed to start:', e);
       this.mqttRunning = false;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
@@ -104,19 +105,19 @@ async function installMqttContainer() {
       });
       [container] = dockerContainers;
       if (container.state !== 'running' && container.state !== 'restarting') {
-        logger.info('MQTT broker is starting...');
+        logger.info('ZwaveJSUI MQTT is starting...');
         await this.gladys.system.restartContainer(container.id);
         // wait 5 seconds for the container to restart
         await sleep(5 * 1000);
       }
 
-      logger.info('MQTT broker container successfully started');
+      logger.info('ZwaveJSUI MQTT container successfully started');
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
       });
       this.mqttRunning = true;
     } catch (e) {
-      logger.error('MQTT broker container failed to start:', e);
+      logger.error('ZwaveJSUI MQTT container failed to start:', e);
       this.mqttRunning = false;
       this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
         type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJSUI.STATUS_CHANGE,
