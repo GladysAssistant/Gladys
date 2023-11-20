@@ -115,26 +115,7 @@ const createActions = store => {
       }
     },
     async createDevice(state, newDevice) {
-      store.setState({
-        zwaveSaveNodeStatus: RequestStatus.Getting
-      });
-      try {
-        await state.httpClient.post('/api/v1/device', newDevice);
-        store.setState({
-          zwaveSaveNodeStatus: RequestStatus.Success
-        });
-      } catch (e) {
-        const status = get(e, 'response.status');
-        if (status === 409) {
-          store.setState({
-            zwaveSaveNodeStatus: RequestStatus.ConflictError
-          });
-        } else {
-          store.setState({
-            zwaveSaveNodeStatus: RequestStatus.Error
-          });
-        }
-      }
+      await state.httpClient.post('/api/v1/device', newDevice);
       await actions.getNodes(store.getState());
     },
     editNodeName(state, index, name) {

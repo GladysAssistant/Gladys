@@ -46,6 +46,6 @@ class ZwaveJSUINodePage extends Component {
 }
 
 export default connect(
-  'user,session,zwaveNodes,zwaveStatus,orderDir,searchKeyword,filterExisting,zwaveGetNodesStatus',
+  'user,session,zwaveNodes,zwaveStatus,orderDir,searchKeyword,filterExisting,zwaveGetNodesStatus,zwaveSaveNodeStatus',
   actions
 )(ZwaveJSUINodePage);

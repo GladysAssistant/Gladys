@@ -1,3 +1,4 @@
+import get from 'get-value';
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
 import { Link } from 'preact-router/match';
@@ -34,14 +35,33 @@ class ZwaveNode extends Component {
   }
 
   createDevice = async () => {
-    await this.props.createDevice(this.props.node);
+    this.setState({
+      zwaveSaveNodeStatus: RequestStatus.Getting
+    });
+    try {
+      await this.props.createDevice(this.props.node);
+      this.setState({
+        zwaveSaveNodeStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      const status = get(e, 'response.status');
+      if (status === 409) {
+        this.setState({
+          zwaveSaveNodeStatus: RequestStatus.ConflictError
+        });
+      } else {
+        this.setState({
+          zwaveSaveNodeStatus: RequestStatus.Error
+        });
+      }
+    }
   };
 
   editNodeName = e => {
     this.props.editNodeName(this.props.nodeIndex, e.target.value);
   };
 
-  render(props, { zwaveSaveNodeStatus }) {
+  render({ ...props }, { zwaveSaveNodeStatus }) {
     const loading = zwaveSaveNodeStatus === RequestStatus.Getting;
     return (
       <div index={props.node.id} class="col-md-6">
