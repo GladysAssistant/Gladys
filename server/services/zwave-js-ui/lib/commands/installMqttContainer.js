@@ -51,7 +51,7 @@ async function installMqttContainer() {
 
       logger.info(`Creating ZwaveJSUI MQTT container...`);
       containerMqtt = await this.gladys.system.createContainer(containerDescriptorToMutate);
-      logger.info(`ZwaveJSUI MQTT successfully installed and configured as Docker container: ${containerLog}`);
+      logger.info(`ZwaveJSUI MQTT successfully installed and configured as Docker container: ${containerMqtt}`);
       this.mqttExist = true;
     } catch (e) {
       logger.error('ZwaveJSUI MQTT failed to install as Docker container:', e);
