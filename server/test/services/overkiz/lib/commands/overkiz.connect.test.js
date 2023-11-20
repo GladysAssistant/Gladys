@@ -67,7 +67,7 @@ describe('Connect command', () => {
     expect(overkizHandler.connected).to.be.false;
   });
 
-  it.only('should not connect default OVERKIZ_TYPE', async () => {
+  it('should not connect default OVERKIZ_TYPE', async () => {
     const variable = {
       getValue: stub()
         .onFirstCall()
