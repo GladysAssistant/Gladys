@@ -8,10 +8,10 @@ const Poll = proxyquire('../../../../services/sunspec/lib/sunspec.poll', {}).pol
 
 describe('SunSpec poll', () => {
   // PREPARE
-  let sunspecManager;
+  let sunSpecManager;
 
   beforeEach(() => {
-    sunspecManager = {
+    sunSpecManager = {
       scanDevices: fake.returns(null),
     };
   });
@@ -21,7 +21,7 @@ describe('SunSpec poll', () => {
   });
 
   it('should poll', async () => {
-    await Poll.call(sunspecManager);
-    assert.callCount(sunspecManager.scanDevices, 1);
+    await Poll.call(sunSpecManager);
+    assert.callCount(sunSpecManager.scanDevices, 1);
   });
 });

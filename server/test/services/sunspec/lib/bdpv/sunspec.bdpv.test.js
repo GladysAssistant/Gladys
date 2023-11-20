@@ -6,7 +6,7 @@ const { fake, assert, stub } = sinon;
 
 describe('SunSpec BDPV', () => {
   let gladys;
-  let sunspecManager;
+  let sunSpecManager;
   let MockedClient;
   let MockedCron;
   let Bdpv;
@@ -40,7 +40,7 @@ describe('SunSpec BDPV', () => {
       },
     };
 
-    sunspecManager = {
+    sunSpecManager = {
       gladys,
       getDevices: () => {
         return [
@@ -84,38 +84,38 @@ describe('SunSpec BDPV', () => {
   });
 
   it('should bdpvInit active', async () => {
-    await Bdpv.bdpvInit.call(sunspecManager, true);
-    sunspecManager.bdpvTask.run.call(sunspecManager);
+    await Bdpv.bdpvInit.call(sunSpecManager, true);
+    sunSpecManager.bdpvTask.run.call(sunSpecManager);
     assert.calledTwice(gladys.variable.getValue);
     assert.calledOnce(MockedClient.create);
     // eslint-disable-next-line no-unused-expressions
-    expect(sunspecManager.bdpvTask).to.be.not.null;
-    assert.calledOnce(sunspecManager.bdpvTask.start);
-    assert.notCalled(sunspecManager.bdpvTask.stop);
+    expect(sunSpecManager.bdpvTask).to.be.not.null;
+    assert.calledOnce(sunSpecManager.bdpvTask.start);
+    assert.notCalled(sunSpecManager.bdpvTask.stop);
   });
 
   it('should bdpvInit not active', async () => {
-    await Bdpv.bdpvInit.call(sunspecManager, false);
+    await Bdpv.bdpvInit.call(sunSpecManager, false);
   });
 
   it('should bdpvInit disactivated', async () => {
-    sunspecManager.bdpvTask = {
+    sunSpecManager.bdpvTask = {
       stop: fake.returns(null),
     };
-    await Bdpv.bdpvInit.call(sunspecManager, false);
-    assert.calledOnce(sunspecManager.bdpvTask.stop);
+    await Bdpv.bdpvInit.call(sunSpecManager, false);
+    assert.calledOnce(sunSpecManager.bdpvTask.stop);
   });
 
   it('should bdpvPush', async () => {
-    sunspecManager.bdpvParams = {};
-    sunspecManager.bdpvClient = {
+    sunSpecManager.bdpvParams = {};
+    sunSpecManager.bdpvClient = {
       get: fake.returns({
         status: true,
       }),
     };
-    await Bdpv.bdpvPush.call(sunspecManager);
+    await Bdpv.bdpvPush.call(sunSpecManager);
     assert.calledOnceWithExactly(
-      sunspecManager.bdpvClient.get,
+      sunSpecManager.bdpvClient.get,
       'https://www.bdpv.fr/webservice/majProd/expeditionProd_v3.php',
       {
         params: {
@@ -126,10 +126,10 @@ describe('SunSpec BDPV', () => {
   });
 
   it('should bdpvPush error', async () => {
-    sunspecManager.bdpvParams = {};
-    sunspecManager.bdpvClient = {
+    sunSpecManager.bdpvParams = {};
+    sunSpecManager.bdpvClient = {
       get: fake.throws(new Error('error')),
     };
-    await Bdpv.bdpvPush.call(sunspecManager);
+    await Bdpv.bdpvPush.call(sunSpecManager);
   });
 });

@@ -14,14 +14,12 @@ describe('SunSpec scanNetwork', () => {
   // PREPARE
   let gladys;
   let modbus;
-  let sunspecManager;
+  let sunSpecManager;
 
   beforeEach(() => {
     gladys = {
-      stateManager: {
-        event: {
-          emit: fake.returns(null),
-        },
+      event: {
+        emit: fake.returns(null),
       },
     };
 
@@ -48,8 +46,8 @@ describe('SunSpec scanNetwork', () => {
       getValueModel: fake.returns(201),
     };
 
-    sunspecManager = {
-      eventManager: gladys.stateManager.event,
+    sunSpecManager = {
+      gladys,
       modbuses: [modbus],
     };
   });
@@ -59,9 +57,9 @@ describe('SunSpec scanNetwork', () => {
   });
 
   it('should find a AC and a DC device', async () => {
-    await ScanNetwork.call(sunspecManager);
-    expect(sunspecManager.devices.length).eql(2);
-    expect(sunspecManager.devices[0]).to.deep.eq({
+    await ScanNetwork.call(sunSpecManager);
+    expect(sunSpecManager.devices.length).eql(2);
+    expect(sunSpecManager.devices[0]).to.deep.eq({
       modbus,
       manufacturer: 'manufacturer',
       product: 'product',
@@ -69,7 +67,7 @@ describe('SunSpec scanNetwork', () => {
       swVersion: 'swVersion',
       valueModel: 201,
     });
-    expect(sunspecManager.devices[1]).to.deep.eq({
+    expect(sunSpecManager.devices[1]).to.deep.eq({
       modbus,
       manufacturer: 'manufacturer',
       product: 'product',
@@ -77,7 +75,7 @@ describe('SunSpec scanNetwork', () => {
       swVersion: 'swVersion',
       mppt: 1,
     });
-    assert.calledWithExactly(sunspecManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.STATUS_CHANGE,
     });
   });

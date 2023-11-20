@@ -23,10 +23,8 @@ describe('SunSpec scan', () => {
 
   beforeEach(() => {
     gladys = {
-      stateManager: {
-        event: {
-          emit: fake.returns(null),
-        },
+      event: {
+        emit: fake.returns(null),
       },
       variable: {
         getValue: fake.resolves(null),
@@ -57,14 +55,14 @@ describe('SunSpec scan', () => {
   it('should find Sunspec device', async () => {
     gladys.variable.getValue = fake.resolves('[{"ip":"192.168.1.0/24"}]');
     await sunSpecManager.scan();
-    assert.callCount(sunSpecManager.eventManager.emit, 3);
-    assert.calledWithExactly(sunSpecManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.callCount(gladys.event.emit, 3);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.SCANNING,
       payload: {
         scanning: true,
       },
     });
-    assert.calledWithExactly(sunSpecManager.eventManager.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.SUNSPEC.SCANNING,
       payload: {
         scanning: false,

@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 const SunSpecController = require('../../../../services/sunspec/api/sunspec.controller');
 
-const sunspecManager = {
+const sunSpecManager = {
   getDevices: fake.returns({}),
   connect: fake.resolves(true),
   scanNetwork: fake.resolves(true),
@@ -20,7 +20,7 @@ describe('Devices API', () => {
   let controller;
 
   beforeEach(() => {
-    controller = SunSpecController(sunspecManager);
+    controller = SunSpecController(sunSpecManager);
   });
 
   afterEach(() => {
@@ -34,7 +34,7 @@ describe('Devices API', () => {
     };
 
     controller['get /api/v1/service/sunspec/discover'].controller(req, res);
-    assert.calledOnce(sunspecManager.getDevices);
+    assert.calledOnce(sunSpecManager.getDevices);
     assert.calledOnceWithExactly(res.json, {});
   });
 
@@ -47,7 +47,7 @@ describe('Devices API', () => {
     };
 
     controller['get /api/v1/service/sunspec/discover'].controller(req, res);
-    assert.calledOnceWithExactly(sunspecManager.getDevices, { search: 'search' });
+    assert.calledOnceWithExactly(sunSpecManager.getDevices, { search: 'search' });
     assert.calledOnceWithExactly(res.json, {});
   });
 
@@ -58,7 +58,7 @@ describe('Devices API', () => {
     };
 
     await controller['post /api/v1/service/sunspec/discover'].controller(req, res);
-    assert.calledOnceWithExactly(sunspecManager.scanNetwork);
+    assert.calledOnceWithExactly(sunSpecManager.scanNetwork);
     assert.calledOnceWithExactly(res.json, { success: true });
   });
 });
@@ -67,7 +67,7 @@ describe('Status API', () => {
   let controller;
 
   beforeEach(() => {
-    controller = SunSpecController(sunspecManager);
+    controller = SunSpecController(sunSpecManager);
   });
 
   afterEach(() => {
@@ -81,7 +81,7 @@ describe('Status API', () => {
     };
 
     await controller['post /api/v1/service/sunspec/connect'].controller(req, res);
-    assert.calledOnceWithExactly(sunspecManager.connect);
+    assert.calledOnceWithExactly(sunSpecManager.connect);
     assert.calledOnceWithExactly(res.json, { success: true });
   });
 
@@ -92,7 +92,7 @@ describe('Status API', () => {
     };
 
     await controller['post /api/v1/service/sunspec/disconnect'].controller(req, res);
-    assert.calledOnceWithExactly(sunspecManager.disconnect);
+    assert.calledOnceWithExactly(sunSpecManager.disconnect);
     assert.calledOnceWithExactly(res.json, { success: true });
   });
 
@@ -103,7 +103,7 @@ describe('Status API', () => {
     };
 
     controller['get /api/v1/service/sunspec/status'].controller(req, res);
-    assert.calledOnceWithExactly(sunspecManager.getStatus);
+    assert.calledOnceWithExactly(sunSpecManager.getStatus);
     assert.calledOnce(res.json);
   });
 });
@@ -112,7 +112,7 @@ describe('Configuration API', () => {
   let controller;
 
   beforeEach(() => {
-    controller = SunSpecController(sunspecManager);
+    controller = SunSpecController(sunSpecManager);
   });
 
   afterEach(() => {
@@ -126,7 +126,7 @@ describe('Configuration API', () => {
     };
 
     await controller['get /api/v1/service/sunspec/config'].controller(req, res);
-    assert.calledOnce(sunspecManager.getConfiguration);
+    assert.calledOnce(sunSpecManager.getConfiguration);
     assert.calledOnceWithExactly(res.json, { sunspecUrl: 'sunspecUrl' });
   });
 
@@ -139,13 +139,13 @@ describe('Configuration API', () => {
     const res = {
       json: fake.returns(null),
     };
-    sunspecManager.getConfiguration = fake.returns({ sunspecUrl: 'newSunspecUrl' });
+    sunSpecManager.getConfiguration = fake.returns({ sunspecUrl: 'newSunspecUrl' });
 
     await controller['post /api/v1/service/sunspec/config'].controller(req, res);
-    assert.calledOnceWithExactly(sunspecManager.updateConfiguration, { sunspecUrl: 'newSunspecUrl' });
-    assert.calledOnce(sunspecManager.disconnect);
-    assert.calledOnce(sunspecManager.connect);
-    assert.calledOnce(sunspecManager.getConfiguration);
+    assert.calledOnceWithExactly(sunSpecManager.updateConfiguration, { sunspecUrl: 'newSunspecUrl' });
+    assert.calledOnce(sunSpecManager.disconnect);
+    assert.calledOnce(sunSpecManager.connect);
+    assert.calledOnce(sunSpecManager.getConfiguration);
     assert.calledOnceWithExactly(res.json, { sunspecUrl: 'newSunspecUrl' });
   });
 });
