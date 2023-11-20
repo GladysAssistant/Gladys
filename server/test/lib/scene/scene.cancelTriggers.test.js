@@ -59,6 +59,7 @@ describe('SceneManager.cancelTriggers', () => {
         },
       ],
       actions: [],
+      tags: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('nodeScheduleJob');
     sceneManager.cancelTriggers(scene.selector);
@@ -77,6 +78,7 @@ describe('SceneManager.cancelTriggers', () => {
         },
       ],
       actions: [],
+      tags: [],
     });
     expect(sceneManager.scenes[scene.selector].triggers[0]).not.to.have.property('nodeScheduleJob');
     expect(sceneManager.scenes[scene.selector].triggers[0]).to.have.property('jsInterval');
