@@ -118,7 +118,7 @@ class SelectDeviceFeature extends Component {
     }
     return (
       <Select
-        class='select-device-feature'
+        class="select-device-feature"
         defaultValue={''}
         value={selectedOption}
         onChange={this.handleChange}
