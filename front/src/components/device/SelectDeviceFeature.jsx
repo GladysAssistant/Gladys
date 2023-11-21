@@ -6,8 +6,6 @@ import cx from 'classnames';
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
 
-import style from './SelectDeviceFeature.css';
-
 class SelectDeviceFeature extends Component {
   getOptions = async () => {
     try {
@@ -121,7 +119,7 @@ class SelectDeviceFeature extends Component {
     }
     return (
       <Select
-        className={cx('select-device-feature', style.deviceSelector)}
+        className={cx('select-device-feature')}
         defaultValue={''}
         value={selectedOption}
         onChange={this.handleChange}
