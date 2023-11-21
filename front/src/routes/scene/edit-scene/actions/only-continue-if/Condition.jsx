@@ -76,7 +76,6 @@ class Condition extends Component {
               </label>
               <Select
                 defaultValue={''}
-                className={cx(style.deviceSelector)}
                 value={selectedOption}
                 onChange={this.handleChange}
                 options={props.variableOptions}
