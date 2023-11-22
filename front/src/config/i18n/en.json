@@ -1591,6 +1591,13 @@
         "description": "This action will set the selected house to the selected alarm mode.",
         "houseLabel": "House",
         "alarmModeLabel": "Alarm Mode"
+      },
+      "mqttMessage": {
+        "topic": "Topic",
+        "topicPlaceholder": "/gladys/my-topic",
+        "messageLabel": "Message",
+        "variablesExplanation": "To inject a variable in the text, press '{{'. To set a variable value, you need to use the 'Get device value' box before this one.",
+        "messagePlaceholder": "My message"
       }
     },
     "actions": {
