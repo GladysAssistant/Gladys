@@ -2,8 +2,7 @@
   display: block;
   position: fixed;
   bottom: 30px;
-  left: 50px;
-  animation: fadeOut 0.5s;
+  left: 30px;
   z-index: 10;
 }
 
