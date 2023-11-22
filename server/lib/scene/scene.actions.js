@@ -457,7 +457,7 @@ const actionsFunc = {
       await self.house.panic(action.house);
     }
   },
-  [ACTIONS.MQTT.SEND]: async (self, action, scope) => {
+  [ACTIONS.MQTT.SEND]: (self, action, scope) => {
     const mqttService = self.service.getService('mqtt');
 
     if (mqttService) {
