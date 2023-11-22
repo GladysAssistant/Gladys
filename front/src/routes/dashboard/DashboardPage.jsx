@@ -3,7 +3,6 @@ import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import BoxColumns from './BoxColumns';
 import EmptyState from './EmptyState';
-import NavigationButton from '../../components/navigation/NavigationButton';
 
 import style from './style.css';
 
@@ -16,7 +15,6 @@ const DashboardPage = ({ children, ...props }) => (
           <div class="my-3 my-md-5">
             <div class={cx('container')}>
               <div class="page-header">
-              <NavigationButton />
                 <div>
                   {!props.dashboardListEmpty && (
                     <div class="dropdown">
