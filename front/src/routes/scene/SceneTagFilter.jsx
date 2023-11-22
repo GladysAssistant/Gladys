@@ -2,6 +2,7 @@ import { Component } from 'preact';
 import cx from 'classnames';
 import { Text } from 'preact-i18n';
 import { MAX_LENGTH_TAG } from './constant';
+import styles from './style.css';
 
 class SceneTagFilter extends Component {
   constructor(props) {
@@ -61,6 +62,20 @@ class SceneTagFilter extends Component {
     this.props.searchTags(selectedTags);
   };
 
+  unselectTags = async () => {
+    const tagsStatus = this.props.tags.reduce(
+      (tags, tag) => ({
+        ...tags,
+        [tag.name]: false
+      }),
+      {}
+    );
+    await this.setState({
+      tagsStatus
+    });
+    this.props.searchTags([]);
+  };
+
   componentDidMount() {
     document.addEventListener('click', this.closeTagFilterDropdown, true);
   }
@@ -85,21 +100,35 @@ class SceneTagFilter extends Component {
             show: tagFilterDropdownOpened
           })}
         >
+          <div>
+            <li
+              class="dropdown-item"
+              onClick={() => {
+                this.unselectTags();
+              }}
+            >
+              <i class={cx('fe', 'fe-x-square', styles.iconUnselectAll)} />
+              <span class="custom-control">
+                <Text id="scene.unselectTags" />
+              </span>
+            </li>
+          </div>
           {props.tags &&
             props.tags.map(tag => (
               <div>
-                <li className="dropdown-item" onClick={() => this.selectedTags(tag.name)}>
+                <li class="dropdown-item" onClick={() => this.selectedTags(tag.name)}>
                   <div class="custom-checkbox custom-control">
                     <input
                       id={`tags-filter-${tag.name}`}
                       type="checkbox"
-                      className="custom-control-input"
+                      class="custom-control-input"
                       onChange={() => this.selectedTags(tag.name)}
                       checked={tagsStatus[tag.name]}
                     />
-                    <label className="custom-control-label" htmlFor={`tags-filter-${tag.name}`}>
+                    <label class="custom-control-label" htmlFor={`tags-filter-${tag.name}`}>
                       {tag.name.length > MAX_LENGTH_TAG ? `${tag.name.substring(0, MAX_LENGTH_TAG - 3)}...` : tag.name}
                     </label>
+                    <span class={cx('badge', 'badge-secondary', styles.tagsSceneCount)}>{tag.scene_count}</span>
                   </div>
                 </li>
               </div>
