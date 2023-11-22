@@ -54,7 +54,8 @@ function createActions(store) {
         newScene: {
           name: '',
           icon: null,
-          actions: [[]]
+          actions: [[]],
+          tags: []
         },
         newSceneErrors: null,
         createSceneStatus: null

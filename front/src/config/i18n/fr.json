@@ -1504,9 +1504,15 @@
     }
   },
   "editScene": {
+    "settings": "Configuration",
+    "nameTitle": "Nom de scène",
     "editNamePlaceholder": "Entrez un nom de scène",
     "descriptionTitle": "Description",
+    "iconLabel": "Icône",
     "editDescriptionPlaceholder": "Entrez une description pour la scène",
+    "createTag": "Créer le tag : '{{tagName}}'",
+    "tagsTitle": "Tags",
+    "editTagsPlaceholder": "Entrez un tag pour la scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
@@ -2173,7 +2179,8 @@
     "newButton": "Nouveau",
     "editButton": "Editer",
     "startButton": "Démarrer",
-    "searchPlaceholder": "Chercher une scène"
+    "searchPlaceholder": "Chercher une scène",
+    "filterTagsName": "Filtrer par tags"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
