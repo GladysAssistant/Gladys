@@ -141,23 +141,74 @@ class Chartbox extends Component {
 
       let emptySeries = true;
 
-      const series = data.map((oneFeature, index) => {
-        const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
-        const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
-        const { values, deviceFeature } = oneFeature;
-        const deviceName = deviceFeature.name;
-        const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
-        return {
-          name,
-          data: values.map(value => {
-            emptySeries = false;
-            return {
-              x: value.created_at,
-              y: value.value
-            };
-          })
+      let series = [];
+      if (this.props.box.chart_type === 'timeline') {
+        const serie0 = {
+          name: 'Close',
+          data: []
         };
-      });
+        const serie1 = {
+          name: 'Open',
+          data: []
+        };
+
+        data.forEach(oneFeature => {
+          const { values, deviceFeature } = oneFeature;
+
+          let newData = null;
+          let previousValue = null;
+
+          values.forEach(value => {
+            emptySeries = false;
+            console.log(value, previousValue);
+            if (previousValue === null) {
+              console.log('1');
+              newData = {
+                x: deviceFeature.name,
+                y: [new Date(value.created_at).getTime(), new Date(value.created_at).getTime()]
+              };
+
+              value.value === 0 ? serie0.data.push(newData) : serie1.data.push(newData);
+            } else if (value.value !== previousValue) {
+              console.log('2', value.value, previousValue, value.value !== previousValue);
+              newData = {
+                x: deviceFeature.name,
+                y: [new Date(value.created_at).getTime(), new Date(value.created_at).getTime()]
+              };
+              value.value === 0 ? serie0.data.push(newData) : serie1.data.push(newData);
+            } else if (value.value === 0) {
+              console.log('3.0');
+              serie0.data[serie0.data.length - 1].y[1] = new Date(value.created_at).getTime();
+            } else {
+              console.log('3.1');
+              serie1.data[serie1.data.length - 1].y[1] = new Date(value.created_at).getTime();
+            }
+            previousValue = value.value;
+          });
+        });
+        series.push(serie0);
+        series.push(serie1);
+      } else {
+        series = data.map((oneFeature, index) => {
+          const oneUnit = this.props.box.units ? this.props.box.units[index] : this.props.box.unit;
+          const oneUnitTranslated = oneUnit ? this.props.intl.dictionary.deviceFeatureUnitShort[oneUnit] : null;
+          const { values, deviceFeature } = oneFeature;
+          const deviceName = deviceFeature.name;
+          const name = oneUnitTranslated ? `${deviceName} (${oneUnitTranslated})` : deviceName;
+          return {
+            name,
+            data: values.map(value => {
+              emptySeries = false;
+              return {
+                x: value.created_at,
+                y: value.value
+              };
+            })
+          };
+        });
+      }
+
+      console.log(series);
 
       const newState = {
         series,

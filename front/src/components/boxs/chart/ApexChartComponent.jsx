@@ -10,6 +10,7 @@ import { getApexChartBarOptions } from './ApexChartBarOptions';
 import { getApexChartAreaOptions } from './ApexChartAreaOptions';
 import { getApexChartLineOptions } from './ApexChartLineOptions';
 import { getApexChartStepLineOptions } from './ApexChartStepLineOptions';
+import { getApexChartTimelineOptions } from './ApexChartTimelineOptions';
 
 dayjs.extend(localizedFormat);
 
@@ -33,7 +34,7 @@ class ApexChartComponent extends Component {
       };
     }
     options.tooltip = {
-      x: {
+      y: {
         formatter
       }
     };
@@ -110,9 +111,33 @@ class ApexChartComponent extends Component {
     this.addDateFormatter(options);
     return options;
   };
+  getTimelineChartOptions = () => {
+    let height;
+    if (this.props.size === 'small' && !this.props.display_axes) {
+      height = 40;
+    } else if (this.props.size === 'big' && !this.props.display_axes) {
+      height = 80;
+    } else {
+      height = 200;
+    }
+    const options = getApexChartTimelineOptions({
+      height,
+      series: this.props.series,
+      displayAxes: this.props.display_axes,
+      COLORS,
+      locales: [fr, en],
+      defaultLocale: this.props.user.language
+    });
+    this.addDateFormatter(options);
+
+    return options;
+  };
+
   displayChart = () => {
     let options;
-    if (this.props.chart_type === 'area') {
+    if (this.props.chart_type === 'timeline') {
+      options = this.getTimelineChartOptions();
+    } else if (this.props.chart_type === 'area') {
       options = this.getAreaChartOptions();
     } else if (this.props.chart_type === 'line') {
       options = this.getLineChartOptions();
@@ -130,6 +155,7 @@ class ApexChartComponent extends Component {
       this.chart.render();
     }
   };
+
   componentDidMount() {
     this.displayChart();
   }

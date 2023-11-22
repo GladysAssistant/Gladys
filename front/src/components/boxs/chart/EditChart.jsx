@@ -11,7 +11,7 @@ import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
-  [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
+  //[DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
   [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: true,
   [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: true
@@ -204,6 +204,9 @@ class EditChart extends Component {
                 </option>
                 <option value="bar">
                   <Text id="dashboard.boxes.chart.bar" />
+                </option>
+                <option value="timeline">
+                  <Text id="dashboard.boxes.chart.timeline" />
                 </option>
               </select>
             </div>
