@@ -18,7 +18,13 @@ const get = require('get-value');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
+const {
+  ACTIONS,
+  DEVICE_FEATURE_CATEGORIES,
+  DEVICE_FEATURE_TYPES,
+  ALARM_MODES,
+  EVENTS,
+} = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
@@ -455,6 +461,15 @@ const actionsFunc = {
     }
     if (action.alarm_mode === ALARM_MODES.PANIC) {
       await self.house.panic(action.house);
+    }
+  },
+  [ACTIONS.MQTT.SEND]: async (self, action, scope) => {
+    console.log('ICICICICICICICIICC');
+    const mqttService = self.service.getService('mqtt');
+
+    if (mqttService) {
+      const messageWithVariables = Handlebars.compile(action.message)(scope);
+      mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
 };

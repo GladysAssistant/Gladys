@@ -1592,6 +1592,13 @@
         "description": "Cette action passera la maison sélectionnée dans le mode d'alarme sélectionné.",
         "houseLabel": "Maison",
         "alarmModeLabel": "Mode de l'alarme"
+      },
+      "mqttMessage": {
+        "topic": "Topic",
+        "topicPlaceholder": "/gladys/my-topic",
+        "messageLabel": "Message",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
+        "messagePlaceholder": "Mon message"
       }
     },
     "actions": {
@@ -1646,6 +1653,9 @@
       "alarm": {
         "check-alarm-mode": "Si l'alarme est en mode",
         "set-alarm-mode": "Passer l'alarme en mode"
+      },
+      "mqtt": {
+        "send": "Envoyer un message MQTT"
       }
     },
     "variables": {

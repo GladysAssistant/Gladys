@@ -1645,6 +1645,9 @@
       "alarm": {
         "check-alarm-mode": "If the alarm is in mode",
         "set-alarm-mode": "Set alarm mode to"
+      },
+      "mqtt": {
+        "send": "Send MQTT Message"
       }
     },
     "variables": {
