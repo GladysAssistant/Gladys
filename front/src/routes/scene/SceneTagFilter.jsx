@@ -3,6 +3,7 @@ import cx from 'classnames';
 import { Text } from 'preact-i18n';
 import { MAX_LENGTH_TAG } from './constant';
 import styles from './style.css';
+import debounce from 'debounce';
 
 class SceneTagFilter extends Component {
   constructor(props) {
@@ -59,7 +60,7 @@ class SceneTagFilter extends Component {
       }
     });
     const selectedTags = Object.keys(this.state.tagsStatus).filter(tagName => this.state.tagsStatus[tagName]);
-    this.props.searchTags(selectedTags);
+    debounce(this.props.searchTags, 200)(selectedTags);
   };
 
   unselectTags = async () => {
