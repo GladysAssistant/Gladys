@@ -10,6 +10,7 @@ const db = require('../../models');
 async function getTag() {
   const tagScenes = await db.TagScene.findAll({
     attributes: [[fn('DISTINCT', col('name')), 'name']],
+    order: [[fn('lower', col('name')), 'ASC']],
   });
 
   return tagScenes.map((tagScene) => tagScene.get({ plain: true }));
