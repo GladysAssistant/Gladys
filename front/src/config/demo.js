@@ -3485,6 +3485,50 @@ const data = {
         .subtract(3, 'hour')
         .toDate()
     }
+  ],
+  'get /api/v1/service/sonos/device': [
+    {
+      id: 'c0e21639-4fe9-4d1c-ad65-33255d21bf0d',
+      name: 'Sonos Speaker',
+      external_id: 'sonos:uuid',
+      features: [
+        {
+          name: 'Sonos Play',
+          category: 'music',
+          type: 'play',
+          min: 1,
+          max: 1
+        }
+      ]
+    }
+  ],
+  'get /api/v1/service/sonos/discover': [
+    {
+      name: 'Sonos Speaker',
+      external_id: 'sonos:uuid',
+      features: [
+        {
+          name: 'Sonos Play',
+          category: 'music',
+          type: 'play',
+          min: 1,
+          max: 1
+        }
+      ]
+    },
+    {
+      name: 'Sonos Speaker',
+      external_id: 'sonos:another_uuid',
+      features: [
+        {
+          name: 'Sonos Play',
+          category: 'music',
+          type: 'play',
+          min: 1,
+          max: 1
+        }
+      ]
+    }
   ]
 };
 
