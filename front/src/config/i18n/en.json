@@ -342,13 +342,16 @@
         "line": "Line",
         "area": "Area",
         "bar": "Bar",
+        "timeline": "Binary",
         "stepline": "Step Line",
         "displayAxes": "Display axes?",
         "displayVariation": "Display variation?",
         "yes": "Yes",
         "no": "No",
         "preview": "Preview",
-        "showPreviewButton": "Show preview"
+        "showPreviewButton": "Show preview",
+        "on": "On",
+        "off": "Off"
       },
       "ecowatt": {
         "title": "Ecowatt France",

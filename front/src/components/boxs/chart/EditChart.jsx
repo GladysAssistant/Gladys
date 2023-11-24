@@ -11,10 +11,13 @@ import { DEVICE_FEATURE_TYPES } from '../../../../../server/utils/constants';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 
 const FEATURES_THAT_ARE_NOT_COMPATIBLE = {
-  //[DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true,
   [DEVICE_FEATURE_TYPES.SENSOR.PUSH]: true,
   [DEVICE_FEATURE_TYPES.LIGHT.COLOR]: true,
   [DEVICE_FEATURE_TYPES.CAMERA.IMAGE]: true
+};
+
+const FEATURE_BINARY = {
+  [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true
 };
 
 class EditChart extends Component {
@@ -103,7 +106,13 @@ class EditChart extends Component {
           this.deviceFeatureBySelector.set(feature.selector, feature);
           // We don't support all devices for this view
           if (!FEATURES_THAT_ARE_NOT_COMPATIBLE[feature.type]) {
-            deviceFeaturesOptions.push(featureOption);
+            if (this.props.box.chart_type === 'timeline') {
+              if (FEATURE_BINARY[feature.type]) {
+                deviceFeaturesOptions.push(featureOption);
+              }
+            } else if (!FEATURE_BINARY[feature.type]) {
+              deviceFeaturesOptions.push(featureOption);
+            }
           }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);

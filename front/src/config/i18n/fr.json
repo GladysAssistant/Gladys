@@ -342,13 +342,16 @@
         "line": "Ligne",
         "area": "Aire",
         "bar": "Histogramme",
+        "timeline": "Binaire",
         "stepline": "Ligne droite",
         "displayAxes": "Afficher les axes ?",
         "displayVariation": "Afficher la variation ?",
         "yes": "Oui",
         "no": "Non",
         "preview": "Prévisualisation",
-        "showPreviewButton": "Afficher une prévisualisation"
+        "showPreviewButton": "Afficher une prévisualisation",
+        "on": "On",
+        "off": "Off"
       },
       "ecowatt": {
         "title": "Ecowatt France",

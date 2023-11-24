@@ -2,8 +2,27 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, COLORS, loca
   const options = {
     series,
     chart: {
-      height: 350,
-      type: 'rangeBar'
+      locales,
+      defaultLocale,
+      type: 'rangeBar',
+      fontFamily: 'inherit',
+      height,
+      parentHeightOffset: 0,
+      sparkline: {
+        enabled: !displayAxes
+      },
+      toolbar: {
+        show: false
+      },
+      animations: {
+        enabled: false
+      }
+    },
+    grid: {
+      strokeDashArray: 4,
+      padding: {
+        left: 1
+      }
     },
     plotOptions: {
       bar: {
@@ -17,10 +36,21 @@ const getApexChartTimelineOptions = ({ displayAxes, height, series, COLORS, loca
       type: 'solid'
     },
     xaxis: {
+      labels: {
+        padding: 0,
+        datetimeUTC: false
+      },
+      tooltip: {
+        enabled: false
+      },
+      axisBorder: {
+        show: false
+      },
       type: 'datetime'
     },
     legend: {
-      position: 'right'
+      show: displayAxes,
+      position: 'bottom'
     }
   };
   return options;
