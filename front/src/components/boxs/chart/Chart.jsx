@@ -8,7 +8,6 @@ import { WEBSOCKET_MESSAGE_TYPES, DEVICE_FEATURE_UNITS } from '../../../../../se
 import get from 'get-value';
 import withIntlAsProp from '../../../utils/withIntlAsProp';
 import ApexChartComponent from './ApexChartComponent';
-import { getDeviceFeatureName } from '../../../utils/device';
 
 const ONE_HOUR_IN_MINUTES = 60;
 const ONE_DAY_IN_MINUTES = 24 * 60;
