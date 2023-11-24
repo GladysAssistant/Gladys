@@ -8,11 +8,6 @@ const db = require('../../models');
  * const scenes = await gladys.scene.getTag();
  */
 async function getTag() {
-  /* const tagScenes = await db.TagScene.findAll({
-    attributes: [[fn('DISTINCT', col('name')), 'name']],
-    order: [[fn('lower', col('name')), 'ASC']],
-  });
-   */
   const tagScenes = await db.TagScene.findAll({
     attributes: ['name', [fn('COUNT', col('scene_id')), 'scene_count']],
     group: 'name',

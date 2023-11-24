@@ -61,20 +61,24 @@ async function get(options) {
   if (optionsWithDefault.searchTags) {
     const tags = optionsWithDefault.searchTags.split(',');
 
-    const tagsWithSceneId = await Promise.all(
-      tags.map((tag) =>
-        db.TagScene.findAll({
-          fields: 'scene_id',
-          where: { name: { [Op.like]: `%${tag}%` } },
-        }),
-      ),
-    );
+    const sceneIdsAndNames = (
+      await db.TagScene.findAll({
+        fields: ['name', 'scene_id'],
+        where: {
+          [Op.or]: tags.map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
+        },
+      })
+    ).map((tag) => tag.get({ plain: true }));
 
-    const sceneIds = tagsWithSceneId.map((tagWithSceneId) =>
-      tagWithSceneId.map((tag) => tag.get({ plain: true }).scene_id),
-    );
+    const tagsWithSceneId = {};
+    sceneIdsAndNames.forEach((sceneIdAndName) => {
+      if (sceneIdAndName.name in tagsWithSceneId === false) {
+        tagsWithSceneId[sceneIdAndName.name] = [];
+      }
+      tagsWithSceneId[sceneIdAndName.name].push(sceneIdAndName.scene_id);
+    });
 
-    const intersectionSceneId = intersection(...sceneIds);
+    const intersectionSceneId = intersection(...Object.values(tagsWithSceneId));
 
     where.push({
       [Op.or]: intersectionSceneId.map((sceneId) => ({ id: sceneId })),
