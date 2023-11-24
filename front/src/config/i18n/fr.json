@@ -1048,6 +1048,7 @@
         "description": "Les appareils Sonos sont automatiquement découverts.",
         "error": "Erreur de découverte des appareils Sonos. Est-ce que votre enceinte Sonos est sous tension et accessible sur le réseau local ?",
         "noDeviceFound": "Aucun appareil Sonos n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors du scan.",
         "scan": "Scanner"
       },
 
@@ -2720,6 +2721,15 @@
     "surface": {
       "shortCategoryName": "Surface",
       "decimal": "Surface"
+    },
+    "music": {
+      "shortCategoryName": "Musique",
+      "volume": "Volume de la musique",
+      "play": "Bouton lecture musique",
+      "pause": "Bouton pause musique",
+      "previous": "Bouton précédent musique",
+      "next": "Bouton suivant musique",
+      "playback_state": "Etat de la lecture musique"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

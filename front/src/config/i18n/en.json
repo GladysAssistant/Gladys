@@ -251,7 +251,8 @@
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
       "clock": "Clock",
-      "scene": "Scene"
+      "scene": "Scene",
+      "music": "Music"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -386,6 +387,9 @@
         "alarmStatusText": "Your house is ",
         "alarmArming": "Your house is being armed...",
         "cancelAlarmArming": "Cancel"
+      },
+      "music": {
+        "selectDeviceLabel": "Select device to control"
       }
     }
   },
@@ -890,6 +894,41 @@
         "defaultError": "There was an error saving the device.",
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
+      }
+    },
+    "sonos": {
+      "title": "Sonos",
+      "description": "Control Sonos devices on your local network",
+      "deviceTab": "Devices",
+      "discoverTab": "Sonos Discovery",
+      "setupTab": "Setup",
+      "documentation": "Sonos Documentation",
+      "discoverDeviceDescr": "Automatically scan for Sonos devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "hostLabel": "IP Address",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "device": {
+        "title": "Sonos Devices in Gladys",
+        "editButton": "Edit",
+        "noDeviceFound": "No Sonos devices found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your local network",
+        "description": "Sonos devices are automatically discovered.",
+        "error": "Error discovering Sonos devices. Is your Sonos speaker powered on and accessible on the local network?",
+        "noDeviceFound": "No Sonos devices were discovered.",
+        "errorWhileScanning": "An error occurred during scanning.",
+        "scan": "Scan"
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
       }
     },
     "melcloud": {
@@ -2680,6 +2719,15 @@
     "surface": {
       "shortCategoryName": "Surface",
       "decimal": "Surface"
+    },
+    "music": {
+      "shortCategoryName": "Music",
+      "volume": "Music volume",
+      "play": "Music play button",
+      "pause": "Music pause button",
+      "previous": "Music previous button",
+      "next": "Music next button",
+      "playback_state": "Music playback state"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

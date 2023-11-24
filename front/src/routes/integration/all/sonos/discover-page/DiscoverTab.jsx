@@ -1,5 +1,4 @@
 import { Text } from 'preact-i18n';
-import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
@@ -82,6 +81,11 @@ class DiscoverTab extends Component {
           <div class="alert alert-secondary">
             <Text id="integration.sonos.discover.description" />
           </div>
+          {errorLoading && (
+            <div class="alert alert-danger">
+              <Text id="integration.sonos.discover.errorWhileScanning" />
+            </div>
+          )}
           <div
             class={cx('dimmer', {
               active: loading
