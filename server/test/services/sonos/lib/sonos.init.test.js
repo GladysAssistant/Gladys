@@ -21,12 +21,18 @@ SonosManager.prototype.Devices = [
     AVTransportService: {
       Events: {
         removeAllListeners: fake.returns(null),
-        on: fake.returns(null),
+        // @ts-ignore
+        on: (type, cb) => {
+          cb({ TransportState: 'PLAYING' });
+        },
       },
     },
     Events: {
       removeAllListeners: fake.returns(null),
-      on: fake.returns(null),
+      // @ts-ignore
+      on: (type, cb) => {
+        cb(12);
+      },
     },
   },
 ];
@@ -53,8 +59,16 @@ describe('SonosHandler.init', () => {
   });
 
   it('should init sonos & scan network', async () => {
+    sonosHandler.onAvTransportEvent = fake.returns(null);
+    sonosHandler.onVolumeEvent = fake.returns(null);
     await sonosHandler.init();
     assert.calledOnce(sonosHandler.manager.InitializeWithDiscovery);
+    // @ts-ignore
+    assert.calledWith(sonosHandler.onAvTransportEvent, 'test-uuid', {
+      TransportState: 'PLAYING',
+    });
+    // @ts-ignore
+    assert.calledWith(sonosHandler.onVolumeEvent, 'test-uuid', 12);
     expect(sonosHandler.devices).deep.equal([
       {
         name: 'My sonos',
