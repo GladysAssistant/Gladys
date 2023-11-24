@@ -131,13 +131,13 @@ const PROPERTIES = {
   ELECTRIC_W: 'value-66048',
   ELECTRIC_CONSUMED_W: 'value-66049',
   ELECTRIC_CONSUMED_KWH: 'value-65537',
-  AIR_TEMPERATURE: 'Air temperature',
+  AIR_TEMPERATURE: 'Air_temperature',
   HUMIDITY: 'Humidity',
   ILLUMINANCE: 'Illuminance',
   ULTRAVIOLET: 'Ultraviolet',
   MOTION: 'Motion',
   ANY: 'Any',
-  SMOKE_ALARM: 'Smoke Alarm-Sensor status',
+  SMOKE_ALARM: 'Smoke_Alarm-Sensor_status',
   SLOW_REFRESH: 'slowRefresh',
   SCENE_001: 'scene-001',
   SCENE_002: 'scene-002',
@@ -150,7 +150,7 @@ const PROPERTIES = {
   TARGET_COLOR: 'targetColor',
   HEX_COLOR: 'hexColor',
   POWER: 'Power',
-  MOTION_ALARM: 'Home Security-Motion sensor status',
+  MOTION_ALARM: 'Home_Security-Motion_sensor_status',
 };
 
 const ENDPOINTS = {
