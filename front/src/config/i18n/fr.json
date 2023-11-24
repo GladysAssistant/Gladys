@@ -1024,7 +1024,7 @@
     },
     "sonos": {
       "title": "Sonos",
-      "description": "Contrôler vos appareils Sonos",
+      "description": "Contrôler les appareils Sonos sur votre réseau local",
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Sonos",
       "setupTab": "Configuration",
@@ -1032,7 +1032,7 @@
       "discoverDeviceDescr": "Scanner automatiquement les appareils Sonos",
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
-      "modelLabel": "Modèle",
+      "hostLabel": "Adresse IP",
       "roomLabel": "Pièce",
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",

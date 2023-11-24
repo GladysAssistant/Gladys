@@ -41,6 +41,13 @@ class DiscoverTab extends Component {
     });
     try {
       const discoveredDevices = await this.props.httpClient.get('/api/v1/service/sonos/discover');
+      const existingSonosDevices = await this.props.httpClient.get('/api/v1/service/sonos/device', {});
+      discoveredDevices.forEach(discoveredDevice => {
+        const existingDevice = existingSonosDevices.find(d => d.external_id === discoveredDevice.external_id);
+        if (existingDevice) {
+          discoveredDevice.alreadyExist = true;
+        }
+      });
       this.setState({
         discoveredDevices,
         loading: false,
@@ -85,15 +92,7 @@ class DiscoverTab extends Component {
               <div class="row">
                 {discoveredDevices &&
                   discoveredDevices.map((device, index) => (
-                    <SonosDeviceBox
-                      editable={!device.created_at || device.updatable}
-                      alreadyCreatedButton={device.created_at && !device.updatable}
-                      updateButton={device.updatable}
-                      saveButton={!device.created_at}
-                      device={device}
-                      deviceIndex={index}
-                      housesWithRooms={housesWithRooms}
-                    />
+                    <SonosDeviceBox saveButton device={device} deviceIndex={index} housesWithRooms={housesWithRooms} />
                   ))}
                 {!discoveredDevices || (discoveredDevices.length === 0 && <EmptyState />)}
               </div>

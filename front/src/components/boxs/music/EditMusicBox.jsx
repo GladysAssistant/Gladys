@@ -4,6 +4,7 @@ import Select from 'react-select';
 import { connect } from 'unistore/preact';
 
 import BaseEditBox from '../baseEditBox';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../server/utils/constants';
 
 class EditMusicBoxComponent extends Component {
   updateDevice = option => {
@@ -17,7 +18,9 @@ class EditMusicBoxComponent extends Component {
       await this.setState({
         error: false
       });
-      const musicDevices = await this.props.httpClient.get('/api/v1/device', {});
+      const musicDevices = await this.props.httpClient.get('/api/v1/device', {
+        device_feature_category: DEVICE_FEATURE_CATEGORIES.MUSIC
+      });
       const musicDevicesOptions = musicDevices.map(d => ({
         label: d.name,
         value: d.selector

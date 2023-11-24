@@ -1,7 +1,11 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
-import { DEVICE_FEATURE_TYPES, MUSIC_PLAYBACK_STATE } from '../../../../../server/utils/constants';
+import {
+  WEBSOCKET_MESSAGE_TYPES,
+  DEVICE_FEATURE_TYPES,
+  MUSIC_PLAYBACK_STATE
+} from '../../../../../server/utils/constants';
 
 class MusicComponent extends Component {
   state = {
@@ -19,7 +23,7 @@ class MusicComponent extends Component {
       const nextFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.NEXT);
       const volumeFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.VOLUME);
       const playBackStateFeature = musicDevice.features.find(f => f.type === DEVICE_FEATURE_TYPES.MUSIC.PLAYBACK_STATE);
-      const isPlaying = playBackStateFeature.value === MUSIC_PLAYBACK_STATE.PLAYING;
+      const isPlaying = playBackStateFeature.last_value === MUSIC_PLAYBACK_STATE.PLAYING;
       this.setState({
         musicDevice,
         playFeature,
@@ -27,6 +31,7 @@ class MusicComponent extends Component {
         previousFeature,
         nextFeature,
         volumeFeature,
+        playBackStateFeature,
         isPlaying
       });
     } catch (e) {
@@ -66,47 +71,86 @@ class MusicComponent extends Component {
     await this.setValueDevice(this.state.volumeFeature, parseInt(volume, 10));
   };
 
+  updateDeviceStateWebsocket = payload => {
+    if (payload.device_feature_selector === this.state.playBackStateFeature.selector) {
+      const isPlaying = payload.last_value === MUSIC_PLAYBACK_STATE.PLAYING;
+      this.setState({ isPlaying });
+    }
+    if (payload.device_feature_selector === this.state.volumeFeature.selector) {
+      const newVolumeFeature = { ...this.state.volumeFeature, last_value: payload.last_value };
+      this.setState({ volumeFeature: newVolumeFeature });
+    }
+  };
+
   componentDidMount() {
     this.getDevice();
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceStateWebsocket
+    );
   }
 
-  render(props, { isPlaying }) {
+  componentWillUnmount() {
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.DEVICE.NEW_STATE,
+      this.updateDeviceStateWebsocket
+    );
+  }
+
+  render(props, { isPlaying, musicDevice, previousFeature, nextFeature, volumeFeature }) {
     return (
-      <div class="card p-4">
-        <div class="row">
-          <div class="col">
-            <button class="btn btn-block btn-secondary">
-              <i class="fe fe-skip-back" />
-            </button>
-          </div>
-          <div class="col">
-            <button class="btn btn-block btn-secondary">
-              {!isPlaying && <i class="fe fe-play" />}
-              {isPlaying && <i class="fe fe-pause" />}
-            </button>
-          </div>
-          <div class="col">
-            <button class="btn btn-block btn-secondary">
-              <i class="fe fe-skip-forward" />
-            </button>
-          </div>
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">{musicDevice && musicDevice.name}</h3>
         </div>
-        <div class="row">
-          <div class="col">
-            <input
-              type="range"
-              value={this.state.volume}
-              onChange={this.handleVolumeChange}
-              class="form-control custom-range"
-              step="1"
-              min="0"
-              max="100"
-            />
+        <div class="card-body">
+          <div class="row">
+            <div class="col">
+              {previousFeature && (
+                <button class="btn btn-block btn-secondary" onClick={this.previous}>
+                  <i class="fe fe-skip-back" />
+                </button>
+              )}
+            </div>
+            <div class="col">
+              {!isPlaying && (
+                <button class="btn btn-block btn-secondary" onClick={this.play}>
+                  <i class="fe fe-play" />
+                </button>
+              )}
+              {isPlaying && (
+                <button class="btn btn-block btn-secondary" onClick={this.pause}>
+                  <i class="fe fe-pause" />
+                </button>
+              )}
+            </div>
+            <div class="col">
+              {nextFeature && (
+                <button class="btn btn-block btn-secondary" onClick={this.next}>
+                  <i class="fe fe-skip-forward" />
+                </button>
+              )}
+            </div>
           </div>
+          {volumeFeature && (
+            <div class="row mt-4">
+              <div class="col">
+                <input
+                  type="range"
+                  value={volumeFeature.last_value}
+                  onChange={this.changeVolume}
+                  class="form-control"
+                  step="1"
+                  min="0"
+                  max="100"
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
   }
 }
 
-export default connect('httpClient', {})(MusicComponent);
+export default connect('httpClient,session', {})(MusicComponent);

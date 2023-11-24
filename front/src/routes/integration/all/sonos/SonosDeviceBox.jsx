@@ -1,9 +1,8 @@
 import { Component } from 'preact';
 import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
-import { Link } from 'preact-router';
 import get from 'get-value';
-import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
+
 import { connect } from 'unistore/preact';
 
 class SonosDeviceBox extends Component {
@@ -43,7 +42,11 @@ class SonosDeviceBox extends Component {
       errorMessage: null
     });
     try {
+      let deviceDidNotExist = this.state.device.id === undefined;
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
+      if (deviceDidNotExist) {
+        savedDevice.alreadyExist = true;
+      }
       this.setState({
         device: savedDevice
       });
@@ -91,16 +94,7 @@ class SonosDeviceBox extends Component {
   };
 
   render(
-    {
-      deviceIndex,
-      editable,
-      editButton,
-      deleteButton,
-      saveButton,
-      updateButton,
-      alreadyCreatedButton,
-      housesWithRooms
-    },
+    { deviceIndex, editable, deleteButton, housesWithRooms },
     { device, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
@@ -145,19 +139,6 @@ class SonosDeviceBox extends Component {
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for={`model_${deviceIndex}`}>
-                    <Text id="integration.sonos.modelLabel" />
-                  </label>
-                  <input
-                    id={`model_${deviceIndex}`}
-                    type="text"
-                    value={device.model}
-                    class="form-control"
-                    disabled="true"
-                  />
-                </div>
-
-                <div class="form-group">
                   <label class="form-label" for={`room_${deviceIndex}`}>
                     <Text id="integration.sonos.roomLabel" />
                   </label>
@@ -183,52 +164,23 @@ class SonosDeviceBox extends Component {
                   </select>
                 </div>
 
-                {validModel && (
-                  <div class="form-group">
-                    <label class="form-label">
-                      <Text id="integration.sonos.device.featuresLabel" />
-                    </label>
-                    <DeviceFeatures features={device.features} />
-                  </div>
-                )}
-
                 <div class="form-group">
-                  {validModel && alreadyCreatedButton && (
+                  {device.alreadyExist && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.sonos.alreadyCreatedButton" />
                     </button>
                   )}
 
-                  {validModel && updateButton && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.sonos.updateButton" />
-                    </button>
-                  )}
-
-                  {validModel && saveButton && (
+                  {!device.alreadyExist && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
                       <Text id="integration.sonos.saveButton" />
                     </button>
                   )}
 
-                  {validModel && deleteButton && (
+                  {deleteButton && (
                     <button onClick={this.deleteDevice} class="btn btn-danger">
                       <Text id="integration.sonos.deleteButton" />
                     </button>
-                  )}
-
-                  {!validModel && (
-                    <button class="btn btn-dark" disabled>
-                      <Text id="integration.sonos.unmanagedModelButton" />
-                    </button>
-                  )}
-
-                  {validModel && editButton && (
-                    <Link href={`/dashboard/integration/device/sonos/edit/${device.selector}`}>
-                      <button class="btn btn-secondary float-right">
-                        <Text id="integration.sonos.device.editButton" />
-                      </button>
-                    </Link>
                   )}
                 </div>
               </div>
