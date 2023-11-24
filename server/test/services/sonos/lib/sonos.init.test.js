@@ -18,11 +18,27 @@ SonosManager.prototype.Devices = [
     port: 1400,
     name: 'My sonos',
     uuid: 'test-uuid',
+    AVTransportService: {
+      Events: {
+        removeAllListeners: fake.returns(null),
+        on: fake.returns(null),
+      },
+    },
+    Events: {
+      removeAllListeners: fake.returns(null),
+      on: fake.returns(null),
+    },
   },
 ];
 
 const sonosLib = {
   SonosManager,
+  ServiceEvents: {
+    ServiceEvent: 'test',
+  },
+  SonosEvents: {
+    Volume: 'test',
+  },
 };
 
 describe('SonosHandler.init', () => {

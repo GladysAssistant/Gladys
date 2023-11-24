@@ -28,11 +28,27 @@ SonosManager.prototype.Devices = [
     Previous: devicePrevious,
     Next: deviceNext,
     SetVolume: deviceSetVolume,
+    AVTransportService: {
+      Events: {
+        removeAllListeners: fake.returns(null),
+        on: fake.returns(null),
+      },
+    },
+    Events: {
+      removeAllListeners: fake.returns(null),
+      on: fake.returns(null),
+    },
   },
 ];
 
 const sonosLib = {
   SonosManager,
+  ServiceEvents: {
+    ServiceEvent: 'test',
+  },
+  SonosEvents: {
+    Volume: 'test',
+  },
 };
 
 describe('SonosHandler.setValue', () => {
