@@ -139,6 +139,12 @@ import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
 import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
 import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 
+// Netatmo integration
+import NetatmoPage from '../routes/integration/all/netatmo/device-page';
+import NetatmoEditPage from '../routes/integration/all/netatmo/edit-page';
+import NetatmoSetupPage from '../routes/integration/all/netatmo/setup-page';
+import NetatmoDiscoverPage from '../routes/integration/all/netatmo/discover-page';
+
 // MELCloud integration
 import MELCloudPage from '../routes/integration/all/melcloud/device-page';
 import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
@@ -274,6 +280,11 @@ const AppRouter = connect(
         <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
         <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
         <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
+
+        <NetatmoPage path="/dashboard/integration/device/netatmo" />
+        <NetatmoEditPage path="/dashboard/integration/device/netatmo/edit/:deviceSelector" />
+        <NetatmoDiscoverPage path="/dashboard/integration/device/netatmo/discover" />
+        <NetatmoSetupPage path="/dashboard/integration/device/netatmo/setup" />
 
         <MELCloudPage path="/dashboard/integration/device/melcloud" />
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />

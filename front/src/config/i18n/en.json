@@ -499,6 +499,128 @@
       "rotation18O": "180°",
       "rotation27O": "270°"
     },
+    "netatmo": {
+      "title": "Netatmo",
+      "description": "Control Netatmo Devices",
+      "deviceTab": "Netatmo Devices",
+      "discoverTab": "Discover Netatmo devices",
+      "setupTab": "Settings",
+      "settingsTab": "Settings devices and features",
+      "documentation": "Netatmo Documentation",
+      "discoverDeviceDescr": "Automatically scan Netatmo devices",
+      "alreadyCreatedButton": "Already created",
+      
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "modelLabel": "Model",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "deleteButton": "Delete",
+      "unmanagedModelButton": "Unsupported or Unavailable Model",
+
+      "status": {
+        "notConnected": "Gladys failed to connect to the Netatmo account, more information on the ",
+        "setupPageLink": "Netatmo setup page.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+
+      "device": {
+        "title": "Netatmo devices in Gladys",
+        "noDeviceFound": "No Netatmo devices added yet.",
+        "searchPlaceholder": "Search Netatmo devices",
+        "sidLabel": "Netatmo SID",
+        "ipLabel": "IP Address",
+        "roomLabel": "Room",
+        "featuresLabel": "Features",
+        "saveButton": "Save",
+        "deleteButton": "Delete",
+        "addDeviceButton": "Add",
+        "editButton": "Modify",
+        "noFeatures": "No features",
+        "deviceNotHandled": "Device is not handled",
+        "foundDevice": "Device Found",
+        
+        "updates": "Check for Updates"
+      },
+      "discover": {
+        "title": "Your Netatmo equipment compatible with Gladys",
+        "description": "Netatmo devices are automatically discovered. Your Netatmo devices must be added to your Netatmo account beforehand.",
+        "noDeviceFound": "No Netatmo devices were found. Have you completed all the documentation steps to register your devices?",
+        "noConnect": "You must first configure and login to a Netatmo account from the 'Settings' menu.",
+        "disconnect": "No Netatmo devices can be detected. You must first log back in from the 'Settings' menu.",
+        "alreadyCreatedButton": "Already created",
+        "refreshButton": "Update datas",
+        
+        "error": "Error discovering Netatmo devices. Please check your credentials during setup.",
+        "scan": "Scan"
+      },
+
+      "setup": {
+        "title": "Netatmo Setup",
+        "usernameLabel": "User",
+        "usernamePlaceholder": "Netatmo Connect account email address",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Netatmo Connect account password",
+        "clientIdLabel": "Client ID",
+        "clientIdPlaceholder": "client ID from My Apps in Netatmo Connect",
+        "clientSecretLabel": "Client Secret",
+        "clientSecretPlaceholder": "client secret from My Apps in Netatmo Connect",
+        "scopeLabel": "Connection Scope (Select the actions you want to perform)",
+        "scopePlaceholder": "",
+        "scopes": {
+          "netatmoEnergy": "Netatmo Energy (Thermostat, Valve)",
+          "ENERGY": {
+            "read": "Read thermostat data (read_thermostat)",
+            "write": "Actions on thermostats (write_thermostat)"
+          }
+        },
+        
+        "saveAndConnectLabel": "Save & Connect",
+        "connectLabel": "Connect",
+        "disconnectLabel": "Disconnect",
+        "configure": "Connecting to Netatmo",
+        "connect": "Gladys is connected to Netatmo",
+        "disconnect": "Gladys is not connected to Netatmo",
+        "currentConnection": "Connecting to Netatmo in progress",
+        
+        "description": "You can connect Gladys to your Netatmo account to control associated devices.",
+        "descriptionCreateAccount": "You need to create an account on <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
+        "descriptionCreateProject": "You must then create an \"Apps\" in your <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a> account.",
+        "descriptionGetKeys": "You will then have access to the two keys: \"client ID\" and \"client secret\".",
+
+        "saveLabel": "Save configuration",
+        "error": "An error occurred while saving the configuration.",
+        "connecting": "Configuration saved. Connecting to your Netatmo account...",
+        "connected": "Successfully connected to the Netatmo account!",
+        "connectionError": "Error during connection, please check your configuration."
+      
+      },
+
+      "error": {
+        "defaultError": "An error occurred while registering the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
+      },
+
+      "deviceFeatureValues": {
+        "energy": {
+          "setpointmode": {
+            "0": "Schedule",
+            "1": "Manual",
+            "2": "Frost free",
+            "3": "Away",
+            "4": "Program",
+            "null": "NC"
+          },
+          "heating_req": {
+            "0": "0",
+            "1": "100"
+          }
+        }
+      }
+    },
     "tasmota": {
       "title": "Tasmota",
       "description": "Control your Tasmota devices in HTTP or MQTT.",

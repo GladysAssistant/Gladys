@@ -909,6 +909,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
   },
+  NETATMO: {
+    STATUS: 'netatmo.status',
+    DISCOVER: 'netatmo.discover',
+  },
   MELCLOUD: {
     STATUS: 'melcloud.status',
     DISCOVER: 'melcloud.discover',

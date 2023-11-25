@@ -73,5 +73,10 @@
     "key": "nodeRed",
     "link": "node-red",
     "img": "/assets/integrations/cover/node-red.jpg"
+  },
+  {
+    "key": "netatmo",
+    "link": "netatmo",
+    "img": "/assets/integrations/cover/netatmo.jpg"
   }
 ]
