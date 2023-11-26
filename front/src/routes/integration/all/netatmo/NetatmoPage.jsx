@@ -1,8 +1,10 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
+import { RequestStatus } from '../../../../utils/consts';
+import { STATUS } from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
-const NetatmoPage = ({ children, user }) => (
+const NetatmoPage = ({ children, user, errored, errorCloseWindow, accessDenied, netatmoConnected }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -47,17 +49,6 @@ const NetatmoPage = ({ children, user }) => (
                     <Text id="integration.netatmo.setupTab" />
                   </Link>
 
-                  <Link
-                    href="/dashboard/integration/device/netatmo/settings"
-                    activeClassName="active"
-                    class="list-group-item list-group-item-action d-flex align-items-center"
-                  >
-                    <span class="icon mr-3">
-                      <i class="fe fe-settings" />
-                    </span>
-                    <Text id="integration.netatmo.settingsTab" />
-                  </Link>
-
                   <DeviceConfigurationLink
                     user={user}
                     documentKey="netatmo"
@@ -70,6 +61,38 @@ const NetatmoPage = ({ children, user }) => (
                   </DeviceConfigurationLink>
                 </div>
               </div>
+              {!accessDenied && !errorCloseWindow && errored && (
+                <p class="alert alert-danger">
+                  <Text id="integration.netatmo.setup.error" />
+                </p>
+              )}
+              {accessDenied && (
+                <p class="text-center alert alert-warning">
+                  <Text id="integration.netatmo.setup.declineAuthorize" />
+                </p>
+              )}
+              {errorCloseWindow && (
+                <p class="text-center alert alert-danger">
+                  <Text id="integration.netatmo.setup.errorCloseWindow" />
+                </p>
+              )}
+              {!accessDenied && !errorCloseWindow && (netatmoConnected === STATUS.CONNECTING && (
+                <p class="text-center alert alert-info">
+                  <Text id="integration.netatmo.setup.connecting" />
+                </p>
+              ) || netatmoConnected === STATUS.NOT_INITIALIZED && (
+                <p class="text-center alert alert-warning">
+                  <Text id="integration.netatmo.setup.notConfigured" />
+                </p>
+                ) || netatmoConnected === STATUS.CONNECTED && (
+                <p class="text-center alert alert-success">
+                  <Text id="integration.netatmo.setup.connect" />
+                </p>
+                ) || netatmoConnected === STATUS.DISCONNECTED && (
+                <p class="text-center alert alert-danger">
+                  <Text id="integration.netatmo.setup.disconnect" />
+                </p>
+              ))}
             </div>
 
             <div class="col-lg-9">{children}</div>

@@ -2,73 +2,40 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import { RequestStatus } from '../../../../../utils/consts';
-import { SCOPES } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
+import { SCOPES, STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-
-const SCOPES_ENERGY = SCOPES.ENERGY;
-const redirectUri = `${window.location.origin}/dashboard/integration/device/netatmo/setup`
+import { STATE } from '../../../../../../../server/utils/constants';
 
 class SetupTab extends Component {
-  async componentDidMount() {
-    const urlParams = new URLSearchParams(window.location.search);
-    console.log(this.state.netatmoState)
-    if (urlParams.size > 0) {
-      console.log(urlParams)
-      const code = urlParams.get('code');
-      const state = urlParams.get('state');
-      const accessToken = urlParams.get('access_token');
-      console.log(accessToken)
-      if (code && state) {
-        try {
-          const netatmoState = this.state.netatmoState
-          // Ici, effectuez l'appel à l'API Netatmo pour échanger le code contre un token
-          console.log(code)
-          console.log(state)
-          console.log(netatmoState)
-          await this.props.httpClient.post('/api/v1/service/netatmo/getAccessToken', { codeOAuth: code, redirectUri: redirectUri });
 
-
-
-          // const tokenResponse = await httpClient.post('URL_API_NETATMO', { code });
-          // const accessToken = tokenResponse.data.access_token;
-          // Ensuite, envoyez le token d'accès au serveur Gladys pour le stocker
-          await httpClient.post('/api/v1/service/netatmo/variable/NETATMO_ACCESS_TOKEN', {
-            value: accessToken.trim()
-          });
-
-          // Redirection vers la page de configuration ou de succès
-          route('/dashboard/integration/device/netatmo/setup');
-        } catch (e) {
-          console.error(`Erreur lors de l'échange du code d'authentification:`, e);
-          // Gérer l'erreur ici
-          window.location.href = authUrl;
-          route('/dashboard/integration/device/netatmo/setup');
-        }
-      } else {
-        route('/dashboard/integration/device/netatmo/setup');
-      }
+  getRedirectUri = async () => {
+    try {
+      const { result } = await this.props.httpClient.post('/api/v1/service/netatmo/connect');
+      const redirectUri = `${result.authUrl}&redirect_uri=${encodeURIComponent(this.props.redirectUriNetatmoSetup)}`
+      this.setState({
+        redirectUri: redirectUri,
+      });
+    } catch (e) {
+      console.error(e);
     }
-  }
+  };
+
   componentWillMount() {
     this.getNetatmoConfiguration();
   }
 
   async getNetatmoConfiguration() {
     let netatmoUsername = '';
-    let netatmoPassword = '';
     let netatmoClientId = '';
     let netatmoClientSecret = '';
-    let netatmoState = '';
     let netatmoScopesEnergy = '';
 
     this.setState({
       netatmoGetSettingsStatus: RequestStatus.Getting,
       netatmoUsername,
-      netatmoPassword,
       netatmoClientId,
       netatmoClientSecret,
-      netatmoState,
       netatmoScopesEnergy,
     });
     try {
@@ -89,7 +56,6 @@ class SetupTab extends Component {
       this.setState({
         netatmoGetSettingsStatus: RequestStatus.Success,
         netatmoUsername,
-        netatmoPassword,
         netatmoClientId,
         netatmoClientSecret,
         netatmoScopesEnergy,
@@ -102,10 +68,25 @@ class SetupTab extends Component {
     }
   }
 
-  async saveNetatmoConfiguration(e) {
-    let netatmoState = '';
+  async disconnectNetatmo(e) {
     e.preventDefault();
-    this.setState({
+    try {
+      await this.props.httpClient.post('/api/v1/service/netatmo/disconnect');
+
+      await this.setState({
+        netatmoSaveSettingsStatus: RequestStatus.Success,
+      });
+    } catch (e) {
+      await this.setState({
+        netatmoSaveSettingsStatus: RequestStatus.Error
+      });
+    }
+  }
+
+  async saveNetatmoConfiguration(e) {
+    e.preventDefault();
+
+    await this.setState({
       netatmoSaveSettingsStatus: RequestStatus.Getting
     });
     try {
@@ -125,45 +106,41 @@ class SetupTab extends Component {
         value: this.state.netatmoScopesEnergy.trim()
       });
 
-
-      // start service
-      const { result } = await this.props.httpClient.post('/api/v1/service/netatmo/connect');
-      console.log(result)
-      console.log(redirectUri)
-      const authUrl = `${result.authUrl}&redirect_uri=${encodeURIComponent(redirectUri)}`
-      console.log(authUrl)
-      console.log(result.state.trim()) // bca64c401aa1563e779f07dc64b1638f
-
-      await this.props.httpClient.post('/api/v1/service/netatmo/variable/NETATMO_STATE_OAUTH', {
-        value: result.state.trim()
-      });
-      window.location.href = authUrl;
-      this.setState({
-        netatmoState,
+      await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Success
       });
-      // await startNetatmoService();
-      // await this.props.httpClient.post('/api/v1/service/netatmo/start');
     } catch (e) {
-      bca64c401aa1563e779f07dc64b1638f
-      this.setState({
+      await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Error
       });
     }
-  }
-
-  handleCheckboxChange = (scope, isChecked) => {
-    let newScopes = new Set(this.state.netatmoScopesEnergy.split(' ')); // Créer un Set à partir des scopes actuels
-
-    if (isChecked) {
-      newScopes.add(scope); // Ajouter le scope si la case est cochée
-    } else {
-      newScopes.delete(scope); // Supprimer le scope si la case est décochée
+    try {
+      await this.setState({
+        netatmoSaveSettingsStatus: RequestStatus.Getting
+      });
+      // start service
+      await this.getRedirectUri();
+      // Open a new tab for authorization URL
+      if (this.state.redirectUri) {
+        window.location.href = this.state.redirectUri // window.open(this.state.redirectUri, '_blank');
+        await this.setState({
+          netatmoSaveSettingsStatus: RequestStatus.Success
+        });
+      } else {
+        console.error('Missing redirect URL');
+        await this.setState({
+          netatmoSaveSettingsStatus: RequestStatus.Error
+        });
+      }
+      await this.setState({
+        netatmoSaveSettingsStatus: RequestStatus.Success
+      });
+    } catch (e) {
+      console.error('erreur', e);
+      await this.setState({
+        netatmoSaveSettingsStatus: RequestStatus.Error
+      });
     }
-
-    // Transformer le Set en chaîne, séparée par des espaces
-    const newScopesString = Array.from(newScopes).filter(Boolean).join(' ');
-    this.setState({ netatmoScopesEnergy: newScopesString });
   }
 
   updateConfiguration(e) {
@@ -172,9 +149,21 @@ class SetupTab extends Component {
     });
   }
 
-  render(props, state) {
-    const scopesArray = this.state.netatmoScopesEnergy.split(' '); // Convertir la chaîne en tableau
+  handleCheckboxChange = (scope, isChecked) => {
+    let newScopes = new Set(this.state.netatmoScopesEnergy.split(' '));
 
+    if (isChecked) {
+      newScopes.add(scope);
+    } else {
+      newScopes.delete(scope);
+    }
+
+    const newScopesString = Array.from(newScopes).filter(Boolean).join(' ');
+    this.setState({ netatmoScopesEnergy: newScopesString });
+  }
+
+  render({ children, props, notOnGladysGateway, errored, errorCloseWindow, accessDenied, loading, netatmoConnected }, state) {
+    const scopesArray = this.state.netatmoScopesEnergy.split(' ');
     return (
       <div class="card">
         <div class="card-header">
@@ -185,11 +174,53 @@ class SetupTab extends Component {
         <div class="card-body">
           <div
             class={cx('dimmer', {
-              active: state.netatmoSaveSettingsStatus === RequestStatus.Getting
+              active: state.netatmoSaveSettingsStatus === RequestStatus.Getting || loading
             })}
           >
             <div class="loader" />
             <div class="dimmer-content">
+              {errored && (
+                <p class="alert alert-danger">
+                  <Text id="integration.netatmo.setup.error" />
+                </p>
+              )}
+              {accessDenied && (
+                <p class="text-center alert alert-warning">
+                  <Text id="integration.netatmo.setup.declineAuthorize" />
+                </p>
+              )}
+              {errorCloseWindow && (
+                <p class="text-center alert alert-danger">
+                  <Text id="integration.netatmo.setup.errorCloseWindow" />
+                </p>
+              )}
+              {console.log(netatmoConnected)}
+              {!accessDenied && !errorCloseWindow && (
+                netatmoConnected === STATUS.CONNECTING && (
+                  <p class="text-center alert alert-info">
+                    <Text id="integration.netatmo.setup.connecting" />
+                  </p>
+                )
+                || netatmoConnected === STATUS.NOT_INITIALIZED && (
+                  <p class="text-center alert alert-warning">
+                    <Text id="integration.netatmo.setup.notConfigured" />
+                  </p>
+                )
+                || netatmoConnected === STATUS.PROCESSING_TOKEN && (
+                  <p class="text-center alert alert-warning">
+                    <Text id="integration.netatmo.setup.processingToken" />
+                  </p>
+                )
+                || netatmoConnected === STATUS.CONNECTED && (
+                  <p class="text-center alert alert-success">
+                    <Text id="integration.netatmo.setup.connect" />
+                  </p>
+                )
+                || netatmoConnected === STATUS.DISCONNECTED && (
+                  <p class="text-center alert alert-danger">
+                    <Text id="integration.netatmo.setup.disconnect" />
+                  </p>
+                ))}
               <p>
                 <MarkupText id="integration.netatmo.setup.description" />
                 <MarkupText id="integration.netatmo.setup.descriptionCreateAccount" />
@@ -265,30 +296,30 @@ class SetupTab extends Component {
                     ))}
                   </div>
                 </div>
-
-                {/* <div class="form-group">
-                  <label htmlFor="netatmoScope" className="form-label">
-                    <Text id={`integration.netatmo.setup.scopeLabel`} />
-                  </label>
-                  <Localizer>
-                    <input
-                      name="netatmoScope"
-                      type="text"
-                      placeholder={<Text id="integration.netatmo.setup.scopePlaceholder" />}
-                      value={state.netatmoScopes}
-                      className="form-control"
-                      onInput={this.updateConfiguration.bind(this)}
-                    />
-                  </Localizer>
-                </div> */}
-
-                <div class="row mt-5">
-                  <div class="col">
-                    <button type="submit" class="btn btn-success" onClick={this.saveNetatmoConfiguration.bind(this)}>
-                      <Text id="integration.netatmo.setup.saveLabel" />
-                    </button>
+                {notOnGladysGateway && (
+                  <div class="d-flex justify-content-between mt-5">
+                    <Localizer>
+                      <button type="submit" class="btn btn-success" onClick={this.saveNetatmoConfiguration.bind(this)}>
+                        {netatmoConnected !== STATUS.CONNECTED && (
+                          <Text id="integration.netatmo.setup.saveAndConnectLabel" />
+                        )}
+                        {netatmoConnected === STATUS.CONNECTED && (
+                          <Text id="integration.netatmo.setup.newSaveAndReconnectLabel" />
+                        )}
+                      </button>
+                    </Localizer>
+                    {notOnGladysGateway && netatmoConnected === STATUS.CONNECTED && (
+                      <button
+                        onClick={this.disconnectNetatmo.bind(this)}
+                        class="btn btn-danger"
+                        disabled={netatmoConnected === STATUS.DISCONNECTING}
+                      >
+                        <Text id="integration.netatmo.setup.disconnectLabel" />
+                      </button>
+                    )}
                   </div>
-                </div>
+                )}
+
               </form>
             </div>
           </div>
@@ -298,4 +329,4 @@ class SetupTab extends Component {
   }
 }
 
-export default connect('httpClient,currentUrl', {})(SetupTab);
+export default connect('user,session,httpClient', {})(SetupTab);
