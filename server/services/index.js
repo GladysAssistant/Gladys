@@ -23,3 +23,4 @@ module.exports['nextcloud-talk'] = require('./nextcloud-talk');
 module.exports.tuya = require('./tuya');
 module.exports.melcloud = require('./melcloud');
 module.exports['node-red'] = require('./node-red');
+module.exports.netatmo = require('./netatmo');
