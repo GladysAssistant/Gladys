@@ -26,15 +26,18 @@ class SettingsSystemBatteryLevelWarning extends Component {
   };
 
   updateBatteryLevelUnderWarningThreshold = async e => {
+    let { value, min, max } = e.target;
+    value = Math.max(Number(min), Math.min(Number(max), Number(value)));
+
     await this.setState({
-      batteryLevelUnderWarningThreshold: e.target.value,
+      batteryLevelUnderWarningThreshold: value,
       savingBatteryLevelUnderWarning: true
     });
     try {
       await this.props.httpClient.post(
         `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD}`,
         {
-          value: e.target.value
+          value
         }
       );
     } catch (e) {
@@ -108,7 +111,7 @@ class SettingsSystemBatteryLevelWarning extends Component {
               <input
                 className="form-control"
                 type="number"
-                min="1"
+                min="0"
                 max="100"
                 disabled={savingBatteryLevelUnderWarning || !batteryLevelUnderWarningEnabled}
                 value={batteryLevelUnderWarningThreshold}
