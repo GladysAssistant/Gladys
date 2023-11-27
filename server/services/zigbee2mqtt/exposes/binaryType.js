@@ -78,6 +78,12 @@ const names = {
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },
+  battery_low: {
+    feature: {
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+      type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
+    },
+  },
 };
 
 module.exports = {
