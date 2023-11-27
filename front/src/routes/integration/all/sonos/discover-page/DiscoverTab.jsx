@@ -6,35 +6,9 @@ import style from './style.css';
 import SonosDeviceBox from '../SonosDeviceBox';
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
-import { RequestStatus } from '../../../../../utils/consts';
 
 class DiscoverTab extends Component {
-  async componentWillMount() {
-    this.getDiscoveredDevices();
-    this.getHouses();
-  }
-
-  async getHouses() {
-    this.setState({
-      housesGetStatus: RequestStatus.Getting
-    });
-    try {
-      const params = {
-        expand: 'rooms'
-      };
-      const housesWithRooms = await this.props.httpClient.get(`/api/v1/house`, params);
-      this.setState({
-        housesWithRooms,
-        housesGetStatus: RequestStatus.Success
-      });
-    } catch (e) {
-      this.setState({
-        housesGetStatus: RequestStatus.Error
-      });
-    }
-  }
-
-  async getDiscoveredDevices() {
+  getDiscoveredDevices = async () => {
     this.setState({
       loading: true
     });
@@ -58,6 +32,9 @@ class DiscoverTab extends Component {
         errorLoading: true
       });
     }
+  };
+  async componentWillMount() {
+    this.getDiscoveredDevices();
   }
 
   render(props, { loading, errorLoading, discoveredDevices, housesWithRooms }) {
@@ -68,11 +45,7 @@ class DiscoverTab extends Component {
             <Text id="integration.sonos.discover.title" />
           </h1>
           <div class="page-options d-flex">
-            <button
-              onClick={this.getDiscoveredDevices.bind(this)}
-              class="btn btn-outline-primary ml-2"
-              disabled={loading}
-            >
+            <button onClick={this.getDiscoveredDevices} class="btn btn-outline-primary ml-2" disabled={loading}>
               <Text id="integration.sonos.discover.scan" /> <i class="fe fe-radio" />
             </button>
           </div>
@@ -96,7 +69,7 @@ class DiscoverTab extends Component {
               <div class="row">
                 {discoveredDevices &&
                   discoveredDevices.map((device, index) => (
-                    <SonosDeviceBox saveButton device={device} deviceIndex={index} housesWithRooms={housesWithRooms} />
+                    <SonosDeviceBox saveButton device={device} deviceIndex={index} />
                   ))}
                 {!discoveredDevices || (discoveredDevices.length === 0 && <EmptyState />)}
               </div>

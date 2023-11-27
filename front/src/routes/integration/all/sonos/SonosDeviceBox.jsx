@@ -138,31 +138,33 @@ class SonosDeviceBox extends Component {
                   </Localizer>
                 </div>
 
-                <div class="form-group">
-                  <label class="form-label" for={`room_${deviceIndex}`}>
-                    <Text id="integration.sonos.roomLabel" />
-                  </label>
-                  <select
-                    id={`room_${deviceIndex}`}
-                    onChange={this.updateRoom}
-                    class="form-control"
-                    disabled={!editable || !validModel}
-                  >
-                    <option value="">
-                      <Text id="global.emptySelectOption" />
-                    </option>
-                    {housesWithRooms &&
-                      housesWithRooms.map(house => (
-                        <optgroup label={house.name}>
-                          {house.rooms.map(room => (
-                            <option selected={room.id === device.room_id} value={room.id}>
-                              {room.name}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
-                  </select>
-                </div>
+                {housesWithRooms && (
+                  <div class="form-group">
+                    <label class="form-label" for={`room_${deviceIndex}`}>
+                      <Text id="integration.sonos.roomLabel" />
+                    </label>
+                    <select
+                      id={`room_${deviceIndex}`}
+                      onChange={this.updateRoom}
+                      class="form-control"
+                      disabled={!editable || !validModel}
+                    >
+                      <option value="">
+                        <Text id="global.emptySelectOption" />
+                      </option>
+                      {housesWithRooms &&
+                        housesWithRooms.map(house => (
+                          <optgroup label={house.name}>
+                            {house.rooms.map(room => (
+                              <option selected={room.id === device.room_id} value={room.id}>
+                                {room.name}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                    </select>
+                  </div>
+                )}
 
                 <div class="form-group">
                   {device.alreadyExist && (
