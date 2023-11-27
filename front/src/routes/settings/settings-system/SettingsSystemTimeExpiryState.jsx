@@ -45,7 +45,7 @@ class SettingsSystemTimeExpiryState extends Component {
     this.getNumberOfHoursBeforeStateIsOutdated();
   }
 
-  render({}, { numberOfHoursBeforeStateIsOutdated, savingNumberOfHourseBeforeStateIsOutdated }) {
+  render({}, { numberOfHoursBeforeStateIsOutdated }) {
     return (
       <div class="card">
         <h4 class="card-header">
@@ -62,7 +62,6 @@ class SettingsSystemTimeExpiryState extends Component {
                 className="form-control"
                 type="number"
                 min="1"
-                disabled={savingNumberOfHourseBeforeStateIsOutdated}
                 value={numberOfHoursBeforeStateIsOutdated}
                 onChange={this.updateNumberOfHoursBeforeStateIsOutdated}
               />

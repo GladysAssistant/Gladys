@@ -75,7 +75,7 @@ class SettingsSystemBatteryLevelWarning extends Component {
     this.getBatteryLevelUnderWarning();
   }
 
-  render({}, { batteryLevelUnderWarningThreshold, batteryLevelUnderWarningEnabled, savingBatteryLevelUnderWarning }) {
+  render({}, { batteryLevelUnderWarningThreshold, batteryLevelUnderWarningEnabled }) {
     return (
       <div class="card">
         <h4 class="card-header d-flex flex-row justify-content-between">
@@ -113,7 +113,7 @@ class SettingsSystemBatteryLevelWarning extends Component {
                 type="number"
                 min="0"
                 max="100"
-                disabled={savingBatteryLevelUnderWarning || !batteryLevelUnderWarningEnabled}
+                disabled={!batteryLevelUnderWarningEnabled}
                 value={batteryLevelUnderWarningThreshold}
                 onChange={this.debouncedUpdateBatteryLevelUnderWarningThreshold}
               />
