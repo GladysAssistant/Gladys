@@ -55,9 +55,11 @@ class MusicComponent extends Component {
   };
 
   play = async () => {
+    await this.setState({ isPlaying: true });
     await this.setValueDevice(this.state.playFeature, 1);
   };
   pause = async () => {
+    await this.setState({ isPlaying: false });
     await this.setValueDevice(this.state.pauseFeature, 1);
   };
   next = async () => {
@@ -67,8 +69,10 @@ class MusicComponent extends Component {
     await this.setValueDevice(this.state.previousFeature, 1);
   };
   changeVolume = async e => {
-    const volume = e.target.value;
-    await this.setValueDevice(this.state.volumeFeature, parseInt(volume, 10));
+    const volume = parseInt(e.target.value, 10);
+    const newVolumeFeature = { ...this.state.volumeFeature, last_value: volume };
+    await this.setState({ volumeFeature: newVolumeFeature });
+    await this.setValueDevice(this.state.volumeFeature, volume, 10);
   };
 
   updateDeviceStateWebsocket = payload => {
