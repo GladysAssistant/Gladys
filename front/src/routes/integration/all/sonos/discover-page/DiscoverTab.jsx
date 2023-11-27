@@ -37,7 +37,7 @@ class DiscoverTab extends Component {
     this.getDiscoveredDevices();
   }
 
-  render(props, { loading, errorLoading, discoveredDevices, housesWithRooms }) {
+  render(props, { loading, errorLoading, discoveredDevices }) {
     return (
       <div class="card">
         <div class="card-header">
