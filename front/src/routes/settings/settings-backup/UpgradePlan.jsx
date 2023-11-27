@@ -1,8 +1,7 @@
-import get from 'get-value';
 import { Text } from 'preact-i18n';
 import SettingsLayout from '../SettingsLayout';
 
-const GatewayPage = ({ children, ...props }) => (
+const GatewayPage = ({}) => (
   <SettingsLayout>
     <div class="row">
       <div class="col-md-12">

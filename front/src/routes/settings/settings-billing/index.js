@@ -34,7 +34,7 @@ class SettingsBilling extends Component {
     this.getCurrentPlan();
   }
 
-  render(props, { loading, plan }) {
+  render(props, { loading }) {
     return (
       <SettingsLayout>
         <GatewayBilling openStripeBilling={this.openStripeBilling} loading={loading} />
