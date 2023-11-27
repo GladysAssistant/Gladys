@@ -89,7 +89,7 @@ class SceneTagFilter extends Component {
     return (
       <div
         ref={this.setDropdownRef}
-        class={cx('btn-group', {
+        class={cx('mr-2', 'btn-group', {
           show: tagFilterDropdownOpened
         })}
       >
