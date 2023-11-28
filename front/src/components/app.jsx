@@ -47,6 +47,7 @@ import EditDashboard from '../routes/dashboard/edit-dashboard';
 import IntegrationPage from '../routes/integration';
 import ChatPage from '../routes/chat';
 import MapPage from '../routes/map';
+import EventLogPage from '../routes/event-log';
 import MapNewAreaPage from '../routes/map/NewArea';
 import CalendarPage from '../routes/calendar';
 import ScenePage from '../routes/scene';
@@ -306,6 +307,7 @@ const AppRouter = connect(
 
         <ChatPage path="/dashboard/chat" />
         <MapPage path="/dashboard/maps" />
+        <EventLogPage path="/dashboard/event-log" />
         <MapNewAreaPage path="/dashboard/maps/area/new" />
         <MapNewAreaPage path="/dashboard/maps/area/edit/:areaSelector" />
         <CalendarPage path="/dashboard/calendar" />

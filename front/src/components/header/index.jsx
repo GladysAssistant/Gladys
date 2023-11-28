@@ -167,6 +167,16 @@ const Header = ({ ...props }) => {
                     </Link>
                   </li>
                 )}
+                <li class="nav-item">
+                  <Link
+                    href="/dashboard/event-log"
+                    class={cx('nav-link', {
+                      active: props.currentUrl === '/dashboard/event-log'
+                    })}
+                  >
+                    <i class="fe fe-message-square" /> <Text id="header.event-log" />
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
