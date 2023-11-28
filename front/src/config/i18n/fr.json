@@ -2720,7 +2720,8 @@
     "profile": "Profil",
     "settings": "Paramètres",
     "needHelp": "Besoin d'aide",
-    "signOut": "Déconnexion"
+    "signOut": "Déconnexion",
+    "event-log": "Journal d'évènements"
   },
   "gatewayLinkUser": {
     "title": "Configurer Gladys Plus",
