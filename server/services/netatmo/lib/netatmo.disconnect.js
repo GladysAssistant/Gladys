@@ -4,6 +4,7 @@ const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 
 /**
  * @description Disconnects service and dependencies.
+ * @param {object} netatmoHandler - Netatmo handler.
  * @example
  * disconnect();
  */
@@ -19,9 +20,8 @@ function disconnect(netatmoHandler) {
     access_token: '',
     refresh_token: '',
     expire_in: 0,
-    connected: false
+    connected: false,
   };
-  netatmoHandler.connector = null;
   netatmoHandler.setTokens(tokens);
 
   netatmoHandler.status = STATUS.DISCONNECTED;

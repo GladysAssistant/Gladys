@@ -912,6 +912,10 @@ const WEBSOCKET_MESSAGE_TYPES = {
   NETATMO: {
     STATUS: 'netatmo.status',
     DISCOVER: 'netatmo.discover',
+    ERROR: {
+      CONNECTING: 'netatmo.error-connecting',
+      PROCESSING_TOKEN: 'netatmo.error-processing-token',
+    },
   },
   MELCLOUD: {
     STATUS: 'melcloud.status',

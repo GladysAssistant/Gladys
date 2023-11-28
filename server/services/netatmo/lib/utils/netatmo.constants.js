@@ -8,15 +8,15 @@ const GLADYS_VARIABLES = {
   CONNECTED: 'NETATMO_CONNECTED',
   ACCESS_TOKEN: 'NETATMO_ACCESS_TOKEN',
   REFRESH_TOKEN: 'NETATMO_REFRESH_TOKEN',
-  EXPIRE_IN_TOKEN: 'NETATMO_EXPIRE_IN_TOKEN'
+  EXPIRE_IN_TOKEN: 'NETATMO_EXPIRE_IN_TOKEN',
 };
 
 const SCOPES = {
   ENERGY: {
     read: 'read_thermostat',
-    write: 'write_thermostat'
-  }
-}
+    write: 'write_thermostat',
+  },
+};
 const STATUS = {
   NOT_INITIALIZED: 'not_initialized',
   CONNECTING: 'connecting',
@@ -27,7 +27,6 @@ const STATUS = {
   ERROR: 'error',
   DISCOVERING_DEVICES: 'discovering',
 };
-
 
 module.exports = {
   GLADYS_VARIABLES,

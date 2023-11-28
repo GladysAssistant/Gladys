@@ -15,23 +15,10 @@ module.exports = function NetatmoService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Netatmo service', serviceId);
-    const initResponse = await netatmoHandler.init();
-    logger.error('initResponse:', initResponse);
-    return initResponse; // Renvoie la réponse de init
+    await netatmoHandler.init();
     // await netatmoHandler.loadDevices();
   }
-
-  // /**
-  //  * @public
-  //  * @description This function callback service.
-  //  * @example
-  //  * gladys.services.netatmo.callback();
-  //  */
-  // async function callback() {
-  //   logger.info('Callback authentication Netatmo service', serviceId);
-  //   ???
-  // }
-
+  
   /**
    * @public
    * @description This function stops the service.
@@ -51,7 +38,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
    *  const used = await gladys.services.netatmo.isUsed();
    */
   async function isUsed() {
-    return netatmoHandler.status === STATUS.CONNECTED && netatmoHandler.connector !== null;
+    return netatmoHandler.status === STATUS.CONNECTED;
   }
 
   return Object.freeze({
