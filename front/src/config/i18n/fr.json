@@ -2487,7 +2487,7 @@
     },
     "child-lock": {
       "shortCategoryName": "Sécurité enfant",
-      "mode": "Sécurité enfant"
+      "binary": "Sécurité enfant"
     },
     "smoke-sensor": {
       "shortCategoryName": "Détecteur de fumée",
