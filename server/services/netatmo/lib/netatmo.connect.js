@@ -19,7 +19,7 @@ const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 async function connect(netatmoHandler, configuration) {
   const { clientId, clientSecret, scopes } = configuration;
 
-  if (!clientId || !clientSecret) {
+  if (!clientId || !clientSecret || !scopes) {
     this.status = STATUS.NOT_INITIALIZED;
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
   }
@@ -34,21 +34,10 @@ async function connect(netatmoHandler, configuration) {
 
   this.stateGetAccessToken = crypto.randomBytes(16).toString('hex');
   const scopeValue = scopes && scopes.scopeEnergy ? scopes.scopeEnergy : SCOPES.ENERGY.read;
-  try {
-    this.redirectUri = `${this.baseUrl}/oauth2/authorize?client_id=${clientId}&scope=${encodeURIComponent(
-      scopeValue,
-    )}&state=${this.stateGetAccessToken}`;
-    this.configured = true;
-    return { authUrl: this.redirectUri, state: this.stateGetAccessToken };
-  } catch (e) {
-    this.status = STATUS.ERROR;
-    netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: this.status },
-    });
-    logger.error('Error connecting to Netatmo - Details:', e.response ? e.response.data : e);
-    throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
-  }
+  this.redirectUri = `${this.baseUrl}/oauth2/authorize?client_id=${clientId}&scope=${encodeURIComponent(scopeValue)
+    }&state=${this.stateGetAccessToken}`;
+  this.configured = true;
+  return { authUrl: this.redirectUri, state: this.stateGetAccessToken };
 }
 
 /**
@@ -58,14 +47,19 @@ async function connect(netatmoHandler, configuration) {
  * @param {object} body - Netatmo code to retrieve access tokens.
  * @returns {Promise<object>} Netatmo access token.
  * @example
- * await netatmo.retrieveTokens(netatmoHandler, {
- *  clientId, clientSecret, accessToken, refreshToken, scopes
- * });
+ * await netatmo.retrieveTokens(netatmoHandler,
+ *  {
+ *    clientId, clientSecret, scopes
+ *  },
+ *  {
+ *    codeOAuth, state, redirectUri
+ *  },
+ * );
  */
 async function retrieveTokens(netatmoHandler, configuration, body) {
   const { clientId, clientSecret, scopes } = configuration;
-
-  if (!clientId || !clientSecret || !body.codeOAuth) {
+  const { codeOAuth, state, redirectUri } = body;
+  if (!clientId || !clientSecret || !scopes || !scopes.scopeEnergy || !codeOAuth) {
     netatmoHandler.status = STATUS.NOT_INITIALIZED;
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
   }
@@ -76,7 +70,7 @@ async function retrieveTokens(netatmoHandler, configuration, body) {
     payload: { status: this.status },
   });
 
-  if (body.state !== netatmoHandler.stateGetAccessToken) {
+  if (state !== netatmoHandler.stateGetAccessToken) {
     this.status = STATUS.NOT_INITIALIZED;
     throw new ServiceNotConfiguredError(
       'Netatmo did not connect correctly. The return does not correspond to the initial request',
@@ -90,7 +84,7 @@ async function retrieveTokens(netatmoHandler, configuration, body) {
     grant_type: 'authorization_code',
     client_id: clientId,
     client_secret: clientSecret,
-    redirect_uri: body.redirectUri,
+    redirect_uri: redirectUri,
     scope: scopeValue,
     code: body.codeOAuth,
   };
@@ -104,6 +98,8 @@ async function retrieveTokens(netatmoHandler, configuration, body) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', Host: 'api.netatmo.com' },
       data: querystring.stringify(authentificationForm),
     });
+
+    console.log('response', response)
     const tokens = {
       ...response.data,
       connected: true,
@@ -111,6 +107,7 @@ async function retrieveTokens(netatmoHandler, configuration, body) {
     await netatmoHandler.setTokens(tokens);
     accessToken = response.data.access_token;
     refreshToken = response.data.refresh_token;
+    this.configured = true;
     this.status = STATUS.CONNECTED;
     logger.debug('Netatmo new access tokens well loaded');
   } catch (e) {
