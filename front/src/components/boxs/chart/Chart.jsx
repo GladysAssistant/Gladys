@@ -399,7 +399,7 @@ class Chartbox extends Component {
             </div>
           </div>
 
-          {displayVariation && emptySeries === false && (
+          {displayVariation && props.box.chart_type !== 'timeline' && emptySeries === false && (
             <div class="d-flex align-items-baseline">
               {notNullNotUndefined(lastValueRounded) && !Number.isNaN(lastValueRounded) && (
                 <div class="h1 mb-0 mr-2">

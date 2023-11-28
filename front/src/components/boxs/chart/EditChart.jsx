@@ -20,6 +20,10 @@ const FEATURE_BINARY = {
   [DEVICE_FEATURE_TYPES.LIGHT.BINARY]: true
 };
 
+const CHART_TYPE_OTHERS = ['line', 'stepline', 'area', 'bar'];
+
+const CHART_TYPE_BINARY = ['timeline'];
+
 class EditChart extends Component {
   showPreview = () => {
     this.setState({
@@ -106,13 +110,7 @@ class EditChart extends Component {
           this.deviceFeatureBySelector.set(feature.selector, feature);
           // We don't support all devices for this view
           if (!FEATURES_THAT_ARE_NOT_COMPATIBLE[feature.type]) {
-            if (this.props.box.chart_type === 'timeline') {
-              if (FEATURE_BINARY[feature.type]) {
-                deviceFeaturesOptions.push(featureOption);
-              }
-            } else if (!FEATURE_BINARY[feature.type]) {
-              deviceFeaturesOptions.push(featureOption);
-            }
+            deviceFeaturesOptions.push(featureOption);
           }
           if (this.props.box.device_features && this.props.box.device_features.indexOf(feature.selector) !== -1) {
             selectedDeviceFeaturesOptions.push(featureOption);
@@ -133,7 +131,31 @@ class EditChart extends Component {
           });
         }
       });
-      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false });
+
+      let chartTypeList = [...CHART_TYPE_BINARY, ...CHART_TYPE_OTHERS];
+
+      //Filter
+      if (selectedDeviceFeaturesOptions.length > 0) {
+        const firstDeviceSelector = this.deviceFeatureBySelector.get(selectedDeviceFeaturesOptions[0].value);
+
+        if (FEATURE_BINARY[firstDeviceSelector.type]) {
+          deviceOptions.forEach(deviceOption => {
+            deviceOption.options = deviceOption.options.filter(featureOption => {
+              return FEATURE_BINARY[this.deviceFeatureBySelector.get(featureOption.value).type];
+            });
+          });
+          chartTypeList = CHART_TYPE_BINARY;
+        } else {
+          deviceOptions.forEach(deviceOption => {
+            deviceOption.options = deviceOption.options.filter(featureOption => {
+              return !FEATURE_BINARY[this.deviceFeatureBySelector.get(featureOption.value).type];
+            });
+          });
+          chartTypeList = CHART_TYPE_OTHERS;
+        }
+      }
+
+      await this.setState({ deviceOptions, selectedDeviceFeaturesOptions, loading: false, chartTypeList });
     } catch (e) {
       console.error(e);
       this.setState({ loading: false });
@@ -158,7 +180,7 @@ class EditChart extends Component {
     }
   }
 
-  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview }) {
+  render(props, { selectedDeviceFeaturesOptions, deviceOptions, loading, displayPreview, chartTypeList }) {
     return (
       <BaseEditBox {...props} titleKey="dashboard.boxTitle.chart" titleValue={props.box.title}>
         <div class={loading ? 'dimmer active' : 'dimmer'}>
@@ -202,21 +224,12 @@ class EditChart extends Component {
                 <option>
                   <Text id="global.emptySelectOption" />
                 </option>
-                <option value="line">
-                  <Text id="dashboard.boxes.chart.line" />
-                </option>
-                <option value="stepline">
-                  <Text id="dashboard.boxes.chart.stepline" />
-                </option>
-                <option value="area">
-                  <Text id="dashboard.boxes.chart.area" />
-                </option>
-                <option value="bar">
-                  <Text id="dashboard.boxes.chart.bar" />
-                </option>
-                <option value="timeline">
-                  <Text id="dashboard.boxes.chart.timeline" />
-                </option>
+                {chartTypeList &&
+                  chartTypeList.map(chartType => (
+                    <option value={chartType}>
+                      <Text id={`dashboard.boxes.chart.${chartType}`} />
+                    </option>
+                  ))}
               </select>
             </div>
             <div class="form-group">
@@ -236,51 +249,56 @@ class EditChart extends Component {
                 </option>
               </select>
             </div>
-            <div class="form-group">
-              <label>
-                <Text id="dashboard.boxes.chart.displayVariation" />
-              </label>
-              <select
-                onChange={this.updateDisplayVariation}
-                class="form-control"
-                value={props.box.display_variation ? 'yes' : 'no'}
-              >
-                <option value="yes">
-                  <Text id="dashboard.boxes.chart.yes" />
-                </option>
-                <option value="no">
-                  <Text id="dashboard.boxes.chart.no" />
-                </option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label>
-                <Text id="dashboard.boxes.chart.defaultInterval" />
-              </label>
-              <select onChange={this.updateDefaultInterval} class="form-control" value={props.box.interval}>
-                <option>
-                  <Text id="global.emptySelectOption" />
-                </option>
-                <option value="last-hour">
-                  <Text id="dashboard.boxes.chart.lastHour" />
-                </option>
-                <option value="last-day">
-                  <Text id="dashboard.boxes.chart.lastDay" />
-                </option>
-                <option value="last-week">
-                  <Text id="dashboard.boxes.chart.lastSevenDays" />
-                </option>
-                <option value="last-month">
-                  <Text id="dashboard.boxes.chart.lastThirtyDays" />
-                </option>
-                <option value="last-three-months">
-                  <Text id="dashboard.boxes.chart.lastThreeMonths" />
-                </option>
-                <option value="last-year">
-                  <Text id="dashboard.boxes.chart.lastYear" />
-                </option>
-              </select>
-            </div>
+            {props.box.chart_type !== 'timeline' && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.chart.displayVariation" />
+                </label>
+                <select
+                  onChange={this.updateDisplayVariation}
+                  className="form-control"
+                  value={props.box.display_variation ? 'yes' : 'no'}
+                >
+                  <option value="yes">
+                    <Text id="dashboard.boxes.chart.yes" />
+                  </option>
+                  <option value="no">
+                    <Text id="dashboard.boxes.chart.no" />
+                  </option>
+                </select>
+              </div>
+            )}
+            {props.box.chart_type !== 'timeline' && (
+              <div class="form-group">
+                <label>
+                  <Text id="dashboard.boxes.chart.defaultInterval" />
+                </label>
+                <select onChange={this.updateDefaultInterval} className="form-control" value={props.box.interval}>
+                  <option>
+                    <Text id="global.emptySelectOption" />
+                  </option>
+                  <option value="last-hour">
+                    <Text id="dashboard.boxes.chart.lastHour" />
+                  </option>
+                  <option value="last-day">
+                    <Text id="dashboard.boxes.chart.lastDay" />
+                  </option>
+                  <option value="last-week">
+                    <Text id="dashboard.boxes.chart.lastSevenDays" />
+                  </option>
+                  <option value="last-month">
+                    <Text id="dashboard.boxes.chart.lastThirtyDays" />
+                  </option>
+                  <option value="last-three-months">
+                    <Text id="dashboard.boxes.chart.lastThreeMonths" />
+                  </option>
+                  <option value="last-year">
+                    <Text id="dashboard.boxes.chart.lastYear" />
+                  </option>
+                </select>
+              </div>
+            )}
+
             <div class="form-group">
               <label>
                 <Text id="dashboard.boxes.chart.preview" />
