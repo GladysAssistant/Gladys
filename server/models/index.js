@@ -45,6 +45,7 @@ const SessionModel = require('./session');
 const TagScene = require('./tag_scene');
 const UserModel = require('./user');
 const VariableModel = require('./variable');
+const EventLogModel = require('./event_log');
 
 const models = {
   Area: AreaModel(sequelize, Sequelize),
@@ -70,6 +71,7 @@ const models = {
   TagScene: TagScene(sequelize, Sequelize),
   User: UserModel(sequelize, Sequelize),
   Variable: VariableModel(sequelize, Sequelize),
+  EventLog: EventLogModel(sequelize, Sequelize),
 };
 
 // Associate all model

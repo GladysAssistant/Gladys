@@ -998,6 +998,13 @@ const ALARM_MODES = {
   PANIC: 'panic',
 };
 
+const EVENT_LOG_TYPES = {
+  CALENDAR : {
+    CREATION : 'creation',
+    DELETION : 'deletion'
+  }
+}
+
 const createList = (obj) => {
   const list = [];
   Object.keys(obj).forEach((key) => {
@@ -1100,3 +1107,5 @@ module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;
 
 module.exports.ALARM_MODES = ALARM_MODES;
 module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
+
+module.exports.EVENT_LOG_TYPES = EVENT_LOG_TYPES;
