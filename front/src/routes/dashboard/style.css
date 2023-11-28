@@ -75,3 +75,17 @@
     display: none;
   }
 }
+
+.tabletModeDiv {
+  opacity: 0;
+  max-height: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
+  padding: 0rem;
+}
+
+.tabletModeDivOpen {
+  visibility: visible;
+  opacity: 1;
+  max-height: 20rem;
+}

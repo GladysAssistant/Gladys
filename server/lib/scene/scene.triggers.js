@@ -25,6 +25,15 @@ const triggersFunc = {
   [EVENTS.HOUSE.NO_LONGER_EMPTY]: (event, trigger) => event.house === trigger.house,
   [EVENTS.AREA.USER_ENTERED]: (event, trigger) => event.user === trigger.user && event.area === trigger.area,
   [EVENTS.AREA.USER_LEFT]: (event, trigger) => event.user === trigger.user && event.area === trigger.area,
+  [EVENTS.ALARM.ARM]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.ARMING]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.DISARM]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.PARTIAL_ARM]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.PANIC]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.ALARM.TOO_MANY_CODES_TESTS]: (event, trigger) => event.house === trigger.house,
+  [EVENTS.SYSTEM.START]: () => true,
+  [EVENTS.MQTT.RECEIVED]: (event, trigger) =>
+    event.topic === trigger.topic && (trigger.message === '' || trigger.message === event.message),
 };
 
 module.exports = {

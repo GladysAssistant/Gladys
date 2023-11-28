@@ -10,7 +10,7 @@ const job = new Job(event);
 const RANDOM_IMAGE =
   'image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z/C/HgAGgwJ/lK3Q6wAAAABJRU5ErkJggg==';
 
-describe('Camera.getImageInRoom', () => {
+describe('Camera.getImagesInRoom', () => {
   it('should return image', async () => {
     const stateManager = new StateManager(event);
     const deviceManager = new Device(event, {}, stateManager, {}, {}, {}, job);
@@ -26,7 +26,7 @@ describe('Camera.getImageInRoom', () => {
       ],
     });
     await deviceManager.camera.setImage('test-camera', RANDOM_IMAGE);
-    const cameraImage = await deviceManager.camera.getImageInRoom('2398c689-8b47-43cc-ad32-e98d9be098b5');
-    expect(cameraImage).to.equal(RANDOM_IMAGE);
+    const cameraImage = await deviceManager.camera.getImagesInRoom('2398c689-8b47-43cc-ad32-e98d9be098b5');
+    expect(cameraImage[0]).to.equal(RANDOM_IMAGE);
   });
 });

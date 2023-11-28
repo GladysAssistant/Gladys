@@ -68,5 +68,10 @@
     "key": "melcloud",
     "link": "melcloud",
     "img": "/assets/integrations/cover/melcloud.jpg"
+  },
+  {
+    "key": "nodeRed",
+    "link": "node-red",
+    "img": "/assets/integrations/cover/node-red.jpg"
   }
 ]

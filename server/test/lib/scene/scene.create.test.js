@@ -26,6 +26,7 @@ describe('SceneManager', () => {
           },
         ],
       ],
+      tags: [],
     });
     expect(scene).to.have.property('selector', 'my-living-room');
     assertSinon.calledOnce(brain.addNamedEntity);
@@ -43,6 +44,7 @@ describe('SceneManager', () => {
           },
         ],
       ],
+      tags: [],
     });
     expect(scene).to.have.property('selector', 'my-custom-selector');
   });
@@ -56,6 +58,7 @@ describe('SceneManager', () => {
           type: ACTIONS.LIGHT.TURN_ON,
         },
       ],
+      tags: [],
     });
     return assert.isRejected(promise);
   });
