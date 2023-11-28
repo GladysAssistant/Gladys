@@ -576,7 +576,6 @@
             "write": "Actions on thermostats (write_thermostat)"
           }
         },
-        
         "saveAndConnectLabel": "Save Configuration & Connect",
         "newSaveAndReconnectLabel": "Save New Configuration & Reconnect",
         "connectLabel": "Connect",
@@ -585,18 +584,23 @@
         "connect": "Gladys is connected to Netatmo",
         "disconnect": "Gladys is not connected to Netatmo",
         "notConfigured": "The Netatmo service is not configured",
-  
+
         "description": "You can connect Gladys to your Netatmo account to control the associated devices.",
         "descriptionCreateAccount": "You need to create an account on <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionCreateProject": "You must then create an \"App\" in your <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a> account.",
         "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\".",
 
+        "errorConnecting": {
+          "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum. You can then close this tab.",
+          "other_error_NetatmoPage": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
+          "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
+          "invalid_client": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>"
+        },
+
         "error": "An error occurred while saving the configuration.",
-        "errorCloseWindow": "Error during authorization, closing in 60 seconds. You can inspect the error in your browser's console with a right click.",
-        "declineAuthorize": "Authorization declined, closing in 10 seconds.",
         "connecting": "Configuration saved. Connecting to your Netatmo account...",
         "processingToken": "Connecting to your Netatmo account... Retrieving access token.",
-
+        
         "connected": "Successfully connected to the Netatmo account!",
         "connectionError": "Error during connection, please check your configuration."
       },

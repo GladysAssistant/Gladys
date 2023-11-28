@@ -718,9 +718,14 @@
         "descriptionCreateProject": "Vous devez ensuite créer une \"Apps\" dans votre compte <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\".",
 
+        "errorConnecting": {
+          "other_error": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum. Vous pouvez ensuite fermer cet onglet.",
+          "other_error_NetatmoPage": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum.",
+          "access_denied": "Autorisation déclinée, Veuillez tenter de nouveau et accepter la demande d'accès à vos données.",
+          "invalid_client": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>"
+        },
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
-        "errorCloseWindow": "Erreur lors de l'authorisation, fermeture dans 60 secondes. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur",
-        "declineAuthorize": "Autorisation déclinée, fermeture dans 10 secondes.",
+        
         "connecting": "Configuration sauvegardée. Connexion à votre compte Netatmo en cours...",
         "processingToken": "Connexion à votre compte Netatmo... Récupération du token d'accès.",
         
