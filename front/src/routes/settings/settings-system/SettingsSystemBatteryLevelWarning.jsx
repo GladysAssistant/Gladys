@@ -27,7 +27,9 @@ class SettingsSystemBatteryLevelWarning extends Component {
 
   updateBatteryLevelUnderWarningThreshold = async e => {
     let { value, min, max } = e.target;
-    value = Math.max(Number(min), Math.min(Number(max), Number(value)));
+    if (value !== undefined && value !== null && value !== '') {
+      value = Math.max(Number(min), Math.min(Number(max), Number(value)));
+    }
 
     await this.setState({
       batteryLevelUnderWarningThreshold: value,
