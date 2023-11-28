@@ -7,23 +7,25 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
 class DevicePage extends Component {
-
   getConnectedState = async () => {
     let connectNetatmoStatus = STATUS.CONNECTING;
 
     this.setState({
-      connectNetatmoStatus,
+      connectNetatmoStatus
     });
     try {
-      const { value: connectedState } = await this.props.httpClient.get('/api/v1/service/netatmo/variable/NETATMO_CONNECTED');
-      if (connectedState == true) connectNetatmoStatus = STATUS.CONNECTED; else connectNetatmoStatus = STATUS.DISCONNECTED;
+      const { value: connectedState } = await this.props.httpClient.get(
+        '/api/v1/service/netatmo/variable/NETATMO_CONNECTED'
+      );
+      if (connectedState == true) connectNetatmoStatus = STATUS.CONNECTED;
+      else connectNetatmoStatus = STATUS.DISCONNECTED;
       this.setState({
-        connectNetatmoStatus,
+        connectNetatmoStatus
       });
     } catch (e) {
-      console.log(e)
+      console.log(e);
       this.setState({
-        connectNetatmoStatus: STATUS.NOT_INITIALIZED,
+        connectNetatmoStatus: STATUS.NOT_INITIALIZED
       });
     }
   };
@@ -38,7 +40,8 @@ class DevicePage extends Component {
     let configuration = {};
     try {
       configuration = await this.props.httpClient.get('/api/v1/service/netatmo/config');
-      if (Number(configuration.connected) === 1) connectNetatmoStatus = STATUS.CONNECTED; else connectNetatmoStatus = STATUS.DISCONNECTED;
+      if (Number(configuration.connected) === 1) connectNetatmoStatus = STATUS.CONNECTED;
+      else connectNetatmoStatus = STATUS.DISCONNECTED;
     } catch (e) {
       console.error(e);
     } finally {
@@ -69,14 +72,14 @@ class DevicePage extends Component {
     }
   };
 
-  updateStatus = async (state) => {
+  updateStatus = async state => {
     this.setState({
-      connectNetatmoStatus: state.status,
+      connectNetatmoStatus: state.status
     });
   };
 
-  updateStatusError = async (state) => {
-    console.log('state', state)
+  updateStatusError = async state => {
+    console.log('state', state);
     switch (state.statusType) {
       case STATUS.CONNECTING:
         this.setState({
@@ -86,13 +89,13 @@ class DevicePage extends Component {
         break;
       case STATUS.PROCESSING_TOKEN:
         this.setState({
-          connectNetatmoStatus: state.status,
+          connectNetatmoStatus: state.status
         });
         break;
     }
   };
 
-  handleStateUpdateFromChild = (newState) => {
+  handleStateUpdateFromChild = newState => {
     this.setState(newState);
   };
 
@@ -102,13 +105,19 @@ class DevicePage extends Component {
     // this.loadStatus();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatusError);
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN, this.updateStatus);
+    this.props.session.dispatcher.addListener(
+      WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
+      this.updateStatus
+    );
   }
 
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatus);
-    this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN, this.updateStatus);
+    this.props.session.dispatcher.removeListener(
+      WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
+      this.updateStatus
+    );
   }
 
   render(props, state, { loading }) {

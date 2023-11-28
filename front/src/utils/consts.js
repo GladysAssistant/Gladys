@@ -75,7 +75,7 @@ export const RequestStatus = {
   ValidationError: 'ValidationError',
   RateLimitError: 'RateLimitError',
   ServiceConnected: 'ServiceConnected',
-  ServiceDisconnected: 'ServiceDisconnected', 
+  ServiceDisconnected: 'ServiceDisconnected',
   ServiceNotConfigured: 'ServiceNotConfigured',
   GatewayNoInstanceFound: 'GatewayNoInstanceFound',
   UserNotAcceptedLocally: 'UserNotAcceptedLocally',

@@ -667,7 +667,7 @@
         "addDeviceButton": "Ajouter",
         "deviceNotHandled": "Equipements non pris en charge",
         "foundDevice": "Equipements trouvés",
-        
+
         "updates": "Vérifier les mises à jour"
       },
 
@@ -679,7 +679,7 @@
         "disconnect": "Aucun appareil Netatmo ne peut être détecté. Vous devez d'abord vous reconnecter depuis le menu 'Paramètres'.",
         "alreadyCreatedButton": "Déjà créé",
         "refreshButton": "Mettre à jour",
-        
+
         "error": "Erreur de découverte des appareils Netatmo. Veuillez vérifier vos informations d'identification lors de l'installation.",
         "scan": "Scanner"
       },
@@ -696,14 +696,14 @@
         "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
         "scopeLabel": "Etendue de connexion (Sélectionner les actions que vous souhaitez réaliser)",
         "scopePlaceholder": "",
-        "scopes":{
+        "scopes": {
           "netatmoEnergy": "Netatmo Energie (Thermostat, Vanne)",
           "ENERGY": {
             "read": "Lire les données des thermostats (read_thermostat)",
             "write": "Actions sur les thermostats (write_thermostat)"
           }
         },
-        
+
         "saveAndConnectLabel": "Sauvegarder la configuration & Connecter",
         "newSaveAndReconnectLabel": "Sauvegarder la nouvelle configuration & Reconnecter",
         "connectLabel": "Connecter",
@@ -712,7 +712,7 @@
         "connect": "Gladys est connectée à Netatmo",
         "disconnect": "Gladys n'est pas connectée à Netatmo",
         "notConfigured": "Le service Netatmo n'est pas configuré Netatmo",
-        
+
         "description": "Vous pouvez connecter Gladys à votre compte Netatmo pour commander les appareils associés.",
         "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionCreateProject": "Vous devez ensuite créer une \"Apps\" dans votre compte <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
@@ -725,13 +725,12 @@
           "invalid_client": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>"
         },
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
-        
+
         "connecting": "Configuration sauvegardée. Connexion à votre compte Netatmo en cours...",
         "processingToken": "Connexion à votre compte Netatmo... Récupération du token d'accès.",
-        
+
         "connected": "Connexion réussie au compte Netatmo !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
-      
       },
 
       "error": {

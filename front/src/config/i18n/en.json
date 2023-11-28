@@ -509,7 +509,7 @@
       "documentation": "Netatmo Documentation",
       "discoverDeviceDescr": "Automatically scan Netatmo devices",
       "alreadyCreatedButton": "Already created",
-      
+
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter your device name",
       "modelLabel": "Model",
@@ -541,7 +541,7 @@
         "noFeatures": "No features",
         "deviceNotHandled": "Device is not handled",
         "foundDevice": "Device Found",
-        
+
         "updates": "Check for Updates"
       },
       "discover": {
@@ -552,7 +552,7 @@
         "disconnect": "No Netatmo devices can be detected. You must first log back in from the 'Settings' menu.",
         "alreadyCreatedButton": "Already created",
         "refreshButton": "Update datas",
-        
+
         "error": "Error discovering Netatmo devices. Please check your credentials during setup.",
         "scan": "Scan"
       },
@@ -600,7 +600,7 @@
         "error": "An error occurred while saving the configuration.",
         "connecting": "Configuration saved. Connecting to your Netatmo account...",
         "processingToken": "Connecting to your Netatmo account... Retrieving access token.",
-        
+
         "connected": "Successfully connected to the Netatmo account!",
         "connectionError": "Error during connection, please check your configuration."
       },

@@ -12,13 +12,13 @@ class SetupTab extends Component {
     e.preventDefault();
 
     await this.setState({
-      netatmoDisconnectStatus: RequestStatus.Getting,
+      netatmoDisconnectStatus: RequestStatus.Getting
     });
     try {
       await this.props.httpClient.post('/api/v1/service/netatmo/disconnect');
       this.props.updateStateInIndex({ connectNetatmoStatus: STATUS.DISCONNECTED });
       await this.setState({
-        netatmoDisconnectStatus: RequestStatus.Success,
+        netatmoDisconnectStatus: RequestStatus.Success
       });
     } catch (e) {
       await this.setState({
@@ -61,11 +61,13 @@ class SetupTab extends Component {
       newScopes.delete(scope);
     }
 
-    const newScopesString = Array.from(newScopes).filter(Boolean).join(' ');
+    const newScopesString = Array.from(newScopes)
+      .filter(Boolean)
+      .join(' ');
     this.props.updateStateInIndex({
       netatmoScopesEnergy: newScopesString
     });
-  }
+  };
 
   componentWillUnmount() {
     if (this.showClientSecretTimer) {
@@ -101,32 +103,32 @@ class SetupTab extends Component {
                   <Text id={`integration.netatmo.setup.errorConnecting.${props.messageAlert}`} />
                 </p>
               )}
-              {!props.accessDenied && (
-                props.connectNetatmoStatus === STATUS.CONNECTING && (
+              {!props.accessDenied &&
+                ((props.connectNetatmoStatus === STATUS.CONNECTING && (
                   <p class="text-center alert alert-info">
                     <Text id="integration.netatmo.setup.connecting" />
                   </p>
-                )
-                || props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
-                  <p class="text-center alert alert-warning">
-                    <Text id="integration.netatmo.setup.notConfigured" />
-                  </p>
-                )
-                || props.connectNetatmoStatus === STATUS.PROCESSING_TOKEN && (
-                  <p class="text-center alert alert-warning">
-                    <Text id="integration.netatmo.setup.processingToken" />
-                  </p>
-                )
-                || props.connectNetatmoStatus === STATUS.CONNECTED && (
-                  <p class="text-center alert alert-success">
-                    <Text id="integration.netatmo.setup.connect" />
-                  </p>
-                )
-                || props.connectNetatmoStatus === STATUS.DISCONNECTED && (
-                  <p class="text-center alert alert-danger">
-                    <Text id="integration.netatmo.setup.disconnect" />
-                  </p>
-                ))}
+                )) ||
+                  (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
+                    <p class="text-center alert alert-warning">
+                      <Text id="integration.netatmo.setup.notConfigured" />
+                    </p>
+                  )) ||
+                  (props.connectNetatmoStatus === STATUS.PROCESSING_TOKEN && (
+                    <p class="text-center alert alert-warning">
+                      <Text id="integration.netatmo.setup.processingToken" />
+                    </p>
+                  )) ||
+                  (props.connectNetatmoStatus === STATUS.CONNECTED && (
+                    <p class="text-center alert alert-success">
+                      <Text id="integration.netatmo.setup.connect" />
+                    </p>
+                  )) ||
+                  (props.connectNetatmoStatus === STATUS.DISCONNECTED && (
+                    <p class="text-center alert alert-danger">
+                      <Text id="integration.netatmo.setup.disconnect" />
+                    </p>
+                  )))}
               <p>
                 <MarkupText id="integration.netatmo.setup.description" />
                 <MarkupText id="integration.netatmo.setup.descriptionCreateAccount" />
@@ -203,7 +205,10 @@ class SetupTab extends Component {
                   </label>
                   <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: '10px' }}>
                     {Object.entries(SCOPES.ENERGY).map(([key, value]) => (
-                      <label key={key} style={{ marginRight: '20px', marginBottom: '10px', alignItems: 'center', display: 'flex' }}>
+                      <label
+                        key={key}
+                        style={{ marginRight: '20px', marginBottom: '10px', alignItems: 'center', display: 'flex' }}
+                      >
                         <input
                           type="checkbox"
                           checked={scopesArray ? scopesArray.includes(value) : null}
@@ -238,7 +243,6 @@ class SetupTab extends Component {
                     )}
                   </div>
                 )}
-
               </form>
             </div>
           </div>
