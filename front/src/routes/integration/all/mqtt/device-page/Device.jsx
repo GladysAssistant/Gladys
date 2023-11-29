@@ -5,7 +5,7 @@ import cx from 'classnames';
 import get from 'get-value';
 
 import { RequestStatus } from '../../../../../utils/consts';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
 import MqttDeviceForm from './DeviceForm';
 import BatteryLevelFeature from '../../../../../components/device/view/BatteryLevelFeature';
 
@@ -42,7 +42,7 @@ class MqttDeviceBox extends Component {
       return null;
     }
     const batteryLevelDeviceFeature = this.props.device.features.find(
-      deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
+      deviceFeature => (deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY) && (deviceFeature.type === DEVICE_FEATURE_TYPES.BATTERY.INTEGER)
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
     let mostRecentValueAt = null;

@@ -2433,6 +2433,13 @@
           "zero": "No",
           "one": "Yes"
         }
+      },
+      "tamper": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
+        }
       }
     }
   },
@@ -2452,7 +2459,7 @@
     "battery": {
       "shortCategoryName": "Battery",
       "integer": "Battery",
-      "binary": "Low battery"
+      "binary": "Low battery (yes/no)"
     },
     "temperature-sensor": {
       "shortCategoryName": "Temperature sensor",
@@ -2585,7 +2592,7 @@
     },
     "tamper": {
       "shortCategoryName": "Tamper",
-      "binary": "Tamper"
+      "binary": "Tamper (yes/no)"
     },
     "television": {
       "shortCategoryName": "Television",

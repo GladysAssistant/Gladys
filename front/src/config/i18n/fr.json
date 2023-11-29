@@ -2434,6 +2434,13 @@
           "zero": "Non",
           "one": "Oui"
         }
+      },
+      "tamper": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Non",
+          "one": "Oui"
+        }
       }
     }
   },
@@ -2453,7 +2460,7 @@
     "battery": {
       "shortCategoryName": "Batterie",
       "integer": "Batterie",
-      "binary": "Batterie faible"
+      "binary": "Batterie faible (Oui/Non)"
     },
     "temperature-sensor": {
       "shortCategoryName": "Capteur température",
@@ -2585,8 +2592,8 @@
       "target-temperature": "Température"
     },
     "tamper": {
-      "shortCategoryName": "Autoprotection",
-      "binary": "Autoprotection"
+      "shortCategoryName": "Détecteur de sabotage",
+      "binary": "Détection sabotage (Oui/Non)"
     },
     "television": {
       "shortCategoryName": "Télévision",
