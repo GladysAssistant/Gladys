@@ -42,6 +42,7 @@ const SceneModel = require('./scene');
 const ScriptModel = require('./script');
 const ServiceModel = require('./service');
 const SessionModel = require('./session');
+const TagScene = require('./tag_scene');
 const UserModel = require('./user');
 const VariableModel = require('./variable');
 
@@ -66,6 +67,7 @@ const models = {
   Script: ScriptModel(sequelize, Sequelize),
   Service: ServiceModel(sequelize, Sequelize),
   Session: SessionModel(sequelize, Sequelize),
+  TagScene: TagScene(sequelize, Sequelize),
   User: UserModel(sequelize, Sequelize),
   Variable: VariableModel(sequelize, Sequelize),
 };

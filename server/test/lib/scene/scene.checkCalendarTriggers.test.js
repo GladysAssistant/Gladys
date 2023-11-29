@@ -65,6 +65,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
@@ -103,6 +104,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal([]);
@@ -123,6 +125,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
@@ -143,6 +146,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal([]);
@@ -163,6 +167,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
@@ -183,6 +188,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal([]);
@@ -203,6 +209,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
@@ -223,6 +230,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal([]);
@@ -243,6 +251,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal(['a2b57b0a-7148-4961-8540-e493104bfd7c']);
@@ -267,6 +276,7 @@ describe('scene.checkCalendarTriggers', () => {
         },
       ],
       actions: [[]],
+      tags: [],
     });
     const idsOfEventsMatching = await sceneManager.checkCalendarTriggers();
     expect(idsOfEventsMatching).to.deep.equal([]);

@@ -16,6 +16,7 @@ const { update } = require('./scene.update');
 const { dailyUpdate } = require('./scene.dailyUpdate');
 const { duplicate } = require('./scene.duplicate');
 const { command } = require('./scene.command');
+const { getTag } = require('./scene.getTag');
 
 const { EVENTS, INTENTS } = require('../../utils/constants');
 const { eventFunctionWrapper } = require('../../utils/functionsWrapper');
@@ -86,5 +87,6 @@ SceneManager.prototype.executeSingleAction = executeSingleAction;
 SceneManager.prototype.update = update;
 SceneManager.prototype.duplicate = duplicate;
 SceneManager.prototype.command = command;
+SceneManager.prototype.getTag = getTag;
 
 module.exports = SceneManager;

@@ -311,6 +311,7 @@
         "editBoxNamePlaceholder": "Name of the box",
         "latencyBoxName": "Latency",
         "latencyBoxDescription": "The lower the latency you select, the faster the live stream will start. However, to have a low latency, you need a very fast internet connection with a minimum of ping or the video will be jerky. We recommend medium or low latency.",
+        "upgradeGladysPlusPlanError": "Camera streaming is not included in your Gladys Plus plan. You need to update it in Settings -> Billing.",
         "liveStartError": "An error occured while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
         "notNotSupportedBrowser": "This browser is not supported. In order to enable end-to-end encryption of this video stream, we use the MediaSource API, which is unfortunately not available on Safari iPhone. Strangely, this feature is available on Safari iPad and MacOS... We'll have to be patient, let's hope the API will be available on iPhone soon!",
         "tooManyRequests": "You have reached your monthly video bandwidth limit. Contact us by email or on the forum to get more bandwidth!",
@@ -1542,9 +1543,15 @@
     }
   },
   "editScene": {
+    "settings": "Settings",
+    "nameTitle": "Scene name",
     "editNamePlaceholder": "Enter a scene name",
     "descriptionTitle": "Description",
+    "iconLabel": "Icon",
     "editDescriptionPlaceholder": "Enter a scene description",
+    "tagsTitle": "Tags",
+    "editTagsPlaceholder": "Enter a scene tags",
+    "createTag": "Create tag: '{{tagName}}'",
     "startButton": "Start",
     "saveButton": "Save",
     "deleteButton": "Delete",
@@ -2211,7 +2218,9 @@
     "newButton": "New",
     "editButton": "Edit",
     "startButton": "Start",
-    "searchPlaceholder": "Search scenes"
+    "searchPlaceholder": "Search scenes",
+    "filterTagsName": "Filter by tags",
+    "unselectTags": "Unselect all tags"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -2270,6 +2279,7 @@
   },
   "gatewayBackup": {
     "title": "Backups",
+    "youNeedToUpgrade": "This feature is not available on your Gladys Plus plan. You must upgrade to a higher plan to access backups.",
     "description": "If you are subscribed to Gladys Plus, Gladys creates encrypted backup of your instance every 24 hours. Only you can decrypt backups. You can restore those backups in one-click in this installation, or any new setup.",
     "createdAtColumn": "Date",
     "sizeColumn": "Size",
