@@ -7,8 +7,16 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Netatmo
    */
   async function getConfiguration(req, res) {
-    const configuration = await netatmoHandler.getConfiguration();
-    res.json(configuration);
+    res.json(await netatmoHandler.getConfiguration());
+  }
+
+  /**
+   * @api {get} /api/v1/service/netatmo/status Get Netatmo Status.
+   * @apiName getStatus
+   * @apiGroup Netatmo
+   */
+  async function getStatus(req, res) {
+    res.json(await netatmoHandler.getStatus());
   }
 
   /**
@@ -21,16 +29,6 @@ module.exports = function NetatmoController(netatmoHandler) {
     res.json({
       success: result,
     });
-  }
-
-  /**
-   * @api {get} /api/v1/service/netatmo/getStatus Get Netatmo Status.
-   * @apiName getStatus
-   * @apiGroup Netatmo
-   */
-  async function getStatus(req, res) {
-    const status = await netatmoHandler.getStatus();
-    res.json(status);
   }
 
   /**
@@ -59,7 +57,7 @@ module.exports = function NetatmoController(netatmoHandler) {
   }
 
   /**
-   * @api {post} /api/v1/service/netatmo/retrieveTokens Get access Tokens netatmo with code of return
+   * @api {post} /api/v1/service/netatmo/retrieveTokens Retrieve access Tokens netatmo with code of return
    * @apiName retrieveTokens
    * @apiGroup Netatmo
    */
@@ -77,9 +75,9 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Netatmo
    */
   async function disconnect(req, res) {
-    const result = await netatmoHandler.disconnect(netatmoHandler);
+    await netatmoHandler.disconnect(netatmoHandler);
     res.json({
-      success: result,
+      success: true,
     });
   }
 
@@ -92,7 +90,7 @@ module.exports = function NetatmoController(netatmoHandler) {
       authenticated: true,
       controller: asyncMiddleware(saveConfiguration),
     },
-    'get /api/v1/service/netatmo/getStatus': {
+    'get /api/v1/service/netatmo/status': {
       authenticated: true,
       controller: asyncMiddleware(getStatus),
     },

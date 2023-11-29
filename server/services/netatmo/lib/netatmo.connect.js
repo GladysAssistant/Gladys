@@ -21,6 +21,10 @@ async function connect(netatmoHandler, configuration) {
 
   if (!clientId || !clientSecret || !scopes) {
     this.status = STATUS.NOT_INITIALIZED;
+    netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+      payload: { status: netatmoHandler.status },
+    });
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
   }
 
@@ -61,24 +65,27 @@ async function retrieveTokens(netatmoHandler, configuration, body) {
   const { codeOAuth, state, redirectUri } = body;
   if (!clientId || !clientSecret || !scopes || !scopes.scopeEnergy || !codeOAuth) {
     netatmoHandler.status = STATUS.NOT_INITIALIZED;
+    netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+      payload: { status: netatmoHandler.status },
+    });
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
   }
-
   netatmoHandler.status = STATUS.PROCESSING_TOKEN;
   netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
     payload: { status: this.status },
   });
-
   if (state !== netatmoHandler.stateGetAccessToken) {
     this.status = STATUS.NOT_INITIALIZED;
+    netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+      payload: { status: netatmoHandler.status },
+    });
     throw new ServiceNotConfiguredError(
       'Netatmo did not connect correctly. The return does not correspond to the initial request',
     );
   }
-
-  logger.debug('Loading Netatmo access tokens...');
-
   const scopeValue = scopes && scopes.scopeEnergy ? scopes.scopeEnergy : SCOPES.ENERGY.read;
   const authentificationForm = {
     grant_type: 'authorization_code',
@@ -89,8 +96,6 @@ async function retrieveTokens(netatmoHandler, configuration, body) {
     code: body.codeOAuth,
   };
 
-  let accessToken;
-  let refreshToken;
   try {
     const response = await axios({
       url: `${this.baseUrl}/oauth2/token`,
@@ -98,33 +103,36 @@ async function retrieveTokens(netatmoHandler, configuration, body) {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', Host: 'api.netatmo.com' },
       data: querystring.stringify(authentificationForm),
     });
-
-    console.log('response', response)
     const tokens = {
-      ...response.data,
+      access_token: response.data.access_token,
+      refresh_token: response.data.refresh_token,
+      expire_in: response.data.expire_in,
       connected: true,
     };
     await netatmoHandler.setTokens(tokens);
-    accessToken = response.data.access_token;
-    refreshToken = response.data.refresh_token;
+
     this.configured = true;
     this.status = STATUS.CONNECTED;
+    netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+      payload: { status: this.status },
+    });
     logger.debug('Netatmo new access tokens well loaded');
+    return { success: true };
   } catch (e) {
     this.status = STATUS.ERROR;
+    netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+      payload: { status: this.status },
+    });
+
+    logger.warn('configuration', configuration);
+    logger.warn('body', body);
+    logger.error('Manque données');
+    logger.debug('Loading Netatmo access tokens...');
     logger.error('Error getting new accessToken to Netatmo - Details:', e.response ? e.response.data : e);
     throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
   }
-
-  netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-    payload: { status: this.status },
-  });
-
-  if (accessToken && refreshToken) {
-    return { success: true };
-  }
-  return { success: false };
 }
 
 module.exports = {

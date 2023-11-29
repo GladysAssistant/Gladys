@@ -162,7 +162,7 @@ class NetatmoSetupPage extends Component {
 
   loadStatus = async () => {
     try {
-      const netatmoStatus = await this.props.httpClient.get('/api/v1/service/netatmo/getStatus');
+      const netatmoStatus = await this.props.httpClient.get('/api/v1/service/netatmo/status');
       this.setState({
         netatmoConnected: netatmoStatus.connected
       });

@@ -13,7 +13,7 @@ const { STATUS } = require('./utils/netatmo.constants');
  * @param {string} refreshToken - Netatmo Refresh Token to refresh access tokens.
  * @returns {Promise} Netatmo access token success.
  * @example
- * await netatmo.retrieveTokens(
+ * await netatmo.refreshingTokens(
  *  netatmoHandler,
  *  {username, clientId, clientSecret, accessToken, refreshToken, scopes}
  * );

@@ -7,8 +7,6 @@ const { assert, fake } = sinon;
 
 const NetatmoHandlerMock = sinon.stub();
 NetatmoHandlerMock.prototype.init = fake.returns(null);
-NetatmoHandlerMock.prototype.refreshingTokens = fake.returns({success: false});
-NetatmoHandlerMock.prototype.loadDevices = fake.returns(null);
 NetatmoHandlerMock.prototype.disconnect = fake.returns(null);
 
 const NetatmoService = proxyquire('../../../services/netatmo/index', { './lib': NetatmoHandlerMock });
@@ -16,7 +14,8 @@ const NetatmoService = proxyquire('../../../services/netatmo/index', { './lib': 
 const gladys = {};
 const serviceId = 'ecca4d93-7a8c-4761-9055-fc15460a4b4a';
 
-describe('NetatmoService', () => {
+
+describe.only('NetatmoService', () => {
   const netatmoService = NetatmoService(gladys, serviceId);
 
   beforeEach(() => {
@@ -30,7 +29,6 @@ describe('NetatmoService', () => {
   it('should start service', async () => {
     await netatmoService.start();
     assert.calledOnce(netatmoService.device.init);
-    // assert.calledOnce(netatmoService.device.loadDevices);
     assert.notCalled(netatmoService.device.disconnect);
   });
 

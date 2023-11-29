@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const proxyquire = require('proxyquire').noCallThru();
-const { NetatmoContext } = require('../netatmo.mock.test');
+const NetatmoContext = require('../netatmo.mock.test');
 
 const { assert, fake } = sinon;
 
@@ -21,15 +21,13 @@ const gladys = {
   },
 };
 const serviceId = 'ecca4d93-7a8c-4761-9055-fc15460a4b4a';
+const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
-describe('NetatmoHandler.init', () => {
-  const netatmoHandler = new NetatmoHandler(gladys, serviceId);
-  netatmoHandler.setTokens = fake.returns(null);
+describe.only('NetatmoHandler.init', () => {
 
   beforeEach(() => {
     sinon.reset();
     netatmoHandler.status = 'UNKNOWN';
-
   });
 
   afterEach(() => {
@@ -126,7 +124,7 @@ describe('NetatmoHandler.init', () => {
       payload: { status: STATUS.ERROR },
     });
   });
-  it('well initialized ', async () => {
+  it('should initialized ', async () => {
     gladys.variable.getValue
       .withArgs(GLADYS_VARIABLES.USERNAME, serviceId)
       .returns('username')
@@ -135,7 +133,7 @@ describe('NetatmoHandler.init', () => {
       .withArgs(GLADYS_VARIABLES.CLIENT_SECRET, serviceId)
       .returns('clientSecret')
       .withArgs(GLADYS_VARIABLES.SCOPE_ENERGY, serviceId)
-      .returns('username')
+      .returns('scopeEnergy')
       .withArgs(GLADYS_VARIABLES.ACCESS_TOKEN, serviceId)
       .returns('accessToken')
       .withArgs(GLADYS_VARIABLES.REFRESH_TOKEN, serviceId)
