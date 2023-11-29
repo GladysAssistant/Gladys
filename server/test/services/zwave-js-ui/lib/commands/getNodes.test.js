@@ -44,13 +44,13 @@ describe('zwaveJSUIManager getNodes', () => {
         classes: {
           113: {
             0: {
-              'Home Security-Motion sensor status': {
+              'Home_Security-Motion_sensor_status': {
                 genre: 'user',
                 label: 'label',
                 readOnly: true,
                 commandClass: 113,
                 endpoint: 0,
-                property: 'Home Security-Motion sensor status',
+                property: 'Home_Security-Motion_sensor_status',
               },
             },
           },
@@ -71,7 +71,7 @@ describe('zwaveJSUIManager getNodes', () => {
             name: 'Détecteur de présence',
             selector: 'zwave-js-ui-node-1-home-security-motion-sensor-status-113-0-label',
             category: 'motion-sensor',
-            external_id: 'zwave-js-ui:node_id:1:comclass:113:endpoint:0:property:Home Security-Motion sensor status',
+            external_id: 'zwave-js-ui:node_id:1:comclass:113:endpoint:0:property:Home_Security-Motion_sensor_status',
             type: 'binary',
             min: undefined,
             max: undefined,
@@ -110,7 +110,7 @@ describe('zwaveJSUIManager getNodes', () => {
         classes: {
           49: {
             0: {
-              'Air temperature': {
+              'Air_temperature': {
                 genre: 'user',
                 label: 'label',
                 min: -20,
@@ -119,7 +119,7 @@ describe('zwaveJSUIManager getNodes', () => {
                 readOnly: true,
                 commandClass: 49,
                 endpoint: 0,
-                property: 'Air temperature',
+                property: 'Air_temperature',
               },
             },
           },
@@ -141,7 +141,7 @@ describe('zwaveJSUIManager getNodes', () => {
             selector: 'zwave-js-ui-node-1-air-temperature-49-0-label',
             category: 'temperature-sensor',
             type: 'decimal',
-            external_id: 'zwave-js-ui:node_id:1:comclass:49:endpoint:0:property:Air temperature',
+            external_id: 'zwave-js-ui:node_id:1:comclass:49:endpoint:0:property:Air_temperature',
             read_only: true,
             unit: 'celsius',
             has_feedback: true,
