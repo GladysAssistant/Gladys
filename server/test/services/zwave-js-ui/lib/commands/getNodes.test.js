@@ -110,7 +110,7 @@ describe('zwaveJSUIManager getNodes', () => {
         classes: {
           49: {
             0: {
-              'Air_temperature': {
+              Air_temperature: {
                 genre: 'user',
                 label: 'label',
                 min: -20,
