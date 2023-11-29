@@ -23,13 +23,11 @@ const gladys = {
 const serviceId = 'ecca4d93-7a8c-4761-9055-fc15460a4b4a';
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
-describe.only('NetatmoHandler.init', () => {
-
+describe('NetatmoHandler.init', () => {
   beforeEach(() => {
     sinon.reset();
     netatmoHandler.status = 'UNKNOWN';
   });
-
   afterEach(() => {
     sinon.reset();
   });
@@ -116,12 +114,12 @@ describe.only('NetatmoHandler.init', () => {
     assert.callCount(gladys.variable.getValue, 8);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.REFRESH_TOKEN, serviceId);
     assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.EXPIRE_IN_TOKEN, serviceId);
-    expect(netatmoHandler.status).to.eq(STATUS.ERROR);
+    expect(netatmoHandler.status).to.eq(STATUS.ERROR.PROCESSING_TOKEN);
     expect(netatmoHandler.configured).to.eq(true);
     assert.callCount(gladys.event.emit, 1);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.ERROR },
+      payload: { status: STATUS.ERROR.PROCESSING_TOKEN },
     });
   });
   it('should initialized ', async () => {

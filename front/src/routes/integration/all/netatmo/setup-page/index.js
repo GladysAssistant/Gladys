@@ -34,7 +34,7 @@ class NetatmoSetupPage extends Component {
     if (this.props.error) {
       if (this.props.error === 'access_denied' || this.props.error === 'invalid_client') {
         this.props.httpClient.post('/api/v1/service/netatmo/saveStatus', {
-          statusType: STATUS.CONNECTING,
+          statusType: STATUS.ERROR.CONNECTING,
           message: this.props.error
         });
         setTimeout(() => {
@@ -42,7 +42,7 @@ class NetatmoSetupPage extends Component {
         }, 500);
       } else {
         this.props.httpClient.post('/api/v1/service/netatmo/saveStatus', {
-          statusType: STATUS.CONNECTING,
+          statusType: STATUS.ERROR.CONNECTING,
           message: 'other_error'
         });
         await this.setState({
@@ -117,14 +117,14 @@ class NetatmoSetupPage extends Component {
       } else {
         console.error('Missing redirect URL');
         await this.setState({
-          connectNetatmoStatus: STATUS.ERROR
+          connectNetatmoStatus: STATUS.ERROR.CONNECTING
         });
       }
     } catch (e) {
       console.error('Error when redirecting to netatmo', e);
 
       await this.setState({
-        connectNetatmoStatus: STATUS.ERROR,
+        connectNetatmoStatus: STATUS.ERROR.CONNECTING,
         errored: true
       });
     }

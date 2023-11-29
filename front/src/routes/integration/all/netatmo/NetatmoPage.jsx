@@ -66,11 +66,15 @@ const NetatmoPage = props => (
                     <Text id="integration.netatmo.setup.error" />
                   </p>
                 )) ||
-                  (props.state.accessDenied && (
+                  (props.state.accessDenied && (props.state.messageAlert === 'other_error' && (
                     <p class="text-center alert alert-warning">
                       <Text id={`integration.netatmo.setup.errorConnecting.${props.state.messageAlert}_NetatmoPage`} />
                     </p>
-                  )) ||
+                  ) || (
+                      <p class="text-center alert alert-warning">
+                        <Text id={`integration.netatmo.setup.errorConnecting.${props.state.messageAlert}`} />
+                      </p>
+                    ))) ||
                   (!props.state.accessDenied &&
                     ((props.state.connectNetatmoStatus === STATUS.CONNECTING && (
                       <p class="text-center alert alert-info">

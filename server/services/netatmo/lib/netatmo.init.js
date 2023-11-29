@@ -40,7 +40,7 @@ async function init() {
           connected: false,
         };
         await this.setTokens(tokens);
-        this.status = STATUS.ERROR;
+        this.status = STATUS.ERROR.PROCESSING_TOKEN;
       }
     } else {
       logger.debug('Netatmo no refresh token');

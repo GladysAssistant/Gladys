@@ -15,7 +15,7 @@ const gladys = {};
 const serviceId = 'ecca4d93-7a8c-4761-9055-fc15460a4b4a';
 
 
-describe.only('NetatmoService', () => {
+describe('NetatmoService', () => {
   const netatmoService = NetatmoService(gladys, serviceId);
 
   beforeEach(() => {

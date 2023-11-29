@@ -34,8 +34,7 @@ const body = {
   redirectUri: 'redirectUri'
 };
 
-describe.only('NetatmoHandler.connect', () => {
-
+describe('NetatmoHandler.connect', () => {
   beforeEach(() => {
     sinon.reset();
     netatmoHandler.status = 'UNKNOWN';
@@ -94,7 +93,26 @@ describe.only('NetatmoHandler.connect', () => {
       payload: { status: STATUS.NOT_INITIALIZED },
     });
   });
-  it('should return redirectUri to connect successfully', async () => {
+  it('should return redirectUri to connect successfully with a default scope', async () => {
+    const baseUrl = 'https://api.netatmo.net';
+    const configurationWithScopeDefault = { ...configuration, scopes: { scopeEnergy: undefined } };
+    const response = await netatmoHandler.connect(netatmoHandler, configurationWithScopeDefault);
+
+    const expectedState = '1234567890abcdef1234567890abcdef';
+    expect(netatmoHandler.status).to.eq(STATUS.CONNECTING);
+    expect(netatmoHandler.configured).to.eq(true);
+    expect(response).to.deep.equal({
+      authUrl: `${baseUrl}/oauth2/authorize?client_id=clientId&scope=read_thermostat&state=${expectedState}`,
+      state: expectedState
+    });
+
+    assert.callCount(gladys.event.emit, 1);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+      payload: { status: STATUS.CONNECTING },
+    });
+  });
+  it('should return redirectUri to connect successfully with defined scope', async () => {
     const baseUrl = 'https://api.netatmo.net';
     const response = await netatmoHandler.connect(netatmoHandler, configuration);
 
@@ -114,7 +132,7 @@ describe.only('NetatmoHandler.connect', () => {
   });
 });
 
-describe.only('NetatmoHandler.retrieveTokens', () => {
+describe('NetatmoHandler.retrieveTokens', () => {
   beforeEach(() => {
     sinon.reset();
     netatmoHandler.status = 'UNKNOWN';
@@ -122,7 +140,7 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
 
   afterEach(() => {
     sinon.reset();
-    nock.isDone();
+    nock.cleanAll();
   });
 
   it('should throw an error if clientId is missing', async () => {
@@ -134,6 +152,7 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
         body,
       );
       assert.fail();
+      expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
     }
@@ -153,8 +172,8 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
         badConfiguration,
         body,
       );
-      expect.fail('should have thrown an error');
       assert.fail();
+      expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
       expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
@@ -176,6 +195,7 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
         body,
       );
       assert.fail();
+      expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
     }
@@ -196,6 +216,7 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
         badBody,
       );
       assert.fail();
+      expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
     }
@@ -218,12 +239,46 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
         badBody,
       );
       assert.fail();
+      expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
     }
+    expect(netatmoHandler.status).to.eq(STATUS.DISCONNECTED);
+    assert.callCount(gladys.event.emit, 1);
+    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+      payload: { status: STATUS.DISCONNECTED },
+    });
+  });
+  it('should retrieve tokens successfully with a default scope', async () => {
+    netatmoHandler.stateGetAccessToken = 'state'
+    const configurationWithScopeDefault = { ...configuration, scopes: { scopeEnergy: undefined } };
+    const setTokensSpy = sinon.spy(netatmoHandler, 'setTokens');
+    nock(`${netatmoHandler.baseUrl}`)
+      .persist()
+      .post('/oauth2/token')
+      .reply(200, {
+        access_token: 'fake_access_token',
+        refresh_token: 'fake_refresh_token',
+        expire_in: 10800,
+      });
 
-    expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-
+    const response = await netatmoHandler.retrieveTokens(
+      netatmoHandler,
+      configurationWithScopeDefault,
+      body,
+    );
+    // Checking the results
+    expect(response).to.deep.equal({ success: true });
+    expect(netatmoHandler.status).to.equal(STATUS.CONNECTED);
+    expect(netatmoHandler.configured).to.eq(true);
+    // Checking that setTokens was called with the correct tokens
+    expect(setTokensSpy.calledOnce).to.be.true;
+    expect(setTokensSpy.calledWith(sinon.match.has('access_token', 'fake_access_token'))).to.be.true;
+    expect(setTokensSpy.calledWith(sinon.match.has('refresh_token', 'fake_refresh_token'))).to.be.true;
+    expect(setTokensSpy.calledWith(sinon.match.has('expire_in', 10800))).to.be.true;
+    expect(setTokensSpy.calledWith(sinon.match.has('connected', true))).to.be.true;
+    // Checking the events emits
     assert.callCount(gladys.event.emit, 2);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
@@ -231,10 +286,13 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
     });
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.NOT_INITIALIZED },
+      payload: { status: STATUS.CONNECTED },
     });
+    // Cleaning
+    setTokensSpy.restore();
+    nock.isDone();
   });
-  it('should retrieve tokens successfully', async () => {
+  it('should retrieve tokens successfully with defined scope', async () => {
     netatmoHandler.stateGetAccessToken = 'state'
     const setTokensSpy = sinon.spy(netatmoHandler, 'setTokens');
     nock(`${netatmoHandler.baseUrl}`)
@@ -255,19 +313,12 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
     expect(response).to.deep.equal({ success: true });
     expect(netatmoHandler.status).to.equal(STATUS.CONNECTED);
     expect(netatmoHandler.configured).to.eq(true);
-    expect(response).to.deep.equal({ success: true });
-
     // Checking that setTokens was called with the correct tokens
     expect(setTokensSpy.calledOnce).to.be.true;
     expect(setTokensSpy.calledWith(sinon.match.has('access_token', 'fake_access_token'))).to.be.true;
     expect(setTokensSpy.calledWith(sinon.match.has('refresh_token', 'fake_refresh_token'))).to.be.true;
     expect(setTokensSpy.calledWith(sinon.match.has('expire_in', 10800))).to.be.true;
     expect(setTokensSpy.calledWith(sinon.match.has('connected', true))).to.be.true;
-
-    // Cleaning
-    setTokensSpy.restore();
-    nock.isDone();
-
     // Checking the events emits
     assert.callCount(gladys.event.emit, 2);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -278,13 +329,15 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
       payload: { status: STATUS.CONNECTED },
     });
+    // Cleaning
+    setTokensSpy.restore();
+    nock.isDone();
   });
-  it('should handle errors in retrieveTokens', async () => {
+  it('should handle axios query errors in retrieve Tokens', async () => {
     nock(`${netatmoHandler.baseUrl}`)
       .persist()
       .post('/oauth2/token')
-      .reply(500, { error: 'Server Error' }); // Simule une erreur serveur
-
+      .reply(500, { error: 'Server Error' });
     netatmoHandler.stateGetAccessToken = 'state'
     await assertJS.rejects(
       async () => {
@@ -292,19 +345,65 @@ describe.only('NetatmoHandler.retrieveTokens', () => {
       },
       (err) => {
         assertJS(err instanceof ServiceNotConfiguredError);
-        assertJS(netatmoHandler.status === STATUS.ERROR);
+        assertJS(netatmoHandler.status === STATUS.DISCONNECTED); 
+        assertJS(err.message.includes('500'));
+        assert.callCount(gladys.event.emit, 3);
+        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+          payload: { status: STATUS.PROCESSING_TOKEN },
+        });
+        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
+          payload: { statusType: STATUS.PROCESSING_TOKEN, status: 'get_access_token_fail' },
+        });
+        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+          payload: { status: STATUS.DISCONNECTED },
+        });
         return true;
       }
     );
-    assert.callCount(gladys.event.emit, 2);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.PROCESSING_TOKEN },
-    });
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.ERROR },
-    });
+    // Cleaning
     nock.isDone();
+  });
+  it('should handle errors from setTokens function in retrieveTokens', async () => {
+    sinon.stub(netatmoHandler, 'setTokens').rejects(new Error('Set tokens error'));
+    nock(`${netatmoHandler.baseUrl}`)
+      .persist()
+      .post('/oauth2/token')
+      .reply(200, {
+        access_token: 'fake_access_token',
+        refresh_token: 'fake_refresh_token',
+        expire_in: 10800,
+      });
+    netatmoHandler.stateGetAccessToken = 'state'
+    await assertJS.rejects(
+      async () => {
+        await netatmoHandler.retrieveTokens(netatmoHandler, configuration, body);
+      },
+      (err) => {
+        assertJS(err instanceof ServiceNotConfiguredError);
+        assertJS(err.message.includes('Set tokens error'));
+        assertJS(!err.message.includes('200'));
+        assertJS(netatmoHandler.status === STATUS.DISCONNECTED);
+        assert.callCount(gladys.event.emit, 3);
+        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+          payload: { status: STATUS.PROCESSING_TOKEN },
+        });
+        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
+          payload: { statusType: STATUS.PROCESSING_TOKEN, status: 'get_access_token_fail' },
+        });
+        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+          payload: { status: STATUS.DISCONNECTED },
+        });
+        return true;
+      }
+    );
+    // Cleaning
+    nock.isDone();
+    netatmoHandler.setTokens.restore();
   });
 });

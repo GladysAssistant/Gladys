@@ -913,6 +913,7 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS: 'netatmo.status',
     DISCOVER: 'netatmo.discover',
     ERROR: {
+      CONNECTED: 'netatmo.error-connected',
       CONNECTING: 'netatmo.error-connecting',
       PROCESSING_TOKEN: 'netatmo.error-processing-token',
     },

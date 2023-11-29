@@ -3,7 +3,6 @@ const querystring = require('querystring');
 
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
-const { WEBSOCKET_MESSAGE_TYPES, EVENTS } = require('../../../utils/constants');
 
 const { STATUS } = require('./utils/netatmo.constants');
 
@@ -15,34 +14,24 @@ const { STATUS } = require('./utils/netatmo.constants');
  * @example
  * await netatmo.refreshingTokens(
  *  netatmoHandler,
- *  {username, clientId, clientSecret, accessToken, refreshToken, scopes}
+ *  {clientId, clientSecret},
+ *  refreshToken
  * );
  */
 async function refreshingTokens(configuration, refreshToken) {
     const { clientId, clientSecret } = configuration;
-
     if (!clientId || !clientSecret || !refreshToken) {
-        this.status = STATUS.NOT_INITIALIZED;
+        await this.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null })
         throw new ServiceNotConfiguredError('Netatmo is not connected.');
     }
-
-    this.status = STATUS.PROCESSING_TOKEN;
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-        payload: { status: this.status },
-    });
-
+    await this.saveStatus({ statusType: STATUS.PROCESSING_TOKEN, message: null })
     logger.debug('Loading Netatmo refreshing tokens...');
-
     const authentificationForm = {
         grant_type: 'refresh_token',
         client_id: clientId,
         client_secret: clientSecret,
         refresh_token: refreshToken,
     };
-
-    let newAccessToken;
-    let newRefreshToken;
     try {
         const response = await axios({
             url: `${this.baseUrl}/oauth2/token`,
@@ -51,29 +40,20 @@ async function refreshingTokens(configuration, refreshToken) {
             data: querystring.stringify(authentificationForm),
         });
         const tokens = {
-            ...response.data,
+            access_token: response.data.access_token,
+            refresh_token: response.data.refresh_token,
+            expire_in: response.data.expire_in,
             connected: true,
         };
         await this.setTokens(tokens);
-        newAccessToken = response.data.access_token;
-        newRefreshToken = response.data.refresh_token;
-        this.status = STATUS.CONNECTED;
+        await this.saveStatus({ statusType: STATUS.CONNECTED })
         logger.debug('Netatmo new access tokens well loaded');
+        return { success: true };
     } catch (e) {
-        this.status = STATUS.ERROR;
+        this.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: 'refresh_token_fail' })
         logger.error('Error getting new accessToken to Netatmo - Details:', e.response ? e.response.data : e);
         throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
     }
-
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-        payload: { status: this.status },
-    });
-
-    if (newAccessToken && newRefreshToken) {
-        return { success: true };
-    }
-    return { success: false };
 }
 
 module.exports = {

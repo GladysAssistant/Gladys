@@ -25,7 +25,7 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Netatmo
    */
   async function saveConfiguration(req, res) {
-    const result = await netatmoHandler.saveConfiguration(netatmoHandler, req.body);
+    const result = await netatmoHandler.saveConfiguration(req.body);
     res.json({
       success: result,
     });

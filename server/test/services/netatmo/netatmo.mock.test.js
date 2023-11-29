@@ -19,6 +19,7 @@ const NetatmoContext = function NetatmoContext(gladys, serviceId) {
 
 NetatmoContext.prototype.connect = fake.returns(null);
 NetatmoContext.prototype.setTokens = fake.returns(null);
+NetatmoContext.prototype.saveStatus = fake.returns(null);
 NetatmoContext.prototype.init = fake.returns(null);
 NetatmoContext.prototype.refreshingTokens = fake.returns({ success: false });
 NetatmoContext.prototype.loadDevices = fake.returns(null);

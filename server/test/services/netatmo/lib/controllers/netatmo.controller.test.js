@@ -1,13 +1,7 @@
 const sinon = require('sinon');
-const proxyquire = require('proxyquire').noCallThru();
 const NetatmoController = require('../../../../../services/netatmo/api/netatmo.controller');
-const NetatmoContext = require('../../netatmo.mock.test');
-
 const { assert, fake } = sinon;
 
-const NetatmoHandler = proxyquire('../../../../../services/netatmo/lib/index', {
-  NetatmoContext,
-});
 
 const configuration = [
   { username: 'username' },
@@ -29,7 +23,8 @@ const connectResult = [
   { authUrl: 'redirectUriComplet' },
   { state: 'state' }
 ]
-const netatmoManager = {
+
+const netatmoManagerFake = {
   getConfiguration: fake.returns(configuration),
   getStatus: fake.returns(status),
   saveConfiguration: fake.resolves(configuration),
@@ -39,21 +34,11 @@ const netatmoManager = {
   disconnect: fake.resolves({ success: true }),
 };
 
-const gladys = {
-  event: {
-    emit: fake.returns(null),
-  },
-};
-const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
-
-describe.only('NetatmoController GET/POST', () => {
+describe('NetatmoController GET/POST', () => {
   let controller;
-
   beforeEach(() => {
-    controller = NetatmoController(netatmoManager);
+    controller = NetatmoController(netatmoManagerFake);
   });
-
   afterEach(() => {
     sinon.reset();
   });
@@ -64,32 +49,30 @@ describe.only('NetatmoController GET/POST', () => {
       json: fake.returns(configuration),
     };
     await controller['get /api/v1/service/netatmo/config'].controller(req, res);
-    assert.calledOnce(netatmoManager.getConfiguration);
-    assert.notCalled(netatmoManager.getStatus);
-    assert.notCalled(netatmoManager.saveConfiguration);
-    assert.notCalled(netatmoManager.saveStatus);
-    assert.notCalled(netatmoManager.connect);
-    assert.notCalled(netatmoManager.retrieveTokens);
-    assert.notCalled(netatmoManager.disconnect);
+    assert.calledOnce(netatmoManagerFake.getConfiguration);
+    assert.notCalled(netatmoManagerFake.getStatus);
+    assert.notCalled(netatmoManagerFake.saveConfiguration);
+    assert.notCalled(netatmoManagerFake.saveStatus);
+    assert.notCalled(netatmoManagerFake.connect);
+    assert.notCalled(netatmoManagerFake.retrieveTokens);
+    assert.notCalled(netatmoManagerFake.disconnect);
     assert.calledWith(res.json, sinon.match(configuration));
   });
-
   it('should return get status', async () => {
     const req = {};
     const res = {
       json: fake.returns(status),
     };
     await controller['get /api/v1/service/netatmo/status'].controller(req, res);
-    assert.notCalled(netatmoManager.getConfiguration);
-    assert.calledOnce(netatmoManager.getStatus);
-    assert.notCalled(netatmoManager.saveConfiguration);
-    assert.notCalled(netatmoManager.saveStatus);
-    assert.notCalled(netatmoManager.connect);
-    assert.notCalled(netatmoManager.retrieveTokens);
-    assert.notCalled(netatmoManager.disconnect);
+    assert.notCalled(netatmoManagerFake.getConfiguration);
+    assert.calledOnce(netatmoManagerFake.getStatus);
+    assert.notCalled(netatmoManagerFake.saveConfiguration);
+    assert.notCalled(netatmoManagerFake.saveStatus);
+    assert.notCalled(netatmoManagerFake.connect);
+    assert.notCalled(netatmoManagerFake.retrieveTokens);
+    assert.notCalled(netatmoManagerFake.disconnect);
     assert.calledWith(res.json, sinon.match(status));
   });
-
   it('should save configuration', async () => {
     const req = {
       body: configuration
@@ -97,20 +80,16 @@ describe.only('NetatmoController GET/POST', () => {
     const res = {
       json: fake(),
     };
-
     await controller['post /api/v1/service/netatmo/saveConfiguration'].controller(req, res);
-
-    assert.notCalled(netatmoManager.getConfiguration);
-    assert.notCalled(netatmoManager.getStatus);
-    assert.calledOnce(netatmoManager.saveConfiguration);
-    assert.notCalled(netatmoManager.saveStatus);
-    assert.notCalled(netatmoManager.connect);
-    assert.notCalled(netatmoManager.retrieveTokens)
-    assert.notCalled(netatmoManager.disconnect);
-
+    assert.notCalled(netatmoManagerFake.getConfiguration);
+    assert.notCalled(netatmoManagerFake.getStatus);
+    assert.calledOnce(netatmoManagerFake.saveConfiguration);
+    assert.notCalled(netatmoManagerFake.saveStatus);
+    assert.notCalled(netatmoManagerFake.connect);
+    assert.notCalled(netatmoManagerFake.retrieveTokens)
+    assert.notCalled(netatmoManagerFake.disconnect);
     sinon.assert.calledOnceWithExactly(
-      netatmoManager.saveConfiguration,
-      sinon.match.any,
+      netatmoManagerFake.saveConfiguration,
       req.body
     );
     sinon.assert.calledWithExactly(res.json, { success: configuration });
@@ -122,17 +101,15 @@ describe.only('NetatmoController GET/POST', () => {
     const res = {
       json: fake(),
     };
-
     await controller['post /api/v1/service/netatmo/saveStatus'].controller(req, res);
-    assert.notCalled(netatmoManager.getConfiguration);
-    assert.notCalled(netatmoManager.getStatus);
-    assert.notCalled(netatmoManager.saveConfiguration);
-    assert.calledOnce(netatmoManager.saveStatus);
-    assert.notCalled(netatmoManager.connect);
-    assert.notCalled(netatmoManager.retrieveTokens);
-    assert.notCalled(netatmoManager.disconnect);
-
-    sinon.assert.calledOnceWithExactly(netatmoManager.saveStatus, req.body);
+    assert.notCalled(netatmoManagerFake.getConfiguration);
+    assert.notCalled(netatmoManagerFake.getStatus);
+    assert.notCalled(netatmoManagerFake.saveConfiguration);
+    assert.calledOnce(netatmoManagerFake.saveStatus);
+    assert.notCalled(netatmoManagerFake.connect);
+    assert.notCalled(netatmoManagerFake.retrieveTokens);
+    assert.notCalled(netatmoManagerFake.disconnect);
+    sinon.assert.calledOnceWithExactly(netatmoManagerFake.saveStatus, req.body);
     sinon.assert.calledWithExactly(res.json, { success: status });
   });
   it('should connect', async () => {
@@ -140,26 +117,20 @@ describe.only('NetatmoController GET/POST', () => {
     const res = {
       json: fake(),
     };
-
     await controller['post /api/v1/service/netatmo/connect'].controller(req, res);
-    assert.calledOnce(netatmoManager.getConfiguration);
-    assert.notCalled(netatmoManager.getStatus);
-    assert.notCalled(netatmoManager.saveConfiguration);
-    assert.notCalled(netatmoManager.saveStatus);
-    assert.calledOnce(netatmoManager.connect);
-    assert.notCalled(netatmoManager.retrieveTokens);
-    assert.notCalled(netatmoManager.disconnect);
-
-    // console.log(netatmoManager.saveConfiguration.getCall(0).args);
+    assert.calledOnce(netatmoManagerFake.getConfiguration);
+    assert.notCalled(netatmoManagerFake.getStatus);
+    assert.notCalled(netatmoManagerFake.saveConfiguration);
+    assert.notCalled(netatmoManagerFake.saveStatus);
+    assert.calledOnce(netatmoManagerFake.connect);
+    assert.notCalled(netatmoManagerFake.retrieveTokens);
+    assert.notCalled(netatmoManagerFake.disconnect);
     sinon.assert.calledOnceWithExactly(
-      netatmoManager.connect,
+      netatmoManagerFake.connect,
       sinon.match.any,
       configuration
     );
     sinon.assert.calledWithExactly(res.json, { result: connectResult });
-
-    // sinon.assert.calledOnce(netatmoManager.connect);
-    // sinon.assert.calledWithExactly(res.json, { success: true });
   });
   it('should retrieve tokens', async () => {
     const req = {
@@ -168,27 +139,20 @@ describe.only('NetatmoController GET/POST', () => {
     const res = {
       json: fake(),
     };
-
     await controller['post /api/v1/service/netatmo/retrieveTokens'].controller(req, res);
-    assert.calledOnce(netatmoManager.getConfiguration);
-    assert.notCalled(netatmoManager.getStatus);
-    assert.notCalled(netatmoManager.saveConfiguration);
-    assert.notCalled(netatmoManager.saveStatus);
-    assert.notCalled(netatmoManager.connect);
-    assert.calledOnce(netatmoManager.retrieveTokens);
-    assert.notCalled(netatmoManager.disconnect);
-
-
-    // console.log(netatmoManager.retrieveTokens.getCall(0).args);
-    // console.log(req.body);
+    assert.calledOnce(netatmoManagerFake.getConfiguration);
+    assert.notCalled(netatmoManagerFake.getStatus);
+    assert.notCalled(netatmoManagerFake.saveConfiguration);
+    assert.notCalled(netatmoManagerFake.saveStatus);
+    assert.notCalled(netatmoManagerFake.connect);
+    assert.calledOnce(netatmoManagerFake.retrieveTokens);
+    assert.notCalled(netatmoManagerFake.disconnect);
     sinon.assert.calledOnceWithExactly(
-      netatmoManager.retrieveTokens,
+      netatmoManagerFake.retrieveTokens,
       sinon.match.any,
       configuration,
       req.body
     );
-    // sinon.assert.calledWithExactly(res.json, { success: configuration });
-    // sinon.assert.calledOnceWithExactly(netatmoManager.retrieveTokens, sinon.match.any, configuration, req.body);
     sinon.assert.calledWithExactly(res.json, { result: { success: true } });
   });
   it('should disconnect', async () => {
@@ -196,16 +160,14 @@ describe.only('NetatmoController GET/POST', () => {
     const res = {
       json: fake(),
     };
-
     await controller['post /api/v1/service/netatmo/disconnect'].controller(req, res);
-    assert.notCalled(netatmoManager.getConfiguration);
-    assert.notCalled(netatmoManager.getStatus);
-    assert.notCalled(netatmoManager.saveConfiguration);
-    assert.notCalled(netatmoManager.saveStatus);
-    assert.notCalled(netatmoManager.connect);
-    assert.notCalled(netatmoManager.retrieveTokens);
-    sinon.assert.calledOnce(netatmoManager.disconnect);
-
+    assert.notCalled(netatmoManagerFake.getConfiguration);
+    assert.notCalled(netatmoManagerFake.getStatus);
+    assert.notCalled(netatmoManagerFake.saveConfiguration);
+    assert.notCalled(netatmoManagerFake.saveStatus);
+    assert.notCalled(netatmoManagerFake.connect);
+    assert.notCalled(netatmoManagerFake.retrieveTokens);
+    sinon.assert.calledOnce(netatmoManagerFake.disconnect);
     sinon.assert.calledWithExactly(res.json, { success: true });
   });
 

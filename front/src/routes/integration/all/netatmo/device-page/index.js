@@ -81,13 +81,13 @@ class DevicePage extends Component {
   updateStatusError = async state => {
     console.log('state', state);
     switch (state.statusType) {
-      case STATUS.CONNECTING:
+      case STATUS.ERROR.CONNECTING:
         this.setState({
           accessDenied: true,
           messageAlert: state.status
         });
         break;
-      case STATUS.PROCESSING_TOKEN:
+      case STATUS.ERROR.PROCESSING_TOKEN:
         this.setState({
           connectNetatmoStatus: state.status
         });
@@ -103,12 +103,12 @@ class DevicePage extends Component {
     // this.init();
     this.loadProps();
     // this.loadStatus();
-    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatusError);
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
       this.updateStatus
     );
+    this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
   }
 
   componentWillUnmount() {

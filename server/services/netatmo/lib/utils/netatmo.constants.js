@@ -24,7 +24,13 @@ const STATUS = {
   PROCESSING_TOKEN: 'processing token',
   CONNECTED: 'connected',
   DISCONNECTED: 'disconnected',
-  ERROR: 'error',
+  // ERROR: 'error',
+  ERROR: {
+    CONNECTING: 'error connecting',
+    PROCESSING_TOKEN: 'error processing token',
+    DISCONNECTING: 'error disconnecting',
+    CONNECTED: 'error connected',
+  },
   DISCOVERING_DEVICES: 'discovering',
 };
 

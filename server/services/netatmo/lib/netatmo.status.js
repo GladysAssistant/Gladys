@@ -26,25 +26,66 @@ function getStatus() {
  */
 function saveStatus(status) {
   logger.debug('Changing status Netatmo ...');
-  this.status = status.message;
   try {
     switch (status.statusType) {
-      case STATUS.CONNECTING:
+      case STATUS.ERROR.CONNECTING:
+        this.status = STATUS.DISCONNECTED;
+        this.connected = false;
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING,
-          payload: { statusType: STATUS.CONNECTING, status: this.status },
+          payload: { statusType: STATUS.CONNECTING, status: status.message },
         });
         break;
-      case STATUS.PROCESSING_TOKEN:
+      case STATUS.ERROR.PROCESSING_TOKEN:
+        this.status = STATUS.DISCONNECTED;
+        this.connected = false;
         this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
           type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
-          payload: { statusType: STATUS.PROCESSING_TOKEN, status: this.status },
+          payload: { statusType: STATUS.PROCESSING_TOKEN, status: status.message },
         });
+        break;
+      case STATUS.ERROR.CONNECTED:
+        this.configured = true;
+        this.status = STATUS.DISCONNECTED;
+        this.connected = false;
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTED,
+          payload: { statusType: STATUS.CONNECTED, status: status.message },
+        });
+        break;
+      case STATUS.NOT_INITIALIZED:
+        this.configured = false;
+        this.status = STATUS.NOT_INITIALIZED;
+        this.connected = false;
+        break;
+      case STATUS.CONNECTING:
+        this.configured = true;
+        this.status = STATUS.CONNECTING;
+        this.connected = false;
+        break;
+      case STATUS.PROCESSING_TOKEN:
+        this.configured = true;
+        this.status = STATUS.PROCESSING_TOKEN;
+        this.connected = false;
+        break;
+      case STATUS.CONNECTED:
+        this.configured = true;
+        this.status = STATUS.CONNECTED;
+        this.connected = true;
+        break;
+      case STATUS.DISCONNECTED:
+        this.configured = true;
+        this.status = STATUS.DISCONNECTED;
+        this.connected = false;
         break;
       default:
         break;
     }
     logger.debug('Status Netatmo well changed');
+    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
+      payload: { status: this.status },
+    });
     return true;
   } catch (e) {
     return false;
