@@ -27,6 +27,7 @@ async function getDeviceStatus(deviceExternalId) {
     chargeStatus: vacbot.chargeStatus,
     cleanReport: vacbot.cleanReport,
     batteryLevel: vacbot.batteryLevel,
+    isOnline: vacbot.errorCode !== "4200",
   };
   logger.trace(`Vacbot charge status : ${Object.keys(vacbot)}`);
   logger.debug(`Vacbot ${deviceExternalId} status : ${JSON.stringify(status)}`);
