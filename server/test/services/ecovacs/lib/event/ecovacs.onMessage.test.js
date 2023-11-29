@@ -25,4 +25,11 @@ describe('ecovacs.onMessage command', () => {
       state: 10,
     });
   });
+
+  it('should update device state with a new battery value when CleanReport event is fired', async () => {
+    const gladys = { event };
+    const ecovacsService = EcovacsService(gladys, serviceId);
+    const type = 'CleanReport';
+    await ecovacsService.device.onMessage(type, devices[0], 10.1);
+  });
 });
