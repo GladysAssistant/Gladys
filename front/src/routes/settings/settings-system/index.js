@@ -65,6 +65,26 @@ class SettingsSystem extends Component {
     });
   };
 
+  updateDeviceAggregateStateHistory = async e => {
+    await this.setState({
+      deviceAggregateStateHistoryInDays: e.target.value,
+      savingDeviceStateHistory: true
+    });
+    try {
+      await this.props.httpClient.post(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS}`,
+        {
+          value: e.target.value
+        }
+      );
+    } catch (e) {
+      console.error(e);
+    }
+    await this.setState({
+      savingDeviceStateHistory: false
+    });
+  };
+
   updateNumberOfHoursBeforeStateIsOutdated = async e => {
     await this.setState({
       numberOfHoursBeforeStateIsOutdated: e.target.value,
@@ -98,6 +118,26 @@ class SettingsSystem extends Component {
     }
   };
 
+  getDeviceAggregateStateHistoryPreference = async () => {
+    try {
+      const { value } = await this.props.httpClient.get(
+        `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS}`
+      );
+      this.setState({
+        deviceAggregateStateHistoryInDays: value
+      });
+    } catch (e) {
+      console.error(e);
+      const status = get(e, 'response.status');
+      if (status === 404) {
+        // Default value is -1
+        this.setState({
+          deviceAggregateStateHistoryInDays: '-1'
+        });
+      }
+    }
+  };
+
   getNumberOfHoursBeforeStateIsOutdated = async () => {
     try {
       const { value } = await this.props.httpClient.get(
@@ -121,6 +161,7 @@ class SettingsSystem extends Component {
     this.props.getContainers();
     this.getTimezone();
     this.getDeviceStateHistoryPreference();
+    this.getDeviceAggregateStateHistoryPreference();
     this.getNumberOfHoursBeforeStateIsOutdated();
     // we start the ping a little bit after to give it some time to breathe
     this.refreshPingIntervalId = setInterval(() => {
@@ -144,6 +185,7 @@ class SettingsSystem extends Component {
     {
       selectedTimezone,
       deviceStateHistoryInDays,
+      deviceAggregateStateHistoryInDays,
       vacuumStarted,
       numberOfHoursBeforeStateIsOutdated,
       savingNumberOfHourseBeforeStateIsOutdated
@@ -165,9 +207,11 @@ class SettingsSystem extends Component {
         updateTimezone={this.updateTimezone}
         selectedTimezone={selectedTimezone}
         deviceStateHistoryInDays={deviceStateHistoryInDays}
+        deviceAggregateStateHistoryInDays={deviceAggregateStateHistoryInDays}
         numberOfHoursBeforeStateIsOutdated={numberOfHoursBeforeStateIsOutdated}
         savingNumberOfHourseBeforeStateIsOutdated={savingNumberOfHourseBeforeStateIsOutdated}
         updateDeviceStateHistory={this.updateDeviceStateHistory}
+        updateDeviceAggregateStateHistory={this.updateDeviceAggregateStateHistory}
         updateNumberOfHoursBeforeStateIsOutdated={this.updateNumberOfHoursBeforeStateIsOutdated}
         vacuumDatabase={this.vacuumDatabase}
         vacuumStarted={vacuumStarted}

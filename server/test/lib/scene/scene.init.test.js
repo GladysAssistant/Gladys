@@ -46,7 +46,7 @@ describe('scene.init', () => {
 
   it('should init scene all scheduled task', async () => {
     await sceneManager.init();
-    assert.callCount(scheduler.scheduleJob, 3);
+    assert.callCount(scheduler.scheduleJob, 4);
     assert.calledWithMatch(
       scheduler.scheduleJob,
       { tz: 'Europe/Paris', hour: 0, minute: 0, second: 0 },
@@ -55,7 +55,7 @@ describe('scene.init', () => {
     assert.calledWithMatch(scheduler.scheduleJob, '* * * * *', sinon.match.func);
 
     // Check that scheduled method send an event
-    scheduler.scheduleJob.getCall(2).callback();
+    scheduler.scheduleJob.getCall(3).callback();
     assert.calledOnceWithExactly(event.emit, 'calendar.check-if-event-is-coming');
   });
 });

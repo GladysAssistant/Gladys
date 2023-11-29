@@ -11,17 +11,12 @@ const CardFilter = ({ changeOrderDir, orderValue = 'asc', search, searchValue, s
         <Text id="global.orderDirDesc" />
       </option>
     </select>
+
     <div class="input-icon ml-2">
       <span class="input-icon-addon">
         <i class="fe fe-search" />
       </span>
-      <input
-        type="text"
-        class="form-control w-10"
-        placeholder={searchPlaceHolder}
-        onInput={search}
-        value={searchValue}
-      />
+      <input type="text" class="form-control" placeholder={searchPlaceHolder} onInput={search} value={searchValue} />
     </div>
   </Fragment>
 );

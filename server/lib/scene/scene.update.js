@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
@@ -16,6 +17,13 @@ async function update(selector, scene) {
     where: {
       selector,
     },
+    include: [
+      {
+        model: db.TagScene,
+        as: 'tags',
+        attributes: ['name'],
+      },
+    ],
   });
 
   if (existingScene === null) {
@@ -25,6 +33,21 @@ async function update(selector, scene) {
   const oldName = existingScene.name;
 
   await existingScene.update(scene);
+
+  await db.TagScene.destroy({
+    where: {
+      scene_id: existingScene.id,
+    },
+  });
+
+  if (scene.tags) {
+    await db.TagScene.bulkCreate(
+      scene.tags.map((tag) => ({
+        scene_id: existingScene.id,
+        name: tag.name,
+      })),
+    );
+  }
 
   const plainScene = existingScene.get({ plain: true });
   // Remove scene in brain if already present

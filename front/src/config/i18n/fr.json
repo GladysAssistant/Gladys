@@ -132,7 +132,7 @@
       "title": "Clé de restauration",
       "description": "Les sauvegardes Gladys Plus sont entièrement chiffrées, c'est pour cela que nous avons besoin de votre clé de restauration.",
       "backupKeyLabel": "Clé de restauration",
-      "backupKeyPlaceholder": "Saississez votre clé de restauration",
+      "backupKeyPlaceholder": "Saisissez votre clé de restauration",
       "cancelButton": "Annuler",
       "saveButton": "Enregistrer"
     },
@@ -160,6 +160,9 @@
         "durationOneWeek": "1 semaine",
         "durationOneMonth": "1 mois",
         "durationThreeMonth": "3 mois",
+        "durationSixMonths": "6 mois",
+        "durationOneYear": "1 an",
+        "durationTwoYears": "2 ans",
         "unlimited": "Illimité"
       },
       "saveSettingsButton": "Sauvegarder les paramètres"
@@ -241,7 +244,7 @@
       "weather": "Météo",
       "temperature-in-room": "Température de la pièce",
       "humidity-in-room": "Humidité de la pièce",
-      "user-presence": "Utilisateurs présent",
+      "user-presence": "Utilisateurs présents",
       "camera": "Caméra",
       "devices-in-room": "Appareils de la pièce",
       "devices": "Appareils",
@@ -308,6 +311,7 @@
         "editBoxNamePlaceholder": "Nom de la box",
         "latencyBoxName": "Latence",
         "latencyBoxDescription": "Plus vous sélectionnez une latence basse, et plus vite le live démarrera. Néanmoins, pour avoir une latence basse, il faut une connexion internet très rapide et avec un minimum de ping sinon la vidéo sera saccadée. Nous conseillons une latence moyenne ou basse.",
+        "upgradeGladysPlusPlanError": "Le streaming de caméra n'est pas compris dans votre plan Gladys Plus. Vous devez le mettre à jour dans Paramètres -> Facturation.",
         "liveStartError": "Une erreur est survenue en démarrant le streaming. Est-ce que l'URL de votre caméra est bien une URL d'un flux vidéo et pas une image ?",
         "notNotSupportedBrowser": "Ce navigateur n'est pas supporté. Afin de permettre le chiffrement de bout en bout de ce flux vidéo, nous utilisons l'API MediaSource, qui n'est malheureusement pas disponible sur Safari iPhone. Etrangement, cette fonctionnalité est disponible sur Safari iPad et MacOS... Il faudra s'armer de patience, espérons que l'API arrive vite sur iPhone !",
         "tooManyRequests": "Vous avez atteint votre limite mensuelle de bande passante vidéo. Contactez-nous par email ou sur le forum pour avoir plus de bande passante !",
@@ -349,7 +353,7 @@
       "ecowatt": {
         "title": "Ecowatt France",
         "description": "Cette box vous permet de vérifier l'état du réseau électrique français grâce à l'API Ecowatt.",
-        "error": "Une erreur est survenue lors du rafraichissement via l'API RTE, merci de re-essayer.",
+        "error": "Une erreur est survenue lors du rafraîchissement via l'API RTE, merci de re-essayer.",
         "dailyTitle": "Prévisions du jour",
         "nextDaysTitle": "Prévisions des prochains jours",
         "ok": "Réseau ok",
@@ -377,7 +381,7 @@
         "partiallyArmedButton": "Armement",
         "partiallyArmedButtonSecondLine": "partiel",
         "panicButton": "Panique",
-        "editBoxNameLabel": "Nom du widget",
+        "editBoxNameLabel": "Nom du widget (optionnel)",
         "editBoxNamePlaceholder": "Entrez le nom du widget",
         "editHouseLabel": "Sélectionnez la maison qui est concernée pour l'activation/désactivation de l'alarme.",
         "alarmStatusText": "Votre maison est ",
@@ -416,7 +420,7 @@
       "accountTab": "Compte",
       "syncTab": "Synchronisation",
       "shareTab": "Partage",
-      "description": "Synchonisez vos calendriers CalDAV.",
+      "description": "Synchronisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
       "shareIntroduction": "Choisissez les calendriers que vous voulez partager avec les autres utilisateurs de cette installation Gladys. Ils deviennent ensuite utilisables dans les scènes et affichables dans l'onglet calendrier pour tous les utilisateurs de cette installation.",
@@ -514,7 +518,7 @@
         "createDeviceError": "Une erreur s'est produite lors de la création de cet appareil dans Gladys.",
         "notManagedByBluteoothButton": "Géré par le service \"{{service}}\"",
         "notManagedByBluteooth": "Vous ne pouvez gérer cet appareil ici car il est déjà attaché au service \"{{service}}\".",
-        "saveSuccess": "L'appareil Bluetooth a été créé avec succés.",
+        "saveSuccess": "L'appareil Bluetooth a été créé avec succès.",
         "saveError": "Une erreur est survenue lors de la création de l'appareil.",
         "peripheral": {
           "title": "Configuration d'un appareil Bluetooth",
@@ -576,7 +580,12 @@
         "scanButton": "Recherche sur le réseau",
         "bridgeButtonNotPressed": "Le bouton du pont n'a pas été appuyé : veuillez appuyer sur le bouton de votre pont Philips Hue et réessayer.",
         "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
-        "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?"
+        "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?",
+        "manualConfiguration": {
+          "title": "Configuration manuelle",
+          "text": "Si vous connaissez l'adresse IP de votre pont Philips Hue, vous pouvez la saisir et lancer une configuration manuelle.",
+          "input": "Adresse IP"
+        }
       },
       "device": {
         "title": "Appareils dans Gladys",
@@ -654,7 +663,7 @@
           "discoverButton": "Rechercher",
           "usernameLabel": "Nom d'utilisateur",
           "passwordLabel": "Mot de passe",
-          "needAuthenticationAlert": "L'apparail est protégé par nom d'utilisateur et mot de passe.",
+          "needAuthenticationAlert": "L'appareil est protégé par nom d'utilisateur et mot de passe.",
           "authenticateButton": "Se connecter et analyser",
           "authError": "Nom d'utilisateur ou mot de passe incorrects."
         }
@@ -766,7 +775,7 @@
         "deviceNotHandled": "L'appareil n'est pas encore géré, veuillez nous contacter pour nous aider à le connecter dans Gladys !",
         "createGithubIssue": "Proposer ce périphérique"
       },
-      "noDeviceFound": "Auncun appareil zigbee2mqtt n'a encore été ajouté.",
+      "noDeviceFound": "Aucun appareil zigbee2mqtt n'a encore été ajouté.",
       "nameLabel": "Nom",
       "namePlaceholder": "Donner un nom à l'appareil",
       "roomLabel": "Pièce",
@@ -791,7 +800,7 @@
         "running": "Node-RED démarré avec succès.",
         "notEnabled": "Node-RED n'est pas activé.",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Node-RED depuis Gladys.",
-        "invalidDockerNetwork": "Gladys est basée sur une installation personalisée, pour installer Node-RED depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"."
+        "invalidDockerNetwork": "Gladys est basée sur une installation personnalisée, pour installer Node-RED depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\"."
       },
       "setup": {
         "title": "Configuration du service Node-RED",
@@ -821,7 +830,7 @@
       "longDescription": "Il est possible d'utiliser Google Home pour contrôler vos appareils Gladys à la voix. Pour configurer Google Home, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
       "pageTitle": "Gladys Assistant",
       "cardTitle": "Voulez-vous connecter Gladys Assistant à Google ?",
-      "pageDescription": "En vous connectant, vous authorizez Google à accéder à vos appareils.",
+      "pageDescription": "En vous connectant, vous autorisez Google à accéder à vos appareils.",
       "error": "Une erreur est survenue. Merci de réessayer.",
       "connectedAs": "Connecté en tant que",
       "googleWillBeAble": "Google pourra :",
@@ -846,7 +855,7 @@
         "error": "Une erreur est survenue pendant le processus de liaison avec votre compte Enedis, merci de réessayer.",
         "notOnGladysGateway": "Cette intégration est disponible via Gladys Plus, pour vous connectez/re-connecter rendez-vous sur l'interface Gladys Plus, disponible ici :",
         "connectedToUsagePointds": "Connecté à Enedis avec succès ! La première synchronisation peut prendre entre 2h et 3h selon le volume de requêtes sur l'API Enedis. Il n'est pas nécessaire de garder cet onglet ouvert, la synchronisation a lieu en arrière-plan.",
-        "reconnectInfo": "Si jamais vous voulez rafraichir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 2 ans.",
+        "reconnectInfo": "Si jamais vous voulez rafraîchir votre clé d'accès, vous pouvez refaire le processus de connexion. Il est nécessaire de se reconnecter une fois tous les 2 ans.",
         "dailyConsumptionFeatureName": "Consommation quotidienne"
       },
       "usagePoints": {
@@ -880,7 +889,7 @@
       "longDescription": "Il est possible d'utiliser Amazon Alexa pour contrôler vos appareils Gladys à la voix. Pour configurer Alexa, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
       "pageTitle": "Gladys Assistant",
       "cardTitle": "Voulez-vous connecter Gladys Assistant à Amazon Alexa ?",
-      "pageDescription": "En vous connectant, vous authorizez Alexa à accéder à vos appareils.",
+      "pageDescription": "En vous connectant, vous autorisez Alexa à accéder à vos appareils.",
       "error": "Une erreur est survenue. Merci de réessayer.",
       "connectedAs": "Connecté en tant que",
       "googleWillBeAble": "Amazon Alexa pourra :",
@@ -1415,9 +1424,15 @@
     }
   },
   "editScene": {
+    "settings": "Configuration",
+    "nameTitle": "Nom de scène",
     "editNamePlaceholder": "Entrez un nom de scène",
     "descriptionTitle": "Description",
+    "iconLabel": "Icône",
     "editDescriptionPlaceholder": "Entrez une description pour la scène",
+    "createTag": "Créer le tag : '{{tagName}}'",
+    "tagsTitle": "Tags",
+    "editTagsPlaceholder": "Entrez un tag pour la scène",
     "startButton": "Démarrer",
     "saveButton": "Sauvegarder",
     "deleteButton": "Supprimer",
@@ -1681,6 +1696,9 @@
       },
       "system": {
         "start": "Gladys démarre"
+      },
+      "mqtt": {
+        "received": "Recevoir un message MQTT"
       }
     },
     "triggersCard": {
@@ -1779,6 +1797,14 @@
       },
       "gladysStart": {
         "description": "Cette scène sera exécutée à chaque démarrage de Gladys"
+      },
+      "mqttReceived": {
+        "description": "Cette scène s'exécutera lorsque un message sera reçu dans le topic MQTT sélectionné",
+        "topicLabel": "Topic",
+        "topicPlaceholder": "Entrez votre topic",
+        "messageLabel": "Message",
+        "messagePlaceholder": "Entrez le message attendu",
+        "messageDescription": "Entrez le message attendu ou laissez vide pour exécuter la scène quelque soit le message"
       }
     }
   },
@@ -1974,6 +2000,7 @@
       "hourly-device-state-aggregate": "Agrégation donnée capteur horaire",
       "gladys-gateway-backup": "Sauvegarde Gladys Plus",
       "device-state-purge-single-feature": "Nettoyage des états d'un appareil",
+      "device-state-purge": "Nettoyage des vieux états d'appareils",
       "vacuum": "Nettoyage de la base de donnée",
       "service-zigbee2mqtt-backup": "Sauvegarde Zigbee2MQTT"
     },
@@ -2008,7 +2035,9 @@
     "timezone": "Fuseau horaire",
     "timezoneText": "Le fuseau horaire est utilisé dans les scènes programmées.",
     "deviceStateRetentionTime": "Conserver l'historique des états des appareils",
-    "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états des appareils.",
+    "deviceStateRetentionTimeDescription": "La période pendant laquelle Gladys gardera en base de données les états bruts des appareils.",
+    "deviceAggregatesStateRetentionTime": "Conserver les états agrégées",
+    "deviceAggregatesStateRetentionTimeDescription": "Gladys calcule des historiques d'états pré-calculés afin d'avoir des données plus légère à afficher sur le tableau de bord. Vous pouvez sélectionner ici combien de temps ces données doivent être gardée.",
     "numberOfHoursBeforeStateIsOutdated": "Délai avant expiration d'un état",
     "numberOfHoursBeforeStateIsOutdatedDescription": "Ce délai correspond au nombre d'heures avant qu'un état de capteur soit considéré comme \"périmé\" et ainsi plus affiché sur le tableau de bord.",
     "hours": "heures",
@@ -2070,7 +2099,9 @@
     "newButton": "Nouveau",
     "editButton": "Editer",
     "startButton": "Démarrer",
-    "searchPlaceholder": "Chercher une scène"
+    "searchPlaceholder": "Chercher une scène",
+    "filterTagsName": "Filtrer par tags",
+    "unselectTags": "Désélectionner tous les tags"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -2129,6 +2160,7 @@
   },
   "gatewayBackup": {
     "title": "Sauvegardes",
+    "youNeedToUpgrade": "Cette fonctionnalité n'est pas disponible sur votre plan Gladys Plus. Vous devez passer à un plan supérieur pour accéder aux sauvegardes. ",
     "description": "Si vous êtes abonné à Gladys Plus, Gladys crée une sauvegarde chiffrée de votre instance toutes les 24 heures. Vous seul pouvez déchiffrer les sauvegardes. Vous pouvez restaurer ces sauvegardes en un seul clic dans cette installation, ou toute nouvelle configuration.",
     "createdAtColumn": "Date",
     "sizeColumn": "Taille",
@@ -2381,8 +2413,8 @@
       "opening-sensor": {
         "binary": {
           "other": "Aucune valeur reçue",
-          "zero": "Fermé",
-          "one": "Ouvert"
+          "zero": "Ouvert",
+          "one": "Fermé"
         }
       },
       "co-sensor": {
@@ -2671,7 +2703,7 @@
     "typingInProgress": "Ecrit...",
     "gladysAlt": "Gladys",
     "gpt3Integration": "Intégration avec ChatGPT",
-    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec ChatGPT, ce qui lui donne une intelligence sur-dimensionné ! Pour en savoir plus,",
+    "gpt3IntegrationExplanation": "Gladys est maintenant compatible avec ChatGPT, ce qui lui donne une intelligence sur-dimensionnée ! Pour en savoir plus,",
     "gpt3ClickHere": "cliquez-ici !",
     "examples": {
       "whatsTheWeatherLike": "\"Quel temps fait-il ?\"",

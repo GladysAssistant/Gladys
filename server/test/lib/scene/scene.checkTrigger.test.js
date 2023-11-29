@@ -22,6 +22,14 @@ describe('scene.checkTrigger', () => {
 
   const brain = {};
 
+  const service = {
+    getService: fake.returns({
+      device: {
+        subscribe: fake.returns(null),
+      },
+    }),
+  };
+
   beforeEach(() => {
     const house = {
       get: fake.resolves([]),
@@ -42,7 +50,7 @@ describe('scene.checkTrigger', () => {
 
     const stateManager = new StateManager();
 
-    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain);
+    sceneManager = new SceneManager(stateManager, event, device, {}, {}, house, {}, {}, {}, scheduler, brain, service);
   });
 
   afterEach(() => {

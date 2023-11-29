@@ -514,6 +514,10 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: sceneController.duplicate,
     },
+    'get /api/v1/tag_scene': {
+      authenticated: true,
+      controller: sceneController.getTag,
+    },
     // system
     'get /api/v1/system/info': {
       authenticated: true,
