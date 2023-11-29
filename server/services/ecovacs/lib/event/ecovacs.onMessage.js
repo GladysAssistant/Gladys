@@ -20,10 +20,10 @@ function onMessage(type, device, value) {
       });
       break;
     case 'CleanReport':
-        logger.trace(`CleanReport: ${value}`);
-        break;
+      logger.trace(`CleanReport: ${value}`);
+      break;
     default:
-        logger.info(`Event ${type} with value "${value}" is not handled yet.`);
+      logger.info(`Event ${type} with value "${value}" is not handled yet.`);
   }
 }
 module.exports = {

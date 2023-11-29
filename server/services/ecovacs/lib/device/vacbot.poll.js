@@ -39,14 +39,14 @@ async function poll(device) {
     vacbot.run('GetCleanState'); // retrieve the cleaning status. Answer : { trigger: 'alert', state: 'idle' }
     vacbot.run('GetChargeState'); // retrieve the charging status. Answer : { isCharging: 1, mode: 'slot' }
     vacbot.run('GetSleepStatus'); // retrieve the sleep status. Answer : { enable: 1 }
-  };
+  }
 
   // logger.trace(`POLL vacbot : `, vacbot);
   switch (vacbot.errorCode) {
-    case "3": // String (see ecovacs-deebot.js/library/errorCodes.json)
+    case '3': // String (see ecovacs-deebot.js/library/errorCodes.json)
       logger.error(`Error "${vacbot.errorCode}" occured : ${vacbot.errorDescription}.`);
       break;
-    case "4200":
+    case '4200':
       logger.error(`Error "${vacbot.errorCode}" occured : ${vacbot.errorDescription}.`);
       this.connected = false;
       vacbot.disconnect();
@@ -54,7 +54,7 @@ async function poll(device) {
     default:
       logger.debug(`Error code "${vacbot.errorCode}" : ${vacbot.errorDescription}.`);
       break;
-  };
+  }
 }
 
 module.exports = {
