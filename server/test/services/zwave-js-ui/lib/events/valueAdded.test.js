@@ -431,17 +431,17 @@ describe('zwaveJSUIManager valueAdded', () => {
     ]);
   });
 
-  it('should handle value added 49-0-Air temperature', () => {
+  it('should handle value added 49-0-Air_temperature', () => {
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 49,
       endpoint: 0,
-      property: 'Air temperature',
+      property: 'Air_temperature',
       type: 'number',
       label: 'Air temperature',
       unit: '°C',
       writeable: false,
     });
-    expect(zwaveJSUIManager.nodes[1].classes[49][0]['Air temperature']).to.deep.equal({
+    expect(zwaveJSUIManager.nodes[1].classes[49][0].Air_temperature).to.deep.equal({
       commandClass: 49,
       endpoint: 0,
       genre: 'user',
@@ -449,7 +449,7 @@ describe('zwaveJSUIManager valueAdded', () => {
       label: 'Air temperature',
       unit: '°C',
       nodeId: 1,
-      property: 'Air temperature',
+      property: 'Air_temperature',
       writeable: false,
     });
     const nodes = zwaveJSUIManager.getNodes();
@@ -458,7 +458,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'temperature-sensor',
-        external_id: 'zwave-js-ui:node_id:1:comclass:49:endpoint:0:property:Air temperature',
+        external_id: 'zwave-js-ui:node_id:1:comclass:49:endpoint:0:property:Air_temperature',
         type: 'decimal',
         has_feedback: true,
         last_value: undefined,
@@ -472,23 +472,23 @@ describe('zwaveJSUIManager valueAdded', () => {
     ]);
   });
 
-  it('should handle value added 113-0-Smoke Alarm-Sensor status', () => {
+  it('should handle value added 113-0-Smoke_Alarm-Sensor_status', () => {
     zwaveJSUIManager.valueAdded(zwaveNode, {
       commandClass: 113,
       endpoint: 0,
-      property: 'Smoke Alarm-Sensor status',
+      property: 'Smoke_Alarm-Sensor_status',
       type: 'number',
       label: 'Motion sensor status',
       writeable: false,
     });
-    expect(zwaveJSUIManager.nodes[1].classes[113][0]['Smoke Alarm-Sensor status']).to.deep.equal({
+    expect(zwaveJSUIManager.nodes[1].classes[113][0]['Smoke_Alarm-Sensor_status']).to.deep.equal({
       commandClass: 113,
       endpoint: 0,
       genre: 'user',
       label: 'Motion sensor status',
       type: 'number',
       nodeId: 1,
-      property: 'Smoke Alarm-Sensor status',
+      property: 'Smoke_Alarm-Sensor_status',
       writeable: false,
     });
     const nodes = zwaveJSUIManager.getNodes();
@@ -497,7 +497,7 @@ describe('zwaveJSUIManager valueAdded', () => {
     expect(nodes[0].features).to.deep.equal([
       {
         category: 'smoke-sensor',
-        external_id: 'zwave-js-ui:node_id:1:comclass:113:endpoint:0:property:Smoke Alarm-Sensor status',
+        external_id: 'zwave-js-ui:node_id:1:comclass:113:endpoint:0:property:Smoke_Alarm-Sensor_status',
         has_feedback: true,
         last_value: undefined,
         name: 'Motion sensor status',
