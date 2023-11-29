@@ -4,10 +4,6 @@
   align-items: center;
 }
 
-.deviceSelector {
-  z-index: 10;
-}
-
 .explanationText {
   font-size: 12px;
   margin-bottom: .375rem;
