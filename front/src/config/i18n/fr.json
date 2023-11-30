@@ -572,6 +572,7 @@
       "description": "Contrôler les lumières Philips Hue.",
       "deviceTab": "Appareils",
       "setupTab": "Configuration des Ponts",
+      "documentation": "Documentation",
       "setup": {
         "connectedBridgesTitle": "Ponts connectés",
         "disconnectButton": "Déconnexion",
