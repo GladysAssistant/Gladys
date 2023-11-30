@@ -1,5 +1,5 @@
-const { fake } = require("sinon");
-const { STATUS } = require("../../../services/netatmo/lib/utils/netatmo.constants");
+const { fake } = require('sinon');
+const { STATUS } = require('../../../services/netatmo/lib/utils/netatmo.constants');
 
 const NetatmoContext = function NetatmoContext(gladys, serviceId) {
   this.gladys = gladys;

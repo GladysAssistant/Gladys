@@ -2,8 +2,8 @@ const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
 const proxyquire = require('proxyquire').noCallThru();
-const NetatmoContext = require('../netatmo.mock.test');
 const assertJS = require('assert');
+const NetatmoContext = require('../netatmo.mock.test');
 
 const { assert, fake } = sinon;
 
@@ -20,8 +20,6 @@ const gladys = {
   },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-// const netatmoHandler = new NetatmoHandler(gladys, serviceId);
-
 const configuration = {
   clientId: 'clientId',
   clientSecret: 'clientSecret',
@@ -29,30 +27,24 @@ const configuration = {
 const refreshToken = 'refreshToken';
 
 describe('NetatmoHandler.refreshingTokens', () => {
-  let netatmoHandler
+  let netatmoHandler;
   beforeEach(() => {
     sinon.reset();
     netatmoHandler = new NetatmoHandler(gladys, serviceId);
   });
-
   afterEach(() => {
     sinon.reset();
     nock.cleanAll();
   });
-
   it('should throw an error if clientId is missing', async () => {
     const badConfiguration = { ...configuration, clientId: null };
     try {
-      await netatmoHandler.refreshingTokens(
-        badConfiguration,
-        refreshToken,
-      );
+      await netatmoHandler.refreshingTokens(badConfiguration, refreshToken);
       // assert.fail();
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
     }
-
     expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
     assert.callCount(gladys.event.emit, 1);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -63,17 +55,13 @@ describe('NetatmoHandler.refreshingTokens', () => {
   it('should throw an error if clientSecret is missing', async () => {
     const badConfiguration = { ...configuration, clientSecret: null };
     try {
-      await netatmoHandler.refreshingTokens(
-        badConfiguration,
-        refreshToken,
-      );
+      await netatmoHandler.refreshingTokens(badConfiguration, refreshToken);
       assert.fail();
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
       expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
     }
-
     expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
     assert.callCount(gladys.event.emit, 1);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -84,16 +72,12 @@ describe('NetatmoHandler.refreshingTokens', () => {
   it('should throw an error if refreshToken is missing', async () => {
     const badRefreshToken = null;
     try {
-      await netatmoHandler.refreshingTokens(
-        configuration,
-        badRefreshToken,
-      );
+      await netatmoHandler.refreshingTokens(configuration, badRefreshToken);
       assert.fail();
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
     }
-
     expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
     assert.callCount(gladys.event.emit, 1);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -102,31 +86,27 @@ describe('NetatmoHandler.refreshingTokens', () => {
     });
   });
   it('should refresh tokens successfully', async () => {
-    netatmoHandler.stateGetAccessToken = 'state'
+    netatmoHandler.stateGetAccessToken = 'state';
     const setTokensSpy = sinon.spy(netatmoHandler, 'setTokens');
     nock(`${netatmoHandler.baseUrl}`)
       .persist()
       .post('/oauth2/token')
       .reply(200, {
-        access_token: 'fake_access_token',
-        refresh_token: 'fake_refresh_token',
+        access_token: 'fake_accessToken',
+        refresh_token: 'fake_refreshToken',
         expire_in: 10800,
       });
-
-    const response = await netatmoHandler.refreshingTokens(
-      configuration,
-      refreshToken,
-    );
+    const response = await netatmoHandler.refreshingTokens(configuration, refreshToken);
     // Checking the results
     expect(response).to.deep.equal({ success: true });
     expect(netatmoHandler.status).to.equal(STATUS.CONNECTED);
     expect(netatmoHandler.configured).to.eq(true);
     // Checking that setTokens was called with the correct tokens
-    expect(setTokensSpy.calledOnce).to.be.true;
-    expect(setTokensSpy.calledWith(sinon.match.has('access_token', 'fake_access_token'))).to.be.true;
-    expect(setTokensSpy.calledWith(sinon.match.has('refresh_token', 'fake_refresh_token'))).to.be.true;
-    expect(setTokensSpy.calledWith(sinon.match.has('expire_in', 10800))).to.be.true;
-    expect(setTokensSpy.calledWith(sinon.match.has('connected', true))).to.be.true;
+    expect(setTokensSpy.calledOnce).to.equal(true);
+    expect(setTokensSpy.calledWith(sinon.match.has('accessToken', 'fake_accessToken'))).to.equal(true);
+    expect(setTokensSpy.calledWith(sinon.match.has('refreshToken', 'fake_refreshToken'))).to.equal(true);
+    expect(setTokensSpy.calledWith(sinon.match.has('expireIn', 10800))).to.equal(true);
+    expect(setTokensSpy.calledWith(sinon.match.has('connected', true))).to.equal(true);
     // Checking the events emits
     assert.callCount(gladys.event.emit, 2);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -168,7 +148,7 @@ describe('NetatmoHandler.refreshingTokens', () => {
           payload: { status: STATUS.DISCONNECTED },
         });
         return true;
-      }
+      },
     );
     // Cleaning
     nock.isDone();
@@ -179,11 +159,11 @@ describe('NetatmoHandler.refreshingTokens', () => {
       .persist()
       .post('/oauth2/token')
       .reply(200, {
-        access_token: 'fake_access_token',
-        refresh_token: 'fake_refresh_token',
+        access_token: 'fake_accessToken',
+        refresh_token: 'fake_refreshToken',
         expire_in: 10800,
       });
-    netatmoHandler.stateGetAccessToken = 'state'
+    netatmoHandler.stateGetAccessToken = 'state';
     await assertJS.rejects(
       async () => {
         await netatmoHandler.refreshingTokens(configuration, refreshToken);
@@ -194,9 +174,9 @@ describe('NetatmoHandler.refreshingTokens', () => {
         assertJS(!err.message.includes('200'));
         assertJS(netatmoHandler.status === STATUS.DISCONNECTED);
         return true;
-      }
+      },
     );
-    assert.callCount(gladys.event.emit, 3); 
+    assert.callCount(gladys.event.emit, 3);
     assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
       payload: { status: STATUS.PROCESSING_TOKEN },

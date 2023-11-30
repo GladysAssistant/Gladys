@@ -14,35 +14,28 @@ const NetatmoService = proxyquire('../../../services/netatmo/index', { './lib': 
 const gladys = {};
 const serviceId = 'ecca4d93-7a8c-4761-9055-fc15460a4b4a';
 
-
 describe('NetatmoService', () => {
   const netatmoService = NetatmoService(gladys, serviceId);
-
   beforeEach(() => {
     sinon.reset();
   });
-
   afterEach(() => {
     sinon.reset();
   });
-
   it('should start service', async () => {
     await netatmoService.start();
     assert.calledOnce(netatmoService.device.init);
     assert.notCalled(netatmoService.device.disconnect);
   });
-
   it('should stop service', async () => {
     netatmoService.stop();
     assert.notCalled(netatmoService.device.init);
     assert.calledOnce(netatmoService.device.disconnect);
   });
-
   it('isUsed: should return false, service not used', async () => {
     const used = await netatmoService.isUsed();
     expect(used).to.equal(false);
   });
-
   it('isUsed: should return true, service is used', async () => {
     netatmoService.device.status = STATUS.CONNECTED;
     const used = await netatmoService.isUsed();

@@ -17,9 +17,9 @@ function disconnect(netatmoHandler) {
   });
 
   const tokens = {
-    access_token: '',
-    refresh_token: '',
-    expire_in: 0,
+    accessToken: '',
+    refreshToken: '',
+    expireIn: 0,
     connected: false,
   };
   netatmoHandler.setTokens(tokens);

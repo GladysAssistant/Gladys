@@ -18,7 +18,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
     await netatmoHandler.init();
     // await netatmoHandler.loadDevices();
   }
-  
+
   /**
    * @public
    * @description This function stops the service.

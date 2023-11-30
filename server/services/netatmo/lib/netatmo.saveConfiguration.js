@@ -5,7 +5,7 @@ const { GLADYS_VARIABLES } = require('./utils/netatmo.constants');
 /**
  * @description Save Netatmo configuration.
  * @param {object} configuration - Configuration to save.
- * @returns {Promise} Netatmo configuration.
+ * @returns {Promise<boolean>} Netatmo well save configuration.
  * @example
  * await saveConfiguration({ endpoint: '...', accessKey: '...', secretKey: '...'});
  */

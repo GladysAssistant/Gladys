@@ -1,28 +1,17 @@
 const sinon = require('sinon');
 const NetatmoController = require('../../../../../services/netatmo/api/netatmo.controller');
-const { assert, fake } = sinon;
 
+const { assert, fake } = sinon;
 
 const configuration = [
   { username: 'username' },
   { clientId: 'clientId' },
   { clientSecret: 'clientSecret' },
-  { scopes: { scopeEnergy: 'read_thermostat write_thermostat' } }
+  { scopes: { scopeEnergy: 'read_thermostat write_thermostat' } },
 ];
-const bodyTokens = [
-  { codeOAuth: 'codeOAuth' },
-  { state: 'state' },
-  { redirectUri: 'redirectUri' }
-];
-const status = [
-  { configured: true },
-  { connected: false },
-  { status: 'disconnecting' }
-];
-const connectResult = [
-  { authUrl: 'redirectUriComplet' },
-  { state: 'state' }
-]
+const bodyTokens = [{ codeOAuth: 'codeOAuth' }, { state: 'state' }, { redirectUri: 'redirectUri' }];
+const status = [{ configured: true }, { connected: false }, { status: 'disconnecting' }];
+const connectResult = [{ authUrl: 'redirectUriComplet' }, { state: 'state' }];
 
 const netatmoManagerFake = {
   getConfiguration: fake.returns(configuration),
@@ -75,7 +64,7 @@ describe('NetatmoController GET/POST', () => {
   });
   it('should save configuration', async () => {
     const req = {
-      body: configuration
+      body: configuration,
     };
     const res = {
       json: fake(),
@@ -86,17 +75,14 @@ describe('NetatmoController GET/POST', () => {
     assert.calledOnce(netatmoManagerFake.saveConfiguration);
     assert.notCalled(netatmoManagerFake.saveStatus);
     assert.notCalled(netatmoManagerFake.connect);
-    assert.notCalled(netatmoManagerFake.retrieveTokens)
+    assert.notCalled(netatmoManagerFake.retrieveTokens);
     assert.notCalled(netatmoManagerFake.disconnect);
-    sinon.assert.calledOnceWithExactly(
-      netatmoManagerFake.saveConfiguration,
-      req.body
-    );
+    sinon.assert.calledOnceWithExactly(netatmoManagerFake.saveConfiguration, req.body);
     sinon.assert.calledWithExactly(res.json, { success: configuration });
   });
   it('should save status', async () => {
     const req = {
-      body: status
+      body: status,
     };
     const res = {
       json: fake(),
@@ -125,16 +111,12 @@ describe('NetatmoController GET/POST', () => {
     assert.calledOnce(netatmoManagerFake.connect);
     assert.notCalled(netatmoManagerFake.retrieveTokens);
     assert.notCalled(netatmoManagerFake.disconnect);
-    sinon.assert.calledOnceWithExactly(
-      netatmoManagerFake.connect,
-      sinon.match.any,
-      configuration
-    );
+    sinon.assert.calledOnceWithExactly(netatmoManagerFake.connect, sinon.match.any, configuration);
     sinon.assert.calledWithExactly(res.json, { result: connectResult });
   });
   it('should retrieve tokens', async () => {
     const req = {
-      body: bodyTokens
+      body: bodyTokens,
     };
     const res = {
       json: fake(),
@@ -147,12 +129,7 @@ describe('NetatmoController GET/POST', () => {
     assert.notCalled(netatmoManagerFake.connect);
     assert.calledOnce(netatmoManagerFake.retrieveTokens);
     assert.notCalled(netatmoManagerFake.disconnect);
-    sinon.assert.calledOnceWithExactly(
-      netatmoManagerFake.retrieveTokens,
-      sinon.match.any,
-      configuration,
-      req.body
-    );
+    sinon.assert.calledOnceWithExactly(netatmoManagerFake.retrieveTokens, sinon.match.any, configuration, req.body);
     sinon.assert.calledWithExactly(res.json, { result: { success: true } });
   });
   it('should disconnect', async () => {
@@ -170,6 +147,4 @@ describe('NetatmoController GET/POST', () => {
     sinon.assert.calledOnce(netatmoManagerFake.disconnect);
     sinon.assert.calledWithExactly(res.json, { success: true });
   });
-
-
 });

@@ -1,4 +1,3 @@
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { GLADYS_VARIABLES, STATUS } = require('./utils/netatmo.constants');
 const logger = require('../../../utils/logger');
 
@@ -14,9 +13,9 @@ async function getAccessToken() {
 
   if (!accessToken || accessToken === '') {
     const tokens = {
-      access_token: '',
-      refresh_token: '',
-      expire_in: '',
+      accessToken: '',
+      refreshToken: '',
+      expireIn: '',
       connected: false,
     };
     await this.setTokens(tokens);

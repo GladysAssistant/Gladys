@@ -17,8 +17,6 @@ const gladys = {
   },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-// const netatmoHandler = new NetatmoHandler(gladys, serviceId);
-
 const status = {
   configured: false,
   connected: false,
@@ -26,7 +24,7 @@ const status = {
 };
 
 describe('NetatmoHandler.saveStatus', () => {
-  let netatmoHandler
+  let netatmoHandler;
   beforeEach(() => {
     sinon.reset();
     netatmoHandler = new NetatmoHandler(gladys, serviceId);
@@ -39,9 +37,11 @@ describe('NetatmoHandler.saveStatus', () => {
     sinon.reset();
   });
   it('should save and output Netatmo status in case of error during connection', async () => {
-    const result = await netatmoHandler.saveStatus({ statusType: STATUS.ERROR.CONNECTING, message: 'error_connecting' });
-
-    expect(result).to.be.true;
+    const result = await netatmoHandler.saveStatus({
+      statusType: STATUS.ERROR.CONNECTING,
+      message: 'error_connecting',
+    });
+    expect(result).to.equal(true);
     expect(netatmoHandler.status).to.eq(STATUS.DISCONNECTED);
     expect(netatmoHandler.configured).to.eq(status.configured);
     expect(netatmoHandler.connected).to.eq(status.connected);
@@ -56,9 +56,11 @@ describe('NetatmoHandler.saveStatus', () => {
     });
   });
   it('should save and output Netatmo status in case of error when connected', async () => {
-    const result = await netatmoHandler.saveStatus({ statusType: STATUS.ERROR.CONNECTED, message: 'error_when_connected' });
-
-    expect(result).to.be.true;
+    const result = await netatmoHandler.saveStatus({
+      statusType: STATUS.ERROR.CONNECTED,
+      message: 'error_when_connected',
+    });
+    expect(result).to.equal(true);
     expect(netatmoHandler.status).to.eq(STATUS.DISCONNECTED);
     expect(netatmoHandler.configured).to.eq(true);
     expect(netatmoHandler.connected).to.eq(status.connected);
@@ -74,8 +76,7 @@ describe('NetatmoHandler.saveStatus', () => {
   });
   it('should save and output Netatmo status in case of no specify', async () => {
     const result = await netatmoHandler.saveStatus({ statusType: '', message: 'error_when_connected' });
-
-    expect(result).to.be.true;
+    expect(result).to.equal(true);
     expect(netatmoHandler.status).to.eq(status.status);
     expect(netatmoHandler.configured).to.eq(status.configured);
     expect(netatmoHandler.connected).to.eq(status.connected);
@@ -87,8 +88,7 @@ describe('NetatmoHandler.saveStatus', () => {
   });
   it('should fail save', async () => {
     const result = await netatmoHandler.saveStatus();
-
-    expect(result).to.be.false;
+    expect(result).to.equal(false);
     expect(netatmoHandler.status).to.eq(status.status);
     expect(netatmoHandler.configured).to.eq(status.configured);
     expect(netatmoHandler.connected).to.eq(status.connected);

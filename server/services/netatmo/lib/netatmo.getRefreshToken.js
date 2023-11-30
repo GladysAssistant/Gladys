@@ -1,4 +1,3 @@
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { GLADYS_VARIABLES, STATUS } = require('./utils/netatmo.constants');
 const logger = require('../../../utils/logger');
 
@@ -14,9 +13,9 @@ async function getRefreshToken() {
   const expireToken = await this.gladys.variable.getValue(GLADYS_VARIABLES.EXPIRE_IN_TOKEN, this.serviceId);
   if (!refreshToken || refreshToken === '') {
     const tokens = {
-      access_token: '',
-      refresh_token: '',
-      expire_in: '',
+      accessToken: '',
+      refreshToken: '',
+      expireIn: '',
       connected: false,
     };
     await this.setTokens(tokens);
@@ -24,7 +23,7 @@ async function getRefreshToken() {
     return undefined;
   }
   logger.debug(`Netatmo refresh token well loaded`);
-  return {refreshToken, expireToken};
+  return { refreshToken, expireToken };
 }
 
 module.exports = {

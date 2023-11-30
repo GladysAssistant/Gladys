@@ -34,9 +34,9 @@ async function init() {
       } else {
         logger.error('Netatmo no successfull connect', response);
         const tokens = {
-          access_token: '',
-          refresh_token: '',
-          expire_in: '',
+          accessToken: '',
+          refreshToken: '',
+          expireIn: '',
           connected: false,
         };
         await this.setTokens(tokens);

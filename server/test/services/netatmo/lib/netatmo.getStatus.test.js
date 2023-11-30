@@ -6,7 +6,6 @@ const NetatmoContext = require('../netatmo.mock.test');
 const NetatmoHandler = proxyquire('../../../../services/netatmo/lib/index', {
   NetatmoContext,
 });
-
 const { fake } = sinon;
 
 const gladys = {
@@ -15,8 +14,6 @@ const gladys = {
   },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-// const netatmoHandler = new NetatmoHandler(gladys, serviceId);
-
 const status = {
   configured: false,
   connected: false,
@@ -24,7 +21,7 @@ const status = {
 };
 
 describe('NetatmoHandler.getStatus', () => {
-  let netatmoHandler
+  let netatmoHandler;
   beforeEach(() => {
     sinon.reset();
     netatmoHandler = new NetatmoHandler(gladys, serviceId);
