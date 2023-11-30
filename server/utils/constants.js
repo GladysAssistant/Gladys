@@ -348,6 +348,9 @@ const ACTIONS = {
   ECOWATT: {
     CONDITION: 'ecowatt.condition',
   },
+  MQTT: {
+    SEND: 'mqtt.send',
+  },
 };
 
 const INTENTS = {
