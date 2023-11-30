@@ -17,7 +17,7 @@ const gladys = {
   },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+// const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 const status = {
   configured: false,
@@ -26,7 +26,10 @@ const status = {
 };
 
 describe('NetatmoHandler.saveStatus', () => {
+  let netatmoHandler
   beforeEach(() => {
+    sinon.reset();
+    netatmoHandler = new NetatmoHandler(gladys, serviceId);
     netatmoHandler.configured = false;
     netatmoHandler.connected = false;
     netatmoHandler.status = STATUS.NOT_INITIALIZED;

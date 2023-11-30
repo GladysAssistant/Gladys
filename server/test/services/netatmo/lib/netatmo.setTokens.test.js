@@ -21,10 +21,11 @@ const tokens = {
 
 describe('NetatmoHandler.setTokens', () => {
   let setValueStub;
-
+  let netatmoHandler
   beforeEach(() => {
-    setValueStub = sinon.stub();
     sinon.reset();
+    netatmoHandler = new NetatmoHandler({}, serviceId);
+    setValueStub = sinon.stub();
   });
   afterEach(() => {
     sinon.reset();

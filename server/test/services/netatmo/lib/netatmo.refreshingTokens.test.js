@@ -20,7 +20,7 @@ const gladys = {
   },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+// const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 const configuration = {
   clientId: 'clientId',
@@ -29,9 +29,10 @@ const configuration = {
 const refreshToken = 'refreshToken';
 
 describe('NetatmoHandler.refreshingTokens', () => {
+  let netatmoHandler
   beforeEach(() => {
     sinon.reset();
-    netatmoHandler.status = 'UNKNOWN';
+    netatmoHandler = new NetatmoHandler(gladys, serviceId);
   });
 
   afterEach(() => {
@@ -137,7 +138,7 @@ describe('NetatmoHandler.refreshingTokens', () => {
       payload: { status: STATUS.CONNECTED },
     });
     // Cleaning
-    setTokensSpy.restore();
+    setTokensSpy.resetHistory();
     nock.isDone();
   });
   it('should handle axios query errors in refreshTokens', async () => {
@@ -210,6 +211,6 @@ describe('NetatmoHandler.refreshingTokens', () => {
     });
     // Cleaning
     nock.isDone();
-    netatmoHandler.setTokens.restore();
+    netatmoHandler.setTokens.reset();
   });
 });

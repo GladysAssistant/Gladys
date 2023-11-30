@@ -21,7 +21,6 @@ const gladys = {
   },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 const configuration = {
   clientId: 'clientId',
@@ -35,9 +34,11 @@ const body = {
 };
 
 describe('NetatmoHandler.connect', () => {
+  let netatmoHandler
   beforeEach(() => {
     sinon.reset();
-    netatmoHandler.status = 'UNKNOWN';
+    netatmoHandler = new NetatmoHandler(gladys, serviceId);
+    // netatmoHandler.status = 'UNKNOWN';
     // @ts-ignore
     this.randomBytesStub = sinon.stub(crypto, 'randomBytes').returns(Buffer.from('1234567890abcdef1234567890abcdef', 'hex'));
   });
@@ -133,9 +134,10 @@ describe('NetatmoHandler.connect', () => {
 });
 
 describe('NetatmoHandler.retrieveTokens', () => {
+  let netatmoHandler
   beforeEach(() => {
     sinon.reset();
-    netatmoHandler.status = 'UNKNOWN';
+    netatmoHandler = new NetatmoHandler(gladys, serviceId);
   });
 
   afterEach(() => {
@@ -289,7 +291,7 @@ describe('NetatmoHandler.retrieveTokens', () => {
       payload: { status: STATUS.CONNECTED },
     });
     // Cleaning
-    setTokensSpy.restore();
+    setTokensSpy.resetHistory();
     nock.isDone();
   });
   it('should retrieve tokens successfully with defined scope', async () => {
@@ -330,7 +332,7 @@ describe('NetatmoHandler.retrieveTokens', () => {
       payload: { status: STATUS.CONNECTED },
     });
     // Cleaning
-    setTokensSpy.restore();
+    setTokensSpy.resetHistory();
     nock.isDone();
   });
   it('should handle axios query errors in retrieve Tokens', async () => {
@@ -404,6 +406,6 @@ describe('NetatmoHandler.retrieveTokens', () => {
     );
     // Cleaning
     nock.isDone();
-    netatmoHandler.setTokens.restore();
+    netatmoHandler.setTokens.reset();
   });
 });

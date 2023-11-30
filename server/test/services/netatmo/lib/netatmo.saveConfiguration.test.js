@@ -10,7 +10,7 @@ const { GLADYS_VARIABLES } = require('../../../../services/netatmo/lib/utils/net
 
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-const netatmoHandler = new NetatmoHandler({}, serviceId);
+// const netatmoHandler = new NetatmoHandler({}, serviceId);
 
 const configuration = {
   username: 'username',
@@ -21,10 +21,11 @@ const configuration = {
 
 describe('NetatmoHandler.saveConfiguration', () => {
   let setValueStub;
-
+  let netatmoHandler
   beforeEach(() => {
-    setValueStub = sinon.stub();
     sinon.reset();
+    netatmoHandler = new NetatmoHandler({}, serviceId);
+    setValueStub = sinon.stub();
   });
   afterEach(() => {
     sinon.reset();

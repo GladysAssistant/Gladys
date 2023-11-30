@@ -21,12 +21,13 @@ const gladys = {
   },
 };
 const serviceId = 'ecca4d93-7a8c-4761-9055-fc15460a4b4a';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+// const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 describe('NetatmoHandler.init', () => {
+  let netatmoHandler
   beforeEach(() => {
     sinon.reset();
-    netatmoHandler.status = 'UNKNOWN';
+    netatmoHandler = new NetatmoHandler(gladys, serviceId);
   });
   afterEach(() => {
     sinon.reset();

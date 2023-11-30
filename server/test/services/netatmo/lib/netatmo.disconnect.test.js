@@ -18,13 +18,13 @@ const gladys = {
   },
 };
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+// const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 describe('NetatmoHandler.disconnect', () => {
-
+  let netatmoHandler
   beforeEach(() => {
-    netatmoHandler.status = 'UNKNOWN';
     sinon.reset();
+    netatmoHandler = new NetatmoHandler(gladys, serviceId);
   });
   afterEach(() => {
     sinon.reset();
@@ -49,6 +49,6 @@ describe('NetatmoHandler.disconnect', () => {
       payload: { status: STATUS.DISCONNECTED },
     });
     // Cleaning
-    setTokensSpy.restore();
+    setTokensSpy.resetHistory();
   });
 });
