@@ -457,6 +457,14 @@ const actionsFunc = {
       await self.house.panic(action.house);
     }
   },
+  [ACTIONS.MQTT.SEND]: (self, action, scope) => {
+    const mqttService = self.service.getService('mqtt');
+
+    if (mqttService) {
+      const messageWithVariables = Handlebars.compile(action.message)(scope);
+      mqttService.device.publish(action.topic, messageWithVariables);
+    }
+  },
 };
 
 module.exports = {
