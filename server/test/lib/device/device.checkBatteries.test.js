@@ -58,6 +58,9 @@ describe('Device check batteries', () => {
     const service = {
       getService: () => null,
     };
+    const brain = {
+      getReply: () => 'Avertissement !!! Le niveau de la batterie de Test device est inférieur à 30 % (actuel : 20 %)',
+    };
     const variables = {
       getValue: (key) => {
         if (key === SYSTEM_VARIABLE_NAMES.DEVICE_BATTERY_LEVEL_WARNING_ENABLED) {
@@ -66,7 +69,7 @@ describe('Device check batteries', () => {
         return 30;
       },
     };
-    const device = new Device(event, messageManager, stateManager, service, {}, variables, job, {}, user);
+    const device = new Device(event, messageManager, stateManager, service, {}, variables, job, brain, user);
 
     await device.checkBatteries();
 
