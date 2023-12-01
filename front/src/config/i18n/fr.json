@@ -2066,7 +2066,7 @@
       "dead": "Mort"
     },
     "batteryLevel": "Alerte sur le niveau de batterie",
-    "batteryLevelDescription": "À 09h00, uniquement le samedi, un message sera envoyé à tous les admins dès que le niveau de la batterie parsera en dessous du pourcentage choisi"
+    "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi."
   },
   "newArea": {
     "createNewZoneButton": "Créer une zone",
