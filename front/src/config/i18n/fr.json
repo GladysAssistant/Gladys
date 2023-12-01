@@ -2064,7 +2064,9 @@
       "paused": "En Pause",
       "exited": "Arrêté",
       "dead": "Mort"
-    }
+    },
+    "batteryLevel": "Alerte sur le niveau de batterie",
+    "batteryLevelDescription": "Tous les samedis à 9h00, un message sera envoyé à tous les administrateurs si le niveau de batterie d'un appareil passe en dessous du seuil choisi."
   },
   "newArea": {
     "createNewZoneButton": "Créer une zone",
