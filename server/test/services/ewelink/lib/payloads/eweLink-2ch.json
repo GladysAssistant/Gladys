@@ -4,12 +4,14 @@
   "deviceid": "10004531ae",
   "apikey": "validApikey",
   "extra": {
-    "extra": {
-      "uiid": 7,
-      "model": "PSA-BHA-GL"
-    }
+    "uiid": 7,
+    "model": "PSA-BHA-GL"
   },
   "params": {
+    "switches": [
+      { "switch": "on", "outlet": 0 },
+      { "switch": "off", "outlet": 1 }
+    ],
     "fwVersion": "3.3.0"
   },
   "ip": "192.168.0.1",

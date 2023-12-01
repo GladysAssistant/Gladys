@@ -17,6 +17,17 @@
       "has_feedback": true,
       "min": 0,
       "max": 1
+    },
+    {
+      "name": "Test 6 unknown",
+      "external_id": "ewelink:10004536ae:unknown",
+      "selector": "ewelink:10004536ae:unknown",
+      "category": "unknown",
+      "type": "unknown",
+      "read_only": false,
+      "has_feedback": true,
+      "min": 0,
+      "max": 1
     }
   ],
   "params": [

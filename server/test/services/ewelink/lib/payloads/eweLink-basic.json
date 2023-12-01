@@ -4,10 +4,8 @@
   "deviceid": "10004536ae",
   "apikey": "validApikey",
   "extra": {
-    "extra": {
-      "uiid": 6,
-      "model": "PSA-BHA-GL"
-    }
+    "uiid": 6,
+    "model": "PSA-BHA-GL"
   },
   "params": {
     "fwVersion": "3.3.0"

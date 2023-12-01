@@ -52,14 +52,14 @@ function readOnlineValue(online) {
  * @description Create an eWeLink device for Gladys.
  * @param {string} serviceId - The UUID of the service.
  * @param {object} device - The eWeLink device.
- * @param {number} channel - The channel of the device to control.
  * @returns {object} Return Gladys device.
  * @example
  * getDevice(serviceId, device, channel);
  */
-function getDevice(serviceId, device, channel = 0) {
+function getDevice(serviceId, device) {
   const name = getDeviceName(device);
   const externalId = getExternalId(device);
+  const { params = {} } = device;
 
   const createdDevice = {
     name,
@@ -77,7 +77,7 @@ function getDevice(serviceId, device, channel = 0) {
       },
       {
         name: DEVICE_FIRMWARE,
-        value: (device.params && device.params.fwVersion) || '?.?.?',
+        value: params.fwVersion || '?.?.?',
       },
       {
         name: DEVICE_ONLINE,
@@ -86,9 +86,11 @@ function getDevice(serviceId, device, channel = 0) {
     ],
   };
 
-  if (device.online) {
+  const deviceUiid = (device.extra || {}).uiid;
+  if (device.online && deviceUiid) {
+    const channel = params.switch ? 1 : (params.switches || []).length;
     Object.keys(AVAILABLE_FEATURE_MODELS).forEach((type) => {
-      if (AVAILABLE_FEATURE_MODELS[type].uiid.includes(device.uiid)) {
+      if (AVAILABLE_FEATURE_MODELS[type].uiid.includes(deviceUiid)) {
         let ch = 1;
         do {
           const featureExternalId = (type === 'binary' ? [externalId, type, ch] : [externalId, type]).join(':');
