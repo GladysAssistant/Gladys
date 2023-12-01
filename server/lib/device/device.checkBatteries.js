@@ -1,3 +1,4 @@
+const { ConversationContext } = require('node-nlp');
 const logger = require('../../utils/logger');
 const {
   SYSTEM_VARIABLE_NAMES,
@@ -35,12 +36,17 @@ async function checkBatteries() {
         return feature.last_value < minPercentBattery;
       })
       .forEach((feature) => {
-        const messages = {
-          [AVAILABLE_LANGUAGES.EN]: `Warning !!! Battery level on ${device.name} is under ${minPercentBattery}% (current: ${feature.last_value}%)`,
-          [AVAILABLE_LANGUAGES.FR]: `Avertissement !!! Le niveau de la batterie de ${device.name} est inférieur à ${minPercentBattery} % (actuel : ${feature.last_value} %)`,
-        };
         admins.forEach((admin) => {
-          this.messageManager.sendToUser(admin.selector, messages[admin.language]);
+          const message = this.brain.getReply(admin.language, 'battery-threshold.success', {
+            device: {
+              name: device.name,
+            },
+            value: {
+              min: minPercentBattery,
+              current: feature.last_value,
+            },
+          });
+          this.messageManager.sendToUser(admin.selector, message);
         });
       });
   });
