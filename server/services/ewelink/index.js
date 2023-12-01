@@ -1,11 +1,11 @@
 const logger = require('../../utils/logger');
-const EweLinkHandler = require('./lib/device');
+const EweLinkHandler = require('./lib');
 const EwelinkController = require('./api/ewelink.controller');
 
 module.exports = function EwelinkService(gladys, serviceId) {
   // require the eWeLink module
-  const eWeLinkApi = require('ewelink-api');
-  const eWeLinkHandler = new EweLinkHandler(gladys, eWeLinkApi, serviceId);
+  const { default: eweLinkApi } = require('ewelink-api-next');
+  const eWeLinkHandler = new EweLinkHandler(gladys, eweLinkApi, serviceId);
 
   /**
    * @public
@@ -15,7 +15,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting eWeLink service');
-    await eWeLinkHandler.connect();
+    await eWeLinkHandler.loadConfiguration();
   }
 
   /**

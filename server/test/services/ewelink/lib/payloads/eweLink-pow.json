@@ -4,12 +4,11 @@
   "deviceid": "10004533ae",
   "apikey": "validApikey",
   "extra": {
-    "extra": {
-      "uiid": 5,
-      "model": "ITA-GZ1-GL"
-    }
+    "uiid": 5,
+    "model": "ITA-GZ1-GL"
   },
   "params": {
+    "switch": "on",
     "fwVersion": "3.3.0"
   },
   "ip": "192.168.0.3",

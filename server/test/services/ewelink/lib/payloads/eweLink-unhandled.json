@@ -4,10 +4,8 @@
   "deviceid": "10004535ae",
   "apikey": "validApikey",
   "extra": {
-    "extra": {
-      "uiid": 10000,
-      "model": "ITU-GB1-LG"
-    }
+    "uiid": 10000,
+    "model": "ITU-GB1-LG"
   },
   "brandName": "SONOFF",
   "productModel": "UNKNOWN",
