@@ -2442,6 +2442,20 @@
           "zero": "No",
           "one": "Yes"
         }
+      },
+      "battery": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
+        }
+      },
+      "tamper": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
+        }
       }
     }
   },
@@ -2460,7 +2474,8 @@
     },
     "battery": {
       "shortCategoryName": "Battery",
-      "integer": "Battery"
+      "integer": "Battery",
+      "binary": "Low battery (yes/no)"
     },
     "temperature-sensor": {
       "shortCategoryName": "Temperature sensor",
@@ -2590,6 +2605,10 @@
       "binary": "Switch (On/Off)",
       "mode": "Mode",
       "target-temperature": "Temperature"
+    },
+    "tamper": {
+      "shortCategoryName": "Tamper",
+      "binary": "Tamper (yes/no)"
     },
     "television": {
       "shortCategoryName": "Television",

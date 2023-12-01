@@ -420,6 +420,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SURFACE: 'surface',
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
+  TAMPER: 'tamper',
   TELEVISION: 'television',
   TEMPERATURE_SENSOR: 'temperature-sensor',
   THERMOSTAT: 'thermostat',
@@ -474,6 +475,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   BATTERY: {
     INTEGER: 'integer',
+    BINARY: 'binary',
   },
   VIBRATION_SENSOR: {
     BINARY: 'binary',
@@ -500,6 +502,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   SURFACE: {
     DECIMAL: 'decimal',
+  },
+  TAMPER: {
+    BINARY: 'binary',
   },
   TELEVISION: {
     BINARY: 'binary',
