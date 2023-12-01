@@ -1,11 +1,5 @@
-const { ConversationContext } = require('node-nlp');
 const logger = require('../../utils/logger');
-const {
-  SYSTEM_VARIABLE_NAMES,
-  AVAILABLE_LANGUAGES,
-  DEVICE_FEATURE_CATEGORIES,
-  USER_ROLE,
-} = require('../../utils/constants');
+const { SYSTEM_VARIABLE_NAMES, DEVICE_FEATURE_CATEGORIES, USER_ROLE } = require('../../utils/constants');
 
 /**
  * @description Check battery level and warn if needed.
