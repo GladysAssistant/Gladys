@@ -13,6 +13,7 @@ const boxesSchema = Joi.array().items(
       camera: Joi.string(),
       name: Joi.string().allow(''),
       modes: Joi.object(),
+      device: Joi.string(),
       device_features: Joi.array().items(Joi.string()),
       device_feature_names: Joi.array().items(Joi.string()),
       device_feature: Joi.string(),

@@ -10,6 +10,7 @@ import EcowattBox from '../../components/boxs/ecowatt/Ecowatt';
 import ClockBox from '../../components/boxs/clock/Clock';
 import SceneBox from '../../components/boxs/scene/SceneBox';
 import AlarmBox from '../../components/boxs/alarm/Alarm';
+import MusicBox from '../../components/boxs/music/MusicBox';
 
 const Box = ({ children, ...props }) => {
   switch (props.box.type) {
@@ -37,6 +38,8 @@ const Box = ({ children, ...props }) => {
       return <SceneBox {...props} />;
     case 'alarm':
       return <AlarmBox {...props} />;
+    case 'music':
+      return <MusicBox {...props} />;
   }
 };
 

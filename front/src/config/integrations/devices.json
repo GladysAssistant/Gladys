@@ -73,5 +73,10 @@
     "key": "nodeRed",
     "link": "node-red",
     "img": "/assets/integrations/cover/node-red.jpg"
+  },
+  {
+    "key": "sonos",
+    "link": "sonos",
+    "img": "/assets/integrations/cover/sonos.jpg"
   }
 ]

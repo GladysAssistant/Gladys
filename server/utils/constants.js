@@ -58,6 +58,11 @@ const AC_MODE = {
   FAN: 4,
 };
 
+const MUSIC_PLAYBACK_STATE = {
+  PLAYING: 1,
+  PAUSED: 0,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -405,6 +410,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   LIGHT: 'light',
   LIGHT_SENSOR: 'light-sensor',
   MOTION_SENSOR: 'motion-sensor',
+  MUSIC: 'music',
   OPENING_SENSOR: 'opening-sensor',
   PM25_SENSOR: 'pm25-sensor',
   FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
@@ -531,6 +537,14 @@ const DEVICE_FEATURE_TYPES = {
     REWIND: 'rewind',
     FORWARD: 'forward',
     RECORD: 'record',
+  },
+  MUSIC: {
+    VOLUME: 'volume',
+    PLAY: 'play',
+    PAUSE: 'pause',
+    PREVIOUS: 'previous',
+    NEXT: 'next',
+    PLAYBACK_STATE: 'playback_state',
   },
   ENERGY_SENSOR: {
     BINARY: 'binary',
@@ -942,6 +956,7 @@ const DASHBOARD_BOX_TYPE = {
   ECOWATT: 'ecowatt',
   CLOCK: 'clock',
   SCENE: 'scene',
+  MUSIC: 'music',
 };
 
 const ERROR_MESSAGES = {
@@ -1106,3 +1121,5 @@ module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;
 
 module.exports.ALARM_MODES = ALARM_MODES;
 module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
+
+module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;

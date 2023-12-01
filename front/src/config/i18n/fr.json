@@ -251,7 +251,8 @@
       "chart": "Graphique",
       "ecowatt": "Ecowatt ( France )",
       "clock": "Horloge",
-      "scene": "Scène"
+      "scene": "Scène",
+      "music": "Musique"
     },
     "boxes": {
       "column": "Colonne {{index}}",
@@ -387,6 +388,9 @@
         "alarmStatusText": "Votre maison est ",
         "alarmArming": "Votre maison est en train d'être armée...",
         "cancelAlarmArming": "Annuler"
+      },
+      "music": {
+        "selectDeviceLabel": "Sélectionner l'appareil à contrôler"
       }
     }
   },
@@ -1012,6 +1016,42 @@
         "connecting": "Configuration sauvegardée. Connexion à votre compte cloud Tuya...",
         "connected": "Connexion réussie au compte cloud Tuya !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
+
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
+    "sonos": {
+      "title": "Sonos",
+      "description": "Contrôler les appareils Sonos sur votre réseau local",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Sonos",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Sonos",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Sonos",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "hostLabel": "Adresse IP",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "device": {
+        "title": "Appareils Sonos dans Gladys",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil Sonos trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre réseau local",
+        "description": "Les appareils Sonos sont automatiquement découverts.",
+        "error": "Erreur de découverte des appareils Sonos. Est-ce que votre enceinte Sonos est sous tension et accessible sur le réseau local ?",
+        "noDeviceFound": "Aucun appareil Sonos n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors du scan.",
+        "scan": "Scanner"
       },
 
       "error": {
@@ -2697,6 +2737,15 @@
     "surface": {
       "shortCategoryName": "Surface",
       "decimal": "Surface"
+    },
+    "music": {
+      "shortCategoryName": "Musique",
+      "volume": "Volume de la musique",
+      "play": "Bouton lecture musique",
+      "pause": "Bouton pause musique",
+      "previous": "Bouton précédent musique",
+      "next": "Bouton suivant musique",
+      "playback_state": "Etat de la lecture musique"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
