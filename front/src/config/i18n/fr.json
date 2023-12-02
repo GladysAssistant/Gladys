@@ -2702,7 +2702,8 @@
     },
     "voc-sensor": {
       "shortCategoryName": "Capteur de pollution COV",
-      "decimal": "COV (Décimale)"
+      "decimal": "COV (Décimale)",
+      "integer": "Indice COV (entier)"
     },
     "shutter": {
       "shortCategoryName": "Volet",

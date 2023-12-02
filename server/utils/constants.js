@@ -577,6 +577,7 @@ const DEVICE_FEATURE_TYPES = {
   },
   VOC_SENSOR: {
     DECIMAL: 'decimal',
+    INTEGER: 'integer',
   },
   SHUTTER: {
     STATE: 'state',

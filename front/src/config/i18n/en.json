@@ -2700,7 +2700,8 @@
     },
     "voc-sensor": {
       "shortCategoryName": "VOC Sensor",
-      "decimal": "VOC (decimal)"
+      "decimal": "VOC (decimal)",
+      "integer": "VOC Index (integer)"
     },
     "shutter": {
       "shortCategoryName": "Shutter",
