@@ -17,6 +17,9 @@ const { saveTokens } = require('./user/ewelink.saveTokens');
 const { handleRequest } = require('./handlers/ewelink.handleRequest');
 const { handleResponse } = require('./handlers/ewelink.handleResponse');
 
+const { init } = require('./ewelink.init');
+const { upgrade } = require('./versions/ewelink.upgrade');
+
 /**
  * @description Add ability to control an eWeLink device.
  * @param {object} gladys - Gladys instance.
@@ -57,5 +60,8 @@ EweLinkHandler.prototype.discover = discover;
 EweLinkHandler.prototype.poll = poll;
 EweLinkHandler.prototype.setValue = setValue;
 EweLinkHandler.prototype.getStatus = getStatus;
+
+EweLinkHandler.prototype.init = init;
+EweLinkHandler.prototype.upgrade = upgrade;
 
 module.exports = EweLinkHandler;
