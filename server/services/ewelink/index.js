@@ -15,7 +15,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting eWeLink service');
-    await eWeLinkHandler.loadConfiguration();
+    await eWeLinkHandler.init();
   }
 
   /**

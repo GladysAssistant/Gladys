@@ -13,6 +13,7 @@
     "arm64"
   ],
   "dependencies": {
+    "bluebird": "^3.7.2",
     "ewelink-api-next": "^1.0.3"
   }
 }
