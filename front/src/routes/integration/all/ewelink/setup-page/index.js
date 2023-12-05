@@ -137,7 +137,7 @@ class EweLinkSetupPage extends Component {
   }
 
   render(
-    {},
+    { user },
     {
       loadEwelinkStatus,
       ewelinkStatus,
@@ -149,7 +149,7 @@ class EweLinkSetupPage extends Component {
     }
   ) {
     return (
-      <EweLinkPage>
+      <EweLinkPage user={user}>
         <SetupTab
           ewelinkStatus={ewelinkStatus}
           loadEwelinkStatus={loadEwelinkStatus}

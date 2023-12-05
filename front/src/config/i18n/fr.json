@@ -1401,6 +1401,7 @@
       "deviceTab": "Appareils",
       "discoverTab": "Découverte eWeLink",
       "setupTab": "Configuration",
+      "documentation": "Documentation eWeLink",
       "discoverDeviceDescr": "Scanner automatiquement les appareils eWeLink",
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",

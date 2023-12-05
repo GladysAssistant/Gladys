@@ -1399,6 +1399,7 @@
       "deviceTab": "Devices",
       "discoverTab": "eWeLink discover",
       "setupTab": "Setup",
+      "documentation": "eWeLink documentation",
       "discoverDeviceDescr": "Automatically scan eWeLink devices",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
