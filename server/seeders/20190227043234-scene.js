@@ -23,10 +23,32 @@ module.exports = {
           updated_at: '2019-02-12 07:49:07.556 +00:00',
         },
         {
-          id: '88428a7d-ea9d-46a6-b0d2-46bf82d37e53 \n',
+          id: '88428a7d-ea9d-46a6-b0d2-46bf82d37e53',
           name: 'To Duplicate scene',
           icon: 'fe fe-bell',
           selector: 'to-duplicate-scene',
+          actions: JSON.stringify([
+            [
+              {
+                type: ACTIONS.LIGHT.TURN_ON,
+              },
+            ],
+          ]),
+          triggers: JSON.stringify([
+            {
+              type: EVENTS.TIME.CHANGED,
+              scheduler_type: 'every-day',
+              time: '12:00',
+            },
+          ]),
+          created_at: '2022-04-15 07:49:07.556 +00:00',
+          updated_at: '2022-04-15 07:49:07.556 +00:00',
+        },
+        {
+          id: '956794d8-a9cb-49bf-a677-57e820288b5a',
+          name: 'Scene with tags',
+          icon: 'fe fe-bell',
+          selector: 'scene-with-tag',
           actions: JSON.stringify([
             [
               {

@@ -6,6 +6,7 @@ import CardFilter from '../../components/layout/CardFilter';
 import SceneCards from './SceneCards';
 import EmptyState from './EmptyState';
 import style from './style.css';
+import SceneTagFilter from './SceneTagFilter';
 
 const ScenePage = ({ children, ...props }) => (
   <div class="page">
@@ -17,6 +18,7 @@ const ScenePage = ({ children, ...props }) => (
               <Text id="scene.title" />
             </h1>
             <div class="page-options d-flex">
+              <SceneTagFilter tags={props.tags} searchTags={props.searchTags} sceneTagSearch={props.sceneTagSearch} />
               <Localizer>
                 <CardFilter
                   changeOrderDir={props.changeOrderDir}
@@ -26,8 +28,11 @@ const ScenePage = ({ children, ...props }) => (
                   searchPlaceHolder={<Text id="scene.searchPlaceholder" />}
                 />
               </Localizer>
-              <Link href="/dashboard/scene/new" class="btn btn-outline-primary ml-2">
-                <Text id="scene.newButton" /> <i class="fe fe-plus" />
+              <Link href="/dashboard/scene/new" class={cx('btn', 'btn-outline-primary', 'ml-2', style.newButton)}>
+                <span class="d-none d-lg-inline-block mr-2">
+                  <Text id="scene.newButton" />
+                </span>
+                <i class="fe fe-plus" />
               </Link>
             </div>
           </div>

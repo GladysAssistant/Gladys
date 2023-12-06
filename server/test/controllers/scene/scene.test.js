@@ -10,6 +10,7 @@ describe('POST /api/v1/scene', () => {
         name: 'New Scene',
         icon: 'bell',
         triggers: [],
+        tags: [],
         actions: [
           [
             {
@@ -45,6 +46,7 @@ describe('GET /api/v1/scene', () => {
             active: true,
             description: null,
             selector: 'test-scene',
+            tags: [],
             last_executed: null,
             updated_at: '2019-02-12T07:49:07.556Z',
           },
@@ -138,6 +140,28 @@ describe('POST /api/v1/scene/:scene_selector/duplicate', () => {
         expect(res.body).to.have.property('icon', 'anchor');
         expect(res.body).to.have.property('name', 'Duplicated Scene');
         expect(res.body).to.have.property('selector', 'duplicated-scene');
+      });
+  });
+});
+
+describe('GET /api/v1/tag_scene', () => {
+  it('should get tags', async () => {
+    await authenticatedRequest
+      .get('/api/v1/tag_scene')
+      .send()
+      .expect('Content-Type', /json/)
+      .expect(200)
+      .then((res) => {
+        expect(res.body).to.deep.equal([
+          {
+            name: 'tag 1',
+            scene_count: 1,
+          },
+          {
+            name: 'tag 2',
+            scene_count: 1,
+          },
+        ]);
       });
   });
 });

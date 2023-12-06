@@ -82,6 +82,8 @@ async function create(device) {
     if (deviceInDb === null) {
       deviceInDb = await db.Device.create(device, { transaction });
     } else {
+      this.brain.removeNamedEntity('device', deviceInDb.identifier, deviceInDb.name);
+
       actionEvent = EVENTS.DEVICE.UPDATE;
       oldPollFrequency = deviceInDb.poll_frequency;
 
@@ -106,6 +108,8 @@ async function create(device) {
     deviceToReturn = deviceInDb.get({ plain: true });
     deviceToReturn.features = deviceToReturn.features || [];
     deviceToReturn.params = deviceToReturn.params || [];
+
+    this.brain.addNamedEntity('device', deviceToReturn.selector, deviceToReturn.name);
 
     // if we need to create features
     const newFeatures = await Promise.map(features, async (feature) => {

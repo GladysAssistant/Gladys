@@ -57,72 +57,36 @@ const CreateLocalGladysAccount = ({ children, ...props }) => (
         <label class="form-label">
           <Text id="signup.preferences.deviceStateHistoryDuration.title" />
         </label>
-        <div class="custom-controls-stacked">
-          <label class="custom-control custom-radio">
-            <input
-              type="radio"
-              class="custom-control-input"
-              name="device-state-history-radio"
-              onChange={updateSystemProperty(
-                SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS,
-                props.updateSystemPreferences
-              )}
-              value="7"
-              checked={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS] === 7}
-            />
-            <div class="custom-control-label">
-              <Text id="signup.preferences.deviceStateHistoryDuration.durationOneWeek" />
-            </div>
-          </label>
-          <label class="custom-control custom-radio">
-            <input
-              type="radio"
-              class="custom-control-input"
-              name="device-state-history-radio"
-              onChange={updateSystemProperty(
-                SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS,
-                props.updateSystemPreferences
-              )}
-              value="30"
-              checked={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS] === 30}
-            />
-            <div class="custom-control-label">
-              <Text id="signup.preferences.deviceStateHistoryDuration.durationOneMonth" />
-            </div>
-          </label>
-          <label class="custom-control custom-radio">
-            <input
-              type="radio"
-              class="custom-control-input"
-              name="device-state-history-radio"
-              onChange={updateSystemProperty(
-                SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS,
-                props.updateSystemPreferences
-              )}
-              value="90"
-              checked={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS] === 90}
-            />
-            <div class="custom-control-label">
-              <Text id="signup.preferences.deviceStateHistoryDuration.durationThreeMonth" />
-            </div>
-          </label>
-          <label class="custom-control custom-radio">
-            <input
-              type="radio"
-              class="custom-control-input"
-              name="device-state-history-radio"
-              onChange={updateSystemProperty(
-                SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS,
-                props.updateSystemPreferences
-              )}
-              value="-1"
-              checked={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS] === -1}
-            />
-            <div class="custom-control-label">
-              <Text id="signup.preferences.deviceStateHistoryDuration.unlimited" />
-            </div>
-          </label>
-        </div>
+        <select
+          class="form-control"
+          value={props.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]}
+          onChange={updateSystemProperty(
+            SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS,
+            props.updateSystemPreferences
+          )}
+        >
+          <option value="7">
+            <Text id="signup.preferences.deviceStateHistoryDuration.durationOneWeek" />
+          </option>
+          <option value="30">
+            <Text id="signup.preferences.deviceStateHistoryDuration.durationOneMonth" />
+          </option>
+          <option value="90">
+            <Text id="signup.preferences.deviceStateHistoryDuration.durationThreeMonth" />
+          </option>
+          <option value="180">
+            <Text id="signup.preferences.deviceStateHistoryDuration.durationSixMonths" />
+          </option>
+          <option value="365">
+            <Text id="signup.preferences.deviceStateHistoryDuration.durationOneYear" />
+          </option>
+          <option value="730">
+            <Text id="signup.preferences.deviceStateHistoryDuration.durationTwoYears" />
+          </option>
+          <option value="-1">
+            <Text id="signup.preferences.deviceStateHistoryDuration.unlimited" />
+          </option>
+        </select>
       </div>
       <div class="form-group">
         <button onClick={props.savePreferences} class="btn btn-success">

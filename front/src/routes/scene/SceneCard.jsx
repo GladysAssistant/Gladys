@@ -3,6 +3,7 @@ import { Component } from 'preact';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import style from './style.css';
+import { MAX_LENGTH_TAG } from './constant';
 
 class SceneCard extends Component {
   startScene = async () => {
@@ -34,7 +35,7 @@ class SceneCard extends Component {
           <div class="loader" />
           <div class="dimmer-content h-100">
             <div class="card h-100 d-flex flex-column justify-content-between">
-              <div class="card-body pb-0 pt-3 pl-3 pr-3 text-center h-100">
+              <div class="card-body p-3 text-center h-100 d-flex flex-column">
                 <div class={style.scene_icon}>
                   <i class={`fe fe-${props.scene.icon}`} />
                 </div>
@@ -53,6 +54,16 @@ class SceneCard extends Component {
                 </div>
                 <h4>{props.scene.name}</h4>
                 <div class={`text-muted ${style.descriptionSceneEllipsis}`}>{props.scene.description}</div>
+                <div>
+                  {props.scene.tags &&
+                    props.scene.tags.map(tag => (
+                      <span class="badge badge-secondary mr-1">
+                        {tag.name.length > MAX_LENGTH_TAG
+                          ? `${tag.name.substring(0, MAX_LENGTH_TAG - 3)}...`
+                          : tag.name}
+                      </span>
+                    ))}
+                </div>
               </div>
               <div class="mt-auto">
                 <div class="card-footer">

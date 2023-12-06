@@ -38,6 +38,13 @@ async function getAccessToken(refreshToken, scope) {
     throw new Error401(`Session was revoked`);
   }
 
+  if (session.tablet_mode_locked) {
+    const scopeIsAlarmWrite = scope.length === 1 && scope[0] === 'alarm:write';
+    if (!scopeIsAlarmWrite) {
+      throw new Error401('TABLET_IS_LOCKED');
+    }
+  }
+
   const accessToken = generateAccessToken(session.user_id, scope, session.id, this.jwtSecret);
 
   return {

@@ -59,6 +59,12 @@ function createActions(store) {
         await state.httpClient.post(`/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS}`, {
           value: state.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]
         });
+        await state.httpClient.post(
+          `/api/v1/variable/${SYSTEM_VARIABLE_NAMES.DEVICE_AGGREGATE_STATE_HISTORY_IN_DAYS}`,
+          {
+            value: state.signupSystemPreferences[SYSTEM_VARIABLE_NAMES.DEVICE_STATE_HISTORY_IN_DAYS]
+          }
+        );
         store.setState({
           signupSaveSystemPreferences: RequestStatus.Success
         });

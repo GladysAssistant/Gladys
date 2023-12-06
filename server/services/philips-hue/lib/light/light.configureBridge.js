@@ -1,5 +1,4 @@
 const logger = require('../../../../utils/logger');
-const { NotFoundError } = require('../../../../utils/coreErrors');
 const { Error403 } = require('../../../../utils/httpErrors');
 const {
   HUE_DEVICE_NAME,
@@ -13,34 +12,39 @@ const {
 
 /**
  * @description Configure the philips hue bridge.
- * @param {string} serialNumber - Serial number of the Philips Hue Bridge.
+ * @param {string} ipAddress - IP Address of the Philips Hue Bridge.
  * @returns {Promise<object>} Resolve with created device.
  * @example
  * configureBridge('162.198.1.1');
  */
-async function configureBridge(serialNumber) {
-  const bridge = this.bridgesBySerialNumber.get(serialNumber);
+async function configureBridge(ipAddress) {
+  const bridge = this.bridgesByIP.get(ipAddress);
   if (!bridge) {
-    throw new NotFoundError(`BRIDGE_NOT_FOUND`);
+    logger.info(`Connecting to hue bridge ip = ${ipAddress} manually (not from discovered bridges)...`);
+  } else {
+    logger.info(`Connecting to hue bridge "${bridge.name}", ip = ${ipAddress} (from discovered bridges)...`);
   }
-  logger.info(`Connecting to hue bridge "${serialNumber}", ip = ${bridge.ipaddress}...`);
   try {
     const hueApi = this.hueClient.api;
-    const unauthenticatedApi = await hueApi.createLocal(bridge.ipaddress).connect();
+    const unauthenticatedApi = await hueApi.createLocal(ipAddress).connect();
     const user = await unauthenticatedApi.users.createUser(HUE_APP_NAME, HUE_DEVICE_NAME);
-    const authenticatedApi = await hueApi.createLocal(bridge.ipaddress).connect(user.username);
-    this.hueApisBySerialNumber.set(serialNumber, authenticatedApi);
+    const authenticatedApi = await hueApi.createLocal(ipAddress).connect(user.username);
+    // Get configuration to fetch serialNumber
+    const bridgeConfig = await authenticatedApi.configuration.get();
+    const bridgeSerialNumber = bridgeConfig.bridgeid;
+    const bridgeName = bridge ? bridge.name : bridgeConfig.name;
+    this.hueApisBySerialNumber.set(bridgeSerialNumber, authenticatedApi);
     const deviceCreated = await this.gladys.device.create({
-      name: bridge.name,
+      name: bridgeName,
       service_id: this.serviceId,
-      external_id: `${BRIDGE_EXTERNAL_ID_BASE}:${serialNumber}`,
-      selector: `${BRIDGE_EXTERNAL_ID_BASE}:${serialNumber}`,
+      external_id: `${BRIDGE_EXTERNAL_ID_BASE}:${bridgeSerialNumber}`,
+      selector: `${BRIDGE_EXTERNAL_ID_BASE}:${bridgeSerialNumber}`,
       model: BRIDGE_MODEL,
       features: [],
       params: [
         {
           name: BRIDGE_IP_ADDRESS,
-          value: bridge.ipaddress,
+          value: ipAddress,
         },
         {
           name: BRIDGE_USERNAME,
@@ -48,7 +52,7 @@ async function configureBridge(serialNumber) {
         },
         {
           name: BRIDGE_SERIAL_NUMBER,
-          value: serialNumber,
+          value: bridgeSerialNumber,
         },
       ],
     });

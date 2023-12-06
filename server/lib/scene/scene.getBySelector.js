@@ -13,6 +13,13 @@ async function getBySelector(selector) {
     where: {
       selector,
     },
+    include: [
+      {
+        model: db.TagScene,
+        as: 'tags',
+        attributes: ['name'],
+      },
+    ],
   });
 
   if (scene === null) {

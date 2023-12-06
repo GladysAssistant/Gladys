@@ -24,7 +24,8 @@ const PAGES_WITHOUT_HEADER = [
   '/gateway-configure-two-factor',
   '/confirm-email',
   '/dashboard/integration/device/google-home/authorize',
-  '/dashboard/integration/device/alexa/authorize'
+  '/dashboard/integration/device/alexa/authorize',
+  '/locked'
 ];
 
 const Header = ({ ...props }) => {
@@ -170,6 +171,16 @@ const Header = ({ ...props }) => {
                     </Link>
                   </li>
                 )}
+                <li class="nav-item">
+                  <Link
+                    href="/dashboard"
+                    class={cx('nav-link', {
+                      active: props.currentUrl === '/dashboard'
+                    })}
+                  >
+                    <i class="fe fe-book-open" /> <Text id="header.event_logs" />
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
