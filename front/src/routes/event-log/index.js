@@ -5,9 +5,9 @@ import { route } from 'preact-router';
 import EventLogPage from './EventLogPage';
 
 
-class Dashboard extends Component {
+class EventLog extends Component {
     render(props, {}) {
         return <EventLogPage {...props} />;
     }
     }
-    
+ export default connect('session')(EventLog);
