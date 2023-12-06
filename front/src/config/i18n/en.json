@@ -398,6 +398,27 @@
     "validationError": "Dashboard created is not valid, did you fill all the boxes correctly?",
     "createDashboardButton": "Create"
   },
+  "EventLog": {
+    "root": {
+      "title": "Event log",
+      "subtitle": "{{length}} of {{total}} events",
+      "filter": {
+        "titleType": "Type of event",
+        "eventType":{
+          "all": "All events",
+          "intern" : "Internal events"
+        },
+        "titleDate": "Date",
+        "date": {
+          "today": "Today",
+          "yesterday": "Yesterday",
+          "last7Days": "Last week",
+          "last30Days": "Last month",
+          "last365Days": "Last year"
+        }
+      }
+    }
+  },
   "integration": {
     "root": {
       "title": "Integrations",
