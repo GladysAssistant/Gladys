@@ -1,6 +1,8 @@
 const Promise = require('bluebird');
 const EventEmitter = require('events');
 
+const { log } = require('./event.log');
+
 const resolvedPromise = Promise.resolve();
 
 const Event = function Event() {
@@ -29,5 +31,7 @@ Event.prototype.removeListener = function removeListener(event, cb) {
 Event.prototype.listenerCount = function listenerCount(event) {
   return this.emitter.listenerCount(event);
 };
+
+Event.prototype.log = log;
 
 module.exports = Event;

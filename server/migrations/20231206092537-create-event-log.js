@@ -20,6 +20,10 @@ module.exports = {
             allowNull: false,
             type: Sequelize.DATE,
           },
+          updated_at: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
           });
     },
     down: async (queryInterface, Sequelize) => {
