@@ -398,6 +398,27 @@
     "validationError": "Le tableau de bord n'est pas valide, êtes-vous sûr d'avoir rempli tous les champs ?",
     "createDashboardButton": "Créer"
   },
+  "EventLog": {
+    "root": {
+      "title": "Journal des évènements",
+      "subtitle": "{{length}} de {{total}} évènements",
+      "filter": {
+        "titleType": "Type d'évènement",
+        "eventType":{
+          "all": "Tous les évènements",
+          "intern" : "Evenements internes"
+        },
+        "titleDate": "Date",
+        "date": {
+          "today": "Aujourd'hui",
+          "yesterday": "Hier",
+          "last7Days": "Cette semaine",
+          "last30Days": "Ce mois-ci",
+          "last365Days": "Cette année"
+        }
+      }
+    }
+  },
   "integration": {
     "root": {
       "title": "Intégrations",
