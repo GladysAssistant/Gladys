@@ -22,7 +22,58 @@ class EventLogPage extends Component {
                     <div class="page-subtitle">
                       <Text id="EventLog.root.subtitle" fields={{ length: 5, total: totalSize }} />
                     </div>
+                  </div>
+                      <div class="row">
+                  <div class="col-lg-3">
+                    <div class = "card"> 
+                        <div class= "card-header">
+                            <h3 class="card-title">
+                            <Text id = "EventLog.root.filter.titleType"></Text>
+                            </h3>
+                        </div>
+                        <div class = "card-body">
+                            <div>
+                            <input type = "checkbox"></input> <Text id = "EventLog.root.filter.eventType.all"></Text>
+                            </div>
+                            <div>
+                            <input type = "checkbox"></input> <Text id = "EventLog.root.filter.eventType.intern"></Text>
+                            </div>
+                        </div>
                     </div>
+                    <div class = "card"> 
+                        <div class= "card-header">
+                            <h3 class="card-title">
+                            <Text id = "EventLog.root.filter.titleDate"></Text>
+                            </h3>
+                        </div>
+                        <div class = "card-body">
+                            <div>
+                            <input type = "checkbox"></input> <Text id = "EventLog.root.filter.date.today"></Text>
+                            </div>
+                            <div>
+                            <input type = "checkbox"></input> <Text id = "EventLog.root.filter.date.yesterday"></Text>
+                            </div>
+                            <div>
+                            <input type = "checkbox"></input> <Text id = "EventLog.root.filter.date.last7Days"></Text>
+                            </div>
+                            <div>
+                            <input type = "checkbox"></input> <Text id = "EventLog.root.filter.date.last30Days"></Text>
+                            </div>
+                            <div>
+                            <input type = "checkbox"></input> <Text id = "EventLog.root.filter.date.last365Days"></Text>
+                            </div>
+                        </div>
+                    </div>
+                    
+                  </div>
+                  <div class="col-lg-9">
+                    <div class="row row-cards">
+                      <div>Là on aura la liste des evenements</div>
+                    </div>
+                  </div>
+                </div>
+                    
+                    
                     </div>
                     </div>
                     </div>
