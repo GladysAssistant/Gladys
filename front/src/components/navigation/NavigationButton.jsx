@@ -4,19 +4,23 @@ import style from './style.css';
 class NavigationButton extends Component {
   state = {
     hideUp: true,
-    hideDown: true
+    hideDown: true,
+    isScrolling: false
   };
 
   componentDidMount() {
     window.addEventListener('scroll', this.handleScroll);
+    window.addEventListener('scrollend', this.handleScrollEnd);
   }
 
   componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
+    windows.removeEventListener('scrollend', this.handleScrollEnd);
   }
 
   handleScroll = () => {
     let state = this.state;
+
     if (window.scrollY === 0 || window.scrollY <= 400) {
       state.hideUp = true;
     } else {
@@ -27,7 +31,17 @@ class NavigationButton extends Component {
     } else {
       state.hideDown = false;
     }
+
+    state.isScrolling = true;
     this.setState(state);
+  };
+
+  handleScrollEnd = () => {
+    let state = this.state;
+    setTimeout(() => {
+      state.isScrolling = false;
+      this.setState(state);
+    }, 3000);
   };
 
   scrollTop() {
@@ -50,24 +64,28 @@ class NavigationButton extends Component {
     return (
       <div className={style.goTo}>
         <div>
-          <button
-            id="scrollButton"
-            className={`btn btn-primary btn-sm ${style.halfCircleUp}`}
-            onClick={this.scrollTop}
-            disabled={this.state.hideUp}
-          >
-            Ʌ
-          </button>
+          {this.state.isScrolling ? (
+            <button
+              id="scrollButton"
+              className={`btn btn-primary btn-sm ${style.halfCircleUp}`}
+              onClick={this.scrollTop}
+              disabled={this.state.hideUp}
+            >
+              Ʌ
+            </button>
+          ) : null}
         </div>
         <div>
-          <button
-            id="scrollButton"
-            className={`btn btn-primary btn-sm ${style.halfCircleDown}`}
-            onClick={this.scrollBot}
-            disabled={this.state.hideDown}
-          >
-            V
-          </button>
+          {this.state.isScrolling ? (
+            <button
+              id="scrollButton"
+              className={`btn btn-primary btn-sm ${style.halfCircleDown}`}
+              onClick={this.scrollBot}
+              disabled={this.state.hideDown}
+            >
+              V
+            </button>
+          ) : null}
         </div>
       </div>
     );
