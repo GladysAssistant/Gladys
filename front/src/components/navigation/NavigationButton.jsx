@@ -15,7 +15,7 @@ class NavigationButton extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
-    windows.removeEventListener('scrollend', this.handleScrollEnd);
+    window.removeEventListener('scrollend', this.handleScrollEnd);
   }
 
   handleScroll = () => {
