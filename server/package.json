@@ -30,9 +30,9 @@
     "cypress": "npm run cypress:clean && npm run cypress:start",
     "cypress:start": "cross-env SQLITE_FILE_PATH=./gladys-cypress.db node index.js",
     "cypress:clean": "npx rimraf ./gladys-cypress.db*",
-    "hygen:create-service": "npx hygen gladys_module service new",
-    "hygen:create-dashboard-box": "npx hygen gladys_module dashboard_box new",
-    "hygen:create-integration-box": "npx hygen gladys_module box new"
+    "hygen:create-service": "npx hygen gladys_module service",
+    "hygen:create-dashboard-box": "npx hygen gladys_module dashboard_box",
+    "hygen:create-integration-box": "npx hygen gladys_module box"
   },
   "author": "Pierre-Gilles Leymarie",
   "license": "Apache-2.0",
