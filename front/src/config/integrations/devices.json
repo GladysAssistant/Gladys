@@ -78,5 +78,10 @@
     "key": "netatmo",
     "link": "netatmo",
     "img": "/assets/integrations/cover/netatmo.jpg"
+  },
+  {
+    "key": "sonos",
+    "link": "sonos",
+    "img": "/assets/integrations/cover/sonos.jpg"
   }
 ]

@@ -251,7 +251,8 @@
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
       "clock": "Clock",
-      "scene": "Scene"
+      "scene": "Scene",
+      "music": "Music"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -311,6 +312,7 @@
         "editBoxNamePlaceholder": "Name of the box",
         "latencyBoxName": "Latency",
         "latencyBoxDescription": "The lower the latency you select, the faster the live stream will start. However, to have a low latency, you need a very fast internet connection with a minimum of ping or the video will be jerky. We recommend medium or low latency.",
+        "upgradeGladysPlusPlanError": "Camera streaming is not included in your Gladys Plus plan. You need to update it in Settings -> Billing.",
         "liveStartError": "An error occured while starting this live stream. Are you sure the URL of your camera is a video flux and not an image?",
         "notNotSupportedBrowser": "This browser is not supported. In order to enable end-to-end encryption of this video stream, we use the MediaSource API, which is unfortunately not available on Safari iPhone. Strangely, this feature is available on Safari iPad and MacOS... We'll have to be patient, let's hope the API will be available on iPhone soon!",
         "tooManyRequests": "You have reached your monthly video bandwidth limit. Contact us by email or on the forum to get more bandwidth!",
@@ -386,6 +388,9 @@
         "alarmStatusText": "Your house is ",
         "alarmArming": "Your house is being armed...",
         "cancelAlarmArming": "Cancel"
+      },
+      "music": {
+        "selectDeviceLabel": "Select device to control"
       }
     }
   },
@@ -445,6 +450,7 @@
       "description": "Control Philips Hue Lights and plugs with the official hub",
       "deviceTab": "Devices",
       "setupTab": "Setup Bridges",
+      "documentation": "Documentation",
       "setup": {
         "connectedBridgesTitle": "Connected bridges",
         "disconnectButton": "Disconnect",
@@ -1023,6 +1029,41 @@
         "defaultError": "There was an error saving the device.",
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
+      }
+    },
+    "sonos": {
+      "title": "Sonos",
+      "description": "Control Sonos devices on your local network",
+      "deviceTab": "Devices",
+      "discoverTab": "Sonos Discovery",
+      "setupTab": "Setup",
+      "documentation": "Sonos Documentation",
+      "discoverDeviceDescr": "Automatically scan for Sonos devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "hostLabel": "IP Address",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "device": {
+        "title": "Sonos Devices in Gladys",
+        "editButton": "Edit",
+        "noDeviceFound": "No Sonos devices found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your local network",
+        "description": "Sonos devices are automatically discovered.",
+        "error": "Error discovering Sonos devices. Is your Sonos speaker powered on and accessible on the local network?",
+        "noDeviceFound": "No Sonos devices were discovered.",
+        "errorWhileScanning": "An error occurred during scanning.",
+        "scan": "Scan"
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
       }
     },
     "melcloud": {
@@ -1723,6 +1764,13 @@
         "description": "This action will set the selected house to the selected alarm mode.",
         "houseLabel": "House",
         "alarmModeLabel": "Alarm Mode"
+      },
+      "mqttMessage": {
+        "topic": "Topic",
+        "topicPlaceholder": "/gladys/my-topic",
+        "messageLabel": "Message",
+        "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
+        "messagePlaceholder": "My message"
       }
     },
     "actions": {
@@ -1777,6 +1825,9 @@
       "alarm": {
         "check-alarm-mode": "If the alarm is in mode",
         "set-alarm-mode": "Set alarm mode to"
+      },
+      "mqtt": {
+        "send": "Send MQTT Message"
       }
     },
     "variables": {
@@ -2184,7 +2235,9 @@
       "paused": "Paused",
       "exited": "Exited",
       "dead": "Dead"
-    }
+    },
+    "batteryLevel": "Battery level alert",
+    "batteryLevelDescription": "Every Saturday at 9:00 am, a message will be sent to all administrators if a device's battery level falls below the chosen threshold."
   },
   "newArea": {
     "createNewZoneButton": "Create new zone",
@@ -2231,7 +2284,8 @@
     "editButton": "Edit",
     "startButton": "Start",
     "searchPlaceholder": "Search scenes",
-    "filterTagsName": "Filter by tags"
+    "filterTagsName": "Filter by tags",
+    "unselectTags": "Unselect all tags"
   },
   "gateway": {
     "instanceConfiguredTitle": "Gladys Plus",
@@ -2290,6 +2344,7 @@
   },
   "gatewayBackup": {
     "title": "Backups",
+    "youNeedToUpgrade": "This feature is not available on your Gladys Plus plan. You must upgrade to a higher plan to access backups.",
     "description": "If you are subscribed to Gladys Plus, Gladys creates encrypted backup of your instance every 24 hours. Only you can decrypt backups. You can restore those backups in one-click in this installation, or any new setup.",
     "createdAtColumn": "Date",
     "sizeColumn": "Size",
@@ -2827,6 +2882,15 @@
     "surface": {
       "shortCategoryName": "Surface",
       "decimal": "Surface"
+    },
+    "music": {
+      "shortCategoryName": "Music",
+      "volume": "Music volume",
+      "play": "Music play button",
+      "pause": "Music pause button",
+      "previous": "Music previous button",
+      "next": "Music next button",
+      "playback_state": "Music playback state"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

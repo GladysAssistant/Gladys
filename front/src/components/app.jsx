@@ -145,6 +145,10 @@ import NetatmoEditPage from '../routes/integration/all/netatmo/edit-page';
 import NetatmoSetupPage from '../routes/integration/all/netatmo/setup-page';
 import NetatmoDiscoverPage from '../routes/integration/all/netatmo/discover-page';
 
+// Sonos integration
+import SonosDevicePage from '../routes/integration/all/sonos/device-page';
+import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
+
 // MELCloud integration
 import MELCloudPage from '../routes/integration/all/melcloud/device-page';
 import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
@@ -286,6 +290,9 @@ const AppRouter = connect(
         <NetatmoEditPage path="/dashboard/integration/device/netatmo/edit/:deviceSelector" />
         <NetatmoDiscoverPage path="/dashboard/integration/device/netatmo/discover" />
         <NetatmoSetupPage path="/dashboard/integration/device/netatmo/setup" />
+
+        <SonosDevicePage path="/dashboard/integration/device/sonos" />
+        <SonosDiscoveryPage path="/dashboard/integration/device/sonos/discover" />
 
         <MELCloudPage path="/dashboard/integration/device/melcloud" />
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />
