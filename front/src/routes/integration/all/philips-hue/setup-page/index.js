@@ -13,7 +13,7 @@ class PhilipsHueSetupPage extends Component {
 
   render(props, {}) {
     return (
-      <PhilipsHuePage>
+      <PhilipsHuePage user={props.user}>
         <SetupTab {...props} />
       </PhilipsHuePage>
     );

@@ -12,7 +12,7 @@ class ZwaveNodePage extends Component {
 
   render(props, {}) {
     return (
-      <ZwavePage>
+      <ZwavePage user={props.user}>
         <NodeTab {...props} />
       </ZwavePage>
     );

@@ -20,7 +20,7 @@ class LANManagerDiscoverPage extends Component {
 
   render(props, {}) {
     return (
-      <LANManagerPage>
+      <LANManagerPage user={props.user}>
         <LANManagerDiscoverTab {...props} />
       </LANManagerPage>
     );
@@ -28,6 +28,6 @@ class LANManagerDiscoverPage extends Component {
 }
 
 export default connect(
-  'session,httpClient,houses,lanManagerDiscoveredDevices,lanManagerGetDiscoveredDevicesStatus,lanManagerDiscoverUpdate,lanManagerStatus,filterExisting',
+  'session,user,httpClient,houses,lanManagerDiscoveredDevices,lanManagerGetDiscoveredDevicesStatus,lanManagerDiscoverUpdate,lanManagerStatus,filterExisting',
   actions
 )(LANManagerDiscoverPage);

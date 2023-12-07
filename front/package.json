@@ -51,6 +51,8 @@
     "apexcharts": "^3.41.1",
     "axios": "^0.21.1",
     "classnames": "^2.3.1",
+    "common-js": "^0.3.8",
+    "commonjs": "^0.0.1",
     "cropperjs": "^1.5.12",
     "date-fns": "^2.22.1",
     "dayjs": "^1.10.6",

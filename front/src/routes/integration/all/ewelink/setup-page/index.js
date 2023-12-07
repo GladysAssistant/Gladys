@@ -26,7 +26,7 @@ class EweLinkSetupPage extends Component {
 
   render(props, {}) {
     return (
-      <EweLinkPage>
+      <EweLinkPage user={props.user}>
         <SetupTab {...props} />
       </EweLinkPage>
     );
