@@ -80,7 +80,7 @@ const names = {
   },
   battery_low: {
     feature: {
-      category: DEVICE_FEATURE_CATEGORIES.BATTERY,
+      category: DEVICE_FEATURE_CATEGORIES.BATTERY_LOW,
       type: DEVICE_FEATURE_TYPES.SENSOR.BINARY,
     },
   },

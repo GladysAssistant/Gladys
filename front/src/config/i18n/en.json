@@ -2443,7 +2443,7 @@
           "one": "Yes"
         }
       },
-      "battery": {
+      "battery-low": {
         "binary": {
           "other": "No value received",
           "zero": "No",
@@ -2474,7 +2474,10 @@
     },
     "battery": {
       "shortCategoryName": "Battery",
-      "integer": "Battery",
+      "integer": "Battery"
+    },
+    "battery-low": {
+      "shortCategoryName": "Low Battery",
       "binary": "Low battery (yes/no)"
     },
     "temperature-sensor": {

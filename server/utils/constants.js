@@ -386,6 +386,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   AIRQUALITY_SENSOR: 'airquality-sensor',
   AIR_CONDITIONING: 'air-conditioning',
   BATTERY: 'battery',
+  BATTERY_LOW: 'battery-low',
   BUTTON: 'button',
   CAMERA: 'camera',
   CUBE: 'cube',
@@ -475,6 +476,8 @@ const DEVICE_FEATURE_TYPES = {
   },
   BATTERY: {
     INTEGER: 'integer',
+  },
+  BATTERY_LOW: {
     BINARY: 'binary',
   },
   VIBRATION_SENSOR: {
