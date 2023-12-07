@@ -15,7 +15,7 @@ module.exports = function NetatmoService(gladys, serviceId) {
    */
   async function start() {
     logger.info('Starting Netatmo service', serviceId);
-    await netatmoHandler.init();
+    await netatmoHandler.init(netatmoHandler);
     // await netatmoHandler.loadDevices();
   }
 

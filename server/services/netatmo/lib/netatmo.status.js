@@ -53,6 +53,12 @@ function saveStatus(status) {
           payload: { statusType: STATUS.CONNECTED, status: status.message },
         });
         break;
+      case STATUS.ERROR.SET_DEVICES_VALUES:
+        this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTED,
+          payload: { statusType: STATUS.CONNECTED, status: status.message },
+        });
+        break;
       case STATUS.NOT_INITIALIZED:
         this.configured = false;
         this.status = STATUS.NOT_INITIALIZED;
@@ -78,6 +84,12 @@ function saveStatus(status) {
         this.status = STATUS.DISCONNECTED;
         this.connected = false;
         break;
+      case STATUS.DISCOVERING_DEVICES:
+        this.configured = true;
+        this.status = STATUS.DISCOVERING_DEVICES;
+        this.connected = true;
+        break;
+
       default:
         break;
     }

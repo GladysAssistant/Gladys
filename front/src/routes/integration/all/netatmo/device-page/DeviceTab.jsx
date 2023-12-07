@@ -111,10 +111,12 @@ class DeviceTab extends Component {
                   netatmoDevices.map((device, index) => (
                     <NetatmoDeviceBox
                       editable
+                      editButton
                       saveButton
                       deleteButton
                       device={device}
                       deviceIndex={index}
+                      showMostRecentValueAt={device.created_at && !device.updatable}
                       getNetatmoDevices={this.getNetatmoDevices.bind(this)}
                       housesWithRooms={housesWithRooms}
                     />

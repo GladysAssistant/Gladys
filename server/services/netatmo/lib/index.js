@@ -8,23 +8,36 @@ const { refreshingTokens } = require('./netatmo.refreshingTokens');
 const { getConfiguration } = require('./netatmo.getConfiguration');
 const { getStatus, saveStatus } = require('./netatmo.status');
 const { saveConfiguration } = require('./netatmo.saveConfiguration');
+const { discoverDevices } = require('./netatmo.discoverDevices');
+const { loadDevices } = require('./netatmo.loadDevices');
+const { loadDeviceDetails } = require('./netatmo.loadDeviceDetails');
+const { pollRefreshingValues, pollRefreshingToken } = require('./netatmo.poll');
+const { setValue } = require('./netatmo.setValue');
 
 const { STATUS } = require('./utils/netatmo.constants');
 
 const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
-  this.baseUrl = 'https://api.netatmo.net';
-
+  this.configuration = {
+    username: null,
+    clientId: null,
+    clientSecret: null,
+    connected: null,
+    scopes: {
+      scopeEnergy: null,
+    },
+  };
   this.configured = false;
   this.connected = false;
   this.redirectUri = null;
+  this.accessToken = null;
+  this.refreshToken = null;
+  this.expireInToken = null;
   this.stateGetAccessToken = null;
   this.status = STATUS.NOT_INITIALIZED;
-  this.pollEnergy = undefined;
-  this.scopes = {
-    netatmoEnergy: false,
-  };
+  this.pollRefreshToken = undefined;
+  this.pollRefreshValues = undefined;
 };
 
 NetatmoHandler.prototype.init = init;
@@ -39,5 +52,11 @@ NetatmoHandler.prototype.getRefreshToken = getRefreshToken;
 NetatmoHandler.prototype.refreshingTokens = refreshingTokens;
 NetatmoHandler.prototype.getConfiguration = getConfiguration;
 NetatmoHandler.prototype.saveConfiguration = saveConfiguration;
+NetatmoHandler.prototype.discoverDevices = discoverDevices;
+NetatmoHandler.prototype.loadDevices = loadDevices;
+NetatmoHandler.prototype.loadDeviceDetails = loadDeviceDetails;
+NetatmoHandler.prototype.pollRefreshingValues = pollRefreshingValues;
+NetatmoHandler.prototype.pollRefreshingToken = pollRefreshingToken;
+NetatmoHandler.prototype.setValue = setValue;
 
 module.exports = NetatmoHandler;

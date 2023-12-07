@@ -2,14 +2,19 @@ import { Component } from 'preact';
 import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 import { Link } from 'preact-router';
+import { connect } from 'unistore/preact';
+import dayjs from 'dayjs';
 import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
-import { connect } from 'unistore/preact';
+import BatteryLevelFeature from '../../../../components/device/view/BatteryLevelFeature';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import styles from './style.css';
 
 class NetatmoDeviceBox extends Component {
   componentWillMount() {
     this.setState({
-      device: this.props.device
+      device: this.props.device,
+      user: this.props.user
     });
   }
 
@@ -45,7 +50,8 @@ class NetatmoDeviceBox extends Component {
     try {
       const savedDevice = await this.props.httpClient.post(`/api/v1/device`, this.state.device);
       this.setState({
-        device: savedDevice
+        device: savedDevice,
+        isSaving: true
       });
     } catch (e) {
       let errorMessage = 'integration.netatmo.error.defaultError';
@@ -90,6 +96,26 @@ class NetatmoDeviceBox extends Component {
     });
   };
 
+  getDeviceProperty = () => {
+    if (!this.state.device.features) {
+      return null;
+    }
+    const batteryLevelDeviceFeature = this.state.device.features.find(
+      deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
+    );
+    const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
+    let mostRecentValueAt = null;
+    this.state.device.features.forEach(feature => {
+      if (feature.last_value_changed && new Date(feature.last_value_changed) > mostRecentValueAt) {
+        mostRecentValueAt = new Date(feature.last_value_changed);
+      }
+    });
+    return {
+      batteryLevel,
+      mostRecentValueAt
+    };
+  };
+
   render(
     {
       deviceIndex,
@@ -99,13 +125,15 @@ class NetatmoDeviceBox extends Component {
       saveButton,
       updateButton,
       alreadyCreatedButton,
+      showMostRecentValueAt,
       housesWithRooms
     },
-    { device, loading, errorMessage, tooMuchStatesError, statesNumber }
+    { device, user, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
     const online = device.online;
-
+    const { batteryLevel, mostRecentValueAt } = this.getDeviceProperty();
+    const modelImage = `../../../../assets/integrations/devices/netatmo/netatmo-${device.model}.jpg`;
     return (
       <div class="col-md-6">
         <div class="card">
@@ -116,6 +144,19 @@ class NetatmoDeviceBox extends Component {
                 &nbsp;{device.name}
               </div>
             </Localizer>
+            {device.deviceNetatmo && device.deviceNetatmo.firmware_revision && (
+              <div class={styles['firmware-revision']}>
+                <strong>
+                  <Text id={`integration.netatmo.device.firmwareRevisionLabel`} />
+                </strong>
+                &nbsp;{device.deviceNetatmo.firmware_revision}
+              </div>
+            )}
+            {showMostRecentValueAt && batteryLevel && (
+              <div class="page-options d-flex">
+                <BatteryLevelFeature batteryLevel={batteryLevel} />
+              </div>
+            )}
           </div>
           <div
             class={cx('dimmer', {
@@ -135,6 +176,16 @@ class NetatmoDeviceBox extends Component {
                     <MarkupText id="device.tooMuchStatesToDelete" fields={{ count: statesNumber }} />
                   </div>
                 )}
+                <div class="form-group">
+                  <img
+                    src={modelImage}
+                    onError={e => {
+                      e.target.style.display = 'none';
+                    }}
+                    alt={`Image de ${device.name}`}
+                    className={styles['device-image-container']}
+                  />
+                </div>
                 <div class="form-group">
                   <label class="form-label" for={`name_${deviceIndex}`}>
                     <Text id="integration.netatmo.nameLabel" />
@@ -164,7 +215,34 @@ class NetatmoDeviceBox extends Component {
                     disabled="true"
                   />
                 </div>
-
+                {device.deviceNetatmo && device.deviceNetatmo.plug && device.deviceNetatmo.plug.name && (
+                  <div class="form-group">
+                    <label class="form-label" for={`model_${deviceIndex}`}>
+                      <Text id="integration.netatmo.device.connectedPlugLabel" />
+                    </label>
+                    <input
+                      id={`connectedPlug_${deviceIndex}`}
+                      type="text"
+                      value={device.deviceNetatmo.plug.name}
+                      class="form-control"
+                      disabled="true"
+                    />
+                  </div>
+                )}
+                {device.deviceNetatmo && device.deviceNetatmo.room && (
+                  <div class="form-group">
+                    <label class="form-label" for={`model_${deviceIndex}`}>
+                      <Text id="integration.netatmo.device.roomNetatmoApiLabel" />
+                    </label>
+                    <input
+                      id={`connectedPlug_${deviceIndex}`}
+                      type="text"
+                      value={device.deviceNetatmo.room.name}
+                      class="form-control"
+                      disabled="true"
+                    />
+                  </div>
+                )}
                 <div class="form-group">
                   <label class="form-label" for={`room_${deviceIndex}`}>
                     <Text id="integration.netatmo.roomLabel" />
@@ -214,8 +292,18 @@ class NetatmoDeviceBox extends Component {
                   )}
 
                   {validModel && saveButton && (
-                    <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.netatmo.saveButton" />
+                    <button
+                      onClick={this.saveDevice}
+                      class={`btn ${this.state.isSaving ? 'btn-primary' : 'btn-success'} mr-2`}
+                      disabled={this.state.isSaving}
+                    >
+                      {this.state.isSaving ? (
+                        <Text id="integration.netatmo.alreadyCreatedButton" />
+                      ) : (
+                        <Text id="integration.netatmo.saveButton" />
+                      )}
+                      {/* {!this.state.isSaving && (<Text id="integration.netatmo.saveButton" />)}
+                      {this.state.isSaving && (<Text id="integration.netatmo.alreadyCreatedButton" />)} */}
                     </button>
                   )}
 
@@ -238,6 +326,23 @@ class NetatmoDeviceBox extends Component {
                       </button>
                     </Link>
                   )}
+
+                  {validModel && showMostRecentValueAt && (
+                    <p class="mt-4">
+                      {mostRecentValueAt ? (
+                        <Text
+                          id="integration.mqtt.device.mostRecentValueAt"
+                          fields={{
+                            mostRecentValueAt: dayjs(mostRecentValueAt)
+                              .locale(user.language)
+                              .fromNow()
+                          }}
+                        />
+                      ) : (
+                        <Text id="integration.netatmo.device.noValueReceived" />
+                      )}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -248,4 +353,4 @@ class NetatmoDeviceBox extends Component {
   }
 }
 
-export default connect('httpClient', {})(NetatmoDeviceBox);
+export default connect('httpClient,user', {})(NetatmoDeviceBox);

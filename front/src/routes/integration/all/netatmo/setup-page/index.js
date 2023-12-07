@@ -108,7 +108,7 @@ class NetatmoSetupPage extends Component {
       await this.getRedirectUri();
       const redirectUri = this.state.redirectUri;
       const regex = /dashboard|integration|device|netatmo|setup/;
-      // // Open a new tab for authorization URL
+      // Open a new tab for authorization URL
       if (redirectUri && regex.test(this.state.redirectUri)) {
         window.open(this.state.redirectUri, '_blank'); //TODO à supprimer -> window.open(this.state.redirectUri, '_blank');window.location.href = this.state.redirectUri;
         await this.setState({
@@ -145,9 +145,7 @@ class NetatmoSetupPage extends Component {
         netatmoUsername: configuration.username,
         netatmoClientId: configuration.clientId,
         netatmoClientSecret: configuration.clientSecret,
-        connectNetatmoStatusState: configuration.connected,
         netatmoScopesEnergy: configuration.scopes.scopeEnergy,
-        netatmoScopes: configuration.scopes,
         connectNetatmoStatus,
         clientSecretChanges: false
       });

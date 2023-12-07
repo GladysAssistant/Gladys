@@ -502,8 +502,8 @@
     "netatmo": {
       "title": "Netatmo",
       "description": "Control Netatmo Devices",
-      "deviceTab": "Netatmo Devices",
-      "discoverTab": "Discover Netatmo devices",
+      "deviceTab": "Devices",
+      "discoverTab": "Discover Netatmo",
       "setupTab": "Settings",
       "settingsTab": "Settings devices and features",
       "documentation": "Netatmo Documentation",
@@ -527,36 +527,40 @@
       },
 
       "device": {
-        "title": "Netatmo devices in Gladys",
-        "noDeviceFound": "No Netatmo devices added yet.",
-        "searchPlaceholder": "Search Netatmo devices",
+        "title": "Netatmo Devices in Gladys",
+        "noDeviceFound": "No Netatmo devices have been added yet.",
+        "searchPlaceholder": "Search for a device",
         "sidLabel": "Netatmo SID",
-        "ipLabel": "IP Address",
         "roomLabel": "Room",
+        "ipLabel": "IP Address",
         "featuresLabel": "Features",
         "saveButton": "Save",
         "deleteButton": "Delete",
-        "addDeviceButton": "Add",
-        "editButton": "Modify",
+        "editButton": "Edit",
         "noFeatures": "No features",
-        "deviceNotHandled": "Device is not handled",
-        "foundDevice": "Device Found",
+        "addDeviceButton": "Add",
+        "deviceNotHandled": "Unsupported devices",
+        "foundDevice": "Devices found",
 
-        "updates": "Check for Updates"
+        "updates": "Check for updates",
+        "noValueReceived": "No value received.",
+        "firmwareRevisionLabel": "Firmware: ",
+        "connectedPlugLabel": "Connected to bridge",
+        "roomNetatmoApiLabel": "Room in Netatmo API"
       },
       "discover": {
-        "title": "Your Netatmo equipment compatible with Gladys",
-        "description": "Netatmo devices are automatically discovered. Your Netatmo devices must be added to your Netatmo account beforehand.",
-        "noDeviceFound": "No Netatmo devices were found. Have you completed all the documentation steps to register your devices?",
-        "noConnect": "You must first configure and login to a Netatmo account from the 'Settings' menu.",
-        "disconnect": "No Netatmo devices can be detected. You must first log back in from the 'Settings' menu.",
-        "alreadyCreatedButton": "Already created",
-        "refreshButton": "Update datas",
+        "title": "Your Netatmo Devices Compatible with Gladys",
+        "description": "Your Netatmo devices must be added to your Netatmo account beforehand. Press the 'Scan' button to discover Netatmo devices for the first time. Press 'Refresh' if you want to retrieve new features of your devices.",
+        "noDeviceFound": "No Netatmo devices were found. Have you completed all the steps in the documentation to register your devices on the Netatmo API?",
+        "noConnect": "No Netatmo devices. You must first configure and connect to a Netatmo account from the 'Settings' menu.",
+        "disconnect": "No Netatmo devices can be detected. You must first reconnect from the 'Settings' menu.",
+        "alreadyCreatedButton": "Already Created",
+        "refreshButton": "Update",
 
         "error": "Error discovering Netatmo devices. Please check your credentials during setup.",
-        "scan": "Scan"
+        "scan": "Scan",
+        "refresh": "Refresh"
       },
-
       "setup": {
         "title": "Netatmo Setup",
         "usernameLabel": "User",
@@ -2665,9 +2669,18 @@
       "shortCategoryName": "Opening sensor",
       "binary": "Opening (open/closed)"
     },
+    "orientation-sensor": {
+      "shortCategoryName": "Orientation detector",
+      "integer": "Orientation angle (degree)"
+    },
     "humidity-sensor": {
       "shortCategoryName": "Humidity sensor",
       "decimal": "Humidity (decimal)"
+    },
+    "schedule": {
+      "shortCategoryName": "Temporality",
+      "time-hour": "Hour (hh:mm:ss)",
+      "time-day-hour": "Day/Hour (yy/mm/dd hh:mm:ss)"
     },
     "soil-moisture-sensor": {
       "shortCategoryName": "Soil moisture sensor",
@@ -2796,7 +2809,12 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Thermostat Temperature"
+      "target-temperature": "Thermostat Temperature",
+      "text": "Setpoint Mode"
+    },
+    "thermostat-request-sensor": {
+      "shortCategoryName": "Thermostat",
+      "integer": "Heating Demand"
     },
     "airquality-sensor": {
       "shortCategoryName": "Air Quality",

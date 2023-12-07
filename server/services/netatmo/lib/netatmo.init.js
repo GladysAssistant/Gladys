@@ -1,60 +1,47 @@
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 const { STATUS } = require('./utils/netatmo.constants');
 
 /**
+ * @param {object} netatmoHandler - Of nothing.
  * @description Initialize service with properties and connect to devices.
  * @example
  * await init();
  */
-async function init() {
-  const configuration = await this.getConfiguration();
-  const { username, clientId, clientSecret } = configuration;
+async function init(netatmoHandler) {
+  await netatmoHandler.getConfiguration(netatmoHandler);
+  const { username, clientId, clientSecret } = netatmoHandler.configuration;
+  logger.warn(username, ' ', clientId);
   if (!username || !clientId || !clientSecret) {
-    this.status = STATUS.NOT_INITIALIZED;
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: this.status },
-    });
+    netatmoHandler.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
   }
-  this.configured = true;
+  netatmoHandler.configured = true;
   // TODO Limiter si redémarrages intempestifs ?
-  const accessToken = await this.getAccessToken();
-  if (accessToken) {
-    const resRefreshToken = await this.getRefreshToken();
-
-    if (resRefreshToken) {
-      const { refreshToken } = resRefreshToken;
-      const response = await this.refreshingTokens(configuration, refreshToken);
-      if (response.success) {
-        logger.info('Netatmo successfull connect');
-        this.status = STATUS.CONNECTED;
-      } else {
-        logger.error('Netatmo no successfull connect', response);
-        const tokens = {
-          accessToken: '',
-          refreshToken: '',
-          expireIn: '',
-          connected: false,
-        };
-        await this.setTokens(tokens);
-        this.status = STATUS.ERROR.PROCESSING_TOKEN;
-      }
+  await netatmoHandler.getAccessToken(netatmoHandler);
+  await netatmoHandler.getRefreshToken(netatmoHandler);
+  if (netatmoHandler.accessToken && netatmoHandler.refreshToken) {
+    const response = await netatmoHandler.refreshingTokens();
+    if (response.success) {
+      netatmoHandler.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+      logger.info('Netatmo successfull connect with status: ', netatmoHandler.status);
+      await netatmoHandler.pollRefreshingValues(netatmoHandler);
+      await netatmoHandler.pollRefreshingToken(netatmoHandler);
     } else {
-      logger.debug('Netatmo no refresh token');
-      this.status = STATUS.DISCONNECTED;
+      logger.error('Netatmo no successfull connect', response, ' with status: ', netatmoHandler.status);
+      const tokens = {
+        accessToken: '',
+        refreshToken: '',
+        expireIn: '',
+        connected: false,
+      };
+      await netatmoHandler.setTokens(tokens);
+      netatmoHandler.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: null });
     }
   } else {
-    logger.debug('Netatmo no access token');
-    this.status = STATUS.DISCONNECTED;
+    logger.debug('Netatmo no access or no refresh token');
+    netatmoHandler.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });
   }
-
-  this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
-    type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-    payload: { status: this.status },
-  });
 }
 
 module.exports = {

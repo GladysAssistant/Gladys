@@ -4,23 +4,17 @@ const querystring = require('querystring');
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
-const { STATUS } = require('./utils/netatmo.constants');
+const { STATUS, API } = require('./utils/netatmo.constants');
 
 /**
  * @description Netatmo retrieve access and refresh token method.
- * @param {object} configuration - Netatmo configuration properties.
- * @param {string} refreshToken - Netatmo Refresh Token to refresh access tokens.
  * @returns {Promise} Netatmo access token success.
  * @example
- * await netatmo.refreshingTokens(
- *  netatmoHandler,
- *  {clientId, clientSecret},
- *  refreshToken
- * );
+ * await netatmo.refreshingTokens();
  */
-async function refreshingTokens(configuration, refreshToken) {
-  const { clientId, clientSecret } = configuration;
-  if (!clientId || !clientSecret || !refreshToken) {
+async function refreshingTokens() {
+  const { clientId, clientSecret } = this.configuration;
+  if (!clientId || !clientSecret || !this.refreshToken) {
     await this.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
     throw new ServiceNotConfiguredError('Netatmo is not connected.');
   }
@@ -30,13 +24,13 @@ async function refreshingTokens(configuration, refreshToken) {
     grant_type: 'refresh_token',
     client_id: clientId,
     client_secret: clientSecret,
-    refresh_token: refreshToken,
+    refresh_token: this.refreshToken,
   };
   try {
     const response = await axios({
-      url: `${this.baseUrl}/oauth2/token`,
+      url: `${API.TOKEN}`,
       method: 'post',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8', Host: 'api.netatmo.com' },
+      headers: { 'Content-Type': API.HEADER.CONTENT_TYPE, Host: API.HEADER.HOST },
       data: querystring.stringify(authentificationForm),
     });
     const tokens = {
@@ -45,9 +39,9 @@ async function refreshingTokens(configuration, refreshToken) {
       expireIn: response.data.expire_in,
       connected: true,
     };
-    await this.setTokens(tokens);
-    await this.saveStatus({ statusType: STATUS.CONNECTED });
-    logger.debug('Netatmo new access tokens well loaded');
+    await this.setTokens(this, tokens);
+    await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+    logger.debug('Netatmo new access tokens well loaded with status: ', this.status);
     return { success: true };
   } catch (e) {
     this.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: 'refresh_token_fail' });

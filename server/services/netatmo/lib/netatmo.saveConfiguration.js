@@ -17,6 +17,10 @@ async function saveConfiguration(configuration) {
     await this.gladys.variable.setValue(GLADYS_VARIABLES.CLIENT_ID, clientId, this.serviceId);
     await this.gladys.variable.setValue(GLADYS_VARIABLES.CLIENT_SECRET, clientSecret, this.serviceId);
     await this.gladys.variable.setValue(GLADYS_VARIABLES.SCOPE_ENERGY, scopeEnergy, this.serviceId);
+    this.configuration.username = username;
+    this.configuration.scopeEnergy = clientId;
+    this.configuration.clientSecret = clientSecret;
+    this.configuration.scopes.scopeEnergy = scopeEnergy;
     logger.debug('Netatmo configuration well stored');
     return true;
   } catch (e) {

@@ -282,6 +282,7 @@ const AppRouter = connect(
         <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
 
         <NetatmoPage path="/dashboard/integration/device/netatmo" />
+        <NetatmoEditPage path="/dashboard/integration/device/netatmo/edit" />
         <NetatmoEditPage path="/dashboard/integration/device/netatmo/edit/:deviceSelector" />
         <NetatmoDiscoverPage path="/dashboard/integration/device/netatmo/discover" />
         <NetatmoSetupPage path="/dashboard/integration/device/netatmo/setup" />

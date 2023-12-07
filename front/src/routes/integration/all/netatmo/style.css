@@ -1,0 +1,12 @@
+.firmware-revision {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 0.75rem;
+}
+
+.device-image-container {
+    max-width: 75%;
+    margin: 0 auto;
+    display: block;
+}

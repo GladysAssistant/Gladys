@@ -7,7 +7,8 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Netatmo
    */
   async function getConfiguration(req, res) {
-    res.json(await netatmoHandler.getConfiguration());
+    const result = await netatmoHandler.getConfiguration(netatmoHandler);
+    res.json(result);
   }
 
   /**
@@ -16,7 +17,8 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Netatmo
    */
   async function getStatus(req, res) {
-    res.json(await netatmoHandler.getStatus());
+    const result = await netatmoHandler.getStatus()
+    res.json(result);
   }
 
   /**
@@ -49,8 +51,8 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Netatmo
    */
   async function connect(req, res) {
-    const configuration = await netatmoHandler.getConfiguration();
-    const result = await netatmoHandler.connect(netatmoHandler, configuration);
+    await netatmoHandler.getConfiguration(netatmoHandler);
+    const result = await netatmoHandler.connect(netatmoHandler);
     res.json({
       result,
     });
@@ -62,8 +64,8 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Netatmo
    */
   async function retrieveTokens(req, res) {
-    const configuration = await netatmoHandler.getConfiguration();
-    const result = await netatmoHandler.retrieveTokens(netatmoHandler, configuration, req.body);
+    await netatmoHandler.getConfiguration(netatmoHandler);
+    const result = await netatmoHandler.retrieveTokens(netatmoHandler, req.body);
     res.json({
       result,
     });
@@ -79,6 +81,34 @@ module.exports = function NetatmoController(netatmoHandler) {
     res.json({
       success: true,
     });
+  }
+
+  /**
+   * @api {get} /api/v1/service/netatmo/discover Retrieve netatmo devices from API.
+   * @apiName discover
+   * @apiGroup Netatmo
+   */
+  async function discover(req, res) {
+    let devices;
+    if (!netatmoHandler.discoveredDevices) {
+      devices = await netatmoHandler.discoverDevices(netatmoHandler);
+    } else {
+      devices = netatmoHandler.discoveredDevices.filter((device) => {
+        const existInGladys = netatmoHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
+        return existInGladys === null;
+      });
+    }
+    res.json(devices);
+  }
+
+  /**
+   * @api {get} /api/v1/service/netatmo/refreshDiscover Retrieve netatmo devices from API.
+   * @apiName refreshDiscover
+   * @apiGroup Netatmo
+   */
+  async function refreshDiscover(req, res) {
+    const devices = await netatmoHandler.discoverDevices(netatmoHandler);
+    res.json(devices);
   }
 
   return {
@@ -109,6 +139,14 @@ module.exports = function NetatmoController(netatmoHandler) {
     'post /api/v1/service/netatmo/disconnect': {
       authenticated: true,
       controller: asyncMiddleware(disconnect),
+    },
+    'get /api/v1/service/netatmo/discover': {
+      authenticated: true,
+      controller: asyncMiddleware(discover),
+    },
+    'get /api/v1/service/netatmo/refreshDiscover': {
+      authenticated: true,
+      controller: asyncMiddleware(refreshDiscover),
     },
   };
 };

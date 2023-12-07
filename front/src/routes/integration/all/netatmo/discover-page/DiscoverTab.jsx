@@ -35,6 +35,25 @@ class DiscoverTab extends Component {
     }
   }
 
+  async getRefreshDiscovered() {
+    this.setState({
+      loading: true
+    });
+    try {
+      const discoveredDevices = await this.props.httpClient.get('/api/v1/service/netatmo/refreshDiscover');
+      this.setState({
+        discoveredDevices,
+        loading: false,
+        errorLoading: false
+      });
+    } catch (e) {
+      this.setState({
+        loading: false,
+        errorLoading: true
+      });
+    }
+  }
+
   async getDiscoveredDevices() {
     this.setState({
       loading: true
@@ -63,11 +82,13 @@ class DiscoverTab extends Component {
           </h1>
           <div class="page-options d-flex">
             <button
-              onClick={this.getDiscoveredDevices.bind(this)}
+              onClick={this.getRefreshDiscovered.bind(this)}
               class="btn btn-outline-primary ml-2"
               disabled={loading}
             >
-              <Text id="integration.netatmo.discover.scan" /> <i class="fe fe-radio" />
+              {!discoveredDevices && <Text id="integration.netatmo.discover.scan" />}
+              {discoveredDevices && <Text id="integration.netatmo.discover.refresh" />}
+              <i class="fe fe-radio" />
             </button>
           </div>
         </div>

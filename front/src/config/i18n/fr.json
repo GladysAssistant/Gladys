@@ -628,14 +628,13 @@
     "netatmo": {
       "title": "Netatmo",
       "description": "Contrôler les équipements Netatmo",
-      "deviceTab": "Appareils Netatmo",
-      "discoverTab": "Découverte appareils Netatmo",
-      "setupTab": "Configuration de connexion",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Netatmo",
+      "setupTab": "Configuration",
       "settingsTab": "Paramètrages",
       "documentation": "Documentation Netatmo",
       "discoverDeviceDescr": "Scanner automatiquement les appareils Netatmo",
       "alreadyCreatedButton": "Déjà créé",
-
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
       "modelLabel": "Modèle",
@@ -644,14 +643,12 @@
       "updateButton": "Mettre à jour",
       "deleteButton": "Supprimer",
       "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
-
       "status": {
         "notConnected": "Gladys n'a pas réussi à se connecter au compte Netatmo, plus d'informations sur la ",
-        "setupPageLink": "page de configuration Netatmo.",
+        "setupPageLink": "Page de configuration Netatmo.",
         "online": "En ligne",
         "offline": "Hors ligne"
       },
-
       "device": {
         "title": "Appareils Netatmo dans Gladys",
         "noDeviceFound": "Aucun appareil Netatmo n'a encore été ajouté.",
@@ -667,23 +664,24 @@
         "addDeviceButton": "Ajouter",
         "deviceNotHandled": "Equipements non pris en charge",
         "foundDevice": "Equipements trouvés",
-
-        "updates": "Vérifier les mises à jour"
+        "updates": "Vérifier les mises à jour",
+        "noValueReceived": "Aucune valeur reçue.",
+        "firmwareRevisionLabel": "Firmware: ",
+        "connectedPlugLabel": "Connecté au pont",
+        "roomNetatmoApiLabel": "Pièce dans l'API Netatmo"
       },
-
       "discover": {
         "title": "Vos appareils Netatmo compatibles avec Gladys",
-        "description": "Les appareils Netatmo sont automatiquement découverts. Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant.",
+        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant. Appuyer sur le bouton 'Scanner' pour découvrir les appareils Netatmo la première fois. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
         "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
         "noConnect": "Aucun appareil Netatmo. Vous devez d'abord configurer et vous connecter à un compte Netatmo depuis le menu 'Paramètres'.",
         "disconnect": "Aucun appareil Netatmo ne peut être détecté. Vous devez d'abord vous reconnecter depuis le menu 'Paramètres'.",
         "alreadyCreatedButton": "Déjà créé",
         "refreshButton": "Mettre à jour",
-
         "error": "Erreur de découverte des appareils Netatmo. Veuillez vérifier vos informations d'identification lors de l'installation.",
-        "scan": "Scanner"
+        "scan": "Scanner",
+        "refresh": "Rafraîchir"
       },
-
       "setup": {
         "title": "Configuration Netatmo",
         "usernameLabel": "Utilisateur",
@@ -694,7 +692,7 @@
         "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
         "clientSecretLabel": "Secret client",
         "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
-        "scopeLabel": "Etendue de connexion (Sélectionner les actions que vous souhaitez réaliser)",
+        "scopeLabel": "Etendue de connexion (Sélectionner les actions que vous souhaitez pouvoir réaliser avec Gladys)",
         "scopePlaceholder": "",
         "scopes": {
           "netatmoEnergy": "Netatmo Energie (Thermostat, Vanne)",
@@ -703,7 +701,6 @@
             "write": "Actions sur les thermostats (write_thermostat)"
           }
         },
-
         "saveAndConnectLabel": "Sauvegarder la configuration & Connecter",
         "newSaveAndReconnectLabel": "Sauvegarder la nouvelle configuration & Reconnecter",
         "connectLabel": "Connecter",
@@ -712,12 +709,10 @@
         "connect": "Gladys est connectée à Netatmo",
         "disconnect": "Gladys n'est pas connectée à Netatmo",
         "notConfigured": "Le service Netatmo n'est pas configuré Netatmo",
-
         "description": "Vous pouvez connecter Gladys à votre compte Netatmo pour commander les appareils associés.",
         "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionCreateProject": "Vous devez ensuite créer une \"Apps\" dans votre compte <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\".",
-
         "errorConnecting": {
           "other_error": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum. Vous pouvez ensuite fermer cet onglet.",
           "other_error_NetatmoPage": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum.",
@@ -725,20 +720,16 @@
           "invalid_client": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>"
         },
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
-
         "connecting": "Configuration sauvegardée. Connexion à votre compte Netatmo en cours...",
         "processingToken": "Connexion à votre compte Netatmo... Récupération du token d'accès.",
-
         "connected": "Connexion réussie au compte Netatmo !",
         "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration."
       },
-
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
         "conflictError": "L'appareil actuel est déjà dans Gladys."
       },
-
       "deviceFeatureValues": {
         "energy": {
           "setpointmode": {
@@ -2668,9 +2659,18 @@
       "shortCategoryName": "Détecteur d'ouverture",
       "binary": "Ouverture (Oui/Non)"
     },
+    "orientation-sensor": {
+      "shortCategoryName": "Détecteur d'orientation",
+      "integer": "Angle d'orientation (degré)"
+    },
     "humidity-sensor": {
       "shortCategoryName": "Capteur d'humidité",
       "decimal": "Humidité (pourcentage)"
+    },
+    "schedule": {
+      "shortCategoryName": "Temporalité",
+      "time-hour": "Heure (hh:mm:ss)",
+      "time-day-hour": "Jour/Heure (jj/mm/aa hh:mm:ss)"
     },
     "soil-moisture-sensor": {
       "shortCategoryName": "Capteur d'humidité du sol",
@@ -2799,7 +2799,12 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Température de consigne"
+      "target-temperature": "Température de consigne",
+      "text": "Mode de consigne"
+    },
+    "thermostat-request-sensor": {
+      "shortCategoryName": "Thermostat",
+      "integer": "Demande de chauffe"
     },
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
