@@ -704,8 +704,8 @@ module.exports = {
     },
     voc_index: {
       feature: {
-        category: DEVICE_FEATURE_CATEGORIES.VOC_SENSOR,
-        type: DEVICE_FEATURE_TYPES.VOC_SENSOR.INTEGER,
+        category: DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VOC_INDEX_SENSOR.INTEGER,
         min: 1,
         max: 500,
       },

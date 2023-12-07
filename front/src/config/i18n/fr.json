@@ -2702,7 +2702,10 @@
     },
     "voc-sensor": {
       "shortCategoryName": "Capteur de pollution COV",
-      "decimal": "COV (Décimale)",
+      "decimal": "COV (Décimale)"
+    },
+    "voc-index-sensor": {
+      "shortCategoryName": "Indice COV",
       "integer": "Indice COV (entier)"
     },
     "shutter": {

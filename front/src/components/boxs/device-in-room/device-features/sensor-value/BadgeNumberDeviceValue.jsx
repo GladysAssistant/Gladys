@@ -1,7 +1,7 @@
 import { Text } from 'preact-i18n';
 import cx from 'classnames';
 
-import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../../server/utils/constants';
 import RawDeviceValue from './RawDeviceValue';
 
 const colorLowAsGreen = (value, safeLimit, warnLimit) => {
@@ -48,25 +48,17 @@ const getVocIndexColor = value => {
 
 const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
+  [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000),
+  [DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR]: value => getVocIndexColor(value),
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 12, 35),
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value)
 };
 
-const BADGE_TYPES = {
-  [DEVICE_FEATURE_TYPES.VOC_SENSOR.DECIMAL]: value => colorLowAsGreen(value, 250, 2000),
-  [DEVICE_FEATURE_TYPES.VOC_SENSOR.INTEGER]: value => getVocIndexColor(value)
-};
-
 const BadgeNumberDeviceValue = props => {
-  const { category, type, last_value: lastValue = null, unit } = props.deviceFeature;
+  const { category, last_value: lastValue = null, unit } = props.deviceFeature;
 
-  let colorMethod = BADGE_CATEGORIES[category];
-
-  if (!colorMethod) {
-    colorMethod = BADGE_TYPES[type];
-  }
-
+  const colorMethod = BADGE_CATEGORIES[category];
   if (!colorMethod) {
     return <RawDeviceValue {...props} />;
   }
