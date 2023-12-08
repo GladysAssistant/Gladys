@@ -27,12 +27,10 @@ async function setValue(device, deviceFeature, value) {
   }
 
   if (deviceFeature.type === DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION) {
-    console.log(deviceFeature);
-    console.log(value);
     await sonosDevice.PlayNotification({
       trackUri: value,
       onlyWhenPlaying: false,
-      volume: 25, // Set the volume for the notification (and revert back afterwards)
+      volume: 30, // Set the volume for the notification (and revert back afterwards)
       timeout: 10,
     });
   }
