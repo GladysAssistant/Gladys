@@ -203,7 +203,7 @@
     "success": {
       "title": "Merci !",
       "introduction": "Je m'appelle <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\"> Pierre-Gilles Leymarie</a>, et j'ai commencé à travailler sur Gladys Assistant en 2013.",
-      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys. J'espère que vous apprécierez utiliser ce logiciel.",
+      "thanksForChoosingOpenSource": "Je voudrais vous remercier d'avoir choisi Gladys. J'espère que vous apprécierez ce logiciel.",
       "ifYouWantToSupportThisSotware": "J'essaie de faire de Gladys mon activité principale, je compte sur vos contributions pour rendre ce projet durable. Si vous souhaitez accéder à des fonctionnalités supplémentaires et supporter ce projet open-source, rendez-vous sur <a href=\"https://gladysassistant.com/fr/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a>.",
       "goToDashboardButton": "Accéder au tableau de bord"
     }
@@ -584,7 +584,7 @@
         "connectButton": "Connecter/Reconnecter",
         "scanButton": "Recherche sur le réseau",
         "bridgeButtonNotPressed": "Le bouton du pont n'a pas été appuyé : veuillez appuyer sur le bouton de votre pont Philips Hue et réessayer.",
-        "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href =\"https://community.gladysassistant.com\">Gladys community</a>.",
+        "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
         "noBridgesFound": "Nous n'avons trouvé aucun pont Philips Hue sur votre réseau. Êtes-vous sûr que vous êtes connecté au même réseau que votre pont et que celui-ci est sous tension?",
         "manualConfiguration": {
           "title": "Configuration manuelle",
@@ -1545,7 +1545,7 @@
         "valueTypeSimple": "Simple",
         "simpleExplanationText": "Entrez ici la nouvelle valeur que vous souhaitez assigner à votre appareil.",
         "valueTypeComputed": "Calculée",
-        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc."
+        "computedExplanationText": "À la place d'une valeur fixe, vous pouvez entrer ici un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc."
       },
       "onlyContinueIf": {
         "variableLabel": "Variable",
@@ -1554,7 +1554,7 @@
         "removeLabel": "Effacer",
         "orText": "OU",
         "orButton": "+ OU",
-        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{'. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
+        "explanationText": "Dans le champs valeur, entrez soit une valeur brute soit un calcul basé sur une variable de scène. Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc condition."
       },
       "checkTime": {
         "description": "La scène continuera si l'heure actuelle est comprise entre les bornes spécifiées, aux jours spécifiés. Si une condition est vide, elle ne sera pas prise en compte.",
@@ -2010,7 +2010,7 @@
     "rateLimitError": "Vous avez essayé ce formulaire trop de fois. Veuillez réessayer dans 30 minutes ou redémarrer votre instance Gladys maintenant.",
     "invalidEmail": "Nous n'avons pas pu vérifier votre adresse e-mail.",
     "validationLinkConfirmation": "Êtes-vous sûr d'avoir cliqué/copié correctement le lien ?",
-    "contactUs": "Si cela ne fonctionne toujours pas, veuillez nous contacter sur la <a href=\"https://community.gladysassistant.com\">communauté Gladys</a>.",
+    "contactUs": "Si cela ne fonctionne toujours pas, veuillez nous contacter sur la <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "emailConfirmed": "E-mail confirmé",
     "signIn": "Connexion",
     "confirmationInProgress": "Confirmation en cours ..."
@@ -2034,7 +2034,7 @@
   },
   "httpErrors": {
     "rateLimitError": "Vous avez essayé ce formulaire trop de fois. Veuillez réessayer dans 30 minutes ou redémarrer votre instance Gladys maintenant.",
-    "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou contacter Gladys community.",
+    "unknownError": "Une erreur inconnue s'est produite. Veuillez réessayer ou nous contacter sur la <a href=\"https://community.gladysassistant.com/\" target=\"_blank\" rel=\"noopener noreferrer\"> Gladys Community</a>.",
     "networkError": "Erreur réseau : nous n'avons pas réussi à contacter votre instance Gladys. Êtes-vous connecté au réseau ? Votre instance Gladys est-elle en cours d'exécution ?"
   },
   "jobsSettings": {
@@ -2780,7 +2780,7 @@
   },
   "errorPage": {
     "title": "Oups... Cette page n'existe pas.",
-    "description": "Si vous pensez qu'il s'agit d'un bug de Gladys Assistant, veuillez le signaler à notre équipe!",
+    "description": "Si vous pensez qu'il s'agit d'un bug de Gladys Assistant, veuillez le signaler à notre équipe !",
     "goBack": "Retour"
   },
   "chat": {
