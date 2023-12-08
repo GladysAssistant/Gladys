@@ -391,6 +391,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   AIRQUALITY_SENSOR: 'airquality-sensor',
   AIR_CONDITIONING: 'air-conditioning',
   BATTERY: 'battery',
+  BATTERY_LOW: 'battery-low',
   BUTTON: 'button',
   CAMERA: 'camera',
   CUBE: 'cube',
@@ -426,6 +427,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SURFACE: 'surface',
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
+  TAMPER: 'tamper',
   TELEVISION: 'television',
   TEMPERATURE_SENSOR: 'temperature-sensor',
   THERMOSTAT: 'thermostat',
@@ -482,6 +484,9 @@ const DEVICE_FEATURE_TYPES = {
   BATTERY: {
     INTEGER: 'integer',
   },
+  BATTERY_LOW: {
+    BINARY: 'binary',
+  },
   VIBRATION_SENSOR: {
     BINARY: 'binary',
     STATUS: 'status',
@@ -507,6 +512,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   SURFACE: {
     DECIMAL: 'decimal',
+  },
+  TAMPER: {
+    BINARY: 'binary',
   },
   TELEVISION: {
     BINARY: 'binary',
