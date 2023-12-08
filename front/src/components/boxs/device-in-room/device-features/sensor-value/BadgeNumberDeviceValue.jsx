@@ -35,9 +35,21 @@ const getAqiColor = value => {
   return 'danger';
 };
 
+const getVocIndexColor = value => {
+  if (value < 150) {
+    return 'success';
+  } else if (value < 250) {
+    return 'warning';
+  } else if (value < 400) {
+    return 'orange';
+  }
+  return 'danger';
+};
+
 const BADGE_CATEGORIES = {
   [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: value => colorLowAsGreen(value, 600, 1200),
   [DEVICE_FEATURE_CATEGORIES.VOC_SENSOR]: value => colorLowAsGreen(value, 250, 2000),
+  [DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR]: value => getVocIndexColor(value),
   [DEVICE_FEATURE_CATEGORIES.PM25_SENSOR]: value => colorLowAsGreen(value, 12, 35),
   [DEVICE_FEATURE_CATEGORIES.FORMALDEHYD_SENSOR]: value => colorLowAsGreen(value, 50, 120),
   [DEVICE_FEATURE_CATEGORIES.AIRQUALITY_SENSOR]: value => getAqiColor(value)

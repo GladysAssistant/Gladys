@@ -433,6 +433,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   UV_SENSOR: 'uv-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
+  VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
 };
@@ -577,6 +578,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   VOC_SENSOR: {
     DECIMAL: 'decimal',
+  },
+  VOC_INDEX_SENSOR: {
+    INTEGER: 'integer',
   },
   SHUTTER: {
     STATE: 'state',

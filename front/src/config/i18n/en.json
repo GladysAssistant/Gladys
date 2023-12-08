@@ -2702,6 +2702,10 @@
       "shortCategoryName": "VOC Sensor",
       "decimal": "VOC (decimal)"
     },
+    "voc-index-sensor": {
+      "shortCategoryName": "VOC Index",
+      "integer": "VOC Index (integer)"
+    },
     "shutter": {
       "shortCategoryName": "Shutter",
       "state": "Shutter state",
