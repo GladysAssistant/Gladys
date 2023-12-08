@@ -56,3 +56,15 @@
   overflow-x: hidden;
   max-height: 200px;
 }
+
+.iconUnselectAll {
+  position: absolute;
+  margin-top: 4px;
+  margin-left: 1px;
+}
+
+.tagsSceneCount {
+  position: absolute;
+  right: -10px;
+  top: 4px;
+}
