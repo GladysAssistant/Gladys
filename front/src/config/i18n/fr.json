@@ -1640,6 +1640,13 @@
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
+      },
+      "playNotification": {
+        "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
+        "needGladysPlus": "Nécessite Gladys Plus car les API de \"Text To Speech\" sont payantes.",
+        "deviceLabel": "Enceinte",
+        "textLabel": "Message à dire sur l'enceinte",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       }
     },
     "actions": {
@@ -1697,6 +1704,9 @@
       },
       "mqtt": {
         "send": "Envoyer un message MQTT"
+      },
+      "music": {
+        "play-notification": "Parler sur une enceinte"
       }
     },
     "variables": {
