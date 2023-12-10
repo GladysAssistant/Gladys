@@ -25,6 +25,9 @@ import HouseEmptyOrNotCondition from './actions/HouseEmptyOrNotCondition';
 import CalendarIsEventRunning from './actions/CalendarIsEventRunning';
 import EcowattCondition from './actions/EcowattCondition';
 import SendMessageCameraParams from './actions/SendMessageCameraParams';
+import CheckAlarmMode from './actions/CheckAlarmMode';
+import SetAlarmMode from './actions/SetAlarmMode';
+import SendMqttMessage from './actions/SendMqttMessage';
 
 const deleteActionFromColumn = (columnIndex, rowIndex, deleteAction) => () => {
   deleteAction(columnIndex, rowIndex);
@@ -52,7 +55,10 @@ const ACTION_ICON = {
   [ACTIONS.HOUSE.IS_NOT_EMPTY]: 'fe fe-home',
   [ACTIONS.DEVICE.SET_VALUE]: 'fe fe-radio',
   [ACTIONS.CALENDAR.IS_EVENT_RUNNING]: 'fe fe-calendar',
-  [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap'
+  [ACTIONS.ECOWATT.CONDITION]: 'fe fe-zap',
+  [ACTIONS.ALARM.CHECK_ALARM_MODE]: 'fe fe-bell',
+  [ACTIONS.ALARM.SET_ALARM_MODE]: 'fe fe-bell',
+  [ACTIONS.MQTT.SEND]: 'fe fe-message-square'
 };
 
 const ACTION_CARD_TYPE = 'ACTION_CARD_TYPE';
@@ -87,7 +93,9 @@ const ActionCard = ({ children, ...props }) => {
       class={cx({
         'col-lg-12': props.action.type === ACTIONS.CONDITION.ONLY_CONTINUE_IF,
         'col-lg-6':
-          props.action.type === ACTIONS.MESSAGE.SEND || props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING,
+          props.action.type === ACTIONS.MESSAGE.SEND ||
+          props.action.type === ACTIONS.CALENDAR.IS_EVENT_RUNNING ||
+          props.action.type === ACTIONS.MQTT.SEND,
         'col-lg-4':
           props.action.type !== ACTIONS.CONDITION.ONLY_CONTINUE_IF &&
           props.action.type !== ACTIONS.MESSAGE.SEND &&
@@ -330,6 +338,33 @@ const ActionCard = ({ children, ...props }) => {
               columnIndex={props.columnIndex}
               index={props.index}
               updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.ALARM.CHECK_ALARM_MODE && (
+            <CheckAlarmMode
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.ALARM.SET_ALARM_MODE && (
+            <SetAlarmMode
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+            />
+          )}
+          {props.action.type === ACTIONS.MQTT.SEND && (
+            <SendMqttMessage
+              action={props.action}
+              columnIndex={props.columnIndex}
+              index={props.index}
+              updateActionProperty={props.updateActionProperty}
+              actionsGroupsBefore={props.actionsGroupsBefore}
+              variables={props.variables}
+              triggersVariables={props.triggersVariables}
             />
           )}
         </div>

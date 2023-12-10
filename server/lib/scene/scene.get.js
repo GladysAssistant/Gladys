@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
+const intersection = require('lodash.intersection');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
@@ -26,19 +27,20 @@ async function get(options) {
     attributes: optionsWithDefault.fields,
     offset: optionsWithDefault.skip,
     order: [[optionsWithDefault.order_by, optionsWithDefault.order_dir]],
+    include: [
+      {
+        model: db.TagScene,
+        as: 'tags',
+        attributes: ['name'],
+      },
+    ],
   };
 
   if (optionsWithDefault.take !== undefined) {
     queryParams.limit = optionsWithDefault.take;
   }
 
-  if (optionsWithDefault.search) {
-    queryParams.where = Sequelize.where(Sequelize.fn('lower', Sequelize.col('name')), {
-      [Op.like]: `%${optionsWithDefault.search}%`,
-    });
-  }
-
-  // search by device feature selectors
+  // search by scene selectors
   if (optionsWithDefault.selectors) {
     queryParams.where = {
       [Op.or]: optionsWithDefault.selectors.split(',').map((selector) => ({
@@ -47,10 +49,51 @@ async function get(options) {
     };
   }
 
+  const where = [];
+  if (optionsWithDefault.search) {
+    where.push(
+      Sequelize.where(Sequelize.fn('lower', Sequelize.col('t_scene.name')), {
+        [Op.like]: `%${optionsWithDefault.search}%`,
+      }),
+    );
+  }
+
+  if (optionsWithDefault.searchTags) {
+    const tags = optionsWithDefault.searchTags.split(',');
+
+    const sceneIdsAndNames = (
+      await db.TagScene.findAll({
+        fields: ['name', 'scene_id'],
+        where: {
+          [Op.or]: tags.map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
+        },
+      })
+    ).map((tag) => tag.get({ plain: true }));
+
+    const tagsWithSceneId = {};
+    sceneIdsAndNames.forEach((sceneIdAndName) => {
+      if (sceneIdAndName.name in tagsWithSceneId === false) {
+        tagsWithSceneId[sceneIdAndName.name] = [];
+      }
+      tagsWithSceneId[sceneIdAndName.name].push(sceneIdAndName.scene_id);
+    });
+
+    const intersectionSceneId = intersection(...Object.values(tagsWithSceneId));
+
+    where.push({
+      [Op.or]: intersectionSceneId.map((sceneId) => ({ id: sceneId })),
+    });
+  }
+
+  if (where.length > 0) {
+    queryParams.where = {
+      [Op.and]: where,
+    };
+  }
+
   const scenes = await db.Scene.findAll(queryParams);
 
-  const scenesPlain = scenes.map((scene) => scene.get({ plain: true }));
-  return scenesPlain;
+  return scenes.map((scene) => scene.get({ plain: true }));
 }
 
 module.exports = {

@@ -30,6 +30,23 @@ const DiscoverTab = ({ children, ...props }) => (
         </label>
       </div>
     </div>
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">
+        <label class="custom-switch">
+          <input
+            type="checkbox"
+            class="custom-switch-input"
+            checked={props.filterExisting === undefined || props.filterExisting}
+            onClick={props.toggleFilterOnExisting}
+            disabled={props.discoverZigbee2mqtt}
+          />
+          <span class={cx('custom-switch-indicator', 'mr-1', { 'bg-light': props.discoverZigbee2mqtt })} />
+          <span class="custom-switch-description">
+            <Text id="integration.zigbee2mqtt.discover.hideExistingDevices" />
+          </span>
+        </label>
+      </li>
+    </ul>
     <div class="card-body">
       <CheckStatus />
 

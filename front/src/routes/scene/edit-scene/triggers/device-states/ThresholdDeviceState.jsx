@@ -3,7 +3,7 @@ import { Text } from 'preact-i18n';
 
 class ThresholdDeviceState extends Component {
   handleThresholdOnlyModeChange = e => {
-    this.props.updateTriggerProperty(this.props.index, 'threshold_only', !e.target.checked);
+    this.props.updateTriggerProperty(this.props.index, 'threshold_only', e.target.checked);
   };
 
   render({ trigger }) {

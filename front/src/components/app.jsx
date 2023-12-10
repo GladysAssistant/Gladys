@@ -14,6 +14,7 @@ import Header from './header';
 import Layout from './layout';
 import Redirect from './router/Redirect';
 import Login from '../routes/login';
+import Locked from '../routes/locked';
 import Error from '../routes/error';
 import ForgotPassword from '../routes/forgot-password';
 import ResetPassword from '../routes/reset-password';
@@ -138,11 +139,18 @@ import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
 import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
 import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 
+// Sonos integration
+import SonosDevicePage from '../routes/integration/all/sonos/device-page';
+import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
+
 // MELCloud integration
 import MELCloudPage from '../routes/integration/all/melcloud/device-page';
 import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
 import MELCloudSetupPage from '../routes/integration/all/melcloud/setup-page';
 import MELCloudDiscoverPage from '../routes/integration/all/melcloud/discover-page';
+
+// NodeRed integration
+import NodeRedPage from '../routes/integration/all/node-red/setup-page';
 
 const defaultState = getDefaultState();
 const store = createStore(defaultState);
@@ -178,6 +186,7 @@ const AppRouter = connect(
         ) : (
           <ResetPassword path="/reset-password" />
         )}
+        <Locked path="/locked" />
         {config.gatewayMode ? <LinkGatewayUser path="/link-gateway-user" /> : <Error type="404" default />}
         {config.gatewayMode ? <SignupGateway path="/signup-gateway" /> : <Error type="404" default />}
         {config.gatewayMode ? (
@@ -249,6 +258,9 @@ const AppRouter = connect(
         <Zigbee2mqttSettingsPage path="/dashboard/integration/device/zigbee2mqtt/settings" />
         <Zigbee2mqttSetupPage path="/dashboard/integration/device/zigbee2mqtt/setup" />
         <Zigbee2mqttEditPage path="/dashboard/integration/device/zigbee2mqtt/edit/:deviceSelector" />
+
+        <NodeRedPage path="/dashboard/integration/device/node-red" />
+
         <XiaomiPage path="/dashboard/integration/device/xiaomi" />
         <EditXiaomiPage path="/dashboard/integration/device/xiaomi/edit/:deviceSelector" />
         <TasmotaPage path="/dashboard/integration/device/tasmota" />
@@ -266,6 +278,9 @@ const AppRouter = connect(
         <TuyaEditPage path="/dashboard/integration/device/tuya/edit/:deviceSelector" />
         <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
         <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
+
+        <SonosDevicePage path="/dashboard/integration/device/sonos" />
+        <SonosDiscoveryPage path="/dashboard/integration/device/sonos/discover" />
 
         <MELCloudPage path="/dashboard/integration/device/melcloud" />
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />

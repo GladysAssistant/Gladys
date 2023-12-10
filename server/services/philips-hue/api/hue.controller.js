@@ -14,11 +14,11 @@ module.exports = function HueController(philipsHueLightHandler) {
   /**
    * @api {post} /api/v1/service/philips-hue/bridge/configure Configure Philips Hue Bridge
    * @apiName ConfigureBridge
-   * @apiParam {String} serial Serial number of the bridge
+   * @apiParam {String} ipAddress IP Address of the bridge
    * @apiGroup PhilipsHue
    */
   async function configureBridge(req, res) {
-    const bridge = await philipsHueLightHandler.configureBridge(req.body.serial);
+    const bridge = await philipsHueLightHandler.configureBridge(req.body.ipAddress);
     res.json(bridge);
   }
 

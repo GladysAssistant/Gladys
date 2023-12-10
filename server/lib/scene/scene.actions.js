@@ -18,7 +18,7 @@ const get = require('get-value');
 const dayjs = require('dayjs');
 const utc = require('dayjs/plugin/utc');
 const timezone = require('dayjs/plugin/timezone');
-const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../utils/constants');
+const { ACTIONS, DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, ALARM_MODES } = require('../../utils/constants');
 const { getDeviceFeature } = require('../../utils/device');
 const { AbortScene } = require('../../utils/coreErrors');
 const { compare } = require('../../utils/compare');
@@ -435,6 +435,34 @@ const actionsFunc = {
       }
     } catch (e) {
       throw new AbortScene(e.message);
+    }
+  },
+  [ACTIONS.ALARM.CHECK_ALARM_MODE]: async (self, action) => {
+    const house = await self.house.getBySelector(action.house);
+    if (house.alarm_mode !== action.alarm_mode) {
+      throw new AbortScene(`House "${house.name}" is not in mode ${action.alarm_mode}`);
+    }
+  },
+  [ACTIONS.ALARM.SET_ALARM_MODE]: async (self, action) => {
+    if (action.alarm_mode === ALARM_MODES.ARMED) {
+      await self.house.arm(action.house, true);
+    }
+    if (action.alarm_mode === ALARM_MODES.DISARMED) {
+      await self.house.disarm(action.house);
+    }
+    if (action.alarm_mode === ALARM_MODES.PARTIALLY_ARMED) {
+      await self.house.partialArm(action.house);
+    }
+    if (action.alarm_mode === ALARM_MODES.PANIC) {
+      await self.house.panic(action.house);
+    }
+  },
+  [ACTIONS.MQTT.SEND]: (self, action, scope) => {
+    const mqttService = self.service.getService('mqtt');
+
+    if (mqttService) {
+      const messageWithVariables = Handlebars.compile(action.message)(scope);
+      mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
 };

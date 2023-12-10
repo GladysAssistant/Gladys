@@ -15,7 +15,7 @@ class PhilipsHueDevicePage extends Component {
 
   render(props, {}) {
     return (
-      <PhilipsHuePage>
+      <PhilipsHuePage user={props.user}>
         {props.philipsHueDevices && props.philipsHueDevices.length ? <DevicePage {...props} /> : <div />}
         <FoundDevices {...props} />
       </PhilipsHuePage>

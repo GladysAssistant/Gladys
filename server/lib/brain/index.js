@@ -19,6 +19,7 @@ const Brain = function Brain() {
   this.namedEntities = {
     room: new Map(),
     scene: new Map(),
+    device: new Map(),
   };
 };
 
