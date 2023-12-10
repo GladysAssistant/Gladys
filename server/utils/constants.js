@@ -930,8 +930,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   EWELINK: {
     STATUS: 'ewelink.status',
-    NEW_DEVICE: 'ewelink.new-device',
-    ERROR: 'ewelink.error',
   },
   BROADLINK: {
     LEARN_MODE: 'broadlink.learn',
