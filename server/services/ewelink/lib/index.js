@@ -18,6 +18,7 @@ const { handleRequest } = require('./handlers/ewelink.handleRequest');
 const { handleResponse } = require('./handlers/ewelink.handleResponse');
 
 const { init } = require('./ewelink.init');
+const { stop } = require('./ewelink.stop');
 const { upgrade } = require('./versions/ewelink.upgrade');
 
 /**
@@ -62,6 +63,7 @@ EweLinkHandler.prototype.setValue = setValue;
 EweLinkHandler.prototype.getStatus = getStatus;
 
 EweLinkHandler.prototype.init = init;
+EweLinkHandler.prototype.stop = stop;
 EweLinkHandler.prototype.upgrade = upgrade;
 
 module.exports = EweLinkHandler;

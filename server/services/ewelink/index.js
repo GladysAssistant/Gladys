@@ -26,6 +26,7 @@ module.exports = function EwelinkService(gladys, serviceId) {
    */
   async function stop() {
     logger.info('Stopping eWeLink service');
+    await eWeLinkHandler.stop();
   }
 
   return Object.freeze({

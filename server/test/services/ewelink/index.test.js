@@ -7,7 +7,8 @@ const { SERVICE_ID } = require('./lib/constants');
 const { fake, assert } = sinon;
 
 const EweLinkHandlerMock = sinon.stub();
-EweLinkHandlerMock.prototype.init = fake.returns(null);
+EweLinkHandlerMock.prototype.init = fake.resolves(null);
+EweLinkHandlerMock.prototype.stop = fake.resolves(null);
 
 const EweLinkService = proxyquire('../../../services/ewelink/index', {
   './lib': EweLinkHandlerMock,
@@ -28,12 +29,16 @@ describe('EweLinkService', () => {
       .to.have.property('controllers')
       .and.be.instanceOf(Object);
   });
+
   it('should start service', async () => {
     await eweLinkService.start();
     assert.calledOnceWithExactly(eweLinkService.device.init);
+    assert.notCalled(eweLinkService.device.stop);
   });
+
   it('should stop service', async () => {
     await eweLinkService.stop();
     assert.notCalled(eweLinkService.device.init);
+    assert.calledOnceWithExactly(eweLinkService.device.stop);
   });
 });
