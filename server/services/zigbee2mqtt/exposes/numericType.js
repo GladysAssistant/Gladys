@@ -702,6 +702,14 @@ module.exports = {
         max: 5500,
       },
     },
+    voc_index: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VOC_INDEX_SENSOR.INTEGER,
+        min: 1,
+        max: 500,
+      },
+    },
     soil_moisture: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.SOIL_MOISTURE_SENSOR,

@@ -251,7 +251,8 @@
       "chart": "Chart",
       "ecowatt": "Ecowatt (France)",
       "clock": "Clock",
-      "scene": "Scene"
+      "scene": "Scene",
+      "music": "Music"
     },
     "boxes": {
       "column": "Column {{index}}",
@@ -387,6 +388,9 @@
         "alarmStatusText": "Your house is ",
         "alarmArming": "Your house is being armed...",
         "cancelAlarmArming": "Cancel"
+      },
+      "music": {
+        "selectDeviceLabel": "Select device to control"
       }
     }
   },
@@ -446,6 +450,7 @@
       "description": "Control Philips Hue Lights and plugs with the official hub",
       "deviceTab": "Devices",
       "setupTab": "Setup Bridges",
+      "documentation": "Documentation",
       "setup": {
         "connectedBridgesTitle": "Connected bridges",
         "disconnectButton": "Disconnect",
@@ -891,6 +896,41 @@
         "defaultError": "There was an error saving the device.",
         "defaultDeletionError": "There was an error deleting the device.",
         "conflictError": "Current device is already in Gladys."
+      }
+    },
+    "sonos": {
+      "title": "Sonos",
+      "description": "Control Sonos devices on your local network",
+      "deviceTab": "Devices",
+      "discoverTab": "Sonos Discovery",
+      "setupTab": "Setup",
+      "documentation": "Sonos Documentation",
+      "discoverDeviceDescr": "Automatically scan for Sonos devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "hostLabel": "IP Address",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "device": {
+        "title": "Sonos Devices in Gladys",
+        "editButton": "Edit",
+        "noDeviceFound": "No Sonos devices found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your local network",
+        "description": "Sonos devices are automatically discovered.",
+        "error": "Error discovering Sonos devices. Is your Sonos speaker powered on and accessible on the local network?",
+        "noDeviceFound": "No Sonos devices were discovered.",
+        "errorWhileScanning": "An error occurred during scanning.",
+        "scan": "Scan"
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
       }
     },
     "melcloud": {
@@ -1591,6 +1631,13 @@
         "description": "This action will set the selected house to the selected alarm mode.",
         "houseLabel": "House",
         "alarmModeLabel": "Alarm Mode"
+      },
+      "mqttMessage": {
+        "topic": "Topic",
+        "topicPlaceholder": "/gladys/my-topic",
+        "messageLabel": "Message",
+        "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
+        "messagePlaceholder": "My message"
       }
     },
     "actions": {
@@ -1645,6 +1692,9 @@
       "alarm": {
         "check-alarm-mode": "If the alarm is in mode",
         "set-alarm-mode": "Set alarm mode to"
+      },
+      "mqtt": {
+        "send": "Send MQTT Message"
       }
     },
     "variables": {
@@ -2052,7 +2102,9 @@
       "paused": "Paused",
       "exited": "Exited",
       "dead": "Dead"
-    }
+    },
+    "batteryLevel": "Battery level alert",
+    "batteryLevelDescription": "Every Saturday at 9:00 am, a message will be sent to all administrators if a device's battery level falls below the chosen threshold."
   },
   "newArea": {
     "createNewZoneButton": "Create new zone",
@@ -2429,6 +2481,20 @@
           "zero": "No",
           "one": "Yes"
         }
+      },
+      "battery-low": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
+        }
+      },
+      "tamper": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
+        }
       }
     }
   },
@@ -2448,6 +2514,10 @@
     "battery": {
       "shortCategoryName": "Battery",
       "integer": "Battery"
+    },
+    "battery-low": {
+      "shortCategoryName": "Low Battery",
+      "binary": "Low battery (yes/no)"
     },
     "temperature-sensor": {
       "shortCategoryName": "Temperature sensor",
@@ -2578,6 +2648,10 @@
       "mode": "Mode",
       "target-temperature": "Temperature"
     },
+    "tamper": {
+      "shortCategoryName": "Tamper",
+      "binary": "Tamper (yes/no)"
+    },
     "television": {
       "shortCategoryName": "Television",
       "binary": "Power",
@@ -2650,6 +2724,10 @@
       "shortCategoryName": "VOC Sensor",
       "decimal": "VOC (decimal)"
     },
+    "voc-index-sensor": {
+      "shortCategoryName": "VOC Index",
+      "integer": "VOC Index (integer)"
+    },
     "shutter": {
       "shortCategoryName": "Shutter",
       "state": "Shutter state",
@@ -2683,6 +2761,15 @@
     "surface": {
       "shortCategoryName": "Surface",
       "decimal": "Surface"
+    },
+    "music": {
+      "shortCategoryName": "Music",
+      "volume": "Music volume",
+      "play": "Music play button",
+      "pause": "Music pause button",
+      "previous": "Music previous button",
+      "next": "Music next button",
+      "playback_state": "Music playback state"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

@@ -58,6 +58,8 @@ const actionSchema = Joi.array().items(
         evaluate_value: Joi.string(),
       }),
       alarm_mode: Joi.string().valid(...ALARM_MODES_LIST),
+      topic: Joi.string(),
+      message: Joi.string().allow(''),
     }),
   ),
 );

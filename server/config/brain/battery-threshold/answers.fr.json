@@ -1,0 +1,8 @@
+[
+  {
+    "label": "battery-threshold.success",
+    "answers": [
+      "Avertissement !!! Le niveau de la batterie de {{ device.name }} est inférieur à {{ value.min }}% (actuel : {{ value.current }}%)"
+    ]
+  }
+]
