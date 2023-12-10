@@ -39,7 +39,7 @@ describe('EweLinkHandler discover', () => {
 
   beforeEach(() => {
     eWeLinkHandler = new EwelinkHandler(gladys, EweLinkApiMock, SERVICE_ID);
-    eWeLinkHandler.ewelinkClient = new EweLinkApiMock.WebAPI();
+    eWeLinkHandler.ewelinkWebAPIClient = new EweLinkApiMock.WebAPI();
     eWeLinkHandler.status = { configured: true, connected: true };
   });
 
@@ -54,12 +54,12 @@ describe('EweLinkHandler discover', () => {
   });
   it('should found 0 devices', async () => {
     // Force eWeLink API to give empty response
-    sinon.stub(eWeLinkHandler.ewelinkClient.device, 'getAllThingsAllPages').resolves({ error: 0, data: {} });
+    sinon.stub(eWeLinkHandler.ewelinkWebAPIClient.device, 'getAllThingsAllPages').resolves({ error: 0, data: {} });
     const newDevices = await eWeLinkHandler.discover();
     expect(newDevices).to.have.deep.members([]);
   });
   it('should return not configured error', async () => {
-    eWeLinkHandler.ewelinkClient.at = EWELINK_INVALID_ACCESS_TOKEN;
+    eWeLinkHandler.ewelinkWebAPIClient.at = EWELINK_INVALID_ACCESS_TOKEN;
     try {
       await eWeLinkHandler.discover();
       assert.fail();
@@ -69,7 +69,7 @@ describe('EweLinkHandler discover', () => {
     }
   });
   it('should throw an error and emit a message when AccessToken is no more valid', async () => {
-    eWeLinkHandler.ewelinkClient.at = EWELINK_DENIED_ACCESS_TOKEN;
+    eWeLinkHandler.ewelinkWebAPIClient.at = EWELINK_DENIED_ACCESS_TOKEN;
     try {
       await eWeLinkHandler.discover();
       assert.fail();

@@ -21,7 +21,7 @@ describe('eWeLinkHandler deleteTokens', () => {
     };
 
     eWeLinkHandler = new EwelinkHandler(gladys, null, SERVICE_ID);
-    eWeLinkHandler.ewelinkClient = {
+    eWeLinkHandler.ewelinkWebAPIClient = {
       appId: 'APP_ID',
       at: 'ACCESS_TOKEN',
       rt: 'REFRESH_TOKEN',
@@ -39,7 +39,7 @@ describe('eWeLinkHandler deleteTokens', () => {
   it('should clear user tokens', async () => {
     await eWeLinkHandler.deleteTokens();
 
-    assert.calledOnceWithExactly(eWeLinkHandler.ewelinkClient.request.delete, '/v2/user/oauth/token', {
+    assert.calledOnceWithExactly(eWeLinkHandler.ewelinkWebAPIClient.request.delete, '/v2/user/oauth/token', {
       headers: {
         'X-CK-Appid': 'APP_ID',
         Authorization: `Bearer ACCESS_TOKEN`,

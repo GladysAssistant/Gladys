@@ -189,7 +189,7 @@ describe('eWeLinkHandler loadConfiguration', () => {
       region: 'APPLICATION_REGION_VALUE',
     });
 
-    expect(eWeLinkHandler.ewelinkClient.at).eq('ACCESS_TOKEN');
-    expect(eWeLinkHandler.ewelinkClient.rt).eq('REFRESH_TOKEN');
+    expect(eWeLinkHandler.ewelinkWebAPIClient.at).eq('ACCESS_TOKEN');
+    expect(eWeLinkHandler.ewelinkWebAPIClient.rt).eq('REFRESH_TOKEN');
   });
 });

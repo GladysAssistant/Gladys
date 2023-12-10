@@ -25,7 +25,7 @@ describe('eWeLinkHandler exchangeToken', () => {
     };
 
     eWeLinkHandler = new EwelinkHandler(gladys, null, SERVICE_ID);
-    eWeLinkHandler.ewelinkClient = {
+    eWeLinkHandler.ewelinkWebAPIClient = {
       oauth: {
         getToken: fake.resolves({ data: tokens }),
       },
@@ -55,7 +55,7 @@ describe('eWeLinkHandler exchangeToken', () => {
       expect(e.message).eq('eWeLink login state is invalid');
     }
 
-    assert.notCalled(eWeLinkHandler.ewelinkClient.oauth.getToken);
+    assert.notCalled(eWeLinkHandler.ewelinkWebAPIClient.oauth.getToken);
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.event.emit);
   });
@@ -68,7 +68,7 @@ describe('eWeLinkHandler exchangeToken', () => {
 
     await eWeLinkHandler.exchangeToken({ redirectUrl, code, region, state });
 
-    assert.calledOnceWithExactly(eWeLinkHandler.ewelinkClient.oauth.getToken, {
+    assert.calledOnceWithExactly(eWeLinkHandler.ewelinkWebAPIClient.oauth.getToken, {
       code,
       redirectUrl,
       region,

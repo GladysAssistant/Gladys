@@ -7,7 +7,7 @@ const { updateStatus } = require('./config/ewelink.updateStatus');
 const { getStatus } = require('./config/ewelink.getStatus');
 const { saveConfiguration } = require('./config/ewelink.saveConfiguration');
 const { loadConfiguration } = require('./config/ewelink.loadConfiguration');
-const { createClient } = require('./config/ewelink.createClient');
+const { createClients } = require('./config/ewelink.createClients');
 
 const { buildLoginUrl } = require('./user/ewelink.buildLoginUrl');
 const { exchangeToken } = require('./user/ewelink.exchangeToken');
@@ -33,7 +33,7 @@ const EweLinkHandler = function EweLinkHandler(gladys, eweLinkApi, serviceId) {
   this.eweLinkApi = eweLinkApi;
   this.serviceId = serviceId;
 
-  this.ewelinkClient = null;
+  this.ewelinkWebAPIClient = null;
   this.loginState = null;
   this.configuration = {};
   this.status = {
@@ -46,7 +46,7 @@ EweLinkHandler.prototype.updateStatus = updateStatus;
 
 EweLinkHandler.prototype.saveConfiguration = saveConfiguration;
 EweLinkHandler.prototype.loadConfiguration = loadConfiguration;
-EweLinkHandler.prototype.createClient = createClient;
+EweLinkHandler.prototype.createClients = createClients;
 
 EweLinkHandler.prototype.buildLoginUrl = buildLoginUrl;
 EweLinkHandler.prototype.exchangeToken = exchangeToken;

@@ -13,7 +13,7 @@ function buildLoginUrl({ redirectUrl }) {
   logger.info('eWeLink: create new login URL');
   const state = generate(10, { number: true, lowercase: true, uppercase: true });
   this.loginState = state;
-  return this.ewelinkClient.oauth.createLoginUrl({
+  return this.ewelinkWebAPIClient.oauth.createLoginUrl({
     redirectUrl,
     grantType: 'authorization_code',
     state,

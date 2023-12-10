@@ -11,7 +11,7 @@ describe('eWeLinkHandler buildLoginUrl', () => {
 
   beforeEach(() => {
     eWeLinkHandler = new EwelinkHandler({}, null, SERVICE_ID);
-    eWeLinkHandler.ewelinkClient = {
+    eWeLinkHandler.ewelinkWebAPIClient = {
       oauth: {
         createLoginUrl: fake.returns('LOGIN_URL'),
       },
@@ -28,9 +28,9 @@ describe('eWeLinkHandler buildLoginUrl', () => {
     const redirectUrl = 'http://localhost:1440/redirectUrl';
     const loginUrl = eWeLinkHandler.buildLoginUrl({ redirectUrl });
 
-    assert.calledOnce(eWeLinkHandler.ewelinkClient.oauth.createLoginUrl);
+    assert.calledOnce(eWeLinkHandler.ewelinkWebAPIClient.oauth.createLoginUrl);
     assert.calledWithMatch(
-      eWeLinkHandler.ewelinkClient.oauth.createLoginUrl,
+      eWeLinkHandler.ewelinkWebAPIClient.oauth.createLoginUrl,
       match({
         redirectUrl,
         grantType: 'authorization_code',

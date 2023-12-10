@@ -28,7 +28,7 @@ async function loadConfiguration() {
 
     this.configuration = { applicationId, applicationSecret, applicationRegion };
 
-    this.createClient();
+    this.createClients();
   } catch (e) {
     this.updateStatus({ configured: false, connected: false });
     throw e;
@@ -42,8 +42,8 @@ async function loadConfiguration() {
     }
 
     const tokenObject = JSON.parse(tokens);
-    this.ewelinkClient.at = tokenObject.accessToken;
-    this.ewelinkClient.rt = tokenObject.refreshToken;
+    this.ewelinkWebAPIClient.at = tokenObject.accessToken;
+    this.ewelinkWebAPIClient.rt = tokenObject.refreshToken;
 
     logger.info('eWeLink: stored configuration well loaded...');
   } catch (e) {

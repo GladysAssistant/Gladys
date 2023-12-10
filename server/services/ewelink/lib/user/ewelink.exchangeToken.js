@@ -18,7 +18,7 @@ async function exchangeToken({ redirectUrl, code, region, state }) {
     throw new BadParameters('eWeLink login state is invalid');
   }
 
-  const tokenResponse = await this.ewelinkClient.oauth.getToken({
+  const tokenResponse = await this.ewelinkWebAPIClient.oauth.getToken({
     region,
     redirectUrl,
     code,
@@ -26,8 +26,8 @@ async function exchangeToken({ redirectUrl, code, region, state }) {
 
   const data = await this.handleResponse(tokenResponse);
 
-  this.ewelinkClient.at = data.accessToken;
-  this.ewelinkClient.rt = data.refreshToken;
+  this.ewelinkWebAPIClient.at = data.accessToken;
+  this.ewelinkWebAPIClient.rt = data.refreshToken;
 
   await this.saveTokens(data);
 

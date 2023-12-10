@@ -26,7 +26,7 @@ describe('eWeLinkHandler poll', () => {
     };
 
     eWeLinkHandler = new EwelinkHandler(gladys, EweLinkApiMock, SERVICE_ID);
-    eWeLinkHandler.ewelinkClient = new EweLinkApiMock.WebAPI();
+    eWeLinkHandler.ewelinkWebAPIClient = new EweLinkApiMock.WebAPI();
     eWeLinkHandler.status = { configured: true, connected: true };
   });
 
@@ -93,7 +93,7 @@ describe('eWeLinkHandler poll', () => {
     }
   });
   it('should throw an error when AccessToken is no more valid', async () => {
-    eWeLinkHandler.ewelinkClient.at = EWELINK_DENIED_ACCESS_TOKEN;
+    eWeLinkHandler.ewelinkWebAPIClient.at = EWELINK_DENIED_ACCESS_TOKEN;
     try {
       await eWeLinkHandler.poll(Gladys2ChDevice);
       assert.fail();
