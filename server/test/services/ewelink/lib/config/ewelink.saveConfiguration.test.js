@@ -47,7 +47,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.variable.destroy);
 
-    expect(eWeLinkHandler.ewelinkClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
   });
 
   it('should throw a BadParameter error as SECRET and REGION variables are mossing', async () => {
@@ -63,7 +63,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.variable.destroy);
 
-    expect(eWeLinkHandler.ewelinkClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
   });
 
   it('should throw a BadParameter error as REGION variables is missing', async () => {
@@ -79,7 +79,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.variable.destroy);
 
-    expect(eWeLinkHandler.ewelinkClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
   });
 
   it('should throw a error on database store failure', async () => {
@@ -105,7 +105,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.calledOnceWithExactly(gladys.variable.setValue, 'APPLICATION_ID', EWELINK_APP_ID, SERVICE_ID);
     assert.notCalled(gladys.variable.destroy);
 
-    expect(eWeLinkHandler.ewelinkClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
   });
 
   it('should save configuration and send events', async () => {
@@ -131,6 +131,6 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.calledWithExactly(gladys.variable.setValue, 'APPLICATION_REGION', EWELINK_APP_REGION, SERVICE_ID);
     assert.calledOnceWithExactly(gladys.variable.destroy, 'USER_TOKENS', SERVICE_ID);
 
-    expect(eWeLinkHandler.ewelinkClient).not.eq(null);
+    expect(eWeLinkHandler.ewelinkWebAPIClient).not.eq(null);
   });
 });

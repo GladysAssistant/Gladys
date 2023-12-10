@@ -10,10 +10,10 @@ async function deleteTokens() {
   logger.info('eWeLink: disconnecting user...');
   // see https://coolkit-technologies.github.io/eWeLink-API/#/en/OAuth2.0?id=unbind-third-party-accounts
   const logoutCall = async () =>
-    this.ewelinkClient.request.delete('/v2/user/oauth/token', {
+    this.ewelinkWebAPIClient.request.delete('/v2/user/oauth/token', {
       headers: {
-        'X-CK-Appid': this.ewelinkClient.appId || '',
-        Authorization: `Bearer ${this.ewelinkClient.at}`,
+        'X-CK-Appid': this.ewelinkWebAPIClient.appId || '',
+        Authorization: `Bearer ${this.ewelinkWebAPIClient.at}`,
       },
     });
 
@@ -21,8 +21,8 @@ async function deleteTokens() {
 
   // Clear tokens
   await this.gladys.variable.destroy(CONFIGURATION_KEYS.USER_TOKENS, this.serviceId);
-  this.ewelinkClient.at = null;
-  this.ewelinkClient.rt = null;
+  this.ewelinkWebAPIClient.at = null;
+  this.ewelinkWebAPIClient.rt = null;
 
   this.updateStatus({ connected: false });
   logger.info('eWeLink: user well disconnected');

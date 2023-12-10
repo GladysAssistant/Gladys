@@ -9,7 +9,9 @@ const { getExternalId } = require('../utils/externalId');
  * discover();
  */
 async function discover() {
-  const { thingList = [] } = await this.handleRequest(async () => this.ewelinkClient.device.getAllThingsAllPages());
+  const { thingList = [] } = await this.handleRequest(async () =>
+    this.ewelinkWebAPIClient.device.getAllThingsAllPages(),
+  );
   logger.info(`eWeLink: ${thingList.length} device(s) found while retrieving from the cloud !`);
 
   const discoveredDevices = [];

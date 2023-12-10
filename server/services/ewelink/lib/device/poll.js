@@ -23,7 +23,7 @@ async function poll(device) {
 
   try {
     const { thingList } = await this.handleRequest(async () =>
-      this.ewelinkClient.device.getThings({ thingList: [{ id: deviceId }] }),
+      this.ewelinkWebAPIClient.device.getThings({ thingList: [{ id: deviceId }] }),
     );
     const [{ itemData: eWeLinkDevice }] = thingList;
     logger.debug('eWeLink: load device: %j', eWeLinkDevice);

@@ -28,7 +28,7 @@ async function saveConfiguration({ applicationId = '', applicationSecret = '', a
 
     this.configuration = { applicationId, applicationSecret, applicationRegion };
 
-    this.createClient();
+    this.createClients();
 
     this.updateStatus({ configured: true, connected: false });
     logger.info('eWeLink: new configuration well saved...');

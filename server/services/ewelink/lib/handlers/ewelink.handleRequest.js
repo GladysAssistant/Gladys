@@ -21,7 +21,7 @@ async function handleRequest(request, nbRetry = 0) {
   // 402 - Access token expired, so refresh it and retry.
   // see https://coolkit-technologies.github.io/eWeLink-API/#/en/APICenterV2?id=error-codes
   if (response.error === 402 && nbRetry < NB_MAX_RETRY_EXPIRED) {
-    const tokenResponse = await this.ewelinkClient.user.refreshToken();
+    const tokenResponse = await this.ewelinkWebAPIClient.user.refreshToken();
     const tokens = await this.handleResponse(tokenResponse);
     // Store new tokens
     await this.saveTokens(tokens);

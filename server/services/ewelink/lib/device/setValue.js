@@ -29,7 +29,7 @@ async function setValue(device, deviceFeature, value) {
         params.switch = binaryValue;
       }
 
-      await this.handleRequest(async () => this.ewelinkClient.device.setThingStatus(1, deviceId, params));
+      await this.handleRequest(async () => this.ewelinkWebAPIClient.device.setThingStatus(1, deviceId, params));
       break;
     }
     default:

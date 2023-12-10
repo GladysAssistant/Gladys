@@ -27,7 +27,7 @@ describe('eWeLinkHandler handleRequest', () => {
 
     eWeLinkHandler = new EwelinkHandler(gladys, null, SERVICE_ID);
     eWeLinkHandler.status = { configured: true, connected: true };
-    eWeLinkHandler.ewelinkClient = {
+    eWeLinkHandler.ewelinkWebAPIClient = {
       user: {
         refreshToken: stub().resolves({ error: 0, data: tokens }),
       },
@@ -51,7 +51,7 @@ describe('eWeLinkHandler handleRequest', () => {
     }
 
     assert.notCalled(request);
-    assert.notCalled(eWeLinkHandler.ewelinkClient.user.refreshToken);
+    assert.notCalled(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.variable.destroy);
     assert.notCalled(gladys.event.emit);
@@ -70,7 +70,7 @@ describe('eWeLinkHandler handleRequest', () => {
     }
 
     assert.notCalled(request);
-    assert.notCalled(eWeLinkHandler.ewelinkClient.user.refreshToken);
+    assert.notCalled(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.variable.destroy);
     assert.notCalled(gladys.event.emit);
@@ -83,7 +83,7 @@ describe('eWeLinkHandler handleRequest', () => {
     expect(result).eq('SUCCESS');
 
     assert.calledOnceWithExactly(request);
-    assert.notCalled(eWeLinkHandler.ewelinkClient.user.refreshToken);
+    assert.notCalled(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.variable.destroy);
     assert.notCalled(gladys.event.emit);
@@ -100,7 +100,7 @@ describe('eWeLinkHandler handleRequest', () => {
 
     assert.calledTwice(request);
     assert.alwaysCalledWithExactly(request);
-    assert.calledOnce(eWeLinkHandler.ewelinkClient.user.refreshToken);
+    assert.calledOnce(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
     assert.calledOnceWithExactly(gladys.variable.setValue, 'USER_TOKENS', JSON.stringify(tokens), SERVICE_ID);
     assert.notCalled(gladys.variable.destroy);
     assert.notCalled(gladys.event.emit);
@@ -119,7 +119,7 @@ describe('eWeLinkHandler handleRequest', () => {
 
     assert.calledTwice(request);
     assert.alwaysCalledWithExactly(request);
-    assert.calledOnceWithExactly(eWeLinkHandler.ewelinkClient.user.refreshToken);
+    assert.calledOnceWithExactly(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
     assert.calledOnceWithExactly(gladys.variable.setValue, 'USER_TOKENS', JSON.stringify(tokens), SERVICE_ID);
     assert.calledOnceWithExactly(gladys.variable.destroy, 'USER_TOKENS', SERVICE_ID);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -129,7 +129,7 @@ describe('eWeLinkHandler handleRequest', () => {
   });
 
   it('should not retry if refresh token returns 402 error', async () => {
-    eWeLinkHandler.ewelinkClient.user.refreshToken = stub().resolves({ error: 402, msg: 'ERROR FROM API' });
+    eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken = stub().resolves({ error: 402, msg: 'ERROR FROM API' });
 
     const request = stub().resolves({ data: 'RETRY', error: 402 });
 
@@ -142,7 +142,7 @@ describe('eWeLinkHandler handleRequest', () => {
     }
 
     assert.calledOnceWithExactly(request);
-    assert.calledOnceWithExactly(eWeLinkHandler.ewelinkClient.user.refreshToken);
+    assert.calledOnceWithExactly(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
     assert.notCalled(gladys.variable.setValue);
     assert.calledOnceWithExactly(gladys.variable.destroy, 'USER_TOKENS', SERVICE_ID);
     assert.calledOnceWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
@@ -163,7 +163,7 @@ describe('eWeLinkHandler handleRequest', () => {
     }
 
     assert.calledOnceWithExactly(request);
-    assert.notCalled(eWeLinkHandler.ewelinkClient.user.refreshToken);
+    assert.notCalled(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.variable.destroy);
     assert.notCalled(gladys.event.emit);

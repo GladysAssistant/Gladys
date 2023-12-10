@@ -1,12 +1,12 @@
 /**
- * @description Create eWeLink client.
+ * @description Create eWeLink Web API and WebSocket clients.
  * @example
- * this.createClient();
+ * await this.createClients();
  */
-async function createClient() {
+async function createClients() {
   const { applicationId, applicationSecret, applicationRegion } = this.configuration;
 
-  this.ewelinkClient = new this.eweLinkApi.WebAPI({
+  this.ewelinkWebAPIClient = new this.eweLinkApi.WebAPI({
     appId: applicationId,
     appSecret: applicationSecret,
     region: applicationRegion,
@@ -14,5 +14,5 @@ async function createClient() {
 }
 
 module.exports = {
-  createClient,
+  createClients,
 };
