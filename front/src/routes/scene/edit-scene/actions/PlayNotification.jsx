@@ -92,7 +92,7 @@ class PlayNotification extends Component {
             </span>
           </label>
           <div class="mb-1 small">
-            <Text id="editScene.actionsCard.playNotification.explanationText" />
+            <Text id="editScene.actionsCard.playNotification.variablesExplanation" />
           </div>
           <div className="tags-input">
             <TextWithVariablesInjected

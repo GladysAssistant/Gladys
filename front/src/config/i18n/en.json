@@ -1638,6 +1638,13 @@
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
+      },
+      "playNotification": {
+        "description": "This action will make Gladys speak on the selected speaker.",
+        "needGladysPlus": "Requires Gladys Plus as Text-To-Speech APIs are paid.",
+        "deviceLabel": "Speaker",
+        "textLabel": "Message to speak on the speaker",
+        "variablesExplanation": "To inject a variable, type '{{ '. Note: You must have defined a variable beforehand in a 'Retrieve Last State' action placed before this message block."
       }
     },
     "actions": {
@@ -1695,6 +1702,9 @@
       },
       "mqtt": {
         "send": "Send MQTT Message"
+      },
+      "music": {
+        "play-notification": "Talk on a speaker"
       }
     },
     "variables": {
@@ -2743,7 +2753,8 @@
       "pause": "Music pause button",
       "previous": "Music previous button",
       "next": "Music next button",
-      "playback_state": "Music playback state"
+      "playback_state": "Music playback state",
+      "play_notification": "Broadcast a notification"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

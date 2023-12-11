@@ -2755,7 +2755,8 @@
       "pause": "Bouton pause musique",
       "previous": "Bouton précédent musique",
       "next": "Bouton suivant musique",
-      "playback_state": "Etat de la lecture musique"
+      "playback_state": "Etat de la lecture musique",
+      "play_notification": "Diffuser une notification"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",
