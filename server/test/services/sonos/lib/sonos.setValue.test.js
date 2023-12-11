@@ -53,7 +53,7 @@ const sonosLib = {
   },
 };
 
-describe.only('SonosHandler.setValue', () => {
+describe('SonosHandler.setValue', () => {
   const sonosHandler = new SonosHandler(gladys, sonosLib, serviceId);
 
   beforeEach(async () => {
