@@ -30,7 +30,7 @@ const Header = ({ ...props }) => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
+    const handleClickOutside = e => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         props.closeDropDown();
       }

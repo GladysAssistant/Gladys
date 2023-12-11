@@ -33,9 +33,9 @@ function createActions(store) {
       });
     },
     closeDropDown() {
-    store.setState({
-      showDropDown: false,
-    });
+      store.setState({
+        showDropDown: false
+      });
     },
     toggleCollapsedMenu(state) {
       store.setState({
