@@ -2557,9 +2557,9 @@
       "shortCategoryName": "Counter",
       "integer": "Counter (integer)"
     },
-    "access-control": {
-      "shortCategoryName": "Access Control",
-      "mode": "Access Control Mode"
+    "child-lock": {
+      "shortCategoryName": "Child Lock",
+      "binary": "Child lock"
     },
     "smoke-sensor": {
       "shortCategoryName": "Smoke sensor",
