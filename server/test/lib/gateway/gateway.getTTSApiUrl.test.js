@@ -74,4 +74,16 @@ describe('gateway.getTTSApiUrl', () => {
     const gateway = new Gateway(variable, event, system, {}, {}, {}, {}, {}, job);
     await assert.isRejected(gateway.getTTSApiUrl(), Error403);
   });
+  it('should return error', async () => {
+    const forbidden = function gladysGatewayJsMock() {
+      return {
+        ttsGetToken: fake.rejects(new Error('test error')),
+      };
+    };
+    const Gateway = proxyquire('../../../lib/gateway', {
+      '@gladysassistant/gladys-gateway-js': forbidden,
+    });
+    const gateway = new Gateway(variable, event, system, {}, {}, {}, {}, {}, job);
+    await assert.isRejected(gateway.getTTSApiUrl(), Error, 'test error');
+  });
 });
