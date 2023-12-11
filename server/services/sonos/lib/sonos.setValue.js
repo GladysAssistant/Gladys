@@ -30,7 +30,7 @@ async function setValue(device, deviceFeature, value) {
     await sonosDevice.PlayNotification({
       trackUri: value,
       onlyWhenPlaying: false,
-      volume: 30, // Set the volume for the notification (and revert back afterwards)
+      volume: 45, // Set the volume for the notification (and revert back afterwards)
       timeout: 10,
     });
   }
