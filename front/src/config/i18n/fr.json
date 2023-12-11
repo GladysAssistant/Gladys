@@ -2559,9 +2559,9 @@
       "shortCategoryName": "Compteur",
       "integer": "Compteur entier"
     },
-    "access-control": {
-      "shortCategoryName": "Mode de contrôle d'accès",
-      "mode": "Mode de contrôle d'accès"
+    "child-lock": {
+      "shortCategoryName": "Sécurité enfant",
+      "binary": "Sécurité enfant"
     },
     "smoke-sensor": {
       "shortCategoryName": "Détecteur de fumée",
