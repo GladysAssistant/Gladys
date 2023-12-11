@@ -1,4 +1,5 @@
 import { Text, Localizer } from 'preact-i18n';
+import { useEffect, useRef } from 'preact/hooks';
 import cx from 'classnames';
 import get from 'get-value';
 import { Link } from 'preact-router/match';
@@ -26,6 +27,22 @@ const PAGES_WITHOUT_HEADER = [
 ];
 
 const Header = ({ ...props }) => {
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        props.closeDropDown();
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [props]);
+
   if (isUrlInArray(props.currentUrl, PAGES_WITHOUT_HEADER)) {
     return null;
   }
@@ -55,7 +72,7 @@ const Header = ({ ...props }) => {
               </span>
             </a>
             <div class="d-flex order-lg-2 ml-auto">
-              <div class={cx('dropdown', { show: props.showDropDown })}>
+              <div class={cx('dropdown', { show: props.showDropDown })} ref={dropdownRef}>
                 <a onClick={props.toggleDropDown} class="nav-link pr-0 leading-none" data-toggle="dropdown">
                   <span class="avatar" style={`background-image: url(${props.profilePicture})`} />
                   <span class="ml-2 d-none d-lg-block">

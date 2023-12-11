@@ -164,6 +164,7 @@ const AppRouter = connect(
         profilePicture={props.profilePicture}
         toggleDropDown={props.toggleDropDown}
         showDropDown={props.showDropDown}
+        closeDropDown={props.closeDropDown}
         toggleCollapsedMenu={props.toggleCollapsedMenu}
         showCollapsedMenu={props.showCollapsedMenu}
         logout={props.logout}
