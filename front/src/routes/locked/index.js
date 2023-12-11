@@ -116,6 +116,7 @@ class Locked extends Component {
     try {
       await this.setState({ error: false, wrongCode: false, tooManyRequests: false });
       const houseSelector = this.props.session.getTabletModeCurrentHouseSelector();
+      await this.props.httpClient.refreshAccessToken();
       await this.props.httpClient.post(`/api/v1/house/${houseSelector}/disarm_with_code`, {
         code: this.state.currentCode
       });
