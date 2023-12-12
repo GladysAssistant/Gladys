@@ -7,8 +7,8 @@ const {
   DEVICE_POLL_FREQUENCIES,
 } = require('../../../../utils/constants');
 const { addSelector } = require('../../../../utils/addSelector');
-const { setDeviceFeature } = require('../../../../utils/setDeviceFeature');
-const { setDeviceParam } = require('../../../../utils/setDeviceParam');
+const { setDeviceFeature } = require('../../../../utils/device');
+const { setDeviceParam } = require('../../../../utils/device');
 
 const { PARAMS } = require('../utils/bluetooth.constants');
 
