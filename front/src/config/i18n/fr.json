@@ -2607,6 +2607,20 @@
           "zero": "Non",
           "one": "Oui"
         }
+      },
+      "battery-low": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Non",
+          "one": "Oui"
+        }
+      },
+      "tamper": {
+        "binary": {
+          "other": "Aucune valeur reçue",
+          "zero": "Non",
+          "one": "Oui"
+        }
       }
     }
   },
@@ -2626,6 +2640,10 @@
     "battery": {
       "shortCategoryName": "Batterie",
       "integer": "Batterie"
+    },
+    "battery-low": {
+      "shortCategoryName": "Batterie faible",
+      "binary": "Batterie faible (Oui/Non)"
     },
     "temperature-sensor": {
       "shortCategoryName": "Capteur température",
@@ -2665,9 +2683,9 @@
       "shortCategoryName": "Compteur",
       "integer": "Compteur entier"
     },
-    "access-control": {
-      "shortCategoryName": "Mode de contrôle d'accès",
-      "mode": "Mode de contrôle d'accès"
+    "child-lock": {
+      "shortCategoryName": "Sécurité enfant",
+      "binary": "Sécurité enfant"
     },
     "smoke-sensor": {
       "shortCategoryName": "Détecteur de fumée",
@@ -2765,6 +2783,10 @@
       "mode": "Mode",
       "target-temperature": "Température"
     },
+    "tamper": {
+      "shortCategoryName": "Détecteur de sabotage",
+      "binary": "Détection sabotage (Oui/Non)"
+    },
     "television": {
       "shortCategoryName": "Télévision",
       "binary": "Power",
@@ -2836,6 +2858,10 @@
     "voc-sensor": {
       "shortCategoryName": "Capteur de pollution COV",
       "decimal": "COV (Décimale)"
+    },
+    "voc-index-sensor": {
+      "shortCategoryName": "Indice COV",
+      "integer": "Indice COV (entier)"
     },
     "shutter": {
       "shortCategoryName": "Volet",

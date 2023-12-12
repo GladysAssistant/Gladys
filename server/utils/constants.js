@@ -387,10 +387,11 @@ const INTENTS = {
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
-  ACCESS_CONTROL: 'access-control',
+  CHILD_LOCK: 'child-lock',
   AIRQUALITY_SENSOR: 'airquality-sensor',
   AIR_CONDITIONING: 'air-conditioning',
   BATTERY: 'battery',
+  BATTERY_LOW: 'battery-low',
   BUTTON: 'button',
   CAMERA: 'camera',
   CUBE: 'cube',
@@ -428,6 +429,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SURFACE: 'surface',
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
+  TAMPER: 'tamper',
   TELEVISION: 'television',
   TEMPERATURE_SENSOR: 'temperature-sensor',
   THERMOSTAT: 'thermostat',
@@ -436,6 +438,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   UV_SENSOR: 'uv-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
+  VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
 };
@@ -474,8 +477,8 @@ const DEVICE_FEATURE_TYPES = {
   SIREN: {
     BINARY: 'binary',
   },
-  ACCESS_CONTROL: {
-    MODE: 'mode',
+  CHILD_LOCK: {
+    BINARY: 'binary',
   },
   CUBE: {
     MODE: 'mode',
@@ -483,6 +486,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   BATTERY: {
     INTEGER: 'integer',
+  },
+  BATTERY_LOW: {
+    BINARY: 'binary',
   },
   VIBRATION_SENSOR: {
     BINARY: 'binary',
@@ -509,6 +515,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   SURFACE: {
     DECIMAL: 'decimal',
+  },
+  TAMPER: {
+    BINARY: 'binary',
   },
   TELEVISION: {
     BINARY: 'binary',
@@ -584,6 +593,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   VOC_SENSOR: {
     DECIMAL: 'decimal',
+  },
+  VOC_INDEX_SENSOR: {
+    INTEGER: 'integer',
   },
   SHUTTER: {
     STATE: 'state',

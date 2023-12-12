@@ -2613,6 +2613,20 @@
           "zero": "No",
           "one": "Yes"
         }
+      },
+      "battery-low": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
+        }
+      },
+      "tamper": {
+        "binary": {
+          "other": "No value received",
+          "zero": "No",
+          "one": "Yes"
+        }
       }
     }
   },
@@ -2632,6 +2646,10 @@
     "battery": {
       "shortCategoryName": "Battery",
       "integer": "Battery"
+    },
+    "battery-low": {
+      "shortCategoryName": "Low Battery",
+      "binary": "Low battery (yes/no)"
     },
     "temperature-sensor": {
       "shortCategoryName": "Temperature sensor",
@@ -2671,9 +2689,9 @@
       "shortCategoryName": "Counter",
       "integer": "Counter (integer)"
     },
-    "access-control": {
-      "shortCategoryName": "Access Control",
-      "mode": "Access Control Mode"
+    "child-lock": {
+      "shortCategoryName": "Child Lock",
+      "binary": "Child lock"
     },
     "smoke-sensor": {
       "shortCategoryName": "Smoke sensor",
@@ -2771,6 +2789,10 @@
       "mode": "Mode",
       "target-temperature": "Temperature"
     },
+    "tamper": {
+      "shortCategoryName": "Tamper",
+      "binary": "Tamper (yes/no)"
+    },
     "television": {
       "shortCategoryName": "Television",
       "binary": "Power",
@@ -2842,6 +2864,10 @@
     "voc-sensor": {
       "shortCategoryName": "VOC Sensor",
       "decimal": "VOC (decimal)"
+    },
+    "voc-index-sensor": {
+      "shortCategoryName": "VOC Index",
+      "integer": "VOC Index (integer)"
     },
     "shutter": {
       "shortCategoryName": "Shutter",
