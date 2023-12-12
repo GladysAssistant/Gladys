@@ -11,16 +11,16 @@ const { GLADYS_VARIABLES } = require('./utils/netatmo.constants');
  */
 async function saveConfiguration(configuration) {
   logger.debug('Saving Netatmo configuration...');
-  const { username, clientId, clientSecret, scopeEnergy } = configuration;
+  const { username, clientId, clientSecret } = configuration;
+  // const { username, clientId, clientSecret, scopeEnergy } = configuration;
   try {
     await this.gladys.variable.setValue(GLADYS_VARIABLES.USERNAME, username, this.serviceId);
     await this.gladys.variable.setValue(GLADYS_VARIABLES.CLIENT_ID, clientId, this.serviceId);
     await this.gladys.variable.setValue(GLADYS_VARIABLES.CLIENT_SECRET, clientSecret, this.serviceId);
-    await this.gladys.variable.setValue(GLADYS_VARIABLES.SCOPE_ENERGY, scopeEnergy, this.serviceId);
     this.configuration.username = username;
-    this.configuration.scopeEnergy = clientId;
+    this.configuration.clientId = clientId;
     this.configuration.clientSecret = clientSecret;
-    this.configuration.scopes.scopeEnergy = scopeEnergy;
+    // this.configuration.scopes.scopeEnergy = scopeEnergy;
     logger.debug('Netatmo configuration well stored');
     return true;
   } catch (e) {

@@ -1,0 +1,25 @@
+.btnTextLineSpacing {
+  line-height: 1.5;
+  /* La valeur peut être ajustée selon les besoins, 1 est le défaut */
+}
+/* Style par défaut pour les grands écrans */
+.buttonGroup {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  /* ajuster selon besoin */
+}
+
+/* Style pour les petits écrans */
+@media (max-width: 768px) {
+  .buttonGroup {
+    flex-direction: column;
+    align-items: stretch;
+    /* pour que les boutons prennent toute la largeur */
+  }
+
+  .buttonGroup button:not(:last-child) {
+    margin-bottom: 1rem;
+    /* espace entre les boutons, sauf pour le dernier */
+  }
+}

@@ -39,7 +39,7 @@ async function setValue(device, deviceFeature, value) {
     home_id: homeId.value, // mandatory
     room_id: roomId.value, // mandatory
     mode: 'manual', // mandatory
-    temp: transformedValue
+    temp: transformedValue,
   };
   try {
     const response = await axios({

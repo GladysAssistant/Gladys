@@ -10,7 +10,7 @@ const logger = require('../../../utils/logger');
  */
 async function getRefreshToken(netatmoHandler) {
   logger.debug('Loading Netatmo refresh token...');
-  const {serviceId} = netatmoHandler;
+  const { serviceId } = netatmoHandler;
   netatmoHandler.refreshToken = await netatmoHandler.gladys.variable.getValue(
     GLADYS_VARIABLES.REFRESH_TOKEN,
     serviceId,
@@ -24,7 +24,7 @@ async function getRefreshToken(netatmoHandler) {
       accessToken: '',
       refreshToken: '',
       expireIn: '',
-      connected: false,
+      // connected: false,
     };
     await netatmoHandler.setTokens(netatmoHandler, tokens);
     await this.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });

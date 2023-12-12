@@ -707,23 +707,25 @@
             "write": "Actions sur les thermostats (write_thermostat)"
           }
         },
-        "saveAndConnectLabel": "Sauvegarder la configuration & Connecter",
-        "newSaveAndReconnectLabel": "Sauvegarder la nouvelle configuration & Reconnecter",
-        "connectLabel": "Connecter",
-        "disconnectLabel": "Déconnecter (Supprime les accès de Gladys)",
+        "saveLabel": "Sauvegarder la configuration",
+        "connectLabel": "Et connecter",
+        "reconnectLabel": "Et reconnecter",
+        "disconnectLineOneLabel": "Déconnecter",
+        "disconnectLineTwoLabel": "(Supprime les accès de Gladys)",
         "configure": "Connexion à Netatmo",
         "connect": "Gladys est connectée à Netatmo",
         "disconnect": "Gladys n'est pas connectée à Netatmo",
         "notConfigured": "Le service Netatmo n'est pas configuré Netatmo",
         "description": "Vous pouvez connecter Gladys à votre compte Netatmo pour commander les appareils associés.",
         "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
-        "descriptionCreateProject": "Vous devez ensuite créer une \"Apps\" dans votre compte <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
-        "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\".",
+        "descriptionCreateProject": "Vous devez ensuite créer une \"application\" dans votre compte développeur Netatmo via le menu <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+        "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\" à copier ci-dessous.",
         "errorConnecting": {
           "other_error": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum. Vous pouvez ensuite fermer cet onglet.",
           "other_error_NetatmoPage": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum.",
           "access_denied": "Autorisation déclinée, Veuillez tenter de nouveau et accepter la demande d'accès à vos données.",
-          "invalid_client": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>"
+          "invalid_client": "Identifiant client invalide. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+          "get_access_token_fail": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
         },
         "error": "Une erreur s'est produite lors de la sauvegarde de la configuration.",
         "connecting": "Configuration sauvegardée. Connexion à votre compte Netatmo en cours...",

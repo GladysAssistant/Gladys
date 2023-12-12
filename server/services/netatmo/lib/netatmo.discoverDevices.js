@@ -23,6 +23,7 @@ async function discoverDevices(netatmoHandler) {
   let devicesNetatmo = [];
   try {
     devicesNetatmo = await netatmoHandler.loadDevices();
+    console.log(devicesNetatmo);
     logger.info(`${devicesNetatmo.length} Netatmo devices found`);
   } catch (e) {
     logger.error('Unable to load Netatmo devices', e);
@@ -33,10 +34,13 @@ async function discoverDevices(netatmoHandler) {
       service_id: netatmoHandler.serviceId,
       deviceNetatmo: device,
     }));
+
+    console.log(netatmoHandler.discoveredDevices);
     const discoveredDevices = netatmoHandler.discoveredDevices.filter((device) => {
       const existInGladys = netatmoHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
       return existInGladys === null;
     });
+    console.log(discoveredDevices);
     netatmoHandler.saveStatus({ statusType: STATUS.CONNECTED, message: null });
     return discoveredDevices;
   }

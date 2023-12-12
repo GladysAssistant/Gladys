@@ -14,7 +14,7 @@ function disconnect(netatmoHandler) {
     accessToken: '',
     refreshToken: '',
     expireIn: 0,
-    connected: false,
+    // connected: false,
   };
   netatmoHandler.setTokens(netatmoHandler, tokens);
   clearInterval(netatmoHandler.pollRefreshToken);

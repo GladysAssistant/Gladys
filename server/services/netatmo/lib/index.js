@@ -14,7 +14,7 @@ const { loadDeviceDetails } = require('./netatmo.loadDeviceDetails');
 const { pollRefreshingValues, pollRefreshingToken } = require('./netatmo.poll');
 const { setValue } = require('./netatmo.setValue');
 
-const { STATUS } = require('./utils/netatmo.constants');
+const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 
 const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.gladys = gladys;
@@ -23,9 +23,9 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
     username: null,
     clientId: null,
     clientSecret: null,
-    connected: null,
+    // connected: null,
     scopes: {
-      scopeEnergy: null,
+      scopeEnergy: `${SCOPES.ENERGY.read} ${SCOPES.ENERGY.write}`,
     },
   };
   this.configured = false;

@@ -16,7 +16,7 @@ const { STATUS, SCOPES, API } = require('./utils/netatmo.constants');
  */
 async function connect(netatmoHandler) {
   const { clientId, clientSecret, scopes } = netatmoHandler.configuration;
-
+  console.log('netatmoHandler.configuration', netatmoHandler.configuration);
   if (!clientId || !clientSecret || !scopes) {
     await netatmoHandler.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
@@ -26,6 +26,7 @@ async function connect(netatmoHandler) {
 
   netatmoHandler.stateGetAccessToken = crypto.randomBytes(16).toString('hex');
   const scopeValue = scopes && scopes.scopeEnergy ? scopes.scopeEnergy : SCOPES.ENERGY.read;
+  console.log('scopeValue', scopeValue);
   netatmoHandler.redirectUri = `${API.OAUTH2}?client_id=${clientId}&scope=${encodeURIComponent(scopeValue)}&state=${
     netatmoHandler.stateGetAccessToken
   }`;
@@ -78,7 +79,7 @@ async function retrieveTokens(netatmoHandler, body) {
       accessToken: response.data.access_token,
       refreshToken: response.data.refresh_token,
       expireIn: response.data.expire_in,
-      connected: true,
+      // connected: true,
     };
     await netatmoHandler.setTokens(netatmoHandler, tokens);
     netatmoHandler.accessToken = tokens.accessToken;

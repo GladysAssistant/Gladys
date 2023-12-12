@@ -54,7 +54,7 @@ function buildFeatureThermSetpointTemperature(name, externalId) {
 }
 
 /**
- * @description Transforms Netatmo feature as Gladys feature. 
+ * @description Transforms Netatmo feature as Gladys feature.
  * Chosen setpoint_mode (program, away, hg, manual, off, max).
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
@@ -78,7 +78,7 @@ function buildFeatureThermSetpointMode(name, externalId) {
 }
 
 /**
- * @description Transforms Netatmo feature as Gladys feature. 
+ * @description Transforms Netatmo feature as Gladys feature.
  * Thermostat goes back to schedule after that start timestamp and duration programmed.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
@@ -102,7 +102,7 @@ function buildFeatureThermSetpointStartTime(name, externalId) {
 }
 
 /**
- * @description Transforms Netatmo feature as Gladys feature.	
+ * @description Transforms Netatmo feature as Gladys feature.
  * Thermostat goes back to schedule after that timestamp.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.

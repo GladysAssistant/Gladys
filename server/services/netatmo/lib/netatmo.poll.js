@@ -36,7 +36,7 @@ async function pollRefreshingValues(netatmoHandler) {
       }
     });
     await netatmoHandler.saveStatus({ statusType: STATUS.CONNECTED, message: null });
-  }, 20 * 1000);
+  }, 60 * 1000);
 }
 
 /**
@@ -49,7 +49,7 @@ async function pollRefreshingValues(netatmoHandler) {
  */
 async function pollRefreshingToken(netatmoHandler) {
   netatmoHandler.pollRefreshToken = setInterval(async () => {
-    const {expireInToken} = netatmoHandler;
+    const { expireInToken } = netatmoHandler;
     logger.debug('Looking for Netatmo devices values...');
 
     const response = await netatmoHandler.refreshingTokens();
@@ -63,7 +63,7 @@ async function pollRefreshingToken(netatmoHandler) {
         accessToken: '',
         refreshToken: '',
         expireIn: '',
-        connected: false,
+        // connected: false,
       };
       await netatmoHandler.setTokens(tokens);
       netatmoHandler.status = STATUS.ERROR.PROCESSING_TOKEN;

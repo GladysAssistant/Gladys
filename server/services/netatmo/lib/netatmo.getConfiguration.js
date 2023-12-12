@@ -10,23 +10,27 @@ const { GLADYS_VARIABLES } = require('./utils/netatmo.constants');
  */
 async function getConfiguration(netatmoHandler) {
   logger.debug('Loading Netatmo configuration...');
-  const {serviceId} = netatmoHandler;
-  const username = await netatmoHandler.gladys.variable.getValue(GLADYS_VARIABLES.USERNAME, serviceId);
-  const clientId = await netatmoHandler.gladys.variable.getValue(GLADYS_VARIABLES.CLIENT_ID, serviceId);
-  const clientSecret = await netatmoHandler.gladys.variable.getValue(GLADYS_VARIABLES.CLIENT_SECRET, serviceId);
-  const scopeEnergy = await netatmoHandler.gladys.variable.getValue(GLADYS_VARIABLES.SCOPE_ENERGY, serviceId);
-  const connected = await netatmoHandler.gladys.variable.getValue(GLADYS_VARIABLES.CONNECTED, serviceId);
-  const scopes = { scopeEnergy };
+  const { serviceId } = netatmoHandler;
+  netatmoHandler.configuration.username = await netatmoHandler.gladys.variable.getValue(
+    GLADYS_VARIABLES.USERNAME,
+    serviceId,
+  );
+  netatmoHandler.configuration.clientId = await netatmoHandler.gladys.variable.getValue(
+    GLADYS_VARIABLES.CLIENT_ID,
+    serviceId,
+  );
+  netatmoHandler.configuration.clientSecret = await netatmoHandler.gladys.variable.getValue(
+    GLADYS_VARIABLES.CLIENT_SECRET,
+    serviceId,
+  );
+  // const scopeEnergy = await netatmoHandler.gladys.variable.getValue(GLADYS_VARIABLES.SCOPE_ENERGY, serviceId);
+  // const connected = await netatmoHandler.gladys.variable.getValue(GLADYS_VARIABLES.CONNECTED, serviceId);
+  // const scopes = { scopeEnergy };
 
-  logger.debug(`Netatmo configuration: username='${username}' clientId='${clientId}'`);
-  this.configuration = {
-    username,
-    clientId,
-    clientSecret,
-    scopes,
-    connected,
-  };
-  return this.configuration;
+  logger.debug(
+    `Netatmo configuration: username='${netatmoHandler.configuration.username}' clientId='${netatmoHandler.configuration.clientId}'`,
+  );
+  return netatmoHandler.configuration;
 }
 
 module.exports = {

@@ -88,8 +88,8 @@ class NetatmoSetupPage extends Component {
       this.props.httpClient.post('/api/v1/service/netatmo/saveConfiguration', {
         username: this.state.netatmoUsername,
         clientId: this.state.netatmoClientId,
-        clientSecret: this.state.netatmoClientSecret,
-        scopeEnergy: this.state.netatmoScopesEnergy
+        clientSecret: this.state.netatmoClientSecret
+        // scopeEnergy: this.state.netatmoScopesEnergy
       });
       await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Success
@@ -131,12 +131,12 @@ class NetatmoSetupPage extends Component {
   };
 
   loadProps = async () => {
-    let connectNetatmoStatus = STATUS.CONNECTING;
+    // let connectNetatmoStatus = STATUS.CONNECTING;
     let configuration = {};
     try {
       configuration = await this.props.httpClient.get('/api/v1/service/netatmo/config');
-      if (Number(configuration.connected) === 1) connectNetatmoStatus = STATUS.CONNECTED;
-      else connectNetatmoStatus = STATUS.DISCONNECTED;
+      // if (Number(configuration.connected) === 1) connectNetatmoStatus = STATUS.CONNECTED;
+      // else connectNetatmoStatus = STATUS.DISCONNECTED;
     } catch (e) {
       console.error(e);
       await this.setState({ errored: true });
@@ -145,24 +145,18 @@ class NetatmoSetupPage extends Component {
         netatmoUsername: configuration.username,
         netatmoClientId: configuration.clientId,
         netatmoClientSecret: configuration.clientSecret,
-        netatmoScopesEnergy: configuration.scopes.scopeEnergy,
-        connectNetatmoStatus,
+        // netatmoScopesEnergy: configuration.scopes.scopeEnergy,
+        // connectNetatmoStatus,
         clientSecretChanges: false
       });
     }
-  };
-
-  init = async () => {
-    await this.setState({ loading: true, errored: false });
-    await Promise.all([this.getSessionGatewayClient(), this.detectCode()]);
-    await this.setState({ loading: false });
   };
 
   loadStatus = async () => {
     try {
       const netatmoStatus = await this.props.httpClient.get('/api/v1/service/netatmo/status');
       this.setState({
-        netatmoConnected: netatmoStatus.connected
+        connectNetatmoStatus: netatmoStatus.status
       });
     } catch (e) {
       this.setState({
@@ -171,6 +165,12 @@ class NetatmoSetupPage extends Component {
       });
       console.error(e);
     }
+  };
+
+  init = async () => {
+    await this.setState({ loading: true, errored: false });
+    await Promise.all([this.getSessionGatewayClient(), this.detectCode()]);
+    await this.setState({ loading: false });
   };
 
   updateStatus = async state => {
@@ -183,7 +183,7 @@ class NetatmoSetupPage extends Component {
     switch (state.statusType) {
       case STATUS.CONNECTING:
         if (state.status !== 'other_error') {
-          await this.setState({});
+          // await this.setState({});
           this.setState({
             connectNetatmoStatus: STATUS.DISCONNECTED,
             accessDenied: true,
@@ -197,9 +197,24 @@ class NetatmoSetupPage extends Component {
         }
         break;
       case STATUS.PROCESSING_TOKEN:
-        this.setState({
-          connectNetatmoStatus: state.status
-        });
+        if (state.status === 'get_access_token_fail') {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            accessDenied: true,
+            messageAlert: state.status
+          });
+        } else if (state.status === 'invalid_client') {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            accessDenied: true,
+            messageAlert: state.status
+          });
+        } else {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            errored: true
+          });
+        }
         break;
     }
   };
@@ -211,7 +226,7 @@ class NetatmoSetupPage extends Component {
   componentDidMount() {
     this.init();
     this.loadProps();
-    // this.loadStatus();
+    this.loadStatus();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatusError);
     this.props.session.dispatcher.addListener(

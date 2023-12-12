@@ -1,7 +1,7 @@
 const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 
 /**
- * @description Transforms Netatmo feature as Gladys feature. 
+ * @description Transforms Netatmo feature as Gladys feature.
  * Signal RF strength (no signal, weak, average, good or excellent).
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.

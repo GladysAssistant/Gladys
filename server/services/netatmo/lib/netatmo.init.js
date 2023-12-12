@@ -25,15 +25,15 @@ async function init(netatmoHandler) {
     if (response.success) {
       netatmoHandler.saveStatus({ statusType: STATUS.CONNECTED, message: null });
       logger.info('Netatmo successfull connect with status: ', netatmoHandler.status);
-      await netatmoHandler.pollRefreshingValues(netatmoHandler);
       await netatmoHandler.pollRefreshingToken(netatmoHandler);
+      await netatmoHandler.pollRefreshingValues(netatmoHandler);
     } else {
       logger.error('Netatmo no successfull connect', response, ' with status: ', netatmoHandler.status);
       const tokens = {
         accessToken: '',
         refreshToken: '',
         expireIn: '',
-        connected: false,
+        // connected: false,
       };
       await netatmoHandler.setTokens(tokens);
       netatmoHandler.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: null });

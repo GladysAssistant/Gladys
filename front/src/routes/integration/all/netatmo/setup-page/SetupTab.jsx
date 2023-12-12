@@ -1,8 +1,9 @@
 import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
+import style from './style.css';
 import { RequestStatus } from '../../../../../utils/consts';
-import { SCOPES, STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
+import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 
@@ -52,22 +53,22 @@ class SetupTab extends Component {
     }
   };
 
-  handleCheckboxChange = (scope, isChecked) => {
-    let newScopes = new Set(this.props.netatmoScopesEnergy.split(' '));
+  // handleCheckboxChange = (scope, isChecked) => {
+  //   let newScopes = new Set(this.props.netatmoScopesEnergy.split(' '));
 
-    if (isChecked) {
-      newScopes.add(scope);
-    } else {
-      newScopes.delete(scope);
-    }
+  //   if (isChecked) {
+  //     newScopes.add(scope);
+  //   } else {
+  //     newScopes.delete(scope);
+  //   }
 
-    const newScopesString = Array.from(newScopes)
-      .filter(Boolean)
-      .join(' ');
-    this.props.updateStateInIndex({
-      netatmoScopesEnergy: newScopesString
-    });
-  };
+  //   const newScopesString = Array.from(newScopes)
+  //     .filter(Boolean)
+  //     .join(' ');
+  //   this.props.updateStateInIndex({
+  //     netatmoScopesEnergy: newScopesString
+  //   });
+  // };
 
   componentWillUnmount() {
     if (this.showClientSecretTimer) {
@@ -77,7 +78,6 @@ class SetupTab extends Component {
   }
 
   render(props, state, { loading }) {
-    const scopesArray = props.netatmoScopesEnergy ? props.netatmoScopesEnergy.split(' ') : null;
     return (
       <div class="card">
         <div class="card-header">
@@ -93,14 +93,10 @@ class SetupTab extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {props.errored && (
-                <p class="alert alert-danger">
-                  <Text id="integration.netatmo.setup.error" />
-                </p>
-              )}
+              {console.log(props)}
               {props.accessDenied && (
                 <p class="text-center alert alert-warning">
-                  <Text id={`integration.netatmo.setup.errorConnecting.${props.messageAlert}`} />
+                  <MarkupText id={`integration.netatmo.setup.errorConnecting.${props.messageAlert}`} />
                 </p>
               )}
               {!props.accessDenied &&
@@ -198,7 +194,7 @@ class SetupTab extends Component {
                   </div>
                 </div>
 
-                <div className="form-group">
+                {/*TODO <div className="form-group">
                   <label htmlFor="netatmoScope" className="form-label">
                     <Text id={`integration.netatmo.setup.scopeLabel`} />
                     <Text id={`integration.netatmo.setup.scopes.netatmoEnergyTitle`} />
@@ -219,26 +215,34 @@ class SetupTab extends Component {
                       </label>
                     ))}
                   </div>
-                </div>
+                </div> */}
                 {props.notOnGladysGateway && (
-                  <div class="d-flex justify-content-between mt-5">
+                  <div class={style.buttonGroup}>
                     <Localizer>
-                      <button type="submit" class="btn btn-success" onClick={props.saveConfiguration}>
+                      <button
+                        type="submit"
+                        class={`btn btn-success ${style.btnTextLineSpacing}`}
+                        onClick={props.saveConfiguration}
+                      >
+                        <Text id="integration.netatmo.setup.saveLabel" />
+                        <br />
                         {props.connectNetatmoStatus !== STATUS.CONNECTED && (
-                          <Text id="integration.netatmo.setup.saveAndConnectLabel" />
+                          <Text id="integration.netatmo.setup.connectLabel" />
                         )}
                         {props.connectNetatmoStatus === STATUS.CONNECTED && (
-                          <Text id="integration.netatmo.setup.newSaveAndReconnectLabel" />
+                          <Text id="integration.netatmo.setup.reconnectLabel" />
                         )}
                       </button>
                     </Localizer>
                     {props.notOnGladysGateway && props.connectNetatmoStatus === STATUS.CONNECTED && (
                       <button
                         onClick={this.disconnectNetatmo.bind(this)}
-                        class="btn btn-danger"
+                        class={`btn btn-danger ${style.btnTextLineSpacing}`}
                         disabled={props.connectNetatmoStatus === STATUS.DISCONNECTING}
                       >
-                        <Text id="integration.netatmo.setup.disconnectLabel" />
+                        <Text id="integration.netatmo.setup.disconnectLineOneLabel" />
+                        <br />
+                        <Text id="integration.netatmo.setup.disconnectLineTwoLabel" />
                       </button>
                     )}
                   </div>

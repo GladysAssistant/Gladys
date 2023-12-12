@@ -2,22 +2,39 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import DeviceTab from './DeviceTab';
 import NetatmoPage from '../NetatmoPage';
+import { RequestStatus } from '../../../../../utils/consts';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
 import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
 class DevicePage extends Component {
-  loadProps = async () => {
-    let connectNetatmoStatus = STATUS.CONNECTING;
-    let configuration = {};
+  // loadProps = async () => {
+  //   let connectNetatmoStatus = STATUS.CONNECTING;
+  //   let configuration = {};
+  //   try {
+  //     configuration = await this.props.httpClient.get('/api/v1/service/netatmo/config');
+  //   } catch (e) {
+  //     console.error(e);
+  //   } finally {
+  //     this.setState({
+  //       connectNetatmoStatus
+  //     });
+  //   }
+  // };
+
+  loadStatus = async () => {
     try {
-      configuration = await this.props.httpClient.get('/api/v1/service/netatmo/config');
-      if (Number(configuration.connected) === 1) connectNetatmoStatus = STATUS.CONNECTED;
-      else connectNetatmoStatus = STATUS.DISCONNECTED;
+      const netatmoStatus = await this.props.httpClient.get('/api/v1/service/netatmo/status');
+      this.setState({
+        connectNetatmoStatus: netatmoStatus.status
+      });
     } catch (e) {
+      this.setState({
+        netatmoConnectionError: RequestStatus.NetworkError,
+        errored: true
+      });
       console.error(e);
     } finally {
       this.setState({
-        connectNetatmoStatus,
         showConnect: true
       });
     }
@@ -50,7 +67,8 @@ class DevicePage extends Component {
   };
 
   componentDidMount() {
-    this.loadProps();
+    // this.loadProps();
+    this.loadStatus();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatusError);
     this.props.session.dispatcher.addListener(
