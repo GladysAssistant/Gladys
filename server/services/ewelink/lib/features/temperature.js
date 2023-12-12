@@ -3,12 +3,10 @@ const {
   DEVICE_FEATURE_TYPES,
   DEVICE_FEATURE_UNITS,
 } = require('../../../../utils/constants');
-const logger = require('../../../../utils/logger');
-const { parseExternalId } = require('../utils/externalId');
 
 module.exports = {
   // Gladys feature
-  generateFeature: (name, channel = 0) => {
+  generateFeature: (name) => {
     return {
       name: `${name} Temperature`,
       category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -20,14 +18,17 @@ module.exports = {
       unit: DEVICE_FEATURE_UNITS.CELSIUS,
     };
   },
-  pollTemperature: (eWeLinkDevice, feature) => {
-    const { deviceId } = parseExternalId(feature.external_id);
-    const currentTemperature = (eWeLinkDevice.params && eWeLinkDevice.params.currentTemperature) || false;
-    // if the value is different from the value we have, save new state
-    if (currentTemperature && feature.last_value !== currentTemperature) {
-      logger.debug(`eWeLink: Polling device "${deviceId}", temperature new value = ${currentTemperature}`);
-      return currentTemperature;
+  readStates: (externalId, params) => {
+    const states = [];
+
+    // Current temperature
+    if (params.currentTemperature) {
+      states.push({
+        featureExternalId: `${externalId}:temperature`,
+        state: params.currentTemperature,
+      });
     }
-    return null;
+
+    return states;
   },
 };

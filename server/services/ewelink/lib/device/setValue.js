@@ -1,6 +1,5 @@
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
-const { writeBinaryValue } = require('../features/binary');
 const { parseExternalId } = require('../utils/externalId');
 
 /**
@@ -22,7 +21,7 @@ async function setValue(device, deviceFeature, value) {
         0,
       );
 
-      const binaryValue = writeBinaryValue(value);
+      const binaryValue = value ? 'on' : 'off';
       if (nbBinaryFeatures > 1) {
         params.switches = [{ switch: binaryValue, outlet: channel }];
       } else {

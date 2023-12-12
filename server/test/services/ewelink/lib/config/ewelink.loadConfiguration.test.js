@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 
-const { assert, fake, stub } = sinon;
+const { assert, fake, stub, match } = sinon;
 
 const EwelinkHandler = require('../../../../../services/ewelink/lib');
 const { SERVICE_ID } = require('../constants');
@@ -11,9 +11,15 @@ const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/consta
 describe('eWeLinkHandler loadConfiguration', () => {
   let eWeLinkHandler;
   let eWeLinkApiMock;
+  let eWeLinkWsMock;
   let gladys;
 
   beforeEach(() => {
+    eWeLinkWsMock = stub();
+    eWeLinkWsMock.prototype.Connect = {
+      create: stub(),
+    };
+
     gladys = {
       event: {
         emit: fake.returns(null),
@@ -25,6 +31,7 @@ describe('eWeLinkHandler loadConfiguration', () => {
 
     eWeLinkApiMock = {
       WebAPI: stub(),
+      Ws: eWeLinkWsMock,
     };
     eWeLinkHandler = new EwelinkHandler(gladys, eWeLinkApiMock, SERVICE_ID);
   });
@@ -52,6 +59,7 @@ describe('eWeLinkHandler loadConfiguration', () => {
       assert.calledWithExactly(gladys.variable.getValue, 'APPLICATION_REGION', SERVICE_ID);
 
       assert.notCalled(eWeLinkApiMock.WebAPI);
+      assert.notCalled(eWeLinkApiMock.Ws);
     }
   });
 
@@ -80,6 +88,7 @@ describe('eWeLinkHandler loadConfiguration', () => {
       assert.calledWithExactly(gladys.variable.getValue, 'APPLICATION_REGION', SERVICE_ID);
 
       assert.notCalled(eWeLinkApiMock.WebAPI);
+      assert.notCalled(eWeLinkApiMock.Ws);
     }
   });
 
@@ -110,6 +119,7 @@ describe('eWeLinkHandler loadConfiguration', () => {
       assert.calledWithExactly(gladys.variable.getValue, 'APPLICATION_REGION', SERVICE_ID);
 
       assert.notCalled(eWeLinkApiMock.WebAPI);
+      assert.notCalled(eWeLinkApiMock.Ws);
     }
   });
 
@@ -151,6 +161,13 @@ describe('eWeLinkHandler loadConfiguration', () => {
         appSecret: 'APPLICATION_SECRET_VALUE',
         region: 'APPLICATION_REGION_VALUE',
       });
+      assert.calledOnceWithExactly(eWeLinkApiMock.Ws, {
+        appId: 'APPLICATION_ID_VALUE',
+        appSecret: 'APPLICATION_SECRET_VALUE',
+        region: 'APPLICATION_REGION_VALUE',
+      });
+
+      assert.notCalled(eWeLinkWsMock.prototype.Connect.create);
     }
   });
 
@@ -188,6 +205,21 @@ describe('eWeLinkHandler loadConfiguration', () => {
       appSecret: 'APPLICATION_SECRET_VALUE',
       region: 'APPLICATION_REGION_VALUE',
     });
+    assert.calledOnceWithExactly(eWeLinkApiMock.Ws, {
+      appId: 'APPLICATION_ID_VALUE',
+      appSecret: 'APPLICATION_SECRET_VALUE',
+      region: 'APPLICATION_REGION_VALUE',
+    });
+
+    assert.calledOnce(eWeLinkWsMock.prototype.Connect.create);
+    assert.calledWithMatch(
+      eWeLinkWsMock.prototype.Connect.create,
+      match({ appId: 'APPLICATION_ID_VALUE', region: 'APPLICATION_REGION_VALUE', at: 'ACCESS_TOKEN' }),
+      match.func,
+      match.func,
+      match.func,
+      match.func,
+    );
 
     expect(eWeLinkHandler.ewelinkWebAPIClient.at).eq('ACCESS_TOKEN');
     expect(eWeLinkHandler.ewelinkWebAPIClient.rt).eq('REFRESH_TOKEN');

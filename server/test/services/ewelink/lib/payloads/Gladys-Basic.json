@@ -4,8 +4,7 @@
   "model": "Basic",
   "external_id": "ewelink:10004536ae",
   "selector": "ewelink:10004536ae",
-  "should_poll": true,
-  "poll_frequency": 30000,
+  "should_poll": false,
   "features": [
     {
       "name": "Test 6 On/Off",
@@ -31,10 +30,6 @@
     }
   ],
   "params": [
-    {
-      "name": "IP_ADDRESS",
-      "value": "192.168.0.6"
-    },
     {
       "name": "FIRMWARE",
       "value": "3.1.2"

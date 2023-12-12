@@ -28,6 +28,7 @@ async function saveConfiguration({ applicationId = '', applicationSecret = '', a
 
     this.configuration = { applicationId, applicationSecret, applicationRegion };
 
+    this.closeWebSocketClient();
     this.createClients();
 
     this.updateStatus({ configured: true, connected: false });

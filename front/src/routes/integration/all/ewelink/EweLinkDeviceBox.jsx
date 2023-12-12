@@ -69,7 +69,7 @@ class EweLinkDeviceBox extends Component {
   ) {
     const validModel = device.features && device.features.length > 0;
     const online = device.params.find(param => param.name === DEVICE_ONLINE).value === '1';
-    const firmware = device.params.find(param => param.name === DEVICE_FIRMWARE).value;
+    const firmware = (device.params.find(param => param.name === DEVICE_FIRMWARE) || { value: '?.?.?' }).value;
 
     return (
       <div class="col-md-6">

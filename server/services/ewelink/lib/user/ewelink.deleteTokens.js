@@ -21,8 +21,11 @@ async function deleteTokens() {
 
   // Clear tokens
   await this.gladys.variable.destroy(CONFIGURATION_KEYS.USER_TOKENS, this.serviceId);
+
   this.ewelinkWebAPIClient.at = null;
   this.ewelinkWebAPIClient.rt = null;
+
+  this.closeWebSocketClient();
 
   this.updateStatus({ connected: false });
   logger.info('eWeLink: user well disconnected');

@@ -4,6 +4,7 @@
  * await this.stop();
  */
 async function stop() {
+  this.closeWebSocketClient();
   this.ewelinkWebAPIClient = null;
   this.updateStatus({ connected: false });
 }

@@ -87,6 +87,27 @@ class WebAPI {
   }
 }
 
-const items = { WebAPI, Device };
+class Connect {
+  constructor(root) {
+    this.root = root;
+
+    this.create = () => {};
+  }
+}
+
+class Ws {
+  constructor(options = { appId: EWELINK_APP_ID, appSecret: EWELINK_APP_SECRET, region: EWELINK_APP_REGION }) {
+    this.appId = options.appId;
+    this.appSecret = options.appSecret;
+    this.region = options.region;
+
+    // default with right access token
+    this.at = EWELINK_VALID_ACCESS_TOKEN;
+
+    this.Connect = new Connect(this);
+  }
+}
+
+const items = { WebAPI, Device, Ws, Connect };
 
 module.exports = { default: items, ...items };

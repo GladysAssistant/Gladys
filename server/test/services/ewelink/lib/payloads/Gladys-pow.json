@@ -4,8 +4,7 @@
   "model": "Pow",
   "external_id": "ewelink:10004533ae",
   "selector": "ewelink:10004533ae",
-  "should_poll": true,
-  "poll_frequency": 30000,
+  "should_poll": false,
   "features": [
     {
       "name": "Test 3 On/Off",
@@ -20,10 +19,6 @@
     }
   ],
   "params": [
-    {
-      "name": "IP_ADDRESS",
-      "value": "192.168.0.3"
-    },
     {
       "name": "FIRMWARE",
       "value": "3.3.0"

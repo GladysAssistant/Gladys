@@ -4,18 +4,9 @@
   "model": "MINI",
   "external_id": "ewelink:10004532ae",
   "selector": "ewelink:10004532ae",
-  "should_poll": true,
-  "poll_frequency": 30000,
+  "should_poll": false,
   "features": [],
   "params": [
-    {
-      "name": "IP_ADDRESS",
-      "value": "?.?.?.?"
-    },
-    {
-      "name": "FIRMWARE",
-      "value": "?.?.?"
-    },
     {
       "name": "ONLINE",
       "value": "0"

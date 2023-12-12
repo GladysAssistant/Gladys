@@ -4,8 +4,7 @@
   "model": "TH",
   "external_id": "ewelink:10004534ae",
   "selector": "ewelink:10004534ae",
-  "should_poll": true,
-  "poll_frequency": 30000,
+  "should_poll": false,
   "features": [
     {
       "name": "Test 4 On/Off",
@@ -44,10 +43,6 @@
     }
   ],
   "params": [
-    {
-      "name": "IP_ADDRESS",
-      "value": "192.168.0.4"
-    },
     {
       "name": "FIRMWARE",
       "value": "3.1.2"

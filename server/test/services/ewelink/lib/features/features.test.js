@@ -24,17 +24,6 @@ describe('eWeLink features parseExternalId', () => {
   });
 });
 
-describe('eWeLink features readOnlineValue', () => {
-  it('should return 1 if device is online', () => {
-    const value = features.readOnlineValue(true);
-    expect(value).to.equal('1');
-  });
-  it('should return 0 if device is offline', () => {
-    const value = features.readOnlineValue(false);
-    expect(value).to.equal('0');
-  });
-});
-
 describe('eWeLink features getDevice', () => {
   it('should return device without features if offline', () => {
     const device = features.getDevice(SERVICE_ID, eweLinkOfflineDevice);

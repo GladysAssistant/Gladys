@@ -2,9 +2,10 @@ const Promise = require('bluebird');
 
 const logger = require('../../../../utils/logger');
 const v2 = require('./ewelink.v2');
+const v3 = require('./ewelink.v3');
 const { CONFIGURATION_KEYS } = require('../utils/constants');
 
-const VERSIONS = [v2];
+const VERSIONS = [v2, v3];
 
 /**
  * @description Upgrades eWeLink integration to last version.

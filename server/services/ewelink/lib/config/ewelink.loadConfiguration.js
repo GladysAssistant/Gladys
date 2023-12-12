@@ -42,8 +42,11 @@ async function loadConfiguration() {
     }
 
     const tokenObject = JSON.parse(tokens);
+
     this.ewelinkWebAPIClient.at = tokenObject.accessToken;
     this.ewelinkWebAPIClient.rt = tokenObject.refreshToken;
+
+    await this.createWebSocketClient();
 
     logger.info('eWeLink: stored configuration well loaded...');
   } catch (e) {

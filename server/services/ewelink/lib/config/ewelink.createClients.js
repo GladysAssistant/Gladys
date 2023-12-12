@@ -11,6 +11,12 @@ function createClients() {
     appSecret: applicationSecret,
     region: applicationRegion,
   });
+
+  this.ewelinkWebSocketClientFactory = new this.eweLinkApi.Ws({
+    appId: applicationId,
+    appSecret: applicationSecret,
+    region: applicationRegion,
+  });
 }
 
 module.exports = {

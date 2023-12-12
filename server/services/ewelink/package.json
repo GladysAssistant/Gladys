@@ -14,6 +14,7 @@
   ],
   "dependencies": {
     "bluebird": "^3.7.2",
-    "ewelink-api-next": "^1.0.3"
+    "ewelink-api-next": "^1.0.3",
+    "get-value": "^3.0.1"
   }
 }

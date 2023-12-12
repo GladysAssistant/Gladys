@@ -31,6 +31,8 @@ async function exchangeToken({ redirectUrl, code, region, state }) {
 
   await this.saveTokens(data);
 
+  await this.createWebSocketClient();
+
   this.updateStatus({ connected: true });
   logger.info('eWeLink: user well connected...');
 }

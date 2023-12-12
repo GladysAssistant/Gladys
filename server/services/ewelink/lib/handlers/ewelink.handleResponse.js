@@ -20,6 +20,7 @@ async function handleResponse(response) {
       case 401:
       case 402:
         await this.gladys.variable.destroy(CONFIGURATION_KEYS.USER_TOKENS, this.serviceId);
+        this.closeWebSocketClient();
         this.updateStatus({ connected: false });
         throw new ServiceNotConfiguredError(msg);
       case 400:

@@ -1,5 +1,4 @@
 const { discover } = require('./device/discover');
-const { poll } = require('./device/poll');
 const { setValue } = require('./device/setValue');
 
 const { updateStatus } = require('./config/ewelink.updateStatus');
@@ -16,6 +15,13 @@ const { saveTokens } = require('./user/ewelink.saveTokens');
 
 const { handleRequest } = require('./handlers/ewelink.handleRequest');
 const { handleResponse } = require('./handlers/ewelink.handleResponse');
+
+const { createWebSocketClient } = require('./websocket/ewelink.createWebSocketClient');
+const { closeWebSocketClient } = require('./websocket/ewelink.closeWebSocketClient');
+const { onWebSocketMessage } = require('./websocket/ewelink.onWebSocketMessage');
+const { onWebSocketError } = require('./websocket/ewelink.onWebSocketError');
+const { onWebSocketClose } = require('./websocket/ewelink.onWebSocketClose');
+const { onWebSocketOpen } = require('./websocket/ewelink.onWebSocketOpen');
 
 const { init } = require('./ewelink.init');
 const { stop } = require('./ewelink.stop');
@@ -35,6 +41,9 @@ const EweLinkHandler = function EweLinkHandler(gladys, eweLinkApi, serviceId) {
   this.serviceId = serviceId;
 
   this.ewelinkWebAPIClient = null;
+  this.ewelinkWebSocketClientFactory = null;
+  this.ewelinkWebSocketClient = null;
+
   this.loginState = null;
   this.configuration = {};
   this.status = {
@@ -58,9 +67,15 @@ EweLinkHandler.prototype.handleRequest = handleRequest;
 EweLinkHandler.prototype.handleResponse = handleResponse;
 
 EweLinkHandler.prototype.discover = discover;
-EweLinkHandler.prototype.poll = poll;
 EweLinkHandler.prototype.setValue = setValue;
 EweLinkHandler.prototype.getStatus = getStatus;
+
+EweLinkHandler.prototype.createWebSocketClient = createWebSocketClient;
+EweLinkHandler.prototype.closeWebSocketClient = closeWebSocketClient;
+EweLinkHandler.prototype.onWebSocketOpen = onWebSocketOpen;
+EweLinkHandler.prototype.onWebSocketClose = onWebSocketClose;
+EweLinkHandler.prototype.onWebSocketError = onWebSocketError;
+EweLinkHandler.prototype.onWebSocketMessage = onWebSocketMessage;
 
 EweLinkHandler.prototype.init = init;
 EweLinkHandler.prototype.stop = stop;

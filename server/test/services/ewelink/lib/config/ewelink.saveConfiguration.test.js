@@ -26,6 +26,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
 
     eWeLinkApiMock = {
       WebAPI: stub(),
+      Ws: stub(),
     };
     eWeLinkHandler = new EwelinkHandler(gladys, eWeLinkApiMock, SERVICE_ID);
   });
@@ -48,6 +49,8 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.destroy);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 
   it('should throw a BadParameter error as SECRET and REGION variables are mossing', async () => {
@@ -64,6 +67,8 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.destroy);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 
   it('should throw a BadParameter error as REGION variables is missing', async () => {
@@ -80,6 +85,8 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.destroy);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 
   it('should throw a error on database store failure', async () => {
@@ -106,6 +113,8 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.destroy);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 
   it('should save configuration and send events', async () => {
@@ -132,5 +141,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.calledOnceWithExactly(gladys.variable.destroy, 'USER_TOKENS', SERVICE_ID);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).not.eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).not.eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 });
