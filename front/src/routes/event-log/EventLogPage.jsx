@@ -2,7 +2,7 @@ import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 import { Component } from 'preact';
-import {logBox} from './././components/log/logBox';
+import logBox from '../../components/log/logBox';
 
 import style from './style.css';
 
@@ -70,7 +70,7 @@ class EventLogPage extends Component {
                   <div class="col-lg-9">
                     <div class="row row-cards">
                       <div>Là on aura la liste des evenements</div>
-                      <logBox></logBox>
+                      <logBox style={{ display: 'none' }}></logBox>
                     </div>
                   </div>
                 </div>

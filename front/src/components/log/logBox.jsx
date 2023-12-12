@@ -16,13 +16,16 @@ class logBox extends Component {
 
     render(props) {
         // Your render logic goes here
+        return(
         <div class = "card"> 
             <div class= "card-header">
-                <h>bonjour</h>
+                <h1>bonjour</h1>
             </div>
             <div class = "card-body">
 
             </div>
         </div>
+        )
     }
 }
+export default logBox;
