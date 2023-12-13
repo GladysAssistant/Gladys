@@ -67,18 +67,26 @@ class EventLogPage extends Component {
                     </div>
                     
                   </div>
+           
                   <div class="col-lg-9">
-                    <div class="row row-cards">
-                      <div>Là on aura la liste des evenements</div>
-                      <LogBox/>
+                    
+                    <div class="row row-cards" >
+                     
+                      <LogBox />
+                      <LogBox />
+                      <LogBox />
+                      <LogBox />
                     </div>
+                  
                   </div>
                 </div>
+                
                     
                     
                     </div>
                     </div>
                     </div>
+                    
                     </div>)}
 }
 

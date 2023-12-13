@@ -17,13 +17,28 @@ class LogBox extends Component {
     render(props) {
         // Your render logic goes here
         return(
-        <div class = "card"> 
-            <div class= "card-header">
-                bonjour
+       
+        <div class = "card" > 
+            <div class= "card-header ">
+                <div class='box'  style="flex-grow: 1; max-width:10%;">
+                    <i class="fe fe-message-square" />
+                </div>
+
+                <div class='box' style="flex-grow: 1;">
+                    <div class="card-title"  style="text-align: center;">
+                        Ouverture de porte 
+                    </div>
+                </div>
+                <div class='box'>
+                    12/09/2019
+                </div>
             </div>
             <div class = "card-body">
+                La porte de la cuisine de la maison principale s'est ouverte rapidement
 
             </div>
+            
+            
         </div>
         )
     }
