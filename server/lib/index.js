@@ -25,7 +25,6 @@ const System = require('./system');
 const Variable = require('./variable');
 const services = require('../services');
 const Weather = require('./weather');
-const EventLog = require('./eventlog');
 const { EVENTS } = require('../utils/constants');
 
 /**
@@ -71,7 +70,6 @@ function Gladys(params = {}) {
   const calendar = new Calendar(service);
   const scheduler = new Scheduler(event);
   const weather = new Weather(service, event, message, house);
-  const eventlog = new EventLog();
   const gateway = new Gateway(
     variable,
     event,
@@ -126,7 +124,6 @@ function Gladys(params = {}) {
     system,
     variable,
     weather,
-    eventlog,
     start: async () => {
       // set wal mode
       await db.sequelize.query('PRAGMA journal_mode=WAL;');

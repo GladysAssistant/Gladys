@@ -1,12 +1,9 @@
-const db = require('../../models');
+const EventLog = function EventLog() {};
 
-async function log(type, ref){
-    const eventLog = await db.EventLog.create({
-        service : type.service,
-        type : type.type
-    });
-    
-    return eventLog.get({ plain: true });
-}
+const {add} = require('./event.log.add');
+const {get} = require('./event.log.get');
 
-module.exports = {log};
+EventLog.prototype.add = add;
+EventLog.prototype.get = get;
+
+module.exports = {EventLog};
