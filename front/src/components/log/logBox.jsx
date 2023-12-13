@@ -3,7 +3,7 @@ import { Component } from 'preact';
 import dayjs from 'dayjs';
 import style from './style.css';
 
-class logBox extends Component {
+class LogBox extends Component {
     date = "2019-11-11";
     time = "11:11:11";
 
@@ -19,7 +19,7 @@ class logBox extends Component {
         return(
         <div class = "card"> 
             <div class= "card-header">
-                <h1>bonjour</h1>
+                bonjour
             </div>
             <div class = "card-body">
 
@@ -28,4 +28,4 @@ class logBox extends Component {
         )
     }
 }
-export default logBox;
+export default LogBox;
