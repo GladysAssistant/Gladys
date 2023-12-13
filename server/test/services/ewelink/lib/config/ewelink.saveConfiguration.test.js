@@ -49,7 +49,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.destroy);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
-    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
     expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 
@@ -67,7 +67,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.destroy);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
-    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
     expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 
@@ -85,7 +85,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.destroy);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
-    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
     expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 
@@ -113,7 +113,7 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.notCalled(gladys.variable.destroy);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).eq(null);
-    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
     expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
   });
 
@@ -141,7 +141,6 @@ describe('eWeLinkHandler saveConfiguration', () => {
     assert.calledOnceWithExactly(gladys.variable.destroy, 'USER_TOKENS', SERVICE_ID);
 
     expect(eWeLinkHandler.ewelinkWebAPIClient).not.eq(null);
-    expect(eWeLinkHandler.ewelinkWebSocketClientFactory).not.eq(null);
-    expect(eWeLinkHandler.ewelinkWebSocketClient).eq(null);
+    expect(eWeLinkHandler.ewelinkWebSocketClient).not.eq(null);
   });
 });

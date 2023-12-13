@@ -5,7 +5,7 @@ const { stub, assert } = sinon;
 
 const EwelinkHandler = require('../../../../../services/ewelink/lib');
 const { SERVICE_ID } = require('../constants');
-const { ServiceNotConfiguredError, BadParameters } = require('../../../../../utils/coreErrors');
+const { ServiceNotConfiguredError, BadParameters, NotFoundError } = require('../../../../../utils/coreErrors');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 
 const tokens = { accessToken: 'ACCESS_TOKEN', refreshToken: 'REFRESH_TOKEN' };
@@ -159,6 +159,42 @@ describe('eWeLinkHandler handleRequest', () => {
       assert.fail();
     } catch (e) {
       expect(e).instanceOf(BadParameters);
+      expect(e.message).to.equal('API ERROR');
+    }
+
+    assert.calledOnceWithExactly(request);
+    assert.notCalled(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
+    assert.notCalled(gladys.variable.setValue);
+    assert.notCalled(gladys.variable.destroy);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should throws NotFoundError on 405 error', async () => {
+    const request = stub().resolves({ data: 'ERROR', error: 405, msg: 'API ERROR' });
+
+    try {
+      await eWeLinkHandler.handleRequest(request);
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(NotFoundError);
+      expect(e.message).to.equal('API ERROR');
+    }
+
+    assert.calledOnceWithExactly(request);
+    assert.notCalled(eWeLinkHandler.ewelinkWebAPIClient.user.refreshToken);
+    assert.notCalled(gladys.variable.setValue);
+    assert.notCalled(gladys.variable.destroy);
+    assert.notCalled(gladys.event.emit);
+  });
+
+  it('should throws NotFoundError on 4002 error', async () => {
+    const request = stub().resolves({ data: 'ERROR', error: 4002, msg: 'API ERROR' });
+
+    try {
+      await eWeLinkHandler.handleRequest(request);
+      assert.fail();
+    } catch (e) {
+      expect(e).instanceOf(NotFoundError);
       expect(e.message).to.equal('API ERROR');
     }
 

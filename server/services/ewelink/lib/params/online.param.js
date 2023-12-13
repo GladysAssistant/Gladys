@@ -1,3 +1,5 @@
+const { DEVICE_PARAMS } = require('../utils/constants');
+
 /**
  * @description Convert online state.
  * @param {boolean} rawValue - Param raw value.
@@ -11,6 +13,6 @@ function convertValue(rawValue) {
 
 module.exports = {
   EWELINK_KEY_PATH: 'online',
-  GLADYS_PARAM_KEY: 'ONLINE',
+  GLADYS_PARAM_KEY: DEVICE_PARAMS.ONLINE,
   convertValue,
 };

@@ -27,12 +27,28 @@ module.exports = {
       params.switches.forEach(({ switch: value, outlet }) => {
         const state = value === 'on' ? STATE.ON : STATE.OFF;
         states.push({
-          featureExternalId: `${externalId}:binary:${outlet}`,
+          featureExternalId: `${externalId}:binary:${outlet + 1}`,
           state,
         });
       });
     }
 
     return states;
+  },
+  writeParams: (device, parsedExternalId, value) => {
+    const convertedValue = value ? 'on' : 'off';
+
+    // Count number of binary features to determine if "switch" or "switches" param need to be changed
+    const nbBinaryFeatures = device.features.reduce(
+      (acc, currentFeature) => (currentFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ? acc + 1 : acc),
+      0,
+    );
+
+    if (nbBinaryFeatures > 1) {
+      const { channel } = parsedExternalId;
+      return { switches: [{ switch: convertedValue, outlet: channel - 1 }] };
+    }
+
+    return { switch: convertedValue };
   },
 };

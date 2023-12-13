@@ -12,6 +12,7 @@ const { buildLoginUrl } = require('./user/ewelink.buildLoginUrl');
 const { exchangeToken } = require('./user/ewelink.exchangeToken');
 const { deleteTokens } = require('./user/ewelink.deleteTokens');
 const { saveTokens } = require('./user/ewelink.saveTokens');
+const { retrieveUserApiKey } = require('./user/ewelink.retrieveUserApiKey');
 
 const { handleRequest } = require('./handlers/ewelink.handleRequest');
 const { handleResponse } = require('./handlers/ewelink.handleResponse');
@@ -41,8 +42,10 @@ const EweLinkHandler = function EweLinkHandler(gladys, eweLinkApi, serviceId) {
   this.serviceId = serviceId;
 
   this.ewelinkWebAPIClient = null;
-  this.ewelinkWebSocketClientFactory = null;
   this.ewelinkWebSocketClient = null;
+  this.userApiKey = null;
+
+  this.discoveredDevices = [];
 
   this.loginState = null;
   this.configuration = {};
@@ -53,6 +56,7 @@ const EweLinkHandler = function EweLinkHandler(gladys, eweLinkApi, serviceId) {
 };
 
 EweLinkHandler.prototype.updateStatus = updateStatus;
+EweLinkHandler.prototype.getStatus = getStatus;
 
 EweLinkHandler.prototype.saveConfiguration = saveConfiguration;
 EweLinkHandler.prototype.loadConfiguration = loadConfiguration;
@@ -62,13 +66,13 @@ EweLinkHandler.prototype.buildLoginUrl = buildLoginUrl;
 EweLinkHandler.prototype.exchangeToken = exchangeToken;
 EweLinkHandler.prototype.deleteTokens = deleteTokens;
 EweLinkHandler.prototype.saveTokens = saveTokens;
+EweLinkHandler.prototype.retrieveUserApiKey = retrieveUserApiKey;
 
 EweLinkHandler.prototype.handleRequest = handleRequest;
 EweLinkHandler.prototype.handleResponse = handleResponse;
 
 EweLinkHandler.prototype.discover = discover;
 EweLinkHandler.prototype.setValue = setValue;
-EweLinkHandler.prototype.getStatus = getStatus;
 
 EweLinkHandler.prototype.createWebSocketClient = createWebSocketClient;
 EweLinkHandler.prototype.closeWebSocketClient = closeWebSocketClient;

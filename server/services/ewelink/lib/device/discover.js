@@ -1,3 +1,4 @@
+const { mergeDevices } = require('../../../../utils/device');
 const logger = require('../../../../utils/logger');
 const features = require('../features');
 const { getExternalId } = require('../utils/externalId');
@@ -14,19 +15,15 @@ async function discover() {
   );
   logger.info(`eWeLink: ${thingList.length} device(s) found while retrieving from the cloud !`);
 
-  const discoveredDevices = [];
+  const discoveredDevices = thingList.map(({ itemData }) => {
+    logger.debug(`eWeLink: new device "${itemData.deviceid}" (${itemData.productModel}) discovered`);
 
-  thingList.forEach(({ itemData }) => {
     const deviceInGladys = this.gladys.stateManager.get('deviceByExternalId', getExternalId(itemData));
-    // ...if it is already in Gladys, ignore it...
-    if (deviceInGladys) {
-      logger.debug(`eWeLink: device "${itemData.deviceid}" is already in Gladys !`);
-    } else {
-      logger.debug(`eWeLink: new device "${itemData.deviceid}" (${itemData.productModel}) discovered`);
-      const discoveredDevice = features.getDevice(this.serviceId, itemData);
-      discoveredDevices.push(discoveredDevice);
-    }
+    const discoveredDevice = features.getDevice(this.serviceId, itemData);
+    return mergeDevices(discoveredDevice, deviceInGladys);
   });
+
+  this.discoveredDevices = discoveredDevices;
 
   return discoveredDevices;
 }

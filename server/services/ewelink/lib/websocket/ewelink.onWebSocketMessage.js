@@ -11,16 +11,30 @@ const { readParams } = require('../params');
 /**
  * @description Action to execute when WebSocket receives a message.
  * @param {object} ws - Current WebSocket client.
- * @param {object} message - WebSocket message.
+ * @param {object} message - WebSocket event message.
  * @example
- * this.onWebSocketMessage();
+ * await this.onWebSocketMessage();
  */
 async function onWebSocketMessage(ws, message) {
-  logger.debug('eWeLink: WebSocket received a message: %j', message);
+  const { data: rawData = '' } = message;
+  logger.debug('eWeLink: WebSocket received a message with data: %s', rawData);
+  let data = {};
+  try {
+    data = JSON.parse(rawData);
+  } catch (e) {
+    logger.debug('eWeLink: WebSocket message is not a JSON object');
+  }
 
-  await this.handleResponse(message);
+  await this.handleResponse(data);
 
-  const { deviceid = '', params = {} } = message;
+  const { deviceid, params = {} } = data;
+
+  // Message is not concerning a device
+  if (!deviceid) {
+    logger.debug('eWeLink: WebSocket message is not about a device, skipping it...');
+    return;
+  }
+
   const externalId = getExternalId({ deviceid });
 
   // Load device to update params
@@ -33,13 +47,16 @@ async function onWebSocketMessage(ws, message) {
     states.forEach(({ featureExternalId, state }) => {
       // Before sending event, check if feature exists
       const feature = this.gladys.stateManager.get('deviceFeatureByExternalId', featureExternalId);
-      if (feature) {
+      if (!feature) {
+        logger.debug(`eWeLink: feature "${featureExternalId}" not found in Gladys`);
+      } else if (feature.last_value === state) {
+        // And check if value has really changed
+        logger.debug(`eWeLink: feature "${featureExternalId}" state already up-to-date`);
+      } else {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: featureExternalId,
           state,
         });
-      } else {
-        logger.debug(`eWeLink: feature ${featureExternalId} not found in Gladys`);
       }
     });
 

@@ -47,17 +47,28 @@ describe('EweLinkHandler discover', () => {
     sinon.reset();
   });
 
-  it('should found 3 devices, 2 of wich are already in Gladys and 3 are a new unknown device', async () => {
+  it('should found 5 devices, 2 of wich are already in Gladys and 3 are a new unknown device', async () => {
     const newDevices = await eWeLinkHandler.discover();
-    expect(newDevices.length).to.equal(3);
-    expect(newDevices).to.have.deep.members([GladysOfflineDevice, GladysThDevice, GladysUnhandledDevice]);
+    expect(newDevices.length).to.equal(5);
+    expect(newDevices).to.have.deep.members([
+      { ...Gladys2ChDevice, room_id: undefined, updatable: false },
+      GladysOfflineDevice,
+      { ...GladysPowDevice, room_id: undefined, updatable: false },
+      GladysThDevice,
+      GladysUnhandledDevice,
+    ]);
+
+    expect(eWeLinkHandler.discoveredDevices).to.deep.eq(newDevices);
   });
+
   it('should found 0 devices', async () => {
     // Force eWeLink API to give empty response
     sinon.stub(eWeLinkHandler.ewelinkWebAPIClient.device, 'getAllThingsAllPages').resolves({ error: 0, data: {} });
     const newDevices = await eWeLinkHandler.discover();
     expect(newDevices).to.have.deep.members([]);
+    expect(eWeLinkHandler.discoveredDevices).to.deep.eq([]);
   });
+
   it('should return not configured error', async () => {
     eWeLinkHandler.ewelinkWebAPIClient.at = EWELINK_INVALID_ACCESS_TOKEN;
     try {
@@ -66,8 +77,10 @@ describe('EweLinkHandler discover', () => {
     } catch (error) {
       expect(error).instanceOf(ServiceNotConfiguredError);
       expect(error.message).to.equal('eWeLink: Error, service is not configured');
+      expect(eWeLinkHandler.discoveredDevices).to.deep.eq([]);
     }
   });
+
   it('should throw an error and emit a message when AccessToken is no more valid', async () => {
     eWeLinkHandler.ewelinkWebAPIClient.at = EWELINK_DENIED_ACCESS_TOKEN;
     try {
@@ -76,6 +89,7 @@ describe('EweLinkHandler discover', () => {
     } catch (error) {
       expect(error).instanceOf(Error);
       expect(error.message).to.equal('eWeLink: Authentication error');
+      expect(eWeLinkHandler.discoveredDevices).to.deep.eq([]);
     }
   });
 });

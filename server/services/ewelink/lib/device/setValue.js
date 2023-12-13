@@ -1,6 +1,11 @@
 const { DEVICE_FEATURE_TYPES } = require('../../../../utils/constants');
 const logger = require('../../../../utils/logger');
+const binary = require('../features/binary');
 const { parseExternalId } = require('../utils/externalId');
+
+const FEATURE_TYPE_MAP = {
+  [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: binary,
+};
 
 /**
  * @description Change value of an eWeLink device.
@@ -8,32 +13,20 @@ const { parseExternalId } = require('../utils/externalId');
  * @param {object} deviceFeature - The deviceFeature to control.
  * @param {string|number} value - The new value.
  * @example
- * setValue(device, deviceFeature);
+ * setValue({ ...device }, { ...deviceFeature }, 1);
  */
 async function setValue(device, deviceFeature, value) {
-  const { deviceId, channel } = parseExternalId(deviceFeature.external_id);
-  switch (deviceFeature.type) {
-    case DEVICE_FEATURE_TYPES.SWITCH.BINARY: {
-      const params = {};
-      // Count number of binary features to determine if "switch" or "switches" param need to be changed
-      const nbBinaryFeatures = device.features.reduce(
-        (acc, currentFeature) => (currentFeature.type === DEVICE_FEATURE_TYPES.SWITCH.BINARY ? acc + 1 : acc),
-        0,
-      );
+  const { external_id: featureExternalId, type } = deviceFeature;
 
-      const binaryValue = value ? 'on' : 'off';
-      if (nbBinaryFeatures > 1) {
-        params.switches = [{ switch: binaryValue, outlet: channel }];
-      } else {
-        params.switch = binaryValue;
-      }
+  const mapper = FEATURE_TYPE_MAP[type];
+  if (mapper) {
+    const parsedExternalId = parseExternalId(featureExternalId);
+    const { deviceId } = parsedExternalId;
+    const params = binary.writeParams(device, parsedExternalId, value);
 
-      await this.handleRequest(async () => this.ewelinkWebAPIClient.device.setThingStatus(1, deviceId, params));
-      break;
-    }
-    default:
-      logger.warn(`eWeLink: Warning, feature type "${deviceFeature.type}" not handled yet!`);
-      break;
+    this.ewelinkWebSocketClient.Connect.updateState(deviceId, params);
+  } else {
+    logger.warn(`eWeLink: Warning, feature type "${type}" not handled yet!`);
   }
 }
 

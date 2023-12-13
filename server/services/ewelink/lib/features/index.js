@@ -12,7 +12,7 @@ const AVAILABLE_FEATURES = [binaryFeature, humidityFeature, temperatureFeature];
 
 const AVAILABLE_FEATURE_MODELS = {
   binary: {
-    uiid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15],
+    uiid: [1, 2, 3, 4, 5, 6, 7, 8, 9, 14, 15, 126],
     feature: binaryFeature,
   },
   humidity: {

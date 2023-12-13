@@ -12,7 +12,7 @@ function createClients() {
     region: applicationRegion,
   });
 
-  this.ewelinkWebSocketClientFactory = new this.eweLinkApi.Ws({
+  this.ewelinkWebSocketClient = new this.eweLinkApi.Ws({
     appId: applicationId,
     appSecret: applicationSecret,
     region: applicationRegion,

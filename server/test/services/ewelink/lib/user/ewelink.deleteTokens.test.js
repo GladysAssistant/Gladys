@@ -29,6 +29,7 @@ describe('eWeLinkHandler deleteTokens', () => {
         delete: fake.resolves({}),
       },
     };
+    eWeLinkHandler.ewelinkWebSocketClient = {};
     eWeLinkHandler.status = { configured: true, connected: true };
   });
 

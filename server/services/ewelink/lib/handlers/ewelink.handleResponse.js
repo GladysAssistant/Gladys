@@ -10,26 +10,27 @@ const { CONFIGURATION_KEYS } = require('../utils/constants');
  * const data = this.handleResponse(res, (data) => console.log);
  */
 async function handleResponse(response) {
-  const { error, msg, data } = response;
+  const { error, msg, reason, data } = response;
+  const message = msg || reason;
   logger.debug(`eWeLink response: %j`, response);
 
   if (error) {
     // see https://coolkit-technologies.github.io/eWeLink-API/#/en/APICenterV2?id=error-codes
-    logger.error(`eWeLink: error with API - ${msg}`);
+    logger.error(`eWeLink: error with API - ${message}`);
     switch (error) {
       case 401:
       case 402:
         await this.gladys.variable.destroy(CONFIGURATION_KEYS.USER_TOKENS, this.serviceId);
         this.closeWebSocketClient();
         this.updateStatus({ connected: false });
-        throw new ServiceNotConfiguredError(msg);
+        throw new ServiceNotConfiguredError(message);
       case 400:
-        throw new BadParameters(msg);
+        throw new BadParameters(message);
       case 405:
       case 4002:
-        throw new NotFoundError(msg);
+        throw new NotFoundError(message);
       default:
-        throw new Error(msg);
+        throw new Error(message);
     }
   }
 

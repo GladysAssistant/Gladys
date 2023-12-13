@@ -5,7 +5,8 @@
  */
 async function createWebSocketClient() {
   const { applicationId: appId, applicationRegion: region } = this.configuration;
-  this.ewelinkWebSocketClient = await this.ewelinkWebSocketClientFactory.Connect.create(
+  this.ewelinkWebSocketClient.userApiKey = this.userApiKey;
+  await this.ewelinkWebSocketClient.Connect.create(
     {
       appId,
       region,

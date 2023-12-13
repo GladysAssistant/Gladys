@@ -50,6 +50,10 @@
     {
       "name": "ONLINE",
       "value": "1"
+    },
+    {
+      "name": "API_KEY",
+      "value": "validApikey"
     }
   ]
 }

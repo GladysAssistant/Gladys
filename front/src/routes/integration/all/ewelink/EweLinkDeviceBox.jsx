@@ -4,7 +4,7 @@ import cx from 'classnames';
 import { Link } from 'preact-router';
 import get from 'get-value';
 
-import { DEVICE_FIRMWARE, DEVICE_ONLINE } from '../../../../../../server/services/ewelink/lib/utils/constants';
+import { DEVICE_PARAMS } from '../../../../../../server/services/ewelink/lib/utils/constants';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 
 class EweLinkDeviceBox extends Component {
@@ -68,8 +68,8 @@ class EweLinkDeviceBox extends Component {
     { loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
-    const online = device.params.find(param => param.name === DEVICE_ONLINE).value === '1';
-    const firmware = (device.params.find(param => param.name === DEVICE_FIRMWARE) || { value: '?.?.?' }).value;
+    const online = device.params.find(param => param.name === DEVICE_PARAMS.ONLINE).value === '1';
+    const firmware = (device.params.find(param => param.name === DEVICE_PARAMS.FIRMWARE) || { value: '?.?.?' }).value;
 
     return (
       <div class="col-md-6">
@@ -82,7 +82,7 @@ class EweLinkDeviceBox extends Component {
               </div>
             </Localizer>
             <div class="page-options d-flex">
-              {device.params.find(param => param.name === DEVICE_FIRMWARE) && (
+              {device.params.find(param => param.name === DEVICE_PARAMS.FIRMWARE) && (
                 <div class="tag tag-blue">{`Firmware: ${firmware}`}</div>
               )}
             </div>

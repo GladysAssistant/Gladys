@@ -46,6 +46,12 @@ async function loadConfiguration() {
     this.ewelinkWebAPIClient.at = tokenObject.accessToken;
     this.ewelinkWebAPIClient.rt = tokenObject.refreshToken;
 
+    // Load user API key
+    this.userApiKey = await this.gladys.variable.getValue(CONFIGURATION_KEYS.USER_API_KEY, this.serviceId);
+    if (!this.userApiKey) {
+      await this.retrieveUserApiKey();
+    }
+
     await this.createWebSocketClient();
 
     logger.info('eWeLink: stored configuration well loaded...');

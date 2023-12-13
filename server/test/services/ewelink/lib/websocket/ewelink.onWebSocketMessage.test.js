@@ -16,7 +16,10 @@ describe('eWeLinkHandler onWebSocketMessage', () => {
   beforeEach(() => {
     gladys = {
       stateManager: {
-        get: stub().returns(device),
+        get: stub()
+          .onFirstCall()
+          .returns(device)
+          .returns({ last_value: 45 }),
       },
       event: {
         emit: stub().returns(null),
@@ -33,10 +36,13 @@ describe('eWeLinkHandler onWebSocketMessage', () => {
   });
 
   it('should do nothing, device is not found', async () => {
-    gladys.stateManager.get.returns(null);
+    gladys.stateManager.get = stub().returns(null);
 
-    const message = { deviceid: 'unknown-device' };
-    await eWeLinkHandler.onWebSocketMessage(null, message);
+    const eventMessage = {
+      data: JSON.stringify({ deviceid: 'unknown-device' }),
+    };
+
+    await eWeLinkHandler.onWebSocketMessage(null, eventMessage);
 
     assert.calledOnceWithExactly(gladys.stateManager.get, 'deviceByExternalId', 'ewelink:unknown-device');
     assert.notCalled(gladys.event.emit);
@@ -48,8 +54,11 @@ describe('eWeLinkHandler onWebSocketMessage', () => {
   it('should do nothing, feature not exists', async () => {
     gladys.stateManager.get.onSecondCall().returns(null);
 
-    const message = { deviceid: 'known-device', params: { switch: 'on' } };
-    await eWeLinkHandler.onWebSocketMessage(null, message);
+    const eventMessage = {
+      data: JSON.stringify({ deviceid: 'known-device', params: { switch: 'on' } }),
+    };
+
+    await eWeLinkHandler.onWebSocketMessage(null, eventMessage);
 
     assert.callCount(gladys.stateManager.get, 2);
     assert.calledWithExactly(gladys.stateManager.get, 'deviceByExternalId', 'ewelink:known-device');
@@ -61,9 +70,34 @@ describe('eWeLinkHandler onWebSocketMessage', () => {
     expect(device).deep.eq({ params: [] });
   });
 
+  it('should not emit state event as feature is up-to-date', async () => {
+    const eventMessage = {
+      data: JSON.stringify({
+        deviceid: 'known-device',
+        params: { currentHumidity: 45 },
+      }),
+    };
+
+    await eWeLinkHandler.onWebSocketMessage(null, eventMessage);
+
+    assert.callCount(gladys.stateManager.get, 2);
+    assert.calledWithExactly(gladys.stateManager.get, 'deviceByExternalId', 'ewelink:known-device');
+    assert.calledWithExactly(gladys.stateManager.get, 'deviceFeatureByExternalId', 'ewelink:known-device:humidity');
+
+    assert.notCalled(gladys.event.emit);
+    assert.notCalled(gladys.device.setParam);
+    expect(device).deep.eq({ params: [] });
+  });
+
   it('should emit state event', async () => {
-    const message = { deviceid: 'known-device', params: { switch: 'on', currentTemperature: 17, currentHumidity: 23 } };
-    await eWeLinkHandler.onWebSocketMessage(null, message);
+    const eventMessage = {
+      data: JSON.stringify({
+        deviceid: 'known-device',
+        params: { switch: 'on', currentTemperature: 17, currentHumidity: 23 },
+      }),
+    };
+
+    await eWeLinkHandler.onWebSocketMessage(null, eventMessage);
 
     assert.callCount(gladys.stateManager.get, 4);
     assert.calledWithExactly(gladys.stateManager.get, 'deviceByExternalId', 'ewelink:known-device');
@@ -91,8 +125,11 @@ describe('eWeLinkHandler onWebSocketMessage', () => {
   });
 
   it('should update device params', async () => {
-    const message = { deviceid: 'known-device', params: { online: true } };
-    await eWeLinkHandler.onWebSocketMessage(null, message);
+    const eventMessage = {
+      data: JSON.stringify({ deviceid: 'known-device', params: { online: true } }),
+    };
+
+    await eWeLinkHandler.onWebSocketMessage(null, eventMessage);
 
     assert.calledOnceWithExactly(gladys.stateManager.get, 'deviceByExternalId', 'ewelink:known-device');
 
@@ -100,5 +137,29 @@ describe('eWeLinkHandler onWebSocketMessage', () => {
 
     assert.calledOnceWithExactly(gladys.device.setParam, device, 'ONLINE', '1');
     expect(device).deep.eq({ params: [{ name: 'ONLINE', value: '1' }] });
+  });
+
+  it('should ignore non JSON data', async () => {
+    const eventMessage = {
+      data: 'pong',
+    };
+
+    await eWeLinkHandler.onWebSocketMessage(null, eventMessage);
+
+    assert.notCalled(gladys.stateManager.get);
+    assert.notCalled(gladys.event.emit);
+    assert.notCalled(gladys.device.setParam);
+  });
+
+  it('should ignore not device oriented data', async () => {
+    const eventMessage = {
+      data: JSON.stringify({}),
+    };
+
+    await eWeLinkHandler.onWebSocketMessage(null, eventMessage);
+
+    assert.notCalled(gladys.stateManager.get);
+    assert.notCalled(gladys.event.emit);
+    assert.notCalled(gladys.device.setParam);
   });
 });

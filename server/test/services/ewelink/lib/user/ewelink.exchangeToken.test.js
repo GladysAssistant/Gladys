@@ -1,9 +1,14 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const proxyquire = require('proxyquire').noCallThru();
 
 const { fake, assert, match } = sinon;
 
-const EwelinkHandler = require('../../../../../services/ewelink/lib');
+const retrieveUserApiKey = fake.resolves(null);
+
+const EwelinkHandler = proxyquire('../../../../../services/ewelink/lib', {
+  './user/ewelink.retrieveUserApiKey': { retrieveUserApiKey },
+});
 const { SERVICE_ID, EWELINK_APP_ID, EWELINK_APP_REGION } = require('../constants');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../../utils/constants');
 const { BadParameters } = require('../../../../../utils/coreErrors');
@@ -30,7 +35,7 @@ describe('eWeLinkHandler exchangeToken', () => {
         getToken: fake.resolves({ data: tokens }),
       },
     };
-    eWeLinkHandler.ewelinkWebSocketClientFactory = {
+    eWeLinkHandler.ewelinkWebSocketClient = {
       Connect: {
         create: fake.returns({}),
       },
@@ -65,12 +70,13 @@ describe('eWeLinkHandler exchangeToken', () => {
     }
 
     assert.notCalled(eWeLinkHandler.ewelinkWebAPIClient.oauth.getToken);
-    assert.notCalled(eWeLinkHandler.ewelinkWebSocketClientFactory.Connect.create);
+    assert.notCalled(retrieveUserApiKey);
+    assert.notCalled(eWeLinkHandler.ewelinkWebSocketClient.Connect.create);
     assert.notCalled(gladys.variable.setValue);
     assert.notCalled(gladys.event.emit);
   });
 
-  it('should retreive, store user token and emit event', async () => {
+  it('should retreive, store user token and API key and emit event', async () => {
     const redirectUrl = 'http://localhost:1440';
     const code = 'auth_code';
     const region = 'app_region';
@@ -83,9 +89,10 @@ describe('eWeLinkHandler exchangeToken', () => {
       redirectUrl,
       region,
     });
-    assert.calledOnce(eWeLinkHandler.ewelinkWebSocketClientFactory.Connect.create);
+    assert.calledOnceWithExactly(retrieveUserApiKey);
+    assert.calledOnce(eWeLinkHandler.ewelinkWebSocketClient.Connect.create);
     assert.calledWithMatch(
-      eWeLinkHandler.ewelinkWebSocketClientFactory.Connect.create,
+      eWeLinkHandler.ewelinkWebSocketClient.Connect.create,
       match({ appId: EWELINK_APP_ID, region: EWELINK_APP_REGION, at: tokens.accessToken }),
       match.func,
       match.func,

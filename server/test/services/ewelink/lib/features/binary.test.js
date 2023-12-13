@@ -16,8 +16,8 @@ describe('eWeLink binary feature -> readState', () => {
   it('should return switches states', () => {
     const states = readStates('ewelink-id', {
       switches: [
-        { switch: 'on', outlet: 1 },
-        { switch: 'off', outlet: 2 },
+        { switch: 'on', outlet: 0 },
+        { switch: 'off', outlet: 1 },
       ],
     });
     expect(states).deep.eq([

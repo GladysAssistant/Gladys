@@ -3,11 +3,15 @@ const logger = require('../../../../utils/logger');
 /**
  * @description Action to execute when WebSocket is closed.
  * @example
- * this.onWebSocketClose();
+ * await this.onWebSocketClose();
  */
-function onWebSocketClose() {
-  this.closeWebSocketClient();
-  logger.info('eWeLink: WebSocket is closed');
+async function onWebSocketClose() {
+  logger.warn('eWeLink: WebSocket is closed');
+
+  // Try to reopen it if Gladys is not stopping
+  if (this.ewelinkWebSocketClient !== null) {
+    await this.createWebSocketClient();
+  }
 }
 
 module.exports = {

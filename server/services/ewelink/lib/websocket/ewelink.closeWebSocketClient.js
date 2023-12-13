@@ -4,9 +4,8 @@
  * this.closeWebSocketClient();
  */
 function closeWebSocketClient() {
-  if (this.ewelinkWebSocketClient !== null) {
-    this.ewelinkWebSocketClient.close();
-    this.ewelinkWebSocketClient = null;
+  if (this.ewelinkWebSocketClient && this.ewelinkWebSocketClient.Connect && this.ewelinkWebSocketClient.Connect.ws) {
+    this.ewelinkWebSocketClient.Connect.ws.close();
   }
 }
 

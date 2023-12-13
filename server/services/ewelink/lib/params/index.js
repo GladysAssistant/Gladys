@@ -1,9 +1,10 @@
 const get = require('get-value');
 
-const onlineParam = require('./online.param');
 const firmwareParam = require('./firmware.param');
+const onlineParam = require('./online.param');
+const apiKeyParam = require('./apikey.param');
 
-const PARAMS = [firmwareParam, onlineParam];
+const PARAMS = [firmwareParam, onlineParam, apiKeyParam];
 
 /**
  * @description Read device params from eWeLink device params.

@@ -12,6 +12,7 @@ const {
   EWELINK_VALID_ACCESS_TOKEN,
   EWELINK_INVALID_ACCESS_TOKEN,
 } = require('./constants');
+const logger = require('../../../../utils/logger');
 
 const fakeDevices = [EweLink2ChDevice, EweLinkOfflineDevice, EweLinkPowDevice, EweLinkThDevice, EweLinkUnhandledDevice];
 
@@ -67,11 +68,6 @@ class Device {
 
     return response;
   }
-
-  async setThingStatus(type, id, params) {
-    const deviceResponse = await this.getThings({ thingList: [{ id }] });
-    return { ...deviceResponse, data: {} };
-  }
 }
 
 class WebAPI {
@@ -92,6 +88,18 @@ class Connect {
     this.root = root;
 
     this.create = () => {};
+  }
+
+  updateState(deviceId, params, action, userAgent, userApiKey) {
+    logger.debug(
+      'update state with user token %s and deviceId=%s - param=%j - action=%s - userAgent=%s - apiKey=%s',
+      this.root.at,
+      deviceId,
+      params,
+      action,
+      userAgent,
+      userApiKey,
+    );
   }
 }
 
