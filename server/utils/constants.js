@@ -1008,6 +1008,19 @@ const EVENT_LOG_TYPES = {
       service: 'HOUSE',
       type: 'UPDATED',
     },
+    CREATED : {
+      service: 'HOUSE',
+      type: 'CREATED',
+    },
+    DELETED : {
+      service: 'HOUSE',
+      type: 'DELETED',
+    },
+    ARMING : {
+      service: 'HOUSE',
+      type: 'ARMING',
+    }
+    
   }
 }
 

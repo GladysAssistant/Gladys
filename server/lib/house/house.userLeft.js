@@ -1,7 +1,7 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 const logger = require('../../utils/logger');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENT_LOG_TYPES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 
 /**
  * @description User left the house.
@@ -53,6 +53,7 @@ async function userLeft(houseSelector, userSelector) {
       user: userSelector,
       house: houseSelector,
     });
+    this.event.logger.add(EVENT_LOG_TYPES.HOUSE.USER_LEFT, house.name, user.firstname + " " + user.lastname);
     // and we emit websocket event so that the change is sent to UI
     this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.USER_PRESENCE.LEFT_HOME,

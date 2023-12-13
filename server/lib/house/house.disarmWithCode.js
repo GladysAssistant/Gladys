@@ -1,7 +1,7 @@
 const Promise = require('bluebird');
 
 const db = require('../../models');
-const { ALARM_MODES, EVENTS } = require('../../utils/constants');
+const { EVENT_LOG_TYPES, ALARM_MODES, EVENTS } = require('../../utils/constants');
 const { NotFoundError, ForbiddenError, TooManyRequests } = require('../../utils/coreErrors');
 
 /**
@@ -34,6 +34,7 @@ async function disarmWithCode(selector, code) {
       type: EVENTS.ALARM.TOO_MANY_CODES_TESTS,
       house: selector,
     });
+    this.event.logger.add(EVENT_LOG_TYPES.HOUSE.DISARM_FAIL_CODE, house.name);
     throw new TooManyRequests('TOO_MANY_CODES_TESTS', rateLimitRes.msBeforeNext);
   }
 

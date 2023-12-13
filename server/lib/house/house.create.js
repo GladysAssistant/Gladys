@@ -1,5 +1,5 @@
 const db = require('../../models');
-const { EVENTS } = require('../../utils/constants');
+const { EVENTS, EVENT_LOG_TYPES } = require('../../utils/constants');
 
 /**
  * @public
@@ -18,6 +18,7 @@ const { EVENTS } = require('../../utils/constants');
 async function create(house) {
   const newHouse = await db.House.create(house);
   this.event.emit(EVENTS.HOUSE.CREATED, newHouse.get({ plain: true }));
+  this.event.logger.add(EVENT_LOG_TYPES.HOUSE.CREATED, newHouse.name);
   return newHouse;
 }
 

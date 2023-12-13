@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 const db = require('../../models');
-const { ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENT_LOG_TYPES, ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
 
 /**
@@ -39,6 +39,7 @@ async function arm(selector, disableWaitTime = false) {
     type: EVENTS.ALARM.ARMING,
     house: selector,
   });
+  this.event.logger.add(EVENT_LOG_TYPES.HOUSE.ARMING, house.name);
 
   const waitTimeInMs = disableWaitTime ? 0 : house.alarm_delay_before_arming * 1000;
 

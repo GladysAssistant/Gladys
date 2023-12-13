@@ -16,6 +16,14 @@ module.exports = {
             allowNull: false,
             type: Sequelize.ENUM(Object.values(EVENT_LOG_TYPES).flat())
           },
+          sender_name: {
+            allowNull: true,
+            type: Sequelize.STRING,
+          },
+          event_property: {
+            allowNull: true,
+            type: Sequelize.STRING,
+          },
           created_at: {
             allowNull: false,
             type: Sequelize.DATE,

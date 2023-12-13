@@ -18,6 +18,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         type: DataTypes.ENUM(Object.values(EVENT_LOG_TYPES).flat())
       },
+      sender_name: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
+      event_property: {
+        allowNull: true,
+        type: DataTypes.STRING,
+      },
     },
     {},
   );

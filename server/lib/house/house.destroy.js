@@ -1,6 +1,6 @@
 const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
-const { EVENTS } = require('../../utils/constants');
+const { EVENT_LOG_TYPES, EVENTS } = require('../../utils/constants');
 
 /**
  * @public
@@ -22,6 +22,8 @@ async function destroy(selector) {
 
   await house.destroy();
   this.event.emit(EVENTS.HOUSE.DELETED, house.get({ plain: true }));
+  this.event.logger.add(EVENT_LOG_TYPES.HOUSE.DELETED, house.name);
+
 }
 
 module.exports = {

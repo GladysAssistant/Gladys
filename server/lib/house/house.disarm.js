@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 const db = require('../../models');
-const { ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENT_LOG_TYPES, ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
 
 /**
@@ -42,6 +42,8 @@ async function disarm(selector) {
     type: EVENTS.ALARM.DISARM,
     house: selector,
   });
+  this.event.logger.add(EVENT_LOG_TYPES.HOUSE.DISARM, house.name);
+
   // Emit websocket event to update UI
   this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED,
