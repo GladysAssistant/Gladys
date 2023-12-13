@@ -1,12 +1,9 @@
 const db = require('../../models');
 
-async function get(type, ref){
-    const eventLog = await db.EventLog.create({
-        service : type.service,
-        type : type.type
-    });
+async function get(){
+    const logs = await db.EventLog.findAll({});
     
-    return eventLog.get({ plain: true });
+    return logs.map((log) => log.get({ plain: true }));
 }
 
 module.exports = {get};

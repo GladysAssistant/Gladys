@@ -19,6 +19,7 @@ const SceneController = require('./controllers/scene.controller');
 const SystemController = require('./controllers/system.controller');
 const VariableController = require('./controllers/variable.controller');
 const WeatherController = require('./controllers/weather.controller');
+const EventLogController = require('./controllers/eventlog.controller');
 
 /**
  * @description Return object of routes.
@@ -49,6 +50,7 @@ function getRoutes(gladys) {
   const sceneController = SceneController(gladys);
   const systemController = SystemController(gladys);
   const weatherController = WeatherController(gladys);
+  const eventlogController = EventLogController(gladys);
 
   const routes = {};
 
@@ -564,6 +566,10 @@ function getRoutes(gladys) {
     'get /api/v1/house/:house_selector/weather': {
       authenticated: true,
       controller: weatherController.getByHouse,
+    },
+    'get /api/v1/logs': {
+      authenticated: true,
+      controller: eventlogController.get,
     },
   };
 
