@@ -52,8 +52,11 @@ class LogBox extends Component {
                         <Text id={this.getTitle(props.service,props.type)}/>
                     </div>
                 </div>
-                <div class='box'>
-                    {this.getDate(props.date)} {this.getTime(props.date)}
+                <div class='box' style= "flex-grow : 1;  max-width:15%;">
+                    {this.getDate(props.date)} 
+                </div>
+                <div class='box' style= "flex-grow : 1;  max-width:15%;">
+                    {this.getTime(props.date)}
                 </div>
             </div>
             <div class = "card-body">
