@@ -1,6 +1,5 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
-import dayjs from 'dayjs';
 import style from './style.css';
 
 class LogBox extends Component {
@@ -24,11 +23,15 @@ class LogBox extends Component {
     }
 
     setIcon(service){
-        this.icon = this.dico_icon[type];
+        this.icon = this.dico_icon[service];
     }
 
     setTitle(service,type){
         this.title = "EventLog.event."+service+"."+type+".title";
+    }
+
+    setDescription(service,type){
+        this.description = "EventLog.event."+service+"."+type+".description";
     }
 
 
@@ -40,31 +43,33 @@ class LogBox extends Component {
         //this.setDateAndTime(date);
         //this.setIcon(service);
         //this.setTitle(service,type);
+        //this.setDescription(service,type);
         return(
        
         <div class = "card" > 
             <div class= "card-header " style = "background-color : #E0EBFF">
                 <div class='box'  style="flex-grow: 1; max-width:10%;">
-                    <i class="fe fe-message-square" />
+                    <i class={this.icon}/>
                 </div>
 
                 <div class='box' style="flex-grow: 1;">
                     <div class="card-title"  style="text-align: center;">
-                        {this.title}
+                        <Text id={this.title}/>
                     </div>
                 </div>
                 <div class='box'>
-                    {this.date}
+                    <Text id={this.date}/>
                 </div>
             </div>
             <div class = "card-body">
                 <div class='box'  style="border-bottom : solid 1px grey; display : inline-block">
-                    {this.time}
+                <Text id={this.time}/>
                 
                 </div>
 
                 <div class='box'  style="flex-grow: 1; padding-top : 10px">
-                    {this.description}
+                    <Text id={this.description} fields={{service : service, type : type, sender_name : sender_name, eventProperty : eventProperty}} />
+                    
                 </div>
             </div>
             

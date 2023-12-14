@@ -417,6 +417,50 @@
           "last365Days": "Cette année"
         }
       }
+    },
+    "event": {
+      "HOUSE": {
+        "CREATED":{
+          "title": "Maison créée",
+          "description": "La maison {{sender_name}} a été créée."
+        },
+        "UPDATED":{
+          "title": "Maison mise à jour",
+          "description": "La maison {{sender_name}} a été mise à jour."
+        },
+        "DELETED":{
+          "title": "Maison supprimée",
+          "description": "La maison {{sender_name}} a été supprimée."
+        },
+        "ARMING":{
+          "title": "Alarme armée",
+          "description": "L'alarme de la maison {{sender_name}} a été armée."
+        },
+        "DISARM":{
+          "title": "Alarme désarmée",
+          "description": "L'alarme de la maison {{sender_name}} a été désarmée."
+        },
+        "DISARM_FAIL_CODE":{
+          "title": "Erreur en desarmant l'alarme",
+          "description": "L'alarme de la maison {{sender_name}} n'a pas pu être désarmée car le code était incorrect."
+        },
+        "PANIC": {
+          "title": "Alarme panique",
+          "description": "L'alarme de la maison {{sender_name}} a été déclenchée."
+        },
+        "PARTIAL_ARMING":{
+          "title": "Alarme partiellement armée",
+          "description": "L'alarme de la maison {{sender_name}} a été partiellement armée."
+        },
+        "USER-LEFT":{
+          "title": "Utilisateur parti",
+          "description": "L'utilisateur {{eventProperty}} est parti de la maison {{sender_name}}."
+        },
+        "USER-JOIN":{
+          "title": "Utilisateur arrivé",
+          "description": "L'utilisateur {{eventProperty}} est parti de la maison {{sender_name}}."
+        }
+      }
     }
   },
   "integration": {
