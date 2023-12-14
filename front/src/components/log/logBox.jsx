@@ -16,26 +16,33 @@ class LogBox extends Component {
         House : "fe fe-home",
     }
     
+    constructor(props) {
+        super(props);
+      }
 
     //"2019-11-11 11:11:11.111 fuseau horaire"
-    setDateAndTime(date){
-        this.date = date.substring(0,10);
-        this.time = date.substring(11,19);
+    getDate(date){
+        return date.substring(0,10);
+    }
+
+    getTime(date){
+        return date.substring(11,19);
     }
 
     setIcon(service){
         this.icon = this.dico_icon[type];
     }
 
-    setTitle(service,type){
-        this.title = "EventLog.event."+service+"."+type+".title";
+    getTitle(service,type){
+        return "EventLog.event."+service+"."+type+".title";
+    }
+
+    getDescription(service,type){
+        return "EventLog.event."+service+"."+type+".title";
     }
 
 
-
-
-
-    render(props, {date, service, type, sender_name,eventProperty}) {
+    render(props) {
         // penser à decommanter 
         //this.setDateAndTime(date);
         //this.setIcon(service);
@@ -50,21 +57,21 @@ class LogBox extends Component {
 
                 <div class='box' style="flex-grow: 1;">
                     <div class="card-title"  style="text-align: center;">
-                        {this.title}
+                        {getTitle(props.service,props.type)}
                     </div>
                 </div>
                 <div class='box'>
-                    {this.date}
+                    {getDate(props.date)}
                 </div>
             </div>
             <div class = "card-body">
                 <div class='box'  style="border-bottom : solid 1px grey; display : inline-block">
-                    {this.time}
+                    {getTime(props.date)}
                 
                 </div>
 
                 <div class='box'  style="flex-grow: 1; padding-top : 10px">
-                    {this.description}
+                    {getDescription(props.service,props.type)}
                 </div>
             </div>
             

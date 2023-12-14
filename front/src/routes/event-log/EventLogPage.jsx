@@ -102,7 +102,7 @@ class EventLogPage extends Component {
 
                   <div class="row row-cards" >
                     {this.state.logs.map((event) => (
-                      <LogBox date={event.date} service={event.type} sender_name={event.sender_name} eventProperty={event.event_property}/>
+                      <LogBox date={event.created_at} service={event.service} type={event.type} sender_name={event.sender_name} eventProperty={event.event_property}/>
                     ))}
                   </div>
                 </div>
