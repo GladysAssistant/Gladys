@@ -3,16 +3,8 @@ import { Component } from 'preact';
 import style from './style.css';
 
 class LogBox extends Component {
-    date = "2019-11-11";
-    time = "11:11:11";
-
-    title = "ouverture de porte";
-    description = "qqn a ouvert la porte de la maison"
-
-    icon = "fe fe-home";
-
     dico_icon = {
-        House : "fe fe-home",
+        "HOUSE" : "fe fe-home",
     }
     
     constructor(props) {
@@ -28,8 +20,8 @@ class LogBox extends Component {
         return date.substring(11,19);
     }
 
-    setIcon(service){
-        this.icon = this.dico_icon[service];
+    getIcon(service){
+        return this.dico_icon[service];
     }
 
     getTitle(service,type){
@@ -37,7 +29,7 @@ class LogBox extends Component {
     }
 
     getDescription(service,type){
-        return "EventLog.event."+service+"."+type+".title";
+        return "EventLog.event."+service+"."+type+".description";
     }
 
 
@@ -52,26 +44,21 @@ class LogBox extends Component {
         <div class = "card" > 
             <div class= "card-header " style = "background-color : #E0EBFF">
                 <div class='box'  style="flex-grow: 1; max-width:10%;">
-                    <i class={this.icon}/>
+                    <i class={this.getIcon(props.service)}/>
                 </div>
 
                 <div class='box' style="flex-grow: 1;">
                     <div class="card-title"  style="text-align: center;">
-                        <Text id={getTitle(props.service,props.type)}/>
+                        <Text id={this.getTitle(props.service,props.type)}/>
                     </div>
                 </div>
                 <div class='box'>
-                    <Text id={getDate(props.date)}/>
+                    {this.getDate(props.date)} {this.getTime(props.date)}
                 </div>
             </div>
             <div class = "card-body">
-                <div class='box'  style="border-bottom : solid 1px grey; display : inline-block">
-                    {getTime(props.date)}
-                
-                </div>
-
                 <div class='box'  style="flex-grow: 1; padding-top : 10px">
-                    <Text id={getDescription(props.service,props.type)} fields={{service : service, type : type, sender_name : sender_name, eventProperty : eventProperty}} />
+                    <Text id={this.getDescription(props.service,props.type)} fields={{service : props.service, type : props.type, sender_name : props.sender_name, eventProperty : props.event_property}} />
                     
                 </div>
             </div>
