@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 const db = require('../../models');
-const { ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENT_LOG_TYPES, ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
 
 /**
@@ -33,6 +33,7 @@ async function partialArm(selector) {
     type: EVENTS.ALARM.PARTIAL_ARM,
     house: selector,
   });
+  this.event.logger.add(EVENT_LOG_TYPES.HOUSE.PARTIAL_ARMING, house.name);
   // Emit websocket event to update UI
   this.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.ALARM.PARTIALLY_ARMED,

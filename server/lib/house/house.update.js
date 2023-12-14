@@ -27,7 +27,7 @@ async function update(selector, newHouse) {
   await house.update(newHouse);
 
   this.event.emit(EVENTS.HOUSE.UPDATED, house.get({ plain: true }));
-  this.event.logger.add(EVENT_LOG_TYPES.HOUSE.UPDATED, house);
+  this.event.logger.add(EVENT_LOG_TYPES.HOUSE.UPDATED, house.name);
 
   return house.get({ plain: true });
 }

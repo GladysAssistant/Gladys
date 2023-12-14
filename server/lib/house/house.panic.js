@@ -1,6 +1,6 @@
 const Promise = require('bluebird');
 const db = require('../../models');
-const { ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
+const { EVENT_LOG_TYPES, ALARM_MODES, EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../utils/constants');
 const { NotFoundError, ConflictError } = require('../../utils/coreErrors');
 
 /**
@@ -39,6 +39,8 @@ async function panic(selector) {
       house: selector,
     },
   });
+  this.event.logger.add(EVENT_LOG_TYPES.HOUSE.PANIC, house.name);
+
   return house.get({ plain: true });
 }
 
