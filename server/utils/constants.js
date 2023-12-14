@@ -1019,8 +1019,31 @@ const EVENT_LOG_TYPES = {
     ARMING : {
       service: 'HOUSE',
       type: 'ARMING',
-    }
-    
+    },
+    DISARM: {
+      service: 'HOUSE',
+      type: 'DISARM',
+    },
+    DISARM_FAIL_CODE:{
+      service: 'HOUSE',
+      type: 'DISARM_FAIL_CODE',
+    },
+    PANIC: {
+      service: 'HOUSE',
+      type: 'PANIC',
+    },
+    PARTIAL_ARMING : {
+      service: 'HOUSE',
+      type: 'PARTIAL_ARMING',
+    },
+    USER_LEFT : {
+      service: 'HOUSE',
+      type: 'USER_LEFT',
+    },
+    USER_JOINED : {
+      service: 'HOUSE',
+      type: 'USER_JOINED',
+    } 
   }
 }
 
