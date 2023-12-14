@@ -999,10 +999,6 @@ const ALARM_MODES = {
 };
 
 const EVENT_LOG_TYPES = {
-  CALENDAR : {
-    CREATION : 'creation',
-    DELETION : 'deletion'
-  },
   HOUSE : {
     UPDATED : {
       service: 'HOUSE',

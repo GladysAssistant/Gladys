@@ -567,6 +567,7 @@ function getRoutes(gladys) {
       authenticated: true,
       controller: weatherController.getByHouse,
     },
+    // event logs
     'get /api/v1/logs': {
       authenticated: true,
       controller: eventlogController.get,
