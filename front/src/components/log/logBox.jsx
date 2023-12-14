@@ -12,10 +12,13 @@ class LogBox extends Component {
     title = "ouverture de porte";
     description = "qqn a ouvert la porte de la maison"
 
+    
 
 
-    render(props) {
+
+    render(props, {date, type, action, object,eventProperty}) {
         // Your render logic goes here
+
         return(
        
         <div class = "card" > 
@@ -26,15 +29,15 @@ class LogBox extends Component {
 
                 <div class='box' style="flex-grow: 1;">
                     <div class="card-title"  style="text-align: center;">
-                        Ouverture de porte 
+                        {this.title}
                     </div>
                 </div>
                 <div class='box'>
-                    12/09/2019
+                    {this.date}
                 </div>
             </div>
             <div class = "card-body">
-                La porte de la cuisine de la maison principale s'est ouverte rapidement
+                {this.description}
 
             </div>
             
