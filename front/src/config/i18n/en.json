@@ -417,6 +417,50 @@
           "last365Days": "Last year"
         }
       }
+    },
+    "event": {
+      "HOUSE": {
+        "CREATED": {
+          "title": "House created",
+          "description": "The house {{sender_name}} has been created."
+        },
+        "UPDATED": {
+          "title": "House updated",
+          "description": "The house {{sender_name}} has been updated."
+        },
+        "DELETED": {
+          "title": "House deleted",
+          "description": "The house {{sender_name}} has been deleted."
+        },
+        "ARMING": {
+          "title": "Alarm armed",
+          "description": "The alarm of the house {{sender_name}} has been armed."
+        },
+        "DISARM": {
+          "title": "Alarm disarmed",
+          "description": "The alarm of the house {{sender_name}} has been disarmed."
+        },
+        "DISARM_FAIL_CODE": {
+          "title": "Error disarming alarm",
+          "description": "The alarm of the house {{sender_name}} could not be disarmed because the code was incorrect."
+        },
+        "PANIC": {
+          "title": "Panic alarm",
+          "description": "The alarm of the house {{sender_name}} has been triggered."
+        },
+        "PARTIAL_ARMING": {
+          "title": "Partial alarm armed",
+          "description": "The alarm of the house {{sender_name}} has been partially armed."
+        },
+        "USER-LEFT": {
+          "title": "User left",
+          "description": "The user {{eventProperty}} has left the house {{sender_name}}."
+        },
+        "USER-JOIN": {
+          "title": "User joined",
+          "description": "The user {{eventProperty}} has joined the house {{sender_name}}."
+        }
+      }
     }
   },
   "integration": {

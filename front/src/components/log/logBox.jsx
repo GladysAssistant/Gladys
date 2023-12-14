@@ -1,6 +1,5 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
-import dayjs from 'dayjs';
 import style from './style.css';
 
 class LogBox extends Component {
@@ -30,7 +29,7 @@ class LogBox extends Component {
     }
 
     setIcon(service){
-        this.icon = this.dico_icon[type];
+        this.icon = this.dico_icon[service];
     }
 
     getTitle(service,type){
@@ -47,21 +46,22 @@ class LogBox extends Component {
         //this.setDateAndTime(date);
         //this.setIcon(service);
         //this.setTitle(service,type);
+        //this.setDescription(service,type);
         return(
        
         <div class = "card" > 
             <div class= "card-header " style = "background-color : #E0EBFF">
                 <div class='box'  style="flex-grow: 1; max-width:10%;">
-                    <i class="fe fe-message-square" />
+                    <i class={this.icon}/>
                 </div>
 
                 <div class='box' style="flex-grow: 1;">
                     <div class="card-title"  style="text-align: center;">
-                        {getTitle(props.service,props.type)}
+                        <Text id={getTitle(props.service,props.type)}/>
                     </div>
                 </div>
                 <div class='box'>
-                    {getDate(props.date)}
+                    <Text id={getDate(props.date)}/>
                 </div>
             </div>
             <div class = "card-body">
@@ -71,7 +71,8 @@ class LogBox extends Component {
                 </div>
 
                 <div class='box'  style="flex-grow: 1; padding-top : 10px">
-                    {getDescription(props.service,props.type)}
+                    <Text id={getDescription(props.service,props.type)} fields={{service : service, type : type, sender_name : sender_name, eventProperty : eventProperty}} />
+                    
                 </div>
             </div>
             
