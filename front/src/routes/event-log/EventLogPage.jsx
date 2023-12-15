@@ -63,11 +63,14 @@ class EventLogPage extends Component {
                       </h3>
                     </div>
                     <div class="card-body">
-                      <div>
-                        <input type="checkbox"></input> <Text id="EventLog.root.filter.eventType.all"></Text>
+                    <div>
+                        <input type="radio" name = "typeFilter" checked = "checked"></input> <Text id="EventLog.root.filter.eventType.all"></Text>
                       </div>
                       <div>
-                        <input type="checkbox"></input> <Text id="EventLog.root.filter.eventType.intern"></Text>
+                        <input type="radio" name = "typeFilter"></input> <Text id="EventLog.root.filter.eventType.device"></Text>
+                      </div>
+                      <div>
+                        <input type="radio" name = "typeFilter"></input> <Text id="EventLog.root.filter.eventType.intern"></Text>
                       </div>
                     </div>
                   </div>
@@ -79,19 +82,19 @@ class EventLogPage extends Component {
                     </div>
                     <div class="card-body">
                       <div>
-                        <input type="checkbox"></input> <Text id="EventLog.root.filter.date.today"></Text>
+                        <input type="radio" name = "timeFilter" checked = "checked"></input> <Text id="EventLog.root.filter.date.today"></Text>
                       </div>
                       <div>
-                        <input type="checkbox"></input> <Text id="EventLog.root.filter.date.yesterday"></Text>
+                        <input type="radio" name = "timeFilter"></input> <Text id="EventLog.root.filter.date.yesterday"></Text>
                       </div>
                       <div>
-                        <input type="checkbox"></input> <Text id="EventLog.root.filter.date.last7Days"></Text>
+                        <input type="radio" name = "timeFilter"></input> <Text id="EventLog.root.filter.date.last7Days"></Text>
                       </div>
                       <div>
-                        <input type="checkbox"></input> <Text id="EventLog.root.filter.date.last30Days"></Text>
+                        <input type="radio" name = "timeFilter"></input> <Text id="EventLog.root.filter.date.last30Days"></Text>
                       </div>
                       <div>
-                        <input type="checkbox"></input> <Text id="EventLog.root.filter.date.last365Days"></Text>
+                        <input type="radio" name = "timeFilter"></input> <Text id="EventLog.root.filter.date.last365Days"></Text>
                       </div>
                     </div>
                   </div>

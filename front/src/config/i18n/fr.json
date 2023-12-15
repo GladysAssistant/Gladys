@@ -401,12 +401,13 @@
   "EventLog": {
     "root": {
       "title": "Journal des évènements",
-      "subtitle": "{{length}} de {{total}} évènements",
+      "subtitle": " Évènements {{begin}} à {{end}} sur un total de {{total}}",
       "filter": {
         "titleType": "Type d'évènement",
         "eventType":{
           "all": "Tous les évènements",
-          "intern" : "Evenements internes"
+          "intern" : "Évènements internes",
+          "device": "Évènements appareils"
         },
         "titleDate": "Date",
         "date": {

@@ -401,12 +401,13 @@
   "EventLog": {
     "root": {
       "title": "Event log",
-      "subtitle": "{{length}} of {{total}} events",
+      "subtitle": "Events {{begin}} to {{end}} out of {{total}}",
       "filter": {
         "titleType": "Type of event",
         "eventType":{
           "all": "All events",
-          "intern" : "Internal events"
+          "intern" : "Internal events",
+          "device": "Device events"
         },
         "titleDate": "Date",
         "date": {
