@@ -133,11 +133,11 @@ class EventLogPage extends Component {
                   </div>
                   <nav aria-label="Page navigation">
                     <ul class="pagination">
-                    <li class="page-item"><button class="page-link" onClick = {() =>this.setPageNumber(1)}>«</button></li>
+                    <li class={`page-item ${this.state.pageNumber == 1? 'disabled' : ''}`}><button class="page-link" onClick = {() =>this.setPageNumber(1)}>«</button></li>
                     {this.getPageToShow().map((pageNumber) => (
-                      <li class="page-item"><button class="page-link" onClick = {() =>this.setPageNumber(pageNumber)} disabled = {pageNumber == this.state.pageNumber}>{pageNumber}</button></li>))
+                      <li class={`page-item ${pageNumber == this.state.pageNumber? 'active' : ''}`}><button class="page-link" onClick = {() =>this.setPageNumber(pageNumber)} disabled = {pageNumber == this.state.pageNumber}>{pageNumber}</button></li>))
                     }
-                    <li class="page-item"><button class="page-link" onClick = {() =>this.setPageNumber(Math.ceil(this.state.logs.total / ITEM_PER_PAGE))} >»</button></li>  
+                    <li class={`page-item ${this.state.pageNumber == (Math.ceil(this.state.logs.total / ITEM_PER_PAGE))? 'disabled' : ''}`}><button class="page-link" onClick = {() =>this.setPageNumber(Math.ceil(this.state.logs.total / ITEM_PER_PAGE))}>»</button></li>  
                     </ul>
                   </nav>
                 </div>
