@@ -27,7 +27,12 @@ class EventLogPage extends Component {
       SceneGetLogs: RequestStatus.Getting
     });
     try {
-      const logs = await this.props.httpClient.get(`/api/v1/logs?page=${pageNumber}&per_page=${ITEM_PER_PAGE}`);
+      const dates = {
+        from : "2023-12-15", //dayjs.subtract(1, 'day').toDate().toString(),
+        to : "2023-12-15"//dayjs().toDate().toString()
+      }
+      console.log("test: ", dates)
+      const logs = await this.props.httpClient.get(`/api/v1/logs?page=${pageNumber}&per_page=${ITEM_PER_PAGE}&date_filter_from=${dates.from}&date_filter_to=${dates.to}}`);
       this.setState({
         logs,
         SceneGetLogs: RequestStatus.Success
