@@ -40,7 +40,6 @@ class EventLogPage extends Component {
   };
 
   render(props) {
-    const { totalSize = 10} = props;
     return (
       <div class="page">
         <div class="page-main">
@@ -51,7 +50,7 @@ class EventLogPage extends Component {
                   <Text id="EventLog.root.title" />
                 </h1>
                 <div class="page-subtitle">
-                  <Text id="EventLog.root.subtitle" fields={{ length: 5, total: totalSize }} />
+                  <Text id="EventLog.root.subtitle" fields={{ begin: 0, end : 10, total: this.state.logs.total }} />
                 </div>
               </div>
               <div class="row">
@@ -104,9 +103,9 @@ class EventLogPage extends Component {
                 <div class="col-lg-9">
 
                   <div class="row row-cards" >
-                    {this.state.logs.map((event) => (
+                    {this.state.logs.data ? this.state.logs.data.map((event) => (
                       <LogBox date={event.created_at} service={event.service} type={event.type} sender_name={event.sender_name} eventProperty={event.event_property}/>
-                    ))}
+                    )) : null}
                   </div>
                 </div>
               </div>
