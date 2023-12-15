@@ -46,8 +46,10 @@ const TuyaPage = ({ children, user }) => (
                     </span>
                     <Text id="integration.tuya.setupTab" />
                   </Link>
+
                   <DeviceConfigurationLink
                     user={user}
+                    configurationKey="integrations"
                     documentKey="tuya"
                     linkClass="list-group-item list-group-item-action d-flex align-items-center"
                   >

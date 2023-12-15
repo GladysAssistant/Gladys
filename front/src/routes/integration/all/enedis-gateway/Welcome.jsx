@@ -18,77 +18,62 @@ import {
 import EnedisPage from './EnedisPage';
 
 const EnedisWelcomePage = ({ redirectUri, errored, loading, usagePointsIds, notOnGladysGateway }) => (
-  <div class="page">
-    <div class="page-main">
-      <div class="my-3 my-md-5">
-        <div class="container">
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">
-                    <Text id="integration.enedis.welcome.title" />
-                  </h3>
-                </div>
-                <div class="card-body">
-                  <div
-                    class={cx('dimmer', {
-                      active: loading
-                    })}
-                  >
-                    <div class="loader" />
-                    <div class="dimmer-content">
-                      {errored && (
-                        <p class="alert alert-danger">
-                          <Text id="integration.enedis.welcome.error" />
-                        </p>
-                      )}
-                      {notOnGladysGateway && (
-                        <p class="alert alert-info">
-                          <Text id="integration.enedis.welcome.notOnGladysGateway" />{' '}
-                          <a target="_blank" rel="noopener noreferrer" href="https://plus.gladysassistant.com">
-                            plus.gladysassistant.com
-                          </a>
-                        </p>
-                      )}
-                      {usagePointsIds && (
-                        <p class="alert alert-success">
-                          <Text id="integration.enedis.welcome.connectedToUsagePointds" />
-                          <br />
-                          <br />
-                          <Text id="integration.enedis.welcome.reconnectInfo" />
-                        </p>
-                      )}
-                      <p>
-                        <Text id="integration.enedis.welcome.longDescription" />
-                      </p>
-                      <p>
-                        <Text id="integration.enedis.welcome.longDescription2" />
-                      </p>
-                      <p>
-                        <Text id="integration.enedis.welcome.longDescription3" />
-                      </p>
-                      {!notOnGladysGateway && (
-                        <div>
-                          <p>
-                            <Text id="integration.enedis.welcome.buttonDescription" />
-                          </p>
-                          <a href={redirectUri} target="_blank" rel="noreferrer noopener">
-                            <Localizer>
-                              <img
-                                src={EnedisButton}
-                                alt={<Text id="integration.enedis.welcome.buttonDescription" />}
-                              />
-                            </Localizer>
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title">
+        <Text id="integration.enedis.welcome.title" />
+      </h1>
+    </div>
+    <div class="card-body">
+      <div
+        class={cx('dimmer', {
+          active: loading
+        })}
+      >
+        <div class="loader" />
+        <div class="dimmer-content">
+          {errored && (
+            <p class="alert alert-danger">
+              <Text id="integration.enedis.welcome.error" />
+            </p>
+          )}
+          {notOnGladysGateway && (
+            <p class="alert alert-info">
+              <Text id="integration.enedis.welcome.notOnGladysGateway" />{' '}
+              <a target="_blank" rel="noopener noreferrer" href="https://plus.gladysassistant.com">
+                plus.gladysassistant.com
+              </a>
+            </p>
+          )}
+          {usagePointsIds && (
+            <p class="alert alert-success">
+              <Text id="integration.enedis.welcome.connectedToUsagePointds" />
+              <br />
+              <br />
+              <Text id="integration.enedis.welcome.reconnectInfo" />
+            </p>
+          )}
+          <p>
+            <Text id="integration.enedis.welcome.longDescription" />
+          </p>
+          <p>
+            <Text id="integration.enedis.welcome.longDescription2" />
+          </p>
+          <p>
+            <Text id="integration.enedis.welcome.longDescription3" />
+          </p>
+          {!notOnGladysGateway && (
+            <div>
+              <p>
+                <Text id="integration.enedis.welcome.buttonDescription" />
+              </p>
+              <a href={redirectUri} target="_blank" rel="noreferrer noopener">
+                <Localizer>
+                  <img src={EnedisButton} alt={<Text id="integration.enedis.welcome.buttonDescription" />} />
+                </Localizer>
+              </a>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
@@ -187,7 +172,7 @@ class EnedisWelcomePageComponent extends Component {
   }
   render({}, { redirectUri, loading, errored, usagePointsIds, notOnGladysGateway }) {
     return (
-      <EnedisPage>
+      <EnedisPage user={this.props.user}>
         <EnedisWelcomePage
           redirectUri={redirectUri}
           loading={loading}
