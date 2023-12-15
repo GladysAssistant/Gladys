@@ -1,9 +1,9 @@
 const db = require('../../models');
 
-async function get(start = 0, end = 10){
+async function get(start = 0, number = 10){
     const logs = await db.EventLog.findAll({
         offset: start,
-        limit : end,
+        limit : number,
         order : [['created_at', 'DESC']]
     });
     

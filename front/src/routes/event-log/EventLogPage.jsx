@@ -22,12 +22,12 @@ class EventLogPage extends Component {
     };
   }
 
-  getLogs = async () => {
+  getLogs = async (pageNumber) => {
     this.setState({
       SceneGetLogs: RequestStatus.Getting
     });
     try {
-      const logs = await this.props.httpClient.get(`/api/v1/logs?page=${this.state.pageNumber}&per_page=${ITEM_PER_PAGE}`);
+      const logs = await this.props.httpClient.get(`/api/v1/logs?page=${pageNumber}&per_page=${ITEM_PER_PAGE}`);
       this.setState({
         logs,
         SceneGetLogs: RequestStatus.Success
@@ -40,14 +40,14 @@ class EventLogPage extends Component {
   };
 
   componentDidMount = () => {
-    this.getLogs();
+    this.getLogs(1);
   };
 
   setPageNumber = (pageNumber) => {
     this.setState({
       pageNumber: pageNumber
-    });
-    this.getLogs();
+    })
+    this.getLogs(pageNumber);
   }
 
   getPageToShow = () => {
