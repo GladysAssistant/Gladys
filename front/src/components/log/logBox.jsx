@@ -1,5 +1,7 @@
 import { Text } from 'preact-i18n';
 import { Component } from 'preact';
+import dayjs from 'dayjs';
+
 import style from './style.css';
 
 class LogBox extends Component {
@@ -11,13 +13,14 @@ class LogBox extends Component {
         super(props);
       }
 
-    //"2019-11-11 11:11:11.111 fuseau horaire"
-    getDate(date){
-        return date.substring(0,10);
+    getDate(date) {
+        const newDate = dayjs(date).format('DD/MM/YYYY');
+        return newDate;
     }
 
-    getTime(date){
-        return date.substring(11,19);
+    getTime(date) {
+        const time = dayjs(date).format('HH:mm:ss');
+        return time;
     }
 
     getIcon(service){
