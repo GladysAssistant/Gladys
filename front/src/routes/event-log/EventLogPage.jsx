@@ -27,7 +27,7 @@ class EventLogPage extends Component {
       SceneGetLogs: RequestStatus.Getting
     });
     try {
-      const logs = await this.props.httpClient.get('/api/v1/logs');
+      const logs = await this.props.httpClient.get(`/api/v1/logs?page=${this.state.pageNumber}&per_page=${ITEM_PER_PAGE}`);
       this.setState({
         logs,
         SceneGetLogs: RequestStatus.Success
@@ -47,6 +47,7 @@ class EventLogPage extends Component {
     this.setState({
       pageNumber: pageNumber
     });
+    this.getLogs();
   }
 
   getPageToShow = () => {
