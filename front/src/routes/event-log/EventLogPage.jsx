@@ -14,7 +14,8 @@ class EventLogPage extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      logs: []
+      logs: [],
+      pageNumber: 1,
     };
   }
 
@@ -38,6 +39,25 @@ class EventLogPage extends Component {
   componentDidMount = () => {
     this.getLogs();
   };
+
+  setPageNumber = (pageNumber) => {
+    this.setState({
+      pageNumber: pageNumber
+    });
+  }
+
+  getPageToShow = () => {
+    const { pageNumber, logs } = this.state;
+    console.log(logs.total);
+    const totalPages = Math.ceil(logs.total / 20);
+    const startPage = Math.max(1, pageNumber - 2);
+    const endPage = Math.min(totalPages + 1, pageNumber + 2);
+    const pages = [];
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  }
 
   render(props) {
     const { totalSize = 10} = props;
@@ -108,6 +128,15 @@ class EventLogPage extends Component {
                       <LogBox date={event.created_at} service={event.service} type={event.type} sender_name={event.sender_name} eventProperty={event.event_property}/>
                     ))}
                   </div>
+                  <nav aria-label="Page navigation">
+                    <ul class="pagination">
+                    <li class="page-item"><button class="page-number" onClick = {this.setPageNumber(1)}>«</button></li>
+                    {this.getPageToShow().map((pageNumber) => (
+                      <li class="page-item"><button class="page-number" onClick = {this.setPageNumber(pageNumber)} disabled = {pageNumber == this.state.pageNumber}>{pageNumber}</button></li>))
+                    }
+                    <li class="page-item"><button class="page-number" onClick = {this.setPageNumber(this.state.logs.total)} >»</button></li>  
+                    </ul>
+                  </nav>
                 </div>
               </div>
             </div>
