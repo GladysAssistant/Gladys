@@ -9,7 +9,10 @@ import LogBox from '../../components/log/LogBox.jsx';
 
 import style from './style.css';
 
+const ITEM_PER_PAGE = 5;
+
 class EventLogPage extends Component {
+
 
   constructor(props) {
     super(props);
@@ -49,9 +52,9 @@ class EventLogPage extends Component {
   getPageToShow = () => {
     const { pageNumber, logs } = this.state;
     console.log(logs.total);
-    const totalPages = Math.ceil(logs.total / 20);
+    const totalPages = Math.ceil(logs.total / ITEM_PER_PAGE);
     const startPage = Math.max(1, pageNumber - 2);
-    const endPage = Math.min(totalPages + 1, pageNumber + 2);
+    const endPage = Math.min(totalPages, pageNumber + 2);
     const pages = [];
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
@@ -129,11 +132,11 @@ class EventLogPage extends Component {
                   </div>
                   <nav aria-label="Page navigation">
                     <ul class="pagination">
-                    <li class="page-item"><button class="page-number" onClick = {this.setPageNumber(1)}>«</button></li>
+                    <li class="page-item"><button class="page-link" onClick = {() =>this.setPageNumber(1)}>«</button></li>
                     {this.getPageToShow().map((pageNumber) => (
-                      <li class="page-item"><button class="page-number" onClick = {this.setPageNumber(pageNumber)} disabled = {pageNumber == this.state.pageNumber}>{pageNumber}</button></li>))
+                      <li class="page-item"><button class="page-link" onClick = {() =>this.setPageNumber(pageNumber)} disabled = {pageNumber == this.state.pageNumber}>{pageNumber}</button></li>))
                     }
-                    <li class="page-item"><button class="page-number" onClick = {this.setPageNumber(this.state.logs.total)} >»</button></li>  
+                    <li class="page-item"><button class="page-link" onClick = {() =>this.setPageNumber(Math.ceil(this.state.logs.total / ITEM_PER_PAGE))} >»</button></li>  
                     </ul>
                   </nav>
                 </div>
