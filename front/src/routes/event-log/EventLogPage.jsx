@@ -74,7 +74,7 @@ class EventLogPage extends Component {
                   <Text id="EventLog.root.title" />
                 </h1>
                 <div class="page-subtitle">
-                  <Text id="EventLog.root.subtitle" fields={{ begin: 0, end : 10, total: this.state.logs.total }} />
+                  <Text id="EventLog.root.subtitle" fields={{ begin: this.state.logs.start, end : this.state.logs.end, total: this.state.logs.total }} />
                 </div>
               </div>
               <div class="row">
