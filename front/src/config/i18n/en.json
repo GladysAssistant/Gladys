@@ -2781,6 +2781,7 @@
     },
     "signal": {
       "shortCategoryName": "Signal",
+      "binary": "Reachable",
       "integer": "Signal strength"
     },
     "air-conditioning": {

@@ -2775,6 +2775,7 @@
     },
     "signal": {
       "shortCategoryName": "Signal",
+      "binary": "Joignable",
       "integer": "Intensité du signal"
     },
     "air-conditioning": {

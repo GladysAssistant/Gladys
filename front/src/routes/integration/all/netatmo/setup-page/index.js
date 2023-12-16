@@ -1,5 +1,6 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
+import { route } from 'preact-router';
 import SetupTab from './SetupTab';
 import NetatmoPage from '../NetatmoPage';
 import withIntlAsProp from '../../../../../utils/withIntlAsProp';
@@ -37,9 +38,6 @@ class NetatmoSetupPage extends Component {
           statusType: STATUS.ERROR.CONNECTING,
           message: this.props.error
         });
-        setTimeout(() => {
-          window.close();
-        }, 500);
       } else {
         this.props.httpClient.post('/api/v1/service/netatmo/saveStatus', {
           statusType: STATUS.ERROR.CONNECTING,
@@ -68,8 +66,8 @@ class NetatmoSetupPage extends Component {
         });
         this.setState({ connectNetatmoStatus: STATUS.CONNECTED });
         setTimeout(() => {
-          window.close();
-        }, 500);
+          route('/dashboard/integration/device/netatmo/setup', true);
+        }, 100);
       } catch (e) {
         console.error(e);
         this.props.httpClient.post('/api/v1/service/netatmo/saveStatus', {
@@ -86,10 +84,8 @@ class NetatmoSetupPage extends Component {
 
     try {
       this.props.httpClient.post('/api/v1/service/netatmo/saveConfiguration', {
-        username: this.state.netatmoUsername,
         clientId: this.state.netatmoClientId,
         clientSecret: this.state.netatmoClientSecret
-        // scopeEnergy: this.state.netatmoScopesEnergy
       });
       await this.setState({
         netatmoSaveSettingsStatus: RequestStatus.Success
@@ -104,13 +100,11 @@ class NetatmoSetupPage extends Component {
       await this.setState({
         connectNetatmoStatus: STATUS.CONNECTING
       });
-      // start service
       await this.getRedirectUri();
       const redirectUri = this.state.redirectUri;
       const regex = /dashboard|integration|device|netatmo|setup/;
-      // Open a new tab for authorization URL
       if (redirectUri && regex.test(this.state.redirectUri)) {
-        window.open(this.state.redirectUri, '_blank'); //TODO à supprimer -> window.open(this.state.redirectUri, '_blank');window.location.href = this.state.redirectUri;
+        window.location.href = this.state.redirectUri;
         await this.setState({
           netatmoSaveSettingsStatus: RequestStatus.Success
         });
@@ -131,22 +125,16 @@ class NetatmoSetupPage extends Component {
   };
 
   loadProps = async () => {
-    // let connectNetatmoStatus = STATUS.CONNECTING;
     let configuration = {};
     try {
       configuration = await this.props.httpClient.get('/api/v1/service/netatmo/config');
-      // if (Number(configuration.connected) === 1) connectNetatmoStatus = STATUS.CONNECTED;
-      // else connectNetatmoStatus = STATUS.DISCONNECTED;
     } catch (e) {
       console.error(e);
       await this.setState({ errored: true });
     } finally {
       await this.setState({
-        netatmoUsername: configuration.username,
         netatmoClientId: configuration.clientId,
         netatmoClientSecret: configuration.clientSecret,
-        // netatmoScopesEnergy: configuration.scopes.scopeEnergy,
-        // connectNetatmoStatus,
         clientSecretChanges: false
       });
     }
@@ -183,7 +171,6 @@ class NetatmoSetupPage extends Component {
     switch (state.statusType) {
       case STATUS.CONNECTING:
         if (state.status !== 'other_error') {
-          // await this.setState({});
           this.setState({
             connectNetatmoStatus: STATUS.DISCONNECTED,
             accessDenied: true,

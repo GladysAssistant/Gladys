@@ -28,9 +28,6 @@ class SetupTab extends Component {
     }
   }
 
-  updateUsername = e => {
-    this.props.updateStateInIndex({ netatmoUsername: e.target.value });
-  };
   updateClientId = e => {
     this.props.updateStateInIndex({ netatmoClientId: e.target.value });
   };
@@ -52,23 +49,6 @@ class SetupTab extends Component {
       this.showClientSecretTimer = setTimeout(() => this.setState({ showClientSecret: false }), 5000);
     }
   };
-
-  // handleCheckboxChange = (scope, isChecked) => {
-  //   let newScopes = new Set(this.props.netatmoScopesEnergy.split(' '));
-
-  //   if (isChecked) {
-  //     newScopes.add(scope);
-  //   } else {
-  //     newScopes.delete(scope);
-  //   }
-
-  //   const newScopesString = Array.from(newScopes)
-  //     .filter(Boolean)
-  //     .join(' ');
-  //   this.props.updateStateInIndex({
-  //     netatmoScopesEnergy: newScopesString
-  //   });
-  // };
 
   componentWillUnmount() {
     if (this.showClientSecretTimer) {
@@ -134,22 +114,6 @@ class SetupTab extends Component {
 
               <form>
                 <div class="form-group">
-                  <label for="netatmoUsername" class="form-label">
-                    <Text id={`integration.netatmo.setup.usernameLabel`} />
-                  </label>
-                  <Localizer>
-                    <input
-                      name="netatmoUsername"
-                      type="text"
-                      placeholder={<Text id="integration.netatmo.setup.usernamePlaceholder" />}
-                      value={props.netatmoUsername}
-                      class="form-control"
-                      onInput={this.updateUsername}
-                    />
-                  </Localizer>
-                </div>
-
-                <div class="form-group">
                   <label htmlFor="netatmoClientId" className="form-label">
                     <Text id={`integration.netatmo.setup.clientIdLabel`} />
                   </label>
@@ -193,29 +157,6 @@ class SetupTab extends Component {
                     </span>
                   </div>
                 </div>
-
-                {/*TODO <div className="form-group">
-                  <label htmlFor="netatmoScope" className="form-label">
-                    <Text id={`integration.netatmo.setup.scopeLabel`} />
-                    <Text id={`integration.netatmo.setup.scopes.netatmoEnergyTitle`} />
-                  </label>
-                  <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', marginTop: '10px' }}>
-                    {Object.entries(SCOPES.ENERGY).map(([key, value]) => (
-                      <label
-                        key={key}
-                        style={{ marginRight: '20px', marginBottom: '10px', alignItems: 'center', display: 'flex' }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={scopesArray ? scopesArray.includes(value) : null}
-                          onChange={e => this.handleCheckboxChange(value, e.target.checked)}
-                          style={{ marginRight: '5px' }}
-                        />
-                        <Text id={`integration.netatmo.setup.scopes.ENERGY.${key.replace(/_/g, '').toLowerCase()}`} />
-                      </label>
-                    ))}
-                  </div>
-                </div> */}
                 {props.notOnGladysGateway && (
                   <div class={style.buttonGroup}>
                     <Localizer>

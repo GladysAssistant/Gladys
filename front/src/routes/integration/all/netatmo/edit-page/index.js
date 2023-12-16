@@ -89,7 +89,7 @@ class EditNetatmoDevice extends Component {
     );
   }
 
-  render(props, state, { }) {
+  render(props, state, {}) {
     return (
       <NetatmoPage {...props} state={state} updateStateInIndex={this.handleStateUpdateFromChild}>
         <UpdateDevice
