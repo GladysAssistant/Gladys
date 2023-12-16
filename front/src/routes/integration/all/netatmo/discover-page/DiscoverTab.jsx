@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
@@ -94,7 +94,12 @@ class DiscoverTab extends Component {
         </div>
         <div class="card-body">
           <div class="alert alert-secondary">
-            <Text id="integration.netatmo.discover.description" />
+            <p>
+              <Text id="integration.netatmo.discover.description" />
+            </p>
+            <p>
+              <MarkupText id="integration.netatmo.discover.descriptionCompatibility" />
+            </p>
           </div>
           <div
             class={cx('dimmer', {
@@ -116,7 +121,7 @@ class DiscoverTab extends Component {
                   discoveredDevices.map((device, index) => (
                     <NetatmoDeviceBox
                       editable={!device.created_at || device.updatable}
-                      alreadyCreatedButton={device.created_at && !device.updatable}
+                      alreadyCreatedButton={!device.created_at && !device.updatable}
                       updateButton={device.updatable}
                       saveButton={!device.created_at}
                       device={device}

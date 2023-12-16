@@ -511,7 +511,6 @@
       "deviceTab": "Devices",
       "discoverTab": "Discover Netatmo",
       "setupTab": "Settings",
-      "settingsTab": "Settings devices and features",
       "documentation": "Netatmo Documentation",
       "discoverDeviceDescr": "Automatically scan Netatmo devices",
       "alreadyCreatedButton": "Already created",
@@ -557,6 +556,7 @@
       "discover": {
         "title": "Your Netatmo Devices Compatible with Gladys",
         "description": "Your Netatmo devices must be added to your Netatmo account beforehand. Press the 'Scan' button to discover Netatmo devices for the first time. Press 'Refresh' if you want to retrieve new features of your devices.",
+        "descriptionCompatibility": "You will only see devices that are currently compatible with Gladys here. For any requests to add devices and/or features, please visit the <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
         "noDeviceFound": "No Netatmo devices were found. Have you completed all the steps in the documentation to register your devices on the Netatmo API?",
         "noConnect": "No Netatmo devices. You must first configure and connect to a Netatmo account from the 'Settings' menu.",
         "disconnect": "No Netatmo devices can be detected. You must first reconnect from the 'Settings' menu.",
@@ -597,8 +597,11 @@
         "notConfigured": "The Netatmo service is not configured",
         "description": "You can connect Gladys to your Netatmo account to control the associated devices.",
         "descriptionCreateAccount": "You need to create an account on <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
-        "descriptionCreateProject": "You must then create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a> menu.",
+        "descriptionCreateProject": "You will then need to create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a> menu.",
         "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\" to copy below.",
+        "descriptionScopeInformation": "When you connect Gladys to your dedicated Netatmo App, you grant it permission to access your data in both read and write modes (referred to as \"read\" and \"write\" scopes). Of course, as Gladys is installed locally, none of these data is exposed.",
+        "titleAdditionalInformation": "Additional Information on the Operation of the \"Energy\" API:",
+        "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
         "errorConnecting": {
           "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum. You can then close this tab.",
           "other_error_NetatmoPage": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",

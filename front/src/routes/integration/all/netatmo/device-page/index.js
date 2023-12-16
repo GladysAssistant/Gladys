@@ -7,20 +7,6 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
 class DevicePage extends Component {
-  // loadProps = async () => {
-  //   let connectNetatmoStatus = STATUS.CONNECTING;
-  //   let configuration = {};
-  //   try {
-  //     configuration = await this.props.httpClient.get('/api/v1/service/netatmo/config');
-  //   } catch (e) {
-  //     console.error(e);
-  //   } finally {
-  //     this.setState({
-  //       connectNetatmoStatus
-  //     });
-  //   }
-  // };
-
   loadStatus = async () => {
     try {
       const netatmoStatus = await this.props.httpClient.get('/api/v1/service/netatmo/status');

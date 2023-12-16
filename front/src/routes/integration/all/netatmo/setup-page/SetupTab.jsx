@@ -73,7 +73,6 @@ class SetupTab extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {console.log(props)}
               {props.accessDenied && (
                 <p class="text-center alert alert-warning">
                   <MarkupText id={`integration.netatmo.setup.errorConnecting.${props.messageAlert}`} />
@@ -110,6 +109,24 @@ class SetupTab extends Component {
                 <MarkupText id="integration.netatmo.setup.descriptionCreateAccount" />
                 <MarkupText id="integration.netatmo.setup.descriptionCreateProject" />
                 <MarkupText id="integration.netatmo.setup.descriptionGetKeys" />
+              </p>
+              <p>
+                <label htmlFor="titleAdditionalInformation" className="form-label" style={{ fontStyle: 'italic' }}>
+                  <MarkupText id="integration.netatmo.setup.descriptionScopeInformation" />
+                </label>
+              </p>
+              <p>
+                <label
+                  htmlFor="titleAdditionalInformation"
+                  className="form-label"
+                  style={{
+                    textDecoration: 'underline',
+                    fontWeight: 'bold'
+                  }}
+                >
+                  <MarkupText id="integration.netatmo.setup.titleAdditionalInformation" />
+                </label>
+                <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformation" />
               </p>
 
               <form>

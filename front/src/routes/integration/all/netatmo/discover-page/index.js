@@ -7,23 +7,6 @@ import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/const
 import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
 class NetatmoDiscoverPage extends Component {
-  // loadProps = async () => {
-  //   let connectNetatmoStatus = STATUS.CONNECTING;
-  //   let configuration = {};
-  //   try {
-  //     configuration = await this.props.httpClient.get('/api/v1/service/netatmo/config');
-  //     if (Number(configuration.connected) === 1) connectNetatmoStatus = STATUS.CONNECTED;
-  //     else connectNetatmoStatus = STATUS.DISCONNECTED;
-  //   } catch (e) {
-  //     console.error(e);
-  // } finally {
-  //   this.setState({
-  //     connectNetatmoStatus,
-  //     showConnect: true
-  //   });
-  // }
-  // };
-
   loadStatus = async () => {
     try {
       const netatmoStatus = await this.props.httpClient.get('/api/v1/service/netatmo/status');

@@ -1,13 +1,13 @@
 import { Component } from 'preact';
 import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
-import { Link } from 'preact-router';
 import { connect } from 'unistore/preact';
 import dayjs from 'dayjs';
 import get from 'get-value';
 import DeviceFeatures from '../../../../components/device/view/DeviceFeatures';
 import BatteryLevelFeature from '../../../../components/device/view/BatteryLevelFeature';
-import { DEVICE_FEATURE_CATEGORIES } from '../../../../../../server/utils/constants';
+import { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } from '../../../../../../server/utils/constants';
+import { PARAMS } from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import styles from './style.css';
 
 class NetatmoDeviceBox extends Component {
@@ -97,22 +97,59 @@ class NetatmoDeviceBox extends Component {
   };
 
   getDeviceProperty = () => {
-    if (!this.state.device.features) {
+    const device = this.state.device;
+    if (!device.features) {
       return null;
     }
-    const batteryLevelDeviceFeature = this.state.device.features.find(
+    const batteryLevelDeviceFeature = device.features.find(
       deviceFeature => deviceFeature.category === DEVICE_FEATURE_CATEGORIES.BATTERY
     );
     const batteryLevel = get(batteryLevelDeviceFeature, 'last_value');
     let mostRecentValueAt = null;
-    this.state.device.features.forEach(feature => {
+    device.features.forEach(feature => {
       if (feature.last_value_changed && new Date(feature.last_value_changed) > mostRecentValueAt) {
         mostRecentValueAt = new Date(feature.last_value_changed);
       }
     });
+
+    let roomNameNetatmo = null;
+    const roomNameParam = device.params.find(param => param.name === PARAMS.ROOM_NAME);
+    if (roomNameParam) {
+      roomNameNetatmo = roomNameParam.value;
+    }
+
+    let plugName = null;
+    const plugNameParam = device.params.find(param => param.name === PARAMS.PLUG_NAME);
+    if (plugNameParam) {
+      plugName = plugNameParam.value;
+    }
+
+    let firmware = null;
+    const firmwareParam = device.params.find(param => param.name === PARAMS.FIRMWARE_REVISION);
+    if (firmwareParam) {
+      firmware = firmwareParam.value;
+    } else if (device.deviceNetatmo && device.deviceNetatmo.firmware_revision) {
+      firmware = device.deviceNetatmo.firmware_revision;
+    }
+
+    const reachableDeviceFeature = device.features.find(
+      deviceFeature =>
+        deviceFeature.category === DEVICE_FEATURE_CATEGORIES.SIGNAL &&
+        deviceFeature.type === DEVICE_FEATURE_TYPES.SIGNAL.BINARY
+    );
+    const reachable = get(reachableDeviceFeature, 'last_value');
+    const online =
+      reachable ||
+      (device.deviceNetatmo &&
+        (device.deviceNetatmo.reachable || device.deviceNetatmo.room.reachable || device.deviceNetatmo.last_seen));
+
     return {
       batteryLevel,
-      mostRecentValueAt
+      mostRecentValueAt,
+      roomNameNetatmo,
+      plugName,
+      firmware,
+      online
     };
   };
 
@@ -120,7 +157,6 @@ class NetatmoDeviceBox extends Component {
     {
       deviceIndex,
       editable,
-      editButton,
       deleteButton,
       saveButton,
       updateButton,
@@ -131,8 +167,9 @@ class NetatmoDeviceBox extends Component {
     { device, user, loading, errorMessage, tooMuchStatesError, statesNumber }
   ) {
     const validModel = device.features && device.features.length > 0;
-    const online = device.online;
-    const { batteryLevel, mostRecentValueAt } = this.getDeviceProperty();
+    const { batteryLevel, mostRecentValueAt, roomNameNetatmo, plugName, firmware, online } = this.getDeviceProperty();
+    const saveButtonCondition =
+      (saveButton && !alreadyCreatedButton) || (saveButton && !this.state.isSaving && alreadyCreatedButton);
     const modelImage = `../../../../assets/integrations/devices/netatmo/netatmo-${device.model}.jpg`;
     return (
       <div class="col-md-6">
@@ -144,16 +181,17 @@ class NetatmoDeviceBox extends Component {
                 &nbsp;{device.name}
               </div>
             </Localizer>
-            {device.deviceNetatmo && device.deviceNetatmo.firmware_revision && (
+            {firmware && (
               <div class={styles['firmware-revision']}>
                 <strong>
                   <Text id={`integration.netatmo.device.firmwareRevisionLabel`} />
                 </strong>
-                &nbsp;{device.deviceNetatmo.firmware_revision}
+                &nbsp;{firmware}
               </div>
             )}
             {showMostRecentValueAt && batteryLevel && (
-              <div class="page-options d-flex">
+              <div class={styles['battery-level']}>
+                {/* "page-options d-flex" */}
                 <BatteryLevelFeature batteryLevel={batteryLevel} />
               </div>
             )}
@@ -215,7 +253,7 @@ class NetatmoDeviceBox extends Component {
                     disabled="true"
                   />
                 </div>
-                {device.deviceNetatmo && device.deviceNetatmo.plug && device.deviceNetatmo.plug.name && (
+                {plugName && (
                   <div class="form-group">
                     <label class="form-label" for={`model_${deviceIndex}`}>
                       <Text id="integration.netatmo.device.connectedPlugLabel" />
@@ -223,13 +261,13 @@ class NetatmoDeviceBox extends Component {
                     <input
                       id={`connectedPlug_${deviceIndex}`}
                       type="text"
-                      value={device.deviceNetatmo.plug.name}
+                      value={plugName}
                       class="form-control"
                       disabled="true"
                     />
                   </div>
                 )}
-                {device.deviceNetatmo && device.deviceNetatmo.room && (
+                {roomNameNetatmo && (
                   <div class="form-group">
                     <label class="form-label" for={`model_${deviceIndex}`}>
                       <Text id="integration.netatmo.device.roomNetatmoApiLabel" />
@@ -237,7 +275,7 @@ class NetatmoDeviceBox extends Component {
                     <input
                       id={`connectedPlug_${deviceIndex}`}
                       type="text"
-                      value={device.deviceNetatmo.room.name}
+                      value={roomNameNetatmo}
                       class="form-control"
                       disabled="true"
                     />
@@ -279,7 +317,7 @@ class NetatmoDeviceBox extends Component {
                 )}
 
                 <div class="form-group">
-                  {validModel && alreadyCreatedButton && (
+                  {validModel && this.state.isSaving && alreadyCreatedButton && (
                     <button class="btn btn-primary mr-2" disabled="true">
                       <Text id="integration.netatmo.alreadyCreatedButton" />
                     </button>
@@ -291,19 +329,9 @@ class NetatmoDeviceBox extends Component {
                     </button>
                   )}
 
-                  {validModel && saveButton && (
-                    <button
-                      onClick={this.saveDevice}
-                      class={`btn ${this.state.isSaving ? 'btn-primary' : 'btn-success'} mr-2`}
-                      disabled={this.state.isSaving}
-                    >
-                      {this.state.isSaving ? (
-                        <Text id="integration.netatmo.alreadyCreatedButton" />
-                      ) : (
-                        <Text id="integration.netatmo.saveButton" />
-                      )}
-                      {/* {!this.state.isSaving && (<Text id="integration.netatmo.saveButton" />)}
-                      {this.state.isSaving && (<Text id="integration.netatmo.alreadyCreatedButton" />)} */}
+                  {validModel && saveButtonCondition && (
+                    <button onClick={this.saveDevice} class={`btn btn-success mr-2`}>
+                      <Text id="integration.netatmo.saveButton" />
                     </button>
                   )}
 
@@ -317,14 +345,6 @@ class NetatmoDeviceBox extends Component {
                     <button class="btn btn-dark" disabled>
                       <Text id="integration.netatmo.unmanagedModelButton" />
                     </button>
-                  )}
-
-                  {validModel && editButton && (
-                    <Link href={`/dashboard/integration/device/netatmo/edit/${device.selector}`}>
-                      <button class="btn btn-secondary float-right">
-                        <Text id="integration.netatmo.device.editButton" />
-                      </button>
-                    </Link>
                   )}
 
                   {validModel && showMostRecentValueAt && (

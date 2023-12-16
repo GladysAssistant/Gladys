@@ -65,6 +65,16 @@ const ENERGY_MODES = {
   SCHEDULE: 'schedule',
 };
 
+const PARAMS = {
+  HOME_ID: 'home_id',
+  ROOM_ID: 'room_id',
+  ROOM_NAME: 'room_name',
+  PLUG_ID: 'plug_id',
+  PLUG_NAME: 'plug_name',
+  FIRMWARE_REVISION: 'firmware_revision',
+  MODULES_BRIDGE_ID: 'modules_bridge_id',
+};
+
 module.exports = {
   GLADYS_VARIABLES,
   SCOPES,
@@ -72,4 +82,5 @@ module.exports = {
   API,
   SUPPORTED_MODULE_TYPE,
   ENERGY_MODES,
+  PARAMS,
 };

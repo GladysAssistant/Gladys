@@ -1,6 +1,6 @@
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
-const { API, STATUS } = require('./utils/netatmo.constants');
+const { API, STATUS, PARAMS } = require('./utils/netatmo.constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { writeValues } = require('./device/netatmo.deviceMapping');
 
@@ -14,8 +14,8 @@ const { writeValues } = require('./device/netatmo.deviceMapping');
  */
 async function setValue(device, deviceFeature, value) {
   const externalId = deviceFeature.external_id;
-  const homeId = device.params.find((oneParam) => oneParam.name === 'HOME_ID');
-  const roomId = device.params.find((oneParam) => oneParam.name === 'ROOM_ID');
+  const homeId = device.params.find((oneParam) => oneParam.name === PARAMS.HOME_ID);
+  const roomId = device.params.find((oneParam) => oneParam.name === PARAMS.ROOM_ID);
   if (!homeId || !roomId) {
     throw new BadParameters(
       `Netatmo device external_id: "${externalId}" should contains parameters "HOME_ID" and "ROOM_ID"`,

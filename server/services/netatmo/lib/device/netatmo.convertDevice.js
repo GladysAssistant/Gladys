@@ -7,7 +7,7 @@ const {
   buildFeatureOpenWindow,
 } = require('./netatmo.buildFeaturesCommonTemp');
 const logger = require('../../../../utils/logger');
-const { SUPPORTED_MODULE_TYPE } = require('../utils/netatmo.constants');
+const { SUPPORTED_MODULE_TYPE, PARAMS } = require('../utils/netatmo.constants');
 const { buildFeatureBattery, buildFeatureLastSeen } = require('./netatmo.buildFeaturesCommon');
 const {
   buildFeatureReachable,
@@ -56,9 +56,9 @@ function convertDevice(netatmoDevice) {
       features.push(buildFeatureBoilerStatus(name, externalId));
       /* params */
       params = [
-        { name: 'ROOM_ID', value: room.id },
-        { name: 'PLUG_ID', value: plug.id },
-        { name: 'FIRMWARE_REVISION', value: firmwareRevision },
+        { name: PARAMS.PLUG_ID, value: plug.id },
+        { name: PARAMS.PLUG_NAME, value: plug.name },
+        { name: PARAMS.FIRMWARE_REVISION, value: firmwareRevision },
       ];
       break;
     }
@@ -74,9 +74,8 @@ function convertDevice(netatmoDevice) {
       features.push(buildFeaturePlugConnectedBoiler(name, externalId));
       /* params */
       params = [
-        { name: 'ROOM_ID', value: room.id },
-        { name: 'MODULES_BRIDGE_ID', value: JSON.stringify(modulesBridged) },
-        { name: 'FIRMWARE_REVISION', value: firmwareRevision },
+        { name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) },
+        { name: PARAMS.FIRMWARE_REVISION, value: firmwareRevision },
       ];
       break;
     }
@@ -85,7 +84,11 @@ function convertDevice(netatmoDevice) {
   }
   /* features common to all devices */
   features.push(buildFeatureReachable(name, externalId));
-  params.push({ name: 'HOME_ID', value: homeId });
+  params.push(
+    { name: PARAMS.HOME_ID, value: homeId },
+    { name: PARAMS.ROOM_ID, value: room.id },
+    { name: PARAMS.ROOM_NAME, value: room.name },
+  );
 
   const device = {
     name,
