@@ -1,4 +1,3 @@
-const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 const { STATUS } = require('./utils/netatmo.constants');
 const logger = require('../../../utils/logger');
 const { updateValues } = require('./netatmo.saveValue');
@@ -14,16 +13,11 @@ const { updateValues } = require('./netatmo.saveValue');
 async function pollRefreshingValues(netatmoHandler) {
   netatmoHandler.pollRefreshValues = setInterval(async () => {
     logger.debug('Looking for Netatmo devices values...');
-    if (netatmoHandler.status !== STATUS.CONNECTED) {
-      clearInterval(netatmoHandler.pollRefreshValues);
-      throw new ServiceNotConfiguredError('Unable to get Netatmo devices values until service is not well configured');
-    }
-    await netatmoHandler.saveStatus({ statusType: STATUS.GET_DEVICES_VALUES, message: null });
+    await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.GET_DEVICES_VALUES, message: null });
 
     let devicesNetatmo = [];
     try {
       devicesNetatmo = await netatmoHandler.loadDevices();
-      logger.info(`${devicesNetatmo.length} getting Netatmo devices`);
     } catch (e) {
       logger.error('Unable to load Netatmo devices', e);
     }
@@ -35,8 +29,8 @@ async function pollRefreshingValues(netatmoHandler) {
         await updateValues(netatmoHandler, deviceExistInGladys, device, externalId);
       }
     });
-    await netatmoHandler.saveStatus({ statusType: STATUS.CONNECTED, message: null });
-  }, 60 * 1000);
+    await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED, message: null });
+  }, 120 * 1000);
 }
 
 /**
@@ -45,7 +39,7 @@ async function pollRefreshingValues(netatmoHandler) {
  * @param {object} netatmoHandler - Of nothing.
  * @returns {Promise} Promise of nothing.
  * @example
- * pollRefreshingToken(device);
+ * pollRefreshingToken(netatmoHandler);
  */
 async function pollRefreshingToken(netatmoHandler) {
   netatmoHandler.pollRefreshToken = setInterval(async () => {
@@ -55,19 +49,16 @@ async function pollRefreshingToken(netatmoHandler) {
     const response = await netatmoHandler.refreshingTokens();
     if (response.success) {
       logger.info('Netatmo successfull refresh token');
-      netatmoHandler.status = STATUS.CONNECTED;
-      netatmoHandler.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+      netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED, message: null });
     } else {
       logger.error('Netatmo no successfull refresh token and disconnect', response);
       const tokens = {
         accessToken: '',
         refreshToken: '',
         expireIn: '',
-        // connected: false,
       };
       await netatmoHandler.setTokens(tokens);
-      netatmoHandler.status = STATUS.ERROR.PROCESSING_TOKEN;
-      netatmoHandler.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: null });
+      netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.ERROR.PROCESSING_TOKEN, message: null });
     }
     if (netatmoHandler.expireInToken !== expireInToken) {
       netatmoHandler.expireInToken = expireInToken;

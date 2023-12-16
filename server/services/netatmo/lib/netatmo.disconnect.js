@@ -9,16 +9,16 @@ const { STATUS } = require('./utils/netatmo.constants');
  */
 function disconnect(netatmoHandler) {
   logger.debug('Disonnecting from Netatmo...');
-  netatmoHandler.saveStatus({ statusType: STATUS.DISCONNECTING, message: null });
+  netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.DISCONNECTING, message: null });
   const tokens = {
     accessToken: '',
     refreshToken: '',
     expireIn: 0,
-    // connected: false,
   };
   netatmoHandler.setTokens(netatmoHandler, tokens);
   clearInterval(netatmoHandler.pollRefreshToken);
-  netatmoHandler.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });
+  netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.DISCONNECTED, message: null });
+  logger.debug('Netatmo disconnected');
 }
 
 module.exports = {

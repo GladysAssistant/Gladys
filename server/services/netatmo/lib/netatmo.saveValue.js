@@ -1,4 +1,4 @@
-const { EVENTS } = require('../../../utils/constants');
+const { EVENTS, DEVICE_FEATURE_TYPES } = require('../../../utils/constants');
 const { BadParameters } = require('../../../utils/coreErrors');
 const logger = require('../../../utils/logger');
 const { readValues } = require('./device/netatmo.deviceMapping');
@@ -24,6 +24,10 @@ async function updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externa
     throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" have no network indicator`);
   }
   const { setpoint, measured, room } = deviceNetatmo;
+  const now = new Date();
+  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+  const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+
   deviceGladys.features.forEach((deviceFeature) => {
     const externalIdFeature = deviceFeature.external_id.split(':');
     const featureName = externalIdFeature[externalIdFeature.length - 1];
@@ -37,41 +41,70 @@ async function updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externa
     } else if (room && typeof room[featureName] !== 'undefined') {
       value = room[featureName];
     }
-    if (featureName === 'reachable' && typeof value === 'undefined') {
-      switch (deviceNetatmo.type) {
-        case SUPPORTED_MODULE_TYPE.PLUG: {
-          const now = new Date();
-          const thirtyMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
-          if (deviceNetatmo.last_therm_seen && new Date(deviceNetatmo.last_therm_seen) > thirtyMinutesAgo) {
+
+    switch (deviceNetatmo.type) {
+      case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
+        if (featureName === 'therm_setpoint_end_time' && typeof value === 'undefined') {
+          value = null;
+        }
+        break;
+      }
+      case SUPPORTED_MODULE_TYPE.PLUG: {
+        if (featureName === 'reachable' && typeof value === 'undefined') {
+          if (deviceNetatmo.last_plug_seen && new Date(deviceNetatmo.last_plug_seen * 1000) > oneHourAgo) {
             value = true;
             break;
           }
           value = false;
-          break;
         }
-        default:
-          break;
+        if (featureName === 'plug_connected_boiler' && typeof value === 'undefined') {
+          value = false;
+        }
+        if (featureName === 'last_plug_seen' && typeof value === 'undefined') {
+          value =
+            deviceNetatmo.reachable === true || deviceNetatmo.room.reachable === true
+              ? now.getTime() / 1000
+              : undefined;
+        }
+        break;
       }
+      default:
+        break;
     }
+
     if (typeof value !== 'undefined') {
       const transformedValue = readValues[deviceFeature.category][deviceFeature.type](value);
-      if (deviceFeature.last_value !== transformedValue && deviceFeature.type !== 'text') {
+      if (
+        (deviceFeature.last_value !== transformedValue || new Date(deviceFeature.last_value_changed) < tenMinutesAgo) &&
+        deviceFeature.type !== DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT
+      ) {
         if (transformedValue !== null && transformedValue !== undefined) {
           netatmoHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: deviceFeature.external_id,
             state: transformedValue,
           });
         }
-      } else if (deviceFeature.type === 'text' && deviceFeature.last_value_string !== transformedValue) {
+      } else if (
+        deviceFeature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT &&
+        deviceFeature.last_value_string !== value
+      ) {
         netatmoHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: deviceFeature.external_id,
-          text: transformedValue,
+          state: transformedValue,
+        });
+        netatmoHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: deviceFeature.external_id,
+          text: value,
         });
       }
     } else {
       logger.error(
         'deviceGladys: ',
         deviceGladys.name,
+        'deviceFeature.category: ',
+        deviceFeature.category,
+        'deviceFeature.type: ',
+        deviceFeature.type,
         'featureName: ',
         featureName,
         ' not found in the root of the Netatmo device nor in the other properties',

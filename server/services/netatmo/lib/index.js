@@ -20,10 +20,8 @@ const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.configuration = {
-    username: null,
     clientId: null,
     clientSecret: null,
-    // connected: null,
     scopes: {
       scopeEnergy: `${SCOPES.ENERGY.read} ${SCOPES.ENERGY.write}`,
     },

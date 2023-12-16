@@ -10,29 +10,6 @@ const {
  * @param {string} externalId - Gladys external ID.
  * @returns {object} Gladys feature or undefined.
  * @example
- * buildFeatureReachable(device_name, 'netatmo:device_id');
- */
-function buildFeatureReachable(name, externalId) {
-  return {
-    name: `Reachable (WiFi or Power) - ${name}`,
-    external_id: `${externalId}:reachable`,
-    selector: `${externalId}:reachable`,
-    category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-    type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-    read_only: true,
-    keep_history: true,
-    has_feedback: false,
-    min: 0,
-    max: 1,
-  };
-}
-
-/**
- * @description Transforms Netatmo feature as Gladys feature.
- * @param {string} name - Name device from Netatmo.
- * @param {string} externalId - Gladys external ID.
- * @returns {object} Gladys feature or undefined.
- * @example
  * buildFeatureBattery(device_name, 'netatmo:device_id');
  */
 function buildFeatureBattery(name, externalId) {
@@ -51,7 +28,31 @@ function buildFeatureBattery(name, externalId) {
   };
 }
 
+/**
+ * @description Transforms Netatmo feature as Gladys feature.
+ * @param {string} name - Name device from Netatmo.
+ * @param {string} externalId - Gladys external ID.
+ * @param {string} featureName - Netatmo feature name.
+ * @returns {object} Gladys feature or undefined.
+ * @example
+ * buildFeatureLastSeen(device_name, 'netatmo:device_id', 'last_therm_seen');
+ */
+function buildFeatureLastSeen(name, externalId, featureName) {
+  return {
+    name: `Last seen - ${name}`,
+    external_id: `${externalId}:${featureName}`,
+    selector: `${externalId}:${featureName}`,
+    category: DEVICE_FEATURE_CATEGORIES.SCHEDULE,
+    type: DEVICE_FEATURE_TYPES.SCHEDULE.TIME_DAY_HOUR,
+    read_only: true,
+    keep_history: true,
+    has_feedback: false,
+    min: 0,
+    max: 12 * 60 * 60 * 1000,
+  };
+}
+
 module.exports = {
-  buildFeatureReachable,
   buildFeatureBattery,
+  buildFeatureLastSeen,
 };

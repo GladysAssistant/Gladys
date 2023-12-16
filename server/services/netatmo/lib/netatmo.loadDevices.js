@@ -30,7 +30,6 @@ async function loadDevices() {
       listHomeDevices = results.filter((device) => device !== undefined).flat();
     }
     logger.debug(`${listHomeDevices.length} Netatmo devices loaded`);
-
     return listHomeDevices;
   } catch (e) {
     logger.error('e.status: ', e.status, 'e.data.error', e.response.data.error);

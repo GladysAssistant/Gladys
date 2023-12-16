@@ -10,10 +10,9 @@ const { STATUS } = require('./utils/netatmo.constants');
  */
 async function init(netatmoHandler) {
   await netatmoHandler.getConfiguration(netatmoHandler);
-  const { username, clientId, clientSecret } = netatmoHandler.configuration;
-  logger.warn(username, ' ', clientId);
-  if (!username || !clientId || !clientSecret) {
-    netatmoHandler.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
+  const { clientId, clientSecret } = netatmoHandler.configuration;
+  if (!clientId || !clientSecret) {
+    netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.NOT_INITIALIZED, message: null });
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
   }
   netatmoHandler.configured = true;
@@ -23,7 +22,7 @@ async function init(netatmoHandler) {
   if (netatmoHandler.accessToken && netatmoHandler.refreshToken) {
     const response = await netatmoHandler.refreshingTokens();
     if (response.success) {
-      netatmoHandler.saveStatus({ statusType: STATUS.CONNECTED, message: null });
+      netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED, message: null });
       logger.info('Netatmo successfull connect with status: ', netatmoHandler.status);
       await netatmoHandler.pollRefreshingToken(netatmoHandler);
       await netatmoHandler.pollRefreshingValues(netatmoHandler);
@@ -33,14 +32,13 @@ async function init(netatmoHandler) {
         accessToken: '',
         refreshToken: '',
         expireIn: '',
-        // connected: false,
       };
       await netatmoHandler.setTokens(tokens);
-      netatmoHandler.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: null });
+      netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.ERROR.PROCESSING_TOKEN, message: null });
     }
   } else {
     logger.debug('Netatmo no access or no refresh token');
-    netatmoHandler.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });
+    netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.DISCONNECTED, message: null });
   }
 }
 

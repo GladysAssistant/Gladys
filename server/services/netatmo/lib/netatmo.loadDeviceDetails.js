@@ -11,7 +11,7 @@ const { API, SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
  */
 async function loadDeviceDetails(homeData) {
   const homeId = homeData.id;
-  logger.debug('loadDeviceDetails...', homeId);
+  logger.debug('loading devices details in home id: ', homeId, '...');
   const paramsForm = {
     home_id: homeId,
   };
@@ -32,7 +32,7 @@ async function loadDeviceDetails(homeData) {
       modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.THERMOSTAT) !== undefined
     ) {
       try {
-        logger.debug('loadDeviceDetails Thermostats...', homeId);
+        logger.debug('loading Thermostats details...');
         const responseGetThermostat = await axios({
           url: API.GET_THERMOSTATS,
           method: 'get',
@@ -45,8 +45,14 @@ async function loadDeviceDetails(homeData) {
             modulesThermostat.push(...thermostat.modules);
           });
         }
+        logger.debug('Thermostats details loaded in home: ', homeId);
       } catch (e) {
-        logger.info('e.statusGetThermostat: ', e.statusGetThermostat, 'e.data.error', e.response.data.error);
+        logger.error(
+          'Error getting thermostats details - status error: ',
+          e.statusGetThermostat,
+          ' data error: ',
+          e.response.data.error,
+        );
         return undefined;
       }
     }
@@ -117,14 +123,20 @@ async function loadDeviceDetails(homeData) {
             )
           ).filter((item) => item !== undefined)
         : undefined;
-      logger.info('listDevices load: ', listDevices.length);
+      logger.debug('Devices details loaded in home: ', homeId);
     } else {
       logger.warn('Status load devices not ok: ', statusGetHomestatus);
     }
     return listDevices;
   } catch (e) {
-    logger.error('e: ', e);
-    // logger.error('e.statusGetHomestatus: ', e.statusGetHomestatus, 'e.data.error', e.response.data.error);
+    logger.error(
+      'Error getting devices details - error: ',
+      e,
+      ' - status error: ',
+      e.status,
+      ' data error: ',
+      e.response.data.error,
+    );
     return undefined;
   }
 }

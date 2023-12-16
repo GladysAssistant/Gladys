@@ -5,7 +5,7 @@ const querystring = require('querystring');
 const logger = require('../../../utils/logger');
 const { ServiceNotConfiguredError } = require('../../../utils/coreErrors');
 
-const { STATUS, SCOPES, API } = require('./utils/netatmo.constants');
+const { STATUS, API } = require('./utils/netatmo.constants');
 
 /**
  * @description Connect to Netatmo and getting code to get access tokens.
@@ -16,17 +16,15 @@ const { STATUS, SCOPES, API } = require('./utils/netatmo.constants');
  */
 async function connect(netatmoHandler) {
   const { clientId, clientSecret, scopes } = netatmoHandler.configuration;
-  console.log('netatmoHandler.configuration', netatmoHandler.configuration);
-  if (!clientId || !clientSecret || !scopes) {
-    await netatmoHandler.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
+  if (!clientId || !clientSecret) {
+    await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.NOT_INITIALIZED, message: null });
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
   }
-  await netatmoHandler.saveStatus({ statusType: STATUS.CONNECTING, message: null });
+  await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTING, message: null });
   logger.debug('Connecting to Netatmo...');
 
   netatmoHandler.stateGetAccessToken = crypto.randomBytes(16).toString('hex');
-  const scopeValue = scopes && scopes.scopeEnergy ? scopes.scopeEnergy : SCOPES.ENERGY.read;
-  console.log('scopeValue', scopeValue);
+  const scopeValue = scopes.scopeEnergy;
   netatmoHandler.redirectUri = `${API.OAUTH2}?client_id=${clientId}&scope=${encodeURIComponent(scopeValue)}&state=${
     netatmoHandler.stateGetAccessToken
   }`;
@@ -46,20 +44,21 @@ async function connect(netatmoHandler) {
  * );
  */
 async function retrieveTokens(netatmoHandler, body) {
+  logger.debug('Getting tokens to Netatmo API...');
   const { clientId, clientSecret, scopes } = netatmoHandler.configuration;
   const { codeOAuth, state, redirectUri } = body;
-  if (!clientId || !clientSecret || !scopes || !codeOAuth) {
-    await netatmoHandler.saveStatus({ statusType: STATUS.NOT_INITIALIZED, message: null });
+  if (!clientId || !clientSecret || !codeOAuth) {
+    await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.NOT_INITIALIZED, message: null });
     throw new ServiceNotConfiguredError('Netatmo is not configured.');
   }
   if (state !== netatmoHandler.stateGetAccessToken) {
-    await netatmoHandler.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });
+    await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.DISCONNECTED, message: null });
     throw new ServiceNotConfiguredError(
       'Netatmo did not connect correctly. The return does not correspond to the initial request',
     );
   }
-  await netatmoHandler.saveStatus({ statusType: STATUS.PROCESSING_TOKEN, message: null });
-  const scopeValue = scopes && scopes.scopeEnergy ? scopes.scopeEnergy : SCOPES.ENERGY.read;
+  await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.PROCESSING_TOKEN, message: null });
+  const scopeValue = scopes.scopeEnergy;
   const authentificationForm = {
     grant_type: 'authorization_code',
     client_id: clientId,
@@ -79,17 +78,19 @@ async function retrieveTokens(netatmoHandler, body) {
       accessToken: response.data.access_token,
       refreshToken: response.data.refresh_token,
       expireIn: response.data.expire_in,
-      // connected: true,
     };
     await netatmoHandler.setTokens(netatmoHandler, tokens);
     netatmoHandler.accessToken = tokens.accessToken;
-    await netatmoHandler.saveStatus({ statusType: STATUS.CONNECTED });
+    await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED });
     logger.debug('Netatmo new access tokens well loaded');
     await netatmoHandler.pollRefreshingToken(netatmoHandler);
     await netatmoHandler.pollRefreshingValues(netatmoHandler);
     return { success: true };
   } catch (e) {
-    netatmoHandler.saveStatus({ statusType: STATUS.ERROR.PROCESSING_TOKEN, message: 'get_access_token_fail' });
+    netatmoHandler.saveStatus(netatmoHandler, {
+      statusType: STATUS.ERROR.PROCESSING_TOKEN,
+      message: 'get_access_token_fail',
+    });
     logger.error('Error getting new accessToken to Netatmo - Details:', e.response ? e.response.data : e);
     throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);
   }

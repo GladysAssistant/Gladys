@@ -93,13 +93,11 @@ module.exports = function NetatmoController(netatmoHandler) {
     if (!netatmoHandler.discoveredDevices) {
       devices = await netatmoHandler.discoverDevices(netatmoHandler);
     } else {
-      // console.log(netatmoHandler.discoveredDevices)
       devices = netatmoHandler.discoveredDevices.filter((device) => {
         const existInGladys = netatmoHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
         return existInGladys === null;
       });
     }
-    console.log(devices);
     res.json(devices);
   }
 

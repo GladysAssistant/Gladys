@@ -24,7 +24,6 @@ async function getRefreshToken(netatmoHandler) {
       accessToken: '',
       refreshToken: '',
       expireIn: '',
-      // connected: false,
     };
     await netatmoHandler.setTokens(netatmoHandler, tokens);
     await this.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });

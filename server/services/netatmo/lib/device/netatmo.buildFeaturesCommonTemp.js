@@ -11,7 +11,7 @@ const {
  * @param {string} featureName - Gladys external ID.
  * @returns {object} Gladys feature or undefined.
  * @example
- * buildFeatureTemperature(device_name, 'netatmo:device_id');
+ * buildFeatureTemperature(device_name, 'netatmo:device_id', 'temperature');
  */
 function buildFeatureTemperature(name, externalId, featureName) {
   return {
@@ -69,7 +69,7 @@ function buildFeatureThermSetpointMode(name, externalId) {
     selector: `${externalId}:therm_setpoint_mode`,
     category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
     type: DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT,
-    read_only: false,
+    read_only: true,
     keep_history: false,
     has_feedback: false,
     min: 0,
@@ -93,7 +93,7 @@ function buildFeatureThermSetpointStartTime(name, externalId) {
     selector: `${externalId}:therm_setpoint_start_time`,
     category: DEVICE_FEATURE_CATEGORIES.SCHEDULE,
     type: DEVICE_FEATURE_TYPES.SCHEDULE.TIME_HOUR,
-    read_only: false,
+    read_only: true,
     keep_history: true,
     has_feedback: false,
     min: 0,
@@ -117,35 +117,11 @@ function buildFeatureThermSetpointEndTime(name, externalId) {
     selector: `${externalId}:therm_setpoint_end_time`,
     category: DEVICE_FEATURE_CATEGORIES.SCHEDULE,
     type: DEVICE_FEATURE_TYPES.SCHEDULE.TIME_HOUR,
-    read_only: false,
-    keep_history: true,
-    has_feedback: false,
-    min: 0,
-    max: 12 * 60 * 60 * 1000,
-  };
-}
-
-/**
- * @description Transforms Netatmo feature as Gladys feature. Thermostat ask heating.
- * @param {string} name - Name device from Netatmo.
- * @param {string} externalId - Gladys external ID.
- * @returns {object} Gladys feature or undefined.
- * @example
- * buildFeatureHeatingPowerRequest(device_name, 'netatmo:device_id');
- */
-function buildFeatureHeatingPowerRequest(name, externalId) {
-  return {
-    name: `Heating power request - ${name}`,
-    external_id: `${externalId}:heating_power_request`,
-    selector: `${externalId}:heating_power_request`,
-    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT_REQUEST_SENSOR,
-    type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
-    unit: DEVICE_FEATURE_UNITS.PERCENT,
     read_only: true,
     keep_history: true,
     has_feedback: false,
     min: 0,
-    max: 100,
+    max: 12 * 60 * 60 * 1000,
   };
 }
 
@@ -178,6 +154,5 @@ module.exports = {
   buildFeatureThermSetpointMode,
   buildFeatureThermSetpointStartTime,
   buildFeatureThermSetpointEndTime,
-  buildFeatureHeatingPowerRequest,
   buildFeatureOpenWindow,
 };

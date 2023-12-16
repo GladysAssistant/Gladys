@@ -37,7 +37,6 @@ async function refreshingTokens() {
       accessToken: response.data.access_token,
       refreshToken: response.data.refresh_token,
       expireIn: response.data.expire_in,
-      // connected: true,
     };
     await this.setTokens(this, tokens);
     await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
