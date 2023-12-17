@@ -1,6 +1,8 @@
 const sinon = require('sinon');
 const Promise = require('bluebird');
 
+const { assert: chaiAssert } = require('chai');
+
 const { assert, fake } = sinon;
 
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
@@ -24,6 +26,16 @@ describe('zwaveJSUIHandler.connect', () => {
 
   afterEach(() => {
     sinon.reset();
+  });
+
+  it('should not connect, mqttUrl not defined', async () => {
+    const gladysNotConfigured = {
+      variable: {
+        getValue: fake.resolves(null),
+      },
+    };
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladysNotConfigured, {}, serviceId);
+    await chaiAssert.isRejected(zwaveJSUIHandler.connect());
   });
 
   it('should connect to MQTT broker with success', async () => {

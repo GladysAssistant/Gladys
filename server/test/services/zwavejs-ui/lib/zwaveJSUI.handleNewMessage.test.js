@@ -34,6 +34,10 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
       JSON.stringify(data),
     );
   });
+  it('should not crash even with broken JSON', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    await zwaveJSUIHandler.handleNewMessage('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/getNodes', 'toto');
+  });
   it('should save a new open value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage(
