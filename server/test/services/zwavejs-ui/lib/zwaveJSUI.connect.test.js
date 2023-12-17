@@ -17,7 +17,7 @@ const gladys = {
   },
 };
 
-describe('zwaveJSUIHandler.init', () => {
+describe('zwaveJSUIHandler.connect', () => {
   beforeEach(() => {
     sinon.reset();
   });
@@ -30,6 +30,7 @@ describe('zwaveJSUIHandler.init', () => {
     const mqttClient = {
       end: fake.returns(null),
       removeAllListeners: fake.returns(null),
+      subscribe: fake.returns(null),
       on: (event, cb) => {
         if (event === 'connect') {
           cb();

@@ -21,7 +21,7 @@ describe('zwaveJSUIHandler.saveConfiguration', () => {
     sinon.reset();
   });
 
-  it('should connect to MQTT broker with success', async () => {
+  it('should save mqtt configuration', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.saveConfiguration({
       mqtt_url: 'mqtt://localhost',
