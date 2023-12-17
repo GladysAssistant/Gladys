@@ -24,6 +24,16 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
     sinon.reset();
   });
 
+  it('should save nodes received', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    const data = {
+      result: [],
+    };
+    await zwaveJSUIHandler.handleNewMessage(
+      'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/getNodes',
+      JSON.stringify(data),
+    );
+  });
   it('should save a new open value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage(
