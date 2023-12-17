@@ -78,5 +78,10 @@
     "key": "sonos",
     "link": "sonos",
     "img": "/assets/integrations/cover/sonos.jpg"
+  },
+  {
+    "key": "zwavejs-ui",
+    "link": "zwavejs-ui",
+    "img": "/assets/integrations/cover/zwave-js-ui.jpg"
   }
 ]

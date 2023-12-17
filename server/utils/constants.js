@@ -63,6 +63,11 @@ const MUSIC_PLAYBACK_STATE = {
   PAUSED: 0,
 };
 
+const OPENING_SENSOR_STATE = {
+  OPEN: 0,
+  CLOSE: 1,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -915,6 +920,11 @@ const WEBSOCKET_MESSAGE_TYPES = {
     ERROR: 'mqtt.error',
     INSTALLATION_STATUS: 'mqtt.install-status',
   },
+  ZWAVEJS_UI: {
+    CONNECTED: 'zwavejs-ui.connected',
+    ERROR: 'zwavejs-ui.error',
+    SCAN_COMPLETED: 'zwavejs-ui.scan-completed',
+  },
   ZIGBEE2MQTT: {
     DISCOVER: 'zigbee2mqtt.discover',
     STATUS_CHANGE: 'zigbee2mqtt.status-change',
@@ -1139,3 +1149,4 @@ module.exports.ALARM_MODES = ALARM_MODES;
 module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
 
 module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
+module.exports.OPENING_SENSOR_STATE = OPENING_SENSOR_STATE;

@@ -1,0 +1,4109 @@
+{
+  "success": true,
+  "message": "Success zwave api call",
+  "result": [
+    {
+      "id": 1,
+      "name": "",
+      "loc": "",
+      "values": {
+        "32-0-currentValue": {
+          "id": "1-32-0-currentValue",
+          "nodeId": 1,
+          "toUpdate": false,
+          "commandClass": 32,
+          "commandClassName": "Basic",
+          "endpoint": 0,
+          "property": "currentValue",
+          "propertyName": "currentValue",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Current value",
+          "stateless": false,
+          "commandClassVersion": 0,
+          "min": 0,
+          "max": 99,
+          "list": false,
+          "isCurrentValue": true,
+          "lastUpdate": 1702649469988
+        }
+      },
+      "groups": [],
+      "neighbors": [],
+      "ready": true,
+      "available": true,
+      "hassDevices": {},
+      "failed": false,
+      "inited": true,
+      "eventsQueue": [
+        {
+          "time": "2023-12-15T14:11:09.987Z",
+          "event": "alive",
+          "args": [0]
+        },
+        {
+          "time": "2023-12-15T14:11:10.007Z",
+          "event": "ready",
+          "args": []
+        }
+      ],
+      "status": "Alive",
+      "interviewStage": "Complete",
+      "priorityReturnRoute": {},
+      "customReturnRoute": {},
+      "customSUCReturnRoutes": [],
+      "applicationRoute": null,
+      "hexId": "0x0086 0x0001-0x005a",
+      "dbLink": "https://devices.zwave-js.io/?jumpTo=0x0086:0x0001:0x005a:1.2",
+      "manufacturerId": 134,
+      "productId": 90,
+      "productType": 1,
+      "deviceConfig": {
+        "filename": "/Users/pierregilles/code/zwave-js-ui/node_modules/@zwave-js/config/config/devices/0x0086/zw090.json",
+        "isEmbedded": true,
+        "manufacturer": "AEON Labs",
+        "manufacturerId": 134,
+        "label": "ZW090",
+        "description": "Z‐Stick Gen5 USB Controller",
+        "devices": [
+          { "productType": 1, "productId": 90 },
+          { "productType": 257, "productId": 90 },
+          { "productType": 513, "productId": 90 }
+        ],
+        "firmwareVersion": { "min": "0.0", "max": "255.255" },
+        "preferred": false,
+        "associations": {},
+        "paramInformation": { "_map": {} },
+        "compat": { "disableCallbackFunctionTypeCheck": [81, 85] },
+        "metadata": {
+          "reset": "Use this procedure only in the event that the primary controller is missing or otherwise inoperable.\n\nPress and hold the Action Button on Z-Stick for 20 seconds and then release",
+          "manual": "https://products.z-wavealliance.org/ProductManual/File?folder=&filename=MarketCertificationFiles/1345/Z%20Stick%20Gen5%20manual%201.pdf"
+        }
+      },
+      "productLabel": "ZW090",
+      "productDescription": "Z‐Stick Gen5 USB Controller",
+      "manufacturer": "AEON Labs",
+      "firmwareVersion": "1.2",
+      "sdkVersion": "6.81.6",
+      "protocolVersion": 3,
+      "endpointsCount": 0,
+      "endpoints": [{ "index": 0, "label": "Root Endpoint" }],
+      "supportsSecurity": false,
+      "supportsBeaming": true,
+      "isControllerNode": true,
+      "isListening": true,
+      "isFrequentListening": false,
+      "isRouting": true,
+      "keepAwake": false,
+      "maxDataRate": 100000,
+      "deviceClass": { "basic": 2, "generic": 2, "specific": 1 },
+      "lastActive": 1702653315161,
+      "firmwareCapabilities": { "firmwareUpgradable": false },
+      "deviceId": "134-90-1",
+      "hasDeviceConfigChanged": false,
+      "supportsTime": false,
+      "statistics": {
+        "messagesTX": 142,
+        "messagesRX": 142,
+        "messagesDroppedRX": 0,
+        "NAK": 0,
+        "CAN": 0,
+        "timeoutACK": 0,
+        "timeoutResponse": 0,
+        "timeoutCallback": 0,
+        "messagesDroppedTX": 0,
+        "backgroundRSSI": {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702653315163
+        }
+      },
+      "powerlevel": 0,
+      "measured0dBm": 1,
+      "bgRSSIPoints": [
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -69 },
+          "timestamp": 1702649475044
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -69 },
+          "timestamp": 1702649475044
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -71, "average": -69 },
+          "timestamp": 1702649505046
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -71, "average": -69 },
+          "timestamp": 1702649505046
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -75, "average": -70 },
+          "timestamp": 1702649535062
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -75, "average": -70 },
+          "timestamp": 1702649535062
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702649565048
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702649565048
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702649595051
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702649595051
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702649625055
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702649625055
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702649655052
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702649655052
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702649685050
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702649685050
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702649715055
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702649715055
+        },
+        {
+          "channel0": { "current": -72, "average": -69 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702649745061
+        },
+        {
+          "channel0": { "current": -72, "average": -69 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702649745061
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702649775066
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702649775066
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -79, "average": -71 },
+          "timestamp": 1702649805059
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -79, "average": -71 },
+          "timestamp": 1702649805059
+        },
+        {
+          "channel0": { "current": -72, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702649835065
+        },
+        {
+          "channel0": { "current": -72, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702649835065
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702649865061
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702649865061
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702649895063
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702649895063
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702649925064
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702649925064
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702649955068
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702649955068
+        },
+        {
+          "channel0": { "current": -65, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702649985063
+        },
+        {
+          "channel0": { "current": -65, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702649985063
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650015064
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650015064
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650045067
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650045067
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650075068
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650075068
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650105069
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650105069
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650135074
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650135074
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650165071
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650165071
+        },
+        {
+          "channel0": { "current": -65, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650195074
+        },
+        {
+          "channel0": { "current": -65, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650195074
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650225076
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650225076
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650255083
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650255083
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650285082
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650285082
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650315085
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650315085
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650345088
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650345088
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650375082
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650375082
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650405085
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650405085
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650435086
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650435086
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702650465094
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702650465094
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650495091
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650495091
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650525086
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650525086
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650555085
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650555085
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650585088
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650585088
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -68, "average": -71 },
+          "timestamp": 1702650615089
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -68, "average": -71 },
+          "timestamp": 1702650615089
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650645090
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650645090
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650675089
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702650675089
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650705091
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650705091
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650735094
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650735094
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650765092
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650765092
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702650795095
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702650795095
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650825107
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650825107
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650855098
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650855098
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650885095
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702650885095
+        },
+        {
+          "channel0": { "current": -72, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650915097
+        },
+        {
+          "channel0": { "current": -72, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650915097
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650945093
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702650945093
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650975096
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702650975096
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702651005096
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702651005096
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702651035096
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702651035096
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702651065102
+        },
+        {
+          "channel0": { "current": -66, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702651065102
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702651095099
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702651095099
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702651125102
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702651125102
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702651155105
+        },
+        {
+          "channel0": { "current": -71, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702651155105
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702651185105
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702651185105
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702651215112
+        },
+        {
+          "channel0": { "current": -68, "average": -69 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702651215112
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702651245106
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702651245106
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702651275117
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -75, "average": -71 },
+          "timestamp": 1702651275117
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702651305109
+        },
+        {
+          "channel0": { "current": -69, "average": -69 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702651305109
+        },
+        {
+          "channel0": { "current": -63, "average": -68 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702651335119
+        },
+        {
+          "channel0": { "current": -63, "average": -68 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702651335119
+        },
+        {
+          "channel0": { "current": -66, "average": -68 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702651365123
+        },
+        {
+          "channel0": { "current": -66, "average": -68 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702651365123
+        },
+        {
+          "channel0": { "current": -65, "average": -68 },
+          "channel1": { "current": -66, "average": -70 },
+          "timestamp": 1702651395109
+        },
+        {
+          "channel0": { "current": -65, "average": -68 },
+          "channel1": { "current": -66, "average": -70 },
+          "timestamp": 1702651395109
+        },
+        {
+          "channel0": { "current": -63, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651425110
+        },
+        {
+          "channel0": { "current": -63, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651425110
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651455110
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651455110
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651485114
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651485114
+        },
+        {
+          "channel0": { "current": -72, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702651515111
+        },
+        {
+          "channel0": { "current": -72, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702651515111
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702651545114
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702651545114
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702651575113
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702651575113
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702651605125
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702651605125
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702651635112
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702651635112
+        },
+        {
+          "channel0": { "current": -63, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651665107
+        },
+        {
+          "channel0": { "current": -63, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651665107
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651695110
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651695110
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702651725110
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702651725110
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702651755124
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702651755124
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651785116
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651785116
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651815115
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651815115
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702651845117
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702651845117
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651875125
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651875125
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651905126
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651905126
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651935122
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702651935122
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651965122
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651965122
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651995121
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702651995121
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652025123
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652025123
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652055131
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652055131
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652085126
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652085126
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652115127
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652115127
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652145128
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652145128
+        },
+        {
+          "channel0": { "current": -63, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702652175140
+        },
+        {
+          "channel0": { "current": -63, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702652175140
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652205142
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652205142
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652235148
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652235148
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652265141
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652265141
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652295137
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652295137
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652325138
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652325138
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652355139
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652355139
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652385138
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652385138
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652415140
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652415140
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702652445142
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702652445142
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702652475141
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -71, "average": -70 },
+          "timestamp": 1702652475141
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702652505143
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -68, "average": -70 },
+          "timestamp": 1702652505143
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652535143
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652535143
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652565144
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652565144
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652595137
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652595137
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -75, "average": -70 },
+          "timestamp": 1702652625143
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -75, "average": -70 },
+          "timestamp": 1702652625143
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652655144
+        },
+        {
+          "channel0": { "current": -71, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652655144
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652685149
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652685149
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652715144
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -70 },
+          "timestamp": 1702652715144
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652745146
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652745146
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652775146
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -70 },
+          "timestamp": 1702652775146
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652805154
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652805154
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652835150
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -72, "average": -70 },
+          "timestamp": 1702652835150
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -80, "average": -71 },
+          "timestamp": 1702652865151
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -80, "average": -71 },
+          "timestamp": 1702652865151
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702652895152
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702652895152
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702652925160
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702652925160
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702652955157
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702652955157
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702652985156
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702652985156
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702653015150
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702653015150
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702653045153
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702653045153
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702653075152
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -71, "average": -71 },
+          "timestamp": 1702653075152
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702653105160
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702653105160
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702653135168
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702653135168
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702653165165
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -69, "average": -71 },
+          "timestamp": 1702653165165
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702653195162
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702653195162
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702653225155
+        },
+        {
+          "channel0": { "current": -66, "average": -67 },
+          "channel1": { "current": -72, "average": -71 },
+          "timestamp": 1702653225155
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -68, "average": -71 },
+          "timestamp": 1702653255168
+        },
+        {
+          "channel0": { "current": -65, "average": -67 },
+          "channel1": { "current": -68, "average": -71 },
+          "timestamp": 1702653255168
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702653285161
+        },
+        {
+          "channel0": { "current": -69, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702653285161
+        },
+        {
+          "channel0": { "current": -68, "average": -67 },
+          "channel1": { "current": -74, "average": -71 },
+          "timestamp": 1702653315163
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "capteur-ouverture",
+      "loc": "salon",
+      "values": {
+        "49-0-Air temperature": {
+          "id": "2-49-0-Air temperature",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 49,
+          "commandClassName": "Multilevel Sensor",
+          "endpoint": 0,
+          "property": "Air temperature",
+          "propertyName": "Air temperature",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Air temperature",
+          "ccSpecific": { "sensorType": 1, "scale": 0 },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "unit": "°C",
+          "list": false,
+          "value": 19.2,
+          "lastUpdate": 1702651498703
+        },
+        "112-0-1": {
+          "id": "2-112-0-1",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 1,
+          "propertyName": "Door/window State",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "description": "What state is door/window when the magnet is close to the sensor",
+          "label": "Door/window State",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            { "text": "Closed when magnet near", "value": 0 },
+            { "text": "Opened when magnet near", "value": 1 }
+          ],
+          "value": 0,
+          "lastUpdate": 1702648857765
+        },
+        "112-0-3": {
+          "id": "2-112-0-3",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 3,
+          "propertyName": "Associations in Z-Wave Network Security Mode",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Associations in Z-Wave Network Security Mode",
+          "default": 3,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 3,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "None of the groups sent as secure",
+              "value": 0
+            },
+            {
+              "text": "2nd group \"On/off\" sent as secure",
+              "value": 1
+            },
+            {
+              "text": "3rd group \"Tamper\" sent as secure",
+              "value": 2
+            },
+            {
+              "text": "2nd and 3rd group sent as secure",
+              "value": 3
+            }
+          ],
+          "value": 3,
+          "lastUpdate": 1702648857807
+        },
+        "112-0-11": {
+          "id": "2-112-0-11",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 11,
+          "propertyName": "2nd Association Group Triggers",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "2nd Association Group Triggers",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 2,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Switch after opening and closing",
+              "value": 0
+            },
+            {
+              "text": "Switch after opening (Parameter 12)",
+              "value": 1
+            },
+            {
+              "text": "Switch after closing (Parameter 13)",
+              "value": 2
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1702648857849
+        },
+        "112-0-12": {
+          "id": "2-112-0-12",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 12,
+          "propertyName": "Value of ON Command Sent to 2nd Association Group",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Value of ON Command Sent to 2nd Association Group",
+          "default": 255,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 255,
+          "lastUpdate": 1702648857895
+        },
+        "112-0-13": {
+          "id": "2-112-0-13",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 13,
+          "propertyName": "Value of OFF Command Sent to 2nd Association Group",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Value of OFF Command Sent to 2nd Association Group",
+          "default": 255,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1702648857940
+        },
+        "112-0-14": {
+          "id": "2-112-0-14",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 14,
+          "propertyName": "Association for Opening - Time Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Association for Opening - Time Delay",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 32400,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1702648857985
+        },
+        "112-0-15": {
+          "id": "2-112-0-15",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 15,
+          "propertyName": "Association for Closing - Time Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Association for Closing - Time Delay",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 32400,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1702648858032
+        },
+        "112-0-30": {
+          "id": "2-112-0-30",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 30,
+          "propertyName": "Tamper - Alarm Cancellation Delay",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Tamper - Alarm Cancellation Delay",
+          "default": 5,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 32400,
+          "list": false,
+          "value": 5,
+          "lastUpdate": 1702648858078
+        },
+        "112-0-31": {
+          "id": "2-112-0-31",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 31,
+          "propertyName": "Tamper - Reporting Alarm Cancellation",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Tamper - Reporting Alarm Cancellation",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            {
+              "text": "Do not send tamper cancellation report",
+              "value": 0
+            },
+            {
+              "text": "Send tamper cancellation report",
+              "value": 1
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1702648858128
+        },
+        "112-0-50": {
+          "id": "2-112-0-50",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 50,
+          "propertyName": "Interval of Temperature Measurements",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Interval of Temperature Measurements",
+          "default": 300,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 32400,
+          "list": false,
+          "value": 300,
+          "lastUpdate": 1702648858176
+        },
+        "112-0-51": {
+          "id": "2-112-0-51",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 51,
+          "propertyName": "Temperature Reports Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Temperature Reports Threshold",
+          "default": 10,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 300,
+          "list": false,
+          "value": 10,
+          "lastUpdate": 1702648858219
+        },
+        "112-0-52": {
+          "id": "2-112-0-52",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 52,
+          "propertyName": "Interval of Temperature Reports",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Interval of Temperature Reports",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 32400,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1702648858264
+        },
+        "112-0-53": {
+          "id": "2-112-0-53",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 53,
+          "propertyName": "Temperature Offset",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Temperature Offset",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": -1000,
+          "max": 1000,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1702648858309
+        },
+        "112-0-54": {
+          "id": "2-112-0-54",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 54,
+          "propertyName": "Temperature Alarm Reports",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Temperature Alarm Reports",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 3,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            { "text": "Temperature alarms disabled", "value": 0 },
+            { "text": "High temperature alarm", "value": 1 },
+            { "text": "Low temperature alarm", "value": 2 },
+            {
+              "text": "High and low temperature alarms enabled",
+              "value": 3
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1702648858356
+        },
+        "112-0-55": {
+          "id": "2-112-0-55",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 55,
+          "propertyName": "High Temperature Alarm Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "High Temperature Alarm Threshold",
+          "default": 350,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 1,
+          "max": 600,
+          "list": false,
+          "value": 350,
+          "lastUpdate": 1702648858400
+        },
+        "112-0-56": {
+          "id": "2-112-0-56",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 56,
+          "propertyName": "Low Temperature Alarm Threshold",
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Low Temperature Alarm Threshold",
+          "default": 100,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 599,
+          "list": false,
+          "value": 100,
+          "lastUpdate": 1702648858449
+        },
+        "112-0-2-1": {
+          "id": "2-112-0-2-1",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 2,
+          "propertyName": "Visual LED Indications - Open/close",
+          "propertyKey": 1,
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Visual LED Indications - Open/close",
+          "default": 0,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            { "text": "No indication", "value": 0 },
+            { "text": "Open/Close indication", "value": 1 }
+          ],
+          "value": 0,
+          "lastUpdate": 1702648858493
+        },
+        "112-0-2-2": {
+          "id": "2-112-0-2-2",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 2,
+          "propertyName": "Visual LED Indications - Wake Up",
+          "propertyKey": 2,
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Visual LED Indications - Wake Up",
+          "default": 1,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            { "text": "No indication", "value": 0 },
+            { "text": "Enable wake up notification", "value": 1 }
+          ],
+          "value": 1,
+          "lastUpdate": 1702648858494
+        },
+        "112-0-2-4": {
+          "id": "2-112-0-2-4",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 112,
+          "commandClassName": "Configuration",
+          "endpoint": 0,
+          "property": 2,
+          "propertyName": "Visual LED Indications - Tampering",
+          "propertyKey": 4,
+          "type": "number",
+          "readable": true,
+          "writeable": true,
+          "label": "Visual LED Indications - Tampering",
+          "default": 1,
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 1,
+          "list": true,
+          "allowManualEntry": false,
+          "states": [
+            { "text": "No indication", "value": 0 },
+            {
+              "text": "Enable indication of device tampering",
+              "value": 1
+            }
+          ],
+          "value": 1,
+          "lastUpdate": 1702648858494
+        },
+        "113-0-Heat Alarm-Heat sensor status": {
+          "id": "2-113-0-Heat Alarm-Heat sensor status",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 113,
+          "commandClassName": "Notification",
+          "endpoint": 0,
+          "property": "Heat Alarm",
+          "propertyName": "Heat Alarm",
+          "propertyKey": "Heat sensor status",
+          "propertyKeyName": "Heat sensor status",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Heat sensor status",
+          "ccSpecific": { "notificationType": 4 },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            { "text": "idle", "value": 0 },
+            { "text": "Overheat detected", "value": 2 },
+            { "text": "Underheat detected", "value": 6 }
+          ],
+          "value": 0,
+          "lastUpdate": 1702648858777
+        },
+        "113-0-Home Security-Cover status": {
+          "id": "2-113-0-Home Security-Cover status",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 113,
+          "commandClassName": "Notification",
+          "endpoint": 0,
+          "property": "Home Security",
+          "propertyName": "Home Security",
+          "propertyKey": "Cover status",
+          "propertyKeyName": "Cover status",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Cover status",
+          "ccSpecific": { "notificationType": 7 },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            { "text": "idle", "value": 0 },
+            {
+              "text": "Tampering, product cover removed",
+              "value": 3
+            }
+          ],
+          "value": 0,
+          "lastUpdate": 1702648859067
+        },
+        "113-0-Power Management-Battery maintenance status": {
+          "id": "2-113-0-Power Management-Battery maintenance status",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 113,
+          "commandClassName": "Notification",
+          "endpoint": 0,
+          "property": "Power Management",
+          "propertyName": "Power Management",
+          "propertyKey": "Battery maintenance status",
+          "propertyKeyName": "Battery maintenance status",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Battery maintenance status",
+          "ccSpecific": { "notificationType": 8 },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            { "text": "idle", "value": 0 },
+            { "text": "Replace battery now", "value": 11 }
+          ],
+          "value": 0,
+          "lastUpdate": 1702648859209
+        },
+        "113-0-alarmType": {
+          "id": "2-113-0-alarmType",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 113,
+          "commandClassName": "Notification",
+          "endpoint": 0,
+          "property": "alarmType",
+          "propertyName": "alarmType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Alarm Type",
+          "stateless": false,
+          "commandClassVersion": 5,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1702650360959
+        },
+        "113-0-alarmLevel": {
+          "id": "2-113-0-alarmLevel",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 113,
+          "commandClassName": "Notification",
+          "endpoint": 0,
+          "property": "alarmLevel",
+          "propertyName": "alarmLevel",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Alarm Level",
+          "stateless": false,
+          "commandClassVersion": 5,
+          "min": 0,
+          "max": 255,
+          "list": false,
+          "value": 0,
+          "lastUpdate": 1702650360960
+        },
+        "113-0-Access Control-Door state (simple)": {
+          "id": "2-113-0-Access Control-Door state (simple)",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 113,
+          "commandClassName": "Notification",
+          "endpoint": 0,
+          "property": "Access Control",
+          "propertyName": "Access Control",
+          "propertyKey": "Door state (simple)",
+          "propertyKeyName": "Door state (simple)",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Door state (simple)",
+          "ccSpecific": { "notificationType": 6 },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            { "text": "Window/door is open", "value": 22 },
+            { "text": "Window/door is closed", "value": 23 }
+          ],
+          "value": 22,
+          "lastUpdate": 1702650360961
+        },
+        "113-0-Access Control-Door state": {
+          "id": "2-113-0-Access Control-Door state",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 113,
+          "commandClassName": "Notification",
+          "endpoint": 0,
+          "property": "Access Control",
+          "propertyName": "Access Control",
+          "propertyKey": "Door state",
+          "propertyKeyName": "Door state",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Door state",
+          "ccSpecific": { "notificationType": 6 },
+          "stateless": false,
+          "commandClassVersion": 5,
+          "min": 0,
+          "max": 255,
+          "list": true,
+          "states": [
+            { "text": "Window/door is open", "value": 22 },
+            { "text": "Window/door is closed", "value": 23 },
+            {
+              "text": "Window/door is open in regular position",
+              "value": 5632
+            },
+            {
+              "text": "Window/door is open in tilt position",
+              "value": 5633
+            }
+          ],
+          "value": 22,
+          "lastUpdate": 1702650360961
+        },
+        "114-0-manufacturerId": {
+          "id": "2-114-0-manufacturerId",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "manufacturerId",
+          "propertyName": "manufacturerId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Manufacturer ID",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 271,
+          "lastUpdate": 1702648855677
+        },
+        "114-0-productType": {
+          "id": "2-114-0-productType",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productType",
+          "propertyName": "productType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product type",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 1794,
+          "lastUpdate": 1702648855677
+        },
+        "114-0-productId": {
+          "id": "2-114-0-productId",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 114,
+          "commandClassName": "Manufacturer Specific",
+          "endpoint": 0,
+          "property": "productId",
+          "propertyName": "productId",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Product ID",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 65535,
+          "list": false,
+          "value": 4096,
+          "lastUpdate": 1702648855678
+        },
+        "128-0-level": {
+          "id": "2-128-0-level",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "level",
+          "propertyName": "level",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "min": 0,
+          "max": 100,
+          "unit": "%",
+          "list": false,
+          "value": 100,
+          "lastUpdate": 1702648856714
+        },
+        "128-0-isLow": {
+          "id": "2-128-0-isLow",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 128,
+          "commandClassName": "Battery",
+          "endpoint": 0,
+          "property": "isLow",
+          "propertyName": "isLow",
+          "type": "boolean",
+          "readable": true,
+          "writeable": false,
+          "label": "Low battery level",
+          "stateless": false,
+          "commandClassVersion": 1,
+          "list": false,
+          "value": false,
+          "lastUpdate": 1702648856716
+        },
+        "132-0-wakeUpInterval": {
+          "id": "2-132-0-wakeUpInterval",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "wakeUpInterval",
+          "propertyName": "wakeUpInterval",
+          "type": "number",
+          "readable": false,
+          "writeable": true,
+          "label": "wakeUpInterval (property)",
+          "default": 21600,
+          "stateless": false,
+          "commandClassVersion": 2,
+          "min": 0,
+          "max": 64800,
+          "step": 3600,
+          "list": false,
+          "value": 21600,
+          "lastUpdate": 1702648856565
+        },
+        "132-0-controllerNodeId": {
+          "id": "2-132-0-controllerNodeId",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 132,
+          "commandClassName": "Wake Up",
+          "endpoint": 0,
+          "property": "controllerNodeId",
+          "propertyName": "controllerNodeId",
+          "type": "any",
+          "readable": true,
+          "writeable": false,
+          "label": "Node ID of the controller",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": 1,
+          "lastUpdate": 1702648856603
+        },
+        "134-0-libraryType": {
+          "id": "2-134-0-libraryType",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "libraryType",
+          "propertyName": "libraryType",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Library type",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": true,
+          "states": [
+            { "text": "Unknown", "value": 0 },
+            { "text": "Static Controller", "value": 1 },
+            { "text": "Controller", "value": 2 },
+            { "text": "Enhanced Slave", "value": 3 },
+            { "text": "Slave", "value": 4 },
+            { "text": "Installer", "value": 5 },
+            { "text": "Routing Slave", "value": 6 },
+            { "text": "Bridge Controller", "value": 7 },
+            { "text": "Device under Test", "value": 8 },
+            { "text": "N/A", "value": 9 },
+            { "text": "AV Remote", "value": 10 },
+            { "text": "AV Device", "value": 11 }
+          ],
+          "value": 3,
+          "lastUpdate": 1702648855777
+        },
+        "134-0-protocolVersion": {
+          "id": "2-134-0-protocolVersion",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "protocolVersion",
+          "propertyName": "protocolVersion",
+          "type": "string",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave protocol version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": "4.38",
+          "lastUpdate": 1702648855778
+        },
+        "134-0-firmwareVersions": {
+          "id": "2-134-0-firmwareVersions",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "firmwareVersions",
+          "propertyName": "firmwareVersions",
+          "type": "string[]",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip firmware versions",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": ["3.2"],
+          "lastUpdate": 1702648855779
+        },
+        "134-0-hardwareVersion": {
+          "id": "2-134-0-hardwareVersion",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 134,
+          "commandClassName": "Version",
+          "endpoint": 0,
+          "property": "hardwareVersion",
+          "propertyName": "hardwareVersion",
+          "type": "number",
+          "readable": true,
+          "writeable": false,
+          "label": "Z-Wave chip hardware version",
+          "stateless": false,
+          "commandClassVersion": 2,
+          "list": false,
+          "value": 2,
+          "lastUpdate": 1702648855780
+        },
+        "119-0-name": {
+          "id": "2-119-0-name",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 119,
+          "commandClassName": "Node Naming and Location",
+          "property": "name",
+          "propertyName": "name",
+          "type": "string",
+          "readable": true,
+          "writeable": true,
+          "label": "Node name",
+          "stateless": false,
+          "commandClassVersion": 0,
+          "list": false,
+          "value": "Capteur ouverture/porte salon",
+          "lastUpdate": 1702653154778
+        },
+        "119-0-location": {
+          "id": "2-119-0-location",
+          "nodeId": 2,
+          "toUpdate": false,
+          "commandClass": 119,
+          "commandClassName": "Node Naming and Location",
+          "property": "location",
+          "propertyName": "location",
+          "type": "string",
+          "readable": true,
+          "writeable": true,
+          "label": "Node location",
+          "stateless": false,
+          "commandClassVersion": 0,
+          "list": false,
+          "value": "salon",
+          "lastUpdate": 1702653191305
+        }
+      },
+      "groups": [
+        {
+          "text": "Lifeline",
+          "endpoint": 0,
+          "value": 1,
+          "maxNodes": 1,
+          "isLifeline": true,
+          "multiChannel": true
+        },
+        {
+          "text": "On/Off",
+          "endpoint": 0,
+          "value": 2,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": true
+        },
+        {
+          "text": "Tamper",
+          "endpoint": 0,
+          "value": 3,
+          "maxNodes": 5,
+          "isLifeline": false,
+          "multiChannel": true
+        }
+      ],
+      "neighbors": [],
+      "ready": true,
+      "available": true,
+      "hassDevices": {},
+      "failed": false,
+      "inited": true,
+      "eventsQueue": [
+        {
+          "time": "2023-12-15T14:24:13.158Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:30.186Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:30.187Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:30.189Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:30.190Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:30.642Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:30.642Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:30.643Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:30.644Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:31.341Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:31.342Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:31.343Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:31.344Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:31.740Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:31.740Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:31.741Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:31.742Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:32.437Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:32.438Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:32.444Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:32.444Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:32.935Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:32.936Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:32.938Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:32.939Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.033Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.033Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.034Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.035Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.132Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.133Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.134Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.135Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.232Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.233Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.235Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.235Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.332Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.333Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.334Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.335Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.431Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.432Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.433Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.434Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.534Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.535Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.536Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:33.536Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.116Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.117Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.119Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.120Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.209Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.210Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.211Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.211Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.613Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.614Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.615Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.616Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.812Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.812Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.814Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:52.815Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:53.113Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:53.114Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:53.116Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:53.116Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:53.312Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:53.312Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:53.314Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:53.315Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:54.614Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:54.615Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:54.618Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:24:54.618Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:01.320Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:01.321Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:01.322Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:01.323Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:58.157Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:58.158Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:58.159Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:58.164Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:58.250Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:58.251Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:58.252Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:25:58.253Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:26:00.056Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:26:00.061Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:26:00.062Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:26:00.064Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 23,
+              "prevValue": 22,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:26:00.960Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmType",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmType"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:26:00.960Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "alarmLevel",
+              "endpoint": 0,
+              "newValue": 0,
+              "prevValue": 0,
+              "propertyName": "alarmLevel"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:26:00.961Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state (simple)",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state (simple)"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:26:00.962Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Notification",
+              "commandClass": 113,
+              "property": "Access Control",
+              "propertyKey": "Door state",
+              "endpoint": 0,
+              "newValue": 22,
+              "prevValue": 23,
+              "propertyName": "Access Control",
+              "propertyKeyName": "Door state"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T14:44:58.704Z",
+          "event": "value updated",
+          "args": [
+            {
+              "commandClassName": "Multilevel Sensor",
+              "commandClass": 49,
+              "property": "Air temperature",
+              "endpoint": 0,
+              "newValue": 19.2,
+              "prevValue": 21.3,
+              "propertyName": "Air temperature"
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T15:12:34.780Z",
+          "event": "value added",
+          "args": [
+            {
+              "commandClassName": "Node Naming and Location",
+              "commandClass": 119,
+              "property": "name",
+              "newValue": "Capteur ouverture/porte salon",
+              "propertyName": "name",
+              "nodeId": 2
+            }
+          ]
+        },
+        {
+          "time": "2023-12-15T15:13:11.310Z",
+          "event": "value added",
+          "args": [
+            {
+              "commandClassName": "Node Naming and Location",
+              "commandClass": 119,
+              "property": "location",
+              "newValue": "salon",
+              "propertyName": "location",
+              "nodeId": 2
+            }
+          ]
+        }
+      ],
+      "status": "Asleep",
+      "interviewStage": "Complete",
+      "priorityReturnRoute": {},
+      "customReturnRoute": {},
+      "prioritySUCReturnRoute": null,
+      "customSUCReturnRoutes": [],
+      "hexId": "0x010f 0x0702-0x1000",
+      "dbLink": "https://devices.zwave-js.io/?jumpTo=0x010f:0x0702:0x1000:3.2",
+      "manufacturerId": 271,
+      "productId": 4096,
+      "productType": 1794,
+      "deviceConfig": {
+        "filename": "/Users/pierregilles/code/zwave-js-ui/node_modules/@zwave-js/config/config/devices/0x010f/fgdw002.json",
+        "isEmbedded": true,
+        "manufacturer": "Fibargroup",
+        "manufacturerId": 271,
+        "label": "FGDW002",
+        "description": "Fibaro Door Window Sensor 2",
+        "devices": [
+          { "productType": 1794, "productId": 4096 },
+          { "productType": 1794, "productId": 8192 },
+          { "productType": 1794, "productId": 12288 },
+          { "productType": 1794, "productId": 16384 },
+          { "productType": 1794, "productId": 28672 }
+        ],
+        "firmwareVersion": { "min": "0.0", "max": "255.255" },
+        "preferred": false,
+        "paramInformation": { "_map": {} }
+      },
+      "productLabel": "FGDW002",
+      "productDescription": "Fibaro Door Window Sensor 2",
+      "manufacturer": "Fibargroup",
+      "firmwareVersion": "3.2",
+      "protocolVersion": 3,
+      "zwavePlusVersion": 1,
+      "zwavePlusNodeType": 0,
+      "zwavePlusRoleType": 6,
+      "nodeType": 1,
+      "endpointsCount": 0,
+      "endpoints": [{ "index": 0, "label": "Root Endpoint" }],
+      "isSecure": false,
+      "security": "None",
+      "supportsSecurity": false,
+      "supportsBeaming": true,
+      "isControllerNode": false,
+      "isListening": false,
+      "isFrequentListening": false,
+      "isRouting": true,
+      "keepAwake": false,
+      "maxDataRate": 100000,
+      "deviceClass": { "basic": 4, "generic": 7, "specific": 1 },
+      "lastActive": 1702651498694,
+      "firmwareCapabilities": {
+        "firmwareUpgradable": true,
+        "firmwareTargets": [0]
+      },
+      "deviceId": "271-4096-1794",
+      "hasDeviceConfigChanged": false,
+      "batteryLevels": { "0": 100 },
+      "minBatteryLevel": 100,
+      "supportsTime": false,
+      "statistics": {
+        "commandsTX": 0,
+        "commandsRX": 35,
+        "commandsDroppedRX": 0,
+        "commandsDroppedTX": 0,
+        "timeoutResponse": 0,
+        "lwr": { "repeaters": [], "protocolDataRate": 3 },
+        "lastSeen": "2023-12-15T14:44:58.694Z"
+      }
+    }
+  ],
+  "args": [],
+  "origin": true
+}
