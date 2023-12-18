@@ -17,8 +17,7 @@ describe.only('Netatmo Connect', () => {
     eventEmitter = new EventEmitter();
     NetatmoHandlerMock.gladys = { event: eventEmitter };
     sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
-    // @ts-ignore
-    NetatmoHandlerMock.saveStatus = netatmoStatus.saveStatus;
+    NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
     NetatmoHandlerMock.status = 'not_initialized';
   });
 

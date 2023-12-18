@@ -7,6 +7,7 @@ const discoverDevicesMock = require('./netatmo.discoverDevices.mock.test.json');
 const { STATUS, SCOPES } = require('../../../services/netatmo/lib/utils/netatmo.constants');
 
 const NetatmoHandlerMock = {
+  serviceId: 'serviceId',
   configuration: {
     clientId: null,
     clientSecret: null,
@@ -24,7 +25,6 @@ const NetatmoHandlerMock = {
   status: STATUS.NOT_INITIALIZED,
   pollRefreshToken: undefined,
   pollRefreshValues: undefined,
-  
   init: sinon.stub().resolves(),
   connect: sinon.stub().resolves(),
   disconnect: sinon.stub().resolves(),

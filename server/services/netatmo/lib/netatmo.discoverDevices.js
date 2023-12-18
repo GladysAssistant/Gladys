@@ -40,6 +40,7 @@ async function discoverDevices(netatmoHandler) {
     logger.debug(`${discoveredDevices.length} new Netatmo devices found`);
     return discoveredDevices;
   }
+  netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED, message: null });
   logger.debug('No devices found');
   return [];
 }

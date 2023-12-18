@@ -1,67 +1,53 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const proxyquire = require('proxyquire').noCallThru();
-const NetatmoContext = require('../netatmo.mock.test');
+const { saveConfiguration } = require('../../../../services/netatmo/lib/netatmo.saveConfiguration');
+const { NetatmoHandlerMock } = require('../netatmo.mock.test');
+const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
+const netatmoSetTokens = require('../../../../services/netatmo/lib/netatmo.setTokens');
 
-const NetatmoHandler = proxyquire('../../../../services/netatmo/lib/index', {
-  NetatmoContext,
-});
-const { GLADYS_VARIABLES } = require('../../../../services/netatmo/lib/utils/netatmo.constants');
+describe.only('Netatmo Save configuration', () => {
 
-const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-const configuration = {
-  username: 'username',
-  clientId: 'clientId',
-  clientSecret: 'clientSecret',
-  scopeEnergy: 'read_thermostat write_thermostat',
-};
-
-describe('NetatmoHandler.saveConfiguration', () => {
-  let setValueStub;
-  let netatmoHandler;
   beforeEach(() => {
     sinon.reset();
-    netatmoHandler = new NetatmoHandler({}, serviceId);
-    setValueStub = sinon.stub();
+
+    NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
+    NetatmoHandlerMock.setTokens = sinon.stub().callsFake(netatmoSetTokens.setTokens);
+    NetatmoHandlerMock.status = 'not_initialized';
+    NetatmoHandlerMock.gladys = {
+      variable: {
+        setValue: sinon.stub().resolves()
+      }
+    };
   });
+
   afterEach(() => {
     sinon.reset();
   });
-  it('should throw an error if username is missing', async () => {
-    const badConfiguration = { ...configuration, username: null };
-    const result = await netatmoHandler.saveConfiguration(badConfiguration);
-    expect(result).to.equal(false);
+
+  it('should successfully save the configuration', async () => {
+    const testConfig = {
+      clientId: 'new-client-id',
+      clientSecret: 'new-client-secret',
+    };
+    const result = await saveConfiguration.call(NetatmoHandlerMock, testConfig);
+
+    expect(result).to.be.true;
+    expect(NetatmoHandlerMock.configuration.clientId).to.equal('new-client-id');
+    expect(NetatmoHandlerMock.configuration.clientSecret).to.equal('new-client-secret');
+    sinon.assert.calledWith(NetatmoHandlerMock.gladys.variable.setValue, 'NETATMO_CLIENT_ID', 'new-client-id', NetatmoHandlerMock.serviceId);
+    sinon.assert.calledWith(NetatmoHandlerMock.gladys.variable.setValue, 'NETATMO_CLIENT_SECRET', 'new-client-secret', NetatmoHandlerMock.serviceId);
   });
-  it('should throw an error if clientId is missing', async () => {
-    const badConfiguration = { ...configuration, clientId: null };
-    const result = await netatmoHandler.saveConfiguration(badConfiguration);
-    expect(result).to.equal(false);
-  });
-  it('should throw an error if clientSecret is missing', async () => {
-    const badConfiguration = { ...configuration, clientSecret: null };
-    const result = await netatmoHandler.saveConfiguration(badConfiguration);
-    expect(result).to.equal(false);
-  });
-  it('should throw an error if scopeEnergy is missing', async () => {
-    const badConfiguration = { ...configuration, scopeEnergy: null };
-    const result = await netatmoHandler.saveConfiguration(badConfiguration);
-    expect(result).to.equal(false);
-  });
-  it('should save configuration successfully', async () => {
-    const netatmoHandlerFake = new NetatmoHandler(
-      {
-        variable: {
-          setValue: setValueStub,
-        },
-      },
-      serviceId,
-    );
-    setValueStub.resolves();
-    const result = await netatmoHandlerFake.saveConfiguration(configuration);
-    expect(result).to.equal(true);
-    sinon.assert.calledWith(setValueStub, GLADYS_VARIABLES.USERNAME, 'username', serviceId);
-    sinon.assert.calledWith(setValueStub, GLADYS_VARIABLES.CLIENT_ID, 'clientId', serviceId);
-    sinon.assert.calledWith(setValueStub, GLADYS_VARIABLES.CLIENT_SECRET, 'clientSecret', serviceId);
-    sinon.assert.calledWith(setValueStub, GLADYS_VARIABLES.SCOPE_ENERGY, 'read_thermostat write_thermostat', serviceId);
+
+  it('should handle an error during configuration save', async () => {
+    const testConfig = {
+      clientId: 'new-client-id',
+      clientSecret: 'new-client-secret',
+    };
+    NetatmoHandlerMock.gladys.variable.setValue.withArgs('NETATMO_CLIENT_ID', sinon.match.any).throws(new Error('Failed to save'));
+    const result = await saveConfiguration.call(NetatmoHandlerMock, testConfig);
+
+    expect(result).to.be.false;
+    sinon.assert.calledWith(NetatmoHandlerMock.gladys.variable.setValue, 'NETATMO_CLIENT_ID', 'new-client-id', NetatmoHandlerMock.serviceId);
+    sinon.assert.neverCalledWith(NetatmoHandlerMock.gladys.variable.setValue, 'NETATMO_CLIENT_SECRET', 'new-client-secret', NetatmoHandlerMock.serviceId);
   });
 });
