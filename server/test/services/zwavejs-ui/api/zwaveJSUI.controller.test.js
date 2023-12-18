@@ -8,6 +8,11 @@ const zwaveJSUIHandler = {
   connect: fake.resolves(null),
   saveConfiguration: fake.resolves(null),
   devices: [{ name: 'toto' }],
+  getConfiguration: fake.resolves({
+    mqtt_url: 'mqtt://localhost',
+    mqtt_username: 'my_username',
+    mqtt_password: 'my_password',
+  }),
   configured: true,
   connected: false,
 };
@@ -55,6 +60,20 @@ describe('ZwaveJSUIController', () => {
     await controller['post /api/v1/service/zwavejs-ui/configuration'].controller(req, res);
     assert.calledWith(zwaveJSUIHandler.saveConfiguration, req.body);
     assert.calledWith(res.json, { success: true });
+  });
+  it('should get configuration', async () => {
+    const req = {};
+    const res = {
+      json: fake.returns([]),
+    };
+
+    await controller['get /api/v1/service/zwavejs-ui/configuration'].controller(req, res);
+    assert.called(zwaveJSUIHandler.getConfiguration);
+    assert.calledWith(res.json, {
+      mqtt_url: 'mqtt://localhost',
+      mqtt_username: 'my_username',
+      mqtt_password: 'my_password',
+    });
   });
   it('should call getNodes function', async () => {
     const req = {};

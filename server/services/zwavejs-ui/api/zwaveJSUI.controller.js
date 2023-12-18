@@ -19,6 +19,16 @@ module.exports = function ZwaveJSUIController(zwaveJSUIHandler) {
     await zwaveJSUIHandler.saveConfiguration(req.body);
     res.json({ success: true });
   }
+
+  /**
+   * @api {get} /api/v1/service/zwavejs-ui/configuration Get configuration
+   * @apiName getConfiguration
+   * @apiGroup ZwaveJSUI
+   */
+  async function getConfiguration(req, res) {
+    const config = await zwaveJSUIHandler.getConfiguration();
+    res.json(config);
+  }
   /**
    * @api {post} /api/v1/service/zwavejs-ui/connect Connect to MQTT broker
    * @apiName connect
@@ -58,6 +68,10 @@ module.exports = function ZwaveJSUIController(zwaveJSUIHandler) {
     'post /api/v1/service/zwavejs-ui/configuration': {
       authenticated: true,
       controller: asyncMiddleware(saveConfiguration),
+    },
+    'get /api/v1/service/zwavejs-ui/configuration': {
+      authenticated: true,
+      controller: asyncMiddleware(getConfiguration),
     },
     'post /api/v1/service/zwavejs-ui/connect': {
       authenticated: true,

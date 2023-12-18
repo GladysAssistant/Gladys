@@ -56,17 +56,11 @@ class DiscoverTab extends Component {
 
   getConfiguration = async () => {
     try {
-      const { value: mqttUrl } = await this.props.httpClient.get(
-        `/api/v1/variable/${CONFIGURATION.ZWAVEJS_UI_MQTT_URL_KEY}`
-      );
-      await this.setState({ mqttUrl });
-      const { value: mqttUsername } = await this.props.httpClient.get(
-        `/api/v1/variable/${CONFIGURATION.ZWAVEJS_UI_MQTT_USERNAME_KEY}`
-      );
-      const { value: mqttPassword } = await this.props.httpClient.get(
-        `/api/v1/variable/${CONFIGURATION.ZWAVEJS_UI_MQTT_PASSWORD_KEY}`
-      );
-      await this.setState({ mqttUsername, mqttPassword });
+      const config = await this.props.httpClient.get('/api/v1/service/zwavejs-ui/configuration');
+      const mqttUrl = config.mqtt_url || '';
+      const mqttUsername = config.mqtt_username || '';
+      const mqttPassword = config.mqtt_password || '';
+      await this.setState({ mqttUrl, mqttUsername, mqttPassword });
     } catch (e) {
       console.error(e);
     }

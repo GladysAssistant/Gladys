@@ -1,6 +1,7 @@
 const { init } = require('./zwaveJSUI.init');
 const { connect } = require('./zwaveJSUI.connect');
 const { disconnect } = require('./zwaveJSUI.disconnect');
+const { getConfiguration } = require('./zwaveJSUI.getConfiguration');
 const { handleNewMessage } = require('./zwaveJSUI.handleNewMessage');
 const { onNewDeviceDiscover } = require('./zwaveJSUI.onNewDeviceDiscover');
 const { publish } = require('./zwaveJSUI.publish');
@@ -28,6 +29,7 @@ const ZwaveJSUIHandler = function ZwaveJSUIHandler(gladys, mqttLibrary, serviceI
 ZwaveJSUIHandler.prototype.init = init;
 ZwaveJSUIHandler.prototype.connect = connect;
 ZwaveJSUIHandler.prototype.disconnect = disconnect;
+ZwaveJSUIHandler.prototype.getConfiguration = getConfiguration;
 ZwaveJSUIHandler.prototype.handleNewMessage = handleNewMessage;
 ZwaveJSUIHandler.prototype.onNewDeviceDiscover = onNewDeviceDiscover;
 ZwaveJSUIHandler.prototype.publish = publish;
