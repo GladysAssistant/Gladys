@@ -1,7 +1,7 @@
 ---
 inject: true
 to: ../front/src/config/demo.js
-before: "\'get /api/v1/job?take=500\': ["
+before: "'get /api/v1/job?take=500': \\["
 skip_if: "get /api/v1/service/<%= module %>/device"
 ---
   'get /api/v1/service/<%= module %>': {
