@@ -476,9 +476,6 @@ const DEVICE_FEATURE_TYPES = {
     EFFECT_MODE: 'effect-mode',
     EFFECT_SPEED: 'effect-speed',
   },
-  BATTERY: {
-    INTEGER: 'integer',
-  },
   SENSOR: {
     DECIMAL: 'decimal',
     INTEGER: 'integer',
