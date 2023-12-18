@@ -12,6 +12,7 @@ const { forgotPassword } = require('./user.forgotPassword');
 const { update } = require('./user.update');
 const { updateBySelector } = require('./user.updateBySelector');
 const { updatePassword } = require('./user.updatePassword');
+const { getByRole } = require('./user.getByRole');
 
 const User = function User(session, stateManager, variable) {
   this.session = session;
@@ -33,5 +34,6 @@ User.prototype.getByTelegramUserId = getByTelegramUserId;
 User.prototype.update = update;
 User.prototype.updateBySelector = updateBySelector;
 User.prototype.updatePassword = updatePassword;
+User.prototype.getByRole = getByRole;
 
 module.exports = User;

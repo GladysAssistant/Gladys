@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const BluetoothPage = ({ children }) => (
+const BluetoothPage = ({ children, user }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -45,6 +46,18 @@ const BluetoothPage = ({ children }) => (
                     </span>
                     <Text id="integration.bluetooth.setupTab" />
                   </Link>
+
+                  <DeviceConfigurationLink
+                    user={user}
+                    configurationKey="integrations"
+                    documentKey="bluetooth"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.bluetooth.documentation" />
+                  </DeviceConfigurationLink>
                 </div>
               </div>
             </div>

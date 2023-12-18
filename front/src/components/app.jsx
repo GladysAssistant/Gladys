@@ -144,6 +144,10 @@ import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
 import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
 import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 
+// Sonos integration
+import SonosDevicePage from '../routes/integration/all/sonos/device-page';
+import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
+
 // MELCloud integration
 import MELCloudPage from '../routes/integration/all/melcloud/device-page';
 import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
@@ -283,6 +287,9 @@ const AppRouter = connect(
         <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
         <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
 
+        <SonosDevicePage path="/dashboard/integration/device/sonos" />
+        <SonosDiscoveryPage path="/dashboard/integration/device/sonos/discover" />
+
         <MELCloudPage path="/dashboard/integration/device/melcloud" />
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />
         <MELCloudDiscoverPage path="/dashboard/integration/device/melcloud/discover" />
@@ -306,8 +313,8 @@ const AppRouter = connect(
         <GoogleHomeWelcomePage path="/dashboard/integration/communication/googlehome" />
         <GoogleHomeGateway path="/dashboard/integration/device/google-home/authorize" />
         <AlexaWelcomePage path="/dashboard/integration/communication/alexa" />
-        <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <AlexaGateway path="/dashboard/integration/device/alexa/authorize" />
+        <OwntracksWelcomePage path="/dashboard/integration/device/owntracks" />
         <EnedisGateway path="/dashboard/integration/device/enedis" />
         <EnedisGatewayUsagePoints path="/dashboard/integration/device/enedis/usage-points" />
         <EnedisGateway path="/dashboard/integration/device/enedis/redirect" />

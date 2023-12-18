@@ -142,6 +142,14 @@ module.exports = {
         max: 100000,
       },
     },
+    illuminance: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.LIGHT_SENSOR,
+        type: DEVICE_FEATURE_TYPES.SENSOR.DECIMAL,
+        min: 0,
+        max: 100000,
+      },
+    },
     local_temperature: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR,
@@ -700,6 +708,14 @@ module.exports = {
         unit: DEVICE_FEATURE_UNITS.PPB,
         min: 0,
         max: 5500,
+      },
+    },
+    voc_index: {
+      feature: {
+        category: DEVICE_FEATURE_CATEGORIES.VOC_INDEX_SENSOR,
+        type: DEVICE_FEATURE_TYPES.VOC_INDEX_SENSOR.INTEGER,
+        min: 1,
+        max: 500,
       },
     },
     soil_moisture: {

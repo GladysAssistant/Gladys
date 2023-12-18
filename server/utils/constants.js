@@ -65,6 +65,11 @@ const VACBOT_MODE = {
   CHARGE: 2,
 };
 
+const MUSIC_PLAYBACK_STATE = {
+  PLAYING: 1,
+  PAUSED: 0,
+};
+
 const USER_ROLE = {
   ADMIN: 'admin',
   HABITANT: 'habitant',
@@ -106,6 +111,8 @@ const SYSTEM_VARIABLE_NAMES = {
   GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY: 'GLADYS_GATEWAY_ALEXA_USER_IS_CONNECTED_WITH_GATEWAY',
   GLADYS_GATEWAY_OPEN_AI_ENABLED: 'GLADYS_GATEWAY_OPEN_AI_ENABLED',
   TIMEZONE: 'TIMEZONE',
+  DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD: 'DEVICE_BATTERY_LEVEL_WARNING_THRESHOLD',
+  DEVICE_BATTERY_LEVEL_WARNING_ENABLED: 'DEVICE_BATTERY_LEVEL_WARNING_ENABLED',
 };
 
 const EVENTS = {
@@ -132,6 +139,7 @@ const EVENTS = {
     PURGE_STATES: 'device.purge-states',
     CALCULATE_HOURLY_AGGREGATE: 'device.calculate-hourly-aggregate',
     PURGE_STATES_SINGLE_FEATURE: 'device.purge-states-single-feature',
+    CHECK_BATTERIES: 'device.check-batteries',
   },
   GATEWAY: {
     CREATE_BACKUP: 'gateway.create-backup',
@@ -355,6 +363,12 @@ const ACTIONS = {
   ECOWATT: {
     CONDITION: 'ecowatt.condition',
   },
+  MQTT: {
+    SEND: 'mqtt.send',
+  },
+  MUSIC: {
+    PLAY_NOTIFICATION: 'music.play-notification',
+  },
 };
 
 const INTENTS = {
@@ -383,10 +397,11 @@ const INTENTS = {
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
-  ACCESS_CONTROL: 'access-control',
+  CHILD_LOCK: 'child-lock',
   AIRQUALITY_SENSOR: 'airquality-sensor',
   AIR_CONDITIONING: 'air-conditioning',
   BATTERY: 'battery',
+  BATTERY_LOW: 'battery-low',
   BUTTON: 'button',
   CAMERA: 'camera',
   CUBE: 'cube',
@@ -406,6 +421,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   LIGHT: 'light',
   LIGHT_SENSOR: 'light-sensor',
   MOTION_SENSOR: 'motion-sensor',
+  MUSIC: 'music',
   OPENING_SENSOR: 'opening-sensor',
   PM25_SENSOR: 'pm25-sensor',
   FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
@@ -422,6 +438,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   SURFACE: 'surface',
   SWITCH: 'switch',
   SPEED_SENSOR: 'speed-sensor',
+  TAMPER: 'tamper',
   TELEVISION: 'television',
   TEMPERATURE_SENSOR: 'temperature-sensor',
   THERMOSTAT: 'thermostat',
@@ -429,6 +446,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   UV_SENSOR: 'uv-sensor',
   VIBRATION_SENSOR: 'vibration-sensor',
   VOC_SENSOR: 'voc-sensor',
+  VOC_INDEX_SENSOR: 'voc-index-sensor',
   VOLUME_SENSOR: 'volume-sensor',
   TEXT: 'text',
 };
@@ -467,8 +485,8 @@ const DEVICE_FEATURE_TYPES = {
   SIREN: {
     BINARY: 'binary',
   },
-  ACCESS_CONTROL: {
-    MODE: 'mode',
+  CHILD_LOCK: {
+    BINARY: 'binary',
   },
   CUBE: {
     MODE: 'mode',
@@ -476,6 +494,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   BATTERY: {
     INTEGER: 'integer',
+  },
+  BATTERY_LOW: {
+    BINARY: 'binary',
   },
   VIBRATION_SENSOR: {
     BINARY: 'binary',
@@ -502,6 +523,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   SURFACE: {
     DECIMAL: 'decimal',
+  },
+  TAMPER: {
+    BINARY: 'binary',
   },
   TELEVISION: {
     BINARY: 'binary',
@@ -544,6 +568,15 @@ const DEVICE_FEATURE_TYPES = {
     STOP: 'stop',
     CHARGE: 'charge',
   },
+  MUSIC: {
+    VOLUME: 'volume',
+    PLAY: 'play',
+    PAUSE: 'pause',
+    PREVIOUS: 'previous',
+    NEXT: 'next',
+    PLAYBACK_STATE: 'playback_state',
+    PLAY_NOTIFICATION: 'play_notification',
+  },
   ENERGY_SENSOR: {
     BINARY: 'binary',
     POWER: 'power',
@@ -575,6 +608,9 @@ const DEVICE_FEATURE_TYPES = {
   },
   VOC_SENSOR: {
     DECIMAL: 'decimal',
+  },
+  VOC_INDEX_SENSOR: {
+    INTEGER: 'integer',
   },
   SHUTTER: {
     STATE: 'state',
@@ -960,6 +996,7 @@ const DASHBOARD_BOX_TYPE = {
   VACBOT: 'vacbot',
   CLOCK: 'clock',
   SCENE: 'scene',
+  MUSIC: 'music',
 };
 
 const ERROR_MESSAGES = {
@@ -1125,3 +1162,5 @@ module.exports.DEFAULT_VALUE_TEMPERATURE = DEFAULT_VALUE_TEMPERATURE;
 
 module.exports.ALARM_MODES = ALARM_MODES;
 module.exports.ALARM_MODES_LIST = ALARM_MODES_LIST;
+
+module.exports.MUSIC_PLAYBACK_STATE = MUSIC_PLAYBACK_STATE;
