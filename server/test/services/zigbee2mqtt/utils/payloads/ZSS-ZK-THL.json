@@ -178,7 +178,7 @@
         "max": 100000,
         "category": "light-sensor",
         "type": "decimal",
-        "unit": "lux",
+        "unit": null,
         "external_id": "zigbee2mqtt:0xe0798dfffedeae2b:light-sensor:decimal:illuminance",
         "selector": "zigbee2mqtt-0xe0798dfffedeae2b-light-sensor-decimal-illuminance"
       },
