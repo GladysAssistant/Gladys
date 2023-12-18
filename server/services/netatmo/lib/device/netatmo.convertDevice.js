@@ -1,19 +1,12 @@
 const {
   buildFeatureTemperature,
   buildFeatureThermSetpointTemperature,
-  buildFeatureThermSetpointMode,
-  buildFeatureThermSetpointEndTime,
-  buildFeatureThermSetpointStartTime,
   buildFeatureOpenWindow,
 } = require('./netatmo.buildFeaturesCommonTemp');
 const logger = require('../../../../utils/logger');
 const { SUPPORTED_MODULE_TYPE, PARAMS } = require('../utils/netatmo.constants');
-const { buildFeatureBattery, buildFeatureLastSeen } = require('./netatmo.buildFeaturesCommon');
-const {
-  buildFeatureReachable,
-  buildFeatureRfStrength,
-  buildFeatureWifiStrength,
-} = require('./netatmo.buildFeaturesSignal');
+const { buildFeatureBattery } = require('./netatmo.buildFeaturesCommon');
+const { buildFeatureRfStrength, buildFeatureWifiStrength } = require('./netatmo.buildFeaturesSignal');
 const { buildFeatureBoilerStatus, buildFeaturePlugConnectedBoiler } = require('./netatmo.buildFeaturesSpecifEnergy');
 
 /**
@@ -41,14 +34,10 @@ function convertDevice(netatmoDevice) {
     case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
       /* features common */
       features.push(buildFeatureBattery(name, externalId));
-      features.push(buildFeatureLastSeen(name, externalId, 'last_therm_seen'));
       /* features common Netatmo Energy */
       features.push(buildFeatureTemperature(name, externalId, 'temperature'));
       features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
       features.push(buildFeatureThermSetpointTemperature(name, externalId));
-      features.push(buildFeatureThermSetpointMode(name, externalId));
-      features.push(buildFeatureThermSetpointStartTime(name, externalId));
-      features.push(buildFeatureThermSetpointEndTime(name, externalId));
       features.push(buildFeatureOpenWindow(name, externalId));
       /* features common modules RF */
       features.push(buildFeatureRfStrength(name, externalId));
@@ -64,8 +53,6 @@ function convertDevice(netatmoDevice) {
     }
     case SUPPORTED_MODULE_TYPE.PLUG: {
       const modulesBridged = netatmoDevice.modules_bridged || [];
-      /* features common */
-      features.push(buildFeatureLastSeen(name, externalId, 'last_plug_seen'));
       /* features common modules RF */
       features.push(buildFeatureRfStrength(name, externalId));
       /* features common modules WiFi */
@@ -83,13 +70,10 @@ function convertDevice(netatmoDevice) {
       break;
   }
   /* features common to all devices */
-  features.push(buildFeatureReachable(name, externalId));
-  params.push(
-    { name: PARAMS.HOME_ID, value: homeId },
-    { name: PARAMS.ROOM_ID, value: room.id },
-    { name: PARAMS.ROOM_NAME, value: room.name },
-  );
-
+  params.push({ name: PARAMS.HOME_ID, value: homeId });
+  if (room.id) {
+    params.push({ name: PARAMS.ROOM_ID, value: room.id }, { name: PARAMS.ROOM_NAME, value: room.name });
+  }
   const device = {
     name,
     external_id: externalId,
@@ -100,6 +84,9 @@ function convertDevice(netatmoDevice) {
     features: features.filter((feature) => feature),
     params: params.filter((param) => param),
   };
+  if (netatmoDevice.not_handled) {
+    device.not_handled = true;
+  }
 
   logger.info(`Netatmo "${name}, ${model}" device converted`);
   return device;

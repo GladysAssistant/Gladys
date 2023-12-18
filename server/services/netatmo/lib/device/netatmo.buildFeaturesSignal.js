@@ -2,29 +2,6 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../..
 
 /**
  * @description Transforms Netatmo feature as Gladys feature.
- * @param {string} name - Name device from Netatmo.
- * @param {string} externalId - Gladys external ID.
- * @returns {object} Gladys feature or undefined.
- * @example
- * buildFeatureReachable(device_name, 'netatmo:device_id');
- */
-function buildFeatureReachable(name, externalId) {
-  return {
-    name: `Reachable (WiFi or Power) - ${name}`,
-    external_id: `${externalId}:reachable`,
-    selector: `${externalId}:reachable`,
-    category: DEVICE_FEATURE_CATEGORIES.SIGNAL,
-    type: DEVICE_FEATURE_TYPES.SIGNAL.BINARY,
-    read_only: true,
-    keep_history: true,
-    has_feedback: false,
-    min: 0,
-    max: 1,
-  };
-}
-
-/**
- * @description Transforms Netatmo feature as Gladys feature.
  * Signal RF strength (no signal, weak, average, good or excellent).
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
@@ -72,7 +49,6 @@ function buildFeatureWifiStrength(name, externalId) {
 }
 
 module.exports = {
-  buildFeatureReachable,
   buildFeatureRfStrength,
   buildFeatureWifiStrength,
 };

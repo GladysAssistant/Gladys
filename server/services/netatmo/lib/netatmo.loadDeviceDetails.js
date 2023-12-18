@@ -1,6 +1,6 @@
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
-const { API, SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
+const { API, SUPPORTED_MODULE_TYPE, SUPPORTED_CATEGORY_TYPE } = require('./utils/netatmo.constants');
 
 /**
  * @description Discover Netatmo cloud devices.
@@ -25,7 +25,6 @@ async function loadDeviceDetails(homeData) {
     const { body: bodyGetHomestatus, status: statusGetHomestatus } = responseGetHomestatus.data;
     const { rooms: roomsHomeData, modules: modulesHomeData } = homeData;
     const { rooms: roomsHomestatus, modules: modulesHomestatus } = bodyGetHomestatus.home;
-
     let thermostats;
     let modulesThermostat = [];
     if (
@@ -42,6 +41,7 @@ async function loadDeviceDetails(homeData) {
             await Promise.all(
               modulesHomestatus.map(async (module) => {
                 let moduleSupported = false;
+                let categoryAPI;
                 let device;
                 let plugThermostat;
                 switch (module.type) {
@@ -60,6 +60,7 @@ async function loadDeviceDetails(homeData) {
                         // eslint-disable-next-line no-underscore-dangle
                         .find((thermostat) => thermostat._id === module.bridge);
                     }
+                    categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
                     break;
                   case SUPPORTED_MODULE_TYPE.PLUG:
                     device = thermostats
@@ -70,23 +71,24 @@ async function loadDeviceDetails(homeData) {
                       // eslint-disable-next-line no-underscore-dangle
                       .find((thermostat) => thermostat._id === module.id);
                     moduleSupported = true;
+                    categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
                     break;
                   default:
                     moduleSupported = false;
                     break;
                 }
+                const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);
+                const roomDevice = {
+                  ...roomsHomeData.find((roomHomeData) => roomHomeData.id === moduleHomeData.room_id),
+                  ...roomsHomestatus.find((room) => room.id === moduleHomeData.room_id),
+                };
+                const plugDevice = {
+                  ...modulesHomeData.find((mod) => mod.id === module.bridge),
+                  ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
+                  ...plugThermostat,
+                };
+                const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
                 if (moduleSupported) {
-                  const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);
-                  const roomDevice = {
-                    ...roomsHomeData.find((roomHomeData) => roomHomeData.id === moduleHomeData.room_id),
-                    ...roomsHomestatus.find((room) => room.id === moduleHomeData.room_id),
-                  };
-                  const plugDevice = {
-                    ...modulesHomeData.find((mod) => mod.id === module.bridge),
-                    ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
-                    ...plugThermostat,
-                  };
-                  const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
                   const deviceSupported = {
                     ...module,
                     ...moduleHomeData,
@@ -94,10 +96,20 @@ async function loadDeviceDetails(homeData) {
                     home: homeId,
                     room: roomDevice,
                     plug,
+                    categoryAPI,
                   };
                   return deviceSupported;
                 }
-                return undefined;
+                const deviceNotSupported = {
+                  ...module,
+                  ...moduleHomeData,
+                  ...device,
+                  home: homeId,
+                  room: roomDevice,
+                  plug,
+                  not_handled: true,
+                };
+                return deviceNotSupported;
               }),
             )
           ).filter((item) => item !== undefined)

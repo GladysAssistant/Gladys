@@ -416,13 +416,11 @@ const DEVICE_FEATURE_CATEGORIES = {
   MOTION_SENSOR: 'motion-sensor',
   MUSIC: 'music',
   OPENING_SENSOR: 'opening-sensor',
-  ORIENTATION_SENSOR: 'orientation-sensor',
   PM25_SENSOR: 'pm25-sensor',
   FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
   PRECIPITATION_SENSOR: 'precipitation-sensor',
   PRESENCE_SENSOR: 'presence-sensor',
   PRESSURE_SENSOR: 'pressure-sensor',
-  SCHEDULE: 'schedule',
   SHUTTER: 'shutter',
   SIGNAL: 'signal',
   SIREN: 'siren',
@@ -508,7 +506,6 @@ const DEVICE_FEATURE_TYPES = {
     CLICK: 'click',
   },
   SIGNAL: {
-    BINARY: 'binary',
     QUALITY: 'integer',
   },
   AIR_CONDITIONING: {
@@ -571,10 +568,6 @@ const DEVICE_FEATURE_TYPES = {
     INDEX: 'index',
     DAILY_CONSUMPTION: 'daily-consumption',
   },
-  SCHEDULE: {
-    TIME_DAY_HOUR: 'time-day-hour',
-    TIME_HOUR: 'time-hour',
-  },
   SPEED_SENSOR: {
     DECIMAL: 'decimal',
   },
@@ -620,7 +613,6 @@ const DEVICE_FEATURE_TYPES = {
   },
   THERMOSTAT: {
     TARGET_TEMPERATURE: 'target-temperature',
-    TEXT: 'text',
   },
   AIRQUALITY_SENSOR: {
     AQI: 'aqi',
@@ -845,7 +837,6 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.SQUARE_METER,
     DEVICE_FEATURE_UNITS.SQUARE_KILOMETER,
   ],
-  [DEVICE_FEATURE_CATEGORIES.ORIENTATION_SENSOR]: [DEVICE_FEATURE_UNITS.DEGREE],
 };
 
 const ACTIONS_STATUS = {

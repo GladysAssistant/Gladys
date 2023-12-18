@@ -32,7 +32,6 @@ async function discoverDevices(netatmoHandler) {
       service_id: netatmoHandler.serviceId,
       deviceNetatmo: device,
     }));
-
     const discoveredDevices = netatmoHandler.discoveredDevices.filter((device) => {
       const existInGladys = netatmoHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
       return existInGladys === null;

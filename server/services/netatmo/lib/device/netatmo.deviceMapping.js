@@ -1,37 +1,10 @@
 const { DEVICE_FEATURE_TYPES, DEVICE_FEATURE_CATEGORIES } = require('../../../../utils/constants');
-const { ENERGY_MODES } = require('../utils/netatmo.constants');
 
 const writeValues = {
   [DEVICE_FEATURE_CATEGORIES.THERMOSTAT]: {
     /* therm_setpoint_temperature: 14 */
     [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromDevice) => {
       return valueFromDevice;
-    },
-    /* mode: therm_setpoint_mode = "program", "away", "hg", "manual", "off", "max", "schedule" */
-    [DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT]: (valueFromGladys) => {
-      let valueToDevice;
-      if (valueFromGladys === 0) {
-        valueToDevice = ENERGY_MODES.OFF;
-      }
-      if (valueFromGladys === 1) {
-        valueToDevice = ENERGY_MODES.PROGRAM;
-      }
-      if (valueFromGladys === 2) {
-        valueToDevice = ENERGY_MODES.AWAY;
-      }
-      if (valueFromGladys === 3) {
-        valueToDevice = ENERGY_MODES.HG;
-      }
-      if (valueFromGladys === 4) {
-        valueToDevice = ENERGY_MODES.MANUAL;
-      }
-      if (valueFromGladys === 5) {
-        valueToDevice = ENERGY_MODES.MAX;
-      }
-      if (valueFromGladys === 6) {
-        valueToDevice = ENERGY_MODES.SCHEDULE;
-      }
-      return valueToDevice;
     },
   },
 };
@@ -41,45 +14,12 @@ const readValues = {
     [DEVICE_FEATURE_TYPES.THERMOSTAT.TARGET_TEMPERATURE]: (valueFromDevice) => {
       return valueFromDevice;
     },
-    /* therm_setpoint_mode: "program", "away", "hg", "manual", "off", "max", "schedule" */
-    [DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT]: (valueFromDevice) => {
-      let valueToGladys;
-      if (valueFromDevice === ENERGY_MODES.OFF) {
-        valueToGladys = 0;
-      }
-      if (valueFromDevice === ENERGY_MODES.PROGRAM) {
-        valueToGladys = 1;
-      }
-      if (valueFromDevice === ENERGY_MODES.AWAY) {
-        valueToGladys = 2;
-      }
-      if (valueFromDevice === ENERGY_MODES.HG) {
-        valueToGladys = 3;
-      }
-      if (valueFromDevice === ENERGY_MODES.MANUAL) {
-        valueToGladys = 4;
-      }
-      if (valueFromDevice === ENERGY_MODES.MAX) {
-        valueToGladys = 5;
-      }
-      if (valueFromDevice === ENERGY_MODES.SCHEDULE) {
-        valueToGladys = 6;
-      }
-      return valueToGladys;
-    },
   },
   [DEVICE_FEATURE_CATEGORIES.SWITCH]: {
     /* plug_connected_boiler: 1 */
     /* boiler_status: true */
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {
       const valueToGladys = valueFromDevice === (true || 1) ? 1 : 0;
-      return valueToGladys;
-    },
-  },
-  [DEVICE_FEATURE_CATEGORIES.ORIENTATION_SENSOR]: {
-    /* therm_orientation: 1 */
-    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice) => {
-      const valueToGladys = parseInt(valueFromDevice, 10);
       return valueToGladys;
     },
   },
@@ -97,29 +37,10 @@ const readValues = {
     },
   },
   [DEVICE_FEATURE_CATEGORIES.SIGNAL]: {
-    /* reachable: true or room.reachable: true */
-    [DEVICE_FEATURE_TYPES.SIGNAL.BINARY]: (valueFromDevice) => {
-      const valueToGladys = valueFromDevice === (true || 1) ? 1 : 0;
-      return valueToGladys;
-    },
     /* rf_strength: 76 */
     /* wifi_strength: 76 */
     [DEVICE_FEATURE_TYPES.SIGNAL.QUALITY]: (valueFromDevice) => {
       const valueToGladys = parseInt(valueFromDevice, 10);
-      return valueToGladys;
-    },
-  },
-  [DEVICE_FEATURE_CATEGORIES.SCHEDULE]: {
-    /* room.therm_setpoint_start_time: 1701382473 */
-    /* room.therm_setpoint_end_time: 1701382473 */
-    /* last_therm_seen: 1701493502 */
-    /* last_plug_seen: 1701493502 */
-    [DEVICE_FEATURE_TYPES.SCHEDULE.TIME_HOUR]: (valueFromDevice) => {
-      const valueToGladys = valueFromDevice * 1000;
-      return valueToGladys;
-    },
-    [DEVICE_FEATURE_TYPES.SCHEDULE.TIME_DAY_HOUR]: (valueFromDevice) => {
-      const valueToGladys = valueFromDevice * 1000;
       return valueToGladys;
     },
   },

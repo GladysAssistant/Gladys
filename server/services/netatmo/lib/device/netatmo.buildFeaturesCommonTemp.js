@@ -55,78 +55,6 @@ function buildFeatureThermSetpointTemperature(name, externalId) {
 
 /**
  * @description Transforms Netatmo feature as Gladys feature.
- * Chosen setpoint_mode (program, away, hg, manual, off, max).
- * @param {string} name - Name device from Netatmo.
- * @param {string} externalId - Gladys external ID.
- * @returns {object} Gladys feature or undefined.
- * @example
- * buildFeatureThermSetpointMode(device_name, 'netatmo:device_id');
- */
-function buildFeatureThermSetpointMode(name, externalId) {
-  return {
-    name: `Setpoint mode - ${name}`,
-    external_id: `${externalId}:therm_setpoint_mode`,
-    selector: `${externalId}:therm_setpoint_mode`,
-    category: DEVICE_FEATURE_CATEGORIES.THERMOSTAT,
-    type: DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT,
-    read_only: true,
-    keep_history: false,
-    has_feedback: false,
-    min: 0,
-    max: 0,
-  };
-}
-
-/**
- * @description Transforms Netatmo feature as Gladys feature.
- * Thermostat goes back to schedule after that start timestamp and duration programmed.
- * @param {string} name - Name device from Netatmo.
- * @param {string} externalId - Gladys external ID.
- * @returns {object} Gladys feature or undefined.
- * @example
- * buildFeatureThermSetpointEndTime(device_name, 'netatmo:device_id');
- */
-function buildFeatureThermSetpointStartTime(name, externalId) {
-  return {
-    name: `Setpoint start time - ${name}`,
-    external_id: `${externalId}:therm_setpoint_start_time`,
-    selector: `${externalId}:therm_setpoint_start_time`,
-    category: DEVICE_FEATURE_CATEGORIES.SCHEDULE,
-    type: DEVICE_FEATURE_TYPES.SCHEDULE.TIME_HOUR,
-    read_only: true,
-    keep_history: true,
-    has_feedback: false,
-    min: 0,
-    max: 12 * 60 * 60 * 1000,
-  };
-}
-
-/**
- * @description Transforms Netatmo feature as Gladys feature.
- * Thermostat goes back to schedule after that timestamp.
- * @param {string} name - Name device from Netatmo.
- * @param {string} externalId - Gladys external ID.
- * @returns {object} Gladys feature or undefined.
- * @example
- * buildFeatureThermSetpointEndTime(device_name, 'netatmo:device_id');
- */
-function buildFeatureThermSetpointEndTime(name, externalId) {
-  return {
-    name: `Setpoint end time - ${name}`,
-    external_id: `${externalId}:therm_setpoint_end_time`,
-    selector: `${externalId}:therm_setpoint_end_time`,
-    category: DEVICE_FEATURE_CATEGORIES.SCHEDULE,
-    type: DEVICE_FEATURE_TYPES.SCHEDULE.TIME_HOUR,
-    read_only: true,
-    keep_history: true,
-    has_feedback: false,
-    min: 0,
-    max: 12 * 60 * 60 * 1000,
-  };
-}
-
-/**
- * @description Transforms Netatmo feature as Gladys feature.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
  * @returns {object} Gladys feature or undefined.
@@ -151,8 +79,5 @@ function buildFeatureOpenWindow(name, externalId) {
 module.exports = {
   buildFeatureTemperature,
   buildFeatureThermSetpointTemperature,
-  buildFeatureThermSetpointMode,
-  buildFeatureThermSetpointStartTime,
-  buildFeatureThermSetpointEndTime,
   buildFeatureOpenWindow,
 };

@@ -12,7 +12,20 @@ const SCOPES = {
     read: 'read_thermostat',
     write: 'write_thermostat',
   },
+  HOME_SECURITY: {
+    read_camera: 'read_camera',
+    read_presence: 'read_presence',
+    read_carbonmonoxidedetector: 'read_carbonmonoxidedetector',
+    read_smokedetector: 'read_smokedetector',
+  },
+  WEATHER: {
+    read_station: 'read_station',
+  },
+  AIRCARE: {
+    read_homecoach: 'read_homecoach',
+  },
 };
+
 const STATUS = {
   NOT_INITIALIZED: 'not_initialized',
   CONNECTING: 'connecting',
@@ -31,6 +44,7 @@ const STATUS = {
   DISCOVERING_DEVICES: 'discovering',
 };
 
+const GITHUB_BASE_URL = 'https://github.com/GladysAssistant/Gladys/issues/new';
 const BASE_API = 'https://api.netatmo.com';
 const API = {
   HEADER: {
@@ -50,19 +64,13 @@ const API = {
   GET_MEASURE: `${BASE_API}/api/getmeasure`,
 };
 
+const SUPPORTED_CATEGORY_TYPE = {
+  ENERGY: 'Energy',
+};
+
 const SUPPORTED_MODULE_TYPE = {
   THERMOSTAT: 'NATherm1',
   PLUG: 'NAPlug',
-};
-
-const ENERGY_MODES = {
-  OFF: 'off',
-  PROGRAM: 'program',
-  AWAY: 'away',
-  HG: 'hg',
-  MANUAL: 'manual',
-  MAX: 'max',
-  SCHEDULE: 'schedule',
 };
 
 const PARAMS = {
@@ -79,8 +87,9 @@ module.exports = {
   GLADYS_VARIABLES,
   SCOPES,
   STATUS,
+  GITHUB_BASE_URL,
   API,
+  SUPPORTED_CATEGORY_TYPE,
   SUPPORTED_MODULE_TYPE,
-  ENERGY_MODES,
   PARAMS,
 };

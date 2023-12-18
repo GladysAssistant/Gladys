@@ -17,15 +17,27 @@ const { setValue } = require('./netatmo.setValue');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 
+function buildScopesConfig(scopes) {
+  const scopesConfig = {};
+  Object.keys(scopes).forEach((key) => {
+    const words = key.toLowerCase().split('_');
+    const camelCaseKey = words
+      .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
+      .join('');
+    const scopeKey = `scope${camelCaseKey.charAt(0).toUpperCase() + camelCaseKey.slice(1)}`;
+    scopesConfig[scopeKey] = Object.values(scopes[key]).join(' ');
+  });
+
+  return scopesConfig;
+}
+
 const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.gladys = gladys;
   this.serviceId = serviceId;
   this.configuration = {
     clientId: null,
     clientSecret: null,
-    scopes: {
-      scopeEnergy: `${SCOPES.ENERGY.read} ${SCOPES.ENERGY.write}`,
-    },
+    scopes: buildScopesConfig(SCOPES),
   };
   this.configured = false;
   this.connected = false;

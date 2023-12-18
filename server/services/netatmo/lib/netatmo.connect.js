@@ -24,8 +24,8 @@ async function connect(netatmoHandler) {
   logger.debug('Connecting to Netatmo...');
 
   netatmoHandler.stateGetAccessToken = crypto.randomBytes(16).toString('hex');
-  const scopeValue = scopes.scopeEnergy;
-  netatmoHandler.redirectUri = `${API.OAUTH2}?client_id=${clientId}&scope=${encodeURIComponent(scopeValue)}&state=${
+  const scopeValues = Object.values(scopes).join(' ');
+  netatmoHandler.redirectUri = `${API.OAUTH2}?client_id=${clientId}&scope=${encodeURIComponent(scopeValues)}&state=${
     netatmoHandler.stateGetAccessToken
   }`;
   netatmoHandler.configured = true;
@@ -58,13 +58,13 @@ async function retrieveTokens(netatmoHandler, body) {
     );
   }
   await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.PROCESSING_TOKEN, message: null });
-  const scopeValue = scopes.scopeEnergy;
+  const scopeValues = Object.values(scopes).join(' ');
   const authentificationForm = {
     grant_type: 'authorization_code',
     client_id: clientId,
     client_secret: clientSecret,
     redirect_uri: redirectUri,
-    scope: scopeValue,
+    scope: scopeValues,
     code: body.codeOAuth,
   };
   try {
