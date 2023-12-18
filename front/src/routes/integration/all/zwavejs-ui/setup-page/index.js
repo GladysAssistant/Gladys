@@ -6,7 +6,6 @@ import get from 'get-value';
 
 import ZwaveJSUIPage from '../ZwaveJSUIPage';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../../server/utils/constants';
-import { CONFIGURATION } from '../../../../../../../server/services/zwavejs-ui/lib/constants';
 
 class DiscoverTab extends Component {
   showPasswordTimer = null;
