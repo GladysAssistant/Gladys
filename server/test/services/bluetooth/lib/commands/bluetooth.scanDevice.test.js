@@ -96,7 +96,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
       ],
     });
@@ -132,7 +132,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
       ],
     });
@@ -169,7 +169,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
       ],
     });
@@ -206,7 +206,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
         {
           name: PARAMS.MANUFACTURER,
@@ -248,7 +248,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
       ],
     });
@@ -301,7 +301,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
       ],
     });
@@ -350,7 +350,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
       ],
     });
@@ -400,7 +400,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
       ],
     });
@@ -450,7 +450,7 @@ describe('bluetooth.scanDevice', () => {
       params: [
         {
           name: PARAMS.LOADED,
-          value: true,
+          value: 'true',
         },
       ],
     });

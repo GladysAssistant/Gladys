@@ -189,72 +189,60 @@ const EnedisUsagePoints = ({
   syncs,
   sync
 }) => (
-  <div class="page mt-4 mt-lg-0">
-    <div class="page-main">
-      <div class="my-3 my-md-5">
-        <div class="container">
+  <div class="card">
+    <div class="card-header">
+      <h1 class="card-title">
+        <Text id="integration.enedis.usagePoints.title" />
+      </h1>
+      <div class="page-options d-flex">
+        {usagePointsDevices && usagePointsDevices.length > 0 && (
+          <button class="btn btn-primary" onClick={sync}>
+            <i class="fe fe-refresh-cw" />{' '}
+            <span class="d-none d-sm-inline-block ml-2">
+              <Text id="integration.enedis.usagePoints.refreshLocal" />
+            </span>
+          </button>
+        )}
+      </div>
+    </div>
+    <div class="card-body">
+      <div
+        class={cx('dimmer', {
+          active: loading
+        })}
+      >
+        <div class="loader" />
+        <div class="dimmer-content">
+          {errored && (
+            <p class="alert alert-danger">
+              <Text id="integration.enedis.welcome.error" />
+            </p>
+          )}
+
+          {usagePointsDevices && usagePointsDevices.length === 0 && (
+            <p class="alert alert-info">
+              <Text id="integration.enedis.usagePoints.emptyState" />
+            </p>
+          )}
+
+          {usagePointsDevices && usagePointsDevices.length > 0 && (
+            <p class="alert alert-primary">
+              <Text id="integration.enedis.usagePoints.explanation" />
+            </p>
+          )}
+
           <div class="row">
-            <div class="col-lg-12">
-              <div class="card">
-                <div class="card-header">
-                  <h3 class="card-title">
-                    <Text id="integration.enedis.usagePoints.title" />
-                  </h3>
-                  <div class="page-options d-flex">
-                    {usagePointsDevices && usagePointsDevices.length > 0 && (
-                      <button class="btn btn-primary" onClick={sync}>
-                        <i class="fe fe-refresh-cw" />{' '}
-                        <span class="d-none d-sm-inline-block ml-2">
-                          <Text id="integration.enedis.usagePoints.refreshLocal" />
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-                <div class="card-body">
-                  <div
-                    class={cx('dimmer', {
-                      active: loading
-                    })}
-                  >
-                    <div class="loader" />
-                    <div class="dimmer-content">
-                      {errored && (
-                        <p class="alert alert-danger">
-                          <Text id="integration.enedis.welcome.error" />
-                        </p>
-                      )}
-
-                      {usagePointsDevices && usagePointsDevices.length === 0 && (
-                        <p class="alert alert-info">
-                          <Text id="integration.enedis.usagePoints.emptyState" />
-                        </p>
-                      )}
-
-                      {usagePointsDevices && usagePointsDevices.length > 0 && (
-                        <p class="alert alert-primary">
-                          <Text id="integration.enedis.usagePoints.explanation" />
-                        </p>
-                      )}
-
-                      <div class="row">
-                        {usagePointsDevices &&
-                          usagePointsDevices.map((usagePointDevice, index) => (
-                            <UsagePointDevice
-                              device={usagePointDevice}
-                              deviceIndex={index}
-                              updateDeviceParam={updateDeviceParam}
-                              saveDevice={saveDevice}
-                              destroyDevice={destroyDevice}
-                              syncs={syncs}
-                            />
-                          ))}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {usagePointsDevices &&
+              usagePointsDevices.map((usagePointDevice, index) => (
+                <UsagePointDevice
+                  device={usagePointDevice}
+                  deviceIndex={index}
+                  updateDeviceParam={updateDeviceParam}
+                  saveDevice={saveDevice}
+                  destroyDevice={destroyDevice}
+                  syncs={syncs}
+                />
+              ))}
           </div>
         </div>
       </div>
@@ -357,7 +345,7 @@ class EnedisWelcomePageComponent extends Component {
   }
   render({ user }, { loading, errored, usagePointsDevices, syncs }) {
     return (
-      <EnedisPage>
+      <EnedisPage user={this.props.user}>
         <EnedisUsagePoints
           loading={loading}
           errored={errored}

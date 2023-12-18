@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const DashboardSettings = ({ children }) => (
+const MqttPage = ({ children, user }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -34,6 +35,30 @@ const DashboardSettings = ({ children }) => (
                     </span>
                     <Text id="integration.mqtt.setupTab" />
                   </Link>
+
+                  <DeviceConfigurationLink
+                    user={user}
+                    configurationKey="integrations"
+                    documentKey="mqtt"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.mqtt.documentation" />
+                  </DeviceConfigurationLink>
+
+                  <DeviceConfigurationLink
+                    user={user}
+                    configurationKey="api"
+                    documentKey="mqtt-api"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.mqtt.apiDocumentation" />
+                  </DeviceConfigurationLink>
                 </div>
               </div>
             </div>
@@ -46,4 +71,4 @@ const DashboardSettings = ({ children }) => (
   </div>
 );
 
-export default DashboardSettings;
+export default MqttPage;

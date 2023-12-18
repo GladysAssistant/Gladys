@@ -13,6 +13,7 @@ const devicePause = fake.resolves(null);
 const devicePrevious = fake.resolves(null);
 const deviceNext = fake.resolves(null);
 const deviceSetVolume = fake.resolves(null);
+const devicePlayNotification = fake.resolves(null);
 
 const SonosManager = sinon.stub();
 SonosManager.prototype.InitializeWithDiscovery = fake.returns(null);
@@ -28,6 +29,7 @@ SonosManager.prototype.Devices = [
     Previous: devicePrevious,
     Next: deviceNext,
     SetVolume: deviceSetVolume,
+    PlayNotification: devicePlayNotification,
     AVTransportService: {
       Events: {
         removeAllListeners: fake.returns(null),
@@ -167,5 +169,31 @@ describe('SonosHandler.setValue', () => {
     };
     await sonosHandler.setValue(device, deviceFeature, 46);
     assert.calledWith(deviceSetVolume, 46);
+  });
+  it('should play notification on Sonos', async () => {
+    const device = {
+      name: 'My sonos',
+      external_id: 'sonos:test-uuid',
+      service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
+      should_poll: false,
+    };
+    const deviceFeature = {
+      name: 'My sonos - Play notification',
+      external_id: 'sonos:test-uuid:play-notification',
+      category: 'music',
+      type: 'play_notification',
+      min: 1,
+      max: 1,
+      keep_history: false,
+      read_only: false,
+      has_feedback: false,
+    };
+    await sonosHandler.setValue(device, deviceFeature, 'http://test.com');
+    assert.calledWith(devicePlayNotification, {
+      onlyWhenPlaying: false,
+      timeout: 10,
+      trackUri: 'http://test.com',
+      volume: 45,
+    });
   });
 });

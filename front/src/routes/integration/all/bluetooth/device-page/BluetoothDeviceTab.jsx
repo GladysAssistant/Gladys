@@ -10,9 +10,9 @@ import CardFilter from '../../../../../components/layout/CardFilter';
 const BluetoothDeviceTab = ({ children, getBluetoothDevicesStatus, bluetoothDevices, ...props }) => (
   <div class="card">
     <div class="card-header">
-      <h3 class="card-title">
+      <h1 class="card-title">
         <Text id="integration.bluetooth.device.title" />
-      </h3>
+      </h1>
       <div class="page-options d-flex">
         <Localizer>
           <CardFilter

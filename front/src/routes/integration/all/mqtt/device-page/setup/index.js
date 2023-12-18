@@ -265,7 +265,7 @@ class MqttDeviceSetupPage extends Component {
 
   render(props, state) {
     return (
-      <MqttPage>
+      <MqttPage user={props.user}>
         <FeatureTab
           {...props}
           {...state}

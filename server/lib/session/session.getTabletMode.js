@@ -2,7 +2,7 @@ const db = require('../../models');
 const { NotFoundError } = require('../../utils/coreErrors');
 
 /**
- * @description Get tablet model
+ * @description Get tablet model.
  * @param {string} userId - Id of the user.
  * @param {string} sessionId - Uuid of the session.
  * @returns {Promise} Return session.

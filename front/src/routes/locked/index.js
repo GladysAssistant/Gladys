@@ -114,8 +114,15 @@ class Locked extends Component {
   validateCode = async e => {
     e.preventDefault();
     try {
-      await this.setState({ error: false, wrongCode: false, tooManyRequests: false });
+      await this.setState({
+        error: false,
+        wrongCode: false,
+        tooManyRequests: false,
+        errorMessage: null,
+        errorStatus: null
+      });
       const houseSelector = this.props.session.getTabletModeCurrentHouseSelector();
+      await this.props.httpClient.refreshAccessToken();
       await this.props.httpClient.post(`/api/v1/house/${houseSelector}/disarm_with_code`, {
         code: this.state.currentCode
       });
@@ -132,7 +139,7 @@ class Locked extends Component {
       } else if (message === 'INVALID_CODE') {
         this.setState({ wrongCode: true });
       } else {
-        this.setState({ error: true });
+        this.setState({ error: true, errorMessage: e.toString(), errorStatus: status });
       }
     }
   };
@@ -143,7 +150,7 @@ class Locked extends Component {
   componentWillUnmount() {
     this.props.session.dispatcher.removeListener(WEBSOCKET_MESSAGE_TYPES.ALARM.DISARMED, this.disarmed);
   }
-  render({}, { currentCode, error, wrongCode, tooManyRequests, waitTimeInMinute }) {
+  render({}, { currentCode, error, wrongCode, tooManyRequests, waitTimeInMinute, errorMessage, errorStatus }) {
     return (
       <div class={cx('container', style.lockedContainer)}>
         <div class="row">
@@ -170,8 +177,13 @@ class Locked extends Component {
                   <Text id="locked.description" />
                 </p>
                 {error && (
-                  <div class="alert alert-error">
+                  <div class="alert alert-danger">
                     <Text id="locked.error" />
+                  </div>
+                )}
+                {errorMessage && (
+                  <div class="alert alert-danger">
+                    {errorStatus} {errorMessage}
                   </div>
                 )}
                 {wrongCode && (
