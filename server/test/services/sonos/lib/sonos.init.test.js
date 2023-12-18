@@ -142,6 +142,17 @@ describe('SonosHandler.init', () => {
             read_only: true,
             has_feedback: false,
           },
+          {
+            name: 'My sonos - Play Notification',
+            external_id: 'sonos:test-uuid:play-notification',
+            category: 'music',
+            type: 'play_notification',
+            min: 1,
+            max: 1,
+            keep_history: false,
+            read_only: false,
+            has_feedback: false,
+          },
         ],
       },
     ]);

@@ -1,5 +1,5 @@
 const { addSelector } = require('../../../../utils/addSelector');
-const { setDeviceParam } = require('../../../../utils/setDeviceParam');
+const { setDeviceParam } = require('../../../../utils/device');
 
 const { PARAMS } = require('../utils/bluetooth.constants');
 const { encodeParamValue } = require('./bluetooth.information');
@@ -24,7 +24,7 @@ function transformToDevice(peripheral) {
   };
 
   if (!connectable) {
-    setDeviceParam(device, PARAMS.LOADED, true);
+    setDeviceParam(device, PARAMS.LOADED, 'true');
   }
 
   addSelector(device);

@@ -424,6 +424,7 @@
       "accountTab": "Compte",
       "syncTab": "Synchronisation",
       "shareTab": "Partage",
+      "documentation": "Documentation CalDav",
       "description": "Synchronisez vos calendriers CalDAV.",
       "accountIntroduction": "Pour synchroniser Gladys avec un calendrier CalDAV, vous devez avoir un calendrier compatible et entrer la configuration ci-dessous.",
       "syncIntroduction": "Choisissez les calendriers que vous souhaitez synchroniser.",
@@ -493,8 +494,9 @@
       "title": "Bluetooth",
       "description": "Contrôler vos appareils Bluetooth.",
       "deviceTab": "Appareils",
-      "discoverTab": "Découverte",
+      "discoverTab": "Découverte Bluetooth",
       "setupTab": "Scanner de présence",
+      "documentation": "Documentation Bluetooth",
       "bluetoothNotReadyError": "Le module Bluetooth n'est pas disponible, merci de vérifier qu'il est bien activé.",
       "device": {
         "title": "Appareils Bluetooth",
@@ -548,6 +550,7 @@
     "telegram": {
       "title": "Telegram",
       "description": "Parlez à Gladys grâce à Telegram.",
+      "documentation": "Documentation Telegram",
       "introduction": "Pour connecter Gladys à Telegram, vous devez d'abord créer un bot Telegram à l'aide du Botfather. Envoyez une commande <b>/newbot</b> au <a href=\"https://telegram.me/BotFather\"> @BotFather </a> dans Telegram. Ensuite, entrez la clé API qu'il vous a donné ci-dessous.",
       "link": "<b>ACTION REQUISE :</b> Pour parler à Gladys dans Telegram, cliquez sur <a href=\"{{link}}\"> ce lien </a>. Ne parlez pas à votre bot dans Telegram directement avant d'avoir cliqué sur ce lien, sinon votre bot ne pourra pas savoir que c'est vous qui envoyez un message.",
       "note": "Ce lien est unique à votre compte, ne l'envoyez pas à d'autres utilisateurs.",
@@ -558,6 +561,7 @@
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
       "description": "Parlez à Gladys grâce à Nextcloud Talk.",
+      "documentation": "Documentation Nextcloud Talk",
       "introduction": "Pour communiquer via Talk, il faut créer un compte spécifique Nextcloud représentant votre bot.",
       "url": "URL de l'instance Nextcloud",
       "urlInfo": "Entrez l'url de base de votre instance Nextcloud.",
@@ -576,7 +580,7 @@
       "description": "Contrôler les lumières Philips Hue.",
       "deviceTab": "Appareils",
       "setupTab": "Configuration des Ponts",
-      "documentation": "Documentation",
+      "documentation": "Documentation Philips Hue",
       "setup": {
         "connectedBridgesTitle": "Ponts connectés",
         "disconnectButton": "Déconnexion",
@@ -607,6 +611,7 @@
       "description": "Récupérez le flux vidéos de vos caméras dans Gladys",
       "search": "Chercher une caméra",
       "new": "Nouveau",
+      "documentation": "Documentation Caméra",
       "documentationButton": "Documentation",
       "nameLabel": "Nom de la caméra",
       "namePlaceholder": "Entrez le nom de votre caméra",
@@ -695,6 +700,7 @@
       "title": "TP-Link",
       "description": "Contrôler les lumières et prises TP-Link.",
       "deviceTab": "Appareils",
+      "documentation": "Documentation TP-Link",
       "device": {
         "title": "Appareils dans Gladys",
         "nameLabel": "Nom",
@@ -831,6 +837,7 @@
 
     "googleHome": {
       "title": "Google Home",
+      "documentation": "Documentation Google Home",
       "description": "Contrôlez vos appareils Gladys à la voix dans Google Home",
       "longDescription": "Il est possible d'utiliser Google Home pour contrôler vos appareils Gladys à la voix. Pour configurer Google Home, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
       "pageTitle": "Gladys Assistant",
@@ -851,6 +858,7 @@
       "description": "Vos données de consommation électrique dans Gladys",
       "welcomeTab": "Connexion avec Enedis",
       "usagePointsTab": "Mes compteurs",
+      "documentation": "Documentation Enedis",
       "welcome": {
         "title": "Connexion à Enedis",
         "longDescription": "Enedis gère le réseau d'électricité jusqu'au compteur d'électricité. Pour récupérez vos données de consommation d'électricité dans Gladys, autorisez Enedis à nous transmettre vos données Linky.",
@@ -890,6 +898,7 @@
     },
     "alexa": {
       "title": "Amazon Alexa",
+      "documentation": "Documentation Alexa",
       "description": "Contrôlez vos appareils Gladys à la voix dans Alexa",
       "longDescription": "Il est possible d'utiliser Amazon Alexa pour contrôler vos appareils Gladys à la voix. Pour configurer Alexa, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>.",
       "pageTitle": "Gladys Assistant",
@@ -907,6 +916,7 @@
     },
     "homekit": {
       "title": "Apple HomeKit",
+      "documentation": "Documentation HomeKit",
       "description": "Connectez Gladys à HomeKit et utilisez Siri pour lui parler.",
       "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
@@ -918,13 +928,15 @@
       "resetError": "Une erreur est survenue pendant la réinitialisation du pont"
     },
     "owntracks": {
-      "title": "Owntracks",
+      "title": "OwnTracks",
       "description": "Envoyez votre position GPS à Gladys via une application",
-      "longDescription": "Owntracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser Owntracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer Owntracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
+      "documentation": "Documentation OwnTracks",
+      "longDescription": "OwnTracks est une application open-source disponible sur iOS et Android qui vous permet d'envoyer votre position GPS à un serveur distant. Il est possible d'utiliser OwnTracks avec Gladys pour déclencher des scènes selon votre position. Pour configurer OwnTracks, vous pouvez suivre ce tutoriel dans <a href=\"https://gladysassistant.com/fr/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">notre documentation</a>."
     },
     "zwave": {
       "title": "Open-Zwave [OLD]",
       "description": "En fin de vie, il n'est plus possible de l'utiliser.",
+      "documentation": "Documentation Open-Zwave",
       "device": {
         "title": "Anciens appareils Open-Zwave",
         "convertToMqtt": "Convertir en appareil MQTT",
@@ -943,6 +955,7 @@
     },
     "openWeather": {
       "title": "API OpenWeather",
+      "documentation": "Documentation OpenWeather",
       "description": "Affichez les données de météo de votre ville dans Gladys.",
       "introduction": "Cette intégration vous aide à intégrer l'API OpenWeather pour obtenir la météo dans Gladys.",
       "instructions": "Vous devez d'abord créer un compte sur le site Web de l'API d'OpenWeather : <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
@@ -957,7 +970,7 @@
       "deviceTab": "Appareils",
       "discoverTab": "Découverte Tuya",
       "setupTab": "Configuration",
-      "documentation": "Tuya documentation",
+      "documentation": "Documentation Tuya",
       "discoverDeviceDescr": "Scanner automatiquement les appareils Tuya",
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
@@ -1066,6 +1079,7 @@
       "deviceTab": "Appareils",
       "discoverTab": "Découverte MELCloud",
       "setupTab": "Configuration",
+      "documentation": "Documentation MELCloud",
       "discoverDeviceDescr": "Scanner automatiquement les appareils MELCloud",
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
@@ -1121,6 +1135,8 @@
       "description": "Connexion à un serveur MQTT, en local ou en distant.",
       "deviceTab": "Appareils",
       "setupTab": "Configuration",
+      "documentation": "Documentation MQTT",
+      "apiDocumentation": "Documentation MQTT API",
       "status": {
         "notConfigured": "Le service MQTT n'est pas configuré, veuillez vous rendre sur la ",
         "notConnected": "Gladys n'a pas réussi à se connecter au serveur MQTT, plus d'informations sur la ",
@@ -1198,6 +1214,7 @@
       "description": "Contrôlez vos appareils Broadlink.",
       "remoteTab": "Appareils",
       "peripheralTab": "Appareils disponibles",
+      "documentation": "Documentation Broadlink",
       "peripheral": {
         "title": "Appareils Broadlink disponibles",
         "description": "Ici vous trouverez les appareils Broadlink disponible. Si celui que vous cherchez est manquant, merci de vérifier qu'il est bien connecté au réseau.",
@@ -1320,6 +1337,8 @@
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Gérez les appareils Xiaomi via le pont Xiaomi.",
+      "deviceTab": "Appareils",
+      "documentation": "Documentation Xiaomi",
       "device": {
         "title": "Appareils Xiaomi dans Gladys",
         "noDevices": "Aucun appareil Xiaomi n'a encore été ajouté.",
@@ -1351,8 +1370,9 @@
       "title": "LAN Manager",
       "description": "Gérez les appareils sur votre réseau local.",
       "deviceTab": "Appareils",
-      "discoverTab": "Découverte",
-      "setupTab": "Configuration",
+      "discoverTab": "Découverte LAN",
+      "setupTab": "Scanner de présence",
+      "documentation": "Documentation LAN Manager",
       "device": {
         "title": "Appareils LAN",
         "search": "Chercher un appareil",
@@ -1373,7 +1393,7 @@
         "discoveringError": "Une erreur est survenue lors de la recherche, vérifiez la configuration du scanner, sinon consultez les logs."
       },
       "setup": {
-        "title": "Configuration LAN",
+        "title": "Scanner de présence",
         "errorLabel": "Une erreur est survenue lors du chargement de la configuration.",
         "noConfigLabel": "La configuration n'est pas chargée, merci de réessayer.",
         "presenceScannerDescription": "Le scanner de présence effectue un scan sur le réseau à interval régulier. Dès qu’un appareil est détecté, l'appareil est marqué comme \"présent\" dans Gladys. Dans les scènes, vous avez la possibilité de créer un déclencheur qui écoute sur cet état. Ainsi, vous pouvez facilement faire une scène qui vous met comme présent à la maison dès qu'un appareil est détecté sur le réseau.",
@@ -1399,6 +1419,7 @@
       "deviceTab": "Appareils",
       "discoverTab": "Découverte eWeLink",
       "setupTab": "Configuration",
+      "documentation": "Documentation eWeLink",
       "discoverDeviceDescr": "Scanner automatiquement les appareils eWeLink",
       "nameLabel": "Nom de l'appareil",
       "namePlaceholder": "Entrez le nom de votre appareil",
@@ -1451,6 +1472,7 @@
     },
     "openai": {
       "title": "OpenAI ChatGPT",
+      "documentation": "Documentation ChatGPT",
       "description": "Donne à Gladys la puissance de l'intelligence artificielle.",
       "firstExplanation": "Gladys peut utiliser l'intelligence artificielle OpenAI ChatGPT pour vous permettre de communiquer avec votre maison connectée.",
       "aFewExamples": "Quelques exemples :",
@@ -1640,6 +1662,13 @@
         "messageLabel": "Message",
         "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message.",
         "messagePlaceholder": "Mon message"
+      },
+      "playNotification": {
+        "description": "Cette action fera parler Gladys sur l'enceinte sélectionnée.",
+        "needGladysPlus": "Nécessite Gladys Plus car les API de \"Text To Speech\" sont payantes.",
+        "deviceLabel": "Enceinte",
+        "textLabel": "Message à dire sur l'enceinte",
+        "variablesExplanation": "Pour injecter une variable, tapez '{{ '. Attention, vous devez avoir défini une variable auparavant dans une action 'Récupérer le dernier état' placé avant ce bloc message."
       }
     },
     "actions": {
@@ -1697,6 +1726,9 @@
       },
       "mqtt": {
         "send": "Envoyer un message MQTT"
+      },
+      "music": {
+        "play-notification": "Parler sur une enceinte"
       }
     },
     "variables": {
@@ -2771,7 +2803,8 @@
       "pause": "Bouton pause musique",
       "previous": "Bouton précédent musique",
       "next": "Bouton suivant musique",
-      "playback_state": "Etat de la lecture musique"
+      "playback_state": "Etat de la lecture musique",
+      "play_notification": "Diffuser une notification"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

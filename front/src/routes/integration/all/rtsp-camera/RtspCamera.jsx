@@ -14,23 +14,34 @@ const RtspCameraPage = ({ children, ...props }) => (
       <div class="my-3 my-md-5">
         <div class="container">
           <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-3">
+              <h3 class="page-title mb-5">
+                <Text id="integration.rtspCamera.title" />
+              </h3>
+              <div>
+                <div class="list-group list-group-transparent mb-0">
+                  <DeviceConfigurationLink
+                    user={props.user}
+                    configurationKey="integrations"
+                    documentKey="camera"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.rtspCamera.documentation" />
+                  </DeviceConfigurationLink>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-9">
               <div class="card">
                 <div class="card-header">
                   <h1 class="card-title d-none d-lg-inline-block">
                     <Text id="integration.rtspCamera.title" />
                   </h1>
                   <div class="page-options d-flex">
-                    <DeviceConfigurationLink
-                      documentKey="camera"
-                      user={props.user}
-                      linkClass="btn btn-outline-secondary mr-2"
-                    >
-                      <span class="d-none d-lg-inline-block mr-2">
-                        <Text id="integration.rtspCamera.documentationButton" />{' '}
-                      </span>
-                      <i class="fe fe-book-open" />
-                    </DeviceConfigurationLink>
                     <Localizer>
                       <CardFilter
                         changeOrderDir={props.changeOrderDir}

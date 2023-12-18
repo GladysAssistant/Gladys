@@ -359,6 +359,9 @@ const ACTIONS = {
   MQTT: {
     SEND: 'mqtt.send',
   },
+  MUSIC: {
+    PLAY_NOTIFICATION: 'music.play-notification',
+  },
 };
 
 const INTENTS = {
@@ -554,6 +557,7 @@ const DEVICE_FEATURE_TYPES = {
     PREVIOUS: 'previous',
     NEXT: 'next',
     PLAYBACK_STATE: 'playback_state',
+    PLAY_NOTIFICATION: 'play_notification',
   },
   ENERGY_SENSOR: {
     BINARY: 'binary',

@@ -73,6 +73,17 @@ const convertToGladysDevice = (serviceId, device) => {
         read_only: true,
         has_feedback: false,
       },
+      {
+        name: `${device.name} - Play Notification`,
+        external_id: `sonos:${device.uuid}:play-notification`,
+        category: DEVICE_FEATURE_CATEGORIES.MUSIC,
+        type: DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION,
+        min: 1,
+        max: 1,
+        keep_history: false,
+        read_only: false,
+        has_feedback: false,
+      },
     ],
   };
 };

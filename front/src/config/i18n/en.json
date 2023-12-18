@@ -422,6 +422,7 @@
     "telegram": {
       "title": "Telegram",
       "description": "Chat with Gladys remotely through Telegram.",
+      "documentation": "Telegram documentation",
       "introduction": "To connect Gladys to Telegram, you first need to create a Telegram bot using the Botfather. Send a <b>/newbot</b> message to the <a href=\"https://telegram.me/BotFather\">@BotFather</a> in Telegram. Then, enter the API key he gave you below.",
       "link": "<b>ACTION REQUIRED:</b> To talk to Gladys in Telegram, click on <a href=\"{{link}}\">this link</a>. Don't speak in Telegram directly to your bot before having click on this link, otherwise your bot won't be able to know that it's you who are sending a message.",
       "note": "This link is unique to your account, do not send it to other users.",
@@ -432,6 +433,7 @@
     "nextcloudTalk": {
       "title": "Nextcloud Talk",
       "description": "Speak with Gladys thanks to Nextcloud Talk.",
+      "documentation": "Nextcloud Talk documentation",
       "introduction": "To speak through Nextcloud Talk, you need a specific Nextcloud account for your bot.",
       "url": "Nextcloud host",
       "urlInfo": "Enter your Nextcloud base URL.",
@@ -450,7 +452,7 @@
       "description": "Control Philips Hue Lights and plugs with the official hub",
       "deviceTab": "Devices",
       "setupTab": "Setup Bridges",
-      "documentation": "Documentation",
+      "documentation": "Philips Hue documentation",
       "setup": {
         "connectedBridgesTitle": "Connected bridges",
         "disconnectButton": "Disconnect",
@@ -481,6 +483,7 @@
       "description": "Display your cameras video flux in Gladys.",
       "search": "Search cameras",
       "new": "New",
+      "documentation": "Camera documentation",
       "documentationButton": "Documentation",
       "nameLabel": "Camera Name",
       "namePlaceholder": "Enter the name of your camera",
@@ -569,6 +572,7 @@
       "title": "TP-Link",
       "description": "Control TP-Link Bulbs and Plugs in Gladys",
       "deviceTab": "Devices",
+      "documentation": "TP-Link documentation",
       "device": {
         "title": "Devices in Gladys",
         "nameLabel": "Name",
@@ -706,6 +710,7 @@
 
     "googleHome": {
       "title": "Google Home",
+      "documentation": "Google Home documentation",
       "description": "Control your Gladys device with your voice in Google Home",
       "longDescription": "It's possible to use Google Home to control your Gladys devices by voice. To configure Google Home with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/google-home/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>.",
       "pageTitle": "Gladys Assistant",
@@ -723,6 +728,7 @@
     },
     "alexa": {
       "title": "Amazon Alexa",
+      "documentation": "Alexa documentation",
       "description": "Control your Gladys device with your voice in Alexa",
       "longDescription": "It's possible to use Amazon Alexa to control your Gladys devices by voice. To configure Alexa with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/alexa/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>.",
       "pageTitle": "Gladys Assistant",
@@ -743,6 +749,7 @@
       "description": "Your electricity consumption data in Gladys",
       "welcomeTab": "Connection with Enedis",
       "usagePointsTab": "My meters",
+      "documentation": "Enedis documentation",
       "welcome": {
         "title": "Connection with Enedis",
         "longDescription": "Enedis manages the electricity network up to the electricity meter. To retrieve your electricity consumption in Gladys, authorise Enedis to send us your Linky data.",
@@ -782,6 +789,7 @@
     },
     "homekit": {
       "title": "Apple HomeKit",
+      "documentation": "HomeKit documentation",
       "description": "Connect Gladys to HomeKit and use Siri to control your devices.",
       "introduction": "To connect Gladys to HomeKit, you need an Apple device (iPhone, iPad, iPod touch).",
       "qrCode": "Scan this QR code from your iOS Home app to add Gladys and all compatible devices.",
@@ -793,13 +801,15 @@
       "resetError": "An error appears while resetting bridge."
     },
     "owntracks": {
-      "title": "Owntracks",
+      "title": "OwnTracks",
       "description": "Send your GPS location to Gladys with a mobile app",
-      "longDescription": "Owntracks is an open-source app running on iOS and Android that let you send your geolocation to a server. You can use Owntracks to trigger scenes based on your geolocation. To configure Owntracks with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>."
+      "documentation": "OwnTracks documentation",
+      "longDescription": "OwnTracks is an open-source app running on iOS and Android that let you send your geolocation to a server. You can use OwnTracks to trigger scenes based on your geolocation. To configure OwnTracks with Gladys, follow this tutorial <a href=\"https://gladysassistant.com/docs/integrations/owntracks/\"  target=\"_blank\" rel=\"noopener noreferrer\">in our documentation</a>."
     },
     "zwave": {
       "title": "Open-Zwave [OLD]",
       "description": "This integration is deprecated, we are migrating to zwave-js-ui.",
+      "documentation": "Open-Zwave documentation",
       "device": {
         "title": "Legacy Open-Zwave Devices",
         "convertToMqtt": "Convert to MQTT device",
@@ -818,6 +828,7 @@
     },
     "openWeather": {
       "title": "OpenWeather API",
+      "documentation": "OpenWeather documentation",
       "description": "Display the weather in your town on your dashboard.",
       "introduction": "This integration helps you integrate with OpenWeather API to get the weather in Gladys.",
       "instructions": "You first need to create an account on OpenWeather API website: <a href=\"https://openweathermap.org/api\">https://openweathermap.org/api</a>.",
@@ -939,6 +950,7 @@
       "deviceTab": "Devices",
       "discoverTab": "MELCloud discover",
       "setupTab": "Setup",
+      "documentation": "MELCloud documentation",
       "discoverDeviceDescr": "Automatically scan MELCloud devices",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
@@ -964,7 +976,7 @@
       },
       "discover": {
         "title": "Devices detected on your MELCloud cloud account",
-        "description": "MELCloud devices are automatically discovered. Your eWeLink devices need to be added to your eWeLink cloud account before.",
+        "description": "MELCloud devices are automatically discovered. Your MELClou devices need to be added to your MELCloud cloud account before.",
         "error": "Error discovering MELCloud devices. Please verify your credentials on Setup.",
         "noDeviceFound": "No MELCloud device discovered.",
         "scan": "Scan"
@@ -993,6 +1005,8 @@
       "description": "Connect to a local or remote MQTT server",
       "deviceTab": "Devices",
       "setupTab": "Setup",
+      "documentation": "MQTT documentation",
+      "apiDocumentation": "MQTT API documentation ",
       "status": {
         "notConfigured": "MQTT service is not configured, please go to ",
         "notConnected": "MQTT service failed to connect to network, please go to ",
@@ -1070,6 +1084,7 @@
       "description": "Control your Broadlink devices.",
       "remoteTab": "Devices",
       "peripheralTab": "Discover devices",
+      "documentation": "Broadlink documentation",
       "peripheral": {
         "title": "Available Broadlink devices",
         "description": "Here are discovered Broadlink devices, if one is missing, please check its network link.",
@@ -1193,8 +1208,9 @@
       "title": "LAN Manager",
       "description": "Manage you device through you local network.",
       "deviceTab": "Devices",
-      "discoverTab": "Discover",
-      "setupTab": "Setup",
+      "discoverTab": "LAN Discover",
+      "setupTab": "Presence scanner",
+      "documentation": "Lan Manager documentation",
       "device": {
         "title": "LAN Devices",
         "search": "Search devices",
@@ -1215,7 +1231,7 @@
         "discoveringError": "An error occurred, check scanner configuration, or check logs."
       },
       "setup": {
-        "title": "LAN Settings",
+        "title": "Presence scanner",
         "errorLabel": "An error occurred while loading configuration.",
         "noConfigLabel": "Configuration not loaded, please retry.",
         "presenceScannerDescription": "The presence scanner feature is doing a network scan at a defined interval. When a device is detected, the device will be flagged as \"seen\" in Gladys. In scene, you can create a trigger on this state change to set you home when a device is detected at home for example.",
@@ -1238,6 +1254,8 @@
     "xiaomi": {
       "title": "Xiaomi Home",
       "description": "Control Xiaomi home devices with the official hub",
+      "deviceTab": "Devices",
+      "documentation": "Xiaomi documentation",
       "device": {
         "title": "Xiaomi devices in Gladys",
         "noDevices": "No Xiaomi devices added yet.",
@@ -1270,6 +1288,7 @@
       "accountTab": "Account",
       "syncTab": "Synchronization",
       "shareTab": "Sharing",
+      "documentation": "CalDav documentation",
       "description": "Sync your CalDAV calendars and use them in scenes.",
       "accountIntroduction": "To sync Gladys calendar using CalDAV, you first need an external compatible calendar. Then enter the configuration below.",
       "syncIntroduction": "Choose calendars to synchronize.",
@@ -1339,8 +1358,9 @@
       "title": "Bluetooth",
       "description": "Control your Bluetooth devices and detect your presence.",
       "deviceTab": "Devices",
-      "discoverTab": "Discover",
+      "discoverTab": "Bluetooth discover",
       "setupTab": "Presence scanner",
+      "documentation": "Bluetooth documentation",
       "bluetoothNotReadyError": "Bluetooth device is not reachable, please check it is enabled.",
       "device": {
         "title": "Bluetooth Devices",
@@ -1397,6 +1417,7 @@
       "deviceTab": "Devices",
       "discoverTab": "eWeLink discover",
       "setupTab": "Setup",
+      "documentation": "eWeLink documentation",
       "discoverDeviceDescr": "Automatically scan eWeLink devices",
       "nameLabel": "Device Name",
       "namePlaceholder": "Enter the name of your device",
@@ -1449,6 +1470,7 @@
     },
     "openai": {
       "title": "OpenAI ChatGPT",
+      "documentation": "ChatGPT documentation",
       "description": "Give Gladys the power of artifical intelligence",
       "firstExplanation": "Gladys can use OpenAI ChatGPT artificial intelligence to help you communicate with your connected home.",
       "aFewExamples": "A few examples of things you can ask: ",
@@ -1638,6 +1660,13 @@
         "messageLabel": "Message",
         "variablesExplanation": "To inject a variable in the text, press '{{ '. To set a variable value, you need to use the 'Get device value' box before this one.",
         "messagePlaceholder": "My message"
+      },
+      "playNotification": {
+        "description": "This action will make Gladys speak on the selected speaker.",
+        "needGladysPlus": "Requires Gladys Plus as Text-To-Speech APIs are paid.",
+        "deviceLabel": "Speaker",
+        "textLabel": "Message to speak on the speaker",
+        "variablesExplanation": "To inject a variable, type '{{ '. Note: You must have defined a variable beforehand in a 'Retrieve Last State' action placed before this message block."
       }
     },
     "actions": {
@@ -1695,6 +1724,9 @@
       },
       "mqtt": {
         "send": "Send MQTT Message"
+      },
+      "music": {
+        "play-notification": "Talk on a speaker"
       }
     },
     "variables": {
@@ -2769,7 +2801,8 @@
       "pause": "Music pause button",
       "previous": "Music previous button",
       "next": "Music next button",
-      "playback_state": "Music playback state"
+      "playback_state": "Music playback state",
+      "play_notification": "Broadcast a notification"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

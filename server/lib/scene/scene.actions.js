@@ -465,6 +465,21 @@ const actionsFunc = {
       mqttService.device.publish(action.topic, messageWithVariables);
     }
   },
+  [ACTIONS.MUSIC.PLAY_NOTIFICATION]: async (self, action, scope) => {
+    // Get device
+    const device = self.stateManager.get('device', action.device);
+    const deviceFeature = getDeviceFeature(
+      device,
+      DEVICE_FEATURE_CATEGORIES.MUSIC,
+      DEVICE_FEATURE_TYPES.MUSIC.PLAY_NOTIFICATION,
+    );
+    // replace variable in text
+    const messageWithVariables = Handlebars.compile(action.text)(scope);
+    // Get TTS URL
+    const { url } = await self.gateway.getTTSApiUrl({ text: messageWithVariables });
+    // Play TTS Notification on device
+    await self.device.setValue(device, deviceFeature, url);
+  },
 };
 
 module.exports = {

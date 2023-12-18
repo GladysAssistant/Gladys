@@ -18,7 +18,7 @@ class XiaomiPage extends Component {
 
   render(props, {}) {
     return (
-      <XiaomiLayout>
+      <XiaomiLayout user={props.user}>
         {props.xiaomiDevices && props.xiaomiDevices.length ? <DevicePanel {...props} /> : <div />}
         <SetupPanel {...props} />
       </XiaomiLayout>
