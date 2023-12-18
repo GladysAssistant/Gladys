@@ -1097,7 +1097,7 @@
       },
       "discover": {
         "title": "Appareils détectés sur votre instance Z-Wave JS UI",
-        "description": "Les appareils Z-Wave JS UI sont automatiquement découverts. Attention, seuls les appareils avec un nom et une \"location\" sont affichés ici. Si vous éditez ces paramètres, vous devrez re-apparairer l'appareil dans Gladys.",
+        "description": "Les appareils Z-Wave JS UI sont automatiquement découverts. Attention, seuls les appareils avec un nom et une \"location\" sont affichés ici. Si vous éditez ces paramètres, vous devrez réappairer l'appareil dans Gladys.",
         "error": "Erreur de découverte des appareils Z-Wave JS UI. Est-ce que votre broker MQTT est bien disponible et accessible ?",
         "noDeviceFound": "Aucun appareil Z-Wave JS UI n'a été découvert.",
         "errorWhileScanning": "Une erreur est survenue lors de la découverte.",
@@ -1105,7 +1105,7 @@
       },
       "setup": {
         "title": "Configuration",
-        "description": "Vous devez connecter Gladys au broker MQTT auquel est connecté votre instance Z-Wave JS UI. Cette intégration s'adresse à un public qui déjà des appareils Z-Wave. Si vous commencez votre installation, nous vous recommandons de passer par le protocole Zigbee.",
+        "description": "Vous devez connecter Gladys au broker MQTT auquel est connecté votre instance Z-Wave JS UI. Cette intégration s'adresse à un public qui a déjà des appareils Z-Wave. Si vous commencez votre installation, nous vous recommandons de passer par le protocole Zigbee.",
         "urlLabel": "URL du broker",
         "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
         "userLabel": "Nom d'utilisateur",
