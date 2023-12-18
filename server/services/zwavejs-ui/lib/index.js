@@ -14,7 +14,7 @@ const { saveConfiguration } = require('./zwaveJSUI.saveConfiguration');
  * @param {object} mqttLibrary - MQTT lib.
  * @param {string} serviceId - UUID of the service in DB.
  * @example
- * const mqttHandler = new MqttHandler(gladys, client, serviceId);
+ * const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, client, serviceId);
  */
 const ZwaveJSUIHandler = function ZwaveJSUIHandler(gladys, mqttLibrary, serviceId) {
   this.gladys = gladys;

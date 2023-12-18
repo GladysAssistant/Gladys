@@ -9,7 +9,7 @@ const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
 async function onNewDeviceDiscover(data) {
   const devices = [];
   data.result.forEach((zwaveJSDevice) => {
-    if (zwaveJSDevice.name && zwaveJSDevice.name.length > 0) {
+    if (zwaveJSDevice.name && zwaveJSDevice.name.length > 0 && zwaveJSDevice.loc && zwaveJSDevice.loc.length > 0) {
       devices.push(convertToGladysDevice(this.serviceId, zwaveJSDevice));
     }
   });
