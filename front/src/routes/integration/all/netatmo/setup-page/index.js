@@ -106,7 +106,7 @@ class NetatmoSetupPage extends Component {
       if (redirectUri && regex.test(this.state.redirectUri)) {
         window.location.href = this.state.redirectUri;
         await this.setState({
-          netatmoSaveSettingsStatus: RequestStatus.Success
+          connectNetatmoStatus: RequestStatus.Success
         });
       } else {
         console.error('Missing redirect URL');

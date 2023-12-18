@@ -510,47 +510,35 @@
     },
     "netatmo": {
       "title": "Netatmo",
-      "description": "Control Netatmo Devices",
+      "description": "Control Netatmo equipment",
       "deviceTab": "Devices",
-      "discoverTab": "Discover Netatmo",
-      "setupTab": "Settings",
+      "discoverTab": "Netatmo Discovery",
+      "setupTab": "Setup",
       "documentation": "Netatmo Documentation",
       "discoverDeviceDescr": "Automatically scan Netatmo devices",
-      "alreadyCreatedButton": "Already created",
-
-      "nameLabel": "Device Name",
-      "namePlaceholder": "Enter your device name",
-      "modelLabel": "Model",
-      "roomLabel": "Room",
-      "saveButton": "Save",
-      "updateButton": "Update",
-      "deleteButton": "Delete",
-      "unmanagedModelButton": "Unsupported or Unavailable Model",
-
+      "unmanagedModelButton": "Model not supported or unavailable",
       "status": {
-        "notConnected": "Gladys failed to connect to the Netatmo account, more information on the ",
-        "setupPageLink": "Netatmo setup page.",
-        "online": "Online",
-        "offline": "Offline"
+        "notConnected": "Gladys failed to connect to the Netatmo account, please verify your credentials on the ",
+        "setupPageLink": "Netatmo Setup Page.",
+        "connecting": "Connecting to your Netatmo account...",
+        "connect": "Gladys is connected to Netatmo",
+        "disconnect": "Gladys is not connected to Netatmo",
+        "notConfigured": "The Netatmo service is not configured"
       },
-
       "device": {
         "title": "Netatmo Devices in Gladys",
         "noDeviceFound": "No Netatmo devices have been added yet.",
-        "searchPlaceholder": "Search for a device",
-        "sidLabel": "Netatmo SID",
+        "sidLabel": "Netatmo device SID",
+        "nameLabel": "Device name",
+        "namePlaceholder": "Enter your device name",
+        "modelLabel": "Model",
         "roomLabel": "Room",
-        "ipLabel": "IP Address",
         "featuresLabel": "Features",
         "saveButton": "Save",
-        "deleteButton": "Delete",
+        "updateButton": "Update",
         "editButton": "Edit",
-        "noFeatures": "No features",
-        "addDeviceButton": "Add",
-        "deviceNotHandled": "Unsupported devices",
-        "foundDevice": "Devices found",
-
-        "updates": "Check for updates",
+        "deleteButton": "Delete",
+        "unmanagedModelButton": "Unsupported model",
         "noValueReceived": "No value received.",
         "firmwareRevisionLabel": "Firmware: ",
         "connectedPlugLabel": "Connected to bridge",
@@ -560,85 +548,46 @@
         "title": "Your Netatmo Devices Compatible with Gladys",
         "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats associated with their Plug. The first discovery is done automatically. Press 'Refresh' if you want to retrieve new features of your devices.",
         "descriptionCompatibility": "For any requests to add devices and/or features, please visit the <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
-        "noDeviceFound": "No Netatmo devices were found. If you own a Netatmo Thermostat, have you completed all the steps in the documentation to register your devices on the Netatmo API ?",
+        "noDeviceFound": "No Netatmo devices were found. If you own a Netatmo Thermostat, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
         "alreadyCreatedButton": "Already Created",
-        "refreshButton": "Update",
-
-        "error": "Error discovering Netatmo devices. Please check your credentials during setup.",
         "scan": "Scan",
         "refresh": "Refresh"
       },
       "setup": {
         "title": "Netatmo Setup",
-        "usernameLabel": "User",
-        "usernamePlaceholder": "Netatmo Connect account email address",
-        "passwordLabel": "Password",
-        "passwordPlaceholder": "Netatmo Connect account password",
         "clientIdLabel": "Client ID",
         "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
         "clientSecretLabel": "Client Secret",
         "clientSecretPlaceholder": "Client secret from My Apps in Netatmo Connect",
-        "scopeLabel": "Connection Scope (Select the actions you wish to be able to perform with Gladys)",
-        "scopePlaceholder": "",
-        "scopes": {
-          "netatmoEnergy": "Netatmo Energy (Thermostat, Valve)",
-          "ENERGY": {
-            "read": "Read thermostat data (read_thermostat)",
-            "write": "Actions on thermostats (write_thermostat)"
-          }
-        },
         "saveLabel": "Save Configuration",
-        "connectLabel": "And connect",
-        "reconnectLabel": "And reconnect",
-        "disconnectLineOneLabel": "Disconnect",
-        "disconnectLineTwoLabel": "(Removes Gladys's Access)",
-        "configure": "Connecting to Netatmo",
-        "connect": "Gladys is connected to Netatmo",
-        "disconnect": "Gladys is not connected to Netatmo",
-        "notConfigured": "The Netatmo service is not configured",
+        "connectLabel": "and connect to Netatmo",
+        "reconnectLabel": "and reconnect to Netatmo",
+        "disconnectLabel": "Disconnect",
+        "disconnectInformationLabel": "(Removes Gladys's Access)",
         "description": "You can connect Gladys to your Netatmo account to control the associated devices.",
         "descriptionCreateAccount": "You need to create an account on <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
-        "descriptionCreateProject": "You will then need to create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a> menu.",
+        "descriptionCreateProject": "You will then need to create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
         "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\" to copy below.",
-        "descriptionScopeInformation": "When you connect Gladys to your dedicated Netatmo App, you grant it permission to access your data in both read and write modes (referred to as \"read\" and \"write\" scopes). There is nothing for you to configure; these scopes are automatically integrated and will be presented to you during the connection request (see documentation if necessary). Of course, as Gladys is installed locally, none of these data is exposed.",
+        "descriptionScopeInformation": "When you connect Gladys to your dedicated Netatmo App, you grant it permission to access your data in read and write modes (referred to as \"read\" and \"write\" scopes). You don't have to configure anything, these scopes are automatically integrated and will be presented to you during the connection request (see documentation if needed). Of course, since Gladys is installed locally, none of these data is exposed.",
         "titleAdditionalInformation": "Additional Information on the Operation of the \"Energy\" API:",
         "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
         "errorConnecting": {
-          "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum. You can then close this tab.",
-          "other_error_NetatmoPage": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
+          "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
           "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
           "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
           "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
         },
-        "error": "An error occurred while saving the configuration.",
+        "notConfigured": "The Netatmo service is not configured",
         "connecting": "Configuration saved. Connecting to your Netatmo account...",
         "processingToken": "Connecting to your Netatmo account... Retrieving access token.",
-
-        "connected": "Successfully connected to the Netatmo account!",
+        "connect": "Gladys is connected to Netatmo",
+        "disconnect": "Gladys is not connected to Netatmo",
         "connectionError": "Error during connection, please check your configuration."
       },
-
       "error": {
         "defaultError": "An error occurred while registering the device.",
         "defaultDeletionError": "An error occurred while deleting the device.",
         "conflictError": "The current device is already in Gladys."
-      },
-
-      "deviceFeatureValues": {
-        "energy": {
-          "setpointmode": {
-            "0": "Schedule",
-            "1": "Manual",
-            "2": "Frost free",
-            "3": "Away",
-            "4": "Program",
-            "null": "NC"
-          },
-          "heating_req": {
-            "0": "0",
-            "1": "100"
-          }
-        }
       }
     },
     "tasmota": {
@@ -2782,11 +2731,6 @@
       "shortCategoryName": "Humidity sensor",
       "decimal": "Humidity (decimal)"
     },
-    "schedule": {
-      "shortCategoryName": "Temporality",
-      "time-hour": "Hour (hh:mm:ss)",
-      "time-day-hour": "Day/Hour (yy/mm/dd hh:mm:ss)"
-    },
     "soil-moisture-sensor": {
       "shortCategoryName": "Soil moisture sensor",
       "decimal": "Soil moisture (decimal)"
@@ -2814,7 +2758,6 @@
     },
     "signal": {
       "shortCategoryName": "Signal",
-      "binary": "Reachable",
       "integer": "Signal strength"
     },
     "air-conditioning": {
@@ -2923,8 +2866,7 @@
     },
     "thermostat": {
       "shortCategoryName": "Thermostat",
-      "target-temperature": "Thermostat Temperature",
-      "text": "Setpoint Mode"
+      "target-temperature": "Thermostat Temperature"
     },
     "thermostat-request-sensor": {
       "shortCategoryName": "Thermostat",

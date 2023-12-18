@@ -1,4 +1,4 @@
-import { Text } from 'preact-i18n';
+import { Text, MarkupText } from 'preact-i18n';
 import { Link } from 'preact-router/match';
 import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 import { STATUS } from '../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
@@ -61,46 +61,38 @@ const NetatmoPage = props => (
                 </div>
               </div>
               {props.state.showConnect &&
-                ((!props.state.accessDenied && props.state.errored && (
-                  <p class="alert alert-danger">
-                    <Text id="integration.netatmo.setup.error" />
+                ((props.state.accessDenied && (
+                  <p class="text-center alert alert-warning">
+                    <MarkupText id={`integration.netatmo.setup.errorConnecting.${props.state.messageAlert}`} />
                   </p>
                 )) ||
-                  (props.state.accessDenied &&
-                    ((props.state.messageAlert === 'other_error' && (
-                      <p class="text-center alert alert-warning">
-                        <Text
-                          id={`integration.netatmo.setup.errorConnecting.${props.state.messageAlert}_NetatmoPage`}
-                        />
-                      </p>
-                    )) || (
-                      <p class="text-center alert alert-warning">
-                        <Text id={`integration.netatmo.setup.errorConnecting.${props.state.messageAlert}`} />
-                      </p>
-                    ))) ||
                   (!props.state.accessDenied &&
-                    ((props.state.connectNetatmoStatus === STATUS.CONNECTING && (
-                      <p class="text-center alert alert-info">
-                        <Text id="integration.netatmo.setup.connecting" />
+                    ((props.state.errored && (
+                      <p class="alert alert-danger">
+                        <Text id="integration.netatmo.setup.connectionError" />
                       </p>
                     )) ||
+                      (props.state.connectNetatmoStatus === STATUS.CONNECTING && (
+                        <p class="text-center alert alert-info">
+                          <Text id="integration.netatmo.status.connecting" />
+                        </p>
+                      )) ||
                       (props.state.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
                         <p class="text-center alert alert-warning">
-                          <Text id="integration.netatmo.setup.notConfigured" />
+                          <Text id="integration.netatmo.status.notConfigured" />
                         </p>
                       )) ||
                       (props.state.connectNetatmoStatus === STATUS.CONNECTED && (
                         <p class="text-center alert alert-success">
-                          <Text id="integration.netatmo.setup.connect" />
+                          <Text id="integration.netatmo.status.connect" />
                         </p>
                       )) ||
                       (props.state.connectNetatmoStatus === STATUS.DISCONNECTED && (
                         <p class="text-center alert alert-danger">
-                          <Text id="integration.netatmo.setup.disconnect" />
+                          <Text id="integration.netatmo.status.disconnect" />
                         </p>
                       )))))}
             </div>
-
             <div class="col-lg-9">{props.children}</div>
           </div>
         </div>

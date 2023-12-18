@@ -198,9 +198,9 @@ class SetupTab extends Component {
                         class={`btn btn-danger ${style.btnTextLineSpacing}`}
                         disabled={props.connectNetatmoStatus === STATUS.DISCONNECTING}
                       >
-                        <Text id="integration.netatmo.setup.disconnectLineOneLabel" />
+                        <Text id="integration.netatmo.setup.disconnectLabel" />
                         <br />
-                        <Text id="integration.netatmo.setup.disconnectLineTwoLabel" />
+                        <Text id="integration.netatmo.setup.disconnectInformationLabel" />
                       </button>
                     )}
                   </div>
