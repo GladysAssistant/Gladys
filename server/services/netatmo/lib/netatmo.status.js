@@ -82,6 +82,10 @@ function saveStatus(netatmoHandler, status) {
         netatmoHandler.status = STATUS.CONNECTED;
         netatmoHandler.connected = true;
         break;
+      case STATUS.DISCONNECTING:
+        netatmoHandler.configured = true;
+        netatmoHandler.status = STATUS.DISCONNECTING;
+        break;
       case STATUS.DISCONNECTED:
         netatmoHandler.configured = true;
         netatmoHandler.status = STATUS.DISCONNECTED;

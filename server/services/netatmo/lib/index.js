@@ -11,6 +11,7 @@ const { saveConfiguration } = require('./netatmo.saveConfiguration');
 const { discoverDevices } = require('./netatmo.discoverDevices');
 const { loadDevices } = require('./netatmo.loadDevices');
 const { loadDeviceDetails } = require('./netatmo.loadDeviceDetails');
+const { loadThermostatDetails } = require('./netatmo.loadThermostatDetails');
 const { pollRefreshingValues, pollRefreshingToken } = require('./netatmo.poll');
 const { setValue } = require('./netatmo.setValue');
 
@@ -53,6 +54,7 @@ NetatmoHandler.prototype.saveConfiguration = saveConfiguration;
 NetatmoHandler.prototype.discoverDevices = discoverDevices;
 NetatmoHandler.prototype.loadDevices = loadDevices;
 NetatmoHandler.prototype.loadDeviceDetails = loadDeviceDetails;
+NetatmoHandler.prototype.loadThermostatDetails = loadThermostatDetails;
 NetatmoHandler.prototype.pollRefreshingValues = pollRefreshingValues;
 NetatmoHandler.prototype.pollRefreshingToken = pollRefreshingToken;
 NetatmoHandler.prototype.setValue = setValue;

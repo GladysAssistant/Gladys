@@ -682,11 +682,9 @@
       },
       "discover": {
         "title": "Vos appareils Netatmo compatibles avec Gladys",
-        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant. Appuyer sur le bouton 'Scanner' pour découvrir les appareils Netatmo la première fois. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
-        "descriptionCompatibility": "Vous ne verrez ici que les appareils actuellement compatibles avec Gladys. Pour toute demande d'ajout d'appareils et/ou de fonctionnalités, veuillez vous rendre sur le <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Forum Gladys Assistant - Catégorie \"Demande de fonctionnalités\"</a>.",
-        "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
-        "noConnect": "Aucun appareil Netatmo. Vous devez d'abord configurer et vous connecter à un compte Netatmo depuis le menu 'Paramètres'.",
-        "disconnect": "Aucun appareil Netatmo ne peut être détecté. Vous devez d'abord vous reconnecter depuis le menu 'Paramètres'.",
+        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant d'être ajoutés à Gladys qui ne supporte actuellement que les Thermostats associés à leur Plug. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
+        "descriptionCompatibility": "Pour toute demande d'ajout d'appareils et/ou de fonctionnalités, veuillez vous rendre sur le <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Forum Gladys Assistant - Catégorie \"Demande de fonctionnalités\"</a>.",
+        "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Si vous possédez un Thermostat Netatmo, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
         "alreadyCreatedButton": "Déjà créé",
         "refreshButton": "Mettre à jour",
         "error": "Erreur de découverte des appareils Netatmo. Veuillez vérifier vos informations d'identification lors de l'installation.",
@@ -725,7 +723,7 @@
         "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionCreateProject": "Vous devrez ensuite créer une \"application\" dans votre compte développeur Netatmo via le menu <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
         "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\" à copier ci-dessous.",
-        "descriptionScopeInformation": "Lorsque vous connectez Gladys à votre App Netatmo dédiée, vous lui donnez l'autorisation d'accéder à vos données en lecture et en écriture (appelé scopes \"read\" et \"write\"). Bien entendu, Gladys étant installée en local, aucune de ces données ne se retrouve exposées.",
+        "descriptionScopeInformation": "Lorsque vous connectez Gladys à votre App Netatmo dédiée, vous lui donnez l'autorisation d'accéder à vos données en lecture et en écriture (appelé scopes \"read\" et \"write\"). Vous n'avez rien à configuré, ces scopes sont automatiquement intégrés et vous serons exposés lors de la demande de connexion (voir documentation au besoin). Bien entendu, Gladys étant installée en local, aucune de ces données ne se retrouve exposées.",
         "titleAdditionalInformation": "Informations complémentaires sur le fonctionnement de l'API \"Energie\" :",
         "descriptionAdditionalInformation": "Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe.",
         "errorConnecting": {

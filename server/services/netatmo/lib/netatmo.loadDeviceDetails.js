@@ -27,34 +27,13 @@ async function loadDeviceDetails(homeData) {
     const { rooms: roomsHomestatus, modules: modulesHomestatus } = bodyGetHomestatus.home;
 
     let thermostats;
-    const modulesThermostat = [];
+    let modulesThermostat = [];
     if (
       modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.THERMOSTAT) !== undefined
     ) {
-      try {
-        logger.debug('loading Thermostats details...');
-        const responseGetThermostat = await axios({
-          url: API.GET_THERMOSTATS,
-          method: 'get',
-          headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
-        });
-        const { body: bodyGetThermostat, status: statusGetThermostat } = responseGetThermostat.data;
-        thermostats = bodyGetThermostat.devices;
-        if (statusGetThermostat === 'ok') {
-          thermostats.forEach((thermostat) => {
-            modulesThermostat.push(...thermostat.modules);
-          });
-        }
-        logger.debug('Thermostats details loaded in home: ', homeId);
-      } catch (e) {
-        logger.error(
-          'Error getting thermostats details - status error: ',
-          e.statusGetThermostat,
-          ' data error: ',
-          e.response.data.error,
-        );
-        return undefined;
-      }
+      const deviceThermostats = await this.loadThermostatDetails();
+      thermostats = deviceThermostats.thermostats;
+      modulesThermostat = deviceThermostats.modules;
     }
     let listDevices;
     if (statusGetHomestatus === 'ok') {
@@ -63,13 +42,13 @@ async function loadDeviceDetails(homeData) {
             await Promise.all(
               modulesHomestatus.map(async (module) => {
                 let moduleSupported = false;
-                let deviceThermostat;
+                let device;
                 let plugThermostat;
                 switch (module.type) {
                   case SUPPORTED_MODULE_TYPE.THERMOSTAT:
                     moduleSupported = true;
                     if (thermostats && modulesThermostat) {
-                      deviceThermostat = modulesThermostat.find(
+                      device = modulesThermostat.find(
                         // eslint-disable-next-line no-underscore-dangle
                         (moduleThermostat) => moduleThermostat._id === module.id,
                       );
@@ -83,7 +62,7 @@ async function loadDeviceDetails(homeData) {
                     }
                     break;
                   case SUPPORTED_MODULE_TYPE.PLUG:
-                    deviceThermostat = thermostats
+                    device = thermostats
                       .map((thermostat) => {
                         const { modules, ...rest } = thermostat;
                         return rest;
@@ -111,7 +90,7 @@ async function loadDeviceDetails(homeData) {
                   const deviceSupported = {
                     ...module,
                     ...moduleHomeData,
-                    ...deviceThermostat,
+                    ...device,
                     home: homeId,
                     room: roomDevice,
                     plug,
