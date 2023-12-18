@@ -18,6 +18,7 @@ const ScenePage = ({ children, ...props }) => (
               <Text id="scene.title" />
             </h1>
             <div class="page-options d-flex">
+              <SceneTagFilter tags={props.tags} searchTags={props.searchTags} sceneTagSearch={props.sceneTagSearch} />
               <Localizer>
                 <CardFilter
                   changeOrderDir={props.changeOrderDir}
@@ -27,7 +28,6 @@ const ScenePage = ({ children, ...props }) => (
                   searchPlaceHolder={<Text id="scene.searchPlaceholder" />}
                 />
               </Localizer>
-              <SceneTagFilter tags={props.tags} searchTags={props.searchTags} sceneTagSearch={props.sceneTagSearch} />
               <Link href="/dashboard/scene/new" class={cx('btn', 'btn-outline-primary', 'ml-2', style.newButton)}>
                 <span class="d-none d-lg-inline-block mr-2">
                   <Text id="scene.newButton" />

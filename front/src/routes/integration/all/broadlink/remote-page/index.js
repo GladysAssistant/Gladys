@@ -71,7 +71,7 @@ class BroadlinkDeviceSetupPage extends Component {
 
   render(props, { loading, device, peripheral, isRemote }) {
     return (
-      <BroadlinkPage>
+      <BroadlinkPage user={props.user}>
         <div
           class={cx('dimmer', {
             active: loading === RequestStatus.Getting

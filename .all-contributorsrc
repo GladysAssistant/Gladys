@@ -227,8 +227,18 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "jbrisavoine",
+      "name": "Jonathan Brisavoine",
+      "avatar_url": "https://avatars.githubusercontent.com/u/138247436?v=4",
+      "profile": "https://github.com/jbrisavoine",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
-  "skipCi": true
+  "skipCi": true,
+  "commitType": "docs"
 }

@@ -101,14 +101,15 @@ const EditBoxColumns = ({ children, ...props }) => (
               )}
 
               {column.length === 0 && <EmptyColumnDropZone moveCard={props.moveCard} x={x} />}
+
+              {props.isMobileReordering && <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
+              <div class="d-flex justify-content-center mb-4">
+                <button class="btn btn-primary" onClick={() => props.addBox(x)}>
+                  <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
+                </button>
+              </div>
             </div>
           ))}
-      </div>
-      {props.isMobileReordering && <AutoScrollMobile position="bottom" box_type={DASHBOARD_EDIT_BOX_TYPE} />}
-      <div class="d-flex justify-content-center">
-        <button class="btn btn-primary" onClick={props.addBox}>
-          <Text id="dashboard.addBoxButton" /> <i class="fe fe-plus" />
-        </button>
       </div>
     </DndProvider>
   </div>

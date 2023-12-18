@@ -2,7 +2,6 @@ import { Component } from 'preact';
 import { Text, Localizer } from 'preact-i18n';
 import Select from 'react-select';
 import update from 'immutability-helper';
-import cx from 'classnames';
 
 import TextWithVariablesInjected from '../../../../../components/scene/TextWithVariablesInjected';
 
@@ -76,7 +75,6 @@ class Condition extends Component {
               </label>
               <Select
                 defaultValue={''}
-                className={cx(style.deviceSelector)}
                 value={selectedOption}
                 onChange={this.handleChange}
                 options={props.variableOptions}

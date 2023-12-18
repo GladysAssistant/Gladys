@@ -40,7 +40,7 @@ describe('bluetooth.transformToDevice', () => {
       params: [
         {
           name: 'loaded',
-          value: true,
+          value: 'true',
         },
       ],
     };
@@ -61,7 +61,7 @@ describe('bluetooth.transformToDevice', () => {
       params: [
         {
           name: 'loaded',
-          value: true,
+          value: 'true',
         },
       ],
     };
@@ -81,7 +81,7 @@ describe('bluetooth.transformToDevice', () => {
       params: [
         {
           name: 'loaded',
-          value: true,
+          value: 'true',
         },
       ],
     };

@@ -104,7 +104,7 @@ class MqttNodePage extends Component {
 
   render(props, state) {
     return (
-      <MqttPage>
+      <MqttPage user={props.user}>
         <SetupTab
           {...props}
           {...state}

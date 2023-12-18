@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const CalDAV = ({ children }) => (
+const CalDAV = ({ children, user }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -30,7 +31,7 @@ const CalDAV = ({ children }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-sliders" />
+                      <i class="fe fe-refresh-cw" />
                     </span>
                     <Text id="integration.caldav.syncTab" />
                   </Link>
@@ -41,10 +42,22 @@ const CalDAV = ({ children }) => (
                     class="list-group-item list-group-item-action d-flex align-items-center"
                   >
                     <span class="icon mr-3">
-                      <i class="fe fe-sliders" />
+                      <i class="fe fe-share" />
                     </span>
                     <Text id="integration.caldav.shareTab" />
                   </Link>
+
+                  <DeviceConfigurationLink
+                    user={user}
+                    configurationKey="integrations"
+                    documentKey="caldav"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.caldav.documentation" />
+                  </DeviceConfigurationLink>
                 </div>
               </div>
             </div>

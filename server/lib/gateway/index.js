@@ -29,6 +29,7 @@ const { saveUsersKeys } = require('./gateway.saveUsersKeys');
 const { refreshUserKeys } = require('./gateway.refreshUserKeys');
 const { getEcowattSignals } = require('./gateway.getEcowattSignals');
 const { openAIAsk } = require('./gateway.openAIAsk');
+const { getTTSApiUrl } = require('./gateway.getTTSApiUrl');
 const { forwardMessageToOpenAI } = require('./gateway.forwardMessageToOpenAI');
 
 // Enedis API
@@ -123,5 +124,8 @@ Gateway.prototype.forwardMessageToOpenAI = forwardMessageToOpenAI;
 Gateway.prototype.enedisGetConsumptionLoadCurve = enedisGetConsumptionLoadCurve;
 Gateway.prototype.enedisGetDailyConsumption = enedisGetDailyConsumption;
 Gateway.prototype.enedisGetDailyConsumptionMaxPower = enedisGetDailyConsumptionMaxPower;
+
+// TTS API
+Gateway.prototype.getTTSApiUrl = getTTSApiUrl;
 
 module.exports = Gateway;
