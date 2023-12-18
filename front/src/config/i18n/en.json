@@ -2723,10 +2723,6 @@
       "shortCategoryName": "Opening sensor",
       "binary": "Opening (open/closed)"
     },
-    "orientation-sensor": {
-      "shortCategoryName": "Orientation detector",
-      "integer": "Orientation angle (degree)"
-    },
     "humidity-sensor": {
       "shortCategoryName": "Humidity sensor",
       "decimal": "Humidity (decimal)"
@@ -2867,10 +2863,6 @@
     "thermostat": {
       "shortCategoryName": "Thermostat",
       "target-temperature": "Thermostat Temperature"
-    },
-    "thermostat-request-sensor": {
-      "shortCategoryName": "Thermostat",
-      "integer": "Heating Demand"
     },
     "airquality-sensor": {
       "shortCategoryName": "Air Quality",

@@ -2725,10 +2725,6 @@
       "shortCategoryName": "Détecteur d'ouverture",
       "binary": "Ouverture (Oui/Non)"
     },
-    "orientation-sensor": {
-      "shortCategoryName": "Détecteur d'orientation",
-      "integer": "Angle d'orientation (degré)"
-    },
     "humidity-sensor": {
       "shortCategoryName": "Capteur d'humidité",
       "decimal": "Humidité (pourcentage)"
@@ -2869,10 +2865,6 @@
     "thermostat": {
       "shortCategoryName": "Thermostat",
       "target-temperature": "Température de consigne"
-    },
-    "thermostat-request-sensor": {
-      "shortCategoryName": "Thermostat",
-      "integer": "Demande de chauffe"
     },
     "airquality-sensor": {
       "shortCategoryName": "Qualité de l'air",
