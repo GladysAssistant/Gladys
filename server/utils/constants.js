@@ -359,6 +359,9 @@ const ACTIONS = {
   MQTT: {
     SEND: 'mqtt.send',
   },
+  MUSIC: {
+    PLAY_NOTIFICATION: 'music.play-notification',
+  },
 };
 
 const INTENTS = {
@@ -387,7 +390,7 @@ const INTENTS = {
 };
 
 const DEVICE_FEATURE_CATEGORIES = {
-  ACCESS_CONTROL: 'access-control',
+  CHILD_LOCK: 'child-lock',
   AIRQUALITY_SENSOR: 'airquality-sensor',
   AIR_CONDITIONING: 'air-conditioning',
   BATTERY: 'battery',
@@ -474,8 +477,8 @@ const DEVICE_FEATURE_TYPES = {
   SIREN: {
     BINARY: 'binary',
   },
-  ACCESS_CONTROL: {
-    MODE: 'mode',
+  CHILD_LOCK: {
+    BINARY: 'binary',
   },
   CUBE: {
     MODE: 'mode',
@@ -554,6 +557,7 @@ const DEVICE_FEATURE_TYPES = {
     PREVIOUS: 'previous',
     NEXT: 'next',
     PLAYBACK_STATE: 'playback_state',
+    PLAY_NOTIFICATION: 'play_notification',
   },
   ENERGY_SENSOR: {
     BINARY: 'binary',

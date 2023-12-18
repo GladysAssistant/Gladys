@@ -12,7 +12,7 @@ class BroadlinkDevicePage extends Component {
 
   render(props, {}) {
     return (
-      <BroadlinkPage>
+      <BroadlinkPage user={props.user}>
         <PeripheralTab {...props} />
       </BroadlinkPage>
     );
