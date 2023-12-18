@@ -1,0 +1,51 @@
+{
+  "thermostats": [
+    {
+      "_id": "70:ee:50:xx:xx:e0",
+      "type": "NAPlug",
+      "last_setup": 1580000589,
+      "firmware": 200,
+      "last_status_store": 1602798842,
+      "plug_connected_boiler": true,
+      "wifi_status": 45,
+      "modules": [
+        "04:00:00:xx:73:00",
+        "09:00:00:xx:b0:fb"
+      ],
+      "station_name": "Relais Test",
+      "place": {
+        "altitude": 50,
+        "city": "Ville Test",
+        "country": "FR",
+        "timezone": "Europe/Paris"
+      },
+      "udp_conn": true,
+      "last_plug_seen": 1602798842
+    }
+  ],
+  "modules": [
+    {
+      "_id": "04:00:00:xx:73:00",
+      "type": "NATherm1",
+      "firmware": 60,
+      "last_message": 1602798840,
+      "rf_status": 60,
+      "battery_vp": 3000,
+      "therm_orientation": 1,
+      "therm_relay_cmd": 100,
+      "anticipating": false,
+      "module_name": "Thermostat Test",
+      "battery_percent": 50,
+      "event_history": {},
+      "setpoint_history": [],
+      "last_therm_seen": 1602798840,
+      "setpoint": {},
+      "therm_program_list": [],
+      "measured": {
+        "time": 1602798668,
+        "temperature": 19,
+        "setpoint_temp": 19
+      }
+    }
+  ]
+}

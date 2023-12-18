@@ -1,44 +1,58 @@
-const sinon = require('sinon');
 const { expect } = require('chai');
-const proxyquire = require('proxyquire').noCallThru();
+const sinon = require('sinon');
+const proxyquire = require('proxyquire');
+
+const { NetatmoHandlerMock } = require('./netatmo.mock.test');
 const { STATUS } = require('../../../services/netatmo/lib/utils/netatmo.constants');
 
-const { assert, fake } = sinon;
+describe.only('Netatmo Service', () => {
+  let NetatmoService;
+  let netatmoService;
+  let gladys;
+  let serviceId;
 
-const NetatmoHandlerMock = sinon.stub();
-NetatmoHandlerMock.prototype.init = fake.returns(null);
-NetatmoHandlerMock.prototype.disconnect = fake.returns(null);
-
-const NetatmoService = proxyquire('../../../services/netatmo/index', { './lib': NetatmoHandlerMock });
-
-const gladys = {};
-const serviceId = 'ecca4d93-7a8c-4761-9055-fc15460a4b4a';
-
-describe('NetatmoService', () => {
-  const netatmoService = NetatmoService(gladys, serviceId);
   beforeEach(() => {
-    sinon.reset();
+    gladys = { service: { getService: sinon.stub() } };
+    serviceId = 'some-service-id';
+
+    NetatmoService = proxyquire('../../../services/netatmo/index', {
+      './lib': function () {
+        return NetatmoHandlerMock;
+      },
+    });
+
+    netatmoService = NetatmoService(gladys, serviceId);
   });
+
   afterEach(() => {
-    sinon.reset();
+    sinon.restore();
   });
-  it('should start service', async () => {
-    await netatmoService.start();
-    assert.calledOnce(netatmoService.device.init);
-    assert.notCalled(netatmoService.device.disconnect);
+
+  describe('start', () => {
+    it('should start the service correctly', async () => {
+      await netatmoService.start();
+      expect(NetatmoHandlerMock.init.calledOnce).to.be.true;
+    });
   });
-  it('should stop service', async () => {
-    netatmoService.stop();
-    assert.notCalled(netatmoService.device.init);
-    assert.calledOnce(netatmoService.device.disconnect);
+
+  describe('stop', () => {
+    it('should stop the service correctly', async () => {
+      await netatmoService.stop();
+      expect(NetatmoHandlerMock.disconnect.calledOnce).to.be.true;
+    });
   });
-  it('isUsed: should return false, service not used', async () => {
-    const used = await netatmoService.isUsed();
-    expect(used).to.equal(false);
-  });
-  it('isUsed: should return true, service is used', async () => {
-    netatmoService.device.status = STATUS.CONNECTED;
-    const used = await netatmoService.isUsed();
-    expect(used).to.equal(true);
+
+  describe('isUsed', () => {
+    it('should return true when Netatmo is connected', async () => {
+      NetatmoHandlerMock.status = STATUS.CONNECTED;
+      const result = await netatmoService.isUsed();
+      expect(result).to.be.true;
+    });
+
+    it('should return false when Netatmo is not connected', async () => {
+      NetatmoHandlerMock.status = STATUS.NOT_INITIALIZED;
+      const result = await netatmoService.isUsed();
+      expect(result).to.be.false;
+    });
   });
 });

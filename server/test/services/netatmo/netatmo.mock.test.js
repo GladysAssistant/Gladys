@@ -1,28 +1,63 @@
-const { fake } = require('sinon');
-const { STATUS } = require('../../../services/netatmo/lib/utils/netatmo.constants');
+const sinon = require('sinon');
 
-const NetatmoContext = function NetatmoContext(gladys, serviceId) {
-  this.gladys = gladys;
-  this.serviceId = serviceId;
-  this.baseUrl = 'https://api.netatmo.net';
+const devicesMock = require('./netatmo.loadDevices.mock.test.json');
+const deviceDetailsMock = require('./netatmo.loadDevicesDetails.mock.test.json');
+const thermostatsDetailsMock = require('./netatmo.loadThermostatDetails.mock.test.json');
+const discoverDevicesMock = require('./netatmo.discoverDevices.mock.test.json');
+const { STATUS, SCOPES } = require('../../../services/netatmo/lib/utils/netatmo.constants');
 
-  this.configured = false;
-  this.connected = false;
-  this.redirectUri = null;
-  this.stateGetAccessToken = null;
-  this.status = STATUS.NOT_INITIALIZED;
-  this.pollEnergy = undefined;
-  this.scopes = {
-    netatmoEnergy: false,
-  };
+const NetatmoHandlerMock = {
+  configuration: {
+    clientId: null,
+    clientSecret: null,
+    scopes: {
+      scopeEnergy: `${SCOPES.ENERGY.read} ${SCOPES.ENERGY.write}`,
+    },
+  },
+  configured: false,
+  connected: false,
+  redirectUri: null,
+  accessToken: null,
+  refreshToken: null,
+  expireInToken: null,
+  stateGetAccessToken: null,
+  status: STATUS.NOT_INITIALIZED,
+  pollRefreshToken: undefined,
+  pollRefreshValues: undefined,
+  
+  init: sinon.stub().resolves(),
+  connect: sinon.stub().resolves(),
+  disconnect: sinon.stub().resolves(),
+  retrieveTokens: sinon.stub().resolves({
+    accessToken: 'mock_access_token',
+    refreshToken: 'mock_refresh_token',
+    expireIn: 10800
+  }),
+  setTokens: sinon.stub().resolves(),
+  getStatus: sinon.stub().returns(STATUS.NOT_INITIALIZED),
+  saveStatus: sinon.stub().resolves(),
+  getAccessToken: sinon.stub().resolves('mock_access_token'),
+  getRefreshToken: sinon.stub().resolves('mock_refresh_token'),
+  refreshingTokens: sinon.stub().resolves({
+    accessToken: 'mock_access_token',
+    refreshToken: 'mock_refresh_token',
+    expireIn: 10800
+  }),
+  getConfiguration: sinon.stub().resolves({
+    clientId: 'mock_client_id',
+    clientSecret: 'mock_client_secret',
+    redirectUri: 'mock_redirect_uri'
+  }),
+  saveConfiguration: sinon.stub().resolves(),
+  discoverDevices: sinon.stub().resolves(discoverDevicesMock),
+  loadDevices: sinon.stub().resolves(devicesMock),
+  loadDeviceDetails: sinon.stub().resolves(deviceDetailsMock),
+  loadThermostatDetails: sinon.stub().resolves(thermostatsDetailsMock),
+  pollRefreshingValues: sinon.stub().resolves(),
+  pollRefreshingToken: sinon.stub().resolves(),
+  setValue: sinon.stub().resolves(),
 };
 
-NetatmoContext.prototype.connect = fake.returns(null);
-NetatmoContext.prototype.setTokens = fake.returns(null);
-NetatmoContext.prototype.saveStatus = fake.returns(null);
-NetatmoContext.prototype.init = fake.returns(null);
-NetatmoContext.prototype.refreshingTokens = fake.returns({ success: false });
-NetatmoContext.prototype.loadDevices = fake.returns(null);
-NetatmoContext.prototype.disconnect = fake.returns(null);
-
-module.exports = NetatmoContext;
+module.exports = {
+  NetatmoHandlerMock
+};

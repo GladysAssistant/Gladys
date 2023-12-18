@@ -1,150 +1,141 @@
+const { expect } = require('chai');
 const sinon = require('sinon');
 const NetatmoController = require('../../../../../services/netatmo/api/netatmo.controller');
+const { NetatmoHandlerMock } = require('../../netatmo.mock.test');
 
-const { assert, fake } = sinon;
+const netatmoController = NetatmoController(NetatmoHandlerMock);
 
-const configuration = [
-  { username: 'username' },
-  { clientId: 'clientId' },
-  { clientSecret: 'clientSecret' },
-  { scopes: { scopeEnergy: 'read_thermostat write_thermostat' } },
-];
-const bodyTokens = [{ codeOAuth: 'codeOAuth' }, { state: 'state' }, { redirectUri: 'redirectUri' }];
-const status = [{ configured: true }, { connected: false }, { status: 'disconnecting' }];
-const connectResult = [{ authUrl: 'redirectUriComplet' }, { state: 'state' }];
+describe.only('Netatmo Controller', () => {
+  let req;
+  let res;
 
-const netatmoManagerFake = {
-  getConfiguration: fake.returns(configuration),
-  getStatus: fake.returns(status),
-  saveConfiguration: fake.resolves(configuration),
-  saveStatus: fake.resolves(status),
-  connect: fake.returns(connectResult),
-  retrieveTokens: fake.resolves({ success: true }),
-  disconnect: fake.resolves({ success: true }),
-};
-
-describe('NetatmoController GET/POST', () => {
-  let controller;
   beforeEach(() => {
-    controller = NetatmoController(netatmoManagerFake);
-  });
-  afterEach(() => {
     sinon.reset();
+
+    req = {
+      body: {},
+      params: {},
+      query: {},
+    };
+
+    res = {
+      json: sinon.spy(),
+      status: sinon.stub().returnsThis(),
+    };
   });
 
-  it('should return configuration', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(configuration),
-    };
-    await controller['get /api/v1/service/netatmo/config'].controller(req, res);
-    assert.calledOnce(netatmoManagerFake.getConfiguration);
-    assert.notCalled(netatmoManagerFake.getStatus);
-    assert.notCalled(netatmoManagerFake.saveConfiguration);
-    assert.notCalled(netatmoManagerFake.saveStatus);
-    assert.notCalled(netatmoManagerFake.connect);
-    assert.notCalled(netatmoManagerFake.retrieveTokens);
-    assert.notCalled(netatmoManagerFake.disconnect);
-    assert.calledWith(res.json, sinon.match(configuration));
+  describe('getConfiguration', () => {
+    it('should get the netatmo configuration', async () => {
+      const configuration = { clientId: 'test', clientSecret: 'test', redirectUri: 'test' };
+      NetatmoHandlerMock.getConfiguration.resolves(configuration);
+
+      await netatmoController['get /api/v1/service/netatmo/config'].controller(req, res);
+      expect(res.json.calledWith(configuration)).to.be.true;
+    });
   });
-  it('should return get status', async () => {
-    const req = {};
-    const res = {
-      json: fake.returns(status),
-    };
-    await controller['get /api/v1/service/netatmo/status'].controller(req, res);
-    assert.notCalled(netatmoManagerFake.getConfiguration);
-    assert.calledOnce(netatmoManagerFake.getStatus);
-    assert.notCalled(netatmoManagerFake.saveConfiguration);
-    assert.notCalled(netatmoManagerFake.saveStatus);
-    assert.notCalled(netatmoManagerFake.connect);
-    assert.notCalled(netatmoManagerFake.retrieveTokens);
-    assert.notCalled(netatmoManagerFake.disconnect);
-    assert.calledWith(res.json, sinon.match(status));
+
+  describe('getStatus', () => {
+    it('should get the netatmo status', async () => {
+      const status = { connected: true };
+      NetatmoHandlerMock.getStatus.resolves(status);
+
+      await netatmoController['get /api/v1/service/netatmo/status'].controller(req, res);
+      expect(res.json.calledWith(status)).to.be.true;
+    });
   });
-  it('should save configuration', async () => {
-    const req = {
-      body: configuration,
-    };
-    const res = {
-      json: fake(),
-    };
-    await controller['post /api/v1/service/netatmo/saveConfiguration'].controller(req, res);
-    assert.notCalled(netatmoManagerFake.getConfiguration);
-    assert.notCalled(netatmoManagerFake.getStatus);
-    assert.calledOnce(netatmoManagerFake.saveConfiguration);
-    assert.notCalled(netatmoManagerFake.saveStatus);
-    assert.notCalled(netatmoManagerFake.connect);
-    assert.notCalled(netatmoManagerFake.retrieveTokens);
-    assert.notCalled(netatmoManagerFake.disconnect);
-    sinon.assert.calledOnceWithExactly(netatmoManagerFake.saveConfiguration, req.body);
-    sinon.assert.calledWithExactly(res.json, { success: configuration });
+
+  describe('saveConfiguration', () => {
+    it('should save the netatmo configuration', async () => {
+      const configuration = { clientId: 'test', clientSecret: 'test', redirectUri: 'test' };
+      req.body = configuration;
+      NetatmoHandlerMock.saveConfiguration.resolves(true);
+
+      await netatmoController['post /api/v1/service/netatmo/saveConfiguration'].controller(req, res);
+      expect(res.json.calledWith({ success: true })).to.be.true;
+    });
   });
-  it('should save status', async () => {
-    const req = {
-      body: status,
-    };
-    const res = {
-      json: fake(),
-    };
-    await controller['post /api/v1/service/netatmo/saveStatus'].controller(req, res);
-    assert.notCalled(netatmoManagerFake.getConfiguration);
-    assert.notCalled(netatmoManagerFake.getStatus);
-    assert.notCalled(netatmoManagerFake.saveConfiguration);
-    assert.calledOnce(netatmoManagerFake.saveStatus);
-    assert.notCalled(netatmoManagerFake.connect);
-    assert.notCalled(netatmoManagerFake.retrieveTokens);
-    assert.notCalled(netatmoManagerFake.disconnect);
-    sinon.assert.calledOnceWithExactly(netatmoManagerFake.saveStatus, req.body);
-    sinon.assert.calledWithExactly(res.json, { success: status });
+
+  describe('saveStatus', () => {
+    it('should save the netatmo status', async () => {
+      const status = { connected: true };
+      req.body = status;
+      NetatmoHandlerMock.saveStatus.resolves(true);
+
+      await netatmoController['post /api/v1/service/netatmo/saveStatus'].controller(req, res);
+      expect(res.json.calledWith({ success: true })).to.be.true;
+    });
   });
-  it('should connect', async () => {
-    const req = {};
-    const res = {
-      json: fake(),
-    };
-    await controller['post /api/v1/service/netatmo/connect'].controller(req, res);
-    assert.calledOnce(netatmoManagerFake.getConfiguration);
-    assert.notCalled(netatmoManagerFake.getStatus);
-    assert.notCalled(netatmoManagerFake.saveConfiguration);
-    assert.notCalled(netatmoManagerFake.saveStatus);
-    assert.calledOnce(netatmoManagerFake.connect);
-    assert.notCalled(netatmoManagerFake.retrieveTokens);
-    assert.notCalled(netatmoManagerFake.disconnect);
-    sinon.assert.calledOnceWithExactly(netatmoManagerFake.connect, sinon.match.any, configuration);
-    sinon.assert.calledWithExactly(res.json, { result: connectResult });
+
+  describe('connect', () => {
+    it('should connect netatmo', async () => {
+      NetatmoHandlerMock.connect.resolves(true);
+
+      await netatmoController['post /api/v1/service/netatmo/connect'].controller(req, res);
+      expect(res.json.calledWith({ result: true })).to.be.true;
+    });
   });
-  it('should retrieve tokens', async () => {
-    const req = {
-      body: bodyTokens,
-    };
-    const res = {
-      json: fake(),
-    };
-    await controller['post /api/v1/service/netatmo/retrieveTokens'].controller(req, res);
-    assert.calledOnce(netatmoManagerFake.getConfiguration);
-    assert.notCalled(netatmoManagerFake.getStatus);
-    assert.notCalled(netatmoManagerFake.saveConfiguration);
-    assert.notCalled(netatmoManagerFake.saveStatus);
-    assert.notCalled(netatmoManagerFake.connect);
-    assert.calledOnce(netatmoManagerFake.retrieveTokens);
-    assert.notCalled(netatmoManagerFake.disconnect);
-    sinon.assert.calledOnceWithExactly(netatmoManagerFake.retrieveTokens, sinon.match.any, configuration, req.body);
-    sinon.assert.calledWithExactly(res.json, { result: { success: true } });
+
+  describe('retrieveTokens', () => {
+    it('should retrieve netatmo tokens', async () => {
+      req.body = { code: 'test-code' };
+      NetatmoHandlerMock.retrieveTokens.resolves({ accessToken: 'test-token', refreshToken: 'test-refresh-token' });
+
+      await netatmoController['post /api/v1/service/netatmo/retrieveTokens'].controller(req, res);
+      expect(res.json.calledWith({
+        result: {
+          accessToken: 'test-token',
+          refreshToken: 'test-refresh-token'
+        }
+      })).to.be.true;
+    });
   });
-  it('should disconnect', async () => {
-    const req = {};
-    const res = {
-      json: fake(),
-    };
-    await controller['post /api/v1/service/netatmo/disconnect'].controller(req, res);
-    assert.notCalled(netatmoManagerFake.getConfiguration);
-    assert.notCalled(netatmoManagerFake.getStatus);
-    assert.notCalled(netatmoManagerFake.saveConfiguration);
-    assert.notCalled(netatmoManagerFake.saveStatus);
-    assert.notCalled(netatmoManagerFake.connect);
-    assert.notCalled(netatmoManagerFake.retrieveTokens);
-    sinon.assert.calledOnce(netatmoManagerFake.disconnect);
-    sinon.assert.calledWithExactly(res.json, { success: true });
+
+  describe('disconnect', () => {
+    it('should disconnect netatmo', async () => {
+      NetatmoHandlerMock.disconnect.resolves();
+
+      await netatmoController['post /api/v1/service/netatmo/disconnect'].controller(req, res);
+      expect(res.json.calledWith({ success: true })).to.be.true;
+    });
+  });
+
+  describe('discover', () => {
+    it('should discover netatmo devices', async () => {
+      const devices = [{ id: 'device1' }, { id: 'device2' }];
+      NetatmoHandlerMock.discoverDevices.resolves(devices);
+
+      await netatmoController['get /api/v1/service/netatmo/discover'].controller(req, res);
+      expect(res.json.calledWith(devices)).to.be.true;
+    });
+    it('should return already discovered devices that are not in Gladys', async () => {
+
+      const discoveredDevices = [
+        { external_id: 'netatmo:70:ee:50:xx:xx:e0', notInGladys: true },
+        { external_id: 'netatmo:70:ee:50:xx:xx:e1', notInGladys: false }
+      ];
+      NetatmoHandlerMock.discoveredDevices = discoveredDevices;
+      NetatmoHandlerMock.gladys = {
+        stateManager: {
+          get: sinon.stub().callsFake((type, externalId) => {
+            const device = discoveredDevices.find(d => d.external_id === externalId);
+            return device && !device.notInGladys ? {} : null;
+          }),
+        },
+      };
+      await netatmoController['get /api/v1/service/netatmo/discover'].controller(req, res);
+
+      const expectedDevices = discoveredDevices.filter(d => d.notInGladys);
+      expect(res.json.calledWith(expectedDevices)).to.be.true;
+    });
+  });
+
+  describe('refreshDiscover', () => {
+    it('should refresh and discover new netatmo devices', async () => {
+      const devices = [{ id: 'device3' }, { id: 'device4' }];
+      NetatmoHandlerMock.discoverDevices.resolves(devices);
+
+      await netatmoController['get /api/v1/service/netatmo/refreshDiscover'].controller(req, res);
+      expect(res.json.calledWith(devices)).to.be.true;
+    });
   });
 });

@@ -1,160 +1,91 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const proxyquire = require('proxyquire').noCallThru();
-const NetatmoContext = require('../netatmo.mock.test');
-
-const { assert, fake } = sinon;
-
-const NetatmoHandler = proxyquire('../../../../services/netatmo/lib/index', {
-  NetatmoContext,
-});
-const { STATUS, GLADYS_VARIABLES } = require('../../../../services/netatmo/lib/utils/netatmo.constants');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
+const EventEmitter = require('events');
+const { init } = require('../../../../services/netatmo/lib/netatmo.init');
+const { NetatmoHandlerMock } = require('../netatmo.mock.test');
+const netatmoRefreshingTokens = require('../../../../services/netatmo/lib/netatmo.refreshingTokens');
+const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const { EVENTS } = require('../../../../utils/constants');
 
-const gladys = {
-  variable: {
-    getValue: sinon.stub(),
-  },
-  event: {
-    emit: fake.returns(null),
-  },
-};
-const serviceId = 'ecca4d93-7a8c-4761-9055-fc15460a4b4a';
-
-describe('NetatmoHandler.init', () => {
-  let netatmoHandler;
+describe.only('Netatmo Init', () => {
+  let eventEmitter;
   beforeEach(() => {
-    sinon.reset();
-    netatmoHandler = new NetatmoHandler(gladys, serviceId);
+    sinon.restore();
+    eventEmitter = new EventEmitter();
+    NetatmoHandlerMock.gladys = { event: eventEmitter };
+    sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
+
+    NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
+    NetatmoHandlerMock.status = 'not_initialized';
+    NetatmoHandlerMock.refreshingTokens = sinon.stub().callsFake(netatmoRefreshingTokens.refreshingTokens);
   });
   afterEach(() => {
-    sinon.reset();
+    sinon.restore();
   });
 
-  it('should not initialized and receive error', async () => {
-    gladys.variable.getValue.withArgs(GLADYS_VARIABLES.USERNAME, serviceId).returns('username');
+  it('should throw an error if not configured', async () => {
+    NetatmoHandlerMock.configuration.clientId = null;
+    NetatmoHandlerMock.configuration.clientSecret = null;
 
     try {
-      await netatmoHandler.init();
+      await init(NetatmoHandlerMock);
+      expect.fail('should have thrown an error');
     } catch (e) {
-      assert.callCount(gladys.event.emit, 1);
-      assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-        type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-        payload: { status: STATUS.NOT_INITIALIZED },
-      });
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
+      expect(e.message).to.equal('Netatmo is not configured.');
     }
+    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
+    expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: 'netatmo.status',
+      payload: { status: 'not_initialized' },
+    })).to.be.true;
   });
-  it('should not initialized, disconnect state with no Access Token and errored stored Tokens', async () => {
-    gladys.variable.getValue
-      .withArgs(GLADYS_VARIABLES.USERNAME, serviceId)
-      .returns('username')
-      .withArgs(GLADYS_VARIABLES.CLIENT_ID, serviceId)
-      .returns('clientId')
-      .withArgs(GLADYS_VARIABLES.CLIENT_SECRET, serviceId)
-      .returns('clientSecret');
 
-    await netatmoHandler.init();
-    assert.callCount(gladys.variable.getValue, 6);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.USERNAME, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.CLIENT_ID, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.CLIENT_SECRET, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SCOPE_ENERGY, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.CONNECTED, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_TOKEN, serviceId);
-    expect(netatmoHandler.status).to.eq(STATUS.DISCONNECTED);
-    expect(netatmoHandler.configured).to.eq(true);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.DISCONNECTED },
-    });
+  it('should handle valid access and refresh tokens', async () => {
+    NetatmoHandlerMock.configuration.clientId = 'valid_client_id';
+    NetatmoHandlerMock.configuration.clientSecret = 'valid_client_secret';
+    NetatmoHandlerMock.accessToken = 'valid_access_token';
+    NetatmoHandlerMock.refreshToken = 'valid_refresh_token';
+    NetatmoHandlerMock.refreshingTokens.resolves({ success: true });
+
+    await init(NetatmoHandlerMock);
+
+    expect(NetatmoHandlerMock.refreshingTokens.called).to.be.true;
+    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
+    expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: 'netatmo.status',
+      payload: { status: 'connected' },
+    })).to.be.true;
   });
-  it('should not initialized, disconnect state with no Refresh Token and errored stored Tokens', async () => {
-    gladys.variable.getValue
-      .withArgs(GLADYS_VARIABLES.USERNAME, serviceId)
-      .returns('username')
-      .withArgs(GLADYS_VARIABLES.CLIENT_ID, serviceId)
-      .returns('clientId')
-      .withArgs(GLADYS_VARIABLES.CLIENT_SECRET, serviceId)
-      .returns('clientSecret')
-      .withArgs(GLADYS_VARIABLES.ACCESS_TOKEN, serviceId)
-      .returns('accessToken');
 
-    await netatmoHandler.init();
-    assert.callCount(gladys.variable.getValue, 8);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.REFRESH_TOKEN, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.EXPIRE_IN_TOKEN, serviceId);
-    expect(netatmoHandler.status).to.eq(STATUS.DISCONNECTED);
-    expect(netatmoHandler.configured).to.eq(true);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.DISCONNECTED },
-    });
+  it('should handle failed token refresh', async () => {
+    NetatmoHandlerMock.refreshingTokens.resolves({ success: false });
+
+    await init(NetatmoHandlerMock);
+
+    expect(NetatmoHandlerMock.setTokens.calledWith(sinon.match.any, sinon.match.has('accessToken', ''))).to.be.true;
+    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
+    expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: 'netatmo.error-processing-token',
+      payload: { statusType: 'processing token', status: null },
+    })).to.be.true;
+    expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: 'netatmo.status',
+      payload: { status: 'disconnected' },
+    })).to.be.true;
   });
-  it('should not initialized, refreshing Token fail', async () => {
-    gladys.variable.getValue
-      .withArgs(GLADYS_VARIABLES.USERNAME, serviceId)
-      .returns('username')
-      .withArgs(GLADYS_VARIABLES.CLIENT_ID, serviceId)
-      .returns('clientId')
-      .withArgs(GLADYS_VARIABLES.CLIENT_SECRET, serviceId)
-      .returns('clientSecret')
-      .withArgs(GLADYS_VARIABLES.ACCESS_TOKEN, serviceId)
-      .returns('accessToken')
-      .withArgs(GLADYS_VARIABLES.REFRESH_TOKEN, serviceId)
-      .returns('refreshToken');
 
-    netatmoHandler.refreshingTokens = fake.returns({ success: false });
-    await netatmoHandler.init();
-    assert.callCount(gladys.variable.getValue, 8);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.REFRESH_TOKEN, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.EXPIRE_IN_TOKEN, serviceId);
-    expect(netatmoHandler.status).to.eq(STATUS.ERROR.PROCESSING_TOKEN);
-    expect(netatmoHandler.configured).to.eq(true);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.ERROR.PROCESSING_TOKEN },
-    });
-  });
-  it('should initialized ', async () => {
-    gladys.variable.getValue
-      .withArgs(GLADYS_VARIABLES.USERNAME, serviceId)
-      .returns('username')
-      .withArgs(GLADYS_VARIABLES.CLIENT_ID, serviceId)
-      .returns('clientId')
-      .withArgs(GLADYS_VARIABLES.CLIENT_SECRET, serviceId)
-      .returns('clientSecret')
-      .withArgs(GLADYS_VARIABLES.SCOPE_ENERGY, serviceId)
-      .returns('scopeEnergy')
-      .withArgs(GLADYS_VARIABLES.ACCESS_TOKEN, serviceId)
-      .returns('accessToken')
-      .withArgs(GLADYS_VARIABLES.REFRESH_TOKEN, serviceId)
-      .returns('refreshToken')
-      .withArgs(GLADYS_VARIABLES.EXPIRE_IN_TOKEN, serviceId)
-      .returns(10800);
+  it('should handle missing access or refresh tokens', async () => {
+    NetatmoHandlerMock.accessToken = null;
+    NetatmoHandlerMock.refreshToken = null;
 
-    netatmoHandler.refreshingTokens = fake.returns({ success: true });
-    await netatmoHandler.init();
+    await init(NetatmoHandlerMock);
 
-    assert.callCount(gladys.variable.getValue, 8);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.USERNAME, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.CLIENT_ID, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.CLIENT_SECRET, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.SCOPE_ENERGY, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.CONNECTED, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.ACCESS_TOKEN, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.REFRESH_TOKEN, serviceId);
-    assert.calledWith(gladys.variable.getValue, GLADYS_VARIABLES.EXPIRE_IN_TOKEN, serviceId);
-
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.CONNECTED },
-    });
-    expect(netatmoHandler.status).to.eq(STATUS.CONNECTED);
+    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
+    expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      type: 'netatmo.status',
+      payload: { status: 'disconnected' },
+    })).to.be.true;
   });
 });

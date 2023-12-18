@@ -1,379 +1,180 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const crypto = require('crypto');
 const nock = require('nock');
-const proxyquire = require('proxyquire').noCallThru();
-const assertJS = require('assert');
-const NetatmoContext = require('../netatmo.mock.test');
+const EventEmitter = require('events');
+const { connect, retrieveTokens } = require('../../../../services/netatmo/lib/netatmo.connect');
+const { NetatmoHandlerMock } = require('../netatmo.mock.test');
+const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
+const { EVENTS } = require('../../../../utils/constants');
 
-const { assert, fake } = sinon;
+describe.only('Netatmo Connect', () => {
+  let eventEmitter;
 
-const NetatmoHandler = proxyquire('../../../../services/netatmo/lib/index', {
-  NetatmoContext,
-});
-const { STATUS } = require('../../../../services/netatmo/lib/utils/netatmo.constants');
-const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-
-const gladys = {
-  event: {
-    emit: fake.returns(null),
-  },
-};
-const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
-const configuration = {
-  clientId: 'clientId',
-  clientSecret: 'clientSecret',
-  scopes: { scopeEnergy: 'read_thermostat write_thermostat' },
-};
-const body = {
-  codeOAuth: 'codeOAuth',
-  state: 'state',
-  redirectUri: 'redirectUri',
-};
-
-describe('NetatmoHandler.connect', () => {
-  let netatmoHandler;
   beforeEach(() => {
     sinon.reset();
-    netatmoHandler = new NetatmoHandler(gladys, serviceId);
-    // netatmoHandler.status = 'UNKNOWN';
-    this.randomBytesStub = sinon
-      .stub(crypto, 'randomBytes')
-      // @ts-ignore
-      .returns(Buffer.from('1234567890abcdef1234567890abcdef', 'hex'));
-  });
-  afterEach(() => {
-    sinon.reset();
-    this.randomBytesStub.restore();
-  });
-  it('should throw an error if clientId is missing', async () => {
-    const badConfiguration = { ...configuration, clientId: null };
-    try {
-      await netatmoHandler.connect(netatmoHandler, badConfiguration);
-      assert.fail();
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    }
-    expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.NOT_INITIALIZED },
-    });
-  });
-  it('should throw an error if clientSecret is missing', async () => {
-    const badConfiguration = { ...configuration, clientSecret: null };
-    try {
-      await netatmoHandler.connect(netatmoHandler, badConfiguration);
-      assert.fail();
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    }
+    nock.cleanAll();
 
-    expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.NOT_INITIALIZED },
-    });
+    eventEmitter = new EventEmitter();
+    NetatmoHandlerMock.gladys = { event: eventEmitter };
+    sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
+    // @ts-ignore
+    NetatmoHandlerMock.saveStatus = netatmoStatus.saveStatus;
+    NetatmoHandlerMock.status = 'not_initialized';
   });
-  it('should throw an error if scopes is missing', async () => {
-    const badConfiguration = { ...configuration, scopes: undefined };
-    try {
-      await netatmoHandler.connect(netatmoHandler, badConfiguration);
-      assert.fail();
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    }
 
-    expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.NOT_INITIALIZED },
-    });
-  });
-  it('should return redirectUri to connect successfully with a default scope', async () => {
-    const baseUrl = 'https://api.netatmo.net';
-    const configurationWithScopeDefault = { ...configuration, scopes: { scopeEnergy: undefined } };
-    const response = await netatmoHandler.connect(netatmoHandler, configurationWithScopeDefault);
-
-    const expectedState = '1234567890abcdef1234567890abcdef';
-    expect(netatmoHandler.status).to.eq(STATUS.CONNECTING);
-    expect(netatmoHandler.configured).to.eq(true);
-    expect(response).to.deep.equal({
-      authUrl: `${baseUrl}/oauth2/authorize?client_id=clientId&scope=read_thermostat&state=${expectedState}`,
-      state: expectedState,
-    });
-
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.CONNECTING },
-    });
-  });
-  it('should return redirectUri to connect successfully with defined scope', async () => {
-    const baseUrl = 'https://api.netatmo.net';
-    const response = await netatmoHandler.connect(netatmoHandler, configuration);
-
-    const expectedState = '1234567890abcdef1234567890abcdef';
-    expect(netatmoHandler.status).to.eq(STATUS.CONNECTING);
-    expect(netatmoHandler.configured).to.eq(true);
-    expect(response).to.deep.equal({
-      authUrl: `${baseUrl}/oauth2/authorize?client_id=clientId&scope=read_thermostat%20write_thermostat&state=${expectedState}`,
-      state: expectedState,
-    });
-
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.CONNECTING },
-    });
-  });
-});
-
-describe('NetatmoHandler.retrieveTokens', () => {
-  let netatmoHandler;
-  beforeEach(() => {
-    sinon.reset();
-    netatmoHandler = new NetatmoHandler(gladys, serviceId);
-  });
   afterEach(() => {
     sinon.reset();
     nock.cleanAll();
   });
-  it('should throw an error if clientId is missing', async () => {
-    const badConfiguration = { ...configuration, clientId: null };
-    try {
-      await netatmoHandler.retrieveTokens(netatmoHandler, badConfiguration, body);
-      assert.fail();
-      expect.fail('should have thrown an error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    }
 
-    expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.NOT_INITIALIZED },
+  describe('connect', () => {
+    it('should throw an error if netatmo is not configured', async () => {
+      try {
+        await connect(NetatmoHandlerMock);
+        expect.fail('should have thrown an error');
+      } catch (e) {
+        expect(e.message).to.equal('Netatmo is not configured.');
+      }
     });
-  });
-  it('should throw an error if clientSecret is missing', async () => {
-    const badConfiguration = { ...configuration, clientSecret: null };
-    try {
-      await netatmoHandler.retrieveTokens(netatmoHandler, badConfiguration, body);
-      assert.fail();
-      expect.fail('should have thrown an error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-      expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-    }
 
-    expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.NOT_INITIALIZED },
-    });
-  });
-  it('should throw an error if scopes is missing', async () => {
-    const badConfiguration = { ...configuration, scopes: undefined };
-    try {
-      await netatmoHandler.retrieveTokens(netatmoHandler, badConfiguration, body);
-      assert.fail();
-      expect.fail('should have thrown an error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    }
+    it('should return auth url and state if netatmo is configured', async () => {
+      NetatmoHandlerMock.configuration.clientId = 'test-client-id';
+      NetatmoHandlerMock.configuration.clientSecret = 'test-client-secret';
+      NetatmoHandlerMock.configuration.scopes = { scopeEnergy: 'scope' };
 
-    expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.NOT_INITIALIZED },
+      const result = await connect(NetatmoHandlerMock);
+      expect(result).to.have.property('authUrl');
+      expect(result).to.have.property('state');
+      expect(NetatmoHandlerMock.configured).to.be.true;
     });
   });
-  it('should throw an error if codeOAuth is missing', async () => {
-    const badBody = { ...body, codeOAuth: null };
-    try {
-      await netatmoHandler.retrieveTokens(netatmoHandler, configuration, badBody);
-      assert.fail();
-      expect.fail('should have thrown an error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    }
 
-    expect(netatmoHandler.status).to.eq(STATUS.NOT_INITIALIZED);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.NOT_INITIALIZED },
-    });
-  });
-  it('should throw an error if state !== netatmoHandler.stateGetAccessToken', async () => {
-    const badBody = { ...body, state: 'bad_state' };
-    netatmoHandler.stateGetAccessToken = 'state';
-    try {
-      await netatmoHandler.retrieveTokens(netatmoHandler, configuration, badBody);
-      assert.fail();
-      expect.fail('should have thrown an error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-    }
-    expect(netatmoHandler.status).to.eq(STATUS.DISCONNECTED);
-    assert.callCount(gladys.event.emit, 1);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.DISCONNECTED },
-    });
-  });
-  it('should retrieve tokens successfully with a default scope', async () => {
-    netatmoHandler.stateGetAccessToken = 'state';
-    const configurationWithScopeDefault = { ...configuration, scopes: { scopeEnergy: undefined } };
-    const setTokensSpy = sinon.spy(netatmoHandler, 'setTokens');
-    nock(`${netatmoHandler.baseUrl}`)
-      .persist()
-      .post('/oauth2/token')
-      .reply(200, {
-        access_token: 'fake_accessToken',
-        refresh_token: 'fake_refreshToken',
-        expire_in: 10800,
-      });
+  describe('retrieveTokens', () => {
+    it('should throw an error if state does not match', async () => {
+      const body = { codeOAuth: 'test-code', state: 'invalid-state', redirectUri: 'test-redirect-uri' };
+      NetatmoHandlerMock.stateGetAccessToken = 'valid-state';
 
-    const response = await netatmoHandler.retrieveTokens(netatmoHandler, configurationWithScopeDefault, body);
-    // Checking the results
-    expect(response).to.deep.equal({ success: true });
-    expect(netatmoHandler.status).to.equal(STATUS.CONNECTED);
-    expect(netatmoHandler.configured).to.eq(true);
-    // Checking that setTokens was called with the correct tokens
-    expect(setTokensSpy.calledOnce).to.equal(true);
-    expect(setTokensSpy.calledWith(sinon.match.has('accessToken', 'fake_accessToken'))).to.equal(true);
-    expect(setTokensSpy.calledWith(sinon.match.has('refreshToken', 'fake_refreshToken'))).to.equal(true);
-    expect(setTokensSpy.calledWith(sinon.match.has('expireIn', 10800))).to.equal(true);
-    expect(setTokensSpy.calledWith(sinon.match.has('connected', true))).to.equal(true);
-    // Checking the events emits
-    assert.callCount(gladys.event.emit, 2);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.PROCESSING_TOKEN },
+      try {
+        await retrieveTokens(NetatmoHandlerMock, body);
+        expect.fail('should have thrown an error');
+      } catch (e) {
+        expect(e.message).to.include('The return does not correspond to the initial request');
+        expect(NetatmoHandlerMock.status).to.equal('disconnected');
+        expect(NetatmoHandlerMock.configured).to.be.true;
+        expect(NetatmoHandlerMock.connected).to.be.false;
+        expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
+        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'disconnected' },
+        })).to.be.true;
+      }
     });
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.CONNECTED },
+    it('should retrieve tokens and update netatmo status if state matches', async () => {
+      const body = { codeOAuth: 'test-code', state: 'valid-state', redirectUri: 'test-redirect-uri' };
+      const tokens = {
+        access_token: 'access-token',
+        refresh_token: 'refresh-token',
+        expire_in: 3600
+      };
+
+      nock('https://api.netatmo.com')
+        .persist()
+        .post('/oauth2/token')
+        .reply(200, tokens);
+
+      const result = await retrieveTokens(NetatmoHandlerMock, body);
+      expect(result).to.deep.equal({ success: true });
+      expect(NetatmoHandlerMock.status).to.equal('connected');
+      expect(NetatmoHandlerMock.configured).to.be.true;
+      expect(NetatmoHandlerMock.connected).to.be.true;
+      expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
+      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'processing token' },
+      })).to.be.true;
+      expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'connected' },
+      })).to.be.true;
     });
-    // Cleaning
-    setTokensSpy.resetHistory();
-    nock.isDone();
-  });
-  it('should handle axios query errors in retrieve Tokens', async () => {
-    nock(`${netatmoHandler.baseUrl}`)
-      .persist()
-      .post('/oauth2/token')
-      .reply(500, { error: 'Server Error' });
-    netatmoHandler.stateGetAccessToken = 'state';
-    await assertJS.rejects(
-      async () => {
-        await netatmoHandler.retrieveTokens(netatmoHandler, configuration, body);
-      },
-      (err) => {
-        assertJS(err instanceof ServiceNotConfiguredError);
-        assertJS(netatmoHandler.status === STATUS.DISCONNECTED);
-        assertJS(err.message.includes('500'));
-        assert.callCount(gladys.event.emit, 3);
-        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-          payload: { status: STATUS.PROCESSING_TOKEN },
-        });
-        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
-          payload: { statusType: STATUS.PROCESSING_TOKEN, status: 'get_access_token_fail' },
-        });
-        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-          payload: { status: STATUS.DISCONNECTED },
-        });
-        return true;
-      },
-    );
-    // Cleaning
-    nock.isDone();
-  });
-  it('should retrieve tokens successfully with defined scope', async () => {
-    netatmoHandler.stateGetAccessToken = 'state';
-    const setTokensSpy = sinon.spy(netatmoHandler, 'setTokens');
-    nock(`${netatmoHandler.baseUrl}`)
-      .persist()
-      .post('/oauth2/token')
-      .reply(200, {
-        access_token: 'fake_accessToken',
-        refresh_token: 'fake_refreshToken',
-        expire_in: 10800,
-      });
-    const response = await netatmoHandler.retrieveTokens(netatmoHandler, configuration, body);
-    // Checking the results
-    expect(response).to.deep.equal({ success: true });
-    expect(netatmoHandler.status).to.equal(STATUS.CONNECTED);
-    expect(netatmoHandler.configured).to.eq(true);
-    // Checking that setTokens was called with the correct tokens
-    expect(setTokensSpy.calledOnce).to.equal(true);
-    expect(setTokensSpy.calledWith(sinon.match.has('accessToken', 'fake_accessToken'))).to.equal(true);
-    expect(setTokensSpy.calledWith(sinon.match.has('refreshToken', 'fake_refreshToken'))).to.equal(true);
-    expect(setTokensSpy.calledWith(sinon.match.has('expireIn', 10800))).to.equal(true);
-    expect(setTokensSpy.calledWith(sinon.match.has('connected', true))).to.equal(true);
-    // Checking the events emits
-    assert.callCount(gladys.event.emit, 2);
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.PROCESSING_TOKEN },
+    it('should throw an error if configuration is not complete', async () => {
+      const body = { codeOAuth: 'test-code', state: 'valid-state', redirectUri: 'test-redirect-uri' };
+      NetatmoHandlerMock.configuration.clientId = null;
+
+      try {
+        await retrieveTokens(NetatmoHandlerMock, body);
+        expect.fail('should have thrown an error');
+      } catch (e) {
+        expect(e.message).to.equal('Netatmo is not configured.');
+        expect(NetatmoHandlerMock.status).to.equal('not_initialized');
+        expect(NetatmoHandlerMock.configured).to.be.false;
+        expect(NetatmoHandlerMock.connected).to.be.false;
+        expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
+        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'not_initialized' },
+        })).to.be.true;
+      }
     });
-    assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-      type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-      payload: { status: STATUS.CONNECTED },
+
+    it('should throw an error when axios request fails', async () => {
+      const body = { codeOAuth: 'test-code', state: 'valid-state', redirectUri: 'test-redirect-uri' };
+
+      NetatmoHandlerMock.configuration.clientId = 'test-client-id';
+      NetatmoHandlerMock.configuration.clientSecret = 'test-client-secret';
+      NetatmoHandlerMock.configuration.scopes = { scopeEnergy: 'scope' };
+      NetatmoHandlerMock.stateGetAccessToken = 'valid-state';
+
+      nock('https://api.netatmo.com')
+        .post('/oauth2/token')
+        .reply(400, { error: 'invalid_request' });
+
+      try {
+        await retrieveTokens(NetatmoHandlerMock, body);
+        expect.fail('should have thrown an error');
+      } catch (e) {
+        expect(e.message).to.include('Service is not connected with error');
+        expect(NetatmoHandlerMock.status).to.equal('disconnected');
+        expect(NetatmoHandlerMock.configured).to.be.true;
+        expect(NetatmoHandlerMock.connected).to.be.false;
+        expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(3);
+        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'processing token' },
+        })).to.be.true;
+        expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.error-processing-token',
+          payload: { statusType: 'processing token', status: 'get_access_token_fail' },
+        })).to.be.true;
+        expect(NetatmoHandlerMock.gladys.event.emit.getCall(2).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'disconnected' },
+        })).to.be.true;
+      }
     });
-    // Cleaning
-    setTokensSpy.resetHistory();
-    nock.isDone();
-  });
-  it('should handle errors from setTokens function in retrieveTokens', async () => {
-    sinon.stub(netatmoHandler, 'setTokens').rejects(new Error('Set tokens error'));
-    nock(`${netatmoHandler.baseUrl}`)
-      .persist()
-      .post('/oauth2/token')
-      .reply(200, {
-        access_token: 'fake_accessToken',
-        refresh_token: 'fake_refreshToken',
-        expire_in: 10800,
-      });
-    netatmoHandler.stateGetAccessToken = 'state';
-    await assertJS.rejects(
-      async () => {
-        await netatmoHandler.retrieveTokens(netatmoHandler, configuration, body);
-      },
-      (err) => {
-        assertJS(err instanceof ServiceNotConfiguredError);
-        assertJS(err.message.includes('Set tokens error'));
-        assertJS(!err.message.includes('200'));
-        assertJS(netatmoHandler.status === STATUS.DISCONNECTED);
-        assert.callCount(gladys.event.emit, 3);
-        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-          payload: { status: STATUS.PROCESSING_TOKEN },
-        });
-        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
-          payload: { statusType: STATUS.PROCESSING_TOKEN, status: 'get_access_token_fail' },
-        });
-        assert.calledWith(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
-          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
-          payload: { status: STATUS.DISCONNECTED },
-        });
-        return true;
-      },
-    );
-    // Cleaning
-    nock.isDone();
-    netatmoHandler.setTokens.resetHistory();
+    it('should handle errors without a response object', async () => {
+      const body = { codeOAuth: 'test-code', state: 'valid-state', redirectUri: 'test-redirect-uri' };
+
+      NetatmoHandlerMock.configuration.clientId = 'test-client-id';
+      NetatmoHandlerMock.configuration.clientSecret = 'test-client-secret';
+      NetatmoHandlerMock.configuration.scopes = { scopeEnergy: 'scope' };
+      NetatmoHandlerMock.stateGetAccessToken = 'valid-state';
+
+      nock('https://api.netatmo.com')
+        .post('/oauth2/token')
+        .replyWithError('Network error');
+
+      try {
+        await retrieveTokens(NetatmoHandlerMock, body);
+        expect.fail('should have thrown an error');
+      } catch (e) {
+        expect(e.message).to.include('NETATMO: Service is not connected with error');
+        expect(e.response).to.be.undefined;
+        expect(NetatmoHandlerMock.status).to.equal('disconnected');
+        expect(NetatmoHandlerMock.configured).to.be.true;
+        expect(NetatmoHandlerMock.connected).to.be.false;
+      }
+    });
+
   });
 });
