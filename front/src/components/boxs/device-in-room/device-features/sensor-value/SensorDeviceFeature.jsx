@@ -11,22 +11,19 @@ import IconBinaryDeviceValue from './IconBinaryDeviceValue';
 import SignalQualityDeviceValue from './SignalQualityDeviceValue';
 import ButtonClickDeviceValue from './ButtonClickDeviceValue';
 import TextDeviceValue from './TextDeviceValue';
-import ScheduleDeviceValue from './ScheduleDeviceValue';
 import NoRecentValueBadge from './NoRecentValueBadge';
 
 const DISPLAY_BY_FEATURE_CATEGORY = {
   [DEVICE_FEATURE_CATEGORIES.MOTION_SENSOR]: LastSeenDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.PRESENCE_SENSOR]: LastSeenDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: IconBinaryDeviceValue,
+  [DEVICE_FEATURE_CATEGORIES.SIGNAL]: SignalQualityDeviceValue,
   [DEVICE_FEATURE_CATEGORIES.BUTTON]: ButtonClickDeviceValue,
-  [DEVICE_FEATURE_CATEGORIES.TEXT]: TextDeviceValue,
-  [DEVICE_FEATURE_CATEGORIES.SCHEDULE]: ScheduleDeviceValue
+  [DEVICE_FEATURE_CATEGORIES.TEXT]: TextDeviceValue
 };
 
 const DISPLAY_BY_FEATURE_TYPE = {
   [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: BinaryDeviceValue,
-  [DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT]: TextDeviceValue,
-  [DEVICE_FEATURE_TYPES.SIGNAL.QUALITY]: SignalQualityDeviceValue
 };
 
 const DEVICE_FEATURES_WITHOUT_EXPIRATION = [
