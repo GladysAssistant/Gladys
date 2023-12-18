@@ -2,7 +2,7 @@ const Promise = require('bluebird');
 
 const logger = require('../../../../utils/logger');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
-const { setDeviceParam } = require('../../../../utils/setDeviceParam');
+const { setDeviceParam } = require('../../../../utils/device');
 
 const { INFORMATION_SERVICES } = require('../device/bluetooth.information');
 const { PARAMS } = require('../utils/bluetooth.constants');
@@ -20,7 +20,7 @@ async function scanDevice(peripheralUuid) {
 
   const device = this.discoveredDevices[peripheralUuid];
 
-  setDeviceParam(device, PARAMS.LOADED, false);
+  setDeviceParam(device, PARAMS.LOADED, 'false');
   this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
     type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER,
     payload: device,
@@ -61,7 +61,7 @@ async function scanDevice(peripheralUuid) {
   } catch (e) {
     logger.warn(`Bluetooth: unable to scan ${peripheralUuid} - ${e}`);
   } finally {
-    setDeviceParam(device, PARAMS.LOADED, true);
+    setDeviceParam(device, PARAMS.LOADED, 'true');
     this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.BLUETOOTH.DISCOVER,
       payload: device,

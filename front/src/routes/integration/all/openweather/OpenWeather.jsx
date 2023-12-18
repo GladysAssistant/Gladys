@@ -1,5 +1,6 @@
 import { Text, MarkupText, Localizer } from 'preact-i18n';
 import cx from 'classnames';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
 const OpenWeatherPage = ({ children, ...props }) => (
   <div class="page">
@@ -7,8 +8,34 @@ const OpenWeatherPage = ({ children, ...props }) => (
       <div class="my-3 my-md-5">
         <div class="container">
           <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-3">
+              <h3 class="page-title mb-5">
+                <Text id="integration.openWeather.title" />
+              </h3>
+              <div>
+                <div class="list-group list-group-transparent mb-0">
+                  <DeviceConfigurationLink
+                    user={props.user}
+                    configurationKey="integrations"
+                    documentKey="openweather"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.openWeather.documentation" />
+                  </DeviceConfigurationLink>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-9">
               <div class="card">
+                <div class="card-header">
+                  <h1 class="card-title">
+                    <Text id="integration.openWeather.title" />
+                  </h1>
+                </div>
                 <div class="card-body">
                   <div
                     class={cx('dimmer', {
@@ -17,9 +44,6 @@ const OpenWeatherPage = ({ children, ...props }) => (
                   >
                     <div class="loader" />
                     <div class="dimmer-content">
-                      <h2>
-                        <Text id="integration.openWeather.title" />
-                      </h2>
                       <p>
                         <Text id="integration.openWeather.introduction" />
                       </p>

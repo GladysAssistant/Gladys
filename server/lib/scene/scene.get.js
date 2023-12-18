@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const Sequelize = require('sequelize');
+const intersection = require('lodash.intersection');
 const db = require('../../models');
 
 const DEFAULT_OPTIONS = {
@@ -58,14 +59,29 @@ async function get(options) {
   }
 
   if (optionsWithDefault.searchTags) {
-    const tags = await db.TagScene.findAll({
-      fields: 'scene_id',
-      where: {
-        [Op.or]: optionsWithDefault.searchTags.split(',').map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
-      },
+    const tags = optionsWithDefault.searchTags.split(',');
+
+    const sceneIdsAndNames = (
+      await db.TagScene.findAll({
+        fields: ['name', 'scene_id'],
+        where: {
+          [Op.or]: tags.map((tag) => ({ name: { [Op.like]: `%${tag}%` } })),
+        },
+      })
+    ).map((tag) => tag.get({ plain: true }));
+
+    const tagsWithSceneId = {};
+    sceneIdsAndNames.forEach((sceneIdAndName) => {
+      if (sceneIdAndName.name in tagsWithSceneId === false) {
+        tagsWithSceneId[sceneIdAndName.name] = [];
+      }
+      tagsWithSceneId[sceneIdAndName.name].push(sceneIdAndName.scene_id);
     });
+
+    const intersectionSceneId = intersection(...Object.values(tagsWithSceneId));
+
     where.push({
-      [Op.or]: tags.map((tag) => tag.get({ plain: true })).map((tag) => ({ id: tag.scene_id })),
+      [Op.or]: intersectionSceneId.map((sceneId) => ({ id: sceneId })),
     });
   }
 

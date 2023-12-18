@@ -1,6 +1,7 @@
 import EditWeatherBox from '../../../components/boxs/weather/EditWeatherBox';
 import EditRoomTemperatureBox from '../../../components/boxs/room-temperature/EditRoomTemperatureBox';
 import EditRoomHumidityBox from '../../../components/boxs/room-humidity/EditRoomHumidityBox';
+import EditMusicBox from '../../../components/boxs/music/EditMusicBox';
 import EditCameraBox from '../../../components/boxs/camera/EditCamera';
 import EditAtHomeBox from '../../../components/boxs/user-presence/EditUserPresenceBox';
 import EditDevicesInRoom from '../../../components/boxs/device-in-room/EditDeviceInRoom';
@@ -42,6 +43,8 @@ const Box = ({ children, ...props }) => {
       return <EditSceneBox {...props} />;
     case 'alarm':
       return <EditAlarmBox {...props} />;
+    case 'music':
+      return <EditMusicBox {...props} />;
     default:
       return <SelectBoxType {...props} />;
   }

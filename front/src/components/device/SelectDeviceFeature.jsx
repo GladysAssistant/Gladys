@@ -1,12 +1,9 @@
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import Select from 'react-select';
-import cx from 'classnames';
 
 import { getDeviceFeatureName } from '../../utils/device';
 import withIntlAsProp from '../../utils/withIntlAsProp';
-
-import style from './SelectDeviceFeature.css';
 
 class SelectDeviceFeature extends Component {
   getOptions = async () => {
@@ -121,7 +118,7 @@ class SelectDeviceFeature extends Component {
     }
     return (
       <Select
-        className={cx('select-device-feature', style.deviceSelector)}
+        class="select-device-feature"
         defaultValue={''}
         value={selectedOption}
         onChange={this.handleChange}

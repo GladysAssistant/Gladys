@@ -23,9 +23,9 @@ class SetupTab extends Component {
         {props.philipsHueBridgesDevices && props.philipsHueBridgesDevices.length > 0 && (
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">
+              <h1 class="card-title">
                 <Text id="integration.philipsHue.setup.connectedBridgesTitle" />
-              </h3>
+              </h1>
             </div>
             <div class="card-body">
               <div
@@ -65,9 +65,9 @@ class SetupTab extends Component {
         )}
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">
+            <h1 class="card-title">
               <Text id="integration.philipsHue.setup.bridgesOnNetwork" />
-            </h3>
+            </h1>
             <div class="page-options d-flex">
               <button
                 class="btn btn-info"

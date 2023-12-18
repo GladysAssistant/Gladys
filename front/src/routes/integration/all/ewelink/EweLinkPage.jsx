@@ -1,7 +1,8 @@
 import { Text } from 'preact-i18n';
 import { Link } from 'preact-router/match';
+import DeviceConfigurationLink from '../../../../components/documentation/DeviceConfigurationLink';
 
-const EweLinkPage = ({ children }) => (
+const EweLinkPage = ({ children, user }) => (
   <div class="page">
     <div class="page-main">
       <div class="my-3 my-md-5">
@@ -45,6 +46,18 @@ const EweLinkPage = ({ children }) => (
                     </span>
                     <Text id="integration.eWeLink.setupTab" />
                   </Link>
+
+                  <DeviceConfigurationLink
+                    user={user}
+                    configurationKey="integrations"
+                    documentKey="sonoff"
+                    linkClass="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-book-open" />
+                    </span>
+                    <Text id="integration.eWeLink.documentation" />
+                  </DeviceConfigurationLink>
                 </div>
               </div>
             </div>

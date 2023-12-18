@@ -104,11 +104,11 @@ class EditDashboard extends Component {
     await this.setState(newState);
   };
 
-  addBox = () => {
+  addBox = x => {
     const newState = update(this.state, {
       currentDashboard: {
         boxes: {
-          0: {
+          [x]: {
             $push: [{}]
           }
         }

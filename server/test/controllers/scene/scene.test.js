@@ -155,9 +155,11 @@ describe('GET /api/v1/tag_scene', () => {
         expect(res.body).to.deep.equal([
           {
             name: 'tag 1',
+            scene_count: 1,
           },
           {
             name: 'tag 2',
+            scene_count: 1,
           },
         ]);
       });
