@@ -13,7 +13,10 @@ async function getAccessToken(netatmoHandler) {
   logger.debug('Loading Netatmo access token...');
   const { serviceId } = netatmoHandler;
   try {
-    netatmoHandler.accessToken = await netatmoHandler.gladys.variable.getValue(GLADYS_VARIABLES.ACCESS_TOKEN, serviceId);
+    netatmoHandler.accessToken = await netatmoHandler.gladys.variable.getValue(
+      GLADYS_VARIABLES.ACCESS_TOKEN,
+      serviceId,
+    );
     if (!netatmoHandler.accessToken || netatmoHandler.accessToken === '') {
       const tokens = {
         accessToken: '',
@@ -52,7 +55,6 @@ async function getRefreshToken(netatmoHandler) {
       serviceId,
     );
     if (!netatmoHandler.refreshToken) {
-      console.log('coucou', netatmoHandler.refresh_token)
       const tokens = {
         accessToken: '',
         refreshToken: '',

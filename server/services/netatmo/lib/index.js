@@ -16,6 +16,18 @@ const { setValue } = require('./netatmo.setValue');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 
+/**
+ *
+ * @description Poll refreshing Token values of an Netatmo device.
+ * @param {object} scopes - Scopes format.
+ * @returns {object} ScopesString - Of nothing.
+ * @example
+ * buildScopesConfig({
+ * ENERGY: {
+ *   read: 'read_thermostat',
+ *   write: 'write_thermostat',
+ * }});
+ */
 function buildScopesConfig(scopes) {
   const scopesConfig = {};
   Object.keys(scopes).forEach((key) => {

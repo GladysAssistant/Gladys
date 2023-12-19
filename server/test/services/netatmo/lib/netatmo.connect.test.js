@@ -7,7 +7,7 @@ const { NetatmoHandlerMock } = require('../netatmo.mock.test');
 const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
 const { EVENTS } = require('../../../../utils/constants');
 
-describe.only('Netatmo Connect', () => {
+describe('Netatmo Connect', () => {
   let eventEmitter;
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe.only('Netatmo Connect', () => {
       const result = await connect(NetatmoHandlerMock);
       expect(result).to.have.property('authUrl');
       expect(result).to.have.property('state');
-      expect(NetatmoHandlerMock.configured).to.be.true;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
     });
   });
 
@@ -59,13 +59,15 @@ describe.only('Netatmo Connect', () => {
       } catch (e) {
         expect(e.message).to.include('The return does not correspond to the initial request');
         expect(NetatmoHandlerMock.status).to.equal('disconnected');
-        expect(NetatmoHandlerMock.configured).to.be.true;
-        expect(NetatmoHandlerMock.connected).to.be.false;
+        expect(NetatmoHandlerMock.configured).to.equal(true);
+        expect(NetatmoHandlerMock.connected).to.equal(false);
         expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'disconnected' },
-        })).to.be.true;
+        expect(
+          NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+            type: 'netatmo.status',
+            payload: { status: 'disconnected' },
+          }),
+        ).to.equal(true);
       }
     });
     it('should retrieve tokens and update netatmo status if state matches', async () => {
@@ -73,7 +75,7 @@ describe.only('Netatmo Connect', () => {
       const tokens = {
         access_token: 'access-token',
         refresh_token: 'refresh-token',
-        expire_in: 3600
+        expire_in: 3600,
       };
 
       nock('https://api.netatmo.com')
@@ -84,17 +86,21 @@ describe.only('Netatmo Connect', () => {
       const result = await retrieveTokens(NetatmoHandlerMock, body);
       expect(result).to.deep.equal({ success: true });
       expect(NetatmoHandlerMock.status).to.equal('connected');
-      expect(NetatmoHandlerMock.configured).to.be.true;
-      expect(NetatmoHandlerMock.connected).to.be.true;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
+      expect(NetatmoHandlerMock.connected).to.equal(true);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'processing token' },
-      })).to.be.true;
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'connected' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'processing token' },
+        }),
+      ).to.equal(true);
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'connected' },
+        }),
+      ).to.equal(true);
     });
     it('should throw an error if configuration is not complete', async () => {
       const body = { codeOAuth: 'test-code', state: 'valid-state', redirectUri: 'test-redirect-uri' };
@@ -106,13 +112,15 @@ describe.only('Netatmo Connect', () => {
       } catch (e) {
         expect(e.message).to.equal('Netatmo is not configured.');
         expect(NetatmoHandlerMock.status).to.equal('not_initialized');
-        expect(NetatmoHandlerMock.configured).to.be.false;
-        expect(NetatmoHandlerMock.connected).to.be.false;
+        expect(NetatmoHandlerMock.configured).to.equal(false);
+        expect(NetatmoHandlerMock.connected).to.equal(false);
         expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'not_initialized' },
-        })).to.be.true;
+        expect(
+          NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+            type: 'netatmo.status',
+            payload: { status: 'not_initialized' },
+          }),
+        ).to.equal(true);
       }
     });
 
@@ -134,21 +142,27 @@ describe.only('Netatmo Connect', () => {
       } catch (e) {
         expect(e.message).to.include('Service is not connected with error');
         expect(NetatmoHandlerMock.status).to.equal('disconnected');
-        expect(NetatmoHandlerMock.configured).to.be.true;
-        expect(NetatmoHandlerMock.connected).to.be.false;
+        expect(NetatmoHandlerMock.configured).to.equal(true);
+        expect(NetatmoHandlerMock.connected).to.equal(false);
         expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(3);
-        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'processing token' },
-        })).to.be.true;
-        expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.error-processing-token',
-          payload: { statusType: 'processing token', status: 'get_access_token_fail' },
-        })).to.be.true;
-        expect(NetatmoHandlerMock.gladys.event.emit.getCall(2).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'disconnected' },
-        })).to.be.true;
+        expect(
+          NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+            type: 'netatmo.status',
+            payload: { status: 'processing token' },
+          }),
+        ).to.equal(true);
+        expect(
+          NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+            type: 'netatmo.error-processing-token',
+            payload: { statusType: 'processing token', status: 'get_access_token_fail' },
+          }),
+        ).to.equal(true);
+        expect(
+          NetatmoHandlerMock.gladys.event.emit.getCall(2).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+            type: 'netatmo.status',
+            payload: { status: 'disconnected' },
+          }),
+        ).to.equal(true);
       }
     });
     it('should handle errors without a response object', async () => {
@@ -168,12 +182,11 @@ describe.only('Netatmo Connect', () => {
         expect.fail('should have thrown an error');
       } catch (e) {
         expect(e.message).to.include('NETATMO: Service is not connected with error');
-        expect(e.response).to.be.undefined;
+        expect(e.response).to.equal(undefined);
         expect(NetatmoHandlerMock.status).to.equal('disconnected');
-        expect(NetatmoHandlerMock.configured).to.be.true;
-        expect(NetatmoHandlerMock.connected).to.be.false;
+        expect(NetatmoHandlerMock.configured).to.equal(true);
+        expect(NetatmoHandlerMock.connected).to.equal(false);
       }
     });
-
   });
 });

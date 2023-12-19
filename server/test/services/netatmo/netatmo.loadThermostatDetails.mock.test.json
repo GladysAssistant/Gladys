@@ -1,17 +1,14 @@
 {
   "thermostats": [
     {
-      "_id": "70:ee:50:xx:xx:e0",
+      "_id": "70:ee:50:xx:xx:xx",
       "type": "NAPlug",
       "last_setup": 1580000589,
       "firmware": 200,
       "last_status_store": 1602798842,
       "plug_connected_boiler": true,
       "wifi_status": 45,
-      "modules": [
-        "04:00:00:xx:73:00",
-        "09:00:00:xx:b0:fb"
-      ],
+      "modules": ["04:00:00:xx:xx:xx", "02:00:00:xx:xx:xx"],
       "station_name": "Relais Test",
       "place": {
         "altitude": 50,
@@ -25,7 +22,7 @@
   ],
   "modules": [
     {
-      "_id": "04:00:00:xx:73:00",
+      "_id": "04:00:00:xx:xx:xx",
       "type": "NATherm1",
       "firmware": 60,
       "last_message": 1602798840,

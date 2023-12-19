@@ -60,7 +60,10 @@ async function setValue(device, deviceFeature, value) {
     );
     logger.error('error details: ', e.response.data.error.code, ' - ', e.response.data.error.message);
     if (e.response.status === 403 && e.response.data.error.code === 13) {
-      this.saveStatus({ statusType: STATUS.ERROR.SET_DEVICES_VALUES, message: 'set_devices_value_fail_scope_rights' });
+      this.saveStatus(this, {
+        statusType: STATUS.ERROR.SET_DEVICES_VALUES,
+        message: 'set_devices_value_fail_scope_rights',
+      });
     }
   }
 }

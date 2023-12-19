@@ -10,7 +10,8 @@ const { API, SUPPORTED_MODULE_TYPE, SUPPORTED_CATEGORY_TYPE } = require('./utils
  * await loadDevicesDetails();
  */
 async function loadDeviceDetails(homeData) {
-  const homeId = homeData.id;
+  const { rooms: roomsHomeData, modules: modulesHomeData, id: homeId } = homeData;
+
   logger.debug('loading devices details in home id: ', homeId, '...');
   const paramsForm = {
     home_id: homeId,
@@ -23,19 +24,18 @@ async function loadDeviceDetails(homeData) {
       data: paramsForm,
     });
     const { body: bodyGetHomestatus, status: statusGetHomestatus } = responseGetHomestatus.data;
-    const { rooms: roomsHomeData, modules: modulesHomeData } = homeData;
     const { rooms: roomsHomestatus, modules: modulesHomestatus } = bodyGetHomestatus.home;
-    let thermostats;
-    let modulesThermostat = [];
-    if (
-      modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.THERMOSTAT) !== undefined
-    ) {
-      const deviceThermostats = await this.loadThermostatDetails();
-      thermostats = deviceThermostats.thermostats;
-      modulesThermostat = deviceThermostats.modules;
-    }
-    let listDevices;
+    let listDevices = [];
     if (statusGetHomestatus === 'ok') {
+      let thermostats;
+      let modulesThermostat = [];
+      if (
+        modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.THERMOSTAT) !== undefined
+      ) {
+        const deviceThermostats = await this.loadThermostatDetails();
+        thermostats = deviceThermostats.thermostats;
+        modulesThermostat = deviceThermostats.modules;
+      }
       listDevices = modulesHomestatus
         ? (
             await Promise.all(

@@ -87,7 +87,6 @@ function convertDevice(netatmoDevice) {
   if (netatmoDevice.not_handled) {
     device.not_handled = true;
   }
-
   logger.info(`Netatmo "${name}, ${model}" device converted`);
   return device;
 }

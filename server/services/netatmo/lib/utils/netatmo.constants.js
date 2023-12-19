@@ -39,6 +39,7 @@ const STATUS = {
     DISCONNECTING: 'error disconnecting',
     CONNECTED: 'error connected',
     SET_DEVICES_VALUES: 'error set devices values',
+    GET_DEVICES_VALUES: 'error get devices values',
   },
   GET_DEVICES_VALUES: 'get devices values',
   DISCOVERING_DEVICES: 'discovering',

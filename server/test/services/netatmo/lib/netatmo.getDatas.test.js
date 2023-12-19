@@ -9,7 +9,7 @@ const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 const { GLADYS_VARIABLES } = require('../../../../services/netatmo/lib/utils/netatmo.constants');
 const { EVENTS } = require('../../../../utils/constants');
 
-describe.only('Netatmo Data Retrieval', () => {
+describe('Netatmo Data Retrieval', () => {
   let eventEmitter;
   beforeEach(() => {
     sinon.restore();
@@ -36,8 +36,8 @@ describe.only('Netatmo Data Retrieval', () => {
             return 10800;
           }
           return null;
-        })
-      }
+        }),
+      },
     };
     sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
   });
@@ -52,29 +52,37 @@ describe.only('Netatmo Data Retrieval', () => {
     });
 
     it('should return undefined and disconnect if no access token is available', async () => {
-      NetatmoHandlerMock.gladys.variable.getValue.withArgs(GLADYS_VARIABLES.ACCESS_TOKEN, sinon.match.any).returns(undefined);
+      NetatmoHandlerMock.gladys.variable.getValue
+        .withArgs(GLADYS_VARIABLES.ACCESS_TOKEN, sinon.match.any)
+        .returns(undefined);
 
       const accessToken = await getAccessToken(NetatmoHandlerMock);
-      expect(accessToken).to.be.undefined;
+      expect(accessToken).to.equal(undefined);
       sinon.assert.calledWith(NetatmoHandlerMock.saveStatus, sinon.match.has('status', 'disconnected'));
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'disconnected' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'disconnected' },
+        }),
+      ).to.equal(true);
     });
 
     it('should throw an error if not configured', async () => {
-      NetatmoHandlerMock.gladys.variable.getValue.withArgs(GLADYS_VARIABLES.ACCESS_TOKEN, sinon.match.any).throws(new Error('Test error'));
+      NetatmoHandlerMock.gladys.variable.getValue
+        .withArgs(GLADYS_VARIABLES.ACCESS_TOKEN, sinon.match.any)
+        .throws(new Error('Test error'));
       try {
         await getAccessToken(NetatmoHandlerMock);
         expect.fail('should have thrown an error');
       } catch (e) {
         expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'not_initialized' },
-        })).to.be.true;
+        expect(
+          NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+            type: 'netatmo.status',
+            payload: { status: 'not_initialized' },
+          }),
+        ).to.equal(true);
         expect(e).to.be.instanceOf(ServiceNotConfiguredError);
         expect(e.message).to.equal('Netatmo is not configured.');
       }
@@ -90,30 +98,38 @@ describe.only('Netatmo Data Retrieval', () => {
     });
 
     it('should return undefined and disconnect if no refresh token is available', async () => {
-      NetatmoHandlerMock.gladys.variable.getValue.withArgs(GLADYS_VARIABLES.REFRESH_TOKEN, sinon.match.any).returns(undefined);
+      NetatmoHandlerMock.gladys.variable.getValue
+        .withArgs(GLADYS_VARIABLES.REFRESH_TOKEN, sinon.match.any)
+        .returns(undefined);
 
       const refreshToken = await getRefreshToken(NetatmoHandlerMock);
-      expect(refreshToken).to.be.undefined;
+      expect(refreshToken).to.equal(undefined);
       sinon.assert.calledWith(NetatmoHandlerMock.saveStatus, sinon.match.has('status', 'disconnected'));
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'disconnected' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'disconnected' },
+        }),
+      ).to.equal(true);
     });
 
     it('should throw an error if not configured', async () => {
-      NetatmoHandlerMock.gladys.variable.getValue.withArgs(GLADYS_VARIABLES.EXPIRE_IN_TOKEN, sinon.match.any).throws(new Error('Test error'));
+      NetatmoHandlerMock.gladys.variable.getValue
+        .withArgs(GLADYS_VARIABLES.EXPIRE_IN_TOKEN, sinon.match.any)
+        .throws(new Error('Test error'));
       try {
         await getRefreshToken(NetatmoHandlerMock);
         expect.fail('should have thrown an error');
       } catch (e) {
         expect(NetatmoHandlerMock.refreshToken).to.equal('valid_refresh_token');
         expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'not_initialized' },
-        })).to.be.true;
+        expect(
+          NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+            type: 'netatmo.status',
+            payload: { status: 'not_initialized' },
+          }),
+        ).to.equal(true);
         expect(e).to.be.instanceOf(ServiceNotConfiguredError);
         expect(e.message).to.equal('Netatmo is not configured.');
       }
@@ -128,17 +144,21 @@ describe.only('Netatmo Data Retrieval', () => {
     });
 
     it('should throw an error if not configured', async () => {
-      NetatmoHandlerMock.gladys.variable.getValue.withArgs(GLADYS_VARIABLES.CLIENT_SECRET, sinon.match.any).throws(new Error('Test error'));
+      NetatmoHandlerMock.gladys.variable.getValue
+        .withArgs(GLADYS_VARIABLES.CLIENT_SECRET, sinon.match.any)
+        .throws(new Error('Test error'));
       try {
         await getConfiguration(NetatmoHandlerMock);
         expect.fail('should have thrown an error');
       } catch (e) {
         expect(NetatmoHandlerMock.configuration.clientId).to.equal('valid_client_id');
         expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-        expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
-          payload: { status: 'not_initialized' },
-        })).to.be.true;
+        expect(
+          NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+            type: 'netatmo.status',
+            payload: { status: 'not_initialized' },
+          }),
+        ).to.equal(true);
         expect(e).to.be.instanceOf(ServiceNotConfiguredError);
         expect(e.message).to.equal('Netatmo is not configured.');
       }

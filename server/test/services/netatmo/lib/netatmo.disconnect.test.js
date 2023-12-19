@@ -6,7 +6,7 @@ const { NetatmoHandlerMock } = require('../netatmo.mock.test');
 const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
 const { EVENTS } = require('../../../../utils/constants');
 
-describe.only('Netatmo Disconnect', () => {
+describe('Netatmo Disconnect', () => {
   let eventEmitter;
   let fakeIntervalId;
 
@@ -19,7 +19,7 @@ describe.only('Netatmo Disconnect', () => {
 
     NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
     NetatmoHandlerMock.status = 'not_initialized';
-    fakeIntervalId = setTimeout(() => { }, 1000);
+    fakeIntervalId = setTimeout(() => {}, 1000);
     sinon.stub(global, 'setInterval').returns(fakeIntervalId);
     sinon.stub(global, 'clearInterval');
   });
@@ -32,15 +32,19 @@ describe.only('Netatmo Disconnect', () => {
     disconnect(NetatmoHandlerMock);
 
     expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-    expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: 'netatmo.status',
-      payload: { status: 'disconnecting' },
-    })).to.be.true;
-    expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: 'netatmo.status',
-      payload: { status: 'disconnected' },
-    })).to.be.true;
+    expect(
+      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'disconnecting' },
+      }),
+    ).to.equal(true);
+    expect(
+      NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'disconnected' },
+      }),
+    ).to.equal(true);
     // @ts-ignore
-    expect(global.clearInterval.calledWith(fakeIntervalId)).to.be.true;
+    expect(global.clearInterval.calledWith(fakeIntervalId)).to.equal(true);
   });
 });

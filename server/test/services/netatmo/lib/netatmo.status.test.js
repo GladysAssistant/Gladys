@@ -6,7 +6,7 @@ const { NetatmoHandlerMock } = require('../netatmo.mock.test');
 const { EVENTS } = require('../../../../utils/constants');
 const { STATUS } = require('../../../../services/netatmo/lib/utils/netatmo.constants');
 
-describe.only('Netatmo Discover devices', () => {
+describe('Netatmo Discover devices', () => {
   let eventEmitter;
   beforeEach(() => {
     sinon.reset();
@@ -42,7 +42,7 @@ describe.only('Netatmo Discover devices', () => {
   describe('saveStatus', () => {
     let fakeIntervalId;
     beforeEach(() => {
-      fakeIntervalId = setTimeout(() => { }, 1000);
+      fakeIntervalId = setTimeout(() => {}, 1000);
       sinon.stub(global, 'setInterval').returns(fakeIntervalId);
       sinon.stub(global, 'clearInterval');
     });
@@ -57,22 +57,22 @@ describe.only('Netatmo Discover devices', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.NOT_INITIALIZED, message: null });
 
       expect(NetatmoHandlerMock.status).to.equal('not_initialized');
-      expect(NetatmoHandlerMock.configured).to.be.false;
-      expect(NetatmoHandlerMock.connected).to.be.false;
+      expect(NetatmoHandlerMock.configured).to.equal(false);
+      expect(NetatmoHandlerMock.connected).to.equal(false);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'not_initialized' },
       });
       // @ts-ignore
-      expect(global.clearInterval.calledWith(fakeIntervalId)).to.be.true;
+      expect(global.clearInterval.calledWith(fakeIntervalId)).to.equal(true);
     });
     it('should update the status to CONNECTING and emit the event', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.CONNECTING, message: null });
 
       expect(NetatmoHandlerMock.status).to.equal('connecting');
-      expect(NetatmoHandlerMock.configured).to.be.true;
-      expect(NetatmoHandlerMock.connected).to.be.false;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
+      expect(NetatmoHandlerMock.connected).to.equal(false);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
@@ -83,8 +83,8 @@ describe.only('Netatmo Discover devices', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.PROCESSING_TOKEN, message: null });
 
       expect(NetatmoHandlerMock.status).to.equal('processing token');
-      expect(NetatmoHandlerMock.configured).to.be.true;
-      expect(NetatmoHandlerMock.connected).to.be.false;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
+      expect(NetatmoHandlerMock.connected).to.equal(false);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
@@ -95,8 +95,8 @@ describe.only('Netatmo Discover devices', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.CONNECTED, message: null });
 
       expect(NetatmoHandlerMock.status).to.equal('connected');
-      expect(NetatmoHandlerMock.configured).to.be.true;
-      expect(NetatmoHandlerMock.connected).to.be.true;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
+      expect(NetatmoHandlerMock.connected).to.equal(true);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
@@ -107,7 +107,7 @@ describe.only('Netatmo Discover devices', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.DISCONNECTING, message: null });
 
       expect(NetatmoHandlerMock.status).to.equal('disconnecting');
-      expect(NetatmoHandlerMock.configured).to.be.true;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
@@ -119,26 +119,38 @@ describe.only('Netatmo Discover devices', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.DISCONNECTED, message: null });
 
       expect(NetatmoHandlerMock.status).to.equal('disconnected');
-      expect(NetatmoHandlerMock.configured).to.be.true;
-      expect(NetatmoHandlerMock.connected).to.be.false;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
+      expect(NetatmoHandlerMock.connected).to.equal(false);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'disconnected' },
       });
       // @ts-ignore
-      expect(global.clearInterval.calledWith(fakeIntervalId)).to.be.true;
+      expect(global.clearInterval.calledWith(fakeIntervalId)).to.equal(true);
     });
     it('should update the status to DISCOVERING_DEVICES and emit the event', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.DISCOVERING_DEVICES, message: null });
 
       expect(NetatmoHandlerMock.status).to.equal('discovering');
-      expect(NetatmoHandlerMock.configured).to.be.true;
-      expect(NetatmoHandlerMock.connected).to.be.true;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
+      expect(NetatmoHandlerMock.connected).to.equal(true);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'discovering' },
+      });
+    });
+    it('should update the status to GET_DEVICES_VALUES and emit the event', () => {
+      saveStatus(NetatmoHandlerMock, { statusType: STATUS.GET_DEVICES_VALUES, message: null });
+
+      expect(NetatmoHandlerMock.status).to.equal('get devices values');
+      expect(NetatmoHandlerMock.configured).to.equal(true);
+      expect(NetatmoHandlerMock.connected).to.equal(true);
+      expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
+      sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'get devices values' },
       });
     });
 
@@ -149,16 +161,20 @@ describe.only('Netatmo Discover devices', () => {
       });
 
       expect(NetatmoHandlerMock.status).to.equal('disconnected');
-      expect(NetatmoHandlerMock.connected).to.be.false;
+      expect(NetatmoHandlerMock.connected).to.equal(false);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.error-connecting',
-        payload: { statusType: 'connecting', status: 'error_connecting' },
-      })).to.be.true;
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'disconnected' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.error-connecting',
+          payload: { statusType: 'connecting', status: 'error_connecting' },
+        }),
+      ).to.equal(true);
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'disconnected' },
+        }),
+      ).to.equal(true);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'disconnected' },
@@ -172,16 +188,20 @@ describe.only('Netatmo Discover devices', () => {
       });
 
       expect(NetatmoHandlerMock.status).to.equal('disconnected');
-      expect(NetatmoHandlerMock.connected).to.be.false;
+      expect(NetatmoHandlerMock.connected).to.equal(false);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.error-processing-token',
-        payload: { statusType: 'processing token', status: 'get_access_token_fail' },
-      })).to.be.true;
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'disconnected' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.error-processing-token',
+          payload: { statusType: 'processing token', status: 'get_access_token_fail' },
+        }),
+      ).to.equal(true);
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'disconnected' },
+        }),
+      ).to.equal(true);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'disconnected' },
@@ -195,17 +215,21 @@ describe.only('Netatmo Discover devices', () => {
       });
 
       expect(NetatmoHandlerMock.status).to.equal('disconnected');
-      expect(NetatmoHandlerMock.configured).to.be.true;
-      expect(NetatmoHandlerMock.connected).to.be.false;
+      expect(NetatmoHandlerMock.configured).to.equal(true);
+      expect(NetatmoHandlerMock.connected).to.equal(false);
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.error-connected',
-        payload: { statusType: 'connected', status: 'error_connected' },
-      })).to.be.true;
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'disconnected' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.error-connected',
+          payload: { statusType: 'connected', status: 'error_connected' },
+        }),
+      ).to.equal(true);
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'disconnected' },
+        }),
+      ).to.equal(true);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'disconnected' },
@@ -221,14 +245,18 @@ describe.only('Netatmo Discover devices', () => {
 
       expect(NetatmoHandlerMock.status).to.equal('connected');
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.error-connected',
-        payload: { statusType: 'connected', status: 'error_set_devices_values' },
-      })).to.be.true;
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'connected' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.error-connected',
+          payload: { statusType: 'connected', status: 'error_set_devices_values' },
+        }),
+      ).to.equal(true);
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'connected' },
+        }),
+      ).to.equal(true);
       sinon.assert.calledWith(NetatmoHandlerMock.gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'connected' },
@@ -238,14 +266,14 @@ describe.only('Netatmo Discover devices', () => {
     it('should handle unknown status types gracefully', () => {
       const result = saveStatus(NetatmoHandlerMock, { statusType: 'unknown_status', message: null });
 
-      expect(result).to.be.true;
+      expect(result).to.equal(true);
     });
 
     it('should return false on error', () => {
       NetatmoHandlerMock.gladys.event.emit = sinon.stub().throws(new Error('Emit failed'));
 
       const result = saveStatus(NetatmoHandlerMock, { statusType: STATUS.CONNECTED, message: null });
-      expect(result).to.be.false;
+      expect(result).to.equal(false);
     });
   });
 });

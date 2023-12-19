@@ -19,7 +19,7 @@ const readValues = {
     /* plug_connected_boiler: 1 */
     /* boiler_status: true */
     [DEVICE_FEATURE_TYPES.SWITCH.BINARY]: (valueFromDevice) => {
-      const valueToGladys = valueFromDevice === (true || 1) ? 1 : 0;
+      const valueToGladys = valueFromDevice === true || valueFromDevice === 1 ? 1 : 0;
       return valueToGladys;
     },
   },
@@ -47,7 +47,7 @@ const readValues = {
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: {
     /* room.open_window: false */
     [DEVICE_FEATURE_TYPES.SENSOR.BINARY]: (valueFromDevice) => {
-      const valueToGladys = valueFromDevice === (true || 1) ? 1 : 0;
+      const valueToGladys = valueFromDevice === true || valueFromDevice === 1 ? 1 : 0;
       return valueToGladys;
     },
   },

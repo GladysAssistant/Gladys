@@ -31,7 +31,7 @@ const NetatmoHandlerMock = {
   retrieveTokens: sinon.stub().resolves({
     accessToken: 'mock_access_token',
     refreshToken: 'mock_refresh_token',
-    expireIn: 10800
+    expireIn: 10800,
   }),
   setTokens: sinon.stub().resolves(),
   getStatus: sinon.stub().returns(STATUS.NOT_INITIALIZED),
@@ -41,12 +41,12 @@ const NetatmoHandlerMock = {
   refreshingTokens: sinon.stub().resolves({
     accessToken: 'mock_access_token',
     refreshToken: 'mock_refresh_token',
-    expireIn: 10800
+    expireIn: 10800,
   }),
   getConfiguration: sinon.stub().resolves({
     clientId: 'mock_client_id',
     clientSecret: 'mock_client_secret',
-    redirectUri: 'mock_redirect_uri'
+    redirectUri: 'mock_redirect_uri',
   }),
   saveConfiguration: sinon.stub().resolves(),
   discoverDevices: sinon.stub().resolves(discoverDevicesMock),
@@ -56,8 +56,9 @@ const NetatmoHandlerMock = {
   pollRefreshingValues: sinon.stub().resolves(),
   pollRefreshingToken: sinon.stub().resolves(),
   setValue: sinon.stub().resolves(),
+  updateValues: sinon.stub().resolves(),
 };
 
 module.exports = {
-  NetatmoHandlerMock
+  NetatmoHandlerMock,
 };

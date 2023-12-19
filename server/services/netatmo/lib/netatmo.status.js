@@ -60,6 +60,12 @@ function saveStatus(netatmoHandler, status) {
           payload: { statusType: STATUS.CONNECTED, status: status.message },
         });
         break;
+      case STATUS.ERROR.GET_DEVICES_VALUES:
+        netatmoHandler.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTED,
+          payload: { statusType: STATUS.CONNECTED, status: status.message },
+        });
+        break;
 
       case STATUS.NOT_INITIALIZED:
         netatmoHandler.configured = false;
@@ -95,6 +101,11 @@ function saveStatus(netatmoHandler, status) {
       case STATUS.DISCOVERING_DEVICES:
         netatmoHandler.configured = true;
         netatmoHandler.status = STATUS.DISCOVERING_DEVICES;
+        netatmoHandler.connected = true;
+        break;
+      case STATUS.GET_DEVICES_VALUES:
+        netatmoHandler.configured = true;
+        netatmoHandler.status = STATUS.GET_DEVICES_VALUES;
         netatmoHandler.connected = true;
         break;
 

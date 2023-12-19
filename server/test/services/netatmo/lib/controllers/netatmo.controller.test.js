@@ -5,7 +5,7 @@ const { NetatmoHandlerMock } = require('../../netatmo.mock.test');
 
 const netatmoController = NetatmoController(NetatmoHandlerMock);
 
-describe.only('Netatmo Controller', () => {
+describe('Netatmo Controller', () => {
   let req;
   let res;
 
@@ -30,7 +30,7 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.getConfiguration.resolves(configuration);
 
       await netatmoController['get /api/v1/service/netatmo/config'].controller(req, res);
-      expect(res.json.calledWith(configuration)).to.be.true;
+      expect(res.json.calledWith(configuration)).to.equal(true);
     });
   });
 
@@ -40,7 +40,7 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.getStatus.resolves(status);
 
       await netatmoController['get /api/v1/service/netatmo/status'].controller(req, res);
-      expect(res.json.calledWith(status)).to.be.true;
+      expect(res.json.calledWith(status)).to.equal(true);
     });
   });
 
@@ -51,7 +51,7 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.saveConfiguration.resolves(true);
 
       await netatmoController['post /api/v1/service/netatmo/saveConfiguration'].controller(req, res);
-      expect(res.json.calledWith({ success: true })).to.be.true;
+      expect(res.json.calledWith({ success: true })).to.equal(true);
     });
   });
 
@@ -62,7 +62,7 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.saveStatus.resolves(true);
 
       await netatmoController['post /api/v1/service/netatmo/saveStatus'].controller(req, res);
-      expect(res.json.calledWith({ success: true })).to.be.true;
+      expect(res.json.calledWith({ success: true })).to.equal(true);
     });
   });
 
@@ -71,7 +71,7 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.connect.resolves(true);
 
       await netatmoController['post /api/v1/service/netatmo/connect'].controller(req, res);
-      expect(res.json.calledWith({ result: true })).to.be.true;
+      expect(res.json.calledWith({ result: true })).to.equal(true);
     });
   });
 
@@ -81,12 +81,14 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.retrieveTokens.resolves({ accessToken: 'test-token', refreshToken: 'test-refresh-token' });
 
       await netatmoController['post /api/v1/service/netatmo/retrieveTokens'].controller(req, res);
-      expect(res.json.calledWith({
-        result: {
-          accessToken: 'test-token',
-          refreshToken: 'test-refresh-token'
-        }
-      })).to.be.true;
+      expect(
+        res.json.calledWith({
+          result: {
+            accessToken: 'test-token',
+            refreshToken: 'test-refresh-token',
+          },
+        }),
+      ).to.equal(true);
     });
   });
 
@@ -95,7 +97,7 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.disconnect.resolves();
 
       await netatmoController['post /api/v1/service/netatmo/disconnect'].controller(req, res);
-      expect(res.json.calledWith({ success: true })).to.be.true;
+      expect(res.json.calledWith({ success: true })).to.equal(true);
     });
   });
 
@@ -105,27 +107,26 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.discoverDevices.resolves(devices);
 
       await netatmoController['get /api/v1/service/netatmo/discover'].controller(req, res);
-      expect(res.json.calledWith(devices)).to.be.true;
+      expect(res.json.calledWith(devices)).to.equal(true);
     });
     it('should return already discovered devices that are not in Gladys', async () => {
-
       const discoveredDevices = [
         { external_id: 'netatmo:70:ee:50:xx:xx:e0', notInGladys: true },
-        { external_id: 'netatmo:70:ee:50:xx:xx:e1', notInGladys: false }
+        { external_id: 'netatmo:70:ee:50:xx:xx:e1', notInGladys: false },
       ];
       NetatmoHandlerMock.discoveredDevices = discoveredDevices;
       NetatmoHandlerMock.gladys = {
         stateManager: {
           get: sinon.stub().callsFake((type, externalId) => {
-            const device = discoveredDevices.find(d => d.external_id === externalId);
+            const device = discoveredDevices.find((d) => d.external_id === externalId);
             return device && !device.notInGladys ? {} : null;
           }),
         },
       };
       await netatmoController['get /api/v1/service/netatmo/discover'].controller(req, res);
 
-      const expectedDevices = discoveredDevices.filter(d => d.notInGladys);
-      expect(res.json.calledWith(expectedDevices)).to.be.true;
+      const expectedDevices = discoveredDevices.filter((d) => d.notInGladys);
+      expect(res.json.calledWith(expectedDevices)).to.equal(true);
     });
   });
 
@@ -135,7 +136,7 @@ describe.only('Netatmo Controller', () => {
       NetatmoHandlerMock.discoverDevices.resolves(devices);
 
       await netatmoController['get /api/v1/service/netatmo/refreshDiscover'].controller(req, res);
-      expect(res.json.calledWith(devices)).to.be.true;
+      expect(res.json.calledWith(devices)).to.equal(true);
     });
   });
 });

@@ -9,7 +9,7 @@ const netatmoSetTokens = require('../../../../services/netatmo/lib/netatmo.setTo
 const { EVENTS } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
-describe.only('Netatmo Refreshing Tokens', () => {
+describe('Netatmo Refreshing Tokens', () => {
   let eventEmitter;
   const serviceId = 'serviceId';
   beforeEach(() => {
@@ -23,8 +23,8 @@ describe.only('Netatmo Refreshing Tokens', () => {
     NetatmoHandlerMock.gladys = {
       event: eventEmitter,
       variable: {
-        setValue: sinon.stub().resolves()
-      }
+        setValue: sinon.stub().resolves(),
+      },
     };
     sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
   });
@@ -48,10 +48,12 @@ describe.only('Netatmo Refreshing Tokens', () => {
       expect(e.message).to.equal('Netatmo is not connected.');
       expect(NetatmoHandlerMock.status).to.equal('not_initialized');
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'not_initialized' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'not_initialized' },
+        }),
+      ).to.equal(true);
     }
   });
 
@@ -72,19 +74,33 @@ describe.only('Netatmo Refreshing Tokens', () => {
     const result = await refreshingTokens.call(NetatmoHandlerMock);
     expect(result).to.deep.equal({ success: true });
     expect(NetatmoHandlerMock.status).to.equal('connected');
-    expect(NetatmoHandlerMock.configured).to.be.true;
-    expect(NetatmoHandlerMock.connected).to.be.true;
+    expect(NetatmoHandlerMock.configured).to.equal(true);
+    expect(NetatmoHandlerMock.connected).to.equal(true);
     expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-    expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: 'netatmo.status',
-      payload: { status: 'processing token' },
-    })).to.be.true;
-    expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: 'netatmo.status',
-      payload: { status: 'connected' },
-    })).to.be.true;
-    sinon.assert.calledWith(NetatmoHandlerMock.gladys.variable.setValue, 'NETATMO_ACCESS_TOKEN', 'new-access-token', serviceId);
-    sinon.assert.calledWith(NetatmoHandlerMock.gladys.variable.setValue, 'NETATMO_REFRESH_TOKEN', 'new-refresh-token', serviceId);
+    expect(
+      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'processing token' },
+      }),
+    ).to.equal(true);
+    expect(
+      NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'connected' },
+      }),
+    ).to.equal(true);
+    sinon.assert.calledWith(
+      NetatmoHandlerMock.gladys.variable.setValue,
+      'NETATMO_ACCESS_TOKEN',
+      'new-access-token',
+      serviceId,
+    );
+    sinon.assert.calledWith(
+      NetatmoHandlerMock.gladys.variable.setValue,
+      'NETATMO_REFRESH_TOKEN',
+      'new-refresh-token',
+      serviceId,
+    );
     sinon.assert.calledWith(NetatmoHandlerMock.gladys.variable.setValue, 'NETATMO_EXPIRE_IN_TOKEN', 3600, serviceId);
     expect(NetatmoHandlerMock.status).to.equal('connected');
   });
@@ -102,18 +118,24 @@ describe.only('Netatmo Refreshing Tokens', () => {
       expect(e.message).to.include('NETATMO: Service is not connected with error');
       expect(NetatmoHandlerMock.status).to.equal('disconnected');
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(3);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'processing token' },
-      })).to.be.true;
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.error-processing-token',
-        payload: { statusType: 'processing token', status: 'refresh_token_fail' },
-      })).to.be.true;
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(2).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'disconnected' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'processing token' },
+        }),
+      ).to.equal(true);
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.error-processing-token',
+          payload: { statusType: 'processing token', status: 'refresh_token_fail' },
+        }),
+      ).to.equal(true);
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(2).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'disconnected' },
+        }),
+      ).to.equal(true);
     }
   });
 
@@ -133,11 +155,9 @@ describe.only('Netatmo Refreshing Tokens', () => {
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
       expect(e.message).to.include('NETATMO: Service is not connected with error');
-      expect(e.response).to.be.undefined;
+      expect(e.response).to.equal(undefined);
       expect(NetatmoHandlerMock.status).to.equal('disconnected');
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(3);
     }
   });
-
-
 });

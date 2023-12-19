@@ -9,7 +9,7 @@ const devicesMock = require('../netatmo.loadDevices.mock.test.json');
 const { EVENTS } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
-describe.only('Netatmo Discover devices', () => {
+describe('Netatmo Discover devices', () => {
   let eventEmitter;
   beforeEach(() => {
     sinon.reset();
@@ -20,7 +20,7 @@ describe.only('Netatmo Discover devices', () => {
     NetatmoHandlerMock.status = 'not_initialized';
     NetatmoHandlerMock.gladys = {
       stateManager: {
-        get: sinon.stub().resolves()
+        get: sinon.stub().resolves(),
       },
       event: eventEmitter,
     };
@@ -44,14 +44,18 @@ describe.only('Netatmo Discover devices', () => {
     expect(NetatmoHandlerMock.discoveredDevices).to.deep.equal(discoveredDevices);
     expect(NetatmoHandlerMock.status).to.equal('connected');
     expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-    expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: 'netatmo.status',
-      payload: { status: 'discovering' },
-    })).to.be.true;
-    expect(NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-      type: 'netatmo.status',
-      payload: { status: 'connected' },
-    })).to.be.true;
+    expect(
+      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'discovering' },
+      }),
+    ).to.equal(true);
+    expect(
+      NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        type: 'netatmo.status',
+        payload: { status: 'connected' },
+      }),
+    ).to.equal(true);
   });
 
   it('should throw an error if not connected', async () => {
@@ -63,10 +67,12 @@ describe.only('Netatmo Discover devices', () => {
       expect(e.message).to.equal('Unable to discover Netatmo devices until service is not well configured');
       expect(NetatmoHandlerMock.status).to.equal('not_initialized');
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-      expect(NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'not_initialized' },
-      })).to.be.true;
+      expect(
+        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+          type: 'netatmo.status',
+          payload: { status: 'not_initialized' },
+        }),
+      ).to.equal(true);
     }
   });
 

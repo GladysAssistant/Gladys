@@ -5,7 +5,7 @@ const proxyquire = require('proxyquire');
 const { NetatmoHandlerMock } = require('./netatmo.mock.test');
 const { STATUS } = require('../../../services/netatmo/lib/utils/netatmo.constants');
 
-describe.only('Netatmo Service', () => {
+describe('Netatmo Service', () => {
   let NetatmoService;
   let netatmoService;
   let gladys;
@@ -16,7 +16,7 @@ describe.only('Netatmo Service', () => {
     serviceId = 'some-service-id';
 
     NetatmoService = proxyquire('../../../services/netatmo/index', {
-      './lib': function () {
+      './lib': function mockFunction() {
         return NetatmoHandlerMock;
       },
     });
@@ -31,14 +31,14 @@ describe.only('Netatmo Service', () => {
   describe('start', () => {
     it('should start the service correctly', async () => {
       await netatmoService.start();
-      expect(NetatmoHandlerMock.init.calledOnce).to.be.true;
+      expect(NetatmoHandlerMock.init.calledOnce).to.equal(true);
     });
   });
 
   describe('stop', () => {
     it('should stop the service correctly', async () => {
       await netatmoService.stop();
-      expect(NetatmoHandlerMock.disconnect.calledOnce).to.be.true;
+      expect(NetatmoHandlerMock.disconnect.calledOnce).to.equal(true);
     });
   });
 
@@ -46,13 +46,13 @@ describe.only('Netatmo Service', () => {
     it('should return true when Netatmo is connected', async () => {
       NetatmoHandlerMock.status = STATUS.CONNECTED;
       const result = await netatmoService.isUsed();
-      expect(result).to.be.true;
+      expect(result).to.equal(true);
     });
 
     it('should return false when Netatmo is not connected', async () => {
       NetatmoHandlerMock.status = STATUS.NOT_INITIALIZED;
       const result = await netatmoService.isUsed();
-      expect(result).to.be.false;
+      expect(result).to.equal(false);
     });
   });
 });
