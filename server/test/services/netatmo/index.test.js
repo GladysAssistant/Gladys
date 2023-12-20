@@ -25,7 +25,7 @@ describe('Netatmo Service', () => {
   });
 
   afterEach(() => {
-    sinon.restore();
+    sinon.reset();
   });
 
   describe('start', () => {

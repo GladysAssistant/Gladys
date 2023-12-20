@@ -8,10 +8,10 @@ const devicesGladysMock = require('../netatmo.convertDevices.mock.test.json');
 
 describe('Netatmo Convert Device', () => {
   beforeEach(() => {
-    sinon.restore();
+    sinon.reset();
   });
   afterEach(() => {
-    sinon.restore();
+    sinon.reset();
   });
 
   describe('Netatmo Convert Device', () => {

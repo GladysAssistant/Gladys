@@ -42,13 +42,13 @@ describe('Netatmo Discover devices', () => {
   describe('saveStatus', () => {
     let fakeIntervalId;
     beforeEach(() => {
-      fakeIntervalId = setTimeout(() => {}, 1000);
+      fakeIntervalId = setTimeout(() => { }, 1000);
       sinon.stub(global, 'setInterval').returns(fakeIntervalId);
       sinon.stub(global, 'clearInterval');
     });
 
     afterEach(() => {
-      sinon.restore();
+      sinon.reset();
     });
 
     it('should update the status to NOT_INITIALIZED and emit the event', () => {

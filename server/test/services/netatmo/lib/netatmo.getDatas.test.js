@@ -12,7 +12,7 @@ const { EVENTS } = require('../../../../utils/constants');
 describe('Netatmo Data Retrieval', () => {
   let eventEmitter;
   beforeEach(() => {
-    sinon.restore();
+    sinon.reset();
     eventEmitter = new EventEmitter();
     NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
     NetatmoHandlerMock.status = 'not_initialized';
@@ -42,7 +42,7 @@ describe('Netatmo Data Retrieval', () => {
     sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
   });
   afterEach(() => {
-    sinon.restore();
+    sinon.reset();
   });
 
   describe('getAccessToken', () => {

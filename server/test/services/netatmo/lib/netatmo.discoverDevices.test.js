@@ -35,6 +35,7 @@ describe('Netatmo Discover devices', () => {
   it('should discover devices successfully', async () => {
     NetatmoHandlerMock.status = 'connected';
     NetatmoHandlerMock.gladys.stateManager.get = sinon.stub().returns(null);
+    NetatmoHandlerMock.loadDevices = sinon.stub().returns(devicesMock);
 
     const discoveredDevices = await discoverDevices(NetatmoHandlerMock);
 

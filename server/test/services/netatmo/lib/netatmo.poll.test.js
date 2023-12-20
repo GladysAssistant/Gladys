@@ -21,7 +21,7 @@ describe('Netatmo Poll', () => {
   describe('pollRefreshingValues', () => {
     let eventEmitter;
     beforeEach(() => {
-      sinon.restore();
+      sinon.reset();
       sinon.stub(global, 'setInterval');
 
       eventEmitter = new EventEmitter();
@@ -38,7 +38,7 @@ describe('Netatmo Poll', () => {
     });
 
     afterEach(() => {
-      sinon.restore();
+      sinon.reset();
     });
 
     it('should refresh device values periodically', async () => {
@@ -86,7 +86,7 @@ describe('Netatmo Poll', () => {
   describe('pollRefreshingToken', () => {
     let eventEmitter;
     beforeEach(() => {
-      sinon.restore();
+      sinon.reset();
       sinon.stub(global, 'setInterval');
 
       eventEmitter = new EventEmitter();
@@ -99,7 +99,7 @@ describe('Netatmo Poll', () => {
     });
 
     afterEach(() => {
-      sinon.restore();
+      sinon.reset();
     });
 
     it('should handle failed token refresh', async () => {

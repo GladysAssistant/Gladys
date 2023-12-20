@@ -11,7 +11,7 @@ const { EVENTS } = require('../../../../utils/constants');
 describe('Netatmo Init', () => {
   let eventEmitter;
   beforeEach(() => {
-    sinon.restore();
+    sinon.reset();
     eventEmitter = new EventEmitter();
     NetatmoHandlerMock.gladys = { event: eventEmitter };
     sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
@@ -21,7 +21,7 @@ describe('Netatmo Init', () => {
     NetatmoHandlerMock.refreshingTokens = sinon.stub().callsFake(netatmoRefreshingTokens.refreshingTokens);
   });
   afterEach(() => {
-    sinon.restore();
+    sinon.reset();
   });
 
   it('should throw an error if not configured', async () => {
