@@ -19,7 +19,7 @@ describe('Netatmo Disconnect', () => {
 
     NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
     NetatmoHandlerMock.status = 'not_initialized';
-    fakeIntervalId = setTimeout(() => { }, 1000);
+    fakeIntervalId = setTimeout(() => {}, 1000);
     sinon.stub(global, 'setInterval').returns(fakeIntervalId);
     sinon.stub(global, 'clearInterval');
   });

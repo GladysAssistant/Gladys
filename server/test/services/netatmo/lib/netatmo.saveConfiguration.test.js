@@ -3,14 +3,14 @@ const sinon = require('sinon');
 const { saveConfiguration } = require('../../../../services/netatmo/lib/netatmo.saveConfiguration');
 const { NetatmoHandlerMock } = require('../netatmo.mock.test');
 const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
-const netatmoSetTokens = require('../../../../services/netatmo/lib/netatmo.setTokens');
+// const netatmoSetTokens = require('../../../../services/netatmo/lib/netatmo.setTokens');
 
 describe('Netatmo Save configuration', () => {
   beforeEach(() => {
     sinon.reset();
 
     NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
-    NetatmoHandlerMock.setTokens = sinon.stub().callsFake(netatmoSetTokens.setTokens);
+    // NetatmoHandlerMock.setTokens = sinon.stub().callsFake(netatmoSetTokens.setTokens);
     NetatmoHandlerMock.status = 'not_initialized';
     NetatmoHandlerMock.gladys = {
       variable: {
