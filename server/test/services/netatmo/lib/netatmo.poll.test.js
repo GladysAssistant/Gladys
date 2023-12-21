@@ -10,9 +10,12 @@ const devicesExistsMock = require('../netatmo.discoverDevices.mock.test.json');
 
 describe('Netatmo Poll', () => {
   let eventEmitter;
+  let clock;
+
   beforeEach(() => {
     sinon.reset();
 
+    clock = sinon.useFakeTimers();
     eventEmitter = new EventEmitter();
     NetatmoHandlerMock.status = 'not_initialized';
     NetatmoHandlerMock.gladys = {
@@ -27,12 +30,12 @@ describe('Netatmo Poll', () => {
   });
 
   afterEach(() => {
+    clock.restore();
     sinon.reset();
   });
 
   describe('pollRefreshingValues', () => {
     it('should refresh device values periodically', async () => {
-      const clock = sinon.useFakeTimers();
       NetatmoHandlerMock.status = 'connected';
       NetatmoHandlerMock.loadDevices = sinon.stub().resolves(devicesMock);
 
@@ -48,7 +51,6 @@ describe('Netatmo Poll', () => {
       });
       clock.tick(120 * 1000);
       sinon.assert.calledTwice(NetatmoHandlerMock.loadDevices);
-      clock.reset();
     });
 
     it('should refresh device values periodically without device existing in Gladys', async () => {
@@ -133,14 +135,12 @@ describe('Netatmo Poll', () => {
     });
 
     it('should new expiration token different expiration token store', async () => {
-      const clock = sinon.useFakeTimers();
       NetatmoHandlerMock.refreshingTokens = sinon.stub().resolves({ success: true });
       NetatmoHandlerMock.expireInToken = 3600;
       await pollRefreshingToken(NetatmoHandlerMock);
       sinon.assert.called(NetatmoHandlerMock.refreshingTokens);
       clock.tick(3600 * 1000);
       sinon.assert.calledTwice(NetatmoHandlerMock.refreshingTokens);
-      clock.reset();
     });
     it('should restart polling when expireInToken changes', async () => {
       NetatmoHandlerMock.expireInToken = 3600;
