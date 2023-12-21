@@ -26,7 +26,7 @@ async function setValue(device, deviceFeature, value) {
     throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" should starts with "netatmo:"`);
   }
   if (!topic || topic.length === 0) {
-    throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" have no network indicator`);
+    throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" have no id and category indicator`);
   }
   const featureName = topic[topic.length - 1];
 
@@ -40,15 +40,13 @@ async function setValue(device, deviceFeature, value) {
     temp: transformedValue,
   };
   try {
-    const response = await axios({
+    await axios({
       url: API.SET_ROOM_THERMPOINT,
       method: 'post',
       headers: { accept: API.HEADER.ACCEPT, Authorization: `Bearer ${this.accessToken}` },
       data: paramsForm,
     });
-    if (response.status === 200) {
-      logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
-    }
+    logger.debug(`Value has been changed on the device ${device.name} / ${featureName}: ${transformedValue}`);
   } catch (e) {
     logger.error(
       'setValue error with status code: ',
@@ -63,6 +61,11 @@ async function setValue(device, deviceFeature, value) {
       this.saveStatus(this, {
         statusType: STATUS.ERROR.SET_DEVICES_VALUES,
         message: 'set_devices_value_fail_scope_rights',
+      });
+    } else {
+      this.saveStatus(this, {
+        statusType: STATUS.ERROR.SET_DEVICES_VALUES,
+        message: 'set_devices_value_error_unknown',
       });
     }
   }

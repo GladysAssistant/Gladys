@@ -43,18 +43,19 @@ describe('Netatmo Discover devices', () => {
     let fakeIntervalId;
     beforeEach(() => {
       fakeIntervalId = setTimeout(() => {}, 1000);
+      // @ts-ignore
       if (typeof global.setInterval.restore === 'function') {
+        // @ts-ignore
         global.setInterval.restore();
       }
       sinon.stub(global, 'setInterval').returns(fakeIntervalId);
 
-      // Vérifier si clearInterval a déjà été stubbed
+      // @ts-ignore
       if (typeof global.clearInterval.restore === 'function') {
+        // @ts-ignore
         global.clearInterval.restore();
       }
       sinon.stub(global, 'clearInterval');
-      // sinon.stub(global, 'setInterval').returns(fakeIntervalId);
-      // sinon.stub(global, 'clearInterval');
     });
 
     afterEach(() => {

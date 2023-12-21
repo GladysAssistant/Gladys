@@ -63,13 +63,15 @@ async function loadDeviceDetails(homeData) {
                     categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
                     break;
                   case SUPPORTED_MODULE_TYPE.PLUG:
-                    device = thermostats
-                      .map((thermostat) => {
-                        const { modules, ...rest } = thermostat;
-                        return rest;
-                      })
-                      // eslint-disable-next-line no-underscore-dangle
-                      .find((thermostat) => thermostat._id === module.id);
+                    if (thermostats) {
+                      device = thermostats
+                        .map((thermostat) => {
+                          const { modules, ...rest } = thermostat;
+                          return rest;
+                        })
+                        // eslint-disable-next-line no-underscore-dangle
+                        .find((thermostat) => thermostat._id === module.id);
+                    }
                     moduleSupported = true;
                     categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
                     break;

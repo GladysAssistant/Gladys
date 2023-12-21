@@ -74,8 +74,8 @@
     "last_therm_seen": 1600500000,
     "setpoint": {
       "setpoint_mode": "manual",
-      "setpoint_temp": 19.5,
-      "setpoint_endtime": 1600800000
+      "setpoint_temp": 14,
+      "setpoint_endtime": 1703096987
     },
     "therm_program_list": [
       { "monday": [{ "start": "06:00", "end": "09:00", "temp": 19 }] },

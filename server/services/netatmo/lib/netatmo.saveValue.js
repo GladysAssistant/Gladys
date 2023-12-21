@@ -21,7 +21,7 @@ async function updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externa
     throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" should starts with "netatmo:"`);
   }
   if (!topic || topic.length === 0) {
-    throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" have no network indicator`);
+    throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" have no id and category indicator`);
   }
   const { setpoint, measured, room } = deviceNetatmo;
   const now = new Date();
