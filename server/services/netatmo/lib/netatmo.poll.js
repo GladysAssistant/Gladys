@@ -29,7 +29,7 @@ async function refreshNetatmoValues(netatmoHandler) {
     if (deviceExistInGladys) {
       await updateValues(netatmoHandler, deviceExistInGladys, device, externalId);
     } else {
-      logger.info('device does not exist in Gladys');
+      logger.info(`device ${externalId} - ${device.type} does not exist in Gladys`);
     }
   });
   netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED, message: null });

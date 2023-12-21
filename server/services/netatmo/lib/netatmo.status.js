@@ -71,6 +71,7 @@ function saveStatus(netatmoHandler, status) {
         netatmoHandler.configured = false;
         netatmoHandler.status = STATUS.NOT_INITIALIZED;
         netatmoHandler.connected = false;
+        clearInterval(netatmoHandler.pollRefreshToken);
         clearInterval(netatmoHandler.pollRefreshValues);
         break;
       case STATUS.CONNECTING:
@@ -96,6 +97,7 @@ function saveStatus(netatmoHandler, status) {
         netatmoHandler.configured = true;
         netatmoHandler.status = STATUS.DISCONNECTED;
         netatmoHandler.connected = false;
+        clearInterval(netatmoHandler.pollRefreshToken);
         clearInterval(netatmoHandler.pollRefreshValues);
         break;
       case STATUS.DISCOVERING_DEVICES:

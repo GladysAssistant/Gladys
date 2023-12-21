@@ -16,7 +16,6 @@ function disconnect(netatmoHandler) {
     expireIn: 0,
   };
   netatmoHandler.setTokens(netatmoHandler, tokens);
-  clearInterval(netatmoHandler.pollRefreshToken);
   netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.DISCONNECTED, message: null });
   logger.debug('Netatmo disconnected');
 }

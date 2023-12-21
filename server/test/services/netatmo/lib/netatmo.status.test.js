@@ -1,13 +1,16 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const EventEmitter = require('events');
+
+const { assert } = sinon;
 const { getStatus, saveStatus } = require('../../../../services/netatmo/lib/netatmo.status');
 const { NetatmoHandlerMock } = require('../netatmo.mock.test');
-const { EVENTS } = require('../../../../utils/constants');
+const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { STATUS } = require('../../../../services/netatmo/lib/utils/netatmo.constants');
 
 describe('Netatmo Discover devices', () => {
   let eventEmitter;
+
   beforeEach(() => {
     sinon.reset();
 
@@ -40,30 +43,24 @@ describe('Netatmo Discover devices', () => {
   });
 
   describe('saveStatus', () => {
-    let fakeIntervalId;
-    beforeEach(() => {
-      fakeIntervalId = setTimeout(() => {}, 1000);
-      // @ts-ignore
-      if (typeof global.setInterval.restore === 'function') {
-        // @ts-ignore
-        global.setInterval.restore();
-      }
-      sinon.stub(global, 'setInterval').returns(fakeIntervalId);
+    let clock;
 
-      // @ts-ignore
-      if (typeof global.clearInterval.restore === 'function') {
-        // @ts-ignore
-        global.clearInterval.restore();
-      }
-      sinon.stub(global, 'clearInterval');
+    beforeEach(() => {
+      sinon.reset();
+      clock = sinon.useFakeTimers();
     });
 
     afterEach(() => {
+      clock.restore();
       sinon.reset();
     });
 
     it('should update the status to NOT_INITIALIZED and emit the event', () => {
-      NetatmoHandlerMock.pollRefreshValues = fakeIntervalId;
+      sinon.spy(clock, 'clearInterval');
+      const intervalPollRefreshTokenSpy = sinon.spy();
+      const intervalPollRefreshValuesSpy = sinon.spy();
+      NetatmoHandlerMock.pollRefreshToken = setInterval(intervalPollRefreshTokenSpy, 3600);
+      NetatmoHandlerMock.pollRefreshValues = setInterval(intervalPollRefreshValuesSpy, 120);
 
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.NOT_INITIALIZED, message: null });
 
@@ -75,8 +72,10 @@ describe('Netatmo Discover devices', () => {
         type: 'netatmo.status',
         payload: { status: 'not_initialized' },
       });
-      // @ts-ignore
-      expect(global.clearInterval.calledWith(fakeIntervalId)).to.equal(true);
+      clock.tick(3600 * 1000 * 2);
+      assert.calledTwice(clock.clearInterval);
+      expect(intervalPollRefreshTokenSpy.notCalled).to.equal(true);
+      expect(intervalPollRefreshValuesSpy.notCalled).to.equal(true);
     });
     it('should update the status to CONNECTING and emit the event', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.CONNECTING, message: null });
@@ -126,7 +125,12 @@ describe('Netatmo Discover devices', () => {
       });
     });
     it('should update the status to DISCONNECTED and emit the event', () => {
-      NetatmoHandlerMock.pollRefreshValues = fakeIntervalId;
+      sinon.spy(clock, 'clearInterval');
+      const intervalPollRefreshTokenSpy = sinon.spy();
+      const intervalPollRefreshValuesSpy = sinon.spy();
+      NetatmoHandlerMock.pollRefreshToken = setInterval(intervalPollRefreshTokenSpy, 3600);
+      NetatmoHandlerMock.pollRefreshValues = setInterval(intervalPollRefreshValuesSpy, 120);
+
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.DISCONNECTED, message: null });
 
       expect(NetatmoHandlerMock.status).to.equal('disconnected');
@@ -137,8 +141,10 @@ describe('Netatmo Discover devices', () => {
         type: 'netatmo.status',
         payload: { status: 'disconnected' },
       });
-      // @ts-ignore
-      expect(global.clearInterval.calledWith(fakeIntervalId)).to.equal(true);
+      clock.tick(3600 * 1000 * 2);
+      assert.calledTwice(clock.clearInterval);
+      expect(intervalPollRefreshTokenSpy.notCalled).to.equal(true);
+      expect(intervalPollRefreshValuesSpy.notCalled).to.equal(true);
     });
     it('should update the status to DISCOVERING_DEVICES and emit the event', () => {
       saveStatus(NetatmoHandlerMock, { statusType: STATUS.DISCOVERING_DEVICES, message: null });
@@ -176,13 +182,13 @@ describe('Netatmo Discover devices', () => {
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
       expect(
         NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.error-connecting',
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING,
           payload: { statusType: 'connecting', status: 'error_connecting' },
         }),
       ).to.equal(true);
       expect(
         NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
           payload: { status: 'disconnected' },
         }),
       ).to.equal(true);
@@ -203,13 +209,13 @@ describe('Netatmo Discover devices', () => {
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
       expect(
         NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.error-processing-token',
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.PROCESSING_TOKEN,
           payload: { statusType: 'processing token', status: 'get_access_token_fail' },
         }),
       ).to.equal(true);
       expect(
         NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.status',
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS,
           payload: { status: 'disconnected' },
         }),
       ).to.equal(true);
@@ -231,7 +237,7 @@ describe('Netatmo Discover devices', () => {
       expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
       expect(
         NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-          type: 'netatmo.error-connected',
+          type: WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTED,
           payload: { statusType: 'connected', status: 'error_connected' },
         }),
       ).to.equal(true);

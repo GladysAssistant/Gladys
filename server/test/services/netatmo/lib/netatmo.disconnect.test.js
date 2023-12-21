@@ -1,6 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const EventEmitter = require('events');
+
+const { assert } = sinon;
 const { disconnect } = require('../../../../services/netatmo/lib/netatmo.disconnect');
 const { NetatmoHandlerMock } = require('../netatmo.mock.test');
 const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
@@ -8,10 +10,11 @@ const { EVENTS } = require('../../../../utils/constants');
 
 describe('Netatmo Disconnect', () => {
   let eventEmitter;
-  let fakeIntervalId;
+  let clock;
 
   beforeEach(() => {
     sinon.reset();
+    clock = sinon.useFakeTimers();
 
     eventEmitter = new EventEmitter();
     NetatmoHandlerMock.gladys = { event: eventEmitter };
@@ -19,16 +22,19 @@ describe('Netatmo Disconnect', () => {
 
     NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
     NetatmoHandlerMock.status = 'not_initialized';
-    fakeIntervalId = setTimeout(() => {}, 1000);
-    sinon.stub(global, 'setInterval').returns(fakeIntervalId);
-    sinon.stub(global, 'clearInterval');
   });
 
   afterEach(() => {
+    clock.restore();
     sinon.reset();
   });
   it('should properly disconnect from Netatmo', () => {
-    NetatmoHandlerMock.pollRefreshToken = fakeIntervalId;
+    sinon.spy(clock, 'clearInterval');
+    const intervalPollRefreshTokenSpy = sinon.spy();
+    const intervalPollRefreshValuesSpy = sinon.spy();
+    NetatmoHandlerMock.pollRefreshToken = setInterval(intervalPollRefreshTokenSpy, 3600 * 1000);
+    NetatmoHandlerMock.pollRefreshValues = setInterval(intervalPollRefreshValuesSpy, 120 * 1000);
+
     disconnect(NetatmoHandlerMock);
 
     expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
@@ -44,7 +50,10 @@ describe('Netatmo Disconnect', () => {
         payload: { status: 'disconnected' },
       }),
     ).to.equal(true);
-    // @ts-ignore
-    expect(global.clearInterval.calledWith(fakeIntervalId)).to.equal(true);
+
+    clock.tick(3600 * 1000 * 2);
+    assert.calledTwice(clock.clearInterval);
+    expect(intervalPollRefreshTokenSpy.notCalled).to.equal(true);
+    expect(intervalPollRefreshValuesSpy.notCalled).to.equal(true);
   });
 });

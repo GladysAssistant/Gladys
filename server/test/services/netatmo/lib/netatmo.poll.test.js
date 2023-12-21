@@ -12,19 +12,6 @@ describe('Netatmo Poll', () => {
   let eventEmitter;
   beforeEach(() => {
     sinon.reset();
-    // @ts-ignore
-    if (typeof global.setInterval.restore === 'function') {
-      // @ts-ignore
-      global.setInterval.restore();
-    }
-    sinon.stub(global, 'setInterval');
-
-    // @ts-ignore
-    if (typeof global.clearInterval.restore === 'function') {
-      // @ts-ignore
-      global.clearInterval.restore();
-    }
-    sinon.stub(global, 'clearInterval');
 
     eventEmitter = new EventEmitter();
     NetatmoHandlerMock.status = 'not_initialized';
@@ -61,7 +48,7 @@ describe('Netatmo Poll', () => {
       });
       clock.tick(120 * 1000);
       sinon.assert.calledTwice(NetatmoHandlerMock.loadDevices);
-      clock.restore();
+      clock.reset();
     });
 
     it('should refresh device values periodically without device existing in Gladys', async () => {
@@ -153,7 +140,7 @@ describe('Netatmo Poll', () => {
       sinon.assert.called(NetatmoHandlerMock.refreshingTokens);
       clock.tick(3600 * 1000);
       sinon.assert.calledTwice(NetatmoHandlerMock.refreshingTokens);
-      clock.restore();
+      clock.reset();
     });
     it('should restart polling when expireInToken changes', async () => {
       NetatmoHandlerMock.expireInToken = 3600;

@@ -947,7 +947,6 @@ const WEBSOCKET_MESSAGE_TYPES = {
   },
   NETATMO: {
     STATUS: 'netatmo.status',
-    DISCOVER: 'netatmo.discover',
     ERROR: {
       CONNECTED: 'netatmo.error-connected',
       CONNECTING: 'netatmo.error-connecting',
