@@ -66,7 +66,7 @@ describe('Netatmo Load Devices', () => {
   });
 
   it('should handle API errors gracefully', async () => {
-    const badBodyHomesData = bodyHomesDataMock;
+    const badBodyHomesData = JSON.parse(JSON.stringify(bodyHomesDataMock));
     badBodyHomesData.homes[0].modules = undefined;
     nock('https://api.netatmo.com')
       .get('/api/homesdata')
@@ -74,6 +74,34 @@ describe('Netatmo Load Devices', () => {
         body: badBodyHomesData,
         status: 'ok',
       });
+
+    const devices = await loadDevices.call(NetatmoHandlerMock);
+
+    expect(devices).to.deep.eq([]);
+  });
+
+  it('should return an empty array if no homes are returned from the API', async () => {
+    const bodyHomesDataEmpty = JSON.parse(JSON.stringify(bodyHomesDataMock));
+    bodyHomesDataEmpty.homes = [];
+
+    nock('https://api.netatmo.com')
+      .get('/api/homesdata')
+      .reply(200, { body: bodyHomesDataEmpty, status: 'ok' });
+
+    const devices = await loadDevices.call(NetatmoHandlerMock);
+
+    expect(devices).to.deep.eq([]);
+  });
+
+  it('should return an empty array if homes are returned without modules', async () => {
+    const bodyHomesDataNoModules = JSON.parse(JSON.stringify(bodyHomesDataMock));
+    bodyHomesDataNoModules.homes.forEach((home) => {
+      home.modules = undefined;
+    });
+
+    nock('https://api.netatmo.com')
+      .get('/api/homesdata')
+      .reply(200, { body: bodyHomesDataNoModules, status: 'ok' });
 
     const devices = await loadDevices.call(NetatmoHandlerMock);
 

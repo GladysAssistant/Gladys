@@ -115,6 +115,13 @@
           "type": "therm"
         }
       ]
+    },
+    {
+      "id": "7e2xxxxxxxxxxxxxxxxx",
+      "name": "Secondary House Stark",
+      "altitude": 1220,
+      "country": "US",
+      "modules": []
     }
   ]
 }

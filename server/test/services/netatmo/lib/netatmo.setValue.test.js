@@ -46,7 +46,6 @@ describe('Netatmo Set Value', () => {
       .reply(200, {});
 
     await setValue.call(NetatmoHandlerMock, deviceMock, deviceFeatureMock, newValue);
-
   });
 
   it('should throw an error if not home ID parameter', async () => {

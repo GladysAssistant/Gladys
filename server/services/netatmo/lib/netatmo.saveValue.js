@@ -25,7 +25,6 @@ async function updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externa
   }
   const { setpoint, measured, room } = deviceNetatmo;
   const now = new Date();
-  const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
   const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
 
   deviceGladys.features.forEach((deviceFeature) => {
@@ -43,28 +42,9 @@ async function updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externa
     }
 
     switch (deviceNetatmo.type) {
-      case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
-        if (featureName === 'therm_setpoint_end_time' && typeof value === 'undefined') {
-          value = null;
-        }
-        break;
-      }
       case SUPPORTED_MODULE_TYPE.PLUG: {
-        if (featureName === 'reachable' && typeof value === 'undefined') {
-          if (deviceNetatmo.last_plug_seen && new Date(deviceNetatmo.last_plug_seen * 1000) > oneHourAgo) {
-            value = true;
-            break;
-          }
-          value = false;
-        }
         if (featureName === 'plug_connected_boiler' && typeof value === 'undefined') {
           value = false;
-        }
-        if (featureName === 'last_plug_seen' && typeof value === 'undefined') {
-          value =
-            deviceNetatmo.reachable === true || deviceNetatmo.room.reachable === true
-              ? now.getTime() / 1000
-              : undefined;
         }
         break;
       }
@@ -78,24 +58,12 @@ async function updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externa
         (deviceFeature.last_value !== transformedValue || new Date(deviceFeature.last_value_changed) < tenMinutesAgo) &&
         deviceFeature.type !== DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT
       ) {
-        if (transformedValue !== null && transformedValue !== undefined) {
+        if (transformedValue !== null && transformedValue !== undefined && !Number.isNaN(transformedValue)) {
           netatmoHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: deviceFeature.external_id,
             state: transformedValue,
           });
         }
-      } else if (
-        deviceFeature.type === DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT &&
-        deviceFeature.last_value_string !== value
-      ) {
-        netatmoHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: deviceFeature.external_id,
-          state: transformedValue,
-        });
-        netatmoHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: deviceFeature.external_id,
-          text: value,
-        });
       }
     } else {
       logger.error(

@@ -164,5 +164,27 @@
       "therm_setpoint_mode": "schedule"
     },
     "plug": null
+  },
+  {
+    "id": "70:ee:00:xx:xx:xx",
+    "type": "NOC",
+    "firmware_revision": 3018000,
+    "wifi_state": "high",
+    "wifi_strength": 59,
+    "sd_status": 4,
+    "alim_status": 2,
+    "siren_status": "no_sound",
+    "monitoring": "on",
+    "name": "Outdoor Parking Camera",
+    "setup_date": 1608493953,
+    "room_id": "8765432109",
+    "home": "5e1xxxxxxxxxxxxxxxxx",
+    "room": {
+      "id": "8765432109",
+      "name": "Extérieur",
+      "type": "outdoor",
+      "module_ids": ["70:ee:00:xx:xx:xx", "02:00:00:xx:xx:xx", "05:00:00:xx:xx:xx", "06:00:00:xx:xx:xx"]
+    },
+    "not_handled": true
   }
 ]

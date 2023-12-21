@@ -28,6 +28,8 @@ async function refreshNetatmoValues(netatmoHandler) {
     const deviceExistInGladys = await netatmoHandler.gladys.stateManager.get('deviceByExternalId', externalId);
     if (deviceExistInGladys) {
       await updateValues(netatmoHandler, deviceExistInGladys, device, externalId);
+    } else {
+      logger.info('device does not exist in Gladys');
     }
   });
   netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED, message: null });
