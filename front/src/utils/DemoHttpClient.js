@@ -18,7 +18,7 @@ export class DemoHttpClient {
   async get(url, query) {
     await this.getDemoFile();
     let key = `get ${url}`;
-    
+
     if (query) {
       key += `?`;
       for (const [index, [param, value]] of Object.entries(query).entries()) {
@@ -29,7 +29,7 @@ export class DemoHttpClient {
       }
       console.log(key);
     }
-    
+
     if (!this.responses[key]) {
       console.error(`${key} not found in demo.js`);
       throw new Error(`${key} not found in demo.js`);
