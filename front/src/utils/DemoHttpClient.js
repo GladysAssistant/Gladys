@@ -27,7 +27,6 @@ export class DemoHttpClient {
         }
         key += `${param}=${value}`;
       }
-      console.log(key);
     }
 
     if (!this.responses[key]) {
