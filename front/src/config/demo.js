@@ -233,9 +233,9 @@ const data = {
     updated_at: '2019-05-16T06:29:44.767Z'
   },
   'get /api/v1/session/tablet_mode': {
-    
+    tablet_mode: false,
+    current_house_id: 'house'
   },
-
   'get /api/v1/house/main-house/weather': {
     temperature: 27.9,
     humidity: 0.99,
