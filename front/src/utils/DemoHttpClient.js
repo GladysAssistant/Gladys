@@ -14,15 +14,20 @@ export class DemoHttpClient {
     return this.responses;
   };
   setToken() {}
+  
+  transformRequest = (index, param, value) => {
+
+  };
 
   async get(url, query) {
     await this.getDemoFile();
     let key = `get ${url}`;
 
     if (query) {
-      key += `?`;
       for (const [index, [param, value]] of Object.entries(query).entries()) {
-        if (index >= 1) {
+        if (index < 1) {
+          key += `?`;
+        } else {
           key += `&`;
         }
         key += `${param}=${value}`;
