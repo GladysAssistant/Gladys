@@ -30,17 +30,17 @@
   },
   "calendar": {
     "allDay": "Toute la journée",
-    "previous": "précédent",
-    "next": "suivant",
-    "today": "aujourd'hui",
-    "month": "mois",
-    "week": "semaine",
-    "day": "jour",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "today": "Aujourd'hui",
+    "month": "Mois",
+    "week": "Semaine",
+    "day": "Jour",
     "agenda": "Agenda",
-    "date": "date",
-    "time": "heure",
-    "event": "événement",
-    "noEventsInRange": "Aucuns évènements trouvés dans cette période.",
+    "date": "Date",
+    "time": "Heure",
+    "event": "Événement",
+    "noEventsInRange": "Aucun événement trouvé dans cette période.",
     "noCalendarsConnected": "Vous n'avez connecté aucun calendrier. Pour connecter un calendrier, vous pouvez vous rendre dans l'onglet intégrations, ou demander à ce qu'un autre membre de cette instance Gladys partage un de ses calendriers."
   },
   "device": {
@@ -73,7 +73,7 @@
     "codePlaceholder": "Tapez votre code",
     "error": "Une erreur est survenue, merci de réessayer",
     "wrongCodeError": "Code invalide, merci de réessayer",
-    "tooManyRequests": "Veuillez attendre {{count}} minutes avant de re-essayer.",
+    "tooManyRequests": "Veuillez attendre {{count}} minutes avant de réessayer.",
     "validateButton": "Valider"
   },
   "signup": {
@@ -210,7 +210,7 @@
   },
   "dashboard": {
     "title": "Tableau de bord",
-    "editDashboardButton": "Editer",
+    "editDashboardButton": "Éditer",
     "newDashboardButton": "Nouveau",
     "editDashboardCancelButton": "Annuler",
     "editDashboardDeleteButton": "Supprimer",
@@ -226,9 +226,9 @@
     },
     "enableFullScreen": "Plein écran",
     "disableFullScreen": "Quitter plein écran",
-    "editDashboardTitle": "Editer le tableau de bord",
+    "editDashboardTitle": "Éditer le tableau de bord",
     "emptyDashboardSentenceTop": "Votre tableau de bord n'est pas encore configuré.",
-    "emptyDashboardSentenceBottom": "Cliquez sur le bouton \"Editer\" pour le compléter.",
+    "emptyDashboardSentenceBottom": "Cliquez sur le bouton \"Éditer\" pour le compléter.",
     "noDashboardSentenceBottom": "Cliquez sur le bouton \"Nouveau\" pour créer un tableau de bord.",
     "gatewayInstanceNotFoundError": "Votre instance Gladys n'est pas connectée à Gladys Plus.",
     "editDashboardNameLabel": "Nom",
@@ -512,7 +512,7 @@
         "featureNamePlaceholder": "Nom de la fonctionnalité",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
-        "editButton": "Editer"
+        "editButton": "Éditer"
       },
       "discover": {
         "title": "Découverte Bluetooth",
@@ -754,7 +754,7 @@
       },
       "setup": {
         "title": "Configuration du service Zigbee2mqtt",
-        "description": "Ce service utilise deux containers Docker (MQTT broker and Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces containers.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
+        "description": "Ce service utilise deux conteneurs Docker (MQTT broker and Zigbee2mqtt). Activer Zigbee2mqtt pour déployer ces conteneurs.\nPour en savoir plus, rendez-vous sur la page de documentation Zigbee2mqtt",
         "enableLabel": "Activation du service Zigbee2mqtt",
         "nonDockerEnv": "Gladys ne s'exécute actuellement pas dans Docker, il est impossible d'activer Zigbee2mqtt depuis Gladys.",
         "invalidDockerNetwork": "Gladys est basée sur une installation personnalisée, pour installer Zigbee2mqtt depuis cette page, le conteneur Docker de Gladys doit être démarré avec l'option \"network=host\".",
@@ -774,7 +774,7 @@
       },
       "device": {
         "title": "Appareils Zigbee",
-        "editButton": "Editer"
+        "editButton": "Éditer"
       },
       "discover": {
         "title": "Découverte du réseau Zigbee",
@@ -815,7 +815,7 @@
       },
       "setup": {
         "title": "Configuration du service Node-RED",
-        "description": "Ce service utilise un container Docker. Activez Node-RED pour déployer ce container.\nPour en savoir plus, rendez-vous sur la page de documentation Node-RED.",
+        "description": "Ce service utilise un conteneur Docker. Activez Node-RED pour déployer ce conteneur.\nPour en savoir plus, rendez-vous sur la page de documentation Node-RED.",
         "descriptionBackup": "Pour le moment, Node-RED n'est pas sauvegardé dans Gladys Plus.\nSi vous souhaitez une sauvegarde pour Node-RED, veuillez suivre cette <a href=\"https://community.gladysassistant.com/t/mini-tuto-backup-par-email-des-flows-node-red/8402\" target=\"_blank\" rel=\"noopener noreferrer\">documentation</a>",
         "error": "Une erreur s'est produite au démarrage du service Node-RED.",
         "enableLabel": "Activation du service Node-RED",
@@ -921,7 +921,7 @@
       "introduction": "Pour connecter Gladys à HomeKit, vous devez être en possession d'un appareil compatible Apple (iPhone, iPad, iPod touch).",
       "qrCode": "Scannez ce QR code depuis l'application Maison de votre appareil iOS pour ajouter Gladys et tous ses appareils compatibles.",
       "configurationError": "Une erreur est survenue lors de la récupération des paramètres HomeKit",
-      "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparait pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
+      "reload": "Si vous avez ajouté récemment un appareil sur Gladys et qu'il n'apparaît pas sur votre application Maison, essayez de relancer l'intégration en cliquant sur le bouton ci-dessous.",
       "reloadButton": "Relancer",
       "reset": "En cas de problèmes de connexion entre votre application Maison et le pont Gladys HomeKit vous pouvez essayer de le réinitialiser en cliquant sur le bouton ci-dessous. <b>ATTENTION</b>, vous devrez supprimer et ajouter à nouveau le pont Gladys à votre application Maison sur votre appareil Apple.",
       "resetButton": "Réinitialiser",
@@ -948,7 +948,7 @@
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
-        "editButton": "Editer",
+        "editButton": "Éditer",
         "mostRecentValueAt": "Dernière valeur reçue {{mostRecentValueAt}}.",
         "noValueReceived": "Aucune valeur reçue."
       }
@@ -990,7 +990,7 @@
       "device": {
         "title": "Appareils Tuya dans Gladys",
         "updates": "Vérifier les mises à jour",
-        "editButton": "Editer",
+        "editButton": "Éditer",
         "noDeviceFound": "Aucun appareil Tuya trouvé.",
         "featuresLabel": "Fonctionnalités"
       },
@@ -1054,7 +1054,7 @@
       "deleteButton": "Supprimer",
       "device": {
         "title": "Appareils Sonos dans Gladys",
-        "editButton": "Editer",
+        "editButton": "Éditer",
         "noDeviceFound": "Aucun appareil Sonos trouvé.",
         "featuresLabel": "Fonctionnalités"
       },
@@ -1099,7 +1099,7 @@
       "device": {
         "title": "Appareils MELCloud dans Gladys",
         "updates": "Vérifier les mises à jour",
-        "editButton": "Editer",
+        "editButton": "Éditer",
         "noDeviceFound": "Aucun appareil MELCloud trouvé.",
         "featuresLabel": "Fonctionnalités"
       },
@@ -1153,7 +1153,7 @@
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
         "returnButton": "Retour",
-        "editButton": "Editer",
+        "editButton": "Éditer",
         "notFound": "Appareil introuvable.",
         "backToList": "Retour à la liste des appareils",
         "saveError": "Erreur lors de l'enregistrement ou de la suppression de l'appareil",
@@ -1181,7 +1181,7 @@
         "copyMqttTopic": "Copier le topic MQTT",
         "copied": "Copié !",
         "copyFailed": "Erreur lors de la copie",
-        "deleteLabel": "Supprimer fonctionnalité"
+        "deleteLabel": "Supprimer la fonctionnalité"
       },
       "setup": {
         "title": "Configuration MQTT",
@@ -1242,17 +1242,17 @@
         "roomLabel": "Pièce",
         "saveButton": "Enregistrer",
         "deleteButton": "Supprimer",
-        "editButton": "Editer",
+        "editButton": "Éditer",
         "featuresLabel": "Fonctionnalités"
       },
       "setup": {
         "noNameLabel": "Pas de nom",
         "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
-        "saveSuccess": "L'appareil Broadlink a été créé avec succés.",
+        "saveSuccess": "L'appareil Broadlink a été créé avec succès.",
         "notFound": "Appareil introuvable.",
         "saveButton": "Enregistrer",
         "peripheralLabel": "Périphérique lié",
-        "categoryLabel": "Type d'appareil à contrôller",
+        "categoryLabel": "Type d'appareil à contrôler",
         "featuresLabel": "Fonctionnalités",
         "learnModeTitle": "Capturer le signal de la télécommande",
         "learningModeInProgress": "Appuyez sur le bouton de la télécommande",
@@ -1348,7 +1348,7 @@
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
         "deleteButton": "Supprimer",
-        "editButton": "Editer les détails"
+        "editButton": "Éditer les détails"
       },
       "setup": {
         "title": "Aucun appareil Xiaomi dans Gladys",
@@ -1439,7 +1439,7 @@
       "device": {
         "title": "Appareils eWeLink dans Gladys",
         "updates": "Vérifier les mises à jour",
-        "editButton": "Editer",
+        "editButton": "Éditer",
         "noDeviceFound": "Aucun appareil eWeLink trouvé.",
         "featuresLabel": "Fonctionnalités"
       },
@@ -1479,7 +1479,7 @@
       "turnOnTheLight": "Allume la lumière du salon !",
       "sizeOfEiffelTower": "Quelle est la taille de la tour Eiffel ?",
       "eggDuration": "Comment cuire les oeufs durs ?",
-      "showMeTheCameraInTheKitchen": "Montre moi la caméra de la cuisine",
+      "showMeTheCameraInTheKitchen": "Montre-moi la caméra de la cuisine",
       "activateOpenAiChat": "Activer ChatGPT dans le chat Gladys",
       "rateLimit": "L'API ChatGPT étant payante, cette intégration est actuellement limitée à 1 000 requêtes par mois et par compte.",
       "notOnGladysPlus": "L'API ChatGPT étant payante, cette intégration est proposée via Gladys Plus uniquement.",
@@ -1914,7 +1914,7 @@
     "profilePictureLabel": "Photo de profil",
     "chooseFileLabel": "Choisir un fichier",
     "emailLabel": "E-mail",
-    "emailText": "Votre email sert juste d'identifiant, il n'est enregistré qu'en local",
+    "emailText": "Votre email sert juste d'identifiant, il n'est enregistré qu'en local.",
     "emailPlaceholder": "Entrez votre e-mail",
     "emailOtherUserPlaceholder": "Entrez un e-mail",
     "languageLabel": "Langue",
@@ -1965,20 +1965,20 @@
     "title": "Utilisateurs",
     "searchPlaceholder": "Chercher un utilisateur",
     "newUserButton": "Nouveau",
-    "editUserButton": "Editer",
-    "noUsersFound": "Aucuns utilisateurs trouvés avec cette recherche.",
+    "editUserButton": "Éditer",
+    "noUsersFound": "Aucun utilisateur trouvé avec cette recherche.",
     "deleteUserButton": "Supprimer",
     "confirmDeleteUserButton": "Confirmer",
     "cancelDeleteUser": "Annuler",
     "deleteUserWarning": "Supprimer un utilisateur supprimera toutes les données associées à cet utilisateur (tableau de bord, localisation, préférences). Confirmez vous la suppression de cet utilisateur ?",
     "createUser": {
       "title": "Créer un nouvel utilisateur",
-      "createUserButton": "Créer utilisateur"
+      "createUserButton": "Créer l'utilisateur"
     },
     "editUser": {
-      "title": "Editer utilisateur",
+      "title": "Éditer l'utilisateur",
       "resetPassword": "Réinitialiser le mot de passe",
-      "editPreferences": "Editer les préférences",
+      "editPreferences": "Éditer les préférences",
       "resetPasswordButton": "Réinitialiser",
       "success": "Profil enregistré avec succès !"
     }
@@ -2143,7 +2143,7 @@
   "newArea": {
     "createNewZoneButton": "Créer une zone",
     "cardTitleCreate": "Créer une nouvelle zone",
-    "cardTitleEdit": "Editer une zone",
+    "cardTitleEdit": "Éditer une zone",
     "cardDescription": "Dans Gladys, vous pouvez définir des \"zones\". Ces zones sont utiles dans les scènes, où vous pouvez créer des scènes qui se déclenchent quand un utilisateur entre/quitte une zone.",
     "nameLabel": "Nom",
     "namePlaceholder": "Entrez un nom pour votre zone",
@@ -2182,7 +2182,7 @@
     "title": "Scènes",
     "emptySceneSentenceTop": "Impossible de trouver des scènes.",
     "newButton": "Nouveau",
-    "editButton": "Editer",
+    "editButton": "Éditer",
     "startButton": "Démarrer",
     "searchPlaceholder": "Chercher une scène",
     "filterTagsName": "Filtrer par tags",
@@ -2876,8 +2876,8 @@
     "keepHistoryLabel": "Conserver l'historique des états ?",
     "keepHistorySmallDescription": "Oui, conserver l'historique",
     "keepHistoryDescription": "Si oui, les états de cette fonctionnalité seront conservés selon la durée définie sur la page <a href=\"/dashboard/settings/system\">Système</a>. Si non, seul le dernier état sera conservé.",
-    "addButton": "Ajouter fonctionnalité",
-    "deleteLabel": "Supprimer fonctionnalité",
+    "addButton": "Ajouter une fonctionnalité",
+    "deleteLabel": "Supprimer la fonctionnalité",
     "saveError": "Erreur de sauvegarde ou de suppression de l'appareil",
     "saveConflictError": "Conflit : Êtes-vous certains que toutes les fonctionnalités ont un ID externe unique ?",
     "notFound": "Appareil recherché introuvable.",
