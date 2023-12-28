@@ -769,7 +769,7 @@
         "zigbee2Mqtt": "Zigbee2mqtt",
         "gladys": "Gladys",
         "mqtt": "MQTT",
-        "status": "Status",
+        "status": "Statut",
         "connectionUrl": "URL de l'interface Zigbee2mqtt : <a href=\"{{url}}\" target=\"_blank\">{{url}}</a>"
       },
       "device": {
@@ -826,7 +826,7 @@
         "activationNodeRed": "Activation...",
         "serviceStatus": "Etat du service Node-RED",
         "containersStatus": "Conteneurs liés à Node-RED",
-        "status": "Status",
+        "status": "Statut",
         "node-red": "Node-RED",
         "gladys": "Gladys",
         "usernameLabel": "Nom d'utilisateur",
@@ -1995,7 +1995,7 @@
     "selector": "Nom interne : {{key}}",
     "integrationLinkTitle": "Aller à la page de l'intégration",
     "status": {
-      "title": "Status",
+      "title": "Statut",
       "UNKNOWN": {
         "title": "Inconnu",
         "detail": "Service non trouvé"
