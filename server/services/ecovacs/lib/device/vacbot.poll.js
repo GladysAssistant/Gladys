@@ -11,6 +11,11 @@ const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES } = require('../../../..
  * poll(device);
  */
 async function poll(device) {
+  const service = await this.gladys.service.getByName('ecovacs');
+  if (service.status === 'STOPPED') {
+    // service is not started, do not poll the device
+    return;
+  }
   if (!this.connected) {
     await this.connect();
   }
