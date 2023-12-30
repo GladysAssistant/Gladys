@@ -1,34 +1,33 @@
+const proxyquire = require('proxyquire').noCallThru();
 const sinon = require('sinon');
+const { serviceId, devices } = require('../../consts.test');
+const { fakes } = require('../../mocks/ecovacs-api.mock.test');
 
 const { assert, fake } = sinon;
+const ecovacsGetVacbotObjMock = fake.resolves(fakes);
 
-const EcovacsManager = require('../../../../../services/ecovacs/lib');
+const EcovacsHandler = proxyquire('../../../../../services/ecovacs/lib', {
+  './device/vacbot.getVacbotObj.js': { getVacbotObj: ecovacsGetVacbotObjMock },
+});
+const EcovacsService = proxyquire('../../../../../services/ecovacs', {
+  './lib': EcovacsHandler,
+});
 
 const gladys = {
-  variable: {
-    getValue: fake.resolves(null),
-    setValue: fake.resolves(null),
-  },
   device: {
-    get: fake.resolves([]),
+    get: fake.resolves(devices), // 3 registered devices
   },
 };
-const serviceId = 'de051f90-f34a-4fd5-be2e-e502339ec9bc';
 
 describe('ecovacs.stop command', () => {
-  let ecovacsManager;
-
   beforeEach(() => {
-    ecovacsManager = new EcovacsManager(gladys, serviceId);
-  });
-
-  afterEach(() => {
     sinon.reset();
   });
 
   it('check listeners and peripherals are well removed', async () => {
-    await ecovacsManager.stop();
-    // TODO : complete
-    assert.notCalled(gladys.variable.setValue);
+    const ecovacsService = EcovacsService(gladys, serviceId);
+    await ecovacsService.device.stop();
+    // call disconnect for all registered devices
+    assert.calledThrice(fakes.disconnect);
   });
 });

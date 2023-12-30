@@ -38,6 +38,7 @@ describe('Ecovacs : vacbot status', () => {
       chargeStatus: 'idle',
       cleanReport: 'idle',
       batteryLevel: 100,
+      isOnline: true,
     };
     expect(status).to.deep.equal(expected);
   });

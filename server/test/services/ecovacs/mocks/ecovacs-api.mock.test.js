@@ -11,6 +11,7 @@ const countries = {
   },
 };
 
+// fakes vacbotObj
 const fakes = {
   // Attributes
   did: '0ccdd884-b00f-4838-a50b-bf4fb3fc7a12',
@@ -20,6 +21,8 @@ const fakes = {
   deviceImageURL: 'http://image.url',
   mainBrush: true,
   is_ready: true,
+  errorCode: '3',
+  errorDescription: 'Fake error description',
   chargeStatus: 'idle',
   cleanReport: 'idle',
   batteryLevel: 100,
@@ -32,6 +35,7 @@ const fakes = {
   // Methods
   getName: fake.returns('DEEBOT OZMO 920 Series'),
   connect: fake.resolves(true),
+  disconnect: fake.resolves(true),
   run: fake.resolves(true),
   clean: fake.resolves(true),
   stop: fake.resolves(true),

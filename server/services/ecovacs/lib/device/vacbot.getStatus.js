@@ -1,5 +1,3 @@
-const logger = require('../../../../utils/logger');
-
 /**
  * @description Get the vacbot status.
  * @param {string} deviceExternalId - The deviceExternalId to control.
@@ -27,9 +25,8 @@ async function getDeviceStatus(deviceExternalId) {
     chargeStatus: vacbot.chargeStatus,
     cleanReport: vacbot.cleanReport,
     batteryLevel: vacbot.batteryLevel,
+    isOnline: vacbot.errorCode !== '4200',
   };
-  logger.trace(`Vacbot charge status : ${Object.keys(vacbot)}`);
-  logger.debug(`Vacbot ${deviceExternalId} status : ${JSON.stringify(status)}`);
   return status;
 }
 

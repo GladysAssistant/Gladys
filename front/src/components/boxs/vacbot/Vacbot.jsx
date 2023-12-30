@@ -82,16 +82,19 @@ const VacbotBox = ({ children, ...props }) => {
               <div>
                 {deviceFeatures.map((deviceFeature, deviceFeatureIndex) => (
                   <div class="card-body ">
-                    <div class="d-flex bd-highlight mt-9">
-                      {deviceFeature.type === DEVICE_FEATURE_TYPES.VACBOT.STATE && (
-                        <VacbotModeControls
-                          deviceFeature={deviceFeature}
-                          deviceFeatureIndex={deviceFeatureIndex}
-                          updateValue={props.updateValue}
-                          updateValueWithDebounce={props.updateValueWithDebounce}
-                        />
-                      )}
-                    </div>
+                    {!props.vacbotStatus.isOnline && <div> OFFLINE </div>}
+                    {props.vacbotStatus.isOnline && (
+                      <div class="d-flex bd-highlight mt-9">
+                        {deviceFeature.type === DEVICE_FEATURE_TYPES.VACBOT.STATE && (
+                          <VacbotModeControls
+                            deviceFeature={deviceFeature}
+                            deviceFeatureIndex={deviceFeatureIndex}
+                            updateValue={props.updateValue}
+                            updateValueWithDebounce={props.updateValueWithDebounce}
+                          />
+                        )}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
