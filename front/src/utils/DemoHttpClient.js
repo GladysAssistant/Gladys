@@ -14,10 +14,8 @@ export class DemoHttpClient {
     return this.responses;
   };
   setToken() {}
-  
-  transformRequest = (index, param, value) => {
 
-  };
+  transformRequest = (index, param, value) => {};
 
   async get(url, query) {
     await this.getDemoFile();
