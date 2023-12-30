@@ -8,7 +8,6 @@ const logger = require('../../../../utils/logger');
 async function start() {
   logger.debug(`Ecovacs: Starting`);
   const { login, password, countryCode } = await this.getConfiguration();
-  logger.debug(`Ecovacs: ${login} ${password} ${countryCode}`);
   if (login || password || countryCode) {
     this.configured = true;
   }

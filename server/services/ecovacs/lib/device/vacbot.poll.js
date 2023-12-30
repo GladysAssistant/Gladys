@@ -29,7 +29,6 @@ async function poll(device) {
   logger.trace(`Is Vacbot ready ? ${vacbot.is_ready}`);
   if (vacbot.is_ready) {
     await Promise.mapSeries(device.features || [], (feature) => {
-      logger.debug(`Ecovacs: feature: ${JSON.stringify(feature)}`);
       switch (feature.category) {
         case DEVICE_FEATURE_CATEGORIES.BATTERY: // Integer
           if (feature.type === DEVICE_FEATURE_TYPES.VACBOT.INTEGER) {
@@ -46,7 +45,6 @@ async function poll(device) {
     vacbot.run('GetSleepStatus'); // retrieve the sleep status. Answer : { enable: 1 }
   }
 
-  // logger.trace(`POLL vacbot : `, vacbot);
   switch (vacbot.errorCode) {
     case '3': // String (see ecovacs-deebot.js/library/errorCodes.json)
       logger.error(`Error "${vacbot.errorCode}" occured : ${vacbot.errorDescription}.`);

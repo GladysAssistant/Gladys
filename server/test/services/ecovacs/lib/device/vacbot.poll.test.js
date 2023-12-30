@@ -14,12 +14,12 @@ const gladys = {
   event,
   variable: variableOk,
   service: {
-    getByName: () => { 
+    getByName: () => {
       return {
-        status: 'STARTED'
-      }; 
-    }
-  }
+        status: 'STARTED',
+      };
+    },
+  },
 };
 
 describe('Ecovacs : vacbot polling', () => {
@@ -42,13 +42,12 @@ describe('Ecovacs : vacbot polling', () => {
     fakes.errorCode = '4200'; // vacbot with errorCode 4200
     ecovacsService.device.vacbots.set(devices[0], fakes);
     await ecovacsService.device.poll(devices[0]);
-    
   });
 
   it('should not poll device : it is not ready', async () => {
     fakes.is_ready = false; // vacbot not ready
     ecovacsService.device.vacbots.set(devices[0], fakes);
     await ecovacsService.device.poll(devices[0]);
-    assert.notCalled(fakes.run);    
+    assert.notCalled(fakes.run);
   });
 });

@@ -57,14 +57,11 @@ module.exports = function EcovacsController(ecovacsHandler) {
   async function getDeviceStatus(req, res) {
     const device = ecovacsHandler.gladys.device.getBySelector(req.params.device_selector);
     const deviceExternalId = device.external_id;
-    logger.debug(`${deviceExternalId} from ${JSON.stringify(req.params)}`);
     if (deviceExternalId) {
-      logger.debug(`Searching ${deviceExternalId} `);
       const status = await ecovacsHandler.getDeviceStatus(deviceExternalId);
-      logger.debug(`${JSON.stringify(status)}`);
       res.json(status);
     } else {
-      logger.debug(`${deviceExternalId} not found`);
+      // deviceExternalId not found
       res.json({});
     }
   }

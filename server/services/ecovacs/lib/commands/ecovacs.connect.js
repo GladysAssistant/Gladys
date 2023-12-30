@@ -1,7 +1,6 @@
 const nodeMachineId = require('node-machine-id');
 const { EVENTS, WEBSOCKET_MESSAGE_TYPES } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-const { CONFIGURATION } = require('../utils/ecovacs.constants');
 const logger = require('../../../../utils/logger');
 
 /**
@@ -31,9 +30,6 @@ async function connect() {
       this.configured = false;
       throw new ServiceNotConfiguredError('Ecovacs: Error, service is not configured');
     }
-    logger.debug(
-      `Ecovacs: connect with config ${CONFIGURATION.ECOVACS_LOGIN_KEY}=${accountId},${CONFIGURATION.ECOVACS_PASSWORD_KEY}=${password}, ${CONFIGURATION.ECOVACS_COUNTRY_KEY}=${countryCode}`,
-    );
 
     // You need to provide a device ID uniquely identifying the
     // machine you're using to connect, the country you're in.
@@ -42,7 +38,6 @@ async function connect() {
     const continent = this.ecovacsLibrary.countries[countryCode.toUpperCase()].continent.toLowerCase();
     const deviceId = EcoVacsAPI.getDeviceId(nodeMachineId.machineIdSync(), deviceID);
 
-    logger.debug(`Ecovacs client params : ${deviceId}, ${countryCode}, ${continent}, ${authDomain}`);
     this.ecovacsClient = new EcoVacsAPI(deviceId, countryCode, continent, authDomain);
     try {
       await this.ecovacsClient.connect(accountId, password);

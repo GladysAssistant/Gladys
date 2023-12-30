@@ -18,7 +18,6 @@ async function setValue(device, deviceFeature, value) {
     throw new NotFoundError(`ECOVACS_API_NOT_FOUND`);
   }
 
-  logger.debug(`DeviceFeature ${deviceFeature.type}`);
   switch (deviceFeature.type) {
     case DEVICE_FEATURE_TYPES.VACBOT.STATE:
       if (value === 1) {

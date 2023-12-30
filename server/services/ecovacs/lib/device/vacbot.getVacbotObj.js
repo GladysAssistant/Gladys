@@ -1,4 +1,3 @@
-const logger = require('../../../../utils/logger');
 const { parseExternalId } = require('../utils/ecovacs.externalId');
 
 /**
@@ -12,9 +11,7 @@ async function getVacbotObj(deviceExternalId) {
   if (!this.connected) {
     await this.connect();
   }
-  logger.debug(`Vacbot ${deviceExternalId}: status`);
-  const { prefix, devicePid, deviceNumber } = parseExternalId(deviceExternalId);
-  logger.debug(`${deviceExternalId} => ${prefix}  ${devicePid}  ${deviceNumber}`);
+  const { deviceNumber } = parseExternalId(deviceExternalId);
   const devices = await this.ecovacsClient.devices();
   const vacuum = devices[deviceNumber];
   const vacbot = this.ecovacsClient.getVacBot(

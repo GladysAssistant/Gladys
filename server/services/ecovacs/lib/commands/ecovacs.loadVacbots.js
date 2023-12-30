@@ -13,16 +13,10 @@ async function loadVacbots() {
   const registered = await this.gladys.device.get({
     service_id: this.serviceId,
   });
-  logger.trace(`Registered : `, registered);
   registered.forEach(async (device) => {
     const vacbot = await this.getVacbotObj(device.external_id);
     this.listen(vacbot, device);
     this.vacbots.set(device, vacbot);
-    logger.debug(
-      `Loaded in memory and ready to be handled : ${device.external_id} (gladys device) ====> ${
-        this.vacbots.get(device).vacuum.deviceName
-      } (vacbot object)`,
-    );
   });
 }
 

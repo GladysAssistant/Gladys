@@ -7,7 +7,7 @@ const { assert, fake } = sinon;
 const ecovacsGetVacbotObjMock = fake.resolves(fakes);
 
 const EcovacsHandler = proxyquire('../../../../../services/ecovacs/lib', {
-  './device/vacbot.getVacbotObj.js': { getVacbotObj: ecovacsGetVacbotObjMock },  
+  './device/vacbot.getVacbotObj.js': { getVacbotObj: ecovacsGetVacbotObjMock },
 });
 const EcovacsService = proxyquire('../../../../../services/ecovacs', {
   './lib': EcovacsHandler,
@@ -20,14 +20,14 @@ const gladys = {
 };
 
 describe('ecovacs.stop command', () => {
-   beforeEach(() => {
+  beforeEach(() => {
     sinon.reset();
   });
 
   it('check listeners and peripherals are well removed', async () => {
     const ecovacsService = EcovacsService(gladys, serviceId);
     await ecovacsService.device.stop();
-    // call disconnect for all registered devices  
+    // call disconnect for all registered devices
     assert.calledThrice(fakes.disconnect);
   });
 });
