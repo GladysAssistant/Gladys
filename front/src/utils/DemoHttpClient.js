@@ -15,8 +15,6 @@ export class DemoHttpClient {
   };
   setToken() {}
 
-  transformRequest = (index, param, value) => {};
-
   async get(url, query) {
     await this.getDemoFile();
     let key = `get ${url}`;
