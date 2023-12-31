@@ -31,5 +31,14 @@ describe('ecovacs.onMessage command', () => {
     const ecovacsService = EcovacsService(gladys, serviceId);
     const type = 'CleanReport';
     await ecovacsService.device.onMessage(type, devices[0], 10.1);
+    // only a log is done
+  });
+
+  it('should not update device state with unknown event fired', async () => {
+    const gladys = { event };
+    const ecovacsService = EcovacsService(gladys, serviceId);
+    const type = 'Unknown';
+    await ecovacsService.device.onMessage(type, devices[0], 10.1);
+    // only a log is done
   });
 });

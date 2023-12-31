@@ -72,11 +72,11 @@ describe('EcovacsHandler setValue', () => {
     assert.notCalled(fakes.pause);
   });
 
-  it('should set the binary value is not handled', async () => {
+  it('should not set the binary value since state is not handled', async () => {
     await ecovacsService.device.setValue(
       devices[0],
       { external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0', category: 'vacbot', type: 'state' },
-      null,
+      3,
     );
     assert.notCalled(fakes.stop);
     assert.notCalled(fakes.clean);
