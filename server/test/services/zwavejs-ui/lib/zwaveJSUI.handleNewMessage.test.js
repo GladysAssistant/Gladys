@@ -41,8 +41,8 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
   it('should save a new open value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage(
-      'zwave/living-room/my-sensor/notification/endpoint_0/Access_Control/Door_state_simple',
-      '{"time":1702654592227,"value":22, "nodeId": 2}',
+      'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',
+      '{data: [{"name": "my-sensor", "location": "living-room"}, {"commandClassName": "Notification","commandClass": 113,"property": "Access Control","endpoint": 0,"newValue": 22,"prevValue": 23,"propertyName": "Access Control", "propertyKey": "Door state (simple)"}]}',
     );
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
@@ -52,8 +52,8 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
   it('should save a new closed value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage(
-      'zwave/living-room/my-sensor/notification/endpoint_0/Access_Control/Door_state_simple',
-      '{"time":1702654592227,"value":23, "nodeId": 2}',
+      'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',
+      '{data: [{"name": "my-sensor", "location": "living-room"}, {"commandClassName": "Notification","commandClass": 113,"property": "Access Control","endpoint": 0,"newValue": 23,"prevValue": 22,"propertyName": "Access Control", "propertyKey": "Door state (simple)"}]}',
     );
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',

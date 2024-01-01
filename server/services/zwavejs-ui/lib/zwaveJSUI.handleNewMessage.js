@@ -15,27 +15,32 @@ function handleNewMessage(topic, message) {
   logger.debug(`Receives MQTT message from ${topic}`);
 
   try {
-    const splittedTopic = topic.split('/');
     const parsedMessage = JSON.parse(message);
     // On list of devices received
     if (topic === 'zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/getNodes') {
       this.onNewDeviceDiscover(parsedMessage);
-    } else if (splittedTopic.length === 7) {
-      // trying to match example: zwave/living-room/my-sensor/notification/endpoint_0/Access_Control/Door_state_simple
-      const [, , , comClassName, endpoint, property, propertyKey] = splittedTopic;
-      const [, endpointNumber] = endpoint.split('_');
-      const comClassNameClean = cleanNames(comClassName);
+    } else if (topic === 'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated') {
+      // A value has been updated: https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-addedquot-quotvalue-updatedquot-quotvalue-removedquot
+      const node = parsedMessage.data[0];
+      const updatedValue = parsedMessage.data[1];
+      const { commandClassName, property, propertyKey, endpoint, newValue } = updatedValue;
+      const comClassNameClean = cleanNames(commandClassName);
       const propertyClean = cleanNames(property);
       const propertyKeyClean = cleanNames(propertyKey);
+      let statePath = `${comClassNameClean}.${propertyClean}`;
+      if (propertyKeyClean !== '') {
+        statePath += `.${propertyKeyClean}`;
+      }
       const valueConverted = get(
         STATES,
-        `${comClassNameClean}.${propertyClean}.${propertyKeyClean}.${parsedMessage.value}`,
+        `${statePath}.${newValue}`,
       );
       if (valueConverted !== undefined) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: getDeviceFeatureExternalId(
-            parsedMessage.nodeId,
-            endpointNumber,
+            node.location,
+            node.name,
+            endpoint,
             comClassNameClean,
             propertyClean,
             propertyKeyClean,

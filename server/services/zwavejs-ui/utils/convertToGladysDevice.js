@@ -26,11 +26,16 @@ const convertToGladysDevice = (serviceId, device) => {
     const commandClassNameClean = cleanNames(commandClassName);
     const propertyClean = cleanNames(property);
     const propertyKeyClean = cleanNames(propertyKey);
-    const exposeFound = get(EXPOSES, `${commandClassNameClean}.${propertyClean}.${propertyKeyClean}`);
+    let exposePath = `${commandClassNameClean}.${propertyClean}`;
+    if (propertyKeyClean !== '') {
+      exposePath += `.${propertyKeyClean}`;
+    }
+    const exposeFound = get(EXPOSES, exposePath);
     if (exposeFound) {
       features.push({
         ...exposeFound,
         name: value.id,
+        nodeId: value.nodeId,
         external_id: getDeviceFeatureExternalId(
           device.id,
           endpoint,
