@@ -7,8 +7,12 @@ Changelog
 =========
 MAJOR 10-2023 v1 Deals with the ecovacs api, handle a vacbot, basic control & battery features handled, a new box to control your bot 
 
-MINOR (WIP) 11-2023 Handle unreachable vacbot (ie : when battery is empty or device off or out of network for any reason): 
--> 2023-11-10T18:31:26+0100 <error> vacbot.poll.js:42 (EcovacsHandler.poll) Error 4200 occured : Robot not reachable.
+MINOR  11-2023 v1.1.0 
+- Handle unreachable vacbot (ie : when battery is empty or device off or out of network for any reason): 
+    -> 2023-11-10T18:31:26+0100 <error> vacbot.poll.js:42 (EcovacsHandler.poll) Error 4200 occured : Robot not reachable.
+- Do not poll device if service stopped
+- Disconnect from mqtt when service stops
+
 
 Todos
 =====
@@ -54,20 +58,33 @@ Technical informations
 service will be find here : /gladys_path/server/services/ecovacs
 
 commands :
+
 - ecovacs.start.js
 - ecovacs.stop.js
 
 
-HANDLER
+*HANDLER*
+
 Handler class name : EcovacsHandler
 const ecovacs = new EcovacsHandler(gladys, serviceId);
 
 
-API
+*API*
+
 controller class name : EcovacsController
 const Ecovacs = require('./api/ecovacs.controller');
 
 controllers: EcovacsController(ecovacs);
+
+Entry points :
+
+- 'get /api/v1/service/ecovacs/vacbots'
+- 'get /api/v1/service/ecovacs/status'
+- 'get /api/v1/service/ecovacs/:device_selector/status'
+- 'get /api/v1/service/ecovacs/config'
+- 'post /api/v1/service/ecovacs/config'
+- 'get /api/v1/service/ecovacs/connect'
+- 'get /api/v1/service/ecovacs/discover'
 
 
 Dependencies
