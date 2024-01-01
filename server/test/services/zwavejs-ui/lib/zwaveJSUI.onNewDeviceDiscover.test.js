@@ -46,6 +46,7 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
             read_only: true,
             has_feedback: true,
             name: '2-113-0-Access Control-Door state (simple)',
+            nodeId: 2,
             external_id: 'zwavejs-ui:salon:capteur-ouverture:0:notification:access_control:door_state_simple',
           },
         ],
