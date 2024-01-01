@@ -1,4 +1,4 @@
-const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, OPENING_SENSOR_STATE } = require('../../../utils/constants');
+const { DEVICE_FEATURE_CATEGORIES, DEVICE_FEATURE_TYPES, OPENING_SENSOR_STATE, STATE } = require('../../../utils/constants');
 
 const CONFIGURATION = {
   ZWAVEJS_UI_MQTT_URL_KEY: 'ZWAVEJS_UI_MQTT_URL',
@@ -7,6 +7,26 @@ const CONFIGURATION = {
 };
 
 const EXPOSES = {
+  binary_switch: {
+    currentvalue: {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      min: 0,
+      max: 1,
+      keep_history: true,
+      read_only: true,
+      has_feedback: true,
+    },
+    targetValue: {
+      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
+      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
+      min: 0,
+      max: 1,
+      keep_history: false,
+      read_only: false,
+      has_feedback: true,
+    }
+  },
   notification: {
     access_control: {
       door_state_simple: {
@@ -23,6 +43,16 @@ const EXPOSES = {
 };
 
 const STATES = {
+  binary_switch: {
+    currentvalue: {
+      false: STATE.OFF,
+      true: STATE.ON,
+    },
+    targetvalue: {
+      false: STATE.OFF,
+      true: STATE.ON,
+    }
+  },
   notification: {
     access_control: {
       door_state_simple: {
