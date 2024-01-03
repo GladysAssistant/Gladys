@@ -3,6 +3,7 @@ import ApexCharts from 'apexcharts';
 
 import fr from 'apexcharts/dist/locales/fr.json';
 import en from 'apexcharts/dist/locales/en.json';
+import de from 'apexcharts/dist/locales/de.json';
 
 import dayjs from 'dayjs';
 import localizedFormat from 'dayjs/plugin/localizedFormat';
@@ -43,7 +44,7 @@ class ApexChartComponent extends Component {
       displayAxes: this.props.display_axes,
       series: this.props.series,
       COLORS,
-      locales: [fr, en],
+      locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -63,7 +64,7 @@ class ApexChartComponent extends Component {
       series: this.props.series,
       displayAxes: this.props.display_axes,
       COLORS,
-      locales: [fr, en],
+      locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -84,7 +85,7 @@ class ApexChartComponent extends Component {
       COLORS,
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en],
+      locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);
@@ -104,7 +105,7 @@ class ApexChartComponent extends Component {
       COLORS,
       displayAxes: this.props.display_axes,
       series: this.props.series,
-      locales: [fr, en],
+      locales: [fr, en, de],
       defaultLocale: this.props.user.language
     });
     this.addDateFormatter(options);

@@ -4,6 +4,8 @@ const dayjs = require('dayjs');
 
 require('dayjs/locale/en');
 require('dayjs/locale/fr');
+require('dayjs/locale/de');
+
 const LocalizedFormat = require('dayjs/plugin/localizedFormat');
 
 const EventEmitter = require('events');
