@@ -7,7 +7,6 @@ import { format } from 'date-fns';
 import Select from 'react-select';
 
 import fr from 'date-fns/locale/fr';
-import de from 'date-fns/locale/de';
 
 import 'react-datepicker/dist/react-datepicker.css';
 

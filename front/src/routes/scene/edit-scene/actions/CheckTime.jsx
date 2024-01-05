@@ -10,7 +10,6 @@ import 'react-datepicker/dist/react-datepicker.css';
 import style from './CheckTime.css';
 
 import fr from 'date-fns/locale/fr';
-import de from 'date-fns/locale/de';
 
 const weekDays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
