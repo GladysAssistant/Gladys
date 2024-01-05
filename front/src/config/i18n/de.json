@@ -605,20 +605,20 @@
         "notEnabled": "Zigbee2MQTT ist nicht aktiviert. Bitte gehe zur ",
         "mqttNotInstalled": "MQTT-Broker konnte nicht installiert werden",
         "mqttNotRunning": "MQTT-Broker konnte nicht gestartet werden",
-        "Zigbee2MQTTNotInstalled": "Zigbee2MQTT konnte nicht installiert werden",
-        "Zigbee2MQTTNotRunning": "Zigbee2MQTT konnte nicht gestartet werden",
+        "zigbee2mqttNotInstalled": "Zigbee2MQTT konnte nicht installiert werden",
+        "zigbee2mqttNotRunning": "Zigbee2MQTT konnte nicht gestartet werden",
         "gladysNotConnected": "Gladys konnte keine Verbindung zu MQTT herstellen",
-        "Zigbee2MQTTNotConnected": "Zigbee2MQTT konnte keine Verbindung zu MQTT herstellen",
+        "zigbee2mqttNotConnected": "Zigbee2MQTT konnte keine Verbindung zu MQTT herstellen",
         "settingsPageLink": "USB-Dongle-Einstellungen.",
         "setupPageLink": "Einrichtungseite."
       },
       "settings": {
         "title": "USB-Dongle-Einstellungen",
         "description": "Um Zigbee2MQTT in Gladys zu verwenden, benötigst du einen mit deiner Gladys-Instanz verbundenen Zigbee2MQTT-USB-Dongle.",
-        "Zigbee2MQTTUsbDriverPathLabel": "Wähle den USB-Port aus, an dem dein Zigbee2MQTT-Dongle angeschlossen ist",
-        "Zigbee2MQTTUsbDriverPathPlaceholder": "USB-Port",
-        "Zigbee2MQTTUsbDongleNameLabel": "Wähle deinen Zigbee-Dongle-Modell aus",
-        "Zigbee2MQTTUsbDongleNamePlaceholder": "Zigbee-Dongle-Modell",
+        "zigbee2mqttUsbDriverPathLabel": "Wähle den USB-Port aus, an dem dein Zigbee2MQTT-Dongle angeschlossen ist",
+        "zigbee2mqttUsbDriverPathPlaceholder": "USB-Port",
+        "zigbee2mqttUsbDongleNameLabel": "Wähle deinen Zigbee-Dongle-Modell aus",
+        "zigbee2mqttUsbDongleNamePlaceholder": "Zigbee-Dongle-Modell",
         "saveButton": "Einstellungen sichern",
         "refreshButton": "USB-Liste aktualisieren",
         "notAttached": "Gladys ist mit keinem Zigbee2MQTT-USB-Dongle verbunden.",
@@ -631,7 +631,7 @@
         "enableLabel": "Zigbee2MQTT aktivieren",
         "nonDockerEnv": "Gladys läuft nicht unter Docker. Du kannst von hier aus keinen MQTT-Broker installieren.",
         "invalidDockerNetwork": "Du hast Gladys als benutzerdefinierte Installation eingerichtet. Um den Broker von hier aus zu installieren, muss der Gladys-Container im \"host\"-Netzwerkmodus konfiguriert sein.",
-        "enableZigbee2MQTT": "Zigbee2MQTT aktivieren",
+        "enableZigbee2mqtt": "Zigbee2MQTT aktivieren",
         "containersStatus": "Zigbee2MQTT-Container",
         "serviceStatus": "Status des Zigbee2MQTT-Dienstes",
         "link": "Link",
@@ -639,7 +639,7 @@
         "error": "Beim Starten von Zigbee2MQTT ist ein Fehler aufgetreten.",
         "mqttZigbeeLink": "MQTT - Zigbee",
         "gladysMqttLink": "Gladys - MQTT",
-        "Zigbee2MQTT": "Zigbee2MQTT",
+        "zigbee2Mqtt": "Zigbee2MQTT",
         "gladys": "Gladys",
         "mqtt": "MQTT",
         "status": "Status",
@@ -1985,7 +1985,7 @@
     "registered": "Registriert:",
     "session": "Sitzung",
     "revoke": "Widerrufen",
-    "unknownDevice": "Unbekanntes Gerät",
+    "unknowDevice": "Unbekanntes Gerät",
     "apiKey": "API-Schlüssel"
   },
   "servicesSettings": {
@@ -2083,7 +2083,7 @@
       "gladys-gateway-backup": "Gladys-Plus-Backup",
       "device-state-purge-single-feature": "Zustände einzelner Gerätemerkmale aufräumen",
       "vacuum": "Datenbank reinigen",
-      "service-Zigbee2MQTT-backup": "Zigbee2MQTT-Backup"
+      "service-zigbee2mqtt-backup": "Zigbee2MQTT-Backup"
     },
     "jobErrors": {
       "purged-when-restarted": "Gladys Assistant wurde neu gestartet, während diese Aufgabe noch lief. Daher wurde sie gelöscht. Das bedeutet nicht, dass die Aufgabe fehlgeschlagen ist – es handelt sich um normales Verhalten."
