@@ -157,7 +157,7 @@
       "distanceUnitMeter": "SI (Meter)",
       "distanceUnitUs": "Imperial/US (Meilen)",
       "deviceStateHistoryDuration": {
-        "title": "Verlauf der Gerätestatus",
+        "title": "Speicherdauer für Gerätestatus-Verlauf",
         "durationOneWeek": "1 Woche",
         "durationOneMonth": "1 Monat",
         "durationThreeMonth": "3 Monate",
@@ -203,7 +203,7 @@
     },
     "success": {
       "title": "Vielen Dank!",
-      "introduction": "Ich bin <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\">Pierre-Gilles Leymarie</a> und ich habe 2013 mit der Arbeit an Gladys Assistant begonnen.",
+      "introduction": "Ich bin <a href=\"https://twitter.com/pierregillesl\" target=\"_blank\" rel=\"noopener noreferrer\">Pierre-Gilles Leymarie</a> und habe 2013 mit der Arbeit an Gladys Assistant begonnen.",
       "thanksForChoosingOpenSource": "Ich möchte dir dafür danken, dass du dich für Gladys entschieden hast. Ich hoffe, du wirst genauso viel Freude beim Verwenden dieser Software haben, wie ich beim Entwickeln hatte.",
       "ifYouWantToSupportThisSotware": "Ich bin auf Unterstützungen angewiesen, um an diesem Projekt nachhaltig arbeiten zu können. Wenn du Gladys unterstützen und Zugang zu zusätzlichen Funktionen erhalten möchtest, dann kannst du dies mittels <a href=\"https://gladysassistant.com/plus\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Plus</a> tun.",
       "goToDashboardButton": "Zum Dashboard gehen"
