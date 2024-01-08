@@ -42,10 +42,10 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage(
       'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',
-      '{"data": [{"name": "my-sensor", "location": "living-room"}, {"commandClassName": "Notification","commandClass": 113,"property": "Access Control","endpoint": 0,"newValue": 22,"prevValue": 23,"propertyName": "Access Control", "propertyKey": "Door state (simple)"}]}',
+      '{"data": [{"id":2}, {"commandClassName": "Notification","commandClass": 113,"property": "Access Control","endpoint": 0,"newValue": 22,"prevValue": 23,"propertyName": "Access Control", "propertyKey": "Door state (simple)"}]}',
     );
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:living-room:my-sensor:0:notification:access_control:door_state_simple',
+      device_feature_external_id: 'zwavejs-ui:2:notification:0:access_control:door_state_simple',
       state: 0,
     });
   });
@@ -53,10 +53,10 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage(
       'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',
-      '{"data": [{"name": "my-sensor", "location": "living-room"}, {"commandClassName": "Notification","commandClass": 113,"property": "Access Control","endpoint": 0,"newValue": 23,"prevValue": 22,"propertyName": "Access Control", "propertyKey": "Door state (simple)"}]}',
+      '{"data": [{"id": 2}, {"commandClassName": "Notification","commandClass": 113,"property": "Access Control","endpoint": 0,"newValue": 23,"prevValue": 22,"propertyName": "Access Control", "propertyKey": "Door state (simple)"}]}',
     );
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:living-room:my-sensor:0:notification:access_control:door_state_simple',
+      device_feature_external_id: 'zwavejs-ui:2:notification:0:access_control:door_state_simple',
       state: 1,
     });
   });

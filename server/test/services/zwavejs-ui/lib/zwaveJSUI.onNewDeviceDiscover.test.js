@@ -33,7 +33,7 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
     expect(zwaveJSUIHandler.devices).to.deep.equal([
       {
         name: 'capteur-ouverture',
-        external_id: 'zwavejs-ui:salon:capteur-ouverture',
+        external_id: 'zwavejs-ui:2',
         service_id: 'ffa13430-df93-488a-9733-5c540e9558e0',
         should_poll: false,
         features: [
@@ -47,7 +47,8 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
             has_feedback: true,
             name: '2-113-0-Access Control-Door state (simple)',
             nodeId: 2,
-            external_id: 'zwavejs-ui:salon:capteur-ouverture:0:notification:access_control:door_state_simple',
+            endpoint: 0,
+            external_id: 'zwavejs-ui:2:notification:0:access_control:door_state_simple',
           },
         ],
       },

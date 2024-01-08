@@ -13,8 +13,8 @@ const cleanNames = (text) => {
     .toLowerCase();
 };
 
-const getDeviceFeatureExternalId = (location, name, endpoint, comClass, property, propertyKey) =>
-  `zwavejs-ui:${location}:${name}:${endpoint}:${comClass}:${property}:${propertyKey}`;
+const getDeviceFeatureExternalId = (nodeId, commandClass, endpoint, property, propertyKey) =>
+  `zwavejs-ui:${nodeId}:${commandClass}:${endpoint}:${property}${propertyKey ? `:${propertyKey}` : ''}`;
 
 const convertToGladysDevice = (serviceId, device) => {
   const features = [];
@@ -36,13 +36,13 @@ const convertToGladysDevice = (serviceId, device) => {
         ...exposeFound,
         name: value.id,
         nodeId: value.nodeId,
+        endpoint,
         external_id: getDeviceFeatureExternalId(
-          device.loc,
-          device.name,
-          endpoint,
+          value.nodeId,
           commandClassNameClean,
+          endpoint,
           propertyClean,
-          propertyKeyClean,
+          propertyKeyClean
         ),
       });
     }
@@ -50,7 +50,7 @@ const convertToGladysDevice = (serviceId, device) => {
 
   return {
     name: device.name,
-    external_id: `zwavejs-ui:${device.loc}:${device.name}`,
+    external_id: `zwavejs-ui:${device.id}`,
     service_id: serviceId,
     should_poll: false,
     features,
