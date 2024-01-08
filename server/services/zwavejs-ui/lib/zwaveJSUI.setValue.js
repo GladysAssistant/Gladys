@@ -63,7 +63,6 @@ function getCommand(deviceFeature) {
     commandPath += `.${segments[4]}`;
   }
 
-  console.log('looking for path %o', {commandPath, segments});
   return get(COMMANDS, commandPath);
 }
 
