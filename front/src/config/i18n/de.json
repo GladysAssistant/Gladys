@@ -548,7 +548,7 @@
       "discover": {
         "title": "Ihre mit Gladys kompatiblen Netatmo-Geräte",
         "description": "Ihre Netatmo-Geräte müssen zuerst zu Ihrem Netatmo-Konto hinzugefügt werden, bevor sie zu Gladys hinzugefügt werden können, das derzeit nur Thermostate unterstützt, die mit ihrem Plug verbunden sind. Die erste Entdeckung erfolgt automatisch. Drücken Sie 'Aktualisieren', wenn Sie die neuen Funktionen Ihrer Geräte abrufen möchten.",
-        "descriptionCompatibility": "Für alle Anfragen zur Hinzufügung von Geräten und/oder Funktionen, besuchen Sie bitte das <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Kategorie \"Funktionsanfragen\"</a>.",
+        "descriptionCompatibility": "Für alle Anfragen zur Hinzufügung von Geräten und/oder Funktionen, besuchen Sie bitte das <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Kategorie \"Funktionsanfragen\"</a>.",
         "noDeviceFound": "Keine Netatmo-Geräte gefunden. Haben Sie alle Schritte der Dokumentation befolgt, um Ihre Geräte in der Netatmo-API zu registrieren?",
         "alreadyCreatedButton": "Bereits erstellt",
         "scan": "Scannen",
@@ -566,11 +566,11 @@
         "disconnectLabel": "Trennen",
         "disconnectInformationLabel": "(Entfernt Gladys-Zugriff)",
         "description": "Sie können Gladys mit Ihrem Netatmo-Konto verbinden, um die zugehörigen Geräte zu steuern.",
-        "descriptionCreateAccount": "Sie müssen ein Konto auf <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a> erstellen.",
+        "descriptionCreateAccount": "Sie müssen ein Konto auf <a href=\"https://auth.netatmo.com/de-de/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a> erstellen.",
         "descriptionCreateProject": "Danach müssen Sie eine \"Anwendung\" in Ihrem Netatmo-Entwicklerkonto über das Menü <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">Meine App</a> erstellen.",
         "descriptionGetKeys": "Dann haben Sie Zugriff auf zwei Schlüssel: \"Kunden-ID\" und \"Kundengeheimnis\", die Sie unten kopieren können.",
         "descriptionScopeInformation": "Wenn Sie Gladys mit Ihrer dedizierten Netatmo-App verbinden, erteilen Sie ihr die Berechtigung, auf Ihre Daten zum Lesen und Schreiben zuzugreifen (genannt Scopes \"read\" und \"write\"). Sie müssen nichts konfigurieren, diese Scopes sind automatisch integriert und werden Ihnen bei der Verbindungsanfrage angezeigt (siehe Dokumentation bei Bedarf). Da Gladys lokal installiert ist, werden keine dieser Daten preisgegeben.",
-        "titleAdditionalInformation": "Weitere Informationen über die Funktionsweise der \"Energie\"-API:",
+        "titleAdditionalInformation": "Weitere Informationen über die Funktionsweise der \"Energy\"-API:",
         "descriptionAdditionalInformation": "Temperaturbefehle werden auf Raumniveau ausgeführt. Daher sind beide Informationen als Funktionen für mehr Kontrolle verfügbar. Wenn Sie andere Temperatursensoren im gleichen Raum wie Ihr Thermostat haben, wird die Durchschnittstemperatur dieses Raums berücksichtigt, um den Heizungssteuerschalter auszulösen.",
         "errorConnecting": {
           "other_error": "Fehler bei der Autorisierung. Sie können den Fehler in der Konsole Ihres Browsers mit einem Rechtsklick untersuchen. Wenn der Fehler weiterhin besteht, posten Sie bitte die Protokolle im Forum.",
