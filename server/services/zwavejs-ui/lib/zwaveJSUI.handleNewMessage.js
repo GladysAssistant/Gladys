@@ -38,10 +38,9 @@ function handleNewMessage(topic, message) {
       if (valueConverted !== undefined) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: getDeviceFeatureExternalId(
-            node.location,
-            node.name,
-            endpoint,
+            node.id,
             comClassNameClean,
+            endpoint,
             propertyClean,
             propertyKeyClean,
           ),
