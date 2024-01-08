@@ -6,6 +6,36 @@ const CONFIGURATION = {
   ZWAVEJS_UI_MQTT_PASSWORD_KEY: 'ZWAVEJS_UI_MQTT_PASSWORD',
 };
 
+const STATES = {
+  binary_switch: {
+    currentvalue: {
+      [STATE.OFF]: false,
+      [STATE.ON]: true,
+      false: STATE.OFF,
+      true: STATE.ON,
+    }
+  },
+  notification: {
+    access_control: {
+      door_state_simple: {
+        22: OPENING_SENSOR_STATE.OPEN,
+        23: OPENING_SENSOR_STATE.CLOSE,
+      },
+    },
+  },
+};
+
+const COMMANDS = {
+  binary_switch: {
+    currentvalue: {
+      getName: () => 'set',
+      getArgs: (value, ccVersion) => {
+        return [STATES.binary_switch.currentvalue[value]];
+      }
+    }
+  }
+};
+
 const EXPOSES = {
   binary_switch: {
     currentvalue: {
@@ -14,15 +44,6 @@ const EXPOSES = {
       min: 0,
       max: 1,
       keep_history: true,
-      read_only: true,
-      has_feedback: true,
-    },
-    targetValue: {
-      category: DEVICE_FEATURE_CATEGORIES.SWITCH,
-      type: DEVICE_FEATURE_TYPES.SWITCH.BINARY,
-      min: 0,
-      max: 1,
-      keep_history: false,
       read_only: false,
       has_feedback: true,
     }
@@ -42,28 +63,8 @@ const EXPOSES = {
   },
 };
 
-const STATES = {
-  binary_switch: {
-    currentvalue: {
-      false: STATE.OFF,
-      true: STATE.ON,
-    },
-    targetvalue: {
-      false: STATE.OFF,
-      true: STATE.ON,
-    }
-  },
-  notification: {
-    access_control: {
-      door_state_simple: {
-        22: OPENING_SENSOR_STATE.OPEN,
-        23: OPENING_SENSOR_STATE.CLOSE,
-      },
-    },
-  },
-};
-
 module.exports = {
+  COMMANDS,
   CONFIGURATION,
   EXPOSES,
   STATES,
