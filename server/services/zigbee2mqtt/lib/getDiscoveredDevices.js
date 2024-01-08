@@ -10,6 +10,8 @@ const { convertDevice } = require('../utils/convertDevice');
  */
 function getDiscoveredDevices(filters = {}) {
   let devices = Object.values(this.discoveredDevices)
+    // Filter unknown models
+    .filter((d) => d.definition !== null)
     // Convert to Gladys device
     .map((d) => convertDevice(d, this.serviceId))
     .map((d) => {
