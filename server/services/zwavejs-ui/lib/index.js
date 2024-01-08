@@ -7,6 +7,7 @@ const { onNewDeviceDiscover } = require('./zwaveJSUI.onNewDeviceDiscover');
 const { publish } = require('./zwaveJSUI.publish');
 const { scan } = require('./zwaveJSUI.scan');
 const { saveConfiguration } = require('./zwaveJSUI.saveConfiguration');
+const { setValue } = require('./zwaveJSUI.setValue');
 
 /**
  * @description Z-Wave JS UI handler.
@@ -35,5 +36,6 @@ ZwaveJSUIHandler.prototype.onNewDeviceDiscover = onNewDeviceDiscover;
 ZwaveJSUIHandler.prototype.publish = publish;
 ZwaveJSUIHandler.prototype.scan = scan;
 ZwaveJSUIHandler.prototype.saveConfiguration = saveConfiguration;
+ZwaveJSUIHandler.prototype.setValue = setValue;
 
 module.exports = ZwaveJSUIHandler;

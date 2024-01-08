@@ -23,7 +23,7 @@ function handleNewMessage(topic, message) {
       // A value has been updated: https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-addedquot-quotvalue-updatedquot-quotvalue-removedquot
       const node = parsedMessage.data[0];
       const updatedValue = parsedMessage.data[1];
-      const { commandClassName, property, propertyKey, endpoint, newValue } = updatedValue;
+      const { commandClassName, commandClass, property, propertyKey, endpoint, newValue } = updatedValue;
       const comClassNameClean = cleanNames(commandClassName);
       const propertyClean = cleanNames(property);
       const propertyKeyClean = cleanNames(propertyKey);
@@ -39,7 +39,7 @@ function handleNewMessage(topic, message) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: getDeviceFeatureExternalId(
             node.id,
-            comClassNameClean,
+            commandClass,
             endpoint,
             propertyClean,
             propertyKeyClean,

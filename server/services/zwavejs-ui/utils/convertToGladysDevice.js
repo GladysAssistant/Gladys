@@ -16,13 +16,17 @@ const cleanNames = (text) => {
 const getDeviceFeatureExternalId = (nodeId, commandClass, endpoint, property, propertyKey) =>
   `zwavejs-ui:${nodeId}:${commandClass}:${endpoint}:${property}${propertyKey ? `:${propertyKey}` : ''}`;
 
+const getDeviceFeatureName = 
+  (nodeId, commandClassName, endpoint, propertyName, propertyKeyName, commandClassVersion) => 
+    `${nodeId}:${commandClassName}:${endpoint}:${propertyName}${propertyKeyName ? `:${propertyKeyName}` : ''}:${commandClassVersion}`;
+
 const convertToGladysDevice = (serviceId, device) => {
   const features = [];
 
   // Foreach value, we check if there is a matching feature in Gladys
   Object.keys(device.values).forEach((valueKey) => {
     const value = device.values[valueKey];
-    const { commandClassName, property, propertyKey, endpoint } = value;
+    const { commandClass, commandClassName, property, propertyKey, endpoint, commandClassVersion = 1 } = value;
     const commandClassNameClean = cleanNames(commandClassName);
     const propertyClean = cleanNames(property);
     const propertyKeyClean = cleanNames(propertyKey);
@@ -34,12 +38,17 @@ const convertToGladysDevice = (serviceId, device) => {
     if (exposeFound) {
       features.push({
         ...exposeFound,
-        name: value.id,
-        nodeId: value.nodeId,
-        endpoint,
-        external_id: getDeviceFeatureExternalId(
+        // Name is used to store the commandClassVersion
+        name: getDeviceFeatureName(
           value.nodeId,
           commandClassNameClean,
+          endpoint,
+          propertyClean,
+          propertyKeyClean,
+          commandClassVersion),
+        external_id: getDeviceFeatureExternalId(
+          value.nodeId,
+          commandClass,
           endpoint,
           propertyClean,
           propertyKeyClean
