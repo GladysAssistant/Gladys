@@ -6,7 +6,7 @@ const { convertToGladysDevice } = require('../utils/convertToGladysDevice');
  * @param {object} data - Data sent by ZWave JS UI.
  * @example zwaveJSUI.onNewDeviceDiscover();
  */
-async function onNewDeviceDiscover(data) {
+function onNewDeviceDiscover(data) {
   const devices = [];
   data.result.forEach((zwaveJSDevice) => {
     if (zwaveJSDevice.name && zwaveJSDevice.name.length > 0) {
