@@ -13,13 +13,6 @@ const cleanNames = (text) => {
     .toLowerCase();
 };
 
-const getDeviceFeatureExternalId = (nodeId, commandClass, endpoint, property, propertyKey) =>
-  `zwavejs-ui:${nodeId}:${commandClass}:${endpoint}:${property}${propertyKey ? `:${propertyKey}` : ''}`;
-
-const getDeviceFeatureName = 
-  (nodeId, commandClassName, endpoint, propertyName, propertyKeyName, commandClassVersion) => 
-    `${nodeId}:${commandClassName}:${endpoint}:${propertyName}${propertyKeyName ? `:${propertyKeyName}` : ''}:${commandClassVersion}`;
-
 const convertToGladysDevice = (serviceId, device) => {
   const features = [];
 
@@ -38,21 +31,16 @@ const convertToGladysDevice = (serviceId, device) => {
     if (exposeFound) {
       features.push({
         ...exposeFound,
-        // Name is used to store the commandClassVersion
-        name: getDeviceFeatureName(
-          value.nodeId,
-          commandClassNameClean,
-          endpoint,
-          propertyClean,
-          propertyKeyClean,
-          commandClassVersion),
-        external_id: getDeviceFeatureExternalId(
-          value.nodeId,
-          commandClass,
-          endpoint,
-          propertyClean,
-          propertyKeyClean
-        ),
+        name: value.id,
+        external_id: `zwavejs-ui:${value.id}`,
+        node_id: device.id,
+        // These are custom properties only available on the object in memory (not in DB)
+        command_class_version: commandClassVersion,
+        command_class_name: commandClassNameClean,
+        command_class: commandClass,
+        endpoint,
+        property: propertyClean,
+        property_key: propertyKeyClean,
       });
     }
   });
@@ -68,6 +56,5 @@ const convertToGladysDevice = (serviceId, device) => {
 
 module.exports = {
   cleanNames,
-  getDeviceFeatureExternalId,
   convertToGladysDevice,
 };

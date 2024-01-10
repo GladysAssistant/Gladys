@@ -28,8 +28,8 @@ const STATES = {
 const COMMANDS = {
   binary_switch: {
     currentvalue: {
-      getName: () => 'set',
-      getArgs: (value, ccVersion) => {
+      getName: (_nodeFeature) => 'set',
+      getArgs: (value, _nodeFeature) => {
         return [STATES.binary_switch.currentvalue[value]];
       }
     }
