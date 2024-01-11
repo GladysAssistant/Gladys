@@ -46,6 +46,48 @@ describe('LANManager scan', () => {
 
     expect(manager.scanning).to.equal(false);
     expect(result).deep.equal([{ device: '2', mac: 'mac' }]);
+    expect(manager.discoveredDevices).deep.equal([{ device: '2', mac: 'mac' }]);
+
+    assert.calledWithNew(NmapScan);
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+      payload: {
+        scanning: true,
+        configured: true,
+      },
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+      payload: {
+        scanning: false,
+        configured: true,
+        deviceChanged: true,
+        success: true,
+      },
+    });
+  });
+
+  it('scan devices dupe found', async () => {
+    manager.configured = true;
+    manager.ipMasks = [
+      { mask: '255.255.255.248/29', enabled: true },
+      { mask: '192.168.0.1/10', enabled: false },
+    ];
+
+    NmapScan.prototype.on.onCall(1).yieldsRight([
+      { device: '1', mac: 'mac' },
+      { device: '2', mac: 'mac' },
+    ]);
+
+    const result = await manager.scan();
+
+    expect(manager.scanning).to.equal(false);
+    expect(result).deep.equal([
+      { device: '1', mac: 'mac' },
+      { device: '2', mac: 'mac' },
+    ]);
+    expect(manager.discoveredDevices).deep.equal([{ device: '2', mac: 'mac' }]);
 
     assert.calledWithNew(NmapScan);
     assert.calledTwice(gladys.event.emit);
@@ -97,6 +139,40 @@ describe('LANManager scan', () => {
         configured: true,
         deviceChanged: false,
         success: false,
+      },
+    });
+  });
+
+  it('scan devices cancel', async () => {
+    manager.configured = true;
+    manager.ipMasks = [
+      { mask: '255.255.255.248/29', enabled: true },
+      { mask: '192.168.0.1/10', enabled: false },
+    ];
+
+    NmapScan.prototype.on.onCall(0).yieldsRight('Scan cancelled');
+
+    const result = await manager.scan();
+
+    expect(manager.scanning).to.equal(false);
+    expect(result).deep.equal([]);
+
+    assert.calledWithNew(NmapScan);
+    assert.calledTwice(gladys.event.emit);
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+      payload: {
+        scanning: true,
+        configured: true,
+      },
+    });
+    assert.calledWithExactly(gladys.event.emit, EVENTS.WEBSOCKET.SEND_ALL, {
+      type: WEBSOCKET_MESSAGE_TYPES.LAN.SCANNING,
+      payload: {
+        scanning: false,
+        configured: true,
+        deviceChanged: false,
+        success: true,
       },
     });
   });

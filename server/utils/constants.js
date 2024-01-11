@@ -77,6 +77,7 @@ const USER_ROLE = {
 const AVAILABLE_LANGUAGES = {
   EN: 'en',
   FR: 'fr',
+  DE: 'de',
 };
 
 const SESSION_TOKEN_TYPES = {
