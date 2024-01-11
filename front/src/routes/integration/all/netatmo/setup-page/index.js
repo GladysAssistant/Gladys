@@ -11,7 +11,7 @@ import { RequestStatus } from '../../../../../utils/consts';
 class NetatmoSetupPage extends Component {
   getRedirectUri = async () => {
     try {
-      const { result } = await this.props.httpClient.post('/api/v1/service/netatmo/connect');
+      const result = await this.props.httpClient.post('/api/v1/service/netatmo/connect');
       const redirectUri = `${result.authUrl}&redirect_uri=${encodeURIComponent(this.state.redirectUriNetatmoSetup)}`;
       await this.setState({
         redirectUri
@@ -34,12 +34,12 @@ class NetatmoSetupPage extends Component {
   detectCode = async () => {
     if (this.props.error) {
       if (this.props.error === 'access_denied' || this.props.error === 'invalid_client') {
-        this.props.httpClient.post('/api/v1/service/netatmo/saveStatus', {
+        this.props.httpClient.post('/api/v1/service/netatmo/status', {
           statusType: STATUS.ERROR.CONNECTING,
           message: this.props.error
         });
       } else {
-        this.props.httpClient.post('/api/v1/service/netatmo/saveStatus', {
+        this.props.httpClient.post('/api/v1/service/netatmo/status', {
           statusType: STATUS.ERROR.CONNECTING,
           message: 'other_error'
         });
@@ -55,7 +55,7 @@ class NetatmoSetupPage extends Component {
       let successfulNewToken = false;
       try {
         await this.setState({ connectNetatmoStatus: STATUS.PROCESSING_TOKEN, errored: false });
-        const response = await this.props.httpClient.post('/api/v1/service/netatmo/retrieveTokens', {
+        const response = await this.props.httpClient.post('/api/v1/service/netatmo/token', {
           codeOAuth: this.props.code,
           redirectUri: this.state.redirectUriNetatmoSetup,
           state: this.props.state
@@ -70,7 +70,7 @@ class NetatmoSetupPage extends Component {
         }, 100);
       } catch (e) {
         console.error(e);
-        this.props.httpClient.post('/api/v1/service/netatmo/saveStatus', {
+        this.props.httpClient.post('/api/v1/service/netatmo/status', {
           statusType: STATUS.PROCESSING_TOKEN,
           message: 'other_error'
         });
@@ -83,7 +83,7 @@ class NetatmoSetupPage extends Component {
     e.preventDefault();
 
     try {
-      this.props.httpClient.post('/api/v1/service/netatmo/saveConfiguration', {
+      this.props.httpClient.post('/api/v1/service/netatmo/configuration', {
         clientId: this.state.netatmoClientId,
         clientSecret: this.state.netatmoClientSecret
       });
@@ -235,7 +235,7 @@ class NetatmoSetupPage extends Component {
 
   render(props, state, { loading }) {
     return (
-      <NetatmoPage {...props} state={state} updateStateInIndex={this.handleStateUpdateFromChild}>
+      <NetatmoPage {...props}>
         <SetupTab
           {...props}
           {...state}

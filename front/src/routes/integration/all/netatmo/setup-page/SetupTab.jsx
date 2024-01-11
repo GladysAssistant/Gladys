@@ -27,14 +27,12 @@ class SetupTab extends Component {
       });
     }
   }
-
   updateClientId = e => {
     this.props.updateStateInIndex({ netatmoClientId: e.target.value });
   };
   updateClientSecret = e => {
     this.props.updateStateInIndex({ netatmoClientSecret: e.target.value });
   };
-
   toggleClientSecret = () => {
     const { showClientSecret } = this.state;
 
@@ -73,6 +71,7 @@ class SetupTab extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
+              {console.log(props)}
               {props.accessDenied && (
                 <p class="text-center alert alert-warning">
                   <MarkupText id={`integration.netatmo.setup.errorConnecting.${props.messageAlert}`} />

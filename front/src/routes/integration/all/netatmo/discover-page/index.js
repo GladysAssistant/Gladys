@@ -19,10 +19,6 @@ class NetatmoDiscoverPage extends Component {
         errored: true
       });
       console.error(e);
-    } finally {
-      this.setState({
-        showConnect: true
-      });
     }
   };
 
@@ -35,15 +31,38 @@ class NetatmoDiscoverPage extends Component {
   updateStatusError = async state => {
     switch (state.statusType) {
       case STATUS.CONNECTING:
-        this.setState({
-          accessDenied: true,
-          messageAlert: state.status
-        });
+        if (state.status !== 'other_error') {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            accessDenied: true,
+            messageAlert: state.status
+          });
+        } else {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            errored: true
+          });
+        }
         break;
       case STATUS.PROCESSING_TOKEN:
-        this.setState({
-          connectNetatmoStatus: state.status
-        });
+        if (state.status === 'get_access_token_fail') {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            accessDenied: true,
+            messageAlert: state.status
+          });
+        } else if (state.status === 'invalid_client') {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            accessDenied: true,
+            messageAlert: state.status
+          });
+        } else {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            errored: true
+          });
+        }
         break;
     }
   };
@@ -53,7 +72,6 @@ class NetatmoDiscoverPage extends Component {
   };
 
   componentDidMount() {
-    // this.loadProps();
     this.loadStatus();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatusError);
@@ -74,9 +92,10 @@ class NetatmoDiscoverPage extends Component {
 
   render(props, state, { loading }) {
     return (
-      <NetatmoPage {...props} state={state} updateStateInIndex={this.handleStateUpdateFromChild}>
+      <NetatmoPage {...props}>
         <DiscoverTab
           {...props}
+          {...state}
           loading={loading}
           loadProps={this.loadProps}
           updateStateInIndex={this.handleStateUpdateFromChild}

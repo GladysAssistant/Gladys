@@ -8,6 +8,7 @@ import NetatmoDeviceBox from '../NetatmoDeviceBox';
 import { connect } from 'unistore/preact';
 import { Component } from 'preact';
 import { RequestStatus } from '../../../../../utils/consts';
+import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
 class DiscoverTab extends Component {
   async componentWillMount() {
@@ -40,7 +41,7 @@ class DiscoverTab extends Component {
       loading: true
     });
     try {
-      const discoveredDevices = await this.props.httpClient.get('/api/v1/service/netatmo/refreshDiscover');
+      const discoveredDevices = await this.props.httpClient.get('/api/v1/service/netatmo/device');
       this.setState({
         discoveredDevices,
         loading: false,
@@ -108,6 +109,35 @@ class DiscoverTab extends Component {
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.netatmoListBody)}>
+              {console.log(props)}
+              {!props.accessDenied &&
+                ((props.connectNetatmoStatus === STATUS.CONNECTING && (
+                  <p class="text-center alert alert-info">
+                    <Text id="integration.netatmo.setup.connecting" />
+                  </p>
+                )) ||
+                  (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
+                    <p class="text-center alert alert-warning">
+                      <Text id="integration.netatmo.setup.notConfigured" />
+                    </p>
+                  )) ||
+                  (props.connectNetatmoStatus === STATUS.PROCESSING_TOKEN && (
+                    <p class="text-center alert alert-warning">
+                      <Text id="integration.netatmo.setup.processingToken" />
+                    </p>
+                  )) ||
+                  (props.connectNetatmoStatus === STATUS.CONNECTED && (
+                    <p class="text-center alert alert-success">
+                      <Text id="integration.netatmo.setup.connect" />
+                    </p>
+                  )) ||
+                  (props.connectNetatmoStatus === STATUS.DISCONNECTED && (
+                    <p class="text-center alert alert-danger">
+                      <Text id="integration.netatmo.setup.disconnect" />
+                    </p>
+                  ))
+                )
+              }
               {errorLoading && (
                 <p class="alert alert-warning">
                   <Text id="integration.netatmo.status.notConnected" />
@@ -116,6 +146,7 @@ class DiscoverTab extends Component {
                   </Link>
                 </p>
               )}
+
               <div class="row">
                 {discoveredDevices &&
                   discoveredDevices.map((device, index) => (

@@ -179,7 +179,8 @@ class NetatmoDeviceBox extends Component {
     const sidDevice = device.external_id.replace('netatmo:', '') || (device.deviceNetatmo && device.deviceNetatmo.id);
     const saveButtonCondition =
       (saveButton && !alreadyCreatedButton) || (saveButton && !this.state.isSaving && alreadyCreatedButton);
-    const modelImage = `../../../../assets/integrations/devices/netatmo/netatmo-${device.model}.jpg`;
+
+    const modelImage = `/assets/integrations/devices/netatmo/netatmo-${device.model}.jpg`;
     return (
       <div class="col-md-6">
         <div class="card">
@@ -200,7 +201,6 @@ class NetatmoDeviceBox extends Component {
             )}
             {showMostRecentValueAt && batteryLevel && (
               <div class={styles['battery-level']}>
-                {/* "page-options d-flex" */}
                 <BatteryLevelFeature batteryLevel={batteryLevel} />
               </div>
             )}
