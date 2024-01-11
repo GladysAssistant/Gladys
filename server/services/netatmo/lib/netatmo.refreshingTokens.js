@@ -43,6 +43,13 @@ async function refreshingTokens() {
     logger.debug('Netatmo new access tokens well loaded with status: ', this.status);
     return { success: true };
   } catch (e) {
+    logger.error('Netatmo no successfull refresh token and disconnect');
+    const tokens = {
+      accessToken: '',
+      refreshToken: '',
+      expireIn: '',
+    };
+    await this.setTokens(tokens);
     this.saveStatus(this, { statusType: STATUS.ERROR.PROCESSING_TOKEN, message: 'refresh_token_fail' });
     logger.error('Error getting new accessToken to Netatmo - Details:', e.response ? e.response.data : e);
     throw new ServiceNotConfiguredError(`NETATMO: Service is not connected with error ${e}`);

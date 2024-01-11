@@ -4,18 +4,18 @@ const logger = require('../../../utils/logger');
 const { readValues } = require('./device/netatmo.deviceMapping');
 const { SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
 
+//  * @returns {Promise} Promise of nothing.
+
 /**
  *
- * @description Poll values of an Netatmo device.
- * @param {object} netatmoHandler - Of nothing.
- * @param {object} deviceGladys - Of nothing.
- * @param {object} deviceNetatmo - Of nothing.
- * @param {string} externalId - Of nothing.
- * @returns {Promise} Promise of nothing.
+ * @description Save values of an Netatmo device.
+ * @param {object} deviceGladys - Device object in Gladys.
+ * @param {object} deviceNetatmo - Device object coming from the Netatmo API.
+ * @param {string} externalId - Device identifier in gladys.
  * @example
- * updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externalId);
+ * updateValues(deviceGladys, deviceNetatmo, externalId);
  */
-async function updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externalId) {
+async function updateValues(deviceGladys, deviceNetatmo, externalId) {
   const [prefix, topic] = externalId.split(':');
   if (prefix !== 'netatmo') {
     throw new BadParameters(`Netatmo device external_id is invalid: "${externalId}" should starts with "netatmo:"`);
@@ -59,7 +59,7 @@ async function updateValues(netatmoHandler, deviceGladys, deviceNetatmo, externa
         deviceFeature.type !== DEVICE_FEATURE_TYPES.THERMOSTAT.TEXT
       ) {
         if (transformedValue !== null && transformedValue !== undefined && !Number.isNaN(transformedValue)) {
-          netatmoHandler.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
             device_feature_external_id: deviceFeature.external_id,
             state: transformedValue,
           });

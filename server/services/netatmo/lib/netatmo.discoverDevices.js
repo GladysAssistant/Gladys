@@ -5,42 +5,41 @@ const { convertDevice } = require('./device/netatmo.convertDevice');
 
 /**
  * @description Discover Netatmo cloud devices.
- * @param {object} netatmoHandler - Netatmo handler.
  * @returns {Promise} List of discovered devices;.
  * @example
- * await discoverDevices(netatmoHandler);
+ * await discoverDevices();
  */
-async function discoverDevices(netatmoHandler) {
+async function discoverDevices() {
   logger.debug('Looking for Netatmo devices...');
-  if (netatmoHandler.status !== STATUS.CONNECTED) {
-    netatmoHandler.saveStatus(netatmoHandler, { statusType: netatmoHandler.status, message: null });
+  if (this.status !== STATUS.CONNECTED) {
+    this.saveStatus({ statusType: this.status, message: null });
     throw new ServiceNotConfiguredError('Unable to discover Netatmo devices until service is not well configured');
   }
-  netatmoHandler.discoveredDevices = [];
-  await netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.DISCOVERING_DEVICES, message: null });
+  this.discoveredDevices = [];
+  await this.saveStatus({ statusType: STATUS.DISCOVERING_DEVICES, message: null });
 
   let devicesNetatmo = [];
   try {
-    devicesNetatmo = await netatmoHandler.loadDevices();
+    devicesNetatmo = await this.loadDevices();
     logger.info(`${devicesNetatmo.length} Netatmo devices found`);
   } catch (e) {
     logger.error('Unable to load Netatmo devices', e);
   }
   if (devicesNetatmo.length > 0) {
-    netatmoHandler.discoveredDevices = devicesNetatmo.map((device) => ({
+    this.discoveredDevices = devicesNetatmo.map((device) => ({
       ...convertDevice(device),
-      service_id: netatmoHandler.serviceId,
+      service_id: this.serviceId,
       deviceNetatmo: device,
     }));
-    const discoveredDevices = netatmoHandler.discoveredDevices.filter((device) => {
-      const existInGladys = netatmoHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
+    const discoveredDevices = this.discoveredDevices.filter((device) => {
+      const existInGladys = this.gladys.stateManager.get('deviceByExternalId', device.external_id);
       return existInGladys === null;
     });
-    netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED, message: null });
+    this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
     logger.debug(`${discoveredDevices.length} new Netatmo devices found`);
     return discoveredDevices;
   }
-  netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.CONNECTED, message: null });
+  this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
   logger.debug('No devices found');
   return [];
 }

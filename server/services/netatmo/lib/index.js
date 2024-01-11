@@ -1,46 +1,25 @@
 const { init } = require('./netatmo.init');
-const { connect, retrieveTokens } = require('./netatmo.connect');
+const { connect } = require('./netatmo.connect');
+const { retrieveTokens } = require('./netatmo.retrieveTokens');
 const { disconnect } = require('./netatmo.disconnect');
 const { setTokens } = require('./netatmo.setTokens');
-const { getAccessToken, getRefreshToken } = require('./netatmo.getTokens');
+const { getAccessToken } = require('./netatmo.getAccessToken');
+const { getRefreshToken } = require('./netatmo.getRefreshToken');
 const { refreshingTokens } = require('./netatmo.refreshingTokens');
 const { getConfiguration } = require('./netatmo.getConfiguration');
-const { getStatus, saveStatus } = require('./netatmo.status');
+const { getStatus } = require('./netatmo.getStatus');
+const { saveStatus } = require('./netatmo.saveStatus');
 const { saveConfiguration } = require('./netatmo.saveConfiguration');
 const { discoverDevices } = require('./netatmo.discoverDevices');
 const { loadDevices } = require('./netatmo.loadDevices');
 const { loadDeviceDetails } = require('./netatmo.loadDeviceDetails');
 const { loadThermostatDetails } = require('./netatmo.loadThermostatDetails');
-const { pollRefreshingValues, pollRefreshingToken } = require('./netatmo.poll');
+const { pollRefreshingValues } = require('./netatmo.pollRefreshingValues');
+const { pollRefreshingToken } = require('./netatmo.pollRefreshingTokens');
 const { setValue } = require('./netatmo.setValue');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
-
-/**
- *
- * @description Poll refreshing Token values of an Netatmo device.
- * @param {object} scopes - Scopes format.
- * @returns {object} ScopesString - Of nothing.
- * @example
- * buildScopesConfig({
- * ENERGY: {
- *   read: 'read_thermostat',
- *   write: 'write_thermostat',
- * }});
- */
-function buildScopesConfig(scopes) {
-  const scopesConfig = {};
-  Object.keys(scopes).forEach((key) => {
-    const words = key.toLowerCase().split('_');
-    const camelCaseKey = words
-      .map((word, index) => (index === 0 ? word : word.charAt(0).toUpperCase() + word.slice(1)))
-      .join('');
-    const scopeKey = `scope${camelCaseKey.charAt(0).toUpperCase() + camelCaseKey.slice(1)}`;
-    scopesConfig[scopeKey] = Object.values(scopes[key]).join(' ');
-  });
-
-  return scopesConfig;
-}
+const buildScopesConfig = require('./utils/netatmo.buildScopesConfig');
 
 const NetatmoHandler = function NetatmoHandler(gladys, serviceId) {
   this.gladys = gladys;

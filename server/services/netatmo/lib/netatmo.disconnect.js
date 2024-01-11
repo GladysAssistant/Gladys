@@ -3,20 +3,19 @@ const { STATUS } = require('./utils/netatmo.constants');
 
 /**
  * @description Disconnects service and dependencies.
- * @param {object} netatmoHandler - Netatmo handler.
  * @example
- * disconnect(netatmoHandler);
+ * disconnect();
  */
-function disconnect(netatmoHandler) {
+function disconnect() {
   logger.debug('Disonnecting from Netatmo...');
-  netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.DISCONNECTING, message: null });
+  this.saveStatus({ statusType: STATUS.DISCONNECTING, message: null });
   const tokens = {
     accessToken: '',
     refreshToken: '',
     expireIn: 0,
   };
-  netatmoHandler.setTokens(netatmoHandler, tokens);
-  netatmoHandler.saveStatus(netatmoHandler, { statusType: STATUS.DISCONNECTED, message: null });
+  this.setTokens(tokens);
+  this.saveStatus({ statusType: STATUS.DISCONNECTED, message: null });
   logger.debug('Netatmo disconnected');
 }
 
