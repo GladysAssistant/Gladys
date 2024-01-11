@@ -977,6 +977,10 @@
       "setup": {
         "title": "Configuration",
         "description": "You must connect Gladys to the MQTT broker to which your Z-Wave JS UI instance is connected. This integration is for users who already have Z-Wave devices. If you are starting your installation, we recommend using the Zigbee protocol.",
+        "zwaveJsUiConfigurationTitle": "Configure Z-Wave JS UI",
+        "zwaveJsUiConfigurationMqttDescription": "On the Z-Wave JS UI side, you need to fill in the \"Name\" field in \"MQTT\" with \"zwave-js-ui,\" otherwise, the prefix for some MQTT topics will be incorrect.",
+        "zwaveJsUiConfigurationGatewayDescription": "Next, please fill in the \"Gateway\" section with these exact parameters:",
+        "mqttConfigurationTitle": "Configure MQTT Server",
         "urlLabel": "Broker URL",
         "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
         "userLabel": "Username",

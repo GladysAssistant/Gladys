@@ -22,7 +22,7 @@ function handleNewMessage(topic, message) {
       this.onNewDeviceDiscover(parsedMessage);
     } else if (splittedTopic.length === 7) {
       // trying to match example: zwave/living-room/my-sensor/notification/endpoint_0/Access_Control/Door_state_simple
-      const [, location, zwaveDeviceName, comClassName, endpoint, property, propertyKey] = splittedTopic;
+      const [, , , comClassName, endpoint, property, propertyKey] = splittedTopic;
       const [, endpointNumber] = endpoint.split('_');
       const comClassNameClean = cleanNames(comClassName);
       const propertyClean = cleanNames(property);
@@ -34,8 +34,7 @@ function handleNewMessage(topic, message) {
       if (valueConverted !== undefined) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: getDeviceFeatureExternalId(
-            location,
-            zwaveDeviceName,
+            parsedMessage.nodeId,
             endpointNumber,
             comClassNameClean,
             propertyClean,

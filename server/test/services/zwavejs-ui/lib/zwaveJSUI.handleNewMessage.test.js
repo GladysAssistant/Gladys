@@ -42,10 +42,10 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage(
       'zwave/living-room/my-sensor/notification/endpoint_0/Access_Control/Door_state_simple',
-      '{"time":1702654592227,"value":22}',
+      '{"time":1702654592227,"value":22, "nodeId": 2}',
     );
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:living-room:my-sensor:0:notification:access_control:door_state_simple',
+      device_feature_external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
       state: 0,
     });
   });
@@ -53,10 +53,10 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
     await zwaveJSUIHandler.handleNewMessage(
       'zwave/living-room/my-sensor/notification/endpoint_0/Access_Control/Door_state_simple',
-      '{"time":1702654592227,"value":23}',
+      '{"time":1702654592227,"value":23, "nodeId": 2}',
     );
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:living-room:my-sensor:0:notification:access_control:door_state_simple',
+      device_feature_external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
       state: 1,
     });
   });
