@@ -40,14 +40,16 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
   });
   it('should save a new open value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
-    zwaveJSUIHandler.devices = [{
-      external_id: 'zwavejs-ui:2',
-      features: [
-        {
-          external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple'
-        }
-      ]
-    }];
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+          },
+        ],
+      },
+    ];
 
     await zwaveJSUIHandler.handleNewMessage(
       'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',
@@ -60,14 +62,16 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
   });
   it('should save a new closed value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
-    zwaveJSUIHandler.devices = [{
-      external_id: 'zwavejs-ui:2',
-      features: [
-        {
-          external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple'
-        }
-      ]
-    }];
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:2',
+        features: [
+          {
+            external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+          },
+        ],
+      },
+    ];
 
     await zwaveJSUIHandler.handleNewMessage(
       'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',

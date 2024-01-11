@@ -29,7 +29,7 @@ function getCommand(nodeFeature) {
  * getNode([{external_id: 'zwavejs-ui:3'}], 'zwavejs-ui:3')
  */
 function getNode(nodes, nodeId) {
-  return nodes.find(n => n.external_id === nodeId);
+  return nodes.find((n) => n.external_id === nodeId);
 }
 
 /**
@@ -39,12 +39,12 @@ function getNode(nodes, nodeId) {
  * @returns {object} The node feature if found.
  * @example
  * getNodeFeature({
- *  external_id: 'zwavejs-ui:3', 
+ *  external_id: 'zwavejs-ui:3',
  *  features: [{external_id: 'zwavejs-ui:3-113-0-23-7'}]
  * }, 'zwavejs-ui:3-11-0-23-7')
  */
 function getNodeFeature(node, nodeFeatureId) {
-  return node.features.find(f => f.external_id === nodeFeatureId);
+  return node.features.find((f) => f.external_id === nodeFeatureId);
 }
 
 /**
@@ -64,16 +64,12 @@ function setValue(device, deviceFeature, value) {
 
   const node = getNode(this.devices, device.external_id);
   if (!node) {
-    throw new BadParameters(
-      `ZWaveJs-UI node not found: "${device.external_id}".`,
-    );
+    throw new BadParameters(`ZWaveJs-UI node not found: "${device.external_id}".`);
   }
 
   const nodeFeature = getNodeFeature(node, deviceFeature.external_id);
   if (!nodeFeature) {
-    throw new BadParameters(
-      `ZWaveJs-UI feature not found: "${deviceFeature.external_id}".`,
-    );
+    throw new BadParameters(`ZWaveJs-UI feature not found: "${deviceFeature.external_id}".`);
   }
 
   const command = getCommand(nodeFeature);
@@ -84,15 +80,16 @@ function setValue(device, deviceFeature, value) {
 
   // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=send-command
   // https://zwave-js.github.io/zwave-js-ui/#/guide/mqtt?id=sendcommand
-  const mqttPayload = { 
-    args:[{
-      nodeId: nodeFeature.node_id,
-      commandClass: nodeFeature.command_class,
-      endpoint: nodeFeature.endpoint,
-    },
-    command.getName(nodeFeature),
-    command.getArgs(value, nodeFeature)
-    ] 
+  const mqttPayload = {
+    args: [
+      {
+        nodeId: nodeFeature.node_id,
+        commandClass: nodeFeature.command_class,
+        endpoint: nodeFeature.endpoint,
+      },
+      command.getName(nodeFeature),
+      command.getArgs(value, nodeFeature),
+    ],
   };
   this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
 }

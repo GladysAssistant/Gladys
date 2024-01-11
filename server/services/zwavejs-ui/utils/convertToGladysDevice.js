@@ -15,7 +15,9 @@ const cleanNames = (text) => {
 
 const getDeviceFeatureId = (nodeId, commandClass, endpoint, property, propertyKey) => {
   const propertyKeyClean = cleanNames(propertyKey);
-  return `zwavejs-ui:${nodeId}-${commandClass}-${endpoint}-${cleanNames(property)}${propertyKeyClean !== '' ? `-${propertyKeyClean}` : ''}`;
+  return `zwavejs-ui:${nodeId}-${commandClass}-${endpoint}-${cleanNames(property)}${
+    propertyKeyClean !== '' ? `-${propertyKeyClean}` : ''
+  }`;
 };
 
 const convertToGladysDevice = (serviceId, device) => {
