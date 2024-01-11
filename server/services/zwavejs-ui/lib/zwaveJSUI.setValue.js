@@ -1,18 +1,20 @@
 const get = require('get-value');
 const { BadParameters } = require('../../../utils/coreErrors');
 const { COMMANDS } = require('./constants');
+const { cleanNames } = require('../utils/convertToGladysDevice');
 
 /**
  * @description Returns the command wrapper.
  * @param {object} nodeFeature - The feature.
  * @returns {object} The Command Class command.
  * @example
- * getCommand({command_class_name: 'notification', property: 'home_security', property_key: 'cover_status'})
+ * getCommand({command_class_name: 'Notification', property: 'Home Security', property_key: 'Cover Status'})
  */
 function getCommand(nodeFeature) {
-  let commandPath = `${nodeFeature.command_class_name}.${nodeFeature.property}`;
-  if (nodeFeature.property_key !== '') {
-    commandPath += `.${nodeFeature.property_key}`;
+  let commandPath = `${cleanNames(nodeFeature.command_class_name)}.${cleanNames(nodeFeature.property)}`;
+  const propertyKeyClean = cleanNames(nodeFeature.property_key);
+  if (propertyKeyClean !== '') {
+    commandPath += `.${propertyKeyClean}`;
   }
 
   return get(COMMANDS, commandPath);

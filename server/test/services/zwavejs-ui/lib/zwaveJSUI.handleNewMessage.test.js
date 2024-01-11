@@ -40,23 +40,41 @@ describe('zwaveJSUIHandler.handleNewMessage', () => {
   });
   it('should save a new open value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [{
+      external_id: 'zwavejs-ui:2',
+      features: [
+        {
+          external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple'
+        }
+      ]
+    }];
+
     await zwaveJSUIHandler.handleNewMessage(
       'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',
       '{"data": [{"id":2}, {"commandClassName": "Notification","commandClass": 113,"property": "Access Control","endpoint": 0,"newValue": 22,"prevValue": 23,"propertyName": "Access Control", "propertyKey": "Door state (simple)"}]}',
     );
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:2:113:0:access_control:door_state_simple',
+      device_feature_external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
       state: 0,
     });
   });
   it('should save a new closed value', async () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [{
+      external_id: 'zwavejs-ui:2',
+      features: [
+        {
+          external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple'
+        }
+      ]
+    }];
+
     await zwaveJSUIHandler.handleNewMessage(
       'zwave/_EVENTS/ZWAVE_GATEWAY-zwave-js-ui/node/node_value_updated',
       '{"data": [{"id": 2}, {"commandClassName": "Notification","commandClass": 113,"property": "Access Control","endpoint": 0,"newValue": 23,"prevValue": 22,"propertyName": "Access Control", "propertyKey": "Door state (simple)"}]}',
     );
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:2:113:0:access_control:door_state_simple',
+      device_feature_external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
       state: 1,
     });
   });
