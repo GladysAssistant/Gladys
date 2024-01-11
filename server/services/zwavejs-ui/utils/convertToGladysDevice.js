@@ -13,6 +13,11 @@ const cleanNames = (text) => {
     .toLowerCase();
 };
 
+const getDeviceFeatureId = (nodeId, commandClass, endpoint, property, propertyKey) => {
+  const propertyKeyClean = cleanNames(propertyKey);
+  return `zwavejs-ui:${nodeId}-${commandClass}-${endpoint}-${cleanNames(property)}${propertyKeyClean !== '' ? `-${propertyKeyClean}` : ''}`;
+};
+
 const convertToGladysDevice = (serviceId, device) => {
   const features = [];
 
@@ -32,15 +37,15 @@ const convertToGladysDevice = (serviceId, device) => {
       features.push({
         ...exposeFound,
         name: value.id,
-        external_id: `zwavejs-ui:${value.id}`,
+        external_id: getDeviceFeatureId(device.id, commandClass, endpoint, property, propertyKey),
         node_id: device.id,
         // These are custom properties only available on the object in memory (not in DB)
         command_class_version: commandClassVersion,
-        command_class_name: commandClassNameClean,
+        command_class_name: commandClassName,
         command_class: commandClass,
         endpoint,
-        property: propertyClean,
-        property_key: propertyKeyClean,
+        property,
+        property_key: propertyKey,
       });
     }
   });
@@ -56,5 +61,6 @@ const convertToGladysDevice = (serviceId, device) => {
 
 module.exports = {
   cleanNames,
+  getDeviceFeatureId,
   convertToGladysDevice,
 };
