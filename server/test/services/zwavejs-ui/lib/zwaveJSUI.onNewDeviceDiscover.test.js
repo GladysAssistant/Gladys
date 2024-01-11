@@ -53,7 +53,7 @@ describe('zwaveJSUIHandler.onNewDeviceDiscover.js', () => {
             external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
             node_id: 2,
             property: 'Access Control',
-            property_key: 'Door state (simple)'
+            property_key: 'Door state (simple)',
           },
         ],
       },

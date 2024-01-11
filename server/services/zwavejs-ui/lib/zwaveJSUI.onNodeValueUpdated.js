@@ -20,25 +20,16 @@ function onNodeValueUpdated(message) {
   if (propertyKeyClean !== '') {
     statePath += `.${propertyKeyClean}`;
   }
-  const valueConverted = get(
-    STATES,
-    `${statePath}.${newValue}`,
-  );
+  const valueConverted = get(STATES, `${statePath}.${newValue}`);
 
   const nodeId = `zwavejs-ui:${messageNode.id}`;
-  const node = this.devices.find(n => n.external_id === nodeId);
+  const node = this.devices.find((n) => n.external_id === nodeId);
   if (!node) {
     return;
   }
 
-  const featureId = getDeviceFeatureId(
-    messageNode.id,
-    commandClass,
-    endpoint,
-    property,
-    propertyKey,
-  );
-  const nodeFeature = node.features.find(f => f.external_id === featureId);
+  const featureId = getDeviceFeatureId(messageNode.id, commandClass, endpoint, property, propertyKey);
+  const nodeFeature = node.features.find((f) => f.external_id === featureId);
   if (!nodeFeature) {
     return;
   }
