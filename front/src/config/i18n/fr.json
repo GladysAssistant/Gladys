@@ -1090,6 +1090,7 @@
       "saveButton": "Sauvegarder",
       "alreadyCreatedButton": "Déjà créé",
       "deleteButton": "Supprimer",
+      "alphaWarning": "Cette intégration est une alpha et ne gère pour l'instant qu'un seul appareil: Le capteur d'ouverture de porte Fibaro. Nous sommes preneur de toute aide pour intégrer d'autres appareils !",
       "device": {
         "title": "Appareils Z-Wave JS UI dans Gladys",
         "editButton": "Editer",

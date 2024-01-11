@@ -103,6 +103,9 @@ class DeviceTab extends Component {
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.zwaveJSUIListBody)}>
+              <div class="alert alert-warning">
+                <Text id="integration.zwavejs-ui.alphaWarning" />
+              </div>
               <div class="row">
                 {zwaveJSUIDevices &&
                   zwaveJSUIDevices.length > 0 &&

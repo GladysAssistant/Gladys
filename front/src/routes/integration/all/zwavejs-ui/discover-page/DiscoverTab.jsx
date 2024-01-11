@@ -72,6 +72,9 @@ class DiscoverTab extends Component {
           </div>
         </div>
         <div class="card-body">
+          <div class="alert alert-warning">
+            <Text id="integration.zwavejs-ui.alphaWarning" />
+          </div>
           <div class="alert alert-secondary">
             <Text id="integration.zwavejs-ui.discover.description" />
           </div>
