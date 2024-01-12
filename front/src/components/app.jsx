@@ -143,6 +143,11 @@ import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 import SonosDevicePage from '../routes/integration/all/sonos/device-page';
 import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
 
+// ZWaveJS-UI integration
+import ZwaveJSUIDevicePage from '../routes/integration/all/zwavejs-ui/device-page';
+import ZwaveJSUIDiscoveryPage from '../routes/integration/all/zwavejs-ui/discover-page';
+import ZwaveJSUISetupPage from '../routes/integration/all/zwavejs-ui/setup-page';
+
 // MELCloud integration
 import MELCloudPage from '../routes/integration/all/melcloud/device-page';
 import MELCloudEditPage from '../routes/integration/all/melcloud/edit-page';
@@ -281,6 +286,10 @@ const AppRouter = connect(
 
         <SonosDevicePage path="/dashboard/integration/device/sonos" />
         <SonosDiscoveryPage path="/dashboard/integration/device/sonos/discover" />
+
+        <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwavejs-ui" />
+        <ZwaveJSUIDiscoveryPage path="/dashboard/integration/device/zwavejs-ui/discover" />
+        <ZwaveJSUISetupPage path="/dashboard/integration/device/zwavejs-ui/setup" />
 
         <MELCloudPage path="/dashboard/integration/device/melcloud" />
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />
