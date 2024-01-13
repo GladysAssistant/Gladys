@@ -1,0 +1,132 @@
+{
+    "homeassistant/lock/nuki_398172F4_lock/config" : {
+        "~": "nuki/398172F4",
+        "avty_t": "~/connected",
+        "pl_avail": "true",
+        "pl_not_avail": "false",
+        "dev": {
+            "ids": "[398172F4]",
+            "mf": "Nuki",
+            "name": "Maison",
+            "mdl": "Smart Lock 3.0 Pro"
+        },
+        "name": "Maison",
+        "uniq_id": "398172F4_lock",
+        "cmd_t": "~/lockAction",
+        "pl_lock": "2",
+        "pl_unlk": "1",
+        "pl_open": "3",
+        "stat_t": "~/state",
+        "stat_locked": "1",
+        "stat_locking": "4",
+        "stat_unlocked": "3",
+        "stat_unlocking": "2",
+        "stat_jam": "254",
+        "val_tpl": "{% if value in (\"5\",\"6\",\"7\") %}3{% else %}{{value}}{% endif %}"
+    },
+    "homeassistant/binary_sensor/nuki_398172F4_lock_battery_critical/config" : {
+        "~": "nuki/398172F4",
+        "avty_t": "~/connected",
+        "pl_avail": "true",
+        "pl_not_avail": "false",
+        "dev": {
+            "ids": "[398172F4]",
+            "mf": "Nuki",
+            "name": "Maison",
+            "mdl": "Smart Lock 3.0 Pro"
+        },
+        "name": "Maison Battery critical",
+        "uniq_id": "398172F4_lock_battery_critical",
+        "dev_cla": "battery",
+        "ent_cat": "diagnostic",
+        "stat_t": "~/batteryCritical",
+        "pl_off": "false",
+        "pl_on": "true"
+    },
+    "homeassistant/binary_sensor/nuki_398172F4_battery_charging/config": {
+        "~": "nuki/398172F4",
+        "avty_t": "~/connected",
+        "pl_avail": "true",
+        "pl_not_avail": "false",
+        "dev": {
+            "ids": "[398172F4]",
+            "mf": "Nuki",
+            "name": "Maison",
+            "mdl": "Smart Lock 3.0 Pro"
+        },
+        "name": "Maison Battery charging",
+        "uniq_id": "398172F4_battery_charging",
+        "dev_cla": "battery_charging",
+        "ent_cat": "diagnostic",
+        "stat_t": "~/batteryCharging",
+        "pl_off": "false",
+        "pl_on": "true"
+    },
+    "homeassistant/sensor/nuki_398172F4_battery_percent/config": {
+        "~": "nuki/398172F4",
+        "avty_t": "~/connected",
+        "pl_avail": "true",
+        "pl_not_avail": "false",
+        "dev": {
+            "ids": "[398172F4]",
+            "mf": "Nuki",
+            "name": "Maison",
+            "mdl": "Smart Lock 3.0 Pro"
+        },
+        "name": "Maison Battery",
+        "uniq_id": "398172F4_lock_battery_percent",
+        "dev_cla": "battery",
+        "ent_cat": "diagnostic",
+        "stat_t": "~/batteryChargeState",
+        "stat_cla": "measurement",
+        "unit_of_meas": "%"
+    },
+    "homeassistant/button/nuki_398172F4_unlatch_button/config": {
+        "~": "nuki/398172F4",
+        "avty_t": "~/connected",
+        "pl_avail": "true",
+        "pl_not_avail": "false",
+        "dev": {
+            "ids": "[398172F4]",
+            "mf": "Nuki",
+            "name": "Maison",
+            "mdl": "Smart Lock 3.0 Pro"
+        },
+        "name": "Maison Unlatch",
+        "uniq_id": "398172F4_unlatch_button",
+        "cmd_t": "~/lockAction",
+        "pl_prs": "3"
+    },
+    "homeassistant/button/nuki_398172F4_lockngo_button/config": {
+        "~": "nuki/398172F4",
+        "avty_t": "~/connected",
+        "pl_avail": "true",
+        "pl_not_avail": "false",
+        "dev": {
+            "ids": "[398172F4]",
+            "mf": "Nuki",
+            "name": "Maison",
+            "mdl": "Smart Lock 3.0 Pro"
+        },
+        "name": "Maison Lock 'n' Go",
+        "uniq_id": "398172F4_lock_n_go_button",
+        "cmd_t": "~/lockAction",
+        "pl_prs": "4"
+    },
+    "homeassistant/button/nuki_398172F4_lock_n_go_unlatch/config": {
+        "~": "nuki/398172F4",
+        "avty_t": "~/connected",
+        "pl_avail": "true",
+        "pl_not_avail": "false",
+        "dev": {
+            "ids": "[398172F4]",
+            "mf": "Nuki",
+            "name": "Maison",
+            "mdl": "Smart Lock 3.0 Pro"
+        },
+        "name": "Maison Lock 'n' Go with unlatch",
+        "uniq_id": "398172F4_lock_n_go_unlatch_button",
+        "cmd_t": "~/lockAction",
+        "pl_prs": "5"
+    },
+}
