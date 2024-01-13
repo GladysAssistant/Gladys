@@ -130,6 +130,10 @@ import EweLinkEditPage from '../routes/integration/all/ewelink/edit-page';
 import EweLinkDiscoverPage from '../routes/integration/all/ewelink/discover-page';
 import EweLinkSetupPage from '../routes/integration/all/ewelink/setup-page';
 
+// Nuki
+import NukiPage from '../routes/integration/all/nuki';
+import NukiSetupPage from '../routes/integration/all/nuki/setup-page';
+
 // OpenAI integration
 import OpenAIPage from '../routes/integration/all/openai/index';
 
@@ -287,6 +291,9 @@ const AppRouter = connect(
         <MELCloudDiscoverPage path="/dashboard/integration/device/melcloud/discover" />
         <MELCloudSetupPage path="/dashboard/integration/device/melcloud/setup" />
 
+        <NukiPage path="/dashboard/integration/device/nuki" />
+        <NukiSetupPage path="/dashboard/integration/device/nuki/setup" />
+        
         <BluetoothDevicePage path="/dashboard/integration/device/bluetooth" />
         <BluetoothEditDevicePage path="/dashboard/integration/device/bluetooth/:deviceSelector" />
         <BluetoothSetupPage path="/dashboard/integration/device/bluetooth/setup" />
