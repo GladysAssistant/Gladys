@@ -961,7 +961,7 @@
       "saveButton": "Save",
       "alreadyCreatedButton": "Already Created",
       "deleteButton": "Delete",
-      "alphaWarning": "This integration is in alpha and currently only supports one device: The Fibaro Door/Window sensor. We welcome any assistance to integrate other devices!",
+      "alphaWarning": "This integration is in alpha and currently only supports few devices. We welcome any assistance to integrate other devices!",
       "device": {
         "title": "Z-Wave JS UI Devices in Gladys",
         "editButton": "Edit",
