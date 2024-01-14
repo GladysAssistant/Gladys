@@ -71,7 +71,6 @@ class SetupTab extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {console.log(props)}
               {props.accessDenied && (
                 <p class="text-center alert alert-warning">
                   <MarkupText id={`integration.netatmo.setup.errorConnecting.${props.messageAlert}`} />
@@ -173,33 +172,25 @@ class SetupTab extends Component {
                     </span>
                   </div>
                 </div>
+                <div class="form-group">
+                  <label htmlFor="netatmoSetupConnectionInfo" className="form-label">
+                    <Text id="integration.netatmo.setup.connectionInfoLabel" />
+                  </label>
+                </div>
                 {props.notOnGladysGateway && (
                   <div class={style.buttonGroup}>
                     <Localizer>
-                      <button
-                        type="submit"
-                        class={`btn btn-success ${style.btnTextLineSpacing}`}
-                        onClick={props.saveConfiguration}
-                      >
+                      <button type="submit" class={`btn btn-success`} onClick={props.saveConfiguration}>
                         <Text id="integration.netatmo.setup.saveLabel" />
-                        <br />
-                        {props.connectNetatmoStatus !== STATUS.CONNECTED && (
-                          <Text id="integration.netatmo.setup.connectLabel" />
-                        )}
-                        {props.connectNetatmoStatus === STATUS.CONNECTED && (
-                          <Text id="integration.netatmo.setup.reconnectLabel" />
-                        )}
                       </button>
                     </Localizer>
                     {props.notOnGladysGateway && props.connectNetatmoStatus === STATUS.CONNECTED && (
                       <button
                         onClick={this.disconnectNetatmo.bind(this)}
-                        class={`btn btn-danger ${style.btnTextLineSpacing}`}
+                        class={`btn btn-danger`}
                         disabled={props.connectNetatmoStatus === STATUS.DISCONNECTING}
                       >
                         <Text id="integration.netatmo.setup.disconnectLabel" />
-                        <br />
-                        <Text id="integration.netatmo.setup.disconnectInformationLabel" />
                       </button>
                     )}
                   </div>

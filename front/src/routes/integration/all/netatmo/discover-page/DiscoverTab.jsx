@@ -36,25 +36,6 @@ class DiscoverTab extends Component {
     }
   }
 
-  async getRefreshDiscovered() {
-    this.setState({
-      loading: true
-    });
-    try {
-      const discoveredDevices = await this.props.httpClient.get('/api/v1/service/netatmo/device');
-      this.setState({
-        discoveredDevices,
-        loading: false,
-        errorLoading: false
-      });
-    } catch (e) {
-      this.setState({
-        loading: false,
-        errorLoading: true
-      });
-    }
-  }
-
   async getDiscoveredDevices() {
     this.setState({
       loading: true
@@ -68,6 +49,7 @@ class DiscoverTab extends Component {
       });
     } catch (e) {
       this.setState({
+        discoveredDevices: [],
         loading: false,
         errorLoading: true
       });
@@ -83,7 +65,7 @@ class DiscoverTab extends Component {
           </h1>
           <div class="page-options d-flex">
             <button
-              onClick={this.getRefreshDiscovered.bind(this)}
+              onClick={this.getDiscoveredDevices.bind(this)}
               class="btn btn-outline-primary ml-2"
               disabled={loading}
             >
@@ -94,6 +76,32 @@ class DiscoverTab extends Component {
           </div>
         </div>
         <div class="card-body">
+          {!props.accessDenied &&
+            ((props.connectNetatmoStatus === STATUS.CONNECTING && (
+              <p class="text-center alert alert-info">
+                <Text id="integration.netatmo.setup.connecting" />
+              </p>
+            )) ||
+              (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
+                <p class="text-center alert alert-warning">
+                  <Text id="integration.netatmo.setup.notConfigured" />
+                </p>
+              )) ||
+              (props.connectNetatmoStatus === STATUS.PROCESSING_TOKEN && (
+                <p class="text-center alert alert-warning">
+                  <Text id="integration.netatmo.setup.processingToken" />
+                </p>
+              )) ||
+              (props.connectNetatmoStatus === STATUS.CONNECTED && (
+                <p class="text-center alert alert-success">
+                  <Text id="integration.netatmo.setup.connect" />
+                </p>
+              )) ||
+              (props.connectNetatmoStatus === STATUS.DISCONNECTED && (
+                <p class="text-center alert alert-danger">
+                  <Text id="integration.netatmo.setup.disconnect" />
+                </p>
+              )))}
           <div class="alert alert-secondary">
             <p>
               <Text id="integration.netatmo.discover.description" />
@@ -109,35 +117,6 @@ class DiscoverTab extends Component {
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.netatmoListBody)}>
-              {console.log(props)}
-              {!props.accessDenied &&
-                ((props.connectNetatmoStatus === STATUS.CONNECTING && (
-                  <p class="text-center alert alert-info">
-                    <Text id="integration.netatmo.setup.connecting" />
-                  </p>
-                )) ||
-                  (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
-                    <p class="text-center alert alert-warning">
-                      <Text id="integration.netatmo.setup.notConfigured" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.PROCESSING_TOKEN && (
-                    <p class="text-center alert alert-warning">
-                      <Text id="integration.netatmo.setup.processingToken" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.CONNECTED && (
-                    <p class="text-center alert alert-success">
-                      <Text id="integration.netatmo.setup.connect" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.DISCONNECTED && (
-                    <p class="text-center alert alert-danger">
-                      <Text id="integration.netatmo.setup.disconnect" />
-                    </p>
-                  ))
-                )
-              }
               {errorLoading && (
                 <p class="alert alert-warning">
                   <Text id="integration.netatmo.status.notConnected" />

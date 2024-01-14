@@ -38,6 +38,11 @@ class NetatmoSetupPage extends Component {
           statusType: STATUS.ERROR.CONNECTING,
           message: this.props.error
         });
+        await this.setState({
+          connectNetatmoStatus: STATUS.DISCONNECTED,
+          accessDenied: true,
+          messageAlert: this.props.error
+        });
       } else {
         this.props.httpClient.post('/api/v1/service/netatmo/status', {
           statusType: STATUS.ERROR.CONNECTING,

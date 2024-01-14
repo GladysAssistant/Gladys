@@ -560,11 +560,9 @@
         "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
         "clientSecretLabel": "Client Secret",
         "clientSecretPlaceholder": "Client secret from My Apps in Netatmo Connect",
-        "saveLabel": "Save Configuration",
-        "connectLabel": "and connect to Netatmo",
-        "reconnectLabel": "and reconnect to Netatmo",
+        "saveLabel": "Save and connect",
+        "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Netatmo API when you click on these buttons.",
         "disconnectLabel": "Disconnect",
-        "disconnectInformationLabel": "(Removes Gladys's Access)",
         "description": "You can connect Gladys to your Netatmo account to control the associated devices.",
         "descriptionCreateAccount": "You need to create an account on <a href=\"https://auth.netatmo.com/en-us/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionCreateProject": "You will then need to create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
@@ -575,7 +573,7 @@
         "errorConnecting": {
           "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
           "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
-          "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+          "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled on <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
           "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
         },
         "notConfigured": "The Netatmo service is not configured",

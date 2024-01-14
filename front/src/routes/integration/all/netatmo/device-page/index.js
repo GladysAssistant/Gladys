@@ -53,7 +53,6 @@ class DevicePage extends Component {
   };
 
   componentDidMount() {
-    // this.loadProps();
     this.loadStatus();
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.STATUS, this.updateStatus);
     this.props.session.dispatcher.addListener(WEBSOCKET_MESSAGE_TYPES.NETATMO.ERROR.CONNECTING, this.updateStatusError);
@@ -74,9 +73,10 @@ class DevicePage extends Component {
 
   render(props, state, { loading }) {
     return (
-      <NetatmoPage {...props} state={state} updateStateInIndex={this.handleStateUpdateFromChild}>
+      <NetatmoPage {...props}>
         <DeviceTab
           {...props}
+          {...state}
           loading={loading}
           loadProps={this.loadProps}
           updateStateInIndex={this.handleStateUpdateFromChild}
