@@ -53,7 +53,7 @@ const NetatmoHandlerMock = {
   loadDevices: sinon.stub().resolves(devicesMock),
   loadDeviceDetails: sinon.stub().resolves(deviceDetailsMock),
   loadThermostatDetails: sinon.stub().resolves(thermostatsDetailsMock),
-  pollRefreshingValues: sinon.stub().resolves(),
+  pollRefreshingValuess: sinon.stub().resolves(),
   pollRefreshingToken: sinon.stub().resolves(),
   setValue: sinon.stub().resolves(),
   updateValues: sinon.stub().resolves(),

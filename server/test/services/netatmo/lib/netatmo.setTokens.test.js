@@ -1,17 +1,19 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const { setTokens } = require('../../../../services/netatmo/lib/netatmo.setTokens');
-const { NetatmoHandlerMock } = require('../netatmo.mock.test');
+
+const NetatmoHandler = require('../../../../services/netatmo/lib/index');
+
+const gladys = {
+  variable: {
+    setValue: sinon.stub().resolves(),
+  },
+};
+const serviceId = 'serviceId';
+const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 describe('Netatmo Set Token', () => {
   beforeEach(() => {
     sinon.reset();
-
-    NetatmoHandlerMock.gladys = {
-      variable: {
-        setValue: sinon.stub().resolves(),
-      },
-    };
   });
 
   afterEach(() => {
@@ -25,29 +27,29 @@ describe('Netatmo Set Token', () => {
       expireIn: 3600,
     };
 
-    const result = await setTokens(NetatmoHandlerMock, testTokens);
+    const result = await netatmoHandler.setTokens(testTokens);
 
     expect(result).to.equal(true);
-    expect(NetatmoHandlerMock.accessToken).to.equal('new-access-token');
-    expect(NetatmoHandlerMock.refreshToken).to.equal('new-refresh-token');
-    expect(NetatmoHandlerMock.expireInToken).to.equal(3600);
+    expect(netatmoHandler.accessToken).to.equal('new-access-token');
+    expect(netatmoHandler.refreshToken).to.equal('new-refresh-token');
+    expect(netatmoHandler.expireInToken).to.equal(3600);
     sinon.assert.calledWith(
-      NetatmoHandlerMock.gladys.variable.setValue,
+      netatmoHandler.gladys.variable.setValue,
       'NETATMO_ACCESS_TOKEN',
       'new-access-token',
-      NetatmoHandlerMock.serviceId,
+      netatmoHandler.serviceId,
     );
     sinon.assert.calledWith(
-      NetatmoHandlerMock.gladys.variable.setValue,
+      netatmoHandler.gladys.variable.setValue,
       'NETATMO_REFRESH_TOKEN',
       'new-refresh-token',
-      NetatmoHandlerMock.serviceId,
+      netatmoHandler.serviceId,
     );
     sinon.assert.calledWith(
-      NetatmoHandlerMock.gladys.variable.setValue,
+      netatmoHandler.gladys.variable.setValue,
       'NETATMO_EXPIRE_IN_TOKEN',
       3600,
-      NetatmoHandlerMock.serviceId,
+      netatmoHandler.serviceId,
     );
   });
 
@@ -58,30 +60,30 @@ describe('Netatmo Set Token', () => {
       expireIn: 3600,
     };
 
-    NetatmoHandlerMock.gladys.variable.setValue
+    netatmoHandler.gladys.variable.setValue
       .withArgs('NETATMO_REFRESH_TOKEN', sinon.match.any)
       .throws(new Error('Failed to save'));
 
-    const result = await setTokens(NetatmoHandlerMock, testTokens);
+    const result = await netatmoHandler.setTokens(testTokens);
 
     expect(result).to.equal(false);
     sinon.assert.calledWith(
-      NetatmoHandlerMock.gladys.variable.setValue,
+      netatmoHandler.gladys.variable.setValue,
       'NETATMO_ACCESS_TOKEN',
       'new-access-token',
-      NetatmoHandlerMock.serviceId,
+      netatmoHandler.serviceId,
     );
     sinon.assert.calledWith(
-      NetatmoHandlerMock.gladys.variable.setValue,
+      netatmoHandler.gladys.variable.setValue,
       'NETATMO_REFRESH_TOKEN',
       'new-refresh-token',
-      NetatmoHandlerMock.serviceId,
+      netatmoHandler.serviceId,
     );
     sinon.assert.neverCalledWith(
-      NetatmoHandlerMock.gladys.variable.setValue,
+      netatmoHandler.gladys.variable.setValue,
       'NETATMO_EXPIRE_IN_TOKEN',
       3600,
-      NetatmoHandlerMock.serviceId,
+      netatmoHandler.serviceId,
     );
   });
 });

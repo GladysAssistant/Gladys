@@ -52,7 +52,8 @@ module.exports = function NetatmoController(netatmoHandler) {
    */
   async function connect(req, res) {
     await netatmoHandler.getConfiguration();
-    res.json(await netatmoHandler.connect());
+    const result = await netatmoHandler.connect();
+    res.json(result);
   }
 
   /**
@@ -62,7 +63,8 @@ module.exports = function NetatmoController(netatmoHandler) {
    */
   async function retrieveTokens(req, res) {
     await netatmoHandler.getConfiguration();
-    res.json(await netatmoHandler.retrieveTokens(req.body));
+    const result = await netatmoHandler.retrieveTokens(req.body);
+    res.json(result);
   }
 
   /**
@@ -78,7 +80,7 @@ module.exports = function NetatmoController(netatmoHandler) {
   }
 
   /**
-   * @api {get} /api/v1/service/netatmo/discover Retrieve netatmo devices from API.
+   * @api {get} /api/v1/service/netatmo/discover Discover netatmo devices from API.
    * @apiName discover
    * @apiGroup Netatmo
    */
@@ -92,16 +94,6 @@ module.exports = function NetatmoController(netatmoHandler) {
         return existInGladys === null;
       });
     }
-    res.json(devices);
-  }
-
-  /**
-   * @api {get} /api/v1/service/netatmo/device Retrieve netatmo devices from API.
-   * @apiName refreshDiscover
-   * @apiGroup Netatmo
-   */
-  async function refreshDiscover(req, res) {
-    const devices = await netatmoHandler.discoverDevices();
     res.json(devices);
   }
 
@@ -137,10 +129,6 @@ module.exports = function NetatmoController(netatmoHandler) {
     'get /api/v1/service/netatmo/discover': {
       authenticated: true,
       controller: asyncMiddleware(discover),
-    },
-    'get /api/v1/service/netatmo/device': {
-      authenticated: true,
-      controller: asyncMiddleware(refreshDiscover),
     },
   };
 };

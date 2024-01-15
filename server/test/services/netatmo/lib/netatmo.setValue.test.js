@@ -1,33 +1,33 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
-const EventEmitter = require('events');
-const { setValue } = require('../../../../services/netatmo/lib/netatmo.setValue');
-const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
-const { NetatmoHandlerMock } = require('../netatmo.mock.test');
+
+const { fake } = sinon;
+
 const devicesMock = require('../netatmo.convertDevices.mock.test.json');
 const { EVENTS } = require('../../../../utils/constants');
 const { BadParameters } = require('../../../../utils/coreErrors');
+const NetatmoHandler = require('../../../../services/netatmo/lib/index');
+
+const gladys = {
+  event: {
+    emit: fake.resolves(null),
+  },
+  variable: {
+    setValue: fake.resolves(null),
+  },
+};
+const serviceId = 'serviceId';
+const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const [deviceMock] = devicesMock.filter((device) => device.model === 'NATherm1');
 
 describe('Netatmo Set Value', () => {
-  let eventEmitter;
-  const [deviceMock] = devicesMock.filter((device) => device.model === 'NATherm1');
   beforeEach(() => {
     sinon.reset();
     nock.cleanAll();
 
-    eventEmitter = new EventEmitter();
-    NetatmoHandlerMock.status = 'connected';
-    NetatmoHandlerMock.gladys = {
-      variable: {
-        setValue: sinon.stub().resolves(),
-      },
-      event: eventEmitter,
-    };
-    sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
-
-    NetatmoHandlerMock.accessToken = 'testAccessToken';
-    NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
+    netatmoHandler.status = 'connected';
+    netatmoHandler.accessToken = 'valid_access_token';
   });
 
   afterEach(() => {
@@ -45,7 +45,7 @@ describe('Netatmo Set Value', () => {
       .post('/api/setroomthermpoint')
       .reply(200, {});
 
-    await setValue.call(NetatmoHandlerMock, deviceMock, deviceFeatureMock, newValue);
+    await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
   });
 
   it('should throw an error if not home ID parameter', async () => {
@@ -58,7 +58,7 @@ describe('Netatmo Set Value', () => {
     const newValue = 20;
 
     try {
-      await setValue.call(NetatmoHandlerMock, deviceMockFake, deviceFeatureMock, newValue);
+      await netatmoHandler.setValue(deviceMockFake, deviceFeatureMock, newValue);
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(BadParameters);
@@ -78,7 +78,7 @@ describe('Netatmo Set Value', () => {
     const newValue = 20;
 
     try {
-      await setValue.call(NetatmoHandlerMock, deviceMockFake, deviceFeatureMock, newValue);
+      await netatmoHandler.setValue(deviceMockFake, deviceFeatureMock, newValue);
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(BadParameters);
@@ -98,7 +98,7 @@ describe('Netatmo Set Value', () => {
     const newValue = 20;
 
     try {
-      await setValue.call(NetatmoHandlerMock, deviceMockFake, deviceFeatureMock, newValue);
+      await netatmoHandler.setValue(deviceMockFake, deviceFeatureMock, newValue);
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(BadParameters);
@@ -129,22 +129,23 @@ describe('Netatmo Set Value', () => {
         },
       });
 
-    await setValue.call(NetatmoHandlerMock, deviceMock, deviceFeatureMock, newValue);
+    await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
 
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
     expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.error-connected',
         payload: { statusType: 'connected', status: 'set_devices_value_error_unknown' },
       }),
     ).to.equal(true);
     expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      netatmoHandler.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'connected' },
       }),
     ).to.equal(true);
   });
+
   it('should handle API errors gracefully with error 403 and code 13', async () => {
     const deviceFeatureMock = deviceMock.features.filter((feature) =>
       feature.external_id.includes('therm_setpoint_temperature'),
@@ -160,17 +161,17 @@ describe('Netatmo Set Value', () => {
         },
       });
 
-    await setValue.call(NetatmoHandlerMock, deviceMock, deviceFeatureMock, newValue);
+    await netatmoHandler.setValue(deviceMock, deviceFeatureMock, newValue);
 
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
     expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.error-connected',
         payload: { statusType: 'connected', status: 'set_devices_value_fail_scope_rights' },
       }),
     ).to.equal(true);
     expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      netatmoHandler.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'connected' },
       }),

@@ -17,15 +17,7 @@ const { buildFeatureBoilerStatus, buildFeaturePlugConnectedBoiler } = require('.
  * netatmo.convertDevice({ ... });
  */
 function convertDevice(netatmoDevice) {
-  const {
-    home: homeId,
-    name,
-    type: model,
-    id,
-    room = {},
-    plug = {},
-    firmware_revision: firmwareRevision,
-  } = netatmoDevice;
+  const { home: homeId, name, type: model, id, room = {}, plug = {} } = netatmoDevice;
   const externalId = `netatmo:${id}`;
   logger.debug(`Netatmo convert device "${name}, ${model}"`);
   const features = [];
@@ -47,7 +39,6 @@ function convertDevice(netatmoDevice) {
       params = [
         { name: PARAMS.PLUG_ID, value: plug.id },
         { name: PARAMS.PLUG_NAME, value: plug.name },
-        { name: PARAMS.FIRMWARE_REVISION, value: firmwareRevision },
       ];
       break;
     }
@@ -60,10 +51,7 @@ function convertDevice(netatmoDevice) {
       /* features specif Plugs */
       features.push(buildFeaturePlugConnectedBoiler(name, externalId));
       /* params */
-      params = [
-        { name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) },
-        { name: PARAMS.FIRMWARE_REVISION, value: firmwareRevision },
-      ];
+      params = [{ name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) }];
       break;
     }
     default:

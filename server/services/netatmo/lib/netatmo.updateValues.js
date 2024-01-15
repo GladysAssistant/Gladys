@@ -4,16 +4,12 @@ const logger = require('../../../utils/logger');
 const { readValues } = require('./device/netatmo.deviceMapping');
 const { SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
 
-//  * @returns {Promise} Promise of nothing.
-
 /**
- *
  * @description Save values of an Netatmo device.
  * @param {object} deviceGladys - Device object in Gladys.
  * @param {object} deviceNetatmo - Device object coming from the Netatmo API.
  * @param {string} externalId - Device identifier in gladys.
- * @example
- * updateValues(deviceGladys, deviceNetatmo, externalId);
+ * @example updateValues(deviceGladys, deviceNetatmo, externalId);
  */
 async function updateValues(deviceGladys, deviceNetatmo, externalId) {
   const [prefix, topic] = externalId.split(':');
@@ -51,7 +47,6 @@ async function updateValues(deviceGladys, deviceNetatmo, externalId) {
       default:
         break;
     }
-
     if (typeof value !== 'undefined') {
       const transformedValue = readValues[deviceFeature.category][deviceFeature.type](value);
       if (

@@ -1,16 +1,13 @@
 const logger = require('../../../utils/logger');
 
 /**
- *
  * @description Poll refreshing Token values of an Netatmo device.
- * @example
- * refreshNetatmoTokens();
+ * @example refreshNetatmoTokens();
  */
 async function refreshNetatmoTokens() {
   const { expireInToken } = this;
   await this.refreshingTokens();
   if (this.expireInToken !== expireInToken) {
-    this.expireInToken = expireInToken;
     logger.warn(`New expiration access_token : ${this.expireInToken}ms `);
     clearInterval(this.pollRefreshToken);
     await this.pollRefreshingToken();
@@ -18,13 +15,13 @@ async function refreshNetatmoTokens() {
 }
 
 /**
- *
  * @description Poll refreshing Token values of an Netatmo device.
- * @example
- * pollRefreshingToken();
+ * @example pollRefreshingToken();
  */
 function pollRefreshingToken() {
-  this.pollRefreshToken = setInterval(() => refreshNetatmoTokens(), this.expireInToken * 1000);
+  if (this.expireInToken > 0) {
+    this.pollRefreshToken = setInterval(refreshNetatmoTokens.bind(this), this.expireInToken * 1000);
+  }
 }
 
 module.exports = {

@@ -50,10 +50,6 @@
         "value": "[\"01:00:00:xx:xx:xx\",\"02:00:00:xx:xx:xx\"]"
       },
       {
-        "name": "firmware_revision",
-        "value": 123
-      },
-      {
         "name": "home_id",
         "value": "5e1xxxxxxxxxxxxxxxxx"
       },
@@ -174,10 +170,6 @@
         "value": "Relais Test"
       },
       {
-        "name": "firmware_revision",
-        "value": 65
-      },
-      {
         "name": "home_id",
         "value": "5e1xxxxxxxxxxxxxxxxx"
       },
@@ -240,10 +232,6 @@
       {
         "name": "modules_bridge_id",
         "value": "[]"
-      },
-      {
-        "name": "firmware_revision",
-        "value": 124
       },
       {
         "name": "home_id",

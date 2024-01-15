@@ -1,30 +1,32 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
-const EventEmitter = require('events');
-const { discoverDevices } = require('../../../../services/netatmo/lib/netatmo.discoverDevices');
-const { NetatmoHandlerMock } = require('../netatmo.mock.test');
-const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
+
+const { fake } = sinon;
+
 const devicesMock = require('../netatmo.loadDevices.mock.test.json');
+const discoverDevicesMock = require('../netatmo.discoverDevices.mock.test.json');
 const { EVENTS } = require('../../../../utils/constants');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
+const NetatmoHandler = require('../../../../services/netatmo/lib/index');
+
+const gladys = {
+  event: {
+    emit: fake.resolves(null),
+  },
+  stateManager: {
+    get: sinon.stub().resolves(),
+  },
+};
+const serviceId = 'serviceId';
+const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 describe('Netatmo Discover devices', () => {
-  let eventEmitter;
   beforeEach(() => {
     sinon.reset();
     nock.cleanAll();
 
-    eventEmitter = new EventEmitter();
-    NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
-    NetatmoHandlerMock.status = 'not_initialized';
-    NetatmoHandlerMock.gladys = {
-      stateManager: {
-        get: sinon.stub().resolves(),
-      },
-      event: eventEmitter,
-    };
-    sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
+    netatmoHandler.status = 'not_initialized';
   });
 
   afterEach(() => {
@@ -33,26 +35,26 @@ describe('Netatmo Discover devices', () => {
   });
 
   it('should discover devices successfully', async () => {
-    NetatmoHandlerMock.status = 'connected';
-    NetatmoHandlerMock.gladys.stateManager.get = sinon.stub().returns(null);
-    NetatmoHandlerMock.loadDevices = sinon.stub().returns(devicesMock);
+    netatmoHandler.status = 'connected';
+    netatmoHandler.gladys.stateManager.get = sinon.stub().returns(null);
+    netatmoHandler.loadDevices = sinon.stub().returns(devicesMock);
 
-    const discoveredDevices = await discoverDevices(NetatmoHandlerMock);
+    const discoveredDevices = await netatmoHandler.discoverDevices();
 
     expect(discoveredDevices.length).to.equal(devicesMock.length);
     expect(discoveredDevices[0].external_id).to.equal(`netatmo:${devicesMock[0].id}`);
     expect(discoveredDevices[1].external_id).to.equal(`netatmo:${devicesMock[1].id}`);
-    expect(NetatmoHandlerMock.discoveredDevices).to.deep.equal(discoveredDevices);
-    expect(NetatmoHandlerMock.status).to.equal('connected');
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
+    expect(discoverDevicesMock[0]).to.deep.equal(discoveredDevices[0]);
+    expect(netatmoHandler.status).to.equal('connected');
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
     expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'discovering' },
       }),
     ).to.equal(true);
     expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+      netatmoHandler.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
         type: 'netatmo.status',
         payload: { status: 'connected' },
       }),
@@ -61,15 +63,15 @@ describe('Netatmo Discover devices', () => {
 
   it('should throw an error if not connected', async () => {
     try {
-      await discoverDevices(NetatmoHandlerMock);
+      await netatmoHandler.discoverDevices();
       expect.fail('should have thrown an error');
     } catch (e) {
       expect(e).to.be.instanceOf(ServiceNotConfiguredError);
       expect(e.message).to.equal('Unable to discover Netatmo devices until service is not well configured');
-      expect(NetatmoHandlerMock.status).to.equal('not_initialized');
-      expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
+      expect(netatmoHandler.status).to.equal('not_initialized');
+      expect(netatmoHandler.gladys.event.emit.callCount).to.equal(1);
       expect(
-        NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
+        netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
           type: 'netatmo.status',
           payload: { status: 'not_initialized' },
         }),
@@ -78,26 +80,24 @@ describe('Netatmo Discover devices', () => {
   });
 
   it('should handle an error during device loading', async () => {
-    NetatmoHandlerMock.status = 'connected';
-    NetatmoHandlerMock.loadDevices = sinon.stub().rejects(new Error('Failed to load'));
+    netatmoHandler.status = 'connected';
+    netatmoHandler.loadDevices = sinon.stub().rejects(new Error('Failed to load'));
 
-    const discoveredDevices = await discoverDevices(NetatmoHandlerMock);
+    const discoveredDevices = await netatmoHandler.discoverDevices();
 
     expect(discoveredDevices).to.deep.equal([]);
-    expect(NetatmoHandlerMock.discoveredDevices).to.deep.equal([]);
-    expect(NetatmoHandlerMock.status).to.equal('connected');
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
+    expect(netatmoHandler.status).to.equal('connected');
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
   });
 
   it('should handle no devices found', async () => {
-    NetatmoHandlerMock.status = 'connected';
-    NetatmoHandlerMock.loadDevices = sinon.stub().resolves([]);
+    netatmoHandler.status = 'connected';
+    netatmoHandler.loadDevices = sinon.stub().resolves([]);
 
-    const discoveredDevices = await discoverDevices(NetatmoHandlerMock);
+    const discoveredDevices = await netatmoHandler.discoverDevices();
 
     expect(discoveredDevices).to.deep.equal([]);
-    expect(NetatmoHandlerMock.discoveredDevices).to.deep.equal([]);
-    expect(NetatmoHandlerMock.status).to.equal('connected');
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
+    expect(netatmoHandler.status).to.equal('connected');
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(2);
   });
 });

@@ -1,7 +1,8 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const NetatmoController = require('../../../../../services/netatmo/api/netatmo.controller');
-const { NetatmoHandlerMock } = require('../../netatmo.mock.test');
+
+const NetatmoController = require('../../../../services/netatmo/api/netatmo.controller');
+const { NetatmoHandlerMock } = require('../netatmo.mock.test');
 
 const netatmoController = NetatmoController(NetatmoHandlerMock);
 
@@ -50,7 +51,7 @@ describe('Netatmo Controller', () => {
       req.body = configuration;
       NetatmoHandlerMock.saveConfiguration.resolves(true);
 
-      await netatmoController['post /api/v1/service/netatmo/saveConfiguration'].controller(req, res);
+      await netatmoController['post /api/v1/service/netatmo/configuration'].controller(req, res);
       expect(res.json.calledWith({ success: true })).to.equal(true);
     });
   });
@@ -61,17 +62,18 @@ describe('Netatmo Controller', () => {
       req.body = status;
       NetatmoHandlerMock.saveStatus.resolves(true);
 
-      await netatmoController['post /api/v1/service/netatmo/saveStatus'].controller(req, res);
+      await netatmoController['post /api/v1/service/netatmo/status'].controller(req, res);
       expect(res.json.calledWith({ success: true })).to.equal(true);
     });
   });
 
   describe('connect', () => {
     it('should connect netatmo', async () => {
+      NetatmoHandlerMock.getConfiguration.resolves(true);
       NetatmoHandlerMock.connect.resolves(true);
 
       await netatmoController['post /api/v1/service/netatmo/connect'].controller(req, res);
-      expect(res.json.calledWith({ result: true })).to.equal(true);
+      expect(res.json.calledWith(true)).to.equal(true);
     });
   });
 
@@ -80,13 +82,11 @@ describe('Netatmo Controller', () => {
       req.body = { code: 'test-code' };
       NetatmoHandlerMock.retrieveTokens.resolves({ accessToken: 'test-token', refreshToken: 'test-refresh-token' });
 
-      await netatmoController['post /api/v1/service/netatmo/retrieveTokens'].controller(req, res);
+      await netatmoController['post /api/v1/service/netatmo/token'].controller(req, res);
       expect(
         res.json.calledWith({
-          result: {
-            accessToken: 'test-token',
-            refreshToken: 'test-refresh-token',
-          },
+          accessToken: 'test-token',
+          refreshToken: 'test-refresh-token',
         }),
       ).to.equal(true);
     });
@@ -127,16 +127,6 @@ describe('Netatmo Controller', () => {
 
       const expectedDevices = discoveredDevices.filter((d) => d.notInGladys);
       expect(res.json.calledWith(expectedDevices)).to.equal(true);
-    });
-  });
-
-  describe('refreshDiscover', () => {
-    it('should refresh and discover new netatmo devices', async () => {
-      const devices = [{ id: 'device3' }, { id: 'device4' }];
-      NetatmoHandlerMock.discoverDevices.resolves(devices);
-
-      await netatmoController['get /api/v1/service/netatmo/refreshDiscover'].controller(req, res);
-      expect(res.json.calledWith(devices)).to.equal(true);
     });
   });
 });

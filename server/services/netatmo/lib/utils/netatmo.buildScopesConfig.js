@@ -18,7 +18,6 @@ function buildScopesConfig(scopes) {
       .join('');
     const scopeKey = `scope${camelCaseKey.charAt(0).toUpperCase() + camelCaseKey.slice(1)}`;
     scopesConfig[scopeKey] = Object.values(scopes[key]).join(' ');
-    console.log("scopesConfig:", scopesConfig[scopeKey], "scopeKey:", scopeKey)
   });
 
   return scopesConfig;

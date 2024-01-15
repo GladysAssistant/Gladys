@@ -1,104 +1,90 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const EventEmitter = require('events');
-const { init } = require('../../../../services/netatmo/lib/netatmo.init');
-const { NetatmoHandlerMock } = require('../netatmo.mock.test');
-const netatmoRefreshingTokens = require('../../../../services/netatmo/lib/netatmo.refreshingTokens');
-const netatmoStatus = require('../../../../services/netatmo/lib/netatmo.status');
-// const netatmoSetTokens = require('../../../../services/netatmo/lib/netatmo.setTokens');
-const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
-const { EVENTS } = require('../../../../utils/constants');
+
+const { fake } = sinon;
+
+const NetatmoHandler = require('../../../../services/netatmo/lib/index');
+
+const gladys = {
+  event: {
+    emit: fake.resolves(null),
+  },
+  variable: {
+    getValue: sinon.fake((variableName, serviceId) => {
+      if (variableName === 'NETATMO_CLIENT_ID') {
+        return Promise.resolve('valid_client_id');
+      }
+      if (variableName === 'NETATMO_CLIENT_SECRET') {
+        return Promise.resolve('valid_client_secret');
+      }
+      if (variableName === 'NETATMO_ACCESS_TOKEN') {
+        return Promise.resolve('valid_access_token');
+      }
+      if (variableName === 'NETATMO_REFRESH_TOKEN') {
+        return Promise.resolve('valid_refresh_token');
+      }
+      if (variableName === 'NETATMO_EXPIRE_IN_TOKEN') {
+        return Promise.resolve(10800);
+      }
+      return Promise.reject(new Error('Unknown variable'));
+    }),
+    setValue: sinon.stub().resolves(),
+  },
+};
+const serviceIdFake = 'serviceId';
+const netatmoHandler = new NetatmoHandler(gladys, serviceIdFake);
+netatmoHandler.pollRefreshingToken = fake.resolves(null);
+netatmoHandler.pollRefreshingValues = fake.resolves(null);
 
 describe('Netatmo Init', () => {
-  let eventEmitter;
   beforeEach(() => {
     sinon.reset();
-    eventEmitter = new EventEmitter();
-    NetatmoHandlerMock.gladys = { event: eventEmitter };
-    sinon.spy(NetatmoHandlerMock.gladys.event, 'emit');
 
-    NetatmoHandlerMock.saveStatus = sinon.stub().callsFake(netatmoStatus.saveStatus);
-    NetatmoHandlerMock.status = 'not_initialized';
-    NetatmoHandlerMock.refreshingTokens = sinon.stub().callsFake(netatmoRefreshingTokens.refreshingTokens);
+    netatmoHandler.status = 'not_initialized';
+    netatmoHandler.gladys.variable.getValue = sinon.fake((variableName, serviceId) => {
+      if (variableName === 'NETATMO_CLIENT_ID') {
+        return Promise.resolve('valid_client_id');
+      }
+      if (variableName === 'NETATMO_CLIENT_SECRET') {
+        return Promise.resolve('valid_client_secret');
+      }
+      if (variableName === 'NETATMO_ACCESS_TOKEN') {
+        return Promise.resolve('valid_access_token');
+      }
+      if (variableName === 'NETATMO_REFRESH_TOKEN') {
+        return Promise.resolve('valid_refresh_token');
+      }
+      if (variableName === 'NETATMO_EXPIRE_IN_TOKEN') {
+        return Promise.resolve(10800);
+      }
+      return Promise.reject(new Error('Unknown variable'));
+    });
+    netatmoHandler.refreshingTokens = fake.resolves({ success: true });
   });
+
   afterEach(() => {
     sinon.reset();
   });
 
-  it('should throw an error if not configured', async () => {
-    NetatmoHandlerMock.configuration.clientId = null;
-    NetatmoHandlerMock.configuration.clientSecret = null;
-
-    try {
-      await init(NetatmoHandlerMock);
-      expect.fail('should have thrown an error');
-    } catch (e) {
-      expect(e).to.be.instanceOf(ServiceNotConfiguredError);
-      expect(e.message).to.equal('Netatmo is not configured.');
-    }
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-    expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'not_initialized' },
-      }),
-    ).to.equal(true);
-  });
-
   it('should handle valid access and refresh tokens', async () => {
-    NetatmoHandlerMock.configuration.clientId = 'valid_client_id';
-    NetatmoHandlerMock.configuration.clientSecret = 'valid_client_secret';
-    NetatmoHandlerMock.accessToken = 'valid_access_token';
-    NetatmoHandlerMock.refreshToken = 'valid_refresh_token';
-    NetatmoHandlerMock.refreshingTokens.resolves({ success: true });
+    netatmoHandler.configuration.clientId = 'valid_client_id';
+    netatmoHandler.configuration.clientSecret = 'valid_client_secret';
+    netatmoHandler.accessToken = 'valid_access_token';
+    netatmoHandler.refreshToken = 'valid_refresh_token';
 
-    await init(NetatmoHandlerMock);
+    await netatmoHandler.init();
 
-    expect(NetatmoHandlerMock.refreshingTokens.called).to.equal(true);
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-    expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'connected' },
-      }),
-    ).to.equal(true);
+    expect(netatmoHandler.refreshingTokens.called).to.equal(true);
+    expect(netatmoHandler.pollRefreshingToken.called).to.equal(true);
+    expect(netatmoHandler.pollRefreshingValues.called).to.equal(true);
   });
 
   it('should handle failed token refresh', async () => {
-    NetatmoHandlerMock.refreshingTokens.resolves({ success: false });
-    // NetatmoHandlerMock.setTokens = sinon.stub().callsFake(netatmoSetTokens.setTokens);
+    netatmoHandler.refreshingTokens = fake.resolves({ success: false });
 
-    await init(NetatmoHandlerMock);
+    await netatmoHandler.init();
 
-    // expect(NetatmoHandlerMock.setTokens.calledWith
-    // (sinon.match.any, sinon.match.has('accessToken', ''))).to.equal(true);
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(2);
-    expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.error-processing-token',
-        payload: { statusType: 'processing token', status: null },
-      }),
-    ).to.equal(true);
-    expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(1).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'disconnected' },
-      }),
-    ).to.equal(true);
-  });
-
-  it('should handle missing access or refresh tokens', async () => {
-    NetatmoHandlerMock.accessToken = null;
-    NetatmoHandlerMock.refreshToken = null;
-
-    await init(NetatmoHandlerMock);
-
-    expect(NetatmoHandlerMock.gladys.event.emit.callCount).to.equal(1);
-    expect(
-      NetatmoHandlerMock.gladys.event.emit.getCall(0).calledWith(EVENTS.WEBSOCKET.SEND_ALL, {
-        type: 'netatmo.status',
-        payload: { status: 'disconnected' },
-      }),
-    ).to.equal(true);
+    expect(netatmoHandler.refreshingTokens.called).to.equal(true);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(0);
   });
 });

@@ -1,22 +1,38 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
-const { loadDeviceDetails } = require('../../../../services/netatmo/lib/netatmo.loadDeviceDetails');
-const { NetatmoHandlerMock } = require('../netatmo.mock.test');
+
+const { fake } = sinon;
+
 const bodyHomesDataMock = require('../netatmo.homesdata.mock.test.json');
 const bodyHomeStatusMock = require('../netatmo.homestatus.mock.test.json');
 const thermostatsDetailsMock = require('../netatmo.loadThermostatDetails.mock.test.json');
+const NetatmoHandler = require('../../../../services/netatmo/lib/index');
+
+const gladys = {
+  event: {
+    emit: fake.resolves(null),
+  },
+  stateManager: {
+    get: sinon.stub().resolves(),
+  },
+  variable: {
+    setValue: fake.resolves(null),
+  },
+};
+const serviceId = 'serviceId';
+const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const accessToken = 'testAccessToken';
+const homesMock = bodyHomesDataMock.homes[0];
 
 describe('Netatmo Load Device Details', () => {
-  const accessToken = 'testAccessToken';
-  const homesMock = bodyHomesDataMock.homes[0];
   beforeEach(() => {
     sinon.reset();
     nock.cleanAll();
 
-    NetatmoHandlerMock.status = 'not_initialized';
-    NetatmoHandlerMock.accessToken = accessToken;
-    NetatmoHandlerMock.loadThermostatDetails = sinon.stub().resolves(thermostatsDetailsMock);
+    netatmoHandler.status = 'not_initialized';
+    netatmoHandler.accessToken = accessToken;
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves(thermostatsDetailsMock);
   });
 
   afterEach(() => {
@@ -28,7 +44,7 @@ describe('Netatmo Load Device Details', () => {
     nock('https://api.netatmo.com')
       .get('/api/homestatus')
       .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
-    const devices = await loadDeviceDetails.call(NetatmoHandlerMock, homesMock);
+    const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
     expect(devices).to.have.lengthOf(4);
     expect(devices.filter((device) => device.type === 'NATherm1')).to.have.lengthOf(1);
@@ -54,13 +70,13 @@ describe('Netatmo Load Device Details', () => {
     bodyHomeStatusMockFake.home.modules = bodyHomeStatusMock.home.modules.filter(
       (module) => module.type !== 'NATherm1',
     );
-    NetatmoHandlerMock.loadThermostatDetails = sinon.stub().resolves([]);
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves([]);
 
     nock('https://api.netatmo.com')
       .get('/api/homestatus')
       .reply(200, { body: bodyHomeStatusMockFake, status: 'ok' });
 
-    const devices = await loadDeviceDetails.call(NetatmoHandlerMock, homesMockFake);
+    const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
     expect(devices).to.have.lengthOf(3);
     expect(devices.filter((device) => device.type === 'NATherm1')).to.have.lengthOf(0);
@@ -70,13 +86,13 @@ describe('Netatmo Load Device Details', () => {
   });
 
   it('should load device details successfully but without modules thermostat', async () => {
-    NetatmoHandlerMock.loadThermostatDetails = sinon.stub().resolves([]);
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves([]);
 
     nock('https://api.netatmo.com')
       .get('/api/homestatus')
       .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
 
-    const devices = await loadDeviceDetails.call(NetatmoHandlerMock, homesMock);
+    const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
     const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
     expect(natThermDevices).to.have.lengthOf.at.least(1);
@@ -93,13 +109,13 @@ describe('Netatmo Load Device Details', () => {
     homesMockFake.modules = homesMockFake.modules.filter((module) => module.type !== 'NATherm1');
     const bodyHomeStatusMockFake = { ...bodyHomeStatusMock };
     bodyHomeStatusMockFake.home.modules = undefined;
-    NetatmoHandlerMock.loadThermostatDetails = sinon.stub().resolves([]);
+    netatmoHandler.loadThermostatDetails = sinon.stub().resolves([]);
 
     nock('https://api.netatmo.com')
       .get('/api/homestatus')
       .reply(200, { body: bodyHomeStatusMockFake, status: 'ok' });
 
-    const devices = await loadDeviceDetails.call(NetatmoHandlerMock, homesMockFake);
+    const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
     expect(devices).to.be.eq(undefined);
   });
@@ -120,7 +136,7 @@ describe('Netatmo Load Device Details', () => {
         },
       });
 
-    const devices = await loadDeviceDetails.call(NetatmoHandlerMock, homesMock);
+    const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
     expect(devices).to.be.eq(undefined);
   });
@@ -130,7 +146,7 @@ describe('Netatmo Load Device Details', () => {
       .get('/api/homestatus')
       .reply(200, { body: bodyHomeStatusMock, status: 'error' });
 
-    const devices = await loadDeviceDetails.call(NetatmoHandlerMock, homesMock);
+    const devices = await netatmoHandler.loadDeviceDetails(homesMock);
     expect(devices).to.be.an('array');
     expect(devices).to.have.lengthOf(0);
   });

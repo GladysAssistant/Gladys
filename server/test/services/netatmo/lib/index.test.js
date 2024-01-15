@@ -1,15 +1,15 @@
 const { expect } = require('chai');
 const NetatmoHandler = require('../../../../services/netatmo/lib');
 
+const gladys = {};
+const serviceId = '123';
+const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+
 describe('NetatmoHandler Constructor', () => {
   it('should properly initialize properties', () => {
-    const fakeGladys = {};
-    const fakeServiceId = '123';
-    const handler = new NetatmoHandler(fakeGladys, fakeServiceId);
-
-    expect(handler.gladys).to.equal(fakeGladys);
-    expect(handler.serviceId).to.equal(fakeServiceId);
-    expect(handler.configuration).to.deep.equal({
+    expect(netatmoHandler.gladys).to.equal(gladys);
+    expect(netatmoHandler.serviceId).to.equal(serviceId);
+    expect(netatmoHandler.configuration).to.deep.equal({
       clientId: null,
       clientSecret: null,
       scopes: {

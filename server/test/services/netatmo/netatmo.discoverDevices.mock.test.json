@@ -8,18 +8,6 @@
     "should_poll": false,
     "features": [
       {
-        "name": "Last seen - Relais Test",
-        "external_id": "netatmo:70:ee:50:xx:xx:xx:last_plug_seen",
-        "selector": "netatmo:70:ee:50:xx:xx:xx:last_plug_seen",
-        "category": "schedule",
-        "type": "time-day-hour",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 43200000
-      },
-      {
         "name": "Link RF quality - Relais Test",
         "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
         "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
@@ -54,28 +42,12 @@
         "has_feedback": false,
         "min": 0,
         "max": 1
-      },
-      {
-        "name": "Reachable (WiFi or Power) - Relais Test",
-        "external_id": "netatmo:70:ee:50:xx:xx:xx:reachable",
-        "selector": "netatmo:70:ee:50:xx:xx:xx:reachable",
-        "category": "signal",
-        "type": "binary",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": 0,
-        "max": 1
       }
     ],
     "params": [
       {
         "name": "modules_bridge_id",
         "value": "[\"01:00:00:xx:xx:xx\",\"02:00:00:xx:xx:xx\"]"
-      },
-      {
-        "name": "firmware_revision",
-        "value": 123
       },
       {
         "name": "home_id",
@@ -109,7 +81,7 @@
       "last_bilan": { "y": 2022, "m": 6 },
       "station_name": "Relais Test",
       "place": {
-        "altitude": 100,
+        "altitude": 50,
         "city": "Ville Test",
         "continent": "Europe",
         "country": "FR",

@@ -1,19 +1,35 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const nock = require('nock');
-const { loadThermostatDetails } = require('../../../../services/netatmo/lib/netatmo.loadThermostatDetails');
-const { NetatmoHandlerMock } = require('../netatmo.mock.test');
+
+const { fake } = sinon;
+
 const bodyGetThermostatMock = require('../netatmo.getThermostat.mock.test.json');
 const thermostatsDetailsMock = require('../netatmo.loadThermostatDetails.mock.test.json');
+const NetatmoHandler = require('../../../../services/netatmo/lib/index');
+
+const gladys = {
+  event: {
+    emit: fake.resolves(null),
+  },
+  stateManager: {
+    get: sinon.stub().resolves(),
+  },
+  variable: {
+    setValue: fake.resolves(null),
+  },
+};
+const serviceId = 'serviceId';
+const netatmoHandler = new NetatmoHandler(gladys, serviceId);
+const accessToken = 'testAccessToken';
 
 describe('Netatmo Load Thermostat Details', () => {
-  const accessToken = 'testAccessToken';
   beforeEach(() => {
     sinon.reset();
     nock.cleanAll();
 
-    NetatmoHandlerMock.status = 'not_initialized';
-    NetatmoHandlerMock.accessToken = accessToken;
+    netatmoHandler.status = 'not_initialized';
+    netatmoHandler.accessToken = accessToken;
   });
 
   afterEach(() => {
@@ -26,7 +42,7 @@ describe('Netatmo Load Thermostat Details', () => {
       .get('/api/getthermostatsdata')
       .reply(200, { body: bodyGetThermostatMock, status: 'ok' });
 
-    const { thermostats, modules } = await loadThermostatDetails.call(NetatmoHandlerMock);
+    const { thermostats, modules } = await netatmoHandler.loadThermostatDetails();
     expect(thermostats).to.deep.eq(thermostatsDetailsMock.thermostats);
     expect(modules).to.deep.eq(thermostatsDetailsMock.modules);
     expect(thermostats).to.be.an('array');
@@ -49,7 +65,7 @@ describe('Netatmo Load Thermostat Details', () => {
         },
       });
 
-    const { thermostats, modules } = await loadThermostatDetails.call(NetatmoHandlerMock);
+    const { thermostats, modules } = await netatmoHandler.loadThermostatDetails();
 
     expect(thermostats).to.be.eq(undefined);
     expect(modules).to.be.eq(undefined);
@@ -60,7 +76,7 @@ describe('Netatmo Load Thermostat Details', () => {
       .get('/api/getthermostatsdata')
       .reply(200, { body: bodyGetThermostatMock, status: 'error' });
 
-    const { thermostats, modules } = await loadThermostatDetails.call(NetatmoHandlerMock);
+    const { thermostats, modules } = await netatmoHandler.loadThermostatDetails();
     expect(thermostats).to.deep.eq(thermostatsDetailsMock.thermostats);
     expect(modules).to.deep.eq([]);
     expect(thermostats).to.be.an('array');

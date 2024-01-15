@@ -80,7 +80,6 @@ const PARAMS = {
   ROOM_NAME: 'room_name',
   PLUG_ID: 'plug_id',
   PLUG_NAME: 'plug_name',
-  FIRMWARE_REVISION: 'firmware_revision',
   MODULES_BRIDGE_ID: 'modules_bridge_id',
 };
 
