@@ -38,8 +38,20 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     ];
 
     await zwaveJSUIHandler.onNodeValueUpdated({
-      data: [{id:4}, {commandClassName: 'Notification', commandClass: 113, property: 'Access Control', endpoint: 0, newValue: 22, prevValue: 23, propertyName: 'Access Control', propertyKey: 'Door state (simple)'}]});
-    assert.pass();
+      data: [
+        { id: 4 },
+        {
+          commandClassName: 'Notification',
+          commandClass: 113,
+          property: 'Access Control',
+          endpoint: 0,
+          newValue: 22,
+          prevValue: 23,
+          propertyName: 'Access Control',
+          propertyKey: 'Door state (simple)',
+        },
+      ],
+    });
   });
 
   it('should not fail on unknown feature', async () => {
@@ -52,8 +64,20 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     ];
 
     await zwaveJSUIHandler.onNodeValueUpdated({
-      data: [{id:2}, {commandClassName: 'Notification', commandClass: 113, property: 'Access Control', endpoint: 0, newValue: 22, prevValue: 23, propertyName: 'Access Control', propertyKey: 'Door state (simple)'}]});
-    assert.pass();
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Notification',
+          commandClass: 113,
+          property: 'Access Control',
+          endpoint: 0,
+          newValue: 22,
+          prevValue: 23,
+          propertyName: 'Access Control',
+          propertyKey: 'Door state (simple)',
+        },
+      ],
+    });
   });
 
   it('should save a new open value', async () => {
@@ -70,7 +94,20 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     ];
 
     await zwaveJSUIHandler.onNodeValueUpdated({
-      data: [{id:2}, {commandClassName: 'Notification', commandClass: 113, property: 'Access Control', endpoint: 0, newValue: 22, prevValue: 23, propertyName: 'Access Control', propertyKey: 'Door state (simple)'}]});
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Notification',
+          commandClass: 113,
+          property: 'Access Control',
+          endpoint: 0,
+          newValue: 22,
+          prevValue: 23,
+          propertyName: 'Access Control',
+          propertyKey: 'Door state (simple)',
+        },
+      ],
+    });
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
       state: 0,
@@ -90,10 +127,87 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
     ];
 
     await zwaveJSUIHandler.onNodeValueUpdated({
-      data: [{id:2}, {commandClassName: 'Notification', commandClass: 113, property: 'Access Control', endpoint: 0, newValue: 23, prevValue: 22, propertyName: 'Access Control', propertyKey: 'Door state (simple)'}]});
+      data: [
+        { id: 2 },
+        {
+          commandClassName: 'Notification',
+          commandClass: 113,
+          property: 'Access Control',
+          endpoint: 0,
+          newValue: 23,
+          prevValue: 22,
+          propertyName: 'Access Control',
+          propertyKey: 'Door state (simple)',
+        },
+      ],
+    });
     assert.calledWith(gladys.event.emit, 'device.new-state', {
       device_feature_external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
       state: 1,
+    });
+  });
+  it('should save a new true binary value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3-37-0-currentvalue',
+          },
+        ],
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Switch',
+          commandClass: 37,
+          property: 'currentValue',
+          endpoint: 0,
+          newValue: true,
+          prevValue: false,
+          propertyName: 'currentValue',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:3-37-0-currentvalue',
+      state: 1,
+    });
+  });
+  it('should save a new false binary value', async () => {
+    const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, {}, serviceId);
+    zwaveJSUIHandler.devices = [
+      {
+        external_id: 'zwavejs-ui:3',
+        features: [
+          {
+            external_id: 'zwavejs-ui:3-37-0-currentvalue',
+          },
+        ],
+      },
+    ];
+
+    await zwaveJSUIHandler.onNodeValueUpdated({
+      data: [
+        { id: 3 },
+        {
+          commandClassName: 'Binary Switch',
+          commandClass: 37,
+          property: 'currentValue',
+          endpoint: 0,
+          newValue: false,
+          prevValue: true,
+          propertyName: 'currentValue',
+        },
+      ],
+    });
+    assert.calledWith(gladys.event.emit, 'device.new-state', {
+      device_feature_external_id: 'zwavejs-ui:3-37-0-currentvalue',
+      state: 0,
     });
   });
 });

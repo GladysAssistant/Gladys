@@ -52,6 +52,7 @@ function getNodeFeature(node, nodeFeatureId) {
  * @param {object} device - Updated Gladys device.
  * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string} value - The new device feature value.
+ * @returns {Promise} - The execution promise.
  * @example
  * setValue(device, deviceFeature, 0);
  */
@@ -92,6 +93,8 @@ function setValue(device, deviceFeature, value) {
     ],
   };
   this.publish('zwave/_CLIENTS/ZWAVE_GATEWAY-zwave-js-ui/api/sendCommand/set', JSON.stringify(mqttPayload));
+
+  return Promise.resolve();
 }
 
 module.exports = {

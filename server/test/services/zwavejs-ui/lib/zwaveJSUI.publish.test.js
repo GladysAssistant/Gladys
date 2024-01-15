@@ -3,6 +3,8 @@ const sinon = require('sinon');
 const { assert, fake } = sinon;
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
+const { expect } = require('chai');
+const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
 
@@ -57,7 +59,7 @@ describe('zwaveJSUIHandler.publish', () => {
     try {
       zwaveJSUIHandler.publish('toto', 'mesage');
     } catch (e) {
-      assert.match(e.message, 'MQTT is not configured.');
+      expect(e).instanceOf(ServiceNotConfiguredError);
 
       return;
     }
