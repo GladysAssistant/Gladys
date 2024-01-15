@@ -1,9 +1,9 @@
 const sinon = require('sinon');
+const { expect } = require('chai');
 
 const { assert, fake } = sinon;
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
-const { expect } = require('chai');
 const { ServiceNotConfiguredError } = require('../../../../utils/coreErrors');
 
 const serviceId = 'ffa13430-df93-488a-9733-5c540e9558e0';
