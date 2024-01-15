@@ -92,7 +92,8 @@ class SetupTab extends Component {
                       <Text id="integration.netatmo.setup.processingToken" />
                     </p>
                   )) ||
-                  (props.connectNetatmoStatus === STATUS.CONNECTED && (
+                  ((props.connectNetatmoStatus === STATUS.CONNECTED ||
+                    props.connectNetatmoStatus === STATUS.GET_DEVICES_VALUES) && (
                     <p class="text-center alert alert-success">
                       <Text id="integration.netatmo.setup.connect" />
                     </p>

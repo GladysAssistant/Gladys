@@ -543,7 +543,8 @@
         "noValueReceived": "No value received.",
         "firmwareRevisionLabel": "Firmware: ",
         "connectedPlugLabel": "Connected to bridge",
-        "roomNetatmoApiLabel": "Room in Netatmo API"
+        "roomNetatmoApiLabel": "Room in Netatmo API",
+        "getDevicesValues": "Data recovery in progress..."
       },
       "discover": {
         "title": "Your Netatmo Devices Compatible with Gladys",

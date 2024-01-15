@@ -82,6 +82,11 @@ class DiscoverTab extends Component {
                 <Text id="integration.netatmo.setup.connecting" />
               </p>
             )) ||
+              (props.connectNetatmoStatus === STATUS.GET_DEVICES_VALUES && (
+                <p class="text-center alert alert-info">
+                  <Text id="integration.netatmo.device.getDevicesValues" />
+                </p>
+              )) ||
               (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
                 <p class="text-center alert alert-warning">
                   <Text id="integration.netatmo.setup.notConfigured" />
