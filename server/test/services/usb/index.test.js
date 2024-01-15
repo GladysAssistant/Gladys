@@ -3,7 +3,7 @@ const proxyquire = require('proxyquire').noCallThru();
 const SerialPortMock = require('./SerialPortMock.test');
 
 const UsbService = proxyquire('../../../services/usb/index', {
-  serialport: SerialPortMock,
+  serialport: { SerialPort: SerialPortMock },
 });
 
 describe('usb', () => {
