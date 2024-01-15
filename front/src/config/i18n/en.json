@@ -1025,6 +1025,62 @@
         "conflictError": "The current device is already in Gladys."
       }
     },
+    "zwavejs-ui": {
+      "title": "ZWave JS UI",
+      "description": "Control your devices in Z-Wave JS UI",
+      "deviceTab": "Devices",
+      "discoverTab": "Z-Wave JS UI Discovery",
+      "setupTab": "Configuration",
+      "documentation": "Z-Wave JS UI Documentation",
+      "discoverDeviceDescr": "Automatically scan for Z-Wave JS UI devices",
+      "nameLabel": "Device Name",
+      "namePlaceholder": "Enter your device name",
+      "noFeaturesHandled": "This device is not yet supported by Gladys; feel free to submit it for inclusion!",
+      "featuresLabel": "Features",
+      "roomLabel": "Room",
+      "saveButton": "Save",
+      "alreadyCreatedButton": "Already Created",
+      "deleteButton": "Delete",
+      "alphaWarning": "This integration is in alpha and currently only supports one device: The Fibaro Door/Window sensor. We welcome any assistance to integrate other devices!",
+      "device": {
+        "title": "Z-Wave JS UI Devices in Gladys",
+        "editButton": "Edit",
+        "noDeviceFound": "No Z-Wave JS UI devices found.",
+        "featuresLabel": "Features"
+      },
+      "discover": {
+        "title": "Devices detected on your Z-Wave JS UI instance",
+        "description": "Z-Wave JS UI devices are automatically discovered. Note that only devices with a name and a 'location' are displayed here. If you edit these settings, you will need to re-pair the device in Gladys.",
+        "error": "Error discovering Z-Wave JS UI devices. Is your MQTT broker available and accessible?",
+        "noDeviceFound": "No Z-Wave JS UI devices were discovered.",
+        "errorWhileScanning": "An error occurred during discovery.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "Configuration",
+        "description": "You must connect Gladys to the MQTT broker to which your Z-Wave JS UI instance is connected. This integration is for users who already have Z-Wave devices. If you are starting your installation, we recommend using the Zigbee protocol.",
+        "zwaveJsUiConfigurationTitle": "Configure Z-Wave JS UI",
+        "zwaveJsUiConfigurationMqttDescription": "On the Z-Wave JS UI side, you need to fill in the \"Name\" field in \"MQTT\" with \"zwave-js-ui,\" otherwise, the prefix for some MQTT topics will be incorrect.",
+        "zwaveJsUiConfigurationGatewayDescription": "Next, please fill in the \"Gateway\" section with these exact parameters:",
+        "mqttConfigurationTitle": "Configure MQTT Server",
+        "urlLabel": "Broker URL",
+        "urlPlaceholder": "Ex: mqtt://[mqtt-broker-address]:[port]",
+        "userLabel": "Username",
+        "userPlaceholder": "Enter the MQTT broker username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Enter the MQTT broker password",
+        "saveLabel": "Save Configuration",
+        "error": "An error occurred while saving the configuration.",
+        "connecting": "Configuration saved. Connecting to the MQTT broker...",
+        "connected": "Successfully connected to the MQTT broker!",
+        "notConnected": "Error connecting. Please check your configuration."
+      },
+      "error": {
+        "defaultError": "An error occurred while saving the device.",
+        "defaultDeletionError": "An error occurred while deleting the device.",
+        "conflictError": "The current device is already in Gladys."
+      }
+    },
     "melcloud": {
       "title": "MELCloud",
       "description": "Control your MELCloud devices (works with the cloud)",
