@@ -24,10 +24,10 @@ async function connect() {
     clientId: `gladys-main-instance-zwavejs-ui-${Math.floor(Math.random() * 1000000)}`,
   });
 
-  this.mqttClient.on('connect', () => {
+  this.mqttClient.on('connect', async () => {
     logger.info(`Connected to MQTT server ${mqttUrl}`);
 
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    await this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJS_UI.CONNECTED,
     });
 
@@ -35,26 +35,26 @@ async function connect() {
     this.connected = true;
     this.scan();
   });
-  this.mqttClient.on('error', (err) => {
+  this.mqttClient.on('error', async (err) => {
     logger.warn(`Error while connecting to MQTT - ${err}`);
 
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    await this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJS_UI.ERROR,
       payload: err,
     });
 
     this.disconnect();
   });
-  this.mqttClient.on('offline', () => {
+  this.mqttClient.on('offline', async () => {
     logger.warn(`Disconnected from MQTT server`);
-    this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
+    await this.gladys.event.emit(EVENTS.WEBSOCKET.SEND_ALL, {
       type: WEBSOCKET_MESSAGE_TYPES.ZWAVEJS_UI.ERROR,
       payload: 'DISCONNECTED',
     });
     this.connected = false;
   });
-  this.mqttClient.on('message', (topic, message) => {
-    this.handleNewMessage(topic, message.toString());
+  this.mqttClient.on('message', async (topic, message) => {
+    await this.handleNewMessage(topic, message.toString());
   });
 }
 

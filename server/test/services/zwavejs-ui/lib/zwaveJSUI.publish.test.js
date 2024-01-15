@@ -1,7 +1,6 @@
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
-const { assert: chaiAssert } = require('chai');
 
 const ZwaveJSUIHandler = require('../../../../services/zwavejs-ui/lib');
 
@@ -25,7 +24,7 @@ describe('zwaveJSUIHandler.publish', () => {
     sinon.reset();
   });
 
-  it('should publish MQTT message', async () => {
+  it('should publish MQTT message', () => {
     const mqttClient = {
       publish: fake.returns(null),
     };
@@ -34,10 +33,10 @@ describe('zwaveJSUIHandler.publish', () => {
     };
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, mqttLibrary, serviceId);
     zwaveJSUIHandler.mqttClient = mqttClient;
-    await zwaveJSUIHandler.publish('toto', 'message');
+    zwaveJSUIHandler.publish('toto', 'message');
     assert.calledWith(mqttClient.publish, 'toto', 'message');
   });
-  it('should publish MQTT message with error', async () => {
+  it('should publish MQTT message with error', () => {
     const mqttClient = {
       publish: (topic, message, random, cb) => {
         cb('toto');
@@ -48,16 +47,21 @@ describe('zwaveJSUIHandler.publish', () => {
     };
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, mqttLibrary, serviceId);
     zwaveJSUIHandler.mqttClient = mqttClient;
-    await zwaveJSUIHandler.publish('toto', 'mesage');
+    zwaveJSUIHandler.publish('toto', 'mesage');
   });
   it('should not publish MQTT message', async () => {
-    const mqttClient = {
-      publish: fake.returns(null),
-    };
     const mqttLibrary = {
-      connect: fake.returns(mqttClient),
+      connect: fake.returns(null),
     };
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, mqttLibrary, serviceId);
-    await chaiAssert.isRejected(zwaveJSUIHandler.publish('toto', 'mesage'));
+    try {
+      zwaveJSUIHandler.publish('toto', 'mesage');
+    } catch (e) {
+      assert.match(e.message, 'MQTT is not configured.');
+
+      return;
+    }
+
+    assert.fail();
   });
 });

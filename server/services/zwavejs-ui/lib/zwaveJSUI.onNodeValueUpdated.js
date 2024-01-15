@@ -8,7 +8,7 @@ const { cleanNames, getDeviceFeatureId } = require('../utils/convertToGladysDevi
  * @param {object} message - Data sent by ZWave JS UI.
  * @example zwaveJSUI.onNodeValueUpdated({data: [{node}, {value}]});
  */
-function onNodeValueUpdated(message) {
+async function onNodeValueUpdated(message) {
   // A value has been updated: https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-addedquot-quotvalue-updatedquot-quotvalue-removedquot
   const messageNode = message.data[0];
   const updatedValue = message.data[1];
@@ -35,7 +35,7 @@ function onNodeValueUpdated(message) {
   }
 
   if (valueConverted !== undefined) {
-    this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+    await this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
       device_feature_external_id: nodeFeature.external_id,
       state: valueConverted,
     });
