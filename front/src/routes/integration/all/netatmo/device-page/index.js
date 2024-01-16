@@ -11,7 +11,9 @@ class DevicePage extends Component {
     try {
       const netatmoStatus = await this.props.httpClient.get('/api/v1/service/netatmo/status');
       this.setState({
-        connectNetatmoStatus: netatmoStatus.status
+        connectNetatmoStatus: netatmoStatus.status,
+        connected: netatmoStatus.connected,
+        configured: netatmoStatus.configured
       });
     } catch (e) {
       this.setState({
@@ -27,23 +29,70 @@ class DevicePage extends Component {
   };
 
   updateStatus = async state => {
-    this.setState({
-      connectNetatmoStatus: state.status
+    console.log('updateStatus', state)
+    let connected = false;
+    let configured = false;
+    if (
+      state.status === STATUS.CONNECTED ||
+      state.status === STATUS.GET_DEVICES_VALUES ||
+      state.status === STATUS.DISCOVERING_DEVICES
+    ) {
+      connected = true;
+      configured = true;
+    } else if (state.status === STATUS.NOT_INITIALIZED) {
+      connected = false;
+      configured = false;
+    } else {
+      connected = false;
+      configured = true;
+    }
+    await this.setState({
+      connectNetatmoStatus: state.status,
+      connected,
+      configured
     });
   };
 
   updateStatusError = async state => {
     switch (state.statusType) {
       case STATUS.CONNECTING:
-        this.setState({
-          accessDenied: true,
-          messageAlert: state.status
-        });
+        if (state.status !== 'other_error') {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            connected: false,
+            accessDenied: true,
+            messageAlert: state.status
+          });
+        } else {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            connected: false,
+            errored: true
+          });
+        }
         break;
       case STATUS.PROCESSING_TOKEN:
-        this.setState({
-          connectNetatmoStatus: state.status
-        });
+        if (state.status === 'get_access_token_fail') {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            connected: false,
+            accessDenied: true,
+            messageAlert: state.status
+          });
+        } else if (state.status === 'invalid_client') {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            connected: false,
+            accessDenied: true,
+            messageAlert: state.status
+          });
+        } else {
+          this.setState({
+            connectNetatmoStatus: STATUS.DISCONNECTED,
+            connected: false,
+            errored: true
+          });
+        }
         break;
     }
   };

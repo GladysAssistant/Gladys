@@ -2,6 +2,7 @@ import { Text, Localizer } from 'preact-i18n';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
+import StateConnection from './StateConnection';
 import { RequestStatus } from '../../../../../utils/consts';
 import style from './style.css';
 import CardFilter from '../../../../../components/layout/CardFilter';
@@ -9,7 +10,6 @@ import NetatmoDeviceBox from '../NetatmoDeviceBox';
 import debounce from 'debounce';
 import { Component } from 'preact';
 import { connect } from 'unistore/preact';
-import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 
 class DeviceTab extends Component {
   constructor(props) {
@@ -106,37 +106,7 @@ class DeviceTab extends Component {
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.netatmoListBody)}>
-              {!props.accessDenied &&
-                ((props.connectNetatmoStatus === STATUS.CONNECTING && (
-                  <p class="text-center alert alert-info">
-                    <Text id="integration.netatmo.setup.connecting" />
-                  </p>
-                )) ||
-                  (props.connectNetatmoStatus === STATUS.GET_DEVICES_VALUES && (
-                    <p class="text-center alert alert-info">
-                      <Text id="integration.netatmo.device.getDevicesValues" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
-                    <p class="text-center alert alert-warning">
-                      <Text id="integration.netatmo.setup.notConfigured" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.PROCESSING_TOKEN && (
-                    <p class="text-center alert alert-warning">
-                      <Text id="integration.netatmo.setup.processingToken" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.CONNECTED && (
-                    <p class="text-center alert alert-success">
-                      <Text id="integration.netatmo.setup.connect" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.DISCONNECTED && (
-                    <p class="text-center alert alert-danger">
-                      <Text id="integration.netatmo.setup.disconnect" />
-                    </p>
-                  )))}
+              <StateConnection  {...props} />
               <div class="row">
                 {netatmoDevices &&
                   netatmoDevices.length > 0 &&
