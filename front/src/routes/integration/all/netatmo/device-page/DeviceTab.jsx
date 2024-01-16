@@ -44,7 +44,7 @@ class DeviceTab extends Component {
         getNetatmoStatus: e.message
       });
     }
-  }
+  };
 
   async getHouses() {
     this.setState({
