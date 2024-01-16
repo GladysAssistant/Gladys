@@ -2,6 +2,7 @@ import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import style from './style.css';
+import StateConnection from './StateConnection';
 import { RequestStatus } from '../../../../../utils/consts';
 import { STATUS } from '../../../../../../../server/services/netatmo/lib/utils/netatmo.constants';
 import { Component } from 'preact';
@@ -71,37 +72,7 @@ class SetupTab extends Component {
           >
             <div class="loader" />
             <div class="dimmer-content">
-              {props.accessDenied && (
-                <p class="text-center alert alert-warning">
-                  <MarkupText id={`integration.netatmo.setup.errorConnecting.${props.messageAlert}`} />
-                </p>
-              )}
-              {!props.accessDenied &&
-                ((props.connected && (
-                  <p class="text-center alert alert-success">
-                    <Text id="integration.netatmo.setup.connect" />
-                  </p>
-                )) ||
-                  (props.connectNetatmoStatus === STATUS.CONNECTING && (
-                    <p class="text-center alert alert-info">
-                      <Text id="integration.netatmo.setup.connecting" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.PROCESSING_TOKEN && (
-                    <p class="text-center alert alert-warning">
-                      <Text id="integration.netatmo.setup.processingToken" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.DISCONNECTED && (
-                    <p class="text-center alert alert-danger">
-                      <Text id="integration.netatmo.setup.disconnect" />
-                    </p>
-                  )) ||
-                  (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
-                    <p class="text-center alert alert-warning">
-                      <Text id="integration.netatmo.setup.notConfigured" />
-                    </p>
-                  )))}
+              <StateConnection {...props} />
               <p>
                 <MarkupText id="integration.netatmo.setup.description" />
                 <MarkupText id="integration.netatmo.setup.descriptionCreateAccount" />
@@ -109,18 +80,12 @@ class SetupTab extends Component {
                 <MarkupText id="integration.netatmo.setup.descriptionGetKeys" />
               </p>
               <p>
-                <label 
-                  htmlFor="titleAdditionalInformation" 
-                  className={`form-label ${style.italicText}`}
-                >
+                <label htmlFor="titleAdditionalInformation" className={`form-label ${style.italicText}`}>
                   <MarkupText id="integration.netatmo.setup.descriptionScopeInformation" />
                 </label>
               </p>
               <p>
-                <label
-                  htmlFor="titleAdditionalInformation"
-                  className={`form-label ${style.highlightText}`}
-                >
+                <label htmlFor="titleAdditionalInformation" className={`form-label ${style.highlightText}`}>
                   <MarkupText id="integration.netatmo.setup.titleAdditionalInformation" />
                 </label>
                 <MarkupText id="integration.netatmo.setup.descriptionAdditionalInformation" />

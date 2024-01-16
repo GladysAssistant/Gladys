@@ -35,6 +35,7 @@ class DiscoverTab extends Component {
       });
     }
   }
+
   getDiscoveredDevices = async () => {
     this.setState({
       loading: true
@@ -53,7 +54,26 @@ class DiscoverTab extends Component {
         errorLoading: true
       });
     }
-  }
+  };
+  refreshDiscoveredDevices = async () => {
+    this.setState({
+      loading: true
+    });
+    try {
+      const discoveredDevices = await this.props.httpClient.get('/api/v1/service/netatmo/discover', { refresh: true });
+      this.setState({
+        discoveredDevices,
+        loading: false,
+        errorLoading: false
+      });
+    } catch (e) {
+      this.setState({
+        discoveredDevices: [],
+        loading: false,
+        errorLoading: true
+      });
+    }
+  };
 
   render(props, { loading, errorLoading, discoveredDevices, housesWithRooms }) {
     return (
@@ -63,11 +83,7 @@ class DiscoverTab extends Component {
             <Text id="integration.netatmo.discover.title" />
           </h1>
           <div class="page-options d-flex">
-            <button
-              onClick={this.getDiscoveredDevices}
-              class="btn btn-outline-primary ml-2"
-              disabled={loading}
-            >
+            <button onClick={this.refreshDiscoveredDevices} class="btn btn-outline-primary ml-2" disabled={loading}>
               {!discoveredDevices && <Text id="integration.netatmo.discover.scan" />}
               {discoveredDevices && <Text id="integration.netatmo.discover.refresh" />}
               <i class="fe fe-radio" />
@@ -75,7 +91,7 @@ class DiscoverTab extends Component {
           </div>
         </div>
         <div class="card-body">
-          <StateConnection  {...props} />
+          <StateConnection {...props} />
           <div class="alert alert-secondary">
             <p>
               <Text id="integration.netatmo.discover.description" />

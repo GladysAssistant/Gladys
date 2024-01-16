@@ -22,7 +22,7 @@ class DeviceTab extends Component {
     this.getHouses();
   }
 
-  async getNetatmoDevices() {
+  getNetatmoDevices = async () => {
     this.setState({
       getNetatmoStatus: RequestStatus.Getting
     });
@@ -106,7 +106,7 @@ class DeviceTab extends Component {
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.netatmoListBody)}>
-              <StateConnection  {...props} />
+              <StateConnection {...props} />
               <div class="row">
                 {netatmoDevices &&
                   netatmoDevices.length > 0 &&
@@ -119,7 +119,7 @@ class DeviceTab extends Component {
                       device={device}
                       deviceIndex={index}
                       showMostRecentValueAt={device.created_at && !device.updatable}
-                      getNetatmoDevices={this.getNetatmoDevices.bind(this)}
+                      getNetatmoDevices={this.getNetatmoDevices}
                       housesWithRooms={housesWithRooms}
                     />
                   ))}
