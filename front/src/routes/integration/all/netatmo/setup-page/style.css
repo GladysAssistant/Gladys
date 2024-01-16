@@ -1,3 +1,12 @@
+.highlightText {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+.italicText {
+  font-style: italic;
+}
+
 .btnTextLineSpacing {
   line-height: 1.5;
 }
@@ -13,7 +22,6 @@
   .buttonGroup {
     flex-direction: column;
     align-items: stretch;
-    /* so that the buttons take the full width */
   }
 
   .buttonGroup button:not(:last-child) {

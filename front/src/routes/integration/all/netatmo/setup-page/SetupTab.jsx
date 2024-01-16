@@ -77,14 +77,14 @@ class SetupTab extends Component {
                 </p>
               )}
               {!props.accessDenied &&
-                ((props.connectNetatmoStatus === STATUS.CONNECTING && (
-                  <p class="text-center alert alert-info">
-                    <Text id="integration.netatmo.setup.connecting" />
+                ((props.connected && (
+                  <p class="text-center alert alert-success">
+                    <Text id="integration.netatmo.setup.connect" />
                   </p>
                 )) ||
-                  (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
-                    <p class="text-center alert alert-warning">
-                      <Text id="integration.netatmo.setup.notConfigured" />
+                  (props.connectNetatmoStatus === STATUS.CONNECTING && (
+                    <p class="text-center alert alert-info">
+                      <Text id="integration.netatmo.setup.connecting" />
                     </p>
                   )) ||
                   (props.connectNetatmoStatus === STATUS.PROCESSING_TOKEN && (
@@ -92,15 +92,14 @@ class SetupTab extends Component {
                       <Text id="integration.netatmo.setup.processingToken" />
                     </p>
                   )) ||
-                  ((props.connectNetatmoStatus === STATUS.CONNECTED ||
-                    props.connectNetatmoStatus === STATUS.GET_DEVICES_VALUES) && (
-                    <p class="text-center alert alert-success">
-                      <Text id="integration.netatmo.setup.connect" />
-                    </p>
-                  )) ||
                   (props.connectNetatmoStatus === STATUS.DISCONNECTED && (
                     <p class="text-center alert alert-danger">
                       <Text id="integration.netatmo.setup.disconnect" />
+                    </p>
+                  )) ||
+                  (props.connectNetatmoStatus === STATUS.NOT_INITIALIZED && (
+                    <p class="text-center alert alert-warning">
+                      <Text id="integration.netatmo.setup.notConfigured" />
                     </p>
                   )))}
               <p>
@@ -110,18 +109,17 @@ class SetupTab extends Component {
                 <MarkupText id="integration.netatmo.setup.descriptionGetKeys" />
               </p>
               <p>
-                <label htmlFor="titleAdditionalInformation" className="form-label" style={{ fontStyle: 'italic' }}>
+                <label 
+                  htmlFor="titleAdditionalInformation" 
+                  className={`form-label ${style.italicText}`}
+                >
                   <MarkupText id="integration.netatmo.setup.descriptionScopeInformation" />
                 </label>
               </p>
               <p>
                 <label
                   htmlFor="titleAdditionalInformation"
-                  className="form-label"
-                  style={{
-                    textDecoration: 'underline',
-                    fontWeight: 'bold'
-                  }}
+                  className={`form-label ${style.highlightText}`}
                 >
                   <MarkupText id="integration.netatmo.setup.titleAdditionalInformation" />
                 </label>
@@ -185,7 +183,7 @@ class SetupTab extends Component {
                         <Text id="integration.netatmo.setup.saveLabel" />
                       </button>
                     </Localizer>
-                    {props.notOnGladysGateway && props.connectNetatmoStatus === STATUS.CONNECTED && (
+                    {props.notOnGladysGateway && props.connected && (
                       <button
                         onClick={this.disconnectNetatmo.bind(this)}
                         class={`btn btn-danger`}
