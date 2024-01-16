@@ -553,7 +553,8 @@
         "noDeviceFound": "No Netatmo devices were found. If you own a Netatmo Thermostat, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
         "alreadyCreatedButton": "Already Created",
         "scan": "Scan",
-        "refresh": "Refresh"
+        "refresh": "Refresh",
+        "dicoveringDevices": "Device recovery in progress..."
       },
       "setup": {
         "title": "Netatmo Setup",

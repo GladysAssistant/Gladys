@@ -553,7 +553,8 @@
         "noDeviceFound": "Keine Netatmo-Geräte gefunden. Haben Sie alle Schritte der Dokumentation befolgt, um Ihre Geräte in der Netatmo-API zu registrieren?",
         "alreadyCreatedButton": "Bereits erstellt",
         "scan": "Scannen",
-        "refresh": "Aktualisieren"
+        "refresh": "Aktualisieren",
+        "dicoveringDevices": "Gerätewiederherstellung läuft..."
       },
       "setup": {
         "title": "Netatmo-Konfiguration",

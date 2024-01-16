@@ -681,7 +681,8 @@
         "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Si vous possédez un Thermostat Netatmo, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
         "alreadyCreatedButton": "Déjà créé",
         "scan": "Scanner",
-        "refresh": "Rafraîchir"
+        "refresh": "Rafraîchir",
+        "dicoveringDevices": "Récupération des appareils en cours..."
       },
       "setup": {
         "title": "Configuration Netatmo",

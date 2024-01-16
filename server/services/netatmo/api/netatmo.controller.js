@@ -85,15 +85,7 @@ module.exports = function NetatmoController(netatmoHandler) {
    * @apiGroup Netatmo
    */
   async function discover(req, res) {
-    let devices;
-    if (!netatmoHandler.discoveredDevices) {
-      devices = await netatmoHandler.discoverDevices();
-    } else {
-      devices = netatmoHandler.discoveredDevices.filter((device) => {
-        const existInGladys = netatmoHandler.gladys.stateManager.get('deviceByExternalId', device.external_id);
-        return existInGladys === null;
-      });
-    }
+    const devices = await netatmoHandler.discoverDevices();
     res.json(devices);
   }
 
