@@ -126,7 +126,7 @@ describe('zwaveJSUIHandler.connect', () => {
     const zwaveJSUIHandler = new ZwaveJSUIHandler(gladys, mqttLibrary, serviceId);
     const sut = sinon.stub(zwaveJSUIHandler, 'handleNewMessage').resolves();
     await zwaveJSUIHandler.connect();
-    
+
     assert.calledOnce(sut);
   });
 });
