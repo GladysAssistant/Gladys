@@ -1,4 +1,4 @@
-import { Text, Localizer } from 'preact-i18n';
+import { Text, Localizer, MarkupText } from 'preact-i18n';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
@@ -107,6 +107,11 @@ class DeviceTab extends Component {
             <div class="loader" />
             <div class={cx('dimmer-content', style.netatmoListBody)}>
               <StateConnection {...props} />
+              <div class="alert alert-secondary">
+                <p>
+                  <MarkupText id="integration.netatmo.discover.descriptionInformation" />
+                </p>
+              </div>
               <div class="row">
                 {netatmoDevices &&
                   netatmoDevices.length > 0 &&

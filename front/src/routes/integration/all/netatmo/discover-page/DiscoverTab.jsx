@@ -1,5 +1,4 @@
 import { Text, MarkupText } from 'preact-i18n';
-import { Link } from 'preact-router/match';
 import cx from 'classnames';
 
 import EmptyState from './EmptyState';
@@ -91,13 +90,16 @@ class DiscoverTab extends Component {
           </div>
         </div>
         <div class="card-body">
-          <StateConnection {...props} />
+          <StateConnection {...props} errorLoading={errorLoading} />
           <div class="alert alert-secondary">
             <p>
               <Text id="integration.netatmo.discover.description" />
             </p>
             <p>
               <MarkupText id="integration.netatmo.discover.descriptionCompatibility" />
+            </p>
+            <p>
+              <MarkupText id="integration.netatmo.discover.descriptionInformation" />
             </p>
           </div>
           <div
@@ -107,15 +109,6 @@ class DiscoverTab extends Component {
           >
             <div class="loader" />
             <div class={cx('dimmer-content', style.netatmoListBody)}>
-              {errorLoading && (
-                <p class="alert alert-warning">
-                  <Text id="integration.netatmo.status.notConnected" />
-                  <Link href="/dashboard/integration/device/netatmo/setup">
-                    <Text id="integration.netatmo.status.setupPageLink" />
-                  </Link>
-                </p>
-              )}
-
               <div class="row">
                 {discoveredDevices &&
                   discoveredDevices.map((device, index) => (

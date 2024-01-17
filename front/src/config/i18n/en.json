@@ -519,15 +519,26 @@
       "discoverDeviceDescr": "Automatically scan Netatmo devices",
       "unmanagedModelButton": "Model not supported or unavailable",
       "status": {
+        "notConfigured": "The Netatmo service is not configured",
+        "disconnect": "Gladys is not connected to Netatmo",
         "notConnected": "Gladys failed to connect to the Netatmo account, please verify your credentials on the ",
         "setupPageLink": "Netatmo Setup Page.",
-        "connecting": "Connecting to your Netatmo account...",
         "connect": "Gladys is connected to Netatmo",
-        "disconnect": "Gladys is not connected to Netatmo",
-        "notConfigured": "The Netatmo service is not configured"
+        "connecting": "Configuration saved. Connecting to your Netatmo account...",
+        "processingToken": "Connecting to your Netatmo account... Retrieving access token.",
+        "getDevicesValues": "Data recovery in progress...",
+        "dicoveringDevices": "Device recovery in progress...",
+        "connectionError": "Error during connection, please check your configuration.",
+        "errorConnecting": {
+          "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
+          "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
+          "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled on <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+          "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
+        }
       },
       "device": {
         "title": "Netatmo Devices in Gladys",
+        "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
         "noDeviceFound": "No Netatmo devices have been added yet.",
         "sidLabel": "Netatmo device SID",
         "nameLabel": "Device name",
@@ -543,18 +554,17 @@
         "noValueReceived": "No value received.",
         "firmwareRevisionLabel": "Firmware: ",
         "connectedPlugLabel": "Connected to bridge",
-        "roomNetatmoApiLabel": "Room in Netatmo API",
-        "getDevicesValues": "Data recovery in progress..."
+        "roomNetatmoApiLabel": "Room in Netatmo API"
       },
       "discover": {
         "title": "Your Netatmo Devices Compatible with Gladys",
         "description": "Your Netatmo devices must be added to your Netatmo account before being added to Gladys, which currently only supports Thermostats associated with their Plug. The first discovery is done automatically. Press 'Refresh' if you want to retrieve new features of your devices.",
         "descriptionCompatibility": "For any requests to add devices and/or features, please visit the <a href=\"https://en-community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Gladys Assistant Forum - Feature Requests Category</a>.",
+        "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
         "noDeviceFound": "No Netatmo devices were found. If you own a Netatmo Thermostat, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
         "alreadyCreatedButton": "Already Created",
         "scan": "Scan",
-        "refresh": "Refresh",
-        "dicoveringDevices": "Device recovery in progress..."
+        "refresh": "Refresh"
       },
       "setup": {
         "title": "Netatmo Setup",
@@ -571,19 +581,7 @@
         "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\" to copy below.",
         "descriptionScopeInformation": "When you connect Gladys to your dedicated Netatmo App, you grant it permission to access your data in read and write modes (referred to as \"read\" and \"write\" scopes). You don't have to configure anything, these scopes are automatically integrated and will be presented to you during the connection request (see documentation if needed). Of course, since Gladys is installed locally, none of these data is exposed.",
         "titleAdditionalInformation": "Additional Information on the Operation of the \"Energy\" API:",
-        "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
-        "errorConnecting": {
-          "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
-          "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
-          "invalid_client": "Invalid client ID. Please verify your Netatmo account information and that the account is not banned or disabled on <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
-          "get_access_token_fail": "Incorrect information entered or account disabled. Please check your Netatmo account information and that the account is not banned or disabled <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
-        },
-        "notConfigured": "The Netatmo service is not configured",
-        "connecting": "Configuration saved. Connecting to your Netatmo account...",
-        "processingToken": "Connecting to your Netatmo account... Retrieving access token.",
-        "connect": "Gladys is connected to Netatmo",
-        "disconnect": "Gladys is not connected to Netatmo",
-        "connectionError": "Error during connection, please check your configuration."
+        "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch."
       },
       "error": {
         "defaultError": "An error occurred while registering the device.",

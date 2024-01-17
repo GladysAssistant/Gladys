@@ -29,7 +29,6 @@ class DevicePage extends Component {
   };
 
   updateStatus = async state => {
-    console.log('updateStatus', state);
     let connected = false;
     let configured = false;
     if (
