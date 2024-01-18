@@ -66,22 +66,24 @@ class BlinkLight extends Component {
 
   render(props, { selectedOptions, deviceOptions }) {
     return (
-      <div class="form-group">
-        <div class="row">
-          <label class="form-label">
-            <Text id="editScene.actionsCard.blinkLigths.label" />
-          </label>
-          <Select
-            defaultValue={[]}
-            isMulti
-            value={selectedOptions}
-            onChange={this.handleChange}
-            options={deviceOptions}
-          />
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <div class="form-label">
+              <Text id="editScene.actionsCard.blinkLigths.label" />
+            </div>
+            <Select
+              defaultValue={[]}
+              isMulti
+              value={selectedOptions}
+              onChange={this.handleChange}
+              options={deviceOptions}
+            />
+          </div>
         </div>
-        <div class="row">
-          <div class="col-md-6">
-            Répéter
+        <div class="col-sm-4">
+          <div class="form-group">
+            <div class="form-label">Répéter</div>
             <Localizer>
               <input
                 type="text"
@@ -92,16 +94,26 @@ class BlinkLight extends Component {
               />
             </Localizer>
           </div>
-          <div class="col-md-6">
-            toutes les
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <div class="form-label">toutes les</div>
             <Localizer>
-              <input
-                type="text"
-                class="form-control"
-                value={props.action.waitingTime}
-                onChange={this.handleChangeWaitingTime}
-                placeholder={<Text id="editScene.actionsCard.blinkLights.waitingTime.placeholder" />}
-              />
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  value={props.action.waitingTime}
+                  onChange={this.handleChangeWaitingTime}
+                  aria-describedby="basic-addon2"
+                  placeholder={<Text id="editScene.actionsCard.blinkLights.waitingTime.placeholder" />}
+                />
+                <div class="input-group-append">
+                  <span class="input-group-text" id="basic-addon2">
+                    ms
+                  </span>
+                </div>
+              </div>
             </Localizer>
           </div>
         </div>
