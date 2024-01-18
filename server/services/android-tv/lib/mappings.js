@@ -96,9 +96,29 @@ const keyMappings = {
 
 const appMappings = {
   'com.google.android.tvlauncher': 'Home',
+  'com.google.android.apps.tv.launcherx': 'Home',
   'com.google.android.youtube.tv': 'YouTube',
+  'com.google.android.youtube.tvkids': 'YouTube Kids',
+  'com.google.android.apps.tv.dreamx': 'Ambient Mode',
   'com.android.vending': 'Play Store',
   'com.android.tv.settings': 'Settings',
+  'com.netflix.ninja': 'Netflix',
+  'com.amazon.amazonvideo.livingroom': 'Amazon Prime Video',
+  'com.disney.disneyplus': 'Disney+',
+  'com.apple.atve.androidtv.appletv': 'Apple TV',
+  'com.canal.android.canal': 'myCanal',
+  'tv.wuaki.apptv': 'Rakuten TV',
+  'be.vmma.vtm.zenderapp': 'VTM Go',
+  'be.vrt.vrtnu': 'VRT Max',
+  'com.plexapp.android': 'Plex',
+  'com.tapptic.rtl.tvi': 'RTLplay',
+  'be.rtbf.auvio': 'RTBF Auvio',
+  'com.tcl.waterfall.overseas': 'TCL Channel',
+  'com.tcl.dashboard': 'TCL Dashboard',
+  'com.tcl.gallery': 'TCL Gallery',
+  'com.tcl.ui_mediaCenter': 'TCL Mediacenter',
+  'com.tcl.common.weather': 'TCL Weather',
+  'com.tcl.settings': 'TCL Settings',
 };
 
 module.exports = { keyMappings, appMappings };
