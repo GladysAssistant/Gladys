@@ -517,7 +517,6 @@
       "setupTab": "Setup",
       "documentation": "Netatmo Documentation",
       "discoverDeviceDescr": "Automatically scan Netatmo devices",
-      "unmanagedModelButton": "Model not supported or unavailable",
       "status": {
         "notConfigured": "The Netatmo service is not configured",
         "disconnect": "Gladys is not connected to Netatmo",
@@ -528,7 +527,6 @@
         "processingToken": "Connecting to your Netatmo account... Retrieving access token.",
         "getDevicesValues": "Data recovery in progress...",
         "dicoveringDevices": "Device recovery in progress...",
-        "connectionError": "Error during connection, please check your configuration.",
         "errorConnecting": {
           "other_error": "Error during authorization. You can inspect the error in your browser's console with a right click. If the error persists, please post the logs on the forum.",
           "access_denied": "Authorization declined, please try again and accept the request for access to your data.",
@@ -545,16 +543,12 @@
         "namePlaceholder": "Enter your device name",
         "modelLabel": "Model",
         "roomLabel": "Room",
+        "connectedPlugLabel": "Connected to bridge",
+        "roomNetatmoApiLabel": "Room in Netatmo API",
         "featuresLabel": "Features",
         "saveButton": "Save",
-        "updateButton": "Update",
-        "editButton": "Edit",
         "deleteButton": "Delete",
-        "unmanagedModelButton": "Unsupported model",
-        "noValueReceived": "No value received.",
-        "firmwareRevisionLabel": "Firmware: ",
-        "connectedPlugLabel": "Connected to bridge",
-        "roomNetatmoApiLabel": "Room in Netatmo API"
+        "noValueReceived": "No value received."
       },
       "discover": {
         "title": "Your Netatmo Devices Compatible with Gladys",
@@ -563,25 +557,27 @@
         "descriptionInformation": "State retrieval is currently done every 2 minutes (Netatmo API limitation).",
         "noDeviceFound": "No Netatmo devices were found. If you own a Netatmo Thermostat, have you completed all the steps in the documentation to register your devices on the Netatmo API?",
         "alreadyCreatedButton": "Already Created",
+        "unmanagedModelButton": "Unsupported model",
+        "updateButton": "Update",
         "scan": "Scan",
         "refresh": "Refresh"
       },
       "setup": {
         "title": "Netatmo Setup",
-        "clientIdLabel": "Client ID",
-        "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
-        "clientSecretLabel": "Client Secret",
-        "clientSecretPlaceholder": "Client secret from My Apps in Netatmo Connect",
-        "saveLabel": "Save and connect",
-        "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Netatmo API when you click on these buttons.",
-        "disconnectLabel": "Disconnect",
         "description": "You can connect Gladys to your Netatmo account to control the associated devices.",
         "descriptionCreateAccount": "You need to create an account on <a href=\"https://auth.netatmo.com/en-us/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionCreateProject": "You will then need to create an \"application\" in your Netatmo developer account via the <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
         "descriptionGetKeys": "You will then have access to two keys: \"client ID\" and \"client secret\" to copy below.",
         "descriptionScopeInformation": "When you connect Gladys to your dedicated Netatmo App, you grant it permission to access your data in read and write modes (referred to as \"read\" and \"write\" scopes). You don't have to configure anything, these scopes are automatically integrated and will be presented to you during the connection request (see documentation if needed). Of course, since Gladys is installed locally, none of these data is exposed.",
         "titleAdditionalInformation": "Additional Information on the Operation of the \"Energy\" API:",
-        "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch."
+        "descriptionAdditionalInformation": "Temperature commands are performed at the room level. Therefore, both pieces of information are available as features for more control. If you have other temperature sensors in the same room as your Thermostat, it's the average temperature of that room that will be considered to trigger the heating control switch.",
+        "clientIdLabel": "Client ID",
+        "clientIdPlaceholder": "Client ID from My Apps in Netatmo Connect",
+        "clientSecretLabel": "Client Secret",
+        "clientSecretPlaceholder": "Client secret from My Apps in Netatmo Connect",
+        "connectionInfoLabel": "When you change this information, a new token is required. Disconnecting will also erase your access token. A new connection request will therefore be made to the Netatmo API when you click on these buttons.",
+        "saveLabel": "Save and connect",
+        "disconnectLabel": "Disconnect"
       },
       "error": {
         "defaultError": "An error occurred while registering the device.",

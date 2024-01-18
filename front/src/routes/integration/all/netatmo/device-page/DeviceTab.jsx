@@ -109,7 +109,7 @@ class DeviceTab extends Component {
               <StateConnection {...props} />
               <div class="alert alert-secondary">
                 <p>
-                  <MarkupText id="integration.netatmo.discover.descriptionInformation" />
+                  <MarkupText id="integration.netatmo.device.descriptionInformation" />
                 </p>
               </div>
               <div class="row">

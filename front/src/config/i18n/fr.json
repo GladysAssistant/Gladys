@@ -645,7 +645,6 @@
       "setupTab": "Configuration",
       "documentation": "Documentation Netatmo",
       "discoverDeviceDescr": "Scanner automatiquement les appareils Netatmo",
-      "unmanagedModelButton": "Modèle non pris en charge ou non disponible",
       "status": {
         "notConfigured": "Le service Netatmo n'est pas configuré",
         "disconnect": "Gladys n'est pas connectée à Netatmo",
@@ -656,7 +655,6 @@
         "processingToken": "Connexion à votre compte Netatmo... Récupération du token d'accès.",
         "getDevicesValues": "Récupération des données en cours...",
         "dicoveringDevices": "Récupération des appareils en cours...",
-        "connectionError": "Erreur lors de la connexion, veuillez vérifier votre configuration.",
         "errorConnecting": {
           "other_error": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum.",
           "access_denied": "Autorisation déclinée, Veuillez tenter de nouveau et accepter la demande d'accès à vos données.",
@@ -673,16 +671,12 @@
         "namePlaceholder": "Entrez le nom de votre appareil",
         "modelLabel": "Modèle",
         "roomLabel": "Pièce",
+        "connectedPlugLabel": "Connecté au pont",
+        "roomNetatmoApiLabel": "Pièce dans l'API Netatmo",
         "featuresLabel": "Fonctionnalités",
         "saveButton": "Sauvegarder",
-        "updateButton": "Mettre à jour",
-        "editButton": "Editer",
         "deleteButton": "Supprimer",
-        "unmanagedModelButton": "Modèle non pris en charge",
-        "noValueReceived": "Aucune valeur reçue.",
-        "firmwareRevisionLabel": "Firmware: ",
-        "connectedPlugLabel": "Connecté au pont",
-        "roomNetatmoApiLabel": "Pièce dans l'API Netatmo"
+        "noValueReceived": "Aucune valeur reçue."
       },
       "discover": {
         "title": "Vos appareils Netatmo compatibles avec Gladys",
@@ -691,25 +685,27 @@
         "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Netatmo).",
         "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Si vous possédez un Thermostat Netatmo, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
         "alreadyCreatedButton": "Déjà créé",
+        "updateButton": "Mettre à jour",
+        "unmanagedModelButton": "Modèle non pris en charge",
         "scan": "Scanner",
         "refresh": "Rafraîchir"
       },
       "setup": {
         "title": "Configuration Netatmo",
-        "clientIdLabel": "Identifiant client",
-        "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
-        "clientSecretLabel": "Secret client",
-        "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
-        "saveLabel": "Sauvegarder et connecter",
-        "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d’accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
-        "disconnectLabel": "Déconnecter",
         "description": "Vous pouvez connecter Gladys à votre compte Netatmo pour commander les appareils associés.",
         "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
         "descriptionCreateProject": "Vous devrez ensuite créer une \"application\" dans votre compte développeur Netatmo via le menu <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
         "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\" à copier ci-dessous.",
         "descriptionScopeInformation": "Lorsque vous connectez Gladys à votre App Netatmo dédiée, vous lui donnez l'autorisation d'accéder à vos données en lecture et en écriture (appelé scopes \"read\" et \"write\"). Vous n'avez rien à configuré, ces scopes sont automatiquement intégrés et vous serons exposés lors de la demande de connexion (voir documentation au besoin). Bien entendu, Gladys étant installée en local, aucune de ces données ne se retrouve exposées.",
         "titleAdditionalInformation": "Informations complémentaires sur le fonctionnement de l'API \"Energy\" :",
-        "descriptionAdditionalInformation": "Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe."
+        "descriptionAdditionalInformation": "Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe.",
+        "clientIdLabel": "Identifiant client",
+        "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
+        "clientSecretLabel": "Secret client",
+        "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
+        "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d’accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
+        "saveLabel": "Sauvegarder et connecter",
+        "disconnectLabel": "Déconnecter"
       },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",

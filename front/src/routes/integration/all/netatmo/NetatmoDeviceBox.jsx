@@ -334,7 +334,7 @@ class NetatmoDeviceBox extends Component {
 
                   {validModel && updateButton && (
                     <button onClick={this.saveDevice} class="btn btn-success mr-2">
-                      <Text id="integration.netatmo.device.updateButton" />
+                      <Text id="integration.netatmo.discover.updateButton" />
                     </button>
                   )}
 
@@ -353,7 +353,7 @@ class NetatmoDeviceBox extends Component {
                   {!validModel && (
                     <div>
                       <div class="alert alert-warning">
-                        <Text id="integration.netatmo.device.unmanagedModelButton" />
+                        <Text id="integration.netatmo.discover.unmanagedModelButton" />
                       </div>
                       <a class="btn btn-gray" href={createGithubUrl(device)} target="_blank" rel="noopener noreferrer">
                         <Text id="integration.philipsHue.device.createGithubIssue" />
