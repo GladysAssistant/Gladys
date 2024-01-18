@@ -110,6 +110,26 @@ const actionsFunc = {
       }
     });
   },
+  [ACTIONS.LIGHT.BLINK]: async (self, action, scope) => {
+    await Promise.map(action.devices, async (deviceSelector) => {
+      try {
+        const device = self.stateManager.get('device', deviceSelector);
+        const deviceFeature = getDeviceFeature(
+          device,
+          DEVICE_FEATURE_CATEGORIES.LIGHT,
+          DEVICE_FEATURE_TYPES.LIGHT.BINARY,
+        );
+        const [timesToBlink, waitingTime ] =action;
+        const timerId = setInterval(() => {
+          self.device.setValue(device, deviceFeature, 1);
+          self.device.setValue(device, deviceFeature, 0);
+        }, waitingTime);
+        setTimeout(() => clearInterval(timerId), waitingTime * 2 * timesToBlink);
+      } catch (e) {
+        logger.warn(e);
+      }
+    });
+  },
   [ACTIONS.SWITCH.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
       try {

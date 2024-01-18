@@ -335,6 +335,7 @@ const ACTIONS = {
     TURN_ON: 'light.turn-on',
     TURN_OFF: 'light.turn-off',
     TOGGLE: 'light.toggle',
+    BLINK: 'light.blink',
   },
   SWITCH: {
     TURN_ON: 'switch.turn-on',
