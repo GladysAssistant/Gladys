@@ -2548,7 +2548,23 @@
           "35": "Emergency",
           "36": "Disarm",
           "37": "Arm day zones",
-          "38": "Arm all zones"
+          "38": "Arm all zones",
+          "39": "On press",
+          "40": "On press release",
+          "41": "On hold",
+          "42": "On hold release",
+          "43": "Up press",
+          "44": "Up press release",
+          "45": "Up hold",
+          "46": "Up hold release",
+          "47": "Down press",
+          "48": "Down press release",
+          "49": "Down hold",
+          "50": "Down hold release",
+          "51": "Off press",
+          "52": "Off presse release",
+          "53": "Off hold",
+          "54": "Off hold release"
         }
       },
       "opening-sensor": {

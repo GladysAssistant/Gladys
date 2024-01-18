@@ -2550,7 +2550,23 @@
           "35": "Urgence",
           "36": "Désarmer alarme",
           "37": "Armer zones jour",
-          "38": "Armer alarme"
+          "38": "Armer alarme",
+          "39": "Bouton On pressé",
+          "40": "Bouton On relaché",
+          "41": "Bouton On maintenu",
+          "42": "Bouton On maintenu relaché",
+          "43": "Bouton Haut pressé",
+          "44": "Bouton Haut relaché",
+          "45": "Bouton Haut maintenu",
+          "46": "Bouton Haut maintenu relaché",
+          "47": "Bouton Bas pressé",
+          "48": "Bouton Bas relaché",
+          "49": "Bouton Bas maintenu",
+          "50": "Bouton Bas maintenu relaché",
+          "51": "Bouton Off pressé",
+          "52": "Bouton Off relaché",
+          "53": "Bouton Off maintenu",
+          "54": "Bouton Off maintenu relaché"
         }
       },
       "opening-sensor": {
