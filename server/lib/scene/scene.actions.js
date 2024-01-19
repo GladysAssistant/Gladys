@@ -119,12 +119,12 @@ const actionsFunc = {
           DEVICE_FEATURE_CATEGORIES.LIGHT,
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         );
-        const [timesToBlink, waitingTime ] =action;
+        const { timesToBlink, waitingTime } = action;
         const timerId = setInterval(() => {
           self.device.setValue(device, deviceFeature, 1);
           self.device.setValue(device, deviceFeature, 0);
         }, waitingTime);
-        setTimeout(() => clearInterval(timerId), waitingTime * 2 * timesToBlink);
+        setTimeout(() => clearInterval(timerId), waitingTime * (timesToBlink + 1));
       } catch (e) {
         logger.warn(e);
       }
