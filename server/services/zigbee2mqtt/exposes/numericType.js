@@ -17,10 +17,10 @@ module.exports = {
     max: 10000,
   },
   names: {
-    action_duration:{
+    duration:{
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.DURATION,
-        type: DEVICE_FEATURE_TYPES.DURATION.INTEGER,
+        type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
         unit: DEVICE_FEATURE_UNITS.SECONDS,
       },
     },
