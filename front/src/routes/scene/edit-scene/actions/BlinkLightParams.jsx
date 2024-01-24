@@ -29,13 +29,13 @@ class BlinkLight extends Component {
       this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'devices', []);
     }
   };
-  handleChangeTimesToBlink = e => {
+  handleChangeBlinkingTime = e => {
     let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'timesToBlink', newValue);
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinkingTime', newValue);
   };
-  handleChangeWaitingTime = e => {
-    let newValue = Number.isInteger(parseInt(e.target.value, 10)) ? parseInt(e.target.value, 10) : 0;
-    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'waitingTime', newValue);
+  handleChangeBlinkingSpeed = e => {
+    console.log(e.target.value);
+    this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinkingSpeed', e.target.value);
   };
   refreshSelectedOptions = nextProps => {
     const selectedOptions = [];
@@ -64,57 +64,59 @@ class BlinkLight extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOptions, deviceOptions }) {
+  render(props, { selectedOptions, deviceOptions, blinkingSpeed }) {
     return (
-      <div class="row">
-        <div class="col-sm-4">
-          <div class="form-group">
-            <div class="form-label">
-              <Text id="editScene.actionsCard.blinkLigths.label" />
-            </div>
-            <Select
-              defaultValue={[]}
-              isMulti
-              value={selectedOptions}
-              onChange={this.handleChange}
-              options={deviceOptions}
-            />
-          </div>
-        </div>
-        <div class="col-sm-4">
-          <div class="form-group">
-            <div class="form-label">Répéter</div>
-            <Localizer>
-              <input
-                type="text"
-                class="form-control"
-                value={props.action.timesToBlink}
-                onChange={this.handleChangeTimesToBlink}
-                placeholder={<Text id="editScene.actionsCard.blinkLights.timesToBlink.placeholder" />}
+      <div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="form-group">
+              <div class="form-label">
+                <Text id="editScene.actionsCard.blinkLigths.label" />
+              </div>
+              <Select
+                defaultValue={[]}
+                isMulti
+                value={selectedOptions}
+                onChange={this.handleChange}
+                options={deviceOptions}
               />
-            </Localizer>
+            </div>
           </div>
         </div>
-        <div class="col-sm-4">
-          <div class="form-group">
-            <div class="form-label">toutes les</div>
-            <Localizer>
-              <div class="input-group">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group">
+              <div class="form-label">
+                <Text id="editScene.actionsCard.blinkLights.blinkingTime.label" />
+              </div>
+              <Localizer>
                 <input
                   type="text"
                   class="form-control"
-                  value={props.action.waitingTime}
-                  onChange={this.handleChangeWaitingTime}
-                  aria-describedby="basic-addon2"
-                  placeholder={<Text id="editScene.actionsCard.blinkLights.waitingTime.placeholder" />}
+                  value={props.action.blinkingTime}
+                  onChange={this.handleChangeBlinkingTime}
+                  placeholder={<Text id="editScene.actionsCard.blinkLights.blinkingTime.placeholder" />}
                 />
-                <div class="input-group-append">
-                  <span class="input-group-text" id="basic-addon2">
-                    ms
-                  </span>
-                </div>
+              </Localizer>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <div class="form-label">
+                <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.label" />
               </div>
-            </Localizer>
+              <select class="custom-select" value={blinkingSpeed} onChange={this.handleChangeBlinkingSpeed}>
+                <option value="slow">
+                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.slow" />
+                </option>
+                <option value="medium">
+                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.medium" />
+                </option>
+                <option value="fast">
+                  <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.fast" />
+                </option>
+              </select>
+            </div>
           </div>
         </div>
       </div>

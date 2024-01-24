@@ -1681,12 +1681,16 @@
       },
       "blinkLights": {
         "label": "Sélectionnez les lumières que vous souhaitez faire clignoter",
-        "description": "Réglez le nombre de fois et le temps entre chaque clignotement",
-        "timesToBlink": {
-          "placeholder": "3 fois"
+        "description": "Réglez la durée et la vitesse de clignotement",
+        "blinkingTime": {
+          "label": "Durée (en secondes)",
+          "placeholder": "3"
         },
-        "waitingTime": {
-          "placeholder": "200ms"
+        "blinkingSpeed": {
+          "label": "Mode",
+          "slow": "Lent",
+          "medium": "Normal",
+          "fast": "Rapide"
         }
       },
       "turnOnSwitches": {

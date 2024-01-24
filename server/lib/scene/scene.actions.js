@@ -111,6 +111,22 @@ const actionsFunc = {
     });
   },
   [ACTIONS.LIGHT.BLINK]: async (self, action, scope) => {
+    const { blinkingSpeed, blinkingTime } = action;
+    let blinkingInterval;
+    switch (blinkingSpeed) {
+      case 'slow':
+        blinkingInterval = 1000;
+        break;
+      case 'medium':
+        blinkingInterval = 500;
+        break;
+      case 'fast':
+        blinkingInterval = 100;
+        break;
+      default:
+        blinkingInterval = 100;
+        break;
+    }
     await Promise.map(action.devices, async (deviceSelector) => {
       try {
         const device = self.stateManager.get('device', deviceSelector);
@@ -119,12 +135,12 @@ const actionsFunc = {
           DEVICE_FEATURE_CATEGORIES.LIGHT,
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         );
-        const { timesToBlink, waitingTime } = action;
         const timerId = setInterval(() => {
-          self.device.setValue(device, deviceFeature, 1);
-          self.device.setValue(device, deviceFeature, 0);
-        }, waitingTime);
-        setTimeout(() => clearInterval(timerId), waitingTime * (timesToBlink + 1));
+          const newValue = deviceFeature.last_value === 0 ? 1 : 0;
+          self.device.setValue(device, deviceFeature, newValue);
+          self.device.setValue(device, deviceFeature, !newValue);
+        }, blinkingInterval);
+        setTimeout(() => clearInterval(timerId), blinkingTime);
       } catch (e) {
         logger.warn(e);
       }

@@ -1679,12 +1679,16 @@
       },
       "blinkLights": {
         "label": "Select the lights you want to make blink",
-        "description": "Configure delay between each blink and number of blinks",
-        "timesToBlink": {
+        "description": "Configure blinking duration and speed",
+        "blinkingTime": {
+          "label": "Duration (in seconds)",
           "placeholder": "3"
         },
-        "waitingTime": {
-          "placeholder": "200"
+        "blinkingSpeed": {
+          "label": "Mode",
+          "slow": "Slow",
+          "medium": "Medium",
+          "fast": "Fast"
         }
       },
       "turnOnSwitches": {
