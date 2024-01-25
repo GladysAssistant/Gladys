@@ -135,12 +135,15 @@ const actionsFunc = {
           DEVICE_FEATURE_CATEGORIES.LIGHT,
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         );
+        const oldValue = deviceFeature.last_value;
         const timerId = setInterval(() => {
-          const newValue = deviceFeature.last_value === 0 ? 1 : 0;
-          self.device.setValue(device, deviceFeature, newValue);
-          self.device.setValue(device, deviceFeature, !newValue);
+          self.device.setValue(device, deviceFeature, 1);
+          self.device.setValue(device, deviceFeature, 0);
         }, blinkingInterval);
-        setTimeout(() => clearInterval(timerId), blinkingTime);
+        setTimeout(() => {
+            clearInterval(timerId);
+            self.device.setValue(device, deviceFeature, oldValue);
+          }, blinkingTime * 1000);
       } catch (e) {
         logger.warn(e);
       }
