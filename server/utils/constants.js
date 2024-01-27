@@ -49,7 +49,7 @@ const BUTTON_STATUS = {
   DOWN_PRESS: 43,
   DOWN_HOLD: 44,
   OFF_PRESS: 45,
-  OFF_HOLD: 46
+  OFF_HOLD: 46,
 };
 
 const COVER_STATE = {
