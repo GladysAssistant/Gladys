@@ -1,13 +1,13 @@
-const {
-  buildFeatureTemperature,
-  buildFeatureThermSetpointTemperature,
-  buildFeatureOpenWindow,
-} = require('./netatmo.buildFeaturesCommonTemp');
+const { buildFeatureTemperature, buildFeatureOpenWindow } = require('./netatmo.buildFeaturesCommonTemp');
 const logger = require('../../../../utils/logger');
 const { SUPPORTED_MODULE_TYPE, PARAMS } = require('../utils/netatmo.constants');
 const { buildFeatureBattery } = require('./netatmo.buildFeaturesCommon');
 const { buildFeatureRfStrength, buildFeatureWifiStrength } = require('./netatmo.buildFeaturesSignal');
-const { buildFeatureBoilerStatus, buildFeaturePlugConnectedBoiler } = require('./netatmo.buildFeaturesSpecifEnergy');
+const {
+  buildFeatureThermSetpointTemperature,
+  buildFeatureBoilerStatus,
+  buildFeaturePlugConnectedBoiler,
+} = require('./netatmo.buildFeaturesSpecifEnergy');
 
 /**
  * @description Transform Netatmo device to Gladys device.
@@ -57,7 +57,7 @@ function convertDevice(netatmoDevice) {
     default:
       break;
   }
-  /* features common to all devices */
+  /* params common to all devices features */
   params.push({ name: PARAMS.HOME_ID, value: homeId });
   if (room.id) {
     params.push({ name: PARAMS.ROOM_ID, value: room.id }, { name: PARAMS.ROOM_NAME, value: room.name });
