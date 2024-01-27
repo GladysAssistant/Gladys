@@ -136,12 +136,14 @@ const actionsFunc = {
           DEVICE_FEATURE_TYPES.LIGHT.BINARY,
         );
         const oldValue = deviceFeature.last_value;
-        const timerId = setInterval(() => {
-          self.device.setValue(device, deviceFeature, 1);
-          self.device.setValue(device, deviceFeature, 0);
+        let newValue = 0;
+        let timerId = setTimeout(function blink() {
+          newValue = 1 - newValue;
+          self.device.setValue(device, deviceFeature, newValue);
+          timerId = setTimeout(blink, blinkingInterval);
         }, blinkingInterval);
         setTimeout(() => {
-          clearInterval(timerId);
+          clearTimeout(timerId);
           self.device.setValue(device, deviceFeature, oldValue);
         }, blinkingTime * 1000);
       } catch (e) {
