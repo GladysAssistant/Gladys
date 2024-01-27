@@ -13,11 +13,19 @@ async function updateNATherm1(deviceGladys, deviceNetatmo, externalId) {
   const { measured, room } = deviceNetatmo;
   try {
     deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:rf_strength`)
+      .filter((feature) => feature.external_id === `${externalId}:battery_percent`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `${externalId}:rf_strength`,
-          state: readValues[feature.category][feature.type](deviceNetatmo.rf_strength),
+          device_feature_external_id: `${externalId}:battery_percent`,
+          state: readValues[feature.category][feature.type](deviceNetatmo.battery_percent),
+        });
+      });
+    deviceGladys.features
+      .filter((feature) => feature.external_id === `${externalId}:temperature`)
+      .forEach((feature) => {
+        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
+          device_feature_external_id: `${externalId}:temperature`,
+          state: readValues[feature.category][feature.type](measured.temperature),
         });
       });
     deviceGladys.features
@@ -45,11 +53,11 @@ async function updateNATherm1(deviceGladys, deviceNetatmo, externalId) {
         });
       });
     deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:battery_percent`)
+      .filter((feature) => feature.external_id === `${externalId}:rf_strength`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `${externalId}:battery_percent`,
-          state: readValues[feature.category][feature.type](deviceNetatmo.battery_percent),
+          device_feature_external_id: `${externalId}:rf_strength`,
+          state: readValues[feature.category][feature.type](deviceNetatmo.rf_strength),
         });
       });
     deviceGladys.features
@@ -58,14 +66,6 @@ async function updateNATherm1(deviceGladys, deviceNetatmo, externalId) {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
           device_feature_external_id: `${externalId}:boiler_status`,
           state: readValues[feature.category][feature.type](deviceNetatmo.boiler_status),
-        });
-      });
-    deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:temperature`)
-      .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: `${externalId}:temperature`,
-          state: readValues[feature.category][feature.type](measured.temperature),
         });
       });
   } catch (e) {

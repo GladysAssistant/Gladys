@@ -1,6 +1,4 @@
-const { EVENTS } = require('../../../utils/constants');
 const { BadParameters } = require('../../../utils/coreErrors');
-const { readValues } = require('./device/netatmo.deviceMapping');
 const { updateNAPlug } = require('./device/netatmo.updateNAPlug');
 const { updateNATherm1 } = require('./device/netatmo.updateNATherm1');
 const { SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
