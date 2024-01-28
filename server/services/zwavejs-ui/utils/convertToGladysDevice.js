@@ -13,10 +13,10 @@ const cleanNames = (text) => {
     .toLowerCase();
 };
 
-const getDeviceFeatureId = (nodeId, commandClass, endpoint, property, propertyKey) => {
-  const propertyKeyClean = cleanNames(propertyKey);
-  return `zwavejs-ui:${nodeId}-${commandClass}-${endpoint}-${cleanNames(property)}${
-    propertyKeyClean !== '' ? `-${propertyKeyClean}` : ''
+const getDeviceFeatureId = (nodeId, commandClassName, endpoint, propertyName, propertyKeyName) => {
+  const propertyKeyNameClean = cleanNames(propertyKeyName);
+  return `zwavejs-ui:${nodeId}:${endpoint}:${cleanNames(commandClassName)}:${cleanNames(propertyName)}${
+    propertyKeyNameClean !== '' ? `:${propertyKeyNameClean}` : ''
   }`;
 };
 
@@ -26,10 +26,10 @@ const convertToGladysDevice = (serviceId, device) => {
   // Foreach value, we check if there is a matching feature in Gladys
   Object.keys(device.values).forEach((valueKey) => {
     const value = device.values[valueKey];
-    const { commandClass, commandClassName, property, propertyKey, endpoint, commandClassVersion = 1 } = value;
+    const { commandClass, commandClassName, propertyName, propertyKeyName, endpoint, commandClassVersion = 1 } = value;
     const commandClassNameClean = cleanNames(commandClassName);
-    const propertyClean = cleanNames(property);
-    const propertyKeyClean = cleanNames(propertyKey);
+    const propertyClean = cleanNames(propertyName);
+    const propertyKeyClean = cleanNames(propertyKeyName);
     let exposePath = `${commandClassNameClean}.${propertyClean}`;
     if (propertyKeyClean !== '') {
       exposePath += `.${propertyKeyClean}`;
@@ -39,15 +39,15 @@ const convertToGladysDevice = (serviceId, device) => {
       features.push({
         ...exposeFound,
         name: value.id,
-        external_id: getDeviceFeatureId(device.id, commandClass, endpoint, property, propertyKey),
+        external_id: getDeviceFeatureId(device.id, commandClassName, endpoint, propertyName, propertyKeyName),
         node_id: device.id,
         // These are custom properties only available on the object in memory (not in DB)
         command_class_version: commandClassVersion,
         command_class_name: commandClassName,
         command_class: commandClass,
         endpoint,
-        property,
-        property_key: propertyKey,
+        property_name: propertyName,
+        property_key_name: propertyKeyName,
       });
     }
   });

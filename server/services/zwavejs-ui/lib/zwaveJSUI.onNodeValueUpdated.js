@@ -12,13 +12,13 @@ async function onNodeValueUpdated(message) {
   // A value has been updated: https://zwave-js.github.io/node-zwave-js/#/api/node?id=quotvalue-addedquot-quotvalue-updatedquot-quotvalue-removedquot
   const messageNode = message.data[0];
   const updatedValue = message.data[1];
-  const { commandClassName, commandClass, property, propertyKey, endpoint, newValue } = updatedValue;
+  const { commandClassName, propertyName, propertyKeyName, endpoint, newValue } = updatedValue;
   const comClassNameClean = cleanNames(commandClassName);
-  const propertyClean = cleanNames(property);
-  const propertyKeyClean = cleanNames(propertyKey);
-  let statePath = `${comClassNameClean}.${propertyClean}`;
-  if (propertyKeyClean !== '') {
-    statePath += `.${propertyKeyClean}`;
+  const propertyNameClean = cleanNames(propertyName);
+  const propertyKeyNameClean = cleanNames(propertyKeyName);
+  let statePath = `${comClassNameClean}.${propertyNameClean}`;
+  if (propertyKeyNameClean !== '') {
+    statePath += `.${propertyKeyNameClean}`;
   }
   const valueConverted = get(STATES, `${statePath}.${newValue}`);
 
@@ -28,7 +28,7 @@ async function onNodeValueUpdated(message) {
     return;
   }
 
-  const featureId = getDeviceFeatureId(messageNode.id, commandClass, endpoint, property, propertyKey);
+  const featureId = getDeviceFeatureId(messageNode.id, commandClassName, endpoint, propertyName, propertyKeyName);
   const nodeFeature = node.features.find((f) => f.external_id === featureId);
   if (!nodeFeature) {
     return;

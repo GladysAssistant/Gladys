@@ -11,10 +11,10 @@ const { cleanNames } = require('../utils/convertToGladysDevice');
  * getCommand({command_class_name: 'Notification', property: 'Home Security', property_key: 'Cover Status'})
  */
 function getCommand(nodeFeature) {
-  let commandPath = `${cleanNames(nodeFeature.command_class_name)}.${cleanNames(nodeFeature.property)}`;
-  const propertyKeyClean = cleanNames(nodeFeature.property_key);
-  if (propertyKeyClean !== '') {
-    commandPath += `.${propertyKeyClean}`;
+  let commandPath = `${cleanNames(nodeFeature.command_class_name)}.${cleanNames(nodeFeature.property_name)}`;
+  const propertyKeyNameClean = cleanNames(nodeFeature.property_key_name);
+  if (propertyKeyNameClean !== '') {
+    commandPath += `.${propertyKeyNameClean}`;
   }
 
   return get(COMMANDS, commandPath);

@@ -32,7 +32,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       await zwaveJSUIHandler.setValue(
         { external_id: 'zwavejs-ui:2' },
         {
-          external_id: 'zwavejs-ui:42-112-0-24',
+          external_id: 'zwavejs-ui:42:0:notification:unused:unused',
         },
         '1',
       );
@@ -51,7 +51,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       await zwaveJSUIHandler.setValue(
         { external_id: 'zwavejs-ui:2' },
         {
-          external_id: 'not-zwavejs-ui:42-112-0-24',
+          external_id: 'not-zwavejs-ui:42:0:unused:unused:unused',
         },
         '1',
       );
@@ -71,7 +71,7 @@ describe('zwaveJSUIHandler.setValue', () => {
         external_id: 'zwavejs-ui:2',
         features: [
           {
-            external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
           },
         ],
       },
@@ -80,7 +80,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       await zwaveJSUIHandler.setValue(
         { external_id: 'zwavejs-ui:2' },
         {
-          external_id: 'zwavejs-ui:42-112-0-24',
+          external_id: 'zwavejs-ui:2:0:other:not_known:not_known',
         },
         '1',
       );
@@ -100,10 +100,10 @@ describe('zwaveJSUIHandler.setValue', () => {
         external_id: 'zwavejs-ui:2',
         features: [
           {
-            external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
             command_class_name: 'Notification',
-            property: 'Access Control',
-            property_key: 'Door State (Simple)',
+            property_name: 'Access Control',
+            property_key_name: 'Door State (Simple)',
           },
         ],
       },
@@ -112,7 +112,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       await zwaveJSUIHandler.setValue(
         { external_id: 'zwavejs-ui:2' },
         {
-          external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+          external_id: 'zwavejs-ui:20:notification:access_control:door_state_simple',
         },
         '1',
       );
@@ -147,14 +147,14 @@ describe('zwaveJSUIHandler.setValue', () => {
             read_only: false,
             has_feedback: true,
             name: '3-37-0-currentValue',
-            external_id: 'zwavejs-ui:3-37-0-currentvalue',
+            external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
             node_id: 3,
             command_class_version: 1,
             command_class_name: 'Binary Switch',
             command_class: 37,
             endpoint: 0,
-            property: 'currentValue',
-            property_key: undefined,
+            property_name: 'currentValue',
+            property_key_name: undefined,
           },
         ],
       },
@@ -162,7 +162,7 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     await zwaveJSUIHandler.setValue(
       { external_id: 'zwavejs-ui:3' },
-      { external_id: 'zwavejs-ui:3-37-0-currentvalue' },
+      { external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue' },
       '0',
     );
 
@@ -198,14 +198,14 @@ describe('zwaveJSUIHandler.setValue', () => {
             read_only: false,
             has_feedback: true,
             name: '3-37-0-currentValue',
-            external_id: 'zwavejs-ui:3-37-0-currentvalue',
+            external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
             node_id: 3,
             command_class_version: 1,
             command_class_name: 'Binary Switch',
             command_class: 37,
             endpoint: 0,
-            property: 'currentValue',
-            property_key: undefined,
+            property_name: 'currentValue',
+            property_key_name: undefined,
           },
         ],
       },
@@ -213,7 +213,7 @@ describe('zwaveJSUIHandler.setValue', () => {
 
     await zwaveJSUIHandler.setValue(
       { external_id: 'zwavejs-ui:3' },
-      { external_id: 'zwavejs-ui:3-37-0-currentvalue' },
+      { external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue' },
       '1',
     );
 

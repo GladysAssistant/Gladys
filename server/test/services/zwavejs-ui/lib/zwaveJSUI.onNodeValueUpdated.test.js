@@ -31,7 +31,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         external_id: 'zwavejs-ui:2',
         features: [
           {
-            external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
           },
         ],
       },
@@ -87,7 +87,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         external_id: 'zwavejs-ui:2',
         features: [
           {
-            external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
           },
         ],
       },
@@ -105,11 +105,12 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
           prevValue: 23,
           propertyName: 'Access Control',
           propertyKey: 'Door state (simple)',
+          propertyKeyName: 'Door state (simple)',
         },
       ],
     });
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+      device_feature_external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
       state: 0,
     });
   });
@@ -120,7 +121,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         external_id: 'zwavejs-ui:2',
         features: [
           {
-            external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+            external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
           },
         ],
       },
@@ -138,11 +139,12 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
           prevValue: 22,
           propertyName: 'Access Control',
           propertyKey: 'Door state (simple)',
+          propertyKeyName: 'Door state (simple)',
         },
       ],
     });
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:2-113-0-access_control-door_state_simple',
+      device_feature_external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
       state: 1,
     });
   });
@@ -153,7 +155,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         external_id: 'zwavejs-ui:3',
         features: [
           {
-            external_id: 'zwavejs-ui:3-37-0-currentvalue',
+            external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
           },
         ],
       },
@@ -174,7 +176,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       ],
     });
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:3-37-0-currentvalue',
+      device_feature_external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
       state: 1,
     });
   });
@@ -185,7 +187,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
         external_id: 'zwavejs-ui:3',
         features: [
           {
-            external_id: 'zwavejs-ui:3-37-0-currentvalue',
+            external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
           },
         ],
       },
@@ -206,7 +208,7 @@ describe('zwaveJSUIHandler.onNodeValueUpdated', () => {
       ],
     });
     assert.calledWith(gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: 'zwavejs-ui:3-37-0-currentvalue',
+      device_feature_external_id: 'zwavejs-ui:3:0:binary_switch:currentvalue',
       state: 0,
     });
   });
