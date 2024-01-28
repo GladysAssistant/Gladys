@@ -17,7 +17,7 @@ module.exports = {
     max: 10000,
   },
   names: {
-    duration:{
+    duration: {
       feature: {
         category: DEVICE_FEATURE_CATEGORIES.DURATION,
         type: DEVICE_FEATURE_TYPES.DURATION.DECIMAL,
