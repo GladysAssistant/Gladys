@@ -72,6 +72,7 @@ const SUPPORTED_CATEGORY_TYPE = {
 const SUPPORTED_MODULE_TYPE = {
   THERMOSTAT: 'NATherm1',
   PLUG: 'NAPlug',
+  NRV: 'NRV',
 };
 
 const PARAMS = {

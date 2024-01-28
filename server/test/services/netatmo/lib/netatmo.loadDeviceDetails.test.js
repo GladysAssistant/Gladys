@@ -46,7 +46,7 @@ describe('Netatmo Load Device Details', () => {
       .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
-    expect(devices).to.have.lengthOf(4);
+    expect(devices).to.have.lengthOf(5);
     expect(devices.filter((device) => device.type === 'NATherm1')).to.have.lengthOf(1);
     expect(devices.filter((device) => device.type === 'NAPlug')).to.have.lengthOf(2);
     expect(devices.filter((device) => device.not_handled)).to.have.lengthOf(1);
@@ -78,7 +78,7 @@ describe('Netatmo Load Device Details', () => {
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
-    expect(devices).to.have.lengthOf(3);
+    expect(devices).to.have.lengthOf(4);
     expect(devices.filter((device) => device.type === 'NATherm1')).to.have.lengthOf(0);
     expect(devices.filter((device) => device.type === 'NAPlug')).to.have.lengthOf(2);
     expect(devices.filter((device) => device.not_handled)).to.have.lengthOf(1);
