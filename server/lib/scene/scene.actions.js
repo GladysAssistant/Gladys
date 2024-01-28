@@ -145,7 +145,7 @@ const actionsFunc = {
         setTimeout(() => {
           clearTimeout(timerId);
           self.device.setValue(device, deviceFeature, oldValue);
-        }, blinkingTime * 1000);
+        }, blinkingTime * 1000 + blinkingInterval);
       } catch (e) {
         logger.warn(e);
       }
