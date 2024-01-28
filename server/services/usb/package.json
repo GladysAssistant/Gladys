@@ -14,6 +14,6 @@
   ],
   "scripts": {},
   "dependencies": {
-    "serialport": "^12.0.0"
+    "serialport": "^8.0.5"
   }
 }
