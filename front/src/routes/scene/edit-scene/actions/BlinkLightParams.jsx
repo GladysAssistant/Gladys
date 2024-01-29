@@ -63,7 +63,7 @@ class BlinkLight extends Component {
     this.refreshSelectedOptions(nextProps);
   }
 
-  render(props, { selectedOptions, deviceOptions, blinkingSpeed }) {
+  render(props, { selectedOptions, deviceOptions }) {
     return (
       <div>
         <div class="row">
