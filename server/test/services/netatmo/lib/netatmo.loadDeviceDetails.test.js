@@ -151,7 +151,6 @@ describe('Netatmo Load Device Details', () => {
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
-
     expect(natWeatherStationDevices).to.have.lengthOf.at.least(1);
     natWeatherStationDevices.forEach((device) => {
       expect(device)

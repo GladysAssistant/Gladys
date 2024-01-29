@@ -22,9 +22,9 @@ const serviceId = 'serviceId';
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 describe('Netatmo update NRV features', () => {
-  const deviceGladysNRV = devicesGladys[4];
-  const deviceNetatmoNRV = JSON.parse(JSON.stringify(devicesNetatmo[4]));
-  const externalIdNRV = `netatmo:${devicesNetatmo[4].id}`;
+  const deviceGladysNAMain = devicesGladys[4];
+  const deviceNetatmoNAMain = JSON.parse(JSON.stringify(devicesNetatmo[4]));
+  const externalIdNAMain = `netatmo:${devicesNetatmo[4].id}`;
   beforeEach(() => {
     sinon.reset();
 
@@ -36,11 +36,11 @@ describe('Netatmo update NRV features', () => {
   });
 
   it('should save all values according to all cases', async () => {
-    await netatmoHandler.updateNAMain(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
+    await netatmoHandler.updateNAMain(deviceGladysNAMain, deviceNetatmoNAMain, externalIdNAMain);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(9);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: `${deviceGladysNRV.external_id}:temperature`,
+      device_feature_external_id: `${deviceGladysNAMain.external_id}:temperature`,
       state: 20.2,
     });
     expect(
@@ -99,7 +99,7 @@ describe('Netatmo update NRV features', () => {
     ).to.equal(true);
   });
   it('should handle errors correctly', async () => {
-    deviceNetatmoNRV.battery_percent = undefined;
+    deviceNetatmoNAMain.battery_percent = undefined;
     const error = new Error('Test error');
     netatmoHandler.gladys = {
       event: {
@@ -109,7 +109,7 @@ describe('Netatmo update NRV features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNAMain(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
+      await netatmoHandler.updateNAMain(deviceGladysNAMain, deviceNetatmoNAMain, externalIdNAMain);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);
