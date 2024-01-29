@@ -31,7 +31,7 @@ async function refreshNetatmoValues() {
         logger.info(`device ${externalId} - ${device.type} does not exist in Gladys`);
       }
     },
-    { concurrency: 10 },
+    { concurrency: 2 },
   );
   await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
 }
