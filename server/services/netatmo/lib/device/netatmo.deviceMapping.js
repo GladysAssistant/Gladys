@@ -61,6 +61,33 @@ const readValues = {
       return valueToGladys;
     },
   },
+  [DEVICE_FEATURE_CATEGORIES.CO2_SENSOR]: {
+    /* co2: 550 */
+    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice) => {
+      const valueToGladys = parseInt(valueFromDevice, 10);
+      return valueToGladys;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.HUMIDITY_SENSOR]: {
+    /* humidity: 26 */
+    [DEVICE_FEATURE_TYPES.SENSOR.DECIMAL]: (valueFromDevice) => {
+      return valueFromDevice;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.NOISE_SENSOR]: {
+    /* noise: 32 */
+    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice) => {
+      const valueToGladys = parseInt(valueFromDevice, 10);
+      return valueToGladys;
+    },
+  },
+  [DEVICE_FEATURE_CATEGORIES.PRESSURE_SENSOR]: {
+    /* pressure: 1050 or absolute_pressure: 1018 */
+    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice) => {
+      const valueToGladys = parseInt(valueFromDevice, 10);
+      return valueToGladys;
+    },
+  },
 };
 
 module.exports = { readValues, writeValues };

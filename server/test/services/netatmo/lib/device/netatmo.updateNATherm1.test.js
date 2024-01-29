@@ -3,7 +3,6 @@ const sinon = require('sinon');
 
 const { fake } = sinon;
 
-const { updateNATherm1 } = require('../../../../../services/netatmo/lib/device/netatmo.updateNATherm1');
 const devicesGladys = require('../../netatmo.convertDevices.mock.test.json');
 const devicesNetatmo = require('../../netatmo.loadDevices.mock.test.json');
 const { EVENTS } = require('../../../../../utils/constants');
@@ -37,7 +36,7 @@ describe('Netatmo update NATherm1 features', () => {
   });
 
   it('should save all values according to all cases', async () => {
-    await updateNATherm1.bind(netatmoHandler)(deviceGladys, deviceNetatmoNATherm1, externalIdNATherm1);
+    await netatmoHandler.updateNATherm1(deviceGladys, deviceNetatmoNATherm1, externalIdNATherm1);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(7);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -98,7 +97,7 @@ describe('Netatmo update NATherm1 features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await updateNATherm1.bind(netatmoHandler)(deviceGladys, deviceNetatmoNATherm1, externalIdNATherm1);
+      await netatmoHandler.updateNATherm1(deviceGladys, deviceNetatmoNATherm1, externalIdNATherm1);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

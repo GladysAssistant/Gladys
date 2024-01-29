@@ -22,9 +22,9 @@ const serviceId = 'serviceId';
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
 describe('Netatmo update NRV features', () => {
-  const deviceGladysNRV = devicesGladys[3];
-  const deviceNetatmoNRV = JSON.parse(JSON.stringify(devicesNetatmo[3]));
-  const externalIdNRV = `netatmo:${devicesNetatmo[3].id}`;
+  const deviceGladysNRV = devicesGladys[4];
+  const deviceNetatmoNRV = JSON.parse(JSON.stringify(devicesNetatmo[4]));
+  const externalIdNRV = `netatmo:${devicesNetatmo[4].id}`;
   beforeEach(() => {
     sinon.reset();
 
@@ -36,41 +36,65 @@ describe('Netatmo update NRV features', () => {
   });
 
   it('should save all values according to all cases', async () => {
-    await netatmoHandler.updateNRV(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
+    await netatmoHandler.updateNAMain(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
 
-    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(5);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(9);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: `${deviceGladysNRV.external_id}:battery_percent`,
-      state: 90,
+      device_feature_external_id: `${deviceGladysNRV.external_id}:temperature`,
+      state: 20.2,
     });
     expect(
       netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:09:00:00:xx:xx:xx:battery_percent',
-        state: 90,
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:temperature',
+        state: 20.2,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(1).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:09:00:00:xx:xx:xx:therm_measured_temperature',
-        state: 18.5,
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:co2',
+        state: 500,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(2).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:09:00:00:xx:xx:xx:therm_setpoint_temperature',
-        state: 19,
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:humidity',
+        state: 50,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(3).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:09:00:00:xx:xx:xx:open_window',
-        state: 0,
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:noise',
+        state: 32,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(4).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:09:00:00:xx:xx:xx:rf_strength',
-        state: 80,
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:pressure',
+        state: 1022,
+      }),
+    ).to.equal(true);
+    expect(
+      netatmoHandler.gladys.event.emit.getCall(5).calledWith(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:absolute_pressure',
+        state: 1007,
+      }),
+    ).to.equal(true);
+    expect(
+      netatmoHandler.gladys.event.emit.getCall(6).calledWith(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:min_temp',
+        state: 18.5,
+      }),
+    ).to.equal(true);
+    expect(
+      netatmoHandler.gladys.event.emit.getCall(7).calledWith(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:max_temp',
+        state: 20.7,
+      }),
+    ).to.equal(true);
+    expect(
+      netatmoHandler.gladys.event.emit.getCall(8).calledWith(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: 'netatmo:70:ee:50:jj:jj:jj:wifi_strength',
+        state: 38,
       }),
     ).to.equal(true);
   });
@@ -85,7 +109,7 @@ describe('Netatmo update NRV features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNRV(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
+      await netatmoHandler.updateNAMain(deviceGladysNRV, deviceNetatmoNRV, externalIdNRV);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);

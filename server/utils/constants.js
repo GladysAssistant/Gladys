@@ -429,6 +429,7 @@ const DEVICE_FEATURE_CATEGORIES = {
   LIGHT_SENSOR: 'light-sensor',
   MOTION_SENSOR: 'motion-sensor',
   MUSIC: 'music',
+  NOISE_SENSOR: 'noise-sensor',
   OPENING_SENSOR: 'opening-sensor',
   PM25_SENSOR: 'pm25-sensor',
   FORMALDEHYD_SENSOR: 'formaldehyd-sensor',
@@ -648,6 +649,7 @@ const DEVICE_FEATURE_UNITS = {
   HECTO_PASCAL: 'hPa',
   BAR: 'bar',
   PSI: 'psi',
+  MILLIBAR: 'milli-bar',
   // Light units
   LUX: 'lux',
   // Concentration units
@@ -730,6 +732,8 @@ const DEVICE_FEATURE_UNITS = {
   AQI: 'aqi',
   // For air quality (pm2.5, formaldehyd)
   MICROGRAM_PER_CUBIC_METER: 'microgram-per-cubic-meter',
+  // Noise units
+  DECIBEL: 'decibel',
 };
 
 const WEATHER_UNITS = {
@@ -762,6 +766,7 @@ const DEVICE_FEATURE_UNITS_BY_CATEGORY = {
     DEVICE_FEATURE_UNITS.HECTO_PASCAL,
     DEVICE_FEATURE_UNITS.BAR,
     DEVICE_FEATURE_UNITS.PSI,
+    DEVICE_FEATURE_UNITS.MILLIBAR,
   ],
   [DEVICE_FEATURE_CATEGORIES.TEMPERATURE_SENSOR]: [
     DEVICE_FEATURE_UNITS.CELSIUS,
