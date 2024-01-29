@@ -39,6 +39,30 @@
       },
       "modules": [
         {
+          "_id": "02:00:00:yy:yy:yy",
+          "type": "NAModule1",
+          "module_name": "Outdoor Hygrometer",
+          "last_setup": 1605564992,
+          "data_type": ["Temperature", "Humidity"],
+          "battery_percent": 32,
+          "reachable": true,
+          "firmware": 53,
+          "last_message": 1706525865,
+          "last_seen": 1706517393,
+          "rf_status": 59,
+          "battery_vp": 4784,
+          "dashboard_data": {
+            "time_utc": 1706525814,
+            "Temperature": 14.2,
+            "Humidity": 78,
+            "min_temp": 5.1,
+            "max_temp": 14.8,
+            "date_max_temp": 1706524020,
+            "date_min_temp": 1706487105,
+            "temp_trend": "up"
+          }
+        },
+        {
           "_id": "03:00:00:yy:yy:yy",
           "type": "NAModule4",
           "module_name": "STARK House kitchen hygrometer",
@@ -67,6 +91,30 @@
     }
   ],
   "modules": [
+    {
+      "_id": "02:00:00:yy:yy:yy",
+      "type": "NAModule1",
+      "module_name": "Outdoor Hygrometer",
+      "last_setup": 1605564992,
+      "data_type": ["Temperature", "Humidity"],
+      "battery_percent": 32,
+      "reachable": true,
+      "firmware": 53,
+      "last_message": 1706525865,
+      "last_seen": 1706517393,
+      "rf_status": 59,
+      "battery_vp": 4784,
+      "dashboard_data": {
+        "time_utc": 1706525814,
+        "Temperature": 14.2,
+        "Humidity": 78,
+        "min_temp": 5.1,
+        "max_temp": 14.8,
+        "date_max_temp": 1706524020,
+        "date_min_temp": 1706487105,
+        "temp_trend": "up"
+      }
+    },
     {
       "_id": "03:00:00:yy:yy:yy",
       "type": "NAModule4",

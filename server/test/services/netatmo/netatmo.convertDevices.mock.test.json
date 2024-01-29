@@ -478,6 +478,115 @@
     ]
   },
   {
+    "name": "Outdoor Hygrometer",
+    "external_id": "netatmo:02:00:00:yy:yy:yy",
+    "selector": "netatmo:02:00:00:yy:yy:yy",
+    "model": "NAModule1",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:battery_percent",
+        "selector": "netatmo:02:00:00:yy:yy:yy:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:temperature",
+        "selector": "netatmo:02:00:00:yy:yy:yy:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Minimum in Outdoor",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:min_temp",
+        "selector": "netatmo:02:00:00:yy:yy:yy:min_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Maximum in Outdoor",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:max_temp",
+        "selector": "netatmo:02:00:00:yy:yy:yy:max_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Humidity - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:humidity",
+        "selector": "netatmo:02:00:00:yy:yy:yy:humidity",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - Outdoor Hygrometer",
+        "external_id": "netatmo:02:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:02:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:jj:jj:jj"
+      },
+      {
+        "name": "plug_name",
+        "value": "Weather Station Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Outdoor"
+      }
+    ]
+  },
+  {
     "name": "STARK House kitchen hygrometer",
     "external_id": "netatmo:03:00:00:yy:yy:yy",
     "selector": "netatmo:03:00:00:yy:yy:yy",

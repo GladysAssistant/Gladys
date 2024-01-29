@@ -33,6 +33,10 @@ async function updateValues(deviceGladys, deviceNetatmo, externalId) {
       await this.updateNAMain(deviceGladys, deviceNetatmo, externalId);
       break;
     }
+    case SUPPORTED_MODULE_TYPE.NAMODULE1: {
+      await this.updateNAModule1(deviceGladys, deviceNetatmo, externalId);
+      break;
+    }
     case SUPPORTED_MODULE_TYPE.NAMODULE4: {
       await this.updateNAModule4(deviceGladys, deviceNetatmo, externalId);
       break;

@@ -53,7 +53,11 @@ async function loadDeviceDetails(homeData) {
             let device;
             let plugThermostat;
             let plugWeatherStation;
-            switch (module.type) {
+            let typeModule = module.type;
+            if (typeModule === SUPPORTED_MODULE_TYPE.NAMODULE1 || typeModule === SUPPORTED_MODULE_TYPE.NAMODULE4) {
+              typeModule = 'NAModule';
+            }
+            switch (typeModule) {
               case SUPPORTED_MODULE_TYPE.THERMOSTAT:
                 moduleSupported = true;
                 if (thermostats && modulesThermostat) {
@@ -101,7 +105,7 @@ async function loadDeviceDetails(homeData) {
                     .find((weatherStation) => weatherStation._id === module.id);
                 }
                 break;
-              case SUPPORTED_MODULE_TYPE.NAMODULE4:
+              case 'NAModule':
                 moduleSupported = true;
                 categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
                 if (weatherStations && modulesWeatherStations) {
