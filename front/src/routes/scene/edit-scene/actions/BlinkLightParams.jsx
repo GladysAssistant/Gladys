@@ -34,7 +34,6 @@ class BlinkLight extends Component {
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinkingTime', newValue);
   };
   handleChangeBlinkingSpeed = e => {
-    console.log(e.target.value);
     this.props.updateActionProperty(this.props.columnIndex, this.props.index, 'blinkingSpeed', e.target.value);
   };
   refreshSelectedOptions = nextProps => {
@@ -105,7 +104,7 @@ class BlinkLight extends Component {
               <div class="form-label">
                 <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.label" />
               </div>
-              <select class="custom-select" value={blinkingSpeed} onChange={this.handleChangeBlinkingSpeed}>
+              <select class="custom-select" value={props.action.blinkingSpeed} onChange={this.handleChangeBlinkingSpeed}>
                 <option value="slow">
                   <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.slow" />
                 </option>
