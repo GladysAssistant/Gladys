@@ -3,7 +3,6 @@ const sinon = require('sinon');
 
 const { fake } = sinon;
 
-const { updateNAPlug } = require('../../../../../services/netatmo/lib/device/netatmo.updateNAPlug');
 const devicesGladys = require('../../netatmo.convertDevices.mock.test.json');
 const devicesNetatmo = require('../../netatmo.loadDevices.mock.test.json');
 const { EVENTS } = require('../../../../../utils/constants');
@@ -37,7 +36,7 @@ describe('Netatmo update NAPlug features', () => {
   });
 
   it('should update device values correctly for a plug device connected on boiler', async () => {
-    await updateNAPlug.bind(netatmoHandler)(deviceGladys, deviceNetatmoPlug, externalIdNAPlug);
+    await netatmoHandler.updateNAPlug(deviceGladys, deviceNetatmoPlug, externalIdNAPlug);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(deviceGladys.features.length);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -67,7 +66,7 @@ describe('Netatmo update NAPlug features', () => {
   it('should update device values correctly for a plug device no connected boiler', async () => {
     deviceNetatmoPlug.plug_connected_boiler = undefined;
 
-    await updateNAPlug.bind(netatmoHandler)(deviceGladys, deviceNetatmoPlug, externalIdNAPlug);
+    await netatmoHandler.updateNAPlug(deviceGladys, deviceNetatmoPlug, externalIdNAPlug);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(deviceGladys.features.length);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -104,7 +103,7 @@ describe('Netatmo update NAPlug features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await updateNAPlug.bind(netatmoHandler)(deviceGladys, deviceNetatmoPlug, externalIdNAPlug);
+      await netatmoHandler.updateNAPlug(deviceGladys, deviceNetatmoPlug, externalIdNAPlug);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);
