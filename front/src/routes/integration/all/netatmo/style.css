@@ -1,17 +1,3 @@
-.firmware-revision {
-    position: absolute;
-    top: 5px;
-    right: 15px;
-    font-size: 0.75rem;
-}
-
-.battery-level {
-    position: absolute;
-    top: 25px;
-    right: 15px;
-    font-size: 0.75rem;
-}
-
 .device-image-container {
     max-width: 75%;
     margin: 0 auto;

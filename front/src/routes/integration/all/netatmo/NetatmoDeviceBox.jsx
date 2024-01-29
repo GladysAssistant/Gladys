@@ -182,7 +182,7 @@ class NetatmoDeviceBox extends Component {
               </div>
             </Localizer>
             {showMostRecentValueAt && batteryLevel && (
-              <div class={styles['battery-level']}>
+              <div class="page-options d-flex">
                 <BatteryLevelFeature batteryLevel={batteryLevel} />
               </div>
             )}
