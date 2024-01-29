@@ -104,7 +104,11 @@ class BlinkLight extends Component {
               <div class="form-label">
                 <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.label" />
               </div>
-              <select class="custom-select" value={props.action.blinkingSpeed} onChange={this.handleChangeBlinkingSpeed}>
+              <select
+                class="custom-select"
+                value={props.action.blinkingSpeed}
+                onChange={this.handleChangeBlinkingSpeed}
+              >
                 <option value="slow">
                   <Text id="editScene.actionsCard.blinkLights.blinkingSpeed.slow" />
                 </option>
