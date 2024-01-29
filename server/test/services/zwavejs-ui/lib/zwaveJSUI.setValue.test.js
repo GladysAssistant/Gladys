@@ -112,7 +112,7 @@ describe('zwaveJSUIHandler.setValue', () => {
       await zwaveJSUIHandler.setValue(
         { external_id: 'zwavejs-ui:2' },
         {
-          external_id: 'zwavejs-ui:20:notification:access_control:door_state_simple',
+          external_id: 'zwavejs-ui:2:0:notification:access_control:door_state_simple',
         },
         '1',
       );
