@@ -36,86 +36,86 @@ async function loadDeviceDetails(homeData) {
         thermostats = deviceThermostats.thermostats;
         modulesThermostat = deviceThermostats.modules;
       }
-      listDevices = modulesHomestatus
-        ? (
-            await Promise.all(
-              modulesHomestatus.map(async (module) => {
-                let moduleSupported = false;
-                let categoryAPI;
-                let device;
-                let plugThermostat;
-                switch (module.type) {
-                  case SUPPORTED_MODULE_TYPE.THERMOSTAT:
-                    moduleSupported = true;
-                    if (thermostats && modulesThermostat) {
-                      device = modulesThermostat.find(
-                        // eslint-disable-next-line no-underscore-dangle
-                        (moduleThermostat) => moduleThermostat._id === module.id,
-                      );
-                      plugThermostat = thermostats
-                        .map((thermostat) => {
-                          const { modules, ...rest } = thermostat;
-                          return rest;
-                        })
-                        // eslint-disable-next-line no-underscore-dangle
-                        .find((thermostat) => thermostat._id === module.bridge);
-                    }
-                    categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
-                    break;
-                  case SUPPORTED_MODULE_TYPE.PLUG:
-                    if (thermostats) {
-                      device = thermostats
-                        .map((thermostat) => {
-                          const { modules, ...rest } = thermostat;
-                          return rest;
-                        })
-                        // eslint-disable-next-line no-underscore-dangle
-                        .find((thermostat) => thermostat._id === module.id);
-                    }
-                    moduleSupported = true;
-                    categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
-                    break;
-                  default:
-                    moduleSupported = false;
-                    break;
+      if (modulesHomestatus) {
+        listDevices = modulesHomestatus
+          .map((module) => {
+            let moduleSupported = false;
+            let categoryAPI;
+            let device;
+            let plugThermostat;
+            switch (module.type) {
+              case SUPPORTED_MODULE_TYPE.THERMOSTAT:
+                moduleSupported = true;
+                if (thermostats && modulesThermostat) {
+                  device = modulesThermostat.find(
+                    // eslint-disable-next-line no-underscore-dangle
+                    (moduleThermostat) => moduleThermostat._id === module.id,
+                  );
+                  plugThermostat = thermostats
+                    .map((thermostat) => {
+                      const { modules, ...rest } = thermostat;
+                      return rest;
+                    })
+                    // eslint-disable-next-line no-underscore-dangle
+                    .find((thermostat) => thermostat._id === module.bridge);
                 }
-                const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);
-                const roomDevice = {
-                  ...roomsHomeData.find((roomHomeData) => roomHomeData.id === moduleHomeData.room_id),
-                  ...roomsHomestatus.find((room) => room.id === moduleHomeData.room_id),
-                };
-                const plugDevice = {
-                  ...modulesHomeData.find((mod) => mod.id === module.bridge),
-                  ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
-                  ...plugThermostat,
-                };
-                const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
-                if (moduleSupported) {
-                  const deviceSupported = {
-                    ...module,
-                    ...moduleHomeData,
-                    ...device,
-                    home: homeId,
-                    room: roomDevice,
-                    plug,
-                    categoryAPI,
-                  };
-                  return deviceSupported;
+                categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
+                break;
+              case SUPPORTED_MODULE_TYPE.PLUG:
+                if (thermostats) {
+                  device = thermostats
+                    .map((thermostat) => {
+                      const { modules, ...rest } = thermostat;
+                      return rest;
+                    })
+                    // eslint-disable-next-line no-underscore-dangle
+                    .find((thermostat) => thermostat._id === module.id);
                 }
-                const deviceNotSupported = {
-                  ...module,
-                  ...moduleHomeData,
-                  ...device,
-                  home: homeId,
-                  room: roomDevice,
-                  plug,
-                  not_handled: true,
-                };
-                return deviceNotSupported;
-              }),
-            )
-          ).filter((item) => item !== undefined)
-        : undefined;
+                moduleSupported = true;
+                categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
+                break;
+              default:
+                moduleSupported = false;
+                break;
+            }
+            const moduleHomeData = modulesHomeData.find((mod) => mod.id === module.id);
+            const roomDevice = {
+              ...roomsHomeData.find((roomHomeData) => roomHomeData.id === moduleHomeData.room_id),
+              ...roomsHomestatus.find((room) => room.id === moduleHomeData.room_id),
+            };
+            const plugDevice = {
+              ...modulesHomeData.find((mod) => mod.id === module.bridge),
+              ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
+              ...plugThermostat,
+            };
+            const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
+            if (moduleSupported) {
+              const deviceSupported = {
+                ...module,
+                ...moduleHomeData,
+                ...device,
+                home: homeId,
+                room: roomDevice,
+                plug,
+                categoryAPI,
+              };
+              return deviceSupported;
+            }
+            const deviceNotSupported = {
+              ...module,
+              ...moduleHomeData,
+              ...device,
+              home: homeId,
+              room: roomDevice,
+              plug,
+              not_handled: true,
+            };
+            return deviceNotSupported;
+          })
+          .filter((item) => item !== undefined);
+      } else {
+        listDevices = undefined;
+      }
       logger.debug('Devices details loaded in home: ', homeId);
     } else {
       logger.warn('Status load devices not ok: ', statusGetHomestatus);

@@ -18,6 +18,8 @@ const { pollRefreshingToken } = require('./netatmo.pollRefreshingToken');
 const { pollRefreshingValues } = require('./netatmo.pollRefreshingValues');
 const { setValue } = require('./netatmo.setValue');
 const { updateValues } = require('./netatmo.updateValues');
+const { updateNAPlug } = require('./device/netatmo.updateNAPlug');
+const { updateNATherm1 } = require('./device/netatmo.updateNATherm1');
 
 const { STATUS, SCOPES } = require('./utils/netatmo.constants');
 const buildScopesConfig = require('./utils/netatmo.buildScopesConfig');
@@ -62,5 +64,7 @@ NetatmoHandler.prototype.pollRefreshingValues = pollRefreshingValues;
 NetatmoHandler.prototype.pollRefreshingToken = pollRefreshingToken;
 NetatmoHandler.prototype.setValue = setValue;
 NetatmoHandler.prototype.updateValues = updateValues;
+NetatmoHandler.prototype.updateNAPlug = updateNAPlug;
+NetatmoHandler.prototype.updateNATherm1 = updateNATherm1;
 
 module.exports = NetatmoHandler;

@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const { STATUS } = require('./utils/netatmo.constants');
 const logger = require('../../../utils/logger');
 
@@ -19,15 +20,19 @@ async function refreshNetatmoValues() {
     });
     logger.error('Unable to load Netatmo devices', e);
   }
-  devicesNetatmo.map(async (device) => {
-    const externalId = `netatmo:${device.id}`;
-    const deviceExistInGladys = await this.gladys.stateManager.get('deviceByExternalId', externalId);
-    if (deviceExistInGladys) {
-      await this.updateValues(deviceExistInGladys, device, externalId);
-    } else {
-      logger.info(`device ${externalId} - ${device.type} does not exist in Gladys`);
-    }
-  });
+  await Promise.map(
+    devicesNetatmo,
+    async (device) => {
+      const externalId = `netatmo:${device.id}`;
+      const deviceExistInGladys = await this.gladys.stateManager.get('deviceByExternalId', externalId);
+      if (deviceExistInGladys) {
+        await this.updateValues(deviceExistInGladys, device, externalId);
+      } else {
+        logger.info(`device ${externalId} - ${device.type} does not exist in Gladys`);
+      }
+    },
+    { concurrency: 10 },
+  );
   await this.saveStatus({ statusType: STATUS.CONNECTED, message: null });
 }
 

@@ -1,6 +1,4 @@
 const { BadParameters } = require('../../../utils/coreErrors');
-const { updateNAPlug } = require('./device/netatmo.updateNAPlug');
-const { updateNATherm1 } = require('./device/netatmo.updateNATherm1');
 const { SUPPORTED_MODULE_TYPE } = require('./utils/netatmo.constants');
 
 /**
@@ -20,11 +18,11 @@ async function updateValues(deviceGladys, deviceNetatmo, externalId) {
   }
   switch (deviceNetatmo.type) {
     case SUPPORTED_MODULE_TYPE.PLUG: {
-      await updateNAPlug.bind(this)(deviceGladys, deviceNetatmo, externalId);
+      await this.updateNAPlug(deviceGladys, deviceNetatmo, externalId);
       break;
     }
     case SUPPORTED_MODULE_TYPE.THERMOSTAT: {
-      await updateNATherm1.bind(this)(deviceGladys, deviceNetatmo, externalId);
+      await this.updateNATherm1(deviceGladys, deviceNetatmo, externalId);
       break;
     }
     default:

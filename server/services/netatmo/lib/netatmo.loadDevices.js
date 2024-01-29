@@ -1,3 +1,4 @@
+const Promise = require('bluebird');
 const { default: axios } = require('axios');
 const logger = require('../../../utils/logger');
 const { API } = require('./utils/netatmo.constants');
@@ -19,14 +20,17 @@ async function loadDevices() {
     const { homes } = body;
     let listHomeDevices = [];
     if (status === 'ok') {
-      const devicesPromises = homes.map(async (home) => {
-        const { modules } = home;
-        if (modules) {
-          return this.loadDeviceDetails(home);
-        }
-        return undefined;
-      });
-      const results = await Promise.all(devicesPromises);
+      const results = await Promise.map(
+        homes,
+        async (home) => {
+          const { modules } = home;
+          if (modules) {
+            return this.loadDeviceDetails(home);
+          }
+          return undefined;
+        },
+        { concurrency: 2 },
+      );
       listHomeDevices = results.filter((device) => device !== undefined).flat();
     }
     logger.debug(`${listHomeDevices.length} Netatmo devices loaded`);
