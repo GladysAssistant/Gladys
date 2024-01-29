@@ -2550,7 +2550,15 @@
           "35": "Urgence",
           "36": "Désarmer alarme",
           "37": "Armer zones jour",
-          "38": "Armer alarme"
+          "38": "Armer alarme",
+          "39": "Bouton On pressé",
+          "40": "Bouton On maintenu",
+          "41": "Bouton Plus pressé",
+          "42": "Bouton Plus maintenu",
+          "43": "Bouton Moins pressé",
+          "44": "Bouton Moins maintenu",
+          "45": "Bouton Off pressé",
+          "46": "Bouton Off maintenu"
         }
       },
       "opening-sensor": {
