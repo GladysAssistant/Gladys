@@ -2622,7 +2622,15 @@
           "35": "Notfall",
           "36": "Alarm ausschalten",
           "37": "Alarm für Tageszonen scharf schalten",
-          "38": "Alarm für alle Zonen scharf schalten"
+          "38": "Alarm für alle Zonen scharf schalten",
+          "39": "An-Taste gedrückt",
+          "40": "An-Taste gehalten",
+          "41": "Auf-Taste gedrückt",
+          "42": "Auf-Taste gehalten",
+          "43": "Ab-Taste gedrückt",
+          "44": "Ab-Taste gehalten",
+          "45": "Aus-Taste gedrückt",
+          "46": "Aus-Taste gehalten"
         }
       },
       "opening-sensor": {
