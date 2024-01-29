@@ -478,6 +478,141 @@
     ]
   },
   {
+    "name": "STARK House kitchen hygrometer",
+    "external_id": "netatmo:03:00:00:yy:yy:yy",
+    "selector": "netatmo:03:00:00:yy:yy:yy",
+    "model": "NAModule4",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:battery_percent",
+        "selector": "netatmo:03:00:00:yy:yy:yy:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:temperature",
+        "selector": "netatmo:03:00:00:yy:yy:yy:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - room Kitchen",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:therm_measured_temperature",
+        "selector": "netatmo:03:00:00:yy:yy:yy:therm_measured_temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Minimum in Kitchen",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:min_temp",
+        "selector": "netatmo:03:00:00:yy:yy:yy:min_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Maximum in Kitchen",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:max_temp",
+        "selector": "netatmo:03:00:00:yy:yy:yy:max_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "CO2 - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:co2",
+        "selector": "netatmo:03:00:00:yy:yy:yy:co2",
+        "category": "co2-sensor",
+        "type": "integer",
+        "unit": "ppm",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "name": "Humidity - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:humidity",
+        "selector": "netatmo:03:00:00:yy:yy:yy:humidity",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link RF quality - STARK House kitchen hygrometer",
+        "external_id": "netatmo:03:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:03:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:jj:jj:jj"
+      },
+      {
+        "name": "plug_name",
+        "value": "Weather Station Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Office"
+      }
+    ]
+  },
+  {
     "name": "Outdoor Parking Camera",
     "external_id": "netatmo:70:ee:00:xx:xx:xx",
     "selector": "netatmo:70:ee:00:xx:xx:xx",

@@ -101,6 +101,22 @@
         "noise": 32,
         "pressure": 1022.5,
         "absolute_pressure": 1007.8
+      },
+      {
+        "id": "03:00:00:xx:xx:xx",
+        "type": "NAModule4",
+        "battery_state": "medium",
+        "battery_level": 4932,
+        "firmware_revision": 53,
+        "rf_state": "medium",
+        "rf_strength": 70,
+        "last_seen": 1706464227,
+        "reachable": true,
+        "bridge": "70:ee:50:jj:jj:jj",
+        "ts": 1706464124,
+        "temperature": 18.1,
+        "co2": 854,
+        "humidity": 60
       }
     ],
     "persons": [
