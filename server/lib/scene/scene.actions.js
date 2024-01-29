@@ -121,10 +121,10 @@ const actionsFunc = {
         blinkingInterval = 500;
         break;
       case 'fast':
-        blinkingInterval = 100;
+        blinkingInterval = 200;
         break;
       default:
-        blinkingInterval = 100;
+        blinkingInterval = 200;
         break;
     }
     await Promise.map(action.devices, async (deviceSelector) => {
