@@ -204,6 +204,28 @@ describe('Netatmo Load Device Details', () => {
     });
   });
 
+  it('should load device details successfully but without weather station details', async () => {
+    netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
+
+    nock('https://api.netatmo.com')
+      .get('/api/homestatus')
+      .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
+
+    const devices = await netatmoHandler.loadDeviceDetails(homesMock);
+
+    const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    expect(natWeatherStationDevices).to.have.lengthOf.at.least(1);
+    natWeatherStationDevices.forEach((device) => {
+      expect(device)
+        .to.have.property('room')
+        .that.is.an('object');
+      expect(device)
+        .to.have.property('modules_bridged')
+        .that.is.an('array');
+      expect(device).to.not.have.property('dashboard_data');
+    });
+  });
+
   it('should no load device details without modules', async () => {
     const homesMockFake = { ...JSON.parse(JSON.stringify(homesMock)) };
     homesMockFake.modules = homesMockFake.modules.filter((module) => module.type !== 'NATherm1');
