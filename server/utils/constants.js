@@ -964,6 +964,14 @@ const WEBSOCKET_MESSAGE_TYPES = {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
   },
+  NETATMO: {
+    STATUS: 'netatmo.status',
+    ERROR: {
+      CONNECTED: 'netatmo.error-connected',
+      CONNECTING: 'netatmo.error-connecting',
+      PROCESSING_TOKEN: 'netatmo.error-processing-token',
+    },
+  },
   MELCLOUD: {
     STATUS: 'melcloud.status',
     DISCOVER: 'melcloud.discover',
