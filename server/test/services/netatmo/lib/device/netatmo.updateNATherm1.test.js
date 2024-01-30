@@ -21,7 +21,7 @@ const serviceId = 'serviceId';
 
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
-describe('Netatmo update NATherm1 features', () => {
+describe.only('Netatmo update NATherm1 features', () => {
   const deviceGladys = devicesGladys[1];
   const deviceNetatmoNATherm1 = JSON.parse(JSON.stringify(devicesNetatmo[1]));
   const externalIdNATherm1 = `netatmo:${devicesNetatmo[1].id}`;
