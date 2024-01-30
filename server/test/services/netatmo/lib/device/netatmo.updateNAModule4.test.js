@@ -3,7 +3,6 @@ const sinon = require('sinon');
 
 const { fake } = sinon;
 
-const { updateNAModule4 } = require('../../../../../services/netatmo/lib/device/netatmo.updateNAModule4');
 const devicesGladys = require('../../netatmo.convertDevices.mock.test.json');
 const devicesNetatmo = require('../../netatmo.loadDevices.mock.test.json');
 const { EVENTS } = require('../../../../../utils/constants');
@@ -37,7 +36,7 @@ describe('Netatmo update Smart Indoor module NAModule4 features', () => {
   });
 
   it('should save all values according to all cases', async () => {
-    await updateNAModule4.bind(netatmoHandler)(deviceGladysNAModule4, deviceNetatmoNAModule4, externalIdNAModule4);
+    await netatmoHandler.updateNAModule4(deviceGladysNAModule4, deviceNetatmoNAModule4, externalIdNAModule4);
 
     expect(netatmoHandler.gladys.event.emit.callCount).to.equal(8);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
@@ -104,7 +103,7 @@ describe('Netatmo update Smart Indoor module NAModule4 features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await updateNAModule4.bind(netatmoHandler)(deviceGladysNAModule4, deviceNetatmoNAModule4, externalIdNAModule4);
+      await netatmoHandler.updateNAModule4(deviceGladysNAModule4, deviceNetatmoNAModule4, externalIdNAModule4);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);
