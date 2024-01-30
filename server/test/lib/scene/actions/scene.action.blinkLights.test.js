@@ -52,10 +52,10 @@ describe('scene.blink-lights', () => {
       ],
       scope,
     );
-    clock.tick(2000);
+    clock.tick(3200);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 0);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 1);
-    assert.callCount(device.setValue, 2);
+    assert.callCount(device.setValue, 3);
   });
 
   it('should blink light in medium mode', async () => {
@@ -91,10 +91,10 @@ describe('scene.blink-lights', () => {
       ],
       scope,
     );
-    clock.tick(2000);
+    clock.tick(2700);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 0);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 1);
-    assert.callCount(device.setValue, 4);
+    assert.callCount(device.setValue, 5);
   });
 
   it('should blink light in fast mode', async () => {
@@ -130,10 +130,10 @@ describe('scene.blink-lights', () => {
       ],
       scope,
     );
-    clock.tick(2000);
+    clock.tick(2200);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 0);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 1);
-    assert.callCount(device.setValue, 10);
+    assert.callCount(device.setValue, 11);
   });
 
   it('should blink light in unknown mode', async () => {
@@ -169,10 +169,10 @@ describe('scene.blink-lights', () => {
       ],
       scope,
     );
-    clock.tick(2000);
+    clock.tick(2200);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 0);
     assert.calledWithExactly(device.setValue, device, deviceFeature, 1);
-    assert.callCount(device.setValue, 10);
+    assert.callCount(device.setValue, 11);
   });
 
   it('should throw error when blinking light', async () => {
