@@ -2405,6 +2405,7 @@
     "hPa": "Hektopascal (hPa)",
     "bar": "Bar",
     "psi": "Pound-force per square inch (psi)",
+    "milli-bar": "Millibar (mbar)",
     "lux": "Lux",
     "ppm": "Parts per million (ppm)",
     "ppb": "Parts per billion (ppb)",
@@ -2470,7 +2471,8 @@
     "microgram-per-cubic-meter": "Mikrogramm pro Kubikmeter (µg/m³)",
     "square-centimeter": "Quadratzentimeter (cm²)",
     "square-meter": "Quadratmeter (m²)",
-    "square-kilometer": "Quadratkilometer (km²)"
+    "square-kilometer": "Quadratkilometer (km²)",
+    "decibel": "Dezibel (dB)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2480,6 +2482,7 @@
     "pascal": "Pa",
     "hPa": "hPa",
     "bar": "bar",
+    "milli-bar": "mbar",
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
@@ -2546,7 +2549,8 @@
     "microgram-per-cubic-meter": "µg/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
-    "square-kilometer": "km²"
+    "square-kilometer": "km²",
+    "decibel": "dB"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2744,7 +2748,8 @@
     },
     "co2-sensor": {
       "shortCategoryName": "CO2-Sensor",
-      "decimal": "CO2 (Dezimal)"
+      "decimal": "CO2 (Dezimal)",
+      "integer": "CO2 (Ganzzahl)"
     },
     "switch": {
       "shortCategoryName": "Schalter",
@@ -2771,7 +2776,8 @@
     },
     "pressure-sensor": {
       "shortCategoryName": "Drucksensor",
-      "decimal": "Druck (dezimal)"
+      "decimal": "Druck (dezimal)",
+      "integer": "Druck (Ganzzahl)"
     },
     "leak-sensor": {
       "shortCategoryName": "Wasserlecksensor",
@@ -2943,6 +2949,10 @@
       "next": "Musik: Nächster Titel",
       "playback_state": "Musik: Wiedergabestatus",
       "play_notification": "Benachrichtigung senden"
+    },
+    "noise-sensor": {
+      "shortCategoryName": "Schallsensor",
+      "integer": "Rauschen (Ganzzahl)"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",

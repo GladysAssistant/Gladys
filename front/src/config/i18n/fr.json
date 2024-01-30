@@ -2409,6 +2409,7 @@
     "hPa": "Hectopascal (hPa)",
     "bar": "Bar",
     "psi": "Livre-force par pouce carré (psi)",
+    "milli-bar": "Millibar (mbar)",
     "lux": "Lux",
     "ppm": "Partie par million (ppm)",
     "watt": "Watt (W)",
@@ -2474,7 +2475,8 @@
     "microgram-per-cubic-meter": "Microgramme par mètre cube (µg/m³)",
     "square-centimeter": "Centimètre carré (cm²)",
     "square-meter": "Mètre carré (m²)",
-    "square-kilometer": "Kilomètre carré (km²)"
+    "square-kilometer": "Kilomètre carré (km²)",
+    "decibel": "Décibel (dB)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2485,6 +2487,7 @@
     "hPa": "hPa",
     "bar": "bar",
     "psi": "psi",
+    "milli-bar": "mbar",
     "lux": "lx",
     "ppm": "ppm",
     "ppb": "ppb",
@@ -2550,7 +2553,8 @@
     "microgram-per-cubic-meter": "µg/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
-    "square-kilometer": "km²"
+    "square-kilometer": "km²",
+    "decibel": "dB"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2748,7 +2752,8 @@
     },
     "co2-sensor": {
       "shortCategoryName": "Capteur de dioxyde de carbone (Co2)",
-      "decimal": "Niveau de CO2"
+      "decimal": "Niveau de CO2 (décimal)",
+      "integer": "Niveau de CO2 (entier)"
     },
     "switch": {
       "shortCategoryName": "Prise",
@@ -2775,7 +2780,8 @@
     },
     "pressure-sensor": {
       "shortCategoryName": "Capteur de pression",
-      "decimal": "Valeur décimale pression"
+      "decimal": "Pression (décimale)",
+      "integer": "Pression (entier)"
     },
     "leak-sensor": {
       "shortCategoryName": "Détecteur de fuite",
@@ -2947,6 +2953,10 @@
       "next": "Bouton suivant musique",
       "playback_state": "Etat de la lecture musique",
       "play_notification": "Diffuser une notification"
+    },
+    "noise-sensor": {
+      "shortCategoryName": "Capteur sonore",
+      "integer": "Bruit (entier)"
     },
     "unknown": {
       "shortCategoryName": "Inconnu",

@@ -77,6 +77,20 @@
         "firmware_revision": 236,
         "rf_strength": 106,
         "wifi_strength": 66
+      },
+      {
+        "id": "70:ee:50:jj:jj:jj",
+        "type": "NAMain",
+        "firmware_revision": 202,
+        "wifi_state": "full",
+        "wifi_strength": 38,
+        "ts": 1706464169,
+        "temperature": 20.2,
+        "co2": 500,
+        "humidity": 50,
+        "noise": 32,
+        "pressure": 1022.5,
+        "absolute_pressure": 1007.8
       }
     ],
     "persons": [

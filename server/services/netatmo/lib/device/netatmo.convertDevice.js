@@ -8,6 +8,12 @@ const {
   buildFeatureBoilerStatus,
   buildFeaturePlugConnectedBoiler,
 } = require('./netatmo.buildFeaturesSpecifEnergy');
+const {
+  buildFeatureCo2,
+  buildFeatureHumidity,
+  buildFeatureNoise,
+  buildFeaturePressure,
+} = require('./netatmo.buildFeaturesSpecifWeather');
 
 /**
  * @description Transform Netatmo device to Gladys device.
@@ -50,6 +56,25 @@ function convertDevice(netatmoDevice) {
       features.push(buildFeatureWifiStrength(name, externalId));
       /* features specif Plugs */
       features.push(buildFeaturePlugConnectedBoiler(name, externalId));
+      /* params */
+      params = [{ name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) }];
+      break;
+    }
+    case SUPPORTED_MODULE_TYPE.NAMAIN: {
+      const modulesBridged = netatmoDevice.modules_bridged || [];
+      /* features common Netatmo */
+      features.push(buildFeatureTemperature(name, externalId, 'temperature'));
+      features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
+      features.push(buildFeatureTemperature(`Minimum in ${room.name}`, externalId, 'min_temp'));
+      features.push(buildFeatureTemperature(`Maximum in ${room.name}`, externalId, 'max_temp'));
+      /* features specific Netatmo Weather */
+      features.push(buildFeatureCo2(name, externalId));
+      features.push(buildFeatureHumidity(name, externalId));
+      features.push(buildFeatureNoise(name, externalId));
+      features.push(buildFeaturePressure(`Pressure - ${name}`, externalId, 'pressure'));
+      features.push(buildFeaturePressure(`Absolute pressure - ${name}`, externalId, 'absolute_pressure'));
+      /* features common modules WiFi */
+      features.push(buildFeatureWifiStrength(name, externalId));
       /* params */
       params = [{ name: PARAMS.MODULES_BRIDGE_ID, value: JSON.stringify(modulesBridged) }];
       break;
