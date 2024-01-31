@@ -144,9 +144,19 @@ import TuyaEditPage from '../routes/integration/all/tuya/edit-page';
 import TuyaSetupPage from '../routes/integration/all/tuya/setup-page';
 import TuyaDiscoverPage from '../routes/integration/all/tuya/discover-page';
 
+// Netatmo integration
+import NetatmoPage from '../routes/integration/all/netatmo/device-page';
+import NetatmoSetupPage from '../routes/integration/all/netatmo/setup-page';
+import NetatmoDiscoverPage from '../routes/integration/all/netatmo/discover-page';
+
 // Sonos integration
 import SonosDevicePage from '../routes/integration/all/sonos/device-page';
 import SonosDiscoveryPage from '../routes/integration/all/sonos/discover-page';
+
+// ZWaveJS-UI integration
+import ZwaveJSUIDevicePage from '../routes/integration/all/zwavejs-ui/device-page';
+import ZwaveJSUIDiscoveryPage from '../routes/integration/all/zwavejs-ui/discover-page';
+import ZwaveJSUISetupPage from '../routes/integration/all/zwavejs-ui/setup-page';
 
 // MELCloud integration
 import MELCloudPage from '../routes/integration/all/melcloud/device-page';
@@ -287,8 +297,16 @@ const AppRouter = connect(
         <TuyaDiscoverPage path="/dashboard/integration/device/tuya/discover" />
         <TuyaSetupPage path="/dashboard/integration/device/tuya/setup" />
 
+        <NetatmoPage path="/dashboard/integration/device/netatmo" />
+        <NetatmoDiscoverPage path="/dashboard/integration/device/netatmo/discover" />
+        <NetatmoSetupPage path="/dashboard/integration/device/netatmo/setup" />
+
         <SonosDevicePage path="/dashboard/integration/device/sonos" />
         <SonosDiscoveryPage path="/dashboard/integration/device/sonos/discover" />
+
+        <ZwaveJSUIDevicePage path="/dashboard/integration/device/zwavejs-ui" />
+        <ZwaveJSUIDiscoveryPage path="/dashboard/integration/device/zwavejs-ui/discover" />
+        <ZwaveJSUISetupPage path="/dashboard/integration/device/zwavejs-ui/setup" />
 
         <MELCloudPage path="/dashboard/integration/device/melcloud" />
         <MELCloudEditPage path="/dashboard/integration/device/melcloud/edit/:deviceSelector" />

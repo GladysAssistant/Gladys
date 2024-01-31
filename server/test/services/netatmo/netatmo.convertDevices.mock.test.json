@@ -1,0 +1,257 @@
+[
+  {
+    "name": "Relais Test",
+    "external_id": "netatmo:70:ee:50:xx:xx:xx",
+    "selector": "netatmo:70:ee:50:xx:xx:xx",
+    "model": "NAPlug",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Link RF quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link Wifi quality - Relais Test",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:wifi_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Relais Test connected boiler",
+        "external_id": "netatmo:70:ee:50:xx:xx:xx:plug_connected_boiler",
+        "selector": "netatmo:70:ee:50:xx:xx:xx:plug_connected_boiler",
+        "category": "switch",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1
+      }
+    ],
+    "params": [
+      {
+        "name": "modules_bridge_id",
+        "value": "[\"01:00:00:xx:xx:xx\",\"02:00:00:xx:xx:xx\"]"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "1234567890"
+      },
+      {
+        "name": "room_name",
+        "value": "Garage Test"
+      }
+    ]
+  },
+  {
+    "name": "Thermostat Test",
+    "external_id": "netatmo:04:00:00:xx:xx:xx",
+    "selector": "netatmo:04:00:00:xx:xx:xx",
+    "model": "NATherm1",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:battery_percent",
+        "selector": "netatmo:04:00:00:xx:xx:xx:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Temperature - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:temperature",
+        "selector": "netatmo:04:00:00:xx:xx:xx:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - room Maison Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:therm_measured_temperature",
+        "selector": "netatmo:04:00:00:xx:xx:xx:therm_measured_temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Setpoint temperature - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:therm_setpoint_temperature",
+        "selector": "netatmo:04:00:00:xx:xx:xx:therm_setpoint_temperature",
+        "category": "thermostat",
+        "type": "target-temperature",
+        "unit": "celsius",
+        "read_only": false,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 5,
+        "max": 30
+      },
+      {
+        "name": "Detecting open window - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:open_window",
+        "selector": "netatmo:04:00:00:xx:xx:xx:open_window",
+        "category": "opening-sensor",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1
+      },
+      {
+        "name": "Link RF quality - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "selector": "netatmo:04:00:00:xx:xx:xx:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Boiler status - Thermostat Test",
+        "external_id": "netatmo:04:00:00:xx:xx:xx:boiler_status",
+        "selector": "netatmo:04:00:00:xx:xx:xx:boiler_status",
+        "category": "switch",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:xx:xx:xx"
+      },
+      {
+        "name": "plug_name",
+        "value": "Relais Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "0987654321"
+      },
+      {
+        "name": "room_name",
+        "value": "Maison Test"
+      }
+    ]
+  },
+  {
+    "name": "Relais Salon Test",
+    "external_id": "netatmo:70:ee:50:yy:yy:yy",
+    "selector": "netatmo:70:ee:50:yy:yy:yy",
+    "model": "NAPlug",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Link RF quality - Relais Salon Test",
+        "external_id": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
+        "selector": "netatmo:70:ee:50:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Link Wifi quality - Relais Salon Test",
+        "external_id": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
+        "selector": "netatmo:70:ee:50:yy:yy:yy:wifi_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Relais Salon Test connected boiler",
+        "external_id": "netatmo:70:ee:50:yy:yy:yy:plug_connected_boiler",
+        "selector": "netatmo:70:ee:50:yy:yy:yy:plug_connected_boiler",
+        "category": "switch",
+        "type": "binary",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 1
+      }
+    ],
+    "params": [
+      {
+        "name": "modules_bridge_id",
+        "value": "[]"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      }
+    ]
+  },
+  {
+    "name": "Outdoor Parking Camera",
+    "external_id": "netatmo:70:ee:00:xx:xx:xx",
+    "selector": "netatmo:70:ee:00:xx:xx:xx",
+    "model": "NOC",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [],
+    "params": [
+      { "name": "home_id", "value": "5e1xxxxxxxxxxxxxxxxx" },
+      { "name": "room_id", "value": "8765432109" },
+      { "name": "room_name", "value": "Extérieur" }
+    ],
+    "not_handled": true
+  }
+]

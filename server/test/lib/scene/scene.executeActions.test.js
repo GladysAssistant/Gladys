@@ -456,6 +456,45 @@ describe('scene.executeActions', () => {
       11,
     );
   });
+  it('should execute action device.setValue with string', async () => {
+    const example = {
+      stop: fake.resolves(null),
+    };
+
+    stateManager.setState('service', 'example', example);
+    stateManager.setState('deviceFeature', 'my-device-feature', {
+      device_id: 'device-id',
+    });
+    stateManager.setState('deviceById', 'device-id', {
+      id: 'device-id',
+      features: [],
+    });
+    const device = {
+      setValue: fake.resolves(null),
+    };
+    await executeActions(
+      { stateManager, event, device },
+      [
+        [
+          {
+            type: ACTIONS.DEVICE.SET_VALUE,
+            device_feature: 'my-device-feature',
+            value: '11',
+          },
+        ],
+      ],
+      {},
+    );
+    assert.calledWith(
+      device.setValue,
+      {
+        id: 'device-id',
+        features: [],
+      },
+      { device_id: 'device-id' },
+      11,
+    );
+  });
   it('should execute action device.setValue', async () => {
     const example = {
       stop: fake.resolves(null),

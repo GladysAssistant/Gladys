@@ -97,6 +97,7 @@
       "languageLabel": "Langue",
       "english": "English",
       "french": "Français",
+      "german": "Deutsch",
       "birthdateLabel": "Date de naissance",
       "birthdatePlaceHolder": "Entrez votre date de naissance",
       "january": "Janvier",
@@ -652,6 +653,82 @@
       "rotation18O": "180°",
       "rotation27O": "270°"
     },
+    "netatmo": {
+      "title": "Netatmo",
+      "description": "Contrôler les équipements Netatmo",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Netatmo",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Netatmo",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Netatmo",
+      "status": {
+        "notConfigured": "Le service Netatmo n'est pas configuré",
+        "disconnect": "Gladys n'est pas connectée à Netatmo",
+        "notConnected": "Gladys n'a pas réussi à se connecter au compte Netatmo, veuillez vérifier vos informations d'identification sur la ",
+        "setupPageLink": "Page de configuration Netatmo.",
+        "connect": "Gladys est connectée à Netatmo",
+        "connecting": "Configuration sauvegardée. Connexion à votre compte Netatmo en cours...",
+        "processingToken": "Connexion à votre compte Netatmo... Récupération du token d'accès.",
+        "getDevicesValues": "Récupération des données en cours...",
+        "dicoveringDevices": "Récupération des appareils en cours...",
+        "errorConnecting": {
+          "other_error": "Erreur lors de l'authorisation. Vous pouvez inspecter par un clique droit l'erreur dans la console de votre navigateur. Si l'erreur persiste, veuillez poster les logs sur le forum.",
+          "access_denied": "Autorisation déclinée, Veuillez tenter de nouveau et accepter la demande d'accès à vos données.",
+          "invalid_client": "Identifiant client invalide. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+          "get_access_token_fail": "Informations renseignées erronnées ou compte désactivé. Veuillez vérifier les informations de votre compte Netatmo et que le compte n'est pas bani ou désactivé <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>."
+        }
+      },
+      "device": {
+        "title": "Appareils Netatmo dans Gladys",
+        "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Netatmo).",
+        "noDeviceFound": "Aucun appareil Netatmo n'a encore été ajouté.",
+        "sidLabel": "SID Netatmo de l'appareil",
+        "nameLabel": "Nom de l'appareil",
+        "namePlaceholder": "Entrez le nom de votre appareil",
+        "modelLabel": "Modèle",
+        "roomLabel": "Pièce",
+        "connectedPlugLabel": "Connecté au pont",
+        "roomNetatmoApiLabel": "Pièce dans l'API Netatmo",
+        "featuresLabel": "Fonctionnalités",
+        "saveButton": "Sauvegarder",
+        "deleteButton": "Supprimer",
+        "noValueReceived": "Aucune valeur reçue."
+      },
+      "discover": {
+        "title": "Vos appareils Netatmo compatibles avec Gladys",
+        "description": "Vos appareils Netatmo doivent être ajoutés à votre compte Netatmo avant d'être ajoutés à Gladys qui ne supporte actuellement que les Thermostats associés à leur Plug. La 1ère découverte se fait automatiquement. Appuyer sur 'Rafraichir' si vous souhaitez récupérer les nouvelles fonctionnalités de vos appareils.",
+        "descriptionCompatibility": "Pour toute demande d'ajout d'appareils et/ou de fonctionnalités, veuillez vous rendre sur le <a href=\"https://community.gladysassistant.com/c/feature-requests\" target=\"_blank\" rel=\"noopener noreferrer\">Forum Gladys Assistant - Catégorie \"Demande de fonctionnalités\"</a>.",
+        "descriptionInformation": "La récupération des états se fait actuellement toutes les 2 minutes (limitation de l'API Netatmo).",
+        "noDeviceFound": "Aucun appareil Netatmo n'a été trouvé. Si vous possédez un Thermostat Netatmo, avez-vous bien réalisé toutes les étapes de la documentation pour enregistrer vos appareils sur l'API Netatmo ?",
+        "alreadyCreatedButton": "Déjà créé",
+        "updateButton": "Mettre à jour",
+        "unmanagedModelButton": "Modèle non pris en charge",
+        "scan": "Scanner",
+        "refresh": "Rafraîchir"
+      },
+      "setup": {
+        "title": "Configuration Netatmo",
+        "description": "Vous pouvez connecter Gladys à votre compte Netatmo pour commander les appareils associés.",
+        "descriptionCreateAccount": "Vous avez besoin de créer un compte sur <a href=\"https://auth.netatmo.com/fr-fr/access/login\" target=\"_blank\" rel=\"noopener noreferrer\">Netatmo Connect</a>.",
+        "descriptionCreateProject": "Vous devrez ensuite créer une \"application\" dans votre compte développeur Netatmo via le menu <a href=\"https://dev.netatmo.com/apps/\" target=\"_blank\" rel=\"noopener noreferrer\">My App</a>.",
+        "descriptionGetKeys": "Vous aurez alors accès aux deux clés : \"client ID\" et \"client secret\" à copier ci-dessous.",
+        "descriptionScopeInformation": "Lorsque vous connectez Gladys à votre App Netatmo dédiée, vous lui donnez l'autorisation d'accéder à vos données en lecture et en écriture (appelé scopes \"read\" et \"write\"). Vous n'avez rien à configuré, ces scopes sont automatiquement intégrés et vous serons exposés lors de la demande de connexion (voir documentation au besoin). Bien entendu, Gladys étant installée en local, aucune de ces données ne se retrouve exposées.",
+        "titleAdditionalInformation": "Informations complémentaires sur le fonctionnement de l'API \"Energy\" :",
+        "descriptionAdditionalInformation": "Les commandes de températures sont effectuées au niveau de la pièce. Les 2 informations sont donc disponibles en fonctionnalités pour plus de contrôle. Si vous possédez d'autres capteurs de température dans la même pièce que votre Thermostat, c'est la température moyenne de cette pièce qui sera prise en compte pour déclencher le commutateur de contrôle de chauffe.",
+        "clientIdLabel": "Identifiant client",
+        "clientIdPlaceholder": "client ID de My Apps dans Netatmo Connect",
+        "clientSecretLabel": "Secret client",
+        "clientSecretPlaceholder": "client secret de My Apps dans Netatmo Connect",
+        "connectionInfoLabel": "Lorsque vous modifiez ces informations, un nouveau jeton est requis. La déconnexion effacera également votre jeton d’accès. Une nouvelle demande de connexion sera donc faite à l'API Netatmo lorsque vous cliquerez sur ces boutons.",
+        "saveLabel": "Sauvegarder et connecter",
+        "disconnectLabel": "Déconnecter"
+      },
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
     "tasmota": {
       "title": "Tasmota",
       "description": "Contrôler vos appareils Tasmota en MQTT ou HTTP",
@@ -1141,6 +1218,62 @@
         "scan": "Scanner"
       },
 
+      "error": {
+        "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
+        "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
+        "conflictError": "L'appareil actuel est déjà dans Gladys."
+      }
+    },
+    "zwavejs-ui": {
+      "title": "ZWave JS UI",
+      "description": "Contrôler vos appareils dans Z-Wave JS UI",
+      "deviceTab": "Appareils",
+      "discoverTab": "Découverte Z-Wave JS UI",
+      "setupTab": "Configuration",
+      "documentation": "Documentation Z-Wave JS UI",
+      "discoverDeviceDescr": "Scanner automatiquement les appareils Z-Wave JS UI",
+      "nameLabel": "Nom de l'appareil",
+      "namePlaceholder": "Entrez le nom de votre appareil",
+      "noFeaturesHandled": "Cet appareil n'est pas encore géré par Gladys, n'hésitez pas à nous le soumettre pour qu'il soit ajouté !",
+      "featuresLabel": "Fonctionnalités",
+      "roomLabel": "Pièce",
+      "saveButton": "Sauvegarder",
+      "alreadyCreatedButton": "Déjà créé",
+      "deleteButton": "Supprimer",
+      "alphaWarning": "Cette intégration est une alpha et ne gère pour l'instant qu'un seul appareil: Le capteur d'ouverture de porte Fibaro. Nous sommes preneur de toute aide pour intégrer d'autres appareils !",
+      "device": {
+        "title": "Appareils Z-Wave JS UI dans Gladys",
+        "editButton": "Editer",
+        "noDeviceFound": "Aucun appareil Z-Wave JS UI trouvé.",
+        "featuresLabel": "Fonctionnalités"
+      },
+      "discover": {
+        "title": "Appareils détectés sur votre instance Z-Wave JS UI",
+        "description": "Les appareils Z-Wave JS UI sont automatiquement découverts. Attention, seuls les appareils avec un nom et une \"location\" sont affichés ici. Si vous éditez ces paramètres, vous devrez réappairer l'appareil dans Gladys.",
+        "error": "Erreur de découverte des appareils Z-Wave JS UI. Est-ce que votre broker MQTT est bien disponible et accessible ?",
+        "noDeviceFound": "Aucun appareil Z-Wave JS UI n'a été découvert.",
+        "errorWhileScanning": "Une erreur est survenue lors de la découverte.",
+        "scan": "Scanner"
+      },
+      "setup": {
+        "title": "Configuration",
+        "description": "Vous devez connecter Gladys au broker MQTT auquel est connecté votre instance Z-Wave JS UI. Cette intégration s'adresse à un public qui a déjà des appareils Z-Wave. Si vous commencez votre installation, nous vous recommandons de passer par le protocole Zigbee.",
+        "zwaveJsUiConfigurationTitle": "Configurer Z-Wave JS UI",
+        "zwaveJsUiConfigurationMqttDescription": "Côté Z-Wave JS UI, vous devez remplir dans \"MQTT\" le champ \"Name\" par \"zwave-js-ui\" sinon le préfix de certains topic MQTT ne sera pas bon.",
+        "zwaveJsUiConfigurationGatewayDescription": "Ensuite, veuillez remplir la section \"Gateway\" avec ces paramètres exactement :",
+        "mqttConfigurationTitle": "Configurer le serveur MQTT",
+        "urlLabel": "URL du broker",
+        "urlPlaceholder": "Ex: mqtt://[adresse-broker-mqtt]:[port]",
+        "userLabel": "Nom d'utilisateur",
+        "userPlaceholder": "Entrez le nom d'utilisateur du broker MQTT",
+        "passwordLabel": "Mot de passe",
+        "passwordPlaceholder": "Entrez le mot de passe du broker MQTT",
+        "saveLabel": "Sauvegarder la configuration",
+        "error": "Une erreur s'est produite lors de l'enregistrement de la configuration.",
+        "connecting": "Configuration enregistrée. Connexion au broker MQTT en cours...",
+        "connected": "Connecté au broker MQTT avec succès !",
+        "notConnected": "Erreur lors de la connexion, veuillez vérifier votre configuration."
+      },
       "error": {
         "defaultError": "Une erreur s'est produite lors de l'enregistrement de l'appareil.",
         "defaultDeletionError": "Une erreur s'est produite lors de la suppression de l'appareil.",
@@ -2001,6 +2134,7 @@
     "languageLabel": "Langue",
     "english": "English",
     "french": "Français",
+    "german": "Deutsch",
     "roleLabel": "Rôle",
     "passwordLabel": "Mot de passe (min 8 caractères)",
     "passwordPlaceholder": "Entrez votre mot de passe",
@@ -2581,7 +2715,15 @@
           "35": "Urgence",
           "36": "Désarmer alarme",
           "37": "Armer zones jour",
-          "38": "Armer alarme"
+          "38": "Armer alarme",
+          "39": "Bouton On pressé",
+          "40": "Bouton On maintenu",
+          "41": "Bouton Plus pressé",
+          "42": "Bouton Plus maintenu",
+          "43": "Bouton Moins pressé",
+          "44": "Bouton Moins maintenu",
+          "45": "Bouton Off pressé",
+          "46": "Bouton Off maintenu"
         }
       },
       "opening-sensor": {

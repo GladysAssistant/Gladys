@@ -61,7 +61,9 @@ const actionsFunc = {
       throw new AbortScene('ACTION_VALUE_NOT_A_NUMBER');
     }
 
-    return self.device.setValue(device, deviceFeature, value);
+    const valueInNumber = Number(value);
+
+    return self.device.setValue(device, deviceFeature, valueInNumber);
   },
   [ACTIONS.LIGHT.TURN_ON]: async (self, action, scope) => {
     await Promise.map(action.devices, async (deviceSelector) => {
