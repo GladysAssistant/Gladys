@@ -29,14 +29,6 @@ async function updateNAModule1(deviceGladys, deviceNetatmo, externalId) {
         });
       });
     deviceGladys.features
-      .filter((feature) => feature.external_id === `${externalId}:therm_measured_temperature`)
-      .forEach((feature) => {
-        this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {
-          device_feature_external_id: feature.external_id,
-          state: readValues[feature.category][feature.type](room.therm_measured_temperature),
-        });
-      });
-    deviceGladys.features
       .filter((feature) => feature.external_id === `${externalId}:humidity`)
       .forEach((feature) => {
         this.gladys.event.emit(EVENTS.DEVICE.NEW_STATE, {

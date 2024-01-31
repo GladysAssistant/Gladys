@@ -38,7 +38,7 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
   it('should save all values according to all cases', async () => {
     await netatmoHandler.updateNAModule1(deviceGladysNAModule1, deviceNetatmoNAModule1, externalIdNAModule1);
 
-    // expect(netatmoHandler.gladys.event.emit.callCount).to.equal(7);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(6);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
       device_feature_external_id: `${deviceGladysNAModule1.external_id}:battery_percent`,
       state: 32,
@@ -57,30 +57,24 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(2).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:therm_measured_temperature',
-        state: 19,
-      }),
-    ).to.equal(true);
-    expect(
-      netatmoHandler.gladys.event.emit.getCall(3).calledWith(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:humidity',
         state: 78,
       }),
     ).to.equal(true);
     expect(
-      netatmoHandler.gladys.event.emit.getCall(4).calledWith(EVENTS.DEVICE.NEW_STATE, {
+      netatmoHandler.gladys.event.emit.getCall(3).calledWith(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:min_temp',
         state: 5.1,
       }),
     ).to.equal(true);
     expect(
-      netatmoHandler.gladys.event.emit.getCall(5).calledWith(EVENTS.DEVICE.NEW_STATE, {
+      netatmoHandler.gladys.event.emit.getCall(4).calledWith(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:max_temp',
         state: 14.8,
       }),
     ).to.equal(true);
     expect(
-      netatmoHandler.gladys.event.emit.getCall(6).calledWith(EVENTS.DEVICE.NEW_STATE, {
+      netatmoHandler.gladys.event.emit.getCall(5).calledWith(EVENTS.DEVICE.NEW_STATE, {
         device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:rf_strength',
         state: 59,
       }),
