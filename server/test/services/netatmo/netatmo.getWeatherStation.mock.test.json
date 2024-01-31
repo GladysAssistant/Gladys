@@ -61,6 +61,31 @@
             "date_min_temp": 1706487105,
             "temp_trend": "up"
           }
+        },
+        {
+          "_id": "03:00:00:yy:yy:yy",
+          "type": "NAModule4",
+          "module_name": "STARK House kitchen hygrometer",
+          "last_setup": 1608046641,
+          "data_type": ["Temperature", "CO2", "Humidity"],
+          "battery_percent": 41,
+          "reachable": true,
+          "firmware": 53,
+          "last_message": 1706517399,
+          "last_seen": 1706517393,
+          "rf_status": 72,
+          "battery_vp": 4935,
+          "dashboard_data": {
+            "time_utc": 1706517393,
+            "Temperature": 18.1,
+            "CO2": 922,
+            "Humidity": 60,
+            "min_temp": 15.7,
+            "max_temp": 18.2,
+            "date_max_temp": 1706513445,
+            "date_min_temp": 1706503755,
+            "temp_trend": "stable"
+          }
         }
       ]
     }

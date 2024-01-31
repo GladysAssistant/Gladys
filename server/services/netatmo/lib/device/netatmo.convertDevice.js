@@ -116,6 +116,26 @@ function convertDevice(netatmoDevice) {
       ];
       break;
     }
+    case SUPPORTED_MODULE_TYPE.NAMODULE4: {
+      /* features common */
+      features.push(buildFeatureBattery(name, externalId));
+      /* features common Netatmo */
+      features.push(buildFeatureTemperature(name, externalId, 'temperature'));
+      features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
+      features.push(buildFeatureTemperature(`Minimum in ${room.name}`, externalId, 'min_temp'));
+      features.push(buildFeatureTemperature(`Maximum in ${room.name}`, externalId, 'max_temp'));
+      /* features specific Netatmo Weather */
+      features.push(buildFeatureCo2(name, externalId));
+      features.push(buildFeatureHumidity(name, externalId));
+      /* features common modules RF */
+      features.push(buildFeatureRfStrength(name, externalId));
+      /* params */
+      params = [
+        { name: PARAMS.PLUG_ID, value: plug.id },
+        { name: PARAMS.PLUG_NAME, value: plug.name },
+      ];
+      break;
+    }
     default:
       break;
   }

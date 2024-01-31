@@ -86,6 +86,14 @@
           "setup_date": 1605564992,
           "room_id": "8765432109",
           "bridge": "70:ee:50:jj:jj:jj"
+        },
+        {
+          "id": "03:00:00:xx:xx:xx",
+          "type": "NAModule4",
+          "name": "STARK House kitchen hygrometer",
+          "setup_date": 1605564990,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:jj:jj:jj"
         }
       ],
       "temperature_control_mode": "heating",

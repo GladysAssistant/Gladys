@@ -21,10 +21,10 @@ const serviceId = 'serviceId';
 
 const netatmoHandler = new NetatmoHandler(gladys, serviceId);
 
-describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
-  const deviceGladysNAModule1 = devicesGladys[5];
-  const deviceNetatmoNAModule1 = JSON.parse(JSON.stringify(devicesNetatmo[5]));
-  const externalIdNAModule1 = `netatmo:${devicesNetatmo[5].id}`;
+describe('Netatmo update Smart Indoor module NAModule4 features', () => {
+  const deviceGladysNAModule4 = devicesGladys[6];
+  const deviceNetatmoNAModule4 = JSON.parse(JSON.stringify(devicesNetatmo[6]));
+  const externalIdNAModule4 = `netatmo:${devicesNetatmo[6].id}`;
   beforeEach(() => {
     sinon.reset();
 
@@ -36,52 +36,64 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
   });
 
   it('should save all values according to all cases', async () => {
-    await netatmoHandler.updateNAModule1(deviceGladysNAModule1, deviceNetatmoNAModule1, externalIdNAModule1);
+    await netatmoHandler.updateNAModule4(deviceGladysNAModule4, deviceNetatmoNAModule4, externalIdNAModule4);
 
-    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(6);
+    expect(netatmoHandler.gladys.event.emit.callCount).to.equal(8);
     sinon.assert.calledWith(netatmoHandler.gladys.event.emit, 'device.new-state', {
-      device_feature_external_id: `${deviceGladysNAModule1.external_id}:battery_percent`,
-      state: 32,
+      device_feature_external_id: `${deviceGladysNAModule4.external_id}:battery_percent`,
+      state: 41,
     });
     expect(
       netatmoHandler.gladys.event.emit.getCall(0).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:battery_percent',
-        state: 32,
+        device_feature_external_id: 'netatmo:03:00:00:yy:yy:yy:battery_percent',
+        state: 41,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(1).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:temperature',
-        state: 14.2,
+        device_feature_external_id: 'netatmo:03:00:00:yy:yy:yy:temperature',
+        state: 18.2,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(2).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:humidity',
-        state: 78,
+        device_feature_external_id: 'netatmo:03:00:00:yy:yy:yy:therm_measured_temperature',
+        state: 19,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(3).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:min_temp',
-        state: 5.1,
+        device_feature_external_id: 'netatmo:03:00:00:yy:yy:yy:co2',
+        state: 922,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(4).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:max_temp',
-        state: 14.8,
+        device_feature_external_id: 'netatmo:03:00:00:yy:yy:yy:humidity',
+        state: 60,
       }),
     ).to.equal(true);
     expect(
       netatmoHandler.gladys.event.emit.getCall(5).calledWith(EVENTS.DEVICE.NEW_STATE, {
-        device_feature_external_id: 'netatmo:02:00:00:yy:yy:yy:rf_strength',
-        state: 59,
+        device_feature_external_id: 'netatmo:03:00:00:yy:yy:yy:min_temp',
+        state: 15.7,
+      }),
+    ).to.equal(true);
+    expect(
+      netatmoHandler.gladys.event.emit.getCall(6).calledWith(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: 'netatmo:03:00:00:yy:yy:yy:max_temp',
+        state: 18.2,
+      }),
+    ).to.equal(true);
+    expect(
+      netatmoHandler.gladys.event.emit.getCall(7).calledWith(EVENTS.DEVICE.NEW_STATE, {
+        device_feature_external_id: 'netatmo:03:00:00:yy:yy:yy:rf_strength',
+        state: 72,
       }),
     ).to.equal(true);
   });
   it('should handle errors correctly', async () => {
-    deviceNetatmoNAModule1.battery_percent = undefined;
+    deviceNetatmoNAModule4.battery_percent = undefined;
     const error = new Error('Test error');
     netatmoHandler.gladys = {
       event: {
@@ -91,7 +103,7 @@ describe('Netatmo update Smart Outdoor module NAModule1 features', () => {
     sinon.stub(logger, 'error');
 
     try {
-      await netatmoHandler.updateNAModule1(deviceGladysNAModule1, deviceNetatmoNAModule1, externalIdNAModule1);
+      await netatmoHandler.updateNAModule4(deviceGladysNAModule4, deviceNetatmoNAModule4, externalIdNAModule4);
     } catch (e) {
       expect(e).to.equal(error);
       sinon.assert.calledOnce(logger.error);
