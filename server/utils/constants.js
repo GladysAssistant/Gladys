@@ -42,6 +42,14 @@ const BUTTON_STATUS = {
   DISARM: 36,
   ARM_DAY_ZONES: 37,
   ARM_ALL_ZONES: 38,
+  ON_PRESS: 39,
+  ON_HOLD: 40,
+  UP_PRESS: 41,
+  UP_HOLD: 42,
+  DOWN_PRESS: 43,
+  DOWN_HOLD: 44,
+  OFF_PRESS: 45,
+  OFF_HOLD: 46,
 };
 
 const COVER_STATE = {
@@ -972,6 +980,14 @@ const WEBSOCKET_MESSAGE_TYPES = {
   TUYA: {
     STATUS: 'tuya.status',
     DISCOVER: 'tuya.discover',
+  },
+  NETATMO: {
+    STATUS: 'netatmo.status',
+    ERROR: {
+      CONNECTED: 'netatmo.error-connected',
+      CONNECTING: 'netatmo.error-connecting',
+      PROCESSING_TOKEN: 'netatmo.error-processing-token',
+    },
   },
   MELCLOUD: {
     STATUS: 'melcloud.status',
