@@ -431,19 +431,6 @@
         "max": 50
       },
       {
-        "name": "Temperature - room Office",
-        "external_id": "netatmo:02:00:00:yy:yy:yy:therm_measured_temperature",
-        "selector": "netatmo:02:00:00:yy:yy:yy:therm_measured_temperature",
-        "category": "temperature-sensor",
-        "type": "decimal",
-        "unit": "celsius",
-        "read_only": true,
-        "keep_history": true,
-        "has_feedback": false,
-        "min": -10,
-        "max": 50
-      },
-      {
         "name": "Temperature - Minimum in Outdoor",
         "external_id": "netatmo:02:00:00:yy:yy:yy:min_temp",
         "selector": "netatmo:02:00:00:yy:yy:yy:min_temp",

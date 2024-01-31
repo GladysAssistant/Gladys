@@ -84,7 +84,6 @@ function convertDevice(netatmoDevice) {
       features.push(buildFeatureBattery(name, externalId));
       /* features common Netatmo */
       features.push(buildFeatureTemperature(name, externalId, 'temperature'));
-      features.push(buildFeatureTemperature(`room ${room.name}`, externalId, 'therm_measured_temperature'));
       features.push(buildFeatureTemperature(`Minimum in ${room.name}`, externalId, 'min_temp'));
       features.push(buildFeatureTemperature(`Maximum in ${room.name}`, externalId, 'max_temp'));
       /* features specific Netatmo Weather */
