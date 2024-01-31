@@ -37,11 +37,13 @@ async function loadDeviceDetails(homeData) {
         modulesThermostat = deviceThermostats.modules;
       }
       let weatherStations;
+      let modulesWeatherStations = [];
       if (
         modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.NAMAIN) !== undefined
       ) {
         const deviceWeatherStations = await this.loadWeatherStationDetails();
         weatherStations = deviceWeatherStations.weatherStations;
+        modulesWeatherStations = deviceWeatherStations.modules;
       }
       if (modulesHomestatus) {
         listDevices = modulesHomestatus
@@ -50,7 +52,12 @@ async function loadDeviceDetails(homeData) {
             let categoryAPI;
             let device;
             let plugThermostat;
-            switch (module.type) {
+            let plugWeatherStation;
+            let typeModule = module.type;
+            if (typeModule === SUPPORTED_MODULE_TYPE.NAMODULE1 || typeModule === SUPPORTED_MODULE_TYPE.NAMODULE4) {
+              typeModule = 'NAModule';
+            }
+            switch (typeModule) {
               case SUPPORTED_MODULE_TYPE.THERMOSTAT:
                 moduleSupported = true;
                 if (thermostats && modulesThermostat) {
@@ -97,6 +104,23 @@ async function loadDeviceDetails(homeData) {
                     .find((weatherStation) => weatherStation._id === module.id);
                 }
                 break;
+              case 'NAModule':
+                moduleSupported = true;
+                categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
+                if (weatherStations && modulesWeatherStations) {
+                  device = modulesWeatherStations.find(
+                    // eslint-disable-next-line no-underscore-dangle
+                    (moduleWeatherStation) => moduleWeatherStation._id === module.id,
+                  );
+                  plugWeatherStation = weatherStations
+                    .map((weatherStation) => {
+                      const { modules, ...rest } = weatherStation;
+                      return rest;
+                    })
+                    // eslint-disable-next-line no-underscore-dangle
+                    .find((weatherStation) => weatherStation._id === module.bridge);
+                }
+                break;
               default:
                 moduleSupported = false;
                 break;
@@ -110,6 +134,7 @@ async function loadDeviceDetails(homeData) {
               ...modulesHomeData.find((mod) => mod.id === module.bridge),
               ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
               ...plugThermostat,
+              ...plugWeatherStation,
             };
             const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
             if (moduleSupported) {

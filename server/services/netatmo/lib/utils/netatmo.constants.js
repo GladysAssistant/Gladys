@@ -76,6 +76,7 @@ const SUPPORTED_MODULE_TYPE = {
   PLUG: 'NAPlug',
   NRV: 'NRV',
   NAMAIN: 'NAMain',
+  NAMODULE1: 'NAModule1',
 };
 
 const PARAMS = {

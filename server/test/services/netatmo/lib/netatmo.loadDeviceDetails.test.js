@@ -54,12 +54,14 @@ describe('Netatmo Load Device Details', () => {
     const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
     const natValveDevices = devices.filter((device) => device.type === 'NRV');
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    const natNAModule1Devices = devices.filter((device) => device.type === 'NAModule1');
     const natNotHandledDevices = devices.filter((device) => device.not_handled);
 
     expect(natThermDevices).to.have.lengthOf(1);
     expect(natPlugDevices).to.have.lengthOf(2);
     expect(natValveDevices).to.have.lengthOf(1);
     expect(natWeatherStationDevices).to.have.lengthOf(1);
+    expect(natNAModule1Devices).to.have.lengthOf(1);
     expect(natNotHandledDevices).to.have.lengthOf(1);
     natThermDevices.forEach((device) => {
       expect(device.room).to.be.an('object');
@@ -96,11 +98,13 @@ describe('Netatmo Load Device Details', () => {
     const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
     const natValveDevices = devices.filter((device) => device.type === 'NRV');
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    const natNAModule1Devices = devices.filter((device) => device.type === 'NAModule1');
     const natNotHandledDevices = devices.filter((device) => device.not_handled);
     expect(natThermDevices).to.have.lengthOf(0);
     expect(natPlugDevices).to.have.lengthOf(2);
     expect(natValveDevices).to.have.lengthOf(1);
     expect(natWeatherStationDevices).to.have.lengthOf(1);
+    expect(natNAModule1Devices).to.have.lengthOf(1);
     expect(natNotHandledDevices).to.have.lengthOf(1);
     expect(devices).to.be.an('array');
   });
@@ -123,11 +127,13 @@ describe('Netatmo Load Device Details', () => {
     const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
     const natValveDevices = devices.filter((device) => device.type === 'NRV');
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    const natNAModule1Devices = devices.filter((device) => device.type === 'NAModule1');
     const natNotHandledDevices = devices.filter((device) => device.not_handled);
     expect(natThermDevices).to.have.lengthOf(1);
     expect(natPlugDevices).to.have.lengthOf(2);
     expect(natValveDevices).to.have.lengthOf(1);
     expect(natWeatherStationDevices).to.have.lengthOf(0);
+    expect(natNAModule1Devices).to.have.lengthOf(1);
     expect(natNotHandledDevices).to.have.lengthOf(1);
   });
 
@@ -160,7 +166,9 @@ describe('Netatmo Load Device Details', () => {
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
     const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    const natNAModule1Devices = devices.filter((device) => device.type === 'NAModule1');
     expect(natWeatherStationDevices).to.have.lengthOf.at.least(1);
+    expect(natNAModule1Devices).to.have.lengthOf.at.least(1);
     natWeatherStationDevices.forEach((device) => {
       expect(device)
         .to.have.property('room')
@@ -169,6 +177,13 @@ describe('Netatmo Load Device Details', () => {
         .to.have.property('modules_bridged')
         .that.is.an('array');
       expect(device).to.not.have.property('dashboard_data');
+    });
+    expect(natNAModule1Devices).to.have.lengthOf.at.least(1);
+    natNAModule1Devices.forEach((device) => {
+      expect(device)
+        .to.have.property('plug')
+        .that.is.an('object');
+      expect(device.plug).to.not.have.property('dashboard_data');
     });
   });
 

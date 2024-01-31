@@ -78,6 +78,14 @@
           "setup_date": 1605564990,
           "room_id": "8765432109",
           "modules_bridged": ["02:00:00:yy:yy:yy", "05:00:00:yy:yy:yy", "06:00:00:yy:yy:yy", "03:00:00:yy:yy:yy"]
+        },
+        {
+          "id": "02:00:00:xx:xx:xx",
+          "type": "NAModule1",
+          "name": "Outdoor Hygrometer",
+          "setup_date": 1605564992,
+          "room_id": "8765432109",
+          "bridge": "70:ee:50:jj:jj:jj"
         }
       ],
       "temperature_control_mode": "heating",
