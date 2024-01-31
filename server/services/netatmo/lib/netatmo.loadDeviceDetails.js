@@ -131,6 +131,7 @@ async function loadDeviceDetails(homeData) {
               ...modulesHomeData.find((mod) => mod.id === module.bridge),
               ...modulesHomestatus.find((modulePlug) => modulePlug.id === module.bridge),
               ...plugThermostat,
+              ...plugWeatherStation,
             };
             const plug = Object.keys(plugDevice).length === 0 ? undefined : plugDevice;
             if (moduleSupported) {
