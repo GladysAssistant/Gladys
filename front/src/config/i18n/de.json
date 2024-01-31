@@ -2883,7 +2883,8 @@
     },
     "speed-sensor": {
       "shortCategoryName": "Geschwindigkeitssensor",
-      "decimal": "Geschwindigkeit"
+      "decimal": "Geschwindigkeit (dezimal)",
+      "integer": "Geschwindigkeit (ganze Zahl)"
     },
     "precipitation-sensor": {
       "shortCategoryName": "Niederschlagssensor",
@@ -2952,7 +2953,11 @@
     },
     "noise-sensor": {
       "shortCategoryName": "Schallsensor",
-      "integer": "Rauschen (Ganzzahl)"
+      "integer": "Rauschen (ganze Zahl)"
+    },
+    "angle-sensor": {
+      "shortCategoryName": "Winkelsensor",
+      "integer": "Winkel (ganze Zahl)"
     },
     "unknown": {
       "shortCategoryName": "Unbekannt",

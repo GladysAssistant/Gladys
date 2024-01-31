@@ -101,9 +101,61 @@ function buildFeaturePressure(name, externalId, featureName) {
   };
 }
 
+/**
+ * @description Transforms Netatmo feature as Gladys feature. Speed of wind.
+ * @param {string} name - Name device from Netatmo.
+ * @param {string} externalId - Gladys external ID.
+ * @param {string} featureName - Gladys external ID.
+ * @returns {object} Gladys feature or undefined.
+ * @example
+ * buildFeaturePressure(device_name, 'netatmo:device_id', 'wind_strength');
+ */
+function buildFeatureWindStrength(name, externalId, featureName) {
+  return {
+    name,
+    external_id: `${externalId}:${featureName}`,
+    selector: `${externalId}:${featureName}`,
+    category: DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SPEED_SENSOR.INTEGER,
+    unit: DEVICE_FEATURE_UNITS.KILOMETER_PER_HOUR,
+    read_only: true,
+    keep_history: true,
+    has_feedback: false,
+    min: 0,
+    max: 300,
+  };
+}
+
+/**
+ * @description Transforms Netatmo feature as Gladys feature. Angle of wind.
+ * @param {string} name - Name device from Netatmo.
+ * @param {string} externalId - Gladys external ID.
+ * @param {string} featureName - Gladys external ID.
+ * @returns {object} Gladys feature or undefined.
+ * @example
+ * buildFeaturePressure(device_name, 'netatmo:device_id', 'wind_angle');
+ */
+function buildFeatureWindAngle(name, externalId, featureName) {
+  return {
+    name,
+    external_id: `${externalId}:${featureName}`,
+    selector: `${externalId}:${featureName}`,
+    category: DEVICE_FEATURE_CATEGORIES.ANGLE_SENSOR,
+    type: DEVICE_FEATURE_TYPES.SENSOR.INTEGER,
+    unit: DEVICE_FEATURE_UNITS.DEGREE,
+    read_only: true,
+    keep_history: true,
+    has_feedback: false,
+    min: 0,
+    max: 300,
+  };
+}
+
 module.exports = {
   buildFeatureCo2,
   buildFeatureHumidity,
   buildFeatureNoise,
   buildFeaturePressure,
+  buildFeatureWindStrength,
+  buildFeatureWindAngle
 };
