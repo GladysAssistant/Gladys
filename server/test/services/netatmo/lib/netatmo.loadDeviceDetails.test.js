@@ -7,6 +7,7 @@ const { fake } = sinon;
 const bodyHomesDataMock = require('../netatmo.homesdata.mock.test.json');
 const bodyHomeStatusMock = require('../netatmo.homestatus.mock.test.json');
 const thermostatsDetailsMock = require('../netatmo.loadThermostatDetails.mock.test.json');
+const weatherStationsDetailsMock = require('../netatmo.loadWeatherStationDetails.mock.test.json');
 const NetatmoHandler = require('../../../../services/netatmo/lib/index');
 
 const gladys = {
@@ -33,6 +34,7 @@ describe('Netatmo Load Device Details', () => {
     netatmoHandler.status = 'not_initialized';
     netatmoHandler.accessToken = accessToken;
     netatmoHandler.loadThermostatDetails = sinon.stub().resolves(thermostatsDetailsMock);
+    netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves(weatherStationsDetailsMock);
   });
 
   afterEach(() => {
@@ -46,12 +48,19 @@ describe('Netatmo Load Device Details', () => {
       .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
     const devices = await netatmoHandler.loadDeviceDetails(homesMock);
 
-    expect(devices).to.have.lengthOf(5);
-    expect(devices.filter((device) => device.type === 'NATherm1')).to.have.lengthOf(1);
-    expect(devices.filter((device) => device.type === 'NAPlug')).to.have.lengthOf(2);
-    expect(devices.filter((device) => device.not_handled)).to.have.lengthOf(1);
+    expect(devices).to.have.lengthOf(6);
+
     const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
-    expect(natThermDevices).to.have.lengthOf.at.least(1);
+    const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
+    const natValveDevices = devices.filter((device) => device.type === 'NRV');
+    const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    const natNotHandledDevices = devices.filter((device) => device.not_handled);
+
+    expect(natThermDevices).to.have.lengthOf(1);
+    expect(natPlugDevices).to.have.lengthOf(2);
+    expect(natValveDevices).to.have.lengthOf(1);
+    expect(natWeatherStationDevices).to.have.lengthOf(1);
+    expect(natNotHandledDevices).to.have.lengthOf(1);
     natThermDevices.forEach((device) => {
       expect(device.room).to.be.an('object');
       expect(device.room).to.not.deep.equal({});
@@ -59,8 +68,12 @@ describe('Netatmo Load Device Details', () => {
       expect(device.plug).to.not.deep.equal({});
       expect(device.categoryAPI).to.be.eq('Energy');
     });
-    const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
-    expect(natPlugDevices).to.have.lengthOf.at.least(2);
+    natWeatherStationDevices.forEach((device) => {
+      expect(device.categoryAPI).to.be.eq('Weather');
+      expect(device)
+        .to.have.property('dashboard_data')
+        .that.is.an('object');
+    });
   });
 
   it('should load device details successfully without thermostat', async () => {
@@ -78,11 +91,44 @@ describe('Netatmo Load Device Details', () => {
 
     const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
 
-    expect(devices).to.have.lengthOf(4);
-    expect(devices.filter((device) => device.type === 'NATherm1')).to.have.lengthOf(0);
-    expect(devices.filter((device) => device.type === 'NAPlug')).to.have.lengthOf(2);
-    expect(devices.filter((device) => device.not_handled)).to.have.lengthOf(1);
+    expect(devices).to.have.lengthOf(5);
+    const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
+    const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
+    const natValveDevices = devices.filter((device) => device.type === 'NRV');
+    const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    const natNotHandledDevices = devices.filter((device) => device.not_handled);
+    expect(natThermDevices).to.have.lengthOf(0);
+    expect(natPlugDevices).to.have.lengthOf(2);
+    expect(natValveDevices).to.have.lengthOf(1);
+    expect(natWeatherStationDevices).to.have.lengthOf(1);
+    expect(natNotHandledDevices).to.have.lengthOf(1);
     expect(devices).to.be.an('array');
+  });
+
+  it('should load device details successfully without weatherStation', async () => {
+    const homesMockFake = JSON.parse(JSON.stringify(homesMock));
+    homesMockFake.modules = homesMockFake.modules.filter((module) => module.type !== 'NAMain');
+    const bodyHomeStatusMockFake = JSON.parse(JSON.stringify(bodyHomeStatusMock));
+    bodyHomeStatusMockFake.home.modules = bodyHomeStatusMock.home.modules.filter((module) => module.type !== 'NAMain');
+    netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
+
+    nock('https://api.netatmo.com')
+      .get('/api/homestatus')
+      .reply(200, { body: bodyHomeStatusMockFake, status: 'ok' });
+
+    const devices = await netatmoHandler.loadDeviceDetails(homesMockFake);
+
+    expect(devices).to.have.lengthOf(5);
+    const natThermDevices = devices.filter((device) => device.type === 'NATherm1');
+    const natPlugDevices = devices.filter((device) => device.type === 'NAPlug');
+    const natValveDevices = devices.filter((device) => device.type === 'NRV');
+    const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    const natNotHandledDevices = devices.filter((device) => device.not_handled);
+    expect(natThermDevices).to.have.lengthOf(1);
+    expect(natPlugDevices).to.have.lengthOf(2);
+    expect(natValveDevices).to.have.lengthOf(1);
+    expect(natWeatherStationDevices).to.have.lengthOf(0);
+    expect(natNotHandledDevices).to.have.lengthOf(1);
   });
 
   it('should load device details successfully but without modules thermostat', async () => {
@@ -104,12 +150,36 @@ describe('Netatmo Load Device Details', () => {
     });
   });
 
+  it('should load device details successfully but without weather station details', async () => {
+    netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
+
+    nock('https://api.netatmo.com')
+      .get('/api/homestatus')
+      .reply(200, { body: bodyHomeStatusMock, status: 'ok' });
+
+    const devices = await netatmoHandler.loadDeviceDetails(homesMock);
+
+    const natWeatherStationDevices = devices.filter((device) => device.type === 'NAMain');
+    expect(natWeatherStationDevices).to.have.lengthOf.at.least(1);
+    natWeatherStationDevices.forEach((device) => {
+      expect(device)
+        .to.have.property('room')
+        .that.is.an('object');
+      expect(device)
+        .to.have.property('modules_bridged')
+        .that.is.an('array');
+      expect(device).to.not.have.property('dashboard_data');
+    });
+  });
+
   it('should no load device details without modules', async () => {
     const homesMockFake = JSON.parse(JSON.stringify(homesMock));
     homesMockFake.modules = homesMockFake.modules.filter((module) => module.type !== 'NATherm1');
+    homesMockFake.modules = homesMockFake.modules.filter((module) => module.type !== 'NAMain');
     const bodyHomeStatusMockFake = { ...bodyHomeStatusMock };
     bodyHomeStatusMockFake.home.modules = undefined;
     netatmoHandler.loadThermostatDetails = sinon.stub().resolves([]);
+    netatmoHandler.loadWeatherStationDetails = sinon.stub().resolves([]);
 
     nock('https://api.netatmo.com')
       .get('/api/homestatus')

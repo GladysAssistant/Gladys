@@ -92,6 +92,30 @@ describe('Netatmo Convert Device', () => {
     expect(gladysDevice.params).to.be.an('array');
   });
 
+  it('should correctly convert a Netatmo Weather Station device', () => {
+    const deviceGladysMock = devicesGladysMock.filter((device) => device.model === 'NAMain')[0];
+    const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NAMain')[0];
+
+    const gladysDevice = convertDevice.bind(netatmoHandler)(deviceNetatmoMock);
+
+    expect(gladysDevice).deep.equal(deviceGladysMock);
+    expect(gladysDevice.features).deep.equal(deviceGladysMock.features);
+    expect(gladysDevice.params).deep.equal(deviceGladysMock.params);
+
+    expect(gladysDevice).to.have.property('name', deviceGladysMock.name);
+    expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}`);
+    expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NAMAIN);
+
+    const featureMock = gladysDevice.features.filter((feature) => feature.category === 'temperature-sensor')[2];
+    expect(featureMock).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}:min_temp`);
+
+    const paramMock = gladysDevice.params.filter((param) => param.name === 'modules_bridge_id')[0];
+    expect(paramMock).to.have.property('value', JSON.stringify(deviceNetatmoMock.modules_bridged));
+
+    expect(gladysDevice.features).to.be.an('array');
+    expect(gladysDevice.params).to.be.an('array');
+  });
+
   it('should correctly convert a Netatmo device not supported', () => {
     const deviceGladysMock = devicesGladysMock.filter((device) => device.not_handled)[0];
     const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NOC')[0];
@@ -130,6 +154,33 @@ describe('Netatmo Convert Device', () => {
 
     const featureMock = gladysDevice.features.filter((feature) => feature.name.includes('connected boiler'))[0];
     expect(featureMock).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}:plug_connected_boiler`);
+
+    const paramMock = gladysDevice.params.filter((param) => param.name === 'modules_bridge_id')[0];
+    expect(paramMock).deep.equal({ name: 'modules_bridge_id', value: '[]' });
+
+    expect(gladysDevice.features).to.be.an('array');
+    expect(gladysDevice.params).to.be.an('array');
+  });
+
+  it('should correctly convert a Netatmo Weather Station device without modules_bridged', () => {
+    const deviceGladysMock = devicesGladysMock.filter((device) => device.model === 'NAMain')[0];
+    deviceGladysMock.params
+      .filter((param) => param.name === 'modules_bridge_id')
+      .forEach((param) => {
+        param.value = '[]';
+      });
+    const deviceNetatmoMock = devicesNetatmoMock.filter((device) => device.type === 'NAMain')[0];
+    deviceNetatmoMock.modules_bridged = undefined;
+
+    const gladysDevice = convertDevice.bind(netatmoHandler)(deviceNetatmoMock);
+
+    expect(gladysDevice).deep.equal(deviceGladysMock);
+    expect(gladysDevice.features).deep.equal(deviceGladysMock.features);
+    expect(gladysDevice.params).deep.equal(deviceGladysMock.params);
+
+    expect(gladysDevice).to.have.property('name', deviceGladysMock.name);
+    expect(gladysDevice).to.have.property('external_id', `netatmo:${deviceNetatmoMock.id}`);
+    expect(gladysDevice).to.have.property('model', SUPPORTED_MODULE_TYPE.NAMAIN);
 
     const paramMock = gladysDevice.params.filter((param) => param.name === 'modules_bridge_id')[0];
     expect(paramMock).deep.equal({ name: 'modules_bridge_id', value: '[]' });

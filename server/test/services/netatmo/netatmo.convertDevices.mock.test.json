@@ -347,6 +347,163 @@
     ]
   },
   {
+    "name": "Weather Station Test",
+    "external_id": "netatmo:70:ee:50:jj:jj:jj",
+    "selector": "netatmo:70:ee:50:jj:jj:jj",
+    "model": "NAMain",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Temperature - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:temperature",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - room Office",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:therm_measured_temperature",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:therm_measured_temperature",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Minimum in Office",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:min_temp",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:min_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "Temperature - Maximum in Office",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:max_temp",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:max_temp",
+        "category": "temperature-sensor",
+        "type": "decimal",
+        "unit": "celsius",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -10,
+        "max": 50
+      },
+      {
+        "name": "CO2 - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:co2",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:co2",
+        "category": "co2-sensor",
+        "type": "integer",
+        "unit": "ppm",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 5000
+      },
+      {
+        "name": "Humidity - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:humidity",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:humidity",
+        "category": "humidity-sensor",
+        "type": "decimal",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Noise - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:noise",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:noise",
+        "category": "noise-sensor",
+        "type": "integer",
+        "unit": "decibel",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 250
+      },
+      {
+        "name": "Pressure - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:pressure",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:pressure",
+        "category": "pressure-sensor",
+        "type": "integer",
+        "unit": "milli-bar",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -1000,
+        "max": 2000
+      },
+      {
+        "name": "Absolute pressure - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:absolute_pressure",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:absolute_pressure",
+        "category": "pressure-sensor",
+        "type": "integer",
+        "unit": "milli-bar",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": -1000,
+        "max": 2000
+      },
+      {
+        "name": "Link Wifi quality - Weather Station Test",
+        "external_id": "netatmo:70:ee:50:jj:jj:jj:wifi_strength",
+        "selector": "netatmo:70:ee:50:jj:jj:jj:wifi_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      }
+    ],
+    "params": [
+      {
+        "name": "modules_bridge_id",
+        "value": "[\"02:00:00:yy:yy:yy\",\"05:00:00:yy:yy:yy\",\"06:00:00:yy:yy:yy\",\"03:00:00:yy:yy:yy\"]"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Office"
+      }
+    ]
+  },
+  {
     "name": "Outdoor Parking Camera",
     "external_id": "netatmo:70:ee:00:xx:xx:xx",
     "selector": "netatmo:70:ee:00:xx:xx:xx",

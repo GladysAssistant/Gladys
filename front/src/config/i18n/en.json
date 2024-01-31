@@ -2407,6 +2407,7 @@
     "hPa": "Hectopascal (hPa)",
     "bar": "Bar",
     "psi": "Pound-force per square inch (psi)",
+    "milli-bar": "Millibar (mbar)",
     "lux": "Lux",
     "ppm": "Parts per million (ppm)",
     "ppb": "Parts per billion (ppb)",
@@ -2472,7 +2473,8 @@
     "microgram-per-cubic-meter": "Microgram per cubic meter (µg/m³)",
     "square-centimeter": "Square centimer (cm²)",
     "square-meter": "Square meter (m²)",
-    "square-kilometer": "Square kilometer (km²)"
+    "square-kilometer": "Square kilometer (km²)",
+    "decibel": "Decibel (dB)"
   },
   "deviceFeatureUnitShort": {
     "celsius": "°C",
@@ -2482,6 +2484,7 @@
     "pascal": "Pa",
     "hPa": "hPa",
     "bar": "bar",
+    "milli-bar": "mbar",
     "psi": "psi",
     "lux": "lx",
     "ppm": "ppm",
@@ -2548,7 +2551,8 @@
     "microgram-per-cubic-meter": "µg/m³",
     "square-centimeter": "cm²",
     "square-meter": "m²",
-    "square-kilometer": "km²"
+    "square-kilometer": "km²",
+    "decibel": "dB"
   },
   "deviceFeatureAction": {
     "category": {
@@ -2746,7 +2750,8 @@
     },
     "co2-sensor": {
       "shortCategoryName": "Co2 Sensor",
-      "decimal": "Co2 (decimal)"
+      "decimal": "Co2 (decimal)",
+      "integer": "Co2 (integer)"
     },
     "switch": {
       "shortCategoryName": "Switch",
@@ -2773,7 +2778,8 @@
     },
     "pressure-sensor": {
       "shortCategoryName": "Pressure sensor",
-      "decimal": "Pressure (decimal)"
+      "decimal": "Pressure (decimal)",
+      "integer": "Pressure (integer)"
     },
     "leak-sensor": {
       "shortCategoryName": "Leak sensor",
@@ -2945,6 +2951,10 @@
       "next": "Music next button",
       "playback_state": "Music playback state",
       "play_notification": "Broadcast a notification"
+    },
+    "noise-sensor": {
+      "shortCategoryName": "Sound sensor",
+      "integer": "Noise (integer)"
     },
     "unknown": {
       "shortCategoryName": "Unknown",

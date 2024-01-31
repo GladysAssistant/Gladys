@@ -36,6 +36,13 @@ async function loadDeviceDetails(homeData) {
         thermostats = deviceThermostats.thermostats;
         modulesThermostat = deviceThermostats.modules;
       }
+      let weatherStations;
+      if (
+        modulesHomeData.find((moduleHomeData) => moduleHomeData.type === SUPPORTED_MODULE_TYPE.NAMAIN) !== undefined
+      ) {
+        const deviceWeatherStations = await this.loadWeatherStationDetails();
+        weatherStations = deviceWeatherStations.weatherStations;
+      }
       if (modulesHomestatus) {
         listDevices = modulesHomestatus
           .map((module) => {
@@ -77,6 +84,18 @@ async function loadDeviceDetails(homeData) {
               case SUPPORTED_MODULE_TYPE.NRV:
                 moduleSupported = true;
                 categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
+              case SUPPORTED_MODULE_TYPE.NAMAIN:
+                moduleSupported = true;
+                categoryAPI = SUPPORTED_CATEGORY_TYPE.WEATHER;
+                if (weatherStations) {
+                  device = weatherStations
+                    .map((weatherStation) => {
+                      const { modules, ...rest } = weatherStation;
+                      return rest;
+                    })
+                    // eslint-disable-next-line no-underscore-dangle
+                    .find((weatherStation) => weatherStation._id === module.id);
+                }
                 break;
               default:
                 moduleSupported = false;
