@@ -80,7 +80,7 @@ const readValues = {
   },
   [DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR]: {
     /* wind_strength: 5 */
-    [DEVICE_FEATURE_TYPES.SENSOR.INTEGER]: (valueFromDevice) => {
+    [DEVICE_FEATURE_TYPES.SPEED_SENSOR.INTEGER]: (valueFromDevice) => {
       const valueToGladys = parseInt(valueFromDevice, 10);
       return valueToGladys;
     },

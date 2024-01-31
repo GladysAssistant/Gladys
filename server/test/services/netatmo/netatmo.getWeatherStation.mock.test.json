@@ -37,7 +37,34 @@
         "temp_trend": "stable",
         "pressure_trend": "down"
       },
-      "modules": []
+      "modules": [
+        {
+          "_id": "06:00:00:yy:yy:yy",
+          "type": "NAModule2",
+          "module_name": "Anemometer STARK Home",
+          "last_setup": 1605604559,
+          "data_type": [
+            "Wind"
+          ],
+          "battery_percent": 51,
+          "reachable": true,
+          "firmware": 27,
+          "last_message": 1706723822,
+          "last_seen": 1706723822,
+          "rf_status": 70,
+          "battery_vp": 4993,
+          "dashboard_data": {
+            "time_utc": 1706723822,
+            "WindStrength": 1,
+            "WindAngle": 270,
+            "GustStrength": 6,
+            "GustAngle": 303,
+            "max_wind_str": 11,
+            "max_wind_angle": 137,
+            "date_max_wind_str": 1706714453
+          }
+        }
+      ]
     }
   ],
   "user": {
