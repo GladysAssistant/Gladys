@@ -25,8 +25,19 @@ const readValues = {
   },
   [DEVICE_FEATURE_CATEGORIES.BATTERY]: {
     /* battery_percent: 76 */
+    /* battery_state: 'medium' */
     [DEVICE_FEATURE_TYPES.BATTERY.INTEGER]: (valueFromDevice) => {
-      const valueToGladys = parseInt(valueFromDevice, 10);
+      const batteryLevels = {
+        max: 100,
+        full: 90,
+        high: 75,
+        medium: 50,
+        low: 25,
+        'very low': 10,
+      };
+
+      const valueToGladys =
+        batteryLevels[valueFromDevice] !== undefined ? batteryLevels[valueFromDevice] : parseInt(valueFromDevice, 10);
       return valueToGladys;
     },
   },

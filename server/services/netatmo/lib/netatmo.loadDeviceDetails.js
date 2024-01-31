@@ -74,6 +74,10 @@ async function loadDeviceDetails(homeData) {
                 moduleSupported = true;
                 categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
                 break;
+              case SUPPORTED_MODULE_TYPE.NRV:
+                moduleSupported = true;
+                categoryAPI = SUPPORTED_CATEGORY_TYPE.ENERGY;
+                break;
               default:
                 moduleSupported = false;
                 break;
