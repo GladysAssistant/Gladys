@@ -6,6 +6,19 @@ const ICON_MAP = {
   [DEVICE_FEATURE_CATEGORIES.OPENING_SENSOR]: {
     0: 'unlock',
     1: 'lock'
+  },
+  [DEVICE_FEATURE_CATEGORIES.LOCK]: {
+    0: 'x-octagon', //'uncalibrated'
+    1: 'lock', //'locked',
+    2: 'activity', //'unlocking',
+    3: 'unlock', //'unlocked',
+    4: 'activity', //'locking',
+    5: 'unlocked', // 'unlatched',
+    6: 'unlocked', // 'unlocked (lock ‘n’ go)',
+    7: 'activity', //'unlatching opening',
+    253: 'cpu', //'boot run'
+    254: 'alert-triangle', // 'motor blocked'
+    255: 'alert-circle', //'undefined'
   }
 };
 

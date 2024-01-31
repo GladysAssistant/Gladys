@@ -5,6 +5,7 @@ const { getDiscoveredDevices } = require('./nuki.mqtt.getDiscoveredDevices');
 const { setValue } = require('./nuki.mqtt.setValue');
 const { handleMessage } = require('./nuki.mqtt.handleMessage');
 const { convertToDevice } = require('./nuki.mqtt.convertToDevice');
+const { subscribeDeviceTopic } = require('./nuki.mqtt.subscribeDeviceTopic');
 
 /**
  * @description Add ability to connect to Nuki MQTT devices.
@@ -31,5 +32,6 @@ NukiMQTTHandler.prototype.setValue = setValue;
 // MQTT
 NukiMQTTHandler.prototype.handleMessage = handleMessage;
 NukiMQTTHandler.prototype.convertToDevice = convertToDevice;
+NukiMQTTHandler.prototype.subscribeDeviceTopic = subscribeDeviceTopic;
 
 module.exports = NukiMQTTHandler;

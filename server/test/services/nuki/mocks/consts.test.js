@@ -62,6 +62,30 @@ const existingDevice = {
   params: [],
 };
 
+const existingDevices = [ 
+  {
+    external_id: 'alreadyExists',
+    name: 'alreadyExists',
+    model: 'Smart Lock 3.0 Pro',
+    room_id: 'room_id',
+    features: [
+      {
+        name: 'feature 1',
+        type: 'type 1',
+        category: 'category 1',
+        external_id: 'external_id:1',
+      },
+      {
+        name: 'feature 2',
+        type: 'type 2',
+        category: 'category 2',
+        external_id: 'external_id:2',
+      },
+    ],
+    params: [],
+  },
+
+ ];
 
 module.exports = {
   serviceId,

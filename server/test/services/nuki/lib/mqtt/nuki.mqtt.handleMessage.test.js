@@ -1,16 +1,19 @@
 const sinon = require('sinon');
 
 const { assert, fake } = sinon;
+const { serviceId } = require('../../mocks/consts.test');
 const NukiHandler = require('../../../../../services/nuki/lib');
 const NukiMQTTHandler = require('../../../../../services/nuki/lib/mqtt');
 
-const serviceId = 'service-uuid-random';
 const gladys = {
   variable: {
     getValue: fake.resolves('result'),
   },
   event: {
     emit: fake.returns(null),
+  },
+  stateManager: {
+    get: fake.returns(null),
   },
 };
 const mqttService = {
@@ -33,7 +36,7 @@ describe('Nuki - MQTT - Handle message', () => {
   });
 
   it('should change NUKI lock state not handled', () => {
-    nukiHandler.handleMessage('homeassistant/my_device/LOCK', JSON.stringify({ HELLO: 'with_value ?' }));
+    nukiHandler.handleMessage('nuki/my_device/LOCK', JSON.stringify({ HELLO: 'with_value ?' }));
 
     assert.notCalled(mqttService.device.publish);
     assert.notCalled(gladys.event.emit);

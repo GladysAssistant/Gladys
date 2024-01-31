@@ -3,7 +3,7 @@ const { DISCOVERY_TOPIC } = require('../utils/nuki.constants');
 /**
  * @description Force MQTT scanning by re-subscribing to topic.
  * @example
- * scan();
+ * nukiMQTTHandler.scan();
  */
 function scan() {
   // Subscribe to Nuki

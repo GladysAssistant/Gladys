@@ -7,11 +7,11 @@ const { BadParameters } = require('../../../../utils/coreErrors');
  * @param {object} deviceFeature - Updated Gladys device feature.
  * @param {string|number} value - The new device feature value.
  * @example
- * setValue(device, deviceFeature, 0);
+ * nukiHandler.setValue(device, deviceFeature, 0);
  */
 function setValue(device, deviceFeature, value) {
   const externalId = deviceFeature.external_id;
-  const [prefix, topic, command] = deviceFeature.external_id.split(':');
+  const [prefix, topic, ] = deviceFeature.external_id.split(':');
 
   if (prefix !== 'nuki') {
     throw new BadParameters(`Nuki device external_id is invalid: "${externalId}" should starts with "nuki:"`);
@@ -19,8 +19,15 @@ function setValue(device, deviceFeature, value) {
   if (!topic || topic.length === 0) {
     throw new BadParameters(`Nuki device external_id is invalid: "${externalId}" have no network indicator`);
   }
-  
+  let command;
+  value === 0 ? command = 'lock' : command = 'unlock';
+  logger.trace(prefix);
+  logger.trace(topic);
+  logger.trace(command);
   logger.trace(value);
+
+  const deviceProtocol = this.getProtocolFromDevice(device);
+  this.getHandler(deviceProtocol).setValue(device, topic, command, value);
 };
 
 module.exports = {

@@ -23,6 +23,28 @@ const NukiPage = ({ children }) => (
                     </span>
                     <Text id="integration.nuki.setupTab" />
                   </Link>
+
+                  <Link
+                    href="/dashboard/integration/device/nuki"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-link" />
+                    </span>
+                    <Text id="integration.nuki.deviceTab" />
+                  </Link>
+
+                  <Link
+                    href="/dashboard/integration/device/nuki/mqtt"
+                    activeClassName="active"
+                    class="list-group-item list-group-item-action d-flex align-items-center"
+                  >
+                    <span class="icon mr-3">
+                      <i class="fe fe-radio" />
+                    </span>
+                    <Text id="integration.nuki.mqttDiscoverTab" />
+                  </Link>
                 </div>
               </div>
             </div>

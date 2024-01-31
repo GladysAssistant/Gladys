@@ -30,7 +30,19 @@ const TOPICS = {
   KEYPAD_BATTERY_CRITICAL: 'keypadBatteryCritical',
 };
 
-
+const LOCK_STATES = {
+  0: 'uncalibrated',
+  1: 'locked',
+  2: 'unlocking',
+  3: 'unlocked',
+  4: 'locking',
+  5: 'unlatched',
+  6: 'unlocked (lock ‘n’ go)',
+  7: 'unlatching opening',
+  253: 'boot run',
+  254: 'motor blocked',
+  255: 'undefined'
+};
 
 const DISCOVERY_TOPIC = 'homeassistant/#'; // this TOPIC is hardcoded in Nuki ...
 
@@ -42,5 +54,6 @@ module.exports = {
   DEVICE_PARAM_NAME,
   DEVICE_PARAM_VALUE,
   DISCOVERY_TOPIC,
-  TOPICS
+  TOPICS,
+  LOCK_STATES
 };

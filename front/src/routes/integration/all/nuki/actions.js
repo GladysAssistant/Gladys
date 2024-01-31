@@ -25,6 +25,29 @@ function createActions(store) {
         });
       }
     },
+    async getNukiDevices(state) {
+      store.setState({
+        getNukiStatus: RequestStatus.Getting
+      });
+      try {
+        const options = {
+          order_dir: state.getNukiOrderDir || 'asc'
+        };
+        if (state.nukiSearch && state.nukiSearch.length) {
+          options.search = state.nukiSearch;
+        }
+
+        const nukiDevices = await state.httpClient.get('/api/v1/service/nuki/device', options);
+        store.setState({
+          nukiDevices,
+          getNukiStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          getNukiStatus: e.message
+        });
+      }
+    },
     updateConfiguration(state, e) {
       const data = {};
       data[e.target.name] = e.target.value;
@@ -82,6 +105,26 @@ function createActions(store) {
         });
       }
     },
+    async getDiscoveredNukiDevices(state, type) {
+      store.setState({
+        loading: true
+      });
+      try {
+        // const discoveredDevices = await state.httpClient.get(`/api/v1/service/nuki/discover/${type}`);
+        const discoveredDevices = [];
+        store.setState({
+          discoveredDevices,
+          loading: false,
+          errorLoading: false
+        });
+      } catch (e) {
+        store.setState({
+          discoveredDevices: undefined,
+          loading: false,
+          errorLoading: true
+        });
+      }
+    },
     displayConnectedMessage() {
       // display 3 seconds a message "Nuki connected"
       store.setState({
@@ -102,6 +145,115 @@ function createActions(store) {
         nukiConnected: false,
         nukiConnectionStatus: undefined,
         nukiConnectionError: error
+      });
+    },
+    async getHouses(state) {
+      store.setState({
+        housesGetStatus: RequestStatus.Getting
+      });
+      try {
+        const params = {
+          expand: 'rooms'
+        };
+        const housesWithRooms = await state.httpClient.get(`/api/v1/house`, params);
+        store.setState({
+          housesWithRooms,
+          housesGetStatus: RequestStatus.Success
+        });
+      } catch (e) {
+        store.setState({
+          housesGetStatus: RequestStatus.Error
+        });
+      }
+    },
+    updateDeviceField(state, listName, index, field, value) {
+      const devices = update(state[listName], {
+        [index]: {
+          [field]: {
+            $set: value
+          }
+        }
+      });
+      store.setState({
+        [listName]: devices
+      });
+    },
+    async saveDevice(state, listName, index) {
+      const device = state[listName][index];
+      const savedDevice = await state.httpClient.post(`/api/v1/device`, device);
+      const devices = update(state[listName], {
+        $splice: [[index, 1, savedDevice]]
+      });
+      store.setState({
+        [listName]: devices
+      });
+    },
+    async deleteDevice(state, index) {
+      const device = state.nukiDevices[index];
+      if (device.created_at) {
+        await state.httpClient.delete(`/api/v1/device/${device.selector}`);
+      }
+      const nukiDevices = update(state.nukiDevices, {
+        $splice: [[index, 1]]
+      });
+      store.setState({
+        nukiDevices
+      });
+    },
+    async search(state, e) {
+      store.setState({
+        nukiSearch: e.target.value
+      });
+      await actions.getNukiDevices(store.getState());
+    },
+    async changeOrderDir(state, e) {
+      store.setState({
+        getNukiOrderDir: e.target.value
+      });
+      await actions.getNukiDevices(store.getState());
+    },
+    async searchDevices(state, type, options = undefined) {
+      store.setState({
+        loading: true
+      });
+      try {
+        await state.httpClient.post(`/api/v1/service/nuki/discover/${type}`, options);
+        store.setState({
+          discoveredDevices: [],
+          errorLoading: false
+        });
+
+        setTimeout(store.setState, 5000, {
+          loading: false
+        });
+      } catch (e) {
+        store.setState({
+          loading: false,
+          errorLoading: true
+        });
+      }
+    },
+    addDiscoveredDevice(state, newDevice) {
+      const existingDevices = state.discoveredDevices || [];
+      const newDevices = [];
+
+      let added = false;
+      existingDevices.forEach(device => {
+        if (device.external_id === newDevice.external_id) {
+          newDevices.push(newDevice);
+          added = true;
+        } else {
+          newDevices.push(device);
+        }
+      });
+
+      if (!added) {
+        newDevices.push(newDevice);
+      }
+
+      store.setState({
+        discoveredDevices: newDevices,
+        loading: false
       });
     }
   };

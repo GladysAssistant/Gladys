@@ -12,10 +12,13 @@ const { getHandler } = require('./config/nuki.getHandler');
 
 const { scan } = require('./device/nuki.scan');
 const { getDiscoveredDevices } = require('./device/nuki.getDiscoveredDevices');
+const { getProtocolFromDevice} = require('./device/nuki.getProtocolFromDevice');
 const { setValue } = require('./device/nuki.setValue');
 const { mergeWithExistingDevice } = require('./device/nuki.mergeWithExistingDevice');
 const { notifyNewDevice } = require('./device/nuki.notifyNewDevice');
 const { poll } = require('./device/nuki.poll');
+const { postCreate } = require('./device/nuki.postCreate');
+const { postDelete } = require('./device/nuki.postDelete');
 
 const nukiHandler = function NukiHandler(gladys, serviceId) {
   this.gladys = gladys;
@@ -43,7 +46,9 @@ nukiHandler.prototype.setValue = setValue;
 nukiHandler.prototype.mergeWithExistingDevice = mergeWithExistingDevice;
 nukiHandler.prototype.notifyNewDevice = notifyNewDevice;
 nukiHandler.prototype.poll = poll;
-// nukiHandler.prototype.getProtocolFromDevice = getProtocolFromDevice;
+nukiHandler.prototype.getProtocolFromDevice = getProtocolFromDevice;
+nukiHandler.prototype.postCreate = postCreate;
+nukiHandler.prototype.postDelete = postDelete;
 
 
 module.exports =  nukiHandler;

@@ -2,11 +2,14 @@ import { Component } from 'preact';
 import { connect } from 'unistore/preact';
 import actions from './actions';
 import NukiPage from './NukiPage';
+import DeviceTab from './device-page/DeviceTab';
 import { WEBSOCKET_MESSAGE_TYPES } from '../../../../../../server/utils/constants';
 
 class NukiIntegration extends Component {
   componentWillMount() {
     this.props.getIntegrationByName('nuki');
+    this.props.getNukiDevices();
+    this.props.getHouses();
     this.props.loadProps();
     this.props.session.dispatcher.addListener(
       WEBSOCKET_MESSAGE_TYPES.NUKI.CONNECTED,
@@ -26,13 +29,13 @@ class NukiIntegration extends Component {
   render(props, {}) {
     return (
       <NukiPage>
-        <div>Hey</div>
+        <DeviceTab {...props} />
       </NukiPage>
     );
   }
 }
 
 export default connect(
-  'user,session,nukiUsername,nukiPassword,nukiConnectionStatus,nukiConnected,nukiConnectionError',
+  'user,session,nukiUsername,nukiPassword,nukiConnectionStatus,nukiConnected,nukiConnectionError,nukiDevices,housesWithRooms,getNukiStatus,nukiSearch,getNukiOrderDir',
   actions
 )(NukiIntegration);

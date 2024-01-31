@@ -1,7 +1,6 @@
 const logger = require('../../../../utils/logger');
 const { addSelector } = require('../../../../utils/addSelector');
 const { DEVICE_PARAM_NAME, DEVICE_PARAM_VALUE } = require('../utils/nuki.constants');
-const { EVENTS } = require('../../../../utils/constants');
 
 const {
   DEVICE_FEATURE_CATEGORIES,
@@ -12,11 +11,13 @@ const {
 
 /**
  * @description Discover Nuki devices through MQTT.
+ * @param {string} message - MQTT message.
+ * @returns {object} Returns Gladys device.
  * @example
- * nuki.convertToDevice();
+ * nukiMQTTHandler.convertToDevice();
  */
-async function convertToDevice(message) {
-  /*
+function convertToDevice(message) {
+  /* Sample message
   {"~":"nuki/398172F4",
    "avty_t":"~/connected",
    "pl_avail":"true", 
@@ -31,7 +32,6 @@ async function convertToDevice(message) {
     "cmd_t":"~/lockAction",
     "pl_prs":"5"}
   */
-  // Subscribe to Tasmota
   const config = JSON.parse(message);
 
   const deviceExternalId = config.dev.ids.replace(/[\[\]']+/g,'');
@@ -61,8 +61,8 @@ async function convertToDevice(message) {
   // battery
   device.features.push({
     name: 'battery',
-    selector: `nuki:${externalId}:battery`,
-    external_id: `nuki:${externalId}:battery`,
+    selector: `${externalId}:battery`,
+    external_id: `${externalId}:battery`,
     category: DEVICE_FEATURE_CATEGORIES.BATTERY,
     type: DEVICE_FEATURE_TYPES.LOCK.INTEGER,
     unit: DEVICE_FEATURE_UNITS.PERCENT,
@@ -76,8 +76,8 @@ async function convertToDevice(message) {
   // lock button
   device.features.push({
     name: 'lock',
-    selector: `nuki:${externalId}:button`,
-    external_id: `nuki:${externalId}:button`,
+    selector: `${externalId}:button`,
+    external_id: `${externalId}:button`,
     category: DEVICE_FEATURE_CATEGORIES.LOCK,
     type: DEVICE_FEATURE_TYPES.LOCK.BINARY,
     read_only: false,
@@ -85,6 +85,20 @@ async function convertToDevice(message) {
     has_feedback: true,
     min: 0,
     max: 1,
+  });
+
+  // lock button
+  device.features.push({
+    name: 'lock-state',
+    selector: `${externalId}:state`,
+    external_id: `${externalId}:state`,
+    category: DEVICE_FEATURE_CATEGORIES.LOCK,
+    type: DEVICE_FEATURE_TYPES.LOCK.STATE,
+    read_only: true,
+    keep_history: true,
+    has_feedback: true,
+    min: 0,
+    max: 255,
   });
 
   return device;
