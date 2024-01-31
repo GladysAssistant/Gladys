@@ -251,6 +251,7 @@
       "devices": "Geräte",
       "chart": "Diagramm",
       "ecowatt": "Ecowatt (Frankreich)",
+      "vacbot": "Vakuumroboter",
       "clock": "Uhr",
       "scene": "Szene",
       "music": "Musik"
@@ -361,6 +362,12 @@
         "ok": "Netz in Ordnung",
         "warning": "Netzwarnung",
         "critical": "Netz kritisch"
+      },
+      "vacbot": {
+        "editVacbotLabel": "Select the vacbot you want to display here.",
+        "editBoxNameLabel": "Enter the name you want to give to the box:",
+        "editBoxNamePlaceholder": "Name of the box",
+        "noVacbotInfo": "Impossible to get the vacbot information."
       },
       "clock": {
         "analog": "Analog",
@@ -643,6 +650,64 @@
         "defaultError": "Beim Sichern des Geräts ist ein Fehler aufgetreten.",
         "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten.",
         "conflictError": "Das aktuelle Topic wird bereits verwendet."
+      }
+    },
+    "ecovacs": {
+      "title": "Ecovacs Deebot",
+      "description": "Steuern Sie Ihre Saugroboter.",
+      "deviceTab": "Geräte",
+      "discoverTab": "Entdecken Sie Ecovacs",
+      "setupTab": "Setup",
+      "discoverDeviceDescr": "Ecovacs-Geräte automatisch scannen",
+      "nameLabel": "Gerätename",
+      "namePlaceholder": "Geben Sie den Namen Ihres Geräts ein",
+      "modelLabel": "Modell",
+      "roomLabel": "Zimmer",
+      "saveButton": "Save",
+      "updateButton": "Update",
+      "alreadyCreatedButton": "Bereits erstellt",
+      "deleteButton": "Löschen",
+      "unmanagedModelButton": "Modell nicht verwaltet oder verfügbar",
+      "status": {
+        "notConnected": "Gladys konnte keine Verbindung zum Ecovacs-Cloud-Konto herstellen, gehen Sie bitte zu ",
+        "setupPageLink": "Ecovacs-Konfigurationsseite.",
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "device": {
+        "title": "Geräte in Gladys",
+        "search": "Geräte suchen",
+        "updates": "Auf updates prüfen",
+        "editButton": "Bearbeiten",
+        "noDeviceFound": "Kein Ecovacs-Gerät gefunden.",
+        "featuresLabel": "Merkmale"
+      },
+      "discover": {
+        "title": "Auf Ihrem Ecovacs-Cloud-Konto erkannte Geräte",
+        "description": "Ecovacs-Geräte werden automatisch erkannt. Ihre Ecovacs-Geräte müssen zuvor zu Ihrem Ecovacs-Cloud-Konto hinzugefügt werden.",
+        "error": "Fehler beim Erkennen von Ecovacs-Geräten. Bitte überprüfen Sie Ihre Anmeldeinformationen beim Setup.",
+        "noDeviceFound": "Kein Ecovacs-Gerät entdeckt.",
+        "scan": "Scan"
+      },
+      "setup": {
+        "title": "Ecovacs configuration",
+        "ecovacsDescription": "Sie können Gladys mit Ihrem Ecovacs-Cloud-Konto verbinden, um die zugehörigen Geräte zu steuern.",
+        "userLabel": "Nutzername",
+        "userPlaceholder": "Geben Sie den Ecovacs-Benutzernamen ein",
+        "countryCodeLabel": "Landesvorwahl",
+        "countryPlaceholder": "Geben Sie Ihre Landesvorwahl ein (z. B. de)",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "Geben Sie das Ecovacs-Passwort ein",
+        "saveLabel": "Konfiguration speichern",
+        "error": "Beim Speichern der Konfiguration ist ein Fehler aufgetreten.",
+        "connecting": "Konfiguration gespeichert. Stellen Sie jetzt eine Verbindung zu Ihrem Ecovacs-Cloud-Konto her ...",
+        "connected": "Mit Erfolg mit dem Ecovacs-Cloud-Konto verbunden!",
+        "connectionError": "Beim Verbindungsaufbau ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Konfiguration."
+      },
+      "error": {
+        "defaultError": "Beim Speichern des Geräts ist ein Fehler aufgetreten.",
+        "defaultDeletionError": "Beim Löschen des Geräts ist ein Fehler aufgetreten.",
+        "conflictError": "Aktuelles Gerät ist bereits bei Gladys."
       }
     },
     "tpLink": {
@@ -1320,6 +1385,13 @@
               "none": "Stopo",
               "one": "Öffnen",
               "other": "Schließen"
+            }
+          },
+          "vacbot": {
+            "state": {
+              "none": "Pause",
+              "one": "Clean",
+              "other": "Stop"
             }
           },
           "television": {
@@ -2564,6 +2636,14 @@
           "other": "Schließen"
         }
       },
+      "vacbot": {
+        "state": {
+          "pause": "Pause",
+          "clean": "Clean",
+          "stop": "Stop",
+          "charge": "Charge"
+        }
+      },
       "air-conditioning": {
         "mode": {
           "auto": "Automatisch",
@@ -2909,6 +2989,17 @@
       "shortCategoryName": "Vorhang",
       "state": "Vorhang: Zustand",
       "position": "Vorhang: Position"
+    },
+    "vacbot": {
+      "shortCategoryName": "Vacbot",
+      "state": "Vacbot state",
+      "integer": "Batterie Level",
+      "binary": "Power",
+      "map": "Standort",
+      "clean": "Clean",
+      "pause": "Pause",
+      "stop": "Stop",
+      "charge": "Kehren Sie zur Ladestation zurück"
     },
     "data": {
       "shortCategoryName": "Daten",
