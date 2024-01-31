@@ -156,10 +156,7 @@ const data = {
         {
           type: 'devices-in-room',
           room: 'living-room',
-          device_features: [
-            'main-vacbot-binary',
-            'main-vacbot-battery'
-          ]
+          device_features: ['main-vacbot-binary', 'main-vacbot-battery']
         }
       ],
       [
@@ -3067,7 +3064,7 @@ const data = {
           last_value_changed: '2023-02-08 14:49:07.556 +00:00'
         }
       ]
-    },
+    }
   ],
   'get /api/v1/service/xiaomi': {
     id: '70cb1e17-3b17-4886-83ab-45b00a9e03b1',
@@ -3721,7 +3718,7 @@ const data = {
           keep_history: false,
           has_feedback: true,
           min: 0,
-          max: 1,
+          max: 1
         },
         {
           name: 'battery',
@@ -3734,8 +3731,8 @@ const data = {
           keep_history: true,
           has_feedback: true,
           min: 0,
-          max: 100,
-        },
+          max: 100
+        }
       ],
       params: []
     }
@@ -3763,7 +3760,7 @@ const data = {
         keep_history: false,
         has_feedback: true,
         min: 0,
-        max: 1,
+        max: 1
       },
       {
         name: 'battery',
@@ -3778,7 +3775,7 @@ const data = {
         min: 0,
         max: 100,
         last_value: '92'
-      },
+      }
     ],
     room: {
       id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
