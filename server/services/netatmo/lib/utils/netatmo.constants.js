@@ -75,6 +75,7 @@ const SUPPORTED_MODULE_TYPE = {
   THERMOSTAT: 'NATherm1',
   PLUG: 'NAPlug',
   NAMAIN: 'NAMain',
+  NAMODULE4: 'NAModule4',
 };
 
 const PARAMS = {
