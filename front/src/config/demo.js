@@ -134,7 +134,8 @@ const data = {
         },
         {
           type: 'vacbot',
-          device_feature: 'ecovacs:5c19a8f3a1e6ee0001782247:0'
+          device_feature: 'ecovacs:5c19a8f3a1e6ee0001782247:0',
+          title: 'Ultron'
         }
       ],
       [
@@ -156,15 +157,8 @@ const data = {
           type: 'devices-in-room',
           room: 'living-room',
           device_features: [
-            'main-tv-binary',
-            'main-tv-volume',
-            'main-tv-channel',
-            'main-presence-sensor',
-            'main-signal-sensor',
             'main-vacbot-binary',
-            'main-vacbot-battery',
-            'air-conditioning',
-            'button-click'
+            'main-vacbot-battery'
           ]
         }
       ],
@@ -744,7 +738,7 @@ const data = {
       },
       {
         id: '28e8ad03-70a8-431f-93cb-df916019c509',
-        name: 'DEEBOT OZMO 920 Series aka ULTRON',
+        name: 'DEEBOT ULTRON',
         selector: 'main-vacbot',
         features: [
           {
@@ -2676,7 +2670,7 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/device?device_feature_selectors=main-tv-binary,main-tv-volume,main-tv-channel,main-presence-sensor,main-signal-sensor,air-conditioning,button-click': [
+  'get /api/v1/device?device_feature_selectors=main-lamp-binary,tv-lamp-binary,tv-lamp-color,tv-lamp-brightness,mqtt-living-room-switch,mqtt-living-room-dimmer,mqtt-living-room-temp,co-living-room': [
     {
       id: '20deebe6-57df-4940-afd1-11c189a407c2',
       name: 'TV',
@@ -3041,250 +3035,39 @@ const data = {
       ]
     }
   ],
-  'get /api/v1/device?device_feature_selectors=main-lamp-binary,tv-lamp-binary,tv-lamp-color,tv-lamp-brightness,mqtt-living-room-switch,mqtt-living-room-dimmer,mqtt-living-room-temp,co-living-room': [
+  'get /api/v1/device?device_feature_selectors=main-vacbot-binary,main-vacbot-battery': [
     {
-      id: '20deebe6-57df-4940-afd1-11c189a407c2',
-      name: 'TV',
-      selector: 'main-tv',
+      id: '28e8ad03-70a8-431f-93cb-df916019c509',
+      name: 'DEEBOT ULTRON 920',
+      selector: 'main-vacbot',
       features: [
         {
-          name: 'TV power',
-          selector: 'main-tv-binary',
-          category: 'television',
-          type: 'binary',
-          min: 0,
-          max: 1,
+          name: 'power',
+          selector: 'main-vacbot-binary',
+          category: 'vacbot',
+          type: 'state',
           read_only: false,
-          last_value: 1,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        },
-        {
-          name: 'TV Volume',
-          selector: 'main-tv-volume',
-          category: 'television',
-          type: 'volume',
+          keep_history: false,
+          has_feedback: true,
           min: 0,
-          max: 20,
-          read_only: false,
-          last_value: 7,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          max: 1
         },
         {
-          name: 'TV Channel',
-          selector: 'main-tv-channel',
-          category: 'television',
-          type: 'channel',
-          min: 0,
-          max: 99,
-          read_only: false,
-          last_value: 22,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        },
-        {
-          name: 'Presence',
-          selector: 'main-presence-sensor',
-          category: 'presence-sensor',
-          type: 'push',
-          unit: null,
-          min: 0,
-          max: 1,
-          read_only: true,
-          last_value: 0,
-          last_value_changed: dayjs().add(60, 'second')
-        },
-        {
-          name: 'Signal quality',
-          selector: 'main-signal-sensor',
-          category: 'signal',
+          name: 'Vacbot battery',
+          selector: `main-vacbot-battery`,
+          category: 'battery',
           type: 'integer',
-          unit: null,
-          min: 0,
-          max: 5,
+          unit: 'percent',
           read_only: true,
-          last_value: 4,
-          last_value_changed: dayjs().add(60, 'second')
-        },
-        {
-          name: 'Button',
-          selector: 'button-click',
-          category: 'button',
-          type: 'click',
-          min: 0,
-          max: 6,
-          read_only: true,
-          last_value: 1,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        }
-      ]
-    },
-    {
-      id: 'e9cc8a96-56b8-41b6-ba99-4c200272abf6',
-      name: 'Main sensors',
-      selector: 'main-sensors',
-      features: [
-        {
-          name: 'CO',
-          selector: 'co-living-room',
-          category: 'co-sensor',
-          type: 'binary',
-          min: 0,
-          max: 1,
-          read_only: true,
-          last_value: 1,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        }
-      ]
-    },
-    {
-      id: 'b32daa9a-8f77-4394-b4f3-ffea215062d2',
-      name: 'Main Lamp',
-      selector: 'main-lamp',
-      features: [
-        {
-          name: 'First lamp',
-          selector: 'main-lamp-binary',
-          category: 'light',
-          type: 'binary',
-          min: 0,
-          max: 1,
-          read_only: false,
-          last_value: 1,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        },
-        {
-          name: 'Second lamp ',
-          selector: 'secondary-lamp-binary',
-          category: 'light',
-          type: 'binary',
-          min: 0,
-          max: 1,
-          read_only: false,
-          last_value: 1,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        },
-        {
-          name: 'TV Lamp color',
-          selector: 'tv-lamp-color',
-          category: 'light',
-          type: 'color',
-          min: 0,
-          max: 16777215,
-          read_only: false,
-          last_value: 65000,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        },
-        {
-          name: 'TV Lamp brightness',
-          selector: 'tv-lamp-brightness',
-          category: 'light',
-          type: 'brightness',
+          keep_history: true,
+          has_feedback: true,
           min: 0,
           max: 100,
-          read_only: false,
-          last_value: 55,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
+          last_value: 81,
+          last_value_changed: '2023-02-08 14:49:07.556 +00:00'
         }
       ]
     },
-    {
-      id: 'b32daa9a-8f77-4394-b4f3-ffea215062d2',
-      name: 'TV Lamp',
-      selector: 'tv-lamp',
-      features: [
-        {
-          name: 'TV Lamp feature',
-          selector: 'tv-lamp-binary',
-          category: 'light',
-          type: 'binary',
-          min: 0,
-          max: 1,
-          read_only: false,
-          last_value: 1,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        }
-      ]
-    },
-    {
-      id: 'adefb484-223e-478a-8330-8fb1b3a20920',
-      selector: 'temperature-living-room',
-      features: [
-        {
-          name: 'Temperature',
-          selector: 'temperature-living-room-celsius',
-          category: 'temperature-sensor',
-          type: 'decimal',
-          unit: 'celsius',
-          min: -200,
-          max: 200,
-          read_only: true,
-          last_value: 27,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        }
-      ]
-    },
-    {
-      id: '81d637d2-b7f5-4cc3-a39e-2270fd069ee2',
-      selector: 'mqtt-living-room',
-      name: 'MQTT device',
-      service: {
-        name: 'mqtt'
-      },
-      features: [
-        {
-          name: 'Temperature',
-          selector: 'mqtt-living-room-temp',
-          category: 'temperature-sensor',
-          type: 'decimal',
-          unit: 'celsius',
-          min: -200,
-          max: 200,
-          read_only: true,
-          last_value: 27,
-          last_value_changed: '2019-02-12 07:49:07.556 +00:00'
-        }
-      ]
-    },
-    {
-      id: 'db3e81b6-00d4-4f9b-8aa6-0e50e719a729',
-      name: 'AC Conditioning',
-      selector: 'air-conditioning',
-      features: [
-        {
-          name: 'AC Conditioning',
-          selector: 'air-conditioning',
-          category: 'air-conditioning',
-          type: 'binary',
-          min: 0,
-          max: 1,
-          read_only: false,
-          last_value: 1,
-          last_value_changed: '2022-10-10 07:49:07.556 +00:00'
-        },
-        {
-          name: 'AC Conditioning',
-          selector: 'air-conditioning',
-          category: 'air-conditioning',
-          type: 'mode',
-          min: 0,
-          max: 2,
-          read_only: false,
-          last_value: 1,
-          last_value_changed: '2022-10-10 07:49:07.556 +00:00'
-        },
-        {
-          name: 'AC Conditioning',
-          selector: 'air-conditioning',
-          category: 'air-conditioning',
-          type: 'target-temperature',
-          min: 0,
-          max: 30,
-          read_only: false,
-          last_value: 24,
-          last_value_changed: '2022-10-10 07:49:07.556 +00:00',
-          unit: 'celsius'
-        }
-      ]
-    }
   ],
   'get /api/v1/service/xiaomi': {
     id: '70cb1e17-3b17-4886-83ab-45b00a9e03b1',
@@ -3930,20 +3713,20 @@ const data = {
       features: [
         {
           name: 'power',
-          selector: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0',
-          external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:binary:0',
-          category: 'switch',
-          type: 'binary',
+          selector: 'ecovacs:5c19a8f3a1e6ee0001782247:state:0',
+          external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:state:0',
+          category: 'vacbot',
+          type: 'state',
           read_only: false,
           keep_history: false,
           has_feedback: true,
           min: 0,
-          max: 1
+          max: 1,
         },
         {
           name: 'battery',
-          selector: 'ecovacs:5c19a8f3a1e6ee0001782247:battery:0',
-          external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:battery:0',
+          selector: `ecovacs:5c19a8f3a1e6ee0001782247:battery:0`,
+          external_id: `ecovacs:5c19a8f3a1e6ee0001782247:battery:0`,
           category: 'battery',
           type: 'integer',
           unit: 'percent',
@@ -3951,8 +3734,8 @@ const data = {
           keep_history: true,
           has_feedback: true,
           min: 0,
-          max: 100
-        }
+          max: 100,
+        },
       ],
       params: []
     }
@@ -3971,13 +3754,31 @@ const data = {
     updated_at: '2023-02-08T15:42:42.556Z',
     features: [
       {
-        name: 'Battery',
-        selector: 'test-battery',
-        external_id: 'zwave:1234:temperature',
+        name: 'power',
+        selector: 'ecovacs:5c19a8f3a1e6ee0001782247:state:0',
+        external_id: 'ecovacs:5c19a8f3a1e6ee0001782247:state:0',
+        category: 'vacbot',
+        type: 'state',
+        read_only: false,
+        keep_history: false,
+        has_feedback: true,
+        min: 0,
+        max: 1,
+      },
+      {
+        name: 'battery',
+        selector: `ecovacs:5c19a8f3a1e6ee0001782247:battery:0`,
+        external_id: `ecovacs:5c19a8f3a1e6ee0001782247:battery:0`,
         category: 'battery',
         type: 'integer',
+        unit: 'percent',
+        read_only: true,
+        keep_history: true,
+        has_feedback: true,
+        min: 0,
+        max: 100,
         last_value: '92'
-      }
+      },
     ],
     room: {
       id: 'cecc52c7-3e67-4b75-9b13-9a8867b0443d',
@@ -3988,6 +3789,7 @@ const data = {
   'get /api/v1/service/ecovacs/ecovacs:5c19a8f3a1e6ee0001782247:0/status': {
     name: 'Ultron',
     model: 'DX5G',
+    isOnline: true,
     imageUrl:
       'https://site-static.ecovacs.com/upload/fr/image/product/2022/09/21/051248_2326-DEEBOT-T9AIVI-1280x1280.jpg',
     mainBrush: true,
