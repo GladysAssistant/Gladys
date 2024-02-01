@@ -397,139 +397,139 @@
     ]
   },
   {
-		"name": "Anemometer STARK Home",
-		"external_id": "netatmo:06:00:00:yy:yy:yy",
-		"selector": "netatmo:06:00:00:yy:yy:yy",
-		"model": "NAModule2",
-		"service_id": "serviceId",
-		"should_poll": false,
-		"features": [
-			{
-				"name": "Battery - Anemometer STARK Home",
-				"external_id": "netatmo:06:00:00:yy:yy:yy:battery_percent",
-				"selector": "netatmo:06:00:00:yy:yy:yy:battery_percent",
-				"category": "battery",
-				"type": "integer",
-				"unit": "percent",
-				"read_only": true,
-				"keep_history": true,
-				"has_feedback": false,
-				"min": 0,
-				"max": 100
-			},
-			{
-				"name": "Wind strength - Anemometer STARK Home",
-				"external_id": "netatmo:06:00:00:yy:yy:yy:wind_strength",
-				"selector": "netatmo:06:00:00:yy:yy:yy:wind_strength",
-				"category": "speed-sensor",
-				"type": "integer",
-				"unit": "kilometer-per-hour",
-				"read_only": true,
-				"keep_history": true,
-				"has_feedback": false,
-				"min": 0,
-				"max": 300
-			},
-			{
-				"name": "Wind angle - Anemometer STARK Home",
-				"external_id": "netatmo:06:00:00:yy:yy:yy:wind_angle",
-				"selector": "netatmo:06:00:00:yy:yy:yy:wind_angle",
-				"category": "angle-sensor",
-				"type": "integer",
-				"unit": "degree",
-				"read_only": true,
-				"keep_history": true,
-				"has_feedback": false,
-				"min": 0,
-				"max": 300
-			},
-			{
-				"name": "Gust strength - Anemometer STARK Home",
-				"external_id": "netatmo:06:00:00:yy:yy:yy:wind_gust",
-				"selector": "netatmo:06:00:00:yy:yy:yy:wind_gust",
-				"category": "speed-sensor",
-				"type": "integer",
-				"unit": "kilometer-per-hour",
-				"read_only": true,
-				"keep_history": true,
-				"has_feedback": false,
-				"min": 0,
-				"max": 300
-			},
-			{
-				"name": "Gust angle - Anemometer STARK Home",
-				"external_id": "netatmo:06:00:00:yy:yy:yy:wind_gust_angle",
-				"selector": "netatmo:06:00:00:yy:yy:yy:wind_gust_angle",
-				"category": "angle-sensor",
-				"type": "integer",
-				"unit": "degree",
-				"read_only": true,
-				"keep_history": true,
-				"has_feedback": false,
-				"min": 0,
-				"max": 300
-			},
-			{
-				"name": "Maximum wind strength - Anemometer STARK Home",
-				"external_id": "netatmo:06:00:00:yy:yy:yy:max_wind_str",
-				"selector": "netatmo:06:00:00:yy:yy:yy:max_wind_str",
-				"category": "speed-sensor",
-				"type": "integer",
-				"unit": "kilometer-per-hour",
-				"read_only": true,
-				"keep_history": true,
-				"has_feedback": false,
-				"min": 0,
-				"max": 300
-			},
-			{
-				"name": "Maximum wind angle - Anemometer STARK Home",
-				"external_id": "netatmo:06:00:00:yy:yy:yy:max_wind_angle",
-				"selector": "netatmo:06:00:00:yy:yy:yy:max_wind_angle",
-				"category": "angle-sensor",
-				"type": "integer",
-				"unit": "degree",
-				"read_only": true,
-				"keep_history": true,
-				"has_feedback": false,
-				"min": 0,
-				"max": 300
-			},
-			{
-				"name": "Link RF quality - Anemometer STARK Home",
-				"external_id": "netatmo:06:00:00:yy:yy:yy:rf_strength",
-				"selector": "netatmo:06:00:00:yy:yy:yy:rf_strength",
-				"category": "signal",
-				"type": "integer",
-				"read_only": true,
-				"keep_history": true,
-				"has_feedback": false,
-				"min": 0,
-				"max": 100
-			}
-		],
-		"params": [
-			{
-				"name": "plug_id",
-				"value": "70:ee:50:jj:jj:jj"
-			},
-			{
-				"name": "plug_name",
-				"value": "Weather Station Test"
-			},
-			{
-				"name": "home_id",
-				"value": "5e1xxxxxxxxxxxxxxxxx"
-			},
-			{
-				"name": "room_id",
-				"value": "8765432109"
-			},
-			{
-				"name": "room_name",
-				"value": "Outdoor"
-			}
-		]
+    "name": "Anemometer STARK Home",
+    "external_id": "netatmo:06:00:00:yy:yy:yy",
+    "selector": "netatmo:06:00:00:yy:yy:yy",
+    "model": "NAModule2",
+    "service_id": "serviceId",
+    "should_poll": false,
+    "features": [
+      {
+        "name": "Battery - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:battery_percent",
+        "selector": "netatmo:06:00:00:yy:yy:yy:battery_percent",
+        "category": "battery",
+        "type": "integer",
+        "unit": "percent",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      },
+      {
+        "name": "Wind strength - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:wind_strength",
+        "selector": "netatmo:06:00:00:yy:yy:yy:wind_strength",
+        "category": "speed-sensor",
+        "type": "integer",
+        "unit": "kilometer-per-hour",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Wind angle - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:wind_angle",
+        "selector": "netatmo:06:00:00:yy:yy:yy:wind_angle",
+        "category": "angle-sensor",
+        "type": "integer",
+        "unit": "degree",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Gust strength - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:wind_gust",
+        "selector": "netatmo:06:00:00:yy:yy:yy:wind_gust",
+        "category": "speed-sensor",
+        "type": "integer",
+        "unit": "kilometer-per-hour",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Gust angle - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:wind_gust_angle",
+        "selector": "netatmo:06:00:00:yy:yy:yy:wind_gust_angle",
+        "category": "angle-sensor",
+        "type": "integer",
+        "unit": "degree",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Maximum wind strength - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:max_wind_str",
+        "selector": "netatmo:06:00:00:yy:yy:yy:max_wind_str",
+        "category": "speed-sensor",
+        "type": "integer",
+        "unit": "kilometer-per-hour",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Maximum wind angle - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:max_wind_angle",
+        "selector": "netatmo:06:00:00:yy:yy:yy:max_wind_angle",
+        "category": "angle-sensor",
+        "type": "integer",
+        "unit": "degree",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 300
+      },
+      {
+        "name": "Link RF quality - Anemometer STARK Home",
+        "external_id": "netatmo:06:00:00:yy:yy:yy:rf_strength",
+        "selector": "netatmo:06:00:00:yy:yy:yy:rf_strength",
+        "category": "signal",
+        "type": "integer",
+        "read_only": true,
+        "keep_history": true,
+        "has_feedback": false,
+        "min": 0,
+        "max": 100
+      }
+    ],
+    "params": [
+      {
+        "name": "plug_id",
+        "value": "70:ee:50:jj:jj:jj"
+      },
+      {
+        "name": "plug_name",
+        "value": "Weather Station Test"
+      },
+      {
+        "name": "home_id",
+        "value": "5e1xxxxxxxxxxxxxxxxx"
+      },
+      {
+        "name": "room_id",
+        "value": "8765432109"
+      },
+      {
+        "name": "room_name",
+        "value": "Outdoor"
+      }
+    ]
   },
   {
     "name": "Outdoor Parking Camera",

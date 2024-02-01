@@ -157,5 +157,5 @@ module.exports = {
   buildFeatureNoise,
   buildFeaturePressure,
   buildFeatureWindStrength,
-  buildFeatureWindAngle
+  buildFeatureWindAngle,
 };

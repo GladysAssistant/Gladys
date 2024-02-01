@@ -75,7 +75,8 @@ describe('Netatmo device mapping', () => {
     it('should correctly transform SPEED_SENSOR.INTEGER value from Netatmo to Gladys', () => {
       const valueFromDevice = 10;
       const valueFromDeviceFloat = 10.5;
-      const mappingFunction = readValues[DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR][DEVICE_FEATURE_TYPES.SPEED_SENSOR.INTEGER];
+      const mappingFunction =
+        readValues[DEVICE_FEATURE_CATEGORIES.SPEED_SENSOR][DEVICE_FEATURE_TYPES.SPEED_SENSOR.INTEGER];
 
       expect(mappingFunction(valueFromDevice)).to.equal(10);
       expect(mappingFunction(valueFromDeviceFloat)).to.equal(10);
