@@ -105,7 +105,8 @@ function buildFeaturePressure(name, externalId, featureName) {
  * @description Transforms Netatmo feature as Gladys feature. Precipitation per hour and sum of the day.
  * @param {string} name - Name device from Netatmo.
  * @param {string} externalId - Gladys external ID.
- * @param {string} featureName - Gladys external ID.
+ * @param {string} featureName - Gladys feature constructor.
+ * @param {string} unit - Gladys unit.
  * @returns {object} Gladys feature or undefined.
  * @example
  * buildFeatureRain(device_name, 'netatmo:device_id', 'rain', 'mm');
@@ -131,5 +132,5 @@ module.exports = {
   buildFeatureHumidity,
   buildFeatureNoise,
   buildFeaturePressure,
-  buildFeatureRain
+  buildFeatureRain,
 };

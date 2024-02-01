@@ -86,8 +86,22 @@ function convertDevice(netatmoDevice) {
       features.push(buildFeatureBattery(name, externalId));
       /* features specific Netatmo Weather */
       features.push(buildFeatureRain(`Current rain - ${name}`, externalId, 'rain', DEVICE_FEATURE_UNITS.MM));
-      features.push(buildFeatureRain(`Precipitation / 1h - ${name}`, externalId, 'sum_rain_1', DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR));
-      features.push(buildFeatureRain(`Sum rain / 24h - ${name}`, externalId, 'sum_rain_24', DEVICE_FEATURE_UNITS.MILLIMETER_PER_DAY));
+      features.push(
+        buildFeatureRain(
+          `Precipitation / 1h - ${name}`,
+          externalId,
+          'sum_rain_1',
+          DEVICE_FEATURE_UNITS.MILLIMETER_PER_HOUR,
+        ),
+      );
+      features.push(
+        buildFeatureRain(
+          `Sum rain / 24h - ${name}`,
+          externalId,
+          'sum_rain_24',
+          DEVICE_FEATURE_UNITS.MILLIMETER_PER_DAY,
+        ),
+      );
       /* features common modules RF */
       features.push(buildFeatureRfStrength(name, externalId));
       /* params */

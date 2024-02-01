@@ -250,9 +250,7 @@
     "_id": "05:00:00:yy:yy:yy",
     "module_name": "STARK House Rain Gauge",
     "last_setup": 1605604312,
-    "data_type": [
-      "Rain"
-    ],
+    "data_type": ["Rain"],
     "place": {
       "altitude": 50,
       "city": "Ville Test",
@@ -278,12 +276,7 @@
       "id": "8765432109",
       "name": "Outdoor",
       "type": "outdoor",
-      "module_ids": [
-        "70:ee:50:ii:ii:ii",
-        "70:ee:50:jj:jj:jj",
-        "70:ee:50:kk:kk:kk",
-        "09:00:00:ll:ll:ll"
-      ],
+      "module_ids": ["70:ee:50:ii:ii:ii", "70:ee:50:jj:jj:jj", "70:ee:50:kk:kk:kk", "09:00:00:ll:ll:ll"],
       "reachable": true,
       "anticipating": false,
       "heating_power_request": 0,
@@ -299,12 +292,7 @@
       "name": "Weather Station Test",
       "setup_date": 1605564990,
       "room_id": "8765432109",
-      "modules_bridged": [
-        "02:00:00:yy:yy:yy",
-        "05:00:00:yy:yy:yy",
-        "06:00:00:yy:yy:yy",
-        "03:00:00:yy:yy:yy"
-      ],
+      "modules_bridged": ["02:00:00:yy:yy:yy", "05:00:00:yy:yy:yy", "06:00:00:yy:yy:yy", "03:00:00:yy:yy:yy"],
       "firmware_revision": 202,
       "wifi_state": "full",
       "wifi_strength": 39,
@@ -325,13 +313,7 @@
       "wifi_status": 40,
       "reachable": true,
       "co2_calibrating": false,
-      "data_type": [
-        "Temperature",
-        "CO2",
-        "Humidity",
-        "Noise",
-        "Pressure"
-      ],
+      "data_type": ["Temperature", "CO2", "Humidity", "Noise", "Pressure"],
       "place": {
         "altitude": 50,
         "city": "Ville Test",
